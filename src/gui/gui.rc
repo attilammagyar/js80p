@@ -1,0 +1,8 @@
+ABOUT BITMAP "resources/about.bmp"
+CONTROLLERS BITMAP "resources/controllers.bmp"
+EFFECTS BITMAP "resources/effects.bmp"
+ENVELOPES BITMAP "resources/envelopes.bmp"
+KNOBSTATES BITMAP "resources/knob_states.bmp"
+KNOBSTATESINACTIVE BITMAP "resources/knob_states_inactive.bmp"
+LFOS BITMAP "resources/lfos.bmp"
+SYNTH BITMAP "resources/synth.bmp"
