@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>JS80P</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="description" content="A MIDI driven, performance oriented, versatile synthesizer plugin." />
+
+  <meta name="twitter:card" content="summary" />
+  <meta property="og:title" content="JS80P" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://attilammagyar.github.io/js80p" />
+  <meta property="og:image" content="https://attilammagyar.github.io/js80p/js80p.png" />
+  <meta property="og:image:alt" content="Screenshot of the JS80P software synthesizer" />
+  <meta property="og:image:width" content="980" />
+  <meta property="og:image:height" content="600" />
+  <meta property="og:description" content="A MIDI driven, performance oriented, versatile synthesizer plugin." />
+
+<style>
+html, body {
+  background: #151520;
+  color: #b8b8c0;
+  font-family: Verdana, Sans-Serif;
+}
+
+body {
+  padding: 5vmin;
+}
+
+a {
+  color: #d0d0e8;
+}
+
+h1 {
+  font-size: 4.8vh;
+  font-weight: bold;
+  margin: 1vmin;
+}
+
+h2 {
+  font-size: 3.8vh;
+  font-weight: bold;
+  margin: 2vmin;
+  margin-top: 5vmin;
+}
+
+#download {
+  margin-bottom: 5vmin;
+  margin-top: 7vmin;
+}
+
+h3 {
+  font-size: 3.2vh;
+  font-weight: normal;
+  margin: 1vmin;
+}
+
+div {
+  font-size: 2.8vh;
+  line-height: 5vh;
+  padding-left: 2vmin;
+  padding-right: 2vmin;
+  max-width: 70vmax;
+  margin: auto;
+  margin-top: 1vmin;
+  margin-bottom: 5vmin;
+}
+
+.center {
+  text-align: center;
+}
+
+a.button {
+  display: inline-block;
+  border-radius: 2vmin;
+  background-color: #b8c0d0;
+  border: outset 0.5vh #b8c0d0;
+  color: #080a10;
+  font-size: 3.2vh;
+  padding: 3vmin;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+video {
+  max-width: 90vmin;
+  max-height: 90vmin;
+  margin: 2vmin;
+}
+
+img.vst {
+  max-width: 474px;
+  max-height: 443px;
+  width: 42vmin;
+}
+
+code {
+  background-color: #08080b;
+  padding: 0.3vmin 0.6vmin;
+  border-radius: 1vmin;
+}
+</style>
+</head>
+<body>
+  <h1 class="center">JS80P</h1>
+  <h3 class="center">A MIDI driven, performance oriented, versatile synthesizer plugin</h3>
+  <div class="center" id="download">
+    <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0/js80p-1_0.zip">Download js80p-1_0.zip (5.0 MB)</a>
+  </div>
+  <h2 class="center">Demos</h2>
+  <div class="center">
+    <video controls>
+      <source src="demo/js80p-demo-1.mp4" type="video/mp4">
+      <source src="demo/js80p-demo-1.webm" type="video/webm">
+        Download demo video:
+        <a href="demo/js80p-demo-1.mp4">MP4</a>
+        <a href="demo/js80p-demo-1.webm">WEBM</a>
+    </video>
+    <br/>
+    <a href="demo/js80p-demo-1.mp3">MP3</a> |
+    <a href="demo/js80p-demo-1.flac">FLAC</a> |
+    <a href="demo/js80p-demo-1.mid">MIDI</a> |
+    <a href="demo/js80p-demo-1.js80p">patch</a>
+  </div>
+  <div class="center">
+    <video controls>
+      <source src="demo/js80p-demo-2.mp4" type="video/mp4">
+      <source src="demo/js80p-demo-2.webm" type="video/webm">
+        Download demo video:
+        <a href="demo/js80p-demo-2.mp4">MP4</a>
+        <a href="demo/js80p-demo-2.webm">WEBM</a>
+    </video>
+    <br/>
+    <a href="demo/js80p-demo-2.mp3">MP3</a> |
+    <a href="demo/js80p-demo-2.flac">FLAC</a> |
+    <a href="demo/js80p-demo-2.mid">MIDI</a> |
+    <a href="demo/js80p-demo-2.js80p">patch</a>
+  </div>
+  <h2 class="center">Source, Bugs, Development</h2>
+  <div class="center">
+    The source code is available at
+    <a href="https://github.com/attilammagyar/js80p">https://github.com/attilammagyar/js80p</a>,
+    <br/>
+    under the terms of the GNU General Public License Version 3.
+  </div>
+  <div class="center">
+    If you find bugs, please report them at
+    <a href="https://github.com/attilammagyar/js80p/issues">https://github.com/attilammagyar/js80p/issues</a>.
+  </div>
+
+  <h2 class="center">System Requirements</h2>
+  <div class="center">
+    <ul>
+      <li>Operating System: Windows 7 or newer</li>
+      <li>CPU: 64 bit, SSE2 support</li>
+      <li>RAM: 50-200 MB, depending on buffer size</li>
+    </ul>
+  </div>
+  <div class="center">
+    <img class="vst" src="vst_compatible.png" alt="JS80P is VST compatible (VST&reg; is a trademark of Steinberg Media Technologies GmbH, registered in Europe and other countries.)" />
+  </div>
+
+  <h2 class="center">Installation</h2>
+  <div class="center">
+    <ol>
+      <li>
+        <a href="releases/js80p-1_0.zip">Download js80p-1_0.zip</a>.
+      </li>
+      <li>Decompress the ZIP file.</li>
+      <li>
+        Move <code>fst/js80p.dll</code> to the folder where you keep your VST 2.4 plugins,
+        <br/>
+        or move <code>vst3/js80p.vst3</code> to your VST 3 folder.
+      </li>
+    </ol>
+  </div>
+  <div class="center">
+    The <code>presets</code> folder in the archive contains a few sounds that you can load by
+    clicking the <em>Import Patch</em> icon near the top left corner of the main screen of
+    the plugin.
+  </div>
+
+  <h2 class="center">Frequenctly Asked Questions</h2>
+  <div class="center">
+    <strong>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</strong>
+    <br/>
+    The reason for JS80P having both kinds of modulation is that they are not
+    always equivalent. They are only identical when the modulator signal is a
+    sinusoid, but with each added harmonic, PM and FM start to differ more and
+    more. A detailed mathematical explanation of this is shown
+    <a href="https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md">here</a>.
+  </div>
+  <div class="center">
+    <strong>Where does the name come from?</strong>
+    <br/>
+    In 2022, I started developing a browser-based synthesizer using the
+    <a href="https://www.w3.org/TR/webaudio/">Web Audio API</a>, mostly being
+    inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80]">Yamaha CS-80</a>.
+    I named that project <a href="https://attilammagyar.github.io/toys/js-80/">JS-80</a>.
+    Then I started adding one little feature and customization option after the
+    other, then it got out of hand, and I also started finding limitations of
+    doing audio in the browser. So I decided to implement a cleaned up version
+    of this synth in C++ as a DAW plugin (with a better waveshaper antialiasing
+    method than what's available in the browser), and so JS80P was born.
+  </div>
+</body>
+</html>
