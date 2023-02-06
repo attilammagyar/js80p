@@ -175,10 +175,12 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
     Sample const folding_times_input_sample = folding * input_sample;
     Sample const delta = folding_times_input_sample - previous_input_sample;
 
-    if (std::fabs(delta) < 0.00000001) {
-        Sample const ret = f(
-            (folding_times_input_sample + previous_input_sample) * 0.5
-        );
+    if (UNLIKELY(std::fabs(delta) < 0.00000001)) {
+        // We're supposed to calculate the average of the current and the
+        // previous input sample here, but since we only do this when their
+        // difference very small or zero, we can probably get away with just
+        // using one of them.
+        Sample const ret = f(folding_times_input_sample);
 
         previous_input_sample = folding_times_input_sample;
         F0_previous_input_sample = F0(folding_times_input_sample);
