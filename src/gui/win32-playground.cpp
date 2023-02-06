@@ -18,7 +18,7 @@
 
 #include <cstdio>
 
-#include "win32.hpp"
+#include "gui/win32.hpp"
 
 
 JS80P::Synth synth;

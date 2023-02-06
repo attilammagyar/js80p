@@ -19,7 +19,7 @@
 #ifndef JS80P__SYNTH__ENVELOPE_CPP
 #define JS80P__SYNTH__ENVELOPE_CPP
 
-#include "envelope.hpp"
+#include "synth/envelope.hpp"
 
 
 namespace JS80P

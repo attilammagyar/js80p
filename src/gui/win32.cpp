@@ -20,9 +20,9 @@
 #include <cstdio>
 #include <cstring>
 
-#include "win32.hpp"
+#include "gui/win32.hpp"
 
-#include "gui.cpp"
+#include "gui/gui.cpp"
 
 
 namespace JS80P {

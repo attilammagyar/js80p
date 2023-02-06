@@ -21,9 +21,9 @@
 
 #include "js80p.hpp"
 
-#include "filter.hpp"
-#include "param.hpp"
-#include "signal_producer.hpp"
+#include "synth/filter.hpp"
+#include "synth/param.hpp"
+#include "synth/signal_producer.hpp"
 
 
 namespace JS80P

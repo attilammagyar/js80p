@@ -21,8 +21,8 @@
 
 #include "js80p.hpp"
 
-#include "param.hpp"
-#include "signal_producer.hpp"
+#include "synth/param.hpp"
+#include "synth/signal_producer.hpp"
 
 
 namespace JS80P

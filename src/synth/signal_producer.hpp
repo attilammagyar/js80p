@@ -23,7 +23,7 @@
 
 #include "js80p.hpp"
 
-#include "queue.hpp"
+#include "synth/queue.hpp"
 
 
 namespace JS80P

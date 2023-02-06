@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "signal_producer.hpp"
+#include "synth/signal_producer.hpp"
 
 
 namespace JS80P

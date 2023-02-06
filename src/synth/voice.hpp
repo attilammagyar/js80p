@@ -24,11 +24,11 @@
 #include "js80p.hpp"
 #include "midi.hpp"
 
-#include "biquad_filter.hpp"
-#include "oscillator.hpp"
-#include "param.hpp"
-#include "signal_producer.hpp"
-#include "wavefolder.hpp"
+#include "synth/biquad_filter.hpp"
+#include "synth/oscillator.hpp"
+#include "synth/param.hpp"
+#include "synth/signal_producer.hpp"
+#include "synth/wavefolder.hpp"
 
 
 namespace JS80P

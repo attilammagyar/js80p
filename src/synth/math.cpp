@@ -19,7 +19,7 @@
 #ifndef JS80P__SYNTH__MATH_CPP
 #define JS80P__SYNTH__MATH_CPP
 
-#include "math.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P

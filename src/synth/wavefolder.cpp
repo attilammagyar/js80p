@@ -21,9 +21,9 @@
 
 #include <cmath>
 
-#include "wavefolder.hpp"
+#include "synth/wavefolder.hpp"
 
-#include "math.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P

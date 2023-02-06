@@ -26,7 +26,7 @@
 #include "js80p.hpp"
 #include "synth.hpp"
 
-#include "gui.hpp"
+#include "gui/gui.hpp"
 
 
 namespace JS80P { namespace Win32GUI

@@ -21,9 +21,9 @@
 
 #include <cmath>
 
-#include "oscillator.hpp"
+#include "synth/oscillator.hpp"
 
-#include "math.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P

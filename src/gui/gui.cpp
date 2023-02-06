@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "gui.hpp"
+#include "gui/gui.hpp"
 
 #include "synth/biquad_filter.hpp"
 #include "synth/oscillator.hpp"

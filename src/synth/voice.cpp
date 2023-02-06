@@ -19,11 +19,9 @@
 #ifndef JS80P__SYNTH__VOICE_CPP
 #define JS80P__SYNTH__VOICE_CPP
 
-#include "debug.hpp"
+#include "synth/voice.hpp"
 
-#include "voice.hpp"
-
-#include "math.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P

@@ -21,9 +21,7 @@
 
 #include <algorithm>
 
-#include "debug.hpp"
-
-#include "param.hpp"
+#include "synth/param.hpp"
 
 
 namespace JS80P

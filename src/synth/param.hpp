@@ -25,9 +25,9 @@
 
 #include "js80p.hpp"
 
-#include "envelope.hpp"
-#include "midi_controller.hpp"
-#include "signal_producer.hpp"
+#include "synth/envelope.hpp"
+#include "synth/midi_controller.hpp"
+#include "synth/signal_producer.hpp"
 
 
 namespace JS80P

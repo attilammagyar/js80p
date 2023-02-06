@@ -21,11 +21,9 @@
 
 #include <cmath>
 
-#include "js80p.hpp"
+#include "synth/biquad_filter.hpp"
 
-#include "biquad_filter.hpp"
-
-#include "math.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P

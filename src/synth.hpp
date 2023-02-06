@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 
-#include "debug.hpp"
 #include "js80p.hpp"
 #include "midi.hpp"
 

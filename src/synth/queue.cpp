@@ -19,7 +19,7 @@
 #ifndef JS80P__SYNTH__QUEUE_CPP
 #define JS80P__SYNTH__QUEUE_CPP
 
-#include "queue.hpp"
+#include "synth/queue.hpp"
 
 
 namespace JS80P

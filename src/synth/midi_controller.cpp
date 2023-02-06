@@ -19,7 +19,7 @@
 #ifndef JS80P__SYNTH__MIDI_CONTROLLER_CPP
 #define JS80P__SYNTH__MIDI_CONTROLLER_CPP
 
-#include "midi_controller.hpp"
+#include "synth/midi_controller.hpp"
 
 
 namespace JS80P
