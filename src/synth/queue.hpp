@@ -36,6 +36,9 @@ class Queue
     public:
         typedef typename std::vector<Item>::size_type SizeType;
 
+        // One shouldn't (re)allocate memory in the audio thread - using a
+        // dynamically growing std::vector here is cheating, but it should
+        // settle after a while.
         static constexpr SizeType RESERVED = 32;
 
         Queue();
