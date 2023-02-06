@@ -70,10 +70,12 @@ void test_filter(
         BiquadFilter<SumOfSines>& filter,
         SumOfSines& input,
         SumOfSines& expected,
-        Number const tolerance
+        Number const tolerance,
+        Integer const rounds = ROUNDS,
+        Integer const sample_count = SAMPLE_COUNT
 ) {
-    Buffer expected_output(SAMPLE_COUNT, CHANNELS);
-    Buffer actual_output(SAMPLE_COUNT, CHANNELS);
+    Buffer expected_output(sample_count, CHANNELS);
+    Buffer actual_output(sample_count, CHANNELS);
 
     filter.set_block_size(BLOCK_SIZE);
     input.set_block_size(BLOCK_SIZE);
@@ -83,15 +85,15 @@ void test_filter(
     input.set_sample_rate(SAMPLE_RATE);
     expected.set_sample_rate(SAMPLE_RATE);
 
-    render_rounds<SumOfSines>(expected, expected_output, ROUNDS);
+    render_rounds<SumOfSines>(expected, expected_output, rounds);
     input.reset();
-    render_rounds< BiquadFilter<SumOfSines> >(filter, actual_output, ROUNDS);
+    render_rounds< BiquadFilter<SumOfSines> >(filter, actual_output, rounds);
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_close(
             expected_output.samples[c],
             actual_output.samples[c],
-            SAMPLE_COUNT,
+            sample_count,
             tolerance,
             "channel=%d",
             (int)c
@@ -561,6 +563,36 @@ TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequenc
     test_filter(filter, input, expected, 0.1);
 
     assert_completed(filter, 2000.0, 0.03, -6.0);
+})
+
+
+TEST(when_no_params_have_envelopes_then_uses_cached_coefficients_within_the_same_group, {
+    SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
+    SumOfSines expected_0(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
+    SumOfSines expected_1(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
+    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilter<SumOfSines> filter_0_1(input, filter_type, 0);
+    BiquadFilter<SumOfSines> filter_0_2(input, filter_type, 0);
+    BiquadFilter<SumOfSines> filter_1_1(input, filter_type, 1);
+
+    filter_0_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_0_2.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_1_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+
+    filter_0_1.frequency.set_value(3520.0);
+    filter_0_2.frequency.set_value(3520.0);
+    filter_1_1.frequency.set_value(440.0);
+
+    filter_0_1.q.set_value(5.0);
+    filter_0_2.q.set_value(5.0);
+    filter_1_1.q.set_value(5.0);
+
+    test_filter(filter_0_1, input, expected_0, 0.12, 1, BLOCK_SIZE);
+
+    filter_0_2.frequency.set_value(7040.0);
+    test_filter(filter_0_2, input, expected_0, 0.12, 1, BLOCK_SIZE);
+
+    test_filter(filter_1_1, input, expected_1, 0.12, 1, BLOCK_SIZE);
 })
 
 

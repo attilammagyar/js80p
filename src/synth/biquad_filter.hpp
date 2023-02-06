@@ -56,13 +56,18 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
                 TypeParam(std::string const name);
         };
 
-        BiquadFilter(InputSignalProducerClass& input, TypeParam& type);
+        BiquadFilter(
+            InputSignalProducerClass& input,
+            TypeParam& type,
+            Integer const shared_coefficients_group = -1
+        );
         BiquadFilter(
             InputSignalProducerClass& input,
             TypeParam& type,
             FloatParam& frequency_leader,
             FloatParam& q_leader,
-            FloatParam& gain_leader
+            FloatParam& gain_leader,
+            Integer const shared_coefficients_group = -1
         );
         virtual ~BiquadFilter();
 
@@ -90,6 +95,17 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
     private:
         static constexpr Number THRESHOLD = 0.000001;
+        static constexpr Integer GROUPS = 4;
+
+        static Integer shared_buffers_rounds[GROUPS];
+        static Sample const* shared_b0_buffers[GROUPS];
+        static Sample const* shared_b1_buffers[GROUPS];
+        static Sample const* shared_b2_buffers[GROUPS];
+        static Sample const* shared_a1_buffers[GROUPS];
+        static Sample const* shared_a2_buffers[GROUPS];
+        static bool shared_are_coefficients_constant[GROUPS];
+        static bool shared_is_silent[GROUPS];
+        static bool shared_is_no_op[GROUPS];
 
         void initialize_instance();
         void register_children();
@@ -97,6 +113,11 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void reallocate_buffers();
         void allocate_buffers();
         void free_buffers();
+
+        Sample const* const* initialize_rendering_with_shared_coefficients(
+            Integer const round,
+            Integer const sample_count
+        );
 
         bool initialize_low_pass_rendering(
             Integer const round,
@@ -187,6 +208,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index);
         void store_silent_coefficient_samples(Integer const index);
 
+        Integer const shared_coefficients_group;
+
         /*
         Notation:
            https://www.w3.org/TR/webaudio/#filters-characteristics
@@ -209,6 +232,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         bool is_silent;
         bool are_coefficients_constant;
+        bool can_use_shared_coefficients;
 };
 
 }

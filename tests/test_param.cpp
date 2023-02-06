@@ -936,6 +936,8 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     follower.set_block_size(block_size);
     follower.set_sample_rate(1.0);
 
+    assert_eq((void*)&envelope, (void*)follower.get_envelope());
+
     envelope.amount.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);

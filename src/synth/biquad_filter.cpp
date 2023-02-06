@@ -30,6 +30,34 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
+Integer BiquadFilter<InputSignalProducerClass>::shared_buffers_rounds[GROUPS];
+
+template<class InputSignalProducerClass>
+Sample const* BiquadFilter<InputSignalProducerClass>::shared_b0_buffers[GROUPS];
+
+template<class InputSignalProducerClass>
+Sample const* BiquadFilter<InputSignalProducerClass>::shared_b1_buffers[GROUPS];
+
+template<class InputSignalProducerClass>
+Sample const* BiquadFilter<InputSignalProducerClass>::shared_b2_buffers[GROUPS];
+
+template<class InputSignalProducerClass>
+Sample const* BiquadFilter<InputSignalProducerClass>::shared_a1_buffers[GROUPS];
+
+template<class InputSignalProducerClass>
+Sample const* BiquadFilter<InputSignalProducerClass>::shared_a2_buffers[GROUPS];
+
+template<class InputSignalProducerClass>
+bool BiquadFilter<InputSignalProducerClass>::shared_are_coefficients_constant[GROUPS];
+
+template<class InputSignalProducerClass>
+bool BiquadFilter<InputSignalProducerClass>::shared_is_silent[GROUPS];
+
+template<class InputSignalProducerClass>
+bool BiquadFilter<InputSignalProducerClass>::shared_is_no_op[GROUPS];
+
+
+template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const name
 )
@@ -41,7 +69,8 @@ BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         InputSignalProducerClass& input,
-        TypeParam& type
+        TypeParam& type,
+        Integer const shared_coefficients_group
 ) : Filter<InputSignalProducerClass>(input, 4),
     frequency(
         "",
@@ -58,7 +87,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_MAX,
         0.0
     ),
-    type(type)
+    type(type),
+    shared_coefficients_group(shared_coefficients_group)
 {
     initialize_instance();
 }
@@ -82,6 +112,10 @@ void BiquadFilter<InputSignalProducerClass>::initialize_instance()
     low_pass_no_op_frequency = std::min(
         (Number)this->nyquist_frequency, frequency.get_max_value()
     );
+
+    for (Integer i = 0; i != GROUPS; ++i) {
+        shared_buffers_rounds[i] = -1;
+    }
 }
 
 
@@ -92,12 +126,14 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         TypeParam& type,
         FloatParam& frequency_leader,
         FloatParam& q_leader,
-        FloatParam& gain_leader
+        FloatParam& gain_leader,
+        Integer const shared_coefficients_group
 ) : Filter<InputSignalProducerClass>(input, 4),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
-    type(type)
+    type(type),
+    shared_coefficients_group(shared_coefficients_group)
 {
     initialize_instance();
 }
@@ -194,6 +230,16 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         Integer const round,
         Integer const sample_count
 ) {
+    Integer const group = shared_coefficients_group;
+
+    can_use_shared_coefficients = group != -1;
+
+    if (can_use_shared_coefficients && shared_buffers_rounds[group] == round) {
+        return initialize_rendering_with_shared_coefficients(
+            round, sample_count
+        );
+    }
+
     bool is_no_op = false;
 
     is_silent = false;
@@ -236,6 +282,18 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         round, sample_count
     );
 
+    if (can_use_shared_coefficients) {
+        shared_buffers_rounds[group] = round;
+        shared_are_coefficients_constant[group] = are_coefficients_constant;
+        shared_is_no_op[group] = is_no_op;
+        shared_is_silent[group] = is_silent;
+        shared_b0_buffers[group] = b0_buffer;
+        shared_b1_buffers[group] = b1_buffer;
+        shared_b2_buffers[group] = b2_buffer;
+        shared_a1_buffers[group] = a1_buffer;
+        shared_a2_buffers[group] = a2_buffer;
+    }
+
     if (is_no_op) {
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
@@ -243,6 +301,32 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
         return this->input_buffer;
     }
+
+    return NULL;
+}
+
+
+template<class InputSignalProducerClass>
+Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering_with_shared_coefficients(
+        Integer const round,
+        Integer const sample_count
+) {
+    Filter<InputSignalProducerClass>::initialize_rendering(
+        round, sample_count
+    );
+
+    if (shared_is_no_op[shared_coefficients_group]) {
+        frequency.skip_round(round, sample_count);
+        q.skip_round(round, sample_count);
+        gain.skip_round(round, sample_count);
+
+        return this->input_buffer;
+    }
+
+    is_silent = shared_is_silent[shared_coefficients_group];
+    are_coefficients_constant = (
+        shared_are_coefficients_constant[shared_coefficients_group]
+    );
 
     return NULL;
 }
@@ -259,6 +343,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
     are_coefficients_constant = (
         frequency.is_constant_in_next_round(round, sample_count)
         && q.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
     );
 
     FloatParam::produce_if_not_constant(&gain, round, sample_count);
@@ -350,6 +439,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         frequency.is_constant_in_next_round(round, sample_count)
         && q.is_constant_in_next_round(round, sample_count)
     );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
+    );
 
     FloatParam::produce_if_not_constant(&gain, round, sample_count);
 
@@ -439,6 +533,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
         frequency.is_constant_in_next_round(round, sample_count)
         && q.is_constant_in_next_round(round, sample_count)
     );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
+    );
 
     FloatParam::produce_if_not_constant(&gain, round, sample_count);
 
@@ -519,6 +618,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
     are_coefficients_constant = (
         frequency.is_constant_in_next_round(round, sample_count)
         && q.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
     );
 
     FloatParam::produce_if_not_constant(&gain, round, sample_count);
@@ -603,6 +707,12 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
         frequency.is_constant_in_next_round(round, sample_count)
         && q.is_constant_in_next_round(round, sample_count)
         && gain.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
+        && gain.get_envelope() == NULL
     );
 
     if (are_coefficients_constant) {
@@ -712,6 +822,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
     are_coefficients_constant = (
         frequency.is_constant_in_next_round(round, sample_count)
         && gain.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && gain.get_envelope() == NULL
     );
 
     FloatParam::produce_if_not_constant(&q, round, sample_count);
@@ -823,6 +938,11 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
     are_coefficients_constant = (
         frequency.is_constant_in_next_round(round, sample_count)
         && gain.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && gain.get_envelope() == NULL
     );
 
     FloatParam::produce_if_not_constant(&q, round, sample_count);
@@ -1000,14 +1120,25 @@ void BiquadFilter<InputSignalProducerClass>::render(
     }
 
     Integer const channels = this->channels;
+    Integer const group = shared_coefficients_group;
     Sample const* const* const input_buffer = this->input_buffer;
 
     if (are_coefficients_constant) {
-        Sample const b0 = b0_buffer[0];
-        Sample const b1 = b1_buffer[0];
-        Sample const b2 = b2_buffer[0];
-        Sample const a1 = a1_buffer[0];
-        Sample const a2 = a2_buffer[0];
+        Sample b0, b1, b2, a1, a2;
+
+        if (can_use_shared_coefficients) {
+            b0 = shared_b0_buffers[group][0];
+            b1 = shared_b1_buffers[group][0];
+            b2 = shared_b2_buffers[group][0];
+            a1 = shared_a1_buffers[group][0];
+            a2 = shared_a2_buffers[group][0];
+        } else {
+            b0 = b0_buffer[0];
+            b1 = b1_buffer[0];
+            b2 = b2_buffer[0];
+            a1 = a1_buffer[0];
+            a2 = a2_buffer[0];
+        }
 
         for (Integer c = 0; c != channels; ++c) {
             Sample x_n_m1 = this->x_n_m1[c];
@@ -1039,11 +1170,25 @@ void BiquadFilter<InputSignalProducerClass>::render(
         return;
     }
 
-    Sample const* b0 = b0_buffer;
-    Sample const* b1 = b1_buffer;
-    Sample const* b2 = b2_buffer;
-    Sample const* a1 = a1_buffer;
-    Sample const* a2 = a2_buffer;
+    Sample const* b0;
+    Sample const* b1;
+    Sample const* b2;
+    Sample const* a1;
+    Sample const* a2;
+
+    if (can_use_shared_coefficients) {
+        b0 = shared_b0_buffers[group];
+        b1 = shared_b1_buffers[group];
+        b2 = shared_b2_buffers[group];
+        a1 = shared_a1_buffers[group];
+        a2 = shared_a2_buffers[group];
+    } else {
+        b0 = b0_buffer;
+        b1 = b1_buffer;
+        b2 = b2_buffer;
+        a1 = a1_buffer;
+        a2 = a2_buffer;
+    }
 
     for (Integer c = 0; c != channels; ++c) {
         Sample x_n_m1 = this->x_n_m1[c];

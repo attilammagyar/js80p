@@ -131,7 +131,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_type,
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
-        param_leaders.filter_1_gain
+        param_leaders.filter_1_gain,
+        modulator == NULL ? 0 : 2
     ),
     wavefolder(filter_1, param_leaders.folding),
     filter_2(
@@ -139,7 +140,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_type,
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
-        param_leaders.filter_2_gain
+        param_leaders.filter_2_gain,
+        modulator == NULL ? 1 : 3
     ),
     velocity_sensitivity(param_leaders.velocity_sensitivity),
     portamento_length(param_leaders.portamento_length),

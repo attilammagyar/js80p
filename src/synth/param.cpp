@@ -454,7 +454,7 @@ void FloatParam::set_envelope(Envelope const* const envelope)
 
 Envelope const* FloatParam::get_envelope() const
 {
-    return envelope;
+    return leader == NULL ? envelope : leader->envelope;
 }
 
 
@@ -464,9 +464,7 @@ void FloatParam::start_envelope(Seconds const time_offset)
     Seconds attack;
     Number amount;
     Number next_value;
-    Envelope const* const envelope = (
-        leader == NULL ? this->envelope : leader->envelope
-    );
+    Envelope const* const envelope = get_envelope();
 
     if (envelope == NULL) {
         return;
@@ -501,9 +499,7 @@ void FloatParam::start_envelope(Seconds const time_offset)
 
 Seconds FloatParam::end_envelope(Seconds const time_offset)
 {
-    Envelope const* const envelope = (
-        leader == NULL ? this->envelope : leader->envelope
-    );
+    Envelope const* const envelope = get_envelope();
 
     if (envelope == NULL) {
         return 0.0;
