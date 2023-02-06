@@ -469,8 +469,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Byte byte_param;
         };
 
-        // See Timur Doumler [ACCU 2017]: Lock-free programming with modern C++
-        // https://www.youtube.com/watch?v=qdrp6k4rcP4
+        /*
+        See Timur Doumler [ACCU 2017]: Lock-free programming with modern C++
+          https://www.youtube.com/watch?v=qdrp6k4rcP4
+        */
         class SingleProducerSingleConsumerMessageQueue
         {
             public:
@@ -486,7 +488,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 size_t size() const;
 
             private:
-                static constexpr size_t SIZE = 0x1000; // must be power of 2
+                static constexpr size_t SIZE = 0x1000; /* must be power of 2 */
                 static constexpr size_t SIZE_MASK = SIZE - 1;
 
                 size_t advance(size_t const index) const;

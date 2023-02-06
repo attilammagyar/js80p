@@ -779,7 +779,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
 
-    // Recalculating the power seems to be slightly faster than std::sqrt(a).
+    /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE_HALF
     );
@@ -792,9 +792,10 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     Sample const a_m_1_cos_w0 = a_m_1 * cos_w0;
     Sample const a_p_1_cos_w0 = a_p_1 * cos_w0;
 
-    // S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2).
-    // Also, alpha_s is always multiplied by 2, which cancels dividing the
-    // sine by 2.
+    /*
+    S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2). Also,
+    alpha_s is always multiplied by 2, which cancels dividing the sine by 2.
+    */
     Sample const alpha_s_double_a_sqrt = (
         Math::sin(w0) * Constants::BIQUAD_FILTER_FREQUENCY_SINE_SCALE * a_sqrt
     );
@@ -889,7 +890,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
 
-    // Recalculating the power seems to be slightly faster than std::sqrt(a).
+    /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE_HALF
     );
@@ -902,9 +903,10 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
     Sample const a_m_1_cos_w0 = a_m_1 * cos_w0;
     Sample const a_p_1_cos_w0 = a_p_1 * cos_w0;
 
-    // S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2).
-    // Also, alpha_s is always multiplied by 2, which eliminates dividing
-    // the sine by 2.
+    /*
+    S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2). Also,
+    alpha_s is always multiplied by 2, which eliminates dividing the sine by 2.
+    */
     Sample const alpha_s_double_a_sqrt = (
         Math::sin(w0) * Constants::BIQUAD_FILTER_FREQUENCY_SINE_SCALE * a_sqrt
     );

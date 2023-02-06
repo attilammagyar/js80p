@@ -153,7 +153,7 @@ class ReferenceTriangle : public NonBandLimitedReferenceWaveform
             Sample const period = 1.0 / (Sample)frequency;
             Sample const half_period = period * 0.5;
 
-            // Shifting by a quarter period so that the wave starts with 0.0
+            /* Shifting by a quarter period so that the wave starts with 0.0 */
             Sample const phase = std::fmod((Sample)time + period * 0.25, period);
 
             return 2.0 * (
@@ -379,7 +379,7 @@ TEST(oscillator_can_be_started_and_stopped_between_samples, {
     Sample expected_samples[2][block_size] = {
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {
-            // sin(2 * pi * frequency * time)
+            /* sin(2 * pi * frequency * time) */
             std::sin(pi_double * frequency * (0.0 * sample_period + time_offset)),
             std::sin(pi_double * frequency * (1.0 * sample_period + time_offset)),
             std::sin(pi_double * frequency * (2.0 * sample_period + time_offset)),
@@ -444,7 +444,7 @@ void assert_amplitude_and_frequency_automation_are_independent_of_each_other(
     constexpr Sample pi_double = (Sample)Math::PI_DOUBLE;
     Sample const* const* block;
     Sample expected_samples[block_size] = {
-        // sin(2 * pi * frequency * time)
+        /* sin(2 * pi * frequency * time) */
         amplitudes[0] * std::sin(pi_double * frequency * (0.0 * sample_period)),
         amplitudes[1] * std::sin(pi_double * frequency * (1.0 * sample_period)),
         amplitudes[2] * std::sin(pi_double * frequency * (2.0 * sample_period)),
@@ -521,7 +521,7 @@ void assert_completed(SimpleOscillator& oscillator)
 }
 
 
-// Both frequency, detune, and fine_detune are constants.
+/* Both frequency, detune, and fine_detune are constants. */
 TEST(sine_wave_25hz_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -546,7 +546,7 @@ TEST(sine_wave_25hz_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_
 })
 
 
-// Detune and fine detune are constants.
+/* Detune and fine detune are constants. */
 TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 1000;
@@ -572,7 +572,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_fine_detuned_two_octaves_up_
 })
 
 
-// Frequency and fine detune are constants.
+/* Frequency and fine detune are constants. */
 TEST(sine_wave_25hz_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -598,7 +598,7 @@ TEST(sine_wave_25hz_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_shou
 })
 
 
-// Fine detune is constant.
+/* Fine detune is constant. */
 TEST(sine_wave_scheduled_to_be_25hz_and_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -625,7 +625,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_fine_detuned_and_scheduled_to_be_detuned
 })
 
 
-// Frequency and detune are constants.
+/* Frequency and detune are constants. */
 TEST(sine_wave_25hz_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -651,7 +651,7 @@ TEST(sine_wave_25hz_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_shou
 })
 
 
-// Detune is constant.
+/* Detune is constant. */
 TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -678,7 +678,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_scheduled_to_be_fine_detuned
 })
 
 
-// Frequency is constant.
+/* Frequency is constant. */
 TEST(sine_wave_25hz_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -705,7 +705,7 @@ TEST(sine_wave_25hz_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_shou
 })
 
 
-// All frequency related params are changing.
+/* All frequency related params are changing. */
 TEST(sine_wave_scheduled_to_be_25hz_and_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
@@ -815,7 +815,7 @@ TEST(oscillator_rendering_is_independent_of_chunk_size, {
 
 
 TEST(amplitude_modulation_creates_two_sidebands, {
-    // https://www.soundonsound.com/techniques/amplitude-modulation
+    /* https://www.soundonsound.com/techniques/amplitude-modulation */
 
     typedef SimpleOscillator Modulator;
     typedef Oscillator<Modulator> Carrier;
@@ -885,7 +885,9 @@ TEST(amplitude_modulation_creates_two_sidebands, {
 
 
 TEST(frequency_may_be_modulated, {
-    // https://www.soundonsound.com/techniques/introduction-frequency-modulation
+    /*
+    https://www.soundonsound.com/techniques/introduction-frequency-modulation
+    */
 
     typedef Constant Modulator;
     typedef Oscillator<Modulator> Carrier;

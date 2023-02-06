@@ -39,8 +39,10 @@ namespace JS80P
 typedef double Number;
 typedef intptr_t Integer;
 
-// aliases for Number to make signatures more informative while avoiding
-// type conversions
+/*
+Aliases for Number to make signatures more informative while avoiding type
+conversions.
+*/
 typedef Number Sample;
 typedef Number Seconds;
 typedef Number Frequency;

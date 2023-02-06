@@ -505,9 +505,11 @@ TransparentWidget::TransparentWidget(
 
 LRESULT TransparentWidget::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    // Though we don't want to paint anything, we still need to validate the
-    // region that is to be painted - BeginPaint() and EndPaint() does
-    // everything that needs to be done about this.
+    /*
+    Though we don't want to paint anything, we still need to validate the
+    region that is to be painted - BeginPaint() and EndPaint() does
+    everything that needs to be done about this.
+    */
 
     PAINTSTRUCT ps;
     BeginPaint(hwnd, &ps);

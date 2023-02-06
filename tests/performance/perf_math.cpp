@@ -177,7 +177,7 @@ DEFINE_FUNC(StdPow10Minus, "std::pow(10,-x)", std::pow(10.0, -x), POW_10_INV_MIN
 
 NEW_GROUP();
 
-// We need to compare these with each containing an arbitrary multiplication as well.
+/* We need to compare these with each containing a multiplication as well. */
 constexpr Number POW_2_SCALE = 1.0 / 100.0;
 constexpr Number EXP_2_SCALE = POW_2_SCALE * Math::LN_OF_2;
 
@@ -187,9 +187,11 @@ DEFINE_FUNC(StdPow2, "std::pow(2,0.01*x)", std::pow(2.0, POW_2_SCALE * x), POW_1
 
 NEW_GROUP();
 
-// Shelving filters need both A = 10 ^ (G / 40) and sqrt(A) - but which is
-// faster: taking the square root of the already calculated A, or to calculate
-// 10 ^ (G / 80) from scratch?
+/*
+Shelving filters need both A = 10 ^ (G / 40) and sqrt(A) - but which is faster:
+taking the square root of the already calculated A, or to calculate
+10 ^ (G / 80) from scratch?
+*/
 DEFINE_FUNC(MathPow10Scaled, "Math::pow_10(0.0125*x)", Math::pow_10(0.0125 * x), 0.0, 20.0);
 DEFINE_FUNC(StdSqrt, "std::sqrt(x)", std::sqrt(x), 0.0, 20.0);
 

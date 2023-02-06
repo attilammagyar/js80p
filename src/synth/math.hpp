@@ -110,11 +110,13 @@ class Math
 
         Number sin_impl(Number const x) const;
 
-        // With a little bit of templating, this might seem to be reusable for
-        // oscillator wavetables, but actually that would mean calculating
-        // weights and indices twice for a single sample lookup in the
-        // two tables for fewer and more partials. Alternatively, bringing the
-        // multiple-table logic here from there would be overkill.
+        /*
+        With a little bit of templating, this might seem to be reusable for
+        oscillator wavetables, but actually that would mean calculating weights
+        and indices twice for a single sample lookup in the two tables for
+        fewer and more partials. Alternatively, bringing the multiple-table
+        logic here from there would be overkill.
+        */
         Number lookup(Number const* table, Number const index) const;
 
         Number sines[TABLE_SIZE];

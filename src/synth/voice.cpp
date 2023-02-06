@@ -254,8 +254,10 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
     oscillator.frequency.cancel_events(time_offset);
 
-    // Though we never assign an envelope to \c Oscillator.frequency, its
-    // modulation level might have one (through its leader).
+    /*
+    Though we never assign an envelope to Oscillator.frequency, its modulation
+    level might have one (through its leader).
+    */
     oscillator.frequency.start_envelope(time_offset);
 
     if (portamento_length <= sampling_period) {

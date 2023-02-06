@@ -699,10 +699,10 @@ TEST(float_param_can_automatically_skip_constant_rounds, {
     constexpr Integer block_size = 10;
     constexpr Integer short_round_length = 6;
     constexpr Sample expected_samples[] = {
-        // -1.0, -1.0, -1.0, -1.0, -1.0,
+        /* -1.0, -1.0, -1.0, -1.0, -1.0, */
         -1.0, 0.125, 0.375, 0.625,
         0.875, 1.0,
-        // 1.0, 1.0, 1.0, 1.0, 1.0,
+        /* 1.0, 1.0, 1.0, 1.0, 1.0, */
     };
     FloatParam float_param("float", -1.0, 1.0, 0.0);
     Sample const* first_round;
