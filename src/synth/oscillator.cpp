@@ -893,7 +893,7 @@ Sample Oscillator<ModulatorSignalProducerClass>::Wavetable::lookup(
 
     Number const sample_index = state->sample_index;
 
-    state->sample_index = clamp(
+    state->sample_index = wrap_around(
         sample_index + state->scale * (Number)frequency
     );
 
@@ -936,7 +936,7 @@ Sample Oscillator<ModulatorSignalProducerClass>::Wavetable::lookup(
 
 
 template<class ModulatorSignalProducerClass>
-Number Oscillator<ModulatorSignalProducerClass>::Wavetable::clamp(
+Number Oscillator<ModulatorSignalProducerClass>::Wavetable::wrap_around(
         Number const index
 ) const {
     return index - std::floor(index * SIZE_INV) * SIZE_FLOAT;

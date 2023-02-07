@@ -213,7 +213,7 @@ class Oscillator : public SignalProducer
                 static Number sines[SIZE];
                 static bool is_initialized;
 
-                Number clamp(Number const index) const;
+                Number wrap_around(Number const index) const;
 
                 Sample interpolate(
                     WavetableState const* state,
