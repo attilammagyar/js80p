@@ -756,8 +756,8 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
             Number const gain_value = (Number)gain_buffer[i];
 
             if (
-                std::fabs(gain_value) < THRESHOLD
-                || frequency_value >= peaking_no_op_frequency
+                    std::fabs(gain_value) < THRESHOLD
+                    || frequency_value >= peaking_no_op_frequency
             ) {
                 store_no_op_coefficient_samples(i);
 

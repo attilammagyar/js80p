@@ -441,8 +441,8 @@ void Synth::note_on(
 
     for (Integer v = 0; v != POLYPHONY; ++v) {
         if (
-            modulators[next_voice]->is_off_after(time_offset)
-            && carriers[next_voice]->is_off_after(time_offset)
+                modulators[next_voice]->is_off_after(time_offset)
+                && carriers[next_voice]->is_off_after(time_offset)
         ) {
             if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
                 previous_note = note;

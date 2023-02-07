@@ -77,16 +77,15 @@ Number Math::exp(Number const x)
 
 Number Math::iterate_exp(Number const x, Number const scale)
 {
-    // \exp(x) = \lim_{n \to \infty} ( 1 + \frac{x}{n} ) ^ n
+    /* \exp(x) = \lim_{n \to \infty} ( 1 + \frac{x}{n} ) ^ n */
 
     /*
-     * Running the approximation for a limited number of iterations
-     * can be 2-3 times faster than the built-in std::exp() and
-     * std::pow() while the error remains acceptably low on the
-     * intervals that we care about. See:
-     *
-     *   https://codingforspeed.com/using-faster-exponential-approximation/
-     */
+    Running the approximation for a limited number of iterations can be 2-3
+    times faster than the built-in std::exp() and std::pow() while the error
+    remains acceptably low on the intervals that we care about. See:
+
+      https://codingforspeed.com/using-faster-exponential-approximation/
+    */
 
     Number value = 1.0 + x * scale;
 
@@ -113,14 +112,13 @@ Number Math::pow_10_inv(Number const x)
 Frequency Math::detune(Frequency const frequency, Number const cents)
 {
     /*
-     * The approximation errors in exp() would keep piling up in oscillators
-     * (even with more iterations) until the oscillators go so much out of phase
-     * that it may produce noticable, even audible problems, so we're using
-     * cmath here.
-     *
-     * Also, std::pow(2.0, c1 * x) seems to be almost twice as fast as
-     * std::exp(c2 * x), for constants c1 and c2 (where c2 = c1 * LN_OF_2).
-     */
+    The approximation errors in exp() would keep piling up in oscillators (even
+    with more iterations) until the oscillators go so much out of phase that it
+    may produce noticable, even audible problems, so we're using cmath here.
+
+    Also, std::pow(2.0, c1 * x) seems to be almost twice as fast as
+    std::exp(c2 * x), for constants c1 and c2 (where c2 = c1 * LN_OF_2).
+    */
     return frequency * (Frequency)std::pow(
         2.0, Constants::DETUNE_CENTS_TO_POWER_OF_2_SCALE * cents
     );

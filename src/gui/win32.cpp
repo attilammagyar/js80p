@@ -1000,10 +1000,7 @@ void ParamEditor::refresh()
         return;
     }
 
-    if (
-        new_ratio != ratio
-        || new_controller_id != controller_id
-    ) {
+    if (new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);
     } else {
         synth.push_message(

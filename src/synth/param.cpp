@@ -315,17 +315,15 @@ bool FloatParam::is_constant_until(Integer const sample_count) const
         return false;
     }
 
-    if (
-        midi_controller != NULL
-        && !midi_controller->events.is_empty()
-        && is_time_offset_before_sample_count(
-            midi_controller->events.front().time_offset, last_sample_idx
+    return (
+        midi_controller == NULL
+        || midi_controller->events.is_empty()
+        || !(
+            is_time_offset_before_sample_count(
+                midi_controller->events.front().time_offset, last_sample_idx
+            )
         )
-    ) {
-        return false;
-    }
-
-    return true;
+    );
 }
 
 
