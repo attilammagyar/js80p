@@ -139,11 +139,13 @@ h1 {
   margin-right: -2px;
 }
 
+#osc-1-main > div.knob:nth-child(7),
 #osc-1-main > div.knob:nth-child(8),
+#osc-1-main > div.knob:nth-child(10),
+#osc-2-main > div.knob:nth-child(7),
 #osc-2-main > div.knob:nth-child(8) {
   border-left: solid 1px #445;
-  border-right: solid 1px #445;
-  width: 56px;
+  width: 57px;
 }
 
 .main-block > .block.osc-main > h1 {
@@ -311,7 +313,7 @@ body.hide-objects .knob span:nth-child(4) {
 .sc11 {
   position: absolute;
   top: 57px;
-  left: 493px;
+  left: 435px;
   display: block;
 }
 
@@ -325,7 +327,7 @@ body.hide-objects .knob span:nth-child(4) {
 .sc13 {
   position: absolute;
   top: 57px;
-  left: 551px;
+  left: 493px;
   display: block;
 }
 
@@ -339,6 +341,13 @@ body.hide-objects .knob span:nth-child(4) {
 .sc15 {
   position: absolute;
   top: 57px;
+  left: 536px;
+  display: block;
+}
+
+.sc16 {
+  position: absolute;
+  top: 57px;
   left: 725px;
   display: block;
 }
@@ -346,7 +355,7 @@ body.hide-objects .knob span:nth-child(4) {
 .sc21 {
   position: absolute;
   top: 337px;
-  left: 493px;
+  left: 435px;
   display: block;
 }
 
@@ -360,7 +369,7 @@ body.hide-objects .knob span:nth-child(4) {
 .sc23 {
   position: absolute;
   top: 337px;
-  left: 551px;
+  left: 493px;
   display: block;
 }
 
@@ -391,7 +400,8 @@ body.hide-objects .knob span:nth-child(4) {
       <span class="sc12">2</span>
       <span class="sc13">3</span>
       <span class="sc14">4</span>
-      <span class="sc15">5</span>
+      <span class="sc15">(mod out)&nbsp;&nbsp;&nbsp;5</span>
+      <span class="sc16">6</span>
       <span class="sc21">1</span>
       <span class="sc22">2</span>
       <span class="sc23">3</span>
@@ -550,16 +560,16 @@ window.onload = function ()
 
     for (o = 1; o <= 2; ++o) {
         create_knob("osc-" + String(o) + "-main", "WAV", "triangle");
-        create_knob("osc-" + String(o) + "-main", "AMP %", "50", "E7");
-        create_knob("osc-" + String(o) + "-main", "VEL S %", "50");
         create_knob("osc-" + String(o) + "-main", "PRT s", "0.01");
         create_knob("osc-" + String(o) + "-main", "PRD c", "2400");
         create_knob("osc-" + String(o) + "-main", "DTN st", "-48");
         create_knob("osc-" + String(o) + "-main", "FIN c", "-1200");
+        create_knob("osc-" + String(o) + "-main", "AMP %", "50", "E7");
         create_knob("osc-" + String(o) + "-main", "FOLD %", "10", "E8");
+        create_knob("osc-" + String(o) + "-main", "VEL S %", "50");
+        create_knob("osc-" + String(o) + "-main", "VOL %", "50", "C12");
         create_knob("osc-" + String(o) + "-main", "WID %", "-100");
         create_knob("osc-" + String(o) + "-main", "PAN %", "-100");
-        create_knob("osc-" + String(o) + "-main", "VOL %", "50", "C12");
 
         create_knob("osc-" + String(o) + "-filter-1", "TYPE", "high-pass");
         create_knob("osc-" + String(o) + "-filter-1", "FREQ Hz", "50");

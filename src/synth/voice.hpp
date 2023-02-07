@@ -48,6 +48,7 @@ class Voice : public SignalProducer
         typedef Wavefolder<Filter1> Wavefolder_;
         typedef BiquadFilter<Wavefolder_> Filter2;
 
+        // TODO: modulation output should incorporate the calculated velocity and the volume parameter as well
         typedef Filter2 ModulationOut;
 
         class Params
