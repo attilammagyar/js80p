@@ -52,11 +52,11 @@ Number Math::cos(Number const x)
 
 Number Math::sin_impl(Number const x) const
 {
-    return lookup(sines, x * SINE_SCALE);
+    return lookup_periodic(sines, x * SINE_SCALE);
 }
 
 
-Number Math::lookup(Number const* table, Number const index) const
+Number Math::lookup_periodic(Number const* table, Number const index) const
 {
     Number const after_weight = index - std::floor(index);
     Number const before_weight = 1.0 - after_weight;

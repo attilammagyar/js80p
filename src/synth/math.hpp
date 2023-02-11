@@ -117,7 +117,7 @@ class Math
         fewer and more partials. Alternatively, bringing the multiple-table
         logic here from there would be overkill.
         */
-        Number lookup(Number const* table, Number const index) const;
+        Number lookup_periodic(Number const* table, Number const index) const;
 
         Number sines[TABLE_SIZE];
 };
