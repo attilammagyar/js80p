@@ -30,26 +30,45 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-Wavefolder<InputSignalProducerClass>::Wavefolder(
-        InputSignalProducerClass& input,
-        FloatParam& folding_leader
-) : Filter<InputSignalProducerClass>(input, 1),
-    folding(folding_leader)
+Wavefolder<InputSignalProducerClass>::Wavefolder(InputSignalProducerClass& input)
+    : Filter<InputSignalProducerClass>(input, 1),
+    folding("FLD", Constants::FOLD_MIN, Constants::FOLD_MAX, 0.0)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+void Wavefolder<InputSignalProducerClass>::initialize_instance()
 {
     this->register_child(folding);
 
     if (this->channels > 0) {
         previous_input_sample = new Sample[this->channels];
         F0_previous_input_sample = new Sample[this->channels];
+        previous_output_sample = new Sample[this->channels];
 
         for (Integer c = 0; c != this->channels; ++c) {
             previous_input_sample[c] = 0.0;
             F0_previous_input_sample[c] = F0(0.0);
+            previous_output_sample[c] = 0.0;
         }
     } else {
         previous_input_sample = NULL;
         F0_previous_input_sample = NULL;
+        previous_output_sample = NULL;
     }
+}
+
+
+template<class InputSignalProducerClass>
+Wavefolder<InputSignalProducerClass>::Wavefolder(
+        InputSignalProducerClass& input,
+        FloatParam& folding_leader
+) : Filter<InputSignalProducerClass>(input, 1),
+    folding(folding_leader)
+{
+    initialize_instance();
 }
 
 
@@ -67,6 +86,7 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
     if (folding_buffer == NULL)
     {
         folding_value = folding.get_value();
+        folding.skip_round(round, sample_count);
 
         if (folding_value < 0.000001) {
             return this->input_buffer;
@@ -92,7 +112,7 @@ void Wavefolder<InputSignalProducerClass>::render(
     Sample* F0_previous_input_sample = this->F0_previous_input_sample;
 
     if (folding_buffer == NULL) {
-        if (folding_value < Constants::FOLD_TRANSITION) {
+        if (folding_value <= Constants::FOLD_TRANSITION) {
             Sample const folded_weight = folding_value * TRANSITION_INV;
             Sample const bypass_weight = 1.0 - folded_weight;
 
@@ -105,7 +125,8 @@ void Wavefolder<InputSignalProducerClass>::render(
                             1.0,
                             input_sample,
                             previous_input_sample[c],
-                            F0_previous_input_sample[c]
+                            F0_previous_input_sample[c],
+                            previous_output_sample[c]
                         )
                         + bypass_weight * input_sample
                     );
@@ -122,7 +143,8 @@ void Wavefolder<InputSignalProducerClass>::render(
                         folding,
                         input_sample,
                         previous_input_sample[c],
-                        F0_previous_input_sample[c]
+                        F0_previous_input_sample[c],
+                        previous_output_sample[c]
                     );
                 }
             }
@@ -133,7 +155,7 @@ void Wavefolder<InputSignalProducerClass>::render(
                 Sample const input_sample = input_buffer[c][i];
                 Sample const folding_raw = folding_buffer[i];
 
-                if (folding_raw < Constants::FOLD_TRANSITION) {
+                if (folding_raw <= Constants::FOLD_TRANSITION) {
                     Sample const folded_weight = folding_raw * TRANSITION_INV;
                     Sample const bypass_weight = 1.0 - folded_weight;
 
@@ -142,7 +164,8 @@ void Wavefolder<InputSignalProducerClass>::render(
                             1.0,
                             input_sample,
                             previous_input_sample[c],
-                            F0_previous_input_sample[c]
+                            F0_previous_input_sample[c],
+                            previous_output_sample[c]
                         )
                         + bypass_weight * input_sample
                     );
@@ -153,7 +176,8 @@ void Wavefolder<InputSignalProducerClass>::render(
                         folding,
                         input_sample,
                         previous_input_sample[c],
-                        F0_previous_input_sample[c]
+                        F0_previous_input_sample[c],
+                        previous_output_sample[c]
                     );
                 }
             }
@@ -170,23 +194,24 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
         Sample const folding,
         Sample const input_sample,
         Sample& previous_input_sample,
-        Sample& F0_previous_input_sample
+        Sample& F0_previous_input_sample,
+        Sample& previous_output_sample
 ) {
     Sample const folding_times_input_sample = folding * input_sample;
     Sample const delta = folding_times_input_sample - previous_input_sample;
 
     if (UNLIKELY(std::fabs(delta) < 0.00000001)) {
         /*
-        We're supposed to calculate the average of the current and the previous
-        input sample here, but since we only do this when their difference very
-        small or zero, we can probably get away with just using one of them.
+        We're supposed to calculate f for the average of the two samples here,
+        but the numerical approximation of f(x) via its antiderivative F0(x) has
+        quite a noticable error near the zeros of the derivative of f(x), and
+        when two very close input samples fall into those regions, then
+        using f would produce audible discontinuities. So instead, we pretend
+        that we encountered the exact same sample value again, which, when
+        folded, should produce the same output sample as last time.
         */
-        Sample const ret = f(folding_times_input_sample);
 
-        previous_input_sample = folding_times_input_sample;
-        F0_previous_input_sample = F0(folding_times_input_sample);
-
-        return ret;
+        return previous_output_sample;
     }
 
     Sample const F0_input_sample = F0(folding_times_input_sample);
@@ -194,6 +219,7 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
 
     previous_input_sample = folding_times_input_sample;
     F0_previous_input_sample = F0_input_sample;
+    previous_output_sample = ret;
 
     return ret;
 }

@@ -21,6 +21,7 @@
 
 #include "js80p.hpp"
 
+#include "synth/filter.hpp"
 #include "synth/param.hpp"
 #include "synth/signal_producer.hpp"
 
@@ -38,6 +39,7 @@ template<class InputSignalProducerClass>
 class Wavefolder : public Filter<InputSignalProducerClass>
 {
     public:
+        Wavefolder(InputSignalProducerClass& input);
         Wavefolder(InputSignalProducerClass& input, FloatParam& folding_leader);
 
         Sample const* const* initialize_rendering(
@@ -70,15 +72,22 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         static constexpr Sample S7 = TRIANGLE_SCALE / (27.0 * Math::PI);
         static constexpr Sample S8 = TRIANGLE_SCALE / (125.0 * Math::PI);
 
+        /*
+        The trigonometric functions in the Math class handle positive numbers
+        better, so we shift everything by a few periods.
+        */
         static constexpr Sample TRIG_OFFSET = (
             Math::PI_DOUBLE * std::ceil(Constants::FOLD_MAX * S5)
         );
+
+        void initialize_instance();
 
         Sample fold(
             Sample const folding,
             Sample const input_sample,
             Sample& previous_input_sample,
-            Sample& F0_previous_input_sample
+            Sample& F0_previous_input_sample,
+            Sample& previous_output_sample
         );
 
         Sample f(Sample const x) const;
@@ -87,6 +96,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         Sample const* folding_buffer;
         Sample* previous_input_sample;
         Sample* F0_previous_input_sample;
+        Sample* previous_output_sample;
         Number folding_value;
 };
 
