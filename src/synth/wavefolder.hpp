@@ -41,6 +41,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
     public:
         Wavefolder(InputSignalProducerClass& input);
         Wavefolder(InputSignalProducerClass& input, FloatParam& folding_leader);
+        ~Wavefolder();
 
         Sample const* const* initialize_rendering(
             Integer const round,

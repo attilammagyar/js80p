@@ -46,6 +46,8 @@ class Distortion : public Filter<InputSignalProducerClass>
             InputSignalProducerClass& input
         );
 
+        ~Distortion();
+
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -70,8 +72,6 @@ class Distortion : public Filter<InputSignalProducerClass>
         static constexpr Sample INPUT_MAX_INV = 1.0 / INPUT_MAX;
         static constexpr Sample TABLE_SIZE_FLOAT = (Sample)TABLE_SIZE;
         static constexpr Sample SCALE = TABLE_SIZE_FLOAT * INPUT_MAX_INV;
-
-        void initialize_instance(Number const steepness);
 
         Sample distort(
             Sample const input_sample,

@@ -73,6 +73,21 @@ Wavefolder<InputSignalProducerClass>::Wavefolder(
 
 
 template<class InputSignalProducerClass>
+Wavefolder<InputSignalProducerClass>::~Wavefolder()
+{
+    if (previous_input_sample != NULL) {
+        delete[] previous_input_sample;
+        delete[] F0_previous_input_sample;
+        delete[] previous_output_sample;
+
+        previous_input_sample = NULL;
+        F0_previous_input_sample = NULL;
+        previous_output_sample = NULL;
+    }
+}
+
+
+template<class InputSignalProducerClass>
 Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
@@ -183,9 +198,6 @@ void Wavefolder<InputSignalProducerClass>::render(
             }
         }
     }
-
-    this->previous_input_sample = previous_input_sample;
-    this->F0_previous_input_sample = F0_previous_input_sample;
 }
 
 

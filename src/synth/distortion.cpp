@@ -37,15 +37,18 @@ Distortion<InputSignalProducerClass>::Distortion(
 ) : Filter<InputSignalProducerClass>(input, 1),
     level(name + "G", 0.0, 1.0, 0.0)
 {
-    initialize_instance(steepness);
-}
-
-
-template<class InputSignalProducerClass>
-void Distortion<InputSignalProducerClass>::initialize_instance(
-        Number const steepness
-) {
     this->register_child(level);
+
+    Sample const table_size_inv = 1.0 / (Sample)TABLE_SIZE;
+    Sample const steepness_inv_double = 2.0 / steepness;
+
+    for (Integer i = 0; i != TABLE_SIZE; ++i) {
+        Number const x = INPUT_MAX * ((Sample)i * table_size_inv);
+        f_table[i] = std::tanh(steepness * x * 0.5);
+        F0_table[i] = (
+            x + steepness_inv_double * std::log(std::exp(-steepness * x) + 1.0)
+        );
+    }
 
     if (this->channels > 0) {
         previous_input_sample = new Sample[this->channels];
@@ -59,17 +62,19 @@ void Distortion<InputSignalProducerClass>::initialize_instance(
         previous_input_sample = NULL;
         F0_previous_input_sample = NULL;
     }
+}
 
-    Sample const table_size_inv = 1.0 / (Sample)TABLE_SIZE;
-    Sample const steepness_inv_double = 2.0 / steepness;
 
-    for (Integer i = 0; i != TABLE_SIZE; ++i) {
-        Number const x = INPUT_MAX * ((Sample)i * table_size_inv);
-        f_table[i] = std::tanh(steepness * x * 0.5);
-        F0_table[i] = (
-            x + steepness_inv_double * std::log(std::exp(-steepness * x) + 1.0)
-        );
+template<class InputSignalProducerClass>
+Distortion<InputSignalProducerClass>::~Distortion()
+{
+    if (previous_input_sample != NULL) {
+        delete[] previous_input_sample;
+        delete[] F0_previous_input_sample;
     }
+
+    previous_input_sample = NULL;
+    F0_previous_input_sample = NULL;
 }
 
 
@@ -148,9 +153,6 @@ void Distortion<InputSignalProducerClass>::render(
             }
         }
     }
-
-    this->previous_input_sample = previous_input_sample;
-    this->F0_previous_input_sample = F0_previous_input_sample;
 }
 
 
