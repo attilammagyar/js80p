@@ -28,6 +28,7 @@
 
 #include "synth/envelope.hpp"
 #include "synth/biquad_filter.hpp"
+#include "synth/distortion.hpp"
 #include "synth/filter.hpp"
 #include "synth/math.hpp"
 #include "synth/midi_controller.hpp"
@@ -557,6 +558,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 bool is_silent;
         };
 
+        typedef Distortion<Bus> Overdrive;
+        typedef Distortion<Overdrive> Distortion_;
+        typedef BiquadFilter<Distortion_> Filter1;
+        typedef BiquadFilter<Filter1> Filter2;
+
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
@@ -593,6 +599,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         SingleProducerSingleConsumerMessageQueue messages;
         Bus bus;
+        Overdrive overdrive;
+        Distortion_ distortion;
+        typename Filter1::TypeParam filter_1_type;
+        typename Filter2::TypeParam filter_2_type;
+        Filter1 filter_1;
+        Filter2 filter_2;
         FloatParam* float_params[FLOAT_PARAMS_MAX];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
         std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];

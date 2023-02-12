@@ -57,6 +57,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         };
 
         BiquadFilter(
+            std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
             Integer const shared_coefficients_group = -1

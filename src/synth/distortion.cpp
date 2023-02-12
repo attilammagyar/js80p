@@ -31,10 +31,11 @@ namespace JS80P
 
 template<class InputSignalProducerClass>
 Distortion<InputSignalProducerClass>::Distortion(
+        std::string const name,
         Number const steepness,
         InputSignalProducerClass& input
 ) : Filter<InputSignalProducerClass>(input, 1),
-    level("G", 0.0, 1.0, 0.0)
+    level(name + "G", 0.0, 1.0, 0.0)
 {
     initialize_instance(steepness);
 }
@@ -69,18 +70,6 @@ void Distortion<InputSignalProducerClass>::initialize_instance(
             x + steepness_inv_double * std::log(std::exp(-steepness * x) + 1.0)
         );
     }
-}
-
-
-template<class InputSignalProducerClass>
-Distortion<InputSignalProducerClass>::Distortion(
-        Number const steepness,
-        InputSignalProducerClass& input,
-        FloatParam& level_leader
-) : Filter<InputSignalProducerClass>(input, 1),
-    level(level_leader)
-{
-    initialize_instance(steepness);
 }
 
 

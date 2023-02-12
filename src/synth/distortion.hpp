@@ -19,6 +19,8 @@
 #ifndef JS80P__SYNTH__DISTORTION_HPP
 #define JS80P__SYNTH__DISTORTION_HPP
 
+#include <string>
+
 #include "js80p.hpp"
 
 #include "synth/param.hpp"
@@ -38,11 +40,10 @@ template<class InputSignalProducerClass>
 class Distortion : public Filter<InputSignalProducerClass>
 {
     public:
-        Distortion(Number const steepness, InputSignalProducerClass& input);
         Distortion(
+            std::string const name,
             Number const steepness,
-            InputSignalProducerClass& input,
-            FloatParam& level_leader
+            InputSignalProducerClass& input
         );
 
         Sample const* const* initialize_rendering(

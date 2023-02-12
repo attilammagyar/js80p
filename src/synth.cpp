@@ -26,8 +26,9 @@
 
 #include "synth.hpp"
 
-#include "synth/envelope.cpp"
 #include "synth/biquad_filter.cpp"
+#include "synth/distortion.cpp"
+#include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
@@ -43,7 +44,7 @@ namespace JS80P
 {
 
 Synth::Synth()
-    : SignalProducer(OUT_CHANNELS, 41),
+    : SignalProducer(OUT_CHANNELS, 47),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
     frequency_modulation_level("FM", Constants::FM_MIN, Constants::FM_MAX, 0.0),
@@ -58,6 +59,12 @@ Synth::Synth()
         volume,
         modulator_add_volume
     ),
+    overdrive("EO", 3.0, bus),
+    distortion("ED", 10.0, overdrive),
+    filter_1_type("EF1TYP"),
+    filter_2_type("EF2TYP"),
+    filter_1("EF1", distortion, filter_1_type),
+    filter_2("EF2", filter_1, filter_2_type),
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
     envelopes((Envelope* const*)envelopes_rw),
@@ -143,6 +150,24 @@ Synth::Synth()
     register_float_param(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
     register_float_param(ParamId::CF2Q, carrier_params.filter_2_q);
     register_float_param(ParamId::CF2G, carrier_params.filter_2_gain);
+
+    register_child(overdrive);
+    float_params[ParamId::EOG - SPECIAL_PARAMS] = &overdrive.level;
+
+    register_child(distortion);
+    float_params[ParamId::EDG - SPECIAL_PARAMS] = &distortion.level;
+
+    register_child(filter_1);
+    register_child(filter_1_type);
+    float_params[ParamId::EF1FRQ - SPECIAL_PARAMS] = &filter_1.frequency;
+    float_params[ParamId::EF1Q - SPECIAL_PARAMS] = &filter_1.q;
+    float_params[ParamId::EF1G - SPECIAL_PARAMS] = &filter_1.gain;
+
+    register_child(filter_2);
+    register_child(filter_2_type);
+    float_params[ParamId::EF2FRQ - SPECIAL_PARAMS] = &filter_2.frequency;
+    float_params[ParamId::EF2Q - SPECIAL_PARAMS] = &filter_2.q;
+    float_params[ParamId::EF2G - SPECIAL_PARAMS] = &filter_2.gain;
 
     Integer next_id = E1AMT - SPECIAL_PARAMS;
 
@@ -572,8 +597,8 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const
             case ParamId::MF2TYP: return modulator_params.filter_2_type.get_default_ratio();
             case ParamId::CF1TYP: return carrier_params.filter_1_type.get_default_ratio();
             case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
-            case ParamId::EF1TYP: return 0.0; // TODO
-            case ParamId::EF2TYP: return 0.0; // TODO
+            case ParamId::EF1TYP: return filter_1_type.get_default_ratio();
+            case ParamId::EF2TYP: return filter_2_type.get_default_ratio();
             case ParamId::L1WAV: return 0.0; // TODO
             case ParamId::L2WAV: return 0.0; // TODO
             case ParamId::L3WAV: return 0.0; // TODO
@@ -595,26 +620,7 @@ Number Synth::float_param_ratio_to_display_value(
         Number const ratio
 ) const {
     if (param_id < SPECIAL_PARAMS) {
-        switch (param_id) {
-            case ParamId::MODE: return 0.0;
-            case ParamId::MWAV: return 0.0;
-            case ParamId::CWAV: return 0.0;
-            case ParamId::MF1TYP: return 0.0;
-            case ParamId::MF2TYP: return 0.0;
-            case ParamId::CF1TYP: return 0.0;
-            case ParamId::CF2TYP: return 0.0;
-            case ParamId::EF1TYP: return 0.0;
-            case ParamId::EF2TYP: return 0.0;
-            case ParamId::L1WAV: return 0.0;
-            case ParamId::L2WAV: return 0.0;
-            case ParamId::L3WAV: return 0.0;
-            case ParamId::L4WAV: return 0.0;
-            case ParamId::L5WAV: return 0.0;
-            case ParamId::L6WAV: return 0.0;
-            case ParamId::L7WAV: return 0.0;
-            case ParamId::L8WAV: return 0.0;
-            default: return 0.0; // This should never be reached.
-        }
+        return 0.0;
     }
 
     return float_params[param_id - SPECIAL_PARAMS]->ratio_to_value(ratio);
@@ -633,8 +639,8 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::MF2TYP: return modulator_params.filter_2_type.ratio_to_value(ratio);
         case ParamId::CF1TYP: return carrier_params.filter_1_type.ratio_to_value(ratio);
         case ParamId::CF2TYP: return carrier_params.filter_2_type.ratio_to_value(ratio);
-        case ParamId::EF1TYP: return 0; // TODO
-        case ParamId::EF2TYP: return 0; // TODO
+        case ParamId::EF1TYP: return filter_1_type.ratio_to_value(ratio);
+        case ParamId::EF2TYP: return filter_2_type.ratio_to_value(ratio);
         case ParamId::L1WAV: return 0; // TODO
         case ParamId::L2WAV: return 0; // TODO
         case ParamId::L3WAV: return 0; // TODO
@@ -668,13 +674,13 @@ Sample const* const* Synth::initialize_rendering(
 ) {
     process_messages();
 
-    Sample const* const* const bus_buffer = SignalProducer::produce<Bus>(
-        &bus, round, sample_count
+    Sample const* const* const buffer = SignalProducer::produce<Filter2>(
+        &filter_2, round, sample_count
     );
 
     clear_midi_controllers();
 
-    return bus_buffer;
+    return buffer;
 }
 
 
@@ -749,10 +755,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio)
                 carrier_params.filter_2_type.set_ratio(ratio);
                 break;
 
-            case ParamId::EF1TYP: // TODO
+            case ParamId::EF1TYP:
+                filter_1_type.set_ratio(ratio);
                 break;
 
-            case ParamId::EF2TYP: // TODO
+            case ParamId::EF2TYP:
+                filter_2_type.set_ratio(ratio);
                 break;
 
             case ParamId::L1WAV: // TODO
@@ -875,8 +883,8 @@ Number Synth::get_param_ratio(ParamId const param_id) const
             case ParamId::MF2TYP: return modulator_params.filter_2_type.get_ratio();
             case ParamId::CF1TYP: return carrier_params.filter_1_type.get_ratio();
             case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
-            case ParamId::EF1TYP: return 0.0; // TODO
-            case ParamId::EF2TYP: return 0.0; // TODO
+            case ParamId::EF1TYP: return filter_1_type.get_ratio();
+            case ParamId::EF2TYP: return filter_2_type.get_ratio();
             case ParamId::L1WAV: return 0.0; // TODO
             case ParamId::L2WAV: return 0.0; // TODO
             case ParamId::L3WAV: return 0.0; // TODO

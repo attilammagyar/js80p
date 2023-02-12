@@ -68,21 +68,25 @@ BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+        std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
         Integer const shared_coefficients_group
 ) : Filter<InputSignalProducerClass>(input, 4),
     frequency(
-        "",
+        name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX
     ),
     q(
-        "", Constants::BIQUAD_FILTER_Q_MIN, Constants::BIQUAD_FILTER_Q_MAX, 1.0
+        name + "Q",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        1.0
     ),
     gain(
-        "",
+        name + "G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
         0.0

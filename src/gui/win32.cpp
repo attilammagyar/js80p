@@ -1573,6 +1573,22 @@ void GUI::build_effects_body()
 
     background->own(effects_body);
 
+    constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
+    constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
+
+    ADD_PE(effects_body,  74,               57, synth, ParamId::EOG,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(effects_body, 237,               57, synth, ParamId::EDG,    LFO_CTLS,   "%.2f", 100.0);
+
+    ADD_PE(effects_body, 385,               57, synth, ParamId::EF1TYP, NO_CTLS,    ft, ftc);
+    ADD_PE(effects_body, 385 + PE_W,        57, synth, ParamId::EF1FRQ, LFO_CTLS,   "%.1f", 1.0);
+    ADD_PE(effects_body, 385 + PE_W * 2,    57, synth, ParamId::EF1Q,   LFO_CTLS,   "%.2f", 1.0);
+    ADD_PE(effects_body, 385 + PE_W * 3,    57, synth, ParamId::EF1G,   LFO_CTLS,   "%.2f", 1.0);
+
+    ADD_PE(effects_body, 690,               57, synth, ParamId::EF2TYP, NO_CTLS,    ft, ftc);
+    ADD_PE(effects_body, 690 + PE_W,        57, synth, ParamId::EF2FRQ, LFO_CTLS,   "%.1f", 1.0);
+    ADD_PE(effects_body, 690 + PE_W * 2,    57, synth, ParamId::EF2Q,   LFO_CTLS,   "%.2f", 1.0);
+    ADD_PE(effects_body, 690 + PE_W * 3,    57, synth, ParamId::EF2G,   LFO_CTLS,   "%.2f", 1.0);
+
     effects_body->hide();
 }
 

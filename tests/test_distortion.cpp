@@ -48,7 +48,7 @@ constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
 TEST(while_distortion_level_is_close_to_zero_the_original_signal_is_barely_affected, {
     SumOfSines input(1.0, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion(10.0, input);
+    Distortion_ distortion("D", 10.0, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
@@ -97,7 +97,7 @@ void naive_distort(Number const level, Buffer &buffer)
 void test_distortion(Number const original_signal_level)
 {
     SumOfSines input(original_signal_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion(10.0, input);
+    Distortion_ distortion("D", 10.0, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
