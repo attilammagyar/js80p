@@ -153,3 +153,19 @@ TEST(detune, {
     assert_eq(880.0, Math::detune(440.0, 1200.0), DOUBLE_DELTA);
     assert_eq(1760.0, Math::detune(440.0, 2400.0), DOUBLE_DELTA);
 })
+
+
+TEST(lookup, {
+    Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
+    Integer const max_index = 6;
+
+    assert_eq(1.0, Math::lookup(table, max_index, 0.0), DOUBLE_DELTA);
+    assert_eq(1.5, Math::lookup(table, max_index, 0.5), DOUBLE_DELTA);
+    assert_eq(1.7, Math::lookup(table, max_index, 0.7), DOUBLE_DELTA);
+    assert_eq(6.0, Math::lookup(table, max_index, 5.0), DOUBLE_DELTA);
+    assert_eq(6.3, Math::lookup(table, max_index, 5.3), DOUBLE_DELTA);
+    assert_eq(6.999, Math::lookup(table, max_index, 5.999), DOUBLE_DELTA);
+    assert_eq(7.0, Math::lookup(table, max_index, 6.0), DOUBLE_DELTA);
+    assert_eq(7.0, Math::lookup(table, max_index, 6.1), DOUBLE_DELTA);
+    assert_eq(7.0, Math::lookup(table, max_index, 7.0), DOUBLE_DELTA);
+})

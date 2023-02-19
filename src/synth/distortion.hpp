@@ -65,7 +65,6 @@ class Distortion : public Filter<InputSignalProducerClass>
     private:
         static constexpr int TABLE_SIZE = 0x0800;
         static constexpr int MAX_INDEX = TABLE_SIZE - 1;
-        static constexpr int MAX_INDEX_BEFORE = MAX_INDEX - 1;
 
         static constexpr Sample INPUT_MAX = 3.0;
         static constexpr Sample INPUT_MIN = -3.0;
@@ -82,7 +81,7 @@ class Distortion : public Filter<InputSignalProducerClass>
         Sample f(Sample const x) const;
         Sample F0(Sample const x) const;
 
-        Sample lookup(Sample const x, Sample const* const table) const;
+        Sample lookup(Sample const* const table, Sample const x) const;
 
         Sample f_table[TABLE_SIZE];
         Sample F0_table[TABLE_SIZE];

@@ -124,6 +124,27 @@ Frequency Math::detune(Frequency const frequency, Number const cents)
     );
 }
 
+
+Number Math::lookup(
+        Number const* const table,
+        int const max_index,
+        Number const index
+) {
+    int const before_index = (int)index;
+
+    if (before_index >= max_index) {
+        return table[max_index];
+    }
+
+    Number const after_weight = index - std::floor(index);
+    Number const before_weight = 1.0 - after_weight;
+    int const after_index = before_index + 1;
+
+    return (
+        before_weight * table[before_index] + after_weight * table[after_index]
+    );
+}
+
 }
 
 #endif

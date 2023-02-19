@@ -191,9 +191,9 @@ template<class InputSignalProducerClass>
 Sample Distortion<InputSignalProducerClass>::f(Sample const x) const
 {
     if (x < 0.0) {
-        return -lookup(-x, f_table);
+        return -lookup(f_table, -x);
     } else {
-        return lookup(x, f_table);
+        return lookup(f_table, x);
     }
 }
 
@@ -206,32 +206,23 @@ Sample Distortion<InputSignalProducerClass>::F0(Sample const x) const
             return -x;
         }
 
-        return lookup(-x, F0_table);
+        return lookup(F0_table, -x);
     } else {
         if (x > INPUT_MAX) {
             return x;
         }
 
-        return lookup(x, F0_table);
+        return lookup(F0_table, x);
     }
 }
 
 
 template<class InputSignalProducerClass>
 Sample Distortion<InputSignalProducerClass>::lookup(
-        Sample const x,
-        Sample const* const table
+        Sample const* const table,
+        Sample const x
 ) const {
-    Sample const index = x * SCALE;
-
-    Number const after_weight = index - std::floor(index);
-    Number const before_weight = 1.0 - after_weight;
-    int const before_index = std::min(MAX_INDEX_BEFORE, (int)index);
-    int const after_index = before_index + 1;
-
-    return (
-        before_weight * table[before_index] + after_weight * table[after_index]
-    );
+    return Math::lookup(table, MAX_INDEX, x * SCALE);
 }
 
 }

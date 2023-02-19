@@ -90,6 +90,12 @@ class Math
             Number const cents
         );
 
+        static Number lookup(
+            Number const* const table,
+            int const max_index,
+            Number const index
+        );
+
     private:
         static constexpr int TABLE_SIZE = 0x0800;
         static constexpr int TABLE_MASK = 0x07ff;
