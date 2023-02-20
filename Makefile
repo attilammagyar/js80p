@@ -76,7 +76,8 @@ SYNTH_COMPONENTS = \
 	synth/signal_producer \
 	synth/queue \
 	synth/voice \
-	synth/wavefolder
+	synth/wavefolder \
+	synth/wavetable
 
 TESTS = \
 	test_example \
@@ -312,6 +313,7 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
 		src/synth/oscillator.cpp src/synth/oscillator.hpp \
+		src/synth/wavetable.cpp src/synth/wavetable.hpp \
 		src/synth/math.cpp src/synth/math.hpp \
 		src/synth/param.cpp src/synth/param.hpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
@@ -324,6 +326,7 @@ $(BUILD_DIR)/test_oscillator$(EXE): \
 $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
 		src/synth/param.cpp src/synth/param.hpp \
+		src/synth/envelope.cpp src/synth/envelope.hpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
 		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
 		src/js80p.hpp \

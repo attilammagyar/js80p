@@ -30,6 +30,7 @@
 #include "synth/param.cpp"
 #include "synth/queue.cpp"
 #include "synth/signal_producer.cpp"
+#include "synth/wavetable.cpp"
 
 
 using namespace JS80P;

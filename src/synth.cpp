@@ -38,6 +38,7 @@
 #include "synth/signal_producer.cpp"
 #include "synth/voice.cpp"
 #include "synth/wavefolder.cpp"
+#include "synth/wavetable.cpp"
 
 
 namespace JS80P
