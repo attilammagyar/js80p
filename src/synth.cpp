@@ -45,7 +45,16 @@ namespace JS80P
 {
 
 Synth::Synth()
-    : SignalProducer(OUT_CHANNELS, 101),
+    : SignalProducer(
+        OUT_CHANNELS,
+        5                   // VOL + ADD + FM + AM + bus
+        + 29 * 2            // Modulator::Params + Carrier::Params
+        + POLYPHONY * 2     // modulators + carriers
+        + ENVELOPES * 10
+        + 2                 // overdrive + distortion
+        + 2                 // filter_1 + filter_1_type
+        + 2                 // filter_2 + filter_2_type
+    ),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
     frequency_modulation_level("FM", Constants::FM_MIN, Constants::FM_MAX, 0.0),
