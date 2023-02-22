@@ -45,7 +45,7 @@ namespace JS80P
 {
 
 Synth::Synth()
-    : SignalProducer(OUT_CHANNELS, 47),
+    : SignalProducer(OUT_CHANNELS, 101),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
     frequency_modulation_level("FM", Constants::FM_MIN, Constants::FM_MAX, 0.0),
@@ -170,23 +170,22 @@ Synth::Synth()
     float_params[ParamId::EF2Q - SPECIAL_PARAMS] = &filter_2.q;
     float_params[ParamId::EF2G - SPECIAL_PARAMS] = &filter_2.gain;
 
-    Integer next_id = E1AMT - SPECIAL_PARAMS;
+    Integer next_id = E1AMT;
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
         Envelope* envelope = new Envelope(std::string("E") + to_string(i));
         envelopes_rw[i] = envelope;
-        register_child(*envelopes_rw[i]);
 
-        float_params[next_id++] = &envelope->amount;
-        float_params[next_id++] = &envelope->initial_value;
-        float_params[next_id++] = &envelope->delay_time;
-        float_params[next_id++] = &envelope->attack_time;
-        float_params[next_id++] = &envelope->peak_value;
-        float_params[next_id++] = &envelope->hold_time;
-        float_params[next_id++] = &envelope->decay_time;
-        float_params[next_id++] = &envelope->sustain_value;
-        float_params[next_id++] = &envelope->release_time;
-        float_params[next_id++] = &envelope->final_value;
+        register_float_param((ParamId)next_id++, envelope->amount);
+        register_float_param((ParamId)next_id++, envelope->initial_value);
+        register_float_param((ParamId)next_id++, envelope->delay_time);
+        register_float_param((ParamId)next_id++, envelope->attack_time);
+        register_float_param((ParamId)next_id++, envelope->peak_value);
+        register_float_param((ParamId)next_id++, envelope->hold_time);
+        register_float_param((ParamId)next_id++, envelope->decay_time);
+        register_float_param((ParamId)next_id++, envelope->sustain_value);
+        register_float_param((ParamId)next_id++, envelope->release_time);
+        register_float_param((ParamId)next_id++, envelope->final_value);
     }
 
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {

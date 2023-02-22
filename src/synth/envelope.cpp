@@ -26,8 +26,7 @@ namespace JS80P
 {
 
 Envelope::Envelope(std::string const name)
-    : SignalProducer(0, 10),
-    amount(name + "AMT",            0.0,    1.0,  1.0),
+    : amount(name + "AMT",            0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),
     delay_time(name + "DEL",        0.0,    6.0,  0.0),
     attack_time(name + "ATK",       0.0,    6.0,  0.02),
@@ -38,16 +37,6 @@ Envelope::Envelope(std::string const name)
     release_time(name + "REL",      0.0,    6.0,  0.1),
     final_value(name + "FIN",       0.0,    1.0,  0.0)
 {
-    register_child(amount);
-    register_child(initial_value);
-    register_child(delay_time);
-    register_child(attack_time);
-    register_child(peak_value);
-    register_child(hold_time);
-    register_child(decay_time);
-    register_child(sustain_value);
-    register_child(release_time);
-    register_child(final_value);
 }
 
 }

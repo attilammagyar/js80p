@@ -1254,8 +1254,27 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     );
     Sample const* const* rendered_samples;
 
-    envelope.set_block_size(block_size);
-    envelope.set_sample_rate(sample_rate);
+    envelope.amount.set_block_size(block_size);
+    envelope.initial_value.set_block_size(block_size);
+    envelope.delay_time.set_block_size(block_size);
+    envelope.attack_time.set_block_size(block_size);
+    envelope.peak_value.set_block_size(block_size);
+    envelope.hold_time.set_block_size(block_size);
+    envelope.decay_time.set_block_size(block_size);
+    envelope.sustain_value.set_block_size(block_size);
+    envelope.release_time.set_block_size(block_size);
+    envelope.final_value.set_block_size(block_size);
+
+    envelope.amount.set_sample_rate(sample_rate);
+    envelope.initial_value.set_sample_rate(sample_rate);
+    envelope.delay_time.set_sample_rate(sample_rate);
+    envelope.attack_time.set_sample_rate(sample_rate);
+    envelope.peak_value.set_sample_rate(sample_rate);
+    envelope.hold_time.set_sample_rate(sample_rate);
+    envelope.decay_time.set_sample_rate(sample_rate);
+    envelope.sustain_value.set_sample_rate(sample_rate);
+    envelope.release_time.set_sample_rate(sample_rate);
+    envelope.final_value.set_sample_rate(sample_rate);
 
     envelope.attack_time.set_value(3.0);
     envelope.hold_time.set_value(12.0);

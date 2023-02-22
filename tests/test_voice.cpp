@@ -102,8 +102,28 @@ TEST(portamento, {
     params.fine_detune.set_block_size(block_size);
     params.fine_detune.set_envelope(&envelope);
 
-    envelope.set_sample_rate(sample_rate);
-    envelope.set_block_size(block_size);
+    envelope.amount.set_block_size(block_size);
+    envelope.initial_value.set_block_size(block_size);
+    envelope.delay_time.set_block_size(block_size);
+    envelope.attack_time.set_block_size(block_size);
+    envelope.peak_value.set_block_size(block_size);
+    envelope.hold_time.set_block_size(block_size);
+    envelope.decay_time.set_block_size(block_size);
+    envelope.sustain_value.set_block_size(block_size);
+    envelope.release_time.set_block_size(block_size);
+    envelope.final_value.set_block_size(block_size);
+
+    envelope.amount.set_sample_rate(sample_rate);
+    envelope.initial_value.set_sample_rate(sample_rate);
+    envelope.delay_time.set_sample_rate(sample_rate);
+    envelope.attack_time.set_sample_rate(sample_rate);
+    envelope.peak_value.set_sample_rate(sample_rate);
+    envelope.hold_time.set_sample_rate(sample_rate);
+    envelope.decay_time.set_sample_rate(sample_rate);
+    envelope.sustain_value.set_sample_rate(sample_rate);
+    envelope.release_time.set_sample_rate(sample_rate);
+    envelope.final_value.set_sample_rate(sample_rate);
+
     envelope.attack_time.set_value(portamento_length);
     envelope.initial_value.set_value(
         params.fine_detune.value_to_ratio(-portamento_depth)

@@ -35,13 +35,8 @@ class FloatParam;
 
 /**
  * \brief A collection of parameters specifying an envelope.
- *
- * \note An \c Envelope does not actually produce any signals on its own, but it
- *       still inherits from \c SignalProducer, in order to make sure that block
- *       size and sample rate changes are propagated automatically to all the
- *       params.
  */
-class Envelope : public SignalProducer
+class Envelope
 {
     public:
         Envelope(std::string const name);

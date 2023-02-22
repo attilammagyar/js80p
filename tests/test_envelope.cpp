@@ -45,35 +45,3 @@ TEST(an_envelope_is_a_collection_of_float_params, {
     assert_eq("E1REL", envelope.release_time.get_name());
     assert_eq("E1FIN", envelope.final_value.get_name());
 })
-
-
-TEST(when_basic_properties_change_then_all_params_are_notified, {
-    constexpr Integer block_size = 12345;
-    constexpr Frequency sample_rate = 48000.0;
-    Envelope envelope("E1");
-
-    envelope.set_block_size(block_size);
-    envelope.set_sample_rate(sample_rate);
-
-    assert_eq(sample_rate, envelope.amount.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.initial_value.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.delay_time.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.attack_time.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.peak_value.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.hold_time.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.decay_time.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.sustain_value.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.release_time.get_sample_rate(), DOUBLE_DELTA);
-    assert_eq(sample_rate, envelope.final_value.get_sample_rate(), DOUBLE_DELTA);
-
-    assert_eq((int)block_size, (int)envelope.amount.get_block_size());
-    assert_eq((int)block_size, (int)envelope.initial_value.get_block_size());
-    assert_eq((int)block_size, (int)envelope.delay_time.get_block_size());
-    assert_eq((int)block_size, (int)envelope.attack_time.get_block_size());
-    assert_eq((int)block_size, (int)envelope.peak_value.get_block_size());
-    assert_eq((int)block_size, (int)envelope.hold_time.get_block_size());
-    assert_eq((int)block_size, (int)envelope.decay_time.get_block_size());
-    assert_eq((int)block_size, (int)envelope.sustain_value.get_block_size());
-    assert_eq((int)block_size, (int)envelope.release_time.get_block_size());
-    assert_eq((int)block_size, (int)envelope.final_value.get_block_size());
-})
