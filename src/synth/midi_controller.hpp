@@ -37,6 +37,10 @@ class MidiController
 
         MidiController();
 
+        /**
+         * \brief Store the new value of the controller, and also queue it as
+         *        an event with a time offset for sample-exact params.
+         */
         void change(Seconds const time_offset, Number const new_value);
         Number get_value() const;
         void clear();
