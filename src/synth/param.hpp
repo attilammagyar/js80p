@@ -25,7 +25,6 @@
 
 #include "js80p.hpp"
 
-#include "synth/envelope.hpp"
 #include "synth/midi_controller.hpp"
 #include "synth/signal_producer.hpp"
 

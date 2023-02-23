@@ -23,7 +23,6 @@
 
 #include "js80p.hpp"
 
-#include "synth/signal_producer.hpp"
 #include "synth/param.hpp"
 
 

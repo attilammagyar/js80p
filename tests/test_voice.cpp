@@ -21,8 +21,8 @@
 
 #include "js80p.hpp"
 
-#include "synth/envelope.cpp"
 #include "synth/biquad_filter.cpp"
+#include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
