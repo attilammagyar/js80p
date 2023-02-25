@@ -967,6 +967,8 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     };
     FloatParam float_param("float", -5.0, 5.0, 3.0, 0.5);
     MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -975,10 +977,15 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 
     assert_eq((void*)&midi_controller, (void*)float_param.get_midi_controller());
 
+    change_index_1 = float_param.get_change_index();
     midi_controller.change(1.2, 0.2514);
+    change_index_2 = float_param.get_change_index();
 
     // Non-sample-exact param usage.
     assert_eq(-2.5, float_param.get_value());
+    assert_eq(0.2514, float_param.get_ratio());
+
+    assert_neq((int)change_index_1, (int)change_index_2);
 
     assert_true(float_param.is_constant_until(2));
     assert_false(float_param.is_constant_until(3));
@@ -1000,6 +1007,8 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
     FloatParam leader("float", -5.0, 5.0, 3.0, 0.5);
     FloatParam follower(leader);
     MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
 
@@ -1010,8 +1019,13 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
     follower.set_block_size(block_size);
     follower.set_sample_rate(1.0);
 
+    change_index_1 = follower.get_change_index();
     midi_controller.change(1.2, 0.2514);
+    change_index_2 = follower.get_change_index();
     assert_eq(-2.5, follower.get_value());
+    assert_eq(0.2514, follower.get_ratio());
+
+    assert_neq((int)change_index_1, (int)change_index_2);
 
     assert_true(follower.is_constant_until(2));
     assert_false(follower.is_constant_until(3));
@@ -1377,11 +1391,13 @@ TEST(modulated_param_might_have_a_midi_controller_assigned, {
     modulation_level_leader.schedule_value(2.0, modulation_level_value);
     midi_controller.change(0.1, 0.5);
 
+    assert_false(modulatable_float_param.is_constant_in_next_round(1, block_size));
     rendered_samples = FloatParam::produce< ModulatableFloatParam<Modulator> >(
         &modulatable_float_param, 1
     );
     assert_eq(expected_samples[0], rendered_samples[0], block_size, DOUBLE_DELTA);
 
+    assert_false(modulatable_float_param.is_constant_in_next_round(2, block_size));
     rendered_samples = FloatParam::produce< ModulatableFloatParam<Modulator> >(
         &modulatable_float_param, 2
     );

@@ -29,15 +29,25 @@ using namespace JS80P;
 
 TEST(midi_controller_stores_midi_control_change_events, {
     MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
+    Integer change_index_3;
 
+    change_index_1 = midi_controller.get_change_index();
     midi_controller.change(1.0, 0.2);
+    change_index_2 = midi_controller.get_change_index();
     assert_eq(0.2, midi_controller.get_value());
 
     midi_controller.change(1.5, 0.5);
+    change_index_3 = midi_controller.get_change_index();
     assert_eq(0.5, midi_controller.get_value());
 
     midi_controller.change(2.0, 0.8);
     assert_eq(0.8, midi_controller.get_value());
+
+    assert_neq((int)change_index_1, (int)change_index_2);
+    assert_neq((int)change_index_2, (int)change_index_3);
+    assert_neq((int)change_index_3, (int)change_index_1);
 
     assert_eq(3, (int)midi_controller.events.length());
     assert_eq(1.0, midi_controller.events[0].time_offset, DOUBLE_DELTA);

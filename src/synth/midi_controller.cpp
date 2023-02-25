@@ -25,7 +25,7 @@
 namespace JS80P
 {
 
-MidiController::MidiController() : value(0.5), events(events_rw)
+MidiController::MidiController() : change_index(0), value(0.5), events(events_rw)
 {
 }
 
@@ -36,6 +36,14 @@ void MidiController::change(Seconds const time_offset, Number const new_value)
 
     events_rw.push(event);
     value = new_value;
+    ++change_index;
+    change_index &= 0x7fffffff;
+}
+
+
+Integer MidiController::get_change_index() const
+{
+    return change_index;
 }
 
 

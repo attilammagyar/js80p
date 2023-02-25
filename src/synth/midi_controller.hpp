@@ -42,11 +42,13 @@ class MidiController
          *        an event with a time offset for sample-exact params.
          */
         void change(Seconds const time_offset, Number const new_value);
+        Integer get_change_index() const;
         Number get_value() const;
         void clear();
 
     private:
         Queue<SignalProducer::Event> events_rw;
+        Integer change_index;
         Number value;
 
     public:

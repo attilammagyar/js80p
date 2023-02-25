@@ -280,10 +280,24 @@ void FloatParam::set_ratio(Number const ratio)
 }
 
 
+Number FloatParam::get_ratio() const
+{
+    if (is_following_leader()) {
+        return leader->get_ratio();
+    } else if (midi_controller != NULL) {
+        return midi_controller->get_value();
+    } else {
+        return Param<Number>::get_ratio();
+    }
+}
+
+
 Integer FloatParam::get_change_index() const
 {
     if (is_following_leader()) {
         return leader->get_change_index();
+    } else if (midi_controller != NULL) {
+        return midi_controller->get_change_index();
     } else {
         return Param<Number>::get_change_index();
     }

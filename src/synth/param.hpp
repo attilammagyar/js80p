@@ -154,6 +154,7 @@ class FloatParam : public Param<Number>
         void set_value(Number const new_value);
         Number get_value() const;
         void set_ratio(Number const ratio);
+        Number get_ratio() const;
         Integer get_change_index() const;
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
