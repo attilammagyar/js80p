@@ -35,15 +35,21 @@ void MidiController::change(Seconds const time_offset, Number const new_value)
     SignalProducer::Event event(EVT_CHANGE, time_offset, 0, new_value, 0.0);
 
     events_rw.push(event);
-    value = new_value;
-    ++change_index;
-    change_index &= 0x7fffffff;
+    change(new_value);
 }
 
 
 Integer MidiController::get_change_index() const
 {
     return change_index;
+}
+
+
+void MidiController::change(Number const new_value)
+{
+    value = new_value;
+    ++change_index;
+    change_index &= 0x7fffffff;
 }
 
 

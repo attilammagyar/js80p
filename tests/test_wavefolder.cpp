@@ -23,6 +23,7 @@
 
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
+#include "synth/flexible_controller.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/param.cpp"

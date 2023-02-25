@@ -301,7 +301,7 @@ class RendererWithCircularDependecy : public SignalProducer
 };
 
 
-TEST(cycles_in_rendering_are_broken_up_by_delaying_one_of_the_signal_producers, {
+TEST(cyclic_dependencies_in_rendering_are_broken_up_by_delaying_one_of_the_signal_producers, {
     constexpr Integer block_size = 3;
     constexpr Sample expected_samples_1[] = {3.0, 3.0, 3.0};
     constexpr Sample expected_samples_2[] = {2.0, 2.0, 2.0};
@@ -368,7 +368,7 @@ class PreparerWithCircularDependecy : public SignalProducer
 };
 
 
-TEST(cycles_in_rendering_initialization_are_broken_up_by_delaying_one_of_the_signal_producers, {
+TEST(cyclic_dependencies_in_rendering_initialization_are_broken_up_by_delaying_one_of_the_signal_producers, {
     constexpr Integer block_size = 3;
     PreparerWithCircularDependecy signal_producer_1;
     PreparerWithCircularDependecy signal_producer_2;

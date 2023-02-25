@@ -69,6 +69,7 @@ SYNTH_COMPONENTS = \
 	synth/distortion \
 	synth/envelope \
 	synth/filter \
+	synth/flexible_controller \
 	synth/math \
 	synth/midi_controller \
 	synth/oscillator \
@@ -84,6 +85,7 @@ TESTS = \
 	test_biquad_filter \
 	test_distortion \
 	test_envelope \
+	test_flexible_controller \
 	test_math \
 	test_midi_controller \
 	test_oscillator \
@@ -182,6 +184,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_queue$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_midi_controller$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_flexible_controller$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
@@ -288,6 +291,18 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		src/synth/param.cpp src/synth/param.hpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
 		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
+		src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_flexible_controller$(EXE): \
+		tests/test_flexible_controller.cpp \
+		src/synth/flexible_controller.cpp src/synth/flexible_controller.hpp \
+		src/synth/midi_controller.cpp src/synth/midi_controller.hpp \
+		src/synth/param.cpp src/synth/param.hpp \
+		src/synth/envelope.cpp src/synth/envelope.hpp \
+		src/synth/queue.cpp src/synth/queue.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)

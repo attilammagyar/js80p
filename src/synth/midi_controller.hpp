@@ -46,6 +46,9 @@ class MidiController
         Number get_value() const;
         void clear();
 
+    protected:
+        void change(Number const new_value);
+
     private:
         Queue<SignalProducer::Event> events_rw;
         Integer change_index;

@@ -22,6 +22,7 @@
 #include <algorithm>
 
 #include "synth/param.hpp"
+#include "synth/flexible_controller.hpp"
 
 
 namespace JS80P
@@ -210,6 +211,7 @@ FloatParam::FloatParam(
 ) : Param<Number>(name, min_value, max_value, default_value),
     leader(NULL),
     midi_controller(NULL),
+    flexible_controller(NULL),
     envelope(NULL),
     should_round(round_to > 0.0),
     round_to(round_to),
@@ -227,6 +229,7 @@ FloatParam::FloatParam(FloatParam& leader)
     ),
     leader(&leader),
     midi_controller(NULL),
+    flexible_controller(NULL),
     envelope(NULL),
     should_round(false),
     round_to(0.0),
@@ -244,6 +247,10 @@ Number FloatParam::get_value() const
         return leader->get_value();
     } else if (midi_controller != NULL) {
         return round_value(ratio_to_value(midi_controller->get_value()));
+    } else if (flexible_controller != NULL) {
+        flexible_controller->update();
+
+        return round_value(ratio_to_value(flexible_controller->get_value()));
     } else {
         return Param<Number>::get_value();
     }
@@ -286,6 +293,10 @@ Number FloatParam::get_ratio() const
         return leader->get_ratio();
     } else if (midi_controller != NULL) {
         return midi_controller->get_value();
+    } else if (flexible_controller != NULL) {
+        flexible_controller->update();
+
+        return flexible_controller->get_value();
     } else {
         return Param<Number>::get_ratio();
     }
@@ -298,6 +309,10 @@ Integer FloatParam::get_change_index() const
         return leader->get_change_index();
     } else if (midi_controller != NULL) {
         return midi_controller->get_change_index();
+    } else if (flexible_controller != NULL) {
+        flexible_controller->update();
+
+        return flexible_controller->get_change_index();
     } else {
         return Param<Number>::get_change_index();
     }
@@ -462,6 +477,24 @@ MidiController const* FloatParam::get_midi_controller() const
 }
 
 
+void FloatParam::set_flexible_controller(FlexibleController* flexible_controller)
+{
+    if (flexible_controller == NULL && this->flexible_controller != NULL) {
+        this->flexible_controller->update();
+
+        set_value(ratio_to_value(this->flexible_controller->get_value()));
+    }
+
+    this->flexible_controller = flexible_controller;
+}
+
+
+FlexibleController const* FloatParam::get_flexible_controller()
+{
+    return flexible_controller;
+}
+
+
 void FloatParam::set_envelope(Envelope const* const envelope)
 {
     this->envelope = envelope;
@@ -550,6 +583,9 @@ Sample const* const* FloatParam::initialize_rendering(
                 ratio_to_value(midi_controller->events[i].number_param_1)
             );
         }
+    } else if (flexible_controller != NULL) {
+        flexible_controller->update();
+        set_value(ratio_to_value(flexible_controller->get_value()));
     }
 
     return NULL;

@@ -30,6 +30,7 @@
 #include "synth/distortion.cpp"
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
+#include "synth/flexible_controller.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/oscillator.cpp"
@@ -47,13 +48,14 @@ namespace JS80P
 Synth::Synth()
     : SignalProducer(
         OUT_CHANNELS,
-        5                   // VOL + ADD + FM + AM + bus
-        + 29 * 2            // Modulator::Params + Carrier::Params
-        + POLYPHONY * 2     // modulators + carriers
+        5                           // VOL + ADD + FM + AM + bus
+        + 29 * 2                    // Modulator::Params + Carrier::Params
+        + POLYPHONY * 2             // modulators + carriers
+        + 2                         // overdrive + distortion
+        + 2                         // filter_1 + filter_1_type
+        + 2                         // filter_2 + filter_2_type
+        + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
-        + 2                 // overdrive + distortion
-        + 2                 // filter_1 + filter_1_type
-        + 2                 // filter_2 + filter_2_type
     ),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
@@ -77,8 +79,9 @@ Synth::Synth()
     filter_2("EF2", filter_1, filter_2_type),
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
-    envelopes((Envelope* const*)envelopes_rw),
-    midi_controllers((MidiController* const*)midi_controllers_rw)
+    midi_controllers((MidiController* const*)midi_controllers_rw),
+    flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
+    envelopes((Envelope* const*)envelopes_rw)
 {
     for (int i = 0; i != FLOAT_PARAMS_MAX; ++i) {
         float_params[i] = NULL;
@@ -179,22 +182,39 @@ Synth::Synth()
     float_params[ParamId::EF2Q - SPECIAL_PARAMS] = &filter_2.q;
     float_params[ParamId::EF2G - SPECIAL_PARAMS] = &filter_2.gain;
 
-    Integer next_id = E1AMT;
+    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+        /*
+         * Not using Math::exp() and friends here, for 2 reasons:
+         *  1. We go out of their domain here.
+         *  2. Since this loop runs only once, we can afford favoring accuracy
+         *     over speed.
+         */
+        frequencies[note] = (
+            (Frequency)std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
+        );
+    }
 
-    for (Integer i = 0; i != ENVELOPES; ++i) {
-        Envelope* envelope = new Envelope(std::string("E") + to_string(i));
-        envelopes_rw[i] = envelope;
+    for (int i = 0; i != POLYPHONY; ++i) {
+        modulators[i] = new Modulator(
+            frequencies, Midi::NOTES, modulator_params
+        );
+        register_child(*modulators[i]);
 
-        register_float_param((ParamId)next_id++, envelope->amount);
-        register_float_param((ParamId)next_id++, envelope->initial_value);
-        register_float_param((ParamId)next_id++, envelope->delay_time);
-        register_float_param((ParamId)next_id++, envelope->attack_time);
-        register_float_param((ParamId)next_id++, envelope->peak_value);
-        register_float_param((ParamId)next_id++, envelope->hold_time);
-        register_float_param((ParamId)next_id++, envelope->decay_time);
-        register_float_param((ParamId)next_id++, envelope->sustain_value);
-        register_float_param((ParamId)next_id++, envelope->release_time);
-        register_float_param((ParamId)next_id++, envelope->final_value);
+        carriers[i] = new Carrier(
+            frequencies,
+            Midi::NOTES,
+            carrier_params,
+            &modulators[i]->modulation_out,
+            amplitude_modulation_level,
+            frequency_modulation_level
+        );
+        register_child(*carriers[i]);
+    }
+
+    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
+        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+            midi_note_to_voice_assignments[channel][note] = -1;
+        }
     }
 
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
@@ -271,40 +291,36 @@ Synth::Synth()
     midi_controllers_rw[ControllerId::UNDEFINED_38] = new MidiController();
     midi_controllers_rw[ControllerId::UNDEFINED_39] = new MidiController();
 
-    for (int i = 0; i != POLYPHONY; ++i) {
-        modulators[i] = new Modulator(
-            frequencies, Midi::NOTES, modulator_params
-        );
-        register_child(*modulators[i]);
+    Integer next_id = C1IN;
 
-        carriers[i] = new Carrier(
-            frequencies,
-            Midi::NOTES,
-            carrier_params,
-            &modulators[i]->modulation_out,
-            amplitude_modulation_level,
-            frequency_modulation_level
+    for (Integer i = 0; i != FLEXIBLE_CONTROLLERS; ++i) {
+        FlexibleController* flexible_controller = (
+            new FlexibleController(std::string("C") + to_string(i))
         );
-        register_child(*carriers[i]);
+        flexible_controllers_rw[i] = flexible_controller;
 
+        register_float_param((ParamId)next_id++, flexible_controller->input);
+        register_float_param((ParamId)next_id++, flexible_controller->min);
+        register_float_param((ParamId)next_id++, flexible_controller->max);
+        register_float_param((ParamId)next_id++, flexible_controller->amount);
+        register_float_param((ParamId)next_id++, flexible_controller->distortion);
+        register_float_param((ParamId)next_id++, flexible_controller->randomness);
     }
 
-    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-        /*
-         * Not using Math::exp() and friends here, for 2 reasons:
-         *  1. We go out of their domain here.
-         *  2. Since this loop runs only once, we can afford favoring accuracy
-         *     over speed.
-         */
-        frequencies[note] = (
-            (Frequency)std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
-        );
-    }
+    for (Integer i = 0; i != ENVELOPES; ++i) {
+        Envelope* envelope = new Envelope(std::string("E") + to_string(i));
+        envelopes_rw[i] = envelope;
 
-    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
-        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            midi_note_to_voice_assignments[channel][note] = -1;
-        }
+        register_float_param((ParamId)next_id++, envelope->amount);
+        register_float_param((ParamId)next_id++, envelope->initial_value);
+        register_float_param((ParamId)next_id++, envelope->delay_time);
+        register_float_param((ParamId)next_id++, envelope->attack_time);
+        register_float_param((ParamId)next_id++, envelope->peak_value);
+        register_float_param((ParamId)next_id++, envelope->hold_time);
+        register_float_param((ParamId)next_id++, envelope->decay_time);
+        register_float_param((ParamId)next_id++, envelope->sustain_value);
+        register_float_param((ParamId)next_id++, envelope->release_time);
+        register_float_param((ParamId)next_id++, envelope->final_value);
     }
 
     update_param_states();
@@ -819,8 +835,9 @@ void Synth::handle_assign_controller(
         return;
     }
 
-    param->set_envelope(NULL);
     param->set_midi_controller(NULL);
+    param->set_flexible_controller(NULL);
+    param->set_envelope(NULL);
 
     controller_assignments[param_id].store(controller_id);
 
@@ -837,16 +854,45 @@ void Synth::handle_assign_controller(
             param->set_midi_controller(&velocity);
             break;
 
-        case SHAPED_CONTROLLER_1: break;
-        case SHAPED_CONTROLLER_2: break;
-        case SHAPED_CONTROLLER_3: break;
-        case SHAPED_CONTROLLER_4: break;
-        case SHAPED_CONTROLLER_5: break;
-        case SHAPED_CONTROLLER_6: break;
-        case SHAPED_CONTROLLER_7: break;
-        case SHAPED_CONTROLLER_8: break;
-        case SHAPED_CONTROLLER_9: break;
-        case SHAPED_CONTROLLER_10: break;
+        case FLEXIBLE_CONTROLLER_1:
+            param->set_flexible_controller(flexible_controllers[0]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_2:
+            param->set_flexible_controller(flexible_controllers[1]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_3:
+            param->set_flexible_controller(flexible_controllers[2]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_4:
+            param->set_flexible_controller(flexible_controllers[3]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_5:
+            param->set_flexible_controller(flexible_controllers[4]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_6:
+            param->set_flexible_controller(flexible_controllers[5]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_7:
+            param->set_flexible_controller(flexible_controllers[6]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_8:
+            param->set_flexible_controller(flexible_controllers[7]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_9:
+            param->set_flexible_controller(flexible_controllers[8]);
+            break;
+
+        case FLEXIBLE_CONTROLLER_10:
+            param->set_flexible_controller(flexible_controllers[9]);
+            break;
 
         case LFO_1: break;
         case LFO_2: break;

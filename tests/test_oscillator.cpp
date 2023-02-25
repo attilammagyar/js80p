@@ -24,6 +24,7 @@
 #include "js80p.hpp"
 
 #include "synth/envelope.cpp"
+#include "synth/flexible_controller.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/oscillator.cpp"

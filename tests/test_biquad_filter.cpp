@@ -26,6 +26,7 @@
 #include "synth/biquad_filter.cpp"
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
+#include "synth/flexible_controller.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/param.cpp"
 #include "synth/queue.cpp"

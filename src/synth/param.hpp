@@ -35,6 +35,9 @@ namespace JS80P
 class Envelope;
 
 
+class FlexibleController;
+
+
 /**
  * \brief A variable that can influence the synthesized sound or other
  *        parameters.
@@ -167,6 +170,9 @@ class FloatParam : public Param<Number>
         void set_midi_controller(MidiController const* const midi_controller);
         MidiController const* get_midi_controller() const;
 
+        void set_flexible_controller(FlexibleController* flexible_controller);
+        FlexibleController const* get_flexible_controller();
+
         void set_envelope(Envelope const* const envelope);
         Envelope const* get_envelope() const;
         void start_envelope(Seconds const time_offset);
@@ -225,6 +231,7 @@ class FloatParam : public Param<Number>
 
         FloatParam* const leader;
         MidiController const* midi_controller;
+        FlexibleController* flexible_controller;
         Envelope const* envelope;
 
         bool const should_round;

@@ -19,7 +19,7 @@ Effects:
 
     Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb
 
-Development progress: 51.8%
+Development progress: 58.5%
 ---------------------------
 
  * Oscillator features: 80%
@@ -28,7 +28,7 @@ Development progress: 51.8%
  * Wave folder: 100%
  * Envelopes: 100%
  * LFOs: 0%
- * MIDI Controller Customization: 0%
+ * Flexible Controllers: 67%
  * GUI: 30%
  * Effects: 33%
  * Patch persistency: 0%
