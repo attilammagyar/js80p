@@ -448,6 +448,10 @@ void FloatParam::handle_cancel_event(Event const& event)
 
 void FloatParam::set_midi_controller(MidiController const* const midi_controller)
 {
+    if (midi_controller == NULL && this->midi_controller != NULL) {
+        set_value(ratio_to_value(this->midi_controller->get_value()));
+    }
+
     this->midi_controller = midi_controller;
 }
 

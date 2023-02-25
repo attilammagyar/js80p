@@ -996,6 +996,10 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+
+    midi_controller.change(0.0, 0.35);
+    float_param.set_midi_controller(NULL);
+    assert_eq(-1.5, float_param.get_value(), DOUBLE_DELTA);
 })
 
 
@@ -1037,6 +1041,10 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
 
     assert_eq(expected_samples, follower_samples[0], block_size, DOUBLE_DELTA);
     assert_eq((void*)leader_samples, (void*)follower_samples);
+
+    midi_controller.change(0.0, 0.35);
+    leader.set_midi_controller(NULL);
+    assert_eq(-1.5, follower.get_value(), DOUBLE_DELTA);
 })
 
 
