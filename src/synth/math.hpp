@@ -91,6 +91,12 @@ class Math
             Number const cents
         );
 
+        /**
+         * \brief Return a pseudo random number between 0.0 and 1.0, based on
+         *        the given number between 0.0 and 1.0. The return value is
+         *        deterministic, the same input number will always generate the
+         *        same result.
+         */
         static Number randomize(Number const number);
 
         static Number lookup(
