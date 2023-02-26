@@ -232,13 +232,17 @@ TEST(statistics, {
 
 
 TEST(randomize, {
-    constexpr Integer probes = 500;
-    std::vector<Number> numbers(probes);
+    constexpr Integer last_probe = 500;
+    std::vector<Number> numbers(last_probe + 1);
     Math::Statistics statistics;
 
-    for (Integer i = 0; i != probes; ++i) {
-        numbers[i] = Math::randomize((Number)i / (Number)probes);
+    for (Integer i = 0; i != last_probe; ++i) {
+        Number const number = (Number)i / (Number)last_probe;
+        numbers[i] = Math::randomize(1.0, number);
+        assert_eq(number, Math::randomize(0.2, number), 0.21);
     }
+
+    numbers[last_probe] = Math::randomize(1.0, 1.0);
 
     Math::compute_statistics(numbers, statistics);
 

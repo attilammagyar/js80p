@@ -223,13 +223,15 @@ Number Math::combine(
 }
 
 
-Number Math::randomize(Number const number)
+Number Math::randomize(Number const level, Number const number)
 {
-    if (number < 0.0) {
-        return math.randoms[0];
+    if (level < 0.0001) {
+        return number;
     }
 
-    return lookup(math.randoms, RANDOMS, number * RANDOM_SCALE);
+    Number const random = lookup(math.randoms, RANDOMS, number * RANDOM_SCALE);
+
+    return combine(level, random, number);
 }
 
 

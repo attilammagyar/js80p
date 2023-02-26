@@ -106,7 +106,7 @@ class Math
          *        deterministic, the same input number will always generate the
          *        same result.
          */
-        static Number randomize(Number const number);
+        static Number randomize(Number const level, Number const number);
 
         static Number lookup(
             Number const* const table,
