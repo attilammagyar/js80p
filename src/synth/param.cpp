@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include "synth/param.hpp"
-#include "synth/flexible_controller.hpp"
 
 
 namespace JS80P
