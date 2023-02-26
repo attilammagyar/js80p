@@ -247,4 +247,6 @@ TEST(randomize, {
     Math::compute_statistics(numbers, statistics);
 
     assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.02);
+
+    assert_eq(Math::randomize(1.0, 1.0), Math::randomize(1.0, 99999.0));
 })

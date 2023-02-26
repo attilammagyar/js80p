@@ -229,7 +229,9 @@ Number Math::randomize(Number const level, Number const number)
         return number;
     }
 
-    Number const random = lookup(math.randoms, RANDOMS, number * RANDOM_SCALE);
+    Number const random = lookup(
+        math.randoms, RANDOMS_MAX_INDEX, number * RANDOM_SCALE
+    );
 
     return combine(level, random, number);
 }

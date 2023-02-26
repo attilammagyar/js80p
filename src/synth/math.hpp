@@ -133,6 +133,7 @@ class Math
 
     private:
         static constexpr int RANDOMS = 0x0200;
+        static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
         static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
 
         static constexpr int TABLE_SIZE = 0x0800;
