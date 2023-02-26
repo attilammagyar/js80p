@@ -136,10 +136,10 @@ class Math
         static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
         static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
 
-        static constexpr int TABLE_SIZE = 0x0800;
-        static constexpr int TABLE_MASK = 0x07ff;
+        static constexpr int SIN_TABLE_SIZE = 0x0800;
+        static constexpr int SIN_TABLE_MASK = 0x07ff;
 
-        static constexpr Number SINE_SCALE = (Number)TABLE_SIZE / PI_DOUBLE;
+        static constexpr Number SINE_SCALE = (Number)SIN_TABLE_SIZE / PI_DOUBLE;
 
         static constexpr int EXP_ITERATIONS = 8;
 
@@ -167,7 +167,7 @@ class Math
         */
         Number lookup_periodic(Number const* table, Number const index) const;
 
-        Number sines[TABLE_SIZE];
+        Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
 };
 

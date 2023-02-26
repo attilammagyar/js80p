@@ -34,14 +34,15 @@ Math::Math()
 {
     init_sines();
     init_randoms();
+    init_distortion();
 }
 
 
 void Math::init_sines()
 {
-    constexpr Number scale = PI_DOUBLE / (Number)TABLE_SIZE;
+    constexpr Number scale = PI_DOUBLE / (Number)SIN_TABLE_SIZE;
 
-    for (Integer i = 0; i < TABLE_SIZE; ++i) {
+    for (int i = 0; i != SIN_TABLE_SIZE; ++i) {
         sines[i] = std::sin((Number)i * scale);
     }
 }
@@ -59,7 +60,7 @@ void Math::init_randoms()
     Integer x = seed;
     Integer c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
 
-    for (Integer i = 0; i < RANDOMS; ++i) {
+    for (int i = 0; i != RANDOMS; ++i) {
         x = 32718 * x + c;
         c = x >> 16;
         x = x & 0xffff;
@@ -90,8 +91,8 @@ Number Math::sin_impl(Number const x) const
 Number Math::lookup_periodic(Number const* table, Number const index) const
 {
     Number const after_weight = index - std::floor(index);
-    int const before_index = ((int)index) & TABLE_MASK;
-    int const after_index = (before_index + 1) & TABLE_MASK;
+    int const before_index = ((int)index) & SIN_TABLE_MASK;
+    int const after_index = (before_index + 1) & SIN_TABLE_MASK;
 
     return combine(after_weight, table[after_index], table[before_index]);
 }
