@@ -171,33 +171,6 @@ TEST(lookup, {
 })
 
 
-void assert_statistics(
-        Number const expected_validity,
-        Number const expected_min,
-        Number const expected_median,
-        Number const expected_max,
-        Number const expected_mean,
-        Number const expected_standard_deviation,
-        Math::Statistics const& statistics,
-        Number const tolerance = DOUBLE_DELTA
-) {
-    if (!expected_validity) {
-        assert_false(statistics.is_valid);
-
-        return;
-    }
-
-    assert_true(statistics.is_valid);
-    assert_eq(expected_min, statistics.min, tolerance);
-    assert_eq(expected_median, statistics.median, tolerance);
-    assert_eq(expected_max, statistics.max, tolerance);
-    assert_eq(expected_mean, statistics.mean, tolerance);
-    assert_eq(
-        expected_standard_deviation, statistics.standard_deviation, tolerance
-    );
-}
-
-
 TEST(statistics, {
     std::vector<Number> empty;
     std::vector<Number> one_element{1.0};
