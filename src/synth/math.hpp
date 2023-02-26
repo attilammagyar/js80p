@@ -92,6 +92,15 @@ class Math
         );
 
         /**
+         * \brief Compute a_weight * a + (1.0 - a_weight) * b
+         */
+        static Number combine(
+            Number const a_weight,
+            Number const a,
+            Number const b
+        );
+
+        /**
          * \brief Return a pseudo random number between 0.0 and 1.0, based on
          *        the given number between 0.0 and 1.0. The return value is
          *        deterministic, the same input number will always generate the

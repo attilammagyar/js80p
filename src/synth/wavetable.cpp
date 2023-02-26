@@ -198,12 +198,7 @@ Sample Wavetable::lookup(WavetableState* state, Frequency const frequency) const
 
     state->needs_table_interpolation = true;
     state->table_indices[1] = more_partials_index;
-
-    Sample const fewer_partials_weight = max_partials - std::floor(max_partials);
-    Sample const more_partials_weight = 1.0 - fewer_partials_weight;
-
-    state->table_weights[0] = fewer_partials_weight;
-    state->table_weights[1] = more_partials_weight;
+    state->fewer_partials_weight = max_partials - std::floor(max_partials);
 
     return interpolate(state, abs_frequency, sample_index);
 }
@@ -235,29 +230,26 @@ Sample Wavetable::interpolate_sample_linear(
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
     );
-    Sample const sample_1_weight = 1.0 - sample_2_weight;
     Integer const sample_1_index = (Integer)sample_index;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
 
     Sample const* table_1 = samples[state->table_indices[0]];
 
     if (!state->needs_table_interpolation) {
-        return (
-            sample_1_weight * table_1[sample_1_index]
-            + sample_2_weight * table_1[sample_2_index]
+        return Math::combine(
+            sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
         );
     }
 
     Sample const* table_2 = samples[state->table_indices[1]];
 
-    return (
-        state->table_weights[0] * (
-            sample_1_weight * table_1[sample_1_index]
-            + sample_2_weight * table_1[sample_2_index]
-        )
-        + state->table_weights[1] * (
-            sample_1_weight * table_2[sample_1_index]
-            + sample_2_weight * table_2[sample_2_index]
+    return Math::combine(
+        state->fewer_partials_weight,
+        Math::combine(
+            sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
+        ),
+        Math::combine(
+            sample_2_weight, table_2[sample_2_index], table_2[sample_1_index]
         )
     );
 }
@@ -296,9 +288,10 @@ Sample Wavetable::interpolate_sample_lagrange(
     Sample const f_2_2 = table_2[sample_2_index];
     Sample const f_2_3 = table_2[sample_3_index];
 
-    return (
-        state->table_weights[0] * (a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3)
-        + state->table_weights[1] * (a_1 * f_2_1 + a_2 * f_2_2 + a_3 * f_2_3)
+    return Math::combine(
+        state->fewer_partials_weight,
+        a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3,
+        a_1 * f_2_1 + a_2 * f_2_2 + a_3 * f_2_3
     );
 }
 

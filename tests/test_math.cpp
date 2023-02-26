@@ -155,6 +155,15 @@ TEST(detune, {
 })
 
 
+TEST(combine, {
+    assert_eq(42.0, Math::combine(1.0, 42.0, 123.0), DOUBLE_DELTA);
+    assert_eq(123.0, Math::combine(0.0, 42.0, 123.0), DOUBLE_DELTA);
+    assert_eq(
+        0.3 * 42.0 + 0.7 * 123.0, Math::combine(0.3, 42.0, 123.0), DOUBLE_DELTA
+    );
+})
+
+
 TEST(lookup, {
     constexpr Integer max_index = 6;
     Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};

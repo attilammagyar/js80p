@@ -129,21 +129,21 @@ void Wavefolder<InputSignalProducerClass>::render(
     if (folding_buffer == NULL) {
         if (folding_value <= Constants::FOLD_TRANSITION) {
             Sample const folded_weight = folding_value * TRANSITION_INV;
-            Sample const bypass_weight = 1.0 - folded_weight;
 
             for (Integer c = 0; c != channels; ++c) {
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                     Sample const input_sample = input_buffer[c][i];
 
-                    buffer[c][i] = (
-                        folded_weight * fold(
+                    buffer[c][i] = Math::combine(
+                        folded_weight,
+                        fold(
                             1.0,
                             input_sample,
                             previous_input_sample[c],
                             F0_previous_input_sample[c],
                             previous_output_sample[c]
-                        )
-                        + bypass_weight * input_sample
+                        ),
+                        input_sample
                     );
                 }
             }
@@ -172,17 +172,17 @@ void Wavefolder<InputSignalProducerClass>::render(
 
                 if (folding_raw <= Constants::FOLD_TRANSITION) {
                     Sample const folded_weight = folding_raw * TRANSITION_INV;
-                    Sample const bypass_weight = 1.0 - folded_weight;
 
-                    buffer[c][i] = (
-                        folded_weight * fold(
+                    buffer[c][i] = Math::combine(
+                        folded_weight,
+                        fold(
                             1.0,
                             input_sample,
                             previous_input_sample[c],
                             F0_previous_input_sample[c],
                             previous_output_sample[c]
-                        )
-                        + bypass_weight * input_sample
+                        ),
+                        input_sample
                     );
                 } else {
                     Sample const folding = folding_raw + TRANSITION_DELTA;

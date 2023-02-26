@@ -90,13 +90,10 @@ Number Math::sin_impl(Number const x) const
 Number Math::lookup_periodic(Number const* table, Number const index) const
 {
     Number const after_weight = index - std::floor(index);
-    Number const before_weight = 1.0 - after_weight;
     int const before_index = ((int)index) & TABLE_MASK;
     int const after_index = (before_index + 1) & TABLE_MASK;
 
-    return (
-        before_weight * table[before_index] + after_weight * table[after_index]
-    );
+    return combine(after_weight, table[after_index], table[before_index]);
 }
 
 
@@ -212,6 +209,20 @@ void Math::compute_statistics(
 }
 
 
+Number Math::combine(
+        Number const a_weight,
+        Number const a,
+        Number const b
+) {
+    /*
+    One of the multiplications can be eliminated from the following formula:
+
+        a_weight * a + (1.0 - a_weight) * b
+    */
+    return a_weight * (a - b) + b;
+}
+
+
 Number Math::randomize(Number const number)
 {
     if (number < 0.0) {
@@ -234,12 +245,9 @@ Number Math::lookup(
     }
 
     Number const after_weight = index - std::floor(index);
-    Number const before_weight = 1.0 - after_weight;
     int const after_index = before_index + 1;
 
-    return (
-        before_weight * table[before_index] + after_weight * table[after_index]
-    );
+    return combine(after_weight, table[after_index], table[before_index]);
 }
 
 }

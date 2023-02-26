@@ -118,20 +118,18 @@ void Distortion<InputSignalProducerClass>::render(
     Sample* F0_previous_input_sample = this->F0_previous_input_sample;
 
     if (level_buffer == NULL) {
-        Sample const distorted_weight = level_value;
-        Sample const bypass_weight = 1.0 - distorted_weight;
-
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 Sample const input_sample = input_buffer[c][i];
 
-                buffer[c][i] = (
-                    distorted_weight * distort(
+                buffer[c][i] = Math::combine(
+                    level_value,
+                    distort(
                         input_sample,
                         previous_input_sample[c],
                         F0_previous_input_sample[c]
-                    )
-                    + bypass_weight * input_sample
+                    ),
+                    input_sample
                 );
             }
         }
@@ -139,16 +137,15 @@ void Distortion<InputSignalProducerClass>::render(
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 Sample const input_sample = input_buffer[c][i];
-                Sample const distorted_weight = level_buffer[i];
-                Sample const bypass_weight = 1.0 - distorted_weight;
 
-                buffer[c][i] = (
-                    distorted_weight * distort(
+                buffer[c][i] = Math::combine(
+                    level_buffer[i],
+                    distort(
                         input_sample,
                         previous_input_sample[c],
                         F0_previous_input_sample[c]
-                    )
-                    + bypass_weight * input_sample
+                    ),
+                    input_sample
                 );
             }
         }
