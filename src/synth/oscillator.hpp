@@ -132,9 +132,6 @@ class Oscillator : public SignalProducer
         FloatParam harmonic_9;
 
     private:
-        // https://www.music.mcgill.ca/~gary/307/week4/wavetables.html
-        // https://www.music.mcgill.ca/~gary/307/week5/node12.html
-
         static constexpr Number FREQUENCY_MIN = 0.001;
         static constexpr Number FREQUENCY_MAX = 24000.0;
         static constexpr Number FREQUENCY_DEFAULT = 440.0;

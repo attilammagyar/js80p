@@ -136,11 +136,11 @@ void Oscillator<ModulatorSignalProducerClass>::initialize_instance()
         custom_waveform_coefficients, CUSTOM_WAVEFORM_HARMONICS
     );
 
-    wavetables[SINE] = StandardWavetables::sine();
-    wavetables[SAWTOOTH] = StandardWavetables::sawtooth();
-    wavetables[INVERSE_SAWTOOTH] = StandardWavetables::inverse_sawtooth();
-    wavetables[TRIANGLE] = StandardWavetables::triangle();
-    wavetables[SQUARE] = StandardWavetables::square();
+    wavetables[SINE] = StandardWaveforms::sine();
+    wavetables[SAWTOOTH] = StandardWaveforms::sawtooth();
+    wavetables[INVERSE_SAWTOOTH] = StandardWaveforms::inverse_sawtooth();
+    wavetables[TRIANGLE] = StandardWaveforms::triangle();
+    wavetables[SQUARE] = StandardWaveforms::square();
     wavetables[CUSTOM] = custom_waveform;
 
     allocate_buffers(block_size);

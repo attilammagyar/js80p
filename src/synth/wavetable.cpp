@@ -169,7 +169,7 @@ Sample Wavetable::lookup(WavetableState* state, Frequency const frequency) const
         sample_index + state->scale * (Number)frequency
     );
 
-    Integer const partials = Wavetable::partials;
+    Integer const partials = this->partials;
 
     if (partials == 1) {
         state->needs_table_interpolation = false;
@@ -303,40 +303,40 @@ Sample Wavetable::interpolate_sample_lagrange(
 }
 
 
-StandardWavetables const StandardWavetables::standard_wavetables;
+StandardWaveforms const StandardWaveforms::standard_waveforms;
 
 
-Wavetable const* StandardWavetables::sine()
+Wavetable const* StandardWaveforms::sine()
 {
-    return standard_wavetables.sine_wt;
+    return standard_waveforms.sine_wt;
 }
 
 
-Wavetable const* StandardWavetables::sawtooth()
+Wavetable const* StandardWaveforms::sawtooth()
 {
-    return standard_wavetables.sawtooth_wt;
+    return standard_waveforms.sawtooth_wt;
 }
 
 
-Wavetable const* StandardWavetables::inverse_sawtooth()
+Wavetable const* StandardWaveforms::inverse_sawtooth()
 {
-    return standard_wavetables.inverse_sawtooth_wt;
+    return standard_waveforms.inverse_sawtooth_wt;
 }
 
 
-Wavetable const* StandardWavetables::triangle()
+Wavetable const* StandardWaveforms::triangle()
 {
-    return standard_wavetables.triangle_wt;
+    return standard_waveforms.triangle_wt;
 }
 
 
-Wavetable const* StandardWavetables::square()
+Wavetable const* StandardWaveforms::square()
 {
-    return standard_wavetables.square_wt;
+    return standard_waveforms.square_wt;
 }
 
 
-StandardWavetables::StandardWavetables()
+StandardWaveforms::StandardWaveforms()
 {
     Wavetable::initialize();
 
@@ -369,7 +369,7 @@ StandardWavetables::StandardWavetables()
 }
 
 
-StandardWavetables::~StandardWavetables()
+StandardWaveforms::~StandardWaveforms()
 {
     delete sine_wt;
     delete sawtooth_wt;

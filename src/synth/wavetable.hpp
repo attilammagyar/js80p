@@ -44,9 +44,14 @@ class WavetableState
 
 class Wavetable
 {
+    /*
+    https://www.music.mcgill.ca/~gary/307/week4/wavetables.html
+    https://www.music.mcgill.ca/~gary/307/week5/node12.html
+    */
+
     public:
         /*
-        20 Hz at 48 kHz sampling rate has a wavelength of 2400 samples,
+        24 Hz at 48 kHz sampling rate has a wavelength of 2000 samples,
         so 2048 samples per waveform with linear interpolation should be
         good enough for most of the audible spectrum.
 
@@ -122,7 +127,7 @@ class Wavetable
 };
 
 
-class StandardWavetables
+class StandardWaveforms
 {
     public:
         static Wavetable const* sine();
@@ -131,11 +136,11 @@ class StandardWavetables
         static Wavetable const* triangle();
         static Wavetable const* square();
 
-        StandardWavetables();
-        ~StandardWavetables();
+        StandardWaveforms();
+        ~StandardWaveforms();
 
     private:
-        static StandardWavetables const standard_wavetables;
+        static StandardWaveforms const standard_waveforms;
 
         Wavetable const* sine_wt;
         Wavetable const* sawtooth_wt;
