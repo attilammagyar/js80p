@@ -70,6 +70,17 @@ void Math::init_randoms()
 }
 
 
+void Math::init_distortion()
+{
+    Number const max_inv = 1.0 / (Number)DISTORTION_TABLE_MAX_INDEX;
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        Number const x = 2.0 * ((Number)i * max_inv) - 1.0;
+        distortion[i] = std::tanh(8.0 * x) * 0.5 + 0.5;
+    }
+}
+
+
 Number Math::sin(Number const x)
 {
     return math.sin_impl(x);
@@ -221,6 +232,22 @@ Number Math::combine(
         a_weight * a + (1.0 - a_weight) * b
     */
     return a_weight * (a - b) + b;
+}
+
+
+Number Math::distort(Number const level, Number const number)
+{
+    if (level < 0.0001) {
+        return number;
+    }
+
+    return combine(
+        level,
+        lookup(
+            math.distortion, DISTORTION_TABLE_MAX_INDEX, number * DISTORTION_SCALE
+        ),
+        number
+    );
 }
 
 

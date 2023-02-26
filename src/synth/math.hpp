@@ -101,6 +101,12 @@ class Math
         );
 
         /**
+         * \brief Apply a steep, tanh() based distortion to the given value
+         *        between 0.0 and 1.0.
+         */
+        static Number distort(Number const level, Number const number);
+
+        /**
          * \brief Return a pseudo random number between 0.0 and 1.0, based on
          *        the given number between 0.0 and 1.0. The return value is
          *        deterministic, the same input number will always generate the
@@ -136,6 +142,10 @@ class Math
         static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
         static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
 
+        static constexpr int DISTORTION_TABLE_SIZE = 0x0200;
+        static constexpr int DISTORTION_TABLE_MAX_INDEX = DISTORTION_TABLE_SIZE - 1;
+        static constexpr Number DISTORTION_SCALE = (Number)DISTORTION_TABLE_SIZE;
+
         static constexpr int SIN_TABLE_SIZE = 0x0800;
         static constexpr int SIN_TABLE_MASK = 0x07ff;
 
@@ -155,6 +165,7 @@ class Math
 
         void init_sines();
         void init_randoms();
+        void init_distortion();
 
         Number sin_impl(Number const x) const;
 
@@ -169,6 +180,7 @@ class Math
 
         Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
+        Number distortion[DISTORTION_TABLE_SIZE];
 };
 
 }
