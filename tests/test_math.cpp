@@ -250,7 +250,7 @@ TEST(statistics, {
 
 
 TEST(randomize, {
-    constexpr Integer const probes = 500;
+    constexpr Integer probes = 500;
     std::vector<Number> numbers(probes);
     Math::Statistics statistics;
 
