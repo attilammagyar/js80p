@@ -33,6 +33,7 @@ Math const Math::math;
 Math::Math()
 {
     init_sines();
+    init_randoms();
 }
 
 
@@ -42,6 +43,28 @@ void Math::init_sines()
 
     for (Integer i = 0; i < TABLE_SIZE; ++i) {
         sines[i] = std::sin((Number)i * scale);
+    }
+}
+
+
+void Math::init_randoms()
+{
+    /*
+    https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
+    */
+
+    constexpr Integer seed = 0x1705;
+    constexpr Number scale = 1.0 / 65536.0;
+
+    Integer x = seed;
+    Integer c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
+
+    for (Integer i = 0; i < RANDOMS; ++i) {
+        x = 32718 * x + c;
+        c = x >> 16;
+        x = x & 0xffff;
+
+        randoms[i] = (Number)x * scale;
     }
 }
 
@@ -186,6 +209,16 @@ void Math::compute_statistics(
     statistics.standard_deviation = std::sqrt(
         statistics.standard_deviation / size_float
     );
+}
+
+
+Number Math::randomize(Number const number)
+{
+    if (number < 0.0) {
+        return math.randoms[0];
+    }
+
+    return lookup(math.randoms, RANDOMS, number * RANDOM_SCALE);
 }
 
 

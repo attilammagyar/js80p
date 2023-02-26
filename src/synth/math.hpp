@@ -91,6 +91,8 @@ class Math
             Number const cents
         );
 
+        static Number randomize(Number const number);
+
         static Number lookup(
             Number const* const table,
             int const max_index,
@@ -115,6 +117,9 @@ class Math
         };
 
     private:
+        static constexpr int RANDOMS = 0x0200;
+        static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
+
         static constexpr int TABLE_SIZE = 0x0800;
         static constexpr int TABLE_MASK = 0x07ff;
 
@@ -133,6 +138,7 @@ class Math
         Math();
 
         void init_sines();
+        void init_randoms();
 
         Number sin_impl(Number const x) const;
 
@@ -146,6 +152,7 @@ class Math
         Number lookup_periodic(Number const* table, Number const index) const;
 
         Number sines[TABLE_SIZE];
+        Number randoms[RANDOMS];
 };
 
 }

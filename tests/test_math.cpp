@@ -178,7 +178,8 @@ void assert_statistics(
         Number const expected_max,
         Number const expected_mean,
         Number const expected_standard_deviation,
-        Math::Statistics const& statistics
+        Math::Statistics const& statistics,
+        Number const tolerance = DOUBLE_DELTA
 ) {
     if (!expected_validity) {
         assert_false(statistics.is_valid);
@@ -187,12 +188,12 @@ void assert_statistics(
     }
 
     assert_true(statistics.is_valid);
-    assert_eq(expected_min, statistics.min, DOUBLE_DELTA);
-    assert_eq(expected_median, statistics.median, DOUBLE_DELTA);
-    assert_eq(expected_max, statistics.max, DOUBLE_DELTA);
-    assert_eq(expected_mean, statistics.mean, DOUBLE_DELTA);
+    assert_eq(expected_min, statistics.min, tolerance);
+    assert_eq(expected_median, statistics.median, tolerance);
+    assert_eq(expected_max, statistics.max, tolerance);
+    assert_eq(expected_mean, statistics.mean, tolerance);
     assert_eq(
-        expected_standard_deviation, statistics.standard_deviation, DOUBLE_DELTA
+        expected_standard_deviation, statistics.standard_deviation, tolerance
     );
 }
 
@@ -245,4 +246,19 @@ TEST(statistics, {
         ),
         five_stats
     );
+})
+
+
+TEST(randomize, {
+    constexpr Integer const probes = 500;
+    std::vector<Number> numbers(probes);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        numbers[i] = Math::randomize((Number)i / (Number)probes);
+    }
+
+    Math::compute_statistics(numbers, statistics);
+
+    assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.02);
 })
