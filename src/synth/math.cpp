@@ -19,6 +19,8 @@
 #ifndef JS80P__SYNTH__MATH_CPP
 #define JS80P__SYNTH__MATH_CPP
 
+#include <limits>
+
 #include "synth/math.hpp"
 
 
@@ -121,6 +123,62 @@ Frequency Math::detune(Frequency const frequency, Number const cents)
     */
     return frequency * (Frequency)std::pow(
         2.0, Constants::DETUNE_CENTS_TO_POWER_OF_2_SCALE * cents
+    );
+}
+
+
+void Math::compute_statistics(
+        std::vector<Number> const numbers,
+        Statistics& statistics
+) {
+    std::vector<Number>::size_type const size = numbers.size();
+
+    statistics.min = std::numeric_limits<Number>::max();
+    statistics.median = 0.0;
+    statistics.max = std::numeric_limits<Number>::min();
+    statistics.mean = 0.0;
+    statistics.standard_deviation = 0.0;
+    statistics.is_valid = size >= 1;
+
+    if (!statistics.is_valid) {
+        return;
+    }
+
+    std::vector<Number>::size_type const middle = size >> 1;
+
+    if ((size & 1) == 0) {
+        statistics.median = (numbers[middle - 1] + numbers[middle]) / 2.0;
+    } else {
+        statistics.median = numbers[middle];
+    }
+
+    std::vector<Number> sorted(numbers);
+
+    std::sort(sorted.begin(), sorted.end());
+
+    for (std::vector<Number>::const_iterator it = sorted.begin(); it != sorted.end(); ++it) {
+        statistics.mean += *it;
+
+        if (*it < statistics.min) {
+            statistics.min = *it;
+        }
+
+        if (*it > statistics.max) {
+            statistics.max = *it;
+        }
+    }
+
+    Number const size_float = (Number)size;
+
+    statistics.mean /= size_float;
+
+    for (std::vector<Number>::const_iterator it = sorted.begin(); it != sorted.end(); ++it) {
+        Number const diff = *it - statistics.mean;
+        statistics.standard_deviation += diff * diff;
+    }
+
+    statistics.standard_deviation = std::sqrt(
+        statistics.standard_deviation / size_float
     );
 }
 

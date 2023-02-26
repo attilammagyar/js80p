@@ -156,8 +156,8 @@ TEST(detune, {
 
 
 TEST(lookup, {
+    constexpr Integer max_index = 6;
     Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
-    Integer const max_index = 6;
 
     assert_eq(1.0, Math::lookup(table, max_index, 0.0), DOUBLE_DELTA);
     assert_eq(1.5, Math::lookup(table, max_index, 0.5), DOUBLE_DELTA);
@@ -168,4 +168,81 @@ TEST(lookup, {
     assert_eq(7.0, Math::lookup(table, max_index, 6.0), DOUBLE_DELTA);
     assert_eq(7.0, Math::lookup(table, max_index, 6.1), DOUBLE_DELTA);
     assert_eq(7.0, Math::lookup(table, max_index, 7.0), DOUBLE_DELTA);
+})
+
+
+void assert_statistics(
+        Number const expected_validity,
+        Number const expected_min,
+        Number const expected_median,
+        Number const expected_max,
+        Number const expected_mean,
+        Number const expected_standard_deviation,
+        Math::Statistics const& statistics
+) {
+    if (!expected_validity) {
+        assert_false(statistics.is_valid);
+
+        return;
+    }
+
+    assert_true(statistics.is_valid);
+    assert_eq(expected_min, statistics.min, DOUBLE_DELTA);
+    assert_eq(expected_median, statistics.median, DOUBLE_DELTA);
+    assert_eq(expected_max, statistics.max, DOUBLE_DELTA);
+    assert_eq(expected_mean, statistics.mean, DOUBLE_DELTA);
+    assert_eq(
+        expected_standard_deviation, statistics.standard_deviation, DOUBLE_DELTA
+    );
+}
+
+
+TEST(statistics, {
+    std::vector<Number> empty;
+    std::vector<Number> one_element{1.0};
+    std::vector<Number> two_elements{2.0, 1.0};
+    std::vector<Number> three_elements{3.0, 2.0, 1.0};
+    std::vector<Number> four_elements{4.0, 3.0, 2.0, 1.0};
+    std::vector<Number> five_elements{5.0, 4.0, 3.0, 2.0, 0.0};
+
+    Math::Statistics empty_stats;
+    Math::Statistics one_stats;
+    Math::Statistics two_stats;
+    Math::Statistics three_stats;
+    Math::Statistics four_stats;
+    Math::Statistics five_stats;
+
+    Math::compute_statistics(empty, empty_stats);
+    Math::compute_statistics(one_element, one_stats);
+    Math::compute_statistics(two_elements, two_stats);
+    Math::compute_statistics(three_elements, three_stats);
+    Math::compute_statistics(four_elements, four_stats);
+    Math::compute_statistics(five_elements, five_stats);
+
+    assert_statistics(false, 0.0, 0.0, 0.0, 0.0, 0.0, empty_stats);
+    assert_statistics(true, 1.0, 1.0, 1.0, 1.0, 0.0, one_stats);
+    assert_statistics(true, 1.0, 1.5, 2.0, 1.5, 0.5, two_stats);
+    assert_statistics(
+        true, 1.0, 2.0, 3.0, 2.0, std::sqrt(2.0 / 3.0), three_stats
+    );
+    assert_statistics(
+        true,
+        1.0,
+        2.5,
+        4.0,
+        2.5,
+        std::sqrt((1.5 * 1.5 * 2.0 + 0.5 * 0.5 * 2.0) / 4.0),
+        four_stats
+    );
+    assert_statistics(
+        true,
+        0.0,
+        3.0,
+        5.0,
+        2.8,
+        std::sqrt(
+            (2.2 * 2.2 + 1.2 * 1.2 + 0.2 * 0.2 + 0.8 * 0.8 + 2.8 * 2.8) / 5.0
+        ),
+        five_stats
+    );
 })

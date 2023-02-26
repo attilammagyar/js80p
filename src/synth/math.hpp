@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 #include "js80p.hpp"
 
@@ -95,6 +96,23 @@ class Math
             int const max_index,
             Number const index
         );
+
+        class Statistics;
+
+        static void compute_statistics(
+            std::vector<Number> const numbers,
+            Statistics& statistics
+        );
+
+        class Statistics {
+            public:
+                Number min;
+                Number max;
+                Number median;
+                Number mean;
+                Number standard_deviation;
+                bool is_valid;
+        };
 
     private:
         static constexpr int TABLE_SIZE = 0x0800;
