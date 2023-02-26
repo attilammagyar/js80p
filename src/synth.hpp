@@ -450,7 +450,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const ratio
         ) const;
-        ControllerId get_param_controller_id(ParamId const param_id) const;
+        ControllerId get_param_controller_id_atomic(ParamId const param_id) const;
 
         void note_on(
             Seconds const time_offset,

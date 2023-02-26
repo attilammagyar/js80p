@@ -693,8 +693,8 @@ void ControllerSelector::show(
         int const controller_choices,
         ParamEditor* param_editor
 ) {
-    ControllerId const selected_controller_id = synth.get_param_controller_id(
-        param_id
+    ControllerId const selected_controller_id = (
+        synth.get_param_controller_id_atomic(param_id)
     );
 
     JS80P::GUI::Controller const* const controller = GUI::get_controller(
@@ -981,16 +981,15 @@ void ParamEditor::set_up(HINSTANCE application, Widget* parent)
     default_ratio = synth.get_param_default_ratio(param_id);
     update_editor(
         synth.get_param_ratio_atomic(param_id),
-        synth.get_param_controller_id(param_id)
+        synth.get_param_controller_id_atomic(param_id)
     );
 }
 
 
 void ParamEditor::refresh()
 {
-    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
     ControllerId const new_controller_id = (
-        synth.get_param_controller_id(param_id)
+        synth.get_param_controller_id_atomic(param_id)
     );
     bool const had_controller = has_controller;
 
@@ -999,6 +998,8 @@ void ParamEditor::refresh()
     if (!(has_controller && had_controller)) {
         return;
     }
+
+    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
 
     if (new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);

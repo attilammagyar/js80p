@@ -679,7 +679,7 @@ Byte Synth::int_param_ratio_to_display_value(
 }
 
 
-Synth::ControllerId Synth::get_param_controller_id(ParamId const param_id) const
+Synth::ControllerId Synth::get_param_controller_id_atomic(ParamId const param_id) const
 {
     return (Synth::ControllerId)controller_assignments[param_id].load();
 }

@@ -127,7 +127,7 @@ TEST(messages_get_processed_during_rendering, {
     );
     assert_eq(
         Synth::ControllerId::NONE,
-        synth.get_param_controller_id(Synth::ParamId::CVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
     );
     SignalProducer::produce<Synth>(&synth, 1);
 
@@ -148,7 +148,7 @@ TEST(messages_get_processed_during_rendering, {
     );
     assert_eq(
         Synth::ControllerId::ENVELOPE_3,
-        synth.get_param_controller_id(Synth::ParamId::CVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
     );
 });
 
