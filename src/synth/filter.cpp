@@ -19,13 +19,7 @@
 #ifndef JS80P__SYNTH__FILTER_CPP
 #define JS80P__SYNTH__FILTER_CPP
 
-#include <cmath>
-
-#include "js80p.hpp"
-
 #include "synth/filter.hpp"
-
-#include "synth/math.hpp"
 
 
 namespace JS80P
