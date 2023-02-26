@@ -175,15 +175,15 @@ void Math::compute_statistics(
 
     std::vector<Number>::size_type const middle = size >> 1;
 
-    if ((size & 1) == 0) {
-        statistics.median = (numbers[middle - 1] + numbers[middle]) / 2.0;
-    } else {
-        statistics.median = numbers[middle];
-    }
-
     std::vector<Number> sorted(numbers);
 
     std::sort(sorted.begin(), sorted.end());
+
+    if ((size & 1) == 0) {
+        statistics.median = (sorted[middle - 1] + sorted[middle]) / 2.0;
+    } else {
+        statistics.median = sorted[middle];
+    }
 
     for (std::vector<Number>::const_iterator it = sorted.begin(); it != sorted.end(); ++it) {
         statistics.mean += *it;

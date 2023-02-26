@@ -175,9 +175,9 @@ TEST(statistics, {
     std::vector<Number> empty;
     std::vector<Number> one_element{1.0};
     std::vector<Number> two_elements{2.0, 1.0};
-    std::vector<Number> three_elements{3.0, 2.0, 1.0};
-    std::vector<Number> four_elements{4.0, 3.0, 2.0, 1.0};
-    std::vector<Number> five_elements{5.0, 4.0, 3.0, 2.0, 0.0};
+    std::vector<Number> three_elements{2.0, 3.0, 1.0};
+    std::vector<Number> four_elements{3.0, 1.0, 4.0, 2.0};
+    std::vector<Number> five_elements{2.0, 5.0, 3.0, 4.0, 0.0};
 
     Math::Statistics empty_stats;
     Math::Statistics one_stats;
