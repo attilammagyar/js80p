@@ -1567,51 +1567,71 @@ void GUI::build_controllers_body()
     ADD_PE(controllers_body,  21 + PE_W,      44, synth, ParamId::C1MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2,  44, synth, ParamId::C1MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21,            164, synth, ParamId::C1AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W,     164, synth, ParamId::C1DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 2, 164, synth, ParamId::C1RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 211,             44, synth, ParamId::C2IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W,      44, synth, ParamId::C2MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2,  44, synth, ParamId::C2MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211,            164, synth, ParamId::C2AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W,     164, synth, ParamId::C2DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 2, 164, synth, ParamId::C2RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 401,             44, synth, ParamId::C3IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W,      44, synth, ParamId::C3MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2,  44, synth, ParamId::C3MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401,            164, synth, ParamId::C3AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W,     164, synth, ParamId::C3DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 2, 164, synth, ParamId::C3RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 591,             44, synth, ParamId::C4IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W,      44, synth, ParamId::C4MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2,  44, synth, ParamId::C4MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591,            164, synth, ParamId::C4AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W,     164, synth, ParamId::C4DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 2, 164, synth, ParamId::C4RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 781,             44, synth, ParamId::C5IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W,      44, synth, ParamId::C5MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W * 2,  44, synth, ParamId::C5MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781,            164, synth, ParamId::C5AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W,     164, synth, ParamId::C5DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 2, 164, synth, ParamId::C5RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body,  21,            324, synth, ParamId::C6IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W,     324, synth, ParamId::C6MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2, 324, synth, ParamId::C6MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21,            444, synth, ParamId::C6AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W,     444, synth, ParamId::C6DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 2, 444, synth, ParamId::C6RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 211,            324, synth, ParamId::C7IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W,     324, synth, ParamId::C7MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2, 324, synth, ParamId::C7MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211,            444, synth, ParamId::C7AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W,     444, synth, ParamId::C7DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 2, 444, synth, ParamId::C7RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 401,            324, synth, ParamId::C8IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W,     324, synth, ParamId::C8MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2, 324, synth, ParamId::C8MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401,            444, synth, ParamId::C8AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W,     444, synth, ParamId::C8DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 2, 444, synth, ParamId::C8RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 591,            324, synth, ParamId::C9IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W,     324, synth, ParamId::C9MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2, 324, synth, ParamId::C9MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591,            444, synth, ParamId::C9AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W,     444, synth, ParamId::C9DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 2, 444, synth, ParamId::C9RND,    MIDI_CTLS, "%.2f", 100.0);
 
     ADD_PE(controllers_body, 781,            324, synth, ParamId::C10IN,     MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W,     324, synth, ParamId::C10MIN,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W * 2, 324, synth, ParamId::C10MAX,    MIDI_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781,            444, synth, ParamId::C10AMT,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W,     444, synth, ParamId::C10DST,    MIDI_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 2, 444, synth, ParamId::C10RND,    MIDI_CTLS, "%.2f", 100.0);
 
     controllers_body->hide();
 }

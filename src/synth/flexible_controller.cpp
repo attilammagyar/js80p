@@ -59,14 +59,15 @@ void FlexibleController::update()
     }
 
     Number const min_value = min.get_value();
-    Number computed_value = input.get_value();
+    Number const computed_value = Math::randomize(
+        randomness.get_value(),
+        Math::distort(distortion.get_value(), input.get_value())
+    );
 
-    computed_value = (
+    MidiController::change(
         min_value
         + computed_value * amount.get_value() * (max.get_value() - min_value)
     );
-
-    MidiController::change(computed_value);
 
     is_updating = false;
 }

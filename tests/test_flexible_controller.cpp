@@ -19,6 +19,8 @@
 #include "test.cpp"
 #include "utils.cpp"
 
+#include <vector>
+
 #include "js80p.hpp"
 
 #include "synth/envelope.cpp"
@@ -103,4 +105,77 @@ TEST(change_index_is_updated_only_when_there_is_an_actual_change, {
 
     assert_neq((int)change_index_1, (int)change_index_2);
     assert_eq((int)change_index_2, (int)change_index_3);
+})
+
+
+void assert_flexible_controller_value(
+        FlexibleController& flexible_controller,
+        Number const input_value,
+        Number const expected_value,
+        Number const tolerance = 0.01
+) {
+    flexible_controller.input.set_value(input_value);
+    flexible_controller.update();
+    assert_eq(
+        expected_value,
+        flexible_controller.get_value(),
+        tolerance,
+        "input=%f",
+        input_value
+    );
+}
+
+
+TEST(can_distort_the_value, {
+    constexpr Number min = 0.1;
+    constexpr Number max = 0.8;
+    constexpr Number amount = 0.7;
+    constexpr Number adjusted_max = (max - min) * amount;
+    FlexibleController flexible_controller;
+
+    flexible_controller.min.set_value(min);
+    flexible_controller.max.set_value(max);
+    flexible_controller.amount.set_value(amount);
+    flexible_controller.distortion.set_value(1.0);
+    flexible_controller.randomness.set_value(0.0);
+
+    assert_flexible_controller_value(flexible_controller, 0.0, min);
+    assert_flexible_controller_value(flexible_controller, 0.1, min);
+    assert_flexible_controller_value(flexible_controller, 0.2, min);
+    assert_flexible_controller_value(
+        flexible_controller, 0.5, min + adjusted_max / 2.0
+    );
+    assert_flexible_controller_value(flexible_controller, 0.8, min + adjusted_max);
+    assert_flexible_controller_value(flexible_controller, 0.9, min + adjusted_max);
+    assert_flexible_controller_value(flexible_controller, 1.0, min + adjusted_max);
+})
+
+
+TEST(can_randomize_the_value, {
+    constexpr Integer probes = 500;
+    constexpr Number min = 0.1;
+    constexpr Number max = 0.8;
+    constexpr Number amount = 0.7;
+    constexpr Number mean = (min + max * amount) / 2.0;
+    std::vector<Number> numbers(probes);
+    FlexibleController flexible_controller;
+    Math::Statistics statistics;
+
+    flexible_controller.min.set_value(min);
+    flexible_controller.max.set_value(max);
+    flexible_controller.amount.set_value(amount);
+    flexible_controller.distortion.set_value(0.0);
+    flexible_controller.randomness.set_value(1.0);
+
+    for (Integer i = 0; i != probes; ++i) {
+        flexible_controller.input.set_value((Number)i / (Number)probes);
+        flexible_controller.update();
+        numbers[i] = flexible_controller.get_value();
+    }
+
+    Math::compute_statistics(numbers, statistics);
+
+    assert_statistics(
+        true, min, mean, amount * max, mean, (mean - min) / 2.0, statistics, 0.025
+    );
 })
