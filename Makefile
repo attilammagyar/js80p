@@ -63,19 +63,22 @@ WIN_PLAYGROUND_OBJS = \
 	$(OBJ_PLAYGROUND_WIN) \
 	$(GUI_RES)
 
-SYNTH_COMPONENTS = \
-	synth \
-	synth/biquad_filter \
-	synth/distortion \
+PARAM_COMPONENTS = \
 	synth/envelope \
-	synth/filter \
 	synth/flexible_controller \
 	synth/math \
 	synth/midi_controller \
-	synth/oscillator \
 	synth/param \
-	synth/signal_producer \
 	synth/queue \
+	synth/signal_producer
+
+SYNTH_COMPONENTS = \
+	$(PARAM_COMPONENTS) \
+	synth \
+	synth/biquad_filter \
+	synth/distortion \
+	synth/filter \
+	synth/oscillator \
 	synth/voice \
 	synth/wavefolder \
 	synth/wavetable
@@ -99,15 +102,28 @@ TESTS = \
 PERF_TESTS = \
 	perf_math
 
-JS80P_HEADERS = \
+PARAM_HEADERS = \
+	src/js80p.hpp \
+	$(foreach COMPONENT,$(PARAM_COMPONENTS),src/$(COMPONENT).hpp)
+
+PARAM_SOURCES = \
+	$(foreach COMPONENT,$(PARAM_COMPONENTS),src/$(COMPONENT).cpp)
+
+SYNTH_HEADERS = \
 	src/debug.hpp \
 	src/js80p.hpp \
 	src/midi.hpp \
-	src/gui/gui.hpp \
 	$(foreach COMPONENT,$(SYNTH_COMPONENTS),src/$(COMPONENT).hpp)
 
-JS80P_SOURCES = \
+SYNTH_SOURCES = \
 	$(foreach COMPONENT,$(SYNTH_COMPONENTS),src/$(COMPONENT).cpp)
+
+JS80P_HEADERS = \
+	src/gui/gui.hpp \
+	$(SYNTH_HEADERS)
+
+JS80P_SOURCES = \
+	$(SYNTH_SOURCES)
 
 FST_HEADERS = \
 	$(JS80P_HEADERS) \
@@ -229,7 +245,7 @@ $(OBJ_PLAYGROUND_WIN): \
 	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
 		-D OEMRESOURCE -c $< -o $@
 
-$(OBJ_SYNTH_WIN): $(JS80P_HEADERS) $(JS80P_SOURCES) | $(BUILD_DIR)
+$(OBJ_SYNTH_WIN): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
 	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
 		-c src/synth.cpp -o $@
 
@@ -261,11 +277,7 @@ $(BUILD_DIR)/test_example$(EXE): \
 
 $(BUILD_DIR)/test_envelope$(EXE): \
 		tests/test_envelope.cpp \
-		src/synth/envelope.cpp src/synth/envelope.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -274,11 +286,7 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
 		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
-		src/synth/math.cpp src/synth/math.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -287,23 +295,14 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
 		src/synth/distortion.cpp src/synth/distortion.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
-		src/synth/math.cpp src/synth/math.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
-		src/synth/flexible_controller.cpp src/synth/flexible_controller.hpp \
-		src/synth/midi_controller.cpp src/synth/midi_controller.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/envelope.cpp src/synth/envelope.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -329,22 +328,14 @@ $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
 		src/synth/oscillator.cpp src/synth/oscillator.hpp \
 		src/synth/wavetable.cpp src/synth/wavetable.hpp \
-		src/synth/math.cpp src/synth/math.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/envelope.cpp src/synth/envelope.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -368,28 +359,24 @@ $(BUILD_DIR)/test_signal_producer$(EXE): \
 $(BUILD_DIR)/test_synth$(EXE): \
 		tests/test_synth.cpp \
 		$(TEST_LIBS) \
-		$(JS80P_HEADERS) \
-		$(JS80P_SOURCES) \
+		$(SYNTH_HEADERS) \
+		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_voice$(EXE): \
 		tests/test_voice.cpp \
 		$(TEST_LIBS) \
-		$(JS80P_HEADERS) \
-		$(JS80P_SOURCES) \
+		$(SYNTH_SOURCES) \
+		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
-		src/synth/wavefolder.cpp src/synth/wavefolder.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
-		src/synth/math.cpp src/synth/math.hpp \
-		src/synth/param.cpp src/synth/param.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
-		src/js80p.hpp \
+		src/synth/wavefolder.cpp src/synth/wavefolder.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
