@@ -603,8 +603,10 @@ void Background::set_up(HINSTANCE application, Widget* parent)
 {
     Widget::set_up(application, parent);
 
+    constexpr UINT elapse = (UINT)std::ceil(1000.0 / REFRESH_RATE);
+
     // TODO: GetLastError
-    SetTimer(hwnd, TIMER_ID, 83, NULL);
+    SetTimer(hwnd, TIMER_ID, elapse, NULL);
 }
 
 

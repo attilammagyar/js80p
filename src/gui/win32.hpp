@@ -204,6 +204,8 @@ class TabBody : public TransparentWidget
 class Background : public Widget
 {
     public:
+        static constexpr Frequency REFRESH_RATE = 18.0;
+
         Background();
         ~Background();
 
