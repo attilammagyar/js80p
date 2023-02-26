@@ -132,6 +132,8 @@ class Math
 
         Math();
 
+        void init_sines();
+
         Number sin_impl(Number const x) const;
 
         /*

@@ -32,6 +32,12 @@ Math const Math::math;
 
 Math::Math()
 {
+    init_sines();
+}
+
+
+void Math::init_sines()
+{
     constexpr Number scale = PI_DOUBLE / (Number)TABLE_SIZE;
 
     for (Integer i = 0; i < TABLE_SIZE; ++i) {
@@ -42,13 +48,13 @@ Math::Math()
 
 Number Math::sin(Number const x)
 {
-    return Math::math.sin_impl(x);
+    return math.sin_impl(x);
 }
 
 
 Number Math::cos(Number const x)
 {
-    return Math::sin(x + PI_HALF);
+    return sin(x + PI_HALF);
 }
 
 
