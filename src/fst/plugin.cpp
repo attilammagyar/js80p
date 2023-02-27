@@ -69,6 +69,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
     // );
 
     switch (op_code) {
+        case effProcessEvents:
+            fst_plugin->process_events((VstEvents*)pointer);
+            return 1;
+
         case effClose:
             delete fst_plugin;
             return 0;
@@ -100,10 +104,6 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         case effEditClose:
             fst_plugin->close_gui();
             return 0;
-
-        case effProcessEvents:
-            fst_plugin->process_events((VstEvents*)pointer);
-            return 1;
 
         case effGetPlugCategory:
             return kPlugCategSynth;
