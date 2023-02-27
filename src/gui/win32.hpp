@@ -493,6 +493,7 @@ class GUI : public JS80P::GUI
         HBITMAP lfos_bitmap;
         HBITMAP synth_bitmap;
 
+        Background* background;
         TabBody* about_body;
         TabBody* controllers_body;
         TabBody* effects_body;
@@ -503,7 +504,6 @@ class GUI : public JS80P::GUI
         Synth& synth;
         HINSTANCE application;
         ExternallyCreatedWindow parent_window;
-        Background* background;
 };
 
 } }

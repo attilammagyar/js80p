@@ -1460,7 +1460,14 @@ GUI::GUI(
         HWND parent_window,
         Synth& synth
 )
-    : synth(synth),
+    : background(NULL),
+    about_body(NULL),
+    controllers_body(NULL),
+    effects_body(NULL),
+    envelopes_body(NULL),
+    lfos_body(NULL),
+    synth_body(NULL),
+    synth(synth),
     application(application),
     parent_window(application, parent_window)
 {
