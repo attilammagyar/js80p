@@ -38,12 +38,19 @@ AEffect* FstPlugin::create_instance(
     memset(effect, 0, sizeof(AEffect));
 
     effect->dispatcher = &dispatch;
-    effect->flags = effFlagsHasEditor | effFlagsIsSynth | effFlagsCanReplacing;
+    effect->flags = (
+        effFlagsHasEditor
+        | effFlagsIsSynth
+        | effFlagsCanReplacing
+        | effFlagsCanDoubleReplacing
+        // | effFlagsProgramChunks
+    );
     effect->magic = kEffectMagic;
     effect->numInputs = 0;
     effect->numOutputs = OUT_CHANNELS;
     effect->object = (void*)fst_plugin;
     effect->processReplacing = &process_replacing;
+    effect->processDoubleReplacing = &process_double_replacing;
 
     return effect;
 }
@@ -147,7 +154,19 @@ void VSTCALLBACK FstPlugin::process_replacing(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    fst_plugin->generate_float(frames, outdata);
+    fst_plugin->generate_samples<float>(frames, outdata);
+}
+
+
+void VSTCALLBACK FstPlugin::process_double_replacing(
+        AEffect* effect,
+        double** indata,
+        double** outdata,
+        VstInt32 frames
+) {
+    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+
+    fst_plugin->generate_samples<double>(frames, outdata);
 }
 
 
@@ -227,7 +246,8 @@ void FstPlugin::process_midi_event(VstMidiEvent const* const event)
 }
 
 
-void FstPlugin::generate_float(VstInt32 const sample_count, float** samples)
+template<typename NumberType>
+void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** samples)
 {
     if (sample_count < 1) {
         return;
@@ -238,7 +258,7 @@ void FstPlugin::generate_float(VstInt32 const sample_count, float** samples)
 
     for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
         for (VstInt32 i = 0; i != sample_count; ++i) {
-            samples[c][i] = (float)buffer[c][i];
+            samples[c][i] = (NumberType)buffer[c][i];
         }
     }
 }

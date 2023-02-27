@@ -54,6 +54,9 @@ class FstPlugin
         static void VSTCALLBACK process_replacing(
             AEffect* effect, float** indata, float** outdata, VstInt32 frames
         );
+        static void VSTCALLBACK process_double_replacing(
+            AEffect* effect, double** indata, double** outdata, VstInt32 frames
+        );
 
         FstPlugin(
             AEffect* const effect,
@@ -68,7 +71,9 @@ class FstPlugin
         void resume();
         void process_events(VstEvents const* const events);
         void process_midi_event(VstMidiEvent const* const event);
-        void generate_float(VstInt32 const sample_count, float** samples);
+
+        template<typename NumberType>
+        void generate_samples(VstInt32 const sample_count, NumberType** samples);
 
         void open_gui(GUI::Window parent);
         void close_gui();
