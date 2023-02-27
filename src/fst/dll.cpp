@@ -32,7 +32,7 @@ extern "C" BOOL WINAPI DllMain(
         LPVOID lpvReserved
 ) {
     dll_instance = hinstDLL;
-    JS80P_DEBUG("DllMain(...)");
+    JS80P_DEBUG("DllMain(...); hinstDLL=%p", (void*)dll_instance);
 
     return TRUE;
 }
