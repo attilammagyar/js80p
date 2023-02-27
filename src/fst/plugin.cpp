@@ -108,6 +108,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return kVstVersion;
 
         case effCanDo:
+            if (strcmp("receiveVstMidiEvent", (char const*)pointer) == 0) {
+                return 1;
+            }
+
             JS80P_DEBUG(
                 "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
                 (int)op_code,
