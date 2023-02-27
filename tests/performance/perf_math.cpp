@@ -44,7 +44,7 @@ class Function
         {
         }
 
-        Number operator()(Number const x) const
+        Number operator()(Number const x, Number const y) const
         {
             return 0.0;
         }
@@ -75,7 +75,8 @@ Number run_many_times(FuncClass const& func, Number const n)
     Number sum = 0.0;
 
     for (Number x = min; x < max; x += delta) {
-        sum += func(x);
+        Number const y = max - x;
+        sum += func(x, y);
     }
 
     return sum * n_inv;
@@ -126,7 +127,7 @@ class class_name : public Function                                          \
             *(next_func++) = &run_if_requested<class_name>;                 \
         }                                                                   \
                                                                             \
-        Number operator()(Number const x) const                             \
+        Number operator()(Number const x, Number const y) const             \
         {                                                                   \
             return (expr);                                                  \
         }                                                                   \
@@ -194,6 +195,12 @@ taking the square root of the already calculated A, or to calculate
 */
 DEFINE_FUNC(MathPow10Scaled, "Math::pow_10(0.0125*x)", Math::pow_10(0.0125 * x), 0.0, 20.0);
 DEFINE_FUNC(StdSqrt, "std::sqrt(x)", std::sqrt(x), 0.0, 20.0);
+
+
+NEW_GROUP();
+
+DEFINE_FUNC(MathCombine, "Math::combine(x,0.5,y)", Math::combine(x, 0.5, y), 0.0, 1.0);
+DEFINE_FUNC(SimpleCombine, "x*0.5+(1.0-x)*y", x * 0.5 + (1.0 - x) * y, 0.0, 1.0);
 
 
 void usage(char const* name)

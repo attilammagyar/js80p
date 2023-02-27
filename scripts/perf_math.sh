@@ -19,7 +19,7 @@ main()
               for i in 1 2 3
               do
                   echo >&2
-                  time ./build/"$platform"/perf_math "$REPLY" 100000000
+                  time ./build/"$platform"/perf_math "$REPLY" 500000000
               done
           done 2>&1
 }
