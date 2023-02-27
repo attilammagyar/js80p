@@ -70,7 +70,8 @@ class FstPlugin
         void process_midi_event(VstMidiEvent const* const event);
         void generate_float(VstInt32 const sample_count, float** samples);
 
-        void show_gui(GUI::Window parent);
+        void open_gui(GUI::Window parent);
+        void close_gui();
 
         Synth synth;
 

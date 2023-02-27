@@ -94,11 +94,11 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return (VstIntPtr)pointer;
 
         case effEditOpen:
-            JS80P_DEBUG("effEditOpen");
-            fst_plugin->show_gui((GUI::Window)pointer);
-            return 0;
+            fst_plugin->open_gui((GUI::Window)pointer);
+            return 1;
 
         case effEditClose:
+            fst_plugin->close_gui();
             return 0;
 
         case effProcessEvents:
@@ -154,9 +154,7 @@ FstPlugin::FstPlugin(
 
 FstPlugin::~FstPlugin()
 {
-    if (gui != NULL) {
-        delete gui;
-    }
+    close_gui();
 }
 
 
@@ -228,20 +226,23 @@ void FstPlugin::generate_float(VstInt32 const sample_count, float** samples)
 }
 
 
-void FstPlugin::show_gui(GUI::Window parent_window)
+void FstPlugin::open_gui(GUI::Window parent_window)
 {
-    if (gui != NULL) {
-        delete gui;
+    close_gui();
+    gui = GUI::create_instance((GUI::Application)dll_instance, parent_window, synth);
+    gui->show();
+}
+
+
+void FstPlugin::close_gui()
+{
+    if (gui == NULL) {
+        return;
     }
 
-    JS80P_DEBUG(
-        "creating GUI instance; dll_instance=%p, parent_window=%p",
-        (void*)dll_instance,
-        (void*)parent_window
-    );
-    gui = GUI::create_instance((GUI::Application)dll_instance, parent_window, synth);
-    JS80P_DEBUG("showing GUI instance");
-    gui->show();
+    delete gui;
+
+    gui = NULL;
 }
 
 }
