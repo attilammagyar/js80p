@@ -49,6 +49,7 @@ AEffect* FstPlugin::create_instance(
     effect->numInputs = 0;
     effect->numOutputs = OUT_CHANNELS;
     effect->object = (void*)fst_plugin;
+    effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
     effect->processDoubleReplacing = &process_double_replacing;
 
@@ -143,6 +144,18 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
     }
 
     return 0;
+}
+
+
+void VSTCALLBACK FstPlugin::process_accumulating(
+        AEffect* effect,
+        float** indata,
+        float** outdata,
+        VstInt32 frames
+) {
+    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+
+    fst_plugin->generate_and_add_samples(frames, outdata);
 }
 
 
@@ -253,12 +266,37 @@ void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** sampl
         return;
     }
 
-    Sample const* const* buffer = synth.generate_samples(round, (Integer)sample_count);
-    round = (round + 1) & ROUND_MASK;
+    Sample const* const* buffer = render_round(sample_count);
 
     for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
         for (VstInt32 i = 0; i != sample_count; ++i) {
             samples[c][i] = (NumberType)buffer[c][i];
+        }
+    }
+}
+
+
+Sample const* const* FstPlugin::render_round(VstInt32 sample_count)
+{
+    round = (round + 1) & ROUND_MASK;
+
+    return synth.generate_samples(round, (Integer)sample_count);
+}
+
+
+void FstPlugin::generate_and_add_samples(
+        VstInt32 const sample_count,
+        float** samples
+) {
+    if (sample_count < 1) {
+        return;
+    }
+
+    Sample const* const* buffer = render_round(sample_count);
+
+    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
+        for (VstInt32 i = 0; i != sample_count; ++i) {
+            samples[c][i] += (float)buffer[c][i];
         }
     }
 }

@@ -51,11 +51,26 @@ class FstPlugin
             void* pointer,
             float fvalue
         );
-        static void VSTCALLBACK process_replacing(
-            AEffect* effect, float** indata, float** outdata, VstInt32 frames
+
+        static void VSTCALLBACK process_accumulating(
+            AEffect* effect,
+            float** indata,
+            float** outdata,
+            VstInt32 frames
         );
+
+        static void VSTCALLBACK process_replacing(
+            AEffect* effect,
+            float** indata,
+            float** outdata,
+            VstInt32 frames
+        );
+
         static void VSTCALLBACK process_double_replacing(
-            AEffect* effect, double** indata, double** outdata, VstInt32 frames
+            AEffect* effect,
+            double** indata,
+            double** outdata,
+            VstInt32 frames
         );
 
         FstPlugin(
@@ -75,6 +90,8 @@ class FstPlugin
         template<typename NumberType>
         void generate_samples(VstInt32 const sample_count, NumberType** samples);
 
+        void generate_and_add_samples(VstInt32 const sample_count, float** samples);
+
         void open_gui(GUI::Window parent);
         void close_gui();
 
@@ -82,6 +99,8 @@ class FstPlugin
 
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
+
+        Sample const* const* render_round(VstInt32 sample_count);
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
