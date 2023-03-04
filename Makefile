@@ -167,7 +167,7 @@ WIN_DLL_LFLAGS = -Wall -s -shared -static
 WIN_EXE_LFLAGS = -Wall -s -static
 WIN_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode
 
-.PHONY: all dirs clean check docs winguiplayground
+.PHONY: all check clean dirs docs perf winguiplayground
 
 all: dirs $(FST_DLL)
 
