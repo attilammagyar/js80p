@@ -95,17 +95,12 @@ Number Math::cos(Number const x)
 
 Number Math::sin_impl(Number const x) const
 {
-    return lookup_periodic(sines, x * SINE_SCALE);
-}
-
-
-Number Math::lookup_periodic(Number const* table, Number const index) const
-{
+    Number const index = x * SINE_SCALE;
     Number const after_weight = index - std::floor(index);
     int const before_index = ((int)index) & SIN_TABLE_MASK;
     int const after_index = (before_index + 1) & SIN_TABLE_MASK;
 
-    return combine(after_weight, table[after_index], table[before_index]);
+    return combine(after_weight, sines[after_index], sines[before_index]);
 }
 
 
@@ -280,6 +275,36 @@ Number Math::lookup(
     int const after_index = before_index + 1;
 
     return combine(after_weight, table[after_index], table[before_index]);
+}
+
+
+Number Math::lookup_periodic(
+        Number const* table,
+        int const table_size,
+        Number const index
+) {
+    Number const after_weight = index - std::floor(index);
+    int before_index = (int)std::floor(index);
+
+    if (before_index < 0) {
+        before_index -= (before_index / table_size - 1) * table_size;
+    }
+
+    if (before_index >= table_size) {
+        before_index %= table_size;
+    }
+
+    int after_index = before_index + 1;
+
+    if (after_index == table_size) {
+        after_index = 0;
+    }
+
+    return combine(
+        after_weight,
+        table[after_index],
+        table[before_index]
+    );
 }
 
 }

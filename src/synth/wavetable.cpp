@@ -227,6 +227,11 @@ Sample Wavetable::interpolate_sample_linear(
         WavetableState const* state,
         Number const sample_index
 ) const {
+    /*
+    Not using Math::lookup_periodic() here, because we don't want to calculate
+    the weight twice when interpolation between the two tables (fewer and more
+    partials) is needed.
+    */
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
     );

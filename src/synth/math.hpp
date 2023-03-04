@@ -114,9 +114,27 @@ class Math
          */
         static Number randomize(Number const level, Number const number);
 
+        /**
+         * \brief Look up the given floating point, non-negative \c index in the
+         *        given table, with linear interpolation. If \c index is greater
+         *        than or equal to \c max_index, then the last element of the
+         *        table is returned.
+         */
         static Number lookup(
             Number const* const table,
             int const max_index,
+            Number const index
+        );
+
+        /**
+         * \brief Look up the given floating point \c index in the given table,
+         *        with linear interpolation. If the \c index is negative, or it
+         *        is greater than or equal to the specified \c table_size, then
+         *        it wraps around.
+         */
+        static Number lookup_periodic(
+            Number const* table,
+            int const table_size,
             Number const index
         );
 
@@ -168,15 +186,6 @@ class Math
         void init_distortion();
 
         Number sin_impl(Number const x) const;
-
-        /*
-        With a little bit of templating, this might seem to be reusable for
-        oscillator wavetables, but actually that would mean calculating weights
-        and indices twice for a single sample lookup in the two tables for
-        fewer and more partials. Alternatively, bringing the multiple-table
-        logic here from there would be overkill.
-        */
-        Number lookup_periodic(Number const* table, Number const index) const;
 
         Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
