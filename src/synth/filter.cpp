@@ -30,7 +30,8 @@ Filter<InputSignalProducerClass>::Filter(
         InputSignalProducerClass& input,
         Integer const number_of_children
 ) : SignalProducer(input.get_channels(), number_of_children),
-    input(input)
+    input(input),
+    input_buffer(NULL)
 {
 }
 
