@@ -103,7 +103,6 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
     if (folding_buffer == NULL)
     {
         folding_value = folding.get_value();
-        folding.skip_round(round, sample_count);
 
         if (folding_value < 0.000001) {
             return this->input_buffer;

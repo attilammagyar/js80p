@@ -92,7 +92,6 @@ Sample const* const* Distortion<InputSignalProducerClass>::initialize_rendering(
     if (level_buffer == NULL)
     {
         level_value = level.get_value();
-        level.skip_round(round, sample_count);
 
         if (level_value < 0.000001) {
             return this->input_buffer;
