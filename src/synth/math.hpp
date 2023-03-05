@@ -175,6 +175,8 @@ class Math
         static constexpr Number POW_10_SCALE = LN_OF_10 * EXP_SCALE;
         static constexpr Number POW_10_INV_SCALE = -1.0 * POW_10_SCALE;
 
+        static constexpr Number DETUNE_CENTS_TO_POWER_OF_2_SCALE = 1.0 / 1200.0;
+
         static Math const math;
 
         static Number iterate_exp(Number const x, Number const scale);

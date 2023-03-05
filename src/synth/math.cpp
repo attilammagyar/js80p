@@ -154,8 +154,9 @@ Frequency Math::detune(Frequency const frequency, Number const cents)
     Also, std::pow(2.0, c1 * x) seems to be almost twice as fast as
     std::exp(c2 * x), for constants c1 and c2 (where c2 = c1 * LN_OF_2).
     */
-    return frequency * (Frequency)std::pow(
-        2.0, Constants::DETUNE_CENTS_TO_POWER_OF_2_SCALE * cents
+    return (
+        frequency
+        * (Frequency)std::pow(2.0, DETUNE_CENTS_TO_POWER_OF_2_SCALE * cents)
     );
 }
 

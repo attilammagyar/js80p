@@ -19,6 +19,8 @@
 #ifndef JS80P__SYNTH__BIQUAD_FILTER_HPP
 #define JS80P__SYNTH__BIQUAD_FILTER_HPP
 
+#include <cmath>
+
 #include "js80p.hpp"
 
 #include "synth/filter.hpp"
@@ -95,6 +97,11 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         TypeParam& type;
 
     private:
+        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
+        static constexpr Number FREQUENCY_SINE_SCALE = std::sqrt(2.0);
+        static constexpr Number GAIN_SCALE_HALF = (
+            Constants::BIQUAD_FILTER_GAIN_SCALE / 2.0
+        );
         static constexpr Number THRESHOLD = 0.000001;
         static constexpr Integer GROUPS = 4;
 

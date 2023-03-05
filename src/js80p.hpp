@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-#include <cmath>
-
 
 #if defined(__GNUC__) || defined(__clang__)
   #define LIKELY(condition) __builtin_expect((condition), 1)
@@ -51,8 +49,6 @@ typedef unsigned char Byte;
 
 
 namespace Constants {
-    constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
-
     constexpr Number FM_MIN = 0.0;
     constexpr Number FM_MAX = 4800.0;
 
@@ -65,19 +61,16 @@ namespace Constants {
 
     constexpr Number DETUNE_MIN = -4800.0;
     constexpr Number DETUNE_MAX = 4800.0;
-    constexpr Number DETUNE_CENTS_TO_POWER_OF_2_SCALE = 1.0 / 1200.0;
 
     constexpr Number FINE_DETUNE_MIN = -1200.0;
     constexpr Number FINE_DETUNE_MAX = 1200.0;
 
     constexpr Number BIQUAD_FILTER_FREQUENCY_MIN = 20.0;
     constexpr Number BIQUAD_FILTER_FREQUENCY_MAX = 24000.0;
-    constexpr Number BIQUAD_FILTER_FREQUENCY_SINE_SCALE = std::sqrt(2.0);
 
     constexpr Number BIQUAD_FILTER_GAIN_MIN = -48.0;
     constexpr Number BIQUAD_FILTER_GAIN_MAX = 24.0;
     constexpr Number BIQUAD_FILTER_GAIN_SCALE = 1.0 / 40.0;
-    constexpr Number BIQUAD_FILTER_GAIN_SCALE_HALF = 1.0 / 80.0;
 
     constexpr Number BIQUAD_FILTER_Q_MIN = 0.0;
     constexpr Number BIQUAD_FILTER_Q_MAX = 30.0;

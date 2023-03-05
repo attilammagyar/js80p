@@ -899,9 +899,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     );
 
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
-    Sample const a_sqrt = Math::pow_10(
-        (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE_HALF
-    );
+    Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
     Sample const w0 = w0_scale * (Sample)frequency_value;
     Sample const cos_w0 = Math::cos(w0);
@@ -916,7 +914,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     alpha_s is always multiplied by 2, which cancels dividing the sine by 2.
     */
     Sample const alpha_s_double_a_sqrt = (
-        Math::sin(w0) * Constants::BIQUAD_FILTER_FREQUENCY_SINE_SCALE * a_sqrt
+        Math::sin(w0) * FREQUENCY_SINE_SCALE * a_sqrt
     );
 
     store_normalized_coefficient_samples(
@@ -1015,9 +1013,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
     );
 
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
-    Sample const a_sqrt = Math::pow_10(
-        (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE_HALF
-    );
+    Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
     Sample const w0 = w0_scale * (Sample)frequency_value;
     Sample const cos_w0 = Math::cos(w0);
@@ -1029,10 +1025,10 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
 
     /*
     S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2). Also,
-    alpha_s is always multiplied by 2, which eliminates dividing the sine by 2.
+    alpha_s is always multiplied by 2, which cancels dividing the sine by 2.
     */
     Sample const alpha_s_double_a_sqrt = (
-        Math::sin(w0) * Constants::BIQUAD_FILTER_FREQUENCY_SINE_SCALE * a_sqrt
+        Math::sin(w0) * FREQUENCY_SINE_SCALE * a_sqrt
     );
 
     store_normalized_coefficient_samples(
@@ -1054,7 +1050,7 @@ void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
 ) {
     store_normalized_coefficient_samples(
         index,
-        Math::pow_10((Sample)gain_value * Constants::DB_TO_LINEAR_GAIN_SCALE),
+        Math::pow_10((Sample)gain_value * DB_TO_LINEAR_GAIN_SCALE),
         0.0,
         0.0,
         1.0,
