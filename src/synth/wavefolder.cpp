@@ -32,7 +32,9 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Wavefolder<InputSignalProducerClass>::Wavefolder(InputSignalProducerClass& input)
     : Filter<InputSignalProducerClass>(input, 1),
-    folding("FLD", Constants::FOLD_MIN, Constants::FOLD_MAX, 0.0)
+    folding(
+        "FLD", Constants::FOLD_MIN, Constants::FOLD_MAX, Constants::FOLD_DEFAULT
+    )
 {
     initialize_instance();
 }

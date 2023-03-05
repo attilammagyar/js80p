@@ -67,10 +67,16 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FREQUENCY_DEFAULT
     ),
     detune(
-        "", Constants::DETUNE_MIN, Constants::DETUNE_MAX, 0.0
+        "",
+        Constants::DETUNE_MIN,
+        Constants::DETUNE_MAX,
+        Constants::DETUNE_DEFAULT
     ),
     fine_detune(
-        "", Constants::FINE_DETUNE_MIN, Constants::FINE_DETUNE_MAX, 0.0
+        "",
+        Constants::FINE_DETUNE_MIN,
+        Constants::FINE_DETUNE_MAX,
+        Constants::FINE_DETUNE_DEFAULT
     ),
     harmonic_0("", -1.0, 1.0, 0.333),
     harmonic_1("", -1.0, 1.0, 0.333),

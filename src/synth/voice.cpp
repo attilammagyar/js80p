@@ -32,12 +32,26 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
     : waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 1.0),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
-    folding(name + "FLD", Constants::FOLD_MIN, Constants::FOLD_MAX, 0.0),
+    folding(
+        name + "FLD",
+        Constants::FOLD_MIN,
+        Constants::FOLD_MAX,
+        Constants::FOLD_DEFAULT
+    ),
     portamento_length(name + "PRT", 0.0, 3.0, 0.0),
     portamento_depth(name + "PRD", -2400.0, 2400.0, 0.0),
-    detune(name + "DTN", Constants::DETUNE_MIN, Constants::DETUNE_MAX, 0.0, 100.0),
+    detune(
+        name + "DTN",
+        Constants::DETUNE_MIN,
+        Constants::DETUNE_MAX,
+        Constants::DETUNE_DEFAULT,
+        100.0
+    ),
     fine_detune(
-        name + "FIN", Constants::FINE_DETUNE_MIN, Constants::FINE_DETUNE_MAX, 0.0
+        name + "FIN",
+        Constants::FINE_DETUNE_MIN,
+        Constants::FINE_DETUNE_MAX,
+        Constants::FINE_DETUNE_DEFAULT
     ),
     width(name + "WID", -1.0, 1.0, 0.2),
     panning(name + "PAN", -1.0, 1.0, 0.0),
@@ -59,19 +73,19 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
         name + "F1FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
     ),
     filter_1_q(
         name + "F1Q",
         Constants::BIQUAD_FILTER_Q_MIN,
         Constants::BIQUAD_FILTER_Q_MAX,
-        1.0
+        Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
     filter_1_gain(
         name + "F1G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
-        0.0
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
 
     filter_2_type(name + "F2TYP"),
@@ -79,19 +93,19 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
         name + "F2FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
     ),
     filter_2_q(
         name + "F2Q",
         Constants::BIQUAD_FILTER_Q_MIN,
         Constants::BIQUAD_FILTER_Q_MAX,
-        1.0
+        Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
     filter_2_gain(
         name + "F2G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
-        0.0
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT
     )
 {
 }

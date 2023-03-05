@@ -59,8 +59,12 @@ Synth::Synth()
     ),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
-    frequency_modulation_level("FM", Constants::FM_MIN, Constants::FM_MAX, 0.0),
-    amplitude_modulation_level("AM", Constants::AM_MIN, Constants::AM_MAX, 0.0),
+    frequency_modulation_level(
+        "FM", Constants::FM_MIN, Constants::FM_MAX, Constants::FM_DEFAULT
+    ),
+    amplitude_modulation_level(
+        "AM", Constants::AM_MIN, Constants::AM_MAX, Constants::AM_DEFAULT
+    ),
     modulator_params("M"),
     carrier_params("C"),
     bus(

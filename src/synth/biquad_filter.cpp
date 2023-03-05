@@ -77,19 +77,19 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
     ),
     q(
         name + "Q",
         Constants::BIQUAD_FILTER_Q_MIN,
         Constants::BIQUAD_FILTER_Q_MAX,
-        1.0
+        Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
     gain(
         name + "G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
-        0.0
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
     shared_coefficients_group(shared_coefficients_group)
