@@ -112,6 +112,8 @@ class SignalProducer
         virtual void set_block_size(Integer const new_block_size);
         Integer get_block_size() const;
 
+        Sample const* const* get_last_rendered_block(Integer& sample_count) const;
+
         Seconds sample_count_to_time_offset(Integer const sample_count) const;
 
         void schedule(
@@ -214,6 +216,7 @@ class SignalProducer
 
         Queue<Event> events;
         Sample** buffer;
+        Integer last_sample_count;
         Integer block_size;
         Frequency sample_rate;
         Frequency nyquist_frequency;

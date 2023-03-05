@@ -45,6 +45,7 @@ Sample const* const* SignalProducer::produce(
     Seconds const start_time = signal_producer->current_time;
     Integer const count = signal_producer->sample_count_or_block_size(sample_count);
 
+    signal_producer->last_sample_count = count;
     signal_producer->cached_round = round;
 
     signal_producer->cached_buffer = signal_producer->initialize_rendering(round, count);
@@ -94,6 +95,7 @@ SignalProducer::SignalProducer(
 )
     : channels(0 <= channels ? channels : 0),
     buffer(NULL),
+    last_sample_count(0),
     block_size(0),
     current_time(0.0),
     cached_round(-1)
@@ -114,6 +116,7 @@ void SignalProducer::set_block_size(Integer const new_block_size)
     if (new_block_size != block_size) {
         block_size = new_block_size;
         buffer = reallocate_buffer(buffer);
+        last_sample_count = 0;
         cached_round = -1;
 
         for (Children::iterator it = children.begin(); it != children.end(); ++it) {
@@ -199,6 +202,15 @@ Frequency SignalProducer::get_sample_rate() const
 Integer SignalProducer::get_block_size() const
 {
     return block_size;
+}
+
+
+Sample const* const* SignalProducer::get_last_rendered_block(
+        Integer& sample_count
+) const {
+    sample_count = last_sample_count;
+
+    return cached_buffer;
 }
 
 

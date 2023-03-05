@@ -76,6 +76,7 @@ SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
 	synth/biquad_filter \
+	synth/delay \
 	synth/distortion \
 	synth/filter \
 	synth/oscillator \
@@ -86,6 +87,7 @@ SYNTH_COMPONENTS = \
 TESTS = \
 	test_example \
 	test_biquad_filter \
+	test_delay \
 	test_distortion \
 	test_envelope \
 	test_flexible_controller \
@@ -205,6 +207,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
@@ -285,6 +288,15 @@ $(BUILD_DIR)/test_envelope$(EXE): \
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
 		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
+		src/synth/filter.cpp src/synth/filter.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_delay$(EXE): \
+		tests/test_delay.cpp \
+		src/synth/delay.cpp src/synth/delay.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \

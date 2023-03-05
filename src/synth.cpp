@@ -27,6 +27,7 @@
 #include "synth.hpp"
 
 #include "synth/biquad_filter.cpp"
+#include "synth/delay.cpp"
 #include "synth/distortion.cpp"
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"

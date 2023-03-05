@@ -241,6 +241,49 @@ class DelegatingSignalProducer : public SignalProducer
 };
 
 
+TEST(can_query_last_rendered_block, {
+    Sample const* const* rendered_samples;
+    Integer sample_count = 42;
+    DelegatingSignalProducer delegate(1.0);
+    DelegatingSignalProducer delegator(2.0, &delegate);
+
+    delegate.get_last_rendered_block(sample_count);
+    assert_eq(0, (int)sample_count);
+
+    delegator.get_last_rendered_block(sample_count);
+    assert_eq(0, (int)sample_count);
+
+    delegate.set_block_size(10);
+    delegator.set_block_size(10);
+
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(&delegate, 1, 5);
+    assert_eq(
+        (void*)rendered_samples,
+        (void*)delegate.get_last_rendered_block(sample_count)
+    );
+    assert_eq(5, (int)sample_count);
+
+    sample_count = 42;
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(
+        &delegator, 1, 5
+    );
+    assert_eq(
+        (void*)rendered_samples,
+        (void*)delegator.get_last_rendered_block(sample_count)
+    );
+    assert_eq(5, (int)sample_count);
+
+    delegate.set_block_size(20);
+    delegate.get_last_rendered_block(sample_count);
+    assert_eq(0, (int)sample_count);
+
+    sample_count = 42;
+    delegator.set_block_size(20);
+    delegator.get_last_rendered_block(sample_count);
+    assert_eq(0, (int)sample_count);
+})
+
+
 TEST(a_signal_producer_may_delegate_rendering_to_another_during_initialization, {
     constexpr Integer block_size = 2;
     constexpr Sample expected_samples[] = {1.0, 1.0};
