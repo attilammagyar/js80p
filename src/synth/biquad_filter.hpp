@@ -74,8 +74,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         );
         virtual ~BiquadFilter();
 
-        virtual void set_sample_rate(Frequency const new_sample_rate);
-        virtual void set_block_size(Integer const new_block_size);
+        virtual void set_sample_rate(Frequency const new_sample_rate) override;
+        virtual void set_block_size(Integer const new_block_size) override;
 
         void clear();
 
