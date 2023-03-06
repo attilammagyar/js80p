@@ -316,9 +316,21 @@ Wavetable const* StandardWaveforms::sawtooth()
 }
 
 
+Wavetable const* StandardWaveforms::soft_sawtooth()
+{
+    return standard_waveforms.soft_sawtooth_wt;
+}
+
+
 Wavetable const* StandardWaveforms::inverse_sawtooth()
 {
     return standard_waveforms.inverse_sawtooth_wt;
+}
+
+
+Wavetable const* StandardWaveforms::soft_inverse_sawtooth()
+{
+    return standard_waveforms.soft_inverse_sawtooth_wt;
 }
 
 
@@ -328,9 +340,21 @@ Wavetable const* StandardWaveforms::triangle()
 }
 
 
+Wavetable const* StandardWaveforms::soft_triangle()
+{
+    return standard_waveforms.soft_triangle_wt;
+}
+
+
 Wavetable const* StandardWaveforms::square()
 {
     return standard_waveforms.square_wt;
+}
+
+
+Wavetable const* StandardWaveforms::soft_square()
+{
+    return standard_waveforms.soft_square_wt;
 }
 
 
@@ -340,9 +364,13 @@ StandardWaveforms::StandardWaveforms()
 
     Number sine_coefficients[] = {1.0};
     Number sawtooth_coefficients[Wavetable::PARTIALS];
+    Number soft_sawtooth_coefficients[Wavetable::SOFT_PARTIALS];
     Number inverse_sawtooth_coefficients[Wavetable::PARTIALS];
+    Number soft_inverse_sawtooth_coefficients[Wavetable::SOFT_PARTIALS];
     Number triangle_coefficients[Wavetable::PARTIALS];
+    Number soft_triangle_coefficients[Wavetable::SOFT_PARTIALS];
     Number square_coefficients[Wavetable::PARTIALS];
+    Number soft_square_coefficients[Wavetable::SOFT_PARTIALS];
 
     for (Integer i = 0; i != Wavetable::PARTIALS; ++i) {
         Number const plus_or_minus_one = ((i & 1) == 1 ? -1.0 : 1.0);
@@ -357,13 +385,33 @@ StandardWaveforms::StandardWaveforms()
         square_coefficients[i] = (1 + plus_or_minus_one) * two_over_i_pi;
     }
 
+    for (Integer i = 0; i != Wavetable::SOFT_PARTIALS; ++i) {
+        Number const softener = 2.0 / (Number)(i + 2.0);
+        soft_sawtooth_coefficients[i] = softener * sawtooth_coefficients[i];
+        soft_inverse_sawtooth_coefficients[i] = -soft_sawtooth_coefficients[i];
+        soft_triangle_coefficients[i] = softener * triangle_coefficients[i];
+        soft_square_coefficients[i] = softener * square_coefficients[i];
+    }
+
     sine_wt = new Wavetable(sine_coefficients, 1);
     sawtooth_wt = new Wavetable(sawtooth_coefficients, Wavetable::PARTIALS);
+    soft_sawtooth_wt = new Wavetable(
+        soft_sawtooth_coefficients, Wavetable::SOFT_PARTIALS
+    );
     inverse_sawtooth_wt = new Wavetable(
         inverse_sawtooth_coefficients, Wavetable::PARTIALS
     );
+    soft_inverse_sawtooth_wt = new Wavetable(
+        soft_inverse_sawtooth_coefficients, Wavetable::SOFT_PARTIALS
+    );
     triangle_wt = new Wavetable(triangle_coefficients, Wavetable::PARTIALS);
+    soft_triangle_wt = new Wavetable(
+        soft_triangle_coefficients, Wavetable::SOFT_PARTIALS
+    );
     square_wt = new Wavetable(square_coefficients, Wavetable::PARTIALS);
+    soft_square_wt = new Wavetable(
+        soft_square_coefficients, Wavetable::SOFT_PARTIALS
+    );
 }
 
 
@@ -371,15 +419,23 @@ StandardWaveforms::~StandardWaveforms()
 {
     delete sine_wt;
     delete sawtooth_wt;
+    delete soft_sawtooth_wt;
     delete inverse_sawtooth_wt;
+    delete soft_inverse_sawtooth_wt;
     delete triangle_wt;
+    delete soft_triangle_wt;
     delete square_wt;
+    delete soft_square_wt;
 
     sine_wt = NULL;
     sawtooth_wt = NULL;
+    soft_sawtooth_wt = NULL;
     inverse_sawtooth_wt = NULL;
+    soft_inverse_sawtooth_wt = NULL;
     triangle_wt = NULL;
+    soft_triangle_wt = NULL;
     square_wt = NULL;
+    soft_square_wt = NULL;
 }
 
 }

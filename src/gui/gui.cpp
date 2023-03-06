@@ -31,9 +31,13 @@ bool GUI::controllers_by_id_initialized = false;
 char const* const GUI::WAVEFORMS[] = {
     [SimpleOscillator::SINE] = "Sine",
     [SimpleOscillator::SAWTOOTH] = "Saw",
-    [SimpleOscillator::INVERSE_SAWTOOTH] = "InvSaw",
+    [SimpleOscillator::SOFT_SAWTOOTH] = "Soft Sw",
+    [SimpleOscillator::INVERSE_SAWTOOTH] = "Inv Saw",
+    [SimpleOscillator::SOFT_INVERSE_SAWTOOTH] = "Soft I S",
     [SimpleOscillator::TRIANGLE] = "Triangle",
+    [SimpleOscillator::SOFT_TRIANGLE] = "Soft Tri",
     [SimpleOscillator::SQUARE] = "Square",
+    [SimpleOscillator::SOFT_SQUARE] = "Soft Sqr",
     [SimpleOscillator::CUSTOM] = "Custom",
 };
 

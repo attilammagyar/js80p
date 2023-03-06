@@ -68,6 +68,7 @@ class Wavetable
         for notes below B1.
         */
         static constexpr Integer PARTIALS = 384;
+        static constexpr Integer SOFT_PARTIALS = PARTIALS / 2;
 
         static constexpr Number SIZE_FLOAT = (Number)SIZE;
         static constexpr Number SIZE_INV = 1.0 / SIZE_FLOAT;
@@ -132,9 +133,13 @@ class StandardWaveforms
     public:
         static Wavetable const* sine();
         static Wavetable const* sawtooth();
+        static Wavetable const* soft_sawtooth();
         static Wavetable const* inverse_sawtooth();
+        static Wavetable const* soft_inverse_sawtooth();
         static Wavetable const* triangle();
+        static Wavetable const* soft_triangle();
         static Wavetable const* square();
+        static Wavetable const* soft_square();
 
         StandardWaveforms();
         ~StandardWaveforms();
@@ -144,9 +149,13 @@ class StandardWaveforms
 
         Wavetable const* sine_wt;
         Wavetable const* sawtooth_wt;
+        Wavetable const* soft_sawtooth_wt;
         Wavetable const* inverse_sawtooth_wt;
+        Wavetable const* soft_inverse_sawtooth_wt;
         Wavetable const* triangle_wt;
+        Wavetable const* soft_triangle_wt;
         Wavetable const* square_wt;
+        Wavetable const* soft_square_wt;
 };
 
 }

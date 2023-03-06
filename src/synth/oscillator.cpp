@@ -144,9 +144,13 @@ void Oscillator<ModulatorSignalProducerClass>::initialize_instance()
 
     wavetables[SINE] = StandardWaveforms::sine();
     wavetables[SAWTOOTH] = StandardWaveforms::sawtooth();
+    wavetables[SOFT_SAWTOOTH] = StandardWaveforms::soft_sawtooth();
     wavetables[INVERSE_SAWTOOTH] = StandardWaveforms::inverse_sawtooth();
+    wavetables[SOFT_INVERSE_SAWTOOTH] = StandardWaveforms::soft_inverse_sawtooth();
     wavetables[TRIANGLE] = StandardWaveforms::triangle();
+    wavetables[SOFT_TRIANGLE] = StandardWaveforms::soft_triangle();
     wavetables[SQUARE] = StandardWaveforms::square();
+    wavetables[SOFT_SQUARE] = StandardWaveforms::soft_square();
     wavetables[CUSTOM] = custom_waveform;
 
     allocate_buffers(block_size);

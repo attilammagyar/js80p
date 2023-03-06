@@ -48,12 +48,16 @@ class Oscillator : public SignalProducer
 
         static constexpr Waveform SINE = 0;
         static constexpr Waveform SAWTOOTH = 1;
-        static constexpr Waveform INVERSE_SAWTOOTH = 2;
-        static constexpr Waveform TRIANGLE = 3;
-        static constexpr Waveform SQUARE = 4;
-        static constexpr Waveform CUSTOM = 5;
+        static constexpr Waveform SOFT_SAWTOOTH = 2;
+        static constexpr Waveform INVERSE_SAWTOOTH = 3;
+        static constexpr Waveform SOFT_INVERSE_SAWTOOTH = 4;
+        static constexpr Waveform TRIANGLE = 5;
+        static constexpr Waveform SOFT_TRIANGLE = 6;
+        static constexpr Waveform SQUARE = 7;
+        static constexpr Waveform SOFT_SQUARE = 8;
+        static constexpr Waveform CUSTOM = 9;
 
-        static constexpr int WAVEFORMS = 6;
+        static constexpr int WAVEFORMS = 10;
 
         class WaveformParam : public Param<Waveform>
         {
