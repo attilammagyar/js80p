@@ -450,6 +450,7 @@ class ParamEditor : public TransparentWidget
 
         char const* const* const options;
         int const number_of_options;
+        int const value_font_size;
         int const controller_choices;
 
         ControllerSelector& controller_selector;
