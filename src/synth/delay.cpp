@@ -245,6 +245,21 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::merge_inputs_into_delay_buffer(
         Integer const sample_count
 ) {
+    copy_input_into_delay_buffer(sample_count);
+    mix_feedback_into_delay_buffer(sample_count);
+
+    write_index += sample_count;
+
+    if (write_index >= delay_buffer_size) {
+        write_index %= delay_buffer_size;
+    }
+}
+
+
+template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::copy_input_into_delay_buffer(
+        Integer const sample_count
+) {
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
@@ -261,55 +276,59 @@ void Delay<InputSignalProducerClass>::merge_inputs_into_delay_buffer(
             }
         }
     }
+}
 
-    if (LIKELY(feedback_sample_count > 0)) {
-        Integer const feedback_sample_count = std::min(
-            sample_count, this->feedback_sample_count
-        );
 
-        if (feedback_buffer == NULL) {
-            Number const feedback_value = this->feedback_value;
+template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
+        Integer const sample_count
+) {
+    Integer const channels = this->channels;
 
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-                Integer delay_buffer_index = write_index;
+    if (UNLIKELY(feedback_sample_count == 0)) {
+        return;
+    }
 
-                for (Integer i = 0; i != feedback_sample_count; ++i) {
-                    delay_buffer[c][delay_buffer_index] += (
-                        feedback_value * feedback_samples[i]
-                    );
+    Integer const feedback_sample_count = std::min(
+        sample_count, this->feedback_sample_count
+    );
 
-                    ++delay_buffer_index;
+    if (feedback_buffer == NULL) {
+        Number const feedback_value = this->feedback_value;
 
-                    if (delay_buffer_index == delay_buffer_size) {
-                        delay_buffer_index = 0;
-                    }
-                }
-            }
-        } else {
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-                Integer delay_buffer_index = write_index;
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* feedback_samples = feedback_signal_producer_buffer[c];
+            Integer delay_buffer_index = write_index;
 
-                for (Integer i = 0; i != feedback_sample_count; ++i) {
-                    delay_buffer[c][delay_buffer_index] += (
-                        feedback_buffer[i] * feedback_samples[i]
-                    );
+            for (Integer i = 0; i != feedback_sample_count; ++i) {
+                delay_buffer[c][delay_buffer_index] += (
+                    feedback_value * feedback_samples[i]
+                );
 
-                    ++delay_buffer_index;
+                ++delay_buffer_index;
 
-                    if (delay_buffer_index == delay_buffer_size) {
-                        delay_buffer_index = 0;
-                    }
+                if (delay_buffer_index == delay_buffer_size) {
+                    delay_buffer_index = 0;
                 }
             }
         }
-    }
+    } else {
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* feedback_samples = feedback_signal_producer_buffer[c];
+            Integer delay_buffer_index = write_index;
 
-    write_index += sample_count;
+            for (Integer i = 0; i != feedback_sample_count; ++i) {
+                delay_buffer[c][delay_buffer_index] += (
+                    feedback_buffer[i] * feedback_samples[i]
+                );
 
-    if (write_index >= delay_buffer_size) {
-        write_index %= delay_buffer_size;
+                ++delay_buffer_index;
+
+                if (delay_buffer_index == delay_buffer_size) {
+                    delay_buffer_index = 0;
+                }
+            }
+        }
     }
 }
 

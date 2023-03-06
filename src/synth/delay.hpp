@@ -83,6 +83,8 @@ class Delay : public Filter<InputSignalProducerClass>
         );
 
         void merge_inputs_into_delay_buffer(Integer const sample_count);
+        void copy_input_into_delay_buffer(Integer const sample_count);
+        void mix_feedback_into_delay_buffer(Integer const sample_count);
 
         SignalProducer const* feedback_signal_producer;
         Sample const* const* feedback_signal_producer_buffer;
