@@ -86,7 +86,7 @@ TEST(portamento, {
 
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
-    SumOfSines expected(1.0, 200.0, 0.0, 0.0, 0.0, 0.0, SimpleVoice::CHANNELS, 0.00009);
+    SumOfSines expected(0.7071, 200.0, 0.0, 0.0, 0.0, 0.0, SimpleVoice::CHANNELS, 0.00009);
     SimpleVoice::Params params("");
     Envelope envelope("");
     SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);

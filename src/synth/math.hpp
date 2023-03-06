@@ -39,6 +39,7 @@ class Math
         static constexpr Number PI = 3.14159265358979323846264338327950288419716939937510;
         static constexpr Number PI_DOUBLE = 2.0 * PI;
         static constexpr Number PI_HALF = PI / 2.0;
+        static constexpr Number PI_QUARTER = PI / 4.0;
         static constexpr Number PI_SQR = PI * PI;
 
         static constexpr Number SQRT_OF_2 = std::sqrt(2.0);

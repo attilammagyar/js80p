@@ -55,7 +55,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
     ),
     width(name + "WID", -1.0, 1.0, 0.2),
     panning(name + "PAN", -1.0, 1.0, 0.0),
-    volume(name + "VOL", 0.0, 1.0, 0.5),
+    volume(name + "VOL", 0.0, 1.0, 1.0),
 
     harmonic_0(name + "C1", -1.0, 1.0, 0.333),
     harmonic_1(name + "C2", -1.0, 1.0, 0.333),
@@ -112,6 +112,70 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
 
 
 template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
+        Filter2& input,
+        Number& velocity,
+        FloatParam& volume
+) : Filter<Filter2>(input),
+    volume(volume),
+    velocity(velocity)
+{
+}
+
+
+template<class ModulatorSignalProducerClass>
+Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initialize_rendering(
+        Integer const round,
+        Integer const sample_count
+) {
+    Filter<Filter2>::initialize_rendering(round, sample_count);
+
+    volume_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+        &volume, round, sample_count
+    );
+
+    if (volume_buffer == NULL) {
+        volume_value = volume.get_value();
+    }
+
+    return NULL;
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) {
+    Integer const channels = this->channels;
+    Sample const velocity = (Sample)this->velocity;
+    Sample const* volume_buffer = this->volume_buffer;
+
+    if (volume_buffer == NULL) {
+        Sample volume_value = (Sample)this->volume_value;
+
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* const input = this->input_buffer[c];
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[c][i] = velocity * volume_value * input[i];
+            }
+        }
+    } else {
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* const input = this->input_buffer[c];
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[c][i] = velocity * volume_buffer[i] * input[i];
+            }
+        }
+    }
+}
+
+
+template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         Frequency const* frequencies,
         Midi::Note const notes,
@@ -119,7 +183,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader
-) : SignalProducer(CHANNELS, 14),
+) : SignalProducer(CHANNELS, 15),
     notes(notes),
     oscillator(
         param_leaders.waveform,
@@ -163,10 +227,11 @@ Voice<ModulatorSignalProducerClass>::Voice(
     width(param_leaders.width),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
+    volume_applier(filter_2, velocity, volume),
     frequencies(frequencies),
     off_after(0.0),
     state(OFF),
-    modulation_out((ModulationOut&)filter_2)
+    modulation_out((ModulationOut&)volume_applier)
 {
     register_child(velocity_sensitivity);
     register_child(portamento_length);
@@ -179,6 +244,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     register_child(filter_1);
     register_child(wavefolder);
     register_child(filter_2);
+    register_child(volume_applier);
 }
 
 
@@ -338,9 +404,17 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) {
-    oscillator_buffer = SignalProducer::produce<Filter2>(
-        &filter_2, round, sample_count
+    volume_applier_buffer = SignalProducer::produce<VolumeApplier>(
+        &volume_applier, round, sample_count
     )[0];
+
+    panning_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+        &panning, round, sample_count
+    );
+
+    if (panning_buffer == NULL) {
+        panning_value = panning.get_value();
+    }
 
     return NULL;
 }
@@ -353,11 +427,26 @@ void Voice<ModulatorSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) {
-    Sample const velocity = (Sample)this->velocity;
-    Sample const* oscillator_buffer = this->oscillator_buffer;
+    Sample const* const panning_buffer = this->panning_buffer;
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        buffer[0][i] = buffer[1][i] = oscillator_buffer[i] * velocity;
+    if (panning_buffer == NULL) {
+        Number const x = (panning_value + 1.0) * Math::PI_QUARTER;
+        Sample const left_gain = Math::cos(x);
+        Sample const right_gain = Math::sin(x);
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = left_gain * volume_applier_buffer[i];
+            buffer[1][i] = right_gain * volume_applier_buffer[i];
+        }
+    } else {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            Number const x = (panning_buffer[i] + 1.0) * Math::PI_QUARTER;
+            Sample const left_gain = Math::cos(x);
+            Sample const right_gain = Math::sin(x);
+
+            buffer[0][i] = left_gain * volume_applier_buffer[i];
+            buffer[1][i] = right_gain * volume_applier_buffer[i];
+        }
     }
 }
 

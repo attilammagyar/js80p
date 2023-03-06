@@ -25,6 +25,7 @@
 #include "midi.hpp"
 
 #include "synth/biquad_filter.hpp"
+#include "synth/filter.hpp"
 #include "synth/oscillator.hpp"
 #include "synth/param.hpp"
 #include "synth/signal_producer.hpp"
@@ -48,8 +49,9 @@ class Voice : public SignalProducer
         typedef Wavefolder<Filter1> Wavefolder_;
         typedef BiquadFilter<Wavefolder_> Filter2;
 
-        // TODO: modulation output should incorporate the calculated velocity and the volume parameter as well
-        typedef Filter2 ModulationOut;
+        class VolumeApplier;
+
+        typedef VolumeApplier ModulationOut;
 
         class Params
         {
@@ -88,6 +90,35 @@ class Voice : public SignalProducer
                 FloatParam filter_2_frequency;
                 FloatParam filter_2_q;
                 FloatParam filter_2_gain;
+        };
+
+        class VolumeApplier : public Filter<Filter2>
+        {
+            public:
+                VolumeApplier(
+                    Filter2& input,
+                    Number& velocity,
+                    FloatParam& volume
+                );
+
+                Sample const* const* initialize_rendering(
+                    Integer const round,
+                    Integer const sample_count
+                );
+
+                void render(
+                    Integer const round,
+                    Integer const first_sample_index,
+                    Integer const last_sample_index,
+                    Sample** buffer
+                );
+
+            private:
+                FloatParam& volume;
+                Number& velocity;
+
+                Sample const* volume_buffer;
+                Number volume_value;
         };
 
         static constexpr Integer CHANNELS = 2;
@@ -146,12 +177,15 @@ class Voice : public SignalProducer
         FloatParam portamento_length;
         FloatParam portamento_depth;
         FloatParam width; // TODO: implement
-        FloatParam panning; // TODO: implement
-        FloatParam volume; // TODO: implement
+        FloatParam panning;
+        FloatParam volume;
+        VolumeApplier volume_applier;
+        Sample const* volume_applier_buffer;
+        Sample const* panning_buffer;
         Frequency const* frequencies;
-        Sample const* oscillator_buffer;
         Seconds off_after;
         Number velocity;
+        Number panning_value;
         State state;
         Midi::Note note;
 

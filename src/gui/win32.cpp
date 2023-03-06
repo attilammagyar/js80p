@@ -1786,6 +1786,7 @@ void GUI::build_synth_body()
     ADD_PE(synth_body,  87 + PE_W * 6,   36,        synth, ParamId::MFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
     ADD_PE(synth_body,  87 + PE_W * 7,   36,        synth, ParamId::MVS,    MIDI_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body,  87 + PE_W * 8,   36,        synth, ParamId::MVOL,   ALL_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  87 + PE_W * 10,  36,        synth, ParamId::MPAN,   ALL_CTLS,   "%.2f", 100.0);
 
     ADD_PE(synth_body, 735,              36,        synth, ParamId::MF1TYP, NO_CTLS,    ft, ftc);
     ADD_PE(synth_body, 735 + PE_W,       36,        synth, ParamId::MF1FRQ, ALL_CTLS,   "%.1f", 1.0);
@@ -1817,6 +1818,7 @@ void GUI::build_synth_body()
     ADD_PE(synth_body,  87 + PE_W * 6,  316,        synth, ParamId::CFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
     ADD_PE(synth_body,  87 + PE_W * 7,  316,        synth, ParamId::CVS,    MIDI_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body,  87 + PE_W * 8,  316,        synth, ParamId::CVOL,   ALL_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  87 + PE_W * 10, 316,        synth, ParamId::CPAN,   ALL_CTLS,   "%.2f", 100.0);
 
     ADD_PE(synth_body, 735,             316,        synth, ParamId::CF1TYP, NO_CTLS,    ft, ftc);
     ADD_PE(synth_body, 735 + PE_W,      316,        synth, ParamId::CF1FRQ, ALL_CTLS,   "%.1f", 1.0);
