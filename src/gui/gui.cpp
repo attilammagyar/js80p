@@ -37,7 +37,7 @@ char const* const GUI::WAVEFORMS[] = {
     [SimpleOscillator::CUSTOM] = "Custom",
 };
 
-int const GUI::WAVEFORMS_COUNT = 6;
+int const GUI::WAVEFORMS_COUNT = SimpleOscillator::WAVEFORMS;
 
 
 char const* const GUI::BIQUAD_FILTER_TYPES[] = {

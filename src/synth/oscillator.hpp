@@ -53,6 +53,8 @@ class Oscillator : public SignalProducer
         static constexpr Waveform SQUARE = 4;
         static constexpr Waveform CUSTOM = 5;
 
+        static constexpr int WAVEFORMS = 6;
+
         class WaveformParam : public Param<Waveform>
         {
             public:
@@ -159,7 +161,7 @@ class Oscillator : public SignalProducer
         void handle_stop_event(Event const& event);
 
         WavetableState wavetable_state;
-        Wavetable const* wavetables[6];
+        Wavetable const* wavetables[WAVEFORMS];
         Wavetable const* wavetable;
         Wavetable* custom_waveform;
         Sample* computed_amplitude_buffer;
