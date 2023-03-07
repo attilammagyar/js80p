@@ -76,8 +76,8 @@ class SignalProducer
          * \warning It's the caller's responsibility to ensure that
          *          \c sample_count is not greater than the current block size.
          *
-         * \param signal_producer   The SignalProducer which is to render its
-         *                          signal.
+         * \param signal_producer   The \c SignalProducer which is about to
+         *                          render a signal.
          *
          * \param round             Identifies the rendering round - a
          *                          \c SignalProducer's output may be needed by
@@ -86,9 +86,6 @@ class SignalProducer
          *                          round.
          *
          * \param sample_count      How many samples to render per channel.
-         *
-         * \param external_buffer   Produce the output into this buffer insted
-         *                          of the \c SignalProducer's own.
          *
          * \return                  The rendered buffer.
          */
@@ -127,6 +124,8 @@ class SignalProducer
         bool has_events_after(Seconds const time_offset) const;
         Seconds get_last_event_time_offset() const;
 
+        // TODO: initialize_rendering(), render(), and handle_event() should be protected
+
         /**
          * \brief Implement preparations for sample rendering in this method,
          *        e.g. render necessary inputs and param buffers here. Return
@@ -134,12 +133,6 @@ class SignalProducer
          *        rendered buffer if calling \c render() is unnecessary (e.g.
          *        when a filter wants to return its input unaffected).
          *        Do not call this method directly!
-         *
-         * \note It would be nice to have \c protected access for
-         *       \c initialize_rendering(), \c render() and \c handle_event(),
-         *       and declare \c SignalProducer as a friend class in descendants,
-         *       but I could not find a friend declaration that would be
-         *       acceptable for GCC 3.4.2.
          *
          * \warning Do not call this method directly, use
          *          \c SignalProducer::produce<SignalProducerClass>()
@@ -154,12 +147,6 @@ class SignalProducer
         /**
          * \brief Implement sample rendering in this method. Do not call this
          *        method directly!
-         *
-         * \note It would be nice to have \c protected access for
-         *       \c initialize_rendering(), \c render() and \c handle_event(),
-         *       and declare \c SignalProducer as a friend class in descendants,
-         *       but I could not find a friend declaration that would be
-         *       acceptable for GCC 3.4.2.
          *
          * \warning Do not call this method directly, use
          *          \c SignalProducer::produce<SignalProducerClass>()
@@ -176,12 +163,6 @@ class SignalProducer
         /**
          * \brief Implement handling events in this method. Do not call this
          *        method directly!
-         *
-         * \note It would be nice to have \c protected access for
-         *       \c initialize_rendering(), \c render() and \c handle_event(),
-         *       and declare \c SignalProducer as a friend class in descendants,
-         *       but I could not find a friend declaration that would be
-         *       acceptable for GCC 3.4.2.
          *
          * \warning Do not call this method directly, use
          *          \c SignalProducer::produce<SignalProducerClass>()
