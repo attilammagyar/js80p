@@ -822,6 +822,8 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio)
                 break;
         }
     }
+
+    handle_refresh_param(param_id);
 }
 
 

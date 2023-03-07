@@ -99,6 +99,7 @@ TEST(messages_get_processed_during_rendering, {
     );
 
     synth.volume.set_value(1.0);
+    synth.modulator_add_volume.set_value(0.42);
     synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
 
     synth.push_message(
@@ -108,16 +109,13 @@ TEST(messages_get_processed_during_rendering, {
         Synth::MessageType::SET_PARAM, Synth::ParamId::VOL, 0.123, 0
     );
     synth.push_message(
+        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::ADD, 0.0, 0
+    );
+    synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
         Synth::ParamId::CVOL,
         0.0,
         Synth::ControllerId::ENVELOPE_3
-    );
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::VOL, 0.0, 0
-    );
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MWAV, 0.0, 0
     );
 
     assert_eq(1.0, synth.volume.get_value(), DOUBLE_DELTA);
@@ -129,10 +127,13 @@ TEST(messages_get_processed_during_rendering, {
         Synth::ControllerId::NONE,
         synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
     );
+
     SignalProducer::produce<Synth>(&synth, 1);
 
     assert_eq(0.123, synth.volume.get_value(), DOUBLE_DELTA);
     assert_eq(0.123, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA);
+    assert_eq(0.42, synth.modulator_add_volume.get_value(), DOUBLE_DELTA);
+    assert_eq(0.42, synth.get_param_ratio_atomic(Synth::ParamId::ADD), DOUBLE_DELTA);
     assert_eq(
         inv_saw_as_ratio,
         synth.get_param_ratio_atomic(Synth::ParamId::MWAV),
