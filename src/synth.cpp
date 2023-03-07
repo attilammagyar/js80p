@@ -330,7 +330,7 @@ Synth::Synth()
 
     update_param_states();
 
-    // TODO: temporary settings
+    // TODO: remove all these temporary settings
 
     // modulator_params.waveform.set_value(Modulator::Oscillator_::SINE);
     // carrier_params.waveform.set_value(Carrier::Oscillator_::SINE);
