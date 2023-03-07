@@ -97,84 +97,84 @@ namespace JS80P
 static constexpr int FST_OP_CODE_NAMES_LEN = 255;
 
 static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
-    "Open",
-    "Close",
-    "SetProgram",
-    "GetProgram",
-    "SetProgramName",
-    "GetProgramName",
-    "GetParamLabel",
-    "GetParamDisplay",
-    "GetParamName",
+    "Open", // 0
+    "Close", // 1
+    "SetProgram", // 2
+    "GetProgram", // 3
+    "SetProgramName", // 4
+    "GetProgramName", // 5
+    "GetParamLabel", // 6
+    "GetParamDisplay", // 7
+    "GetParamName", // 8
     "UNKNOWN",
-    "SetSampleRate",
-    "SetBlockSize",
-    "MainsChanged",
-    "EditGetRect",
-    "EditOpen",
-    "EditClose",
-    "UNKNOWN",
-    "UNKNOWN",
+    "SetSampleRate", // 10
+    "SetBlockSize", // 11
+    "MainsChanged", // 12
+    "EditGetRect", // 13
+    "EditOpen", // 14
+    "EditClose", // 15
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
-    "UNKNOWN",
-    "Identify",
-    "GetChunk",
-    "SetChunk",
-    "ProcessEvents",
-    "CanBeAutomated",
-    "String2Parameter",
-    "UNKNOWN",
-    "GetProgramNameIndexed",
+    "EditIdle", // 19
     "UNKNOWN",
     "UNKNOWN",
+    "Identify", // 22
+    "GetChunk", // 23
+    "SetChunk", // 24
+    "ProcessEvents", // 25
+    "CanBeAutomated", // 26
+    "String2Parameter", // 27
     "UNKNOWN",
-    "GetInputProperties",
-    "GetOutputProperties",
-    "GetPlugCategory",
+    "GetProgramNameIndexed", // 29
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
-    "UNKNOWN",
-    "UNKNOWN",
-    "UNKNOWN",
-    "SetSpeakerArrangement",
-    "UNKNOWN",
-    "UNKNOWN",
-    "GetEffectName",
-    "UNKNOWN",
-    "GetVendorString",
-    "GetProductString",
-    "GetVendorVersion",
-    "VendorSpecific",
-    "CanDo",
+    "GetInputProperties", // 33
+    "GetOutputProperties", // 34
+    "GetPlugCategory", // 35
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
-    "GetVstVersion",
+    "SetSpeakerArrangement", // 42
+    "UNKNOWN",
+    "UNKNOWN",
+    "GetEffectName", // 45
+    "UNKNOWN",
+    "GetVendorString", // 47
+    "GetProductString", // 48
+    "GetVendorVersion", // 49
+    "VendorSpecific", // 50
+    "CanDo", // 51
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
-    "GetCurrentMidiProgram",
+    "UNKNOWN",
+    "UNKNOWN",
+    "GetVstVersion", // 58
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
-    "UNKNOWN",
-    "GetSpeakerArrangement",
-    "ShellGetNextPlugin",
-    "StartProcess",
-    "StopProcess",
-    "SetTotalSampleToProcess",
+    "GetCurrentMidiProgram", // 63
     "UNKNOWN",
     "UNKNOWN",
+    "GetMidiNoteName", // 66
     "UNKNOWN",
-    "SetProcessPrecision",
+    "UNKNOWN",
+    "GetSpeakerArrangement", // 69
+    "ShellGetNextPlugin", // 70
+    "StartProcess", // 71
+    "StopProcess", // 72
+    "SetTotalSampleToProcess", // 73
+    "UNKNOWN",
+    "UNKNOWN",
+    "UNKNOWN",
+    "SetProcessPrecision", // 77
     "UNKNOWN",
     "UNKNOWN",
     "UNKNOWN",
