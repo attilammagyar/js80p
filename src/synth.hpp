@@ -316,7 +316,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             E6FIN = 215,    // Envelope 6 Final Level
 
             // TODO: generate LFO param ids
-            MAX_PARAM_ID = 2316,
+            MAX_PARAM_ID = 216,
         };
 
         enum ControllerId {
