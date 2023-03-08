@@ -19,7 +19,7 @@ Effects:
 
     Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb
 
-Development progress: 65.3%
+Development progress: 59.36%
 ---------------------------
 
  * Oscillator features: 90%
@@ -32,6 +32,7 @@ Development progress: 65.3%
  * GUI: 55%
  * Effects: 33%
  * Patch persistency: 0%
+ * Aftertouch support: 0%
 
 Features
 --------
