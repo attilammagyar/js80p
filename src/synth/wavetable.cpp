@@ -81,17 +81,14 @@ Wavetable::Wavetable(
         samples[i] = new Sample[SIZE];
     }
 
-    update_coefficients(coefficients, true);
+    update_coefficients(coefficients);
+    normalize();
 }
 
 
-void Wavetable::update_coefficients(
-        Number const coefficients[],
-        bool const normalize
-) {
+void Wavetable::update_coefficients(Number const coefficients[])
+{
     Integer frequency = 1;
-    Sample max = 0.0;
-    Sample sample;
 
     /*
     samples[0]: 0 partials above fundamental
@@ -101,39 +98,41 @@ void Wavetable::update_coefficients(
     */
 
     for (Integer j = 0; j != SIZE; ++j) {
-        sample = std::fabs(
-            samples[0][j] = (
-                (Sample)(coefficients[0] * sines[(j * frequency) & MASK])
-            )
+        samples[0][j] = (
+            (Sample)(coefficients[0] * sines[(j * frequency) & MASK])
         );
-
-        if (UNLIKELY(normalize && sample > max)) {
-            max = sample;
-        }
     }
 
-    for (Integer i = 1; i != partials; ++i) {
+    for (Integer i = 1, prev_i = 0; i != partials; ++i, ++prev_i) {
         ++frequency;
 
         for (Integer j = 0; j != SIZE; ++j) {
-            sample = std::fabs(
-                samples[i][j] = (
-                    samples[i - 1][j]
-                    + (Sample)(coefficients[i] * sines[(j * frequency) & MASK])
-                )
+            samples[i][j] = (
+                samples[prev_i][j]
+                + (Sample)(coefficients[i] * sines[(j * frequency) & MASK])
             );
+        }
+    }
+}
 
-            if (UNLIKELY(normalize && sample > max)) {
+
+void Wavetable::normalize()
+{
+    Sample max = 0.0;
+
+    for (Integer i = 0; i != partials; ++i) {
+        for (Integer j = 0; j != SIZE; ++j) {
+            Sample const sample = std::fabs(samples[i][j]);
+
+            if (sample > max) {
                 max = sample;
             }
         }
     }
 
-    if (UNLIKELY(normalize)) {
-        for (Integer i = 0; i != partials; ++i) {
-            for (Integer j = 0; j != SIZE; ++j) {
-                samples[i][j] /= max;
-            }
+    for (Integer i = 0; i != partials; ++i) {
+        for (Integer j = 0; j != SIZE; ++j) {
+            samples[i][j] /= max;
         }
     }
 }

@@ -95,10 +95,8 @@ class Wavetable
 
         Sample lookup(WavetableState* state, Frequency const frequency) const;
 
-        void update_coefficients(
-            Number const coefficients[],
-            bool const normalize
-        );
+        void update_coefficients(Number const coefficients[]);
+        void normalize();
 
     private:
         static Number sines[SIZE];

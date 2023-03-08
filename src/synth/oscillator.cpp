@@ -215,7 +215,9 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
 template<class ModulatorSignalProducerClass>
 Oscillator<ModulatorSignalProducerClass>::~Oscillator()
 {
-    delete wavetables[CUSTOM];
+    delete custom_waveform;
+    custom_waveform = NULL;
+    wavetables[CUSTOM] = NULL;
     free_buffers();
 }
 
@@ -294,9 +296,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass>::initialize_render
         }
 
         if (has_changed) {
-            custom_waveform->update_coefficients(
-                custom_waveform_coefficients, false
-            );
+            custom_waveform->update_coefficients(custom_waveform_coefficients);
         }
     }
 
