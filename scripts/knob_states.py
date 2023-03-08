@@ -31,7 +31,7 @@ def main(argv):
     glow_color_1 = (72, 0, 55)
     glow_color_2 = (0, 42, 144)
     glow_color_3 = (80, 170, 255)
-    ticks_color = (184, 184, 192)
+    ticks_color = (144, 144, 150)
     line_color = (200, 200, 220)
 
     overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
