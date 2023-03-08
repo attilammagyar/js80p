@@ -49,7 +49,7 @@ void Wavetable::initialize()
     is_initialized = true;
 
     for (Integer j = 0; j != SIZE; ++j) {
-        sines[j] = Math::sin(((Number)j * SIZE_INV) * Math::PI_DOUBLE);
+        sines[j] = std::sin(((Number)j * SIZE_INV) * Math::PI_DOUBLE);
     }
 }
 
@@ -380,7 +380,7 @@ StandardWaveforms::StandardWaveforms()
         sawtooth_coefficients[i] = plus_or_minus_one * two_over_i_pi;
         inverse_sawtooth_coefficients[i] = -sawtooth_coefficients[i];
         triangle_coefficients[i] = (
-            8.0 * Math::sin(i_pi / 2.0) / (i_pi * i_pi)
+            8.0 * std::sin(i_pi / 2.0) / (i_pi * i_pi)
         );
         square_coefficients[i] = (1 + plus_or_minus_one) * two_over_i_pi;
     }
