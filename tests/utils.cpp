@@ -68,11 +68,14 @@ class Buffer
 
 class Constant : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         Constant(Sample const value) : SignalProducer(1, 0), value(value)
         {
         }
 
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -95,6 +98,8 @@ class Constant : public SignalProducer
 
 class SumOfSines : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         SumOfSines(
                 Number const amplitude_1 = 0.0,
@@ -131,6 +136,7 @@ class SumOfSines : public SignalProducer
             events.drop(0);
         }
 
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,

@@ -1163,6 +1163,8 @@ TEST(when_a_flexible_controller_is_assigned_to_the_leader_of_a_float_param_then_
 
 class Modulator : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         static constexpr Number VALUE = 2.0;
 
@@ -1170,6 +1172,9 @@ class Modulator : public SignalProducer
         {
         }
 
+        int render_called;
+
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -1182,8 +1187,6 @@ class Modulator : public SignalProducer
                 buffer[0][i] = VALUE;
             }
         }
-
-        int render_called;
 };
 
 

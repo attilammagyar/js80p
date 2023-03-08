@@ -45,6 +45,8 @@ namespace JS80P
 
 class Synth : public Midi::EventHandler, public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         typedef Voice<SignalProducer> Modulator;
         typedef Voice<Modulator::ModulationOut> Carrier;
@@ -491,18 +493,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset, Midi::Channel const channel
         );
 
-        Sample const* const* initialize_rendering(
-            Integer const round,
-            Integer const sample_count
-        );
-
-        void render(
-            Integer const round,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample** buffer
-        );
-
         // TODO: operating mode: mix&mod (same as add + AM + FM in JS-80) vs. splits
 
         FloatParam volume;
@@ -518,6 +508,18 @@ class Synth : public Midi::EventHandler, public SignalProducer
         MidiController velocity;
 
     protected:
+        Sample const* const* initialize_rendering(
+            Integer const round,
+            Integer const sample_count
+        );
+
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        );
+
         Frequency frequencies[Midi::NOTES];
 
     private:
@@ -573,6 +575,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         class Bus : public SignalProducer
         {
+            friend class SignalProducer;
+
             public:
                 Bus(
                     Integer const channels,

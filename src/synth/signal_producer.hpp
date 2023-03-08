@@ -124,20 +124,13 @@ class SignalProducer
         bool has_events_after(Seconds const time_offset) const;
         Seconds get_last_event_time_offset() const;
 
-        // TODO: initialize_rendering(), render(), and handle_event() should be protected
-
+    protected:
         /**
          * \brief Implement preparations for sample rendering in this method,
          *        e.g. render necessary inputs and param buffers here. Return
          *        NULL if rendering samples is needed, return an already
          *        rendered buffer if calling \c render() is unnecessary (e.g.
          *        when a filter wants to return its input unaffected).
-         *        Do not call this method directly!
-         *
-         * \warning Do not call this method directly, use
-         *          \c SignalProducer::produce<SignalProducerClass>()
-         *          instead.
-         * }
          */
         Sample const* const* initialize_rendering(
             Integer const round,
@@ -145,13 +138,7 @@ class SignalProducer
         );
 
         /**
-         * \brief Implement sample rendering in this method. Do not call this
-         *        method directly!
-         *
-         * \warning Do not call this method directly, use
-         *          \c SignalProducer::produce<SignalProducerClass>()
-         *          instead.
-         * }
+         * \brief Implement sample rendering in this method.
          */
         void render(
             Integer const round,
@@ -161,17 +148,10 @@ class SignalProducer
         );
 
         /**
-         * \brief Implement handling events in this method. Do not call this
-         *        method directly!
-         *
-         * \warning Do not call this method directly, use
-         *          \c SignalProducer::produce<SignalProducerClass>()
-         *          instead.
-         * }
+         * \brief Implement handling events in this method.
          */
         void handle_event(Event const& event);
 
-    protected:
         Sample** reallocate_buffer(Sample** old_buffer) const;
         Sample** allocate_buffer() const;
         Sample** free_buffer(Sample** old_buffer) const;

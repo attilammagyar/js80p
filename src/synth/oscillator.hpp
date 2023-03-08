@@ -41,6 +41,8 @@ typedef Oscillator<SignalProducer> SimpleOscillator;
 template<class ModulatorSignalProducerClass>
 class Oscillator : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         typedef ModulatableFloatParam<ModulatorSignalProducerClass> ModulatedFloatParam;
 
@@ -104,20 +106,6 @@ class Oscillator : public SignalProducer
         void start(Seconds const time_offset);
         void stop(Seconds const time_offset);
 
-        Sample const* const* initialize_rendering(
-            Integer const round,
-            Integer const sample_count
-        );
-
-        void render(
-            Integer const round,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample** buffer
-        );
-
-        void handle_event(Event const& event);
-
         WaveformParam& waveform;
 
         ModulatedFloatParam modulated_amplitude;
@@ -136,6 +124,21 @@ class Oscillator : public SignalProducer
         FloatParam harmonic_7;
         FloatParam harmonic_8;
         FloatParam harmonic_9;
+
+    protected:
+        Sample const* const* initialize_rendering(
+            Integer const round,
+            Integer const sample_count
+        );
+
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        );
+
+        void handle_event(Event const& event);
 
     private:
         static constexpr Number FREQUENCY_MIN = 0.001;

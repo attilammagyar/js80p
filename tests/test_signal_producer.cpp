@@ -154,6 +154,8 @@ TEST(can_convert_sample_number_to_time_offset, {
 
 class CachingTestSignalProducer : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         CachingTestSignalProducer()
             : SignalProducer(1)
@@ -166,6 +168,7 @@ class CachingTestSignalProducer : public SignalProducer
             SignalProducer::render(0, 0, block_size, buffer);
         }
 
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -194,6 +197,8 @@ TEST(rendering_is_done_only_once_per_round, {
 
 class DelegatingSignalProducer : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         DelegatingSignalProducer(
                 Sample const value,
@@ -206,6 +211,12 @@ class DelegatingSignalProducer : public SignalProducer
         {
         }
 
+        DelegatingSignalProducer* delegate;
+        Integer initialize_rendering_calls;
+        Integer render_calls;
+        Sample value;
+
+    protected:
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
@@ -233,11 +244,6 @@ class DelegatingSignalProducer : public SignalProducer
                 buffer[0][i] = value;
             }
         }
-
-        DelegatingSignalProducer* delegate;
-        Integer initialize_rendering_calls;
-        Integer render_calls;
-        Sample value;
 };
 
 
@@ -319,12 +325,17 @@ TEST(a_signal_producer_may_delegate_rendering_to_another_during_initialization, 
 
 class RendererWithCircularDependecy : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         RendererWithCircularDependecy()
             : SignalProducer(1)
         {
         }
 
+        RendererWithCircularDependecy* dependency;
+
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -339,8 +350,6 @@ class RendererWithCircularDependecy : public SignalProducer
                 buffer[0][i] = other_buffer[0][i] + 1.0;
             }
         }
-
-        RendererWithCircularDependecy* dependency;
 };
 
 
@@ -386,6 +395,8 @@ TEST(cyclic_dependencies_in_rendering_are_broken_up_by_delaying_one_of_the_signa
 
 class PreparerWithCircularDependecy : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         PreparerWithCircularDependecy()
             : SignalProducer(1),
@@ -393,6 +404,10 @@ class PreparerWithCircularDependecy : public SignalProducer
         {
         }
 
+        PreparerWithCircularDependecy* dependency;
+        int value;
+
+    protected:
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
@@ -405,9 +420,6 @@ class PreparerWithCircularDependecy : public SignalProducer
 
             return NULL;
         }
-
-        PreparerWithCircularDependecy* dependency;
-        int value;
 };
 
 
@@ -441,6 +453,8 @@ TEST(cyclic_dependencies_in_rendering_initialization_are_broken_up_by_delaying_o
 
 class EventTestSignalProducer : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         static constexpr Event::Type SET_VALUE = 1;
 
@@ -456,6 +470,9 @@ class EventTestSignalProducer : public SignalProducer
             SignalProducer::schedule(SET_VALUE, time_offset, 0, param, param);
         }
 
+        int render_calls;
+
+    protected:
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -475,8 +492,6 @@ class EventTestSignalProducer : public SignalProducer
                 value = event.number_param_1;
             }
         }
-
-        int render_calls;
 
     private:
         Number value;

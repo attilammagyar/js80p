@@ -41,6 +41,8 @@ typedef BiquadFilter<SignalProducer> SimpleBiquadFilter;
 template<class InputSignalProducerClass>
 class BiquadFilter : public Filter<InputSignalProducerClass>
 {
+    friend class SignalProducer;
+
     public:
         typedef Byte Type;
 
@@ -79,6 +81,12 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         void clear();
 
+        FloatParam frequency;
+        FloatParam q;
+        FloatParam gain;
+        TypeParam& type;
+
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -90,11 +98,6 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const last_sample_index,
             Sample** buffer
         );
-
-        FloatParam frequency;
-        FloatParam q;
-        FloatParam gain;
-        TypeParam& type;
 
     private:
         static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;

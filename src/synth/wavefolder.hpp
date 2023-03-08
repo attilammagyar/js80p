@@ -38,11 +38,16 @@ namespace JS80P
 template<class InputSignalProducerClass>
 class Wavefolder : public Filter<InputSignalProducerClass>
 {
+    friend class SignalProducer;
+
     public:
         Wavefolder(InputSignalProducerClass& input);
         Wavefolder(InputSignalProducerClass& input, FloatParam& folding_leader);
         ~Wavefolder();
 
+        FloatParam folding;
+
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -54,8 +59,6 @@ class Wavefolder : public Filter<InputSignalProducerClass>
             Integer const last_sample_index,
             Sample** buffer
         );
-
-        FloatParam folding;
 
     private:
         static constexpr Sample TRANSITION_INV = 1.0 / Constants::FOLD_TRANSITION;

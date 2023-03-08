@@ -37,18 +37,20 @@ typedef Filter<SignalProducer> SimpleFilter;
 template<class InputSignalProducerClass>
 class Filter : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         Filter(
             InputSignalProducerClass& input,
             Integer const number_of_children = 0
         );
 
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
         );
 
-    protected:
         InputSignalProducerClass& input;
         Sample const* const* input_buffer;
 

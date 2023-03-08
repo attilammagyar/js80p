@@ -35,6 +35,8 @@ namespace JS80P
 template<class InputSignalProducerClass>
 class Delay : public Filter<InputSignalProducerClass>
 {
+    friend class SignalProducer;
+
     public:
         Delay(InputSignalProducerClass& input);
         Delay(
@@ -56,6 +58,10 @@ class Delay : public Filter<InputSignalProducerClass>
             SignalProducer const* feedback_signal_producer
         );
 
+        FloatParam feedback;
+        FloatParam time;
+
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -67,9 +73,6 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const last_sample_index,
             Sample** buffer
         );
-
-        FloatParam feedback;
-        FloatParam time;
 
     private:
         void initialize_instance();

@@ -40,6 +40,8 @@ namespace JS80P
 template<class InputSignalProducerClass>
 class Distortion : public Filter<InputSignalProducerClass>
 {
+    friend class SignalProducer;
+
     public:
         Distortion(
             std::string const name,
@@ -49,6 +51,9 @@ class Distortion : public Filter<InputSignalProducerClass>
 
         ~Distortion();
 
+        FloatParam level;
+
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -60,8 +65,6 @@ class Distortion : public Filter<InputSignalProducerClass>
             Integer const last_sample_index,
             Sample** buffer
         );
-
-        FloatParam level;
 
     private:
         static constexpr int TABLE_SIZE = 0x0800;

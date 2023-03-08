@@ -45,6 +45,8 @@ class FlexibleController;
 template<typename NumberType>
 class Param : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         Param(
             std::string const name,
@@ -75,6 +77,7 @@ class Param : public SignalProducer
          */
         Integer get_change_index() const;
 
+    protected:
         void render(
             Integer const round,
             Integer const first_sample_index,
@@ -82,7 +85,6 @@ class Param : public SignalProducer
             Sample** buffer
         );
 
-    protected:
         NumberType clamp(NumberType const value) const;
         void store_new_value(NumberType const new_value);
 
@@ -106,6 +108,8 @@ class Param : public SignalProducer
  */
 class FloatParam : public Param<Number>
 {
+    friend class SignalProducer;
+
     public:
         static constexpr Event::Type EVT_SET_VALUE = 1;
         static constexpr Event::Type EVT_LINEAR_RAMP = 2;
@@ -178,6 +182,7 @@ class FloatParam : public Param<Number>
         void start_envelope(Seconds const time_offset);
         Seconds end_envelope(Seconds const time_offset);
 
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -252,6 +257,8 @@ class FloatParam : public Param<Number>
 template<class ModulatorSignalProducerClass>
 class ModulatableFloatParam : public FloatParam
 {
+    friend class SignalProducer;
+
     public:
         static constexpr Number MODULATION_LEVEL_INSIGNIFICANT = 0.000001;
 
@@ -273,6 +280,7 @@ class ModulatableFloatParam : public FloatParam
         void start_envelope(Seconds const time_offset);
         Seconds end_envelope(Seconds const time_offset);
 
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count

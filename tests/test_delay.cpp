@@ -40,6 +40,8 @@ constexpr Integer CHANNELS = 2;
 
 class FixedSignalProducer : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         FixedSignalProducer(Sample const* const* fixed_samples)
             : SignalProducer(CHANNELS, 0),
@@ -47,6 +49,7 @@ class FixedSignalProducer : public SignalProducer
         {
         }
 
+    protected:
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count

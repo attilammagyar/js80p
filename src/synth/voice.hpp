@@ -38,6 +38,8 @@ namespace JS80P
 template<class ModulatorSignalProducerClass>
 class Voice : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
         enum State {
             OFF = 0,
@@ -94,6 +96,8 @@ class Voice : public SignalProducer
 
         class VolumeApplier : public Filter<Filter2>
         {
+            friend class SignalProducer;
+
             public:
                 VolumeApplier(
                     Filter2& input,
@@ -101,6 +105,7 @@ class Voice : public SignalProducer
                     FloatParam& volume
                 );
 
+            protected:
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
@@ -147,6 +152,7 @@ class Voice : public SignalProducer
             Number const velocity
         );
 
+    protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
