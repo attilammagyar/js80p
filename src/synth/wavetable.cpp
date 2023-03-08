@@ -385,7 +385,7 @@ StandardWaveforms::StandardWaveforms()
     }
 
     for (Integer i = 0; i != Wavetable::SOFT_PARTIALS; ++i) {
-        Number const softener = 2.0 / (Number)(i + 2.0);
+        Number const softener = 5.0 / (Number)(i + 5.0);
         soft_sawtooth_coefficients[i] = softener * sawtooth_coefficients[i];
         soft_inverse_sawtooth_coefficients[i] = -soft_sawtooth_coefficients[i];
         soft_triangle_coefficients[i] = softener * triangle_coefficients[i];
