@@ -43,6 +43,13 @@ class EventHandler
             Number const velocity
         ) {}
 
+        void aftertouch(
+            Seconds const time_offset,
+            Channel const channel,
+            Note const note,
+            Number const pressure
+        ) {}
+
         void note_off(
             Seconds const time_offset,
             Channel const channel,
@@ -453,6 +460,7 @@ constexpr Controller UNDEFINED_39                   = 119;
 
 constexpr Command NOTE_OFF                          = 0x80;
 constexpr Command NOTE_ON                           = 0x90;
+constexpr Command AFTERTOUCH                        = 0xa0;
 constexpr Command CONTROL_CHANGE                    = 0xb0;
 constexpr Command PITCH_BEND_CHANGE                 = 0xe0;
 
@@ -475,6 +483,12 @@ void Dispatcher::dispatch(
     switch (msg_type) {
         case NOTE_ON:
             event_handler.note_on(
+                time_offset, channel, (Note)d1, (Number)d2 * FLOAT_SCALE
+            );
+            break;
+
+        case AFTERTOUCH:
+            event_handler.aftertouch(
                 time_offset, channel, (Note)d1, (Number)d2 * FLOAT_SCALE
             );
             break;

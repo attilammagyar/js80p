@@ -461,6 +461,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number const velocity
         );
 
+        void aftertouch(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const pressure
+        );
+
         void note_off(
             Seconds const time_offset,
             Midi::Channel const channel,

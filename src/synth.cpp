@@ -521,6 +521,22 @@ void Synth::note_on(
 }
 
 
+void Synth::aftertouch(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Number const pressure
+) {
+    this->note.change(time_offset, (Number)note * NOTE_TO_PARAM_SCALE);
+
+    if (midi_note_to_voice_assignments[channel][note] == -1) {
+        return;
+    }
+
+    // Integer const voice = midi_note_to_voice_assignments[channel][note];
+}
+
+
 void Synth::note_off(
         Seconds const time_offset,
         Midi::Channel const channel,
