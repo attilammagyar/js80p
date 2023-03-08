@@ -1772,10 +1772,10 @@ void GUI::build_synth_body()
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
-    ADD_PE(synth_body,  12,  64,                    synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12,  64 + (PE_H + 10),      synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12,  64 + (PE_H + 10) * 2,  synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
-    ADD_PE(synth_body,  12,  64 + (PE_H + 10) * 3,  synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
+    ADD_PE(synth_body,  12, 134,                    synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  12, 134 + (PE_H + 6),       synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  12, 134 + (PE_H + 6) * 2,   synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
+    ADD_PE(synth_body,  12, 134 + (PE_H + 6) * 3,   synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 
     ADD_PE(synth_body,  87,              36,        synth, ParamId::MWAV,   NO_CTLS,    wf, wfc);
     ADD_PE(synth_body,  87 + PE_W * 1,   36,        synth, ParamId::MPRT,   MIDI_CTLS,  "%.3f", 1.0);

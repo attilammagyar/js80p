@@ -76,7 +76,7 @@ html, body {
 }
 
 #main .knob {
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .block {
@@ -181,6 +181,11 @@ h1 {
   text-align: center;
 }
 
+#main .knob.without_ctl {
+  height: 72px;
+  margin-top: 3px;
+}
+
 .knob select {
   background: #000000;
   border: inset 1px #5c5c60;
@@ -272,7 +277,16 @@ body.hide-objects .knob span:nth-child(4) {
 }
 
 #export-import {
-  height: 48px;
+  height: 27px;
+  text-align: center;
+}
+
+svg.icon {
+  padding: 0;
+  margin: 0;
+  border-width: 0;
+  width: 25px;
+  height: 25px;
 }
 
 .last-tab {
@@ -402,6 +416,28 @@ body.hide-objects .knob span:nth-child(4) {
       <span class="sc25">5</span>
       <div id="main" class="block">
         <div id="export-import">
+          <svg class="icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+           <g>
+            <title>Open</title>
+            <path
+              d="M50,120 L150,120 L200,170 L380,170 L380,250 M350,450 L50,450 L50,120 M50,450 L150,250 L450,250 L350,450"
+              opacity="1"
+              stroke-width="50"
+              stroke-linecap="round" stroke-linejoin="round"
+              stroke="#b8b8c0" fill="none"/>
+           </g>
+          </svg>
+          <svg class="icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+           <g>
+            <title>Save</title>
+            <path
+              d="M250,120 L250,320 M140,220 L250,350 M360,220 L250,350 M80,350 L80,450 L420,450 L420,350"
+              opacity="1"
+              stroke-width="50"
+              stroke-linecap="round" stroke-linejoin="round"
+              stroke="#b8b8c0" fill="none"/>
+           </g>
+          </svg>
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">
@@ -508,19 +544,13 @@ function $(obj)
     return (typeof(obj) === "string") ? document.getElementById(obj) : obj;
 }
 
-function create_knob(container, label_text, value_text, controller_text)
+function create_knob(container, label_text, value_text, controller_text, without_ctl)
 {
     var knob_container = document.createElement("div"),
         knob = document.createElement("div"),
-        controller = document.createElement("select"),
-        option = document.createElement("option"),
+        controller, option,
         label = document.createElement("span"),
         value = document.createElement("span");
-
-    knob_container.setAttribute("class", "knob");
-
-    option.textContent = controller_text || "modwheel";
-    option.setAttribute("value", "x");
 
     label.setAttribute("class", "label");
 
@@ -530,9 +560,21 @@ function create_knob(container, label_text, value_text, controller_text)
     knob_container.appendChild(label);
     knob_container.appendChild(knob);
 
-    controller.appendChild(option);
-    knob_container.appendChild(controller);
+    if (without_ctl) {
+        knob_container.setAttribute("class", "knob without_ctl");
+        controller = document.createElement("span");
+    } else {
+        knob_container.setAttribute("class", "knob");
 
+        option = document.createElement("option");
+        option.textContent = controller_text || "modwheel";
+        option.setAttribute("value", "x");
+
+        controller = document.createElement("select");
+        controller.appendChild(option);
+    }
+
+    knob_container.appendChild(controller);
     knob_container.appendChild(value);
 
     $(container).appendChild(knob_container);
@@ -546,6 +588,7 @@ window.onload = function ()
         document.getElementsByTagName("body")[0].setAttribute("class", "hide-objects");
     }
 
+    create_knob("main", "MODE", "split F#3", "modwheel", true);
     create_knob("main", "VOL %", "50");
     create_knob("main", "ADD %", "100");
     create_knob("main", "FM %", "0");
