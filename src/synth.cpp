@@ -88,7 +88,7 @@ Synth::Synth()
     flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
     envelopes((Envelope* const*)envelopes_rw)
 {
-    for (int i = 0; i != FLOAT_PARAMS_MAX; ++i) {
+    for (int i = 0; i != FLOAT_PARAMS; ++i) {
         float_params[i] = NULL;
     }
 
@@ -170,22 +170,22 @@ Synth::Synth()
     register_float_param(ParamId::CF2G, carrier_params.filter_2_gain);
 
     register_child(overdrive);
-    float_params[ParamId::EOG - SPECIAL_PARAMS] = &overdrive.level;
+    float_params[ParamId::EOG] = &overdrive.level;
 
     register_child(distortion);
-    float_params[ParamId::EDG - SPECIAL_PARAMS] = &distortion.level;
+    float_params[ParamId::EDG] = &distortion.level;
 
     register_child(filter_1);
     register_child(filter_1_type);
-    float_params[ParamId::EF1FRQ - SPECIAL_PARAMS] = &filter_1.frequency;
-    float_params[ParamId::EF1Q - SPECIAL_PARAMS] = &filter_1.q;
-    float_params[ParamId::EF1G - SPECIAL_PARAMS] = &filter_1.gain;
+    float_params[ParamId::EF1FRQ] = &filter_1.frequency;
+    float_params[ParamId::EF1Q] = &filter_1.q;
+    float_params[ParamId::EF1G] = &filter_1.gain;
 
     register_child(filter_2);
     register_child(filter_2_type);
-    float_params[ParamId::EF2FRQ - SPECIAL_PARAMS] = &filter_2.frequency;
-    float_params[ParamId::EF2Q - SPECIAL_PARAMS] = &filter_2.q;
-    float_params[ParamId::EF2G - SPECIAL_PARAMS] = &filter_2.gain;
+    float_params[ParamId::EF2FRQ] = &filter_2.frequency;
+    float_params[ParamId::EF2Q] = &filter_2.q;
+    float_params[ParamId::EF2G] = &filter_2.gain;
 
     for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
         /*
@@ -296,11 +296,11 @@ Synth::Synth()
     midi_controllers_rw[ControllerId::UNDEFINED_38] = new MidiController();
     midi_controllers_rw[ControllerId::UNDEFINED_39] = new MidiController();
 
-    Integer next_id = C1IN;
+    Integer next_id = F1IN;
 
     for (Integer i = 0; i != FLEXIBLE_CONTROLLERS; ++i) {
         FlexibleController* flexible_controller = (
-            new FlexibleController(std::string("C") + to_string(i))
+            new FlexibleController(std::string("F") + to_string(i))
         );
         flexible_controllers_rw[i] = flexible_controller;
 
@@ -313,7 +313,7 @@ Synth::Synth()
     }
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
-        Envelope* envelope = new Envelope(std::string("E") + to_string(i));
+        Envelope* envelope = new Envelope(std::string("N") + to_string(i));
         envelopes_rw[i] = envelope;
 
         register_float_param((ParamId)next_id++, envelope->amount);
@@ -433,7 +433,7 @@ Synth::Synth()
 void Synth::register_float_param(ParamId const param_id, FloatParam& float_param)
 {
     register_child(float_param);
-    float_params[param_id - SPECIAL_PARAMS] = &float_param;
+    float_params[param_id] = &float_param;
 }
 
 
@@ -634,30 +634,30 @@ Number Synth::get_param_ratio_atomic(ParamId const param_id) const
 
 Number Synth::get_param_default_ratio(ParamId const param_id) const
 {
-    if (param_id < SPECIAL_PARAMS) {
-        switch (param_id) {
-            case ParamId::MODE: return 0.0; // TODO
-            case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
-            case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
-            case ParamId::MF1TYP: return modulator_params.filter_1_type.get_default_ratio();
-            case ParamId::MF2TYP: return modulator_params.filter_2_type.get_default_ratio();
-            case ParamId::CF1TYP: return carrier_params.filter_1_type.get_default_ratio();
-            case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
-            case ParamId::EF1TYP: return filter_1_type.get_default_ratio();
-            case ParamId::EF2TYP: return filter_2_type.get_default_ratio();
-            case ParamId::L1WAV: return 0.0; // TODO
-            case ParamId::L2WAV: return 0.0; // TODO
-            case ParamId::L3WAV: return 0.0; // TODO
-            case ParamId::L4WAV: return 0.0; // TODO
-            case ParamId::L5WAV: return 0.0; // TODO
-            case ParamId::L6WAV: return 0.0; // TODO
-            case ParamId::L7WAV: return 0.0; // TODO
-            case ParamId::L8WAV: return 0.0; // TODO
-            default: return 0.0; // This should never be reached.
-        }
+    if (param_id < FLOAT_PARAMS) {
+        return float_params[param_id]->get_default_ratio();
     }
 
-    return float_params[param_id - SPECIAL_PARAMS]->get_default_ratio();
+    switch (param_id) {
+        case ParamId::MODE: return 0.0; // TODO
+        case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
+        case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
+        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_default_ratio();
+        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_default_ratio();
+        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_default_ratio();
+        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
+        case ParamId::EF1TYP: return filter_1_type.get_default_ratio();
+        case ParamId::EF2TYP: return filter_2_type.get_default_ratio();
+        case ParamId::L1WAV: return 0.0; // TODO
+        case ParamId::L2WAV: return 0.0; // TODO
+        case ParamId::L3WAV: return 0.0; // TODO
+        case ParamId::L4WAV: return 0.0; // TODO
+        case ParamId::L5WAV: return 0.0; // TODO
+        case ParamId::L6WAV: return 0.0; // TODO
+        case ParamId::L7WAV: return 0.0; // TODO
+        case ParamId::L8WAV: return 0.0; // TODO
+        default: return 0.0; // This should never be reached.
+    }
 }
 
 
@@ -665,11 +665,11 @@ Number Synth::float_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
 ) const {
-    if (param_id < SPECIAL_PARAMS) {
-        return 0.0;
+    if (param_id < FLOAT_PARAMS) {
+        return float_params[param_id]->ratio_to_value(ratio);
     }
 
-    return float_params[param_id - SPECIAL_PARAMS]->ratio_to_value(ratio);
+    return 0.0;
 }
 
 
@@ -695,7 +695,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6WAV: return 0; // TODO
         case ParamId::L7WAV: return 0; // TODO
         case ParamId::L8WAV: return 0; // TODO
-        default: return 0.0; // This should never be reached.
+        default: return 0; // This should never be reached.
     }
 }
 
@@ -762,14 +762,10 @@ void Synth::process_messages()
 
 void Synth::handle_set_param(ParamId const param_id, Number const ratio)
 {
-    if (param_id >= SPECIAL_PARAMS) {
-        int const i = param_id - SPECIAL_PARAMS;
-
-        FloatParam* param = float_params[i];
-
+    if (param_id < FLOAT_PARAMS) {
         // TODO: remove the null check when all params are implemented
-        if (param != NULL) {
-            float_params[i]->set_ratio(ratio);
+        if (float_params[param_id] != NULL) {
+            float_params[param_id]->set_ratio(ratio);
         }
 
     } else {
@@ -847,11 +843,11 @@ void Synth::handle_assign_controller(
         ParamId const param_id,
         Byte const controller_id
 ) {
-    if (param_id < SPECIAL_PARAMS) {
+    if (param_id >= FLOAT_PARAMS) {
         return;
     }
 
-    FloatParam* param = float_params[param_id - SPECIAL_PARAMS];
+    FloatParam* param = float_params[param_id];
 
     // TODO: remove the null check when all params are implemented
     if (param == NULL) {
@@ -952,37 +948,33 @@ void Synth::handle_refresh_param(ParamId const param_id)
 
 Number Synth::get_param_ratio(ParamId const param_id) const
 {
-    if (param_id < SPECIAL_PARAMS) {
-        switch (param_id) {
-            case ParamId::MODE: return 0.0; // TODO
-            case ParamId::MWAV: return modulator_params.waveform.get_ratio();
-            case ParamId::CWAV: return carrier_params.waveform.get_ratio();
-            case ParamId::MF1TYP: return modulator_params.filter_1_type.get_ratio();
-            case ParamId::MF2TYP: return modulator_params.filter_2_type.get_ratio();
-            case ParamId::CF1TYP: return carrier_params.filter_1_type.get_ratio();
-            case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
-            case ParamId::EF1TYP: return filter_1_type.get_ratio();
-            case ParamId::EF2TYP: return filter_2_type.get_ratio();
-            case ParamId::L1WAV: return 0.0; // TODO
-            case ParamId::L2WAV: return 0.0; // TODO
-            case ParamId::L3WAV: return 0.0; // TODO
-            case ParamId::L4WAV: return 0.0; // TODO
-            case ParamId::L5WAV: return 0.0; // TODO
-            case ParamId::L6WAV: return 0.0; // TODO
-            case ParamId::L7WAV: return 0.0; // TODO
-            case ParamId::L8WAV: return 0.0; // TODO
-            default: return 0.0; // This should never be reached.
+    if (param_id < FLOAT_PARAMS) {
+        // TODO: remove the null check when all params are implemented
+        if (float_params[param_id] != NULL) {
+            return float_params[param_id]->get_ratio();
         }
     }
 
-    FloatParam* const param = float_params[param_id - SPECIAL_PARAMS];
-
-    // TODO: remove the null check when all params are implemented
-    if (param != NULL) {
-        return param->get_ratio();
+    switch (param_id) {
+        case ParamId::MODE: return 0.0; // TODO
+        case ParamId::MWAV: return modulator_params.waveform.get_ratio();
+        case ParamId::CWAV: return carrier_params.waveform.get_ratio();
+        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_ratio();
+        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_ratio();
+        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_ratio();
+        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
+        case ParamId::EF1TYP: return filter_1_type.get_ratio();
+        case ParamId::EF2TYP: return filter_2_type.get_ratio();
+        case ParamId::L1WAV: return 0.0; // TODO
+        case ParamId::L2WAV: return 0.0; // TODO
+        case ParamId::L3WAV: return 0.0; // TODO
+        case ParamId::L4WAV: return 0.0; // TODO
+        case ParamId::L5WAV: return 0.0; // TODO
+        case ParamId::L6WAV: return 0.0; // TODO
+        case ParamId::L7WAV: return 0.0; // TODO
+        case ParamId::L8WAV: return 0.0; // TODO
+        default: return 0.0; // This should never be reached.
     }
-
-    return 0.0;
 }
 
 
