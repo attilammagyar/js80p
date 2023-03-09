@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
+
 #include "test.cpp"
 #include "utils.cpp"
 
@@ -86,7 +88,16 @@ TEST(portamento, {
 
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
-    SumOfSines expected(0.7071, 200.0, 0.0, 0.0, 0.0, 0.0, SimpleVoice::CHANNELS, 0.00009);
+    SumOfSines expected(
+        std::sin(Math::PI / 4.0),
+        200.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        SimpleVoice::CHANNELS,
+        0.00009
+    );
     SimpleVoice::Params params("");
     Envelope envelope("");
     SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);
