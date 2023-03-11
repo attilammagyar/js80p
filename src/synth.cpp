@@ -97,95 +97,107 @@ Synth::Synth()
         controller_assignments[i].store(ControllerId::NONE);
     }
 
-    register_float_param(ParamId::VOL, volume);
-    register_float_param(ParamId::ADD, modulator_add_volume);
-    register_float_param(ParamId::FM, frequency_modulation_level);
-    register_float_param(ParamId::AM, amplitude_modulation_level);
+    register_float_param_as_child(ParamId::VOL, volume);
+    register_float_param_as_child(ParamId::ADD, modulator_add_volume);
+    register_float_param_as_child(ParamId::FM, frequency_modulation_level);
+    register_float_param_as_child(ParamId::AM, amplitude_modulation_level);
     register_child(bus);
 
-    register_child(modulator_params.waveform);
-    register_float_param(ParamId::MAMP, modulator_params.amplitude);
-    register_float_param(ParamId::MVS, modulator_params.velocity_sensitivity);
-    register_float_param(ParamId::MFLD, modulator_params.folding);
-    register_float_param(ParamId::MPRT, modulator_params.portamento_length);
-    register_float_param(ParamId::MPRD, modulator_params.portamento_depth);
-    register_float_param(ParamId::MDTN, modulator_params.detune);
-    register_float_param(ParamId::MFIN, modulator_params.fine_detune);
-    register_float_param(ParamId::MWID, modulator_params.width);
-    register_float_param(ParamId::MPAN, modulator_params.panning);
-    register_float_param(ParamId::MVOL, modulator_params.volume);
+    register_param_as_child<Modulator::Oscillator_::WaveformParam>(
+        ParamId::MWAV, modulator_params.waveform
+    );
+    register_float_param_as_child(ParamId::MAMP, modulator_params.amplitude);
+    register_float_param_as_child(ParamId::MVS, modulator_params.velocity_sensitivity);
+    register_float_param_as_child(ParamId::MFLD, modulator_params.folding);
+    register_float_param_as_child(ParamId::MPRT, modulator_params.portamento_length);
+    register_float_param_as_child(ParamId::MPRD, modulator_params.portamento_depth);
+    register_float_param_as_child(ParamId::MDTN, modulator_params.detune);
+    register_float_param_as_child(ParamId::MFIN, modulator_params.fine_detune);
+    register_float_param_as_child(ParamId::MWID, modulator_params.width);
+    register_float_param_as_child(ParamId::MPAN, modulator_params.panning);
+    register_float_param_as_child(ParamId::MVOL, modulator_params.volume);
 
-    register_float_param(ParamId::MC1, modulator_params.harmonic_0);
-    register_float_param(ParamId::MC2, modulator_params.harmonic_1);
-    register_float_param(ParamId::MC3, modulator_params.harmonic_2);
-    register_float_param(ParamId::MC4, modulator_params.harmonic_3);
-    register_float_param(ParamId::MC5, modulator_params.harmonic_4);
-    register_float_param(ParamId::MC6, modulator_params.harmonic_5);
-    register_float_param(ParamId::MC7, modulator_params.harmonic_6);
-    register_float_param(ParamId::MC8, modulator_params.harmonic_7);
-    register_float_param(ParamId::MC9, modulator_params.harmonic_8);
-    register_float_param(ParamId::MC10, modulator_params.harmonic_9);
+    register_float_param_as_child(ParamId::MC1, modulator_params.harmonic_0);
+    register_float_param_as_child(ParamId::MC2, modulator_params.harmonic_1);
+    register_float_param_as_child(ParamId::MC3, modulator_params.harmonic_2);
+    register_float_param_as_child(ParamId::MC4, modulator_params.harmonic_3);
+    register_float_param_as_child(ParamId::MC5, modulator_params.harmonic_4);
+    register_float_param_as_child(ParamId::MC6, modulator_params.harmonic_5);
+    register_float_param_as_child(ParamId::MC7, modulator_params.harmonic_6);
+    register_float_param_as_child(ParamId::MC8, modulator_params.harmonic_7);
+    register_float_param_as_child(ParamId::MC9, modulator_params.harmonic_8);
+    register_float_param_as_child(ParamId::MC10, modulator_params.harmonic_9);
 
-    register_child(modulator_params.filter_1_type);
-    register_float_param(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
-    register_float_param(ParamId::MF1Q, modulator_params.filter_1_q);
-    register_float_param(ParamId::MF1G, modulator_params.filter_1_gain);
+    register_param_as_child<Modulator::Filter1::TypeParam>(
+        ParamId::MF1TYP, modulator_params.filter_1_type
+    );
+    register_float_param_as_child(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
+    register_float_param_as_child(ParamId::MF1Q, modulator_params.filter_1_q);
+    register_float_param_as_child(ParamId::MF1G, modulator_params.filter_1_gain);
 
-    register_child(modulator_params.filter_2_type);
-    register_float_param(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
-    register_float_param(ParamId::MF2Q, modulator_params.filter_2_q);
-    register_float_param(ParamId::MF2G, modulator_params.filter_2_gain);
+    register_param_as_child<Modulator::Filter2::TypeParam>(
+        ParamId::MF2TYP, modulator_params.filter_2_type
+    );
+    register_float_param_as_child(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
+    register_float_param_as_child(ParamId::MF2Q, modulator_params.filter_2_q);
+    register_float_param_as_child(ParamId::MF2G, modulator_params.filter_2_gain);
 
-    register_child(carrier_params.waveform);
-    register_float_param(ParamId::CAMP, carrier_params.amplitude);
-    register_float_param(ParamId::CVS, carrier_params.velocity_sensitivity);
-    register_float_param(ParamId::CFLD, carrier_params.folding);
-    register_float_param(ParamId::CPRT, carrier_params.portamento_length);
-    register_float_param(ParamId::CPRD, carrier_params.portamento_depth);
-    register_float_param(ParamId::CDTN, carrier_params.detune);
-    register_float_param(ParamId::CFIN, carrier_params.fine_detune);
-    register_float_param(ParamId::CWID, carrier_params.width);
-    register_float_param(ParamId::CPAN, carrier_params.panning);
-    register_float_param(ParamId::CVOL, carrier_params.volume);
+    register_param_as_child<Carrier::Oscillator_::WaveformParam>(
+        ParamId::CWAV, carrier_params.waveform
+    );
+    register_float_param_as_child(ParamId::CAMP, carrier_params.amplitude);
+    register_float_param_as_child(ParamId::CVS, carrier_params.velocity_sensitivity);
+    register_float_param_as_child(ParamId::CFLD, carrier_params.folding);
+    register_float_param_as_child(ParamId::CPRT, carrier_params.portamento_length);
+    register_float_param_as_child(ParamId::CPRD, carrier_params.portamento_depth);
+    register_float_param_as_child(ParamId::CDTN, carrier_params.detune);
+    register_float_param_as_child(ParamId::CFIN, carrier_params.fine_detune);
+    register_float_param_as_child(ParamId::CWID, carrier_params.width);
+    register_float_param_as_child(ParamId::CPAN, carrier_params.panning);
+    register_float_param_as_child(ParamId::CVOL, carrier_params.volume);
 
-    register_float_param(ParamId::CC1, carrier_params.harmonic_0);
-    register_float_param(ParamId::CC2, carrier_params.harmonic_1);
-    register_float_param(ParamId::CC3, carrier_params.harmonic_2);
-    register_float_param(ParamId::CC4, carrier_params.harmonic_3);
-    register_float_param(ParamId::CC5, carrier_params.harmonic_4);
-    register_float_param(ParamId::CC6, carrier_params.harmonic_5);
-    register_float_param(ParamId::CC7, carrier_params.harmonic_6);
-    register_float_param(ParamId::CC8, carrier_params.harmonic_7);
-    register_float_param(ParamId::CC9, carrier_params.harmonic_8);
-    register_float_param(ParamId::CC10, carrier_params.harmonic_9);
+    register_float_param_as_child(ParamId::CC1, carrier_params.harmonic_0);
+    register_float_param_as_child(ParamId::CC2, carrier_params.harmonic_1);
+    register_float_param_as_child(ParamId::CC3, carrier_params.harmonic_2);
+    register_float_param_as_child(ParamId::CC4, carrier_params.harmonic_3);
+    register_float_param_as_child(ParamId::CC5, carrier_params.harmonic_4);
+    register_float_param_as_child(ParamId::CC6, carrier_params.harmonic_5);
+    register_float_param_as_child(ParamId::CC7, carrier_params.harmonic_6);
+    register_float_param_as_child(ParamId::CC8, carrier_params.harmonic_7);
+    register_float_param_as_child(ParamId::CC9, carrier_params.harmonic_8);
+    register_float_param_as_child(ParamId::CC10, carrier_params.harmonic_9);
 
-    register_child(carrier_params.filter_1_type);
-    register_float_param(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
-    register_float_param(ParamId::CF1Q, carrier_params.filter_1_q);
-    register_float_param(ParamId::CF1G, carrier_params.filter_1_gain);
+    register_param_as_child<Carrier::Filter1::TypeParam>(
+        ParamId::CF1TYP, carrier_params.filter_1_type
+    );
+    register_float_param_as_child(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
+    register_float_param_as_child(ParamId::CF1Q, carrier_params.filter_1_q);
+    register_float_param_as_child(ParamId::CF1G, carrier_params.filter_1_gain);
 
-    register_child(carrier_params.filter_2_type);
-    register_float_param(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
-    register_float_param(ParamId::CF2Q, carrier_params.filter_2_q);
-    register_float_param(ParamId::CF2G, carrier_params.filter_2_gain);
+    register_param_as_child<Carrier::Filter2::TypeParam>(
+        ParamId::CF2TYP, carrier_params.filter_2_type
+    );
+    register_float_param_as_child(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
+    register_float_param_as_child(ParamId::CF2Q, carrier_params.filter_2_q);
+    register_float_param_as_child(ParamId::CF2G, carrier_params.filter_2_gain);
 
     register_child(overdrive);
-    float_params[ParamId::EOG] = &overdrive.level;
+    register_float_param(ParamId::EOG, overdrive.level);
 
     register_child(distortion);
-    float_params[ParamId::EDG] = &distortion.level;
+    register_float_param(ParamId::EDG, distortion.level);
 
     register_child(filter_1);
-    register_child(filter_1_type);
-    float_params[ParamId::EF1FRQ] = &filter_1.frequency;
-    float_params[ParamId::EF1Q] = &filter_1.q;
-    float_params[ParamId::EF1G] = &filter_1.gain;
+    register_param_as_child<Filter1::TypeParam>(EF1TYP, filter_1_type);
+    register_float_param(ParamId::EF1FRQ, filter_1.frequency);
+    register_float_param(ParamId::EF1Q, filter_1.q);
+    register_float_param(ParamId::EF1G, filter_1.gain);
 
     register_child(filter_2);
-    register_child(filter_2_type);
-    float_params[ParamId::EF2FRQ] = &filter_2.frequency;
-    float_params[ParamId::EF2Q] = &filter_2.q;
-    float_params[ParamId::EF2G] = &filter_2.gain;
+    register_param_as_child<Filter2::TypeParam>(EF2TYP, filter_2_type);
+    register_float_param(ParamId::EF2FRQ, filter_2.frequency);
+    register_float_param(ParamId::EF2Q, filter_2.q);
+    register_float_param(ParamId::EF2G, filter_2.gain);
 
     for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
         /*
@@ -304,28 +316,28 @@ Synth::Synth()
         );
         flexible_controllers_rw[i] = flexible_controller;
 
-        register_float_param((ParamId)next_id++, flexible_controller->input);
-        register_float_param((ParamId)next_id++, flexible_controller->min);
-        register_float_param((ParamId)next_id++, flexible_controller->max);
-        register_float_param((ParamId)next_id++, flexible_controller->amount);
-        register_float_param((ParamId)next_id++, flexible_controller->distortion);
-        register_float_param((ParamId)next_id++, flexible_controller->randomness);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->input);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->min);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->max);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->amount);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->distortion);
+        register_float_param_as_child((ParamId)next_id++, flexible_controller->randomness);
     }
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
         Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
         envelopes_rw[i] = envelope;
 
-        register_float_param((ParamId)next_id++, envelope->amount);
-        register_float_param((ParamId)next_id++, envelope->initial_value);
-        register_float_param((ParamId)next_id++, envelope->delay_time);
-        register_float_param((ParamId)next_id++, envelope->attack_time);
-        register_float_param((ParamId)next_id++, envelope->peak_value);
-        register_float_param((ParamId)next_id++, envelope->hold_time);
-        register_float_param((ParamId)next_id++, envelope->decay_time);
-        register_float_param((ParamId)next_id++, envelope->sustain_value);
-        register_float_param((ParamId)next_id++, envelope->release_time);
-        register_float_param((ParamId)next_id++, envelope->final_value);
+        register_float_param_as_child((ParamId)next_id++, envelope->amount);
+        register_float_param_as_child((ParamId)next_id++, envelope->initial_value);
+        register_float_param_as_child((ParamId)next_id++, envelope->delay_time);
+        register_float_param_as_child((ParamId)next_id++, envelope->attack_time);
+        register_float_param_as_child((ParamId)next_id++, envelope->peak_value);
+        register_float_param_as_child((ParamId)next_id++, envelope->hold_time);
+        register_float_param_as_child((ParamId)next_id++, envelope->decay_time);
+        register_float_param_as_child((ParamId)next_id++, envelope->sustain_value);
+        register_float_param_as_child((ParamId)next_id++, envelope->release_time);
+        register_float_param_as_child((ParamId)next_id++, envelope->final_value);
     }
 
     update_param_states();
@@ -430,9 +442,26 @@ Synth::Synth()
 }
 
 
+template<class ParamClass>
+void Synth::register_param_as_child(
+        ParamId const param_id,
+        ParamClass& param
+) {
+    register_child(param);
+}
+
+
+void Synth::register_float_param_as_child(
+        ParamId const param_id,
+        FloatParam& float_param
+) {
+    register_param_as_child<FloatParam>(param_id, float_param);
+    float_params[param_id] = &float_param;
+}
+
+
 void Synth::register_float_param(ParamId const param_id, FloatParam& float_param)
 {
-    register_child(float_param);
     float_params[param_id] = &float_param;
 }
 

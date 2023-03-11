@@ -499,8 +499,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Byte const byte_param
         );
 
-        Number get_param_ratio_atomic(ParamId const param_id) const;
-        Number get_param_default_ratio(ParamId const param_id) const;
+
         Number float_param_ratio_to_display_value(
             ParamId const param_id,
             Number const ratio
@@ -509,6 +508,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const ratio
         ) const;
+
+        Number get_param_ratio_atomic(ParamId const param_id) const;
+        Number get_param_default_ratio(ParamId const param_id) const;
         ControllerId get_param_controller_id_atomic(ParamId const param_id) const;
 
         void note_on(
@@ -708,6 +710,17 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLOAT_PARAMS = 247;
 
         static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
+
+        template<class ParamClass>
+        void register_param_as_child(
+            ParamId const param_id,
+            ParamClass& param
+        );
+
+        void register_float_param_as_child(
+            ParamId const param_id,
+            FloatParam& float_param
+        );
 
         void register_float_param(
             ParamId const param_id,
