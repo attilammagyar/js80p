@@ -300,7 +300,7 @@ Synth::Synth()
 
     for (Integer i = 0; i != FLEXIBLE_CONTROLLERS; ++i) {
         FlexibleController* flexible_controller = (
-            new FlexibleController(std::string("F") + to_string(i))
+            new FlexibleController(std::string("F") + to_string(i + 1))
         );
         flexible_controllers_rw[i] = flexible_controller;
 
@@ -313,7 +313,7 @@ Synth::Synth()
     }
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
-        Envelope* envelope = new Envelope(std::string("N") + to_string(i));
+        Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
         envelopes_rw[i] = envelope;
 
         register_float_param((ParamId)next_id++, envelope->amount);
