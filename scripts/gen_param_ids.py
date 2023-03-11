@@ -16,8 +16,10 @@ def main(argv):
     param_id = print_lfo_params(param_id)
     param_id = print_special_params(param_id)
 
+    return 0
 
-def print_main_params(param_id):
+
+def print_main_params(param_id: int) -> int:
     params = [
         ("VOL", "   // Volume"),
         ("ADD", "   // Modulator Additive Volume"),
@@ -28,7 +30,7 @@ def print_main_params(param_id):
     return print_params(param_id, "", "", 1, params)
 
 
-def print_oscillator_params(param_id, group, prefix):
+def print_oscillator_params(param_id: int, group: str, prefix: str) -> int:
     params = [
         ("$AMP", "  // $ Amplitude"),
         ("$VS", "   // $ Velocity Sensitivity"),
@@ -64,7 +66,7 @@ def print_oscillator_params(param_id, group, prefix):
     return print_params(param_id, group, prefix, 1, params)
 
 
-def print_effect_params(param_id):
+def print_effect_params(param_id: int) -> int:
     params = [
         ("$OG", "   // $ Overdrive Gain"),
 
@@ -99,7 +101,7 @@ def print_effect_params(param_id):
     return print_params(param_id, "Effects", "E", 1, params)
 
 
-def print_flexible_controllers_params(param_id):
+def print_flexible_controllers_params(param_id: int) -> int:
     params = [
         ("$#IN", "  // $ # Input"),
         ("$#MIN", " // $ # Minimum Value"),
@@ -112,7 +114,7 @@ def print_flexible_controllers_params(param_id):
     return print_params(param_id, "Flexible Controller", "F", 10, params)
 
 
-def print_envelopes_params(param_id):
+def print_envelopes_params(param_id: int) -> int:
     params = [
         ("$#AMT", " // $ # Amount"),
         ("$#INI", " // $ # Initial Level"),
@@ -129,7 +131,7 @@ def print_envelopes_params(param_id):
     return print_params(param_id, "Envelope", "N", 6, params)
 
 
-def print_lfo_params(param_id):
+def print_lfo_params(param_id: int) -> int:
     params = [
         ("$#FRQ", " // $ # Frequency"),
         ("$#AMT", " // $ # Amount"),
@@ -142,7 +144,7 @@ def print_lfo_params(param_id):
     return print_params(param_id, "LFO", "L", 8, params)
 
 
-def print_special_params(param_id):
+def print_special_params(param_id: int) -> int:
     params = [
         ("MODE", "  // Mode"),
         ("MWAV", "  // Modulator Waveform"),
@@ -168,7 +170,13 @@ def print_special_params(param_id):
     return print_params(param_id, "", "", 1, params)
 
 
-def print_params(param_id: int, group: str, prefix: str, objects: int, object_params: list):
+def print_params(
+        param_id: int,
+        group: str,
+        prefix: str,
+        objects: int,
+        object_params: list
+) -> int:
     for i in range(objects):
         obj_id = str(i + 1)
 
