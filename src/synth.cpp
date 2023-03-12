@@ -49,6 +49,321 @@ namespace JS80P
 Synth::ParamIdHashTable Synth::param_id_hash_table;
 
 
+char const* const Synth::PARAM_NAMES[] = {
+    [ParamId::VOL] = "VOL",
+
+    [ParamId::ADD] = "ADD",
+    [ParamId::FM] = "FM",
+    [ParamId::AM] = "AM",
+
+    [ParamId::MAMP] = "MAMP",
+    [ParamId::MVS] = "MVS",
+    [ParamId::MFLD] = "MFLD",
+    [ParamId::MPRT] = "MPRT",
+    [ParamId::MPRD] = "MPRD",
+    [ParamId::MDTN] = "MDTN",
+    [ParamId::MFIN] = "MFIN",
+    [ParamId::MWID] = "MWID",
+    [ParamId::MPAN] = "MPAN",
+    [ParamId::MVOL] = "MVOL",
+
+    [ParamId::MC1] = "MC1",
+    [ParamId::MC2] = "MC2",
+    [ParamId::MC3] = "MC3",
+    [ParamId::MC4] = "MC4",
+    [ParamId::MC5] = "MC5",
+    [ParamId::MC6] = "MC6",
+    [ParamId::MC7] = "MC7",
+    [ParamId::MC8] = "MC8",
+    [ParamId::MC9] = "MC9",
+    [ParamId::MC10] = "MC10",
+
+    [ParamId::MF1FRQ] = "MF1FRQ",
+    [ParamId::MF1Q] = "MF1Q",
+    [ParamId::MF1G] = "MF1G",
+
+    [ParamId::MF2FRQ] = "MF2FRQ",
+    [ParamId::MF2Q] = "MF2Q",
+    [ParamId::MF2G] = "MF2G",
+
+    [ParamId::CAMP] = "CAMP",
+    [ParamId::CVS] = "CVS",
+    [ParamId::CFLD] = "CFLD",
+    [ParamId::CPRT] = "CPRT",
+    [ParamId::CPRD] = "CPRD",
+    [ParamId::CDTN] = "CDTN",
+    [ParamId::CFIN] = "CFIN",
+    [ParamId::CWID] = "CWID",
+    [ParamId::CPAN] = "CPAN",
+    [ParamId::CVOL] = "CVOL",
+
+    [ParamId::CC1] = "CC1",
+    [ParamId::CC2] = "CC2",
+    [ParamId::CC3] = "CC3",
+    [ParamId::CC4] = "CC4",
+    [ParamId::CC5] = "CC5",
+    [ParamId::CC6] = "CC6",
+    [ParamId::CC7] = "CC7",
+    [ParamId::CC8] = "CC8",
+    [ParamId::CC9] = "CC9",
+    [ParamId::CC10] = "CC10",
+
+    [ParamId::CF1FRQ] = "CF1FRQ",
+    [ParamId::CF1Q] = "CF1Q",
+    [ParamId::CF1G] = "CF1G",
+
+    [ParamId::CF2FRQ] = "CF2FRQ",
+    [ParamId::CF2Q] = "CF2Q",
+    [ParamId::CF2G] = "CF2G",
+
+    [ParamId::EOG] = "EOG",
+
+    [ParamId::EDG] = "EDG",
+
+    [ParamId::EF1FRQ] = "EF1FRQ",
+    [ParamId::EF1Q] = "EF1Q",
+    [ParamId::EF1G] = "EF1G",
+
+    [ParamId::EF2FRQ] = "EF2FRQ",
+    [ParamId::EF2Q] = "EF2Q",
+    [ParamId::EF2G] = "EF2G",
+
+    [ParamId::EEDEL] = "EEDEL",
+    [ParamId::EEFB] = "EEFB",
+    [ParamId::EEDF] = "EEDF",
+    [ParamId::EEDG] = "EEDG",
+    [ParamId::EEWID] = "EEWID",
+    [ParamId::EEHPF] = "EEHPF",
+    [ParamId::EEWET] = "EEWET",
+    [ParamId::EEDRY] = "EEDRY",
+
+    [ParamId::ERRS] = "ERRS",
+    [ParamId::ERDF] = "ERDF",
+    [ParamId::ERDG] = "ERDG",
+    [ParamId::ERWID] = "ERWID",
+    [ParamId::ERHPF] = "ERHPF",
+    [ParamId::ERWET] = "ERWET",
+    [ParamId::ERDRY] = "ERDRY",
+
+    [ParamId::F1IN] = "F1IN",
+    [ParamId::F1MIN] = "F1MIN",
+    [ParamId::F1MAX] = "F1MAX",
+    [ParamId::F1AMT] = "F1AMT",
+    [ParamId::F1DST] = "F1DST",
+    [ParamId::F1RND] = "F1RND",
+
+    [ParamId::F2IN] = "F2IN",
+    [ParamId::F2MIN] = "F2MIN",
+    [ParamId::F2MAX] = "F2MAX",
+    [ParamId::F2AMT] = "F2AMT",
+    [ParamId::F2DST] = "F2DST",
+    [ParamId::F2RND] = "F2RND",
+
+    [ParamId::F3IN] = "F3IN",
+    [ParamId::F3MIN] = "F3MIN",
+    [ParamId::F3MAX] = "F3MAX",
+    [ParamId::F3AMT] = "F3AMT",
+    [ParamId::F3DST] = "F3DST",
+    [ParamId::F3RND] = "F3RND",
+
+    [ParamId::F4IN] = "F4IN",
+    [ParamId::F4MIN] = "F4MIN",
+    [ParamId::F4MAX] = "F4MAX",
+    [ParamId::F4AMT] = "F4AMT",
+    [ParamId::F4DST] = "F4DST",
+    [ParamId::F4RND] = "F4RND",
+
+    [ParamId::F5IN] = "F5IN",
+    [ParamId::F5MIN] = "F5MIN",
+    [ParamId::F5MAX] = "F5MAX",
+    [ParamId::F5AMT] = "F5AMT",
+    [ParamId::F5DST] = "F5DST",
+    [ParamId::F5RND] = "F5RND",
+
+    [ParamId::F6IN] = "F6IN",
+    [ParamId::F6MIN] = "F6MIN",
+    [ParamId::F6MAX] = "F6MAX",
+    [ParamId::F6AMT] = "F6AMT",
+    [ParamId::F6DST] = "F6DST",
+    [ParamId::F6RND] = "F6RND",
+
+    [ParamId::F7IN] = "F7IN",
+    [ParamId::F7MIN] = "F7MIN",
+    [ParamId::F7MAX] = "F7MAX",
+    [ParamId::F7AMT] = "F7AMT",
+    [ParamId::F7DST] = "F7DST",
+    [ParamId::F7RND] = "F7RND",
+
+    [ParamId::F8IN] = "F8IN",
+    [ParamId::F8MIN] = "F8MIN",
+    [ParamId::F8MAX] = "F8MAX",
+    [ParamId::F8AMT] = "F8AMT",
+    [ParamId::F8DST] = "F8DST",
+    [ParamId::F8RND] = "F8RND",
+
+    [ParamId::F9IN] = "F9IN",
+    [ParamId::F9MIN] = "F9MIN",
+    [ParamId::F9MAX] = "F9MAX",
+    [ParamId::F9AMT] = "F9AMT",
+    [ParamId::F9DST] = "F9DST",
+    [ParamId::F9RND] = "F9RND",
+
+    [ParamId::F10IN] = "F10IN",
+    [ParamId::F10MIN] = "F10MIN",
+    [ParamId::F10MAX] = "F10MAX",
+    [ParamId::F10AMT] = "F10AMT",
+    [ParamId::F10DST] = "F10DST",
+    [ParamId::F10RND] = "F10RND",
+
+    [ParamId::N1AMT] = "N1AMT",
+    [ParamId::N1INI] = "N1INI",
+    [ParamId::N1DEL] = "N1DEL",
+    [ParamId::N1ATK] = "N1ATK",
+    [ParamId::N1PK] = "N1PK",
+    [ParamId::N1HLD] = "N1HLD",
+    [ParamId::N1DEC] = "N1DEC",
+    [ParamId::N1SUS] = "N1SUS",
+    [ParamId::N1REL] = "N1REL",
+    [ParamId::N1FIN] = "N1FIN",
+
+    [ParamId::N2AMT] = "N2AMT",
+    [ParamId::N2INI] = "N2INI",
+    [ParamId::N2DEL] = "N2DEL",
+    [ParamId::N2ATK] = "N2ATK",
+    [ParamId::N2PK] = "N2PK",
+    [ParamId::N2HLD] = "N2HLD",
+    [ParamId::N2DEC] = "N2DEC",
+    [ParamId::N2SUS] = "N2SUS",
+    [ParamId::N2REL] = "N2REL",
+    [ParamId::N2FIN] = "N2FIN",
+
+    [ParamId::N3AMT] = "N3AMT",
+    [ParamId::N3INI] = "N3INI",
+    [ParamId::N3DEL] = "N3DEL",
+    [ParamId::N3ATK] = "N3ATK",
+    [ParamId::N3PK] = "N3PK",
+    [ParamId::N3HLD] = "N3HLD",
+    [ParamId::N3DEC] = "N3DEC",
+    [ParamId::N3SUS] = "N3SUS",
+    [ParamId::N3REL] = "N3REL",
+    [ParamId::N3FIN] = "N3FIN",
+
+    [ParamId::N4AMT] = "N4AMT",
+    [ParamId::N4INI] = "N4INI",
+    [ParamId::N4DEL] = "N4DEL",
+    [ParamId::N4ATK] = "N4ATK",
+    [ParamId::N4PK] = "N4PK",
+    [ParamId::N4HLD] = "N4HLD",
+    [ParamId::N4DEC] = "N4DEC",
+    [ParamId::N4SUS] = "N4SUS",
+    [ParamId::N4REL] = "N4REL",
+    [ParamId::N4FIN] = "N4FIN",
+
+    [ParamId::N5AMT] = "N5AMT",
+    [ParamId::N5INI] = "N5INI",
+    [ParamId::N5DEL] = "N5DEL",
+    [ParamId::N5ATK] = "N5ATK",
+    [ParamId::N5PK] = "N5PK",
+    [ParamId::N5HLD] = "N5HLD",
+    [ParamId::N5DEC] = "N5DEC",
+    [ParamId::N5SUS] = "N5SUS",
+    [ParamId::N5REL] = "N5REL",
+    [ParamId::N5FIN] = "N5FIN",
+
+    [ParamId::N6AMT] = "N6AMT",
+    [ParamId::N6INI] = "N6INI",
+    [ParamId::N6DEL] = "N6DEL",
+    [ParamId::N6ATK] = "N6ATK",
+    [ParamId::N6PK] = "N6PK",
+    [ParamId::N6HLD] = "N6HLD",
+    [ParamId::N6DEC] = "N6DEC",
+    [ParamId::N6SUS] = "N6SUS",
+    [ParamId::N6REL] = "N6REL",
+    [ParamId::N6FIN] = "N6FIN",
+
+    [ParamId::L1FRQ] = "L1FRQ",
+    [ParamId::L1AMT] = "L1AMT",
+    [ParamId::L1MIN] = "L1MIN",
+    [ParamId::L1MAX] = "L1MAX",
+    [ParamId::L1DST] = "L1DST",
+    [ParamId::L1RND] = "L1RND",
+
+    [ParamId::L2FRQ] = "L2FRQ",
+    [ParamId::L2AMT] = "L2AMT",
+    [ParamId::L2MIN] = "L2MIN",
+    [ParamId::L2MAX] = "L2MAX",
+    [ParamId::L2DST] = "L2DST",
+    [ParamId::L2RND] = "L2RND",
+
+    [ParamId::L3FRQ] = "L3FRQ",
+    [ParamId::L3AMT] = "L3AMT",
+    [ParamId::L3MIN] = "L3MIN",
+    [ParamId::L3MAX] = "L3MAX",
+    [ParamId::L3DST] = "L3DST",
+    [ParamId::L3RND] = "L3RND",
+
+    [ParamId::L4FRQ] = "L4FRQ",
+    [ParamId::L4AMT] = "L4AMT",
+    [ParamId::L4MIN] = "L4MIN",
+    [ParamId::L4MAX] = "L4MAX",
+    [ParamId::L4DST] = "L4DST",
+    [ParamId::L4RND] = "L4RND",
+
+    [ParamId::L5FRQ] = "L5FRQ",
+    [ParamId::L5AMT] = "L5AMT",
+    [ParamId::L5MIN] = "L5MIN",
+    [ParamId::L5MAX] = "L5MAX",
+    [ParamId::L5DST] = "L5DST",
+    [ParamId::L5RND] = "L5RND",
+
+    [ParamId::L6FRQ] = "L6FRQ",
+    [ParamId::L6AMT] = "L6AMT",
+    [ParamId::L6MIN] = "L6MIN",
+    [ParamId::L6MAX] = "L6MAX",
+    [ParamId::L6DST] = "L6DST",
+    [ParamId::L6RND] = "L6RND",
+
+    [ParamId::L7FRQ] = "L7FRQ",
+    [ParamId::L7AMT] = "L7AMT",
+    [ParamId::L7MIN] = "L7MIN",
+    [ParamId::L7MAX] = "L7MAX",
+    [ParamId::L7DST] = "L7DST",
+    [ParamId::L7RND] = "L7RND",
+
+    [ParamId::L8FRQ] = "L8FRQ",
+    [ParamId::L8AMT] = "L8AMT",
+    [ParamId::L8MIN] = "L8MIN",
+    [ParamId::L8MAX] = "L8MAX",
+    [ParamId::L8DST] = "L8DST",
+    [ParamId::L8RND] = "L8RND",
+
+    [ParamId::MODE] = "MODE",
+
+    [ParamId::MWAV] = "MWAV",
+    [ParamId::CWAV] = "CWAV",
+
+    [ParamId::MF1TYP] = "MF1TYP",
+    [ParamId::MF2TYP] = "MF2TYP",
+
+    [ParamId::CF1TYP] = "CF1TYP",
+    [ParamId::CF2TYP] = "CF2TYP",
+
+    [ParamId::EF1TYP] = "EF1TYP",
+    [ParamId::EF2TYP] = "EF2TYP",
+
+    [ParamId::L1WAV] = "L1WAV",
+    [ParamId::L2WAV] = "L2WAV",
+    [ParamId::L3WAV] = "L3WAV",
+    [ParamId::L4WAV] = "L4WAV",
+    [ParamId::L5WAV] = "L5WAV",
+    [ParamId::L6WAV] = "L6WAV",
+    [ParamId::L7WAV] = "L7WAV",
+    [ParamId::L8WAV] = "L8WAV",
+
+    [ParamId::MAX_PARAM_ID] = "",
+};
+
+
 Synth::Synth()
     : SignalProducer(
         OUT_CHANNELS,
@@ -660,7 +975,13 @@ void Synth::push_message(
 }
 
 
-Synth::ParamId Synth::find_param_id(std::string const name) const
+std::string Synth::get_param_name(ParamId const param_id) const
+{
+    return PARAM_NAMES[param_id];
+}
+
+
+Synth::ParamId Synth::get_param_id(std::string const name) const
 {
     return param_id_hash_table.lookup(name.c_str());
 }

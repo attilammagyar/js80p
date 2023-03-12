@@ -58,6 +58,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLEXIBLE_CONTROLLERS = 10;
         static constexpr Integer LFOS = 8;
 
+        static char const* const PARAM_NAMES[];
+
         enum MessageType {
             SET_PARAM = 1,
             ASSIGN_CONTROLLER = 2,
@@ -500,7 +502,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Byte const byte_param
         );
 
-        ParamId find_param_id(std::string const name) const;
+        std::string get_param_name(ParamId const param_id) const;
+        ParamId get_param_id(std::string const name) const;
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
             Number& avg_collisions,
