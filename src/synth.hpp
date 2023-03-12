@@ -139,6 +139,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             EF1FRQ = 58,     // Effects Filter 1 Frequency
             EF1Q = 59,       // Effects Filter 1 Q Factor
             EF1G = 60,       // Effects Filter 1 Gain
+
             EF2FRQ = 61,     // Effects Filter 2 Frequency
             EF2Q = 62,       // Effects Filter 2 Q Factor
             EF2G = 63,       // Effects Filter 2 Gain
@@ -499,6 +500,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Byte const byte_param
         );
 
+        ParamId find_param_id(std::string const name) const;
+        void get_param_id_hash_table_statistics(
+            Integer& max_collisions,
+            Number& avg_collisions,
+            Number& avg_bucket_size
+        ) const;
 
         Number float_param_ratio_to_display_value(
             ParamId const param_id,
@@ -699,6 +706,55 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 bool is_silent;
         };
 
+        class ParamIdHashTable
+        {
+            public:
+                ParamIdHashTable();
+                ~ParamIdHashTable();
+
+                void add(char const* name, ParamId const param_id);
+                ParamId lookup(char const* name);
+                void get_statistics(
+                    Integer& max_collisions,
+                    Number& avg_collisions,
+                    Number& avg_bucket_size
+                ) const;
+
+            private:
+                class Entry
+                {
+                    public:
+                        static constexpr Integer NAME_SIZE = 8;
+                        static constexpr Integer NAME_MAX_INDEX = NAME_SIZE - 1;
+
+                        Entry();
+                        Entry(const char* name, ParamId const param_id);
+                        ~Entry();
+
+                        void set(const char* name, ParamId const param_id);
+
+                        Entry *next;
+                        char name[NAME_SIZE];
+                        ParamId param_id;
+                };
+
+                static constexpr Integer ENTRIES = 0x80;
+                static constexpr Integer MASK = 0x7f;
+                static constexpr Integer MULTIPLIER = 23781;
+                static constexpr Integer SHIFT = 9;
+
+                static Integer hash(char const* name);
+
+                void lookup(
+                    char const* name,
+                    Entry** root,
+                    Entry** parent,
+                    Entry** entry
+                );
+
+                Entry entries[ENTRIES];
+        };
+
         typedef Distortion<Bus> Overdrive;
         typedef Distortion<Overdrive> Distortion_;
         typedef BiquadFilter<Distortion_> Filter1;
@@ -710,6 +766,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLOAT_PARAMS = 247;
 
         static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
+
+        static ParamIdHashTable param_id_hash_table;
 
         template<class ParamClass>
         void register_param_as_child(

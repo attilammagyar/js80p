@@ -46,6 +46,9 @@
 namespace JS80P
 {
 
+Synth::ParamIdHashTable Synth::param_id_hash_table;
+
+
 Synth::Synth()
     : SignalProducer(
         OUT_CHANNELS,
@@ -448,6 +451,7 @@ void Synth::register_param_as_child(
         ParamClass& param
 ) {
     register_child(param);
+    param_id_hash_table.add(param.get_name().c_str(), param_id);
 }
 
 
@@ -463,6 +467,7 @@ void Synth::register_float_param_as_child(
 void Synth::register_float_param(ParamId const param_id, FloatParam& float_param)
 {
     float_params[param_id] = &float_param;
+    param_id_hash_table.add(float_param.get_name().c_str(), param_id);
 }
 
 
@@ -652,6 +657,23 @@ void Synth::push_message(
     Message message(type, param_id, number_param, byte_param);
 
     messages.push(message);
+}
+
+
+Synth::ParamId Synth::find_param_id(std::string const name) const
+{
+    return param_id_hash_table.lookup(name.c_str());
+}
+
+
+void Synth::get_param_id_hash_table_statistics(
+        Integer& max_collisions,
+        Number& avg_collisions,
+        Number& avg_bucket_size
+) const {
+    param_id_hash_table.get_statistics(
+        max_collisions, avg_collisions, avg_bucket_size
+    );
 }
 
 
@@ -1336,6 +1358,206 @@ void Synth::Bus::apply_volume(
             }
         }
     }
+}
+
+
+Synth::ParamIdHashTable::ParamIdHashTable()
+{
+}
+
+
+Synth::ParamIdHashTable::~ParamIdHashTable()
+{
+}
+
+
+void Synth::ParamIdHashTable::add(char const* name, ParamId const param_id)
+{
+    Entry* root;
+    Entry* parent;
+    Entry* entry;
+
+    lookup(name, &root, &parent, &entry);
+
+    if (entry != NULL) {
+        return;
+    }
+
+    if (parent != NULL) {
+        parent->next = new Entry(name, param_id);
+
+        return;
+    }
+
+    root->set(name, param_id);
+}
+
+
+void Synth::ParamIdHashTable::lookup(
+        char const* name,
+        Entry** root,
+        Entry** parent,
+        Entry** entry
+) {
+    Integer const hash = this->hash(name);
+    *root = &entries[hash];
+
+    *parent = NULL;
+
+    if ((*root)->param_id == MAX_PARAM_ID) {
+        *entry = NULL;
+
+        return;
+    }
+
+    *entry = *root;
+
+    while (strncmp((*entry)->name, name, Entry::NAME_SIZE) != 0) {
+        *parent = *entry;
+        *entry = (*entry)->next;
+
+        if (*entry == NULL) {
+            break;
+        }
+    }
+}
+
+
+Synth::ParamId Synth::ParamIdHashTable::lookup(char const* name)
+{
+    Entry* root;
+    Entry* parent;
+    Entry* entry;
+
+    lookup(name, &root, &parent, &entry);
+
+    return entry == NULL ? ParamId::MAX_PARAM_ID : entry->param_id;
+}
+
+
+void Synth::ParamIdHashTable::get_statistics(
+        Integer& max_collisions,
+        Number& avg_collisions,
+        Number& avg_bucket_size
+) const {
+    Integer collisions_sum = 0;
+    Integer collisions_count = 0;
+    Integer bucket_size_sum = 0;
+    Integer bucket_count = 0;
+
+    max_collisions = 0;
+
+    for (Integer i = 0; i != ENTRIES; ++i) {
+        Entry const* entry = &entries[i];
+
+        if (entry->param_id == ParamId::MAX_PARAM_ID) {
+            continue;
+        }
+
+        Integer collisions = 1;
+        ++bucket_count;
+        ++bucket_size_sum;
+        entry = entry->next;
+
+        while (entry != NULL) {
+            ++collisions;
+            ++bucket_size_sum;
+            entry = entry->next;
+        }
+
+        if (collisions > 1) {
+            collisions_sum += collisions;
+            ++collisions_count;
+
+            if (collisions > max_collisions) {
+                max_collisions = collisions;
+            }
+        }
+    }
+
+    avg_collisions = (double)collisions_sum / (double)collisions_count;
+    avg_bucket_size = (double)bucket_size_sum / (double)bucket_count;
+}
+
+
+/*
+Inspiration from https://orlp.net/blog/worlds-smallest-hash-table/
+*/
+Integer Synth::ParamIdHashTable::hash(char const* name)
+{
+    /*
+    We only care about the 36 characters which are used in param names: capital
+    letters and numbers.
+    */
+    constexpr Integer alphabet_size = 36;
+    constexpr char letter_offset = 'A' - 10;
+    constexpr char number_offset = '0';
+
+    if (*name == '\x00') {
+        return 0;
+    }
+
+    Integer i;
+    Integer hash = 0;
+
+    for (i = -1; *name != '\x00'; ++name) {
+        char c = *name;
+
+        if (c >= letter_offset) {
+            c -= letter_offset;
+        } else {
+            c -= number_offset;
+        }
+
+        hash = hash * alphabet_size + c;
+
+        if (++i == 4) {
+            break;
+        }
+    }
+
+    hash = (hash << 3) + i;
+
+    if (hash < 0) {
+        hash = -hash;
+    }
+
+    hash = (hash * MULTIPLIER >> SHIFT) & MASK;
+
+    return hash;
+}
+
+
+Synth::ParamIdHashTable::Entry::Entry() : next(NULL)
+{
+    set("", MAX_PARAM_ID);
+}
+
+
+Synth::ParamIdHashTable::Entry::Entry(const char* name, ParamId const param_id)
+    : next(NULL)
+{
+    set(name, param_id);
+}
+
+
+Synth::ParamIdHashTable::Entry::~Entry()
+{
+    if (next != NULL) {
+        delete next;
+
+        next = NULL;
+    }
+}
+
+
+void Synth::ParamIdHashTable::Entry::set(
+        const char* name,
+        ParamId const param_id
+) {
+    std::fill_n(this->name, NAME_SIZE, '\x00');
+    strncpy(this->name, name, NAME_MAX_INDEX);
+    this->param_id = param_id;
 }
 
 }
