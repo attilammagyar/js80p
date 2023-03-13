@@ -983,8 +983,8 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     change_index_2 = float_param.get_change_index();
 
     // Non-sample-exact param usage.
-    assert_eq(-2.5, float_param.get_value());
-    assert_eq(0.2514, float_param.get_ratio());
+    assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
@@ -1027,8 +1027,8 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
     change_index_1 = follower.get_change_index();
     midi_controller.change(1.2, 0.2514);
     change_index_2 = follower.get_change_index();
-    assert_eq(-2.5, follower.get_value());
-    assert_eq(0.2514, follower.get_ratio());
+    assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
