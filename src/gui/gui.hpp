@@ -54,7 +54,13 @@ class GUI
         static constexpr int NO_CTLS = 0;
         static constexpr int ALL_CTLS = 97;
         static constexpr int LFO_CTLS = ALL_CTLS - Synth::ENVELOPES;
-        static constexpr int MIDI_CTLS = ALL_CTLS - Synth::ENVELOPES - Synth::LFOS;
+        static constexpr int FLEX_CTLS = (
+            ALL_CTLS - Synth::ENVELOPES - Synth::LFOS
+        );
+        static constexpr int MIDI_CTLS = (
+            ALL_CTLS
+            - Synth::ENVELOPES - Synth::LFOS - Synth::FLEXIBLE_CONTROLLERS
+        );
 
         static char const* const WAVEFORMS[];
         static int const WAVEFORMS_COUNT;

@@ -70,7 +70,9 @@ html, body {
 #main {
   width: 64px;
   margin: 1px;
-  height: 550px;
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 553px;
   float: left;
   text-align: center;
 }
@@ -183,6 +185,9 @@ h1 {
 
 #main .knob.without_ctl {
   height: 72px;
+}
+
+#main .knob:nth-child(2) {
   margin-top: 3px;
 }
 
@@ -588,7 +593,7 @@ window.onload = function ()
         document.getElementsByTagName("body")[0].setAttribute("class", "hide-objects");
     }
 
-    create_knob("main", "MODE", "split F#3", "modwheel", true);
+    create_knob("main", "MODE", "split F#3");
     create_knob("main", "VOL %", "50");
     create_knob("main", "ADD %", "100");
     create_knob("main", "FM %", "0");

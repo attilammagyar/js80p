@@ -799,6 +799,15 @@ class Synth : public Midi::EventHandler, public SignalProducer
         );
         void handle_refresh_param(ParamId const param_id);
 
+        void assign_controller_to_param(
+            ParamId const param_id,
+            ControllerId const controller_id
+        );
+        void assign_controller_to_float_param(
+            ParamId const param_id,
+            ControllerId const controller_id
+        );
+
         Number get_param_ratio(ParamId const param_id) const;
 
         void clear_midi_controllers();

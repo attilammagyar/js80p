@@ -513,6 +513,12 @@ TEST(midi_controller_changes_can_affect_parameters, {
         Synth::ControllerId::VELOCITY
     );
     synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::CWAV,
+        0.0,
+        Synth::ControllerId::MODULATION_WHEEL
+    );
+    synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::VOL, 0.0, 0.0
     );
     synth.push_message(
@@ -521,7 +527,11 @@ TEST(midi_controller_changes_can_affect_parameters, {
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0.0
     );
+    synth.push_message(
+        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0
+    );
     synth.control_change(0.0, 1, Midi::VOLUME, 0.42);
+    synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 1.0);
     synth.control_change(0.0, 1, invalid, 0.123);
     synth.control_change(0.0, 1, unused, 0.123);
     synth.pitch_wheel_change(0.0, 1, 0.75);
@@ -534,6 +544,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
     assert_eq(
         600.0, synth.modulator_params.fine_detune.get_value(), DOUBLE_DELTA
     );
+    assert_eq(SimpleOscillator::CUSTOM, synth.carrier_params.waveform.get_value());
 
     assert_true(synth.volume.is_constant_in_next_round(2, 1));
     assert_true(

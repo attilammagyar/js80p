@@ -1215,10 +1215,122 @@ void Synth::handle_assign_controller(
         ParamId const param_id,
         Byte const controller_id
 ) {
-    if (param_id >= FLOAT_PARAMS) {
-        return;
+    controller_assignments[param_id].store(controller_id);
+
+    if (param_id < FLOAT_PARAMS) {
+        assign_controller_to_float_param(param_id, (ControllerId)controller_id);
+    } else {
+        assign_controller_to_param(param_id, (ControllerId)controller_id);
+    }
+}
+
+
+void Synth::handle_refresh_param(ParamId const param_id)
+{
+    param_ratios[param_id].store(get_param_ratio(param_id));
+}
+
+
+void Synth::assign_controller_to_param(
+        ParamId const param_id,
+        ControllerId const controller_id
+) {
+    MidiController* midi_controller = NULL;
+
+    switch (controller_id) {
+        case PITCH_WHEEL: midi_controller = &pitch_wheel; break;
+        case NOTE: midi_controller = &note; break;
+        case VELOCITY: midi_controller = &velocity; break;
+
+        case FLEXIBLE_CONTROLLER_1:
+        case FLEXIBLE_CONTROLLER_2:
+        case FLEXIBLE_CONTROLLER_3:
+        case FLEXIBLE_CONTROLLER_4:
+        case FLEXIBLE_CONTROLLER_5:
+        case FLEXIBLE_CONTROLLER_6:
+        case FLEXIBLE_CONTROLLER_7:
+        case FLEXIBLE_CONTROLLER_8:
+        case FLEXIBLE_CONTROLLER_9:
+        case FLEXIBLE_CONTROLLER_10:
+        case LFO_1:
+        case LFO_2:
+        case LFO_3:
+        case LFO_4:
+        case LFO_5:
+        case LFO_6:
+        case LFO_7:
+        case LFO_8:
+        case ENVELOPE_1:
+        case ENVELOPE_2:
+        case ENVELOPE_3:
+        case ENVELOPE_4:
+        case ENVELOPE_5:
+        case ENVELOPE_6:
+            break;
+
+        default: {
+            if (controller_id < MIDI_CONTROLLERS) {
+                midi_controller = midi_controllers[controller_id];
+            }
+
+            break;
+        }
     }
 
+    switch (param_id) {
+        case ParamId::MODE: // TODO
+            break;
+
+        case ParamId::MWAV:
+            modulator_params.waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::CWAV:
+            carrier_params.waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::MF1TYP:
+            modulator_params.filter_1_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::MF2TYP:
+            modulator_params.filter_2_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::CF1TYP:
+            carrier_params.filter_1_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::CF2TYP:
+            carrier_params.filter_2_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::EF1TYP:
+            filter_1_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::EF2TYP:
+            filter_2_type.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L1WAV: break; // TODO
+        case ParamId::L2WAV: break; // TODO
+        case ParamId::L3WAV: break; // TODO
+        case ParamId::L4WAV: break; // TODO
+        case ParamId::L5WAV: break; // TODO
+        case ParamId::L6WAV: break; // TODO
+        case ParamId::L7WAV: break; // TODO
+        case ParamId::L8WAV: break; // TODO
+
+        default: break; // This should never be reached.
+    }
+}
+
+
+void Synth::assign_controller_to_float_param(
+        ParamId const param_id,
+        ControllerId const controller_id
+) {
     FloatParam* param = float_params[param_id];
 
     // TODO: remove the null check when all params are implemented
@@ -1230,9 +1342,7 @@ void Synth::handle_assign_controller(
     param->set_flexible_controller(NULL);
     param->set_envelope(NULL);
 
-    controller_assignments[param_id].store(controller_id);
-
-    switch ((Synth::ControllerId)controller_id) {
+    switch (controller_id) {
         case PITCH_WHEEL:
             param->set_midi_controller(&pitch_wheel);
             break;
@@ -1309,12 +1419,6 @@ void Synth::handle_assign_controller(
             break;
         }
     }
-}
-
-
-void Synth::handle_refresh_param(ParamId const param_id)
-{
-    param_ratios[param_id].store(get_param_ratio(param_id));
 }
 
 
