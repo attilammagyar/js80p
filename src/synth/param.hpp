@@ -69,6 +69,9 @@ class Param : public SignalProducer
         NumberType ratio_to_value(Number const ratio) const;
         Number value_to_ratio(NumberType const value) const;
 
+        void set_midi_controller(MidiController const* midi_controller);
+        MidiController const* get_midi_controller() const;
+
         /**
          * \brief Whenever the value of the param changes, the change index gets
          *        incremented. You may cache the result of a slow calculation
@@ -78,6 +81,8 @@ class Param : public SignalProducer
         Integer get_change_index() const;
 
     protected:
+        NumberType get_raw_value() const;
+
         void render(
             Integer const round,
             Integer const first_sample_index,
@@ -88,6 +93,7 @@ class Param : public SignalProducer
         NumberType clamp(NumberType const value) const;
         void store_new_value(NumberType const new_value);
 
+        MidiController const* midi_controller;
         std::string const name;
         NumberType const min_value;
         NumberType const max_value;
@@ -171,8 +177,7 @@ class FloatParam : public Param<Number>
         void schedule_value(Seconds const time_offset, Number const new_value);
         void schedule_linear_ramp(Seconds const duration, Number const target_value);
 
-        void set_midi_controller(MidiController const* const midi_controller);
-        MidiController const* get_midi_controller() const;
+        void set_midi_controller(MidiController const* midi_controller);
 
         void set_flexible_controller(FlexibleController* flexible_controller);
         FlexibleController const* get_flexible_controller();
@@ -235,7 +240,6 @@ class FloatParam : public Param<Number>
         bool is_following_leader() const;
 
         FloatParam* const leader;
-        MidiController const* midi_controller;
         FlexibleController* flexible_controller;
         Envelope const* envelope;
 

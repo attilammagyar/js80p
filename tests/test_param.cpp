@@ -179,6 +179,34 @@ TEST(param_clamps_integer_value_to_be_between_min_and_max, {
 })
 
 
+TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows_the_changes_of_the_midi_controller, {
+    constexpr Integer block_size = 5;
+    Param<int> param("int", -10, 10, 0);
+    MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
+
+    param.set_block_size(block_size);
+    param.set_sample_rate(1.0);
+    param.set_midi_controller(&midi_controller);
+
+    assert_eq((void*)&midi_controller, (void*)param.get_midi_controller());
+
+    change_index_1 = param.get_change_index();
+    midi_controller.change(0.0, 0.2514);
+    change_index_2 = param.get_change_index();
+
+    assert_eq(-5, param.get_value());
+    assert_eq(0.2514, param.get_ratio());
+
+    assert_neq((int)change_index_1, (int)change_index_2);
+
+    midi_controller.change(0.0, 0.35);
+    param.set_midi_controller(NULL);
+    assert_eq(-3, param.get_value());
+})
+
+
 void assert_float_param_does_not_change_during_rendering(
         FloatParam& float_param,
         Integer const round,

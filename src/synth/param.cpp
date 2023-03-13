@@ -34,6 +34,7 @@ Param<NumberType>::Param(
         NumberType const max_value,
         NumberType const default_value
 ) : SignalProducer(1),
+    midi_controller(NULL),
     name(name),
     min_value(min_value),
     max_value(max_value),
@@ -63,6 +64,10 @@ NumberType Param<NumberType>::get_default_value() const
 template<typename NumberType>
 NumberType Param<NumberType>::get_value() const
 {
+    if (midi_controller != NULL) {
+        return ratio_to_value(midi_controller->get_value());
+    }
+
     return value;
 }
 
@@ -98,6 +103,13 @@ void Param<NumberType>::store_new_value(NumberType const new_value)
 
 
 template<typename NumberType>
+NumberType Param<NumberType>::get_raw_value() const
+{
+    return value;
+}
+
+
+template<typename NumberType>
 NumberType Param<NumberType>::clamp(NumberType const value) const
 {
     return std::min(max_value, std::max(min_value, value));
@@ -107,6 +119,10 @@ NumberType Param<NumberType>::clamp(NumberType const value) const
 template<typename NumberType>
 Number Param<NumberType>::get_ratio() const
 {
+    if (midi_controller != NULL) {
+        return midi_controller->get_value();
+    }
+
     return std::min(1.0, std::max(0.0, value_to_ratio(value)));
 }
 
@@ -128,6 +144,10 @@ void Param<NumberType>::set_ratio(Number const ratio)
 template<typename NumberType>
 Integer Param<NumberType>::get_change_index() const
 {
+    if (midi_controller != NULL) {
+        return midi_controller->get_change_index();
+    }
+
     return change_index;
 }
 
@@ -147,6 +167,25 @@ template<typename NumberType>
 Number Param<NumberType>::value_to_ratio(NumberType const value) const
 {
     return ((Number)value - (Number)min_value) * range_inv;
+}
+
+
+template<typename NumberType>
+void Param<NumberType>::set_midi_controller(
+        MidiController const* midi_controller
+) {
+    if (midi_controller == NULL && this->midi_controller != NULL) {
+        set_value(ratio_to_value(this->midi_controller->get_value()));
+    }
+
+    this->midi_controller = midi_controller;
+}
+
+
+template<typename NumberType>
+MidiController const* Param<NumberType>::get_midi_controller() const
+{
+    return midi_controller;
 }
 
 
@@ -209,7 +248,6 @@ FloatParam::FloatParam(
         Number const round_to
 ) : Param<Number>(name, min_value, max_value, default_value),
     leader(NULL),
-    midi_controller(NULL),
     flexible_controller(NULL),
     envelope(NULL),
     should_round(round_to > 0.0),
@@ -227,7 +265,6 @@ FloatParam::FloatParam(FloatParam& leader)
         leader.name, leader.min_value, leader.max_value, leader.default_value
     ),
     leader(&leader),
-    midi_controller(NULL),
     flexible_controller(NULL),
     envelope(NULL),
     should_round(false),
@@ -251,7 +288,7 @@ Number FloatParam::get_value() const
 
         return round_value(ratio_to_value(flexible_controller->get_value()));
     } else {
-        return Param<Number>::get_value();
+        return get_raw_value();
     }
 }
 
@@ -290,8 +327,6 @@ Number FloatParam::get_ratio() const
 {
     if (is_following_leader()) {
         return leader->get_ratio();
-    } else if (midi_controller != NULL) {
-        return midi_controller->get_value();
     } else if (flexible_controller != NULL) {
         flexible_controller->update();
 
@@ -306,8 +341,6 @@ Integer FloatParam::get_change_index() const
 {
     if (is_following_leader()) {
         return leader->get_change_index();
-    } else if (midi_controller != NULL) {
-        return midi_controller->get_change_index();
     } else if (flexible_controller != NULL) {
         flexible_controller->update();
 
@@ -413,7 +446,7 @@ void FloatParam::handle_set_value_event(Event const& event)
 
 void FloatParam::handle_linear_ramp_event(Event const& event)
 {
-    Number const value = Param<Number>::get_value();
+    Number const value = get_raw_value();
     Number const done_samples = (
         (Number)(current_time - event.time_offset) * (Number)sample_rate
     );
@@ -460,19 +493,13 @@ void FloatParam::handle_cancel_event(Event const& event)
 }
 
 
-void FloatParam::set_midi_controller(MidiController const* const midi_controller)
+void FloatParam::set_midi_controller(MidiController const* midi_controller)
 {
     if (midi_controller == NULL && this->midi_controller != NULL) {
         set_value(ratio_to_value(this->midi_controller->get_value()));
     }
 
     this->midi_controller = midi_controller;
-}
-
-
-MidiController const* FloatParam::get_midi_controller() const
-{
-    return midi_controller;
 }
 
 
@@ -598,7 +625,7 @@ void FloatParam::render(
         Sample** buffer
 ) {
     if (latest_event_type == EVT_LINEAR_RAMP) {
-        Sample sample = (Sample)(Param<Number>::get_value());
+        Sample sample = (Sample)get_raw_value();
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             buffer[0][i] = sample = (Sample)linear_ramp_state.get_next_value();
