@@ -58,8 +58,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLEXIBLE_CONTROLLERS = 10;
         static constexpr Integer LFOS = 8;
 
-        static char const* const PARAM_NAMES[];
-
         enum MessageType {
             SET_PARAM = 1,
             ASSIGN_CONTROLLER = 2,
@@ -771,12 +769,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
 
         static ParamIdHashTable param_id_hash_table;
+        static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
         template<class ParamClass>
         void register_param_as_child(
             ParamId const param_id,
             ParamClass& param
         );
+
+        template<class ParamClass>
+        void register_param(ParamId const param_id, ParamClass& param);
 
         void register_float_param_as_child(
             ParamId const param_id,
