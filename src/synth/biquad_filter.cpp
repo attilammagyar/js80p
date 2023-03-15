@@ -72,7 +72,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         InputSignalProducerClass& input,
         TypeParam& type,
         Integer const shared_coefficients_group
-) : Filter<InputSignalProducerClass>(input, 4),
+) : Filter<InputSignalProducerClass>(input, 3),
     frequency(
         name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
@@ -132,7 +132,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParam& q_leader,
         FloatParam& gain_leader,
         Integer const shared_coefficients_group
-) : Filter<InputSignalProducerClass>(input, 4),
+) : Filter<InputSignalProducerClass>(input, 3),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
@@ -188,7 +188,6 @@ void BiquadFilter<InputSignalProducerClass>::allocate_buffers()
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::register_children()
 {
-    this->register_child(type);
     this->register_child(frequency);
     this->register_child(q);
     this->register_child(gain);
