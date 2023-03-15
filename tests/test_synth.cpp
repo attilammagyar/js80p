@@ -450,7 +450,7 @@ TEST(messages_get_processed_during_rendering, {
         synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
     );
 
-    SignalProducer::produce<Synth>(&synth, 1);
+    synth.process_messages();
 
     assert_eq(0.123, synth.volume.get_value(), DOUBLE_DELTA);
     assert_eq(0.123, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA);

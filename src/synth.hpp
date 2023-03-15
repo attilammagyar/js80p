@@ -500,6 +500,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Byte const byte_param
         );
 
+        void process_messages();
+
         std::string get_param_name(ParamId const param_id) const;
         ParamId get_param_id(std::string const name) const;
         void get_param_id_hash_table_statistics(
@@ -790,7 +792,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             FloatParam& float_param
         );
 
-        void process_messages();
         void handle_set_param(
             ParamId const param_id,
             Number const ratio
