@@ -54,6 +54,16 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static constexpr Type LOW_SHELF = 5;
         static constexpr Type HIGH_SHELF = 6;
 
+        enum Unicity
+        {
+            UNIQUE = 0, ///< Filter instance should not share its calculated
+                        ///< coefficients with other instances.
+
+            CLONED = 1, ///< Filter instance should share its calculated
+                        ///< coefficients with other instances that are using
+                        ///< the same set of parameter leaders.
+        };
+
         class TypeParam : public Param<Type>
         {
             public:
@@ -64,7 +74,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            Integer const shared_coefficients_group = -1
+            Unicity const unicity = Unicity::UNIQUE
         );
         BiquadFilter(
             InputSignalProducerClass& input,
@@ -72,7 +82,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParam& frequency_leader,
             FloatParam& q_leader,
             FloatParam& gain_leader,
-            Integer const shared_coefficients_group = -1
+            Unicity const unicity = Unicity::UNIQUE
         );
         virtual ~BiquadFilter();
 
@@ -106,17 +116,16 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Constants::BIQUAD_FILTER_GAIN_SCALE / 2.0
         );
         static constexpr Number THRESHOLD = 0.000001;
-        static constexpr Integer GROUPS = 4;
 
-        static Integer shared_buffers_rounds[GROUPS];
-        static Sample const* shared_b0_buffers[GROUPS];
-        static Sample const* shared_b1_buffers[GROUPS];
-        static Sample const* shared_b2_buffers[GROUPS];
-        static Sample const* shared_a1_buffers[GROUPS];
-        static Sample const* shared_a2_buffers[GROUPS];
-        static bool shared_are_coefficients_constant[GROUPS];
-        static bool shared_is_silent[GROUPS];
-        static bool shared_is_no_op[GROUPS];
+        static Integer shared_buffers_round;
+        static Sample const* shared_b0_buffer;
+        static Sample const* shared_b1_buffer;
+        static Sample const* shared_b2_buffer;
+        static Sample const* shared_a1_buffer;
+        static Sample const* shared_a2_buffer;
+        static bool shared_are_coefficients_constant;
+        static bool shared_is_silent;
+        static bool shared_is_no_op;
 
         void initialize_instance();
         void register_children();
@@ -219,7 +228,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index);
         void store_silent_coefficient_samples(Integer const index);
 
-        Integer const shared_coefficients_group;
+        bool const has_clones;
 
         /*
         Notation:

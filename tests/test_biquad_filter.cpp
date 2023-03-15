@@ -67,9 +67,10 @@ TEST(basic_properties, {
 })
 
 
+template<class InputSignalProducerClass = SumOfSines>
 void test_filter(
-        BiquadFilter<SumOfSines>& filter,
-        SumOfSines& input,
+        BiquadFilter<InputSignalProducerClass>& filter,
+        InputSignalProducerClass& input,
         SumOfSines& expected,
         Number const tolerance,
         Integer const rounds = ROUNDS,
@@ -88,7 +89,9 @@ void test_filter(
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     input.reset();
-    render_rounds< BiquadFilter<SumOfSines> >(filter, actual_output, rounds);
+    render_rounds< BiquadFilter<InputSignalProducerClass> >(
+        filter, actual_output, rounds
+    );
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_close(
@@ -567,33 +570,80 @@ TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequenc
 })
 
 
-TEST(when_no_params_have_envelopes_then_uses_cached_coefficients_within_the_same_group, {
+class OtherSumOfSines : public SumOfSines
+{
+    public:
+        OtherSumOfSines(
+                Number const amplitude_1,
+                Frequency const frequency_1,
+                Number const amplitude_2,
+                Frequency const frequency_2,
+                Number const amplitude_3,
+                Frequency const frequency_3,
+                Integer const channels
+        ) : SumOfSines(
+            amplitude_1,
+            frequency_1,
+            amplitude_2,
+            frequency_2,
+            amplitude_3,
+            frequency_3,
+            channels
+        ) {
+        }
+};
+
+
+TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
-    SumOfSines expected_0(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
-    SumOfSines expected_1(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
+    OtherSumOfSines input_other(
+        0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS
+    );
+    SumOfSines expected_clones(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
+    SumOfSines expected_unique(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
+    SumOfSines expected_other(0.0, 440.0, 0.0, 3520.0, 0.33, 7040.0, CHANNELS);
     BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<SumOfSines> filter_0_1("", input, filter_type, 0);
-    BiquadFilter<SumOfSines> filter_0_2("", input, filter_type, 0);
-    BiquadFilter<SumOfSines> filter_1_1("", input, filter_type, 1);
+    BiquadFilter<OtherSumOfSines>::TypeParam filter_type_other("");
+    BiquadFilter<SumOfSines> filter_clone_1(
+        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::CLONED
+    );
+    BiquadFilter<SumOfSines> filter_clone_2(
+        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::CLONED
+    );
+    BiquadFilter<SumOfSines> filter_unique(
+        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::UNIQUE
+    );
+    BiquadFilter<OtherSumOfSines> filter_other(
+        "",
+        input_other,
+        filter_type_other,
+        BiquadFilter<OtherSumOfSines>::Unicity::CLONED
+    );
 
-    filter_0_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
-    filter_0_2.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
-    filter_1_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_clone_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_clone_2.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_unique.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    filter_other.type.set_value(BiquadFilter<OtherSumOfSines>::BAND_PASS);
 
-    filter_0_1.frequency.set_value(3520.0);
-    filter_0_2.frequency.set_value(3520.0);
-    filter_1_1.frequency.set_value(440.0);
+    filter_clone_1.frequency.set_value(3520.0);
+    filter_clone_2.frequency.set_value(3520.0);
+    filter_unique.frequency.set_value(440.0);
+    filter_other.frequency.set_value(7040.0);
 
-    filter_0_1.q.set_value(5.0);
-    filter_0_2.q.set_value(5.0);
-    filter_1_1.q.set_value(5.0);
+    filter_clone_1.q.set_value(5.0);
+    filter_clone_2.q.set_value(5.0);
+    filter_unique.q.set_value(5.0);
+    filter_other.q.set_value(5.0);
 
-    test_filter(filter_0_1, input, expected_0, 0.12, 1, BLOCK_SIZE);
+    test_filter(filter_clone_1, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
-    filter_0_2.frequency.set_value(7040.0);
-    test_filter(filter_0_2, input, expected_0, 0.12, 1, BLOCK_SIZE);
+    filter_clone_2.frequency.set_value(15000.0);
+    test_filter(filter_clone_2, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
-    test_filter(filter_1_1, input, expected_1, 0.12, 1, BLOCK_SIZE);
+    test_filter(filter_unique, input, expected_unique, 0.12, 1, BLOCK_SIZE);
+    test_filter<OtherSumOfSines>(
+        filter_other, input_other, expected_other, 0.12, 1, BLOCK_SIZE
+    );
 })
 
 
