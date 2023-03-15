@@ -73,10 +73,10 @@ class Param : public SignalProducer
         MidiController const* get_midi_controller() const;
 
         /**
-         * \brief Whenever the value of the param changes, the change index gets
-         *        incremented. You may cache the result of a slow calculation
-         *        that depends on a parameter value, as long as the change index
-         *        remains unchanged.
+         * \brief Whenever the value of the parameter changes, the change index
+         *        gets incremented. You may cache the result of a slow
+         *        calculation that depends on a parameter value, as long as the
+         *        change index remains unchanged.
          */
         Integer get_change_index() const;
 
@@ -134,8 +134,8 @@ class FloatParam : public Param<Number>
         /**
          * \brief Render the single channel of the parameter if it has scheduled
          *        changes during this round, but if the parameter is constant
-         *        during the round, then skip it and return \c NULL. A shortcut
-         *        for the following construct:
+         *        during the round, then skip this round for it and return
+         *        \c NULL. A shortcut for the following construct:
          *
          *        \code{.cpp}
          *        if (param.is_constant_in_next_round(round, sample_count) {

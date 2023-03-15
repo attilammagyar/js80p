@@ -127,8 +127,8 @@ class SignalProducer
     protected:
         /**
          * \brief Implement preparations for sample rendering in this method,
-         *        e.g. render necessary inputs and param buffers here. Return
-         *        NULL if rendering samples is needed, return an already
+         *        e.g. render necessary inputs and parameter buffers here.
+         *        Return NULL if rendering samples is needed, return an already
          *        rendered buffer if calling \c render() is unnecessary (e.g.
          *        when a filter wants to return its input unaffected).
          */
