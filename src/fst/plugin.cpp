@@ -266,7 +266,7 @@ void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** sampl
         return;
     }
 
-    Sample const* const* buffer = render_round(sample_count);
+    Sample const* const* buffer = render_next_round(sample_count);
 
     for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
         for (VstInt32 i = 0; i != sample_count; ++i) {
@@ -276,7 +276,7 @@ void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** sampl
 }
 
 
-Sample const* const* FstPlugin::render_round(VstInt32 sample_count)
+Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count)
 {
     round = (round + 1) & ROUND_MASK;
 
@@ -292,7 +292,7 @@ void FstPlugin::generate_and_add_samples(
         return;
     }
 
-    Sample const* const* buffer = render_round(sample_count);
+    Sample const* const* buffer = render_next_round(sample_count);
 
     for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
         for (VstInt32 i = 0; i != sample_count; ++i) {

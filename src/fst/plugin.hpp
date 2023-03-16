@@ -100,7 +100,7 @@ class FstPlugin
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
 
-        Sample const* const* render_round(VstInt32 sample_count);
+        Sample const* const* render_next_round(VstInt32 sample_count);
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
