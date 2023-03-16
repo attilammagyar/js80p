@@ -47,21 +47,23 @@ include make/$(OS)-$(PLATFORM).mk
 
 OBJ_FST_DLL_WIN = $(BUILD_DIR)/fst-dll$(SUFFIX).o
 OBJ_FST_PLUGIN_WIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
+OBJ_SERIALIZER_WIN = $(BUILD_DIR)/serializer$(SUFFIX).o
 OBJ_SYNTH_WIN = $(BUILD_DIR)/synth$(SUFFIX).o
 OBJ_GUI_WIN = $(BUILD_DIR)/gui$(SUFFIX).o
 
 FST_DLL_OBJS = \
-	$(OBJ_SYNTH_WIN) \
+	$(GUI_RES) \
 	$(OBJ_FST_DLL_WIN) \
 	$(OBJ_FST_PLUGIN_WIN) \
 	$(OBJ_GUI_WIN) \
-	$(GUI_RES)
+	$(OBJ_SERIALIZER_WIN) \
+	$(OBJ_SYNTH_WIN)
 
 WIN_PLAYGROUND_OBJS = \
-	$(OBJ_SYNTH_WIN) \
+	$(GUI_RES) \
 	$(OBJ_GUI_WIN) \
 	$(OBJ_PLAYGROUND_WIN) \
-	$(GUI_RES)
+	$(OBJ_SYNTH_WIN)
 
 PARAM_COMPONENTS = \
 	synth/envelope \
@@ -95,6 +97,7 @@ TESTS = \
 	test_midi_controller \
 	test_oscillator \
 	test_param \
+	test_serializer \
 	test_queue \
 	test_signal_producer \
 	test_synth \
@@ -122,9 +125,11 @@ SYNTH_SOURCES = \
 
 JS80P_HEADERS = \
 	src/gui/gui.hpp \
+	src/serializer.hpp \
 	$(SYNTH_HEADERS)
 
 JS80P_SOURCES = \
+	src/serializer.cpp \
 	$(SYNTH_SOURCES)
 
 FST_HEADERS = \
@@ -212,6 +217,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
 # 	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
@@ -251,6 +257,13 @@ $(OBJ_PLAYGROUND_WIN): \
 $(OBJ_SYNTH_WIN): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
 	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
 		-c src/synth.cpp -o $@
+
+$(OBJ_SERIALIZER_WIN): \
+		src/serializer.cpp src/serializer.hpp \
+		$(SYNTH_HEADERS) \
+		| $(BUILD_DIR)
+	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
+		-c $< -o $@
 
 $(OBJ_FST_PLUGIN_WIN): \
 		src/fst/plugin.cpp \
@@ -356,6 +369,15 @@ $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
 		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_serializer$(EXE): \
+		tests/test_serializer.cpp \
+		src/serializer.cpp src/serializer.hpp \
+		$(TEST_LIBS) \
+		$(SYNTH_HEADERS) \
+		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 

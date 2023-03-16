@@ -49,6 +49,8 @@ typedef unsigned char Byte;
 
 
 namespace Constants {
+    constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
+
     constexpr Number AM_DEFAULT = 0.0;
     constexpr Number AM_MAX = 3.0;
     constexpr Number AM_MIN = 0.0;

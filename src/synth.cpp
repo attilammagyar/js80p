@@ -702,7 +702,12 @@ Number Synth::get_param_ratio_atomic(ParamId const param_id) const
 Number Synth::get_param_default_ratio(ParamId const param_id) const
 {
     if (param_id < FLOAT_PARAMS) {
-        return float_params[param_id]->get_default_ratio();
+        // TODO: remove the null check when all params are implemented
+        if (float_params[param_id] != NULL) {
+            return float_params[param_id]->get_default_ratio();
+        } else {
+            return 0.0;
+        }
     }
 
     switch (param_id) {
