@@ -69,6 +69,23 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
+    if (
+            op_code != effEditIdle
+            && op_code != effProcessEvents
+            && op_code != 53
+            && op_code != effGetProgram
+            && op_code != effEditGetRect
+    ) {
+        JS80P_DEBUG(
+            "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
+            (int)op_code,
+            ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+            (int)index,
+            (int)ivalue,
+            fvalue
+        );
+    }
+
     switch (op_code) {
         case effProcessEvents:
             fst_plugin->process_events((VstEvents*)pointer);
@@ -148,14 +165,6 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return 0;
 
         default:
-            JS80P_DEBUG(
-                "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
-                (int)op_code,
-                ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
-                (int)index,
-                (int)ivalue,
-                fvalue
-            );
             return 0;
     }
 
