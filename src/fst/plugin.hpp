@@ -19,6 +19,8 @@
 #ifndef JS80P__FST__PLUGIN_HPP
 #define JS80P__FST__PLUGIN_HPP
 
+#include <string>
+
 #include <windows.h>
 
 #include "aeffect.h"
@@ -28,6 +30,7 @@
 
 #include "js80p.hpp"
 #include "synth.hpp"
+#include "serializer.hpp"
 
 
 namespace JS80P
@@ -92,6 +95,9 @@ class FstPlugin
 
         void generate_and_add_samples(VstInt32 const sample_count, float** samples);
 
+        VstIntPtr get_chunk(void** chunk);
+        void set_chunk(void const* chunk, VstIntPtr const size);
+
         void open_gui(GUI::Window parent);
         void close_gui();
 
@@ -109,6 +115,7 @@ class FstPlugin
         ERect window_rect;
         Integer round;
         GUI* gui;
+        std::string serialized;
 };
 
 }

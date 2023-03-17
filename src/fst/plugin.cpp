@@ -43,7 +43,7 @@ AEffect* FstPlugin::create_instance(
         | effFlagsIsSynth
         | effFlagsCanReplacing
         | effFlagsCanDoubleReplacing
-        // | effFlagsProgramChunks
+        | effFlagsProgramChunks
     );
     effect->magic = kEffectMagic;
     effect->numInputs = 0;
@@ -102,6 +102,13 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
         case effEditClose:
             fst_plugin->close_gui();
+            return 0;
+
+        case effGetChunk:
+            return fst_plugin->get_chunk((void**)pointer);
+
+        case effSetChunk:
+            fst_plugin->set_chunk((void const*)pointer, ivalue);
             return 0;
 
         case effGetPlugCategory:
@@ -299,6 +306,24 @@ void FstPlugin::generate_and_add_samples(
             samples[c][i] += (float)buffer[c][i];
         }
     }
+}
+
+
+VstIntPtr FstPlugin::get_chunk(void** chunk)
+{
+    serialized = Serializer::serialize(synth);
+
+    *chunk = (void*)serialized.c_str();
+
+    return (VstIntPtr)serialized.size();
+}
+
+
+void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size)
+{
+    std::string serialized((char const*)chunk, (std::string::size_type)size);
+
+    Serializer::import(synth, serialized);
 }
 
 
