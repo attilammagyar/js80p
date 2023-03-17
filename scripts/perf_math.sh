@@ -4,14 +4,23 @@ set -e
 
 main()
 {
-    platform="$1"
+    local platform="$1"
+    local executable
 
     if [[ "$platform" = "" ]]
     then
         platform="x86_64-w64-mingw32"
     fi
 
-    ./build/"$platform"/perf_math 2>&1 \
+    executable=./build/"$platform"/perf_math
+
+    if [[ ! -x "$executable" ]]
+    then
+        echo "Unable to find $executable, run \"make check\" first" >&2
+        return 1
+    fi
+
+    "$executable" 2>&1 \
         | grep '(' \
         | tr -d ' ' \
         | while read
