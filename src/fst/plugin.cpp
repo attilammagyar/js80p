@@ -116,7 +116,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
         case effGetEffectName:
         case effGetProductString:
-            strncpy((char*)pointer, FstPlugin::NAME, 64);
+            strncpy((char*)pointer, FstPlugin::NAME, 8);
             return 1;
 
         case effGetVstVersion:
