@@ -25,13 +25,18 @@
 namespace JS80P
 {
 
-MidiController::MidiController() : change_index(0), value(0.5), events(events_rw)
+MidiController::MidiController() noexcept
+    : change_index(0),
+    value(0.5),
+    events(events_rw)
 {
 }
 
 
-void MidiController::change(Seconds const time_offset, Number const new_value)
-{
+void MidiController::change(
+        Seconds const time_offset,
+        Number const new_value
+) noexcept {
     SignalProducer::Event event(EVT_CHANGE, time_offset, 0, new_value, 0.0);
 
     events_rw.push(event);
@@ -39,13 +44,13 @@ void MidiController::change(Seconds const time_offset, Number const new_value)
 }
 
 
-Integer MidiController::get_change_index() const
+Integer MidiController::get_change_index() const noexcept
 {
     return change_index;
 }
 
 
-void MidiController::change(Number const new_value)
+void MidiController::change(Number const new_value) noexcept
 {
     value = new_value;
     ++change_index;
@@ -53,13 +58,13 @@ void MidiController::change(Number const new_value)
 }
 
 
-Number MidiController::get_value() const
+Number MidiController::get_value() const noexcept
 {
     return value;
 }
 
 
-void MidiController::clear()
+void MidiController::clear() noexcept
 {
     events_rw.drop(0);
 }

@@ -43,13 +43,13 @@ class Filter : public SignalProducer
         Filter(
             InputSignalProducerClass& input,
             Integer const number_of_children = 0
-        );
+        ) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         InputSignalProducerClass& input;
         Sample const* const* input_buffer;

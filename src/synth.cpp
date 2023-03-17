@@ -50,7 +50,7 @@ Synth::ParamIdHashTable Synth::param_id_hash_table;
 std::string Synth::param_names_by_id[ParamId::MAX_PARAM_ID];
 
 
-Synth::Synth()
+Synth::Synth() noexcept
     : SignalProducer(
         OUT_CHANNELS,
         5                           // VOL + ADD + FM + AM + bus
@@ -448,15 +448,17 @@ Synth::Synth()
 
 
 template<class ParamClass>
-void Synth::register_param_as_child(ParamId const param_id, ParamClass& param)
-{
+void Synth::register_param_as_child(
+        ParamId const param_id,
+        ParamClass& param
+) noexcept {
     register_child(param);
     register_param<ParamClass>(param_id, param);
 }
 
 
 template<class ParamClass>
-void Synth::register_param(ParamId const param_id, ParamClass& param)
+void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
 {
     std::string const name = param.get_name();
 
@@ -468,14 +470,16 @@ void Synth::register_param(ParamId const param_id, ParamClass& param)
 void Synth::register_float_param_as_child(
         ParamId const param_id,
         FloatParam& float_param
-) {
+) noexcept {
     register_param_as_child<FloatParam>(param_id, float_param);
     float_params[param_id] = &float_param;
 }
 
 
-void Synth::register_float_param(ParamId const param_id, FloatParam& float_param)
-{
+void Synth::register_float_param(
+        ParamId const param_id,
+        FloatParam& float_param
+) noexcept {
     float_params[param_id] = &float_param;
     register_param<FloatParam>(param_id, float_param);
 }
@@ -500,7 +504,7 @@ Synth::~Synth()
 }
 
 
-bool Synth::is_lock_free() const
+bool Synth::is_lock_free() const noexcept
 {
     bool is_lock_free = true;
 
@@ -515,12 +519,12 @@ bool Synth::is_lock_free() const
 }
 
 
-void Synth::suspend()
+void Synth::suspend() noexcept
 {
 }
 
 
-void Synth::resume()
+void Synth::resume() noexcept
 {
 }
 
@@ -530,7 +534,7 @@ void Synth::note_on(
         Midi::Channel const channel,
         Midi::Note const note,
         Number const velocity
-) {
+) noexcept {
     this->note.change(time_offset, (Number)note * NOTE_TO_PARAM_SCALE);
     this->velocity.change(time_offset, velocity);
 
@@ -570,7 +574,7 @@ void Synth::aftertouch(
         Midi::Channel const channel,
         Midi::Note const note,
         Number const pressure
-) {
+) noexcept {
     this->note.change(time_offset, (Number)note * NOTE_TO_PARAM_SCALE);
 
     if (midi_note_to_voice_assignments[channel][note] == -1) {
@@ -586,7 +590,7 @@ void Synth::note_off(
         Midi::Channel const channel,
         Midi::Note const note,
         Number const velocity
-) {
+) noexcept {
     if (midi_note_to_voice_assignments[channel][note] == -1) {
         return;
     }
@@ -605,7 +609,7 @@ void Synth::control_change(
         Midi::Channel const channel,
         Midi::Controller const controller,
         Number const new_value
-) {
+) noexcept {
     if (controller > MIDI_CONTROLLERS) {
         return;
     }
@@ -624,7 +628,7 @@ void Synth::pitch_wheel_change(
         Seconds const time_offset,
         Midi::Channel const channel,
         Number const new_value
-) {
+) noexcept {
     pitch_wheel.change(time_offset, new_value);
 }
 
@@ -632,28 +636,28 @@ void Synth::pitch_wheel_change(
 void Synth::all_sound_off(
         Seconds const time_offset,
         Midi::Channel const channel
-) {
+) noexcept {
 }
 
 
 void Synth::reset_all_controllers(
         Seconds const time_offset,
         Midi::Channel const channel
-) {
+) noexcept {
 }
 
 
 void Synth::all_notes_off(
         Seconds const time_offset,
         Midi::Channel const channel
-) {
+) noexcept {
 }
 
 
 Sample const* const* Synth::generate_samples(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     return SignalProducer::produce<Synth>(this, round, sample_count);
 }
 
@@ -663,20 +667,20 @@ void Synth::push_message(
     ParamId const param_id,
     Number const number_param,
     Byte const byte_param
-) {
+) noexcept {
     Message message(type, param_id, number_param, byte_param);
 
     messages.push(message);
 }
 
 
-std::string Synth::get_param_name(ParamId const param_id) const
+std::string Synth::get_param_name(ParamId const param_id) const noexcept
 {
     return param_names_by_id[param_id];
 }
 
 
-Synth::ParamId Synth::get_param_id(std::string const name) const
+Synth::ParamId Synth::get_param_id(std::string const name) const noexcept
 {
     return param_id_hash_table.lookup(name.c_str());
 }
@@ -686,20 +690,20 @@ void Synth::get_param_id_hash_table_statistics(
         Integer& max_collisions,
         Number& avg_collisions,
         Number& avg_bucket_size
-) const {
+) const noexcept {
     param_id_hash_table.get_statistics(
         max_collisions, avg_collisions, avg_bucket_size
     );
 }
 
 
-Number Synth::get_param_ratio_atomic(ParamId const param_id) const
+Number Synth::get_param_ratio_atomic(ParamId const param_id) const noexcept
 {
     return param_ratios[param_id].load();
 }
 
 
-Number Synth::get_param_default_ratio(ParamId const param_id) const
+Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 {
     if (param_id < FLOAT_PARAMS) {
         // TODO: remove the null check when all params are implemented
@@ -736,7 +740,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const
 Number Synth::float_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
-) const {
+) const noexcept {
     if (param_id < FLOAT_PARAMS) {
         return float_params[param_id]->ratio_to_value(ratio);
     }
@@ -748,7 +752,7 @@ Number Synth::float_param_ratio_to_display_value(
 Byte Synth::int_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
-) const {
+) const noexcept {
     switch (param_id) {
         case ParamId::MODE: return 0; // TODO
         case ParamId::MWAV: return modulator_params.waveform.ratio_to_value(ratio);
@@ -772,13 +776,14 @@ Byte Synth::int_param_ratio_to_display_value(
 }
 
 
-Synth::ControllerId Synth::get_param_controller_id_atomic(ParamId const param_id) const
-{
+Synth::ControllerId Synth::get_param_controller_id_atomic(
+        ParamId const param_id
+) const noexcept {
     return (Synth::ControllerId)controller_assignments[param_id].load();
 }
 
 
-void Synth::update_param_states()
+void Synth::update_param_states() noexcept
 {
     for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
         handle_refresh_param((ParamId)i);
@@ -789,7 +794,7 @@ void Synth::update_param_states()
 Sample const* const* Synth::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     process_messages();
 
     Sample const* const* const buffer = SignalProducer::produce<Filter2>(
@@ -802,7 +807,7 @@ Sample const* const* Synth::initialize_rendering(
 }
 
 
-void Synth::process_messages()
+void Synth::process_messages() noexcept
 {
     size_t const message_count = messages.size();
 
@@ -832,7 +837,7 @@ void Synth::process_messages()
 }
 
 
-void Synth::handle_set_param(ParamId const param_id, Number const ratio)
+void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcept
 {
     if (param_id < FLOAT_PARAMS) {
         // TODO: remove the null check when all params are implemented
@@ -914,7 +919,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio)
 void Synth::handle_assign_controller(
         ParamId const param_id,
         Byte const controller_id
-) {
+) noexcept {
     controller_assignments[param_id].store(controller_id);
 
     if (param_id < FLOAT_PARAMS) {
@@ -925,7 +930,7 @@ void Synth::handle_assign_controller(
 }
 
 
-void Synth::handle_refresh_param(ParamId const param_id)
+void Synth::handle_refresh_param(ParamId const param_id) noexcept
 {
     param_ratios[param_id].store(get_param_ratio(param_id));
 }
@@ -934,7 +939,7 @@ void Synth::handle_refresh_param(ParamId const param_id)
 void Synth::assign_controller_to_param(
         ParamId const param_id,
         ControllerId const controller_id
-) {
+) noexcept {
     MidiController* midi_controller = NULL;
 
     switch (controller_id) {
@@ -1030,7 +1035,7 @@ void Synth::assign_controller_to_param(
 void Synth::assign_controller_to_float_param(
         ParamId const param_id,
         ControllerId const controller_id
-) {
+) noexcept {
     FloatParam* param = float_params[param_id];
 
     // TODO: remove the null check when all params are implemented
@@ -1122,7 +1127,7 @@ void Synth::assign_controller_to_float_param(
 }
 
 
-Number Synth::get_param_ratio(ParamId const param_id) const
+Number Synth::get_param_ratio(ParamId const param_id) const noexcept
 {
     if (param_id < FLOAT_PARAMS) {
         // TODO: remove the null check when all params are implemented
@@ -1154,7 +1159,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const
 }
 
 
-void Synth::clear_midi_controllers()
+void Synth::clear_midi_controllers() noexcept
 {
     pitch_wheel.clear();
     note.clear();
@@ -1173,11 +1178,11 @@ void Synth::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
 }
 
 
-std::string const Synth::to_string(Integer const n) const
+std::string const Synth::to_string(Integer const n) const noexcept
 {
     std::ostringstream s;
 
@@ -1187,7 +1192,7 @@ std::string const Synth::to_string(Integer const n) const
 }
 
 
-Synth::Message::Message()
+Synth::Message::Message() noexcept
     : type(INVALID),
     param_id(ParamId::MAX_PARAM_ID),
     number_param(0.0),
@@ -1196,7 +1201,7 @@ Synth::Message::Message()
 }
 
 
-Synth::Message::Message(Message const& message)
+Synth::Message::Message(Message const& message) noexcept
     : type(message.type),
     param_id(message.param_id),
     number_param(message.number_param),
@@ -1210,7 +1215,8 @@ Synth::Message::Message(
         ParamId const param_id,
         Number const number_param,
         Byte const byte_param
-) : type(type),
+) noexcept
+    : type(type),
     param_id(param_id),
     number_param(number_param),
     byte_param(byte_param)
@@ -1218,7 +1224,7 @@ Synth::Message::Message(
 }
 
 
-Synth::Message& Synth::Message::operator=(Message const& message)
+Synth::Message& Synth::Message::operator=(Message const& message) noexcept
 {
     if (this != &message) {
         type = message.type;
@@ -1231,14 +1237,14 @@ Synth::Message& Synth::Message::operator=(Message const& message)
 }
 
 
-Synth::SingleProducerSingleConsumerMessageQueue::SingleProducerSingleConsumerMessageQueue()
+Synth::SingleProducerSingleConsumerMessageQueue::SingleProducerSingleConsumerMessageQueue() noexcept
     : next_push(0),
     next_pop(0)
 {
 }
 
 
-bool Synth::SingleProducerSingleConsumerMessageQueue::is_lock_free() const
+bool Synth::SingleProducerSingleConsumerMessageQueue::is_lock_free() const noexcept
 {
     return next_push.is_lock_free() && next_pop.is_lock_free();
 }
@@ -1246,7 +1252,7 @@ bool Synth::SingleProducerSingleConsumerMessageQueue::is_lock_free() const
 
 bool Synth::SingleProducerSingleConsumerMessageQueue::push(
         Synth::Message const& message
-) {
+) noexcept {
     size_t const old_next_push = next_push.load();
     size_t const next_pop = this->next_pop.load();
     size_t const new_next_push = advance(old_next_push);
@@ -1262,7 +1268,7 @@ bool Synth::SingleProducerSingleConsumerMessageQueue::push(
 }
 
 
-bool Synth::SingleProducerSingleConsumerMessageQueue::pop(Message& message)
+bool Synth::SingleProducerSingleConsumerMessageQueue::pop(Message& message) noexcept
 {
     size_t const next_pop = this->next_pop.load();
     size_t const next_push = this->next_push.load();
@@ -1279,7 +1285,7 @@ bool Synth::SingleProducerSingleConsumerMessageQueue::pop(Message& message)
 }
 
 
-size_t Synth::SingleProducerSingleConsumerMessageQueue::size() const
+size_t Synth::SingleProducerSingleConsumerMessageQueue::size() const noexcept
 {
     size_t const next_pop = this->next_pop.load();
     size_t const next_push = this->next_push.load();
@@ -1294,7 +1300,7 @@ size_t Synth::SingleProducerSingleConsumerMessageQueue::size() const
 
 size_t Synth::SingleProducerSingleConsumerMessageQueue::advance(
         size_t const index
-) const {
+) const noexcept {
     return (index + 1) & SIZE_MASK;
 }
 
@@ -1306,7 +1312,8 @@ Synth::Bus::Bus(
         Integer const polyphony,
         FloatParam& volume,
         FloatParam& modulator_add_volume
-) : SignalProducer(channels, 0),
+) noexcept
+    : SignalProducer(channels, 0),
     polyphony(polyphony),
     modulators(modulators),
     carriers(carriers),
@@ -1321,7 +1328,7 @@ Synth::Bus::Bus(
 Sample const* const* Synth::Bus::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     is_silent = true;
 
     for (Integer v = 0; v != polyphony; ++v) {
@@ -1363,7 +1370,7 @@ void Synth::Bus::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     render_silence(round, first_sample_index, last_sample_index, buffer);
 
     if (is_silent) {
@@ -1381,7 +1388,7 @@ void Synth::Bus::mix_modulators(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) const {
+) const noexcept {
     Sample const* const modulator_add_volume_buffer = (
         this->modulator_add_volume_buffer
     );
@@ -1440,7 +1447,7 @@ void Synth::Bus::mix_carriers(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) const {
+) const noexcept {
     for (Integer v = 0; v != polyphony; ++v) {
         if (!carriers_on[v]) {
             continue;
@@ -1464,7 +1471,7 @@ void Synth::Bus::apply_volume(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) const {
+) const noexcept {
     Sample const* const volume_buffer = this->volume_buffer;
 
     if (LIKELY(volume_buffer == NULL)) {
@@ -1486,17 +1493,17 @@ void Synth::Bus::apply_volume(
 }
 
 
-Synth::ParamIdHashTable::ParamIdHashTable()
+Synth::ParamIdHashTable::ParamIdHashTable() noexcept
 {
 }
 
 
-Synth::ParamIdHashTable::~ParamIdHashTable()
+Synth::ParamIdHashTable::~ParamIdHashTable() noexcept
 {
 }
 
 
-void Synth::ParamIdHashTable::add(char const* name, ParamId const param_id)
+void Synth::ParamIdHashTable::add(char const* name, ParamId const param_id) noexcept
 {
     Entry* root;
     Entry* parent;
@@ -1523,7 +1530,7 @@ void Synth::ParamIdHashTable::lookup(
         Entry** root,
         Entry** parent,
         Entry** entry
-) {
+) noexcept {
     Integer const hash = this->hash(name);
     *root = &entries[hash];
 
@@ -1548,7 +1555,7 @@ void Synth::ParamIdHashTable::lookup(
 }
 
 
-Synth::ParamId Synth::ParamIdHashTable::lookup(char const* name)
+Synth::ParamId Synth::ParamIdHashTable::lookup(char const* name) noexcept
 {
     Entry* root;
     Entry* parent;
@@ -1564,7 +1571,7 @@ void Synth::ParamIdHashTable::get_statistics(
         Integer& max_collisions,
         Number& avg_collisions,
         Number& avg_bucket_size
-) const {
+) const noexcept {
     Integer collisions_sum = 0;
     Integer collisions_count = 0;
     Integer bucket_size_sum = 0;
@@ -1608,7 +1615,7 @@ void Synth::ParamIdHashTable::get_statistics(
 /*
 Inspiration from https://orlp.net/blog/worlds-smallest-hash-table/
 */
-Integer Synth::ParamIdHashTable::hash(char const* name)
+Integer Synth::ParamIdHashTable::hash(char const* name) noexcept
 {
     /*
     We only care about the 36 characters which are used in param names: capital
@@ -1653,13 +1660,16 @@ Integer Synth::ParamIdHashTable::hash(char const* name)
 }
 
 
-Synth::ParamIdHashTable::Entry::Entry() : next(NULL)
+Synth::ParamIdHashTable::Entry::Entry() noexcept : next(NULL)
 {
     set("", MAX_PARAM_ID);
 }
 
 
-Synth::ParamIdHashTable::Entry::Entry(const char* name, ParamId const param_id)
+Synth::ParamIdHashTable::Entry::Entry(
+        const char* name,
+        ParamId const param_id
+) noexcept
     : next(NULL)
 {
     set(name, param_id);
@@ -1679,7 +1689,7 @@ Synth::ParamIdHashTable::Entry::~Entry()
 void Synth::ParamIdHashTable::Entry::set(
         const char* name,
         ParamId const param_id
-) {
+) noexcept {
     std::fill_n(this->name, NAME_SIZE, '\x00');
     strncpy(this->name, name, NAME_MAX_INDEX);
     this->param_id = param_id;

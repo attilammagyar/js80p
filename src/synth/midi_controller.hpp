@@ -35,19 +35,19 @@ class MidiController
     public:
         static constexpr SignalProducer::Event::Type EVT_CHANGE = 1;
 
-        MidiController();
+        MidiController() noexcept;
 
         /**
          * \brief Store the new value of the controller, and also queue it as
          *        an event with a time offset for sample-exact parameters.
          */
-        void change(Seconds const time_offset, Number const new_value);
-        Integer get_change_index() const;
-        Number get_value() const;
-        void clear();
+        void change(Seconds const time_offset, Number const new_value) noexcept;
+        Integer get_change_index() const noexcept;
+        Number get_value() const noexcept;
+        void clear() noexcept;
 
     protected:
-        void change(Number const new_value);
+        void change(Number const new_value) noexcept;
 
     private:
         Queue<SignalProducer::Event> events_rw;

@@ -29,7 +29,7 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input)
+Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input) noexcept
     : Filter<InputSignalProducerClass>(input, 4),
     feedback(
         "FB",
@@ -49,7 +49,7 @@ Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input)
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::initialize_instance()
+void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 {
     feedback_signal_producer = NULL;
     feedback_signal_producer_buffer = NULL;
@@ -73,7 +73,8 @@ Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
         FloatParam& feedback_leader,
         FloatParam& time_leader
-) : Filter<InputSignalProducerClass>(input, 4),
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 4),
     feedback(feedback_leader),
     time(time_leader)
 {
@@ -82,7 +83,7 @@ Delay<InputSignalProducerClass>::Delay(
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::reallocate_delay_buffer()
+void Delay<InputSignalProducerClass>::reallocate_delay_buffer() noexcept
 {
     Integer const new_delay_buffer_size = std::max(
         (Integer)(this->sample_rate * Constants::DELAY_TIME_MAX) + 1,
@@ -98,7 +99,7 @@ void Delay<InputSignalProducerClass>::reallocate_delay_buffer()
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::free_delay_buffer()
+void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
 {
     if (delay_buffer == NULL) {
         return;
@@ -115,7 +116,7 @@ void Delay<InputSignalProducerClass>::free_delay_buffer()
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::allocate_delay_buffer()
+void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
 {
     delay_buffer_size_float = (Number)delay_buffer_size;
     delay_buffer_size_inv = 1.0 / delay_buffer_size_float;
@@ -136,7 +137,7 @@ void Delay<InputSignalProducerClass>::allocate_delay_buffer()
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::clear()
+void Delay<InputSignalProducerClass>::clear() noexcept
 {
     for (Integer c = 0; c != this->channels; ++c) {
         std::fill_n(delay_buffer[c], delay_buffer_size, 0.0);
@@ -157,7 +158,7 @@ Delay<InputSignalProducerClass>::~Delay()
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_block_size(
         Integer const new_block_size
-) {
+) noexcept {
     SignalProducer::set_block_size(new_block_size);
 
     reallocate_delay_buffer();
@@ -167,7 +168,7 @@ void Delay<InputSignalProducerClass>::set_block_size(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_sample_rate(
         Frequency const new_sample_rate
-) {
+) noexcept {
     SignalProducer::set_sample_rate(new_sample_rate);
 
     reallocate_delay_buffer();
@@ -177,7 +178,7 @@ void Delay<InputSignalProducerClass>::set_sample_rate(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_feedback_signal_producer(
         SignalProducer const* feedback_signal_producer
-) {
+) noexcept {
     this->feedback_signal_producer = feedback_signal_producer;
 }
 
@@ -186,7 +187,7 @@ template<class InputSignalProducerClass>
 Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
-) {
+) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
     initialize_feedback(round, sample_count);
@@ -211,7 +212,7 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::initialize_feedback(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     if (UNLIKELY(feedback_signal_producer == NULL)) {
         feedback_buffer = NULL;
         feedback_signal_producer_buffer = NULL;
@@ -244,7 +245,7 @@ void Delay<InputSignalProducerClass>::initialize_feedback(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::merge_inputs_into_delay_buffer(
         Integer const sample_count
-) {
+) noexcept {
     copy_input_into_delay_buffer(sample_count);
     mix_feedback_into_delay_buffer(sample_count);
 
@@ -259,7 +260,7 @@ void Delay<InputSignalProducerClass>::merge_inputs_into_delay_buffer(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::copy_input_into_delay_buffer(
         Integer const sample_count
-) {
+) noexcept {
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
@@ -282,7 +283,7 @@ void Delay<InputSignalProducerClass>::copy_input_into_delay_buffer(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         Integer const sample_count
-) {
+) noexcept {
     Integer const channels = this->channels;
 
     if (UNLIKELY(feedback_sample_count == 0)) {
@@ -339,7 +340,7 @@ void Delay<InputSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Integer const channels = this->channels;
 
     if (time_buffer == NULL) {

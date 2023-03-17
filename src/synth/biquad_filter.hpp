@@ -67,7 +67,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         class TypeParam : public Param<Type>
         {
             public:
-                TypeParam(std::string const name);
+                TypeParam(std::string const name) noexcept;
         };
 
         BiquadFilter(
@@ -75,7 +75,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             InputSignalProducerClass& input,
             TypeParam& type,
             Unicity const unicity = Unicity::UNIQUE
-        );
+        ) noexcept;
         BiquadFilter(
             InputSignalProducerClass& input,
             TypeParam& type,
@@ -83,13 +83,17 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParam& q_leader,
             FloatParam& gain_leader,
             Unicity const unicity = Unicity::UNIQUE
-        );
+        ) noexcept;
         virtual ~BiquadFilter();
 
-        virtual void set_sample_rate(Frequency const new_sample_rate) override;
-        virtual void set_block_size(Integer const new_block_size) override;
+        virtual void set_sample_rate(
+            Frequency const new_sample_rate
+        ) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
 
-        void clear();
+        void clear() noexcept;
 
         FloatParam frequency;
         FloatParam q;
@@ -100,14 +104,14 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
         static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
@@ -127,93 +131,93 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static bool shared_is_silent;
         static bool shared_is_no_op;
 
-        void initialize_instance();
-        void register_children();
+        void initialize_instance() noexcept;
+        void register_children() noexcept;
 
-        void reallocate_buffers();
-        void allocate_buffers();
-        void free_buffers();
+        void reallocate_buffers() noexcept;
+        void allocate_buffers() noexcept;
+        void free_buffers() noexcept;
 
         Sample const* const* initialize_rendering_with_shared_coefficients(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         bool initialize_low_pass_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_low_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        );
+        ) noexcept;
 
         bool initialize_high_pass_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_high_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        );
+        ) noexcept;
 
         bool initialize_low_shelf_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_low_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const gain_value
-        );
+        ) noexcept;
 
         bool initialize_high_shelf_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_high_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const gain_value
-        );
+        ) noexcept;
 
         bool initialize_band_pass_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_band_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        );
+        ) noexcept;
 
         bool initialize_notch_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_notch_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        );
+        ) noexcept;
 
         bool initialize_peaking_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void store_peaking_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value,
             Number const gain_value
-        );
+        ) noexcept;
 
         void store_gain_coefficient_samples(
             Integer const index,
             Number const gain_value
-        );
+        ) noexcept;
 
         void store_normalized_coefficient_samples(
             Integer const index,
@@ -223,10 +227,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Sample const a0,
             Sample const a1,
             Sample const a2
-        );
+        ) noexcept;
 
-        void store_no_op_coefficient_samples(Integer const index);
-        void store_silent_coefficient_samples(Integer const index);
+        void store_no_op_coefficient_samples(Integer const index) noexcept;
+        void store_silent_coefficient_samples(Integer const index) noexcept;
 
         bool const has_clones;
 

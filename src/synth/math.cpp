@@ -30,7 +30,7 @@ namespace JS80P
 Math const Math::math;
 
 
-Math::Math()
+Math::Math() noexcept
 {
     init_sines();
     init_randoms();
@@ -38,7 +38,7 @@ Math::Math()
 }
 
 
-void Math::init_sines()
+void Math::init_sines() noexcept
 {
     constexpr Number scale = PI_DOUBLE / (Number)SIN_TABLE_SIZE;
 
@@ -48,7 +48,7 @@ void Math::init_sines()
 }
 
 
-void Math::init_randoms()
+void Math::init_randoms() noexcept
 {
     /*
     https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
@@ -70,7 +70,7 @@ void Math::init_randoms()
 }
 
 
-void Math::init_distortion()
+void Math::init_distortion() noexcept
 {
     Number const max_inv = 1.0 / (Number)DISTORTION_TABLE_MAX_INDEX;
 
@@ -81,19 +81,19 @@ void Math::init_distortion()
 }
 
 
-Number Math::sin(Number const x)
+Number Math::sin(Number const x) noexcept
 {
     return math.sin_impl(x);
 }
 
 
-Number Math::cos(Number const x)
+Number Math::cos(Number const x) noexcept
 {
     return sin(x + PI_HALF);
 }
 
 
-Number Math::sin_impl(Number const x) const
+Number Math::sin_impl(Number const x) const noexcept
 {
     Number const index = x * SINE_SCALE;
     Number const after_weight = index - std::floor(index);
@@ -104,13 +104,13 @@ Number Math::sin_impl(Number const x) const
 }
 
 
-Number Math::exp(Number const x)
+Number Math::exp(Number const x) noexcept
 {
     return iterate_exp(x, EXP_SCALE);
 }
 
 
-Number Math::iterate_exp(Number const x, Number const scale)
+Number Math::iterate_exp(Number const x, Number const scale) noexcept
 {
     /* \exp(x) = \lim_{n \to \infty} ( 1 + \frac{x}{n} ) ^ n */
 
@@ -132,19 +132,19 @@ Number Math::iterate_exp(Number const x, Number const scale)
 }
 
 
-Number Math::pow_10(Number const x)
+Number Math::pow_10(Number const x) noexcept
 {
     return iterate_exp(x, POW_10_SCALE);
 }
 
 
-Number Math::pow_10_inv(Number const x)
+Number Math::pow_10_inv(Number const x) noexcept
 {
     return iterate_exp(x, POW_10_INV_SCALE);
 }
 
 
-Frequency Math::detune(Frequency const frequency, Number const cents)
+Frequency Math::detune(Frequency const frequency, Number const cents) noexcept
 {
     /*
     The approximation errors in exp() would keep piling up in oscillators (even
@@ -164,7 +164,7 @@ Frequency Math::detune(Frequency const frequency, Number const cents)
 void Math::compute_statistics(
         std::vector<Number> const numbers,
         Statistics& statistics
-) {
+) noexcept {
     std::vector<Number>::size_type const size = numbers.size();
 
     statistics.min = std::numeric_limits<Number>::max();
@@ -221,7 +221,7 @@ Number Math::combine(
         Number const a_weight,
         Number const a,
         Number const b
-) {
+) noexcept {
     /*
     One of the multiplications can be eliminated from the following formula:
 
@@ -231,7 +231,7 @@ Number Math::combine(
 }
 
 
-Number Math::distort(Number const level, Number const number)
+Number Math::distort(Number const level, Number const number) noexcept
 {
     if (level < 0.0001) {
         return number;
@@ -247,7 +247,7 @@ Number Math::distort(Number const level, Number const number)
 }
 
 
-Number Math::randomize(Number const level, Number const number)
+Number Math::randomize(Number const level, Number const number) noexcept
 {
     if (level < 0.0001) {
         return number;
@@ -265,7 +265,7 @@ Number Math::lookup(
         Number const* const table,
         int const max_index,
         Number const index
-) {
+) noexcept {
     int const before_index = (int)index;
 
     if (before_index >= max_index) {
@@ -283,7 +283,7 @@ Number Math::lookup_periodic(
         Number const* table,
         int const table_size,
         Number const index
-) {
+) noexcept {
     Number const after_weight = index - std::floor(index);
     int before_index = (int)std::floor(index);
 

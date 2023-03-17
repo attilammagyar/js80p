@@ -33,7 +33,8 @@ Param<NumberType>::Param(
         NumberType const min_value,
         NumberType const max_value,
         NumberType const default_value
-) : SignalProducer(1),
+) noexcept
+    : SignalProducer(1),
     midi_controller(NULL),
     name(name),
     min_value(min_value),
@@ -48,21 +49,21 @@ Param<NumberType>::Param(
 
 
 template<typename NumberType>
-std::string const Param<NumberType>::get_name() const
+std::string const Param<NumberType>::get_name() const noexcept
 {
     return name;
 }
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::get_default_value() const
+NumberType Param<NumberType>::get_default_value() const noexcept
 {
     return default_value;
 }
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::get_value() const
+NumberType Param<NumberType>::get_value() const noexcept
 {
     if (midi_controller != NULL) {
         return ratio_to_value(midi_controller->get_value());
@@ -73,28 +74,28 @@ NumberType Param<NumberType>::get_value() const
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::get_min_value() const
+NumberType Param<NumberType>::get_min_value() const noexcept
 {
     return min_value;
 }
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::get_max_value() const
+NumberType Param<NumberType>::get_max_value() const noexcept
 {
     return max_value;
 }
 
 
 template<typename NumberType>
-void Param<NumberType>::set_value(NumberType const new_value)
+void Param<NumberType>::set_value(NumberType const new_value) noexcept
 {
     store_new_value(clamp(new_value));
 }
 
 
 template<typename NumberType>
-void Param<NumberType>::store_new_value(NumberType const new_value)
+void Param<NumberType>::store_new_value(NumberType const new_value) noexcept
 {
     value = new_value;
     ++change_index;
@@ -103,21 +104,21 @@ void Param<NumberType>::store_new_value(NumberType const new_value)
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::get_raw_value() const
+NumberType Param<NumberType>::get_raw_value() const noexcept
 {
     return value;
 }
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::clamp(NumberType const value) const
+NumberType Param<NumberType>::clamp(NumberType const value) const noexcept
 {
     return std::min(max_value, std::max(min_value, value));
 }
 
 
 template<typename NumberType>
-Number Param<NumberType>::get_ratio() const
+Number Param<NumberType>::get_ratio() const noexcept
 {
     if (midi_controller != NULL) {
         return midi_controller->get_value();
@@ -128,21 +129,21 @@ Number Param<NumberType>::get_ratio() const
 
 
 template<typename NumberType>
-Number Param<NumberType>::get_default_ratio() const
+Number Param<NumberType>::get_default_ratio() const noexcept
 {
     return value_to_ratio(get_default_value());
 }
 
 
 template<typename NumberType>
-void Param<NumberType>::set_ratio(Number const ratio)
+void Param<NumberType>::set_ratio(Number const ratio) noexcept
 {
     store_new_value(ratio_to_value(ratio));
 }
 
 
 template<typename NumberType>
-Integer Param<NumberType>::get_change_index() const
+Integer Param<NumberType>::get_change_index() const noexcept
 {
     if (midi_controller != NULL) {
         return midi_controller->get_change_index();
@@ -153,7 +154,7 @@ Integer Param<NumberType>::get_change_index() const
 
 
 template<typename NumberType>
-NumberType Param<NumberType>::ratio_to_value(Number const ratio) const
+NumberType Param<NumberType>::ratio_to_value(Number const ratio) const noexcept
 {
     if (std::is_floating_point<NumberType>::value) {
         return clamp(min_value + (NumberType)((Number)range * ratio));
@@ -164,7 +165,7 @@ NumberType Param<NumberType>::ratio_to_value(Number const ratio) const
 
 
 template<typename NumberType>
-Number Param<NumberType>::value_to_ratio(NumberType const value) const
+Number Param<NumberType>::value_to_ratio(NumberType const value) const noexcept
 {
     return ((Number)value - (Number)min_value) * range_inv;
 }
@@ -173,7 +174,7 @@ Number Param<NumberType>::value_to_ratio(NumberType const value) const
 template<typename NumberType>
 void Param<NumberType>::set_midi_controller(
         MidiController const* midi_controller
-) {
+) noexcept {
     if (midi_controller == NULL && this->midi_controller != NULL) {
         set_value(ratio_to_value(this->midi_controller->get_value()));
     }
@@ -183,7 +184,7 @@ void Param<NumberType>::set_midi_controller(
 
 
 template<typename NumberType>
-MidiController const* Param<NumberType>::get_midi_controller() const
+MidiController const* Param<NumberType>::get_midi_controller() const noexcept
 {
     return midi_controller;
 }
@@ -195,7 +196,7 @@ void Param<NumberType>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Sample const v = (Sample)value;
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -209,7 +210,7 @@ Sample const* const* FloatParam::produce(
         FloatParamClass* float_param,
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     if (float_param->is_following_leader()) {
         return SignalProducer::produce<FloatParamClass>(
             (FloatParamClass*)float_param->leader, round, sample_count
@@ -227,7 +228,7 @@ Sample const* FloatParam::produce_if_not_constant(
         FloatParamClass* float_param,
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     if (float_param->is_constant_in_next_round(round, sample_count)) {
         float_param->skip_round(round, sample_count);
 
@@ -246,7 +247,8 @@ FloatParam::FloatParam(
         Number const max_value,
         Number const default_value,
         Number const round_to
-) : Param<Number>(name, min_value, max_value, default_value),
+) noexcept
+    : Param<Number>(name, min_value, max_value, default_value),
     leader(NULL),
     flexible_controller(NULL),
     envelope(NULL),
@@ -260,7 +262,7 @@ FloatParam::FloatParam(
 }
 
 
-FloatParam::FloatParam(FloatParam& leader)
+FloatParam::FloatParam(FloatParam& leader) noexcept
     : Param<Number>(
         leader.name, leader.min_value, leader.max_value, leader.default_value
     ),
@@ -277,7 +279,7 @@ FloatParam::FloatParam(FloatParam& leader)
 }
 
 
-Number FloatParam::get_value() const
+Number FloatParam::get_value() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_value();
@@ -293,13 +295,13 @@ Number FloatParam::get_value() const
 }
 
 
-bool FloatParam::is_following_leader() const
+bool FloatParam::is_following_leader() const noexcept
 {
     return leader != NULL && leader->envelope == NULL;
 }
 
 
-void FloatParam::set_value(Number const new_value)
+void FloatParam::set_value(Number const new_value) noexcept
 {
     latest_event_type = EVT_SET_VALUE;
 
@@ -307,7 +309,7 @@ void FloatParam::set_value(Number const new_value)
 }
 
 
-Number FloatParam::round_value(Number const value) const
+Number FloatParam::round_value(Number const value) const noexcept
 {
     if (should_round) {
         return std::round(value * round_to_inv) * round_to;
@@ -317,13 +319,13 @@ Number FloatParam::round_value(Number const value) const
 }
 
 
-void FloatParam::set_ratio(Number const ratio)
+void FloatParam::set_ratio(Number const ratio) noexcept
 {
     set_value(ratio_to_value(ratio));
 }
 
 
-Number FloatParam::get_ratio() const
+Number FloatParam::get_ratio() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_ratio();
@@ -337,7 +339,7 @@ Number FloatParam::get_ratio() const
 }
 
 
-Integer FloatParam::get_change_index() const
+Integer FloatParam::get_change_index() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_change_index();
@@ -353,7 +355,7 @@ Integer FloatParam::get_change_index() const
 
 bool FloatParam::is_constant_in_next_round(
         Integer const round, Integer const sample_count
-) {
+) noexcept {
     if (round == constantness_round) {
         return constantness;
     }
@@ -364,7 +366,7 @@ bool FloatParam::is_constant_in_next_round(
 }
 
 
-bool FloatParam::is_constant_until(Integer const sample_count) const
+bool FloatParam::is_constant_until(Integer const sample_count) const noexcept
 {
     if (is_following_leader()) {
         return leader->is_constant_until(sample_count);
@@ -391,7 +393,7 @@ bool FloatParam::is_constant_until(Integer const sample_count) const
 void FloatParam::skip_round(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     if (cached_round != round && !events.is_empty()) {
         current_time += (Seconds)sample_count * sampling_period;
         cached_round = round;
@@ -399,14 +401,18 @@ void FloatParam::skip_round(
 }
 
 
-void FloatParam::schedule_value(Seconds const time_offset, Number const new_value)
-{
+void FloatParam::schedule_value(
+        Seconds const time_offset,
+        Number const new_value
+) noexcept {
     schedule(EVT_SET_VALUE, time_offset, 0, 0.0, new_value);
 }
 
 
-void FloatParam::schedule_linear_ramp(Seconds const duration, Number const target_value)
-{
+void FloatParam::schedule_linear_ramp(
+        Seconds const duration,
+        Number const target_value
+) noexcept {
     Seconds const last_event_time_offset = get_last_event_time_offset();
 
     schedule(
@@ -418,7 +424,7 @@ void FloatParam::schedule_linear_ramp(Seconds const duration, Number const targe
 }
 
 
-void FloatParam::handle_event(Event const& event)
+void FloatParam::handle_event(Event const& event) noexcept
 {
     Param<Number>::handle_event(event);
 
@@ -438,13 +444,13 @@ void FloatParam::handle_event(Event const& event)
 }
 
 
-void FloatParam::handle_set_value_event(Event const& event)
+void FloatParam::handle_set_value_event(Event const& event) noexcept
 {
     set_value(event.number_param_2);
 }
 
 
-void FloatParam::handle_linear_ramp_event(Event const& event)
+void FloatParam::handle_linear_ramp_event(Event const& event) noexcept
 {
     Number const value = get_raw_value();
     Number const done_samples = (
@@ -479,7 +485,7 @@ void FloatParam::handle_linear_ramp_event(Event const& event)
 }
 
 
-void FloatParam::handle_cancel_event(Event const& event)
+void FloatParam::handle_cancel_event(Event const& event) noexcept
 {
     if (latest_event_type == EVT_LINEAR_RAMP) {
         store_new_value(
@@ -493,8 +499,9 @@ void FloatParam::handle_cancel_event(Event const& event)
 }
 
 
-void FloatParam::set_midi_controller(MidiController const* midi_controller)
-{
+void FloatParam::set_midi_controller(
+        MidiController const* midi_controller
+) noexcept {
     if (midi_controller == NULL && this->midi_controller != NULL) {
         set_value(ratio_to_value(this->midi_controller->get_value()));
     }
@@ -503,8 +510,9 @@ void FloatParam::set_midi_controller(MidiController const* midi_controller)
 }
 
 
-void FloatParam::set_flexible_controller(FlexibleController* flexible_controller)
-{
+void FloatParam::set_flexible_controller(
+        FlexibleController* flexible_controller
+) noexcept {
     if (flexible_controller == NULL && this->flexible_controller != NULL) {
         this->flexible_controller->update();
 
@@ -515,25 +523,25 @@ void FloatParam::set_flexible_controller(FlexibleController* flexible_controller
 }
 
 
-FlexibleController const* FloatParam::get_flexible_controller()
+FlexibleController const* FloatParam::get_flexible_controller() noexcept
 {
     return flexible_controller;
 }
 
 
-void FloatParam::set_envelope(Envelope const* const envelope)
+void FloatParam::set_envelope(Envelope const* const envelope) noexcept
 {
     this->envelope = envelope;
 }
 
 
-Envelope const* FloatParam::get_envelope() const
+Envelope const* FloatParam::get_envelope() const noexcept
 {
     return leader == NULL ? envelope : leader->envelope;
 }
 
 
-void FloatParam::start_envelope(Seconds const time_offset)
+void FloatParam::start_envelope(Seconds const time_offset) noexcept
 {
     Seconds next_event_time_offset;
     Seconds attack;
@@ -572,7 +580,7 @@ void FloatParam::start_envelope(Seconds const time_offset)
 }
 
 
-Seconds FloatParam::end_envelope(Seconds const time_offset)
+Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 {
     Envelope const* const envelope = get_envelope();
 
@@ -599,7 +607,7 @@ Seconds FloatParam::end_envelope(Seconds const time_offset)
 Sample const* const* FloatParam::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Param<Number>::initialize_rendering(round, sample_count);
 
     if (midi_controller != NULL) {
@@ -623,7 +631,7 @@ void FloatParam::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     if (latest_event_type == EVT_LINEAR_RAMP) {
         Sample sample = (Sample)get_raw_value();
 
@@ -638,7 +646,7 @@ void FloatParam::render(
 }
 
 
-FloatParam::LinearRampState::LinearRampState()
+FloatParam::LinearRampState::LinearRampState() noexcept
     : start_time_offset(0.0),
     done_samples(0.0),
     initial_value(0.0),
@@ -659,7 +667,7 @@ void FloatParam::LinearRampState::init(
         Number const target_value,
         Number const duration_in_samples,
         Seconds const duration
-) {
+) noexcept {
     if (duration_in_samples > 0.0) {
         is_done = false;
 
@@ -679,7 +687,7 @@ void FloatParam::LinearRampState::init(
 }
 
 
-Number FloatParam::LinearRampState::get_next_value()
+Number FloatParam::LinearRampState::get_next_value() noexcept
 {
     if (is_done) {
         return target_value;
@@ -699,7 +707,7 @@ Number FloatParam::LinearRampState::get_next_value()
 
 Number FloatParam::LinearRampState::get_value_at(
         Seconds const time_offset
-) const {
+) const noexcept {
     if (duration > 0.0 && time_offset <= duration) {
         return initial_value + (time_offset / duration) * delta;
     } else {
@@ -716,7 +724,8 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         Number const min_value,
         Number const max_value,
         Number const default_value
-) : FloatParam(name, min_value, max_value, default_value),
+) noexcept
+    : FloatParam(name, min_value, max_value, default_value),
     modulation_level(modulation_level_leader),
     modulator(modulator)
 {
@@ -727,7 +736,7 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
 template<class ModulatorSignalProducerClass>
 bool ModulatableFloatParam<ModulatorSignalProducerClass>::is_constant_in_next_round(
         Integer const round, Integer const sample_count
-) {
+) noexcept {
     if (modulator == NULL) {
         return FloatParam::is_constant_in_next_round(round, sample_count);
     }
@@ -744,7 +753,7 @@ template<class ModulatorSignalProducerClass>
 Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Sample const* const* const buffer = FloatParam::initialize_rendering(
         round, sample_count
     );
@@ -788,7 +797,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     FloatParam::render(round, first_sample_index, last_sample_index, buffer);
 
     if (is_no_op) {
@@ -815,7 +824,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
 template<class ModulatorSignalProducerClass>
 void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
         Seconds const time_offset
-) {
+) noexcept {
     FloatParam::start_envelope(time_offset);
 
     if (modulator != NULL) {
@@ -827,7 +836,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
 template<class ModulatorSignalProducerClass>
 Seconds ModulatableFloatParam<ModulatorSignalProducerClass>::end_envelope(
         Seconds const time_offset
-) {
+) noexcept {
     Seconds const envelope_end = FloatParam::end_envelope(time_offset);
 
     if (modulator == NULL) {
@@ -846,7 +855,7 @@ template<class ModulatorSignalProducerClass>
 void ModulatableFloatParam<ModulatorSignalProducerClass>::skip_round(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     FloatParam::skip_round(round, sample_count);
 
     if (modulator != NULL) {

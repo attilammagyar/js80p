@@ -30,7 +30,7 @@ namespace JS80P
 AEffect* FstPlugin::create_instance(
         audioMasterCallback const host_callback,
         HINSTANCE const dll_instance
-) {
+) noexcept {
     AEffect* effect = new AEffect();
 
     FstPlugin* fst_plugin = new FstPlugin(effect, host_callback, dll_instance);
@@ -212,7 +212,7 @@ FstPlugin::FstPlugin(
         AEffect* const effect,
         audioMasterCallback const host_callback,
         HINSTANCE const dll_instance
-)
+) noexcept
     : synth(),
     effect(effect),
     host_callback(host_callback),
@@ -233,32 +233,32 @@ FstPlugin::~FstPlugin()
 }
 
 
-void FstPlugin::set_sample_rate(float const new_sample_rate)
+void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
 {
     synth.set_sample_rate((Frequency)new_sample_rate);
 }
 
 
-void FstPlugin::set_block_size(VstIntPtr const new_block_size)
+void FstPlugin::set_block_size(VstIntPtr const new_block_size) noexcept
 {
     synth.set_block_size((Integer)new_block_size);
 }
 
 
-void FstPlugin::suspend()
+void FstPlugin::suspend() noexcept
 {
     synth.suspend();
 }
 
 
-void FstPlugin::resume()
+void FstPlugin::resume() noexcept
 {
     synth.resume();
     host_callback(effect, audioMasterWantMidi, 0, 1, NULL, 0.0f);
 }
 
 
-void FstPlugin::process_events(VstEvents const* const events)
+void FstPlugin::process_events(VstEvents const* const events) noexcept
 {
     VstEvent* event = NULL;
 
@@ -272,7 +272,7 @@ void FstPlugin::process_events(VstEvents const* const events)
 }
 
 
-void FstPlugin::process_midi_event(VstMidiEvent const* const event)
+void FstPlugin::process_midi_event(VstMidiEvent const* const event) noexcept
 {
     Seconds const time_offset = (
         synth.sample_count_to_time_offset((Integer)event->deltaFrames)
@@ -285,8 +285,10 @@ void FstPlugin::process_midi_event(VstMidiEvent const* const event)
 
 
 template<typename NumberType>
-void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** samples)
-{
+void FstPlugin::generate_samples(
+        VstInt32 const sample_count,
+        NumberType** samples
+) noexcept {
     if (sample_count < 1) {
         return;
     }
@@ -301,7 +303,7 @@ void FstPlugin::generate_samples(VstInt32 const sample_count, NumberType** sampl
 }
 
 
-Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count)
+Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
 {
     round = (round + 1) & ROUND_MASK;
 
@@ -312,7 +314,7 @@ Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count)
 void FstPlugin::generate_and_add_samples(
         VstInt32 const sample_count,
         float** samples
-) {
+) noexcept {
     if (sample_count < 1) {
         return;
     }
@@ -327,7 +329,7 @@ void FstPlugin::generate_and_add_samples(
 }
 
 
-VstIntPtr FstPlugin::get_chunk(void** chunk)
+VstIntPtr FstPlugin::get_chunk(void** chunk) noexcept
 {
     serialized = Serializer::serialize(synth);
 
@@ -337,7 +339,7 @@ VstIntPtr FstPlugin::get_chunk(void** chunk)
 }
 
 
-void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size)
+void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 {
     std::string serialized((char const*)chunk, (std::string::size_type)size);
 

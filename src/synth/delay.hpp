@@ -38,17 +38,21 @@ class Delay : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Delay(InputSignalProducerClass& input);
+        Delay(InputSignalProducerClass& input) noexcept;
         Delay(
             InputSignalProducerClass& input,
             FloatParam& feedback_leader,
             FloatParam& time_leader
-        );
+        ) noexcept;
         virtual ~Delay();
 
-        virtual void set_block_size(Integer const new_block_size) override;
-        virtual void set_sample_rate(Frequency const new_sample_rate) override;
-        void clear();
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
+        virtual void set_sample_rate(
+            Frequency const new_sample_rate
+        ) noexcept override;
+        void clear() noexcept;
 
         /**
          * \warning The number of channels of the \c feedback \c SignalProducer
@@ -56,7 +60,7 @@ class Delay : public Filter<InputSignalProducerClass>
          */
         void set_feedback_signal_producer(
             SignalProducer const* feedback_signal_producer
-        );
+        ) noexcept;
 
         FloatParam feedback;
         FloatParam time;
@@ -65,29 +69,29 @@ class Delay : public Filter<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
-        void initialize_instance();
-        void reallocate_delay_buffer();
-        void free_delay_buffer();
-        void allocate_delay_buffer();
+        void initialize_instance() noexcept;
+        void reallocate_delay_buffer() noexcept;
+        void free_delay_buffer() noexcept;
+        void allocate_delay_buffer() noexcept;
 
         void initialize_feedback(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
-        void merge_inputs_into_delay_buffer(Integer const sample_count);
-        void copy_input_into_delay_buffer(Integer const sample_count);
-        void mix_feedback_into_delay_buffer(Integer const sample_count);
+        void merge_inputs_into_delay_buffer(Integer const sample_count) noexcept;
+        void copy_input_into_delay_buffer(Integer const sample_count) noexcept;
+        void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
 
         SignalProducer const* feedback_signal_producer;
         Sample const* const* feedback_signal_producer_buffer;

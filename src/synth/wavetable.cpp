@@ -35,12 +35,12 @@ bool Wavetable::is_initialized = false;
 Number Wavetable::sines[Wavetable::SIZE] = {0.0};
 
 
-WavetableState::WavetableState()
+WavetableState::WavetableState() noexcept
 {
 }
 
 
-void Wavetable::initialize()
+void Wavetable::initialize() noexcept
 {
     if (is_initialized) {
         return;
@@ -60,7 +60,7 @@ void Wavetable::reset_state(
         Frequency const nyquist_frequency,
         Frequency const frequency,
         Seconds const start_time_offset
-) {
+) noexcept {
     state.sample_index = (
         SIZE_FLOAT * (Number)start_time_offset * (Number)frequency
     );
@@ -73,7 +73,7 @@ void Wavetable::reset_state(
 Wavetable::Wavetable(
         Number const coefficients[],
         Integer const coefficients_length
-) : partials(coefficients_length)
+) noexcept : partials(coefficients_length)
 {
     samples = new Sample*[partials];
 
@@ -86,7 +86,7 @@ Wavetable::Wavetable(
 }
 
 
-void Wavetable::update_coefficients(Number const coefficients[])
+void Wavetable::update_coefficients(Number const coefficients[]) noexcept
 {
     Integer frequency = 1;
 
@@ -116,7 +116,7 @@ void Wavetable::update_coefficients(Number const coefficients[])
 }
 
 
-void Wavetable::normalize()
+void Wavetable::normalize() noexcept
 {
     Sample max = 0.0;
 
@@ -150,8 +150,10 @@ Wavetable::~Wavetable()
 }
 
 
-Sample Wavetable::lookup(WavetableState* state, Frequency const frequency) const
-{
+Sample Wavetable::lookup(
+        WavetableState* state,
+        Frequency const frequency
+) const noexcept {
     Frequency const abs_frequency = std::fabs(frequency);
 
     if (UNLIKELY(abs_frequency < 0.0000001)) {
@@ -203,7 +205,7 @@ Sample Wavetable::lookup(WavetableState* state, Frequency const frequency) const
 }
 
 
-Number Wavetable::wrap_around(Number const index) const
+Number Wavetable::wrap_around(Number const index) const noexcept
 {
     return index - std::floor(index * SIZE_INV) * SIZE_FLOAT;
 }
@@ -213,7 +215,7 @@ Sample Wavetable::interpolate(
         WavetableState const* state,
         Frequency const frequency,
         Number const sample_index
-) const {
+) const noexcept {
     if (frequency >= state->interpolation_limit) {
         return interpolate_sample_linear(state, sample_index);
     } else {
@@ -225,7 +227,7 @@ Sample Wavetable::interpolate(
 Sample Wavetable::interpolate_sample_linear(
         WavetableState const* state,
         Number const sample_index
-) const {
+) const noexcept {
     /*
     Not using Math::lookup_periodic() here, because we don't want to calculate
     the weight twice when interpolation between the two tables (fewer and more
@@ -262,7 +264,7 @@ Sample Wavetable::interpolate_sample_linear(
 Sample Wavetable::interpolate_sample_lagrange(
         WavetableState const* state,
         Number const sample_index
-) const {
+) const noexcept {
     Integer const sample_1_index = (Integer)sample_index;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
     Integer const sample_3_index = (sample_2_index + 1) & MASK;
@@ -303,61 +305,61 @@ Sample Wavetable::interpolate_sample_lagrange(
 StandardWaveforms const StandardWaveforms::standard_waveforms;
 
 
-Wavetable const* StandardWaveforms::sine()
+Wavetable const* StandardWaveforms::sine() noexcept
 {
     return standard_waveforms.sine_wt;
 }
 
 
-Wavetable const* StandardWaveforms::sawtooth()
+Wavetable const* StandardWaveforms::sawtooth() noexcept
 {
     return standard_waveforms.sawtooth_wt;
 }
 
 
-Wavetable const* StandardWaveforms::soft_sawtooth()
+Wavetable const* StandardWaveforms::soft_sawtooth() noexcept
 {
     return standard_waveforms.soft_sawtooth_wt;
 }
 
 
-Wavetable const* StandardWaveforms::inverse_sawtooth()
+Wavetable const* StandardWaveforms::inverse_sawtooth() noexcept
 {
     return standard_waveforms.inverse_sawtooth_wt;
 }
 
 
-Wavetable const* StandardWaveforms::soft_inverse_sawtooth()
+Wavetable const* StandardWaveforms::soft_inverse_sawtooth() noexcept
 {
     return standard_waveforms.soft_inverse_sawtooth_wt;
 }
 
 
-Wavetable const* StandardWaveforms::triangle()
+Wavetable const* StandardWaveforms::triangle() noexcept
 {
     return standard_waveforms.triangle_wt;
 }
 
 
-Wavetable const* StandardWaveforms::soft_triangle()
+Wavetable const* StandardWaveforms::soft_triangle() noexcept
 {
     return standard_waveforms.soft_triangle_wt;
 }
 
 
-Wavetable const* StandardWaveforms::square()
+Wavetable const* StandardWaveforms::square() noexcept
 {
     return standard_waveforms.square_wt;
 }
 
 
-Wavetable const* StandardWaveforms::soft_square()
+Wavetable const* StandardWaveforms::soft_square() noexcept
 {
     return standard_waveforms.soft_square_wt;
 }
 
 
-StandardWaveforms::StandardWaveforms()
+StandardWaveforms::StandardWaveforms() noexcept
 {
     Wavetable::initialize();
 

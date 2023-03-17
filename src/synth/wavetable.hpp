@@ -30,7 +30,7 @@ namespace JS80P
 class WavetableState
 {
     public:
-        WavetableState();
+        WavetableState() noexcept;
 
         Number scale;
         Number sample_index;
@@ -76,7 +76,7 @@ class Wavetable
             1.0 / (2.0 * (Frequency)SIZE_FLOAT)
         );
 
-        static void initialize();
+        static void initialize() noexcept;
 
         static void reset_state(
             WavetableState& state,
@@ -84,41 +84,44 @@ class Wavetable
             Frequency const nyquist_frequency,
             Frequency const frequency,
             Seconds const time_offset
-        );
+        ) noexcept;
 
         Wavetable(
             Number const coefficients[],
             Integer const coefficients_length
-        );
+        ) noexcept;
 
         ~Wavetable();
 
-        Sample lookup(WavetableState* state, Frequency const frequency) const;
+        Sample lookup(
+            WavetableState* state,
+            Frequency const frequency
+        ) const noexcept;
 
-        void update_coefficients(Number const coefficients[]);
-        void normalize();
+        void update_coefficients(Number const coefficients[]) noexcept;
+        void normalize() noexcept;
 
     private:
         static Number sines[SIZE];
         static bool is_initialized;
 
-        Number wrap_around(Number const index) const;
+        Number wrap_around(Number const index) const noexcept;
 
         Sample interpolate(
             WavetableState const* state,
             Frequency const frequency,
             Number const sample_index
-        ) const;
+        ) const noexcept;
 
         Sample interpolate_sample_linear(
             WavetableState const* state,
             Number const sample_index
-        ) const;
+        ) const noexcept;
 
         Sample interpolate_sample_lagrange(
             WavetableState const* state,
             Number const sample_index
-        ) const;
+        ) const noexcept;
 
         Integer const partials;
 
@@ -129,17 +132,17 @@ class Wavetable
 class StandardWaveforms
 {
     public:
-        static Wavetable const* sine();
-        static Wavetable const* sawtooth();
-        static Wavetable const* soft_sawtooth();
-        static Wavetable const* inverse_sawtooth();
-        static Wavetable const* soft_inverse_sawtooth();
-        static Wavetable const* triangle();
-        static Wavetable const* soft_triangle();
-        static Wavetable const* square();
-        static Wavetable const* soft_square();
+        static Wavetable const* sine() noexcept;
+        static Wavetable const* sawtooth() noexcept;
+        static Wavetable const* soft_sawtooth() noexcept;
+        static Wavetable const* inverse_sawtooth() noexcept;
+        static Wavetable const* soft_inverse_sawtooth() noexcept;
+        static Wavetable const* triangle() noexcept;
+        static Wavetable const* soft_triangle() noexcept;
+        static Wavetable const* square() noexcept;
+        static Wavetable const* soft_square() noexcept;
 
-        StandardWaveforms();
+        StandardWaveforms() noexcept;
         ~StandardWaveforms();
 
     private:

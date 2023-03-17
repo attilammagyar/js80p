@@ -64,7 +64,7 @@ class Oscillator : public SignalProducer
         class WaveformParam : public Param<Waveform>
         {
             public:
-                WaveformParam(std::string const name);
+                WaveformParam(std::string const name) noexcept;
         };
 
         static constexpr Event::Type EVT_START = 1;
@@ -77,7 +77,7 @@ class Oscillator : public SignalProducer
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
             FloatParam& frequency_modulation_level_leader = dummy_param
-        );
+        ) noexcept;
 
         Oscillator(
             WaveformParam& waveform,
@@ -97,14 +97,14 @@ class Oscillator : public SignalProducer
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
             FloatParam& frequency_modulation_level_leader = dummy_param
-        );
+        ) noexcept;
 
         ~Oscillator() override;
 
-        virtual void set_block_size(Integer const new_block_size) override;
+        virtual void set_block_size(Integer const new_block_size) noexcept override;
 
-        void start(Seconds const time_offset);
-        void stop(Seconds const time_offset);
+        void start(Seconds const time_offset) noexcept;
+        void stop(Seconds const time_offset) noexcept;
 
         WaveformParam& waveform;
 
@@ -129,16 +129,16 @@ class Oscillator : public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
-        void handle_event(Event const& event);
+        void handle_event(Event const& event) noexcept;
 
     private:
         static constexpr Number FREQUENCY_MIN = 0.001;
@@ -147,25 +147,25 @@ class Oscillator : public SignalProducer
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
 
-        void initialize_instance();
-        void allocate_buffers(Integer const size);
-        void free_buffers();
+        void initialize_instance() noexcept;
+        void allocate_buffers(Integer const size) noexcept;
+        void free_buffers() noexcept;
 
         void compute_amplitude_buffer(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         void compute_frequency_buffer(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
         Frequency compute_frequency(
             Number const frequency,
             Number const detune,
             Number const fine_detune
-        ) const;
-        void handle_start_event(Event const& event);
-        void handle_stop_event(Event const& event);
+        ) const noexcept;
+        void handle_start_event(Event const& event) noexcept;
+        void handle_stop_event(Event const& event) noexcept;
 
         WavetableState wavetable_state;
         Wavetable const* wavetables[WAVEFORMS];

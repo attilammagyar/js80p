@@ -58,7 +58,7 @@ class Voice : public SignalProducer
         class Params
         {
             public:
-                Params(std::string const name);
+                Params(std::string const name) noexcept;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParam amplitude;
@@ -103,20 +103,20 @@ class Voice : public SignalProducer
                     Filter2& input,
                     Number& velocity,
                     FloatParam& volume
-                );
+                ) noexcept;
 
             protected:
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
-                );
+                ) noexcept;
 
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** buffer
-                );
+                ) noexcept;
 
             private:
                 FloatParam& volume;
@@ -135,43 +135,43 @@ class Voice : public SignalProducer
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = Oscillator_::dummy_param,
             FloatParam& frequency_modulation_level_leader = Oscillator_::dummy_param
-        );
+        ) noexcept;
 
-        bool is_on() const;
-        bool is_off_after(Seconds const time_offset) const;
+        bool is_on() const noexcept;
+        bool is_off_after(Seconds const time_offset) const noexcept;
 
         void note_on(
             Seconds const time_offset,
             Midi::Note const note,
             Number const velocity,
             Midi::Note const previous_note
-        );
+        ) noexcept;
         void note_off(
             Seconds const time_offset,
             Midi::Note const note,
             Number const velocity
-        );
+        ) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
-        Number calculate_velocity(Number const raw_velocity) const;
+        Number calculate_velocity(Number const raw_velocity) const noexcept;
         void set_up_oscillator_frequency(
             Seconds const time_offset,
             Midi::Note const note,
             Midi::Note const previous_note
-        );
+        ) noexcept;
 
         Midi::Note const notes;
 

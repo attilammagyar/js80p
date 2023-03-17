@@ -53,24 +53,24 @@ class Param : public SignalProducer
             NumberType const min_value,
             NumberType const max_value,
             NumberType const default_value
-        );
+        ) noexcept;
 
-        std::string const get_name() const;
-        NumberType get_default_value() const;
-        NumberType get_value() const;
-        NumberType get_min_value() const;
-        NumberType get_max_value() const;
-        void set_value(NumberType const new_value);
+        std::string const get_name() const noexcept;
+        NumberType get_default_value() const noexcept;
+        NumberType get_value() const noexcept;
+        NumberType get_min_value() const noexcept;
+        NumberType get_max_value() const noexcept;
+        void set_value(NumberType const new_value) noexcept;
 
-        Number get_ratio() const;
-        Number get_default_ratio() const;
-        void set_ratio(Number const ratio);
+        Number get_ratio() const noexcept;
+        Number get_default_ratio() const noexcept;
+        void set_ratio(Number const ratio) noexcept;
 
-        NumberType ratio_to_value(Number const ratio) const;
-        Number value_to_ratio(NumberType const value) const;
+        NumberType ratio_to_value(Number const ratio) const noexcept;
+        Number value_to_ratio(NumberType const value) const noexcept;
 
-        void set_midi_controller(MidiController const* midi_controller);
-        MidiController const* get_midi_controller() const;
+        void set_midi_controller(MidiController const* midi_controller) noexcept;
+        MidiController const* get_midi_controller() const noexcept;
 
         /**
          * \brief Whenever the value of the parameter changes, the change index
@@ -78,20 +78,20 @@ class Param : public SignalProducer
          *        calculation that depends on a parameter value, as long as the
          *        change index remains unchanged.
          */
-        Integer get_change_index() const;
+        Integer get_change_index() const noexcept;
 
     protected:
-        NumberType get_raw_value() const;
+        NumberType get_raw_value() const noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
-        NumberType clamp(NumberType const value) const;
-        void store_new_value(NumberType const new_value);
+        NumberType clamp(NumberType const value) const noexcept;
+        void store_new_value(NumberType const new_value) noexcept;
 
         MidiController const* midi_controller;
         std::string const name;
@@ -129,7 +129,7 @@ class FloatParam : public Param<Number>
             FloatParamClass* float_param,
             Integer const round,
             Integer const sample_count = -1
-        );
+        ) noexcept;
 
         /**
          * \brief Render the single channel of the parameter if it has scheduled
@@ -152,7 +152,7 @@ class FloatParam : public Param<Number>
             FloatParamClass* float_param,
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         FloatParam(
             std::string const name = "",
@@ -160,53 +160,61 @@ class FloatParam : public Param<Number>
             Number const max_value = 1.0,
             Number const default_value = 0.0,
             Number const round_to = 0.0
-        );
+        ) noexcept;
 
-        FloatParam(FloatParam& leader);
+        FloatParam(FloatParam& leader) noexcept;
 
-        void set_value(Number const new_value);
-        Number get_value() const;
-        void set_ratio(Number const ratio);
-        Number get_ratio() const;
-        Integer get_change_index() const;
+        void set_value(Number const new_value) noexcept;
+        Number get_value() const noexcept;
+        void set_ratio(Number const ratio) noexcept;
+        Number get_ratio() const noexcept;
+        Integer get_change_index() const noexcept;
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
-        );
-        bool is_constant_until(Integer const sample_count) const;
-        void skip_round(Integer const round, Integer const sample_count);
-        void schedule_value(Seconds const time_offset, Number const new_value);
-        void schedule_linear_ramp(Seconds const duration, Number const target_value);
+        ) noexcept;
+        bool is_constant_until(Integer const sample_count) const noexcept;
+        void skip_round(Integer const round, Integer const sample_count) noexcept;
+        void schedule_value(
+            Seconds const time_offset,
+            Number const new_value
+        ) noexcept;
+        void schedule_linear_ramp(
+            Seconds const duration,
+            Number const target_value
+        ) noexcept;
 
-        void set_midi_controller(MidiController const* midi_controller);
+        void set_midi_controller(MidiController const* midi_controller) noexcept;
 
-        void set_flexible_controller(FlexibleController* flexible_controller);
-        FlexibleController const* get_flexible_controller();
+        void set_flexible_controller(
+            FlexibleController* flexible_controller
+        ) noexcept;
+        FlexibleController const* get_flexible_controller() noexcept;
 
-        void set_envelope(Envelope const* const envelope);
-        Envelope const* get_envelope() const;
-        void start_envelope(Seconds const time_offset);
-        Seconds end_envelope(Seconds const time_offset);
+        void set_envelope(Envelope const* const envelope) noexcept;
+        Envelope const* get_envelope() const noexcept;
+        void start_envelope(Seconds const time_offset) noexcept;
+        Seconds end_envelope(Seconds const time_offset) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
-        void handle_event(Event const& event);
+        void handle_event(Event const& event) noexcept;
 
     private:
         class LinearRampState
         {
             public:
-                LinearRampState();
+                LinearRampState() noexcept;
 
                 void init(
                     Seconds const start_time_offset,
@@ -215,10 +223,10 @@ class FloatParam : public Param<Number>
                     Number const target_value,
                     Number const duration_in_samples,
                     Seconds const duration
-                );
+                ) noexcept;
 
-                Number get_next_value();
-                Number get_value_at(Seconds const time_offset) const;
+                Number get_next_value() noexcept;
+                Number get_value_at(Seconds const time_offset) const noexcept;
 
                 Seconds start_time_offset;
                 Number done_samples;
@@ -231,13 +239,13 @@ class FloatParam : public Param<Number>
                 bool is_done;
         };
 
-        Number round_value(Number const value) const;
+        Number round_value(Number const value) const noexcept;
 
-        void handle_set_value_event(Event const& event);
-        void handle_linear_ramp_event(Event const& event);
-        void handle_cancel_event(Event const& event);
+        void handle_set_value_event(Event const& event) noexcept;
+        void handle_linear_ramp_event(Event const& event) noexcept;
+        void handle_cancel_event(Event const& event) noexcept;
 
-        bool is_following_leader() const;
+        bool is_following_leader() const noexcept;
 
         FloatParam* const leader;
         FlexibleController* flexible_controller;
@@ -273,29 +281,29 @@ class ModulatableFloatParam : public FloatParam
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0
-        );
+        ) noexcept;
 
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
-        );
+        ) noexcept;
 
-        void skip_round(Integer const round, Integer const sample_count);
+        void skip_round(Integer const round, Integer const sample_count) noexcept;
 
-        void start_envelope(Seconds const time_offset);
-        Seconds end_envelope(Seconds const time_offset);
+        void start_envelope(Seconds const time_offset) noexcept;
+        Seconds end_envelope(Seconds const time_offset) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
         FloatParam modulation_level;

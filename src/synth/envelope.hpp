@@ -38,7 +38,7 @@ class FloatParam;
 class Envelope
 {
     public:
-        Envelope(std::string const name);
+        Envelope(std::string const name) noexcept;
 
         FloatParam amount;
         FloatParam initial_value;

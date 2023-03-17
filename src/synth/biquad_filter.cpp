@@ -60,7 +60,7 @@ bool BiquadFilter<InputSignalProducerClass>::shared_is_no_op;
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const name
-)
+) noexcept
     : Param<Type>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
 {
 }
@@ -72,7 +72,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         InputSignalProducerClass& input,
         TypeParam& type,
         Unicity const unicity
-) : Filter<InputSignalProducerClass>(input, 3),
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 3),
     frequency(
         name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
@@ -99,7 +100,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::initialize_instance()
+void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
 {
     register_children();
 
@@ -130,7 +131,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParam& q_leader,
         FloatParam& gain_leader,
         Unicity const unicity
-) : Filter<InputSignalProducerClass>(input, 3),
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 3),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
@@ -154,7 +156,7 @@ BiquadFilter<InputSignalProducerClass>::~BiquadFilter()
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::reallocate_buffers()
+void BiquadFilter<InputSignalProducerClass>::reallocate_buffers() noexcept
 {
     free_buffers();
     allocate_buffers();
@@ -162,7 +164,7 @@ void BiquadFilter<InputSignalProducerClass>::reallocate_buffers()
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::free_buffers()
+void BiquadFilter<InputSignalProducerClass>::free_buffers() noexcept
 {
     delete[] b0_buffer;
     delete[] b1_buffer;
@@ -173,7 +175,7 @@ void BiquadFilter<InputSignalProducerClass>::free_buffers()
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::allocate_buffers()
+void BiquadFilter<InputSignalProducerClass>::allocate_buffers() noexcept
 {
     b0_buffer = new Sample[this->block_size];
     b1_buffer = new Sample[this->block_size];
@@ -184,7 +186,7 @@ void BiquadFilter<InputSignalProducerClass>::allocate_buffers()
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::register_children()
+void BiquadFilter<InputSignalProducerClass>::register_children() noexcept
 {
     this->register_child(frequency);
     this->register_child(q);
@@ -195,7 +197,7 @@ void BiquadFilter<InputSignalProducerClass>::register_children()
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::set_sample_rate(
         Frequency const new_sample_rate
-) {
+) noexcept {
     Filter<InputSignalProducerClass>::set_sample_rate(new_sample_rate);
 
     w0_scale = (Sample)Math::PI_DOUBLE * (Sample)this->sampling_period;
@@ -208,7 +210,7 @@ void BiquadFilter<InputSignalProducerClass>::set_sample_rate(
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::set_block_size(
         Integer const new_block_size
-) {
+) noexcept {
     if (new_block_size != this->block_size) {
         Filter<InputSignalProducerClass>::set_block_size(new_block_size);
 
@@ -218,7 +220,7 @@ void BiquadFilter<InputSignalProducerClass>::set_block_size(
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::clear()
+void BiquadFilter<InputSignalProducerClass>::clear() noexcept
 {
     for (Integer c = 0; c != this->channels; ++c) {
         x_n_m1[c] = x_n_m2[c] = y_n_m1[c] = y_n_m2[c] = 0.0;
@@ -230,7 +232,7 @@ template<class InputSignalProducerClass>
 Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     can_use_shared_coefficients = has_clones;
 
     if (can_use_shared_coefficients && shared_buffers_round == round) {
@@ -309,7 +311,7 @@ template<class InputSignalProducerClass>
 Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering_with_shared_coefficients(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(
         round, sample_count
     );
@@ -335,7 +337,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const low_pass_no_op_frequency = this->low_pass_no_op_frequency;
     Number const low_pass_silent_frequency = frequency.get_min_value();
 
@@ -409,7 +411,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) {
+) noexcept {
     Sample const w0 = w0_scale * frequency_value;
     Sample const alpha_qdb = (
         0.5 * Math::sin(w0)
@@ -430,7 +432,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const no_op_frequency = frequency.get_min_value();
     Frequency const silent_frequency = this->nyquist_frequency;
 
@@ -504,7 +506,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) {
+) noexcept {
     Sample const w0 = w0_scale * frequency_value;
     Sample const alpha_qdb = (
         0.5 * Math::sin(w0)
@@ -525,7 +527,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const band_pass_silent_frequency = low_pass_no_op_frequency;
 
     are_coefficients_constant = (
@@ -596,7 +598,7 @@ void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) {
+) noexcept {
     Sample const w0 = w0_scale * frequency_value;
     Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
     Sample const cos_w0 = Math::cos(w0);
@@ -611,7 +613,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const notch_no_op_frequency = low_pass_no_op_frequency;
 
     are_coefficients_constant = (
@@ -682,7 +684,7 @@ void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) {
+) noexcept {
     Sample const w0 = w0_scale * frequency_value;
     Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
     Sample const cos_w0 = Math::cos(w0);
@@ -699,7 +701,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const peaking_no_op_frequency = low_pass_no_op_frequency;
 
     are_coefficients_constant = (
@@ -785,7 +787,7 @@ void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
         Number const frequency_value,
         Number const q_value,
         Number const gain_value
-) {
+) noexcept {
     Sample const w0 = w0_scale * frequency_value;
     Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
     Sample const cos_w0 = Math::cos(w0);
@@ -814,7 +816,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Frequency const becomes_gain_frequency = this->nyquist_frequency;
     Number const no_op_frequency = frequency.get_min_value();
 
@@ -888,7 +890,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
         Integer const index,
         Number const frequency_value,
         Number const gain_value
-) {
+) noexcept {
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
@@ -928,7 +930,7 @@ template<class InputSignalProducerClass>
 bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Number const high_shelf_no_op_frequency = low_pass_no_op_frequency;
     Number const becomes_gain_frequency = frequency.get_min_value();
 
@@ -1002,7 +1004,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
         Integer const index,
         Number const frequency_value,
         Number const gain_value
-) {
+) noexcept {
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
@@ -1042,7 +1044,7 @@ template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
         Integer const index,
         Number const gain_value
-) {
+) noexcept {
     store_normalized_coefficient_samples(
         index,
         Math::pow_10((Sample)gain_value * DB_TO_LINEAR_GAIN_SCALE),
@@ -1064,7 +1066,7 @@ void BiquadFilter<InputSignalProducerClass>::store_normalized_coefficient_sample
         Sample const a0,
         Sample const a1,
         Sample const a2
-) {
+) noexcept {
     Sample const a0_inv = 1.0 / a0;
 
     b0_buffer[index] = b0 * a0_inv;
@@ -1078,7 +1080,7 @@ void BiquadFilter<InputSignalProducerClass>::store_normalized_coefficient_sample
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::store_no_op_coefficient_samples(
         Integer const index
-) {
+) noexcept {
     b0_buffer[index] = 1.0;
     b1_buffer[index] =
         b2_buffer[index] =
@@ -1090,7 +1092,7 @@ void BiquadFilter<InputSignalProducerClass>::store_no_op_coefficient_samples(
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::store_silent_coefficient_samples(
         Integer const index
-) {
+) noexcept {
     b0_buffer[index] =
         b1_buffer[index] =
         b2_buffer[index] =
@@ -1105,7 +1107,7 @@ void BiquadFilter<InputSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     if (UNLIKELY(is_silent)) {
         this->render_silence(
             round, first_sample_index, last_sample_index, buffer

@@ -34,7 +34,8 @@ Distortion<InputSignalProducerClass>::Distortion(
         std::string const name,
         Number const steepness,
         InputSignalProducerClass& input
-) : Filter<InputSignalProducerClass>(input, 1),
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 1),
     level(name + "G", 0.0, 1.0, 0.0)
 {
     this->register_child(level);
@@ -82,7 +83,7 @@ template<class InputSignalProducerClass>
 Sample const* const* Distortion<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
     level_buffer = FloatParam::produce_if_not_constant(
@@ -108,7 +109,7 @@ void Distortion<InputSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Integer const channels = this->channels;
     Sample const* const level_buffer = this->level_buffer;
     Sample const* const* const input_buffer = this->input_buffer;
@@ -157,7 +158,7 @@ Sample Distortion<InputSignalProducerClass>::distort(
         Sample const input_sample,
         Sample& previous_input_sample,
         Sample& F0_previous_input_sample
-) {
+) noexcept {
     Sample const delta = input_sample - previous_input_sample;
 
     if (UNLIKELY(std::fabs(delta) < 0.00000001)) {
@@ -184,7 +185,7 @@ Sample Distortion<InputSignalProducerClass>::distort(
 
 
 template<class InputSignalProducerClass>
-Sample Distortion<InputSignalProducerClass>::f(Sample const x) const
+Sample Distortion<InputSignalProducerClass>::f(Sample const x) const noexcept
 {
     if (x < 0.0) {
         return -lookup(f_table, -x);
@@ -195,7 +196,7 @@ Sample Distortion<InputSignalProducerClass>::f(Sample const x) const
 
 
 template<class InputSignalProducerClass>
-Sample Distortion<InputSignalProducerClass>::F0(Sample const x) const
+Sample Distortion<InputSignalProducerClass>::F0(Sample const x) const noexcept
 {
     if (x < 0.0) {
         if (x < INPUT_MIN) {
@@ -217,7 +218,7 @@ template<class InputSignalProducerClass>
 Sample Distortion<InputSignalProducerClass>::lookup(
         Sample const* const table,
         Sample const x
-) const {
+) const noexcept {
     return Math::lookup(table, MAX_INDEX, x * SCALE);
 }
 

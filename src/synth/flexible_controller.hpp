@@ -41,9 +41,9 @@ class FloatParam;
 class FlexibleController : public MidiController
 {
     public:
-        FlexibleController(std::string const name = "");
+        FlexibleController(std::string const name = "") noexcept;
 
-        void update();
+        void update() noexcept;
 
         FloatParam input;
         FloatParam min;
@@ -53,8 +53,10 @@ class FlexibleController : public MidiController
         FloatParam randomness;
 
     private:
-        bool update_change_indices();
-        bool update_change_index(FloatParam& param, Integer& change_index) const;
+        bool update_change_indices() noexcept;
+        bool update_change_index(
+            FloatParam& param, Integer& change_index
+        ) const noexcept;
 
         Integer input_change_index;
         Integer min_change_index;

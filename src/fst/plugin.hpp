@@ -46,7 +46,7 @@ class FstPlugin
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback, HINSTANCE const dll_instance
-        );
+        ) noexcept;
 
         static VstIntPtr VSTCALLBACK dispatch(
             AEffect* effect,
@@ -82,23 +82,29 @@ class FstPlugin
             AEffect* const effect,
             audioMasterCallback const host_callback,
             HINSTANCE const dll_instance
-        );
+        ) noexcept;
         ~FstPlugin();
 
-        void set_sample_rate(float const new_sample_rate);
-        void set_block_size(VstIntPtr const new_block_size);
-        void suspend();
-        void resume();
-        void process_events(VstEvents const* const events);
-        void process_midi_event(VstMidiEvent const* const event);
+        void set_sample_rate(float const new_sample_rate) noexcept;
+        void set_block_size(VstIntPtr const new_block_size) noexcept;
+        void suspend() noexcept;
+        void resume() noexcept;
+        void process_events(VstEvents const* const events) noexcept;
+        void process_midi_event(VstMidiEvent const* const event) noexcept;
 
         template<typename NumberType>
-        void generate_samples(VstInt32 const sample_count, NumberType** samples);
+        void generate_samples(
+            VstInt32 const sample_count,
+            NumberType** samples
+        ) noexcept;
 
-        void generate_and_add_samples(VstInt32 const sample_count, float** samples);
+        void generate_and_add_samples(
+            VstInt32 const sample_count,
+            float** samples
+        ) noexcept;
 
-        VstIntPtr get_chunk(void** chunk);
-        void set_chunk(void const* chunk, VstIntPtr const size);
+        VstIntPtr get_chunk(void** chunk) noexcept;
+        void set_chunk(void const* chunk, VstIntPtr const size) noexcept;
 
         void open_gui(GUI::Window parent);
         void close_gui();
@@ -108,7 +114,7 @@ class FstPlugin
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
 
-        Sample const* const* render_next_round(VstInt32 sample_count);
+        Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
 
         AEffect* const effect;
         audioMasterCallback const host_callback;

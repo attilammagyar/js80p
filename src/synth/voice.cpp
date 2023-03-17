@@ -28,7 +28,7 @@ namespace JS80P
 {
 
 template<class ModulatorSignalProducerClass>
-Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name)
+Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
     : waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 1.0),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
@@ -116,7 +116,8 @@ Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
         Filter2& input,
         Number& velocity,
         FloatParam& volume
-) : Filter<Filter2>(input),
+) noexcept
+    : Filter<Filter2>(input),
     volume(volume),
     velocity(velocity)
 {
@@ -127,7 +128,7 @@ template<class ModulatorSignalProducerClass>
 Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Filter<Filter2>::initialize_rendering(round, sample_count);
 
     volume_buffer = FloatParam::produce_if_not_constant<FloatParam>(
@@ -148,7 +149,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Integer const channels = this->channels;
     Sample const velocity = (Sample)this->velocity;
     Sample const* volume_buffer = this->volume_buffer;
@@ -183,7 +184,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader
-) : SignalProducer(CHANNELS, 15),
+) noexcept
+    : SignalProducer(CHANNELS, 15),
     notes(notes),
     oscillator(
         param_leaders.waveform,
@@ -249,7 +251,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
 
 
 template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::is_on() const
+bool Voice<ModulatorSignalProducerClass>::is_on() const noexcept
 {
     return !is_off_after(current_time);
 }
@@ -258,7 +260,7 @@ bool Voice<ModulatorSignalProducerClass>::is_on() const
 template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::is_off_after(
         Seconds const time_offset
-) const {
+) const noexcept {
     return state == OFF && !oscillator.has_events_after(time_offset);
 }
 
@@ -269,7 +271,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Midi::Note const note,
         Number const velocity,
         Midi::Note const previous_note
-) {
+) noexcept {
     if (state == ON || note >= notes) {
         return;
     }
@@ -308,7 +310,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::calculate_velocity(
         Number const raw_velocity
-) const {
+) const noexcept {
     Number const sensitivity = velocity_sensitivity.get_value();
 
     if (sensitivity <= 1.0) {
@@ -330,7 +332,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Seconds const time_offset,
         Midi::Note const note,
         Midi::Note const previous_note
-) {
+) noexcept {
     Number const portamento_length = this->portamento_length.get_value();
     Frequency const note_frequency = frequencies[note];
 
@@ -369,7 +371,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         Seconds const time_offset,
         Midi::Note const note,
         Number const velocity
-) {
+) noexcept {
     off_after = time_offset + std::max(
         oscillator.amplitude.end_envelope(time_offset),
         volume.end_envelope(time_offset)
@@ -403,7 +405,7 @@ template<class ModulatorSignalProducerClass>
 Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     volume_applier_buffer = SignalProducer::produce<VolumeApplier>(
         &volume_applier, round, sample_count
     )[0];
@@ -426,7 +428,7 @@ void Voice<ModulatorSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Sample const* const panning_buffer = this->panning_buffer;
 
     if (panning_buffer == NULL) {

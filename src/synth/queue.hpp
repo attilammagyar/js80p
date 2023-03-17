@@ -41,22 +41,22 @@ class Queue
         // settle after a while.
         static constexpr SizeType RESERVED = 32;
 
-        Queue();
+        Queue() noexcept;
 
-        bool is_empty() const;
-        void push(Item const& item);
-        Item const& pop();
-        Item const& front() const;
-        Item const& back() const;
-        SizeType const length() const;
-        Item const& operator[](SizeType const index) const;
-        void drop(SizeType const index);
+        bool is_empty() const noexcept;
+        void push(Item const& item) noexcept;
+        Item const& pop() noexcept;
+        Item const& front() const noexcept;
+        Item const& back() const noexcept;
+        SizeType const length() const noexcept;
+        Item const& operator[](SizeType const index) const noexcept;
+        void drop(SizeType const index) noexcept;
 
     protected:
         std::vector<Item> items;
 
     private:
-        void reset_if_empty();
+        void reset_if_empty() noexcept;
 
         SizeType next_push;
         SizeType next_pop;

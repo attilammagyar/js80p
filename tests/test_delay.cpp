@@ -43,7 +43,7 @@ class FixedSignalProducer : public SignalProducer
     friend class SignalProducer;
 
     public:
-        FixedSignalProducer(Sample const* const* fixed_samples)
+        FixedSignalProducer(Sample const* const* fixed_samples) noexcept
             : SignalProducer(CHANNELS, 0),
             fixed_samples(fixed_samples)
         {
@@ -53,7 +53,7 @@ class FixedSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) {
+        ) noexcept {
             return fixed_samples;
         }
 

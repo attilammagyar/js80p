@@ -47,7 +47,7 @@ class Distortion : public Filter<InputSignalProducerClass>
             std::string const name,
             Number const steepness,
             InputSignalProducerClass& input
-        );
+        ) noexcept;
 
         ~Distortion();
 
@@ -57,14 +57,14 @@ class Distortion : public Filter<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
         static constexpr int TABLE_SIZE = 0x0800;
@@ -80,12 +80,12 @@ class Distortion : public Filter<InputSignalProducerClass>
             Sample const input_sample,
             Sample& previous_input_sample,
             Sample& F0_previous_input_sample
-        );
+        ) noexcept;
 
-        Sample f(Sample const x) const;
-        Sample F0(Sample const x) const;
+        Sample f(Sample const x) const noexcept;
+        Sample F0(Sample const x) const noexcept;
 
-        Sample lookup(Sample const* const table, Sample const x) const;
+        Sample lookup(Sample const* const table, Sample const x) const noexcept;
 
         Sample f_table[TABLE_SIZE];
         Sample F0_table[TABLE_SIZE];

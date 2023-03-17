@@ -29,7 +29,8 @@ template<class InputSignalProducerClass>
 Filter<InputSignalProducerClass>::Filter(
         InputSignalProducerClass& input,
         Integer const number_of_children
-) : SignalProducer(input.get_channels(), number_of_children),
+) noexcept
+    : SignalProducer(input.get_channels(), number_of_children),
     input(input),
     input_buffer(NULL)
 {
@@ -40,7 +41,7 @@ template<class InputSignalProducerClass>
 Sample const* const* Filter<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
-) {
+) noexcept {
     input_buffer = SignalProducer::produce<InputSignalProducerClass>(
         &input, round, sample_count
     );

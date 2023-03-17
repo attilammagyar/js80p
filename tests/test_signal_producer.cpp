@@ -45,7 +45,7 @@ TEST(basic_properties, {
 class CompositeSignalProducer : public SignalProducer
 {
     public:
-        CompositeSignalProducer()
+        CompositeSignalProducer() noexcept
             : SignalProducer(1, 1),
             child(1, 0)
         {
@@ -88,17 +88,17 @@ TEST(zero_channels_signal_producer_does_not_produce_anything, {
 class PublicSignalProducer : public SignalProducer
 {
     public:
-        PublicSignalProducer()
+        PublicSignalProducer() noexcept
             : SignalProducer(1)
         {
         }
 
-        Seconds get_sampling_period() const
+        Seconds get_sampling_period() const noexcept
         {
             return sampling_period;
         }
 
-        Frequency get_nyquist_frequency() const
+        Frequency get_nyquist_frequency() const noexcept
         {
             return nyquist_frequency;
         }
@@ -157,12 +157,14 @@ class CachingTestSignalProducer : public SignalProducer
     friend class SignalProducer;
 
     public:
-        CachingTestSignalProducer()
+        CachingTestSignalProducer() noexcept
             : SignalProducer(1)
         {
         }
 
-        virtual void set_block_size(Integer const new_block_size) override
+        virtual void set_block_size(
+                Integer const new_block_size
+        ) noexcept override
         {
             SignalProducer::set_block_size(new_block_size);
             SignalProducer::render(0, 0, block_size, buffer);
@@ -174,7 +176,7 @@ class CachingTestSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             buffer[0][0] += 1.0;
         }
 };
@@ -203,7 +205,8 @@ class DelegatingSignalProducer : public SignalProducer
         DelegatingSignalProducer(
                 Sample const value,
                 DelegatingSignalProducer* delegate = NULL
-        ) : SignalProducer(1),
+        ) noexcept
+            : SignalProducer(1),
             delegate(delegate),
             initialize_rendering_calls(0),
             render_calls(0),
@@ -220,7 +223,7 @@ class DelegatingSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) {
+        ) noexcept {
             ++initialize_rendering_calls;
 
             if (delegate != NULL) {
@@ -237,7 +240,7 @@ class DelegatingSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             ++render_calls;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -328,7 +331,7 @@ class RendererWithCircularDependecy : public SignalProducer
     friend class SignalProducer;
 
     public:
-        RendererWithCircularDependecy()
+        RendererWithCircularDependecy() noexcept
             : SignalProducer(1)
         {
         }
@@ -341,7 +344,7 @@ class RendererWithCircularDependecy : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             Sample const* const* other_buffer = (
                 SignalProducer::produce<RendererWithCircularDependecy>(dependency, round)
             );
@@ -398,7 +401,7 @@ class PreparerWithCircularDependecy : public SignalProducer
     friend class SignalProducer;
 
     public:
-        PreparerWithCircularDependecy()
+        PreparerWithCircularDependecy() noexcept
             : SignalProducer(1),
             value(0)
         {
@@ -411,7 +414,7 @@ class PreparerWithCircularDependecy : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) {
+        ) noexcept {
             SignalProducer::produce<PreparerWithCircularDependecy>(
                 dependency, round
             );
@@ -458,14 +461,14 @@ class EventTestSignalProducer : public SignalProducer
     public:
         static constexpr Event::Type SET_VALUE = 1;
 
-        EventTestSignalProducer()
+        EventTestSignalProducer() noexcept
             : SignalProducer(1),
             render_calls(0),
             value(0.0)
         {
         }
 
-        void schedule(Seconds const time_offset, Number const param)
+        void schedule(Seconds const time_offset, Number const param) noexcept
         {
             SignalProducer::schedule(SET_VALUE, time_offset, 0, param, param);
         }
@@ -478,7 +481,7 @@ class EventTestSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             ++render_calls;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -486,7 +489,7 @@ class EventTestSignalProducer : public SignalProducer
             }
         }
 
-        void handle_event(Event const& event)
+        void handle_event(Event const& event) noexcept
         {
             if (event.type != SignalProducer::EVT_CANCEL) {
                 value = event.number_param_1;

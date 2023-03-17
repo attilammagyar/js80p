@@ -29,7 +29,7 @@
 namespace JS80P
 {
 
-std::string Serializer::serialize(Synth const& synth)
+std::string Serializer::serialize(Synth const& synth) noexcept
 {
     constexpr size_t line_size = 128;
     char line[line_size];
@@ -66,13 +66,14 @@ std::string Serializer::serialize(Synth const& synth)
 }
 
 
-Number Serializer::controller_id_to_float(Synth::ControllerId const controller_id)
-{
+Number Serializer::controller_id_to_float(
+        Synth::ControllerId const controller_id
+) noexcept {
     return (Number)controller_id * CONTROLLER_ID_TO_FLOAT_SCALE;
 }
 
 
-void Serializer::import(Synth& synth, std::string const& serialized)
+void Serializer::import(Synth& synth, std::string const& serialized) noexcept
 {
     reset_all_params_to_default(synth);
     std::vector<std::string>* lines = parse_lines(serialized);
@@ -82,7 +83,7 @@ void Serializer::import(Synth& synth, std::string const& serialized)
 }
 
 
-void Serializer::reset_all_params_to_default(Synth& synth)
+void Serializer::reset_all_params_to_default(Synth& synth) noexcept
 {
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
@@ -103,8 +104,9 @@ void Serializer::reset_all_params_to_default(Synth& synth)
 }
 
 
-std::vector<std::string>* Serializer::parse_lines(std::string const& serialized)
-{
+std::vector<std::string>* Serializer::parse_lines(
+        std::string const& serialized
+) noexcept {
     constexpr Integer max_line_pos = MAX_SIZE - 1;
     std::vector<std::string>* lines = new std::vector<std::string>();
     char* line = new char[MAX_SIZE];
@@ -149,49 +151,49 @@ std::vector<std::string>* Serializer::parse_lines(std::string const& serialized)
 }
 
 
-bool Serializer::is_digit(char const c)
+bool Serializer::is_digit(char const c) noexcept
 {
     return '0' <= c && c <= '9';
 }
 
 
-bool Serializer::is_capital_letter(char const c)
+bool Serializer::is_capital_letter(char const c) noexcept
 {
     return 'A' <= c && c <= 'Z';
 }
 
 
-bool Serializer::is_lowercase_letter(char const c)
+bool Serializer::is_lowercase_letter(char const c) noexcept
 {
     return 'a' <= c && c <= 'z';
 }
 
 
-bool Serializer::is_line_break(char const c)
+bool Serializer::is_line_break(char const c) noexcept
 {
     return c == '\n' || c == '\r';
 }
 
 
-bool Serializer::is_inline_whitespace(char const c)
+bool Serializer::is_inline_whitespace(char const c) noexcept
 {
     return c == ' ' || c == '\t';
 }
 
 
-bool Serializer::is_comment_leader(char const c)
+bool Serializer::is_comment_leader(char const c) noexcept
 {
     return c == ';';
 }
 
 
-bool Serializer::is_section_name_char(char const c)
+bool Serializer::is_section_name_char(char const c) noexcept
 {
     return is_digit(c) || is_capital_letter(c) || is_lowercase_letter(c);
 }
 
 
-void Serializer::process_lines(Synth& synth, std::vector<std::string>* lines)
+void Serializer::process_lines(Synth& synth, std::vector<std::string>* lines) noexcept
 {
     char section_name[7];
     bool inside_js80p_section = false;
@@ -213,8 +215,10 @@ void Serializer::process_lines(Synth& synth, std::vector<std::string>* lines)
 }
 
 
-bool Serializer::parse_section_name(std::string const line, char* section_name)
-{
+bool Serializer::parse_section_name(
+        std::string const line,
+        char* section_name
+) noexcept {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
     Integer pos = 0;
@@ -257,7 +261,7 @@ bool Serializer::parse_section_name(std::string const line, char* section_name)
 }
 
 
-void Serializer::process_line(Synth& synth, std::string const line)
+void Serializer::process_line(Synth& synth, std::string const line) noexcept
 {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
@@ -310,7 +314,7 @@ void Serializer::process_line(Synth& synth, std::string const line)
 bool Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
         std::string::const_iterator& it,
         std::string::const_iterator const end
-) {
+) noexcept {
     if (it == end) {
         return true;
     }
@@ -339,7 +343,7 @@ bool Serializer::parse_param_name(
         std::string::const_iterator& it,
         std::string::const_iterator const end,
         char* param_name
-) {
+) noexcept {
     constexpr Integer param_name_pos_max = Constants::PARAM_NAME_MAX_LENGTH - 1;
     Integer param_name_pos = 0;
 
@@ -361,7 +365,7 @@ bool Serializer::parse_suffix(
         std::string::const_iterator& it,
         std::string::const_iterator const end,
         char* suffix
-) {
+) noexcept {
     Integer suffix_pos = 0;
 
     if (it == end) {
@@ -385,7 +389,7 @@ bool Serializer::parse_suffix(
 bool Serializer::parse_equal_sign(
         std::string::const_iterator& it,
         std::string::const_iterator const end
-) {
+) noexcept {
     if (*it != '=') {
         return false;
     }
@@ -400,7 +404,7 @@ bool Serializer::parse_number(
         std::string::const_iterator& it,
         std::string::const_iterator const end,
         Number& number
-) {
+) noexcept {
     std::string number_text;
     bool has_dot = false;
 
@@ -432,7 +436,7 @@ bool Serializer::parse_number(
 }
 
 
-Number Serializer::to_number(std::string const text)
+Number Serializer::to_number(std::string const text) noexcept
 {
     std::istringstream s(text);
     Number n;

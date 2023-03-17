@@ -25,7 +25,7 @@
 namespace JS80P
 {
 
-Envelope::Envelope(std::string const name)
+Envelope::Envelope(std::string const name) noexcept
     : amount(name + "AMT",            0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),
     delay_time(name + "DEL",        0.0,    6.0,  0.0),

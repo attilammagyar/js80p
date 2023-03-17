@@ -25,7 +25,7 @@
 namespace JS80P
 {
 
-FlexibleController::FlexibleController(std::string const name)
+FlexibleController::FlexibleController(std::string const name) noexcept
     : MidiController(),
     input(name + "IN", 0.0, 1.0, 0.5),
     min(name + "MIN", 0.0, 1.0, 0.0),
@@ -44,7 +44,7 @@ FlexibleController::FlexibleController(std::string const name)
 }
 
 
-void FlexibleController::update()
+void FlexibleController::update() noexcept
 {
     if (is_updating) {
         return;
@@ -73,7 +73,7 @@ void FlexibleController::update()
 }
 
 
-bool FlexibleController::update_change_indices()
+bool FlexibleController::update_change_indices() noexcept
 {
     bool is_dirty;
 
@@ -91,7 +91,7 @@ bool FlexibleController::update_change_indices()
 bool FlexibleController::update_change_index(
         FloatParam& param,
         Integer& change_index
-) const {
+) const noexcept {
     Integer const new_change_index = param.get_change_index();
 
     if (new_change_index == change_index) {

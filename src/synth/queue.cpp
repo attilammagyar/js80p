@@ -26,7 +26,7 @@ namespace JS80P
 {
 
 template<class Item>
-Queue<Item>::Queue()
+Queue<Item>::Queue() noexcept
     : next_push(0),
     next_pop(0),
     size(0)
@@ -36,14 +36,14 @@ Queue<Item>::Queue()
 
 
 template<class Item>
-bool Queue<Item>::is_empty() const
+bool Queue<Item>::is_empty() const noexcept
 {
     return next_push == next_pop;
 }
 
 
 template<class Item>
-void Queue<Item>::push(Item const& item)
+void Queue<Item>::push(Item const& item) noexcept
 {
     if (next_push >= size) {
         items.push_back(item);
@@ -56,7 +56,7 @@ void Queue<Item>::push(Item const& item)
 
 
 template<class Item>
-Item const& Queue<Item>::pop()
+Item const& Queue<Item>::pop() noexcept
 {
     Item const& item = items[next_pop++];
 
@@ -67,7 +67,7 @@ Item const& Queue<Item>::pop()
 
 
 template<class Item>
-void Queue<Item>::reset_if_empty()
+void Queue<Item>::reset_if_empty() noexcept
 {
     if (is_empty()) {
         next_pop = 0;
@@ -77,21 +77,21 @@ void Queue<Item>::reset_if_empty()
 
 
 template<class Item>
-Item const& Queue<Item>::front() const
+Item const& Queue<Item>::front() const noexcept
 {
     return items[next_pop];
 }
 
 
 template<class Item>
-Item const& Queue<Item>::back() const
+Item const& Queue<Item>::back() const noexcept
 {
     return items[next_push - 1];
 }
 
 
 template<class Item>
-typename Queue<Item>::SizeType const Queue<Item>::length() const
+typename Queue<Item>::SizeType const Queue<Item>::length() const noexcept
 {
     return next_push - next_pop;
 }
@@ -100,13 +100,13 @@ typename Queue<Item>::SizeType const Queue<Item>::length() const
 template<class Item>
 Item const& Queue<Item>::operator[](
         typename Queue<Item>::SizeType const index
-) const {
+) const noexcept {
     return items[next_pop + index];
 }
 
 
 template<class Item>
-void Queue<Item>::drop(typename Queue<Item>::SizeType const index)
+void Queue<Item>::drop(typename Queue<Item>::SizeType const index) noexcept
 {
     next_push = next_pop + index;
     reset_if_empty();

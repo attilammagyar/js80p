@@ -71,7 +71,9 @@ class Constant : public SignalProducer
     friend class SignalProducer;
 
     public:
-        Constant(Sample const value) : SignalProducer(1, 0), value(value)
+        Constant(Sample const value) noexcept
+            : SignalProducer(1, 0),
+            value(value)
         {
         }
 
@@ -81,7 +83,7 @@ class Constant : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             Integer const channels = get_channels();
 
             for (Integer c = 0; c != channels; ++c) {
@@ -110,7 +112,8 @@ class SumOfSines : public SignalProducer
                 Frequency const frequency_3 = 0.0,
                 Integer const channels = 1,
                 Number const delay = 0.0
-        ) : SignalProducer(channels, 0),
+        ) noexcept
+            : SignalProducer(channels, 0),
             amplitude_1((Sample)amplitude_1),
             amplitude_2((Sample)amplitude_2),
             amplitude_3((Sample)amplitude_3),
@@ -128,7 +131,7 @@ class SumOfSines : public SignalProducer
         {
         }
 
-        void reset()
+        void reset() noexcept
         {
             current_time = 0.0;
             rendered_samples = 0;
@@ -142,7 +145,7 @@ class SumOfSines : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             Integer const channels = get_channels();
             Sample time = (
                 (Sample)rendered_samples * (Sample)sampling_period + delay

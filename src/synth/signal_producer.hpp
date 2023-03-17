@@ -40,17 +40,17 @@ class SignalProducer
             public:
                 typedef Byte Type;
 
-                Event(Type const type);
-                Event(Event const& event);
+                Event(Type const type) noexcept;
+                Event(Event const& event) noexcept;
                 Event(
                     Type const type,
                     Seconds const time_offset,
                     Integer const int_param = 0,
                     Number const number_param_1 = 0.0,
                     Number const number_param_2 = 0.0
-                );
+                ) noexcept;
 
-                Event& operator=(Event const& event);
+                Event& operator=(Event const& event) noexcept;
 
                 Seconds time_offset;
                 Integer int_param;
@@ -94,24 +94,28 @@ class SignalProducer
             SignalProducerClass* signal_producer,
             Integer const round,
             Integer const sample_count = -1
-        );
+        ) noexcept;
 
         SignalProducer(
             Integer const channels, Integer const number_of_children = 0
-        );
+        ) noexcept;
         virtual ~SignalProducer();
 
-        Integer get_channels() const;
+        Integer get_channels() const noexcept;
 
-        virtual void set_sample_rate(Frequency const new_sample_rate);
-        Frequency get_sample_rate() const;
+        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept;
+        Frequency get_sample_rate() const noexcept;
 
-        virtual void set_block_size(Integer const new_block_size);
-        Integer get_block_size() const;
+        virtual void set_block_size(Integer const new_block_size) noexcept;
+        Integer get_block_size() const noexcept;
 
-        Sample const* const* get_last_rendered_block(Integer& sample_count) const;
+        Sample const* const* get_last_rendered_block(
+            Integer& sample_count
+        ) const noexcept;
 
-        Seconds sample_count_to_time_offset(Integer const sample_count) const;
+        Seconds sample_count_to_time_offset(
+            Integer const sample_count
+        ) const noexcept;
 
         void schedule(
             Event::Type const type,
@@ -119,10 +123,10 @@ class SignalProducer
             Integer const int_param = 0,
             Number const number_param_1 = 0.0,
             Number const number_param_2 = 0.0
-        );
-        void cancel_events(Seconds const time_offset);
-        bool has_events_after(Seconds const time_offset) const;
-        Seconds get_last_event_time_offset() const;
+        ) noexcept;
+        void cancel_events(Seconds const time_offset) noexcept;
+        bool has_events_after(Seconds const time_offset) const noexcept;
+        Seconds get_last_event_time_offset() const noexcept;
 
     protected:
         /**
@@ -135,7 +139,7 @@ class SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         /**
          * \brief Implement sample rendering in this method.
@@ -145,33 +149,33 @@ class SignalProducer
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
         /**
          * \brief Implement handling events in this method.
          */
-        void handle_event(Event const& event);
+        void handle_event(Event const& event) noexcept;
 
-        Sample** reallocate_buffer(Sample** old_buffer) const;
-        Sample** allocate_buffer() const;
-        Sample** free_buffer(Sample** old_buffer) const;
+        Sample** reallocate_buffer(Sample** old_buffer) const noexcept;
+        Sample** allocate_buffer() const noexcept;
+        Sample** free_buffer(Sample** old_buffer) const noexcept;
 
         void render_silence(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
-        bool has_upcoming_events(Integer const sample_count) const;
+        bool has_upcoming_events(Integer const sample_count) const noexcept;
         bool is_time_offset_before_sample_count(
             Seconds const time_offset,
             Integer const sample_count
-        ) const;
+        ) const noexcept;
         Integer sample_count_or_block_size(
             Integer const sample_count = -1
-        ) const;
-        void register_child(SignalProducer& signal_producer);
+        ) const noexcept;
+        void register_child(SignalProducer& signal_producer) noexcept;
 
         Integer const channels;
 
@@ -194,7 +198,7 @@ class SignalProducer
             Integer const current_sample_index,
             Integer const sample_count,
             Integer& next_stop
-        );
+        ) noexcept;
 
         Sample const* const* cached_buffer;
         Children children;

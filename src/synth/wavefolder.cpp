@@ -30,7 +30,9 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-Wavefolder<InputSignalProducerClass>::Wavefolder(InputSignalProducerClass& input)
+Wavefolder<InputSignalProducerClass>::Wavefolder(
+        InputSignalProducerClass& input
+) noexcept
     : Filter<InputSignalProducerClass>(input, 1),
     folding(
         "FLD", Constants::FOLD_MIN, Constants::FOLD_MAX, Constants::FOLD_DEFAULT
@@ -41,7 +43,7 @@ Wavefolder<InputSignalProducerClass>::Wavefolder(InputSignalProducerClass& input
 
 
 template<class InputSignalProducerClass>
-void Wavefolder<InputSignalProducerClass>::initialize_instance()
+void Wavefolder<InputSignalProducerClass>::initialize_instance() noexcept
 {
     this->register_child(folding);
 
@@ -67,7 +69,8 @@ template<class InputSignalProducerClass>
 Wavefolder<InputSignalProducerClass>::Wavefolder(
         InputSignalProducerClass& input,
         FloatParam& folding_leader
-) : Filter<InputSignalProducerClass>(input, 1),
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 1),
     folding(folding_leader)
 {
     initialize_instance();
@@ -93,7 +96,7 @@ template<class InputSignalProducerClass>
 Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
     folding_buffer = FloatParam::produce_if_not_constant(
@@ -119,7 +122,7 @@ void Wavefolder<InputSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     Integer const channels = this->channels;
     Sample const* const folding_buffer = this->folding_buffer;
     Sample const* const* const input_buffer = this->input_buffer;
@@ -209,7 +212,7 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
         Sample& previous_input_sample,
         Sample& F0_previous_input_sample,
         Sample& previous_output_sample
-) {
+) noexcept {
     Sample const folding_times_input_sample = folding * input_sample;
     Sample const delta = folding_times_input_sample - previous_input_sample;
 
@@ -239,7 +242,7 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
 
 
 template<class InputSignalProducerClass>
-Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const
+Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const noexcept
 {
     return (
         S0 * Math::sin(S1 * x + TRIG_OFFSET)
@@ -250,7 +253,7 @@ Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const
 
 
 template<class InputSignalProducerClass>
-Sample Wavefolder<InputSignalProducerClass>::F0(Sample const x) const
+Sample Wavefolder<InputSignalProducerClass>::F0(Sample const x) const noexcept
 {
     return (
         -S6 * Math::cos(S1 * x + TRIG_OFFSET)

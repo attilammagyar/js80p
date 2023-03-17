@@ -36,7 +36,7 @@ FloatParam Oscillator<ModulatorSignalProducerClass>::dummy_param("", 0.0, 0.0, 0
 template<class ModulatorSignalProducerClass>
 Oscillator<ModulatorSignalProducerClass>::WaveformParam::WaveformParam(
         std::string const name
-) : Param<Waveform>(name, SINE, CUSTOM, SAWTOOTH)
+) noexcept : Param<Waveform>(name, SINE, CUSTOM, SAWTOOTH)
 {
 }
 
@@ -47,7 +47,8 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader
-) : SignalProducer(1, 16),
+) noexcept
+    : SignalProducer(1, 16),
     waveform(waveform),
     modulated_amplitude(
         modulator,
@@ -94,7 +95,7 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
 
 
 template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::initialize_instance()
+void Oscillator<ModulatorSignalProducerClass>::initialize_instance() noexcept
 {
     Number const custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS] = {
         0.0, 0.0, 0.0, 0.0, 0.0,
@@ -176,7 +177,8 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader
-) : SignalProducer(1, 16),
+) noexcept
+    : SignalProducer(1, 16),
     waveform(waveform),
     modulated_amplitude(
         modulator,
@@ -225,14 +227,14 @@ Oscillator<ModulatorSignalProducerClass>::~Oscillator()
 template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::allocate_buffers(
         Integer const size
-) {
+) noexcept {
     computed_frequency_buffer = new Frequency[size];
     computed_amplitude_buffer = new Sample[size];
 }
 
 
 template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::free_buffers()
+void Oscillator<ModulatorSignalProducerClass>::free_buffers() noexcept
 {
     if (computed_frequency_buffer != NULL) {
         delete[] computed_frequency_buffer;
@@ -243,7 +245,7 @@ void Oscillator<ModulatorSignalProducerClass>::free_buffers()
 template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::set_block_size(
         Integer const new_block_size
-) {
+) noexcept {
     if (new_block_size != get_block_size()) {
         free_buffers();
         allocate_buffers(new_block_size);
@@ -254,15 +256,17 @@ void Oscillator<ModulatorSignalProducerClass>::set_block_size(
 
 
 template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::start(Seconds const time_offset)
-{
+void Oscillator<ModulatorSignalProducerClass>::start(
+        Seconds const time_offset
+) noexcept {
     schedule(EVT_START, time_offset, 0, 0.0, 0.0);
 }
 
 
 template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::stop(Seconds const time_offset)
-{
+void Oscillator<ModulatorSignalProducerClass>::stop(
+        Seconds const time_offset
+) noexcept {
     schedule(EVT_STOP, time_offset, 0, 0.0, 0.0);
 }
 
@@ -271,7 +275,7 @@ template<class ModulatorSignalProducerClass>
 Sample const* const* Oscillator<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Waveform const waveform = this->waveform.get_value();
 
     if (waveform == CUSTOM) {
@@ -312,7 +316,7 @@ template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::compute_amplitude_buffer(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     Sample const* modulated_amplitude_buffer = (
         FloatParam::produce_if_not_constant<ModulatedFloatParam>(
             &modulated_amplitude, round, sample_count
@@ -366,7 +370,7 @@ template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::compute_frequency_buffer(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     constexpr Byte NONE = 0;
     constexpr Byte FREQUENCY = 1;
     constexpr Byte DETUNE = 2;
@@ -533,7 +537,7 @@ Frequency Oscillator<ModulatorSignalProducerClass>::compute_frequency(
         Number const frequency,
         Number const detune,
         Number const fine_detune
-) const {
+) const noexcept {
     return Math::detune((Frequency)frequency, detune + fine_detune);
 }
 
@@ -544,7 +548,7 @@ void Oscillator<ModulatorSignalProducerClass>::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     if (!is_on) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             buffer[0][i] = 0.0;
@@ -625,7 +629,7 @@ void Oscillator<ModulatorSignalProducerClass>::render(
 template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::handle_event(
         Event const& event
-) {
+) noexcept {
     SignalProducer::handle_event(event);
 
     switch (event.type) {
@@ -643,7 +647,7 @@ void Oscillator<ModulatorSignalProducerClass>::handle_event(
 template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::handle_start_event(
         Event const& event
-) {
+) noexcept {
     is_on = true;
     is_starting = true;
     start_time_offset = current_time - event.time_offset;
@@ -653,7 +657,7 @@ void Oscillator<ModulatorSignalProducerClass>::handle_start_event(
 template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::handle_stop_event(
         Event const& event
-) {
+) noexcept {
     is_on = false;
 }
 

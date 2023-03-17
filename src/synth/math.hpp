@@ -75,22 +75,22 @@ class Math
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.
          */
-        static Number sin(Number const x);
+        static Number sin(Number const x) noexcept;
 
         /**
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.
          */
-        static Number cos(Number const x);
+        static Number cos(Number const x) noexcept;
 
-        static Number exp(Number const x);
-        static Number pow_10(Number const x);
-        static Number pow_10_inv(Number const x);
+        static Number exp(Number const x) noexcept;
+        static Number pow_10(Number const x) noexcept;
+        static Number pow_10_inv(Number const x) noexcept;
 
         static Frequency detune(
             Frequency const frequency,
             Number const cents
-        );
+        ) noexcept;
 
         /**
          * \brief Compute a_weight * a + (1.0 - a_weight) * b
@@ -99,13 +99,13 @@ class Math
             Number const a_weight,
             Number const a,
             Number const b
-        );
+        ) noexcept;
 
         /**
          * \brief Apply a steep, tanh() based distortion to the given value
          *        between 0.0 and 1.0.
          */
-        static Number distort(Number const level, Number const number);
+        static Number distort(Number const level, Number const number) noexcept;
 
         /**
          * \brief Return a pseudo random number between 0.0 and 1.0, based on
@@ -113,7 +113,7 @@ class Math
          *        deterministic, the same input number will always generate the
          *        same result.
          */
-        static Number randomize(Number const level, Number const number);
+        static Number randomize(Number const level, Number const number) noexcept;
 
         /**
          * \brief Look up the given floating point, non-negative \c index in the
@@ -125,7 +125,7 @@ class Math
             Number const* const table,
             int const max_index,
             Number const index
-        );
+        ) noexcept;
 
         /**
          * \brief Look up the given floating point \c index in the given table,
@@ -137,14 +137,14 @@ class Math
             Number const* table,
             int const table_size,
             Number const index
-        );
+        ) noexcept;
 
         class Statistics;
 
         static void compute_statistics(
             std::vector<Number> const numbers,
             Statistics& statistics
-        );
+        ) noexcept;
 
         class Statistics {
             public:
@@ -180,15 +180,15 @@ class Math
 
         static Math const math;
 
-        static Number iterate_exp(Number const x, Number const scale);
+        static Number iterate_exp(Number const x, Number const scale) noexcept;
 
-        Math();
+        Math() noexcept;
 
-        void init_sines();
-        void init_randoms();
-        void init_distortion();
+        void init_sines() noexcept;
+        void init_randoms() noexcept;
+        void init_distortion() noexcept;
 
-        Number sin_impl(Number const x) const;
+        Number sin_impl(Number const x) const noexcept;
 
         Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];

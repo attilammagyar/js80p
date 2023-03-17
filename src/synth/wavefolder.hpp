@@ -41,8 +41,11 @@ class Wavefolder : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Wavefolder(InputSignalProducerClass& input);
-        Wavefolder(InputSignalProducerClass& input, FloatParam& folding_leader);
+        Wavefolder(InputSignalProducerClass& input) noexcept;
+        Wavefolder(
+            InputSignalProducerClass& input,
+            FloatParam& folding_leader
+        ) noexcept;
         ~Wavefolder();
 
         FloatParam folding;
@@ -51,14 +54,14 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
     private:
         static constexpr Sample TRANSITION_INV = 1.0 / Constants::FOLD_TRANSITION;
@@ -84,7 +87,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
             Math::PI_DOUBLE * std::ceil(Constants::FOLD_MAX * S5)
         );
 
-        void initialize_instance();
+        void initialize_instance() noexcept;
 
         Sample fold(
             Sample const folding,
@@ -92,10 +95,10 @@ class Wavefolder : public Filter<InputSignalProducerClass>
             Sample& previous_input_sample,
             Sample& F0_previous_input_sample,
             Sample& previous_output_sample
-        );
+        ) noexcept;
 
-        Sample f(Sample const x) const;
-        Sample F0(Sample const x) const;
+        Sample f(Sample const x) const noexcept;
+        Sample F0(Sample const x) const noexcept;
 
         Sample const* folding_buffer;
         Sample* previous_input_sample;

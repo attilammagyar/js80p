@@ -492,17 +492,17 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MAX_CONTROLLER_ID = 155,
         };
 
-        Synth();
+        Synth() noexcept;
         virtual ~Synth() override;
 
-        bool is_lock_free() const;
+        bool is_lock_free() const noexcept;
 
-        void suspend();
-        void resume();
+        void suspend() noexcept;
+        void resume() noexcept;
 
         Sample const* const* generate_samples(
             Integer const round, Integer const sample_count
-        );
+        ) noexcept;
 
         /**
          * \brief Thread-safe way to change the state of the synthesizer outside
@@ -513,76 +513,78 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const number_param,
             Byte const byte_param
-        );
+        ) noexcept;
 
-        void process_messages();
+        void process_messages() noexcept;
 
-        std::string get_param_name(ParamId const param_id) const;
-        ParamId get_param_id(std::string const name) const;
+        std::string get_param_name(ParamId const param_id) const noexcept;
+        ParamId get_param_id(std::string const name) const noexcept;
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
             Number& avg_collisions,
             Number& avg_bucket_size
-        ) const;
+        ) const noexcept;
 
         Number float_param_ratio_to_display_value(
             ParamId const param_id,
             Number const ratio
-        ) const;
+        ) const noexcept;
         Byte int_param_ratio_to_display_value(
             ParamId const param_id,
             Number const ratio
-        ) const;
+        ) const noexcept;
 
-        Number get_param_ratio_atomic(ParamId const param_id) const;
-        Number get_param_default_ratio(ParamId const param_id) const;
-        ControllerId get_param_controller_id_atomic(ParamId const param_id) const;
+        Number get_param_ratio_atomic(ParamId const param_id) const noexcept;
+        Number get_param_default_ratio(ParamId const param_id) const noexcept;
+        ControllerId get_param_controller_id_atomic(
+            ParamId const param_id
+        ) const noexcept;
 
         void note_on(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
             Number const velocity
-        );
+        ) noexcept;
 
         void aftertouch(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
             Number const pressure
-        );
+        ) noexcept;
 
         void note_off(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
             Number const velocity
-        );
+        ) noexcept;
 
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
             Number const new_value
-        );
+        ) noexcept;
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Number const new_value
-        );
+        ) noexcept;
 
         void all_sound_off(
             Seconds const time_offset, Midi::Channel const channel
-        );
+        ) noexcept;
 
         void reset_all_controllers(
             Seconds const time_offset, Midi::Channel const channel
-        );
+        ) noexcept;
 
         void all_notes_off(
             Seconds const time_offset, Midi::Channel const channel
-        );
+        ) noexcept;
 
         // TODO: operating mode: mix&mod (same as add + AM + FM in JS-80) vs. splits
 
@@ -602,14 +604,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        );
+        ) noexcept;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
-        );
+        ) noexcept;
 
         Frequency frequencies[Midi::NOTES];
 
@@ -617,16 +619,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
         class Message
         {
             public:
-                Message();
-                Message(Message const& message);
+                Message() noexcept;
+                Message(Message const& message) noexcept;
                 Message(
                     MessageType const type,
                     ParamId const param_id,
                     Number const number_param,
                     Byte const byte_param
-                );
+                ) noexcept;
 
-                Message& operator=(Message const& message);
+                Message& operator=(Message const& message) noexcept;
 
                 MessageType type;
                 ParamId param_id;
@@ -641,22 +643,22 @@ class Synth : public Midi::EventHandler, public SignalProducer
         class SingleProducerSingleConsumerMessageQueue
         {
             public:
-                SingleProducerSingleConsumerMessageQueue();
+                SingleProducerSingleConsumerMessageQueue() noexcept;
 
                 SingleProducerSingleConsumerMessageQueue(
                     SingleProducerSingleConsumerMessageQueue const& queue
                 ) = delete;
 
-                bool is_lock_free() const;
-                bool push(Message const& message);
-                bool pop(Message& message);
-                size_t size() const;
+                bool is_lock_free() const noexcept;
+                bool push(Message const& message) noexcept;
+                bool pop(Message& message) noexcept;
+                size_t size() const noexcept;
 
             private:
                 static constexpr size_t SIZE = 0x1000; /* must be power of 2 */
                 static constexpr size_t SIZE_MASK = SIZE - 1;
 
-                size_t advance(size_t const index) const;
+                size_t advance(size_t const index) const noexcept;
 
                 Message messages[SIZE];
 
@@ -676,19 +678,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const polyphony,
                     FloatParam& volume,
                     FloatParam& modulator_add_volume
-                );
+                ) noexcept;
 
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
-                );
+                ) noexcept;
 
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** buffer
-                );
+                ) noexcept;
 
             private:
                 void mix_modulators(
@@ -696,21 +698,21 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** buffer
-                ) const;
+                ) const noexcept;
 
                 void mix_carriers(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** buffer
-                ) const;
+                ) const noexcept;
 
                 void apply_volume(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** buffer
-                ) const;
+                ) const noexcept;
 
                 Integer const polyphony;
                 Synth::Modulator* const* const modulators;
@@ -727,16 +729,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
         class ParamIdHashTable
         {
             public:
-                ParamIdHashTable();
+                ParamIdHashTable() noexcept;
                 ~ParamIdHashTable();
 
-                void add(char const* name, ParamId const param_id);
-                ParamId lookup(char const* name);
+                void add(char const* name, ParamId const param_id) noexcept;
+                ParamId lookup(char const* name) noexcept;
                 void get_statistics(
                     Integer& max_collisions,
                     Number& avg_collisions,
                     Number& avg_bucket_size
-                ) const;
+                ) const noexcept;
 
             private:
                 class Entry
@@ -745,11 +747,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
                         static constexpr Integer NAME_SIZE = 8;
                         static constexpr Integer NAME_MAX_INDEX = NAME_SIZE - 1;
 
-                        Entry();
-                        Entry(const char* name, ParamId const param_id);
+                        Entry() noexcept;
+                        Entry(const char* name, ParamId const param_id) noexcept;
                         ~Entry();
 
-                        void set(const char* name, ParamId const param_id);
+                        void set(const char* name, ParamId const param_id) noexcept;
 
                         Entry *next;
                         char name[NAME_SIZE];
@@ -761,14 +763,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 static constexpr Integer MULTIPLIER = 23781;
                 static constexpr Integer SHIFT = 9;
 
-                static Integer hash(char const* name);
+                static Integer hash(char const* name) noexcept;
 
                 void lookup(
                     char const* name,
                     Entry** root,
                     Entry** parent,
                     Entry** entry
-                );
+                ) noexcept;
 
                 Entry entries[ENTRIES];
         };
@@ -792,47 +794,47 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void register_param_as_child(
             ParamId const param_id,
             ParamClass& param
-        );
+        ) noexcept;
 
         template<class ParamClass>
-        void register_param(ParamId const param_id, ParamClass& param);
+        void register_param(ParamId const param_id, ParamClass& param) noexcept;
 
         void register_float_param_as_child(
             ParamId const param_id,
             FloatParam& float_param
-        );
+        ) noexcept;
 
         void register_float_param(
             ParamId const param_id,
             FloatParam& float_param
-        );
+        ) noexcept;
 
         void handle_set_param(
             ParamId const param_id,
             Number const ratio
-        );
+        ) noexcept;
         void handle_assign_controller(
             ParamId const param_id,
             Byte const controller_id
-        );
-        void handle_refresh_param(ParamId const param_id);
+        ) noexcept;
+        void handle_refresh_param(ParamId const param_id) noexcept;
 
         void assign_controller_to_param(
             ParamId const param_id,
             ControllerId const controller_id
-        );
+        ) noexcept;
         void assign_controller_to_float_param(
             ParamId const param_id,
             ControllerId const controller_id
-        );
+        ) noexcept;
 
-        Number get_param_ratio(ParamId const param_id) const;
+        Number get_param_ratio(ParamId const param_id) const noexcept;
 
-        void clear_midi_controllers();
+        void clear_midi_controllers() noexcept;
 
-        void update_param_states();
+        void update_param_states() noexcept;
 
-        std::string const to_string(Integer const) const;
+        std::string const to_string(Integer const) const noexcept;
 
         SingleProducerSingleConsumerMessageQueue messages;
         Bus bus;

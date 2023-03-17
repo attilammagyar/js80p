@@ -34,9 +34,9 @@ class Serializer
     public:
         static constexpr Integer MAX_SIZE = 256 * 1024;
 
-        static std::string serialize(Synth const& synth);
+        static std::string serialize(Synth const& synth) noexcept;
 
-        static void import(Synth& synth, std::string const& serialized);
+        static void import(Synth& synth, std::string const& serialized) noexcept;
 
     private:
         /*
@@ -50,44 +50,51 @@ class Serializer
 
         static Number controller_id_to_float(
             Synth::ControllerId const controller_id
-        );
+        ) noexcept;
 
-        static void reset_all_params_to_default(Synth& synth);
-        static std::vector<std::string>* parse_lines(std::string const& serialized);
-        static void process_lines(Synth& synth, std::vector<std::string>* lines);
-        static bool parse_section_name(std::string const line, char* section_name);
-        static bool is_section_name_char(char const c);
-        static bool is_digit(char const c);
-        static bool is_capital_letter(char const c);
-        static bool is_lowercase_letter(char const c);
-        static bool is_line_break(char const c);
-        static bool is_inline_whitespace(char const c);
-        static bool is_comment_leader(char const c);
-        static void process_line(Synth& synth, std::string const line);
+        static void reset_all_params_to_default(Synth& synth) noexcept;
+        static std::vector<std::string>* parse_lines(
+            std::string const& serialized
+        ) noexcept;
+        static void process_lines(
+            Synth& synth, std::vector<std::string>* lines
+        ) noexcept;
+        static bool parse_section_name(
+            std::string const line,
+            char* section_name
+        ) noexcept;
+        static bool is_section_name_char(char const c) noexcept;
+        static bool is_digit(char const c) noexcept;
+        static bool is_capital_letter(char const c) noexcept;
+        static bool is_lowercase_letter(char const c) noexcept;
+        static bool is_line_break(char const c) noexcept;
+        static bool is_inline_whitespace(char const c) noexcept;
+        static bool is_comment_leader(char const c) noexcept;
+        static void process_line(Synth& synth, std::string const line) noexcept;
         static bool skipping_remaining_whitespace_or_comment_reaches_the_end(
             std::string::const_iterator& it,
             std::string::const_iterator const end
-        );
+        ) noexcept;
         static bool parse_param_name(
             std::string::const_iterator& it,
             std::string::const_iterator const end,
             char* param_name
-        );
+        ) noexcept;
         static bool parse_suffix(
             std::string::const_iterator& it,
             std::string::const_iterator const end,
             char* suffix
-        );
+        ) noexcept;
         static bool parse_equal_sign(
             std::string::const_iterator& it,
             std::string::const_iterator const end
-        );
+        ) noexcept;
         static bool parse_number(
             std::string::const_iterator& it,
             std::string::const_iterator const end,
             Number& number
-        );
-        static Number to_number(std::string const text);
+        ) noexcept;
+        static Number to_number(std::string const text) noexcept;
 };
 
 }

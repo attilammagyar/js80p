@@ -33,7 +33,7 @@ Sample const* const* SignalProducer::produce(
         SignalProducerClass* signal_producer,
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     if (UNLIKELY(signal_producer->channels == 0)) {
         return NULL;
     }
@@ -92,7 +92,7 @@ Sample const* const* SignalProducer::produce(
 
 SignalProducer::SignalProducer(
         Integer const channels, Integer const number_of_children
-)
+) noexcept
     : channels(0 <= channels ? channels : 0),
     buffer(NULL),
     last_sample_count(0),
@@ -111,7 +111,7 @@ SignalProducer::SignalProducer(
 }
 
 
-void SignalProducer::set_block_size(Integer const new_block_size)
+void SignalProducer::set_block_size(Integer const new_block_size) noexcept
 {
     if (new_block_size != block_size) {
         block_size = new_block_size;
@@ -126,7 +126,7 @@ void SignalProducer::set_block_size(Integer const new_block_size)
 }
 
 
-Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const
+Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const noexcept
 {
     free_buffer(old_buffer);
 
@@ -134,7 +134,7 @@ Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const
 }
 
 
-Sample** SignalProducer::allocate_buffer() const
+Sample** SignalProducer::allocate_buffer() const noexcept
 {
     if (channels <= 0) {
         return NULL;
@@ -151,7 +151,7 @@ Sample** SignalProducer::allocate_buffer() const
 }
 
 
-void SignalProducer::set_sample_rate(Frequency const new_sample_rate)
+void SignalProducer::set_sample_rate(Frequency const new_sample_rate) noexcept
 {
     sample_rate = new_sample_rate;
     sampling_period = 1.0 / (Seconds)new_sample_rate;
@@ -163,13 +163,13 @@ void SignalProducer::set_sample_rate(Frequency const new_sample_rate)
 }
 
 
-SignalProducer::~SignalProducer()
+SignalProducer::~SignalProducer() noexcept
 {
     buffer = free_buffer(buffer);
 }
 
 
-Sample** SignalProducer::free_buffer(Sample** old_buffer) const
+Sample** SignalProducer::free_buffer(Sample** old_buffer) const noexcept
 {
     if (old_buffer == NULL) {
         return NULL;
@@ -187,19 +187,19 @@ Sample** SignalProducer::free_buffer(Sample** old_buffer) const
 }
 
 
-Integer SignalProducer::get_channels() const
+Integer SignalProducer::get_channels() const noexcept
 {
     return channels;
 }
 
 
-Frequency SignalProducer::get_sample_rate() const
+Frequency SignalProducer::get_sample_rate() const noexcept
 {
     return sample_rate;
 }
 
 
-Integer SignalProducer::get_block_size() const
+Integer SignalProducer::get_block_size() const noexcept
 {
     return block_size;
 }
@@ -207,7 +207,7 @@ Integer SignalProducer::get_block_size() const
 
 Sample const* const* SignalProducer::get_last_rendered_block(
         Integer& sample_count
-) const {
+) const noexcept {
     sample_count = last_sample_count;
 
     return cached_buffer;
@@ -216,7 +216,7 @@ Sample const* const* SignalProducer::get_last_rendered_block(
 
 Seconds SignalProducer::sample_count_to_time_offset(
         Integer const sample_count
-) const {
+) const noexcept {
     return current_time + (Seconds)sample_count * sampling_period;
 }
 
@@ -227,7 +227,7 @@ void SignalProducer::schedule(
         Integer const int_param,
         Number const number_param_1,
         Number const number_param_2
-) {
+) noexcept {
     Seconds const time = time_offset + current_time;
 
     Event event(type, time, int_param, number_param_1, number_param_2);
@@ -235,7 +235,7 @@ void SignalProducer::schedule(
 }
 
 
-void SignalProducer::cancel_events(Seconds const time_offset)
+void SignalProducer::cancel_events(Seconds const time_offset) noexcept
 {
     Seconds const time = time_offset + current_time;
 
@@ -250,13 +250,13 @@ void SignalProducer::cancel_events(Seconds const time_offset)
 }
 
 
-bool SignalProducer::has_events_after(Seconds const time_offset) const
+bool SignalProducer::has_events_after(Seconds const time_offset) const noexcept
 {
     return !events.is_empty() && events.back().time_offset > time_offset;
 }
 
 
-Seconds SignalProducer::get_last_event_time_offset() const
+Seconds SignalProducer::get_last_event_time_offset() const noexcept
 {
     return events.is_empty() ? 0.0 : events.back().time_offset - current_time;
 }
@@ -265,7 +265,7 @@ Seconds SignalProducer::get_last_event_time_offset() const
 Sample const* const* SignalProducer::initialize_rendering(
         Integer const round,
         Integer const sample_count
-) {
+) noexcept {
     return NULL;
 }
 
@@ -275,7 +275,7 @@ void SignalProducer::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
 }
 
 
@@ -284,7 +284,7 @@ void SignalProducer::render_silence(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
-) {
+) noexcept {
     for (Integer c = 0; c != channels; ++c) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             buffer[c][i] = 0.0;
@@ -293,14 +293,14 @@ void SignalProducer::render_silence(
 }
 
 
-void SignalProducer::handle_event(Event const& event)
+void SignalProducer::handle_event(Event const& event) noexcept
 {
 }
 
 
 bool SignalProducer::has_upcoming_events(
         Integer const sample_count
-) const {
+) const noexcept {
     return (
         !events.is_empty()
         && is_time_offset_before_sample_count(
@@ -313,25 +313,25 @@ bool SignalProducer::has_upcoming_events(
 bool SignalProducer::is_time_offset_before_sample_count(
             Seconds const time_offset,
             Integer const sample_count
-) const {
+) const noexcept {
     return time_offset <= sample_count_to_time_offset(sample_count);
 }
 
 
 Integer SignalProducer::sample_count_or_block_size(
         Integer const sample_count
-) const {
+) const noexcept {
     return sample_count == -1 ? (Integer)get_block_size() : sample_count;
 }
 
 
-void SignalProducer::register_child(SignalProducer& signal_producer)
+void SignalProducer::register_child(SignalProducer& signal_producer) noexcept
 {
     children.push_back(&signal_producer);
 }
 
 
-SignalProducer::Event::Event(Type const type)
+SignalProducer::Event::Event(Type const type) noexcept
     : time_offset(0.0),
     int_param(0),
     number_param_1(0.0),
@@ -341,7 +341,7 @@ SignalProducer::Event::Event(Type const type)
 }
 
 
-SignalProducer::Event::Event(Event const& event)
+SignalProducer::Event::Event(Event const& event) noexcept
     : time_offset(event.time_offset),
     int_param(event.int_param),
     number_param_1(event.number_param_1),
@@ -357,7 +357,8 @@ SignalProducer::Event::Event(
         Integer const int_param,
         Number const number_param_1,
         Number const number_param_2
-) : time_offset(time_offset),
+) noexcept
+    : time_offset(time_offset),
     int_param(int_param),
     number_param_1(number_param_1),
     number_param_2(number_param_2),
@@ -366,7 +367,7 @@ SignalProducer::Event::Event(
 }
 
 
-SignalProducer::Event& SignalProducer::Event::operator=(Event const& event)
+SignalProducer::Event& SignalProducer::Event::operator=(Event const& event) noexcept
 {
     if (this != &event) {
         type = event.type;
@@ -386,7 +387,7 @@ void SignalProducer::handle_events(
         Integer const current_sample_index,
         Integer const sample_count,
         Integer& next_stop
-) {
+) noexcept {
     Seconds const handle_until = signal_producer->current_time;
 
     while (!signal_producer->events.is_empty()) {

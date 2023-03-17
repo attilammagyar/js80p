@@ -145,11 +145,11 @@ class IntParam : public Param<int>
             int const min_value,
             int const max_value,
             int const default_value
-        ) : Param<int>(name, min_value, max_value, default_value)
+        ) noexcept : Param<int>(name, min_value, max_value, default_value)
         {
         }
 
-        int ratio_to_value(Number const ratio) const
+        int ratio_to_value(Number const ratio) const noexcept
         {
             return Param<int>::ratio_to_value(ratio);
         }
@@ -1196,7 +1196,7 @@ class Modulator : public SignalProducer
     public:
         static constexpr Number VALUE = 2.0;
 
-        Modulator() : SignalProducer(1, 0), render_called(0)
+        Modulator() noexcept : SignalProducer(1, 0), render_called(0)
         {
         }
 
@@ -1208,7 +1208,7 @@ class Modulator : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** buffer
-        ) {
+        ) noexcept {
             ++render_called;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {

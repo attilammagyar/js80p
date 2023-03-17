@@ -41,46 +41,46 @@ class EventHandler
             Channel const channel,
             Note const note,
             Number const velocity
-        ) {}
+        ) noexcept {}
 
         void aftertouch(
             Seconds const time_offset,
             Channel const channel,
             Note const note,
             Number const pressure
-        ) {}
+        ) noexcept {}
 
         void note_off(
             Seconds const time_offset,
             Channel const channel,
             Note const note,
             Number const velocity
-        ) {}
+        ) noexcept {}
 
         void control_change(
             Seconds const time_offset,
             Channel const channel,
             Controller const controller,
             Number const new_value
-        ) {}
+        ) noexcept {}
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Channel const channel,
             Number const new_value
-        ) {}
+        ) noexcept {}
 
         void all_sound_off(
             Seconds const time_offset, Channel const channel
-        ) {}
+        ) noexcept {}
 
         void reset_all_controllers(
             Seconds const time_offset, Channel const channel
-        ) {}
+        ) noexcept {}
 
         void all_notes_off(
             Seconds const time_offset, Channel const channel
-        ) {}
+        ) noexcept {}
 };
 
 
@@ -92,7 +92,7 @@ class Dispatcher
             EventHandlerClass& event_handler,
             Seconds const time_offset,
             Byte const bytes[4]
-        );
+        ) noexcept;
 
     private:
         static constexpr Number PITCH_BEND_SCALE = 1.0 / 16384.0;
@@ -474,7 +474,7 @@ void Dispatcher::dispatch(
         EventHandlerClass& event_handler,
         Seconds const time_offset,
         Byte const bytes[4]
-) {
+) noexcept {
     Command msg_type = bytes[0] & 0xf0;
     Channel channel = bytes[0] & 0x0f;
     Byte d1 = bytes[1] & 0x7f;
