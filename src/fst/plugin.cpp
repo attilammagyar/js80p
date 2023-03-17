@@ -341,7 +341,9 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size)
 {
     std::string serialized((char const*)chunk, (std::string::size_type)size);
 
+    synth.process_messages();
     Serializer::import(synth, serialized);
+    synth.process_messages();
 }
 
 
