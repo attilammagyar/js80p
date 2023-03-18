@@ -29,8 +29,8 @@ namespace JS80P
 class GUI
 {
     public:
-        typedef void* Window; ///< \brief GUI platform dependent parent window identifier
-        typedef void* Application; ///< \brief GUI platform dependent application handle
+        typedef void* Window; ///< \brief GUI platform dependent window identifier.
+        typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
 
         class Controller
         {
@@ -73,7 +73,7 @@ class GUI
         static Controller const CONTROLLERS[];
 
         static GUI* create_instance(
-            Application application,
+            PlatformData platform_data,
             Window parent_window,
             Synth& synth
         );

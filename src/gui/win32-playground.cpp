@@ -97,7 +97,9 @@ int WINAPI wWinMain(
     SetTimer(main_window, timer_id, 100, NULL);
 
     JS80P::GUI* gui = JS80P::GUI::create_instance(
-        (JS80P::GUI::Application)hInstance, (JS80P::GUI::Window)main_window, synth
+        (JS80P::GUI::PlatformData)hInstance,
+        (JS80P::GUI::Window)main_window,
+        synth
     );
     gui->show();
 

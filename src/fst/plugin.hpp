@@ -21,8 +21,6 @@
 
 #include <string>
 
-#include <windows.h>
-
 #include "aeffect.h"
 #include "aeffectx.h"
 
@@ -45,7 +43,8 @@ class FstPlugin
         static constexpr char const* VENDOR = "Attila M. Magyar";
 
         static AEffect* create_instance(
-            audioMasterCallback const host_callback, HINSTANCE const dll_instance
+            audioMasterCallback const host_callback,
+            GUI::PlatformData const platform_data
         ) noexcept;
 
         static VstIntPtr VSTCALLBACK dispatch(
@@ -81,7 +80,7 @@ class FstPlugin
         FstPlugin(
             AEffect* const effect,
             audioMasterCallback const host_callback,
-            HINSTANCE const dll_instance
+            GUI::PlatformData const platform_data
         ) noexcept;
         ~FstPlugin();
 
@@ -118,7 +117,7 @@ class FstPlugin
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
-        HINSTANCE const dll_instance;
+        GUI::PlatformData const platform_data;
 
         ERect window_rect;
         Integer round;

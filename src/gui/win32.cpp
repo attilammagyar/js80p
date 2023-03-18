@@ -28,14 +28,12 @@
 namespace JS80P {
 
 GUI* GUI::create_instance(
-        Application application,
+        PlatformData platform_data,
         Window parent_window,
         Synth& synth
 ) {
-    return (
-        (GUI*)new Win32GUI::GUI(
-            (HINSTANCE)application, (HWND)parent_window, synth
-        )
+    return (GUI*)new Win32GUI::GUI(
+        (HINSTANCE)platform_data, (HWND)parent_window, synth
     );
 }
 

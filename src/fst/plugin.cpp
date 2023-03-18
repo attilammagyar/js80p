@@ -29,11 +29,11 @@ namespace JS80P
 
 AEffect* FstPlugin::create_instance(
         audioMasterCallback const host_callback,
-        HINSTANCE const dll_instance
+        GUI::PlatformData const platform_data
 ) noexcept {
     AEffect* effect = new AEffect();
 
-    FstPlugin* fst_plugin = new FstPlugin(effect, host_callback, dll_instance);
+    FstPlugin* fst_plugin = new FstPlugin(effect, host_callback, platform_data);
 
     memset(effect, 0, sizeof(AEffect));
 
@@ -211,12 +211,12 @@ void VSTCALLBACK FstPlugin::process_double_replacing(
 FstPlugin::FstPlugin(
         AEffect* const effect,
         audioMasterCallback const host_callback,
-        HINSTANCE const dll_instance
+        GUI::PlatformData const platform_data
 ) noexcept
     : synth(),
     effect(effect),
     host_callback(host_callback),
-    dll_instance(dll_instance),
+    platform_data(platform_data),
     round(0),
     gui(NULL)
 {
@@ -352,7 +352,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 void FstPlugin::open_gui(GUI::Window parent_window)
 {
     close_gui();
-    gui = GUI::create_instance((GUI::Application)dll_instance, parent_window, synth);
+    gui = GUI::create_instance(platform_data, parent_window, synth);
     gui->show();
 }
 

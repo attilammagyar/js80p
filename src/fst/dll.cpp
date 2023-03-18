@@ -21,6 +21,7 @@
 #include "debug.hpp"
 
 #include "fst/plugin.hpp"
+#include "gui/gui.hpp"
 
 
 static HINSTANCE dll_instance = NULL;
@@ -42,5 +43,7 @@ extern "C" __declspec(dllexport) AEffect* VSTPluginMain(audioMasterCallback host
 {
     JS80P_DEBUG("VSTPluginMain(...)");
 
-    return JS80P::FstPlugin::create_instance(host_callback, dll_instance);
+    return JS80P::FstPlugin::create_instance(
+        host_callback, (JS80P::GUI::PlatformData)dll_instance
+    );
 }
