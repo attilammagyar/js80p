@@ -39,34 +39,29 @@ typedef Synth::ParamId ParamId;
 typedef Synth::ControllerId ControllerId;
 
 
-class Text
-{
-    public:
-        static constexpr int MAX_LENGTH = 128;
-
-        Text();
-        Text(char const* const text);
-
-        void set(char const* const text);
-
-        char const* c_str() const;
-        WCHAR const* c_wstr() const;
-
-#ifdef UNICODE
-        LPCTSTR get() const;
-#else
-        LPCTSTR get() const;
-#endif
-
-    private:
-        char text[MAX_LENGTH];
-        WCHAR wtext[MAX_LENGTH];
-};
-
-
 class Widget
 {
     public:
+        class Text
+        {
+            public:
+                static constexpr int MAX_LENGTH = 128;
+
+                Text();
+                Text(char const* const text);
+
+                void set(char const* const text);
+
+                char const* c_str() const;
+                WCHAR const* c_wstr() const;
+
+                LPCTSTR get() const;
+
+            private:
+                char text[MAX_LENGTH];
+                WCHAR wtext[MAX_LENGTH];
+        };
+
         static LRESULT process_message(
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );

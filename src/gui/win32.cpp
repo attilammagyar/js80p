@@ -43,19 +43,19 @@ GUI* GUI::create_instance(
 namespace JS80P { namespace Win32GUI
 {
 
-Text::Text()
+Widget::Text::Text()
 {
     set("");
 }
 
 
-Text::Text(char const* const text)
+Widget::Text::Text(char const* const text)
 {
     set(text);
 }
 
 
-void Text::set(char const* const text)
+void Widget::Text::set(char const* const text)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
@@ -77,29 +77,26 @@ void Text::set(char const* const text)
 }
 
 
-char const* Text::c_str() const
+char const* Widget::Text::c_str() const
 {
     return text;
 }
 
 
-WCHAR const* Text::c_wstr() const
+WCHAR const* Widget::Text::c_wstr() const
 {
     return wtext;
 }
 
 
+LPCTSTR Widget::Text::get() const
+{
 #ifdef UNICODE
-    LPCTSTR Text::get() const
-    {
-        return (LPCTSTR)c_wstr();
-    }
+    return (LPCTSTR)c_wstr();
 #else
-    LPCTSTR Text::get() const
-    {
-        return (LPCTSTR)c_str();
-    }
+    return (LPCTSTR)c_str();
 #endif
+}
 
 
 LRESULT Widget::process_message(
@@ -283,7 +280,7 @@ void Widget::fill_rectangle(
 
 void Widget::draw_text(
         HDC hdc,
-        Text const& text,
+        Widget::Text const& text,
         int const font_size_px,
         int const left,
         int const top,
@@ -708,11 +705,11 @@ void ControllerSelector::show(
         controllers[old_controller->index]->unselect();
     }
 
-    char title[Text::MAX_LENGTH];
+    char title[Widget::Text::MAX_LENGTH];
 
     snprintf(
         title,
-        Text::MAX_LENGTH,
+        Widget::Text::MAX_LENGTH,
         "Select controller for \"%s\"",
         JS80P::GUI::PARAMS[param_id]
     );
@@ -1100,13 +1097,13 @@ void ParamEditor::update_value_str_float()
     double const value = (
         synth.float_param_ratio_to_display_value(param_id, ratio) * scale
     );
-    char buffer[Text::MAX_LENGTH];
+    char buffer[Widget::Text::MAX_LENGTH];
 
-    snprintf(buffer, Text::MAX_LENGTH, format, value);
+    snprintf(buffer, Widget::Text::MAX_LENGTH, format, value);
 
-    if (strncmp("-0", buffer, Text::MAX_LENGTH) == 0) {
+    if (strncmp("-0", buffer, Widget::Text::MAX_LENGTH) == 0) {
         value_str.set("0");
-    } else if (strncmp("-0.0", buffer, Text::MAX_LENGTH) == 0) {
+    } else if (strncmp("-0.0", buffer, Widget::Text::MAX_LENGTH) == 0) {
         value_str.set("0.0");
     } else {
         value_str.set(buffer);
@@ -1124,19 +1121,21 @@ void ParamEditor::update_value_str_int()
         return;
     }
 
-    char buffer[Text::MAX_LENGTH];
+    char buffer[Widget::Text::MAX_LENGTH];
 
-    strncpy(buffer, options[value], Text::MAX_LENGTH - 1);
+    strncpy(buffer, options[value], Widget::Text::MAX_LENGTH - 1);
     value_str.set(buffer);
 }
 
 
 void ParamEditor::update_controller_str()
 {
-    char buffer[Text::MAX_LENGTH];
+    char buffer[Widget::Text::MAX_LENGTH];
 
     strncpy(
-        buffer, GUI::get_controller(controller_id)->short_name, Text::MAX_LENGTH - 1
+        buffer,
+        GUI::get_controller(controller_id)->short_name,
+        Widget::Text::MAX_LENGTH - 1
     );
     controller_str.set(buffer);
 }
