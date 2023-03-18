@@ -73,6 +73,15 @@ Number Serializer::controller_id_to_float(
 }
 
 
+Synth::ControllerId Serializer::float_to_controller_id(
+    Number const controller_id
+) noexcept {
+    return (Synth::ControllerId)std::round(
+        FLOAT_TO_CONTROLLER_ID_SCALE * controller_id
+    );
+}
+
+
 void Serializer::import(Synth& synth, std::string const& serialized) noexcept
 {
     reset_all_params_to_default(synth);
@@ -295,15 +304,11 @@ void Serializer::process_line(Synth& synth, std::string const line) noexcept
     }
 
     if (is_controller_assignment) {
-        Synth::ControllerId const controller_id = (
-            (Synth::ControllerId)std::round(FLOAT_TO_CONTROLLER_ID_SCALE * number)
-        );
-
         synth.push_message(
             Synth::MessageType::ASSIGN_CONTROLLER,
             param_id,
             0.0,
-            (Byte)controller_id
+            (Byte)float_to_controller_id(number)
         );
     } else {
         synth.push_message(Synth::MessageType::SET_PARAM, param_id, number, 0);

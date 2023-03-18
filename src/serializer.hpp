@@ -51,6 +51,9 @@ class Serializer
         static Number controller_id_to_float(
             Synth::ControllerId const controller_id
         ) noexcept;
+        static Synth::ControllerId float_to_controller_id(
+            Number const controller_id
+        ) noexcept;
 
         static void reset_all_params_to_default(Synth& synth) noexcept;
         static std::vector<std::string>* parse_lines(
