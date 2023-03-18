@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
-#include "gui/win32.hpp"
-
 #include "gui/gui.cpp"
+#include "gui/win32.hpp"
 
 
 namespace JS80P {
@@ -525,7 +525,19 @@ ParamEditor* TabBody::own(ParamEditor* param_editor)
 }
 
 
-void TabBody::refresh()
+void TabBody::refresh_controlled_params()
+{
+    for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+        ParamEditor* editor = *it;
+
+        if (editor->has_controller()) {
+            editor->refresh();
+        }
+    }
+}
+
+
+void TabBody::refresh_params()
 {
     for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
         (*it)->refresh();
@@ -542,7 +554,8 @@ Background::Background()
         JS80P::GUI::WIDTH,
         JS80P::GUI::HEIGHT
     ),
-    body(NULL)
+    body(NULL),
+    next_full_refresh(FULL_REFRESH_TICKS)
 {
 }
 
@@ -580,14 +593,6 @@ void Background::show_body()
 }
 
 
-void Background::refresh_body()
-{
-    if (body != NULL) {
-        body->refresh();
-    }
-}
-
-
 void Background::set_up(HINSTANCE application, Widget* parent)
 {
     Widget::set_up(application, parent);
@@ -601,9 +606,196 @@ void Background::set_up(HINSTANCE application, Widget* parent)
 
 LRESULT Background::timer(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    refresh_body();
+    if (body == NULL) {
+        return 0;
+    }
+
+    --next_full_refresh;
+
+    if (next_full_refresh == 0) {
+        next_full_refresh = FULL_REFRESH_TICKS;
+        body->refresh_params();
+    } else {
+        body->refresh_controlled_params();
+    }
 
     return 0;
+}
+
+
+std::string const ImportPatchButton::FILTER_STR(
+    "JS80P Patches (*.js80p)\x00*.js80p\x00"
+    "All Files (*.*)\x00*.*\x00",
+    53
+);
+
+
+ImportPatchButton::ImportPatchButton(
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        Synth& synth,
+        TabBody* synth_gui_body
+) : TransparentWidget("Import Patch", left, top, width, height),
+    synth(synth),
+    synth_gui_body(synth_gui_body)
+{
+}
+
+
+void ImportPatchButton::click()
+{
+    Widget::Text filter(ImportPatchButton::FILTER_STR);
+    Widget::Text ext("js80p");
+    TCHAR file_name[MAX_PATH];
+    OPENFILENAME ofn;
+
+    file_name[0] = 0;
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFilter = filter.get();
+    ofn.lpstrFile = file_name;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+    ofn.lpstrDefExt = ext.get();
+
+    if (!GetOpenFileName(&ofn)) {
+        return;
+    }
+
+    HANDLE file;
+    file = CreateFile(
+        file_name,              // lpFileName
+        GENERIC_READ,           // dwDesiredAccess
+        FILE_SHARE_READ,        // dwShareMode
+        NULL,                   // lpSecurityAttributes
+        OPEN_EXISTING,          // dwCreationDisposition
+        FILE_ATTRIBUTE_NORMAL,  // dwFlagsAndAttributes
+        NULL                    // hTemplateFile
+    );
+
+    // TODO: GetLastError
+    if (file == INVALID_HANDLE_VALUE) {
+        return;
+    }
+
+    DWORD size = GetFileSize(file, NULL);
+
+    if (size == INVALID_FILE_SIZE) {
+        // TODO: GetLastError
+        CloseHandle(file);
+
+        return;
+    }
+
+    DWORD read;
+
+    std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
+
+    if (
+        !ReadFile(
+            file,
+            (LPVOID)buffer,
+            std::min(size, (DWORD)Serializer::MAX_SIZE),
+            &read,
+            NULL
+        )
+    ) {
+        // TODO: GetLastError
+        CloseHandle(file);
+
+        return;
+    }
+
+    CloseHandle(file);
+
+    std::string const patch(
+        buffer,
+        std::min(
+            (std::string::size_type)read,
+            (std::string::size_type)Serializer::MAX_SIZE
+        )
+    );
+
+    Serializer::import(synth, patch);
+
+    synth_gui_body->refresh_params();
+}
+
+
+ExportPatchButton::ExportPatchButton(
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        Synth& synth
+) : TransparentWidget("Export Patch", left, top, width, height),
+    synth(synth)
+{
+}
+
+
+void ExportPatchButton::click()
+{
+    Widget::Text filter(ImportPatchButton::FILTER_STR);
+    Widget::Text ext("js80p");
+    TCHAR file_name[MAX_PATH];
+    OPENFILENAME ofn;
+
+    file_name[0] = 0;
+
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFilter = filter.get();
+    ofn.lpstrFile = file_name;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = (
+        OFN_EXPLORER
+        | OFN_HIDEREADONLY
+        | OFN_NOREADONLYRETURN
+        | OFN_OVERWRITEPROMPT
+        | OFN_PATHMUSTEXIST
+    );
+    ofn.lpstrDefExt = ext.get();
+
+    if (!GetSaveFileName(&ofn)) {
+        return;
+    }
+
+    HANDLE file;
+    file = CreateFile(
+        file_name,              // lpFileName
+        GENERIC_WRITE,          // dwDesiredAccess
+        0,                      // dwShareMode
+        NULL,                   // lpSecurityAttributes
+        CREATE_ALWAYS,          // dwCreationDisposition
+        FILE_ATTRIBUTE_NORMAL,  // dwFlagsAndAttributes
+        NULL                    // hTemplateFile
+    );
+
+    // TODO: GetLastError
+    if (file == INVALID_HANDLE_VALUE) {
+        return;
+    }
+
+    std::string const patch = Serializer::serialize(synth);
+    DWORD written;
+
+    if (
+        !WriteFile(
+            file, (LPCVOID)patch.c_str(), (DWORD)patch.length(), &written, NULL
+        )
+    ) {
+        // TODO: GetLastError
+    }
+
+    CloseHandle(file);
 }
 
 
@@ -923,7 +1115,7 @@ ParamEditor::ParamEditor(
     synth(synth),
     ratio(0.0),
     knob(NULL),
-    has_controller(false)
+    has_controller_(false)
 {
 }
 
@@ -951,7 +1143,7 @@ ParamEditor::ParamEditor(
     ratio(0.0),
     knob(NULL),
     controller_id(ControllerId::NONE),
-    has_controller(false)
+    has_controller_(false)
 {
 }
 
@@ -977,20 +1169,20 @@ void ParamEditor::set_up(HINSTANCE application, Widget* parent)
 }
 
 
+bool ParamEditor::has_controller() const
+{
+    return has_controller_;
+}
+
+
 void ParamEditor::refresh()
 {
     ControllerId const new_controller_id = (
         synth.get_param_controller_id_atomic(param_id)
     );
-    bool const had_controller = has_controller;
-
-    has_controller = new_controller_id > Synth::ControllerId::NONE;
-
-    if (!(has_controller && had_controller)) {
-        return;
-    }
-
     Number const new_ratio = synth.get_param_ratio_atomic(param_id);
+
+    has_controller_ = new_controller_id > Synth::ControllerId::NONE;
 
     if (new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);
@@ -1027,13 +1219,13 @@ void ParamEditor::update_editor(ControllerId const new_controller_id)
 
 void ParamEditor::update_editor()
 {
-    has_controller = controller_id > Synth::ControllerId::NONE;
+    has_controller_ = controller_id > Synth::ControllerId::NONE;
 
     update_value_str();
     update_controller_str();
     redraw();
 
-    if (has_controller) {
+    if (has_controller_) {
         knob->deactivate();
     } else {
         knob->activate();
@@ -1068,7 +1260,7 @@ void ParamEditor::handle_controller_change(ControllerId const new_controller_id)
         0.0,
         (Byte)new_controller_id
     );
-    has_controller = true;
+    has_controller_ = true;
     update_editor(new_controller_id);
 }
 
@@ -1170,9 +1362,9 @@ LRESULT ParamEditor::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
             HEIGHT - 36,
             WIDTH - 2,
             16,
-            has_controller ? RGB(0, 0, 0) : RGB(181, 181, 189),
-            has_controller ? RGB(145, 145, 151) : RGB(0, 0, 0),
-            has_controller ? FW_BOLD : FW_NORMAL
+            has_controller_ ? RGB(0, 0, 0) : RGB(181, 181, 189),
+            has_controller_ ? RGB(145, 145, 151) : RGB(0, 0, 0),
+            has_controller_ ? FW_BOLD : FW_NORMAL
         );
     }
 
@@ -1759,6 +1951,11 @@ void GUI::build_synth_body()
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
+
+    ((Widget*)synth_body)->own(
+        new ImportPatchButton(7, 2, 32, 32, synth, synth_body)
+    );
+    ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
 
     ADD_PE(synth_body,  12, 33 + (PE_H + 5),        synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
     ADD_PE(synth_body,  12, 33 + (PE_H + 5) * 2,    synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);

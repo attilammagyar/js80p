@@ -63,6 +63,7 @@ WIN_PLAYGROUND_OBJS = \
 	$(GUI_RES) \
 	$(OBJ_GUI_WIN) \
 	$(OBJ_PLAYGROUND_WIN) \
+	$(OBJ_SERIALIZER_WIN) \
 	$(OBJ_SYNTH_WIN)
 
 PARAM_COMPONENTS = \
@@ -172,7 +173,7 @@ WIN_CXXFLAGS = \
 FST_CXXFLAGS = $(CXXINCS) $(FST_CXXINCS) $(JS80P_CXXFLAGS)
 WIN_DLL_LFLAGS = -Wall -s -shared -static
 WIN_EXE_LFLAGS = -Wall -s -static
-WIN_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode
+WIN_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32
 
 .PHONY: all check clean dirs docs perf winguiplayground
 

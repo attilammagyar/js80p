@@ -19,6 +19,7 @@
 #ifndef JS80P__GUI__WIN32_HPP
 #define JS80P__GUI__WIN32_HPP
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@
 #include <windowsx.h>
 
 #include "js80p.hpp"
+#include "serializer.hpp"
 #include "synth.hpp"
 
 #include "gui/gui.hpp"
@@ -194,7 +196,8 @@ class TabBody : public TransparentWidget
 
         ParamEditor* own(ParamEditor* param_editor);
 
-        void refresh();
+        void refresh_controlled_params();
+        void refresh_params();
 
     private:
         typedef std::vector<ParamEditor*> ParamEditors;
@@ -207,6 +210,7 @@ class Background : public Widget
 {
     public:
         static constexpr Frequency REFRESH_RATE = 18.0;
+        static constexpr Frequency FULL_REFRESH_RATE = 2.0;
 
         Background();
         ~Background();
@@ -214,7 +218,6 @@ class Background : public Widget
         void replace_body(TabBody* new_body);
         void hide_body();
         void show_body();
-        void refresh_body();
 
     protected:
         virtual void set_up(HINSTANCE application, Widget* parent) override;
@@ -223,8 +226,55 @@ class Background : public Widget
 
     private:
         static constexpr UINT_PTR TIMER_ID = 1;
+        static constexpr Integer FULL_REFRESH_TICKS = (
+            (Integer)std::ceil(REFRESH_RATE / FULL_REFRESH_RATE)
+        );
 
         TabBody* body;
+        Integer next_full_refresh;
+};
+
+
+class ImportPatchButton : public TransparentWidget
+{
+    public:
+        static std::string const FILTER_STR;
+
+        ImportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth,
+            TabBody* synth_gui_body
+        );
+
+    protected:
+        virtual void click() override;
+
+    private:
+        char buffer[Serializer::MAX_SIZE];
+        Synth& synth;
+        TabBody* synth_gui_body;
+};
+
+
+class ExportPatchButton : public TransparentWidget
+{
+    public:
+        ExportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth
+        );
+
+    protected:
+        virtual void click() override;
+
+    private:
+        Synth& synth;
 };
 
 
@@ -357,6 +407,8 @@ class ParamEditor : public TransparentWidget
 
         virtual void set_up(HINSTANCE application, Widget* parent) override;
 
+        bool has_controller() const;
+
         void adjust_ratio(Number const ratio);
         void handle_ratio_change(Number const new_ratio);
         void handle_controller_change(ControllerId const new_controller_id);
@@ -463,7 +515,7 @@ class ParamEditor : public TransparentWidget
         Text value_str;
         Text controller_str;
         ControllerId controller_id;
-        bool has_controller;
+        bool has_controller_;
 };
 
 
