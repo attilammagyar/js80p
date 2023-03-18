@@ -19,7 +19,9 @@
 #ifndef JS80P__GUI__WIN32_HPP
 #define JS80P__GUI__WIN32_HPP
 
+#include <string>
 #include <vector>
+
 #include <windows.h>
 #include <windowsx.h>
 
@@ -48,9 +50,9 @@ class Widget
                 static constexpr int MAX_LENGTH = 128;
 
                 Text();
-                Text(char const* const text);
+                Text(std::string const text);
 
-                void set(char const* const text);
+                void set(std::string const text);
 
                 char const* c_str() const;
                 WCHAR const* c_wstr() const;
@@ -58,7 +60,7 @@ class Widget
                 LPCTSTR get() const;
 
             private:
-                char text[MAX_LENGTH];
+                std::string text;
                 WCHAR wtext[MAX_LENGTH];
         };
 

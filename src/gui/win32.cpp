@@ -49,37 +49,34 @@ Widget::Text::Text()
 }
 
 
-Widget::Text::Text(char const* const text)
+Widget::Text::Text(std::string const text)
 {
     set(text);
 }
 
 
-void Widget::Text::set(char const* const text)
+void Widget::Text::set(std::string const text)
 {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-    strncpy(this->text, text, MAX_LENGTH - 1);
-#pragma GCC diagnostic pop
-
-    this->text[MAX_LENGTH - 1] = '\0';
+    this->text = text;
 
 #ifdef UNICODE
     MultiByteToWideChar(
         CP_UTF8,
         0,
-        (LPCCH)text,
-        -1,
+        (LPCCH)text.c_str(),
+        std::min((int)text.length(), MAX_LENGTH),
         (LPWSTR)wtext,
         MAX_LENGTH
     );
+
+    wtext[std::min((int)text.length(), MAX_LENGTH - 1)] = 0;
 #endif
 }
 
 
 char const* Widget::Text::c_str() const
 {
-    return text;
+    return text.c_str();
 }
 
 
