@@ -29,8 +29,8 @@ namespace JS80P
 class GUI
 {
     public:
-        typedef void* Window; /// \brief GUI platform dependent parent window identifier
-        typedef void* Application; /// \brief GUI platform dependent application handle
+        typedef void* Window; ///< \brief GUI platform dependent parent window identifier
+        typedef void* Application; ///< \brief GUI platform dependent application handle
 
         class Controller
         {

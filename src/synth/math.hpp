@@ -49,27 +49,27 @@ class Math
 
         static constexpr Number POW_10_MIN = (
             Constants::BIQUAD_FILTER_GAIN_MIN * Constants::BIQUAD_FILTER_GAIN_SCALE
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr Number POW_10_MAX = (
             Constants::BIQUAD_FILTER_GAIN_MAX * Constants::BIQUAD_FILTER_GAIN_SCALE
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr Number POW_10_INV_MIN = (
             Constants::BIQUAD_FILTER_Q_MIN * Constants::BIQUAD_FILTER_Q_SCALE
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr Number POW_10_INV_MAX = (
             Constants::BIQUAD_FILTER_Q_MAX * Constants::BIQUAD_FILTER_Q_SCALE
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr Number EXP_MIN = (
             std::min(LN_OF_10 * POW_10_MIN, -1.0 * LN_OF_10 * POW_10_INV_MAX)
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr Number EXP_MAX = (
             std::max(LN_OF_10 * POW_10_MAX, -1.0 * LN_OF_10 * POW_10_INV_MIN)
-        ); /// \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         /**
          * \warning Negative numbers close to multiples of PI are not handled

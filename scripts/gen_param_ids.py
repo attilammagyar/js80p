@@ -54,11 +54,11 @@ def print_oscillator_params(param_id: int, group: str, prefix: str) -> int:
         ("$C9", "   ///< $ Custom Waveform 9th Harmonic"),
         ("$C10", "  ///< $ Custom Waveform 10th Harmonic"),
 
-        ("$F1FRQ", "/// $ Filter 1 Frequency"),
+        ("$F1FRQ", "///< $ Filter 1 Frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor"),
         ("$F1G", "  ///< $ Filter 1 Gain"),
 
-        ("$F2FRQ", "/// $ Filter 2 Frequency"),
+        ("$F2FRQ", "///< $ Filter 2 Frequency"),
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
     ]
@@ -72,11 +72,11 @@ def print_effect_params(param_id: int) -> int:
 
         ("$DG", "   ///< $ Distortaion Gain"),
 
-        ("$F1FRQ", "/// $ Filter 1 Frequency"),
+        ("$F1FRQ", "///< $ Filter 1 Frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor"),
         ("$F1G", "  ///< $ Filter 1 Gain"),
 
-        ("$F2FRQ", "/// $ Filter 2 Frequency"),
+        ("$F2FRQ", "///< $ Filter 2 Frequency"),
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
 
@@ -149,13 +149,13 @@ def print_special_params(param_id: int) -> int:
         ("MODE", "  ///< Mode"),
         ("MWAV", "  ///< Modulator Waveform"),
         ("CWAV", "  ///< Carrier Waveform"),
-        ("MF1TYP", "/// Modulator Filter 1 Type"),
-        ("MF2TYP", "/// Modulator Filter 2 Type"),
-        ("CF1TYP", "/// Carrier Filter 1 Type"),
-        ("CF2TYP", "/// Carrier Filter 2 Type"),
+        ("MF1TYP", "///< Modulator Filter 1 Type"),
+        ("MF2TYP", "///< Modulator Filter 2 Type"),
+        ("CF1TYP", "///< Carrier Filter 1 Type"),
+        ("CF2TYP", "///< Carrier Filter 2 Type"),
 
-        ("EF1TYP", "/// Effects Filter 1 Type"),
-        ("EF2TYP", "/// Effects Filter 2 Type"),
+        ("EF1TYP", "///< Effects Filter 1 Type"),
+        ("EF2TYP", "///< Effects Filter 2 Type"),
 
         ("L1WAV", " ///< LFO 1 Waveform"),
         ("L2WAV", " ///< LFO 2 Waveform"),
