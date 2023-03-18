@@ -84,7 +84,6 @@ class Widget
     protected:
         Widget();
         Widget(
-            char const* const class_name,
             char const* const label,
             DWORD dwStyle,
             int left,

@@ -180,7 +180,6 @@ Widget::Widget()
 
 
 Widget::Widget(
-        char const* const class_name,
         char const* const label,
         DWORD dwStyle,
         int left,
@@ -191,7 +190,7 @@ Widget::Widget(
     parent(NULL),
     application(NULL),
     bitmap(NULL),
-    class_name(class_name),
+    class_name("STATIC"),
     label(label),
     dwStyle(dwStyle),
     left(left),
@@ -489,7 +488,6 @@ TransparentWidget::TransparentWidget(
         int width,
         int height
 ) : Widget(
-        "STATIC",
         label,
         WS_CHILD | WS_VISIBLE | SS_NOTIFY,
         left,
@@ -543,7 +541,6 @@ void TabBody::refresh()
 
 Background::Background()
     : Widget(
-        "STATIC",
         "JS80P",
         WS_CHILD | WS_VISIBLE | SS_BITMAP,
         0,
@@ -641,7 +638,6 @@ ControllerSelector::ControllerSelector(
         Background& background,
         Synth& synth
 ) : Widget(
-        "STATIC",
         "Select controller",
         WS_CHILD | WS_VISIBLE | SS_NOTIFY,
         LEFT,
@@ -796,7 +792,6 @@ ControllerSelector::Controller::Controller(
         int const top,
         ControllerId const controller_id
 ) : Widget(
-        "STATIC",
         label,
         WS_CHILD | WS_VISIBLE | SS_NOTIFY,
         left,
@@ -1213,7 +1208,6 @@ ParamEditor::Knob::Knob(
         int top,
         Number const steps
 ) : Widget(
-        "STATIC",
         label,
         WS_CHILD | WS_VISIBLE | SS_BITMAP | SS_NOTIFY,
         left,
