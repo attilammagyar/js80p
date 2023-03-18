@@ -273,7 +273,7 @@ void Widget::fill_rectangle(
     RECT rect;
     rect.left = left;
     rect.top = top;
-    rect.right = width;
+    rect.right = left + width;
     rect.bottom = top + height;
     HBRUSH brush = CreateSolidBrush(color);
     FillRect(hdc, (LPRECT)&rect, brush);
@@ -764,7 +764,7 @@ LRESULT ControllerSelector::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     HDC hdc = BeginPaint(hwnd, &ps);
 
-    fill_rectangle(hdc, left, top, width, height, RGB(0, 0, 0));
+    fill_rectangle(hdc, 0, 0, width, height, RGB(0, 0, 0));
     draw_text(
         hdc,
         title,
