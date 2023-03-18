@@ -85,11 +85,11 @@ class Widget
         Widget();
         Widget(
             char const* const label,
-            DWORD dwStyle,
-            int left,
-            int top,
-            int width,
-            int height
+            DWORD const dwStyle,
+            int const left,
+            int const top,
+            int const width,
+            int const height
         );
         Widget(HINSTANCE application, HWND hwnd);
 
@@ -116,7 +116,7 @@ class Widget
             int const top,
             int const width,
             int const height,
-            COLORREF color
+            COLORREF const color
         );
 
         void draw_text(
@@ -169,7 +169,13 @@ class ExternallyCreatedWindow : public Widget
 class TransparentWidget : public Widget
 {
     public:
-        TransparentWidget(char const* const label, int left, int top, int width, int height);
+        TransparentWidget(
+            char const* const label,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
 
     protected:
         virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -238,7 +244,7 @@ class TabSelector : public TransparentWidget
             HBITMAP bitmap,
             TabBody* tab_body,
             char const* const label,
-            int left
+            int const left
         );
 
     protected:
@@ -330,8 +336,8 @@ class ParamEditor : public TransparentWidget
 
         ParamEditor(
             char const* const label,
-            int left,
-            int top,
+            int const left,
+            int const top,
             ControllerSelector& controller_selector,
             Synth& synth,
             ParamId const param_id,
@@ -342,8 +348,8 @@ class ParamEditor : public TransparentWidget
 
         ParamEditor(
             char const* const label,
-            int left,
-            int top,
+            int const left,
+            int const top,
             ControllerSelector& controller_selector,
             Synth& synth,
             ParamId const param_id,
@@ -399,8 +405,8 @@ class ParamEditor : public TransparentWidget
                 Knob(
                     ParamEditor& editor,
                     char const* const label,
-                    int left,
-                    int top,
+                    int const left,
+                    int const top,
                     Number const steps
                 );
                 virtual ~Knob();

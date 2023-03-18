@@ -181,11 +181,11 @@ Widget::Widget()
 
 Widget::Widget(
         char const* const label,
-        DWORD dwStyle,
-        int left,
-        int top,
-        int width,
-        int height
+        DWORD const dwStyle,
+        int const left,
+        int const top,
+        int const width,
+        int const height
 ) : hwnd(NULL),
     parent(NULL),
     application(NULL),
@@ -268,7 +268,7 @@ void Widget::fill_rectangle(
         int const top,
         int const width,
         int const height,
-        COLORREF color
+        COLORREF const color
 ) {
     RECT rect;
     rect.left = left;
@@ -483,10 +483,10 @@ ExternallyCreatedWindow::~ExternallyCreatedWindow()
 
 TransparentWidget::TransparentWidget(
         char const* const label,
-        int left,
-        int top,
-        int width,
-        int height
+        int const left,
+        int const top,
+        int const width,
+        int const height
 ) : Widget(
         label,
         WS_CHILD | WS_VISIBLE | SS_NOTIFY,
@@ -618,7 +618,7 @@ TabSelector::TabSelector(
         HBITMAP bitmap,
         TabBody* tab_body,
         char const* const label,
-        int left
+        int const left
 ) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT),
     background(background),
     tab_body(tab_body),
@@ -909,8 +909,8 @@ LRESULT ControllerSelector::Controller::mouseleave(
 
 ParamEditor::ParamEditor(
         char const* const label,
-        int left,
-        int top,
+        int const left,
+        int const top,
         ControllerSelector& controller_selector,
         Synth& synth,
         ParamId const param_id,
@@ -936,8 +936,8 @@ ParamEditor::ParamEditor(
 
 ParamEditor::ParamEditor(
         char const* const label,
-        int left,
-        int top,
+        int const left,
+        int const top,
         ControllerSelector& controller_selector,
         Synth& synth,
         ParamId const param_id,
@@ -1204,8 +1204,8 @@ HBITMAP ParamEditor::knob_states_inactive = NULL;
 ParamEditor::Knob::Knob(
         ParamEditor& editor,
         char const* const label,
-        int left,
-        int top,
+        int const left,
+        int const top,
         Number const steps
 ) : Widget(
         label,
