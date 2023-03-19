@@ -232,7 +232,7 @@ class Background : public Widget
 {
     public:
         static constexpr Frequency REFRESH_RATE = 18.0;
-        static constexpr Frequency FULL_REFRESH_RATE = 2.0;
+        static constexpr Frequency FULL_REFRESH_RATE = 3.0;
 
         Background();
         ~Background();
@@ -532,6 +532,7 @@ class ParamEditor : public TransparentWidget
         Number default_ratio;
         Number ratio;
         Knob* knob;
+        int skip_refresh_calls;
         Text value_str;
         Text controller_str;
         Synth::ControllerId controller_id;
