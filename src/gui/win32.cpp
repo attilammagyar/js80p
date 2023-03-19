@@ -1722,7 +1722,7 @@ GUI::GUI(
             synth_bitmap,
             synth_body,
             "Synth",
-            TabSelector::LEFT
+            TabSelector::LEFT + TabSelector::WIDTH * 0
         )
     );
     background->own(
@@ -1731,7 +1731,7 @@ GUI::GUI(
             effects_bitmap,
             effects_body,
             "Effects",
-            TabSelector::LEFT + TabSelector::WIDTH
+            TabSelector::LEFT + TabSelector::WIDTH * 1
         )
     );
     background->own(
@@ -1794,75 +1794,94 @@ void GUI::build_controllers_body()
 
     background->own(controllers_body);
 
-    ADD_PE(controllers_body,  21,             44, synth, ParamId::F1IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W,      44, synth, ParamId::F1MIN,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 0,  44, synth, ParamId::F1IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 1,  44, synth, ParamId::F1MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2,  44, synth, ParamId::F1MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21,            164, synth, ParamId::F1AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W,     164, synth, ParamId::F1DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body,  21 + PE_W * 0, 164, synth, ParamId::F1AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 1, 164, synth, ParamId::F1DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2, 164, synth, ParamId::F1RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 211,             44, synth, ParamId::F2IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W,      44, synth, ParamId::F2MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 211 + PE_W * 0,  44, synth, ParamId::F2IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 1,  44, synth, ParamId::F2MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2,  44, synth, ParamId::F2MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211,            164, synth, ParamId::F2AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W,     164, synth, ParamId::F2DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 211 + PE_W * 0, 164, synth, ParamId::F2AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 1, 164, synth, ParamId::F2DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2, 164, synth, ParamId::F2RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 401,             44, synth, ParamId::F3IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W,      44, synth, ParamId::F3MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 401 + PE_W * 0,  44, synth, ParamId::F3IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 1,  44, synth, ParamId::F3MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2,  44, synth, ParamId::F3MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401,            164, synth, ParamId::F3AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W,     164, synth, ParamId::F3DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 401 + PE_W * 0, 164, synth, ParamId::F3AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 1, 164, synth, ParamId::F3DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2, 164, synth, ParamId::F3RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 591,             44, synth, ParamId::F4IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W,      44, synth, ParamId::F4MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 591 + PE_W * 0,  44, synth, ParamId::F4IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 1,  44, synth, ParamId::F4MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2,  44, synth, ParamId::F4MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591,            164, synth, ParamId::F4AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W,     164, synth, ParamId::F4DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 591 + PE_W * 0, 164, synth, ParamId::F4AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 1, 164, synth, ParamId::F4DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2, 164, synth, ParamId::F4RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 781,             44, synth, ParamId::F5IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W,      44, synth, ParamId::F5MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 781 + PE_W * 0,  44, synth, ParamId::F5IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 1,  44, synth, ParamId::F5MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W * 2,  44, synth, ParamId::F5MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781,            164, synth, ParamId::F5AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W,     164, synth, ParamId::F5DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 781 + PE_W * 0, 164, synth, ParamId::F5AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 1, 164, synth, ParamId::F5DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 781 + PE_W * 2, 164, synth, ParamId::F5RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body,  21,            324, synth, ParamId::F6IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W,     324, synth, ParamId::F6MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body,  21 + PE_W * 0, 324, synth, ParamId::F6IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 1, 324, synth, ParamId::F6MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2, 324, synth, ParamId::F6MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21,            444, synth, ParamId::F6AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W,     444, synth, ParamId::F6DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body,  21 + PE_W * 0, 444, synth, ParamId::F6AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body,  21 + PE_W * 1, 444, synth, ParamId::F6DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body,  21 + PE_W * 2, 444, synth, ParamId::F6RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 211,            324, synth, ParamId::F7IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W,     324, synth, ParamId::F7MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 211 + PE_W * 0, 324, synth, ParamId::F7IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 1, 324, synth, ParamId::F7MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2, 324, synth, ParamId::F7MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211,            444, synth, ParamId::F7AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W,     444, synth, ParamId::F7DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 211 + PE_W * 0, 444, synth, ParamId::F7AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 211 + PE_W * 1, 444, synth, ParamId::F7DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 211 + PE_W * 2, 444, synth, ParamId::F7RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 401,            324, synth, ParamId::F8IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W,     324, synth, ParamId::F8MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 401 + PE_W * 0, 324, synth, ParamId::F8IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 1, 324, synth, ParamId::F8MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2, 324, synth, ParamId::F8MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401,            444, synth, ParamId::F8AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W,     444, synth, ParamId::F8DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 401 + PE_W * 0, 444, synth, ParamId::F8AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 401 + PE_W * 1, 444, synth, ParamId::F8DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 401 + PE_W * 2, 444, synth, ParamId::F8RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 591,            324, synth, ParamId::F9IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W,     324, synth, ParamId::F9MIN,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 591 + PE_W * 0, 324, synth, ParamId::F9IN,     FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 1, 324, synth, ParamId::F9MIN,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2, 324, synth, ParamId::F9MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591,            444, synth, ParamId::F9AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W,     444, synth, ParamId::F9DST,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 591 + PE_W * 0, 444, synth, ParamId::F9AMT,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 591 + PE_W * 1, 444, synth, ParamId::F9DST,    FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(controllers_body, 591 + PE_W * 2, 444, synth, ParamId::F9RND,    FLEX_CTLS, "%.2f", 100.0);
 
-    ADD_PE(controllers_body, 781,            324, synth, ParamId::F10IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W,     324, synth, ParamId::F10MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2, 324, synth, ParamId::F10MAX,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781,            444, synth, ParamId::F10AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W,     444, synth, ParamId::F10DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2, 444, synth, ParamId::F10RND,    FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 781 + PE_W * 0, 324, synth, ParamId::F10IN,    FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 1, 324, synth, ParamId::F10MIN,   FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 2, 324, synth, ParamId::F10MAX,   FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(controllers_body, 781 + PE_W * 0, 444, synth, ParamId::F10AMT,   FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 1, 444, synth, ParamId::F10DST,   FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(controllers_body, 781 + PE_W * 2, 444, synth, ParamId::F10RND,   FLEX_CTLS, "%.2f", 100.0);
 
     controllers_body->hide();
 }
@@ -1877,16 +1896,17 @@ void GUI::build_effects_body()
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
-    ADD_PE(effects_body,  74,               57, synth, ParamId::EOG,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(effects_body, 237,               57, synth, ParamId::EDG,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(effects_body,  74 + PE_W * 0,    57, synth, ParamId::EOG,    LFO_CTLS,   "%.2f", 100.0);
 
-    ADD_PE(effects_body, 385,               57, synth, ParamId::EF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(effects_body, 385 + PE_W,        57, synth, ParamId::EF1FRQ, LFO_CTLS,   "%.1f", 1.0);
+    ADD_PE(effects_body, 237 + PE_W * 0,    57, synth, ParamId::EDG,    LFO_CTLS,   "%.2f", 100.0);
+
+    ADD_PE(effects_body, 385 + PE_W * 0,    57, synth, ParamId::EF1TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(effects_body, 385 + PE_W * 1,    57, synth, ParamId::EF1FRQ, LFO_CTLS,   "%.1f", 1.0);
     ADD_PE(effects_body, 385 + PE_W * 2,    57, synth, ParamId::EF1Q,   LFO_CTLS,   "%.2f", 1.0);
     ADD_PE(effects_body, 385 + PE_W * 3,    57, synth, ParamId::EF1G,   LFO_CTLS,   "%.2f", 1.0);
 
-    ADD_PE(effects_body, 690,               57, synth, ParamId::EF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(effects_body, 690 + PE_W,        57, synth, ParamId::EF2FRQ, LFO_CTLS,   "%.1f", 1.0);
+    ADD_PE(effects_body, 690 + PE_W * 0,    57, synth, ParamId::EF2TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(effects_body, 690 + PE_W * 1,    57, synth, ParamId::EF2FRQ, LFO_CTLS,   "%.1f", 1.0);
     ADD_PE(effects_body, 690 + PE_W * 2,    57, synth, ParamId::EF2Q,   LFO_CTLS,   "%.2f", 1.0);
     ADD_PE(effects_body, 690 + PE_W * 3,    57, synth, ParamId::EF2G,   LFO_CTLS,   "%.2f", 1.0);
 
@@ -1900,68 +1920,79 @@ void GUI::build_envelopes_body()
 
     background->own(envelopes_body);
 
-    ADD_PE(envelopes_body,  37,             44, synth, ParamId::N1AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W,      44, synth, ParamId::N1INI,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body,  37 + PE_W * 0,  44, synth, ParamId::N1AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body,  37 + PE_W * 1,  44, synth, ParamId::N1INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 2,  44, synth, ParamId::N1PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 3,  44, synth, ParamId::N1SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 4,  44, synth, ParamId::N1FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37,            164, synth, ParamId::N1DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W,     164, synth, ParamId::N1ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body,  37 + PE_W * 0, 164, synth, ParamId::N1DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body,  37 + PE_W * 1, 164, synth, ParamId::N1ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 2, 164, synth, ParamId::N1HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 3, 164, synth, ParamId::N1DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 4, 164, synth, ParamId::N1REL,  FLEX_CTLS, "%.3f", 1.0);
 
-    ADD_PE(envelopes_body, 343,             44, synth, ParamId::N2AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W,      44, synth, ParamId::N2INI,  FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(envelopes_body, 343 + PE_W * 0,  44, synth, ParamId::N2AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body, 343 + PE_W * 1,  44, synth, ParamId::N2INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 2,  44, synth, ParamId::N2PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 3,  44, synth, ParamId::N2SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 4,  44, synth, ParamId::N2FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343,            164, synth, ParamId::N2DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W,     164, synth, ParamId::N2ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body, 343 + PE_W * 0, 164, synth, ParamId::N2DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body, 343 + PE_W * 1, 164, synth, ParamId::N2ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 2, 164, synth, ParamId::N2HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 3, 164, synth, ParamId::N2DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 4, 164, synth, ParamId::N2REL,  FLEX_CTLS, "%.3f", 1.0);
 
-    ADD_PE(envelopes_body, 649,             44, synth, ParamId::N3AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W,      44, synth, ParamId::N3INI,  FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(envelopes_body, 649 + PE_W * 0,  44, synth, ParamId::N3AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body, 649 + PE_W * 1,  44, synth, ParamId::N3INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 2,  44, synth, ParamId::N3PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 3,  44, synth, ParamId::N3SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 4,  44, synth, ParamId::N3FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649,            164, synth, ParamId::N3DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W,     164, synth, ParamId::N3ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body, 649 + PE_W * 0, 164, synth, ParamId::N3DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body, 649 + PE_W * 1, 164, synth, ParamId::N3ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 2, 164, synth, ParamId::N3HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 3, 164, synth, ParamId::N3DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 4, 164, synth, ParamId::N3REL,  FLEX_CTLS, "%.3f", 1.0);
 
-    ADD_PE(envelopes_body,  37,            324, synth, ParamId::N4AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W,     324, synth, ParamId::N4INI,  FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(envelopes_body,  37 + PE_W * 0, 324, synth, ParamId::N4AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body,  37 + PE_W * 1, 324, synth, ParamId::N4INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 2, 324, synth, ParamId::N4PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 3, 324, synth, ParamId::N4SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body,  37 + PE_W * 4, 324, synth, ParamId::N4FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37,            444, synth, ParamId::N4DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W,     444, synth, ParamId::N4ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body,  37 + PE_W * 0, 444, synth, ParamId::N4DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body,  37 + PE_W * 1, 444, synth, ParamId::N4ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 2, 444, synth, ParamId::N4HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 3, 444, synth, ParamId::N4DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body,  37 + PE_W * 4, 444, synth, ParamId::N4REL,  FLEX_CTLS, "%.3f", 1.0);
 
-    ADD_PE(envelopes_body, 343,            324, synth, ParamId::N5AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W,     324, synth, ParamId::N5INI,  FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(envelopes_body, 343 + PE_W * 0, 324, synth, ParamId::N5AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body, 343 + PE_W * 1, 324, synth, ParamId::N5INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 2, 324, synth, ParamId::N5PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 3, 324, synth, ParamId::N5SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 343 + PE_W * 4, 324, synth, ParamId::N5FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343,            444, synth, ParamId::N5DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W,     444, synth, ParamId::N5ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body, 343 + PE_W * 0, 444, synth, ParamId::N5DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body, 343 + PE_W * 1, 444, synth, ParamId::N5ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 2, 444, synth, ParamId::N5HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 3, 444, synth, ParamId::N5DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 343 + PE_W * 4, 444, synth, ParamId::N5REL,  FLEX_CTLS, "%.3f", 1.0);
 
-    ADD_PE(envelopes_body, 649,            324, synth, ParamId::N6AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W,     324, synth, ParamId::N6INI,  FLEX_CTLS, "%.2f", 100.0);
+
+    ADD_PE(envelopes_body, 649 + PE_W * 0, 324, synth, ParamId::N6AMT,  FLEX_CTLS, "%.2f", 100.0);
+    ADD_PE(envelopes_body, 649 + PE_W * 1, 324, synth, ParamId::N6INI,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 2, 324, synth, ParamId::N6PK,   FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 3, 324, synth, ParamId::N6SUS,  FLEX_CTLS, "%.2f", 100.0);
     ADD_PE(envelopes_body, 649 + PE_W * 4, 324, synth, ParamId::N6FIN,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649,            444, synth, ParamId::N6DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W,     444, synth, ParamId::N6ATK,  FLEX_CTLS, "%.3f", 1.0);
+
+    ADD_PE(envelopes_body, 649 + PE_W * 0, 444, synth, ParamId::N6DEL,  FLEX_CTLS, "%.3f", 1.0);
+    ADD_PE(envelopes_body, 649 + PE_W * 1, 444, synth, ParamId::N6ATK,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 2, 444, synth, ParamId::N6HLD,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 3, 444, synth, ParamId::N6DEC,  FLEX_CTLS, "%.3f", 1.0);
     ADD_PE(envelopes_body, 649 + PE_W * 4, 444, synth, ParamId::N6REL,  FLEX_CTLS, "%.3f", 1.0);
@@ -2001,7 +2032,7 @@ void GUI::build_synth_body()
     ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 3,    synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
     ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 4,    synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 
-    ADD_PE(synth_body,  87,              36,        synth, ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
+    ADD_PE(synth_body,  87 + PE_W * 0,   36,        synth, ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
     ADD_PE(synth_body,  87 + PE_W * 1,   36,        synth, ParamId::MPRT,   FLEX_CTLS,  "%.3f", 1.0);
     ADD_PE(synth_body,  87 + PE_W * 2,   36,        synth, ParamId::MPRD,   FLEX_CTLS,  "%.2f", 1.0);
     ADD_PE(synth_body,  87 + PE_W * 3,   36,        synth, ParamId::MDTN,   FLEX_CTLS,  "%.f", 0.01);
@@ -2012,12 +2043,12 @@ void GUI::build_synth_body()
     ADD_PE(synth_body,  87 + PE_W * 8,   36,        synth, ParamId::MVOL,   ALL_CTLS,   "%.2f", 100.0);
     ADD_PE(synth_body,  87 + PE_W * 10,  36,        synth, ParamId::MPAN,   ALL_CTLS,   "%.2f", 100.0);
 
-    ADD_PE(synth_body, 735,              36,        synth, ParamId::MF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W,       36,        synth, ParamId::MF1FRQ, ALL_CTLS,   "%.1f", 1.0);
+    ADD_PE(synth_body, 735 + PE_W * 0,   36,        synth, ParamId::MF1TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(synth_body, 735 + PE_W * 1,   36,        synth, ParamId::MF1FRQ, ALL_CTLS,   "%.1f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 2,   36,        synth, ParamId::MF1Q,   ALL_CTLS,   "%.2f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 3,   36,        synth, ParamId::MF1G,   ALL_CTLS,   "%.2f", 1.0);
 
-    ADD_PE(synth_body, 116,             168,        synth, ParamId::MC1,    FLEX_CTLS,  "%.2f", 100.0);
+    ADD_PE(synth_body, 116 + PE_W * 0,  168,        synth, ParamId::MC1,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 1,  168,        synth, ParamId::MC2,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 2,  168,        synth, ParamId::MC3,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 3,  168,        synth, ParamId::MC4,    FLEX_CTLS,  "%.2f", 100.0);
@@ -2028,12 +2059,12 @@ void GUI::build_synth_body()
     ADD_PE(synth_body, 116 + PE_W * 8,  168,        synth, ParamId::MC9,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 9,  168,        synth, ParamId::MC10,   FLEX_CTLS,  "%.2f", 100.0);
 
-    ADD_PE(synth_body, 735,             168,        synth, ParamId::MF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W,      168,        synth, ParamId::MF2FRQ, ALL_CTLS,   "%.1f", 1.0);
+    ADD_PE(synth_body, 735 + PE_W * 0,  168,        synth, ParamId::MF2TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(synth_body, 735 + PE_W * 1,  168,        synth, ParamId::MF2FRQ, ALL_CTLS,   "%.1f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 2,  168,        synth, ParamId::MF2Q,   ALL_CTLS,   "%.2f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 3,  168,        synth, ParamId::MF2G,   ALL_CTLS,   "%.2f", 1.0);
 
-    ADD_PE(synth_body,  87,             316,        synth, ParamId::CWAV,   MIDI_CTLS,  wf, wfc);
+    ADD_PE(synth_body,  87 + PE_W * 0,  316,        synth, ParamId::CWAV,   MIDI_CTLS,  wf, wfc);
     ADD_PE(synth_body,  87 + PE_W * 1,  316,        synth, ParamId::CPRT,   FLEX_CTLS,  "%.3f", 1.0);
     ADD_PE(synth_body,  87 + PE_W * 2,  316,        synth, ParamId::CPRD,   FLEX_CTLS,  "%.2f", 1.0);
     ADD_PE(synth_body,  87 + PE_W * 3,  316,        synth, ParamId::CDTN,   FLEX_CTLS,  "%.f", 0.01);
@@ -2044,12 +2075,12 @@ void GUI::build_synth_body()
     ADD_PE(synth_body,  87 + PE_W * 8,  316,        synth, ParamId::CVOL,   ALL_CTLS,   "%.2f", 100.0);
     ADD_PE(synth_body,  87 + PE_W * 10, 316,        synth, ParamId::CPAN,   ALL_CTLS,   "%.2f", 100.0);
 
-    ADD_PE(synth_body, 735,             316,        synth, ParamId::CF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W,      316,        synth, ParamId::CF1FRQ, ALL_CTLS,   "%.1f", 1.0);
+    ADD_PE(synth_body, 735 + PE_W * 0,  316,        synth, ParamId::CF1TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(synth_body, 735 + PE_W * 1,  316,        synth, ParamId::CF1FRQ, ALL_CTLS,   "%.1f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 2,  316,        synth, ParamId::CF1Q,   ALL_CTLS,   "%.2f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 3,  316,        synth, ParamId::CF1G,   ALL_CTLS,   "%.2f", 1.0);
 
-    ADD_PE(synth_body, 116,             448,        synth, ParamId::CC1,    FLEX_CTLS,  "%.2f", 100.0);
+    ADD_PE(synth_body, 116 + PE_W * 0,  448,        synth, ParamId::CC1,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 1,  448,        synth, ParamId::CC2,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 2,  448,        synth, ParamId::CC3,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 3,  448,        synth, ParamId::CC4,    FLEX_CTLS,  "%.2f", 100.0);
@@ -2060,8 +2091,8 @@ void GUI::build_synth_body()
     ADD_PE(synth_body, 116 + PE_W * 8,  448,        synth, ParamId::CC9,    FLEX_CTLS,  "%.2f", 100.0);
     ADD_PE(synth_body, 116 + PE_W * 9,  448,        synth, ParamId::CC10,   FLEX_CTLS,  "%.2f", 100.0);
 
-    ADD_PE(synth_body, 735,             448,        synth, ParamId::CF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W,      448,        synth, ParamId::CF2FRQ, ALL_CTLS,   "%.1f", 1.0);
+    ADD_PE(synth_body, 735 + PE_W * 0,  448,        synth, ParamId::CF2TYP, MIDI_CTLS,  ft, ftc);
+    ADD_PE(synth_body, 735 + PE_W * 1,  448,        synth, ParamId::CF2FRQ, ALL_CTLS,   "%.1f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 2,  448,        synth, ParamId::CF2Q,   ALL_CTLS,   "%.2f", 1.0);
     ADD_PE(synth_body, 735 + PE_W * 3,  448,        synth, ParamId::CF2G,   ALL_CTLS,   "%.2f", 1.0);
 
