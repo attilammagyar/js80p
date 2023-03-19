@@ -401,8 +401,12 @@ class ParamEditor : public TransparentWidget
         static constexpr int WIDTH = 58;
         static constexpr int HEIGHT = 100;
 
-        static GUI::Bitmap knob_states;
-        static GUI::Bitmap knob_states_inactive;
+        static void initialize_knob_states(
+            GUI::Bitmap active,
+            GUI::Bitmap inactive
+        );
+
+        static void free_knob_states();
 
         ParamEditor(
             char const* const label,
@@ -453,13 +457,22 @@ class ParamEditor : public TransparentWidget
         virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     private:
+        static constexpr int KNOB_STATES_COUNT = 128;
+        static constexpr Number KNOB_STATES_LAST_INDEX = (Number)(KNOB_STATES_COUNT - 1);
+
+        static bool knob_states_initialization_complete;
+
+        static GUI::Bitmap knob_states_active_bitmap;
+        static GUI::Bitmap knob_states_inactive_bitmap;
+
+        static GUI::Bitmap knob_states_active[KNOB_STATES_COUNT];
+        static GUI::Bitmap knob_states_inactive[KNOB_STATES_COUNT];
+
         class Knob : public Widget
         {
             public:
                 static constexpr int WIDTH = 48;
                 static constexpr int HEIGHT = 48;
-
-                static constexpr Number KNOB_STATES_LAST_INDEX = 127.0;
 
                 static constexpr Number MOUSE_MOVE_COARSE_SCALE = (
                     1.0 / ((Number)HEIGHT * 3.0)
@@ -514,6 +527,8 @@ class ParamEditor : public TransparentWidget
                 bool is_clicking;
                 bool is_mouse_captured;
         };
+
+        void complete_knob_state_initialization();
 
         void update_value_str();
         void update_controller_str();

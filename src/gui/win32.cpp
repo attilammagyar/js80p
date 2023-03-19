@@ -1163,6 +1163,50 @@ LRESULT ControllerSelector::Controller::mouseleave(
 }
 
 
+bool ParamEditor::knob_states_initialization_complete = false;
+
+GUI::Bitmap ParamEditor::knob_states_active_bitmap = NULL;
+
+GUI::Bitmap ParamEditor::knob_states_inactive_bitmap = NULL;
+
+GUI::Bitmap ParamEditor::knob_states_active[KNOB_STATES_COUNT];
+
+GUI::Bitmap ParamEditor::knob_states_inactive[KNOB_STATES_COUNT];
+
+
+void ParamEditor::initialize_knob_states(GUI::Bitmap active, GUI::Bitmap inactive)
+{
+    if (knob_states_active_bitmap != NULL) {
+        free_knob_states();
+    }
+
+    knob_states_active_bitmap = active;
+    knob_states_inactive_bitmap = inactive;
+
+    knob_states_initialization_complete = false;
+}
+
+
+void ParamEditor::free_knob_states()
+{
+    if (knob_states_active == NULL) {
+        return;
+    }
+
+    delete_bitmap(knob_states_active_bitmap);
+    delete_bitmap(knob_states_inactive_bitmap);
+
+    for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
+        delete_bitmap(knob_states_active[i]);
+        delete_bitmap(knob_states_inactive[i]);
+    }
+
+    knob_states_initialization_complete = false;
+    knob_states_active_bitmap = NULL;
+    knob_states_inactive_bitmap = NULL;
+}
+
+
 ParamEditor::ParamEditor(
         char const* const label,
         int const left,
@@ -1188,6 +1232,7 @@ ParamEditor::ParamEditor(
     skip_refresh_calls(0),
     has_controller_(false)
 {
+    complete_knob_state_initialization();
 }
 
 
@@ -1217,6 +1262,28 @@ ParamEditor::ParamEditor(
     controller_id(Synth::ControllerId::NONE),
     has_controller_(false)
 {
+    complete_knob_state_initialization();
+}
+
+
+void ParamEditor::complete_knob_state_initialization()
+{
+    if (knob_states_initialization_complete) {
+        return;
+    }
+
+    for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
+        int const left = i * Knob::WIDTH;
+
+        knob_states_active[i] = copy_bitmap_region(
+            knob_states_active_bitmap, left, 0, Knob::WIDTH, Knob::HEIGHT
+        );
+        knob_states_inactive[i] = copy_bitmap_region(
+            knob_states_inactive_bitmap, left, 0, Knob::WIDTH, Knob::HEIGHT
+        );
+    }
+
+    knob_states_initialization_complete = true;
 }
 
 
@@ -1426,11 +1493,6 @@ LRESULT ParamEditor::lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-GUI::Bitmap ParamEditor::knob_states = NULL;
-
-GUI::Bitmap ParamEditor::knob_states_inactive = NULL;
-
-
 ParamEditor::Knob::Knob(
         ParamEditor& editor,
         char const* const label,
@@ -1487,12 +1549,13 @@ void ParamEditor::Knob::update(Number const ratio)
 
 void ParamEditor::Knob::update()
 {
-    int const left = (int)(KNOB_STATES_LAST_INDEX * this->ratio) * WIDTH;
-    GUI::Bitmap source = is_inactive ? knob_states_inactive : knob_states;
+    int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
 
-    knob_state = copy_bitmap_region(source, left, 0, WIDTH, HEIGHT);
-
-    delete_bitmap(set_bitmap(knob_state));
+    if (is_inactive) {
+        set_bitmap(knob_states_inactive[index]);
+    } else {
+        set_bitmap(knob_states_active[index]);
+    }
 }
 
 

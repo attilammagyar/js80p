@@ -670,10 +670,9 @@ GUI::GUI(
     synth(synth),
     platform_data(platform_data)
 {
-
-    ParamEditor::knob_states = Widget::load_bitmap(platform_data, "KNOBSTATES");
-    ParamEditor::knob_states_inactive = Widget::load_bitmap(
-        platform_data, "KNOBSTATESINACTIVE"
+    ParamEditor::initialize_knob_states(
+        Widget::load_bitmap(platform_data, "KNOBSTATES"),
+        Widget::load_bitmap(platform_data, "KNOBSTATESINACTIVE")
     );
 
     about_bitmap = Widget::load_bitmap(platform_data, "ABOUT");
@@ -1087,11 +1086,7 @@ GUI::~GUI()
 {
     delete parent_window;
 
-    Widget::delete_bitmap(ParamEditor::knob_states);
-    Widget::delete_bitmap(ParamEditor::knob_states_inactive);
-
-    ParamEditor::knob_states = NULL;
-    ParamEditor::knob_states_inactive = NULL;
+    ParamEditor::free_knob_states();
 
     Widget::delete_bitmap(about_bitmap);
     Widget::delete_bitmap(controllers_bitmap);

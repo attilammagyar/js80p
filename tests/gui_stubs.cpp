@@ -124,8 +124,15 @@ class ParamEditor : public Widget
         static constexpr int WIDTH = 58;
         static constexpr int HEIGHT = 100;
 
-        static GUI::Bitmap knob_states;
-        static GUI::Bitmap knob_states_inactive;
+        static void initialize_knob_states(
+                GUI::Bitmap active,
+                GUI::Bitmap inactive
+        ) {
+        }
+
+        static void free_knob_states()
+        {
+        }
 
         ParamEditor(
                 char const* const label,
@@ -162,10 +169,6 @@ class ParamEditor : public Widget
             return false;
         }
 };
-
-GUI::Bitmap ParamEditor::knob_states = NULL;
-
-GUI::Bitmap ParamEditor::knob_states_inactive = NULL;
 
 
 class TabBody : public Widget
