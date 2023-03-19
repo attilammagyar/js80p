@@ -129,6 +129,15 @@ void Widget::delete_bitmap(GUI::Bitmap bitmap)
 }
 
 
+Widget::Color Widget::rgb(
+        unsigned char const red,
+        unsigned char const green,
+        unsigned char const blue
+) {
+    return RGB(red, green, blue);
+}
+
+
 LRESULT Widget::process_message(
         HWND hwnd,
         UINT uMsg,
@@ -139,12 +148,24 @@ LRESULT Widget::process_message(
         (Widget*)GetWindowLongPtr(hwnd, GWLP_USERDATA)
     );
 
+    bool is_handled = false;
+
     switch (uMsg) {
         case WM_TIMER:
-            return widget->timer(uMsg, wParam, lParam);
+            is_handled = widget->timer();
 
-        case WM_PAINT:
-            return widget->paint(uMsg, wParam, lParam);
+            break;
+
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            widget->hdc = BeginPaint((HWND)widget->window, &ps);
+
+            is_handled = widget->paint();
+
+            EndPaint((HWND)widget->window, &ps);
+
+            break;
+        }
 
         case WM_LBUTTONDBLCLK:
             return widget->lbuttondblclk(uMsg, wParam, lParam);
@@ -177,8 +198,14 @@ LRESULT Widget::process_message(
         }
 
         default:
-            return widget->call_original_window_procedure(uMsg, wParam, lParam);
+            break;
     }
+
+    if (!is_handled) {
+        return widget->call_original_window_procedure(uMsg, wParam, lParam);
+    }
+
+    return 0;
 }
 
 
@@ -187,6 +214,7 @@ Widget::Widget(GUI::PlatformData platform_data, GUI::Window window)
     platform_data(platform_data),
     bitmap(NULL),
     parent(NULL),
+    hdc(NULL),
     is_hidden(false),
     is_clicking(false),
     original_window_procedure(NULL)
@@ -199,6 +227,7 @@ Widget::Widget()
     platform_data(NULL),
     bitmap(NULL),
     parent(NULL),
+    hdc(NULL),
     is_hidden(false),
     is_clicking(false),
     original_window_procedure(NULL)
@@ -217,6 +246,7 @@ Widget::Widget(
     platform_data(NULL),
     bitmap(NULL),
     parent(NULL),
+    hdc(NULL),
     class_name("STATIC"),
     label(label),
     dwStyle(dwStyle),
@@ -290,38 +320,38 @@ LRESULT Widget::call_original_window_procedure(
 
 
 void Widget::fill_rectangle(
-        HDC hdc,
         int const left,
         int const top,
         int const width,
         int const height,
-        COLORREF const color
+        Color const color
 ) {
     RECT rect;
     rect.left = left;
     rect.top = top;
     rect.right = left + width;
     rect.bottom = top + height;
-    HBRUSH brush = CreateSolidBrush(color);
+    HBRUSH brush = CreateSolidBrush((COLORREF)color);
     FillRect(hdc, (LPRECT)&rect, brush);
     DeleteObject((HGDIOBJ)brush);
 }
 
 
 void Widget::draw_text(
-        HDC hdc,
         Widget::Text const& text,
         int const font_size_px,
         int const left,
         int const top,
         int const width,
         int const height,
-        COLORREF const color,
-        COLORREF const background,
-        int const weight,
+        Color const color,
+        Color const background,
+        FontWeight const font_weight,
         int const padding,
-        UINT const format
+        TextAlignment const alignment
 ) {
+    int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
+
     HFONT font = CreateFont(
         -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72), // cHeight
         0,                              // cWidth
@@ -341,8 +371,8 @@ void Widget::draw_text(
 
     int orig_bk_mode = SetBkMode(hdc, OPAQUE);
     int orig_map_mode = SetMapMode(hdc, MM_TEXT);
-    COLORREF orig_bk_color = SetBkColor(hdc, background);
-    COLORREF orig_text_color = SetTextColor(hdc, color);
+    COLORREF orig_bk_color = SetBkColor(hdc, (COLORREF)background);
+    COLORREF orig_text_color = SetTextColor(hdc, (COLORREF)color);
     HGDIOBJ orig_font = (HFONT)SelectObject(hdc, (HGDIOBJ)font);
 
     RECT text_rect;
@@ -350,19 +380,21 @@ void Widget::draw_text(
     text_rect.top = top;
     text_rect.right = left + width;
     text_rect.bottom = top + height;
-    HBRUSH brush = CreateSolidBrush(background);
+    HBRUSH brush = CreateSolidBrush((COLORREF)background);
     FillRect(hdc, (LPRECT)&text_rect, brush);
 
     text_rect.left += padding;
     text_rect.right -= padding;
 
-    DrawText(
-        hdc,
-        text.get(),
-        -1,
-        (LPRECT)&text_rect,
-        format
-    );
+    UINT format;
+
+    if (alignment == TextAlignment::CENTER) {
+        format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
+    } else {
+        format = DT_SINGLELINE | DT_LEFT | DT_VCENTER;
+    }
+
+    DrawText(hdc, text.get(), -1, (LPRECT)&text_rect, format);
 
     SelectObject(hdc, orig_font);
     SetTextColor(hdc, orig_text_color);
@@ -426,6 +458,12 @@ void Widget::hide()
 }
 
 
+void Widget::focus()
+{
+    SetFocus((HWND)window);
+}
+
+
 void Widget::redraw()
 {
     // TODO: GetLastError()
@@ -460,29 +498,24 @@ GUI::Bitmap Widget::set_bitmap(GUI::Bitmap bitmap)
 }
 
 
-LRESULT Widget::timer(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool Widget::timer()
 {
-    return call_original_window_procedure(uMsg, wParam, lParam);
+    return false;
 }
 
 
-LRESULT Widget::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool Widget::paint()
 {
-    if (bitmap != NULL) {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint((HWND)window, &ps);
-
-        HDC bitmap_hdc = CreateCompatibleDC(hdc);
-        SelectObject(bitmap_hdc, (HBITMAP)bitmap);
-        BitBlt(hdc, 0, 0, width, height, bitmap_hdc, 0, 0, SRCCOPY);
-
-        EndPaint((HWND)window, &ps);
-        DeleteDC(bitmap_hdc);
-
-        return 0;
+    if (bitmap == NULL) {
+        return false;
     }
 
-    return call_original_window_procedure(uMsg, wParam, lParam);
+    HDC bitmap_hdc = CreateCompatibleDC(hdc);
+    SelectObject(bitmap_hdc, (HBITMAP)bitmap);
+    BitBlt(hdc, 0, 0, width, height, bitmap_hdc, 0, 0, SRCCOPY);
+    DeleteDC(bitmap_hdc);
+
+    return true;
 }
 
 
@@ -561,19 +594,9 @@ TransparentWidget::TransparentWidget(
 }
 
 
-LRESULT TransparentWidget::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool TransparentWidget::paint()
 {
-    /*
-    Though we don't want to paint anything, we still need to validate the
-    region that is to be painted - BeginPaint() and EndPaint() does
-    everything that needs to be done about this.
-    */
-
-    PAINTSTRUCT ps;
-    BeginPaint((HWND)window, &ps);
-    EndPaint((HWND)window, &ps);
-
-    return 0;
+    return true;
 }
 
 
@@ -664,10 +687,10 @@ void Background::set_up(GUI::PlatformData platform_data, Widget* parent)
 }
 
 
-LRESULT Background::timer(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool Background::timer()
 {
     if (body == NULL) {
-        return 0;
+        return true;
     }
 
     --next_full_refresh;
@@ -679,7 +702,7 @@ LRESULT Background::timer(UINT uMsg, WPARAM wParam, LPARAM lParam)
         body->refresh_controlled_param_editors();
     }
 
-    return 0;
+    return true;
 }
 
 
@@ -1003,29 +1026,24 @@ void ControllerSelector::handle_selection_change(
 }
 
 
-LRESULT ControllerSelector::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool ControllerSelector::paint()
 {
-    PAINTSTRUCT ps;
-    HDC hdc = BeginPaint((HWND)window, &ps);
-
-    fill_rectangle(hdc, 0, 0, width, height, RGB(0, 0, 0));
+    fill_rectangle(0, 0, width, height, rgb(0, 0, 0));
     draw_text(
-        hdc,
         title,
         12,
         0,
         0,
         WIDTH,
         TITLE_HEIGHT,
-        RGB(181, 181, 189),
-        RGB(0, 0, 0),
-        FW_BOLD,
+        rgb(181, 181, 189),
+        rgb(0, 0, 0),
+        FontWeight::BOLD,
         10,
-        DT_SINGLELINE | DT_LEFT | DT_VCENTER
+        TextAlignment::LEFT
     );
-    EndPaint((HWND)window, &ps);
 
-    return 0;
+    return true;
 }
 
 
@@ -1065,27 +1083,23 @@ void ControllerSelector::Controller::unselect()
 }
 
 
-LRESULT ControllerSelector::Controller::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool ControllerSelector::Controller::paint()
 {
-    PAINTSTRUCT ps;
-    HDC hdc = BeginPaint((HWND)window, &ps);
-
-    COLORREF background;
-    COLORREF color;
+    Color background;
+    Color color;
 
     if (is_selected) {
-        background = RGB(181, 181, 189);
-        color = RGB(0, 0, 0);
+        background = rgb(181, 181, 189);
+        color = rgb(0, 0, 0);
     } else if (is_mouse_over) {
-        background = RGB(63, 63, 66);
-        color = RGB(225, 225, 235);
+        background = rgb(63, 63, 66);
+        color = rgb(225, 225, 235);
     } else {
-        background = RGB(0, 0, 0);
-        color = RGB(181, 181, 189);
+        background = rgb(0, 0, 0);
+        color = rgb(181, 181, 189);
     }
 
     draw_text(
-        hdc,
         label,
         12,
         0,
@@ -1094,14 +1108,12 @@ LRESULT ControllerSelector::Controller::paint(UINT uMsg, WPARAM wParam, LPARAM l
         height,
         color,
         background,
-        FW_BOLD,
+        FontWeight::BOLD,
         10,
-        DT_SINGLELINE | DT_LEFT | DT_VCENTER
+        TextAlignment::LEFT
     );
 
-    EndPaint((HWND)window, &ps);
-
-    return 0;
+    return true;
 }
 
 
@@ -1363,41 +1375,34 @@ void ParamEditor::reset_default()
 }
 
 
-LRESULT ParamEditor::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool ParamEditor::paint()
 {
-    PAINTSTRUCT ps;
-    HDC hdc = BeginPaint((HWND)window, &ps);
-
     draw_text(
-        hdc,
         value_str,
         value_font_size,
         1,
         HEIGHT - 20,
         WIDTH - 2,
         20,
-        RGB(181, 181, 189),
-        RGB(0, 0, 0)
+        rgb(181, 181, 189),
+        rgb(0, 0, 0)
     );
 
     if (controller_choices > 0) {
         draw_text(
-            hdc,
             controller_str,
             10,
             1,
             HEIGHT - 36,
             WIDTH - 2,
             16,
-            has_controller_ ? RGB(0, 0, 0) : RGB(181, 181, 189),
-            has_controller_ ? RGB(145, 145, 151) : RGB(0, 0, 0),
-            has_controller_ ? FW_BOLD : FW_NORMAL
+            has_controller_ ? rgb(0, 0, 0) : rgb(181, 181, 189),
+            has_controller_ ? rgb(145, 145, 151) : rgb(0, 0, 0),
+            has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
         );
     }
 
-    EndPaint((HWND)window, &ps);
-
-    return 0;
+    return true;
 }
 
 
@@ -1535,8 +1540,8 @@ LRESULT ParamEditor::Knob::lbuttondown(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     is_clicking = true;
 
-    prev_x = GET_X_LPARAM(lParam);
-    prev_y = GET_Y_LPARAM(lParam);
+    prev_x = (Number)GET_X_LPARAM(lParam);
+    prev_y = (Number)GET_Y_LPARAM(lParam);
 
     capture_mouse();
 
@@ -1583,7 +1588,7 @@ LRESULT ParamEditor::Knob::mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam)
         editor.adjust_ratio(delta);
     }
 
-    SetFocus((HWND)window);
+    focus();
 
     return 0;
 }

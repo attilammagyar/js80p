@@ -39,6 +39,18 @@ namespace JS80P
 class Widget
 {
     public:
+        typedef COLORREF Color;
+
+        enum TextAlignment {
+            LEFT = 0,
+            CENTER = 1,
+        };
+
+        enum FontWeight {
+            NORMAL = 0,
+            BOLD = 1,
+        };
+
         class Text
         {
             public:
@@ -63,6 +75,12 @@ class Widget
         static GUI::Bitmap load_bitmap(GUI::PlatformData platform_data, char const* name);
         static void delete_bitmap(GUI::Bitmap bitmap);
 
+        static Color rgb(
+            unsigned char const red,
+            unsigned char const green,
+            unsigned char const blue
+        );
+
         static LRESULT process_message(
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );
@@ -71,6 +89,7 @@ class Widget
 
         virtual void show();
         virtual void hide();
+        virtual void focus();
         virtual void click();
 
         void redraw();
@@ -91,8 +110,9 @@ class Widget
 
         virtual void set_up(GUI::PlatformData platform_data, Widget* parent);
 
-        virtual LRESULT timer(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam);
+        virtual bool timer();
+        virtual bool paint();
+
         virtual LRESULT lbuttondblclk(UINT uMsg, WPARAM wParam, LPARAM lParam);
         virtual LRESULT lbuttondown(UINT uMsg, WPARAM wParam, LPARAM lParam);
         virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -107,27 +127,25 @@ class Widget
         );
 
         void fill_rectangle(
-            HDC hdc,
             int const left,
             int const top,
             int const width,
             int const height,
-            COLORREF const color
+            Color const color
         );
 
         void draw_text(
-            HDC hdc,
             Text const& text,
             int const font_size_px,
             int const left,
             int const top,
             int const width,
             int const height,
-            COLORREF const color,
-            COLORREF const background,
-            int const weight = FW_NORMAL,
+            Color const color,
+            Color const background,
+            FontWeight const font_weight = FontWeight::NORMAL,
             int const padding = 0,
-            UINT const format = DT_SINGLELINE | DT_CENTER | DT_VCENTER
+            TextAlignment const alignment = TextAlignment::CENTER
         );
 
         GUI::Bitmap copy_bitmap_region(
@@ -142,6 +160,7 @@ class Widget
         GUI::PlatformData platform_data;
         GUI::Bitmap bitmap;
         Widget* parent;
+        HDC hdc;
 
         Text class_name;
         Text label;
@@ -182,7 +201,7 @@ class TransparentWidget : public Widget
         );
 
     protected:
-        virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+        virtual bool paint() override;
 };
 
 
@@ -225,7 +244,7 @@ class Background : public Widget
     protected:
         virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
-        virtual LRESULT timer(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+        virtual bool timer() override;
 
     private:
         static constexpr UINT_PTR TIMER_ID = 1;
@@ -332,7 +351,7 @@ class ControllerSelector : public Widget
     protected:
         virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
-        virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+        virtual bool paint() override;
 
     private:
         class Controller : public Widget
@@ -353,7 +372,8 @@ class ControllerSelector : public Widget
                 void unselect();
 
             protected:
-                virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+                virtual bool paint() override;
+
                 virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
                 virtual LRESULT mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
                 virtual LRESULT mouseleave(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -428,7 +448,8 @@ class ParamEditor : public TransparentWidget
         void reset_default();
 
     protected:
-        virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+        virtual bool paint() override;
+
         virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
     private:
