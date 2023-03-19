@@ -47,6 +47,8 @@ class GUI
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
         typedef void* Bitmap; ///< \breif GUI platform dependent bitmap.
 
+        typedef std::vector<Widget*> Widgets;
+
         typedef std::vector<ParamEditor*> ParamEditors;
 
         class Controller
@@ -63,6 +65,50 @@ class GUI
                 char const* const short_name;
                 int const index;
                 Synth::ControllerId const id;
+        };
+
+        class Object
+        {
+            public:
+                enum Type {
+                    CLICKABLE = 0,
+                    BITMAP = 1,
+                    CLICKABLE_BITMAP = 2,
+                };
+
+                enum TextAlignment {
+                    LEFT = 0,
+                    CENTER = 1,
+                };
+
+                enum FontWeight {
+                    NORMAL = 0,
+                    BOLD = 1,
+                };
+
+                virtual void click();
+
+                virtual ~Object();
+
+            protected:
+                Object();
+                Object(int const left, int const top, int const width, int const height);
+
+                virtual bool timer();
+                virtual bool paint();
+                virtual bool double_click();
+                virtual bool mouse_down(int const x, int const y);
+                virtual bool mouse_up(int const x, int const y);
+                virtual bool mouse_move(int const x, int const y, bool const modifier);
+                virtual bool mouse_leave(int const x, int const y);
+                virtual bool mouse_wheel(Number const delta);
+
+                int left;
+                int top;
+                int width;
+                int height;
+
+                bool is_clicking;
         };
 
         static constexpr long int WIDTH = 980;

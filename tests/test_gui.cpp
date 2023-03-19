@@ -17,7 +17,6 @@
  */
 
 #include "test.cpp"
-#include "gui_stubs.cpp"
 #include "utils.cpp"
 
 #include <cstddef>
@@ -25,6 +24,10 @@
 #include "js80p.hpp"
 
 #include "synth.cpp"
+
+#include "gui_stubs.cpp"
+
+#include "gui/widgets.cpp"
 #include "gui/gui.cpp"
 
 
@@ -106,4 +109,10 @@ TEST(clamp_ratio, {
     assert_eq(0.1, GUI::clamp_ratio(0.1), DOUBLE_DELTA);
     assert_eq(1.0, GUI::clamp_ratio(1.0), DOUBLE_DELTA);
     assert_eq(1.0, GUI::clamp_ratio(1.1), DOUBLE_DELTA);
+})
+
+
+TEST(gui_initialization, {
+    GUI gui(NULL, NULL, synth);
+    gui.show();
 })

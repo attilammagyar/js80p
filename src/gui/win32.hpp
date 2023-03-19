@@ -19,7 +19,6 @@
 #ifndef JS80P__GUI__WIN32_HPP
 #define JS80P__GUI__WIN32_HPP
 
-#include <cmath>
 #include <string>
 #include <vector>
 
@@ -36,21 +35,36 @@
 namespace JS80P
 {
 
-class Widget
+class Widget : public GUI::Object
 {
     public:
         typedef COLORREF Color;
 
-        enum TextAlignment {
-            LEFT = 0,
-            CENTER = 1,
-        };
+        static GUI::Bitmap load_bitmap(GUI::PlatformData platform_data, char const* name);
+        static void delete_bitmap(GUI::Bitmap bitmap);
 
-        enum FontWeight {
-            NORMAL = 0,
-            BOLD = 1,
-        };
+        static Color rgb(
+            unsigned char const red,
+            unsigned char const green,
+            unsigned char const blue
+        );
 
+        static LRESULT process_message(
+            HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
+        );
+
+        virtual ~Widget();
+
+        void show();
+        void hide();
+
+        void focus();
+        void bring_to_top();
+        void redraw();
+        Widget* own(Widget* widget);
+        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
+
+    protected:
         class Text
         {
             public:
@@ -72,59 +86,22 @@ class Widget
                 WCHAR* wtext;
         };
 
-        static GUI::Bitmap load_bitmap(GUI::PlatformData platform_data, char const* name);
-        static void delete_bitmap(GUI::Bitmap bitmap);
-
-        static Color rgb(
-            unsigned char const red,
-            unsigned char const green,
-            unsigned char const blue
-        );
-
-        static LRESULT process_message(
-            HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
-        );
-
-        virtual ~Widget();
-
-        virtual void show();
-        virtual void hide();
-        virtual void focus();
-        virtual void click();
-
-        void redraw();
-        Widget* own(Widget* widget);
-        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
-
-    protected:
         Widget();
         Widget(
             char const* const label,
-            DWORD const dwStyle,
             int const left,
             int const top,
             int const width,
-            int const height
+            int const height,
+            Type const type = Type::CLICKABLE
         );
         Widget(GUI::PlatformData platform_data, GUI::Window window);
 
+        virtual bool paint() override;
+
         virtual void set_up(GUI::PlatformData platform_data, Widget* parent);
 
-        virtual bool timer();
-        virtual bool paint();
-
-        virtual LRESULT lbuttondblclk(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT lbuttondown(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT mouseleave(UINT uMsg, WPARAM wParam, LPARAM lParam);
-        virtual LRESULT mousewheel(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-        LRESULT call_original_window_procedure(
-            UINT uMsg,
-            WPARAM wParam,
-            LPARAM lParam
-        );
+        void start_timer(Frequency const frequency);
 
         void fill_rectangle(
             int const left,
@@ -135,7 +112,7 @@ class Widget
         );
 
         void draw_text(
-            Text const& text,
+            char const* const text,
             int const font_size_px,
             int const left,
             int const top,
@@ -162,30 +139,34 @@ class Widget
         Widget* parent;
         HDC hdc;
 
+    private:
+        static constexpr UINT_PTR TIMER_ID = 1;
+
+        static constexpr Number MOUSE_WHEEL_COARSE_SCALE = (
+            1.0 / ((Number)WHEEL_DELTA * 100.0)
+        );
+        static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
+            MOUSE_WHEEL_COARSE_SCALE / 25.0
+        );
+
+        LRESULT call_original_window_procedure(
+            UINT uMsg,
+            WPARAM wParam,
+            LPARAM lParam
+        );
+
+        void capture_mouse();
+        void release_captured_mouse();
+
+        void destroy_window();
+
+        GUI::Widgets children;
         Text class_name;
         Text label;
         DWORD dwStyle;
-        int left;
-        int top;
-        int width;
-        int height;
-        bool is_hidden;
-        bool is_clicking;
-
-    private:
-        typedef std::vector<Widget*> Children;
-
-        Children children;
-
         WNDPROC original_window_procedure;
-};
-
-
-class ExternallyCreatedWindow : public Widget
-{
-    public:
-        ExternallyCreatedWindow(GUI::PlatformData platform_data, GUI::Window window);
-        virtual ~ExternallyCreatedWindow();
+        bool is_mouse_captured;
+        bool is_timer_started;
 };
 
 
@@ -202,85 +183,6 @@ class TransparentWidget : public Widget
 
     protected:
         virtual bool paint() override;
-};
-
-
-class ParamEditor;
-
-
-class TabBody : public TransparentWidget
-{
-    public:
-        static constexpr int LEFT = 0;
-        static constexpr int TOP = 30;
-        static constexpr int WIDTH = GUI::WIDTH;
-        static constexpr int HEIGHT = GUI::HEIGHT - TOP;
-
-        TabBody(char const* const label);
-
-        ParamEditor* own(ParamEditor* param_editor);
-
-        void refresh_controlled_param_editors();
-        void refresh_param_editors();
-
-    private:
-        GUI::ParamEditors param_editors;
-};
-
-
-class Background : public Widget
-{
-    public:
-        static constexpr Frequency REFRESH_RATE = 18.0;
-        static constexpr Frequency FULL_REFRESH_RATE = 3.0;
-
-        Background();
-        ~Background();
-
-        void replace_body(TabBody* new_body);
-        void hide_body();
-        void show_body();
-
-    protected:
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
-
-        virtual bool timer() override;
-
-    private:
-        static constexpr UINT_PTR TIMER_ID = 1;
-        static constexpr Integer FULL_REFRESH_TICKS = (
-            (Integer)std::ceil(REFRESH_RATE / FULL_REFRESH_RATE)
-        );
-
-        TabBody* body;
-        Integer next_full_refresh;
-};
-
-
-class TabSelector : public TransparentWidget
-{
-    public:
-        static constexpr int LEFT = 3;
-        static constexpr int TOP = 2;
-        static constexpr int WIDTH = 114;
-        static constexpr int HEIGHT = 28;
-
-        TabSelector(
-            Background* background,
-            GUI::Bitmap bitmap,
-            TabBody* tab_body,
-            char const* const label,
-            int const left
-        );
-
-    protected:
-        virtual void click() override;
-
-    private:
-        Background* background;
-        TabBody* tab_body;
-
-        GUI::Bitmap bitmap;
 };
 
 
@@ -326,234 +228,8 @@ class ExportPatchButton : public TransparentWidget
         Synth& synth;
 };
 
-
-class ControllerSelector : public Widget
-{
-    public:
-        static constexpr int LEFT = 0;
-        static constexpr int TOP = 0;
-        static constexpr int WIDTH = GUI::WIDTH;
-        static constexpr int HEIGHT = GUI::HEIGHT;
-        static constexpr int TITLE_HEIGHT = 30;
-
-        ControllerSelector(Background& background, Synth& synth);
-
-        void show(
-            Synth::ParamId const param_id,
-            int const controller_choices,
-            ParamEditor* param_editor
-        );
-
-        virtual void hide() override;
-
-        void handle_selection_change(Synth::ControllerId const new_controller_id);
-
-    protected:
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
-
-        virtual bool paint() override;
-
-    private:
-        class Controller : public Widget
-        {
-            public:
-                static constexpr int WIDTH = 240;
-                static constexpr int HEIGHT = 22;
-
-                Controller(
-                    ControllerSelector& controller_selector,
-                    char const* const label,
-                    int const left,
-                    int const top,
-                    Synth::ControllerId const controller_id
-                );
-
-                void select();
-                void unselect();
-
-            protected:
-                virtual bool paint() override;
-
-                virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT mouseleave(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-            private:
-                Synth::ControllerId const controller_id;
-                ControllerSelector& controller_selector;
-                bool is_selected;
-                bool is_mouse_over;
-        };
-
-        Text title;
-        Background& background;
-        Synth& synth;
-        ParamEditor* param_editor;
-        Controller* controllers[GUI::ALL_CTLS];
-        Synth::ParamId param_id;
-        Synth::ControllerId selected_controller_id;
-};
-
-
-class ParamEditor : public TransparentWidget
-{
-    public:
-        static constexpr int WIDTH = 58;
-        static constexpr int HEIGHT = 100;
-
-        static void initialize_knob_states(
-            GUI::Bitmap active,
-            GUI::Bitmap inactive
-        );
-
-        static void free_knob_states();
-
-        ParamEditor(
-            char const* const label,
-            int const left,
-            int const top,
-            ControllerSelector& controller_selector,
-            Synth& synth,
-            Synth::ParamId const param_id,
-            int const controller_choices,
-            char const* format,
-            double const scale
-        );
-
-        ParamEditor(
-            char const* const label,
-            int const left,
-            int const top,
-            ControllerSelector& controller_selector,
-            Synth& synth,
-            Synth::ParamId const param_id,
-            int const controller_choices,
-            char const* const* const options,
-            int const number_of_options
-        );
-
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
-
-        bool has_controller() const;
-
-        void adjust_ratio(Number const ratio);
-        void handle_ratio_change(Number const new_ratio);
-        void handle_controller_change(Synth::ControllerId const new_controller_id);
-
-        void refresh();
-        void update_editor(
-            Number const new_ratio,
-            Synth::ControllerId const new_controller_id
-        );
-        void update_editor(Number const new_ratio);
-        void update_editor(Synth::ControllerId const new_controller_id);
-        void update_editor();
-
-        void reset_default();
-
-    protected:
-        virtual bool paint() override;
-
-        virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-    private:
-        static constexpr int KNOB_STATES_COUNT = 128;
-        static constexpr Number KNOB_STATES_LAST_INDEX = (Number)(KNOB_STATES_COUNT - 1);
-
-        static bool knob_states_initialization_complete;
-
-        static GUI::Bitmap knob_states_active_bitmap;
-        static GUI::Bitmap knob_states_inactive_bitmap;
-
-        static GUI::Bitmap knob_states_active[KNOB_STATES_COUNT];
-        static GUI::Bitmap knob_states_inactive[KNOB_STATES_COUNT];
-
-        class Knob : public Widget
-        {
-            public:
-                static constexpr int WIDTH = 48;
-                static constexpr int HEIGHT = 48;
-
-                static constexpr Number MOUSE_MOVE_COARSE_SCALE = (
-                    1.0 / ((Number)HEIGHT * 3.0)
-                );
-                static constexpr Number MOUSE_MOVE_FINE_SCALE = (
-                    MOUSE_MOVE_COARSE_SCALE / 20.0
-                );
-
-                static constexpr Number MOUSE_WHEEL_COARSE_SCALE = (
-                    1.0 / ((Number)WHEEL_DELTA * 100.0)
-                );
-                static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
-                    MOUSE_WHEEL_COARSE_SCALE / 25.0
-                );
-
-                Knob(
-                    ParamEditor& editor,
-                    char const* const label,
-                    int const left,
-                    int const top,
-                    Number const steps
-                );
-                virtual ~Knob();
-
-                virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
-
-                void update(Number const ratio);
-                void update();
-                void activate();
-                void deactivate();
-
-            protected:
-                void capture_mouse();
-                void release_captured_mouse();
-
-                virtual LRESULT lbuttondblclk(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT lbuttondown(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT mouseleave(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-                virtual LRESULT mousewheel(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-            private:
-                Number const steps;
-
-                ParamEditor& editor;
-                GUI::Bitmap knob_state;
-                Number prev_x;
-                Number prev_y;
-                Number ratio;
-                bool is_inactive;
-                bool is_clicking;
-                bool is_mouse_captured;
-        };
-
-        void complete_knob_state_initialization();
-
-        void update_value_str();
-        void update_controller_str();
-
-        Synth::ParamId const param_id;
-        char const* format;
-        double const scale;
-
-        char const* const* const options;
-        int const number_of_options;
-        int const value_font_size;
-        int const controller_choices;
-
-        ControllerSelector& controller_selector;
-        Synth& synth;
-        Number default_ratio;
-        Number ratio;
-        Knob* knob;
-        int skip_refresh_calls;
-        Text value_str;
-        Text controller_str;
-        Synth::ControllerId controller_id;
-        bool has_controller_;
-};
-
 }
+
+#include "widgets.hpp"
 
 #endif

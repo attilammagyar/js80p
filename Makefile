@@ -127,11 +127,13 @@ SYNTH_SOURCES = \
 
 JS80P_HEADERS = \
 	src/gui/gui.hpp \
+	src/gui/widgets.hpp \
 	src/serializer.hpp \
 	$(SYNTH_HEADERS)
 
 JS80P_SOURCES = \
 	src/gui/gui.cpp \
+	src/gui/widgets.cpp \
 	src/serializer.cpp \
 	$(SYNTH_SOURCES)
 
@@ -150,6 +152,7 @@ WIN_GUI_HEADERS = \
 
 WIN_GUI_SOURCES = \
 	src/gui/win32.cpp \
+	src/gui/widgets.cpp \
 	src/gui/gui.cpp
 
 TEST_LIBS = \

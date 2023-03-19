@@ -509,6 +509,79 @@ GUI::Controller const* GUI::get_controller(Synth::ControllerId const controller_
 }
 
 
+GUI::Object::Object() : left(0), top(0), width(0), height(0), is_clicking(false)
+{
+}
+
+
+GUI::Object::Object(int const left, int const top, int const width, int const height)
+    : left(left),
+    top(top),
+    width(width),
+    height(height),
+    is_clicking(false)
+{
+}
+
+
+GUI::Object::~Object()
+{
+}
+
+
+void GUI::Object::click()
+{
+}
+
+
+bool GUI::Object::timer()
+{
+    return false;
+}
+
+
+bool GUI::Object::paint()
+{
+    return false;
+}
+
+
+bool GUI::Object::double_click()
+{
+    return false;
+}
+
+
+bool GUI::Object::mouse_down(int const x, int const y)
+{
+    return false;
+}
+
+
+bool GUI::Object::mouse_up(int const x, int const y)
+{
+    return false;
+}
+
+
+bool GUI::Object::mouse_move(int const x, int const y, bool const modifier)
+{
+    return false;
+}
+
+
+bool GUI::Object::mouse_leave(int const x, int const y)
+{
+    return false;
+}
+
+
+bool GUI::Object::mouse_wheel(Number const delta)
+{
+    return false;
+}
+
+
 void GUI::initialize_controllers_by_id()
 {
     if (controllers_by_id_initialized) {

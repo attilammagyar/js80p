@@ -26,24 +26,32 @@
 
 namespace JS80P {
 
-class Widget
+class Widget : public GUI::Object
 {
     public:
+        typedef Integer Color;
+
         static GUI::Bitmap load_bitmap(
                 GUI::PlatformData platform_data,
                 char const* name
         ) {
-            return NULL;
+            return (GUI::Bitmap)new DummyObject();
         }
 
         static void delete_bitmap(GUI::Bitmap bitmap)
         {
+            delete (DummyObject*)bitmap;
         }
 
-        Widget* own(Widget* widget)
-        {
-            return NULL;
+        static Color rgb(
+            unsigned char const red,
+            unsigned char const green,
+            unsigned char const blue
+        ) {
+            return 0;
         }
+
+        virtual ~Widget();
 
         void show()
         {
@@ -53,147 +61,175 @@ class Widget
         {
         }
 
-        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap)
-        {
-            return NULL;
-        }
-};
-
-
-class Background : public Widget
-{
-    public:
-        void replace_body(TabBody* new_body)
+        void focus()
         {
         }
-};
 
-
-class ControllerSelector : public Widget
-{
-    public:
-        ControllerSelector(Background& background, Synth& synth)
+        void bring_to_top()
         {
         }
-};
 
+        void redraw()
+        {
+        }
 
-class ExportPatchButton : public Widget
-{
-    public:
-        ExportPatchButton(
+        Widget* own(Widget* widget);
+
+        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
+
+    protected:
+        Widget() : Object(), window(NULL), platform_data(NULL), bitmap(NULL)
+        {
+        }
+
+        Widget(
+                char const* const label,
                 int const left,
                 int const top,
                 int const width,
                 int const height,
-                Synth& synth
-        ) {
-        }
-};
-
-
-class ExternallyCreatedWindow : public Widget
-{
-    public:
-        ExternallyCreatedWindow(
-                GUI::PlatformData platform_data,
-                GUI::Window parent_window
-        ) {
-        }
-};
-
-
-class ImportPatchButton : public Widget
-{
-    public:
-        ImportPatchButton(
-                int const left,
-                int const top,
-                int const width,
-                int const height,
-                Synth& synth,
-                TabBody* synth_gui_body
-        ) {
-        }
-};
-
-
-class ParamEditor : public Widget
-{
-    public:
-        static constexpr int WIDTH = 58;
-        static constexpr int HEIGHT = 100;
-
-        static void initialize_knob_states(
-                GUI::Bitmap active,
-                GUI::Bitmap inactive
-        ) {
-        }
-
-        static void free_knob_states()
+                Type const type = Type::CLICKABLE
+        ) : Object(left, top, width, height),
+            window(NULL),
+            platform_data(NULL),
+            bitmap(NULL)
         {
         }
 
-        ParamEditor(
-                char const* const label,
-                int const left,
-                int const top,
-                ControllerSelector& controller_selector,
-                Synth& synth,
-                Synth::ParamId const param_id,
-                int const controller_choices,
-                char const* format,
-                double const scale
-        ) {
-        }
-
-        ParamEditor(
-                char const* const label,
-                int const left,
-                int const top,
-                ControllerSelector& controller_selector,
-                Synth& synth,
-                Synth::ParamId const param_id,
-                int const controller_choices,
-                char const* const* const options,
-                int const number_of_options
-        ) {
-        }
-
-        void refresh()
+        Widget(GUI::PlatformData platform_data, GUI::Window window)
+            : Object(),
+            window(window),
+            platform_data(platform_data),
+            bitmap(NULL)
         {
         }
 
-        bool has_controller() const
+        virtual bool paint() override
         {
             return false;
         }
-};
 
-
-class TabBody : public Widget
-{
-    public:
-        TabBody(char const* const label)
+        virtual void set_up(GUI::PlatformData platform_data, Widget* parent)
         {
         }
+
+        void start_timer(Frequency const frequency)
+        {
+        }
+
+        void fill_rectangle(
+                int const left,
+                int const top,
+                int const width,
+                int const height,
+                Color const color
+        ) {
+        }
+
+        void draw_text(
+                char const* const text,
+                int const font_size_px,
+                int const left,
+                int const top,
+                int const width,
+                int const height,
+                Color const color,
+                Color const background,
+                FontWeight const font_weight = FontWeight::NORMAL,
+                int const padding = 0,
+                TextAlignment const alignment = TextAlignment::CENTER
+        ) {
+        }
+
+        GUI::Bitmap copy_bitmap_region(
+                GUI::Bitmap source,
+                int const left,
+                int const top,
+                int const width,
+                int const height
+        ) {
+            return (GUI::Bitmap)new DummyObject();
+        }
+
+        GUI::Window window;
+        GUI::PlatformData platform_data;
+        GUI::Bitmap bitmap;
+
+    private:
+        class DummyObject
+        {
+        };
+
+        void destroy_window()
+        {
+            window = NULL;
+        }
+
+        void release_captured_mouse()
+        {
+        }
+
+        GUI::Widgets children;
 };
 
 
-class TabSelector : public Widget
+class TransparentWidget : public Widget
 {
     public:
-        static constexpr int LEFT = 3;
-        static constexpr int WIDTH = 114;
+        TransparentWidget(
+            char const* const label,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
 
-        TabSelector(
-                Background* background,
-                GUI::Bitmap bitmap,
-                TabBody* tab_body,
-                char const* const label,
-                int const left
-        ) {
+    protected:
+        virtual bool paint() override;
+};
+
+
+class ExportPatchButton : public TransparentWidget
+{
+    public:
+        ExportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth
+        );
+
+    protected:
+        virtual void click() override
+        {
         }
+
+    private:
+        Synth& synth;
+};
+
+
+class ImportPatchButton : public TransparentWidget
+{
+    public:
+        ImportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth,
+            TabBody* synth_gui_body
+        );
+
+    protected:
+        virtual void click() override
+        {
+        }
+
+    private:
+        Synth& synth;
+        TabBody* synth_gui_body;
 };
 
 }
