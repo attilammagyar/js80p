@@ -130,6 +130,14 @@ class Widget
             UINT const format = DT_SINGLELINE | DT_CENTER | DT_VCENTER
         );
 
+        GUI::Bitmap copy_bitmap_region(
+            GUI::Bitmap source,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
+
         GUI::Window window;
         GUI::PlatformData platform_data;
         GUI::Bitmap bitmap;

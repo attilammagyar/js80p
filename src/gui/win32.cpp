@@ -123,7 +123,9 @@ GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* nam
 
 void Widget::delete_bitmap(GUI::Bitmap bitmap)
 {
-    DeleteObject((HGDIOBJ)bitmap);
+    if (bitmap != NULL) {
+        DeleteObject((HGDIOBJ)bitmap);
+    }
 }
 
 
@@ -370,6 +372,41 @@ void Widget::draw_text(
 
     DeleteObject((HGDIOBJ)brush);
     DeleteObject((HGDIOBJ)font);
+}
+
+
+GUI::Bitmap Widget::copy_bitmap_region(
+        GUI::Bitmap source,
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) {
+    HDC hdc = GetDC((HWND)window);
+
+    HDC source_hdc = CreateCompatibleDC(hdc);
+    HDC destination_hdc = CreateCompatibleDC(hdc);
+
+    GUI::Bitmap destination_bitmap = CreateCompatibleBitmap(hdc, width, height);
+
+    GUI::Bitmap old_source_bitmap = (
+        (GUI::Bitmap)SelectObject(source_hdc, (HGDIOBJ)source)
+    );
+    GUI::Bitmap old_destination_bitmap = (
+        (GUI::Bitmap)SelectObject(destination_hdc, (HGDIOBJ)destination_bitmap)
+    );
+
+    BitBlt(destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY);
+
+    SelectObject(source_hdc, (HGDIOBJ)old_source_bitmap);
+    SelectObject(destination_hdc, (HGDIOBJ)old_destination_bitmap);
+
+    DeleteDC(source_hdc);
+    DeleteDC(destination_hdc);
+
+    ReleaseDC((HWND)window, hdc);
+
+    return destination_bitmap;
 }
 
 
@@ -1435,38 +1472,12 @@ void ParamEditor::Knob::update(Number const ratio)
 
 void ParamEditor::Knob::update()
 {
-    HDC hdc = GetDC((HWND)window);
+    int const left = (int)(KNOB_STATES_LAST_INDEX * this->ratio) * WIDTH;
+    GUI::Bitmap source = is_inactive ? knob_states_inactive : knob_states;
 
-    HDC source_hdc = CreateCompatibleDC(hdc);
-    HDC destination_hdc = CreateCompatibleDC(hdc);
+    knob_state = copy_bitmap_region(source, left, 0, WIDTH, HEIGHT);
 
-    GUI::Bitmap source_bitmap = is_inactive ? knob_states_inactive : knob_states;
-    GUI::Bitmap destination_bitmap = CreateCompatibleBitmap(hdc, WIDTH, HEIGHT);
-
-    GUI::Bitmap old_source_bitmap = (
-        (GUI::Bitmap)SelectObject(source_hdc, (HGDIOBJ)source_bitmap)
-    );
-    GUI::Bitmap old_destination_bitmap = (
-        (GUI::Bitmap)SelectObject(destination_hdc, (HGDIOBJ)destination_bitmap)
-    );
-
-    int source_x = (int)(KNOB_STATES_LAST_INDEX * this->ratio) * WIDTH;
-    BitBlt(destination_hdc, 0, 0, WIDTH, HEIGHT, source_hdc, source_x, 0, SRCCOPY);
-
-    SelectObject(source_hdc, (HGDIOBJ)old_source_bitmap);
-    SelectObject(destination_hdc, (HGDIOBJ)old_destination_bitmap);
-
-    DeleteDC(source_hdc);
-    DeleteDC(destination_hdc);
-
-    ReleaseDC((HWND)window, hdc);
-
-    if (knob_state != NULL) {
-        DeleteObject((HGDIOBJ)knob_state);
-    }
-
-    knob_state = destination_bitmap;
-    set_bitmap(knob_state);
+    delete_bitmap(set_bitmap(knob_state));
 }
 
 
