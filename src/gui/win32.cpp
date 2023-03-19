@@ -1996,10 +1996,10 @@ void GUI::build_synth_body()
     );
     ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
 
-    ADD_PE(synth_body,  12, 33 + (PE_H + 5),        synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12, 33 + (PE_H + 5) * 2,    synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12, 33 + (PE_H + 5) * 3,    synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
-    ADD_PE(synth_body,  12, 33 + (PE_H + 5) * 4,    synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
+    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 1,    synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 2,    synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
+    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 3,    synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
+    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 4,    synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 
     ADD_PE(synth_body,  87,              36,        synth, ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
     ADD_PE(synth_body,  87 + PE_W * 1,   36,        synth, ParamId::MPRT,   FLEX_CTLS,  "%.3f", 1.0);
