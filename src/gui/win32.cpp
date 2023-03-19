@@ -43,15 +43,32 @@ GUI* GUI::create_instance(
 namespace JS80P { namespace Win32GUI
 {
 
-Widget::Text::Text()
+Widget::Text::Text() : wtext(NULL)
 {
     set("");
 }
 
 
-Widget::Text::Text(std::string const text)
+Widget::Text::Text(std::string const text) : wtext(NULL)
 {
     set(text);
+}
+
+
+Widget::Text::~Text()
+{
+    free_wtext();
+}
+
+
+void Widget::Text::free_wtext()
+{
+    if (wtext == NULL) {
+        return;
+    }
+
+    delete[] wtext;
+    wtext = NULL;
 }
 
 
@@ -60,16 +77,26 @@ void Widget::Text::set(std::string const text)
     this->text = text;
 
 #ifdef UNICODE
-    MultiByteToWideChar(
-        CP_UTF8,
-        0,
-        (LPCCH)text.c_str(),
-        std::min((int)text.length(), MAX_LENGTH),
-        (LPWSTR)wtext,
-        MAX_LENGTH
-    );
+    int const length = (int)text.length();
+    int const size = length + 1;
 
-    wtext[std::min((int)text.length(), MAX_LENGTH - 1)] = 0;
+    free_wtext();
+    wtext = new WCHAR[size];
+
+    if (length == 0) {
+        wtext[0] = 0;
+    } else {
+        MultiByteToWideChar(
+            CP_UTF8,
+            0,
+            (LPCCH)text.c_str(),
+            length,
+            (LPWSTR)wtext,
+            size
+        );
+
+        wtext[std::min(size - 1, length)] = 0;
+    }
 #endif
 }
 
@@ -894,13 +921,11 @@ void ControllerSelector::show(
         controllers[old_controller->index]->unselect();
     }
 
-    char title[Widget::Text::MAX_LENGTH];
+    constexpr int title_size = 128;
+    char title[title_size];
 
     snprintf(
-        title,
-        Widget::Text::MAX_LENGTH,
-        "Select controller for \"%s\"",
-        JS80P::GUI::PARAMS[param_id]
+        title, title_size, "Select controller for \"%s\"", JS80P::GUI::PARAMS[param_id]
     );
 
     this->param_id = param_id;
@@ -1314,6 +1339,7 @@ void ParamEditor::update_value_str_float()
 
 void ParamEditor::update_value_str_int()
 {
+    constexpr int max_length = 16;
     Byte const value = (
         synth.int_param_ratio_to_display_value(param_id, ratio)
     );
@@ -1322,22 +1348,23 @@ void ParamEditor::update_value_str_int()
         return;
     }
 
-    char buffer[Widget::Text::MAX_LENGTH];
+    char buffer[max_length];
 
-    strncpy(buffer, options[value], Widget::Text::MAX_LENGTH - 1);
+    strncpy(buffer, options[value], max_length - 1);
+    buffer[max_length - 1] = '\x00';
     value_str.set(buffer);
 }
 
 
 void ParamEditor::update_controller_str()
 {
-    char buffer[Widget::Text::MAX_LENGTH];
+    constexpr int max_length = 16;
+    char buffer[max_length];
 
     strncpy(
-        buffer,
-        GUI::get_controller(controller_id)->short_name,
-        Widget::Text::MAX_LENGTH - 1
+        buffer, GUI::get_controller(controller_id)->short_name, max_length - 1
     );
+    buffer[max_length - 1] = '\x00';
     controller_str.set(buffer);
 }
 

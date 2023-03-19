@@ -49,10 +49,9 @@ class Widget
         class Text
         {
             public:
-                static constexpr int MAX_LENGTH = 128;
-
                 Text();
                 Text(std::string const text);
+                ~Text();
 
                 void set(std::string const text);
 
@@ -62,8 +61,10 @@ class Widget
                 LPCTSTR get() const;
 
             private:
+                void free_wtext();
+
                 std::string text;
-                WCHAR wtext[MAX_LENGTH];
+                WCHAR* wtext;
         };
 
         static LRESULT process_message(
