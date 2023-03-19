@@ -1283,20 +1283,32 @@ void ParamEditor::update_value_str()
 
 void ParamEditor::update_value_str_float()
 {
-    double const value = (
+    constexpr int max_length = 16;
+    Number const value = (
         synth.float_param_ratio_to_display_value(param_id, ratio) * scale
     );
-    char buffer[Widget::Text::MAX_LENGTH];
+    char buffer[max_length];
 
-    snprintf(buffer, Widget::Text::MAX_LENGTH, format, value);
+    snprintf(buffer, max_length, format, value);
 
-    if (strncmp("-0", buffer, Widget::Text::MAX_LENGTH) == 0) {
-        value_str.set("0");
-    } else if (strncmp("-0.0", buffer, Widget::Text::MAX_LENGTH) == 0) {
-        value_str.set("0.0");
-    } else {
-        value_str.set(buffer);
+    bool minus_zero = buffer[0] == '-';
+
+    for (int i = 1; minus_zero && i != max_length; ++i) {
+        if (buffer[i] == '\x00') {
+            break;
+        }
+
+        if (buffer[i] != '0' && buffer[i] != '.') {
+            minus_zero = false;
+        }
     }
+
+    if (minus_zero) {
+        snprintf(buffer, max_length, format, 0.0);
+    }
+
+    buffer[max_length - 1] = '\x00';
+    value_str.set(buffer);
 }
 
 
