@@ -94,6 +94,7 @@ TESTS = \
 	test_distortion \
 	test_envelope \
 	test_flexible_controller \
+	test_gui \
 	test_math \
 	test_midi_controller \
 	test_oscillator \
@@ -130,6 +131,7 @@ JS80P_HEADERS = \
 	$(SYNTH_HEADERS)
 
 JS80P_SOURCES = \
+	src/gui/gui.cpp \
 	src/serializer.cpp \
 	$(SYNTH_SOURCES)
 
@@ -219,6 +221,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
 # 	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
@@ -330,6 +333,15 @@ $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_gui$(EXE): \
+		tests/test_gui.cpp \
+		tests/gui_stubs.cpp \
+		$(TEST_LIBS) \
+		$(JS80P_HEADERS) \
+		$(JS80P_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 

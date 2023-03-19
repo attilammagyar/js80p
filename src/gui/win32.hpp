@@ -33,15 +33,8 @@
 #include "gui/gui.hpp"
 
 
-namespace JS80P { namespace Win32GUI
+namespace JS80P
 {
-
-class GUI;
-
-
-typedef Synth::ParamId ParamId;
-typedef Synth::ControllerId ControllerId;
-
 
 class Widget
 {
@@ -67,6 +60,9 @@ class Widget
                 WCHAR* wtext;
         };
 
+        static GUI::Bitmap load_bitmap(GUI::PlatformData platform_data, char const* name);
+        static void delete_bitmap(GUI::Bitmap bitmap);
+
         static LRESULT process_message(
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );
@@ -79,7 +75,7 @@ class Widget
 
         void redraw();
         Widget* own(Widget* widget);
-        HBITMAP set_bitmap(HBITMAP bitmap);
+        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
 
     protected:
         Widget();
@@ -91,9 +87,9 @@ class Widget
             int const width,
             int const height
         );
-        Widget(HINSTANCE application, HWND hwnd);
+        Widget(GUI::PlatformData platform_data, GUI::Window window);
 
-        virtual void set_up(HINSTANCE application, Widget* parent);
+        virtual void set_up(GUI::PlatformData platform_data, Widget* parent);
 
         virtual LRESULT timer(UINT uMsg, WPARAM wParam, LPARAM lParam);
         virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -134,10 +130,10 @@ class Widget
             UINT const format = DT_SINGLELINE | DT_CENTER | DT_VCENTER
         );
 
-        HWND hwnd;
+        GUI::Window window;
+        GUI::PlatformData platform_data;
+        GUI::Bitmap bitmap;
         Widget* parent;
-        HINSTANCE application;
-        HBITMAP bitmap;
 
         Text class_name;
         Text label;
@@ -161,7 +157,7 @@ class Widget
 class ExternallyCreatedWindow : public Widget
 {
     public:
-        ExternallyCreatedWindow(HINSTANCE application, HWND hwnd);
+        ExternallyCreatedWindow(GUI::PlatformData platform_data, GUI::Window window);
         virtual ~ExternallyCreatedWindow();
 };
 
@@ -190,20 +186,18 @@ class TabBody : public TransparentWidget
     public:
         static constexpr int LEFT = 0;
         static constexpr int TOP = 30;
-        static constexpr int WIDTH = JS80P::GUI::WIDTH;
-        static constexpr int HEIGHT = JS80P::GUI::HEIGHT - TOP;
+        static constexpr int WIDTH = GUI::WIDTH;
+        static constexpr int HEIGHT = GUI::HEIGHT - TOP;
 
         TabBody(char const* const label);
 
         ParamEditor* own(ParamEditor* param_editor);
 
-        void refresh_controlled_params();
-        void refresh_params();
+        void refresh_controlled_param_editors();
+        void refresh_param_editors();
 
     private:
-        typedef std::vector<ParamEditor*> ParamEditors;
-
-        ParamEditors param_editors;
+        GUI::ParamEditors param_editors;
 };
 
 
@@ -221,7 +215,7 @@ class Background : public Widget
         void show_body();
 
     protected:
-        virtual void set_up(HINSTANCE application, Widget* parent) override;
+        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
         virtual LRESULT timer(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -233,6 +227,33 @@ class Background : public Widget
 
         TabBody* body;
         Integer next_full_refresh;
+};
+
+
+class TabSelector : public TransparentWidget
+{
+    public:
+        static constexpr int LEFT = 3;
+        static constexpr int TOP = 2;
+        static constexpr int WIDTH = 114;
+        static constexpr int HEIGHT = 28;
+
+        TabSelector(
+            Background* background,
+            GUI::Bitmap bitmap,
+            TabBody* tab_body,
+            char const* const label,
+            int const left
+        );
+
+    protected:
+        virtual void click() override;
+
+    private:
+        Background* background;
+        TabBody* tab_body;
+
+        GUI::Bitmap bitmap;
 };
 
 
@@ -279,56 +300,29 @@ class ExportPatchButton : public TransparentWidget
 };
 
 
-class TabSelector : public TransparentWidget
-{
-    public:
-        static constexpr int LEFT = 3;
-        static constexpr int TOP = 2;
-        static constexpr int WIDTH = 114;
-        static constexpr int HEIGHT = 28;
-
-        TabSelector(
-            Background* background,
-            HBITMAP bitmap,
-            TabBody* tab_body,
-            char const* const label,
-            int const left
-        );
-
-    protected:
-        virtual void click() override;
-
-    private:
-        Background* background;
-        TabBody* tab_body;
-
-        HBITMAP bitmap;
-};
-
-
 class ControllerSelector : public Widget
 {
     public:
         static constexpr int LEFT = 0;
         static constexpr int TOP = 0;
-        static constexpr int WIDTH = JS80P::GUI::WIDTH;
-        static constexpr int HEIGHT = JS80P::GUI::HEIGHT;
+        static constexpr int WIDTH = GUI::WIDTH;
+        static constexpr int HEIGHT = GUI::HEIGHT;
         static constexpr int TITLE_HEIGHT = 30;
 
         ControllerSelector(Background& background, Synth& synth);
 
         void show(
-            ParamId const param_id,
+            Synth::ParamId const param_id,
             int const controller_choices,
             ParamEditor* param_editor
         );
 
         virtual void hide() override;
 
-        void handle_selection_change(ControllerId const new_controller_id);
+        void handle_selection_change(Synth::ControllerId const new_controller_id);
 
     protected:
-        virtual void set_up(HINSTANCE application, Widget* parent) override;
+        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
         virtual LRESULT paint(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -344,7 +338,7 @@ class ControllerSelector : public Widget
                     char const* const label,
                     int const left,
                     int const top,
-                    ControllerId const controller_id
+                    Synth::ControllerId const controller_id
                 );
 
                 void select();
@@ -357,7 +351,7 @@ class ControllerSelector : public Widget
                 virtual LRESULT mouseleave(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
             private:
-                ControllerId const controller_id;
+                Synth::ControllerId const controller_id;
                 ControllerSelector& controller_selector;
                 bool is_selected;
                 bool is_mouse_over;
@@ -367,9 +361,9 @@ class ControllerSelector : public Widget
         Background& background;
         Synth& synth;
         ParamEditor* param_editor;
-        Controller* controllers[JS80P::GUI::ALL_CTLS];
-        ParamId param_id;
-        ControllerId selected_controller_id;
+        Controller* controllers[GUI::ALL_CTLS];
+        Synth::ParamId param_id;
+        Synth::ControllerId selected_controller_id;
 };
 
 
@@ -379,8 +373,8 @@ class ParamEditor : public TransparentWidget
         static constexpr int WIDTH = 58;
         static constexpr int HEIGHT = 100;
 
-        static HBITMAP knob_states;
-        static HBITMAP knob_states_inactive;
+        static GUI::Bitmap knob_states;
+        static GUI::Bitmap knob_states_inactive;
 
         ParamEditor(
             char const* const label,
@@ -388,7 +382,7 @@ class ParamEditor : public TransparentWidget
             int const top,
             ControllerSelector& controller_selector,
             Synth& synth,
-            ParamId const param_id,
+            Synth::ParamId const param_id,
             int const controller_choices,
             char const* format,
             double const scale
@@ -400,27 +394,27 @@ class ParamEditor : public TransparentWidget
             int const top,
             ControllerSelector& controller_selector,
             Synth& synth,
-            ParamId const param_id,
+            Synth::ParamId const param_id,
             int const controller_choices,
             char const* const* const options,
             int const number_of_options
         );
 
-        virtual void set_up(HINSTANCE application, Widget* parent) override;
+        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
         bool has_controller() const;
 
         void adjust_ratio(Number const ratio);
         void handle_ratio_change(Number const new_ratio);
-        void handle_controller_change(ControllerId const new_controller_id);
+        void handle_controller_change(Synth::ControllerId const new_controller_id);
 
         void refresh();
         void update_editor(
             Number const new_ratio,
-            ControllerId const new_controller_id
+            Synth::ControllerId const new_controller_id
         );
         void update_editor(Number const new_ratio);
-        void update_editor(ControllerId const new_controller_id);
+        void update_editor(Synth::ControllerId const new_controller_id);
         void update_editor();
 
         void reset_default();
@@ -461,7 +455,7 @@ class ParamEditor : public TransparentWidget
                 );
                 virtual ~Knob();
 
-                virtual void set_up(HINSTANCE application, Widget* parent) override;
+                virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
 
                 void update(Number const ratio);
                 void update();
@@ -483,7 +477,7 @@ class ParamEditor : public TransparentWidget
                 Number const steps;
 
                 ParamEditor& editor;
-                HBITMAP knob_state;
+                GUI::Bitmap knob_state;
                 Number prev_x;
                 Number prev_y;
                 Number ratio;
@@ -493,13 +487,9 @@ class ParamEditor : public TransparentWidget
         };
 
         void update_value_str();
-        void update_value_str_float();
-        void update_value_str_int();
         void update_controller_str();
 
-        Number clamp(Number const raw_ratio) const;
-
-        ParamId const param_id;
+        Synth::ParamId const param_id;
         char const* format;
         double const scale;
 
@@ -515,53 +505,10 @@ class ParamEditor : public TransparentWidget
         Knob* knob;
         Text value_str;
         Text controller_str;
-        ControllerId controller_id;
+        Synth::ControllerId controller_id;
         bool has_controller_;
 };
 
-
-class GUI : public JS80P::GUI
-{
-    public:
-        GUI(HINSTANCE application, HWND parent_window, Synth& synth);
-        ~GUI();
-
-        virtual void show() override;
-
-        ControllerSelector* controller_selector;
-
-    private:
-        HBITMAP load_bitmap(LPCTSTR name);
-
-        void build_about_body();
-        void build_controllers_body();
-        void build_effects_body();
-        void build_envelopes_body();
-        void build_lfos_body();
-        void build_synth_body();
-
-        void add_fpe();
-
-        HBITMAP about_bitmap;
-        HBITMAP controllers_bitmap;
-        HBITMAP effects_bitmap;
-        HBITMAP envelopes_bitmap;
-        HBITMAP lfos_bitmap;
-        HBITMAP synth_bitmap;
-
-        Background* background;
-        TabBody* about_body;
-        TabBody* controllers_body;
-        TabBody* effects_body;
-        TabBody* envelopes_body;
-        TabBody* lfos_body;
-        TabBody* synth_body;
-
-        Synth& synth;
-        HINSTANCE application;
-        ExternallyCreatedWindow parent_window;
-};
-
-} }
+}
 
 #endif

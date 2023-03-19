@@ -21,26 +21,11 @@
 #include <cstdio>
 #include <cstring>
 
-#include "gui/gui.cpp"
 #include "gui/win32.hpp"
+#include "gui/gui.cpp"
 
 
-namespace JS80P {
-
-GUI* GUI::create_instance(
-        PlatformData platform_data,
-        Window parent_window,
-        Synth& synth
-) {
-    return (GUI*)new Win32GUI::GUI(
-        (HINSTANCE)platform_data, (HWND)parent_window, synth
-    );
-}
-
-}
-
-
-namespace JS80P { namespace Win32GUI
+namespace JS80P
 {
 
 Widget::Text::Text() : wtext(NULL)
@@ -123,6 +108,25 @@ LPCTSTR Widget::Text::get() const
 }
 
 
+GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* name)
+{
+    Text name_text(name);
+
+    // TODO: GetLastError()
+    GUI::Bitmap bitmap = (GUI::Bitmap)LoadImage(
+        (HINSTANCE)platform_data, name_text.get(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION
+    );
+
+    return bitmap;
+}
+
+
+void Widget::delete_bitmap(GUI::Bitmap bitmap)
+{
+    DeleteObject((HGDIOBJ)bitmap);
+}
+
+
 LRESULT Widget::process_message(
         HWND hwnd,
         UINT uMsg,
@@ -176,11 +180,11 @@ LRESULT Widget::process_message(
 }
 
 
-Widget::Widget(HINSTANCE application, HWND hwnd)
-    : hwnd(hwnd),
-    parent(NULL),
-    application(application),
+Widget::Widget(GUI::PlatformData platform_data, GUI::Window window)
+    : window(window),
+    platform_data(platform_data),
     bitmap(NULL),
+    parent(NULL),
     is_hidden(false),
     is_clicking(false),
     original_window_procedure(NULL)
@@ -189,10 +193,10 @@ Widget::Widget(HINSTANCE application, HWND hwnd)
 
 
 Widget::Widget()
-    : hwnd(NULL),
-    parent(NULL),
-    application(NULL),
+    : window(NULL),
+    platform_data(NULL),
     bitmap(NULL),
+    parent(NULL),
     is_hidden(false),
     is_clicking(false),
     original_window_procedure(NULL)
@@ -207,10 +211,10 @@ Widget::Widget(
         int const top,
         int const width,
         int const height
-) : hwnd(NULL),
-    parent(NULL),
-    application(NULL),
+) : window(NULL),
+    platform_data(NULL),
     bitmap(NULL),
+    parent(NULL),
     class_name("STATIC"),
     label(label),
     dwStyle(dwStyle),
@@ -231,19 +235,19 @@ Widget::~Widget()
         delete *it;
     }
 
-    if (hwnd != NULL) {
-        DestroyWindow(hwnd);
+    if (window != NULL) {
+        DestroyWindow((HWND)window);
     }
 }
 
 
-void Widget::set_up(HINSTANCE application, Widget* parent)
+void Widget::set_up(GUI::PlatformData platform_data, Widget* parent)
 {
-    this->application = application;
+    this->platform_data = platform_data;
     this->parent = parent;
 
     // TODO: GetLastError()
-    hwnd = CreateWindow(
+    window = (GUI::Window)CreateWindow(
         (LPCTSTR)class_name.get(),
         (LPCTSTR)label.get(),
         dwStyle,
@@ -251,17 +255,17 @@ void Widget::set_up(HINSTANCE application, Widget* parent)
         top,
         width,
         height,
-        parent->hwnd,
+        (HWND)parent->window,
         NULL,
-        application,
+        (HINSTANCE)platform_data,
         NULL
     );
 
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+    SetWindowLongPtr((HWND)window, GWLP_USERDATA, (LONG_PTR)this);
 
     original_window_procedure = (
         (WNDPROC)SetWindowLongPtr(
-            hwnd, GWLP_WNDPROC, (LONG_PTR)(&process_message)
+            (HWND)window, GWLP_WNDPROC, (LONG_PTR)(&process_message)
         )
     );
 }
@@ -275,10 +279,10 @@ LRESULT Widget::call_original_window_procedure(
     if (original_window_procedure != NULL) {
         // TODO: GetLastError()
         return CallWindowProc(
-            original_window_procedure, hwnd, uMsg, wParam, lParam
+            original_window_procedure, (HWND)window, uMsg, wParam, lParam
         );
     } else {
-        return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+        return DefWindowProcW((HWND)window, uMsg, wParam, lParam);
     }
 }
 
@@ -373,7 +377,7 @@ void Widget::show()
 {
     // TODO: GetLastError()
     is_hidden = false;
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+    ShowWindow((HWND)window, SW_SHOWNORMAL);
 }
 
 
@@ -381,14 +385,14 @@ void Widget::hide()
 {
     // TODO: GetLastError()
     is_hidden = true;
-    ShowWindow(hwnd, SW_HIDE);
+    ShowWindow((HWND)window, SW_HIDE);
 }
 
 
 void Widget::redraw()
 {
     // TODO: GetLastError()
-    RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE);
+    RedrawWindow((HWND)window, NULL, NULL, RDW_INVALIDATE);
 }
 
 
@@ -400,16 +404,16 @@ void Widget::click()
 Widget* Widget::own(Widget* widget)
 {
     children.push_back(widget);
-    widget->set_up(application, (Widget*)this);
+    widget->set_up(platform_data, (Widget*)this);
 
     return widget;
 }
 
 
-HBITMAP Widget::set_bitmap(HBITMAP bitmap)
+GUI::Bitmap Widget::set_bitmap(GUI::Bitmap bitmap)
 {
     // TODO: GetLastError()
-    HBITMAP old = this->bitmap;
+    GUI::Bitmap old = this->bitmap;
 
     this->bitmap = bitmap;
 
@@ -429,19 +433,19 @@ LRESULT Widget::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (bitmap != NULL) {
         PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hwnd, &ps);
+        HDC hdc = BeginPaint((HWND)window, &ps);
 
         HDC bitmap_hdc = CreateCompatibleDC(hdc);
-        SelectObject(bitmap_hdc, bitmap);
+        SelectObject(bitmap_hdc, (HBITMAP)bitmap);
         BitBlt(hdc, 0, 0, width, height, bitmap_hdc, 0, 0, SRCCOPY);
 
-        EndPaint(hwnd, &ps);
+        EndPaint((HWND)window, &ps);
         DeleteDC(bitmap_hdc);
 
         return 0;
-    } else {
-        return call_original_window_procedure(uMsg, wParam, lParam);
     }
+
+    return call_original_window_procedure(uMsg, wParam, lParam);
 }
 
 
@@ -489,16 +493,16 @@ LRESULT Widget::mousewheel(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
 ExternallyCreatedWindow::ExternallyCreatedWindow(
-        HINSTANCE application,
-        HWND hwnd
-) : Widget(application, hwnd)
+        GUI::PlatformData platform_data,
+        GUI::Window window
+) : Widget(platform_data, window)
 {
 }
 
 
 ExternallyCreatedWindow::~ExternallyCreatedWindow()
 {
-    hwnd = NULL;
+    window = NULL;
 }
 
 
@@ -529,8 +533,8 @@ LRESULT TransparentWidget::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
     */
 
     PAINTSTRUCT ps;
-    BeginPaint(hwnd, &ps);
-    EndPaint(hwnd, &ps);
+    BeginPaint((HWND)window, &ps);
+    EndPaint((HWND)window, &ps);
 
     return 0;
 }
@@ -552,23 +556,15 @@ ParamEditor* TabBody::own(ParamEditor* param_editor)
 }
 
 
-void TabBody::refresh_controlled_params()
+void TabBody::refresh_controlled_param_editors()
 {
-    for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
-        ParamEditor* editor = *it;
-
-        if (editor->has_controller()) {
-            editor->refresh();
-        }
-    }
+    GUI::refresh_controlled_param_editors(param_editors);
 }
 
 
-void TabBody::refresh_params()
+void TabBody::refresh_param_editors()
 {
-    for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
-        (*it)->refresh();
-    }
+    GUI::refresh_param_editors(param_editors);
 }
 
 
@@ -578,8 +574,8 @@ Background::Background()
         WS_CHILD | WS_VISIBLE | SS_BITMAP,
         0,
         0,
-        JS80P::GUI::WIDTH,
-        JS80P::GUI::HEIGHT
+        GUI::WIDTH,
+        GUI::HEIGHT
     ),
     body(NULL),
     next_full_refresh(FULL_REFRESH_TICKS)
@@ -589,7 +585,7 @@ Background::Background()
 
 Background::~Background()
 {
-    KillTimer(hwnd, TIMER_ID);
+    KillTimer((HWND)window, TIMER_ID);
 }
 
 
@@ -620,14 +616,14 @@ void Background::show_body()
 }
 
 
-void Background::set_up(HINSTANCE application, Widget* parent)
+void Background::set_up(GUI::PlatformData platform_data, Widget* parent)
 {
-    Widget::set_up(application, parent);
+    Widget::set_up(platform_data, parent);
 
     constexpr UINT elapse = (UINT)std::ceil(1000.0 / REFRESH_RATE);
 
     // TODO: GetLastError
-    SetTimer(hwnd, TIMER_ID, elapse, NULL);
+    SetTimer((HWND)window, TIMER_ID, elapse, NULL);
 }
 
 
@@ -641,12 +637,33 @@ LRESULT Background::timer(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     if (next_full_refresh == 0) {
         next_full_refresh = FULL_REFRESH_TICKS;
-        body->refresh_params();
+        body->refresh_param_editors();
     } else {
-        body->refresh_controlled_params();
+        body->refresh_controlled_param_editors();
     }
 
     return 0;
+}
+
+
+TabSelector::TabSelector(
+        Background* background,
+        GUI::Bitmap bitmap,
+        TabBody* tab_body,
+        char const* const label,
+        int const left
+) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT),
+    background(background),
+    tab_body(tab_body),
+    bitmap(bitmap)
+{
+}
+
+
+void TabSelector::click()
+{
+    background->set_bitmap(bitmap);
+    background->replace_body(tab_body);
 }
 
 
@@ -683,7 +700,7 @@ void ImportPatchButton::click()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hwnd;
+    ofn.hwndOwner = (HWND)window;
     ofn.lpstrFilter = filter.get();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
@@ -750,7 +767,7 @@ void ImportPatchButton::click()
 
     Serializer::import(synth, patch);
 
-    synth_gui_body->refresh_params();
+    synth_gui_body->refresh_param_editors();
 }
 
 
@@ -778,7 +795,7 @@ void ExportPatchButton::click()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hwnd;
+    ofn.hwndOwner = (HWND)window;
     ofn.lpstrFilter = filter.get();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
@@ -826,27 +843,6 @@ void ExportPatchButton::click()
 }
 
 
-TabSelector::TabSelector(
-        Background* background,
-        HBITMAP bitmap,
-        TabBody* tab_body,
-        char const* const label,
-        int const left
-) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT),
-    background(background),
-    tab_body(tab_body),
-    bitmap(bitmap)
-{
-}
-
-
-void TabSelector::click()
-{
-    background->set_bitmap(bitmap);
-    background->replace_body(tab_body);
-}
-
-
 ControllerSelector::ControllerSelector(
         Background& background,
         Synth& synth
@@ -861,22 +857,22 @@ ControllerSelector::ControllerSelector(
     background(background),
     synth(synth),
     param_editor(NULL),
-    param_id(ParamId::MAX_PARAM_ID),
-    selected_controller_id(ControllerId::MAX_CONTROLLER_ID)
+    param_id(Synth::ParamId::MAX_PARAM_ID),
+    selected_controller_id(Synth::ControllerId::MAX_CONTROLLER_ID)
 {
 }
 
 
-void ControllerSelector::set_up(HINSTANCE application, Widget* parent)
+void ControllerSelector::set_up(GUI::PlatformData platform_data, Widget* parent)
 {
-    Widget::set_up(application, parent);
+    Widget::set_up(platform_data, parent);
 
     constexpr int max_top = HEIGHT - Controller::HEIGHT;
     int top = TITLE_HEIGHT;
     int left = 10;
 
     for (int i = 0; i != GUI::ALL_CTLS; ++i) {
-        ControllerId const id = GUI::CONTROLLERS[i].id;
+        Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
         char const* const label = GUI::CONTROLLERS[i].long_name;
 
         controllers[i] = (Controller*)this->own(
@@ -898,15 +894,15 @@ void ControllerSelector::set_up(HINSTANCE application, Widget* parent)
 
 
 void ControllerSelector::show(
-        ParamId const param_id,
+        Synth::ParamId const param_id,
         int const controller_choices,
         ParamEditor* param_editor
 ) {
-    ControllerId const selected_controller_id = (
+    Synth::ControllerId const selected_controller_id = (
         synth.get_param_controller_id_atomic(param_id)
     );
 
-    JS80P::GUI::Controller const* const controller = GUI::get_controller(
+    GUI::Controller const* const controller = GUI::get_controller(
         selected_controller_id
     );
 
@@ -914,8 +910,8 @@ void ControllerSelector::show(
         return;
     }
 
-    if (this->selected_controller_id < ControllerId::MAX_CONTROLLER_ID) {
-        JS80P::GUI::Controller const* const old_controller = GUI::get_controller(
+    if (this->selected_controller_id < Synth::ControllerId::MAX_CONTROLLER_ID) {
+        GUI::Controller const* const old_controller = GUI::get_controller(
             this->selected_controller_id
         );
         controllers[old_controller->index]->unselect();
@@ -925,7 +921,7 @@ void ControllerSelector::show(
     char title[title_size];
 
     snprintf(
-        title, title_size, "Select controller for \"%s\"", JS80P::GUI::PARAMS[param_id]
+        title, title_size, "Select controller for \"%s\"", GUI::PARAMS[param_id]
     );
 
     this->param_id = param_id;
@@ -946,7 +942,7 @@ void ControllerSelector::show(
     redraw();
     Widget::show();
     background.hide_body();
-    BringWindowToTop(hwnd);
+    BringWindowToTop((HWND)window);
 }
 
 
@@ -958,11 +954,11 @@ void ControllerSelector::hide()
 
 
 void ControllerSelector::handle_selection_change(
-        ControllerId const new_controller_id
+        Synth::ControllerId const new_controller_id
 ) {
     hide();
 
-    if (param_editor == NULL || param_id >= ParamId::MAX_PARAM_ID) {
+    if (param_editor == NULL || param_id >= Synth::Synth::ParamId::MAX_PARAM_ID) {
         return;
     }
 
@@ -973,7 +969,7 @@ void ControllerSelector::handle_selection_change(
 LRESULT ControllerSelector::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hwnd, &ps);
+    HDC hdc = BeginPaint((HWND)window, &ps);
 
     fill_rectangle(hdc, 0, 0, width, height, RGB(0, 0, 0));
     draw_text(
@@ -990,7 +986,7 @@ LRESULT ControllerSelector::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
         10,
         DT_SINGLELINE | DT_LEFT | DT_VCENTER
     );
-    EndPaint(hwnd, &ps);
+    EndPaint((HWND)window, &ps);
 
     return 0;
 }
@@ -1001,7 +997,7 @@ ControllerSelector::Controller::Controller(
         char const* const label,
         int const left,
         int const top,
-        ControllerId const controller_id
+        Synth::ControllerId const controller_id
 ) : Widget(
         label,
         WS_CHILD | WS_VISIBLE | SS_NOTIFY,
@@ -1035,7 +1031,7 @@ void ControllerSelector::Controller::unselect()
 LRESULT ControllerSelector::Controller::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hwnd, &ps);
+    HDC hdc = BeginPaint((HWND)window, &ps);
 
     COLORREF background;
     COLORREF color;
@@ -1066,7 +1062,7 @@ LRESULT ControllerSelector::Controller::paint(UINT uMsg, WPARAM wParam, LPARAM l
         DT_SINGLELINE | DT_LEFT | DT_VCENTER
     );
 
-    EndPaint(hwnd, &ps);
+    EndPaint((HWND)window, &ps);
 
     return 0;
 }
@@ -1092,7 +1088,7 @@ LRESULT ControllerSelector::Controller::mousemove(
         TRACKMOUSEEVENT track_mouse_event;
         track_mouse_event.cbSize = sizeof(TRACKMOUSEEVENT);
         track_mouse_event.dwFlags = TME_LEAVE;
-        track_mouse_event.hwndTrack = hwnd;
+        track_mouse_event.hwndTrack = (HWND)window;
         track_mouse_event.dwHoverTime = 0;
         TrackMouseEvent(&track_mouse_event);
 
@@ -1124,7 +1120,7 @@ ParamEditor::ParamEditor(
         int const top,
         ControllerSelector& controller_selector,
         Synth& synth,
-        ParamId const param_id,
+        Synth::ParamId const param_id,
         int const controller_choices,
         char const* format,
         double const scale
@@ -1151,7 +1147,7 @@ ParamEditor::ParamEditor(
         int const top,
         ControllerSelector& controller_selector,
         Synth& synth,
-        ParamId const param_id,
+        Synth::ParamId const param_id,
         int const controller_choices,
         char const* const* const options,
         int const number_of_options
@@ -1167,15 +1163,15 @@ ParamEditor::ParamEditor(
     synth(synth),
     ratio(0.0),
     knob(NULL),
-    controller_id(ControllerId::NONE),
+    controller_id(Synth::ControllerId::NONE),
     has_controller_(false)
 {
 }
 
 
-void ParamEditor::set_up(HINSTANCE application, Widget* parent)
+void ParamEditor::set_up(GUI::PlatformData platform_data, Widget* parent)
 {
-    TransparentWidget::set_up(application, parent);
+    TransparentWidget::set_up(platform_data, parent);
 
     knob = new Knob(
         *this,
@@ -1202,12 +1198,12 @@ bool ParamEditor::has_controller() const
 
 void ParamEditor::refresh()
 {
-    ControllerId const new_controller_id = (
+    Synth::ControllerId const new_controller_id = (
         synth.get_param_controller_id_atomic(param_id)
     );
     Number const new_ratio = synth.get_param_ratio_atomic(param_id);
 
-    has_controller_ = new_controller_id > Synth::ControllerId::NONE;
+    has_controller_ = new_controller_id > Synth::Synth::ControllerId::NONE;
 
     if (new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);
@@ -1221,7 +1217,7 @@ void ParamEditor::refresh()
 
 void ParamEditor::update_editor(
         Number const new_ratio,
-        ControllerId const new_controller_id
+        Synth::ControllerId const new_controller_id
 ) {
     controller_id = new_controller_id;
     update_editor(new_ratio);
@@ -1230,12 +1226,12 @@ void ParamEditor::update_editor(
 
 void ParamEditor::update_editor(Number const new_ratio)
 {
-    ratio = clamp(new_ratio);
+    ratio = GUI::clamp_ratio(new_ratio);
     update_editor();
 }
 
 
-void ParamEditor::update_editor(ControllerId const new_controller_id)
+void ParamEditor::update_editor(Synth::ControllerId const new_controller_id)
 {
     controller_id = new_controller_id;
     update_editor();
@@ -1268,7 +1264,7 @@ void ParamEditor::adjust_ratio(Number const delta)
 
 void ParamEditor::handle_ratio_change(Number const new_ratio)
 {
-    Number const ratio = clamp(new_ratio);
+    Number const ratio = GUI::clamp_ratio(new_ratio);
 
     synth.push_message(
         Synth::MessageType::SET_PARAM, param_id, ratio, 0
@@ -1277,7 +1273,7 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
 }
 
 
-void ParamEditor::handle_controller_change(ControllerId const new_controller_id)
+void ParamEditor::handle_controller_change(Synth::ControllerId const new_controller_id)
 {
     synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
@@ -1290,81 +1286,36 @@ void ParamEditor::handle_controller_change(ControllerId const new_controller_id)
 }
 
 
-Number ParamEditor::clamp(Number const ratio) const
-{
-    return std::min(1.0, std::max(0.0, ratio));
-}
-
-
 void ParamEditor::update_value_str()
 {
-    if (format != NULL) {
-        update_value_str_float();
-    } else if (options != NULL) {
-        update_value_str_int();
-    }
-}
+    constexpr size_t buffer_size = 16;
+    char buffer[buffer_size];
 
-
-void ParamEditor::update_value_str_float()
-{
-    constexpr int max_length = 16;
-    Number const value = (
-        synth.float_param_ratio_to_display_value(param_id, ratio) * scale
-    );
-    char buffer[max_length];
-
-    snprintf(buffer, max_length, format, value);
-
-    bool minus_zero = buffer[0] == '-';
-
-    for (int i = 1; minus_zero && i != max_length; ++i) {
-        if (buffer[i] == '\x00') {
-            break;
-        }
-
-        if (buffer[i] != '0' && buffer[i] != '.') {
-            minus_zero = false;
-        }
-    }
-
-    if (minus_zero) {
-        snprintf(buffer, max_length, format, 0.0);
-    }
-
-    buffer[max_length - 1] = '\x00';
-    value_str.set(buffer);
-}
-
-
-void ParamEditor::update_value_str_int()
-{
-    constexpr int max_length = 16;
-    Byte const value = (
-        synth.int_param_ratio_to_display_value(param_id, ratio)
+    GUI::param_ratio_to_str(
+        synth,
+        param_id,
+        ratio,
+        scale,
+        format,
+        options,
+        number_of_options,
+        buffer,
+        buffer_size
     );
 
-    if ((int)value >= number_of_options) {
-        return;
-    }
-
-    char buffer[max_length];
-
-    strncpy(buffer, options[value], max_length - 1);
-    buffer[max_length - 1] = '\x00';
     value_str.set(buffer);
 }
 
 
 void ParamEditor::update_controller_str()
 {
-    constexpr int max_length = 16;
-    char buffer[max_length];
+    constexpr size_t last_index = 15;
+    char buffer[last_index + 1];
 
     strncpy(
-        buffer, GUI::get_controller(controller_id)->short_name, max_length - 1
+        buffer, GUI::get_controller(controller_id)->short_name, last_index
     );
-    buffer[max_length - 1] = '\x00';
+    buffer[last_index] = '\x00';
     controller_str.set(buffer);
 }
 
@@ -1378,7 +1329,7 @@ void ParamEditor::reset_default()
 LRESULT ParamEditor::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hwnd, &ps);
+    HDC hdc = BeginPaint((HWND)window, &ps);
 
     draw_text(
         hdc,
@@ -1407,7 +1358,7 @@ LRESULT ParamEditor::paint(UINT uMsg, WPARAM wParam, LPARAM lParam)
         );
     }
 
-    EndPaint(hwnd, &ps);
+    EndPaint((HWND)window, &ps);
 
     return 0;
 }
@@ -1423,9 +1374,9 @@ LRESULT ParamEditor::lbuttonup(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-HBITMAP ParamEditor::knob_states = NULL;
+GUI::Bitmap ParamEditor::knob_states = NULL;
 
-HBITMAP ParamEditor::knob_states_inactive = NULL;
+GUI::Bitmap ParamEditor::knob_states_inactive = NULL;
 
 
 ParamEditor::Knob::Knob(
@@ -1464,9 +1415,9 @@ ParamEditor::Knob::~Knob()
 }
 
 
-void ParamEditor::Knob::set_up(HINSTANCE application, Widget* parent)
+void ParamEditor::Knob::set_up(GUI::PlatformData platform_data, Widget* parent)
 {
-    Widget::set_up(application, parent);
+    Widget::set_up(platform_data, parent);
 
     update(0.0);
 }
@@ -1484,19 +1435,19 @@ void ParamEditor::Knob::update(Number const ratio)
 
 void ParamEditor::Knob::update()
 {
-    HDC hdc = GetDC(hwnd);
+    HDC hdc = GetDC((HWND)window);
 
     HDC source_hdc = CreateCompatibleDC(hdc);
     HDC destination_hdc = CreateCompatibleDC(hdc);
 
-    HBITMAP source_bitmap = is_inactive ? knob_states_inactive : knob_states;
-    HBITMAP destination_bitmap = CreateCompatibleBitmap(hdc, WIDTH, HEIGHT);
+    GUI::Bitmap source_bitmap = is_inactive ? knob_states_inactive : knob_states;
+    GUI::Bitmap destination_bitmap = CreateCompatibleBitmap(hdc, WIDTH, HEIGHT);
 
-    HBITMAP old_source_bitmap = (
-        (HBITMAP)SelectObject(source_hdc, (HGDIOBJ)source_bitmap)
+    GUI::Bitmap old_source_bitmap = (
+        (GUI::Bitmap)SelectObject(source_hdc, (HGDIOBJ)source_bitmap)
     );
-    HBITMAP old_destination_bitmap = (
-        (HBITMAP)SelectObject(destination_hdc, (HGDIOBJ)destination_bitmap)
+    GUI::Bitmap old_destination_bitmap = (
+        (GUI::Bitmap)SelectObject(destination_hdc, (HGDIOBJ)destination_bitmap)
     );
 
     int source_x = (int)(KNOB_STATES_LAST_INDEX * this->ratio) * WIDTH;
@@ -1508,7 +1459,7 @@ void ParamEditor::Knob::update()
     DeleteDC(source_hdc);
     DeleteDC(destination_hdc);
 
-    ReleaseDC(hwnd, hdc);
+    ReleaseDC((HWND)window, hdc);
 
     if (knob_state != NULL) {
         DeleteObject((HGDIOBJ)knob_state);
@@ -1536,7 +1487,7 @@ void ParamEditor::Knob::deactivate()
 void ParamEditor::Knob::capture_mouse()
 {
     is_mouse_captured = true;
-    SetCapture(hwnd);
+    SetCapture((HWND)window);
 }
 
 
@@ -1621,7 +1572,7 @@ LRESULT ParamEditor::Knob::mousemove(UINT uMsg, WPARAM wParam, LPARAM lParam)
         editor.adjust_ratio(delta);
     }
 
-    SetFocus(hwnd);
+    SetFocus((HWND)window);
 
     return 0;
 }
@@ -1656,483 +1607,4 @@ LRESULT ParamEditor::Knob::mousewheel(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-
-#define ADD_PE(owner, left, top, synth, param_id, ctls, varg1, varg2)   \
-    owner->own(                                                         \
-        new ParamEditor(                                                \
-            GUI::PARAMS[param_id],                                      \
-            left,                                                       \
-            top,                                                        \
-            *controller_selector,                                       \
-            synth,                                                      \
-            param_id,                                                   \
-            ctls,                                                       \
-            varg1,                                                      \
-            varg2                                                       \
-        )                                                               \
-    )
-
-#define PE_W ParamEditor::WIDTH
-#define PE_H ParamEditor::HEIGHT
-
-
-GUI::GUI(
-        HINSTANCE application,
-        HWND parent_window,
-        Synth& synth
-)
-    : background(NULL),
-    about_body(NULL),
-    controllers_body(NULL),
-    effects_body(NULL),
-    envelopes_body(NULL),
-    lfos_body(NULL),
-    synth_body(NULL),
-    synth(synth),
-    application(application),
-    parent_window(application, parent_window)
-{
-    ParamEditor::knob_states = load_bitmap(TEXT("KNOBSTATES"));
-    ParamEditor::knob_states_inactive = load_bitmap(TEXT("KNOBSTATESINACTIVE"));
-
-    about_bitmap = load_bitmap(TEXT("ABOUT"));
-    controllers_bitmap = load_bitmap(TEXT("CONTROLLERS"));
-    effects_bitmap = load_bitmap(TEXT("EFFECTS"));
-    envelopes_bitmap = load_bitmap(TEXT("ENVELOPES"));
-    lfos_bitmap = load_bitmap(TEXT("LFOS"));
-    synth_bitmap = load_bitmap(TEXT("SYNTH"));
-
-    background = new Background();
-    GUI::parent_window.own(background);
-
-    background->set_bitmap(synth_bitmap);
-
-    controller_selector = new ControllerSelector(*background, synth);
-
-    build_about_body();
-    build_controllers_body();
-    build_effects_body();
-    build_envelopes_body();
-    build_lfos_body();
-    build_synth_body();
-
-    background->own(
-        new TabSelector(
-            background,
-            synth_bitmap,
-            synth_body,
-            "Synth",
-            TabSelector::LEFT + TabSelector::WIDTH * 0
-        )
-    );
-    background->own(
-        new TabSelector(
-            background,
-            effects_bitmap,
-            effects_body,
-            "Effects",
-            TabSelector::LEFT + TabSelector::WIDTH * 1
-        )
-    );
-    background->own(
-        new TabSelector(
-            background,
-            controllers_bitmap,
-            controllers_body,
-            "Controllers",
-            TabSelector::LEFT + TabSelector::WIDTH * 2
-        )
-    );
-    background->own(
-        new TabSelector(
-            background,
-            envelopes_bitmap,
-            envelopes_body,
-            "Envelopes",
-            TabSelector::LEFT + TabSelector::WIDTH * 3
-        )
-    );
-    background->own(
-        new TabSelector(
-            background,
-            lfos_bitmap,
-            lfos_body,
-            "LFOs",
-            TabSelector::LEFT + TabSelector::WIDTH * 4
-        )
-    );
-    background->own(
-        new TabSelector(
-            background,
-            about_bitmap,
-            about_body,
-            "About",
-            TabSelector::LEFT + TabSelector::WIDTH * 5
-        )
-    );
-
-    background->replace_body(synth_body);
-
-    background->own(controller_selector);
-    controller_selector->hide();
 }
-
-
-void GUI::build_about_body()
-{
-    about_body = new TabBody("About");
-
-    background->own(about_body);
-
-    about_body->hide();
-}
-
-
-void GUI::build_controllers_body()
-{
-    controllers_body = new TabBody("Controllers");
-
-    background->own(controllers_body);
-
-    ADD_PE(controllers_body,  21 + PE_W * 0,  44, synth, ParamId::F1IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 1,  44, synth, ParamId::F1MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 2,  44, synth, ParamId::F1MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body,  21 + PE_W * 0, 164, synth, ParamId::F1AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 1, 164, synth, ParamId::F1DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 2, 164, synth, ParamId::F1RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 211 + PE_W * 0,  44, synth, ParamId::F2IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 1,  44, synth, ParamId::F2MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 2,  44, synth, ParamId::F2MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 211 + PE_W * 0, 164, synth, ParamId::F2AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 1, 164, synth, ParamId::F2DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 2, 164, synth, ParamId::F2RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 401 + PE_W * 0,  44, synth, ParamId::F3IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 1,  44, synth, ParamId::F3MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 2,  44, synth, ParamId::F3MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 401 + PE_W * 0, 164, synth, ParamId::F3AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 1, 164, synth, ParamId::F3DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 2, 164, synth, ParamId::F3RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 591 + PE_W * 0,  44, synth, ParamId::F4IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 1,  44, synth, ParamId::F4MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 2,  44, synth, ParamId::F4MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 591 + PE_W * 0, 164, synth, ParamId::F4AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 1, 164, synth, ParamId::F4DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 2, 164, synth, ParamId::F4RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 781 + PE_W * 0,  44, synth, ParamId::F5IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 1,  44, synth, ParamId::F5MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2,  44, synth, ParamId::F5MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 781 + PE_W * 0, 164, synth, ParamId::F5AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 1, 164, synth, ParamId::F5DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2, 164, synth, ParamId::F5RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body,  21 + PE_W * 0, 324, synth, ParamId::F6IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 1, 324, synth, ParamId::F6MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 2, 324, synth, ParamId::F6MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body,  21 + PE_W * 0, 444, synth, ParamId::F6AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 1, 444, synth, ParamId::F6DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body,  21 + PE_W * 2, 444, synth, ParamId::F6RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 211 + PE_W * 0, 324, synth, ParamId::F7IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 1, 324, synth, ParamId::F7MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 2, 324, synth, ParamId::F7MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 211 + PE_W * 0, 444, synth, ParamId::F7AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 1, 444, synth, ParamId::F7DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 211 + PE_W * 2, 444, synth, ParamId::F7RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 401 + PE_W * 0, 324, synth, ParamId::F8IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 1, 324, synth, ParamId::F8MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 2, 324, synth, ParamId::F8MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 401 + PE_W * 0, 444, synth, ParamId::F8AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 1, 444, synth, ParamId::F8DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 401 + PE_W * 2, 444, synth, ParamId::F8RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 591 + PE_W * 0, 324, synth, ParamId::F9IN,     FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 1, 324, synth, ParamId::F9MIN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 2, 324, synth, ParamId::F9MAX,    FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 591 + PE_W * 0, 444, synth, ParamId::F9AMT,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 1, 444, synth, ParamId::F9DST,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 591 + PE_W * 2, 444, synth, ParamId::F9RND,    FLEX_CTLS, "%.2f", 100.0);
-
-
-    ADD_PE(controllers_body, 781 + PE_W * 0, 324, synth, ParamId::F10IN,    FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 1, 324, synth, ParamId::F10MIN,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2, 324, synth, ParamId::F10MAX,   FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(controllers_body, 781 + PE_W * 0, 444, synth, ParamId::F10AMT,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 1, 444, synth, ParamId::F10DST,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(controllers_body, 781 + PE_W * 2, 444, synth, ParamId::F10RND,   FLEX_CTLS, "%.2f", 100.0);
-
-    controllers_body->hide();
-}
-
-
-void GUI::build_effects_body()
-{
-    effects_body = new TabBody("Effects");
-
-    background->own(effects_body);
-
-    constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
-    constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
-
-    ADD_PE(effects_body,  74 + PE_W * 0,    57, synth, ParamId::EOG,    LFO_CTLS,   "%.2f", 100.0);
-
-    ADD_PE(effects_body, 237 + PE_W * 0,    57, synth, ParamId::EDG,    LFO_CTLS,   "%.2f", 100.0);
-
-    ADD_PE(effects_body, 385 + PE_W * 0,    57, synth, ParamId::EF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(effects_body, 385 + PE_W * 1,    57, synth, ParamId::EF1FRQ, LFO_CTLS,   "%.1f", 1.0);
-    ADD_PE(effects_body, 385 + PE_W * 2,    57, synth, ParamId::EF1Q,   LFO_CTLS,   "%.2f", 1.0);
-    ADD_PE(effects_body, 385 + PE_W * 3,    57, synth, ParamId::EF1G,   LFO_CTLS,   "%.2f", 1.0);
-
-    ADD_PE(effects_body, 690 + PE_W * 0,    57, synth, ParamId::EF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(effects_body, 690 + PE_W * 1,    57, synth, ParamId::EF2FRQ, LFO_CTLS,   "%.1f", 1.0);
-    ADD_PE(effects_body, 690 + PE_W * 2,    57, synth, ParamId::EF2Q,   LFO_CTLS,   "%.2f", 1.0);
-    ADD_PE(effects_body, 690 + PE_W * 3,    57, synth, ParamId::EF2G,   LFO_CTLS,   "%.2f", 1.0);
-
-    effects_body->hide();
-}
-
-
-void GUI::build_envelopes_body()
-{
-    envelopes_body = new TabBody("Envelopes");
-
-    background->own(envelopes_body);
-
-    ADD_PE(envelopes_body,  37 + PE_W * 0,  44, synth, ParamId::N1AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 1,  44, synth, ParamId::N1INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 2,  44, synth, ParamId::N1PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 3,  44, synth, ParamId::N1SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 4,  44, synth, ParamId::N1FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body,  37 + PE_W * 0, 164, synth, ParamId::N1DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 1, 164, synth, ParamId::N1ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 2, 164, synth, ParamId::N1HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 3, 164, synth, ParamId::N1DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 4, 164, synth, ParamId::N1REL,  FLEX_CTLS, "%.3f", 1.0);
-
-
-    ADD_PE(envelopes_body, 343 + PE_W * 0,  44, synth, ParamId::N2AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 1,  44, synth, ParamId::N2INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 2,  44, synth, ParamId::N2PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 3,  44, synth, ParamId::N2SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 4,  44, synth, ParamId::N2FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body, 343 + PE_W * 0, 164, synth, ParamId::N2DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 1, 164, synth, ParamId::N2ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 2, 164, synth, ParamId::N2HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 3, 164, synth, ParamId::N2DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 4, 164, synth, ParamId::N2REL,  FLEX_CTLS, "%.3f", 1.0);
-
-
-    ADD_PE(envelopes_body, 649 + PE_W * 0,  44, synth, ParamId::N3AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 1,  44, synth, ParamId::N3INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 2,  44, synth, ParamId::N3PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 3,  44, synth, ParamId::N3SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 4,  44, synth, ParamId::N3FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body, 649 + PE_W * 0, 164, synth, ParamId::N3DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 1, 164, synth, ParamId::N3ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 2, 164, synth, ParamId::N3HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 3, 164, synth, ParamId::N3DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 4, 164, synth, ParamId::N3REL,  FLEX_CTLS, "%.3f", 1.0);
-
-
-    ADD_PE(envelopes_body,  37 + PE_W * 0, 324, synth, ParamId::N4AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 1, 324, synth, ParamId::N4INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 2, 324, synth, ParamId::N4PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 3, 324, synth, ParamId::N4SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 4, 324, synth, ParamId::N4FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body,  37 + PE_W * 0, 444, synth, ParamId::N4DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 1, 444, synth, ParamId::N4ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 2, 444, synth, ParamId::N4HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 3, 444, synth, ParamId::N4DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body,  37 + PE_W * 4, 444, synth, ParamId::N4REL,  FLEX_CTLS, "%.3f", 1.0);
-
-
-    ADD_PE(envelopes_body, 343 + PE_W * 0, 324, synth, ParamId::N5AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 1, 324, synth, ParamId::N5INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 2, 324, synth, ParamId::N5PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 3, 324, synth, ParamId::N5SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 4, 324, synth, ParamId::N5FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body, 343 + PE_W * 0, 444, synth, ParamId::N5DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 1, 444, synth, ParamId::N5ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 2, 444, synth, ParamId::N5HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 3, 444, synth, ParamId::N5DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 343 + PE_W * 4, 444, synth, ParamId::N5REL,  FLEX_CTLS, "%.3f", 1.0);
-
-
-    ADD_PE(envelopes_body, 649 + PE_W * 0, 324, synth, ParamId::N6AMT,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 1, 324, synth, ParamId::N6INI,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 2, 324, synth, ParamId::N6PK,   FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 3, 324, synth, ParamId::N6SUS,  FLEX_CTLS, "%.2f", 100.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 4, 324, synth, ParamId::N6FIN,  FLEX_CTLS, "%.2f", 100.0);
-
-    ADD_PE(envelopes_body, 649 + PE_W * 0, 444, synth, ParamId::N6DEL,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 1, 444, synth, ParamId::N6ATK,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 2, 444, synth, ParamId::N6HLD,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 3, 444, synth, ParamId::N6DEC,  FLEX_CTLS, "%.3f", 1.0);
-    ADD_PE(envelopes_body, 649 + PE_W * 4, 444, synth, ParamId::N6REL,  FLEX_CTLS, "%.3f", 1.0);
-
-    envelopes_body->hide();
-}
-
-
-void GUI::build_lfos_body()
-{
-    lfos_body = new TabBody("LFOs");
-
-    background->own(lfos_body);
-
-    lfos_body->hide();
-}
-
-
-void GUI::build_synth_body()
-{
-    synth_body = new TabBody("Synth");
-
-    background->own(synth_body);
-
-    constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
-    constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
-    constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
-    constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
-
-    ((Widget*)synth_body)->own(
-        new ImportPatchButton(7, 2, 32, 32, synth, synth_body)
-    );
-    ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
-
-    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 1,    synth, ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 2,    synth, ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 3,    synth, ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
-    ADD_PE(synth_body,  12, 34 + (PE_H + 6) * 4,    synth, ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
-
-    ADD_PE(synth_body,  87 + PE_W * 0,   36,        synth, ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
-    ADD_PE(synth_body,  87 + PE_W * 1,   36,        synth, ParamId::MPRT,   FLEX_CTLS,  "%.3f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 2,   36,        synth, ParamId::MPRD,   FLEX_CTLS,  "%.2f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 3,   36,        synth, ParamId::MDTN,   FLEX_CTLS,  "%.f", 0.01);
-    ADD_PE(synth_body,  87 + PE_W * 4,   36,        synth, ParamId::MFIN,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 5,   36,        synth, ParamId::MAMP,   ALL_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 6,   36,        synth, ParamId::MFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
-    ADD_PE(synth_body,  87 + PE_W * 7,   36,        synth, ParamId::MVS,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 8,   36,        synth, ParamId::MVOL,   ALL_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 10,  36,        synth, ParamId::MPAN,   ALL_CTLS,   "%.2f", 100.0);
-
-    ADD_PE(synth_body, 735 + PE_W * 0,   36,        synth, ParamId::MF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W * 1,   36,        synth, ParamId::MF1FRQ, ALL_CTLS,   "%.1f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 2,   36,        synth, ParamId::MF1Q,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 3,   36,        synth, ParamId::MF1G,   ALL_CTLS,   "%.2f", 1.0);
-
-    ADD_PE(synth_body, 116 + PE_W * 0,  168,        synth, ParamId::MC1,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 1,  168,        synth, ParamId::MC2,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 2,  168,        synth, ParamId::MC3,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 3,  168,        synth, ParamId::MC4,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 4,  168,        synth, ParamId::MC5,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 5,  168,        synth, ParamId::MC6,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 6,  168,        synth, ParamId::MC7,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 7,  168,        synth, ParamId::MC8,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 8,  168,        synth, ParamId::MC9,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 9,  168,        synth, ParamId::MC10,   FLEX_CTLS,  "%.2f", 100.0);
-
-    ADD_PE(synth_body, 735 + PE_W * 0,  168,        synth, ParamId::MF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W * 1,  168,        synth, ParamId::MF2FRQ, ALL_CTLS,   "%.1f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 2,  168,        synth, ParamId::MF2Q,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 3,  168,        synth, ParamId::MF2G,   ALL_CTLS,   "%.2f", 1.0);
-
-    ADD_PE(synth_body,  87 + PE_W * 0,  316,        synth, ParamId::CWAV,   MIDI_CTLS,  wf, wfc);
-    ADD_PE(synth_body,  87 + PE_W * 1,  316,        synth, ParamId::CPRT,   FLEX_CTLS,  "%.3f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 2,  316,        synth, ParamId::CPRD,   FLEX_CTLS,  "%.2f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 3,  316,        synth, ParamId::CDTN,   FLEX_CTLS,  "%.f", 0.01);
-    ADD_PE(synth_body,  87 + PE_W * 4,  316,        synth, ParamId::CFIN,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body,  87 + PE_W * 5,  316,        synth, ParamId::CAMP,   ALL_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 6,  316,        synth, ParamId::CFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
-    ADD_PE(synth_body,  87 + PE_W * 7,  316,        synth, ParamId::CVS,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 8,  316,        synth, ParamId::CVOL,   ALL_CTLS,   "%.2f", 100.0);
-    ADD_PE(synth_body,  87 + PE_W * 10, 316,        synth, ParamId::CPAN,   ALL_CTLS,   "%.2f", 100.0);
-
-    ADD_PE(synth_body, 735 + PE_W * 0,  316,        synth, ParamId::CF1TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W * 1,  316,        synth, ParamId::CF1FRQ, ALL_CTLS,   "%.1f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 2,  316,        synth, ParamId::CF1Q,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 3,  316,        synth, ParamId::CF1G,   ALL_CTLS,   "%.2f", 1.0);
-
-    ADD_PE(synth_body, 116 + PE_W * 0,  448,        synth, ParamId::CC1,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 1,  448,        synth, ParamId::CC2,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 2,  448,        synth, ParamId::CC3,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 3,  448,        synth, ParamId::CC4,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 4,  448,        synth, ParamId::CC5,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 5,  448,        synth, ParamId::CC6,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 6,  448,        synth, ParamId::CC7,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 7,  448,        synth, ParamId::CC8,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 8,  448,        synth, ParamId::CC9,    FLEX_CTLS,  "%.2f", 100.0);
-    ADD_PE(synth_body, 116 + PE_W * 9,  448,        synth, ParamId::CC10,   FLEX_CTLS,  "%.2f", 100.0);
-
-    ADD_PE(synth_body, 735 + PE_W * 0,  448,        synth, ParamId::CF2TYP, MIDI_CTLS,  ft, ftc);
-    ADD_PE(synth_body, 735 + PE_W * 1,  448,        synth, ParamId::CF2FRQ, ALL_CTLS,   "%.1f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 2,  448,        synth, ParamId::CF2Q,   ALL_CTLS,   "%.2f", 1.0);
-    ADD_PE(synth_body, 735 + PE_W * 3,  448,        synth, ParamId::CF2G,   ALL_CTLS,   "%.2f", 1.0);
-
-    synth_body->show();
-}
-
-
-HBITMAP GUI::load_bitmap(LPCTSTR name)
-{
-    // TODO: GetLastError()
-    HBITMAP bitmap = (HBITMAP)LoadImage(
-        application, name, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION
-    );
-
-    return bitmap;
-}
-
-
-GUI::~GUI()
-{
-    HBITMAP knob_states_bitmap = ParamEditor::knob_states;
-    ParamEditor::knob_states = NULL;
-    DeleteObject((HGDIOBJ)knob_states_bitmap);
-
-    knob_states_bitmap = ParamEditor::knob_states_inactive;
-    ParamEditor::knob_states_inactive = NULL;
-    DeleteObject((HGDIOBJ)knob_states_bitmap);
-
-    DeleteObject((HGDIOBJ)about_bitmap);
-    DeleteObject((HGDIOBJ)controllers_bitmap);
-    DeleteObject((HGDIOBJ)effects_bitmap);
-    DeleteObject((HGDIOBJ)envelopes_bitmap);
-    DeleteObject((HGDIOBJ)lfos_bitmap);
-    DeleteObject((HGDIOBJ)synth_bitmap);
-}
-
-
-void GUI::show()
-{
-    background->show();
-}
-
-} }

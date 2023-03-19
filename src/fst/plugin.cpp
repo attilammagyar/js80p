@@ -352,7 +352,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 void FstPlugin::open_gui(GUI::Window parent_window)
 {
     close_gui();
-    gui = GUI::create_instance(platform_data, parent_window, synth);
+    gui = new GUI(platform_data, parent_window, synth);
     gui->show();
 }
 
