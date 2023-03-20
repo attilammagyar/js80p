@@ -91,7 +91,8 @@ Sample const* const* SignalProducer::produce(
 
 
 SignalProducer::SignalProducer(
-        Integer const channels, Integer const number_of_children
+        Integer const channels,
+        Integer const number_of_children
 ) noexcept
     : channels(0 <= channels ? channels : 0),
     buffer(NULL),

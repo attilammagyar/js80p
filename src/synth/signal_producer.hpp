@@ -97,8 +97,10 @@ class SignalProducer
         ) noexcept;
 
         SignalProducer(
-            Integer const channels, Integer const number_of_children = 0
+            Integer const channels,
+            Integer const number_of_children = 0
         ) noexcept;
+
         virtual ~SignalProducer();
 
         Integer get_channels() const noexcept;
