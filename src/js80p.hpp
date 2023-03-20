@@ -80,6 +80,7 @@ namespace Constants {
     constexpr Number DETUNE_DEFAULT = 0.0;
     constexpr Number DETUNE_MAX = 4800.0;
     constexpr Number DETUNE_MIN = -4800.0;
+    constexpr Number DETUNE_SCALE = 1.0 / 100.0;
 
     constexpr Number FINE_DETUNE_DEFAULT = 0.0;
     constexpr Number FINE_DETUNE_MAX = 1200.0;

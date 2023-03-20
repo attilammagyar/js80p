@@ -1050,12 +1050,13 @@ void GUI::build_synth_body()
     PE(synth_body,  87 + PE_W * 0,      36, Synth::ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
     PE(synth_body,  87 + PE_W * 1,      36, Synth::ParamId::MPRT,   FLEX_CTLS,  "%.3f", 1.0);
     PE(synth_body,  87 + PE_W * 2,      36, Synth::ParamId::MPRD,   FLEX_CTLS,  "%.2f", 1.0);
-    PE(synth_body,  87 + PE_W * 3,      36, Synth::ParamId::MDTN,   FLEX_CTLS,  "%.f", 0.01);
+    PE(synth_body,  87 + PE_W * 3,      36, Synth::ParamId::MDTN,   FLEX_CTLS,  "%.f", Constants::DETUNE_SCALE);
     PE(synth_body,  87 + PE_W * 4,      36, Synth::ParamId::MFIN,   ALL_CTLS,   "%.2f", 1.0);
     PE(synth_body,  87 + PE_W * 5,      36, Synth::ParamId::MAMP,   ALL_CTLS,   "%.2f", 100.0);
     PE(synth_body,  87 + PE_W * 6,      36, Synth::ParamId::MFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
     PE(synth_body,  87 + PE_W * 7,      36, Synth::ParamId::MVS,    FLEX_CTLS,  "%.2f", 100.0);
     PE(synth_body,  87 + PE_W * 8,      36, Synth::ParamId::MVOL,   ALL_CTLS,   "%.2f", 100.0);
+    PE(synth_body,  87 + PE_W * 9,      36, Synth::ParamId::MWID,   FLEX_CTLS,  "%.2f", 100.0);
     PE(synth_body,  87 + PE_W * 10,     36, Synth::ParamId::MPAN,   ALL_CTLS,   "%.2f", 100.0);
 
     PE(synth_body, 735 + PE_W * 0,      36, Synth::ParamId::MF1TYP, MIDI_CTLS,  ft, ftc);
@@ -1088,6 +1089,7 @@ void GUI::build_synth_body()
     PE(synth_body,  87 + PE_W * 6,     316, Synth::ParamId::CFLD,   ALL_CTLS,   "%.2f", 100.0 / Constants::FOLD_MAX);
     PE(synth_body,  87 + PE_W * 7,     316, Synth::ParamId::CVS,    FLEX_CTLS,  "%.2f", 100.0);
     PE(synth_body,  87 + PE_W * 8,     316, Synth::ParamId::CVOL,   ALL_CTLS,   "%.2f", 100.0);
+    PE(synth_body,  87 + PE_W * 9,     316, Synth::ParamId::CWID,   FLEX_CTLS,  "%.2f", 100.0);
     PE(synth_body,  87 + PE_W * 10,    316, Synth::ParamId::CPAN,   ALL_CTLS,   "%.2f", 100.0);
 
     PE(synth_body, 735 + PE_W * 0,     316, Synth::ParamId::CF1TYP, MIDI_CTLS,  ft, ftc);

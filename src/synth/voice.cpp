@@ -185,8 +185,9 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader
 ) noexcept
-    : SignalProducer(CHANNELS, 15),
+    : SignalProducer(CHANNELS, 10),
     notes(notes),
+    param_leaders(param_leaders),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -226,7 +227,6 @@ Voice<ModulatorSignalProducerClass>::Voice(
     velocity_sensitivity(param_leaders.velocity_sensitivity),
     portamento_length(param_leaders.portamento_length),
     portamento_depth(param_leaders.portamento_depth),
-    width(param_leaders.width),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, velocity, volume),
@@ -238,7 +238,6 @@ Voice<ModulatorSignalProducerClass>::Voice(
     register_child(velocity_sensitivity);
     register_child(portamento_length);
     register_child(portamento_depth);
-    register_child(width);
     register_child(panning);
     register_child(volume);
 
@@ -280,6 +279,17 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     this->note = note;
     this->velocity = calculate_velocity(velocity);
+
+    /* note_panning = 2.0 * (note / 127.0) - 1.0; */
+    note_panning = std::min(
+        1.0,
+        std::max(
+            -1.0,
+            NOTE_PANNING_SCALE * (
+                note + param_leaders.detune.get_value() * Constants::DETUNE_SCALE
+            ) - 1.0
+        )
+    ) * param_leaders.width.get_value();
 
     oscillator.cancel_events(time_offset);
 
@@ -432,7 +442,10 @@ void Voice<ModulatorSignalProducerClass>::render(
     Sample const* const panning_buffer = this->panning_buffer;
 
     if (panning_buffer == NULL) {
-        Number const x = (panning_value + 1.0) * Math::PI_QUARTER;
+        Number const panning = std::min(
+            1.0, std::max(panning_value + note_panning, -1.0)
+        );
+        Number const x = (panning + 1.0) * Math::PI_QUARTER;
         Sample const left_gain = Math::cos(x);
         Sample const right_gain = Math::sin(x);
 
@@ -442,7 +455,10 @@ void Voice<ModulatorSignalProducerClass>::render(
         }
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Number const x = (panning_buffer[i] + 1.0) * Math::PI_QUARTER;
+            Number const panning = std::min(
+                1.0, std::max(panning_buffer[i] + note_panning, -1.0)
+            );
+            Number const x = (panning + 1.0) * Math::PI_QUARTER;
             Sample const left_gain = Math::cos(x);
             Sample const right_gain = Math::sin(x);
 
