@@ -24,14 +24,31 @@
 
 #include "gui/gui.hpp"
 
-#include "synth/biquad_filter.hpp"
-#include "synth/oscillator.hpp"
-
 
 namespace JS80P
 {
 
 bool GUI::controllers_by_id_initialized = false;
+
+
+char const* const GUI::MODES[] = {
+    [Synth::MIX_AND_MOD] = "Mix&Mod",
+    [Synth::SPLIT_AT_C3] = "Split C3",
+    [Synth::SPLIT_AT_Db3] = "Split Db3",
+    [Synth::SPLIT_AT_D3] = "Split D3",
+    [Synth::SPLIT_AT_Eb3] = "Split Eb3",
+    [Synth::SPLIT_AT_E3] = "Split E3",
+    [Synth::SPLIT_AT_F3] = "Split F3",
+    [Synth::SPLIT_AT_Gb3] = "Split Gb3",
+    [Synth::SPLIT_AT_G3] = "Split G3",
+    [Synth::SPLIT_AT_Ab3] = "Split Ab3",
+    [Synth::SPLIT_AT_A3] = "Split A3",
+    [Synth::SPLIT_AT_Bb3] = "Split Bb3",
+    [Synth::SPLIT_AT_B3] = "Split B3",
+    [Synth::SPLIT_AT_C4] = "Split C4",
+};
+
+int const GUI::MODES_COUNT = Synth::MODES;
 
 
 char const* const GUI::WAVEFORMS[] = {
@@ -364,7 +381,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L8DST] = "LFO 8 Distortion (%)",
     [Synth::ParamId::L8RND] = "LFO 8 Randomness (%)",
 
-    [Synth::ParamId::MODE] = "Mode",
+    [Synth::ParamId::MODE] = "Operating Mode",
 
     [Synth::ParamId::MWAV] = "Modulator Waveform",
     [Synth::ParamId::CWAV] = "Carrier Waveform",
@@ -1032,6 +1049,8 @@ void GUI::build_synth_body()
 
     background->own(synth_body);
 
+    constexpr char const* const* md = JS80P::GUI::MODES;
+    constexpr int mdc = JS80P::GUI::MODES_COUNT;
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
@@ -1042,10 +1061,11 @@ void GUI::build_synth_body()
     );
     ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
 
-    PE(synth_body, 12, 34 + (PE_H + 6) * 1, Synth::ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
-    PE(synth_body, 12, 34 + (PE_H + 6) * 2, Synth::ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
-    PE(synth_body, 12, 34 + (PE_H + 6) * 3, Synth::ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
-    PE(synth_body, 12, 34 + (PE_H + 6) * 4, Synth::ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 0, Synth::ParamId::MODE,   MIDI_CTLS,  md, mdc);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 3, Synth::ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 4, Synth::ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 
     PE(synth_body,  87 + PE_W * 0,      36, Synth::ParamId::MWAV,   MIDI_CTLS,  wf, wfc);
     PE(synth_body,  87 + PE_W * 1,      36, Synth::ParamId::MPRT,   FLEX_CTLS,  "%.3f", 1.0);

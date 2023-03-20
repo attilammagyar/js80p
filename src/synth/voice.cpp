@@ -382,6 +382,10 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         Midi::Note const note,
         Number const velocity
 ) noexcept {
+    if (state != ON) {
+        return;
+    }
+
     off_after = time_offset + std::max(
         oscillator.amplitude.end_envelope(time_offset),
         volume.end_envelope(time_offset)

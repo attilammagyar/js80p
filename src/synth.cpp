@@ -50,10 +50,16 @@ Synth::ParamIdHashTable Synth::param_id_hash_table;
 std::string Synth::param_names_by_id[ParamId::MAX_PARAM_ID];
 
 
+Synth::ModeParam::ModeParam(std::string const name) noexcept
+    : Param<Mode>(name, MIX_AND_MOD, SPLIT_AT_C4, MIX_AND_MOD)
+{
+}
+
+
 Synth::Synth() noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        5                           // VOL + ADD + FM + AM + bus
+        6                           // MODE + VOL + ADD + FM + AM + bus
         + 29 * 2                    // Modulator::Params + Carrier::Params
         + POLYPHONY * 2             // modulators + carriers
         + 2                         // overdrive + distortion
@@ -62,6 +68,7 @@ Synth::Synth() noexcept
         + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
     ),
+    mode("MODE"),
     volume("VOL", 0.0, 1.0, 0.75),
     modulator_add_volume("ADD", 0.0, 1.0, 1.0),
     frequency_modulation_level(
@@ -102,10 +109,13 @@ Synth::Synth() noexcept
         param_names_by_id[i] = "";
     }
 
+    register_param_as_child(ParamId::MODE, mode);
+
     register_float_param_as_child(ParamId::VOL, volume);
     register_float_param_as_child(ParamId::ADD, modulator_add_volume);
     register_float_param_as_child(ParamId::FM, frequency_modulation_level);
     register_float_param_as_child(ParamId::AM, amplitude_modulation_level);
+
     register_child(bus);
 
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(
@@ -445,28 +455,36 @@ void Synth::note_on(
     }
 
     for (Integer v = 0; v != POLYPHONY; ++v) {
-        if (
+        if (!(
                 modulators[next_voice]->is_off_after(time_offset)
                 && carriers[next_voice]->is_off_after(time_offset)
-        ) {
-            if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
-                previous_note = note;
-            }
-
-            midi_note_to_voice_assignments[channel][note] = next_voice;
-            modulators[next_voice]->note_on(
-                time_offset, note, velocity, previous_note
-            );
-            carriers[next_voice]->note_on(
-                time_offset, note, velocity, previous_note
-            );
-
-            previous_note = note;
-
-            break;
-        } else {
+        )) {
             next_voice = (next_voice + 1) & NEXT_VOICE_MASK;
+            continue;
         }
+
+        if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
+            previous_note = note;
+        }
+
+        midi_note_to_voice_assignments[channel][note] = next_voice;
+
+        Mode const mode = this->mode.get_value();
+
+        if (mode == MIX_AND_MOD) {
+            modulators[next_voice]->note_on(time_offset, note, velocity, previous_note);
+            carriers[next_voice]->note_on(time_offset, note, velocity, previous_note);
+        } else {
+            if (note < mode + Midi::NOTE_B_2) {
+                modulators[next_voice]->note_on(time_offset, note, velocity, previous_note);
+            } else {
+                carriers[next_voice]->note_on(time_offset, note, velocity, previous_note);
+            }
+        }
+
+        previous_note = note;
+
+        break;
     }
 }
 
@@ -617,7 +635,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
     }
 
     switch (param_id) {
-        case ParamId::MODE: return 0.0; // TODO
+        case ParamId::MODE: return mode.get_default_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
         case ParamId::MF1TYP: return modulator_params.filter_1_type.get_default_ratio();
@@ -656,7 +674,7 @@ Byte Synth::int_param_ratio_to_display_value(
         Number const ratio
 ) const noexcept {
     switch (param_id) {
-        case ParamId::MODE: return 0; // TODO
+        case ParamId::MODE: return mode.ratio_to_value(ratio);
         case ParamId::MWAV: return modulator_params.waveform.ratio_to_value(ratio);
         case ParamId::CWAV: return carrier_params.waveform.ratio_to_value(ratio);
         case ParamId::MF1TYP: return modulator_params.filter_1_type.ratio_to_value(ratio);
@@ -749,7 +767,8 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
 
     } else {
         switch (param_id) {
-            case ParamId::MODE: // TODO
+            case ParamId::MODE:
+                mode.set_ratio(ratio);
                 break;
 
             case ParamId::MWAV:
@@ -885,7 +904,8 @@ void Synth::assign_controller_to_param(
     }
 
     switch (param_id) {
-        case ParamId::MODE: // TODO
+        case ParamId::MODE:
+            mode.set_midi_controller(midi_controller);
             break;
 
         case ParamId::MWAV:
@@ -1039,7 +1059,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
     }
 
     switch (param_id) {
-        case ParamId::MODE: return 0.0; // TODO
+        case ParamId::MODE: return mode.get_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_ratio();
         case ParamId::MF1TYP: return modulator_params.filter_1_type.get_ratio();

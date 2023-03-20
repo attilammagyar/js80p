@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 
 #include "test.cpp"
@@ -33,6 +34,9 @@ using namespace JS80P;
 
 SimpleOscillator::WaveformParam wavetable_cache_waveform("WAV");
 SimpleOscillator wavetable_cache(wavetable_cache_waveform);
+
+
+constexpr Number OUT_VOLUME_PER_CHANNEL = std::sin(Math::PI / 4.0);
 
 
 // TODO: remove this array once all params are implemented, and use Synth::PARAM_NAMES instead
@@ -327,8 +331,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L8DST,
     // Synth::ParamId::L8RND,
 
-    // TODO: turn on this when MODE is implemented
-    // Synth::ParamId::MODE,
+    Synth::ParamId::MODE,
 
     Synth::ParamId::MWAV,
     Synth::ParamId::CWAV,
@@ -566,4 +569,75 @@ TEST(can_look_up_param_id_by_name, {
         Synth::ParamId const param_id = synth.get_param_id(name);
         assert_eq(IMPLEMENTED_PARAMS[i], param_id, "i=%d, name=\"%s\"", i, name);
     }
+})
+
+
+void test_operating_mode(
+        Number const expected_vol_a3,
+        Number const expected_vol_a5,
+        Synth::Mode const mode
+) {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth;
+    SumOfSines expected(
+        expected_vol_a3, 220.0,
+        expected_vol_a5, 880.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.mode.set_value(mode);
+    synth.volume.set_value(1.0);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.detune.set_value(2400.0);
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+
+    synth.note_on(0.0, 0, Midi::NOTE_A_3, 1.0);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
+    samples = SignalProducer::produce<Synth>(&synth, 1);
+
+    assert_close(
+        expected_samples[0],
+        samples[0],
+        block_size,
+        0.001,
+        "channel=0, mode=%d",
+        (int)mode
+    );
+    assert_close(
+        expected_samples[1],
+        samples[1],
+        block_size,
+        0.001,
+        "channel=1, mode=%d",
+        (int)mode
+    );
+}
+
+
+TEST(operating_mode, {
+    test_operating_mode(
+        OUT_VOLUME_PER_CHANNEL, OUT_VOLUME_PER_CHANNEL, Synth::MIX_AND_MOD
+    );
+    test_operating_mode(OUT_VOLUME_PER_CHANNEL, 0, Synth::SPLIT_AT_C4);
+    test_operating_mode(0, OUT_VOLUME_PER_CHANNEL, Synth::SPLIT_AT_C3);
 })

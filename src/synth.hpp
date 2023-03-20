@@ -492,6 +492,31 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MAX_CONTROLLER_ID = 155,
         };
 
+        typedef Byte Mode;
+
+        static constexpr Mode MIX_AND_MOD = 0;
+        static constexpr Mode SPLIT_AT_C3 = 1;
+        static constexpr Mode SPLIT_AT_Db3 = 2;
+        static constexpr Mode SPLIT_AT_D3 = 3;
+        static constexpr Mode SPLIT_AT_Eb3 = 4;
+        static constexpr Mode SPLIT_AT_E3 = 5;
+        static constexpr Mode SPLIT_AT_F3 = 6;
+        static constexpr Mode SPLIT_AT_Gb3 = 7;
+        static constexpr Mode SPLIT_AT_G3 = 8;
+        static constexpr Mode SPLIT_AT_Ab3 = 9;
+        static constexpr Mode SPLIT_AT_A3 = 10;
+        static constexpr Mode SPLIT_AT_Bb3 = 11;
+        static constexpr Mode SPLIT_AT_B3 = 12;
+        static constexpr Mode SPLIT_AT_C4 = 13;
+
+        static constexpr int MODES = 14;
+
+        class ModeParam : public Param<Mode>
+        {
+            public:
+                ModeParam(std::string const name) noexcept;
+        };
+
         Synth() noexcept;
         virtual ~Synth() override;
 
@@ -586,8 +611,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset, Midi::Channel const channel
         ) noexcept;
 
-        // TODO: operating mode: mix&mod (same as add + AM + FM in JS-80) vs. splits
-
+        ModeParam mode;
         FloatParam volume;
         FloatParam modulator_add_volume;
         FloatParam frequency_modulation_level;

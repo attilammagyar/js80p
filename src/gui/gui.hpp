@@ -85,6 +85,9 @@ class GUI
             - Synth::ENVELOPES - Synth::LFOS - Synth::FLEXIBLE_CONTROLLERS
         );
 
+        static char const* const MODES[];
+        static int const MODES_COUNT;
+
         static char const* const WAVEFORMS[];
         static int const WAVEFORMS_COUNT;
 
