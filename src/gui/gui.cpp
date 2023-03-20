@@ -509,79 +509,6 @@ GUI::Controller const* GUI::get_controller(Synth::ControllerId const controller_
 }
 
 
-GUI::Object::Object() : left(0), top(0), width(0), height(0), is_clicking(false)
-{
-}
-
-
-GUI::Object::Object(int const left, int const top, int const width, int const height)
-    : left(left),
-    top(top),
-    width(width),
-    height(height),
-    is_clicking(false)
-{
-}
-
-
-GUI::Object::~Object()
-{
-}
-
-
-void GUI::Object::click()
-{
-}
-
-
-bool GUI::Object::timer()
-{
-    return false;
-}
-
-
-bool GUI::Object::paint()
-{
-    return false;
-}
-
-
-bool GUI::Object::double_click()
-{
-    return false;
-}
-
-
-bool GUI::Object::mouse_down(int const x, int const y)
-{
-    return false;
-}
-
-
-bool GUI::Object::mouse_up(int const x, int const y)
-{
-    return false;
-}
-
-
-bool GUI::Object::mouse_move(int const x, int const y, bool const modifier)
-{
-    return false;
-}
-
-
-bool GUI::Object::mouse_leave(int const x, int const y)
-{
-    return false;
-}
-
-
-bool GUI::Object::mouse_wheel(Number const delta)
-{
-    return false;
-}
-
-
 void GUI::initialize_controllers_by_id()
 {
     if (controllers_by_id_initialized) {
@@ -599,6 +526,35 @@ void GUI::initialize_controllers_by_id()
     }
 
     controllers_by_id_initialized = true;
+}
+
+
+GUI::Color GUI::rgb(
+        ColorComponent const red,
+        ColorComponent const green,
+        ColorComponent const blue
+) {
+    return (Color)(
+        (unsigned int)red << 16 | (unsigned int)green << 8 | (unsigned int)blue
+    );
+}
+
+
+GUI::ColorComponent GUI::red(Color const color)
+{
+    return color >> 16;
+}
+
+
+GUI::ColorComponent GUI::green(Color const color)
+{
+    return color >> 8;
+}
+
+
+GUI::ColorComponent GUI::blue(Color const color)
+{
+    return color;
 }
 
 
@@ -730,10 +686,11 @@ Number GUI::clamp_ratio(Number const ratio)
 
 GUI::GUI(
         JS80P::GUI::PlatformData platform_data,
-        JS80P::GUI::Window parent_window,
+        JS80P::GUI::PlatformWidget parent_window,
         Synth& synth
 )
-    : background(NULL),
+    : dummy_widget(NULL),
+    background(NULL),
     about_body(NULL),
     controllers_body(NULL),
     effects_body(NULL),
@@ -743,17 +700,20 @@ GUI::GUI(
     synth(synth),
     platform_data(platform_data)
 {
+    dummy_widget = new Widget();
+
     ParamEditor::initialize_knob_states(
-        Widget::load_bitmap(platform_data, "KNOBSTATES"),
-        Widget::load_bitmap(platform_data, "KNOBSTATESINACTIVE")
+        dummy_widget,
+        dummy_widget->load_bitmap(platform_data, "KNOBSTATES"),
+        dummy_widget->load_bitmap(platform_data, "KNOBSTATESINACTIVE")
     );
 
-    about_bitmap = Widget::load_bitmap(platform_data, "ABOUT");
-    controllers_bitmap = Widget::load_bitmap(platform_data, "CONTROLLERS");
-    effects_bitmap = Widget::load_bitmap(platform_data, "EFFECTS");
-    envelopes_bitmap = Widget::load_bitmap(platform_data, "ENVELOPES");
-    lfos_bitmap = Widget::load_bitmap(platform_data, "LFOS");
-    synth_bitmap = Widget::load_bitmap(platform_data, "SYNTH");
+    about_bitmap = dummy_widget->load_bitmap(platform_data, "ABOUT");
+    controllers_bitmap = dummy_widget->load_bitmap(platform_data, "CONTROLLERS");
+    effects_bitmap = dummy_widget->load_bitmap(platform_data, "EFFECTS");
+    envelopes_bitmap = dummy_widget->load_bitmap(platform_data, "ENVELOPES");
+    lfos_bitmap = dummy_widget->load_bitmap(platform_data, "LFOS");
+    synth_bitmap = dummy_widget->load_bitmap(platform_data, "SYNTH");
 
     background = new Background();
 
@@ -1159,20 +1119,265 @@ GUI::~GUI()
 {
     delete parent_window;
 
-    ParamEditor::free_knob_states();
+    ParamEditor::free_knob_states(dummy_widget);
 
-    Widget::delete_bitmap(about_bitmap);
-    Widget::delete_bitmap(controllers_bitmap);
-    Widget::delete_bitmap(effects_bitmap);
-    Widget::delete_bitmap(envelopes_bitmap);
-    Widget::delete_bitmap(lfos_bitmap);
-    Widget::delete_bitmap(synth_bitmap);
+    dummy_widget->delete_bitmap(about_bitmap);
+    dummy_widget->delete_bitmap(controllers_bitmap);
+    dummy_widget->delete_bitmap(effects_bitmap);
+    dummy_widget->delete_bitmap(envelopes_bitmap);
+    dummy_widget->delete_bitmap(lfos_bitmap);
+    dummy_widget->delete_bitmap(synth_bitmap);
+
+    delete dummy_widget;
+
+    dummy_widget = NULL;
 }
 
 
 void GUI::show()
 {
     background->show();
+}
+
+
+WidgetBase::WidgetBase()
+    : platform_widget(NULL),
+    platform_data(NULL),
+    bitmap(NULL),
+    parent(NULL),
+    left(0),
+    top(0),
+    width(0),
+    height(0),
+    is_clicking(false)
+{
+}
+
+
+WidgetBase::WidgetBase(
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) : platform_widget(NULL),
+    platform_data(NULL),
+    bitmap(NULL),
+    parent(NULL),
+    left(left),
+    top(top),
+    width(width),
+    height(height),
+    is_clicking(false)
+{
+}
+
+
+WidgetBase::WidgetBase(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
+    : platform_widget(platform_widget),
+    platform_data(platform_data),
+    bitmap(NULL),
+    parent(NULL),
+    left(0),
+    top(0),
+    width(0),
+    height(0),
+    is_clicking(false)
+{
+}
+
+
+WidgetBase::~WidgetBase()
+{
+}
+
+
+void WidgetBase::destroy_children()
+{
+    for (GUI::Widgets::iterator it = children.begin(); it != children.end(); ++it) {
+        delete *it;
+    }
+}
+
+
+GUI::Bitmap WidgetBase::load_bitmap(
+    GUI::PlatformData platform_data,
+    char const* name
+) {
+    return NULL;
+}
+
+
+void WidgetBase::delete_bitmap(GUI::Bitmap bitmap)
+{
+}
+
+
+void WidgetBase::show()
+{
+}
+
+
+void WidgetBase::hide()
+{
+}
+
+
+
+void WidgetBase::focus()
+{
+}
+
+
+void WidgetBase::bring_to_top()
+{
+}
+
+
+void WidgetBase::redraw()
+{
+}
+
+
+WidgetBase* WidgetBase::own(WidgetBase* widget)
+{
+    children.push_back(widget);
+    widget->set_up(platform_data, (WidgetBase*)this);
+
+    return widget;
+}
+
+
+GUI::Bitmap WidgetBase::set_bitmap(GUI::Bitmap bitmap)
+{
+    GUI::Bitmap old = this->bitmap;
+    this->bitmap = bitmap;
+    redraw();
+
+    return old;
+}
+
+
+GUI::PlatformWidget WidgetBase::get_platform_widget()
+{
+    return platform_widget;
+}
+
+
+void WidgetBase::click()
+{
+}
+
+
+void WidgetBase::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+{
+    this->platform_data = platform_data;
+    this->parent = parent;
+}
+
+
+bool WidgetBase::timer_tick()
+{
+    return false;
+}
+
+
+bool WidgetBase::paint()
+{
+    if (bitmap == NULL) {
+        return false;
+    }
+
+    draw_bitmap(bitmap, 0, 0, width, height);
+
+    return true;
+}
+
+
+bool WidgetBase::double_click()
+{
+    return false;
+}
+
+
+bool WidgetBase::mouse_down(int const x, int const y)
+{
+    return false;
+}
+
+
+bool WidgetBase::mouse_up(int const x, int const y)
+{
+    return false;
+}
+
+
+bool WidgetBase::mouse_move(int const x, int const y, bool const modifier)
+{
+    return false;
+}
+
+
+bool WidgetBase::mouse_leave(int const x, int const y)
+{
+    return false;
+}
+
+
+bool WidgetBase::mouse_wheel(Number const delta, bool const modifier)
+{
+    return false;
+}
+
+
+void WidgetBase::start_timer(Frequency const frequency)
+{
+}
+
+
+void WidgetBase::fill_rectangle(
+    int const left,
+    int const top,
+    int const width,
+    int const height,
+    GUI::Color const color
+) {
+}
+
+
+void WidgetBase::draw_text(
+    char const* const text,
+    int const font_size_px,
+    int const left,
+    int const top,
+    int const width,
+    int const height,
+    GUI::Color const color,
+    GUI::Color const background,
+    FontWeight const font_weight,
+    int const padding,
+    TextAlignment const alignment
+) {
+}
+
+
+void WidgetBase::draw_bitmap(
+        GUI::Bitmap bitmap,
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) {
+}
+
+
+GUI::Bitmap WidgetBase::copy_bitmap_region(
+    GUI::Bitmap source,
+    int const left,
+    int const top,
+    int const width,
+    int const height
+) {
+    return NULL;
 }
 
 }

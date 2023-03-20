@@ -35,34 +35,31 @@
 namespace JS80P
 {
 
-class Widget : public GUI::Object
+class Widget : public WidgetBase
 {
     public:
-        typedef COLORREF Color;
-
-        static GUI::Bitmap load_bitmap(GUI::PlatformData platform_data, char const* name);
-        static void delete_bitmap(GUI::Bitmap bitmap);
-
-        static Color rgb(
-            unsigned char const red,
-            unsigned char const green,
-            unsigned char const blue
-        );
+        static COLORREF to_colorref(GUI::Color const color);
 
         static LRESULT process_message(
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );
 
+        Widget();
         virtual ~Widget();
 
-        void show();
-        void hide();
+        virtual GUI::Bitmap load_bitmap(
+            GUI::PlatformData platform_data,
+            char const* name
+        ) override;
 
-        void focus();
-        void bring_to_top();
-        void redraw();
-        Widget* own(Widget* widget);
-        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
+        virtual void delete_bitmap(GUI::Bitmap bitmap) override;
+
+        virtual void show() override;
+        virtual void hide() override;
+
+        virtual void focus() override;
+        virtual void bring_to_top() override;
+        virtual void redraw() override;
 
     protected:
         class Text
@@ -88,7 +85,6 @@ class Widget : public GUI::Object
 
         static std::string const FILTER_STR;
 
-        Widget();
         Widget(
             char const* const label,
             int const left,
@@ -97,59 +93,59 @@ class Widget : public GUI::Object
             int const height,
             Type const type = Type::CLICKABLE
         );
-        Widget(GUI::PlatformData platform_data, GUI::Window window);
+        Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget);
 
-        virtual bool paint() override;
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
 
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent);
+        virtual void start_timer(Frequency const frequency) override;
 
-        void start_timer(Frequency const frequency);
-
-        void fill_rectangle(
+        virtual void fill_rectangle(
             int const left,
             int const top,
             int const width,
             int const height,
-            Color const color
-        );
+            GUI::Color const color
+        ) override;
 
-        void draw_text(
+        virtual void draw_text(
             char const* const text,
             int const font_size_px,
             int const left,
             int const top,
             int const width,
             int const height,
-            Color const color,
-            Color const background,
+            GUI::Color const color,
+            GUI::Color const background,
             FontWeight const font_weight = FontWeight::NORMAL,
             int const padding = 0,
             TextAlignment const alignment = TextAlignment::CENTER
-        );
+        ) override;
 
-        GUI::Bitmap copy_bitmap_region(
+        virtual void draw_bitmap(
+            GUI::Bitmap bitmap,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        ) override;
+
+        virtual GUI::Bitmap copy_bitmap_region(
             GUI::Bitmap source,
             int const left,
             int const top,
             int const width,
             int const height
-        );
+        ) override;
 
-        GUI::Window window;
-        GUI::PlatformData platform_data;
-        GUI::Bitmap bitmap;
-        Widget* parent;
         HDC hdc;
 
     private:
         static constexpr UINT_PTR TIMER_ID = 1;
 
-        static constexpr Number MOUSE_WHEEL_COARSE_SCALE = (
-            1.0 / ((Number)WHEEL_DELTA * 100.0)
-        );
-        static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
-            MOUSE_WHEEL_COARSE_SCALE / 25.0
-        );
+        static constexpr Number MOUSE_WHEEL_SCALE = 1.0 / (Number)WHEEL_DELTA;
 
         LRESULT call_original_window_procedure(
             UINT uMsg,
@@ -160,9 +156,8 @@ class Widget : public GUI::Object
         void capture_mouse();
         void release_captured_mouse();
 
-        void destroy_window();
+        GUI::PlatformWidget get_platform_widget() const;
 
-        GUI::Widgets children;
         Text class_name;
         Text label;
         DWORD dwStyle;

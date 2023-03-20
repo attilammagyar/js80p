@@ -38,18 +38,22 @@ class ParamEditor;
 class TabBody;
 class TabSelector;
 class Widget;
+class WidgetBase;
 
 
 class GUI
 {
     public:
-        typedef void* Window; ///< \brief GUI platform dependent window identifier.
+        typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
         typedef void* Bitmap; ///< \breif GUI platform dependent bitmap.
 
-        typedef std::vector<Widget*> Widgets;
+        typedef std::vector<WidgetBase*> Widgets;
 
         typedef std::vector<ParamEditor*> ParamEditors;
+
+        typedef unsigned int Color;
+        typedef unsigned char ColorComponent;
 
         class Controller
         {
@@ -65,50 +69,6 @@ class GUI
                 char const* const short_name;
                 int const index;
                 Synth::ControllerId const id;
-        };
-
-        class Object
-        {
-            public:
-                enum Type {
-                    CLICKABLE = 0,
-                    BITMAP = 1,
-                    CLICKABLE_BITMAP = 2,
-                };
-
-                enum TextAlignment {
-                    LEFT = 0,
-                    CENTER = 1,
-                };
-
-                enum FontWeight {
-                    NORMAL = 0,
-                    BOLD = 1,
-                };
-
-                virtual void click();
-
-                virtual ~Object();
-
-            protected:
-                Object();
-                Object(int const left, int const top, int const width, int const height);
-
-                virtual bool timer();
-                virtual bool paint();
-                virtual bool double_click();
-                virtual bool mouse_down(int const x, int const y);
-                virtual bool mouse_up(int const x, int const y);
-                virtual bool mouse_move(int const x, int const y, bool const modifier);
-                virtual bool mouse_leave(int const x, int const y);
-                virtual bool mouse_wheel(Number const delta);
-
-                int left;
-                int top;
-                int width;
-                int height;
-
-                bool is_clicking;
         };
 
         static constexpr long int WIDTH = 980;
@@ -137,6 +97,15 @@ class GUI
 
         static Controller const* get_controller(Synth::ControllerId const controller_id);
 
+        static Color rgb(
+            ColorComponent const red,
+            ColorComponent const green,
+            ColorComponent const blue
+        );
+        static ColorComponent red(Color const color);
+        static ColorComponent green(Color const color);
+        static ColorComponent blue(Color const color);
+
         static void refresh_param_editors(ParamEditors editors);
         static void refresh_controlled_param_editors(ParamEditors editors);
 
@@ -156,7 +125,7 @@ class GUI
 
         GUI(
             PlatformData platform_data,
-            Window parent_window,
+            PlatformWidget parent_window,
             Synth& synth
         );
 
@@ -196,6 +165,8 @@ class GUI
         void build_lfos_body();
         void build_synth_body();
 
+        Widget* dummy_widget;
+
         Bitmap about_bitmap;
         Bitmap controllers_bitmap;
         Bitmap effects_bitmap;
@@ -215,6 +186,220 @@ class GUI
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
+};
+
+
+/**
+ * \brief Base class for the platform-dependent \c Widget class.
+ */
+class WidgetBase
+{
+    public:
+        enum Type {
+            CLICKABLE = 0,
+            BITMAP = 1,
+            CLICKABLE_BITMAP = 2,
+        };
+
+        enum TextAlignment {
+            LEFT = 0,
+            CENTER = 1,
+        };
+
+        enum FontWeight {
+            NORMAL = 0,
+            BOLD = 1,
+        };
+
+        WidgetBase();
+        virtual ~WidgetBase();
+
+        virtual GUI::Bitmap load_bitmap(
+            GUI::PlatformData platform_data,
+            char const* name
+        );
+        virtual void delete_bitmap(GUI::Bitmap bitmap);
+
+        virtual void show();
+        virtual void hide();
+        virtual void focus();
+        virtual void bring_to_top();
+        virtual void redraw();
+        virtual WidgetBase* own(WidgetBase* widget);
+        virtual GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
+
+        virtual GUI::PlatformWidget get_platform_widget();
+
+        virtual void click();
+
+    protected:
+        WidgetBase(int const left, int const top, int const width, int const height);
+        WidgetBase(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget);
+
+        virtual void destroy_children();
+
+        virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent);
+
+        /**
+         * \brief Handle the timer tick event. Return \c true if the event was
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool timer_tick();
+
+        /**
+         * \brief Event handler for painting the widget on the screen.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool paint();
+
+        /**
+         * \brief Handle the double click event.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool double_click();
+
+        /**
+         * \brief Event handler to run when the (left) mouse button is
+         *        pressed down.
+         *
+         * \param   x           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \param   y           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool mouse_down(int const x, int const y);
+
+        /**
+         * \brief Event handler to run when the (left) mouse button is released.
+         *
+         * \param   x           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \param   y           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool mouse_up(int const x, int const y);
+
+        /**
+         * \brief Event handler to run when the mouse cursor moves over the widget.
+         *
+         * \param   x           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \param   y           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \param   modifier    Tells if the modifier key (e.g. "Control" on PC)
+         *                      is held when the event occurred.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool mouse_move(int const x, int const y, bool const modifier);
+
+        /**
+         * \brief Event handler to run when the mouse cursor leaves the widget's area.
+         *
+         * \param   x           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \param   y           Horizontal coordinate of the cursor relative to
+         *                      the top left corner of the widget.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool mouse_leave(int const x, int const y);
+
+        /**
+         * \brief Event handler to run when the mouse wheel is scrolled while
+         *        the cursor is over the widget.
+         *
+         * \param   delta       A floating point number between roughly -1.0 and
+         *                      1.0, indicating the direction and relative speed
+         *                      of the scrolling.
+         *
+         * \param   modifier    Tells if the modifier key (e.g. "Control" on PC)
+         *                      is held when the event occurred.
+         *
+         * \return              Return \c true if the event was handled,
+         *                      \c false if the platform's default event handler
+         *                      needs to be run.
+         */
+        virtual bool mouse_wheel(Number const delta, bool const modifier);
+
+        virtual void start_timer(Frequency const frequency);
+
+        virtual void fill_rectangle(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            GUI::Color const color
+        );
+
+        virtual void draw_text(
+            char const* const text,
+            int const font_size_px,
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            GUI::Color const color,
+            GUI::Color const background,
+            FontWeight const font_weight = FontWeight::NORMAL,
+            int const padding = 0,
+            TextAlignment const alignment = TextAlignment::CENTER
+        );
+
+        virtual void draw_bitmap(
+            GUI::Bitmap bitmap,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
+
+        virtual GUI::Bitmap copy_bitmap_region(
+            GUI::Bitmap source,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
+
+        GUI::Widgets children;
+        GUI::PlatformWidget platform_widget;
+        GUI::PlatformData platform_data;
+        GUI::Bitmap bitmap;
+        WidgetBase* parent;
+
+        int left;
+        int top;
+        int width;
+        int height;
+
+        bool is_clicking;
 };
 
 }

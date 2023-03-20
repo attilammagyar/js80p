@@ -116,7 +116,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return (VstIntPtr)pointer;
 
         case effEditOpen:
-            fst_plugin->open_gui((GUI::Window)pointer);
+            fst_plugin->open_gui((GUI::PlatformWidget)pointer);
             return 1;
 
         case effEditClose:
@@ -349,7 +349,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 }
 
 
-void FstPlugin::open_gui(GUI::Window parent_window)
+void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {
     close_gui();
     gui = new GUI(platform_data, parent_window, synth);

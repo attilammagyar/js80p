@@ -26,62 +26,31 @@
 
 namespace JS80P {
 
-class Widget : public GUI::Object
+class Widget : public WidgetBase
 {
     public:
-        typedef Integer Color;
+        Widget()
+        {
+        }
 
-        static GUI::Bitmap load_bitmap(
+        virtual ~Widget()
+        {
+            destroy_children();
+        }
+
+        virtual GUI::Bitmap load_bitmap(
                 GUI::PlatformData platform_data,
                 char const* name
-        ) {
+        ) override {
             return (GUI::Bitmap)new DummyObject();
         }
 
-        static void delete_bitmap(GUI::Bitmap bitmap)
+        virtual void delete_bitmap(GUI::Bitmap bitmap) override
         {
             delete (DummyObject*)bitmap;
         }
 
-        static Color rgb(
-            unsigned char const red,
-            unsigned char const green,
-            unsigned char const blue
-        ) {
-            return 0;
-        }
-
-        virtual ~Widget();
-
-        void show()
-        {
-        }
-
-        void hide()
-        {
-        }
-
-        void focus()
-        {
-        }
-
-        void bring_to_top()
-        {
-        }
-
-        void redraw()
-        {
-        }
-
-        Widget* own(Widget* widget);
-
-        GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
-
     protected:
-        Widget() : Object(), window(NULL), platform_data(NULL), bitmap(NULL)
-        {
-        }
-
         Widget(
                 char const* const label,
                 int const left,
@@ -89,56 +58,13 @@ class Widget : public GUI::Object
                 int const width,
                 int const height,
                 Type const type = Type::CLICKABLE
-        ) : Object(left, top, width, height),
-            window(NULL),
-            platform_data(NULL),
-            bitmap(NULL)
+        ) : WidgetBase(left, top, width, height)
         {
         }
 
-        Widget(GUI::PlatformData platform_data, GUI::Window window)
-            : Object(),
-            window(window),
-            platform_data(platform_data),
-            bitmap(NULL)
+        Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
+            : WidgetBase(platform_data, platform_widget)
         {
-        }
-
-        virtual bool paint() override
-        {
-            return false;
-        }
-
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent)
-        {
-        }
-
-        void start_timer(Frequency const frequency)
-        {
-        }
-
-        void fill_rectangle(
-                int const left,
-                int const top,
-                int const width,
-                int const height,
-                Color const color
-        ) {
-        }
-
-        void draw_text(
-                char const* const text,
-                int const font_size_px,
-                int const left,
-                int const top,
-                int const width,
-                int const height,
-                Color const color,
-                Color const background,
-                FontWeight const font_weight = FontWeight::NORMAL,
-                int const padding = 0,
-                TextAlignment const alignment = TextAlignment::CENTER
-        ) {
         }
 
         GUI::Bitmap copy_bitmap_region(
@@ -151,25 +77,10 @@ class Widget : public GUI::Object
             return (GUI::Bitmap)new DummyObject();
         }
 
-        GUI::Window window;
-        GUI::PlatformData platform_data;
-        GUI::Bitmap bitmap;
-
     private:
         class DummyObject
         {
         };
-
-        void destroy_window()
-        {
-            window = NULL;
-        }
-
-        void release_captured_mouse()
-        {
-        }
-
-        GUI::Widgets children;
 };
 
 }

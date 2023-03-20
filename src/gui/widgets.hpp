@@ -34,7 +34,10 @@ namespace JS80P
 class ExternallyCreatedWindow : public Widget
 {
     public:
-        ExternallyCreatedWindow(GUI::PlatformData platform_data, GUI::Window window);
+        ExternallyCreatedWindow(
+            GUI::PlatformData platform_data,
+            GUI::PlatformWidget window
+        );
         virtual ~ExternallyCreatedWindow();
 };
 
@@ -133,9 +136,12 @@ class Background : public Widget
         void show_body();
 
     protected:
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
 
-        virtual bool timer() override;
+        virtual bool timer_tick() override;
 
     private:
         static constexpr Integer FULL_REFRESH_TICKS = (
@@ -196,7 +202,10 @@ class ControllerSelector : public Widget
         void handle_selection_change(Synth::ControllerId const new_controller_id);
 
     protected:
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
 
         virtual bool paint() override;
 
@@ -251,11 +260,12 @@ class ParamEditor : public TransparentWidget
         static constexpr int HEIGHT = 100;
 
         static void initialize_knob_states(
+            WidgetBase* widget,
             GUI::Bitmap active,
             GUI::Bitmap inactive
         );
 
-        static void free_knob_states();
+        static void free_knob_states(WidgetBase* widget);
 
         ParamEditor(
             char const* const label,
@@ -281,7 +291,10 @@ class ParamEditor : public TransparentWidget
             int const number_of_options
         );
 
-        virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
 
         bool has_controller() const;
 
@@ -323,6 +336,12 @@ class ParamEditor : public TransparentWidget
                 static constexpr int WIDTH = 48;
                 static constexpr int HEIGHT = 48;
 
+                static constexpr Number MOUSE_WHEEL_COARSE_SCALE = 1.0 / 100.0;
+
+                static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
+                    MOUSE_WHEEL_COARSE_SCALE / 25.0
+                );
+
                 static constexpr Number MOUSE_MOVE_COARSE_SCALE = (
                     1.0 / ((Number)HEIGHT * 3.0)
                 );
@@ -339,7 +358,10 @@ class ParamEditor : public TransparentWidget
                 );
                 virtual ~Knob();
 
-                virtual void set_up(GUI::PlatformData platform_data, Widget* parent) override;
+                virtual void set_up(
+                    GUI::PlatformData platform_data,
+                    WidgetBase* parent
+                ) override;
 
                 void update(Number const ratio);
                 void update();
@@ -351,7 +373,7 @@ class ParamEditor : public TransparentWidget
                 virtual bool mouse_down(int const x, int const y) override;
                 virtual bool mouse_up(int const x, int const y) override;
                 virtual bool mouse_move(int const x, int const y, bool const modifier) override;
-                virtual bool mouse_wheel(Number const delta) override;
+                virtual bool mouse_wheel(Number const delta, bool const modifier) override;
 
             private:
                 Number const steps;

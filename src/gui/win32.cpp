@@ -30,6 +30,13 @@
 namespace JS80P
 {
 
+std::string const Widget::FILTER_STR(
+    "JS80P Patches (*.js80p)\x00*.js80p\x00"
+    "All Files (*.*)\x00*.*\x00",
+    53
+);
+
+
 Widget::Text::Text() : wtext(NULL)
 {
     set("");
@@ -110,6 +117,12 @@ LPCTSTR Widget::Text::get() const
 }
 
 
+COLORREF Widget::to_colorref(GUI::Color const color)
+{
+    return RGB(GUI::red(color), GUI::green(color), GUI::blue(color));
+}
+
+
 GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* name)
 {
     Text name_text(name);
@@ -131,15 +144,6 @@ void Widget::delete_bitmap(GUI::Bitmap bitmap)
 }
 
 
-Widget::Color Widget::rgb(
-        unsigned char const red,
-        unsigned char const green,
-        unsigned char const blue
-) {
-    return RGB(red, green, blue);
-}
-
-
 LRESULT Widget::process_message(
         HWND hwnd,
         UINT uMsg,
@@ -154,17 +158,17 @@ LRESULT Widget::process_message(
 
     switch (uMsg) {
         case WM_TIMER:
-            is_handled = widget->timer();
+            is_handled = widget->timer_tick();
 
             break;
 
         case WM_PAINT: {
             PAINTSTRUCT ps;
-            widget->hdc = BeginPaint((HWND)widget->window, &ps);
+            widget->hdc = BeginPaint((HWND)widget->get_platform_widget(), &ps);
 
             is_handled = widget->paint();
 
-            EndPaint((HWND)widget->window, &ps);
+            EndPaint((HWND)widget->get_platform_widget(), &ps);
 
             break;
         }
@@ -205,7 +209,7 @@ LRESULT Widget::process_message(
             TRACKMOUSEEVENT track_mouse_event;
             track_mouse_event.cbSize = sizeof(TRACKMOUSEEVENT);
             track_mouse_event.dwFlags = TME_LEAVE;
-            track_mouse_event.hwndTrack = (HWND)widget->window;
+            track_mouse_event.hwndTrack = (HWND)widget->get_platform_widget();
             track_mouse_event.dwHoverTime = 0;
             TrackMouseEvent(&track_mouse_event);
 
@@ -226,14 +230,11 @@ LRESULT Widget::process_message(
             break;
 
         case WM_MOUSEWHEEL: {
-
-            bool const modifier = 0 != (wParam & MK_CONTROL);
-            Number const scale = (
-                modifier ? MOUSE_WHEEL_FINE_SCALE : MOUSE_WHEEL_COARSE_SCALE
+            Number const delta = (
+                (Number)GET_WHEEL_DELTA_WPARAM(wParam) * MOUSE_WHEEL_SCALE
             );
-            Number const delta = (Number)GET_WHEEL_DELTA_WPARAM(wParam) * scale;
 
-            is_handled = widget->mouse_wheel(delta);
+            is_handled = widget->mouse_wheel(delta, 0 != (wParam & MK_CONTROL));
 
             break;
         }
@@ -262,12 +263,8 @@ LRESULT Widget::process_message(
 }
 
 
-Widget::Widget(GUI::PlatformData platform_data, GUI::Window window)
-    : GUI::Object(),
-    window(window),
-    platform_data(platform_data),
-    bitmap(NULL),
-    parent(NULL),
+Widget::Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
+    : WidgetBase(platform_data, platform_widget),
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
@@ -278,11 +275,7 @@ Widget::Widget(GUI::PlatformData platform_data, GUI::Window window)
 
 
 Widget::Widget()
-    : GUI::Object(),
-    window(NULL),
-    platform_data(NULL),
-    bitmap(NULL),
-    parent(NULL),
+    : WidgetBase(),
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
@@ -299,11 +292,7 @@ Widget::Widget(
         int const width,
         int const height,
         Type const type
-) : GUI::Object(left, top, width, height),
-    window(NULL),
-    platform_data(NULL),
-    bitmap(NULL),
-    parent(NULL),
+) : WidgetBase(left, top, width, height),
     hdc(NULL),
     class_name("STATIC"),
     label(label),
@@ -328,26 +317,28 @@ Widget::Widget(
 }
 
 
-void Widget::destroy_window()
+Widget::~Widget()
 {
+    release_captured_mouse();
+    destroy_children();
+
     if (is_timer_started) {
-        KillTimer((HWND)window, TIMER_ID);
+        KillTimer((HWND)platform_widget, TIMER_ID);
     }
 
-    if (window != NULL) {
-        DestroyWindow((HWND)window);
-        window = NULL;
+    if (platform_widget != NULL) {
+        DestroyWindow((HWND)platform_widget);
+        platform_widget = NULL;
     }
 }
 
 
-void Widget::set_up(GUI::PlatformData platform_data, Widget* parent)
+void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
-    this->platform_data = platform_data;
-    this->parent = parent;
+    WidgetBase::set_up(platform_data, parent);
 
     // TODO: GetLastError()
-    window = (GUI::Window)CreateWindow(
+    HWND hwnd = CreateWindow(
         (LPCTSTR)class_name.get(),
         (LPCTSTR)label.get(),
         dwStyle,
@@ -355,19 +346,21 @@ void Widget::set_up(GUI::PlatformData platform_data, Widget* parent)
         top,
         width,
         height,
-        (HWND)parent->window,
+        (HWND)parent->get_platform_widget(),
         NULL,
         (HINSTANCE)platform_data,
         NULL
     );
 
-    SetWindowLongPtr((HWND)window, GWLP_USERDATA, (LONG_PTR)this);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
     original_window_procedure = (
         (WNDPROC)SetWindowLongPtr(
-            (HWND)window, GWLP_WNDPROC, (LONG_PTR)(&process_message)
+            hwnd, GWLP_WNDPROC, (LONG_PTR)(&process_message)
         )
     );
+
+    platform_widget = (GUI::PlatformWidget)hwnd;
 }
 
 
@@ -376,7 +369,7 @@ void Widget::start_timer(Frequency const frequency)
     UINT const elapse = (UINT)std::ceil(1000.0 / frequency);
 
     // TODO: GetLastError
-    SetTimer((HWND)window, TIMER_ID, elapse, NULL);
+    SetTimer((HWND)platform_widget, TIMER_ID, elapse, NULL);
 
     is_timer_started = true;
 }
@@ -387,14 +380,14 @@ void Widget::fill_rectangle(
         int const top,
         int const width,
         int const height,
-        Color const color
+        GUI::Color const color
 ) {
     RECT rect;
     rect.left = left;
     rect.top = top;
     rect.right = left + width;
     rect.bottom = top + height;
-    HBRUSH brush = CreateSolidBrush((COLORREF)color);
+    HBRUSH brush = CreateSolidBrush(to_colorref(color));
     FillRect(hdc, (LPRECT)&rect, brush);
     DeleteObject((HGDIOBJ)brush);
 }
@@ -407,8 +400,8 @@ void Widget::draw_text(
         int const top,
         int const width,
         int const height,
-        Color const color,
-        Color const background,
+        GUI::Color const color,
+        GUI::Color const background,
         FontWeight const font_weight,
         int const padding,
         TextAlignment const alignment
@@ -436,8 +429,8 @@ void Widget::draw_text(
 
     int orig_bk_mode = SetBkMode(hdc, OPAQUE);
     int orig_map_mode = SetMapMode(hdc, MM_TEXT);
-    COLORREF orig_bk_color = SetBkColor(hdc, (COLORREF)background);
-    COLORREF orig_text_color = SetTextColor(hdc, (COLORREF)color);
+    COLORREF orig_bk_color = SetBkColor(hdc, to_colorref(background));
+    COLORREF orig_text_color = SetTextColor(hdc, to_colorref(color));
     HGDIOBJ orig_font = (HFONT)SelectObject(hdc, (HGDIOBJ)font);
 
     RECT text_rect;
@@ -472,6 +465,20 @@ void Widget::draw_text(
 }
 
 
+void Widget::draw_bitmap(
+        GUI::Bitmap bitmap,
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) {
+    HDC bitmap_hdc = CreateCompatibleDC(hdc);
+    SelectObject(bitmap_hdc, (HBITMAP)bitmap);
+    BitBlt(hdc, left, top, width, height, bitmap_hdc, 0, 0, SRCCOPY);
+    DeleteDC(bitmap_hdc);
+}
+
+
 GUI::Bitmap Widget::copy_bitmap_region(
         GUI::Bitmap source,
         int const left,
@@ -479,7 +486,7 @@ GUI::Bitmap Widget::copy_bitmap_region(
         int const width,
         int const height
 ) {
-    HDC hdc = GetDC((HWND)window);
+    HDC hdc = GetDC((HWND)platform_widget);
 
     HDC source_hdc = CreateCompatibleDC(hdc);
     HDC destination_hdc = CreateCompatibleDC(hdc);
@@ -501,7 +508,7 @@ GUI::Bitmap Widget::copy_bitmap_region(
     DeleteDC(source_hdc);
     DeleteDC(destination_hdc);
 
-    ReleaseDC((HWND)window, hdc);
+    ReleaseDC((HWND)platform_widget, hdc);
 
     return destination_bitmap;
 }
@@ -510,48 +517,33 @@ GUI::Bitmap Widget::copy_bitmap_region(
 void Widget::show()
 {
     // TODO: GetLastError()
-    ShowWindow((HWND)window, SW_SHOWNORMAL);
+    ShowWindow((HWND)platform_widget, SW_SHOWNORMAL);
 }
 
 
 void Widget::hide()
 {
     // TODO: GetLastError()
-    ShowWindow((HWND)window, SW_HIDE);
+    ShowWindow((HWND)platform_widget, SW_HIDE);
 }
 
 
 void Widget::focus()
 {
-    SetFocus((HWND)window);
+    SetFocus((HWND)platform_widget);
 }
 
 
 void Widget::bring_to_top()
 {
-    BringWindowToTop((HWND)window);
+    BringWindowToTop((HWND)platform_widget);
 }
 
 
 void Widget::redraw()
 {
     // TODO: GetLastError()
-    RedrawWindow((HWND)window, NULL, NULL, RDW_INVALIDATE);
-}
-
-
-bool Widget::paint()
-{
-    if (bitmap == NULL) {
-        return false;
-    }
-
-    HDC bitmap_hdc = CreateCompatibleDC(hdc);
-    SelectObject(bitmap_hdc, (HBITMAP)bitmap);
-    BitBlt(hdc, 0, 0, width, height, bitmap_hdc, 0, 0, SRCCOPY);
-    DeleteDC(bitmap_hdc);
-
-    return true;
+    RedrawWindow((HWND)platform_widget, NULL, NULL, RDW_INVALIDATE);
 }
 
 
@@ -563,10 +555,10 @@ LRESULT Widget::call_original_window_procedure(
     if (original_window_procedure != NULL) {
         // TODO: GetLastError()
         return CallWindowProc(
-            original_window_procedure, (HWND)window, uMsg, wParam, lParam
+            original_window_procedure, (HWND)platform_widget, uMsg, wParam, lParam
         );
     } else {
-        return DefWindowProcW((HWND)window, uMsg, wParam, lParam);
+        return DefWindowProcW((HWND)platform_widget, uMsg, wParam, lParam);
     }
 }
 
@@ -574,7 +566,7 @@ LRESULT Widget::call_original_window_procedure(
 void Widget::capture_mouse()
 {
     is_mouse_captured = true;
-    SetCapture((HWND)window);
+    SetCapture((HWND)platform_widget);
 }
 
 
@@ -587,11 +579,10 @@ void Widget::release_captured_mouse()
 }
 
 
-std::string const Widget::FILTER_STR(
-    "JS80P Patches (*.js80p)\x00*.js80p\x00"
-    "All Files (*.*)\x00*.*\x00",
-    53
-);
+GUI::PlatformWidget Widget::get_platform_widget() const
+{
+    return platform_widget;
+}
 
 
 void ImportPatchButton::click()
@@ -606,7 +597,7 @@ void ImportPatchButton::click()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = (HWND)window;
+    ofn.hwndOwner = (HWND)platform_widget;
     ofn.lpstrFilter = filter.get();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
@@ -689,7 +680,7 @@ void ExportPatchButton::click()
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = (HWND)window;
+    ofn.hwndOwner = (HWND)platform_widget;
     ofn.lpstrFilter = filter.get();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;

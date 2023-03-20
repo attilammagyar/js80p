@@ -28,42 +28,9 @@
 namespace JS80P
 {
 
-Widget::~Widget()
-{
-    release_captured_mouse();
-
-    for (GUI::Widgets::iterator it = children.begin(); it != children.end(); ++it) {
-        delete *it;
-    }
-
-    destroy_window();
-}
-
-
-Widget* Widget::own(Widget* widget)
-{
-    children.push_back(widget);
-    widget->set_up(platform_data, (Widget*)this);
-
-    return widget;
-}
-
-
-GUI::Bitmap Widget::set_bitmap(GUI::Bitmap bitmap)
-{
-    GUI::Bitmap old = this->bitmap;
-
-    this->bitmap = bitmap;
-
-    redraw();
-
-    return old;
-}
-
-
 ExternallyCreatedWindow::ExternallyCreatedWindow(
         GUI::PlatformData platform_data,
-        GUI::Window window
+        GUI::PlatformWidget window
 ) : Widget(platform_data, window)
 {
 }
@@ -71,7 +38,7 @@ ExternallyCreatedWindow::ExternallyCreatedWindow(
 
 ExternallyCreatedWindow::~ExternallyCreatedWindow()
 {
-    window = NULL;
+    platform_widget = NULL;
 }
 
 
@@ -186,7 +153,7 @@ void Background::show_body()
 }
 
 
-void Background::set_up(GUI::PlatformData platform_data, Widget* parent)
+void Background::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     Widget::set_up(platform_data, parent);
 
@@ -194,8 +161,10 @@ void Background::set_up(GUI::PlatformData platform_data, Widget* parent)
 }
 
 
-bool Background::timer()
+bool Background::timer_tick()
 {
+    Widget::timer_tick();
+
     if (body == NULL) {
         return true;
     }
@@ -229,6 +198,8 @@ TabSelector::TabSelector(
 
 void TabSelector::click()
 {
+    TransparentWidget::click();
+
     background->set_bitmap(bitmap);
     background->replace_body(tab_body);
 }
@@ -247,7 +218,7 @@ ControllerSelector::ControllerSelector(
 }
 
 
-void ControllerSelector::set_up(GUI::PlatformData platform_data, Widget* parent)
+void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     Widget::set_up(platform_data, parent);
 
@@ -348,7 +319,9 @@ void ControllerSelector::handle_selection_change(
 
 bool ControllerSelector::paint()
 {
-    fill_rectangle(0, 0, width, height, rgb(0, 0, 0));
+    Widget::paint();
+
+    fill_rectangle(0, 0, width, height, GUI::rgb(0, 0, 0));
     draw_text(
         title,
         12,
@@ -356,8 +329,8 @@ bool ControllerSelector::paint()
         0,
         WIDTH,
         TITLE_HEIGHT,
-        rgb(181, 181, 189),
-        rgb(0, 0, 0),
+        GUI::rgb(181, 181, 189),
+        GUI::rgb(0, 0, 0),
         FontWeight::BOLD,
         10,
         TextAlignment::LEFT
@@ -399,18 +372,20 @@ void ControllerSelector::Controller::unselect()
 
 bool ControllerSelector::Controller::paint()
 {
-    Color background;
-    Color color;
+    Widget::paint();
+
+    GUI::Color background;
+    GUI::Color color;
 
     if (is_selected) {
-        background = rgb(181, 181, 189);
-        color = rgb(0, 0, 0);
+        background = GUI::rgb(181, 181, 189);
+        color = GUI::rgb(0, 0, 0);
     } else if (is_mouse_over) {
-        background = rgb(63, 63, 66);
-        color = rgb(225, 225, 235);
+        background = GUI::rgb(63, 63, 66);
+        color = GUI::rgb(225, 225, 235);
     } else {
-        background = rgb(0, 0, 0);
-        color = rgb(181, 181, 189);
+        background = GUI::rgb(0, 0, 0);
+        color = GUI::rgb(181, 181, 189);
     }
 
     draw_text(
@@ -433,6 +408,8 @@ bool ControllerSelector::Controller::paint()
 
 bool ControllerSelector::Controller::mouse_up(int const x, int const y)
 {
+    Widget::mouse_up(x, y);
+
     controller_selector.handle_selection_change(controller_id);
 
     return true;
@@ -444,6 +421,8 @@ bool ControllerSelector::Controller::mouse_move(
         int const y,
         bool const modifier
 ) {
+    Widget::mouse_move(x, y, modifier);
+
     if (!is_mouse_over) {
         is_mouse_over = true;
         redraw();
@@ -455,6 +434,8 @@ bool ControllerSelector::Controller::mouse_move(
 
 bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 {
+    Widget::mouse_leave(x, y);
+
     if (is_mouse_over) {
         is_mouse_over = false;
         redraw();
@@ -475,10 +456,13 @@ GUI::Bitmap ParamEditor::knob_states_active[KNOB_STATES_COUNT];
 GUI::Bitmap ParamEditor::knob_states_inactive[KNOB_STATES_COUNT];
 
 
-void ParamEditor::initialize_knob_states(GUI::Bitmap active, GUI::Bitmap inactive)
-{
+void ParamEditor::initialize_knob_states(
+    WidgetBase* widget,
+    GUI::Bitmap active,
+    GUI::Bitmap inactive
+) {
     if (knob_states_active_bitmap != NULL) {
-        free_knob_states();
+        free_knob_states(widget);
     }
 
     knob_states_active_bitmap = active;
@@ -488,18 +472,18 @@ void ParamEditor::initialize_knob_states(GUI::Bitmap active, GUI::Bitmap inactiv
 }
 
 
-void ParamEditor::free_knob_states()
+void ParamEditor::free_knob_states(WidgetBase* widget)
 {
     if (knob_states_active_bitmap == NULL) {
         return;
     }
 
-    delete_bitmap(knob_states_active_bitmap);
-    delete_bitmap(knob_states_inactive_bitmap);
+    widget->delete_bitmap(knob_states_active_bitmap);
+    widget->delete_bitmap(knob_states_inactive_bitmap);
 
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        delete_bitmap(knob_states_active[i]);
-        delete_bitmap(knob_states_inactive[i]);
+        widget->delete_bitmap(knob_states_active[i]);
+        widget->delete_bitmap(knob_states_inactive[i]);
     }
 
     knob_states_initialization_complete = false;
@@ -590,7 +574,7 @@ void ParamEditor::complete_knob_state_initialization()
 }
 
 
-void ParamEditor::set_up(GUI::PlatformData platform_data, Widget* parent)
+void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     TransparentWidget::set_up(platform_data, parent);
 
@@ -750,6 +734,8 @@ void ParamEditor::reset_default()
 
 bool ParamEditor::paint()
 {
+    TransparentWidget::paint();
+
     draw_text(
         value_str,
         value_font_size,
@@ -757,8 +743,8 @@ bool ParamEditor::paint()
         HEIGHT - 20,
         WIDTH - 2,
         20,
-        rgb(181, 181, 189),
-        rgb(0, 0, 0)
+        GUI::rgb(181, 181, 189),
+        GUI::rgb(0, 0, 0)
     );
 
     if (controller_choices > 0) {
@@ -769,8 +755,8 @@ bool ParamEditor::paint()
             HEIGHT - 36,
             WIDTH - 2,
             16,
-            has_controller_ ? rgb(0, 0, 0) : rgb(181, 181, 189),
-            has_controller_ ? rgb(145, 145, 151) : rgb(0, 0, 0),
+            has_controller_ ? GUI::rgb(0, 0, 0) : GUI::rgb(181, 181, 189),
+            has_controller_ ? GUI::rgb(145, 145, 151) : GUI::rgb(0, 0, 0),
             has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
         );
     }
@@ -781,6 +767,8 @@ bool ParamEditor::paint()
 
 bool ParamEditor::mouse_up(int const x, int const y)
 {
+    TransparentWidget::mouse_up(x, y);
+
     if (is_clicking && controller_choices > 0) {
         controller_selector.show(param_id, controller_choices, this);
     }
@@ -810,8 +798,10 @@ ParamEditor::Knob::~Knob()
 }
 
 
-void ParamEditor::Knob::set_up(GUI::PlatformData platform_data, Widget* parent)
-{
+void ParamEditor::Knob::set_up(
+        GUI::PlatformData platform_data,
+        WidgetBase* parent
+) {
     Widget::set_up(platform_data, parent);
 
     update(0.0);
@@ -856,6 +846,8 @@ void ParamEditor::Knob::deactivate()
 
 bool ParamEditor::Knob::double_click()
 {
+    Widget::double_click();
+
     if (is_inactive) {
         return true;
     }
@@ -870,6 +862,8 @@ bool ParamEditor::Knob::double_click()
 
 bool ParamEditor::Knob::mouse_down(int const x, int const y)
 {
+    Widget::mouse_down(x, y);
+
     if (is_inactive) {
         return true;
     }
@@ -883,12 +877,13 @@ bool ParamEditor::Knob::mouse_down(int const x, int const y)
 
 bool ParamEditor::Knob::mouse_up(int const x, int const y)
 {
+    Widget::mouse_up(x, y);
+
     if (is_inactive) {
         return true;
     }
 
-    is_clicking = false;
-    mouse_move(x, y, true);
+    focus();
 
     return true;
 }
@@ -899,6 +894,8 @@ bool ParamEditor::Knob::mouse_move(
         int const y,
         bool const modifier
 ) {
+    Widget::mouse_move(x, y, modifier);
+
     if (is_inactive) {
         return true;
     }
@@ -926,16 +923,22 @@ bool ParamEditor::Knob::mouse_move(
 }
 
 
-bool ParamEditor::Knob::mouse_wheel(Number const delta)
+bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 {
+    Widget::mouse_wheel(delta, modifier);
+
     if (is_inactive) {
         return true;
     }
 
+    Number const scale = (
+        modifier ? MOUSE_WHEEL_FINE_SCALE : MOUSE_WHEEL_COARSE_SCALE
+    );
+
     if (steps > 0.0) {
-        editor.adjust_ratio(delta * 10.0);
+        editor.adjust_ratio(delta * scale * 10.0);
     } else {
-        editor.adjust_ratio(delta);
+        editor.adjust_ratio(delta * scale);
     }
 
     return true;

@@ -98,7 +98,7 @@ int WINAPI wWinMain(
 
     JS80P::GUI* gui = new JS80P::GUI(
         (JS80P::GUI::PlatformData)hInstance,
-        (JS80P::GUI::Window)main_window,
+        (JS80P::GUI::PlatformWidget)main_window,
         synth
     );
     gui->show();

@@ -105,7 +105,7 @@ class FstPlugin
         VstIntPtr get_chunk(void** chunk) noexcept;
         void set_chunk(void const* chunk, VstIntPtr const size) noexcept;
 
-        void open_gui(GUI::Window parent);
+        void open_gui(GUI::PlatformWidget parent_window);
         void close_gui();
 
         Synth synth;
