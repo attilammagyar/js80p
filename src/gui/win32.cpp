@@ -447,9 +447,9 @@ void Widget::draw_text(
     UINT format;
 
     if (alignment == TextAlignment::CENTER) {
-        format = DT_SINGLELINE | DT_CENTER | DT_VCENTER;
+        format = DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX;
     } else {
-        format = DT_SINGLELINE | DT_LEFT | DT_VCENTER;
+        format = DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOPREFIX;
     }
 
     DrawText(hdc, text_obj.get(), -1, (LPRECT)&text_rect, format);
