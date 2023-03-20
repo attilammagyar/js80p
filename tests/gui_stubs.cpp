@@ -172,65 +172,23 @@ class Widget : public GUI::Object
         GUI::Widgets children;
 };
 
+}
 
-class TransparentWidget : public Widget
+
+#include "gui/widgets.hpp"
+
+
+namespace JS80P
 {
-    public:
-        TransparentWidget(
-            char const* const label,
-            int const left,
-            int const top,
-            int const width,
-            int const height
-        );
 
-    protected:
-        virtual bool paint() override;
-};
-
-
-class ExportPatchButton : public TransparentWidget
+void ImportPatchButton::click()
 {
-    public:
-        ExportPatchButton(
-            int const left,
-            int const top,
-            int const width,
-            int const height,
-            Synth& synth
-        );
-
-    protected:
-        virtual void click() override
-        {
-        }
-
-    private:
-        Synth& synth;
-};
+}
 
 
-class ImportPatchButton : public TransparentWidget
+void ExportPatchButton::click()
 {
-    public:
-        ImportPatchButton(
-            int const left,
-            int const top,
-            int const width,
-            int const height,
-            Synth& synth,
-            TabBody* synth_gui_body
-        );
-
-    protected:
-        virtual void click() override
-        {
-        }
-
-    private:
-        Synth& synth;
-        TabBody* synth_gui_body;
-};
+}
 
 }
 

@@ -86,6 +86,8 @@ class Widget : public GUI::Object
                 WCHAR* wtext;
         };
 
+        static std::string const FILTER_STR;
+
         Widget();
         Widget(
             char const* const label,
@@ -167,65 +169,6 @@ class Widget : public GUI::Object
         WNDPROC original_window_procedure;
         bool is_mouse_captured;
         bool is_timer_started;
-};
-
-
-class TransparentWidget : public Widget
-{
-    public:
-        TransparentWidget(
-            char const* const label,
-            int const left,
-            int const top,
-            int const width,
-            int const height
-        );
-
-    protected:
-        virtual bool paint() override;
-};
-
-
-class ImportPatchButton : public TransparentWidget
-{
-    public:
-        static std::string const FILTER_STR;
-
-        ImportPatchButton(
-            int const left,
-            int const top,
-            int const width,
-            int const height,
-            Synth& synth,
-            TabBody* synth_gui_body
-        );
-
-    protected:
-        virtual void click() override;
-
-    private:
-        char buffer[Serializer::MAX_SIZE];
-        Synth& synth;
-        TabBody* synth_gui_body;
-};
-
-
-class ExportPatchButton : public TransparentWidget
-{
-    public:
-        ExportPatchButton(
-            int const left,
-            int const top,
-            int const width,
-            int const height,
-            Synth& synth
-        );
-
-    protected:
-        virtual void click() override;
-
-    private:
-        Synth& synth;
 };
 
 }

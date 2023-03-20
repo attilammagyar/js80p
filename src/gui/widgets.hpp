@@ -39,6 +39,63 @@ class ExternallyCreatedWindow : public Widget
 };
 
 
+class TransparentWidget : public Widget
+{
+    public:
+        TransparentWidget(
+            char const* const label,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        );
+
+    protected:
+        virtual bool paint() override;
+};
+
+
+class ImportPatchButton : public TransparentWidget
+{
+    public:
+        ImportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth,
+            TabBody* synth_gui_body
+        );
+
+    protected:
+        virtual void click() override;
+
+    private:
+        char buffer[Serializer::MAX_SIZE];
+        Synth& synth;
+        TabBody* synth_gui_body;
+};
+
+
+class ExportPatchButton : public TransparentWidget
+{
+    public:
+        ExportPatchButton(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth
+        );
+
+    protected:
+        virtual void click() override;
+
+    private:
+        Synth& synth;
+};
+
+
 class ParamEditor;
 
 

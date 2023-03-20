@@ -587,7 +587,7 @@ void Widget::release_captured_mouse()
 }
 
 
-std::string const ImportPatchButton::FILTER_STR(
+std::string const Widget::FILTER_STR(
     "JS80P Patches (*.js80p)\x00*.js80p\x00"
     "All Files (*.*)\x00*.*\x00",
     53
@@ -596,7 +596,7 @@ std::string const ImportPatchButton::FILTER_STR(
 
 void ImportPatchButton::click()
 {
-    Widget::Text filter(ImportPatchButton::FILTER_STR);
+    Widget::Text filter(FILTER_STR);
     Widget::Text ext("js80p");
     TCHAR file_name[MAX_PATH];
     OPENFILENAME ofn;
