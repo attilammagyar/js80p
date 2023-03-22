@@ -96,7 +96,7 @@ namespace Constants {
     constexpr Number FOLD_MIN = 0.0;
 
     constexpr Number PM_DEFAULT = 0.0;
-    constexpr Number PM_MAX = 1.0;
+    constexpr Number PM_MAX = 5.0;
     constexpr Number PM_MIN = 0.0;
 }
 

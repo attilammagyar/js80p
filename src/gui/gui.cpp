@@ -1070,7 +1070,7 @@ void GUI::build_synth_body()
 
     PE(synth_body, 14, 34 + (PE_H + 6) * 0, Synth::ParamId::MODE,   MIDI_CTLS,  md, mdc);
     PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::MIX,    LFO_CTLS,   "%.2f", 100.0);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::PM,     ALL_CTLS,   "%.2f", 100.0);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::PM,     ALL_CTLS,   "%.2f", 100.0 / Constants::PM_MAX);
     PE(synth_body, 14, 34 + (PE_H + 6) * 3, Synth::ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
     PE(synth_body, 14, 34 + (PE_H + 6) * 4, Synth::ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 

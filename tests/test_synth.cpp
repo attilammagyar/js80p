@@ -462,9 +462,9 @@ TEST(messages_get_processed_during_rendering, {
 
     synth.process_messages();
 
-    assert_eq(0.123, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
+    assert_eq(0.123, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
     assert_eq(0.123, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA);
-    assert_eq(0.42, synth.modulator_add_volume.get_value(), DOUBLE_DELTA);
+    assert_eq(0.42, synth.modulator_add_volume.get_ratio(), DOUBLE_DELTA);
     assert_eq(0.42, synth.get_param_ratio_atomic(Synth::ParamId::MIX), DOUBLE_DELTA);
     assert_eq(
         inv_saw_as_ratio,
@@ -536,11 +536,9 @@ TEST(midi_controller_changes_can_affect_parameters, {
 
     SignalProducer::produce<Synth>(&synth, 1, 1);
 
-    assert_eq(0.42, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
-    assert_eq(0.9, synth.modulator_params.amplitude.get_value(), DOUBLE_DELTA);
-    assert_eq(
-        600.0, synth.modulator_params.fine_detune.get_value(), DOUBLE_DELTA
-    );
+    assert_eq(0.42, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
+    assert_eq(0.9, synth.modulator_params.amplitude.get_ratio(), DOUBLE_DELTA);
+    assert_eq(0.75, synth.modulator_params.fine_detune.get_ratio(), DOUBLE_DELTA);
     assert_eq(SimpleOscillator::CUSTOM, synth.carrier_params.waveform.get_value());
 
     assert_true(synth.phase_modulation_level.is_constant_in_next_round(2, 1));
