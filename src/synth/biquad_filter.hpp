@@ -132,6 +132,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static bool shared_is_no_op;
 
         void initialize_instance() noexcept;
+        void update_helper_variables() noexcept;
         void register_children() noexcept;
 
         void reallocate_buffers() noexcept;

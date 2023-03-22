@@ -200,17 +200,18 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_low_pass_filter_is_no_op
 })
 
 
-TEST(when_frequency_is_at_minimum_then_low_pass_filter_is_silent, {
-    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<SumOfSines> filter("", input, filter_type);
+/* JS80P doesn't let the frequency go below 0.1 Hz */
+// TEST(when_frequency_is_at_minimum_then_low_pass_filter_is_silent, {
+    // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    // SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
+    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilter<SumOfSines> filter("", input, filter_type);
 
-    filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
-    filter.frequency.set_value(filter.frequency.get_min_value());
+    // filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
+    // filter.frequency.set_value(filter.frequency.get_min_value());
 
-    test_filter(filter, input, expected, 0.0);
-})
+    // test_filter(filter, input, expected, 0.0);
+// })
 
 
 TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
@@ -231,21 +232,22 @@ TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
 })
 
 
-TEST(when_frequency_is_at_min_value_then_high_pass_filter_is_no_op, {
-    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<SumOfSines> filter("", input, filter_type);
-    Number const min_frequency = filter.frequency.get_min_value();
+/* JS80P doesn't let the frequency go below 0.1 Hz */
+// TEST(when_frequency_is_at_min_value_then_high_pass_filter_is_no_op, {
+    // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilter<SumOfSines> filter("", input, filter_type);
+    // Number const min_frequency = filter.frequency.get_min_value();
 
-    filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
-    filter.frequency.set_value(min_frequency - 1.0);
+    // filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
+    // filter.frequency.set_value(min_frequency - 1.0);
 
-    schedule_small_param_changes(filter, min_frequency - 1.0, 0.03, -6.0);
+    // schedule_small_param_changes(filter, min_frequency - 1.0, 0.03, -6.0);
 
-    test_filter(filter, input, input, 0.0);
+    // test_filter(filter, input, input, 0.0);
 
-    assert_completed(filter, min_frequency, 0.03, -6.0);
-})
+    // assert_completed(filter, min_frequency, 0.03, -6.0);
+// })
 
 
 TEST(when_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_silent, {
@@ -448,22 +450,23 @@ TEST(peaking_filter_can_boost_or_attenuate_a_range_around_the_given_frequency, {
 })
 
 
-TEST(when_frequency_is_at_min_value_then_low_shelf_filter_is_no_op, {
-    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<SumOfSines> filter("", input, filter_type);
-    Number const min_frequency = filter.frequency.get_min_value();
+/* JS80P doesn't let the frequency go below 0.1 Hz */
+// TEST(when_frequency_is_at_min_value_then_low_shelf_filter_is_no_op, {
+    // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilter<SumOfSines> filter("", input, filter_type);
+    // Number const min_frequency = filter.frequency.get_min_value();
 
-    filter.type.set_value(BiquadFilter<SumOfSines>::LOW_SHELF);
-    filter.frequency.set_value(min_frequency - 1.0);
-    filter.gain.set_value(-12.0);
+    // filter.type.set_value(BiquadFilter<SumOfSines>::LOW_SHELF);
+    // filter.frequency.set_value(min_frequency - 1.0);
+    // filter.gain.set_value(-12.0);
 
-    schedule_small_param_changes(filter, min_frequency - 1.0, 0.03, -12.0);
+    // schedule_small_param_changes(filter, min_frequency - 1.0, 0.03, -12.0);
 
-    test_filter(filter, input, input, 0.0);
+    // test_filter(filter, input, input, 0.0);
 
-    assert_completed(filter, min_frequency, 0.03, -12.0);
-})
+    // assert_completed(filter, min_frequency, 0.03, -12.0);
+// })
 
 
 TEST(when_frequency_is_above_the_nyquist_frequency_then_low_shelf_filter_is_gain, {
@@ -537,18 +540,19 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_shelf_filter_is_no_
 })
 
 
-TEST(when_frequency_is_at_minimum_then_high_shelf_filter_is_gain, {
-    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    SumOfSines expected(0.25, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<SumOfSines> filter("", input, filter_type);
+/* JS80P doesn't let the frequency go below 0.1 Hz */
+// TEST(when_frequency_is_at_minimum_then_high_shelf_filter_is_gain, {
+    // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    // SumOfSines expected(0.25, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
+    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilter<SumOfSines> filter("", input, filter_type);
 
-    filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_SHELF);
-    filter.frequency.set_value(filter.frequency.get_min_value());
-    filter.gain.set_value(-6.0);
+    // filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_SHELF);
+    // filter.frequency.set_value(filter.frequency.get_min_value());
+    // filter.gain.set_value(-6.0);
 
-    test_filter(filter, input, expected, 0.001);
-})
+    // test_filter(filter, input, expected, 0.001);
+// })
 
 
 TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequency, {
