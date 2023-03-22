@@ -41,9 +41,8 @@ constexpr Number OUT_VOLUME_PER_CHANNEL = std::sin(Math::PI / 4.0);
 
 // TODO: remove this array once all params are implemented, and use Synth::PARAM_NAMES instead
 Synth::ParamId IMPLEMENTED_PARAMS[] = {
-    Synth::ParamId::VOL,
-
-    Synth::ParamId::ADD,
+    Synth::ParamId::MIX,
+    Synth::ParamId::PM,
     Synth::ParamId::FM,
     Synth::ParamId::AM,
 
@@ -276,6 +275,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
 
     // TODO: turn on these when LFOs are implemented
     // Synth::ParamId::L1FRQ,
+    // Synth::ParamId::L1PHS,
     // Synth::ParamId::L1AMT,
     // Synth::ParamId::L1MIN,
     // Synth::ParamId::L1MAX,
@@ -283,6 +283,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L1RND,
 
     // Synth::ParamId::L2FRQ,
+    // Synth::ParamId::L2PHS,
     // Synth::ParamId::L2AMT,
     // Synth::ParamId::L2MIN,
     // Synth::ParamId::L2MAX,
@@ -290,6 +291,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L2RND,
 
     // Synth::ParamId::L3FRQ,
+    // Synth::ParamId::L3PHS,
     // Synth::ParamId::L3AMT,
     // Synth::ParamId::L3MIN,
     // Synth::ParamId::L3MAX,
@@ -297,6 +299,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L3RND,
 
     // Synth::ParamId::L4FRQ,
+    // Synth::ParamId::L4PHS,
     // Synth::ParamId::L4AMT,
     // Synth::ParamId::L4MIN,
     // Synth::ParamId::L4MAX,
@@ -304,6 +307,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L4RND,
 
     // Synth::ParamId::L5FRQ,
+    // Synth::ParamId::L5PHS,
     // Synth::ParamId::L5AMT,
     // Synth::ParamId::L5MIN,
     // Synth::ParamId::L5MAX,
@@ -311,6 +315,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L5RND,
 
     // Synth::ParamId::L6FRQ,
+    // Synth::ParamId::L6PHS,
     // Synth::ParamId::L6AMT,
     // Synth::ParamId::L6MIN,
     // Synth::ParamId::L6MAX,
@@ -318,6 +323,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L6RND,
 
     // Synth::ParamId::L7FRQ,
+    // Synth::ParamId::L7PHS,
     // Synth::ParamId::L7AMT,
     // Synth::ParamId::L7MIN,
     // Synth::ParamId::L7MAX,
@@ -325,6 +331,7 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     // Synth::ParamId::L7RND,
 
     // Synth::ParamId::L8FRQ,
+    // Synth::ParamId::L8PHS,
     // Synth::ParamId::L8AMT,
     // Synth::ParamId::L8MIN,
     // Synth::ParamId::L8MAX,
@@ -423,7 +430,7 @@ TEST(messages_get_processed_during_rendering, {
         )
     );
 
-    synth.volume.set_value(1.0);
+    synth.phase_modulation_level.set_value(1.0);
     synth.modulator_add_volume.set_value(0.42);
     synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
 
@@ -431,10 +438,10 @@ TEST(messages_get_processed_during_rendering, {
         Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0
     );
     synth.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::VOL, 0.123, 0
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
     );
     synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::ADD, 0.0, 0
+        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0
     );
     synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
@@ -443,7 +450,7 @@ TEST(messages_get_processed_during_rendering, {
         Synth::ControllerId::ENVELOPE_3
     );
 
-    assert_eq(1.0, synth.volume.get_value(), DOUBLE_DELTA);
+    assert_eq(1.0, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
     assert_eq(NULL, synth.carrier_params.volume.get_envelope());
     assert_eq(
         SimpleOscillator::SINE, synth.modulator_params.waveform.get_value()
@@ -455,10 +462,10 @@ TEST(messages_get_processed_during_rendering, {
 
     synth.process_messages();
 
-    assert_eq(0.123, synth.volume.get_value(), DOUBLE_DELTA);
-    assert_eq(0.123, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA);
+    assert_eq(0.123, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
+    assert_eq(0.123, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA);
     assert_eq(0.42, synth.modulator_add_volume.get_value(), DOUBLE_DELTA);
-    assert_eq(0.42, synth.get_param_ratio_atomic(Synth::ParamId::ADD), DOUBLE_DELTA);
+    assert_eq(0.42, synth.get_param_ratio_atomic(Synth::ParamId::MIX), DOUBLE_DELTA);
     assert_eq(
         inv_saw_as_ratio,
         synth.get_param_ratio_atomic(Synth::ParamId::MWAV),
@@ -486,7 +493,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
 
     synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::VOL,
+        Synth::ParamId::PM,
         0.0,
         Synth::ControllerId::VOLUME
     );
@@ -509,7 +516,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
         Synth::ControllerId::MODULATION_WHEEL
     );
     synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::VOL, 0.0, 0.0
+        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0.0
     );
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0.0
@@ -529,14 +536,14 @@ TEST(midi_controller_changes_can_affect_parameters, {
 
     SignalProducer::produce<Synth>(&synth, 1, 1);
 
-    assert_eq(0.42, synth.volume.get_value(), DOUBLE_DELTA);
+    assert_eq(0.42, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
     assert_eq(0.9, synth.modulator_params.amplitude.get_value(), DOUBLE_DELTA);
     assert_eq(
         600.0, synth.modulator_params.fine_detune.get_value(), DOUBLE_DELTA
     );
     assert_eq(SimpleOscillator::CUSTOM, synth.carrier_params.waveform.get_value());
 
-    assert_true(synth.volume.is_constant_in_next_round(2, 1));
+    assert_true(synth.phase_modulation_level.is_constant_in_next_round(2, 1));
     assert_true(
         synth.modulator_params.amplitude.is_constant_in_next_round(2, 1)
     );
@@ -556,9 +563,9 @@ TEST(can_look_up_param_id_by_name, {
         max_collisions, avg_collisions, avg_bucket_size
     );
 
-    assert_lte((int)max_collisions, 4);
-    assert_lte(avg_bucket_size, 1.8);
-    assert_lte(avg_collisions, 2.4);
+    assert_lte((int)max_collisions, 5);
+    assert_lte(avg_bucket_size, 2.22);
+    assert_lte(avg_collisions, 2.51);
 
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(""));
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(" \n"));
@@ -597,7 +604,6 @@ void test_operating_mode(
     expected.set_sample_rate(sample_rate);
 
     synth.mode.set_value(mode);
-    synth.volume.set_value(1.0);
 
     synth.modulator_params.amplitude.set_value(1.0);
     synth.modulator_params.volume.set_value(1.0);

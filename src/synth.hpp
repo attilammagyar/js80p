@@ -77,9 +77,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         };
 
         enum ParamId {
-            VOL = 0,         ///< Volume
-
-            ADD = 1,         ///< Modulator Additive Volume
+            MIX = 0,         ///< Modulator Additive Volume
+            PM = 1,          ///< Phase Modulation
             FM = 2,          ///< Frequency Modulation
             AM = 3,          ///< Amplitude Modulation
 
@@ -309,86 +308,91 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N6FIN = 198,     ///< Envelope 6 Final Level
 
             L1FRQ = 199,     ///< LFO 1 Frequency
-            L1AMT = 200,     ///< LFO 1 Amount
-            L1MIN = 201,     ///< LFO 1 Minimum Value
-            L1MAX = 202,     ///< LFO 1 Maximum Value
-            L1DST = 203,     ///< LFO 1 Distortion
-            L1RND = 204,     ///< LFO 1 Randomness
+            L1PHS = 200,     ///< LFO 1 Phase
+            L1AMT = 201,     ///< LFO 1 Amount
+            L1MIN = 202,     ///< LFO 1 Minimum Value
+            L1MAX = 203,     ///< LFO 1 Maximum Value
+            L1DST = 204,     ///< LFO 1 Distortion
+            L1RND = 205,     ///< LFO 1 Randomness
 
-            L2FRQ = 205,     ///< LFO 2 Frequency
-            L2AMT = 206,     ///< LFO 2 Amount
-            L2MIN = 207,     ///< LFO 2 Minimum Value
-            L2MAX = 208,     ///< LFO 2 Maximum Value
-            L2DST = 209,     ///< LFO 2 Distortion
-            L2RND = 210,     ///< LFO 2 Randomness
+            L2FRQ = 206,     ///< LFO 2 Frequency
+            L2PHS = 207,     ///< LFO 2 Phase
+            L2AMT = 208,     ///< LFO 2 Amount
+            L2MIN = 209,     ///< LFO 2 Minimum Value
+            L2MAX = 210,     ///< LFO 2 Maximum Value
+            L2DST = 211,     ///< LFO 2 Distortion
+            L2RND = 212,     ///< LFO 2 Randomness
 
-            L3FRQ = 211,     ///< LFO 3 Frequency
-            L3AMT = 212,     ///< LFO 3 Amount
-            L3MIN = 213,     ///< LFO 3 Minimum Value
-            L3MAX = 214,     ///< LFO 3 Maximum Value
-            L3DST = 215,     ///< LFO 3 Distortion
-            L3RND = 216,     ///< LFO 3 Randomness
+            L3FRQ = 213,     ///< LFO 3 Frequency
+            L3PHS = 214,     ///< LFO 3 Phase
+            L3AMT = 215,     ///< LFO 3 Amount
+            L3MIN = 216,     ///< LFO 3 Minimum Value
+            L3MAX = 217,     ///< LFO 3 Maximum Value
+            L3DST = 218,     ///< LFO 3 Distortion
+            L3RND = 219,     ///< LFO 3 Randomness
 
-            L4FRQ = 217,     ///< LFO 4 Frequency
-            L4AMT = 218,     ///< LFO 4 Amount
-            L4MIN = 219,     ///< LFO 4 Minimum Value
-            L4MAX = 220,     ///< LFO 4 Maximum Value
-            L4DST = 221,     ///< LFO 4 Distortion
-            L4RND = 222,     ///< LFO 4 Randomness
+            L4FRQ = 220,     ///< LFO 4 Frequency
+            L4PHS = 221,     ///< LFO 4 Phase
+            L4AMT = 222,     ///< LFO 4 Amount
+            L4MIN = 223,     ///< LFO 4 Minimum Value
+            L4MAX = 224,     ///< LFO 4 Maximum Value
+            L4DST = 225,     ///< LFO 4 Distortion
+            L4RND = 226,     ///< LFO 4 Randomness
 
-            L5FRQ = 223,     ///< LFO 5 Frequency
-            L5AMT = 224,     ///< LFO 5 Amount
-            L5MIN = 225,     ///< LFO 5 Minimum Value
-            L5MAX = 226,     ///< LFO 5 Maximum Value
-            L5DST = 227,     ///< LFO 5 Distortion
-            L5RND = 228,     ///< LFO 5 Randomness
+            L5FRQ = 227,     ///< LFO 5 Frequency
+            L5PHS = 228,     ///< LFO 5 Phase
+            L5AMT = 229,     ///< LFO 5 Amount
+            L5MIN = 230,     ///< LFO 5 Minimum Value
+            L5MAX = 231,     ///< LFO 5 Maximum Value
+            L5DST = 232,     ///< LFO 5 Distortion
+            L5RND = 233,     ///< LFO 5 Randomness
 
-            L6FRQ = 229,     ///< LFO 6 Frequency
-            L6AMT = 230,     ///< LFO 6 Amount
-            L6MIN = 231,     ///< LFO 6 Minimum Value
-            L6MAX = 232,     ///< LFO 6 Maximum Value
-            L6DST = 233,     ///< LFO 6 Distortion
-            L6RND = 234,     ///< LFO 6 Randomness
+            L6FRQ = 234,     ///< LFO 6 Frequency
+            L6PHS = 235,     ///< LFO 6 Phase
+            L6AMT = 236,     ///< LFO 6 Amount
+            L6MIN = 237,     ///< LFO 6 Minimum Value
+            L6MAX = 238,     ///< LFO 6 Maximum Value
+            L6DST = 239,     ///< LFO 6 Distortion
+            L6RND = 240,     ///< LFO 6 Randomness
 
-            L7FRQ = 235,     ///< LFO 7 Frequency
-            L7AMT = 236,     ///< LFO 7 Amount
-            L7MIN = 237,     ///< LFO 7 Minimum Value
-            L7MAX = 238,     ///< LFO 7 Maximum Value
-            L7DST = 239,     ///< LFO 7 Distortion
-            L7RND = 240,     ///< LFO 7 Randomness
+            L7FRQ = 241,     ///< LFO 7 Frequency
+            L7PHS = 242,     ///< LFO 7 Phase
+            L7AMT = 243,     ///< LFO 7 Amount
+            L7MIN = 244,     ///< LFO 7 Minimum Value
+            L7MAX = 245,     ///< LFO 7 Maximum Value
+            L7DST = 246,     ///< LFO 7 Distortion
+            L7RND = 247,     ///< LFO 7 Randomness
 
-            L8FRQ = 241,     ///< LFO 8 Frequency
-            L8AMT = 242,     ///< LFO 8 Amount
-            L8MIN = 243,     ///< LFO 8 Minimum Value
-            L8MAX = 244,     ///< LFO 8 Maximum Value
-            L8DST = 245,     ///< LFO 8 Distortion
-            L8RND = 246,     ///< LFO 8 Randomness
+            L8FRQ = 248,     ///< LFO 8 Frequency
+            L8PHS = 249,     ///< LFO 8 Phase
+            L8AMT = 250,     ///< LFO 8 Amount
+            L8MIN = 251,     ///< LFO 8 Minimum Value
+            L8MAX = 252,     ///< LFO 8 Maximum Value
+            L8DST = 253,     ///< LFO 8 Distortion
+            L8RND = 254,     ///< LFO 8 Randomness
 
-            MODE = 247,      ///< Mode
+            MODE = 255,      ///< Mode
+            MWAV = 256,      ///< Modulator Waveform
+            CWAV = 257,      ///< Carrier Waveform
+            MF1TYP = 258,    ///< Modulator Filter 1 Type
+            MF2TYP = 259,    ///< Modulator Filter 2 Type
+            CF1TYP = 260,    ///< Carrier Filter 1 Type
+            CF2TYP = 261,    ///< Carrier Filter 2 Type
+            EF1TYP = 262,    ///< Effects Filter 1 Type
+            EF2TYP = 263,    ///< Effects Filter 2 Type
+            L1WAV = 264,     ///< LFO 1 Waveform
+            L2WAV = 265,     ///< LFO 2 Waveform
+            L3WAV = 266,     ///< LFO 3 Waveform
+            L4WAV = 267,     ///< LFO 4 Waveform
+            L5WAV = 268,     ///< LFO 5 Waveform
+            L6WAV = 269,     ///< LFO 6 Waveform
+            L7WAV = 270,     ///< LFO 7 Waveform
+            L8WAV = 271,     ///< LFO 8 Waveform
 
-            MWAV = 248,      ///< Modulator Waveform
-            CWAV = 249,      ///< Carrier Waveform
-
-            MF1TYP = 250,    ///< Modulator Filter 1 Type
-            MF2TYP = 251,    ///< Modulator Filter 2 Type
-
-            CF1TYP = 252,    ///< Carrier Filter 1 Type
-            CF2TYP = 253,    ///< Carrier Filter 2 Type
-
-            EF1TYP = 254,    ///< Effects Filter 1 Type
-            EF2TYP = 255,    ///< Effects Filter 2 Type
-
-            L1WAV = 256,     ///< LFO 1 Waveform
-            L2WAV = 257,     ///< LFO 2 Waveform
-            L3WAV = 258,     ///< LFO 3 Waveform
-            L4WAV = 259,     ///< LFO 4 Waveform
-            L5WAV = 260,     ///< LFO 5 Waveform
-            L6WAV = 261,     ///< LFO 6 Waveform
-            L7WAV = 262,     ///< LFO 7 Waveform
-            L8WAV = 263,     ///< LFO 8 Waveform
-
-            MAX_PARAM_ID = 264,
+            MAX_PARAM_ID = 272
         };
+
+        static constexpr Integer FLOAT_PARAMS = 255;
 
         enum ControllerId {
             NONE = 0,                       ///< None
@@ -612,8 +616,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
 
         ModeParam mode;
-        FloatParam volume;
         FloatParam modulator_add_volume;
+        FloatParam phase_modulation_level;
         FloatParam frequency_modulation_level;
         FloatParam amplitude_modulation_level;
 
@@ -700,7 +704,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Modulator* const* const modulators,
                     Carrier* const* const carriers,
                     Integer const polyphony,
-                    FloatParam& volume,
                     FloatParam& modulator_add_volume
                 ) noexcept;
 
@@ -731,19 +734,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Sample** buffer
                 ) const noexcept;
 
-                void apply_volume(
-                    Integer const round,
-                    Integer const first_sample_index,
-                    Integer const last_sample_index,
-                    Sample** buffer
-                ) const noexcept;
-
                 Integer const polyphony;
                 Synth::Modulator* const* const modulators;
                 Synth::Carrier* const* const carriers;
-                FloatParam& volume;
                 FloatParam& modulator_add_volume;
-                Sample const* volume_buffer;
                 Sample const* modulator_add_volume_buffer;
                 std::vector<bool> modulators_on;
                 std::vector<bool> carriers_on;
@@ -784,8 +778,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x80;
                 static constexpr Integer MASK = 0x7f;
-                static constexpr Integer MULTIPLIER = 23781;
-                static constexpr Integer SHIFT = 9;
+                static constexpr Integer MULTIPLIER = 15757;
+                static constexpr Integer SHIFT = 11;
 
                 static Integer hash(char const* name) noexcept;
 
@@ -806,8 +800,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
-
-        static constexpr Integer FLOAT_PARAMS = 247;
 
         static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
 

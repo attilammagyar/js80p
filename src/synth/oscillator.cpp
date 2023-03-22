@@ -46,9 +46,10 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         WaveformParam& waveform,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader
+        FloatParam& frequency_modulation_level_leader,
+        FloatParam& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(1, 16),
+    : SignalProducer(1, 17),
     waveform(waveform),
     modulated_amplitude(
         modulator,
@@ -66,6 +67,14 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FREQUENCY_MIN,
         FREQUENCY_MAX,
         FREQUENCY_DEFAULT
+    ),
+    phase(
+        modulator,
+        phase_modulation_level_leader,
+        "MP",
+        0.0,
+        1.0,
+        0.0
     ),
     detune(
         "",
@@ -103,6 +112,7 @@ void Oscillator<ModulatorSignalProducerClass>::initialize_instance() noexcept
     };
     computed_frequency_buffer = NULL;
     computed_amplitude_buffer = NULL;
+    phase_buffer = NULL;
     start_time_offset = 0.0;
     is_on = false;
 
@@ -110,6 +120,7 @@ void Oscillator<ModulatorSignalProducerClass>::initialize_instance() noexcept
     register_child(modulated_amplitude);
     register_child(amplitude);
     register_child(frequency);
+    register_child(phase);
     register_child(detune);
     register_child(fine_detune);
 
@@ -176,7 +187,8 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FloatParam& harmonic_9_leader,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader
+        FloatParam& frequency_modulation_level_leader,
+        FloatParam& phase_modulation_level_leader
 ) noexcept
     : SignalProducer(1, 16),
     waveform(waveform),
@@ -196,6 +208,14 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FREQUENCY_MIN,
         FREQUENCY_MAX,
         FREQUENCY_DEFAULT
+    ),
+    phase(
+        modulator,
+        phase_modulation_level_leader,
+        "MP2",
+        0.0,
+        1.0,
+        0.0
     ),
     detune(detune_leader),
     fine_detune(fine_detune_leader),
@@ -230,6 +250,7 @@ void Oscillator<ModulatorSignalProducerClass>::allocate_buffers(
 ) noexcept {
     computed_frequency_buffer = new Frequency[size];
     computed_amplitude_buffer = new Sample[size];
+    phase_buffer = new Sample[size];
 }
 
 
@@ -238,6 +259,12 @@ void Oscillator<ModulatorSignalProducerClass>::free_buffers() noexcept
 {
     if (computed_frequency_buffer != NULL) {
         delete[] computed_frequency_buffer;
+        delete[] computed_amplitude_buffer;
+        delete[] phase_buffer;
+
+        computed_frequency_buffer = NULL;
+        computed_amplitude_buffer = NULL;
+        phase_buffer = NULL;
     }
 }
 
@@ -307,6 +334,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass>::initialize_render
     wavetable = wavetables[waveform];
     compute_amplitude_buffer(round, sample_count);
     compute_frequency_buffer(round, sample_count);
+    compute_phase_buffer(round, sample_count);
 
     return NULL;
 }
@@ -543,6 +571,26 @@ Frequency Oscillator<ModulatorSignalProducerClass>::compute_frequency(
 
 
 template<class ModulatorSignalProducerClass>
+void Oscillator<ModulatorSignalProducerClass>::compute_phase_buffer(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    Sample const* const phase_buffer = FloatParam::produce_if_not_constant<ModulatedFloatParam>(
+        &phase, round, sample_count
+    );
+    phase_is_constant = phase_buffer == NULL;
+
+    if (phase_is_constant) {
+        phase_value = Wavetable::scale_phase_offset(phase.get_value());
+    } else {
+        for (Integer i = 0; i != sample_count; ++i) {
+            this->phase_buffer[i] = Wavetable::scale_phase_offset(phase_buffer[i]);
+        }
+    }
+}
+
+
+template<class ModulatorSignalProducerClass>
 void Oscillator<ModulatorSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
@@ -558,67 +606,134 @@ void Oscillator<ModulatorSignalProducerClass>::render(
     }
 
     if (computed_frequency_is_constant) {
-        if (UNLIKELY(is_starting)) {
-            is_starting = false;
-            Wavetable::reset_state(
-                wavetable_state,
-                sampling_period,
-                nyquist_frequency,
-                computed_frequency_value,
-                start_time_offset
-            );
-        }
-
-        Frequency const computed_frequency_value = this->computed_frequency_value;
-
-        if (computed_amplitude_is_constant) {
-            Sample const amplitude_value = computed_amplitude_value;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value
-                );
-            }
-        } else {
-            Sample const* amplitude_buffer = computed_amplitude_buffer;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value
-                );
-            }
-        }
-
-    } else {
-        if (UNLIKELY(is_starting)) {
-            is_starting = false;
-            Wavetable::reset_state(
-                wavetable_state,
-                sampling_period,
-                nyquist_frequency,
-                computed_frequency_buffer[first_sample_index],
-                start_time_offset
-            );
-        }
-
-        Frequency const* computed_frequency_buffer = (
-            (Frequency const*)this->computed_frequency_buffer
+        render_with_constant_frequency(
+            round, first_sample_index, last_sample_index, buffer
         );
+    } else {
+        render_with_changing_frequency(
+            round, first_sample_index, last_sample_index, buffer
+        );
+    }
+}
 
-        if (computed_amplitude_is_constant) {
-            Sample const amplitude_value = computed_amplitude_value;
+
+template<class ModulatorSignalProducerClass>
+void Oscillator<ModulatorSignalProducerClass>::render_with_constant_frequency(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    if (UNLIKELY(is_starting)) {
+        is_starting = false;
+        Wavetable::reset_state(
+            wavetable_state,
+            sampling_period,
+            nyquist_frequency,
+            computed_frequency_value,
+            start_time_offset
+        );
+    }
+
+    Frequency const computed_frequency_value = this->computed_frequency_value;
+    Sample const* const phase_buffer = this->phase_buffer;
+
+    if (computed_amplitude_is_constant) {
+        Sample const amplitude_value = computed_amplitude_value;
+
+        if (phase_is_constant) {
+            Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i]
+                    &wavetable_state, computed_frequency_value, phase
                 );
             }
         } else {
-            Sample const* amplitude_buffer = computed_amplitude_buffer;
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_value * wavetable->lookup(
+                    &wavetable_state, computed_frequency_value, phase_buffer[i]
+                );
+            }
+        }
+    } else {
+        Sample const* amplitude_buffer = computed_amplitude_buffer;
+
+        if (phase_is_constant) {
+            Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i]
+                    &wavetable_state, computed_frequency_value, phase
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
+                    &wavetable_state, computed_frequency_value, phase_buffer[i]
+                );
+            }
+        }
+    }
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Oscillator<ModulatorSignalProducerClass>::render_with_changing_frequency(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    if (UNLIKELY(is_starting)) {
+        is_starting = false;
+        Wavetable::reset_state(
+            wavetable_state,
+            sampling_period,
+            nyquist_frequency,
+            computed_frequency_buffer[first_sample_index],
+            start_time_offset
+        );
+    }
+
+    Frequency const* const computed_frequency_buffer = (
+        (Frequency const*)this->computed_frequency_buffer
+    );
+    Sample const* const phase_buffer = this->phase_buffer;
+
+    if (computed_amplitude_is_constant) {
+        Sample const amplitude_value = computed_amplitude_value;
+
+        if (phase_is_constant) {
+            Sample const phase = phase_value;
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_value * wavetable->lookup(
+                    &wavetable_state, computed_frequency_buffer[i], phase
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_value * wavetable->lookup(
+                    &wavetable_state, computed_frequency_buffer[i], phase_buffer[i]
+                );
+            }
+        }
+    } else {
+        Sample const* amplitude_buffer = computed_amplitude_buffer;
+
+        if (phase_is_constant) {
+            Sample const phase = phase_value;
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
+                    &wavetable_state, computed_frequency_buffer[i], phase
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
+                    &wavetable_state, computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
         }

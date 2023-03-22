@@ -38,7 +38,7 @@ html, body {
 }
 
 #lfos .main-block {
-  margin: 2px 30px;
+  margin: 2px 2px;
   padding: 1px 2px;
 }
 
@@ -594,8 +594,8 @@ window.onload = function ()
     }
 
     create_knob("main", "MODE", "split F#3");
-    create_knob("main", "VOL %", "50");
-    create_knob("main", "ADD %", "100");
+    create_knob("main", "MIX %", "100");
+    create_knob("main", "PM %", "50");
     create_knob("main", "FM %", "0");
     create_knob("main", "AM %", "100");
 
@@ -741,6 +741,7 @@ window.onload = function ()
 
         create_knob(k1, "WAV", "triangle");
         create_knob(k1, "FRQ Hz", "0.01");
+        create_knob(k1, "PHS deg", "50");
         create_knob(k1, "AMT %", "50");
         create_knob(k1, "MIN %", "50");
         create_knob(k1, "MAX %", "50");

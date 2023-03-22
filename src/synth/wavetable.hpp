@@ -51,17 +51,6 @@ class Wavetable
 
     public:
         /*
-        24 Hz at 48 kHz sampling rate has a wavelength of 2000 samples,
-        so 2048 samples per waveform with linear interpolation should be
-        good enough for most of the audible spectrum.
-
-        Better interpolation is needed though when frequency is
-        significantly lower than sample_rate / SIZE.
-        */
-        static constexpr Integer SIZE = 0x0800;
-        static constexpr Integer MASK = 0x07ff;
-
-        /*
         The Nyquist limit for 48 kHz sampling rate is 24 kHz, which
         can represent up to 384 partials of a 62.5 Hz sawtooth wave.
         So with 384 partials, we only start to loose high frequencies
@@ -69,12 +58,6 @@ class Wavetable
         */
         static constexpr Integer PARTIALS = 384;
         static constexpr Integer SOFT_PARTIALS = PARTIALS / 2;
-
-        static constexpr Number SIZE_FLOAT = (Number)SIZE;
-        static constexpr Number SIZE_INV = 1.0 / SIZE_FLOAT;
-        static constexpr Frequency INTERPOLATION_LIMIT_SCALE = (
-            1.0 / (2.0 * (Frequency)SIZE_FLOAT)
-        );
 
         static void initialize() noexcept;
 
@@ -86,6 +69,8 @@ class Wavetable
             Seconds const time_offset
         ) noexcept;
 
+        static Number scale_phase_offset(Number const phase_offset) noexcept;
+
         Wavetable(
             Number const coefficients[],
             Integer const coefficients_length
@@ -95,13 +80,31 @@ class Wavetable
 
         Sample lookup(
             WavetableState* state,
-            Frequency const frequency
+            Frequency const frequency,
+            Number const phase_offset
         ) const noexcept;
 
         void update_coefficients(Number const coefficients[]) noexcept;
         void normalize() noexcept;
 
     private:
+        /*
+        24 Hz at 48 kHz sampling rate has a wavelength of 2000 samples,
+        so 2048 samples per waveform with linear interpolation should be
+        good enough for most of the audible spectrum.
+
+        Better interpolation is needed though when frequency is
+        significantly lower than sample_rate / SIZE.
+        */
+        static constexpr Integer SIZE = 0x0800;
+        static constexpr Integer MASK = 0x07ff;
+
+        static constexpr Number SIZE_FLOAT = (Number)SIZE;
+        static constexpr Number SIZE_INV = 1.0 / SIZE_FLOAT;
+        static constexpr Frequency INTERPOLATION_LIMIT_SCALE = (
+            1.0 / (2.0 * (Frequency)SIZE_FLOAT)
+        );
+
         static Number sines[SIZE];
         static bool is_initialized;
 

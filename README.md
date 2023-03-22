@@ -19,11 +19,11 @@ Effects:
 
     Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb
 
-Development progress: 66.5%
+Development progress: 68.5%
 ---------------------------
 
  * Oscillator features: 100%
- * Modulation & mixing modes: 75%
+ * Modulation & mixing modes: 100%
  * Filters: 100%
  * Wave folder: 100%
  * Envelopes: 100%
@@ -48,6 +48,7 @@ Features
  * wave folder
  * amplitude modulation
  * frequency modulation
+ * phase modulation
  * built-in effects:
     * overdrive
     * distortion

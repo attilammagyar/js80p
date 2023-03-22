@@ -943,3 +943,54 @@ TEST(frequency_may_be_modulated, {
         0.05
     );
 })
+
+
+TEST(phase_can_be_controlled, {
+    constexpr Number period_length = 100.0;
+    constexpr Number phase = 120.0 / 360.0;
+    constexpr Frequency frequency = SAMPLE_RATE / period_length;
+    constexpr Integer block_size = 256;
+    constexpr Integer rounds = 10;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Number block_length = (Number)block_size / SAMPLE_RATE;
+    SumOfSines expected(
+        1.0, frequency,
+        0.0, 0.0,
+        0.0, 0.0,
+        1,
+        -(period_length - period_length * phase) / SAMPLE_RATE
+    );
+    SimpleOscillator::WaveformParam waveform_param("");
+    SimpleOscillator oscillator(waveform_param);
+    Buffer rendered_samples(sample_count);
+    Buffer expected_samples(sample_count);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(SAMPLE_RATE);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.frequency.set_value(frequency);
+    oscillator.frequency.schedule_value(block_length + 0.000001, frequency);
+    oscillator.amplitude.set_value(1.0);
+    oscillator.amplitude.schedule_value(block_length * 2.0 + 0.000001, 1.0);
+    oscillator.start(0.0);
+
+    oscillator.phase.set_value(phase);
+    oscillator.phase.schedule_value(0.000001, phase + 0.000001);
+    oscillator.phase.schedule_value(block_length + 0.000001, phase - 0.000001);
+
+    render_rounds<SumOfSines>(expected, expected_samples, rounds, block_size);
+    render_rounds<SimpleOscillator>(
+        oscillator, rendered_samples, rounds, block_size
+    );
+
+    assert_close(
+        expected_samples.samples[0],
+        rendered_samples.samples[0],
+        sample_count,
+        0.001
+    );
+})

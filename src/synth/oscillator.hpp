@@ -76,7 +76,8 @@ class Oscillator : public SignalProducer
             WaveformParam& waveform,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
-            FloatParam& frequency_modulation_level_leader = dummy_param
+            FloatParam& frequency_modulation_level_leader = dummy_param,
+            FloatParam& phase_modulation_level_leader = dummy_param
         ) noexcept;
 
         Oscillator(
@@ -96,7 +97,8 @@ class Oscillator : public SignalProducer
             FloatParam& harmonic_9_leader,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
-            FloatParam& frequency_modulation_level_leader = dummy_param
+            FloatParam& frequency_modulation_level_leader = dummy_param,
+            FloatParam& phase_modulation_level_leader = dummy_param
         ) noexcept;
 
         ~Oscillator() override;
@@ -111,6 +113,7 @@ class Oscillator : public SignalProducer
         ModulatedFloatParam modulated_amplitude;
         FloatParam amplitude;
         ModulatedFloatParam frequency;
+        ModulatedFloatParam phase;
         FloatParam detune;
         FloatParam fine_detune;
 
@@ -155,17 +158,38 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void compute_frequency_buffer(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         Frequency compute_frequency(
             Number const frequency,
             Number const detune,
             Number const fine_detune
         ) const noexcept;
+
+        void compute_phase_buffer(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
         void handle_start_event(Event const& event) noexcept;
         void handle_stop_event(Event const& event) noexcept;
+
+        void render_with_constant_frequency(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+        void render_with_changing_frequency(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
 
         WavetableState wavetable_state;
         Wavetable const* wavetables[WAVEFORMS];
@@ -173,16 +197,19 @@ class Oscillator : public SignalProducer
         Wavetable* custom_waveform;
         Sample* computed_amplitude_buffer;
         Frequency* computed_frequency_buffer;
+        Sample* phase_buffer;
         FloatParam* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
         Number custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS];
         Integer custom_waveform_change_indices[CUSTOM_WAVEFORM_HARMONICS];
         Number computed_amplitude_value;
         Frequency computed_frequency_value;
+        Number phase_value;
         Seconds start_time_offset;
         bool is_on;
         bool is_starting;
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
+        bool phase_is_constant;
 };
 
 }

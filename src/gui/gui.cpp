@@ -94,9 +94,8 @@ GUI::Controller::Controller(
 
 
 char const* const GUI::PARAMS[] = {
-    [Synth::ParamId::VOL] = "Volume (%)",
-
-    [Synth::ParamId::ADD] = "Modulator Additive Volume (%)",
+    [Synth::ParamId::MIX] = "Modulator Additive Volume (%)",
+    [Synth::ParamId::PM] = "Phase Modulation (%)",
     [Synth::ParamId::FM] = "Frequency Modulation (%)",
     [Synth::ParamId::AM] = "Amplitude Modulation (%)",
 
@@ -326,6 +325,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::N6FIN] = "Envelope 6 Final Level (%)",
 
     [Synth::ParamId::L1FRQ] = "LFO 1 Frequency (Hz)",
+    [Synth::ParamId::L1PHS] = "LFO 1 Phase (degree)",
     [Synth::ParamId::L1AMT] = "LFO 1 Amount (%)",
     [Synth::ParamId::L1MIN] = "LFO 1 Minimum Value (%)",
     [Synth::ParamId::L1MAX] = "LFO 1 Maximum Value (%)",
@@ -333,6 +333,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L1RND] = "LFO 1 Randomness (%)",
 
     [Synth::ParamId::L2FRQ] = "LFO 2 Frequency (Hz)",
+    [Synth::ParamId::L2PHS] = "LFO 2 Phase (degree)",
     [Synth::ParamId::L2AMT] = "LFO 2 Amount (%)",
     [Synth::ParamId::L2MIN] = "LFO 2 Minimum Value (%)",
     [Synth::ParamId::L2MAX] = "LFO 2 Maximum Value (%)",
@@ -340,6 +341,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L2RND] = "LFO 2 Randomness (%)",
 
     [Synth::ParamId::L3FRQ] = "LFO 3 Frequency (Hz)",
+    [Synth::ParamId::L3PHS] = "LFO 3 Phase (degree)",
     [Synth::ParamId::L3AMT] = "LFO 3 Amount (%)",
     [Synth::ParamId::L3MIN] = "LFO 3 Minimum Value (%)",
     [Synth::ParamId::L3MAX] = "LFO 3 Maximum Value (%)",
@@ -347,6 +349,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L3RND] = "LFO 3 Randomness (%)",
 
     [Synth::ParamId::L4FRQ] = "LFO 4 Frequency (Hz)",
+    [Synth::ParamId::L4PHS] = "LFO 4 Phase (degree)",
     [Synth::ParamId::L4AMT] = "LFO 4 Amount (%)",
     [Synth::ParamId::L4MIN] = "LFO 4 Minimum Value (%)",
     [Synth::ParamId::L4MAX] = "LFO 4 Maximum Value (%)",
@@ -354,6 +357,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L4RND] = "LFO 4 Randomness (%)",
 
     [Synth::ParamId::L5FRQ] = "LFO 5 Frequency (Hz)",
+    [Synth::ParamId::L5PHS] = "LFO 5 Phase (degree)",
     [Synth::ParamId::L5AMT] = "LFO 5 Amount (%)",
     [Synth::ParamId::L5MIN] = "LFO 5 Minimum Value (%)",
     [Synth::ParamId::L5MAX] = "LFO 5 Maximum Value (%)",
@@ -361,6 +365,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L5RND] = "LFO 5 Randomness (%)",
 
     [Synth::ParamId::L6FRQ] = "LFO 6 Frequency (Hz)",
+    [Synth::ParamId::L6PHS] = "LFO 6 Phase (degree)",
     [Synth::ParamId::L6AMT] = "LFO 6 Amount (%)",
     [Synth::ParamId::L6MIN] = "LFO 6 Minimum Value (%)",
     [Synth::ParamId::L6MAX] = "LFO 6 Maximum Value (%)",
@@ -368,6 +373,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L6RND] = "LFO 6 Randomness (%)",
 
     [Synth::ParamId::L7FRQ] = "LFO 7 Frequency (Hz)",
+    [Synth::ParamId::L7PHS] = "LFO 7 Phase (degree)",
     [Synth::ParamId::L7AMT] = "LFO 7 Amount (%)",
     [Synth::ParamId::L7MIN] = "LFO 7 Minimum Value (%)",
     [Synth::ParamId::L7MAX] = "LFO 7 Maximum Value (%)",
@@ -375,6 +381,7 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L7RND] = "LFO 7 Randomness (%)",
 
     [Synth::ParamId::L8FRQ] = "LFO 8 Frequency (Hz)",
+    [Synth::ParamId::L8PHS] = "LFO 8 Phase (degree)",
     [Synth::ParamId::L8AMT] = "LFO 8 Amount (%)",
     [Synth::ParamId::L8MIN] = "LFO 8 Minimum Value (%)",
     [Synth::ParamId::L8MAX] = "LFO 8 Maximum Value (%)",
@@ -1062,8 +1069,8 @@ void GUI::build_synth_body()
     ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
 
     PE(synth_body, 14, 34 + (PE_H + 6) * 0, Synth::ParamId::MODE,   MIDI_CTLS,  md, mdc);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::VOL,    LFO_CTLS,   "%.2f", 100.0);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::ADD,    LFO_CTLS,   "%.2f", 100.0);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::MIX,    LFO_CTLS,   "%.2f", 100.0);
+    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::PM,     ALL_CTLS,   "%.2f", 100.0);
     PE(synth_body, 14, 34 + (PE_H + 6) * 3, Synth::ParamId::FM,     ALL_CTLS,   "%.2f", 100.0 / Constants::FM_MAX);
     PE(synth_body, 14, 34 + (PE_H + 6) * 4, Synth::ParamId::AM,     ALL_CTLS,   "%.2f", 100.0 / Constants::AM_MAX);
 

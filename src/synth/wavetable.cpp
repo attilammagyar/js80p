@@ -70,6 +70,12 @@ void Wavetable::reset_state(
 }
 
 
+Number Wavetable::scale_phase_offset(Number const phase_offset) noexcept
+{
+    return phase_offset * SIZE_FLOAT;
+}
+
+
 Wavetable::Wavetable(
         Number const coefficients[],
         Integer const coefficients_length
@@ -152,7 +158,8 @@ Wavetable::~Wavetable()
 
 Sample Wavetable::lookup(
         WavetableState* state,
-        Frequency const frequency
+        Frequency const frequency,
+        Number const phase_offset
 ) const noexcept {
     Frequency const abs_frequency = std::fabs(frequency);
 
@@ -176,7 +183,7 @@ Sample Wavetable::lookup(
         state->needs_table_interpolation = false;
         state->table_indices[0] = 0;
 
-        return interpolate(state, abs_frequency, sample_index);
+        return interpolate(state, abs_frequency, sample_index + phase_offset);
     }
 
     Sample const max_partials = (
@@ -194,14 +201,14 @@ Sample Wavetable::lookup(
     if (more_partials_index == fewer_partials_index) {
         state->needs_table_interpolation = false;
 
-        return interpolate(state, abs_frequency, sample_index);
+        return interpolate(state, abs_frequency, sample_index + phase_offset);
     }
 
     state->needs_table_interpolation = true;
     state->table_indices[1] = more_partials_index;
     state->fewer_partials_weight = max_partials - std::floor(max_partials);
 
-    return interpolate(state, abs_frequency, sample_index);
+    return interpolate(state, abs_frequency, sample_index + phase_offset);
 }
 
 
@@ -236,7 +243,7 @@ Sample Wavetable::interpolate_sample_linear(
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
     );
-    Integer const sample_1_index = (Integer)sample_index;
+    Integer const sample_1_index = (Integer)sample_index & MASK;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
 
     Sample const* table_1 = samples[state->table_indices[0]];
@@ -265,7 +272,7 @@ Sample Wavetable::interpolate_sample_lagrange(
         WavetableState const* state,
         Number const sample_index
 ) const noexcept {
-    Integer const sample_1_index = (Integer)sample_index;
+    Integer const sample_1_index = (Integer)sample_index & MASK;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
     Integer const sample_3_index = (sample_2_index + 1) & MASK;
 

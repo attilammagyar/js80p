@@ -69,7 +69,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
         Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0
     );
     synth_1.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::VOL, 0.123, 0
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
     );
     synth_1.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
@@ -89,7 +89,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
         Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, triangle_as_ratio, 0
     );
     synth_2.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::VOL, 0.42, 0
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.42, 0
     );
     synth_2.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
@@ -115,7 +115,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     serializer.import(synth_2, serialized);
     synth_2.process_messages();
 
-    assert_in("\r\nVOL = 0.123", serialized);
+    assert_in("\r\nPM = 0.123", serialized);
 
     assert_eq(
         inv_saw_as_ratio,
@@ -123,7 +123,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
         DOUBLE_DELTA
     );
     assert_eq(
-        0.123, synth_2.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA
+        0.123, synth_2.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
     assert_eq(
         Synth::ControllerId::ENVELOPE_3,
@@ -145,20 +145,20 @@ TEST(importing_a_patch_ignores_comments_and_whitespace_and_unknown_sections, {
     Serializer serializer;
     std::string const patch = (
         "  [  \t   js80p   \t   ]    ; comment\n"
-        "; VOL = 0.99\n"
-        "  ; VOL = 0.98\n"
-        "   \t   VOL    = \t    0.42        \n"
+        "; PM = 0.99\n"
+        "  ; PM = 0.98\n"
+        "   \t   PM    = \t    0.42        \n"
         "CVOL = 0.43 ; some comment\n"
         "\n"
         "[unknown]\n"
-        "VOL = 0.123\n"
+        "PM = 0.123\n"
     );
 
     serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
-        0.42, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA
+        0.42, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
     assert_eq(
         0.43, synth.get_param_ratio_atomic(Synth::ParamId::CVOL), DOUBLE_DELTA
@@ -172,34 +172,34 @@ TEST(importing_a_patch_ignores_invalid_lines_and_unknown_sections, {
     std::string const patch = (
         "AM = 0.99\n"
         "[js80p]\n"
-        "VOL = 0.42\n"
+        "PM = 0.42\n"
         "MVOL = 1\n"
         "CVOL = .6\n"
         "= 0.98\n"
-        "VOL 0.97\n"
-        "VOL =\n"
-        "VOL = a\n"
-        "VOL = 0.96  a   \n"
-        "VOLx = 0.95\n"
-        "VOL = 0.94a   \n"
-        "VOL = 0.93  a   \n"
-        "VOL = -0.92\n"
-        "VOL = 0..91\n"
-        "VOL = ..90\n"
+        "PM 0.97\n"
+        "PM =\n"
+        "PM = a\n"
+        "PM = 0.96  a   \n"
+        "PMx = 0.95\n"
+        "PM = 0.94a   \n"
+        "PM = 0.93  a   \n"
+        "PM = -0.92\n"
+        "PM = 0..91\n"
+        "PM = ..90\n"
         "\n"
         "[js08p]]\n"
         "[js08p]x\n"
         "\n"
         "FM = 0.\n"
-        "ADD = 0.123\n"
+        "MIX = 0.123\n"
         "[js80px]\n"
-        "VOL = 0.89\n"
+        "PM = 0.89\n"
         "MVOL = 0.88\n"
         "CVOL = 0.87\n"
         "FM = 0.86\n"
-        "ADD = 0.85\n"
+        "MIX = 0.85\n"
         "[js80paaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]\n"
-        "VOL = 0.84\n"
+        "PM = 0.84\n"
         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA = 0.83\n"
     );
 
@@ -207,7 +207,7 @@ TEST(importing_a_patch_ignores_invalid_lines_and_unknown_sections, {
     synth.process_messages();
 
     assert_eq(
-        0.42, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA
+        0.42, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
     assert_eq(
         1.00, synth.get_param_ratio_atomic(Synth::ParamId::MVOL), DOUBLE_DELTA
@@ -219,7 +219,7 @@ TEST(importing_a_patch_ignores_invalid_lines_and_unknown_sections, {
         0.0, synth.get_param_ratio_atomic(Synth::ParamId::FM), DOUBLE_DELTA
     );
     assert_eq(
-        0.123, synth.get_param_ratio_atomic(Synth::ParamId::ADD), DOUBLE_DELTA
+        0.123, synth.get_param_ratio_atomic(Synth::ParamId::MIX), DOUBLE_DELTA
     );
     assert_eq(
         synth.get_param_default_ratio(Synth::ParamId::AM),
@@ -239,14 +239,14 @@ TEST(importing_a_patch_does_not_require_terminating_new_line, {
     Serializer serializer;
     std::string const patch = (
         "[js80p]\n"
-        "VOL = 0.42"
+        "PM = 0.42"
     );
 
     serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
-        0.42, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA
+        0.42, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
 })
 
@@ -256,14 +256,14 @@ TEST(imported_values_are_clamped, {
     Serializer serializer;
     std::string const patch = (
         "[js80p]\n"
-        "VOL = 2.1\n"
+        "PM = 2.1\n"
     );
 
     serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
-        1.0, synth.get_param_ratio_atomic(Synth::ParamId::VOL), DOUBLE_DELTA
+        1.0, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
 })
 
@@ -297,8 +297,8 @@ TEST(extremely_long_lines_may_be_truncated, {
     synth.process_messages();
 
     assert_eq(
-        synth.get_param_default_ratio(Synth::ParamId::VOL),
-        synth.get_param_ratio_atomic(Synth::ParamId::VOL),
+        synth.get_param_default_ratio(Synth::ParamId::PM),
+        synth.get_param_ratio_atomic(Synth::ParamId::PM),
         DOUBLE_DELTA
     );
     assert_eq(

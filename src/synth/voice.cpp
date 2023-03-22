@@ -183,7 +183,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Params& param_leaders,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader
+        FloatParam& frequency_modulation_level_leader,
+        FloatParam& phase_modulation_level_leader
 ) noexcept
     : SignalProducer(CHANNELS, 10),
     notes(notes),
@@ -205,7 +206,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_9,
         modulator,
         amplitude_modulation_level_leader,
-        frequency_modulation_level_leader
+        frequency_modulation_level_leader,
+        phase_modulation_level_leader
     ),
     filter_1(
         oscillator,
@@ -303,6 +305,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     oscillator.modulated_amplitude.start_envelope(time_offset);
     oscillator.amplitude.start_envelope(time_offset);
     oscillator.frequency.start_envelope(time_offset);
+    oscillator.phase.start_envelope(time_offset);
     oscillator.fine_detune.start_envelope(time_offset);
 
     filter_1.frequency.start_envelope(time_offset);
@@ -401,8 +404,8 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     panning.end_envelope(time_offset);
 
     oscillator.modulated_amplitude.end_envelope(time_offset);
-    oscillator.amplitude.end_envelope(time_offset);
     oscillator.frequency.end_envelope(time_offset);
+    oscillator.phase.end_envelope(time_offset);
     oscillator.fine_detune.end_envelope(time_offset);
 
     filter_1.frequency.end_envelope(time_offset);

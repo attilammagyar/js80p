@@ -134,7 +134,8 @@ class Voice : public SignalProducer
             Params& param_leaders,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = Oscillator_::dummy_param,
-            FloatParam& frequency_modulation_level_leader = Oscillator_::dummy_param
+            FloatParam& frequency_modulation_level_leader = Oscillator_::dummy_param,
+            FloatParam& phase_modulation_level_leader = Oscillator_::dummy_param
         ) noexcept;
 
         bool is_on() const noexcept;

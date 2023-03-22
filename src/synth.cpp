@@ -59,7 +59,7 @@ Synth::ModeParam::ModeParam(std::string const name) noexcept
 Synth::Synth() noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        6                           // MODE + VOL + ADD + FM + AM + bus
+        6                           // MODE + MIX + PM + FM + AM + bus
         + 29 * 2                    // Modulator::Params + Carrier::Params
         + POLYPHONY * 2             // modulators + carriers
         + 2                         // overdrive + distortion
@@ -69,8 +69,10 @@ Synth::Synth() noexcept
         + ENVELOPES * 10
     ),
     mode("MODE"),
-    volume("VOL", 0.0, 1.0, 0.75),
-    modulator_add_volume("ADD", 0.0, 1.0, 1.0),
+    modulator_add_volume("MIX", 0.0, 1.0, 1.0),
+    phase_modulation_level(
+        "PM", Constants::PM_MIN, Constants::PM_MAX, Constants::PM_DEFAULT
+    ),
     frequency_modulation_level(
         "FM", Constants::FM_MIN, Constants::FM_MAX, Constants::FM_DEFAULT
     ),
@@ -84,7 +86,6 @@ Synth::Synth() noexcept
         modulators,
         carriers,
         POLYPHONY,
-        volume,
         modulator_add_volume
     ),
     overdrive("EO", 3.0, bus),
@@ -111,8 +112,8 @@ Synth::Synth() noexcept
 
     register_param_as_child(ParamId::MODE, mode);
 
-    register_float_param_as_child(ParamId::VOL, volume);
-    register_float_param_as_child(ParamId::ADD, modulator_add_volume);
+    register_float_param_as_child(ParamId::MIX, modulator_add_volume);
+    register_float_param_as_child(ParamId::PM, phase_modulation_level);
     register_float_param_as_child(ParamId::FM, frequency_modulation_level);
     register_float_param_as_child(ParamId::AM, amplitude_modulation_level);
 
@@ -238,7 +239,8 @@ Synth::Synth() noexcept
             carrier_params,
             &modulators[i]->modulation_out,
             amplitude_modulation_level,
-            frequency_modulation_level
+            frequency_modulation_level,
+            phase_modulation_level
         );
         register_child(*carriers[i]);
     }
@@ -1232,14 +1234,12 @@ Synth::Bus::Bus(
         Modulator* const* const modulators,
         Carrier* const* const carriers,
         Integer const polyphony,
-        FloatParam& volume,
         FloatParam& modulator_add_volume
 ) noexcept
     : SignalProducer(channels, 0),
     polyphony(polyphony),
     modulators(modulators),
     carriers(carriers),
-    volume(volume),
     modulator_add_volume(modulator_add_volume),
     modulators_on(POLYPHONY),
     carriers_on(POLYPHONY)
@@ -1275,10 +1275,6 @@ Sample const* const* Synth::Bus::initialize_rendering(
         return NULL;
     }
 
-    volume_buffer = (
-        FloatParam::produce_if_not_constant(&volume, round, sample_count)
-    );
-
     modulator_add_volume_buffer = FloatParam::produce_if_not_constant(
         &modulator_add_volume, round, sample_count
     );
@@ -1301,7 +1297,6 @@ void Synth::Bus::render(
 
     mix_modulators(round, first_sample_index, last_sample_index, buffer);
     mix_carriers(round, first_sample_index, last_sample_index, buffer);
-    apply_volume(round, first_sample_index, last_sample_index, buffer);
 }
 
 
@@ -1382,33 +1377,6 @@ void Synth::Bus::mix_carriers(
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[c][i] += carrier_output[c][i];
-            }
-        }
-    }
-}
-
-
-void Synth::Bus::apply_volume(
-        Integer const round,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
-) const noexcept {
-    Sample const* const volume_buffer = this->volume_buffer;
-
-    if (LIKELY(volume_buffer == NULL)) {
-        Sample const volume_value = (Sample)volume.get_value();
-
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] *= volume_value;
-            }
-        }
-
-    } else {
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] *= volume_buffer[i];
             }
         }
     }

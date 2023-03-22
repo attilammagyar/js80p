@@ -16,13 +16,15 @@ def main(argv):
     param_id = print_lfo_params(param_id)
     param_id = print_special_params(param_id)
 
+    print(f"{INDENTATION}MAX_PARAM_ID = {param_id}")
+
     return 0
 
 
 def print_main_params(param_id: int) -> int:
     params = [
-        ("VOL", "   ///< Volume"),
-        ("ADD", "   ///< Modulator Additive Volume"),
+        ("MIX", "   ///< Modulator Additive Volume"),
+        ("PM", "    ///< Phase Modulation"),
         ("FM", "    ///< Frequency Modulation"),
         ("AM", "    ///< Amplitude Modulation"),
     ]
@@ -134,6 +136,7 @@ def print_envelopes_params(param_id: int) -> int:
 def print_lfo_params(param_id: int) -> int:
     params = [
         ("$#FRQ", " ///< $ # Frequency"),
+        ("$#PHS", " ///< $ # Phase"),
         ("$#AMT", " ///< $ # Amount"),
         ("$#MIN", " ///< $ # Minimum Value"),
         ("$#MAX", " ///< $ # Maximum Value"),

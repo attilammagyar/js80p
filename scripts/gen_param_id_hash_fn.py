@@ -10,8 +10,8 @@ LETTER_OFFSET = ord("A") - 10   # 0x41 - 10
 DIGIT_OFFSET = ord("0")         # 0x30
 
 params = [
-    ("VOL", 0),
-    ("ADD", 1),
+    ("MIX", 0),
+    ("PM", 1),
     ("FM", 2),
     ("AM", 3),
     ("MAMP", 4),
@@ -210,70 +210,78 @@ params = [
     ("N6REL", 197),
     ("N6FIN", 198),
     ("L1FRQ", 199),
-    ("L1AMT", 200),
-    ("L1MIN", 201),
-    ("L1MAX", 202),
-    ("L1DST", 203),
-    ("L1RND", 204),
-    ("L2FRQ", 205),
-    ("L2AMT", 206),
-    ("L2MIN", 207),
-    ("L2MAX", 208),
-    ("L2DST", 209),
-    ("L2RND", 210),
-    ("L3FRQ", 211),
-    ("L3AMT", 212),
-    ("L3MIN", 213),
-    ("L3MAX", 214),
-    ("L3DST", 215),
-    ("L3RND", 216),
-    ("L4FRQ", 217),
-    ("L4AMT", 218),
-    ("L4MIN", 219),
-    ("L4MAX", 220),
-    ("L4DST", 221),
-    ("L4RND", 222),
-    ("L5FRQ", 223),
-    ("L5AMT", 224),
-    ("L5MIN", 225),
-    ("L5MAX", 226),
-    ("L5DST", 227),
-    ("L5RND", 228),
-    ("L6FRQ", 229),
-    ("L6AMT", 230),
-    ("L6MIN", 231),
-    ("L6MAX", 232),
-    ("L6DST", 233),
-    ("L6RND", 234),
-    ("L7FRQ", 235),
-    ("L7AMT", 236),
-    ("L7MIN", 237),
-    ("L7MAX", 238),
-    ("L7DST", 239),
-    ("L7RND", 240),
-    ("L8FRQ", 241),
-    ("L8AMT", 242),
-    ("L8MIN", 243),
-    ("L8MAX", 244),
-    ("L8DST", 245),
-    ("L8RND", 246),
-    ("MODE", 247),
-    ("MWAV", 248),
-    ("CWAV", 249),
-    ("MF1TYP", 250),
-    ("MF2TYP", 251),
-    ("CF1TYP", 252),
-    ("CF2TYP", 253),
-    ("EF1TYP", 254),
-    ("EF2TYP", 255),
-    ("L1WAV", 256),
-    ("L2WAV", 257),
-    ("L3WAV", 258),
-    ("L4WAV", 259),
-    ("L5WAV", 260),
-    ("L6WAV", 261),
-    ("L7WAV", 262),
-    ("L8WAV", 263),
+    ("L1PHS", 200),
+    ("L1AMT", 201),
+    ("L1MIN", 202),
+    ("L1MAX", 203),
+    ("L1DST", 204),
+    ("L1RND", 205),
+    ("L2FRQ", 206),
+    ("L2PHS", 207),
+    ("L2AMT", 208),
+    ("L2MIN", 209),
+    ("L2MAX", 210),
+    ("L2DST", 211),
+    ("L2RND", 212),
+    ("L3FRQ", 213),
+    ("L3PHS", 214),
+    ("L3AMT", 215),
+    ("L3MIN", 216),
+    ("L3MAX", 217),
+    ("L3DST", 218),
+    ("L3RND", 219),
+    ("L4FRQ", 220),
+    ("L4PHS", 221),
+    ("L4AMT", 222),
+    ("L4MIN", 223),
+    ("L4MAX", 224),
+    ("L4DST", 225),
+    ("L4RND", 226),
+    ("L5FRQ", 227),
+    ("L5PHS", 228),
+    ("L5AMT", 229),
+    ("L5MIN", 230),
+    ("L5MAX", 231),
+    ("L5DST", 232),
+    ("L5RND", 233),
+    ("L6FRQ", 234),
+    ("L6PHS", 235),
+    ("L6AMT", 236),
+    ("L6MIN", 237),
+    ("L6MAX", 238),
+    ("L6DST", 239),
+    ("L6RND", 240),
+    ("L7FRQ", 241),
+    ("L7PHS", 242),
+    ("L7AMT", 243),
+    ("L7MIN", 244),
+    ("L7MAX", 245),
+    ("L7DST", 246),
+    ("L7RND", 247),
+    ("L8FRQ", 248),
+    ("L8PHS", 249),
+    ("L8AMT", 250),
+    ("L8MIN", 251),
+    ("L8MAX", 252),
+    ("L8DST", 253),
+    ("L8RND", 254),
+    ("MODE", 255),
+    ("MWAV", 256),
+    ("CWAV", 257),
+    ("MF1TYP", 258),
+    ("MF2TYP", 259),
+    ("CF1TYP", 260),
+    ("CF2TYP", 261),
+    ("EF1TYP", 262),
+    ("EF2TYP", 263),
+    ("L1WAV", 264),
+    ("L2WAV", 265),
+    ("L3WAV", 266),
+    ("L4WAV", 267),
+    ("L5WAV", 268),
+    ("L6WAV", 269),
+    ("L7WAV", 270),
+    ("L8WAV", 271),
 ]
 
 
@@ -289,7 +297,7 @@ def main(argv):
     best_utilized = 0
     best_mod = 2 ** 31
     best_max_coll = 2 ** 31
-    best_avg_coll = 2 ** 31
+    best_avg_len = 2 ** 31
     start = time.time()
     delta = 0
 
@@ -308,18 +316,18 @@ def main(argv):
                     hashes.setdefault(h, []).append(name)
 
                 max_coll = max(len(n) for n in hashes.values())
-                avg_coll = [len(n) for n in hashes.values() if len(n) > 1]
-                avg_coll = sum(avg_coll) / len(avg_coll)
+                avg_len = [len(n) for n in hashes.values()]
+                avg_len = sum(avg_len) / len(avg_len)
                 utilized = len(hashes.keys())
 
                 if (
                     (max_coll < best_max_coll)
-                    or (max_coll == best_max_coll and avg_coll < best_avg_coll)
+                    or (max_coll == best_max_coll and avg_len < best_avg_len)
                 ):
                     delta_t = time.time() - start
                     best_utilized = utilized
                     best_max_coll = max_coll
-                    best_avg_coll = avg_coll
+                    best_avg_len = avg_len
                     best_mod = mod
                     print(
                         "\t".join([
@@ -327,7 +335,7 @@ def main(argv):
                             f"multiplier={multiplier}",
                             f"shift={shift}",
                             f"max_coll={max_coll}",
-                            f"avg_coll={avg_coll}",
+                            f"avg_len={avg_len}",
                             f"mod={mod}",
                             f"utilized={len(hashes)}"
                         ])
