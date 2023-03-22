@@ -57,13 +57,16 @@ class Widget : public WidgetBase
                 int const top,
                 int const width,
                 int const height,
-                Type const type = Type::CLICKABLE
-        ) : WidgetBase(left, top, width, height)
+                Type const type
+        ) : WidgetBase(left, top, width, height, type)
         {
         }
 
-        Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
-            : WidgetBase(platform_data, platform_widget)
+        Widget(
+                GUI::PlatformData platform_data,
+                GUI::PlatformWidget platform_widget,
+                Type const type
+        ) : WidgetBase(platform_data, platform_widget, type)
         {
         }
 

@@ -263,8 +263,8 @@ LRESULT Widget::process_message(
 }
 
 
-Widget::Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
-    : WidgetBase(platform_data, platform_widget),
+Widget::Widget()
+    : WidgetBase(),
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
@@ -274,8 +274,11 @@ Widget::Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_wid
 }
 
 
-Widget::Widget()
-    : WidgetBase(),
+Widget::Widget(
+        GUI::PlatformData platform_data,
+        GUI::PlatformWidget platform_widget,
+        Type const type
+) : WidgetBase(platform_data, platform_widget, type),
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
@@ -292,7 +295,7 @@ Widget::Widget(
         int const width,
         int const height,
         Type const type
-) : WidgetBase(left, top, width, height),
+) : WidgetBase(left, top, width, height, type),
     hdc(NULL),
     class_name("STATIC"),
     label(label),
@@ -302,11 +305,11 @@ Widget::Widget(
     is_timer_started(false)
 {
     switch (type) {
-        case Type::BITMAP:
+        case Type::BACKGROUND:
             dwStyle = WS_CHILD | WS_VISIBLE | SS_BITMAP;
             break;
 
-        case Type::CLICKABLE_BITMAP:
+        case Type::KNOB:
             dwStyle = WS_CHILD | WS_VISIBLE | SS_BITMAP | SS_NOTIFY;
             break;
 

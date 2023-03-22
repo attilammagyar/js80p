@@ -1170,7 +1170,8 @@ void GUI::show()
 
 
 WidgetBase::WidgetBase()
-    : platform_widget(NULL),
+    : type(Type::BACKGROUND),
+    platform_widget(NULL),
     platform_data(NULL),
     bitmap(NULL),
     parent(NULL),
@@ -1187,8 +1188,10 @@ WidgetBase::WidgetBase(
         int const left,
         int const top,
         int const width,
-        int const height
-) : platform_widget(NULL),
+        int const height,
+        Type const type
+) : type(type),
+    platform_widget(NULL),
     platform_data(NULL),
     bitmap(NULL),
     parent(NULL),
@@ -1201,8 +1204,12 @@ WidgetBase::WidgetBase(
 }
 
 
-WidgetBase::WidgetBase(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget)
-    : platform_widget(platform_widget),
+WidgetBase::WidgetBase(
+        GUI::PlatformData platform_data,
+        GUI::PlatformWidget platform_widget,
+        Type const type
+) : type(type),
+    platform_widget(platform_widget),
     platform_data(platform_data),
     bitmap(NULL),
     parent(NULL),

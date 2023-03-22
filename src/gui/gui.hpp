@@ -199,9 +199,16 @@ class WidgetBase
 {
     public:
         enum Type {
-            CLICKABLE = 0,
-            BITMAP = 1,
-            CLICKABLE_BITMAP = 2,
+            BACKGROUND = 0,
+            CONTROLLER = 1,
+            CONTROLLER_SELECTOR = 2,
+            EXPORT_PATCH_BUTTON = 3,
+            EXTERNALLY_CREATED_WINDOW = 4,
+            IMPORT_PATCH_BUTTON = 5,
+            KNOB = 6,
+            PARAM_EDITOR = 7,
+            TAB_BODY = 8,
+            TAB_SELECTOR = 9,
         };
 
         enum TextAlignment {
@@ -236,8 +243,18 @@ class WidgetBase
         virtual void click();
 
     protected:
-        WidgetBase(int const left, int const top, int const width, int const height);
-        WidgetBase(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget);
+        WidgetBase(
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Type const type
+        );
+        WidgetBase(
+            GUI::PlatformData platform_data,
+            GUI::PlatformWidget platform_widget,
+            Type const type
+        );
 
         virtual void destroy_children();
 
@@ -390,6 +407,8 @@ class WidgetBase
             int const width,
             int const height
         );
+
+        Type const type;
 
         GUI::Widgets children;
         GUI::PlatformWidget platform_widget;

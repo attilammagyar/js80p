@@ -50,7 +50,8 @@ class TransparentWidget : public Widget
             int const left,
             int const top,
             int const width,
-            int const height
+            int const height,
+            Type const type
         );
 
     protected:

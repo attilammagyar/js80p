@@ -91,9 +91,13 @@ class Widget : public WidgetBase
             int const top,
             int const width,
             int const height,
-            Type const type = Type::CLICKABLE
+            Type const type
         );
-        Widget(GUI::PlatformData platform_data, GUI::PlatformWidget platform_widget);
+        Widget(
+            GUI::PlatformData platform_data,
+            GUI::PlatformWidget platform_widget,
+            Type const type
+        );
 
         virtual void set_up(
             GUI::PlatformData platform_data,

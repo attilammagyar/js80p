@@ -31,7 +31,7 @@ namespace JS80P
 ExternallyCreatedWindow::ExternallyCreatedWindow(
         GUI::PlatformData platform_data,
         GUI::PlatformWidget window
-) : Widget(platform_data, window)
+) : Widget(platform_data, window, Type::EXTERNALLY_CREATED_WINDOW)
 {
 }
 
@@ -47,8 +47,9 @@ TransparentWidget::TransparentWidget(
         int const left,
         int const top,
         int const width,
-        int const height
-) : Widget(label, left, top, width, height)
+        int const height,
+        Type const type
+) : Widget(label, left, top, width, height, type)
 {
 }
 
@@ -66,7 +67,7 @@ ImportPatchButton::ImportPatchButton(
         int const height,
         Synth& synth,
         TabBody* synth_gui_body
-) : TransparentWidget("Import Patch", left, top, width, height),
+) : TransparentWidget("Import Patch", left, top, width, height, Type::IMPORT_PATCH_BUTTON),
     synth(synth),
     synth_gui_body(synth_gui_body)
 {
@@ -79,14 +80,14 @@ ExportPatchButton::ExportPatchButton(
         int const width,
         int const height,
         Synth& synth
-) : TransparentWidget("Export Patch", left, top, width, height),
+) : TransparentWidget("Export Patch", left, top, width, height, Type::EXPORT_PATCH_BUTTON),
     synth(synth)
 {
 }
 
 
 TabBody::TabBody(char const* const label)
-    : TransparentWidget(label, LEFT, TOP, WIDTH, HEIGHT)
+    : TransparentWidget(label, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY)
 {
 }
 
@@ -114,7 +115,7 @@ void TabBody::refresh_param_editors()
 
 
 Background::Background()
-    : Widget("JS80P", 0, 0, GUI::WIDTH, GUI::HEIGHT, Type::BITMAP),
+    : Widget("JS80P", 0, 0, GUI::WIDTH, GUI::HEIGHT, Type::BACKGROUND),
     body(NULL),
     next_full_refresh(FULL_REFRESH_TICKS)
 {
@@ -188,7 +189,7 @@ TabSelector::TabSelector(
         TabBody* tab_body,
         char const* const label,
         int const left
-) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT),
+) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
     background(background),
     tab_body(tab_body),
     bitmap(bitmap)
@@ -208,7 +209,7 @@ void TabSelector::click()
 ControllerSelector::ControllerSelector(
         Background& background,
         Synth& synth
-) : Widget("Select controller", LEFT, TOP, WIDTH, HEIGHT),
+) : Widget("Select controller", LEFT, TOP, WIDTH, HEIGHT, Type::CONTROLLER_SELECTOR),
     background(background),
     synth(synth),
     param_editor(NULL),
@@ -346,7 +347,7 @@ ControllerSelector::Controller::Controller(
         int const left,
         int const top,
         Synth::ControllerId const controller_id
-) : Widget(label, left, top, WIDTH, HEIGHT),
+) : Widget(label, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
     label(label),
     controller_id(controller_id),
     controller_selector(controller_selector),
@@ -502,7 +503,7 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* format,
         double const scale
-) : TransparentWidget(label, left, top, WIDTH, HEIGHT),
+) : TransparentWidget(label, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(format),
     label(label),
@@ -532,7 +533,7 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* const* const options,
         int const number_of_options
-) : TransparentWidget(label, left, top, WIDTH, HEIGHT),
+) : TransparentWidget(label, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(NULL),
     label(label),
@@ -783,7 +784,7 @@ ParamEditor::Knob::Knob(
         int const left,
         int const top,
         Number const steps
-) : Widget(label, left, top, WIDTH, HEIGHT, Type::CLICKABLE_BITMAP),
+) : Widget(label, left, top, WIDTH, HEIGHT, Type::KNOB),
     steps(steps),
     editor(editor),
     knob_state(NULL),
