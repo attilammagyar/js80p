@@ -719,13 +719,13 @@ Sample const* const* Synth::initialize_rendering(
 ) noexcept {
     process_messages();
 
-    Sample const* const* const buffer = SignalProducer::produce<Filter2>(
+    raw_output = SignalProducer::produce<Filter2>(
         &filter_2, round, sample_count
     );
 
     clear_midi_controllers();
 
-    return buffer;
+    return NULL;
 }
 
 
@@ -1103,6 +1103,23 @@ void Synth::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
+    for (Integer c = 0; c != channels; ++c) {
+        Sample* const out = buffer[c];
+        Sample const* const raw = raw_output[c];
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            /*
+            Normal synth configurations should stay below 0 dB; if we happen to
+            produce samples way outside the [-1, +1] range, it most probably
+            means filter misconfiguration, which is likely to blow up even
+            further. Some plugin hosts are known to automatically turn off
+            plugins which produce extremely loud signals, so in order to avoid
+            that happening to us, we are forcing digital clipping here at
+            around 9 dB.
+            */
+            out[i] = std::min(2.8, std::max(-2.8, raw[i]));
+        }
+    }
 }
 
 
