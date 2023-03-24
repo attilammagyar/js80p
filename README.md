@@ -60,6 +60,14 @@ Features
  * 8 low-frequency oscillators (LFO)
  * configurable MIDI controllers
 
+### Why does JS80P have both Phase Modulation (PM) and Frequency Modulation (FM)? Aren't these two equivalent?
+
+The reason for JS80P having both kinds of modulation is that they are not
+always equivalent. They are only identical when the modulator signal is a
+sinusoid, but with each added harmonic, PM and FM start to differ more and
+more. A detailed mathematical explanation of this is shown in
+[pm-fm-equivalence.md](pm-fm-equivalence.md).
+
 Name
 ----
 
