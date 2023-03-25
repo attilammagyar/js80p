@@ -49,7 +49,7 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FloatParam& frequency_modulation_level_leader,
         FloatParam& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(1, 17),
+    : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
     modulated_amplitude(
         modulator,
@@ -190,7 +190,7 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         FloatParam& frequency_modulation_level_leader,
         FloatParam& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(1, 16),
+    : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
     modulated_amplitude(
         modulator,

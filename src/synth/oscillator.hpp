@@ -148,6 +148,8 @@ class Oscillator : public SignalProducer
         static constexpr Number FREQUENCY_MAX = 24000.0;
         static constexpr Number FREQUENCY_DEFAULT = 440.0;
 
+        static constexpr Integer NUMBER_OF_CHILDREN = 17;
+
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
 
         void initialize_instance() noexcept;
