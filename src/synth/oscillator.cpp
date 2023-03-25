@@ -88,9 +88,9 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
-    harmonic_0("", -1.0, 1.0, 0.333),
-    harmonic_1("", -1.0, 1.0, 0.333),
-    harmonic_2("", -1.0, 1.0, 0.333),
+    harmonic_0("", -1.0, 1.0, 0.0),
+    harmonic_1("", -1.0, 1.0, 0.0),
+    harmonic_2("", -1.0, 1.0, 0.0),
     harmonic_3("", -1.0, 1.0, 0.0),
     harmonic_4("", -1.0, 1.0, 0.0),
     harmonic_5("", -1.0, 1.0, 0.0),

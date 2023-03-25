@@ -53,13 +53,13 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
-    width(name + "WID", -1.0, 1.0, 0.2),
+    width(name + "WID", -1.0, 1.0, 0.0),
     panning(name + "PAN", -1.0, 1.0, 0.0),
     volume(name + "VOL", 0.0, 1.0, 1.0),
 
-    harmonic_0(name + "C1", -1.0, 1.0, 0.333),
-    harmonic_1(name + "C2", -1.0, 1.0, 0.333),
-    harmonic_2(name + "C3", -1.0, 1.0, 0.333),
+    harmonic_0(name + "C1", -1.0, 1.0, 0.0),
+    harmonic_1(name + "C2", -1.0, 1.0, 0.0),
+    harmonic_2(name + "C3", -1.0, 1.0, 0.0),
     harmonic_3(name + "C4", -1.0, 1.0, 0.0),
     harmonic_4(name + "C5", -1.0, 1.0, 0.0),
     harmonic_5(name + "C6", -1.0, 1.0, 0.0),
