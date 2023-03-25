@@ -212,8 +212,8 @@ Sample const* const* FloatParam::produce(
         Integer const sample_count
 ) noexcept {
     if (float_param->is_following_leader()) {
-        return SignalProducer::produce<FloatParamClass>(
-            (FloatParamClass*)float_param->leader, round, sample_count
+        return SignalProducer::produce<FloatParam>(
+            float_param->leader, round, sample_count
         );
     } else {
         return SignalProducer::produce<FloatParamClass>(
@@ -728,6 +728,18 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
     : FloatParam(name, min_value, max_value, default_value),
     modulation_level(modulation_level_leader),
     modulator(modulator)
+{
+    register_child(modulation_level);
+}
+
+
+template<class ModulatorSignalProducerClass>
+ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
+        FloatParam& leader
+) noexcept
+    : FloatParam(leader),
+    modulation_level("", 0.0, 0.0, 0.0),
+    modulator(NULL)
 {
     register_child(modulation_level);
 }

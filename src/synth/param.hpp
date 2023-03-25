@@ -162,6 +162,11 @@ class FloatParam : public Param<Number>
             Number const round_to = 0.0
         ) noexcept;
 
+        /**
+         * \warning When the leader needs to be rendered, it will be rendered as
+         *          a \c FloatParam, even if it's a descendant. Practically,
+         *          this means that only \c FloatParam objects can be leaders.
+         */
         FloatParam(FloatParam& leader) noexcept;
 
         void set_value(Number const new_value) noexcept;
@@ -282,6 +287,8 @@ class ModulatableFloatParam : public FloatParam
             Number const max_value = 1.0,
             Number const default_value = 0.0
         ) noexcept;
+
+        ModulatableFloatParam(FloatParam& leader) noexcept;
 
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
