@@ -29,20 +29,20 @@
 namespace JS80P
 {
 
-template<class ModulatorSignalProducerClass>
-FloatParam Oscillator<ModulatorSignalProducerClass>::dummy_param("", 0.0, 0.0, 0.0);
+template<class ModulatorSignalProducerClass, bool positive>
+FloatParam Oscillator<ModulatorSignalProducerClass, positive>::dummy_param("", 0.0, 0.0, 0.0);
 
 
-template<class ModulatorSignalProducerClass>
-Oscillator<ModulatorSignalProducerClass>::WaveformParam::WaveformParam(
+template<class ModulatorSignalProducerClass, bool positive>
+Oscillator<ModulatorSignalProducerClass, positive>::WaveformParam::WaveformParam(
         std::string const name
 ) noexcept : Param<Waveform>(name, SINE, CUSTOM, SAWTOOTH)
 {
 }
 
 
-template<class ModulatorSignalProducerClass>
-Oscillator<ModulatorSignalProducerClass>::Oscillator(
+template<class ModulatorSignalProducerClass, bool positive>
+Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
         WaveformParam& waveform,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
@@ -103,8 +103,8 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::initialize_instance() noexcept
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() noexcept
 {
     Number const custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS] = {
         0.0, 0.0, 0.0, 0.0, 0.0,
@@ -169,8 +169,48 @@ void Oscillator<ModulatorSignalProducerClass>::initialize_instance() noexcept
 }
 
 
-template<class ModulatorSignalProducerClass>
-Oscillator<ModulatorSignalProducerClass>::Oscillator(
+template<class ModulatorSignalProducerClass, bool positive>
+Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
+        WaveformParam& waveform,
+        FloatParam& amplitude_leader,
+        FloatParam& frequency_leader,
+        FloatParam& phase_leader
+) noexcept
+    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    waveform(waveform),
+    modulated_amplitude(NULL, dummy_param, "X", 0.0, 1.0, 1.0),
+    amplitude(amplitude_leader),
+    frequency(frequency_leader),
+    phase(phase_leader),
+    detune(
+        "",
+        Constants::DETUNE_MIN,
+        Constants::DETUNE_MAX,
+        Constants::DETUNE_DEFAULT
+    ),
+    fine_detune(
+        "",
+        Constants::FINE_DETUNE_MIN,
+        Constants::FINE_DETUNE_MAX,
+        Constants::FINE_DETUNE_DEFAULT
+    ),
+    harmonic_0("", -1.0, 1.0, 0.0),
+    harmonic_1("", -1.0, 1.0, 0.0),
+    harmonic_2("", -1.0, 1.0, 0.0),
+    harmonic_3("", -1.0, 1.0, 0.0),
+    harmonic_4("", -1.0, 1.0, 0.0),
+    harmonic_5("", -1.0, 1.0, 0.0),
+    harmonic_6("", -1.0, 1.0, 0.0),
+    harmonic_7("", -1.0, 1.0, 0.0),
+    harmonic_8("", -1.0, 1.0, 0.0),
+    harmonic_9("", -1.0, 1.0, 0.0)
+{
+    initialize_instance();
+}
+
+
+template<class ModulatorSignalProducerClass, bool positive>
+Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
         WaveformParam& waveform,
         FloatParam& amplitude_leader,
         FloatParam& detune_leader,
@@ -234,8 +274,8 @@ Oscillator<ModulatorSignalProducerClass>::Oscillator(
 }
 
 
-template<class ModulatorSignalProducerClass>
-Oscillator<ModulatorSignalProducerClass>::~Oscillator()
+template<class ModulatorSignalProducerClass, bool positive>
+Oscillator<ModulatorSignalProducerClass, positive>::~Oscillator()
 {
     delete custom_waveform;
     custom_waveform = NULL;
@@ -244,8 +284,8 @@ Oscillator<ModulatorSignalProducerClass>::~Oscillator()
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::allocate_buffers(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::allocate_buffers(
         Integer const size
 ) noexcept {
     computed_frequency_buffer = new Frequency[size];
@@ -254,8 +294,8 @@ void Oscillator<ModulatorSignalProducerClass>::allocate_buffers(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::free_buffers() noexcept
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::free_buffers() noexcept
 {
     if (computed_frequency_buffer != NULL) {
         delete[] computed_frequency_buffer;
@@ -269,8 +309,8 @@ void Oscillator<ModulatorSignalProducerClass>::free_buffers() noexcept
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::set_block_size(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     if (new_block_size != get_block_size()) {
@@ -282,24 +322,71 @@ void Oscillator<ModulatorSignalProducerClass>::set_block_size(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::start(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::start(
         Seconds const time_offset
 ) noexcept {
     schedule(EVT_START, time_offset, 0, 0.0, 0.0);
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::stop(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::stop(
         Seconds const time_offset
 ) noexcept {
     schedule(EVT_STOP, time_offset, 0, 0.0, 0.0);
 }
 
 
-template<class ModulatorSignalProducerClass>
-Sample const* const* Oscillator<ModulatorSignalProducerClass>::initialize_rendering(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::skip_round(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    if (cached_round == round) {
+        return;
+    }
+
+    cached_round = round;
+    cached_buffer = buffer;
+
+    modulated_amplitude.skip_round(round, sample_count);
+    amplitude.skip_round(round, sample_count);
+    frequency.skip_round(round, sample_count);
+    phase.skip_round(round, sample_count);
+    detune.skip_round(round, sample_count);
+    fine_detune.skip_round(round, sample_count);
+
+    harmonic_0.skip_round(round, sample_count);
+    harmonic_1.skip_round(round, sample_count);
+    harmonic_2.skip_round(round, sample_count);
+    harmonic_3.skip_round(round, sample_count);
+    harmonic_4.skip_round(round, sample_count);
+    harmonic_5.skip_round(round, sample_count);
+    harmonic_6.skip_round(round, sample_count);
+    harmonic_7.skip_round(round, sample_count);
+    harmonic_8.skip_round(round, sample_count);
+    harmonic_9.skip_round(round, sample_count);
+
+    for (Integer i = 0; i != sample_count; ++i) {
+        buffer[0][i] = 0.0;
+    }
+
+    if (UNLIKELY(is_starting)) {
+        is_starting = false;
+        Wavetable::reset_state(
+            wavetable_state,
+            sampling_period,
+            nyquist_frequency,
+            frequency.get_value(),
+            start_time_offset
+        );
+    }
+}
+
+
+template<class ModulatorSignalProducerClass, bool positive>
+Sample const* const* Oscillator<ModulatorSignalProducerClass, positive>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -340,8 +427,8 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass>::initialize_render
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::compute_amplitude_buffer(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::compute_amplitude_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -394,8 +481,8 @@ void Oscillator<ModulatorSignalProducerClass>::compute_amplitude_buffer(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::compute_frequency_buffer(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -560,8 +647,8 @@ void Oscillator<ModulatorSignalProducerClass>::compute_frequency_buffer(
 }
 
 
-template<class ModulatorSignalProducerClass>
-Frequency Oscillator<ModulatorSignalProducerClass>::compute_frequency(
+template<class ModulatorSignalProducerClass, bool positive>
+Frequency Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency(
         Number const frequency,
         Number const detune,
         Number const fine_detune
@@ -570,8 +657,8 @@ Frequency Oscillator<ModulatorSignalProducerClass>::compute_frequency(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::compute_phase_buffer(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::compute_phase_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -590,8 +677,8 @@ void Oscillator<ModulatorSignalProducerClass>::compute_phase_buffer(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::render(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -617,8 +704,8 @@ void Oscillator<ModulatorSignalProducerClass>::render(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::render_with_constant_frequency(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_frequency(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -635,42 +722,33 @@ void Oscillator<ModulatorSignalProducerClass>::render_with_constant_frequency(
         );
     }
 
-    Frequency const computed_frequency_value = this->computed_frequency_value;
-    Sample const* const phase_buffer = this->phase_buffer;
-
     if (computed_amplitude_is_constant) {
-        Sample const amplitude_value = computed_amplitude_value;
-
         if (phase_is_constant) {
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value, phase
+                buffer[0][i] = render_sample(
+                    computed_amplitude_value, computed_frequency_value, phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value, phase_buffer[i]
+                buffer[0][i] = render_sample(
+                    computed_amplitude_value, computed_frequency_value, phase_buffer[i]
                 );
             }
         }
     } else {
-        Sample const* amplitude_buffer = computed_amplitude_buffer;
-
         if (phase_is_constant) {
-            Sample const phase = phase_value;
-
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value, phase
+                buffer[0][i] = render_sample(
+                    computed_amplitude_buffer[i], computed_frequency_value, phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_value, phase_buffer[i]
+                buffer[0][i] = render_sample(
+                    computed_amplitude_buffer[i], computed_frequency_value, phase_buffer[i]
                 );
             }
         }
@@ -678,8 +756,8 @@ void Oscillator<ModulatorSignalProducerClass>::render_with_constant_frequency(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::render_with_changing_frequency(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_frequency(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -708,32 +786,28 @@ void Oscillator<ModulatorSignalProducerClass>::render_with_changing_frequency(
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i], phase
+                buffer[0][i] = render_sample(
+                    amplitude_value, computed_frequency_buffer[i], phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_value * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i], phase_buffer[i]
+                buffer[0][i] = render_sample(
+                    amplitude_value, computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
         }
     } else {
-        Sample const* amplitude_buffer = computed_amplitude_buffer;
-
         if (phase_is_constant) {
-            Sample const phase = phase_value;
-
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i], phase
+                buffer[0][i] = render_sample(
+                    computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = amplitude_buffer[i] * wavetable->lookup(
-                    &wavetable_state, computed_frequency_buffer[i], phase_buffer[i]
+                buffer[0][i] = render_sample(
+                    computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
         }
@@ -741,8 +815,24 @@ void Oscillator<ModulatorSignalProducerClass>::render_with_changing_frequency(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::handle_event(
+template<class ModulatorSignalProducerClass, bool positive>
+Sample Oscillator<ModulatorSignalProducerClass, positive>::render_sample(
+        Sample const amplitude,
+        Sample const frequency,
+        Sample const phase
+) noexcept {
+    Sample const sample = amplitude * wavetable->lookup(&wavetable_state, frequency, phase);
+
+    if (positive) {
+        return sample + amplitude;
+    }
+
+    return sample;
+}
+
+
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::handle_event(
         Event const& event
 ) noexcept {
     SignalProducer::handle_event(event);
@@ -759,8 +849,8 @@ void Oscillator<ModulatorSignalProducerClass>::handle_event(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::handle_start_event(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::handle_start_event(
         Event const& event
 ) noexcept {
     is_on = true;
@@ -769,8 +859,8 @@ void Oscillator<ModulatorSignalProducerClass>::handle_start_event(
 }
 
 
-template<class ModulatorSignalProducerClass>
-void Oscillator<ModulatorSignalProducerClass>::handle_stop_event(
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::handle_stop_event(
         Event const& event
 ) noexcept {
     is_on = false;

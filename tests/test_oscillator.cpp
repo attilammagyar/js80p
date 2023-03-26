@@ -25,6 +25,7 @@
 
 #include "synth/envelope.cpp"
 #include "synth/flexible_controller.cpp"
+#include "synth/lfo.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/oscillator.cpp"
@@ -278,6 +279,41 @@ TEST(basic_waveforms, {
     );
     test_basic_waveform<ReferenceSquare>(
         SimpleOscillator::SQUARE, 0.05
+    );
+})
+
+
+TEST(can_apply_dc_offset_to_oscillate_between_0_and_2, {
+    typedef Oscillator<SignalProducer, true> PositiveOscillator;
+    constexpr Frequency frequency = 100.0;
+    constexpr Integer block_size = 128;
+    constexpr Integer rounds = 5;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Sample amplitude = 0.75;
+    ReferenceSine reference(frequency);
+    PositiveOscillator::WaveformParam waveform_param("");
+    PositiveOscillator oscillator(waveform_param);
+    Sample expected_samples[sample_count];
+    Buffer rendered_samples(sample_count);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+    oscillator.waveform.set_value(PositiveOscillator::SINE);
+    oscillator.frequency.set_value(frequency);
+    oscillator.amplitude.set_value(amplitude);
+    oscillator.start(0.0);
+
+    for (Integer i = 0; i != sample_count; ++i) {
+        Seconds const time = (Seconds)i / (Seconds)SAMPLE_RATE;
+        expected_samples[i] = (reference.generate_sample(time) + 1.0) * amplitude;
+    }
+
+    render_rounds<PositiveOscillator>(
+        oscillator, rendered_samples, rounds, block_size
+    );
+
+    assert_close(
+        expected_samples, rendered_samples.samples[0], sample_count, 0.001
     );
 })
 
@@ -992,5 +1028,55 @@ TEST(phase_can_be_controlled, {
         rendered_samples.samples[0],
         sample_count,
         0.001
+    );
+})
+
+
+TEST(can_skip_a_round_without_rendering, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency frequency = 440.0;
+    SumOfSines zero(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1);
+    SumOfSines sine(1.0, frequency, 0.0, 0.0, 0.0, 0.0, 1);
+    SimpleOscillator::WaveformParam waveform_param("");
+    SimpleOscillator oscillator(waveform_param);
+    Buffer rendered_samples(block_size);
+    Buffer expected_samples(block_size);
+
+    zero.set_block_size(block_size);
+    zero.set_sample_rate(SAMPLE_RATE);
+
+    sine.set_block_size(block_size);
+    sine.set_sample_rate(SAMPLE_RATE);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.frequency.set_value(frequency);
+    oscillator.start(0.0);
+
+    oscillator.skip_round(1, block_size);
+    oscillator.skip_round(1, block_size);
+    render_rounds<SumOfSines>(zero, expected_samples, 1, block_size, 1);
+    render_rounds<SimpleOscillator>(
+        oscillator, rendered_samples, 1, block_size, 1
+    );
+    assert_eq(
+        expected_samples.samples[0],
+        rendered_samples.samples[0],
+        block_size,
+        0.001,
+        "round=1"
+    );
+
+    render_rounds<SumOfSines>(sine, expected_samples, 1, block_size, 2);
+    render_rounds<SimpleOscillator>(
+        oscillator, rendered_samples, 1, block_size, 2
+    );
+    assert_eq(
+        expected_samples.samples[0],
+        rendered_samples.samples[0],
+        block_size,
+        0.001,
+        "round=2"
     );
 })

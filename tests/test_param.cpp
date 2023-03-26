@@ -23,10 +23,14 @@
 
 #include "synth/envelope.cpp"
 #include "synth/flexible_controller.cpp"
+#include "synth/lfo.cpp"
+#include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
+#include "synth/oscillator.cpp"
 #include "synth/param.cpp"
 #include "synth/queue.cpp"
 #include "synth/signal_producer.cpp"
+#include "synth/wavetable.cpp"
 
 
 using namespace JS80P;
@@ -1170,6 +1174,105 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
     float_param.set_flexible_controller(NULL);
     assert_eq(2.0, float_param.get_value(), DOUBLE_DELTA);
 })
+
+
+TEST(when_an_lfo_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_lfo, {
+    constexpr Integer block_size = 1024;
+    constexpr Frequency sample_rate = 11025.0;
+    constexpr Frequency frequency = 20.0;
+    FloatParam float_param("float", -3.0, 7.0, 2.0);
+    FloatParam fast_float_param("fast-float", 0.0, 1.0, 1.0);
+    LFO lfo("lfo");
+    Sample const* rendered_samples;
+    Sample const* lfo_buffer;
+    SumOfSines expected(5.0, frequency, 0.0, 0.0, 0.0, 0.0, 1, 0.0, 2.0);
+    Buffer expected_output(block_size, 1);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(20.0);
+    lfo.waveform.set_value(LFO::Oscillator_::SINE);
+    lfo.start(0.0);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_lfo(&lfo);
+
+    fast_float_param.set_block_size(block_size);
+    fast_float_param.set_sample_rate(sample_rate);
+    fast_float_param.set_lfo(&lfo);
+
+    assert_eq((void*)&lfo, (void*)float_param.get_lfo());
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
+
+    render_rounds<SumOfSines>(expected, expected_output, 1);
+    rendered_samples = FloatParam::produce_if_not_constant(
+        &float_param, 1, block_size
+    );
+    lfo_buffer = SignalProducer::produce<LFO>(&lfo, 1, block_size)[0];
+
+    assert_eq(expected_output.samples[0], rendered_samples, block_size, 0.001);
+
+    rendered_samples = FloatParam::produce_if_not_constant(
+        &fast_float_param, 1, block_size
+    );
+    assert_eq((void*)lfo_buffer, (void*)rendered_samples);
+})
+
+
+template<class FloatParamClass>
+void test_follower_lfo()
+{
+    constexpr Integer block_size = 1024;
+    constexpr Frequency sample_rate = 11025.0;
+    constexpr Frequency frequency = 20.0;
+    FloatParam leader("leader", -3.0, 7.0, 2.0);
+    FloatParamClass follower(leader);
+    LFO lfo("lfo");
+    Sample const* rendered_samples;
+    SumOfSines expected(5.0, frequency, 0.0, 0.0, 0.0, 0.0, 1, 0.0, 2.0);
+    Buffer expected_output(block_size, 1);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(20.0);
+    lfo.waveform.set_value(LFO::Oscillator_::SINE);
+    lfo.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+    follower.set_lfo(&lfo);
+
+    assert_eq((void*)&lfo, (void*)follower.get_lfo());
+    assert_false(follower.is_constant_in_next_round(1, block_size));
+
+    render_rounds<SumOfSines>(expected, expected_output, 1);
+    rendered_samples = FloatParam::produce_if_not_constant<FloatParamClass>(
+        &follower, 1, block_size
+    );
+
+    assert_eq(expected_output.samples[0], rendered_samples, block_size, 0.001);
+}
+
+
+TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_lfo, {
+    test_follower_lfo<FloatParam>();
+    test_follower_lfo< ModulatableFloatParam<SignalProducer> >();
+})
+
+
+
+
 
 
 template<class FloatParamClass>

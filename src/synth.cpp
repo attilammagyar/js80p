@@ -32,6 +32,7 @@
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/flexible_controller.cpp"
+#include "synth/lfo.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
 #include "synth/oscillator.cpp"
@@ -98,7 +99,8 @@ Synth::Synth() noexcept
     previous_note(Midi::NOTE_MAX + 1),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
-    envelopes((Envelope* const*)envelopes_rw)
+    envelopes((Envelope* const*)envelopes_rw),
+    lfos((LFO* const*)lfos_rw)
 {
     for (int i = 0; i != FLOAT_PARAMS; ++i) {
         float_params[i] = NULL;
@@ -357,6 +359,29 @@ Synth::Synth() noexcept
         register_float_param_as_child((ParamId)next_id++, envelope->final_value);
     }
 
+    for (Integer i = 0; i != LFOS; ++i) {
+        LFO* lfo = new LFO(std::string("L") + to_string(i + 1));
+        lfos_rw[i] = lfo;
+
+        register_child(*lfo);
+        register_float_param((ParamId)next_id++, lfo->frequency);
+        register_float_param((ParamId)next_id++, lfo->phase);
+        register_float_param((ParamId)next_id++, lfo->min);
+        register_float_param((ParamId)next_id++, lfo->max);
+        register_float_param((ParamId)next_id++, lfo->amount);
+        register_float_param((ParamId)next_id++, lfo->distortion);
+        register_float_param((ParamId)next_id++, lfo->randomness);
+    }
+
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L1WAV, lfos_rw[0]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L2WAV, lfos_rw[1]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L3WAV, lfos_rw[2]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L4WAV, lfos_rw[3]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L5WAV, lfos_rw[4]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L6WAV, lfos_rw[5]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
+
     update_param_states();
 }
 
@@ -435,11 +460,17 @@ bool Synth::is_lock_free() const noexcept
 
 void Synth::suspend() noexcept
 {
+    for (Integer i = 0; i != LFOS; ++i) {
+        lfos_rw[i]->stop(0.0);
+    }
 }
 
 
 void Synth::resume() noexcept
 {
+    for (Integer i = 0; i != LFOS; ++i) {
+        lfos_rw[i]->start(0.0);
+    }
 }
 
 
@@ -646,15 +677,15 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
         case ParamId::EF1TYP: return filter_1_type.get_default_ratio();
         case ParamId::EF2TYP: return filter_2_type.get_default_ratio();
-        case ParamId::L1WAV: return 0.0; // TODO
-        case ParamId::L2WAV: return 0.0; // TODO
-        case ParamId::L3WAV: return 0.0; // TODO
-        case ParamId::L4WAV: return 0.0; // TODO
-        case ParamId::L5WAV: return 0.0; // TODO
-        case ParamId::L6WAV: return 0.0; // TODO
-        case ParamId::L7WAV: return 0.0; // TODO
-        case ParamId::L8WAV: return 0.0; // TODO
-        default: return 0.0; // This should never be reached.
+        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_default_ratio();
+        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_default_ratio();
+        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_default_ratio();
+        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_default_ratio();
+        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_default_ratio();
+        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_default_ratio();
+        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_default_ratio();
+        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_default_ratio();
+        default: return 0.0; // This should neacver be rehed.
     }
 }
 
@@ -685,14 +716,14 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::CF2TYP: return carrier_params.filter_2_type.ratio_to_value(ratio);
         case ParamId::EF1TYP: return filter_1_type.ratio_to_value(ratio);
         case ParamId::EF2TYP: return filter_2_type.ratio_to_value(ratio);
-        case ParamId::L1WAV: return 0; // TODO
-        case ParamId::L2WAV: return 0; // TODO
-        case ParamId::L3WAV: return 0; // TODO
-        case ParamId::L4WAV: return 0; // TODO
-        case ParamId::L5WAV: return 0; // TODO
-        case ParamId::L6WAV: return 0; // TODO
-        case ParamId::L7WAV: return 0; // TODO
-        case ParamId::L8WAV: return 0; // TODO
+        case ParamId::L1WAV: return lfos_rw[0]->waveform.ratio_to_value(ratio);
+        case ParamId::L2WAV: return lfos_rw[1]->waveform.ratio_to_value(ratio);
+        case ParamId::L3WAV: return lfos_rw[2]->waveform.ratio_to_value(ratio);
+        case ParamId::L4WAV: return lfos_rw[3]->waveform.ratio_to_value(ratio);
+        case ParamId::L5WAV: return lfos_rw[4]->waveform.ratio_to_value(ratio);
+        case ParamId::L6WAV: return lfos_rw[5]->waveform.ratio_to_value(ratio);
+        case ParamId::L7WAV: return lfos_rw[6]->waveform.ratio_to_value(ratio);
+        case ParamId::L8WAV: return lfos_rw[7]->waveform.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -805,28 +836,36 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
                 filter_2_type.set_ratio(ratio);
                 break;
 
-            case ParamId::L1WAV: // TODO
+            case ParamId::L1WAV:
+                lfos_rw[0]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L2WAV: // TODO
+            case ParamId::L2WAV:
+                lfos_rw[1]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L3WAV: // TODO
+            case ParamId::L3WAV:
+                lfos_rw[2]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L4WAV: // TODO
+            case ParamId::L4WAV:
+                lfos_rw[3]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L5WAV: // TODO
+            case ParamId::L5WAV:
+                lfos_rw[4]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L6WAV: // TODO
+            case ParamId::L6WAV:
+                lfos_rw[5]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L7WAV: // TODO
+            case ParamId::L7WAV:
+                lfos_rw[6]->waveform.set_ratio(ratio);
                 break;
 
-            case ParamId::L8WAV: // TODO
+            case ParamId::L8WAV:
+                lfos_rw[7]->waveform.set_ratio(ratio);
                 break;
 
             default:
@@ -942,14 +981,37 @@ void Synth::assign_controller_to_param(
             filter_2_type.set_midi_controller(midi_controller);
             break;
 
-        case ParamId::L1WAV: break; // TODO
-        case ParamId::L2WAV: break; // TODO
-        case ParamId::L3WAV: break; // TODO
-        case ParamId::L4WAV: break; // TODO
-        case ParamId::L5WAV: break; // TODO
-        case ParamId::L6WAV: break; // TODO
-        case ParamId::L7WAV: break; // TODO
-        case ParamId::L8WAV: break; // TODO
+        case ParamId::L1WAV:
+            lfos_rw[0]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L2WAV:
+            lfos_rw[1]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L3WAV:
+            lfos_rw[2]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L4WAV:
+            lfos_rw[3]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L5WAV:
+            lfos_rw[4]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L6WAV:
+            lfos_rw[5]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L7WAV:
+            lfos_rw[6]->waveform.set_midi_controller(midi_controller);
+            break;
+
+        case ParamId::L8WAV:
+            lfos_rw[7]->waveform.set_midi_controller(midi_controller);
+            break;
 
         default: break; // This should never be reached.
     }
@@ -970,6 +1032,7 @@ void Synth::assign_controller_to_float_param(
     param->set_midi_controller(NULL);
     param->set_flexible_controller(NULL);
     param->set_envelope(NULL);
+    param->set_lfo(NULL);
 
     switch (controller_id) {
         case PITCH_WHEEL:
@@ -1024,14 +1087,14 @@ void Synth::assign_controller_to_float_param(
             param->set_flexible_controller(flexible_controllers[9]);
             break;
 
-        case LFO_1: break;
-        case LFO_2: break;
-        case LFO_3: break;
-        case LFO_4: break;
-        case LFO_5: break;
-        case LFO_6: break;
-        case LFO_7: break;
-        case LFO_8: break;
+        case LFO_1: param->set_lfo(lfos_rw[0]); break;
+        case LFO_2: param->set_lfo(lfos_rw[1]); break;
+        case LFO_3: param->set_lfo(lfos_rw[2]); break;
+        case LFO_4: param->set_lfo(lfos_rw[3]); break;
+        case LFO_5: param->set_lfo(lfos_rw[4]); break;
+        case LFO_6: param->set_lfo(lfos_rw[5]); break;
+        case LFO_7: param->set_lfo(lfos_rw[6]); break;
+        case LFO_8: param->set_lfo(lfos_rw[7]); break;
 
         case ENVELOPE_1: param->set_envelope(envelopes[0]); break;
         case ENVELOPE_2: param->set_envelope(envelopes[1]); break;
@@ -1070,14 +1133,14 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
         case ParamId::EF1TYP: return filter_1_type.get_ratio();
         case ParamId::EF2TYP: return filter_2_type.get_ratio();
-        case ParamId::L1WAV: return 0.0; // TODO
-        case ParamId::L2WAV: return 0.0; // TODO
-        case ParamId::L3WAV: return 0.0; // TODO
-        case ParamId::L4WAV: return 0.0; // TODO
-        case ParamId::L5WAV: return 0.0; // TODO
-        case ParamId::L6WAV: return 0.0; // TODO
-        case ParamId::L7WAV: return 0.0; // TODO
-        case ParamId::L8WAV: return 0.0; // TODO
+        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_ratio();
+        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_ratio();
+        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_ratio();
+        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_ratio();
+        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_ratio();
+        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_ratio();
+        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_ratio();
+        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }
@@ -1119,6 +1182,10 @@ void Synth::render(
             */
             out[i] = std::min(2.8, std::max(-2.8, raw[i]));
         }
+    }
+
+    for (Integer i = 0; i != LFOS; ++i) {
+        lfos_rw[i]->skip_round(round, get_block_size());
     }
 }
 

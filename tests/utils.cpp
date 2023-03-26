@@ -111,7 +111,8 @@ class SumOfSines : public SignalProducer
                 Number const amplitude_3 = 0.0,
                 Frequency const frequency_3 = 0.0,
                 Integer const channels = 1,
-                Number const delay = 0.0
+                Seconds const phase_offset = 0.0,
+                Sample const sample_offset = 0.0
         ) noexcept
             : SignalProducer(channels, 0),
             amplitude_1((Sample)amplitude_1),
@@ -126,7 +127,8 @@ class SumOfSines : public SignalProducer
             frequency_3_times_pi_double(
                 (Sample)frequency_3 * (Sample)Math::PI_DOUBLE
             ),
-            delay((Sample)delay),
+            phase_offset((Sample)phase_offset),
+            sample_offset(sample_offset),
             rendered_samples(0)
         {
         }
@@ -147,8 +149,8 @@ class SumOfSines : public SignalProducer
                 Sample** buffer
         ) noexcept {
             Integer const channels = get_channels();
-            Sample time = (
-                (Sample)rendered_samples * (Sample)sampling_period + delay
+            Seconds time = (
+                (Seconds)rendered_samples * sampling_period + phase_offset
             );
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -162,7 +164,7 @@ class SumOfSines : public SignalProducer
                     + amplitude_3 * Math::sin(
                         frequency_3_times_pi_double * time
                     )
-                );
+                ) + sample_offset;
 
                 for (Integer c = 0; c != channels; ++c) {
                     buffer[c][i] = sample;
@@ -181,7 +183,8 @@ class SumOfSines : public SignalProducer
         Sample const frequency_1_times_pi_double;
         Sample const frequency_2_times_pi_double;
         Sample const frequency_3_times_pi_double;
-        Sample const delay;
+        Sample const phase_offset;
+        Sample const sample_offset;
 
         Integer rendered_samples;
 };

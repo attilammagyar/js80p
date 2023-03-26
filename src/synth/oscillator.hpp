@@ -31,14 +31,14 @@
 namespace JS80P
 {
 
-template<class ModulatorSignalProducerClass>
+template<class ModulatorSignalProducerClass, bool positive>
 class Oscillator;
 
 
-typedef Oscillator<SignalProducer> SimpleOscillator;
+typedef Oscillator<SignalProducer, false> SimpleOscillator;
 
 
-template<class ModulatorSignalProducerClass>
+template<class ModulatorSignalProducerClass, bool positive = false>
 class Oscillator : public SignalProducer
 {
     friend class SignalProducer;
@@ -83,6 +83,13 @@ class Oscillator : public SignalProducer
         Oscillator(
             WaveformParam& waveform,
             FloatParam& amplitude_leader,
+            FloatParam& frequency_leader,
+            FloatParam& phase_leader
+        ) noexcept;
+
+        Oscillator(
+            WaveformParam& waveform,
+            FloatParam& amplitude_leader,
             FloatParam& detune_leader,
             FloatParam& fine_detune_leader,
             FloatParam& harmonic_0_leader,
@@ -107,6 +114,8 @@ class Oscillator : public SignalProducer
 
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
+
+        void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         WaveformParam& waveform;
 
@@ -191,6 +200,12 @@ class Oscillator : public SignalProducer
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
+        ) noexcept;
+
+        Sample render_sample(
+            Sample const amplitude,
+            Sample const frequency,
+            Sample const phase
         ) noexcept;
 
         WavetableState wavetable_state;

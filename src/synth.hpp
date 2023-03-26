@@ -31,6 +31,7 @@
 #include "synth/distortion.hpp"
 #include "synth/flexible_controller.hpp"
 #include "synth/filter.hpp"
+#include "synth/lfo.hpp"
 #include "synth/math.hpp"
 #include "synth/midi_controller.hpp"
 #include "synth/oscillator.hpp"
@@ -309,65 +310,65 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             L1FRQ = 199,     ///< LFO 1 Frequency
             L1PHS = 200,     ///< LFO 1 Phase
-            L1AMT = 201,     ///< LFO 1 Amount
-            L1MIN = 202,     ///< LFO 1 Minimum Value
-            L1MAX = 203,     ///< LFO 1 Maximum Value
+            L1MIN = 201,     ///< LFO 1 Minimum Value
+            L1MAX = 202,     ///< LFO 1 Maximum Value
+            L1AMT = 203,     ///< LFO 1 Amount
             L1DST = 204,     ///< LFO 1 Distortion
             L1RND = 205,     ///< LFO 1 Randomness
 
             L2FRQ = 206,     ///< LFO 2 Frequency
             L2PHS = 207,     ///< LFO 2 Phase
-            L2AMT = 208,     ///< LFO 2 Amount
-            L2MIN = 209,     ///< LFO 2 Minimum Value
-            L2MAX = 210,     ///< LFO 2 Maximum Value
+            L2MIN = 208,     ///< LFO 2 Minimum Value
+            L2MAX = 209,     ///< LFO 2 Maximum Value
+            L2AMT = 210,     ///< LFO 2 Amount
             L2DST = 211,     ///< LFO 2 Distortion
             L2RND = 212,     ///< LFO 2 Randomness
 
             L3FRQ = 213,     ///< LFO 3 Frequency
             L3PHS = 214,     ///< LFO 3 Phase
-            L3AMT = 215,     ///< LFO 3 Amount
-            L3MIN = 216,     ///< LFO 3 Minimum Value
-            L3MAX = 217,     ///< LFO 3 Maximum Value
+            L3MIN = 215,     ///< LFO 3 Minimum Value
+            L3MAX = 216,     ///< LFO 3 Maximum Value
+            L3AMT = 217,     ///< LFO 3 Amount
             L3DST = 218,     ///< LFO 3 Distortion
             L3RND = 219,     ///< LFO 3 Randomness
 
             L4FRQ = 220,     ///< LFO 4 Frequency
             L4PHS = 221,     ///< LFO 4 Phase
-            L4AMT = 222,     ///< LFO 4 Amount
-            L4MIN = 223,     ///< LFO 4 Minimum Value
-            L4MAX = 224,     ///< LFO 4 Maximum Value
+            L4MIN = 222,     ///< LFO 4 Minimum Value
+            L4MAX = 223,     ///< LFO 4 Maximum Value
+            L4AMT = 224,     ///< LFO 4 Amount
             L4DST = 225,     ///< LFO 4 Distortion
             L4RND = 226,     ///< LFO 4 Randomness
 
             L5FRQ = 227,     ///< LFO 5 Frequency
             L5PHS = 228,     ///< LFO 5 Phase
-            L5AMT = 229,     ///< LFO 5 Amount
-            L5MIN = 230,     ///< LFO 5 Minimum Value
-            L5MAX = 231,     ///< LFO 5 Maximum Value
+            L5MIN = 229,     ///< LFO 5 Minimum Value
+            L5MAX = 230,     ///< LFO 5 Maximum Value
+            L5AMT = 231,     ///< LFO 5 Amount
             L5DST = 232,     ///< LFO 5 Distortion
             L5RND = 233,     ///< LFO 5 Randomness
 
             L6FRQ = 234,     ///< LFO 6 Frequency
             L6PHS = 235,     ///< LFO 6 Phase
-            L6AMT = 236,     ///< LFO 6 Amount
-            L6MIN = 237,     ///< LFO 6 Minimum Value
-            L6MAX = 238,     ///< LFO 6 Maximum Value
+            L6MIN = 236,     ///< LFO 6 Minimum Value
+            L6MAX = 237,     ///< LFO 6 Maximum Value
+            L6AMT = 238,     ///< LFO 6 Amount
             L6DST = 239,     ///< LFO 6 Distortion
             L6RND = 240,     ///< LFO 6 Randomness
 
             L7FRQ = 241,     ///< LFO 7 Frequency
             L7PHS = 242,     ///< LFO 7 Phase
-            L7AMT = 243,     ///< LFO 7 Amount
-            L7MIN = 244,     ///< LFO 7 Minimum Value
-            L7MAX = 245,     ///< LFO 7 Maximum Value
+            L7MIN = 243,     ///< LFO 7 Minimum Value
+            L7MAX = 244,     ///< LFO 7 Maximum Value
+            L7AMT = 245,     ///< LFO 7 Amount
             L7DST = 246,     ///< LFO 7 Distortion
             L7RND = 247,     ///< LFO 7 Randomness
 
             L8FRQ = 248,     ///< LFO 8 Frequency
             L8PHS = 249,     ///< LFO 8 Phase
-            L8AMT = 250,     ///< LFO 8 Amount
-            L8MIN = 251,     ///< LFO 8 Minimum Value
-            L8MAX = 252,     ///< LFO 8 Maximum Value
+            L8MIN = 250,     ///< LFO 8 Minimum Value
+            L8MAX = 251,     ///< LFO 8 Maximum Value
+            L8AMT = 252,     ///< LFO 8 Amount
             L8DST = 253,     ///< LFO 8 Distortion
             L8RND = 254,     ///< LFO 8 Randomness
 
@@ -865,6 +866,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
         std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];
         Envelope* envelopes_rw[ENVELOPES];
+        LFO* lfos_rw[LFOS];
         FlexibleController* flexible_controllers_rw[FLEXIBLE_CONTROLLERS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
@@ -877,6 +879,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         MidiController* const* const midi_controllers;
         FlexibleController* const* const flexible_controllers;
         Envelope* const* const envelopes;
+        LFO* const* const lfos;
 };
 
 }

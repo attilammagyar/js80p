@@ -190,6 +190,7 @@ class SignalProducer
         Seconds sampling_period;
         Seconds current_time;
         Integer cached_round;
+        Sample const* const* cached_buffer;
 
     private:
         typedef std::vector<SignalProducer*> Children;
@@ -202,7 +203,6 @@ class SignalProducer
             Integer& next_stop
         ) noexcept;
 
-        Sample const* const* cached_buffer;
         Children children;
 };
 

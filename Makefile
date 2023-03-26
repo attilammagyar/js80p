@@ -69,8 +69,10 @@ WIN_PLAYGROUND_OBJS = \
 PARAM_COMPONENTS = \
 	synth/envelope \
 	synth/flexible_controller \
+	synth/lfo \
 	synth/math \
 	synth/midi_controller \
+	synth/oscillator \
 	synth/param \
 	synth/queue \
 	synth/signal_producer
@@ -82,7 +84,6 @@ SYNTH_COMPONENTS = \
 	synth/delay \
 	synth/distortion \
 	synth/filter \
-	synth/oscillator \
 	synth/voice \
 	synth/wavefolder \
 	synth/wavetable
@@ -95,6 +96,7 @@ TESTS = \
 	test_envelope \
 	test_flexible_controller \
 	test_gui \
+	test_lfo \
 	test_math \
 	test_midi_controller \
 	test_oscillator \
@@ -217,6 +219,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
@@ -348,6 +351,14 @@ $(BUILD_DIR)/test_gui$(EXE): \
 		| $(BUILD_DIR)
 	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
+$(BUILD_DIR)/test_lfo$(EXE): \
+		tests/test_lfo.cpp \
+		src/synth/wavetable.cpp src/synth/wavetable.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
 $(BUILD_DIR)/test_math$(EXE): \
 		tests/test_math.cpp \
 		src/synth/math.cpp src/synth/math.hpp \
@@ -367,7 +378,6 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
-		src/synth/oscillator.cpp src/synth/oscillator.hpp \
 		src/synth/wavetable.cpp src/synth/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \

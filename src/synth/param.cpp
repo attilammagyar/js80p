@@ -197,10 +197,10 @@ void Param<NumberType>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    Sample const v = (Sample)value;
+    Sample const value = (Sample)this->value;
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        buffer[0][i] = v;
+        buffer[0][i] = value;
     }
 }
 
@@ -215,11 +215,11 @@ Sample const* const* FloatParam::produce(
         return SignalProducer::produce<FloatParam>(
             float_param->leader, round, sample_count
         );
-    } else {
-        return SignalProducer::produce<FloatParamClass>(
-            float_param, round, sample_count
-        );
     }
+
+    return SignalProducer::produce<FloatParamClass>(
+        float_param, round, sample_count
+    );
 }
 
 
@@ -252,7 +252,12 @@ FloatParam::FloatParam(
     leader(NULL),
     flexible_controller(NULL),
     envelope(NULL),
+    lfo(NULL),
     should_round(round_to > 0.0),
+    is_ratio_same_as_value(
+        std::fabs(min_value - 0.0) < 0.000001
+        && std::fabs(max_value - 1.0) < 0.000001
+    ),
     round_to(round_to),
     round_to_inv(should_round ? 1.0 / round_to : 0.0),
     constantness_round(-1),
@@ -269,7 +274,12 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     leader(&leader),
     flexible_controller(NULL),
     envelope(NULL),
+    lfo(NULL),
     should_round(false),
+    is_ratio_same_as_value(
+        std::fabs(min_value - 0.0) < 0.000001
+        && std::fabs(max_value - 1.0) < 0.000001
+    ),
     round_to(0.0),
     round_to_inv(0.0),
     constantness_round(-1),
@@ -370,6 +380,10 @@ bool FloatParam::is_constant_until(Integer const sample_count) const noexcept
 {
     if (is_following_leader()) {
         return leader->is_constant_until(sample_count);
+    }
+
+    if (lfo != NULL) {
+        return false;
     }
 
     Integer const last_sample_idx = sample_count - 1;
@@ -523,7 +537,7 @@ void FloatParam::set_flexible_controller(
 }
 
 
-FlexibleController const* FloatParam::get_flexible_controller() noexcept
+FlexibleController const* FloatParam::get_flexible_controller() const noexcept
 {
     return flexible_controller;
 }
@@ -604,13 +618,31 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 }
 
 
+void FloatParam::set_lfo(LFO* lfo) noexcept
+{
+    this->lfo = lfo;
+}
+
+
+LFO const* FloatParam::get_lfo() const noexcept
+{
+    return lfo;
+}
+
+
 Sample const* const* FloatParam::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
     Param<Number>::initialize_rendering(round, sample_count);
 
-    if (midi_controller != NULL) {
+    if (lfo != NULL) {
+        lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
+
+        if (is_ratio_same_as_value) {
+            return lfo_buffer;
+        }
+    } else if (midi_controller != NULL) {
         for (Queue<Event>::SizeType i = 0, l = midi_controller->events.length(); i != l; ++i) {
             schedule_value(
                 midi_controller->events[i].time_offset,
@@ -632,7 +664,18 @@ void FloatParam::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (latest_event_type == EVT_LINEAR_RAMP) {
+    if (lfo != NULL) {
+        Sample sample = 0.0;
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            sample = ratio_to_value(lfo_buffer[0][i]);
+            buffer[0][i] = sample;
+        }
+
+        if (last_sample_index > first_sample_index) {
+            store_new_value((Number)sample);
+        }
+    } else if (latest_event_type == EVT_LINEAR_RAMP) {
         Sample sample = (Sample)get_raw_value();
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {

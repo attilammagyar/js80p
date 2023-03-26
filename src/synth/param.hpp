@@ -38,6 +38,9 @@ class Envelope;
 class FlexibleController;
 
 
+class LFO;
+
+
 /**
  * \brief A variable that can influence the synthesized sound or other
  *        parameters.
@@ -193,12 +196,15 @@ class FloatParam : public Param<Number>
         void set_flexible_controller(
             FlexibleController* flexible_controller
         ) noexcept;
-        FlexibleController const* get_flexible_controller() noexcept;
+        FlexibleController const* get_flexible_controller() const noexcept;
 
         void set_envelope(Envelope const* const envelope) noexcept;
         Envelope const* get_envelope() const noexcept;
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
+
+        void set_lfo(LFO* lfo) noexcept;
+        LFO const* get_lfo() const noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -255,8 +261,11 @@ class FloatParam : public Param<Number>
         FloatParam* const leader;
         FlexibleController* flexible_controller;
         Envelope const* envelope;
+        LFO* lfo;
+        Sample const* const* lfo_buffer;
 
         bool const should_round;
+        bool const is_ratio_same_as_value;
         Number const round_to;
         Number const round_to_inv;
 

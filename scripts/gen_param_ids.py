@@ -137,9 +137,9 @@ def print_lfo_params(param_id: int) -> int:
     params = [
         ("$#FRQ", " ///< $ # Frequency"),
         ("$#PHS", " ///< $ # Phase"),
-        ("$#AMT", " ///< $ # Amount"),
         ("$#MIN", " ///< $ # Minimum Value"),
         ("$#MAX", " ///< $ # Maximum Value"),
+        ("$#AMT", " ///< $ # Amount"),
         ("$#DST", " ///< $ # Distortion"),
         ("$#RND", " ///< $ # Randomness"),
     ]
