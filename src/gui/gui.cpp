@@ -1046,6 +1046,81 @@ void GUI::build_lfos_body()
 
     background->own(lfos_body);
 
+    constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
+    constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
+
+    PE(lfos_body,  16 + PE_W * 0,  32, Synth::ParamId::L1WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body,  16 + PE_W * 1,  32, Synth::ParamId::L1FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body,  16 + PE_W * 2,  32, Synth::ParamId::L1PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body,  16 + PE_W * 3,  32, Synth::ParamId::L1MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 4,  32, Synth::ParamId::L1MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 5,  32, Synth::ParamId::L1AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body,  16 + PE_W * 6,  32, Synth::ParamId::L1DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 7,  32, Synth::ParamId::L1RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body, 496 + PE_W * 0,  32, Synth::ParamId::L2WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body, 496 + PE_W * 1,  32, Synth::ParamId::L2FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body, 496 + PE_W * 2,  32, Synth::ParamId::L2PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body, 496 + PE_W * 3,  32, Synth::ParamId::L2MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 4,  32, Synth::ParamId::L2MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 5,  32, Synth::ParamId::L2AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body, 496 + PE_W * 6,  32, Synth::ParamId::L2DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 7,  32, Synth::ParamId::L2RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body,  16 + PE_W * 0, 172, Synth::ParamId::L3WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body,  16 + PE_W * 1, 172, Synth::ParamId::L3FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body,  16 + PE_W * 2, 172, Synth::ParamId::L3PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body,  16 + PE_W * 3, 172, Synth::ParamId::L3MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 4, 172, Synth::ParamId::L3MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 5, 172, Synth::ParamId::L3AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body,  16 + PE_W * 6, 172, Synth::ParamId::L3DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 7, 172, Synth::ParamId::L3RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body, 496 + PE_W * 0, 172, Synth::ParamId::L4WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body, 496 + PE_W * 1, 172, Synth::ParamId::L4FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body, 496 + PE_W * 2, 172, Synth::ParamId::L4PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body, 496 + PE_W * 3, 172, Synth::ParamId::L4MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 4, 172, Synth::ParamId::L4MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 5, 172, Synth::ParamId::L4AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body, 496 + PE_W * 6, 172, Synth::ParamId::L4DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 7, 172, Synth::ParamId::L4RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body,  16 + PE_W * 0, 312, Synth::ParamId::L5WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body,  16 + PE_W * 1, 312, Synth::ParamId::L5FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body,  16 + PE_W * 2, 312, Synth::ParamId::L5PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body,  16 + PE_W * 3, 312, Synth::ParamId::L5MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 4, 312, Synth::ParamId::L5MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 5, 312, Synth::ParamId::L5AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body,  16 + PE_W * 6, 312, Synth::ParamId::L5DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 7, 312, Synth::ParamId::L5RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body, 496 + PE_W * 0, 312, Synth::ParamId::L6WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body, 496 + PE_W * 1, 312, Synth::ParamId::L6FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body, 496 + PE_W * 2, 312, Synth::ParamId::L6PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body, 496 + PE_W * 3, 312, Synth::ParamId::L6MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 4, 312, Synth::ParamId::L6MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 5, 312, Synth::ParamId::L6AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body, 496 + PE_W * 6, 312, Synth::ParamId::L6DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 7, 312, Synth::ParamId::L6RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body,  16 + PE_W * 0, 452, Synth::ParamId::L7WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body,  16 + PE_W * 1, 452, Synth::ParamId::L7FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body,  16 + PE_W * 2, 452, Synth::ParamId::L7PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body,  16 + PE_W * 3, 452, Synth::ParamId::L7MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 4, 452, Synth::ParamId::L7MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 5, 452, Synth::ParamId::L7AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body,  16 + PE_W * 6, 452, Synth::ParamId::L7DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body,  16 + PE_W * 7, 452, Synth::ParamId::L7RND,  LFO_CTLS, "%.2f", 100.0);
+
+    PE(lfos_body, 496 + PE_W * 0, 452, Synth::ParamId::L8WAV,  MIDI_CTLS, wf, wfc);
+    PE(lfos_body, 496 + PE_W * 1, 452, Synth::ParamId::L8FRQ,  LFO_CTLS, "%.2f", 1.0);
+    PE(lfos_body, 496 + PE_W * 2, 452, Synth::ParamId::L8PHS,  LFO_CTLS, "%.1f", 360.0);
+    PE(lfos_body, 496 + PE_W * 3, 452, Synth::ParamId::L8MIN,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 4, 452, Synth::ParamId::L8MAX,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 5, 452, Synth::ParamId::L8AMT,  LFO_CTLS, "%.2f", 200.0);
+    PE(lfos_body, 496 + PE_W * 6, 452, Synth::ParamId::L8DST,  LFO_CTLS, "%.2f", 100.0);
+    PE(lfos_body, 496 + PE_W * 7, 452, Synth::ParamId::L8RND,  LFO_CTLS, "%.2f", 100.0);
+
     lfos_body->hide();
 }
 
