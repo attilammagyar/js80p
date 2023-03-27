@@ -35,8 +35,9 @@ FloatParam Oscillator<ModulatorSignalProducerClass, positive>::dummy_param("", 0
 
 template<class ModulatorSignalProducerClass, bool positive>
 Oscillator<ModulatorSignalProducerClass, positive>::WaveformParam::WaveformParam(
-        std::string const name
-) noexcept : Param<Waveform>(name, SINE, CUSTOM, SAWTOOTH)
+        std::string const name,
+        Waveform const max_value
+) noexcept : Param<Waveform>(name, SINE, max_value, SINE)
 {
 }
 

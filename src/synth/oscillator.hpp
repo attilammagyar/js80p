@@ -64,7 +64,10 @@ class Oscillator : public SignalProducer
         class WaveformParam : public Param<Waveform>
         {
             public:
-                WaveformParam(std::string const name) noexcept;
+                WaveformParam(
+                    std::string const name,
+                    Waveform const max_value = CUSTOM
+                ) noexcept;
         };
 
         static constexpr Event::Type EVT_START = 1;

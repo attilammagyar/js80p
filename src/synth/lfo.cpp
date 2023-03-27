@@ -29,7 +29,7 @@ namespace JS80P
 
 LFO::LFO(std::string const name) noexcept
     : SignalProducer(1, 9),
-    waveform(name + "WAV"),
+    waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(name + "FRQ", 0.01, 30.0, 1.0),
     phase(name + "PHS", 0.0, 1.0, 0.0),
     min(name + "MIN", 0.0, 1.0, 0.0),
