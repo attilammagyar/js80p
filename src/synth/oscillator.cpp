@@ -115,6 +115,7 @@ void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() n
     phase_buffer = NULL;
     start_time_offset = 0.0;
     is_on = false;
+    is_starting = false;
 
     register_child(waveform);
     register_child(modulated_amplitude);
