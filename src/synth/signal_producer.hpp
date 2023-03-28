@@ -101,7 +101,7 @@ class SignalProducer
             Integer const number_of_children = 0
         ) noexcept;
 
-        virtual ~SignalProducer();
+        virtual ~SignalProducer() noexcept;
 
         Integer get_channels() const noexcept;
 
