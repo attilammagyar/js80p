@@ -99,7 +99,8 @@ SignalProducer::SignalProducer(
     last_sample_count(0),
     block_size(0),
     current_time(0.0),
-    cached_round(-1)
+    cached_round(-1),
+    cached_buffer(NULL)
 {
     children.reserve(number_of_children);
 
@@ -119,6 +120,7 @@ void SignalProducer::set_block_size(Integer const new_block_size) noexcept
         buffer = reallocate_buffer(buffer);
         last_sample_count = 0;
         cached_round = -1;
+        cached_buffer = NULL;
 
         for (Children::iterator it = children.begin(); it != children.end(); ++it) {
             (*it)->set_block_size(new_block_size);
@@ -209,6 +211,12 @@ Integer SignalProducer::get_block_size() const noexcept
 Sample const* const* SignalProducer::get_last_rendered_block(
         Integer& sample_count
 ) const noexcept {
+    if (cached_buffer == NULL) {
+        sample_count = 0;
+
+        return NULL;
+    }
+
     sample_count = last_sample_count;
 
     return cached_buffer;

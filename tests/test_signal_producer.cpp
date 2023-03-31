@@ -252,18 +252,29 @@ class DelegatingSignalProducer : public SignalProducer
 
 TEST(can_query_last_rendered_block, {
     Sample const* const* rendered_samples;
-    Integer sample_count = 42;
+    Integer sample_count;
     DelegatingSignalProducer delegate(1.0);
     DelegatingSignalProducer delegator(2.0, &delegate);
 
-    delegate.get_last_rendered_block(sample_count);
+    sample_count = 42;
+    assert_eq(NULL, (void*)delegate.get_last_rendered_block(sample_count));
     assert_eq(0, (int)sample_count);
 
-    delegator.get_last_rendered_block(sample_count);
+    sample_count = 42;
+    assert_eq(NULL, (void*)delegator.get_last_rendered_block(sample_count));
     assert_eq(0, (int)sample_count);
 
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(&delegate, 123, 5);
     delegate.set_block_size(10);
     delegator.set_block_size(10);
+
+    sample_count = 42;
+    assert_eq(NULL, (void*)delegate.get_last_rendered_block(sample_count));
+    assert_eq(0, (int)sample_count);
+
+    sample_count = 42;
+    assert_eq(NULL, (void*)delegator.get_last_rendered_block(sample_count));
+    assert_eq(0, (int)sample_count);
 
     rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(&delegate, 1, 5);
     assert_eq(
