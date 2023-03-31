@@ -28,7 +28,11 @@
 
 #include "synth/envelope.hpp"
 #include "synth/biquad_filter.hpp"
+#include "synth/comb_filter.hpp"
+#include "synth/delay.hpp"
 #include "synth/distortion.hpp"
+#include "synth/echo.hpp"
+#include "synth/effect.hpp"
 #include "synth/flexible_controller.hpp"
 #include "synth/filter.hpp"
 #include "synth/lfo.hpp"
@@ -798,6 +802,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         typedef Distortion<Overdrive> Distortion_;
         typedef BiquadFilter<Distortion_> Filter1;
         typedef BiquadFilter<Filter1> Filter2;
+        typedef Echo<Filter2> Echo_;
 
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
@@ -861,6 +866,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         typename Filter2::TypeParam filter_2_type;
         Filter1 filter_1;
         Filter2 filter_2;
+        Echo_ echo;
         Sample const* const* raw_output;
         FloatParam* float_params[FLOAT_PARAMS];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];

@@ -41,17 +41,13 @@ class Delay : public Filter<InputSignalProducerClass>
         Delay(InputSignalProducerClass& input) noexcept;
         Delay(
             InputSignalProducerClass& input,
-            FloatParam& feedback_leader,
+            FloatParam& gain_leader,
             FloatParam& time_leader
         ) noexcept;
         virtual ~Delay();
 
-        virtual void set_block_size(
-            Integer const new_block_size
-        ) noexcept override;
-        virtual void set_sample_rate(
-            Frequency const new_sample_rate
-        ) noexcept override;
+        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
         void clear() noexcept;
 
         /**
@@ -62,7 +58,7 @@ class Delay : public Filter<InputSignalProducerClass>
             SignalProducer const* feedback_signal_producer
         ) noexcept;
 
-        FloatParam feedback;
+        FloatParam gain;
         FloatParam time;
 
     protected:
@@ -80,6 +76,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
     private:
         void initialize_instance() noexcept;
+
         void reallocate_delay_buffer() noexcept;
         void free_delay_buffer() noexcept;
         void allocate_delay_buffer() noexcept;
@@ -93,13 +90,19 @@ class Delay : public Filter<InputSignalProducerClass>
         void copy_input_into_delay_buffer(Integer const sample_count) noexcept;
         void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
 
+        void apply_gain(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+
         SignalProducer const* feedback_signal_producer;
         Sample const* const* feedback_signal_producer_buffer;
         Sample** delay_buffer;
-        Sample const* feedback_buffer;
+        Sample const* gain_buffer;
         Sample const* time_buffer;
         Number feedback_value;
-        Number time_value;
         Integer feedback_sample_count;
         Integer write_index;
         Integer delay_buffer_size;

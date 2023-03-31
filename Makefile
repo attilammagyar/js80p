@@ -81,8 +81,11 @@ SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
 	synth/biquad_filter \
+	synth/comb_filter \
 	synth/delay \
 	synth/distortion \
+	synth/echo \
+	synth/effect \
 	synth/filter \
 	synth/voice \
 	synth/wavefolder \
@@ -91,6 +94,7 @@ SYNTH_COMPONENTS = \
 TESTS = \
 	test_example \
 	test_biquad_filter \
+	test_comb_filter \
 	test_delay \
 	test_distortion \
 	test_envelope \
@@ -222,6 +226,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_comb_filter$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
@@ -311,6 +316,16 @@ $(BUILD_DIR)/test_envelope$(EXE): \
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
 		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
+		src/synth/filter.cpp src/synth/filter.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_comb_filter$(EXE): \
+		tests/test_comb_filter.cpp \
+		src/synth/comb_filter.cpp src/synth/comb_filter.hpp \
+		src/synth/delay.cpp src/synth/delay.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \

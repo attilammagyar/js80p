@@ -42,30 +42,6 @@ using namespace JS80P;
 constexpr Integer CHANNELS = 2;
 
 
-class FixedSignalProducer : public SignalProducer
-{
-    friend class SignalProducer;
-
-    public:
-        FixedSignalProducer(Sample const* const* fixed_samples) noexcept
-            : SignalProducer(CHANNELS, 0),
-            fixed_samples(fixed_samples)
-        {
-        }
-
-    protected:
-        Sample const* const* initialize_rendering(
-                Integer const round,
-                Integer const sample_count
-        ) noexcept {
-            return fixed_samples;
-        }
-
-    private:
-        Sample const* const* const fixed_samples;
-};
-
-
 TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
@@ -92,6 +68,7 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
+    delay.gain.set_value(1.0);
     delay.time.set_value(0.0);
 
     render_rounds< Delay<FixedSignalProducer> >(delay, output, rounds);
@@ -101,7 +78,7 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
             expected_output[c],
             output.samples[c],
             sample_count,
-            DOUBLE_DELTA,
+            0.001,
             "channel=%d",
             (int)c
         );
@@ -119,8 +96,8 @@ TEST(repeats_input_samples_with_delay, {
         {0.20, 0.40, 0.60, 0.80, 1.00},
     };
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.00, 0.00, 0.05, 0.15, 0.25, 0.35, 0.45, 0.30, 0.50, 0.10},
-        {0.00, 0.00, 0.10, 0.30, 0.50, 0.70, 0.90, 0.60, 1.00, 0.20},
+        {0.000, 0.000, 0.025, 0.075, 0.125, 0.175, 0.225, 0.150, 0.250, 0.050},
+        {0.000, 0.000, 0.050, 0.150, 0.250, 0.350, 0.450, 0.300, 0.500, 0.100},
     };
     Sample const* input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -135,6 +112,7 @@ TEST(repeats_input_samples_with_delay, {
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
+    delay.gain.set_value(0.5);
     delay.time.set_value(0.25);
     delay.time.schedule_value(0.71, 0.4);
 
@@ -145,7 +123,7 @@ TEST(repeats_input_samples_with_delay, {
             expected_output[c],
             output.samples[c],
             sample_count,
-            DOUBLE_DELTA,
+            0.001,
             "channel=%d",
             (int)c
         );
@@ -182,6 +160,7 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
     delay.time.set_value(3.0);
+    delay.gain.set_value(1.0);
 
     render_rounds< Delay<FixedSignalProducer> >(delay, output, rounds);
 
@@ -190,7 +169,7 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
             expected_output[c],
             output.samples[c],
             sample_count,
-            DOUBLE_DELTA,
+            0.001,
             "channel=%d",
             (int)c
         );
@@ -211,9 +190,10 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
         {0.02, 0.04, 0.06},
         {0.04, 0.08, 0.12},
     };
+    /* output = gain * (input + feedback) */
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.00, 0.00, 0.11, 0.22, 0.33, 0.11, 0.22, 0.36, 0.12, 0.24, 0.36, 0.12},
-        {0.00, 0.00, 0.22, 0.44, 0.66, 0.22, 0.44, 0.72, 0.24, 0.48, 0.72, 0.24},
+        {0.00, 0.00, 0.06, 0.12, 0.18, 0.12, 0.24, 0.36, 0.12, 0.24, 0.36, 0.12},
+        {0.00, 0.00, 0.12, 0.24, 0.36, 0.24, 0.48, 0.72, 0.24, 0.48, 0.72, 0.24},
     };
     Sample const* input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -237,9 +217,9 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
     delay.set_feedback_signal_producer(&feedback);
+    delay.gain.set_value(0.5);
     delay.time.set_value(0.2);
-    delay.feedback.set_value(0.5);
-    delay.feedback.schedule_value(0.5, 1.0);
+    delay.gain.schedule_value(0.5, 1.0);
 
     SignalProducer::produce<FixedSignalProducer>(&feedback, 12345);
 
@@ -250,11 +230,11 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
             expected_output[c],
             output.samples[c],
             sample_count,
-            DOUBLE_DELTA,
+            0.001,
             "channel=%d",
             (int)c
         );
     }
 
-    assert_eq(1.0, delay.feedback.get_value(), DOUBLE_DELTA);
+    assert_eq(1.0, delay.gain.get_value(), DOUBLE_DELTA);
 })

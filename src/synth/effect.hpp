@@ -16,11 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__SYNTH__FILTER_HPP
-#define JS80P__SYNTH__FILTER_HPP
+#ifndef JS80P__SYNTH__EFFECT_HPP
+#define JS80P__SYNTH__EFFECT_HPP
+
+#include <string>
 
 #include "js80p.hpp"
 
+#include "synth/filter.hpp"
+#include "synth/param.hpp"
 #include "synth/signal_producer.hpp"
 
 
@@ -28,23 +32,19 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-class Filter;
-
-
-typedef Filter<SignalProducer> SimpleFilter;
-
-
-template<class InputSignalProducerClass>
-class Filter : public SignalProducer
+class Effect : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
 
     public:
-        Filter(
+        Effect(
+            std::string const name,
             InputSignalProducerClass& input,
-            Integer const number_of_children = 0,
-            Integer const channels = 0
-        ) noexcept;
+            Integer const number_of_children = 0
+        );
+
+        FloatParam dry;
+        FloatParam wet;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -52,9 +52,17 @@ class Filter : public SignalProducer
             Integer const sample_count
         ) noexcept;
 
-        InputSignalProducerClass& input;
-        Sample const* const* input_buffer;
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
 
+    private:
+        Sample const* wet_buffer;
+        Sample const* dry_buffer;
+        bool is_dry;
 };
 
 }

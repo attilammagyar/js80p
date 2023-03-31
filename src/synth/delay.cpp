@@ -23,6 +23,7 @@
 #include <cmath>
 
 #include "synth/delay.hpp"
+#include "synth/math.hpp"
 
 
 namespace JS80P
@@ -30,15 +31,15 @@ namespace JS80P
 
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input) noexcept
-    : Filter<InputSignalProducerClass>(input, 4),
-    feedback(
-        "FB",
-        Constants::DELAY_FEEDBACK_MIN,
-        Constants::DELAY_FEEDBACK_MAX,
-        Constants::DELAY_FEEDBACK_DEFAULT
+    : Filter<InputSignalProducerClass>(input, 2),
+    gain(
+        "",
+        Constants::DELAY_GAIN_MIN,
+        Constants::DELAY_GAIN_MAX,
+        Constants::DELAY_GAIN_DEFAULT
     ),
     time(
-        "T",
+        "",
         Constants::DELAY_TIME_MIN,
         Constants::DELAY_TIME_MAX,
         Constants::DELAY_TIME_DEFAULT
@@ -54,7 +55,7 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
     feedback_signal_producer = NULL;
     feedback_signal_producer_buffer = NULL;
     delay_buffer = NULL;
-    feedback_buffer = NULL;
+    gain_buffer = NULL;
     time_buffer = NULL;
     feedback_sample_count = 0;
     write_index = 0;
@@ -63,19 +64,19 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 
     reallocate_delay_buffer();
 
+    this->register_child(gain);
     this->register_child(time);
-    this->register_child(feedback);
 }
 
 
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
-        FloatParam& feedback_leader,
+        FloatParam& gain_leader,
         FloatParam& time_leader
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 4),
-    feedback(feedback_leader),
+    : Filter<InputSignalProducerClass>(input, 2),
+    gain(gain_leader),
     time(time_leader)
 {
     initialize_instance();
@@ -195,14 +196,12 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     read_index = (Number)write_index;
     merge_inputs_into_delay_buffer(sample_count);
 
+    gain_buffer = FloatParam::produce_if_not_constant(
+        &gain, round, sample_count
+    );
     time_buffer = FloatParam::produce_if_not_constant(
         &time, round, sample_count
     );
-
-    if (time_buffer == NULL)
-    {
-        time_value = time.get_value();
-    }
 
     return NULL;
 }
@@ -214,7 +213,6 @@ void Delay<InputSignalProducerClass>::initialize_feedback(
         Integer const sample_count
 ) noexcept {
     if (UNLIKELY(feedback_signal_producer == NULL)) {
-        feedback_buffer = NULL;
         feedback_signal_producer_buffer = NULL;
         feedback_sample_count = 0;
 
@@ -226,19 +224,6 @@ void Delay<InputSignalProducerClass>::initialize_feedback(
             feedback_sample_count
         )
     );
-    feedback_buffer = FloatParam::produce_if_not_constant(
-        &feedback, round, sample_count
-    );
-
-    if (feedback_buffer == NULL)
-    {
-        feedback_value = feedback.get_value();
-
-        if (feedback_value < 0.000001) {
-            feedback_signal_producer_buffer = NULL;
-            feedback_sample_count = 0;
-        }
-    }
 }
 
 
@@ -294,40 +279,17 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         sample_count, this->feedback_sample_count
     );
 
-    if (feedback_buffer == NULL) {
-        Number const feedback_value = this->feedback_value;
+    for (Integer c = 0; c != channels; ++c) {
+        Sample const* feedback_samples = feedback_signal_producer_buffer[c];
+        Integer delay_buffer_index = write_index;
 
-        for (Integer c = 0; c != channels; ++c) {
-            Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-            Integer delay_buffer_index = write_index;
+        for (Integer i = 0; i != feedback_sample_count; ++i) {
+            delay_buffer[c][delay_buffer_index] += feedback_samples[i];
 
-            for (Integer i = 0; i != feedback_sample_count; ++i) {
-                delay_buffer[c][delay_buffer_index] += (
-                    feedback_value * feedback_samples[i]
-                );
+            ++delay_buffer_index;
 
-                ++delay_buffer_index;
-
-                if (delay_buffer_index == delay_buffer_size) {
-                    delay_buffer_index = 0;
-                }
-            }
-        }
-    } else {
-        for (Integer c = 0; c != channels; ++c) {
-            Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-            Integer delay_buffer_index = write_index;
-
-            for (Integer i = 0; i != feedback_sample_count; ++i) {
-                delay_buffer[c][delay_buffer_index] += (
-                    feedback_buffer[i] * feedback_samples[i]
-                );
-
-                ++delay_buffer_index;
-
-                if (delay_buffer_index == delay_buffer_size) {
-                    delay_buffer_index = 0;
-                }
+            if (delay_buffer_index == delay_buffer_size) {
+                delay_buffer_index = 0;
             }
         }
     }
@@ -344,6 +306,8 @@ void Delay<InputSignalProducerClass>::render(
     Integer const channels = this->channels;
 
     if (time_buffer == NULL) {
+        Number const time_value = time.get_value();
+
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
             Number read_index = this->read_index - time_value * this->sample_rate;
@@ -375,7 +339,36 @@ void Delay<InputSignalProducerClass>::render(
         }
     }
 
+    apply_gain(round, first_sample_index, last_sample_index, buffer);
+
     read_index += (Number)(last_sample_index - first_sample_index);
+}
+
+
+template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::apply_gain(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    Integer const channels = this->channels;
+
+    if (gain_buffer == NULL) {
+        Sample const gain = this->gain.get_value();
+
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[c][i] *= gain;
+            }
+        }
+    } else {
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[c][i] *= gain_buffer[i];
+            }
+        }
+    }
 }
 
 }

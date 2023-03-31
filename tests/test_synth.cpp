@@ -118,15 +118,14 @@ Synth::ParamId IMPLEMENTED_PARAMS[] = {
     Synth::ParamId::EF2Q,
     Synth::ParamId::EF2G,
 
-    // TODO: turn on these when Echo is implemented
-    // Synth::ParamId::EEDEL,
-    // Synth::ParamId::EEFB,
-    // Synth::ParamId::EEDF,
-    // Synth::ParamId::EEDG,
-    // Synth::ParamId::EEWID,
-    // Synth::ParamId::EEHPF,
-    // Synth::ParamId::EEWET,
-    // Synth::ParamId::EEDRY,
+    Synth::ParamId::EEDEL,
+    Synth::ParamId::EEFB,
+    Synth::ParamId::EEDF,
+    Synth::ParamId::EEDG,
+    Synth::ParamId::EEWID,
+    Synth::ParamId::EEHPF,
+    Synth::ParamId::EEWET,
+    Synth::ParamId::EEDRY,
 
     // TODO: turn on these when Reverb is implemented
     // Synth::ParamId::ERRS,

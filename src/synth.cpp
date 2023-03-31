@@ -27,8 +27,11 @@
 #include "synth.hpp"
 
 #include "synth/biquad_filter.cpp"
+#include "synth/comb_filter.cpp"
 #include "synth/delay.cpp"
 #include "synth/distortion.cpp"
+#include "synth/echo.cpp"
+#include "synth/effect.cpp"
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/flexible_controller.cpp"
@@ -66,6 +69,7 @@ Synth::Synth() noexcept
         + 2                         // overdrive + distortion
         + 2                         // filter_1 + filter_1_type
         + 2                         // filter_2 + filter_2_type
+        + 1                         // echo
         + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
     ),
@@ -95,6 +99,7 @@ Synth::Synth() noexcept
     filter_2_type("EF2TYP"),
     filter_1("EF1", distortion, filter_1_type),
     filter_2("EF2", filter_1, filter_2_type),
+    echo("EE", filter_2),
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
     midi_controllers((MidiController* const*)midi_controllers_rw),
@@ -216,6 +221,16 @@ Synth::Synth() noexcept
     register_float_param(ParamId::EF2FRQ, filter_2.frequency);
     register_float_param(ParamId::EF2Q, filter_2.q);
     register_float_param(ParamId::EF2G, filter_2.gain);
+
+    register_child(echo);
+    register_float_param(ParamId::EEDEL, echo.delay_time);
+    register_float_param(ParamId::EEFB, echo.feedback);
+    register_float_param(ParamId::EEDF, echo.damping_frequency);
+    register_float_param(ParamId::EEDG, echo.damping_gain);
+    register_float_param(ParamId::EEWID, echo.width);
+    register_float_param(ParamId::EEHPF, echo.high_pass_frequency);
+    register_float_param(ParamId::EEWET, echo.wet);
+    register_float_param(ParamId::EEDRY, echo.dry);
 
     for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
         /*
@@ -750,8 +765,8 @@ Sample const* const* Synth::initialize_rendering(
 ) noexcept {
     process_messages();
 
-    raw_output = SignalProducer::produce<Filter2>(
-        &filter_2, round, sample_count
+    raw_output = SignalProducer::produce<Echo_>(
+        &echo, round, sample_count
     );
 
     clear_midi_controllers();

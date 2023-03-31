@@ -28,9 +28,10 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Filter<InputSignalProducerClass>::Filter(
         InputSignalProducerClass& input,
-        Integer const number_of_children
+        Integer const number_of_children,
+        Integer const channels
 ) noexcept
-    : SignalProducer(input.get_channels(), number_of_children),
+    : SignalProducer(channels > 0 ? channels : input.get_channels(), number_of_children),
     input(input),
     input_buffer(NULL)
 {

@@ -98,6 +98,32 @@ class Constant : public SignalProducer
 };
 
 
+class FixedSignalProducer : public SignalProducer
+{
+    friend class SignalProducer;
+
+    public:
+        static constexpr Integer CHANNELS = 2;
+
+        FixedSignalProducer(Sample const* const* fixed_samples) noexcept
+            : SignalProducer(CHANNELS, 0),
+            fixed_samples(fixed_samples)
+        {
+        }
+
+    protected:
+        Sample const* const* initialize_rendering(
+                Integer const round,
+                Integer const sample_count
+        ) noexcept {
+            return fixed_samples;
+        }
+
+    private:
+        Sample const* const* const fixed_samples;
+};
+
+
 class SumOfSines : public SignalProducer
 {
     friend class SignalProducer;

@@ -69,9 +69,9 @@ namespace Constants {
     constexpr Number BIQUAD_FILTER_Q_MIN = 0.0;
     constexpr Number BIQUAD_FILTER_Q_SCALE = 1.0 / 20.0;
 
-    constexpr Number DELAY_FEEDBACK_DEFAULT = 0.5;
-    constexpr Number DELAY_FEEDBACK_MIN = 0.0;
-    constexpr Number DELAY_FEEDBACK_MAX = 1.0;
+    constexpr Number DELAY_GAIN_DEFAULT = 0.5;
+    constexpr Number DELAY_GAIN_MIN = 0.0;
+    constexpr Number DELAY_GAIN_MAX = 1.0;
 
     constexpr Number DELAY_TIME_DEFAULT = 0.5;
     constexpr Number DELAY_TIME_MIN = 0.0;
