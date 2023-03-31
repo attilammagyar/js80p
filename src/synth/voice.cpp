@@ -446,6 +446,8 @@ void Voice<ModulatorSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
+    /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
+
     Sample const* const panning_buffer = this->panning_buffer;
 
     if (panning_buffer == NULL) {
