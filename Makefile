@@ -86,6 +86,7 @@ SYNTH_COMPONENTS = \
 	synth/distortion \
 	synth/echo \
 	synth/effect \
+	synth/effects \
 	synth/filter \
 	synth/voice \
 	synth/wavefolder \

@@ -32,6 +32,7 @@
 #include "synth/distortion.cpp"
 #include "synth/echo.cpp"
 #include "synth/effect.cpp"
+#include "synth/effects.cpp"
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/flexible_controller.cpp"
@@ -66,10 +67,7 @@ Synth::Synth() noexcept
         6                           // MODE + MIX + PM + FM + AM + bus
         + 29 * 2                    // Modulator::Params + Carrier::Params
         + POLYPHONY * 2             // modulators + carriers
-        + 2                         // overdrive + distortion
-        + 2                         // filter_1 + filter_1_type
-        + 2                         // filter_2 + filter_2_type
-        + 1                         // echo
+        + 1                         // effects
         + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
     ),
@@ -93,13 +91,7 @@ Synth::Synth() noexcept
         POLYPHONY,
         modulator_add_volume
     ),
-    overdrive("EO", 3.0, bus),
-    distortion("ED", 10.0, overdrive),
-    filter_1_type("EF1TYP"),
-    filter_2_type("EF2TYP"),
-    filter_1("EF1", distortion, filter_1_type),
-    filter_2("EF2", filter_1, filter_2_type),
-    echo("EE", filter_2),
+    effects("E", bus),
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
     midi_controllers((MidiController* const*)midi_controllers_rw),
@@ -204,33 +196,30 @@ Synth::Synth() noexcept
     register_float_param_as_child(ParamId::CF2Q, carrier_params.filter_2_q);
     register_float_param_as_child(ParamId::CF2G, carrier_params.filter_2_gain);
 
-    register_child(overdrive);
-    register_float_param(ParamId::EOG, overdrive.level);
+    register_child(effects);
 
-    register_child(distortion);
-    register_float_param(ParamId::EDG, distortion.level);
+    register_float_param(ParamId::EOG, effects.overdrive.level);
 
-    register_child(filter_1);
-    register_param_as_child<Filter1::TypeParam>(EF1TYP, filter_1_type);
-    register_float_param(ParamId::EF1FRQ, filter_1.frequency);
-    register_float_param(ParamId::EF1Q, filter_1.q);
-    register_float_param(ParamId::EF1G, filter_1.gain);
+    register_float_param(ParamId::EDG, effects.distortion.level);
 
-    register_child(filter_2);
-    register_param_as_child<Filter2::TypeParam>(EF2TYP, filter_2_type);
-    register_float_param(ParamId::EF2FRQ, filter_2.frequency);
-    register_float_param(ParamId::EF2Q, filter_2.q);
-    register_float_param(ParamId::EF2G, filter_2.gain);
+    register_param<Effects::Filter1<Bus>::TypeParam>(EF1TYP, effects.filter_1_type);
+    register_float_param(ParamId::EF1FRQ, effects.filter_1.frequency);
+    register_float_param(ParamId::EF1Q, effects.filter_1.q);
+    register_float_param(ParamId::EF1G, effects.filter_1.gain);
 
-    register_child(echo);
-    register_float_param(ParamId::EEDEL, echo.delay_time);
-    register_float_param(ParamId::EEFB, echo.feedback);
-    register_float_param(ParamId::EEDF, echo.damping_frequency);
-    register_float_param(ParamId::EEDG, echo.damping_gain);
-    register_float_param(ParamId::EEWID, echo.width);
-    register_float_param(ParamId::EEHPF, echo.high_pass_frequency);
-    register_float_param(ParamId::EEWET, echo.wet);
-    register_float_param(ParamId::EEDRY, echo.dry);
+    register_param<Effects::Filter2<Bus>::TypeParam>(EF2TYP, effects.filter_2_type);
+    register_float_param(ParamId::EF2FRQ, effects.filter_2.frequency);
+    register_float_param(ParamId::EF2Q, effects.filter_2.q);
+    register_float_param(ParamId::EF2G, effects.filter_2.gain);
+
+    register_float_param(ParamId::EEDEL, effects.echo.delay_time);
+    register_float_param(ParamId::EEFB, effects.echo.feedback);
+    register_float_param(ParamId::EEDF, effects.echo.damping_frequency);
+    register_float_param(ParamId::EEDG, effects.echo.damping_gain);
+    register_float_param(ParamId::EEWID, effects.echo.width);
+    register_float_param(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_float_param(ParamId::EEWET, effects.echo.wet);
+    register_float_param(ParamId::EEDRY, effects.echo.dry);
 
     for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
         /*
@@ -690,8 +679,8 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::MF2TYP: return modulator_params.filter_2_type.get_default_ratio();
         case ParamId::CF1TYP: return carrier_params.filter_1_type.get_default_ratio();
         case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
-        case ParamId::EF1TYP: return filter_1_type.get_default_ratio();
-        case ParamId::EF2TYP: return filter_2_type.get_default_ratio();
+        case ParamId::EF1TYP: return effects.filter_1_type.get_default_ratio();
+        case ParamId::EF2TYP: return effects.filter_2_type.get_default_ratio();
         case ParamId::L1WAV: return lfos_rw[0]->waveform.get_default_ratio();
         case ParamId::L2WAV: return lfos_rw[1]->waveform.get_default_ratio();
         case ParamId::L3WAV: return lfos_rw[2]->waveform.get_default_ratio();
@@ -729,8 +718,8 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::MF2TYP: return modulator_params.filter_2_type.ratio_to_value(ratio);
         case ParamId::CF1TYP: return carrier_params.filter_1_type.ratio_to_value(ratio);
         case ParamId::CF2TYP: return carrier_params.filter_2_type.ratio_to_value(ratio);
-        case ParamId::EF1TYP: return filter_1_type.ratio_to_value(ratio);
-        case ParamId::EF2TYP: return filter_2_type.ratio_to_value(ratio);
+        case ParamId::EF1TYP: return effects.filter_1_type.ratio_to_value(ratio);
+        case ParamId::EF2TYP: return effects.filter_2_type.ratio_to_value(ratio);
         case ParamId::L1WAV: return lfos_rw[0]->waveform.ratio_to_value(ratio);
         case ParamId::L2WAV: return lfos_rw[1]->waveform.ratio_to_value(ratio);
         case ParamId::L3WAV: return lfos_rw[2]->waveform.ratio_to_value(ratio);
@@ -765,8 +754,8 @@ Sample const* const* Synth::initialize_rendering(
 ) noexcept {
     process_messages();
 
-    raw_output = SignalProducer::produce<Echo_>(
-        &echo, round, sample_count
+    raw_output = SignalProducer::produce< Effects::Effects<Bus> >(
+        &effects, round, sample_count
     );
 
     clear_midi_controllers();
@@ -844,11 +833,11 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
                 break;
 
             case ParamId::EF1TYP:
-                filter_1_type.set_ratio(ratio);
+                effects.filter_1_type.set_ratio(ratio);
                 break;
 
             case ParamId::EF2TYP:
-                filter_2_type.set_ratio(ratio);
+                effects.filter_2_type.set_ratio(ratio);
                 break;
 
             case ParamId::L1WAV:
@@ -989,11 +978,11 @@ void Synth::assign_controller_to_param(
             break;
 
         case ParamId::EF1TYP:
-            filter_1_type.set_midi_controller(midi_controller);
+            effects.filter_1_type.set_midi_controller(midi_controller);
             break;
 
         case ParamId::EF2TYP:
-            filter_2_type.set_midi_controller(midi_controller);
+            effects.filter_2_type.set_midi_controller(midi_controller);
             break;
 
         case ParamId::L1WAV:
@@ -1146,8 +1135,8 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::MF2TYP: return modulator_params.filter_2_type.get_ratio();
         case ParamId::CF1TYP: return carrier_params.filter_1_type.get_ratio();
         case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
-        case ParamId::EF1TYP: return filter_1_type.get_ratio();
-        case ParamId::EF2TYP: return filter_2_type.get_ratio();
+        case ParamId::EF1TYP: return effects.filter_1_type.get_ratio();
+        case ParamId::EF2TYP: return effects.filter_2_type.get_ratio();
         case ParamId::L1WAV: return lfos_rw[0]->waveform.get_ratio();
         case ParamId::L2WAV: return lfos_rw[1]->waveform.get_ratio();
         case ParamId::L3WAV: return lfos_rw[2]->waveform.get_ratio();
