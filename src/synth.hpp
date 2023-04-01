@@ -807,6 +807,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
+        void register_main_params() noexcept;
+        void register_modulator_params() noexcept;
+        void register_carrier_params() noexcept;
+        void register_effects_params() noexcept;
+        void create_voices() noexcept;
+        void create_midi_controllers() noexcept;
+        void create_flexible_controllers() noexcept;
+        void create_envelopes() noexcept;
+        void create_lfos() noexcept;
+
         template<class ParamClass>
         void register_param_as_child(
             ParamId const param_id,

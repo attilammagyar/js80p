@@ -109,15 +109,48 @@ Synth::Synth() noexcept
         param_names_by_id[i] = "";
     }
 
+    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+        /*
+         * Not using Math::exp() and friends here, for 2 reasons:
+         *  1. We go out of their domain here.
+         *  2. Since this loop runs only once, we can afford favoring accuracy
+         *     over speed.
+         */
+        frequencies[note] = (
+            (Frequency)std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
+        );
+    }
+
+    register_main_params();
+    register_child(bus);
+    register_modulator_params();
+    register_carrier_params();
+    register_child(effects);
+    register_effects_params();
+
+    create_voices();
+    create_midi_controllers();
+    create_flexible_controllers();
+    create_envelopes();
+    create_lfos();
+
+    update_param_states();
+}
+
+
+void Synth::register_main_params() noexcept
+{
     register_param_as_child(ParamId::MODE, mode);
 
     register_float_param_as_child(ParamId::MIX, modulator_add_volume);
     register_float_param_as_child(ParamId::PM, phase_modulation_level);
     register_float_param_as_child(ParamId::FM, frequency_modulation_level);
     register_float_param_as_child(ParamId::AM, amplitude_modulation_level);
+}
 
-    register_child(bus);
 
+void Synth::register_modulator_params() noexcept
+{
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(
         ParamId::MWAV, modulator_params.waveform
     );
@@ -156,7 +189,11 @@ Synth::Synth() noexcept
     register_float_param_as_child(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
     register_float_param_as_child(ParamId::MF2Q, modulator_params.filter_2_q);
     register_float_param_as_child(ParamId::MF2G, modulator_params.filter_2_gain);
+}
 
+
+void Synth::register_carrier_params() noexcept
+{
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(
         ParamId::CWAV, carrier_params.waveform
     );
@@ -195,9 +232,11 @@ Synth::Synth() noexcept
     register_float_param_as_child(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
     register_float_param_as_child(ParamId::CF2Q, carrier_params.filter_2_q);
     register_float_param_as_child(ParamId::CF2G, carrier_params.filter_2_gain);
+}
 
-    register_child(effects);
 
+void Synth::register_effects_params() noexcept
+{
     register_float_param(ParamId::EOG, effects.overdrive.level);
 
     register_float_param(ParamId::EDG, effects.distortion.level);
@@ -220,19 +259,11 @@ Synth::Synth() noexcept
     register_float_param(ParamId::EEHPF, effects.echo.high_pass_frequency);
     register_float_param(ParamId::EEWET, effects.echo.wet);
     register_float_param(ParamId::EEDRY, effects.echo.dry);
+}
 
-    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-        /*
-         * Not using Math::exp() and friends here, for 2 reasons:
-         *  1. We go out of their domain here.
-         *  2. Since this loop runs only once, we can afford favoring accuracy
-         *     over speed.
-         */
-        frequencies[note] = (
-            (Frequency)std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
-        );
-    }
 
+void Synth::create_voices() noexcept
+{
     for (int i = 0; i != POLYPHONY; ++i) {
         modulators[i] = new Modulator(
             frequencies, Midi::NOTES, modulator_params
@@ -256,7 +287,11 @@ Synth::Synth() noexcept
             midi_note_to_voice_assignments[channel][note] = -1;
         }
     }
+}
 
+
+void Synth::create_midi_controllers() noexcept
+{
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
         midi_controllers_rw[i] = NULL;
     }
@@ -330,8 +365,12 @@ Synth::Synth() noexcept
     midi_controllers_rw[ControllerId::UNDEFINED_37] = new MidiController();
     midi_controllers_rw[ControllerId::UNDEFINED_38] = new MidiController();
     midi_controllers_rw[ControllerId::UNDEFINED_39] = new MidiController();
+}
 
-    Integer next_id = F1IN;
+
+void Synth::create_flexible_controllers() noexcept
+{
+    Integer next_id = ParamId::F1IN;
 
     for (Integer i = 0; i != FLEXIBLE_CONTROLLERS; ++i) {
         FlexibleController* flexible_controller = (
@@ -346,6 +385,12 @@ Synth::Synth() noexcept
         register_float_param_as_child((ParamId)next_id++, flexible_controller->distortion);
         register_float_param_as_child((ParamId)next_id++, flexible_controller->randomness);
     }
+}
+
+
+void Synth::create_envelopes() noexcept
+{
+    Integer next_id = ParamId::N1AMT;
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
         Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
@@ -362,6 +407,12 @@ Synth::Synth() noexcept
         register_float_param_as_child((ParamId)next_id++, envelope->release_time);
         register_float_param_as_child((ParamId)next_id++, envelope->final_value);
     }
+}
+
+
+void Synth::create_lfos() noexcept
+{
+    Integer next_id = ParamId::L1FRQ;
 
     for (Integer i = 0; i != LFOS; ++i) {
         LFO* lfo = new LFO(std::string("L") + to_string(i + 1));
@@ -385,8 +436,6 @@ Synth::Synth() noexcept
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L6WAV, lfos_rw[5]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
-
-    update_param_states();
 }
 
 
