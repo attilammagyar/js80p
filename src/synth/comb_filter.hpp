@@ -32,7 +32,11 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-class CombFilter : public Filter< BiquadFilter< Delay<InputSignalProducerClass> > >
+using HighShelfDelay = BiquadFilter< Delay<InputSignalProducerClass> >;
+
+
+template<class InputSignalProducerClass>
+class CombFilter : public Filter< HighShelfDelay<InputSignalProducerClass> >
 {
     friend class SignalProducer;
 
@@ -79,7 +83,7 @@ class CombFilter : public Filter< BiquadFilter< Delay<InputSignalProducerClass> 
 
         bool const is_flipped;
 
-        typename BiquadFilter< Delay<InputSignalProducerClass> >::TypeParam high_shelf_filter_type;
+        typename HighShelfDelay<InputSignalProducerClass>::TypeParam high_shelf_filter_type;
         FloatParam high_shelf_filter_q;
 
         Sample** stereo_gain_buffer;
@@ -91,7 +95,7 @@ class CombFilter : public Filter< BiquadFilter< Delay<InputSignalProducerClass> 
         FloatParam panning;
 
         Delay<InputSignalProducerClass> delay;
-        BiquadFilter< Delay<InputSignalProducerClass> > high_shelf_filter;
+        HighShelfDelay<InputSignalProducerClass> high_shelf_filter;
 };
 
 }

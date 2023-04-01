@@ -112,9 +112,7 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(comb_filter_1);
     this->register_child(comb_filter_2);
 
-    high_pass_filter_type.set_value(
-        BiquadFilter<InputSignalProducerClass>::HIGH_PASS
-    );
+    high_pass_filter_type.set_value(HighPassInput::HIGH_PASS);
 
     comb_filter_1.delay.set_feedback_signal_producer(&comb_filter_2.high_shelf_filter);
 }
@@ -140,7 +138,7 @@ Sample const* const* Echo<InputSignalProducerClass>::initialize_rendering(
         &comb_filter_2, round, sample_count
     );
 
-    return buffer;
+    return NULL;
 }
 
 

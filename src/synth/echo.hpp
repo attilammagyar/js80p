@@ -37,8 +37,9 @@ class Echo : public Effect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef CombFilter< BiquadFilter<InputSignalProducerClass> > CombFilter1;
-        typedef CombFilter< BiquadFilter< Delay< BiquadFilter<InputSignalProducerClass> > > > CombFilter2;
+        typedef BiquadFilter<InputSignalProducerClass> HighPassInput;
+        typedef CombFilter<HighPassInput> CombFilter1;
+        typedef CombFilter< HighShelfDelay< HighPassInput > > CombFilter2;
 
         Echo(std::string const name, InputSignalProducerClass& input);
 

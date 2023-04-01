@@ -31,7 +31,7 @@ template<class InputSignalProducerClass>
 CombFilter<InputSignalProducerClass>::CombFilter(
         InputSignalProducerClass& input,
         StereoMode const stereo_mode
-) : Filter< BiquadFilter< Delay<InputSignalProducerClass> > >(
+) : Filter< HighShelfDelay<InputSignalProducerClass> >(
         high_shelf_filter,
         5,
         input.get_channels()
@@ -67,7 +67,7 @@ CombFilter<InputSignalProducerClass>::CombFilter(
         FloatParam& delay_time_leader,
         FloatParam& high_shelf_filter_frequency_leader,
         FloatParam& high_shelf_filter_gain_leader
-) : Filter< BiquadFilter< Delay<InputSignalProducerClass> > >(
+) : Filter< HighShelfDelay<InputSignalProducerClass> >(
         high_shelf_filter,
         5,
         input.get_channels()
@@ -102,7 +102,7 @@ void CombFilter<InputSignalProducerClass>::initialize_instance() noexcept
     stereo_gain_buffer = SignalProducer::allocate_buffer();
 
     high_shelf_filter_type.set_value(
-        BiquadFilter< Delay<InputSignalProducerClass> >::HIGH_SHELF
+        HighShelfDelay<InputSignalProducerClass>::HIGH_SHELF
     );
 
     this->register_child(high_shelf_filter_type);
@@ -135,7 +135,9 @@ Sample const* const* CombFilter<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
 ) noexcept {
-    Filter< BiquadFilter< Delay<InputSignalProducerClass> > >::initialize_rendering(round, sample_count);
+    Filter< HighShelfDelay<InputSignalProducerClass> >::initialize_rendering(
+        round, sample_count
+    );
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
