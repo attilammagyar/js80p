@@ -88,6 +88,7 @@ SYNTH_COMPONENTS = \
 	synth/effect \
 	synth/effects \
 	synth/filter \
+	synth/reverb \
 	synth/voice \
 	synth/wavefolder \
 	synth/wavetable

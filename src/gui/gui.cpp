@@ -958,6 +958,14 @@ void GUI::build_effects_body()
     PE(effects_body, 258 + PE_W * 6,   242, Synth::ParamId::EEWET,  LFO_CTLS,   "%.2f", 100.0);
     PE(effects_body, 258 + PE_W * 7,   242, Synth::ParamId::EEDRY,  LFO_CTLS,   "%.2f", 100.0);
 
+    PE(effects_body, 287 + PE_W * 0,   428, Synth::ParamId::ERRS,   LFO_CTLS,   "%.2f", 100.0);
+    PE(effects_body, 287 + PE_W * 1,   428, Synth::ParamId::ERDF,   LFO_CTLS,   "%.1f", 1.0);
+    PE(effects_body, 287 + PE_W * 2,   428, Synth::ParamId::ERDG,   LFO_CTLS,   "%.2f", 1.0);
+    PE(effects_body, 287 + PE_W * 3,   428, Synth::ParamId::ERWID,  LFO_CTLS,   "%.2f", 100.0);
+    PE(effects_body, 287 + PE_W * 4,   428, Synth::ParamId::ERHPF,  LFO_CTLS,   "%.1f", 1.0);
+    PE(effects_body, 287 + PE_W * 5,   428, Synth::ParamId::ERWET,  LFO_CTLS,   "%.2f", 100.0);
+    PE(effects_body, 287 + PE_W * 6,   428, Synth::ParamId::ERDRY,  LFO_CTLS,   "%.2f", 100.0);
+
     effects_body->hide();
 }
 

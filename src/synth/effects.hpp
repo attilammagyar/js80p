@@ -27,6 +27,7 @@
 #include "synth/distortion.hpp"
 #include "synth/echo.hpp"
 #include "synth/filter.hpp"
+#include "synth/reverb.hpp"
 
 
 namespace JS80P { namespace Effects
@@ -47,9 +48,12 @@ using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
 template<class InputSignalProducerClass>
 using Echo = JS80P::Echo< Filter2<InputSignalProducerClass> >;
 
+template<class InputSignalProducerClass>
+using Reverb = JS80P::Reverb< Echo<InputSignalProducerClass> >;
+
 
 template<class InputSignalProducerClass>
-class Effects : public Filter< Echo<InputSignalProducerClass> >
+class Effects : public Filter< Reverb<InputSignalProducerClass> >
 {
     public:
         Effects(std::string const name, InputSignalProducerClass& input);
@@ -61,6 +65,7 @@ class Effects : public Filter< Echo<InputSignalProducerClass> >
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
         Echo<InputSignalProducerClass> echo;
+        Reverb<InputSignalProducerClass> reverb;
 };
 
 } }

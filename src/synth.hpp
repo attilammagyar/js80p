@@ -41,6 +41,7 @@
 #include "synth/midi_controller.hpp"
 #include "synth/oscillator.hpp"
 #include "synth/param.hpp"
+#include "synth/reverb.hpp"
 #include "synth/queue.hpp"
 #include "synth/signal_producer.hpp"
 #include "synth/voice.hpp"

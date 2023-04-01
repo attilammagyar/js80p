@@ -29,14 +29,15 @@ template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
         std::string const name,
         InputSignalProducerClass& input
-) : Filter< Echo<InputSignalProducerClass> >(echo, 8, input.get_channels()),
+) : Filter< Reverb<InputSignalProducerClass> >(reverb, 8, input.get_channels()),
     overdrive(name + "O", 3.0, input),
     distortion(name + "D", 10.0, overdrive),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
     filter_1(name + "F1", distortion, filter_1_type),
     filter_2(name + "F2", filter_1, filter_2_type),
-    echo(name + "E", filter_2)
+    echo(name + "E", filter_2),
+    reverb(name + "R", echo)
 {
     this->register_child(overdrive);
     this->register_child(distortion);
@@ -45,6 +46,7 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(filter_1);
     this->register_child(filter_2);
     this->register_child(echo);
+    this->register_child(reverb);
 }
 
 } }

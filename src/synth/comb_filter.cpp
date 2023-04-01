@@ -97,6 +97,44 @@ CombFilter<InputSignalProducerClass>::CombFilter(
 
 
 template<class InputSignalProducerClass>
+CombFilter<InputSignalProducerClass>::CombFilter(
+        InputSignalProducerClass& input,
+        StereoMode const stereo_mode,
+        FloatParam& panning_leader,
+        FloatParam& delay_gain_leader,
+        Seconds const delay_time,
+        FloatParam& high_shelf_filter_frequency_leader,
+        FloatParam& high_shelf_filter_gain_leader
+) : Filter< HighShelfDelay<InputSignalProducerClass> >(
+        high_shelf_filter,
+        5,
+        input.get_channels()
+    ),
+    is_flipped(stereo_mode == StereoMode::FLIPPED),
+    high_shelf_filter_type(""),
+    high_shelf_filter_q(
+        "",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
+    ),
+    stereo_gain_buffer(NULL),
+    panning_buffer(NULL),
+    panning(panning_leader),
+    delay(input, delay_gain_leader, delay_time),
+    high_shelf_filter(
+        delay,
+        high_shelf_filter_type,
+        high_shelf_filter_frequency_leader,
+        high_shelf_filter_q,
+        high_shelf_filter_gain_leader
+    )
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
 void CombFilter<InputSignalProducerClass>::initialize_instance() noexcept
 {
     stereo_gain_buffer = SignalProducer::allocate_buffer();

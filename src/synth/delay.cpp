@@ -84,6 +84,20 @@ Delay<InputSignalProducerClass>::Delay(
 
 
 template<class InputSignalProducerClass>
+Delay<InputSignalProducerClass>::Delay(
+        InputSignalProducerClass& input,
+        FloatParam& gain_leader,
+        Seconds const time
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 2),
+    gain(gain_leader),
+    time("", Constants::DELAY_TIME_MIN, Constants::DELAY_TIME_MAX, time)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::reallocate_delay_buffer() noexcept
 {
     Integer const new_delay_buffer_size = std::max(

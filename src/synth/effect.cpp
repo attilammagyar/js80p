@@ -30,7 +30,11 @@ Effect<InputSignalProducerClass>::Effect(
         std::string const name,
         InputSignalProducerClass& input,
         Integer const number_of_children
-) : Filter<InputSignalProducerClass>(input, number_of_children + 2),
+) : Filter<InputSignalProducerClass>(
+        input,
+        number_of_children + 2,
+        input.get_channels()
+    ),
     dry(name + "DRY", 0.0, 1.0, 1.0),
     wet(name + "WET", 0.0, 1.0, 0.0)
 {

@@ -44,6 +44,11 @@ class Delay : public Filter<InputSignalProducerClass>
             FloatParam& gain_leader,
             FloatParam& time_leader
         ) noexcept;
+        Delay(
+            InputSignalProducerClass& input,
+            FloatParam& gain_leader,
+            Seconds const time
+        ) noexcept;
         virtual ~Delay();
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;

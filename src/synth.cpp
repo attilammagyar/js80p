@@ -41,6 +41,7 @@
 #include "synth/midi_controller.cpp"
 #include "synth/oscillator.cpp"
 #include "synth/param.cpp"
+#include "synth/reverb.cpp"
 #include "synth/queue.cpp"
 #include "synth/signal_producer.cpp"
 #include "synth/voice.cpp"
@@ -259,6 +260,14 @@ void Synth::register_effects_params() noexcept
     register_float_param(ParamId::EEHPF, effects.echo.high_pass_frequency);
     register_float_param(ParamId::EEWET, effects.echo.wet);
     register_float_param(ParamId::EEDRY, effects.echo.dry);
+
+    register_float_param(ParamId::ERRS, effects.reverb.room_size);
+    register_float_param(ParamId::ERDF, effects.reverb.damping_frequency);
+    register_float_param(ParamId::ERDG, effects.reverb.damping_gain);
+    register_float_param(ParamId::ERWID, effects.reverb.width);
+    register_float_param(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_float_param(ParamId::ERWET, effects.reverb.wet);
+    register_float_param(ParamId::ERDRY, effects.reverb.dry);
 }
 
 
@@ -712,12 +721,7 @@ Number Synth::get_param_ratio_atomic(ParamId const param_id) const noexcept
 Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 {
     if (param_id < FLOAT_PARAMS) {
-        // TODO: remove the null check when all params are implemented
-        if (float_params[param_id] != NULL) {
-            return float_params[param_id]->get_default_ratio();
-        } else {
-            return 0.0;
-        }
+        return float_params[param_id]->get_default_ratio();
     }
 
     switch (param_id) {
@@ -846,84 +850,27 @@ void Synth::process_messages() noexcept
 void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcept
 {
     if (param_id < FLOAT_PARAMS) {
-        // TODO: remove the null check when all params are implemented
-        if (float_params[param_id] != NULL) {
-            float_params[param_id]->set_ratio(ratio);
-        }
-
+        float_params[param_id]->set_ratio(ratio);
     } else {
         switch (param_id) {
-            case ParamId::MODE:
-                mode.set_ratio(ratio);
-                break;
-
-            case ParamId::MWAV:
-                modulator_params.waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::CWAV:
-                carrier_params.waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::MF1TYP:
-                modulator_params.filter_1_type.set_ratio(ratio);
-                break;
-
-            case ParamId::MF2TYP:
-                modulator_params.filter_2_type.set_ratio(ratio);
-                break;
-
-            case ParamId::CF1TYP:
-                carrier_params.filter_1_type.set_ratio(ratio);
-                break;
-
-            case ParamId::CF2TYP:
-                carrier_params.filter_2_type.set_ratio(ratio);
-                break;
-
-            case ParamId::EF1TYP:
-                effects.filter_1_type.set_ratio(ratio);
-                break;
-
-            case ParamId::EF2TYP:
-                effects.filter_2_type.set_ratio(ratio);
-                break;
-
-            case ParamId::L1WAV:
-                lfos_rw[0]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L2WAV:
-                lfos_rw[1]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L3WAV:
-                lfos_rw[2]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L4WAV:
-                lfos_rw[3]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L5WAV:
-                lfos_rw[4]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L6WAV:
-                lfos_rw[5]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L7WAV:
-                lfos_rw[6]->waveform.set_ratio(ratio);
-                break;
-
-            case ParamId::L8WAV:
-                lfos_rw[7]->waveform.set_ratio(ratio);
-                break;
-
-            default:
-                // This should never be reached.
-                break;
+            case ParamId::MODE: mode.set_ratio(ratio); break;
+            case ParamId::MWAV: modulator_params.waveform.set_ratio(ratio); break;
+            case ParamId::CWAV: carrier_params.waveform.set_ratio(ratio); break;
+            case ParamId::MF1TYP: modulator_params.filter_1_type.set_ratio(ratio); break;
+            case ParamId::MF2TYP: modulator_params.filter_2_type.set_ratio(ratio); break;
+            case ParamId::CF1TYP: carrier_params.filter_1_type.set_ratio(ratio); break;
+            case ParamId::CF2TYP: carrier_params.filter_2_type.set_ratio(ratio); break;
+            case ParamId::EF1TYP: effects.filter_1_type.set_ratio(ratio); break;
+            case ParamId::EF2TYP: effects.filter_2_type.set_ratio(ratio); break;
+            case ParamId::L1WAV: lfos_rw[0]->waveform.set_ratio(ratio); break;
+            case ParamId::L2WAV: lfos_rw[1]->waveform.set_ratio(ratio); break;
+            case ParamId::L3WAV: lfos_rw[2]->waveform.set_ratio(ratio); break;
+            case ParamId::L4WAV: lfos_rw[3]->waveform.set_ratio(ratio); break;
+            case ParamId::L5WAV: lfos_rw[4]->waveform.set_ratio(ratio); break;
+            case ParamId::L6WAV: lfos_rw[5]->waveform.set_ratio(ratio); break;
+            case ParamId::L7WAV: lfos_rw[6]->waveform.set_ratio(ratio); break;
+            case ParamId::L8WAV: lfos_rw[7]->waveform.set_ratio(ratio); break;
+            default: break; // This should never be reached.
         }
     }
 
@@ -998,74 +945,23 @@ void Synth::assign_controller_to_param(
     }
 
     switch (param_id) {
-        case ParamId::MODE:
-            mode.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::MWAV:
-            modulator_params.waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::CWAV:
-            carrier_params.waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::MF1TYP:
-            modulator_params.filter_1_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::MF2TYP:
-            modulator_params.filter_2_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::CF1TYP:
-            carrier_params.filter_1_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::CF2TYP:
-            carrier_params.filter_2_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::EF1TYP:
-            effects.filter_1_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::EF2TYP:
-            effects.filter_2_type.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L1WAV:
-            lfos_rw[0]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L2WAV:
-            lfos_rw[1]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L3WAV:
-            lfos_rw[2]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L4WAV:
-            lfos_rw[3]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L5WAV:
-            lfos_rw[4]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L6WAV:
-            lfos_rw[5]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L7WAV:
-            lfos_rw[6]->waveform.set_midi_controller(midi_controller);
-            break;
-
-        case ParamId::L8WAV:
-            lfos_rw[7]->waveform.set_midi_controller(midi_controller);
-            break;
-
+        case ParamId::MODE: mode.set_midi_controller(midi_controller); break;
+        case ParamId::MWAV: modulator_params.waveform.set_midi_controller(midi_controller); break;
+        case ParamId::CWAV: carrier_params.waveform.set_midi_controller(midi_controller); break;
+        case ParamId::MF1TYP: modulator_params.filter_1_type.set_midi_controller(midi_controller); break;
+        case ParamId::MF2TYP: modulator_params.filter_2_type.set_midi_controller(midi_controller); break;
+        case ParamId::CF1TYP: carrier_params.filter_1_type.set_midi_controller(midi_controller); break;
+        case ParamId::CF2TYP: carrier_params.filter_2_type.set_midi_controller(midi_controller); break;
+        case ParamId::EF1TYP: effects.filter_1_type.set_midi_controller(midi_controller); break;
+        case ParamId::EF2TYP: effects.filter_2_type.set_midi_controller(midi_controller); break;
+        case ParamId::L1WAV: lfos_rw[0]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L2WAV: lfos_rw[1]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L3WAV: lfos_rw[2]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L4WAV: lfos_rw[3]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L5WAV: lfos_rw[4]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L6WAV: lfos_rw[5]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L7WAV: lfos_rw[6]->waveform.set_midi_controller(midi_controller); break;
+        case ParamId::L8WAV: lfos_rw[7]->waveform.set_midi_controller(midi_controller); break;
         default: break; // This should never be reached.
     }
 }
@@ -1077,68 +973,26 @@ void Synth::assign_controller_to_float_param(
 ) noexcept {
     FloatParam* param = float_params[param_id];
 
-    // TODO: remove the null check when all params are implemented
-    if (param == NULL) {
-        return;
-    }
-
     param->set_midi_controller(NULL);
     param->set_flexible_controller(NULL);
     param->set_envelope(NULL);
     param->set_lfo(NULL);
 
     switch (controller_id) {
-        case PITCH_WHEEL:
-            param->set_midi_controller(&pitch_wheel);
-            break;
+        case PITCH_WHEEL: param->set_midi_controller(&pitch_wheel); break;
+        case NOTE: param->set_midi_controller(&note); break;
+        case VELOCITY: param->set_midi_controller(&velocity); break;
 
-        case NOTE:
-            param->set_midi_controller(&note);
-            break;
-
-        case VELOCITY:
-            param->set_midi_controller(&velocity);
-            break;
-
-        case FLEXIBLE_CONTROLLER_1:
-            param->set_flexible_controller(flexible_controllers[0]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_2:
-            param->set_flexible_controller(flexible_controllers[1]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_3:
-            param->set_flexible_controller(flexible_controllers[2]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_4:
-            param->set_flexible_controller(flexible_controllers[3]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_5:
-            param->set_flexible_controller(flexible_controllers[4]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_6:
-            param->set_flexible_controller(flexible_controllers[5]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_7:
-            param->set_flexible_controller(flexible_controllers[6]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_8:
-            param->set_flexible_controller(flexible_controllers[7]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_9:
-            param->set_flexible_controller(flexible_controllers[8]);
-            break;
-
-        case FLEXIBLE_CONTROLLER_10:
-            param->set_flexible_controller(flexible_controllers[9]);
-            break;
+        case FLEXIBLE_CONTROLLER_1: param->set_flexible_controller(flexible_controllers[0]); break;
+        case FLEXIBLE_CONTROLLER_2: param->set_flexible_controller(flexible_controllers[1]); break;
+        case FLEXIBLE_CONTROLLER_3: param->set_flexible_controller(flexible_controllers[2]); break;
+        case FLEXIBLE_CONTROLLER_4: param->set_flexible_controller(flexible_controllers[3]); break;
+        case FLEXIBLE_CONTROLLER_5: param->set_flexible_controller(flexible_controllers[4]); break;
+        case FLEXIBLE_CONTROLLER_6: param->set_flexible_controller(flexible_controllers[5]); break;
+        case FLEXIBLE_CONTROLLER_7: param->set_flexible_controller(flexible_controllers[6]); break;
+        case FLEXIBLE_CONTROLLER_8: param->set_flexible_controller(flexible_controllers[7]); break;
+        case FLEXIBLE_CONTROLLER_9: param->set_flexible_controller(flexible_controllers[8]); break;
+        case FLEXIBLE_CONTROLLER_10: param->set_flexible_controller(flexible_controllers[9]); break;
 
         case LFO_1: param->set_lfo(lfos_rw[0]); break;
         case LFO_2: param->set_lfo(lfos_rw[1]); break;
@@ -1170,10 +1024,7 @@ void Synth::assign_controller_to_float_param(
 Number Synth::get_param_ratio(ParamId const param_id) const noexcept
 {
     if (param_id < FLOAT_PARAMS) {
-        // TODO: remove the null check when all params are implemented
-        if (float_params[param_id] != NULL) {
-            return float_params[param_id]->get_ratio();
-        }
+        return float_params[param_id]->get_ratio();
     }
 
     switch (param_id) {

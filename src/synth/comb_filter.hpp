@@ -61,6 +61,16 @@ class CombFilter : public Filter< HighShelfDelay<InputSignalProducerClass> >
             FloatParam& high_shelf_filter_gain_leader
         );
 
+        CombFilter(
+            InputSignalProducerClass& input,
+            StereoMode const stereo_mode,
+            FloatParam& panning_leader,
+            FloatParam& delay_gain_leader,
+            Seconds const delay_time,
+            FloatParam& high_shelf_filter_frequency_leader,
+            FloatParam& high_shelf_filter_gain_leader
+        );
+
         virtual ~CombFilter();
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
