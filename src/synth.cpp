@@ -525,11 +525,17 @@ void Synth::suspend() noexcept
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->stop(0.0);
     }
+
+    this->reset();
+    clear_midi_controllers();
 }
 
 
 void Synth::resume() noexcept
 {
+    this->reset();
+    clear_midi_controllers();
+
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->start(0.0);
     }

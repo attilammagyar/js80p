@@ -137,7 +137,7 @@ void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
     delay_buffer_size_inv = 1.0 / delay_buffer_size_float;
 
     if (this->channels <= 0) {
-        clear();
+        reset();
         return;
     }
 
@@ -147,13 +147,15 @@ void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
         delay_buffer[c] = new Sample[delay_buffer_size];
     }
 
-    clear();
+    reset();
 }
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::clear() noexcept
+void Delay<InputSignalProducerClass>::reset() noexcept
 {
+    Filter<InputSignalProducerClass>::reset();
+
     for (Integer c = 0; c != this->channels; ++c) {
         std::fill_n(delay_buffer[c], delay_buffer_size, 0.0);
     }

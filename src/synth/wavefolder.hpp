@@ -48,6 +48,8 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         ) noexcept;
         ~Wavefolder();
 
+        virtual void reset() noexcept override;
+
         FloatParam folding;
 
     protected:

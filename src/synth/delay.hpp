@@ -53,7 +53,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
-        void clear() noexcept;
+        virtual void reset() noexcept override;
 
         /**
          * \warning The number of channels of the \c feedback \c SignalProducer

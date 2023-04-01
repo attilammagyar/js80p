@@ -238,3 +238,51 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
 
     assert_eq(1.0, delay.gain.get_value(), DOUBLE_DELTA);
 })
+
+
+TEST(reset_clears_the_delay_buffer, {
+    constexpr Integer block_size = 5;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+    constexpr Sample expected_output[CHANNELS][block_size] = {
+        {0.0, 0.0, 0.10, 0.20, 0.30},
+        {0.0, 0.0, 0.20, 0.40, 0.60},
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Delay<FixedSignalProducer> delay(input);
+    Sample const* const* rendered_samples;
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_feedback_signal_producer(&delay);
+    delay.gain.set_value(1.0);
+    delay.time.set_value(0.2);
+
+    SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 1);
+    SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 2);
+    delay.reset();
+    rendered_samples = SignalProducer::produce< Delay<FixedSignalProducer> >(
+        &delay, 3
+    );
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            rendered_samples[c],
+            block_size,
+            0.001,
+            "channel=%d",
+            (int)c
+        );
+    }
+})

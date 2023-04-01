@@ -208,6 +208,18 @@ Integer SignalProducer::get_block_size() const noexcept
 }
 
 
+void SignalProducer::reset() noexcept
+{
+    cancel_events(0.0);
+
+    render_silence(-1, 0, block_size, buffer);
+
+    for (Children::iterator it = children.begin(); it != children.end(); ++it) {
+        (*it)->reset();
+    }
+}
+
+
 Sample const* const* SignalProducer::get_last_rendered_block(
         Integer& sample_count
 ) const noexcept {

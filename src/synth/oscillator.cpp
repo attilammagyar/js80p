@@ -325,6 +325,17 @@ void Oscillator<ModulatorSignalProducerClass, positive>::set_block_size(
 
 
 template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::reset() noexcept
+{
+    SignalProducer::reset();
+
+    is_on = false;
+    is_starting = false;
+    start_time_offset = 0.0;
+}
+
+
+template<class ModulatorSignalProducerClass, bool positive>
 void Oscillator<ModulatorSignalProducerClass, positive>::start(
         Seconds const time_offset
 ) noexcept {

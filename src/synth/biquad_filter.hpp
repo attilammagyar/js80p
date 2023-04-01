@@ -93,7 +93,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const new_block_size
         ) noexcept override;
 
-        void clear() noexcept;
+        virtual void reset() noexcept override;
 
         FloatParam frequency;
         FloatParam q;

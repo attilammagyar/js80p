@@ -51,6 +51,8 @@ class Distortion : public Filter<InputSignalProducerClass>
 
         ~Distortion();
 
+        virtual void reset() noexcept override;
+
         FloatParam level;
 
     protected:

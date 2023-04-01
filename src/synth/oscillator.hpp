@@ -114,6 +114,7 @@ class Oscillator : public SignalProducer
         ~Oscillator() override;
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void reset() noexcept override;
 
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;

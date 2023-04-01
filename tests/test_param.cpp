@@ -453,6 +453,26 @@ TEST(when_float_param_linear_ramping_is_canceled_then_last_calculated_value_is_h
 })
 
 
+TEST(resetting_cancels_a_linear_ramping, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[] = {0.3, 0.3, 0.3, 0.3, 0.3};
+    FloatParam float_param("float", -1.0, 1.0, 0.0);
+    Sample const* rendered_samples;
+
+    float_param.set_sample_rate(1.0);
+    float_param.set_block_size(block_size);
+    float_param.set_value(-0.1);
+    float_param.schedule_value(2.0, 0.0);
+    float_param.schedule_linear_ramp(10.0, 1.0);
+
+    FloatParam::produce<FloatParam>(&float_param, 1);
+    float_param.reset();
+    rendered_samples = FloatParam::produce<FloatParam>(&float_param, 2)[0];
+
+    assert_eq(expected_samples, rendered_samples, block_size, DOUBLE_DELTA);
+})
+
+
 TEST(float_param_linear_ramps_may_stretch_over_several_rendering_rounds, {
     constexpr Integer block_size = 3;
     constexpr Integer rounds = 7;

@@ -44,28 +44,83 @@ TEST(basic_properties, {
 
 class CompositeSignalProducer : public SignalProducer
 {
+    friend class SignalProducer;
+
     public:
+        class ChildSignalProducer : public SignalProducer
+        {
+            public:
+                static constexpr Event::Type EVT_TEST = 1;
+
+                ChildSignalProducer() noexcept
+                    : SignalProducer(1, 0),
+                    is_clean(false)
+                {
+                }
+
+                virtual void reset() noexcept override
+                {
+                    SignalProducer::reset();
+
+                    is_clean = true;
+                }
+
+                bool is_clean;
+        };
+
         CompositeSignalProducer() noexcept
             : SignalProducer(1, 1),
-            child(1, 0)
+            child()
         {
             register_child(child);
         }
 
-        SignalProducer child;
+        ChildSignalProducer child;
+
+    protected:
+        void render(
+                Integer const round,
+                Integer const first_sample_index,
+                Integer const last_sample_index,
+                Sample** buffer
+        ) noexcept {
+            for (Integer c = 0; c != this->channels; ++c) {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[c][i] = 1.0;
+                }
+            }
+        }
 };
 
 
-TEST(changes_of_basic_properties_are_propagated_to_children, {
-    constexpr Integer block_size = 12345;
+TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
+    constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 48000.0;
+    constexpr Sample expected_samples[] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    Integer last_rendered_sample_count;
     CompositeSignalProducer composite_signal_producer;
 
     composite_signal_producer.set_block_size(block_size);
     composite_signal_producer.set_sample_rate(sample_rate);
+    composite_signal_producer.child.schedule(
+        CompositeSignalProducer::ChildSignalProducer::EVT_TEST, 0.0
+    );
+    SignalProducer::produce<CompositeSignalProducer>(&composite_signal_producer, 1);
+    composite_signal_producer.reset();
 
     assert_eq((int)block_size, (int)composite_signal_producer.child.get_block_size());
     assert_eq(sample_rate, composite_signal_producer.child.get_sample_rate(), DOUBLE_DELTA);
+    assert_true(composite_signal_producer.child.is_clean);
+    assert_false(composite_signal_producer.child.has_events_after(0.0));
+    assert_eq(
+        expected_samples,
+        composite_signal_producer.get_last_rendered_block(
+            last_rendered_sample_count
+        )[0],
+        block_size,
+        DOUBLE_DELTA,
+        "channel=0"
+    );
 })
 
 

@@ -1080,3 +1080,42 @@ TEST(can_skip_a_round_without_rendering, {
         "round=2"
     );
 })
+
+
+TEST(resetting_the_oscillator_turns_it_off, {
+    constexpr Frequency frequency = 100.0;
+    constexpr Integer block_size = 128;
+    constexpr Integer rounds = 5;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Sample amplitude = 0.75;
+    ReferenceSine reference(frequency);
+    SimpleOscillator::WaveformParam waveform_param("");
+    SimpleOscillator oscillator(waveform_param);
+    Sample expected_samples[sample_count];
+    Buffer rendered_samples(sample_count);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.frequency.set_value(frequency);
+    oscillator.amplitude.set_value(amplitude);
+    oscillator.start(0.0);
+
+    for (Integer i = 0; i != sample_count; ++i) {
+        expected_samples[i] = 0.0;
+    }
+
+    render_rounds<SimpleOscillator>(
+        oscillator, rendered_samples, rounds, block_size
+    );
+
+    oscillator.reset();
+
+    render_rounds<SimpleOscillator>(
+        oscillator, rendered_samples, rounds, block_size
+    );
+
+    assert_close(
+        expected_samples, rendered_samples.samples[0], sample_count, DOUBLE_DELTA
+    );
+})

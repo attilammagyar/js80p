@@ -165,3 +165,42 @@ TEST(portamento, {
         expected_output.samples[0], actual_output.samples[0], block_size, 0.03
     );
 })
+
+
+TEST(resetting_a_voice_turns_it_off, {
+    constexpr Frequency sample_rate = 44100.0;
+    constexpr Integer block_size = 8196;
+    constexpr Integer rounds = 1;
+    constexpr Integer sample_count = block_size * rounds;
+
+    Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
+    Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
+    SumOfSines expected(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SimpleVoice::CHANNELS);
+    SimpleVoice::Params params("");
+    SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);
+
+    expected.set_sample_rate(sample_rate);
+    expected.set_block_size(block_size);
+
+    params.waveform.set_value(SimpleOscillator::SINE);
+    params.amplitude.set_value(1.0);
+    params.volume.set_value(1.0);
+
+    voice.set_sample_rate(sample_rate);
+    voice.set_block_size(block_size);
+
+    voice.note_on(0.0, 1, 1.0, 1);
+
+    SignalProducer::produce<SimpleVoice>(&voice, 999999, block_size);
+
+    voice.reset();
+
+    render_rounds<SumOfSines>(expected, expected_output, rounds);
+    render_rounds<SimpleVoice>(voice, actual_output, rounds);
+
+    assert_close(
+        expected_output.samples[0], actual_output.samples[0], block_size, DOUBLE_DELTA
+    );
+    assert_false(voice.is_on());
+    assert_true(voice.is_off_after(0.0));
+})

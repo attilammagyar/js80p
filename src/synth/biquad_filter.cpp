@@ -111,7 +111,7 @@ void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
     y_n_m1 = new Sample[this->channels];
     y_n_m2 = new Sample[this->channels];
 
-    clear();
+    reset();
     update_helper_variables();
 
     shared_buffers_round = -1;
@@ -223,8 +223,10 @@ void BiquadFilter<InputSignalProducerClass>::set_block_size(
 
 
 template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::clear() noexcept
+void BiquadFilter<InputSignalProducerClass>::reset() noexcept
 {
+    Filter<InputSignalProducerClass>::reset();
+
     for (Integer c = 0; c != this->channels; ++c) {
         x_n_m1[c] = x_n_m2[c] = y_n_m1[c] = y_n_m2[c] = 0.0;
     }

@@ -138,6 +138,8 @@ class Voice : public SignalProducer
             FloatParam& phase_modulation_level_leader = Oscillator_::dummy_param
         ) noexcept;
 
+        virtual void reset() noexcept override;
+
         bool is_on() const noexcept;
         bool is_off_after(Seconds const time_offset) const noexcept;
 
@@ -192,7 +194,6 @@ class Voice : public SignalProducer
         Sample const* volume_applier_buffer;
         Sample const* panning_buffer;
         Frequency const* frequencies;
-        Seconds off_after;
         Number velocity;
         Number panning_value;
         Number note_panning;

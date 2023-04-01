@@ -111,6 +111,8 @@ class SignalProducer
         virtual void set_block_size(Integer const new_block_size) noexcept;
         Integer get_block_size() const noexcept;
 
+        virtual void reset() noexcept;
+
         Sample const* const* get_last_rendered_block(
             Integer& sample_count
         ) const noexcept;

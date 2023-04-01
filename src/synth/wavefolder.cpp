@@ -93,6 +93,19 @@ Wavefolder<InputSignalProducerClass>::~Wavefolder()
 
 
 template<class InputSignalProducerClass>
+void Wavefolder<InputSignalProducerClass>::reset() noexcept
+{
+    Filter<InputSignalProducerClass>::reset();
+
+    for (Integer c = 0; c != this->channels; ++c) {
+        previous_input_sample[c] = 0.0;
+        F0_previous_input_sample[c] = F0(0.0);
+        previous_output_sample[c] = 0.0;
+    }
+}
+
+
+template<class InputSignalProducerClass>
 Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count

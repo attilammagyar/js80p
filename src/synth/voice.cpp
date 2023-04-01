@@ -233,7 +233,6 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume(param_leaders.volume),
     volume_applier(filter_2, velocity, volume),
     frequencies(frequencies),
-    off_after(0.0),
     state(OFF),
     modulation_out((ModulationOut&)volume_applier)
 {
@@ -248,6 +247,15 @@ Voice<ModulatorSignalProducerClass>::Voice(
     register_child(wavefolder);
     register_child(filter_2);
     register_child(volume_applier);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::reset() noexcept
+{
+    SignalProducer::reset();
+
+    state = OFF;
 }
 
 
@@ -389,7 +397,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         return;
     }
 
-    off_after = time_offset + std::max(
+    Seconds off_after = time_offset + std::max(
         oscillator.amplitude.end_envelope(time_offset),
         volume.end_envelope(time_offset)
     );
