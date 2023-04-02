@@ -20,17 +20,14 @@ JS80P_CXXFLAGS = \
 	-msse2 \
 	-ffast-math \
 	-D FST_DONT_DEPRECATE_UNKNOWN \
-	-O3 \
-	$(PLATFORM_CXXFLAGS)
+	-O3
 
-DEBUG_LOG_FILE ?= C:\\\\debug.txt
 DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 
-FST_DLL_DIR = $(DIST_DIR)/fst$(SUFFIX)
-FST_DLL = $(FST_DLL_DIR)/js80p.dll
+FST_MAIN_OS_DIR = $(DIST_DIR)/$(FST_MAIN_OS)$(SUFFIX)
+FST_MAIN_DIR = $(FST_MAIN_OS_DIR)/fst
 
-WIN_PLAYGROUND = $(BUILD_DIR)/win32-playground$(SUFFIX).exe
-OBJ_PLAYGROUND_WIN = $(BUILD_DIR)/win32-playground$(SUFFIX).o
+OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).o
 
 GUI_RES = $(BUILD_DIR)/js80p$(SUFFIX).res
 
@@ -45,26 +42,26 @@ GUI_IMAGES = \
 
 include make/$(OS)-$(PLATFORM).mk
 
-OBJ_FST_DLL_WIN = $(BUILD_DIR)/fst-dll$(SUFFIX).o
-OBJ_FST_PLUGIN_WIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
-OBJ_SERIALIZER_WIN = $(BUILD_DIR)/serializer$(SUFFIX).o
-OBJ_SYNTH_WIN = $(BUILD_DIR)/synth$(SUFFIX).o
-OBJ_GUI_WIN = $(BUILD_DIR)/gui$(SUFFIX).o
+OBJ_FST_MAIN = $(BUILD_DIR)/fst-main$(SUFFIX).o
+OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
+OBJ_SERIALIZER = $(BUILD_DIR)/serializer$(SUFFIX).o
+OBJ_SYNTH = $(BUILD_DIR)/synth$(SUFFIX).o
+OBJ_GUI = $(BUILD_DIR)/gui$(SUFFIX).o
 
-FST_DLL_OBJS = \
+FST_MAIN_OBJS = \
 	$(GUI_RES) \
-	$(OBJ_FST_DLL_WIN) \
-	$(OBJ_FST_PLUGIN_WIN) \
-	$(OBJ_GUI_WIN) \
-	$(OBJ_SERIALIZER_WIN) \
-	$(OBJ_SYNTH_WIN)
+	$(OBJ_FST_MAIN) \
+	$(OBJ_FST_PLUGIN) \
+	$(OBJ_GUI) \
+	$(OBJ_SERIALIZER) \
+	$(OBJ_SYNTH)
 
-WIN_PLAYGROUND_OBJS = \
+GUI_PLAYGROUND_OBJS = \
 	$(GUI_RES) \
-	$(OBJ_GUI_WIN) \
-	$(OBJ_PLAYGROUND_WIN) \
-	$(OBJ_SERIALIZER_WIN) \
-	$(OBJ_SYNTH_WIN)
+	$(OBJ_GUI) \
+	$(OBJ_GUI_PLAYGROUND) \
+	$(OBJ_SERIALIZER) \
+	$(OBJ_SYNTH)
 
 PARAM_COMPONENTS = \
 	synth/envelope \
@@ -151,15 +148,15 @@ FST_HEADERS = \
 
 FST_SOURCES = \
 	src/fst/plugin.cpp \
-	src/fst/dll.cpp \
+	$(FST_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
-WIN_GUI_HEADERS = \
-	src/gui/win32.hpp \
+GUI_HEADERS = \
+	$(GUI_PLATFORM_HEADERS) \
 	$(JS80P_HEADERS)
 
-WIN_GUI_SOURCES = \
-	src/gui/win32.cpp \
+GUI_SOURCES = \
+	$(GUI_PLATFORM_SOURCES) \
 	src/gui/widgets.cpp \
 	src/gui/gui.cpp
 
@@ -178,19 +175,11 @@ TEST_CXXFLAGS = \
 
 CXXINCS = $(PLATFORM_CXXINCS) $(JS80P_CXXINCS)
 
-WIN_CXXFLAGS = \
-	-mwindows \
-	-D UNICODE \
-	-D _UNICODE
-
 FST_CXXFLAGS = $(CXXINCS) $(FST_CXXINCS) $(JS80P_CXXFLAGS)
-WIN_DLL_LFLAGS = -Wall -s -shared -static
-WIN_EXE_LFLAGS = -Wall -s -static
-WIN_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32
 
-.PHONY: all check clean dirs docs perf winguiplayground
+.PHONY: all check clean dirs docs perf guiplayground
 
-all: dirs $(FST_DLL)
+all: dirs $(FST_MAIN)
 
 dirs: $(BUILD_DIR) $(DIST_DIR) $(DOC_DIR)
 
@@ -208,11 +197,11 @@ $(DOC_DIR):
 
 clean:
 	$(RM) \
-		$(FST_DLL) \
-		$(FST_DLL_OBJS) \
+		$(FST_MAIN) \
+		$(FST_MAIN_OBJS) \
 		$(TEST_BINS) \
-		$(WIN_PLAYGROUND) \
-		$(WIN_PLAYGROUND_OBJS) \
+		$(GUI_PLAYGROUND) \
+		$(GUI_PLAYGROUND_OBJS) \
 		$(PERF_TEST_BINS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
@@ -241,63 +230,66 @@ perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 
 docs: $(DOC_DIR) $(DOC_DIR)/html/index.html
 
-winguiplayground: $(WIN_PLAYGROUND)
+guiplayground: $(GUI_PLAYGROUND)
 
 $(DOC_DIR)/html/index.html: \
 		Doxyfile \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
 		$(TEST_LIBS) \
-		$(WIN_GUI_HEADERS) \
-		$(WIN_GUI_SOURCES) \
+		$(GUI_HEADERS) \
+		$(GUI_SOURCES) \
 		$(FST_HEADERS) \
 		$(FST_SOURCES) \
 		| $(DOC_DIR)
 	$(DOXYGEN)
 
-$(FST_DLL): $(FST_DLL_OBJS) | $(FST_DLL_DIR)
-	$(LINK_DLL) $(FST_DLL_OBJS) -o $@ $(WIN_LFLAGS)
+$(FST_MAIN): $(FST_MAIN_OBJS) | $(FST_MAIN_DIR)
+	$(LINK_FST_MAIN) $(FST_MAIN_OBJS) -o $@ $(PLATFORM_LFLAGS)
 
-$(FST_DLL_DIR): | $(DIST_DIR)
+$(FST_MAIN_DIR): | $(FST_MAIN_OS_DIR) $(DIST_DIR)
 	$(MKDIR) $@
 
-$(WIN_PLAYGROUND): $(WIN_PLAYGROUND_OBJS) | $(BUILD_DIR)
-	$(LINK_WIN_EXE) $(WIN_PLAYGROUND_OBJS) -o $@ $(WIN_LFLAGS)
+$(FST_MAIN_OS_DIR): | $(DIST_DIR)
+	$(MKDIR) $@
 
-$(OBJ_PLAYGROUND_WIN): \
-		src/gui/win32-playground.cpp \
-		$(WIN_GUI_SOURCES) $(WIN_GUI_HEADERS) \
+$(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
+	$(LINK_GUI_PLAYGROUND) $(GUI_PLAYGROUND_OBJS) -o $@ $(PLATFORM_LFLAGS)
+
+$(OBJ_GUI_PLAYGROUND): \
+		$(GUI_PLAYGROUND_SOURCES) \
+		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
+	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
 		-D OEMRESOURCE -c $< -o $@
 
-$(OBJ_SYNTH_WIN): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
-	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
+$(OBJ_SYNTH): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
+	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
 		-c src/synth.cpp -o $@
 
-$(OBJ_SERIALIZER_WIN): \
+$(OBJ_SERIALIZER): \
 		src/serializer.cpp src/serializer.hpp \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPPW) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) \
+	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
 		-c $< -o $@
 
-$(OBJ_FST_PLUGIN_WIN): \
+$(OBJ_FST_PLUGIN): \
 		src/fst/plugin.cpp \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPPW) $(FST_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) -c $< -o $@
+	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
-$(OBJ_GUI_WIN) : \
-		$(WIN_GUI_SOURCES) $(WIN_GUI_HEADERS) \
+$(OBJ_GUI) : \
+		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPPW) $(CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) -c $< -o $@
+	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
-$(OBJ_FST_DLL_WIN): \
-		src/fst/dll.cpp \
+$(OBJ_FST_MAIN): \
+		$(FST_MAIN_SOURCES) \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPPW) $(FST_CXXFLAGS) $(DEBUG_LOG) $(WIN_CXXFLAGS) -c $< -o $@
+	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
 $(GUI_RES): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
