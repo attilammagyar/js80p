@@ -52,7 +52,7 @@ AEffect* FstPlugin::create_instance(
     effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
     effect->processDoubleReplacing = &process_double_replacing;
-    effect->uniqueID = CCONST('A', 'M', 'J', '8');
+    effect->uniqueID = CCONST('a', 'm', 'j', '8');
     effect->version = FstPlugin::VERSION;
 
     return effect;
@@ -135,11 +135,11 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
         case effGetEffectName:
         case effGetProductString:
-            strncpy((char*)pointer, FstPlugin::NAME, 8);
+            strncpy((char*)pointer, Constants::PLUGIN_NAME, 8);
             return 1;
 
         case effGetVendorString:
-            strncpy((char*)pointer, FstPlugin::VENDOR, 24);
+            strncpy((char*)pointer, Constants::COMPANY_NAME, 24);
             return 1;
 
         case effGetVendorVersion:

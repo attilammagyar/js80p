@@ -49,6 +49,13 @@ typedef unsigned char Byte;
 
 
 namespace Constants {
+    constexpr char const* COMPANY_NAME = "Attila M. Magyar";
+    constexpr char const* COMPANY_WEB = "https://github.com/attilammagyar/js80p";
+    constexpr char const* COMPANY_EMAIL = "";
+
+    constexpr char const* PLUGIN_NAME = "JS80P";
+    constexpr char const* PLUGIN_VERSION = "1.0.0";
+
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
 
     constexpr Number AM_DEFAULT = 0.0;
