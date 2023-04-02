@@ -44,7 +44,7 @@ class Widget : public WidgetBase
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );
 
-        Widget();
+        Widget(char const* const text);
         virtual ~Widget();
 
         virtual GUI::Bitmap load_bitmap(
@@ -86,7 +86,7 @@ class Widget : public WidgetBase
         static std::string const FILTER_STR;
 
         Widget(
-            char const* const label,
+            char const* const text,
             int const left,
             int const top,
             int const width,
@@ -163,7 +163,7 @@ class Widget : public WidgetBase
         GUI::PlatformWidget get_platform_widget() const;
 
         Text class_name;
-        Text label;
+        Text text_text;
         DWORD dwStyle;
         WNDPROC original_window_procedure;
         bool is_mouse_captured;

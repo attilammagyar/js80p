@@ -43,13 +43,13 @@ ExternallyCreatedWindow::~ExternallyCreatedWindow()
 
 
 TransparentWidget::TransparentWidget(
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         int const width,
         int const height,
         Type const type
-) : Widget(label, left, top, width, height, type)
+) : Widget(text, left, top, width, height, type)
 {
 }
 
@@ -86,8 +86,8 @@ ExportPatchButton::ExportPatchButton(
 }
 
 
-TabBody::TabBody(char const* const label)
-    : TransparentWidget(label, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY)
+TabBody::TabBody(char const* const text)
+    : TransparentWidget(text, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY)
 {
 }
 
@@ -187,9 +187,9 @@ TabSelector::TabSelector(
         Background* background,
         GUI::Bitmap bitmap,
         TabBody* tab_body,
-        char const* const label,
+        char const* const text,
         int const left
-) : TransparentWidget(label, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
+) : TransparentWidget(text, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
     background(background),
     tab_body(tab_body),
     bitmap(bitmap)
@@ -229,10 +229,10 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 
     for (int i = 0; i != GUI::ALL_CTLS; ++i) {
         Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
-        char const* const label = GUI::CONTROLLERS[i].long_name;
+        char const* const text = GUI::CONTROLLERS[i].long_name;
 
         controllers[i] = (Controller*)this->own(
-            new Controller(*this, label, left, top, id)
+            new Controller(*this, text, left, top, id)
         );
 
         top += Controller::HEIGHT;
@@ -343,12 +343,11 @@ bool ControllerSelector::paint()
 
 ControllerSelector::Controller::Controller(
         ControllerSelector& controller_selector,
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         Synth::ControllerId const controller_id
-) : Widget(label, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
-    label(label),
+) : Widget(text, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
     controller_id(controller_id),
     controller_selector(controller_selector),
     is_selected(false),
@@ -390,7 +389,7 @@ bool ControllerSelector::Controller::paint()
     }
 
     draw_text(
-        label,
+        text,
         12,
         0,
         0,
@@ -494,7 +493,7 @@ void ParamEditor::free_knob_states(WidgetBase* widget)
 
 
 ParamEditor::ParamEditor(
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         ControllerSelector& controller_selector,
@@ -503,10 +502,9 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* format,
         double const scale
-) : TransparentWidget(label, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(format),
-    label(label),
     scale(scale),
     options(NULL),
     number_of_options(0),
@@ -524,7 +522,7 @@ ParamEditor::ParamEditor(
 
 
 ParamEditor::ParamEditor(
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         ControllerSelector& controller_selector,
@@ -533,10 +531,9 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* const* const options,
         int const number_of_options
-) : TransparentWidget(label, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(NULL),
-    label(label),
     scale(1.0),
     options(options),
     number_of_options(number_of_options),
@@ -581,7 +578,7 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 
     knob = new Knob(
         *this,
-        label,
+        text,
         (WIDTH - ParamEditor::Knob::WIDTH) / 2,
         16,
         number_of_options > 1 ? (Number)(number_of_options - 1) : 0.0
@@ -780,11 +777,11 @@ bool ParamEditor::mouse_up(int const x, int const y)
 
 ParamEditor::Knob::Knob(
         ParamEditor& editor,
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         Number const steps
-) : Widget(label, left, top, WIDTH, HEIGHT, Type::KNOB),
+) : Widget(text, left, top, WIDTH, HEIGHT, Type::KNOB),
     steps(steps),
     editor(editor),
     knob_state(NULL),

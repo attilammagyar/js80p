@@ -730,7 +730,7 @@ GUI::GUI(
     synth(synth),
     platform_data(platform_data)
 {
-    dummy_widget = new Widget();
+    dummy_widget = new Widget("");
 
     ParamEditor::initialize_knob_states(
         dummy_widget,
@@ -1267,8 +1267,9 @@ void GUI::show()
 }
 
 
-WidgetBase::WidgetBase()
+WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
+    text(text),
     platform_widget(NULL),
     platform_data(NULL),
     bitmap(NULL),
@@ -1283,12 +1284,14 @@ WidgetBase::WidgetBase()
 
 
 WidgetBase::WidgetBase(
+        char const* const text,
         int const left,
         int const top,
         int const width,
         int const height,
         Type const type
 ) : type(type),
+    text(text),
     platform_widget(NULL),
     platform_data(NULL),
     bitmap(NULL),
@@ -1307,6 +1310,7 @@ WidgetBase::WidgetBase(
         GUI::PlatformWidget platform_widget,
         Type const type
 ) : type(type),
+    text(""),
     platform_widget(platform_widget),
     platform_data(platform_data),
     bitmap(NULL),

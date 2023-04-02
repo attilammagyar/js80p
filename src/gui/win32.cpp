@@ -263,8 +263,8 @@ LRESULT Widget::process_message(
 }
 
 
-Widget::Widget()
-    : WidgetBase(),
+Widget::Widget(char const* const text)
+    : WidgetBase(text),
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
@@ -289,16 +289,16 @@ Widget::Widget(
 
 
 Widget::Widget(
-        char const* const label,
+        char const* const text,
         int const left,
         int const top,
         int const width,
         int const height,
         Type const type
-) : WidgetBase(left, top, width, height, type),
+) : WidgetBase(text, left, top, width, height, type),
     hdc(NULL),
     class_name("STATIC"),
-    label(label),
+    text_text(text),
     dwStyle(0),
     original_window_procedure(NULL),
     is_mouse_captured(false),
@@ -343,7 +343,7 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     // TODO: GetLastError()
     HWND hwnd = CreateWindow(
         (LPCTSTR)class_name.get(),
-        (LPCTSTR)label.get(),
+        (LPCTSTR)text_text.get(),
         dwStyle,
         left,
         top,

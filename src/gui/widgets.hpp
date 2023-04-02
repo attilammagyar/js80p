@@ -46,7 +46,7 @@ class TransparentWidget : public Widget
 {
     public:
         TransparentWidget(
-            char const* const label,
+            char const* const text,
             int const left,
             int const top,
             int const width,
@@ -111,7 +111,7 @@ class TabBody : public TransparentWidget
         static constexpr int WIDTH = GUI::WIDTH;
         static constexpr int HEIGHT = GUI::HEIGHT - TOP;
 
-        TabBody(char const* const label);
+        TabBody(char const* const text);
 
         ParamEditor* own(ParamEditor* param_editor);
 
@@ -166,7 +166,7 @@ class TabSelector : public TransparentWidget
             Background* background,
             GUI::Bitmap bitmap,
             TabBody* tab_body,
-            char const* const label,
+            char const* const text,
             int const left
         );
 
@@ -221,7 +221,7 @@ class ControllerSelector : public Widget
 
                 Controller(
                     ControllerSelector& controller_selector,
-                    char const* const label,
+                    char const* const text,
                     int const left,
                     int const top,
                     Synth::ControllerId const controller_id
@@ -237,7 +237,6 @@ class ControllerSelector : public Widget
                 virtual bool mouse_leave(int const x, int const y) override;
 
             private:
-                char const* const label;
                 Synth::ControllerId const controller_id;
                 ControllerSelector& controller_selector;
                 bool is_selected;
@@ -269,7 +268,7 @@ class ParamEditor : public TransparentWidget
         static void free_knob_states(WidgetBase* widget);
 
         ParamEditor(
-            char const* const label,
+            char const* const text,
             int const left,
             int const top,
             ControllerSelector& controller_selector,
@@ -281,7 +280,7 @@ class ParamEditor : public TransparentWidget
         );
 
         ParamEditor(
-            char const* const label,
+            char const* const text,
             int const left,
             int const top,
             ControllerSelector& controller_selector,
@@ -352,7 +351,7 @@ class ParamEditor : public TransparentWidget
 
                 Knob(
                     ParamEditor& editor,
-                    char const* const label,
+                    char const* const text,
                     int const left,
                     int const top,
                     Number const steps
@@ -394,7 +393,6 @@ class ParamEditor : public TransparentWidget
 
         Synth::ParamId const param_id;
         char const* const format;
-        char const* const label;
         double const scale;
 
         char const* const* const options;

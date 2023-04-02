@@ -226,7 +226,7 @@ class WidgetBase
             BOLD = 1,
         };
 
-        WidgetBase();
+        WidgetBase(char const* const text);
         virtual ~WidgetBase();
 
         virtual GUI::Bitmap load_bitmap(
@@ -249,6 +249,7 @@ class WidgetBase
 
     protected:
         WidgetBase(
+            char const* const text,
             int const left,
             int const top,
             int const width,
@@ -414,6 +415,7 @@ class WidgetBase
         );
 
         Type const type;
+        char const* const text;
 
         GUI::Widgets children;
         GUI::PlatformWidget platform_widget;

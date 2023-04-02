@@ -29,7 +29,7 @@ namespace JS80P {
 class Widget : public WidgetBase
 {
     public:
-        Widget()
+        Widget(char const* const text) : WidgetBase(text)
         {
         }
 
@@ -52,13 +52,13 @@ class Widget : public WidgetBase
 
     protected:
         Widget(
-                char const* const label,
+                char const* const text,
                 int const left,
                 int const top,
                 int const width,
                 int const height,
                 Type const type
-        ) : WidgetBase(left, top, width, height, type)
+        ) : WidgetBase(text, left, top, width, height, type)
         {
         }
 
