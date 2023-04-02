@@ -100,14 +100,19 @@ class GUI
 
         static Controller const* get_controller(Synth::ControllerId const controller_id);
 
-        static Color rgb(
+        static constexpr Color rgb(
             ColorComponent const red,
             ColorComponent const green,
             ColorComponent const blue
         );
-        static ColorComponent red(Color const color);
-        static ColorComponent green(Color const color);
-        static ColorComponent blue(Color const color);
+        static constexpr ColorComponent red(Color const color);
+        static constexpr ColorComponent green(Color const color);
+        static constexpr ColorComponent blue(Color const color);
+
+        static Color const TEXT_COLOR;
+        static Color const TEXT_BACKGROUND;
+        static Color const TEXT_HIGHLIGHT_COLOR;
+        static Color const TEXT_HIGHLIGHT_BACKGROUND;
 
         static void refresh_param_editors(ParamEditors editors);
         static void refresh_controlled_param_editors(ParamEditors editors);

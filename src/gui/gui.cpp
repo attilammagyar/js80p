@@ -553,7 +553,7 @@ void GUI::initialize_controllers_by_id()
 }
 
 
-GUI::Color GUI::rgb(
+constexpr GUI::Color GUI::rgb(
         ColorComponent const red,
         ColorComponent const green,
         ColorComponent const blue
@@ -564,19 +564,25 @@ GUI::Color GUI::rgb(
 }
 
 
-GUI::ColorComponent GUI::red(Color const color)
+const GUI::Color GUI::TEXT_COLOR = GUI::rgb(181, 181, 189);
+const GUI::Color GUI::TEXT_BACKGROUND = GUI::rgb(0, 0, 0);
+const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(225, 225, 235);
+const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(63, 63, 66);
+
+
+constexpr GUI::ColorComponent GUI::red(Color const color)
 {
     return color >> 16;
 }
 
 
-GUI::ColorComponent GUI::green(Color const color)
+constexpr GUI::ColorComponent GUI::green(Color const color)
 {
     return color >> 8;
 }
 
 
-GUI::ColorComponent GUI::blue(Color const color)
+constexpr GUI::ColorComponent GUI::blue(Color const color)
 {
     return color;
 }

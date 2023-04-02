@@ -322,7 +322,7 @@ bool ControllerSelector::paint()
 {
     Widget::paint();
 
-    fill_rectangle(0, 0, width, height, GUI::rgb(0, 0, 0));
+    fill_rectangle(0, 0, width, height, GUI::TEXT_BACKGROUND);
     draw_text(
         title,
         12,
@@ -330,8 +330,8 @@ bool ControllerSelector::paint()
         0,
         WIDTH,
         TITLE_HEIGHT,
-        GUI::rgb(181, 181, 189),
-        GUI::rgb(0, 0, 0),
+        GUI::TEXT_COLOR,
+        GUI::TEXT_BACKGROUND,
         FontWeight::BOLD,
         10,
         TextAlignment::LEFT
@@ -379,14 +379,14 @@ bool ControllerSelector::Controller::paint()
     GUI::Color color;
 
     if (is_selected) {
-        background = GUI::rgb(181, 181, 189);
-        color = GUI::rgb(0, 0, 0);
+        background = GUI::TEXT_COLOR;
+        color = GUI::TEXT_BACKGROUND;
     } else if (is_mouse_over) {
-        background = GUI::rgb(63, 63, 66);
-        color = GUI::rgb(225, 225, 235);
+        background = GUI::TEXT_HIGHLIGHT_BACKGROUND;
+        color = GUI::TEXT_HIGHLIGHT_COLOR;
     } else {
-        background = GUI::rgb(0, 0, 0);
-        color = GUI::rgb(181, 181, 189);
+        background = GUI::TEXT_BACKGROUND;
+        color = GUI::TEXT_COLOR;
     }
 
     draw_text(
@@ -744,8 +744,8 @@ bool ParamEditor::paint()
         HEIGHT - 20,
         WIDTH - 2,
         20,
-        GUI::rgb(181, 181, 189),
-        GUI::rgb(0, 0, 0)
+        GUI::TEXT_COLOR,
+        GUI::TEXT_BACKGROUND
     );
 
     if (controller_choices > 0) {
@@ -756,8 +756,8 @@ bool ParamEditor::paint()
             HEIGHT - 36,
             WIDTH - 2,
             16,
-            has_controller_ ? GUI::rgb(0, 0, 0) : GUI::rgb(181, 181, 189),
-            has_controller_ ? GUI::rgb(145, 145, 151) : GUI::rgb(0, 0, 0),
+            has_controller_ ? GUI::TEXT_BACKGROUND : GUI::TEXT_COLOR,
+            has_controller_ ? GUI::rgb(145, 145, 151) : GUI::TEXT_BACKGROUND,
             has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
         );
     }
