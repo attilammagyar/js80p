@@ -342,17 +342,17 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 
     // TODO: GetLastError()
     HWND hwnd = CreateWindow(
-        (LPCTSTR)class_name.get(),
-        (LPCTSTR)text_text.get(),
-        dwStyle,
-        left,
-        top,
-        width,
-        height,
-        (HWND)parent->get_platform_widget(),
-        NULL,
-        (HINSTANCE)platform_data,
-        NULL
+        (LPCTSTR)class_name.get(),              // lpClassName
+        (LPCTSTR)text_text.get(),               // lpWindowName
+        dwStyle,                                // dwStyle
+        left,                                   // x
+        top,                                    // y
+        width,                                  // nWidth
+        height,                                 // nHeight
+        (HWND)parent->get_platform_widget(),    // hWndParent
+        NULL,                                   // hMenu
+        (HINSTANCE)platform_data,               // hInstance
+        NULL                                    // lpParam
     );
 
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
