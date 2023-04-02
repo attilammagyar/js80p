@@ -829,6 +829,8 @@ void GUI::build_about_body()
 
     background->own(about_body);
 
+    ((Widget*)about_body)->own(new AboutText());
+
     about_body->hide();
 }
 

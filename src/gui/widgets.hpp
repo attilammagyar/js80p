@@ -20,6 +20,8 @@
 #define JS80P__GUI__WIDGETS_HPP
 
 #include <cmath>
+#include <string>
+#include <vector>
 
 #include "js80p.hpp"
 #include "serializer.hpp"
@@ -410,6 +412,55 @@ class ParamEditor : public TransparentWidget
         char controller_str[TEXT_MAX_LENGTH];
         Synth::ControllerId controller_id;
         bool has_controller_;
+};
+
+
+class AboutText : public Widget
+{
+    public:
+        static constexpr int LEFT = 90;
+        static constexpr int TOP = 32;
+        static constexpr int WIDTH = 800;
+        static constexpr int HEIGHT = 420;
+
+        static constexpr int FONT_SIZE = 12;
+        static constexpr int TEXT_TOP = 15;
+        static constexpr int LINE_HEIGHT = 22;
+        static constexpr int EMPTY_LINE_HEIGHT = 10;
+        static constexpr int PADDING = 10;
+
+        static constexpr char const* TEXT = (
+            "JS80P\n"
+            "Copyright (C) 2023 Attila M. Magyar\n"
+            "https://github.com/attilammagyar/js80p\n"
+            "\n"
+            "License: GNU General Public License Version 3\n"
+            "https://www.gnu.org/licenses/gpl-3.0.en.html\n"
+            "\n"
+            "\n"
+            "Usage\n"
+            "\n"
+            "Move the cursor over a knob, and use the mouse wheel\n"
+            "for adjusting its value, or start dragging it.\n"
+            "\n"
+            "Hold down the \"Control\" key while adjusting a knob\n"
+            "for fine grained adjustments.\n"
+            "\n"
+            "Double click on a knob to reset it to its default value.\n"
+            "\n"
+            "Click on the area below a knob to assign a controller to it.\n"
+            "\n"
+            "It is recommended to use a small buffer size for lower latency,\n"
+            "for example, 128 or 256 samples.\n"
+        );
+
+        AboutText();
+
+    protected:
+        virtual bool paint() override;
+
+    private:
+        std::vector<std::string> lines;
 };
 
 }

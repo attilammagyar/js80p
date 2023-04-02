@@ -214,6 +214,7 @@ class WidgetBase
             PARAM_EDITOR = 7,
             TAB_BODY = 8,
             TAB_SELECTOR = 9,
+            TEXT_BOX = 10,
         };
 
         enum TextAlignment {

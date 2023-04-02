@@ -942,6 +942,53 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
     return true;
 }
 
+
+AboutText::AboutText() : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::TEXT_BOX)
+{
+    std::string line = "";
+
+    for (char const* c = TEXT; *c != '\x00'; ++c) {
+        if (*c == '\n') {
+            lines.push_back(line);
+            line = "";
+        } else {
+            line += *c;
+        }
+    }
+
+    lines.push_back(line);
+}
+
+
+bool AboutText::paint()
+{
+    Widget::paint();
+
+    fill_rectangle(0, 0, width, height, GUI::TEXT_BACKGROUND);
+
+    int top = TEXT_TOP;
+
+    for (std::vector<std::string>::const_iterator it = lines.begin(); it != lines.end(); ++it) {
+        draw_text(
+            it->c_str(),
+            FONT_SIZE,
+            0,
+            top,
+            width,
+            LINE_HEIGHT,
+            GUI::TEXT_COLOR,
+            GUI::TEXT_BACKGROUND,
+            FontWeight::NORMAL,
+            PADDING,
+            TextAlignment::CENTER
+        );
+
+        top += it->length() == 0 ? EMPTY_LINE_HEIGHT : LINE_HEIGHT;
+    }
+
+    return true;
+}
+
 }
 
 #endif
