@@ -558,13 +558,13 @@ void ParamEditor::complete_knob_state_initialization()
     }
 
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        int const left = i * Knob::WIDTH;
+        int const top = i * Knob::HEIGHT;
 
         knob_states_active[i] = copy_bitmap_region(
-            knob_states_active_bitmap, left, 0, Knob::WIDTH, Knob::HEIGHT
+            knob_states_active_bitmap, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
         knob_states_inactive[i] = copy_bitmap_region(
-            knob_states_inactive_bitmap, left, 0, Knob::WIDTH, Knob::HEIGHT
+            knob_states_inactive_bitmap, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
     }
 

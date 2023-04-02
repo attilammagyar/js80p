@@ -45,7 +45,7 @@ def main(argv):
 
     knob_bg.alpha_composite(overlay, (0, 0), (0, 0, width, height))
 
-    knob_states = Image.new("RGB", (width * stages, height), (0, 0, 0))
+    knob_states = Image.new("RGB", (width, height * stages), (0, 0, 0))
     knob_states_canvas = ImageDraw.Draw(knob_states)
     glow_color = glow_color_1
 
@@ -104,10 +104,10 @@ def main(argv):
             1.0
         )
 
-        knob_states.paste(knob.copy(), (width * i, 0, width * i + width, height))
+        knob_states.paste(knob.copy(), (0, height * i, width, height * (i + 1)))
 
     knob_states = knob_states.resize(
-        (int(width / 5) * stages, int(height / 5)), Image.BICUBIC
+        (int(width / 5), int(height / 5) * stages), Image.BICUBIC
     )
     knob_states.save(
         os.path.join(os.path.dirname(argv[0]), "../gui/knob_states.png")
