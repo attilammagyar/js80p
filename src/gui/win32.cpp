@@ -425,7 +425,7 @@ void Widget::draw_text(
         ANSI_CHARSET,                   // iCharSet
         OUT_DEFAULT_PRECIS,             // iOutPrecision
         CLIP_DEFAULT_PRECIS,            // iClipPrecision
-        DEFAULT_QUALITY,                // iQuality
+        ANTIALIASED_QUALITY,            // iQuality
         DEFAULT_PITCH | FF_DONTCARE,    // iPitchAndFamily
         TEXT("Arial")                   // pszFaceName
     );
