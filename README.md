@@ -120,7 +120,9 @@ Development
  * [An Introduction To Frequency Modulation from Sound on Sound](https://www.soundonsound.com/techniques/introduction-frequency-modulation)
 
  * [Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time Convolution
-   by Julian D. Parker, Vadim Zavalishin, Efflam Le Bivic](https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf)
+   by Julian D. Parker, Vadim Zavalishin, Efflam Le
+   Bivic](https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf)
+   (a.k.a. Antiderivative Antialiasing, ADAA)
 
  * [Freeverb (by Jezar at Dreampoint) explained in Physical Audio Signal Processing, by Julius O. Smith III](https://ccrma.stanford.edu/~jos/pasp/Freeverb.html)
 
