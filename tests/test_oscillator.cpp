@@ -219,7 +219,8 @@ void assert_oscillator_output_is_close_to_reference(
         Frequency const sample_rate,
         Integer const block_size,
         Integer const rounds,
-        Number const tolerance
+        Number const tolerance,
+        SimpleOscillator::Waveform const waveform = SimpleOscillator::SINE
 ) {
     Integer const sample_count = rounds * block_size;
     Sample expected_samples[sample_count];
@@ -237,7 +238,12 @@ void assert_oscillator_output_is_close_to_reference(
     );
 
     assert_close(
-        expected_samples, rendered_samples.samples[0], sample_count, tolerance
+        expected_samples,
+        rendered_samples.samples[0],
+        sample_count,
+        tolerance,
+        "waveform=%d",
+        (int)waveform
     );
 }
 
@@ -261,7 +267,7 @@ void test_basic_waveform(
     oscillator.frequency.set_value(frequency);
 
     assert_oscillator_output_is_close_to_reference(
-        reference, oscillator, sample_rate, block_size, rounds, tolerance
+        reference, oscillator, sample_rate, block_size, rounds, tolerance, waveform
     );
 }
 
