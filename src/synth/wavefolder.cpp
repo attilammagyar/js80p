@@ -229,15 +229,15 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
     Sample const folding_times_input_sample = folding * input_sample;
     Sample const delta = folding_times_input_sample - previous_input_sample;
 
-    if (UNLIKELY(std::fabs(delta) < 0.00000001)) {
+    if (UNLIKELY(std::fabs(delta) < 0.000001)) {
         /*
         We're supposed to calculate f for the average of the two samples here,
-        but the numerical approximation of f(x) via its antiderivative F0(x) has
-        quite a noticable error near the zeros of the derivative of f(x), and
-        when two very close input samples fall into those regions, then
-        using f would produce audible discontinuities. So instead, we pretend
-        that we encountered the exact same sample value again, which, when
-        folded, should produce the same output sample as last time.
+        but the numerical approximation of our f(x) via its antiderivative
+        F0(x) has quite a noticable error near the zeros of the derivative of
+        f(x), and when two very close input samples fall into those regions,
+        then using f would produce audible discontinuities. So instead, we
+        pretend that we encountered the exact same sample value again, which,
+        when folded, should produce the same output sample as last time.
         */
 
         return previous_output_sample;
