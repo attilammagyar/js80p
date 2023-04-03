@@ -631,17 +631,22 @@ void Synth::control_change(
         Midi::Controller const controller,
         Number const new_value
 ) noexcept {
+    if (!is_known_midi_controller(controller)) {
+        return;
+    }
+
+    midi_controllers_rw[controller]->change(time_offset, new_value);
+}
+
+
+bool Synth::is_known_midi_controller(
+        Midi::Controller const controller
+) const noexcept {
     if (controller > MIDI_CONTROLLERS) {
-        return;
+        return false;
     }
 
-    MidiController* const midi_controller = midi_controllers_rw[controller];
-
-    if (midi_controller == NULL) {
-        return;
-    }
-
-    midi_controller->change(time_offset, new_value);
+    return midi_controllers_rw[controller] != NULL;
 }
 
 

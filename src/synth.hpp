@@ -622,6 +622,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset, Midi::Channel const channel
         ) noexcept;
 
+        bool is_known_midi_controller(
+            Midi::Controller const controller
+        ) const noexcept;
+
         ModeParam mode;
         FloatParam modulator_add_volume;
         FloatParam phase_modulation_level;
