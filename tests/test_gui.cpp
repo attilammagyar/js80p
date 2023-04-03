@@ -50,7 +50,7 @@ void assert_ratio_as_str(
     char buffer[buffer_size];
 
     GUI::param_ratio_to_str(
-        synth,
+        &synth,
         param_id,
         ratio,
         scale,
@@ -113,6 +113,6 @@ TEST(clamp_ratio, {
 
 
 TEST(gui_initialization, {
-    GUI gui(NULL, NULL, synth);
+    GUI gui(NULL, NULL, &synth);
     gui.show();
 })

@@ -118,7 +118,7 @@ class GUI
         static void refresh_controlled_param_editors(ParamEditors editors);
 
         static void param_ratio_to_str(
-            Synth& synth,
+            Synth* synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -134,7 +134,7 @@ class GUI
         GUI(
             PlatformData platform_data,
             PlatformWidget parent_window,
-            Synth& synth
+            Synth* synth
         );
 
         ~GUI();
@@ -145,7 +145,7 @@ class GUI
         static void initialize_controllers_by_id();
 
         static void param_ratio_to_str_float(
-            Synth& synth,
+            Synth* synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -154,7 +154,7 @@ class GUI
             size_t const buffer_size
         );
         static void param_ratio_to_str_int(
-            Synth& synth,
+            Synth* synth,
             Synth::ParamId const param_id,
             Number const ratio,
             char const* const* const options,
@@ -191,7 +191,7 @@ class GUI
         TabBody* lfos_body;
         TabBody* synth_body;
 
-        Synth& synth;
+        Synth* synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
 };

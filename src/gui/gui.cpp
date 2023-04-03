@@ -609,7 +609,7 @@ void GUI::refresh_controlled_param_editors(ParamEditors param_editors)
 
 
 void GUI::param_ratio_to_str(
-        Synth& synth,
+        Synth* synth,
         Synth::ParamId const param_id,
         Number const ratio,
         Number const scale,
@@ -634,7 +634,7 @@ void GUI::param_ratio_to_str(
 
 
 void GUI::param_ratio_to_str_float(
-        Synth& synth,
+        Synth* synth,
         Synth::ParamId const param_id,
         Number const ratio,
         Number const scale,
@@ -643,7 +643,7 @@ void GUI::param_ratio_to_str_float(
         size_t const buffer_size
 ) {
     Number const value = (
-        synth.float_param_ratio_to_display_value(param_id, ratio) * scale
+        synth->float_param_ratio_to_display_value(param_id, ratio) * scale
     );
 
     snprintf(buffer, buffer_size, format, value);
@@ -667,7 +667,7 @@ void GUI::param_ratio_to_str_float(
 
 
 void GUI::param_ratio_to_str_int(
-        Synth& synth,
+        Synth* synth,
         Synth::ParamId const param_id,
         Number const ratio,
         char const* const* const options,
@@ -676,7 +676,7 @@ void GUI::param_ratio_to_str_int(
         size_t const buffer_size
 ) {
     Byte const value = (
-        synth.int_param_ratio_to_display_value(param_id, ratio)
+        synth->int_param_ratio_to_display_value(param_id, ratio)
     );
 
     if (((int)value >= number_of_options) || ((int)value < 0)) {
@@ -717,7 +717,7 @@ Number GUI::clamp_ratio(Number const ratio)
 GUI::GUI(
         JS80P::GUI::PlatformData platform_data,
         JS80P::GUI::PlatformWidget parent_window,
-        Synth& synth
+        Synth* synth
 )
     : dummy_widget(NULL),
     background(NULL),

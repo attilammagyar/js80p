@@ -29,7 +29,7 @@
 namespace JS80P
 {
 
-std::string Serializer::serialize(Synth const& synth) noexcept
+std::string Serializer::serialize(Synth const* synth) noexcept
 {
     constexpr size_t line_size = 128;
     char line[line_size];
@@ -37,7 +37,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
-        std::string const param_name = synth.get_param_name(param_id);
+        std::string const param_name = synth->get_param_name(param_id);
 
         if (param_name.length() > 0) {
             snprintf(
@@ -45,7 +45,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
                 line_size,
                 "%s = %.15f\r\n",
                 param_name.c_str(),
-                synth.get_param_ratio_atomic(param_id)
+                synth->get_param_ratio_atomic(param_id)
             );
             serialized += line;
 
@@ -55,7 +55,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
                 "%sctl = %.15f\r\n",
                 param_name.c_str(),
                 controller_id_to_float(
-                    synth.get_param_controller_id_atomic(param_id)
+                    synth->get_param_controller_id_atomic(param_id)
                 )
             );
             serialized += line;
@@ -82,7 +82,7 @@ Synth::ControllerId Serializer::float_to_controller_id(
 }
 
 
-void Serializer::import(Synth& synth, std::string const& serialized) noexcept
+void Serializer::import(Synth* synth, std::string const& serialized) noexcept
 {
     reset_all_params_to_default(synth);
     std::vector<std::string>* lines = parse_lines(serialized);
@@ -92,18 +92,18 @@ void Serializer::import(Synth& synth, std::string const& serialized) noexcept
 }
 
 
-void Serializer::reset_all_params_to_default(Synth& synth) noexcept
+void Serializer::reset_all_params_to_default(Synth* synth) noexcept
 {
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
 
-        synth.push_message(
+        synth->push_message(
             Synth::MessageType::SET_PARAM,
             param_id,
-            synth.get_param_default_ratio(param_id),
+            synth->get_param_default_ratio(param_id),
             0
         );
-        synth.push_message(
+        synth->push_message(
             Synth::MessageType::ASSIGN_CONTROLLER,
             param_id,
             0,
@@ -202,7 +202,7 @@ bool Serializer::is_section_name_char(char const c) noexcept
 }
 
 
-void Serializer::process_lines(Synth& synth, std::vector<std::string>* lines) noexcept
+void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) noexcept
 {
     char section_name[7];
     bool inside_js80p_section = false;
@@ -270,7 +270,7 @@ bool Serializer::parse_section_name(
 }
 
 
-void Serializer::process_line(Synth& synth, std::string const line) noexcept
+void Serializer::process_line(Synth* synth, std::string const line) noexcept
 {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
@@ -293,7 +293,7 @@ void Serializer::process_line(Synth& synth, std::string const line) noexcept
         return;
     }
 
-    param_id = synth.get_param_id(param_name);
+    param_id = synth->get_param_id(param_name);
     is_controller_assignment = strncmp(suffix, "ctl", 4) == 0;
 
     if (
@@ -304,14 +304,14 @@ void Serializer::process_line(Synth& synth, std::string const line) noexcept
     }
 
     if (is_controller_assignment) {
-        synth.push_message(
+        synth->push_message(
             Synth::MessageType::ASSIGN_CONTROLLER,
             param_id,
             0.0,
             (Byte)float_to_controller_id(number)
         );
     } else {
-        synth.push_message(Synth::MessageType::SET_PARAM, param_id, number, 0);
+        synth->push_message(Synth::MessageType::SET_PARAM, param_id, number, 0);
     }
 }
 

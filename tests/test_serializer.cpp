@@ -111,8 +111,8 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
     synth_2.process_messages();
 
-    serialized = serializer.serialize(synth_1);
-    serializer.import(synth_2, serialized);
+    serialized = serializer.serialize(&synth_1);
+    serializer.import(&synth_2, serialized);
     synth_2.process_messages();
 
     assert_in("\r\nPM = 0.123", serialized);
@@ -154,7 +154,7 @@ TEST(importing_a_patch_ignores_comments_and_whitespace_and_unknown_sections, {
         "PM = 0.123\n"
     );
 
-    serializer.import(synth, patch);
+    serializer.import(&synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -203,7 +203,7 @@ TEST(importing_a_patch_ignores_invalid_lines_and_unknown_sections, {
         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA = 0.83\n"
     );
 
-    serializer.import(synth, patch);
+    serializer.import(&synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -242,7 +242,7 @@ TEST(importing_a_patch_does_not_require_terminating_new_line, {
         "PM = 0.42"
     );
 
-    serializer.import(synth, patch);
+    serializer.import(&synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -259,7 +259,7 @@ TEST(imported_values_are_clamped, {
         "PM = 2.1\n"
     );
 
-    serializer.import(synth, patch);
+    serializer.import(&synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -293,7 +293,7 @@ TEST(extremely_long_lines_may_be_truncated, {
         "MVOL = 0.42\n"
         "CVOL = 0.123\n"
     );
-    serializer.import(synth, patch);
+    serializer.import(&synth, patch);
     synth.process_messages();
 
     assert_eq(

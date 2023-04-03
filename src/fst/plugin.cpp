@@ -331,7 +331,7 @@ void FstPlugin::generate_and_add_samples(
 
 VstIntPtr FstPlugin::get_chunk(void** chunk) noexcept
 {
-    serialized = Serializer::serialize(synth);
+    serialized = Serializer::serialize(&synth);
 
     *chunk = (void*)serialized.c_str();
 
@@ -344,7 +344,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
     std::string serialized((char const*)chunk, (std::string::size_type)size);
 
     synth.process_messages();
-    Serializer::import(synth, serialized);
+    Serializer::import(&synth, serialized);
     synth.process_messages();
 }
 
@@ -352,7 +352,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {
     close_gui();
-    gui = new GUI(platform_data, parent_window, synth);
+    gui = new GUI(platform_data, parent_window, &synth);
     gui->show();
 }
 
