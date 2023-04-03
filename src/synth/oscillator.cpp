@@ -386,15 +386,23 @@ void Oscillator<ModulatorSignalProducerClass, positive>::skip_round(
     }
 
     if (UNLIKELY(is_starting)) {
-        is_starting = false;
-        Wavetable::reset_state(
-            wavetable_state,
-            sampling_period,
-            nyquist_frequency,
-            frequency.get_value(),
-            start_time_offset
-        );
+        initialize_first_round(frequency.get_value());
     }
+}
+
+
+template<class ModulatorSignalProducerClass, bool positive>
+void Oscillator<ModulatorSignalProducerClass, positive>::initialize_first_round(
+        Frequency const frequency
+) noexcept {
+    is_starting = false;
+    Wavetable::reset_state(
+        wavetable_state,
+        sampling_period,
+        nyquist_frequency,
+        frequency,
+        start_time_offset
+    );
 }
 
 
@@ -725,14 +733,7 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_fr
         Sample** buffer
 ) noexcept {
     if (UNLIKELY(is_starting)) {
-        is_starting = false;
-        Wavetable::reset_state(
-            wavetable_state,
-            sampling_period,
-            nyquist_frequency,
-            computed_frequency_value,
-            start_time_offset
-        );
+        initialize_first_round(computed_frequency_value);
     }
 
     if (computed_amplitude_is_constant) {
@@ -777,14 +778,7 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_fr
         Sample** buffer
 ) noexcept {
     if (UNLIKELY(is_starting)) {
-        is_starting = false;
-        Wavetable::reset_state(
-            wavetable_state,
-            sampling_period,
-            nyquist_frequency,
-            computed_frequency_buffer[first_sample_index],
-            start_time_offset
-        );
+        initialize_first_round(computed_frequency_buffer[first_sample_index]);
     }
 
     Frequency const* const computed_frequency_buffer = (

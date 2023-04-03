@@ -193,6 +193,8 @@ class Oscillator : public SignalProducer
         void handle_start_event(Event const& event) noexcept;
         void handle_stop_event(Event const& event) noexcept;
 
+        void initialize_first_round(Frequency const frequency) noexcept;
+
         void render_with_constant_frequency(
             Integer const round,
             Integer const first_sample_index,
