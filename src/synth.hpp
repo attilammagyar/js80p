@@ -65,7 +65,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
         static constexpr Integer ENVELOPES = 6;
-        static constexpr Integer MIDI_CONTROLLERS = 120;
+        static constexpr Integer MIDI_CONTROLLERS = 128;
         static constexpr Integer FLEXIBLE_CONTROLLERS = 10;
         static constexpr Integer LFOS = 8;
 
@@ -402,105 +402,105 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLOAT_PARAMS = 255;
 
         enum ControllerId {
-            NONE = Midi::NONE,                              ///< None
-            MODULATION_WHEEL = Midi::MODULATION_WHEEL,      ///< Modulation Wheel (CC 1)
-            BREATH = Midi::BREATH,                          ///< Breath (CC 2)
-            UNDEFINED_1 = Midi::UNDEFINED_1,                ///< Undefined (CC 3)
-            FOOT_PEDAL = Midi::FOOT_PEDAL,                  ///< Foot Pedal (CC 4)
-            PORTAMENTO_TIME = Midi::PORTAMENTO_TIME,        ///< Portamento Time (CC 5)
-            VOLUME = Midi::VOLUME,                          ///< Volume (CC 7)
-            BALANCE = Midi::BALANCE,                        ///< Balance (CC 8)
-            UNDEFINED_2 = Midi::UNDEFINED_2,                ///< Undefined (CC 9)
-            PAN = Midi::PAN,                                ///< Pan (CC 10)
-            EXPRESSION_PEDAL = Midi::EXPRESSION_PEDAL,      ///< Expression Pedal (CC 11)
-            FX_CTL_1 = Midi::FX_CTL_1,                      ///< Effect Control 1 (CC 12)
-            FX_CTL_2 = Midi::FX_CTL_2,                      ///< Effect Control 2 (CC 13)
-            UNDEFINED_3 = Midi::UNDEFINED_3,                ///< Undefined (CC 14)
-            UNDEFINED_4 = Midi::UNDEFINED_4,                ///< Undefined (CC 15)
-            GENERAL_1 = Midi::GENERAL_1,                    ///< General (CC 16)
-            GENERAL_2 = Midi::GENERAL_2,                    ///< General (CC 17)
-            GENERAL_3 = Midi::GENERAL_3,                    ///< General (CC 18)
-            GENERAL_4 = Midi::GENERAL_4,                    ///< General (CC 19)
-            UNDEFINED_5 = Midi::UNDEFINED_5,                ///< Undefined (CC 20)
-            UNDEFINED_6 = Midi::UNDEFINED_6,                ///< Undefined (CC 21)
-            UNDEFINED_7 = Midi::UNDEFINED_7,                ///< Undefined (CC 22)
-            UNDEFINED_8 = Midi::UNDEFINED_8,                ///< Undefined (CC 23)
-            UNDEFINED_9 = Midi::UNDEFINED_9,                ///< Undefined (CC 24)
-            UNDEFINED_10 = Midi::UNDEFINED_10,              ///< Undefined (CC 25)
-            UNDEFINED_11 = Midi::UNDEFINED_11,              ///< Undefined (CC 26)
-            UNDEFINED_12 = Midi::UNDEFINED_12,              ///< Undefined (CC 27)
-            UNDEFINED_13 = Midi::UNDEFINED_13,              ///< Undefined (CC 28)
-            UNDEFINED_14 = Midi::UNDEFINED_14,              ///< Undefined (CC 29)
-            UNDEFINED_15 = Midi::UNDEFINED_15,              ///< Undefined (CC 30)
-            UNDEFINED_16 = Midi::UNDEFINED_16,              ///< Undefined (CC 31)
-            PORTAMENTO_AMOUNT = Midi::PORTAMENTO_AMOUNT,    ///< Portamento (CC 84)
-            SOUND_1 = Midi::SOUND_1,                        ///< Sound 1 (CC 70)
-            SOUND_2 = Midi::SOUND_2,                        ///< Sound 2 (CC 71)
-            SOUND_3 = Midi::SOUND_3,                        ///< Sound 3 (CC 72)
-            SOUND_4 = Midi::SOUND_4,                        ///< Sound 4 (CC 73)
-            SOUND_5 = Midi::SOUND_5,                        ///< Sound 5 (CC 74)
-            SOUND_6 = Midi::SOUND_6,                        ///< Sound 6 (CC 75)
-            SOUND_7 = Midi::SOUND_7,                        ///< Sound 7 (CC 76)
-            SOUND_8 = Midi::SOUND_8,                        ///< Sound 8 (CC 77)
-            SOUND_9 = Midi::SOUND_9,                        ///< Sound 9 (CC 78)
-            SOUND_10 = Midi::SOUND_10,                      ///< Sound 10 (CC 79)
-            UNDEFINED_17 = Midi::UNDEFINED_17,              ///< Undefined (CC 85)
-            UNDEFINED_18 = Midi::UNDEFINED_18,              ///< Undefined (CC 86)
-            UNDEFINED_19 = Midi::UNDEFINED_19,              ///< Undefined (CC 87)
-            UNDEFINED_20 = Midi::UNDEFINED_20,              ///< Undefined (CC 89)
-            UNDEFINED_21 = Midi::UNDEFINED_21,              ///< Undefined (CC 90)
-            FX_1 = Midi::FX_1,                              ///< Effect 1 (CC 91)
-            FX_2 = Midi::FX_2,                              ///< Effect 2 (CC 92)
-            FX_3 = Midi::FX_3,                              ///< Effect 3 (CC 93)
-            FX_4 = Midi::FX_4,                              ///< Effect 4 (CC 94)
-            FX_5 = Midi::FX_5,                              ///< Effect 5 (CC 95)
-            UNDEFINED_22 = Midi::UNDEFINED_22,              ///< Undefined (CC 102)
-            UNDEFINED_23 = Midi::UNDEFINED_23,              ///< Undefined (CC 103)
-            UNDEFINED_24 = Midi::UNDEFINED_24,              ///< Undefined (CC 104)
-            UNDEFINED_25 = Midi::UNDEFINED_25,              ///< Undefined (CC 105)
-            UNDEFINED_26 = Midi::UNDEFINED_26,              ///< Undefined (CC 106)
-            UNDEFINED_27 = Midi::UNDEFINED_27,              ///< Undefined (CC 107)
-            UNDEFINED_28 = Midi::UNDEFINED_28,              ///< Undefined (CC 108)
-            UNDEFINED_29 = Midi::UNDEFINED_29,              ///< Undefined (CC 109)
-            UNDEFINED_30 = Midi::UNDEFINED_30,              ///< Undefined (CC 110)
-            UNDEFINED_31 = Midi::UNDEFINED_31,              ///< Undefined (CC 111)
-            UNDEFINED_32 = Midi::UNDEFINED_32,              ///< Undefined (CC 112)
-            UNDEFINED_33 = Midi::UNDEFINED_33,              ///< Undefined (CC 113)
-            UNDEFINED_34 = Midi::UNDEFINED_34,              ///< Undefined (CC 114)
-            UNDEFINED_35 = Midi::UNDEFINED_35,              ///< Undefined (CC 115)
-            UNDEFINED_36 = Midi::UNDEFINED_36,              ///< Undefined (CC 116)
-            UNDEFINED_37 = Midi::UNDEFINED_37,              ///< Undefined (CC 117)
-            UNDEFINED_38 = Midi::UNDEFINED_38,              ///< Undefined (CC 118)
-            UNDEFINED_39 = Midi::UNDEFINED_39,              ///< Undefined (CC 119)
-            PITCH_WHEEL = 128,                              ///< Pitch Wheel
-            NOTE = 129,                                     ///< Note
-            VELOCITY = 130,                                 ///< Velocity
-            FLEXIBLE_CONTROLLER_1 = 131,                    ///< Flexible Controller 1
-            FLEXIBLE_CONTROLLER_2 = 132,                    ///< Flexible Controller 2
-            FLEXIBLE_CONTROLLER_3 = 133,                    ///< Flexible Controller 3
-            FLEXIBLE_CONTROLLER_4 = 134,                    ///< Flexible Controller 4
-            FLEXIBLE_CONTROLLER_5 = 135,                    ///< Flexible Controller 5
-            FLEXIBLE_CONTROLLER_6 = 136,                    ///< Flexible Controller 6
-            FLEXIBLE_CONTROLLER_7 = 137,                    ///< Flexible Controller 7
-            FLEXIBLE_CONTROLLER_8 = 138,                    ///< Flexible Controller 8
-            FLEXIBLE_CONTROLLER_9 = 139,                    ///< Flexible Controller 9
-            FLEXIBLE_CONTROLLER_10 = 140,                   ///< Flexible Controller 10
-            LFO_1 = 141,                                    ///< LFO 1
-            LFO_2 = 142,                                    ///< LFO 2
-            LFO_3 = 143,                                    ///< LFO 3
-            LFO_4 = 144,                                    ///< LFO 4
-            LFO_5 = 145,                                    ///< LFO 5
-            LFO_6 = 146,                                    ///< LFO 6
-            LFO_7 = 147,                                    ///< LFO 7
-            LFO_8 = 148,                                    ///< LFO 8
-            ENVELOPE_1 = 149,                               ///< Envelope 1
-            ENVELOPE_2 = 150,                               ///< Envelope 2
-            ENVELOPE_3 = 151,                               ///< Envelope 3
-            ENVELOPE_4 = 152,                               ///< Envelope 4
-            ENVELOPE_5 = 153,                               ///< Envelope 5
-            ENVELOPE_6 = 154,                               ///< Envelope 6
+            NONE =                      Midi::NONE,                 ///< None
+            MODULATION_WHEEL =          Midi::MODULATION_WHEEL,     ///< Modulation Wheel (CC 1)
+            BREATH =                    Midi::BREATH,               ///< Breath (CC 2)
+            UNDEFINED_1 =               Midi::UNDEFINED_1,          ///< Undefined (CC 3)
+            FOOT_PEDAL =                Midi::FOOT_PEDAL,           ///< Foot Pedal (CC 4)
+            PORTAMENTO_TIME =           Midi::PORTAMENTO_TIME,      ///< Portamento Time (CC 5)
+            VOLUME =                    Midi::VOLUME,               ///< Volume (CC 7)
+            BALANCE =                   Midi::BALANCE,              ///< Balance (CC 8)
+            UNDEFINED_2 =               Midi::UNDEFINED_2,          ///< Undefined (CC 9)
+            PAN =                       Midi::PAN,                  ///< Pan (CC 10)
+            EXPRESSION_PEDAL =          Midi::EXPRESSION_PEDAL,     ///< Expression Pedal (CC 11)
+            FX_CTL_1 =                  Midi::FX_CTL_1,             ///< Effect Control 1 (CC 12)
+            FX_CTL_2 =                  Midi::FX_CTL_2,             ///< Effect Control 2 (CC 13)
+            UNDEFINED_3 =               Midi::UNDEFINED_3,          ///< Undefined (CC 14)
+            UNDEFINED_4 =               Midi::UNDEFINED_4,          ///< Undefined (CC 15)
+            GENERAL_1 =                 Midi::GENERAL_1,            ///< General 1 (CC 16)
+            GENERAL_2 =                 Midi::GENERAL_2,            ///< General 2 (CC 17)
+            GENERAL_3 =                 Midi::GENERAL_3,            ///< General 3 (CC 18)
+            GENERAL_4 =                 Midi::GENERAL_4,            ///< General 4 (CC 19)
+            UNDEFINED_5 =               Midi::UNDEFINED_5,          ///< Undefined (CC 20)
+            UNDEFINED_6 =               Midi::UNDEFINED_6,          ///< Undefined (CC 21)
+            UNDEFINED_7 =               Midi::UNDEFINED_7,          ///< Undefined (CC 22)
+            UNDEFINED_8 =               Midi::UNDEFINED_8,          ///< Undefined (CC 23)
+            UNDEFINED_9 =               Midi::UNDEFINED_9,          ///< Undefined (CC 24)
+            UNDEFINED_10 =              Midi::UNDEFINED_10,         ///< Undefined (CC 25)
+            UNDEFINED_11 =              Midi::UNDEFINED_11,         ///< Undefined (CC 26)
+            UNDEFINED_12 =              Midi::UNDEFINED_12,         ///< Undefined (CC 27)
+            UNDEFINED_13 =              Midi::UNDEFINED_13,         ///< Undefined (CC 28)
+            UNDEFINED_14 =              Midi::UNDEFINED_14,         ///< Undefined (CC 29)
+            UNDEFINED_15 =              Midi::UNDEFINED_15,         ///< Undefined (CC 30)
+            UNDEFINED_16 =              Midi::UNDEFINED_16,         ///< Undefined (CC 31)
+            PORTAMENTO_AMOUNT =         Midi::PORTAMENTO_AMOUNT,    ///< Portamento (CC 84)
+            SOUND_1 =                   Midi::SOUND_1,              ///< Sound 1 (CC 70)
+            SOUND_2 =                   Midi::SOUND_2,              ///< Sound 2 (CC 71)
+            SOUND_3 =                   Midi::SOUND_3,              ///< Sound 3 (CC 72)
+            SOUND_4 =                   Midi::SOUND_4,              ///< Sound 4 (CC 73)
+            SOUND_5 =                   Midi::SOUND_5,              ///< Sound 5 (CC 74)
+            SOUND_6 =                   Midi::SOUND_6,              ///< Sound 6 (CC 75)
+            SOUND_7 =                   Midi::SOUND_7,              ///< Sound 7 (CC 76)
+            SOUND_8 =                   Midi::SOUND_8,              ///< Sound 8 (CC 77)
+            SOUND_9 =                   Midi::SOUND_9,              ///< Sound 9 (CC 78)
+            SOUND_10 =                  Midi::SOUND_10,             ///< Sound 10 (CC 79)
+            UNDEFINED_17 =              Midi::UNDEFINED_17,         ///< Undefined (CC 85)
+            UNDEFINED_18 =              Midi::UNDEFINED_18,         ///< Undefined (CC 86)
+            UNDEFINED_19 =              Midi::UNDEFINED_19,         ///< Undefined (CC 87)
+            UNDEFINED_20 =              Midi::UNDEFINED_20,         ///< Undefined (CC 89)
+            UNDEFINED_21 =              Midi::UNDEFINED_21,         ///< Undefined (CC 90)
+            FX_1 =                      Midi::FX_1,                 ///< Effect 1 (CC 91)
+            FX_2 =                      Midi::FX_2,                 ///< Effect 2 (CC 92)
+            FX_3 =                      Midi::FX_3,                 ///< Effect 3 (CC 93)
+            FX_4 =                      Midi::FX_4,                 ///< Effect 4 (CC 94)
+            FX_5 =                      Midi::FX_5,                 ///< Effect 5 (CC 95)
+            UNDEFINED_22 =              Midi::UNDEFINED_22,         ///< Undefined (CC 102)
+            UNDEFINED_23 =              Midi::UNDEFINED_23,         ///< Undefined (CC 103)
+            UNDEFINED_24 =              Midi::UNDEFINED_24,         ///< Undefined (CC 104)
+            UNDEFINED_25 =              Midi::UNDEFINED_25,         ///< Undefined (CC 105)
+            UNDEFINED_26 =              Midi::UNDEFINED_26,         ///< Undefined (CC 106)
+            UNDEFINED_27 =              Midi::UNDEFINED_27,         ///< Undefined (CC 107)
+            UNDEFINED_28 =              Midi::UNDEFINED_28,         ///< Undefined (CC 108)
+            UNDEFINED_29 =              Midi::UNDEFINED_29,         ///< Undefined (CC 109)
+            UNDEFINED_30 =              Midi::UNDEFINED_30,         ///< Undefined (CC 110)
+            UNDEFINED_31 =              Midi::UNDEFINED_31,         ///< Undefined (CC 111)
+            UNDEFINED_32 =              Midi::UNDEFINED_32,         ///< Undefined (CC 112)
+            UNDEFINED_33 =              Midi::UNDEFINED_33,         ///< Undefined (CC 113)
+            UNDEFINED_34 =              Midi::UNDEFINED_34,         ///< Undefined (CC 114)
+            UNDEFINED_35 =              Midi::UNDEFINED_35,         ///< Undefined (CC 115)
+            UNDEFINED_36 =              Midi::UNDEFINED_36,         ///< Undefined (CC 116)
+            UNDEFINED_37 =              Midi::UNDEFINED_37,         ///< Undefined (CC 117)
+            UNDEFINED_38 =              Midi::UNDEFINED_38,         ///< Undefined (CC 118)
+            UNDEFINED_39 =              Midi::UNDEFINED_39,         ///< Undefined (CC 119)
+            PITCH_WHEEL =               128,                        ///< Pitch Wheel
+            NOTE =                      129,                        ///< Note
+            VELOCITY =                  130,                        ///< Velocity
+            FLEXIBLE_CONTROLLER_1 =     131,                        ///< Flexible Controller 1
+            FLEXIBLE_CONTROLLER_2 =     132,                        ///< Flexible Controller 2
+            FLEXIBLE_CONTROLLER_3 =     133,                        ///< Flexible Controller 3
+            FLEXIBLE_CONTROLLER_4 =     134,                        ///< Flexible Controller 4
+            FLEXIBLE_CONTROLLER_5 =     135,                        ///< Flexible Controller 5
+            FLEXIBLE_CONTROLLER_6 =     136,                        ///< Flexible Controller 6
+            FLEXIBLE_CONTROLLER_7 =     137,                        ///< Flexible Controller 7
+            FLEXIBLE_CONTROLLER_8 =     138,                        ///< Flexible Controller 8
+            FLEXIBLE_CONTROLLER_9 =     139,                        ///< Flexible Controller 9
+            FLEXIBLE_CONTROLLER_10 =    140,                        ///< Flexible Controller 10
+            LFO_1 =                     141,                        ///< LFO 1
+            LFO_2 =                     142,                        ///< LFO 2
+            LFO_3 =                     143,                        ///< LFO 3
+            LFO_4 =                     144,                        ///< LFO 4
+            LFO_5 =                     145,                        ///< LFO 5
+            LFO_6 =                     146,                        ///< LFO 6
+            LFO_7 =                     147,                        ///< LFO 7
+            LFO_8 =                     148,                        ///< LFO 8
+            ENVELOPE_1 =                149,                        ///< Envelope 1
+            ENVELOPE_2 =                150,                        ///< Envelope 2
+            ENVELOPE_3 =                151,                        ///< Envelope 3
+            ENVELOPE_4 =                152,                        ///< Envelope 4
+            ENVELOPE_5 =                153,                        ///< Envelope 5
+            ENVELOPE_6 =                154,                        ///< Envelope 6
 
-            MAX_CONTROLLER_ID = 155,
+            MAX_CONTROLLER_ID =         155,
         };
 
         typedef Byte Mode;
@@ -527,6 +527,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             public:
                 ModeParam(std::string const name) noexcept;
         };
+
+        static bool is_supported_midi_controller(
+            Midi::Controller const controller
+        ) noexcept;
 
         Synth() noexcept;
         virtual ~Synth() override;
@@ -621,10 +625,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void all_notes_off(
             Seconds const time_offset, Midi::Channel const channel
         ) noexcept;
-
-        bool is_known_midi_controller(
-            Midi::Controller const controller
-        ) const noexcept;
 
         ModeParam mode;
         FloatParam modulator_add_volume;
@@ -809,9 +809,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
 
+        static std::vector<bool> supported_midi_controllers;
+        static bool supported_midi_controllers_initialized;
+
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
+        void initialize_supported_midi_controllers() noexcept;
         void register_main_params() noexcept;
         void register_modulator_params() noexcept;
         void register_carrier_params() noexcept;
