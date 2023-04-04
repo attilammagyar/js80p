@@ -148,6 +148,9 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         case effGetVstVersion:
             return kVstVersion;
 
+        case effIdentify:
+            return CCONST('N', 'v', 'E', 'f');
+
         case effCanDo:
             if (strcmp("receiveVstMidiEvent", (char const*)pointer) == 0) {
                 return 1;
