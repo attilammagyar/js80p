@@ -104,8 +104,6 @@ class Widget : public WidgetBase
             WidgetBase* parent
         ) override;
 
-        virtual void start_timer(Frequency const frequency) override;
-
         virtual void fill_rectangle(
             int const left,
             int const top,
@@ -167,7 +165,6 @@ class Widget : public WidgetBase
         DWORD dwStyle;
         WNDPROC original_window_procedure;
         bool is_mouse_captured;
-        bool is_timer_started;
 };
 
 }

@@ -128,28 +128,16 @@ class TabBody : public TransparentWidget
 class Background : public Widget
 {
     public:
-        static constexpr Frequency REFRESH_RATE = 18.0;
-        static constexpr Frequency FULL_REFRESH_RATE = 3.0;
-
         Background();
         ~Background();
 
         void replace_body(TabBody* new_body);
         void hide_body();
         void show_body();
-
-    protected:
-        virtual void set_up(
-            GUI::PlatformData platform_data,
-            WidgetBase* parent
-        ) override;
-
-        virtual bool timer_tick() override;
+        void refresh();
 
     private:
-        static constexpr Integer FULL_REFRESH_TICKS = (
-            (Integer)std::ceil(REFRESH_RATE / FULL_REFRESH_RATE)
-        );
+        static constexpr Integer FULL_REFRESH_TICKS = 3;
 
         TabBody* body;
         Integer next_full_refresh;
