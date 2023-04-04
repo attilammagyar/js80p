@@ -398,7 +398,7 @@ bool ControllerSelector::Controller::paint()
         color,
         background,
         FontWeight::BOLD,
-        10,
+        6,
         TextAlignment::LEFT
     );
 
