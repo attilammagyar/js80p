@@ -1,23 +1,26 @@
 JS80P
 =====
 
-A highly customizable [synthesizer plugin][plugin]. (Work in progress.)
+A MIDI driven, performance oriented, versatile [synthesizer plugin][plugin].
+(Work in progress.)
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
 Signal chain (simplified):
 
-    Oscillator --> Filter --> Folder --> Filter --> Effects --> Out
-                                              |     ^
-        (Frequency & Amplitude Modulation)    |     |
-      +---------------------------------------+     |
-      |                                             |
-      v                                             |
-      Oscillator --> Filter --> Folder --> Filter --+
-
-Effects:
-
-    Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb
+                                                        (x16)
+    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
+                                                  |            ^       |
+        (Frequency & Amplitude Modulation)        |            |       |
+      +-------------------------------------------+            |       |
+      |                                                        |       |
+      v                                                 (x16)  |       |
+      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
+                                                                       |
+    +------------------------------------------------------------------+
+    |
+    v
+    Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb --> Out
 
 Development progress: 83.8%
 ---------------------------
