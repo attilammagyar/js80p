@@ -1,28 +1,33 @@
 JS80P
 =====
 
-A MIDI driven, performance oriented, versatile [synthesizer plugin][plugin].
+A MIDI driven, performance oriented, versatile [synthesizer VST plugin][plugin].
 (Work in progress.)
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
-Signal chain (simplified):
+> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
+> Europe and other countries.
 
-                                                        (x16)
-    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
-                                                  |            ^       |
-        (Frequency & Amplitude Modulation)        |            |       |
-      +-------------------------------------------+            |       |
-      |                                                        |       |
-      v                                                 (x16)  |       |
-      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
-                                                                       |
-    +------------------------------------------------------------------+
-    |
-    v
-    Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb --> Out
+<a name="toc"></a>
 
-Development progress: 83.8%
+Table of Contents
+-----------------
+
+ * [Table of Contents](#toc)
+ * [Development Progress](#prog)
+    * [Future Plans](#future)
+ * [Features](#features)
+    * [Signal Chain (Simplified)](#signal)
+ * [Name](#name)
+ * [Development](#dev)
+    * [Tools](#dev-tools)
+    * [Dependencies](#dev-dep)
+    * [Theory](#dev-theory)
+
+<a name="prog"></a>
+
+Development progress: 91.5%
 ---------------------------
 
  * Oscillator features: 100%
@@ -36,8 +41,18 @@ Development progress: 83.8%
  * Effects: 100%
  * Patch persistency: 100%
  * FST support: 100%
- * VST3 support: 0%
+ * VST3 support: 100%
+ * Presets: 0%
+
+<a name="future"></a>
+
+### Future Plans
+
  * Aftertouch support: 0%
+ * LV2 support: 0%
+ * Linux support: 0%
+
+<a name="features"></a>
 
 Features
 --------
@@ -63,13 +78,33 @@ Features
  * 8 low-frequency oscillators (LFO)
  * configurable MIDI controllers
 
-### Why does JS80P have both Phase Modulation (PM) and Frequency Modulation (FM)? Aren't these two equivalent?
+#### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
 
 The reason for JS80P having both kinds of modulation is that they are not
 always equivalent. They are only identical when the modulator signal is a
 sinusoid, but with each added harmonic, PM and FM start to differ more and
 more. A detailed mathematical explanation of this is shown in
 [pm-fm-equivalence.md](pm-fm-equivalence.md).
+
+<a name="signal"></a>
+
+### Signal Chain (Simplified)
+
+                                                        (x16)
+    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
+                                                  |            ^       |
+        (Frequency & Amplitude Modulation)        |            |       |
+      +-------------------------------------------+            |       |
+      |                                                        |       |
+      v                                                 (x16)  |       |
+      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
+                                                                       |
+    +------------------------------------------------------------------+
+    |
+    v
+    Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb --> Out
+
+<a name="name"></a>
 
 Name
 ----
@@ -86,8 +121,12 @@ plugin, and so JS80P was born.
   [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80]
   [js80]: https://attilammagyar.github.io/toys/js-80/
 
+<a name="dev"></a>
+
 Development
 -----------
+
+<a name="dev-tools"></a>
 
 ### Tools
 
@@ -104,9 +143,14 @@ Development
  * [WinLibs MinGW-w64 7.0.0+ (MSVCRT)](https://winlibs.com/)
  * [Doxygen 1.8.17+](https://www.doxygen.nl/)
 
+<a name="dev-dep"></a>
+
 ### Dependencies
 
  * [FST](https://git.iem.at/zmoelnig/FST)
+ * [VST3 SDK](https://github.com/steinbergmedia/vst3sdk)
+
+<a name="dev-theory"></a>
 
 ### Theory
 

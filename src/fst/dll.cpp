@@ -18,8 +18,6 @@
 
 #include <windows.h>
 
-#include "debug.hpp"
-
 #include "fst/plugin.hpp"
 #include "gui/gui.hpp"
 
@@ -33,7 +31,6 @@ extern "C" BOOL WINAPI DllMain(
         LPVOID lpvReserved
 ) {
     dll_instance = hinstDLL;
-    JS80P_DEBUG("DllMain(...); hinstDLL=%p", (void*)dll_instance);
 
     return TRUE;
 }
@@ -41,8 +38,6 @@ extern "C" BOOL WINAPI DllMain(
 
 extern "C" __declspec(dllexport) AEffect* VSTPluginMain(audioMasterCallback host_callback)
 {
-    JS80P_DEBUG("VSTPluginMain(...)");
-
     return JS80P::FstPlugin::create_instance(
         host_callback, (JS80P::GUI::PlatformData)dll_instance
     );

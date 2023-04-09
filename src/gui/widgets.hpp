@@ -406,15 +406,18 @@ class ParamEditor : public TransparentWidget
 class AboutText : public Widget
 {
     public:
-        static constexpr int LEFT = 90;
-        static constexpr int TOP = 32;
-        static constexpr int WIDTH = 800;
-        static constexpr int HEIGHT = 420;
+        static constexpr int LEFT = 10;
+        static constexpr int TOP = 10;
+        static constexpr int WIDTH = 960;
+        static constexpr int HEIGHT = 546;
 
-        static constexpr int FONT_SIZE = 12;
-        static constexpr int TEXT_TOP = 15;
-        static constexpr int LINE_HEIGHT = 22;
-        static constexpr int EMPTY_LINE_HEIGHT = 10;
+        static constexpr int LOGO_WIDTH = 320;
+        static constexpr int LOGO_HEIGHT = 299;
+
+        static constexpr int FONT_SIZE = 14;
+        static constexpr int TEXT_TOP = 45;
+        static constexpr int LINE_HEIGHT = 25;
+        static constexpr int EMPTY_LINE_HEIGHT = 12;
         static constexpr int PADDING = 10;
 
         static constexpr char const* TEXT = (
@@ -442,12 +445,13 @@ class AboutText : public Widget
             "for example, 128 or 256 samples.\n"
         );
 
-        AboutText();
+        AboutText(GUI::Bitmap logo);
 
     protected:
         virtual bool paint() override;
 
     private:
+        GUI::Bitmap logo;
         std::vector<std::string> lines;
 };
 

@@ -14,18 +14,21 @@ JS80P_CXXINCS = \
 FST_CXXINCS = \
 	-I./lib/fst
 
+VST3_CXXINCS = \
+	-I./lib/vst3sdk
+
 JS80P_CXXFLAGS = \
 	-Wall \
 	-Werror \
 	-msse2 \
 	-ffast-math \
-	-D FST_DONT_DEPRECATE_UNKNOWN \
 	-O3
 
 DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 
-FST_MAIN_OS_DIR = $(DIST_DIR)/$(FST_MAIN_OS)$(SUFFIX)
-FST_MAIN_DIR = $(FST_MAIN_OS_DIR)/fst
+OS_DIR = $(DIST_DIR)/$(TARGET_OS)$(SUFFIX)
+FST_DIR = $(OS_DIR)/fst
+VST3_DIR = $(OS_DIR)/vst3
 
 OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).o
 
@@ -38,20 +41,31 @@ GUI_IMAGES = \
 	resources/envelopes.bmp \
 	resources/knob_states.bmp \
 	resources/lfos.bmp \
-	resources/synth.bmp
+	resources/synth.bmp \
+	resources/vst_logo.bmp
 
 include make/$(OS)-$(PLATFORM).mk
 
 OBJ_FST_MAIN = $(BUILD_DIR)/fst-main$(SUFFIX).o
 OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
+OBJ_VST3_MAIN = $(BUILD_DIR)/vst3-main$(SUFFIX).o
+OBJ_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin$(SUFFIX).o
 OBJ_SERIALIZER = $(BUILD_DIR)/serializer$(SUFFIX).o
 OBJ_SYNTH = $(BUILD_DIR)/synth$(SUFFIX).o
 OBJ_GUI = $(BUILD_DIR)/gui$(SUFFIX).o
 
-FST_MAIN_OBJS = \
+FST_OBJS = \
 	$(GUI_RES) \
 	$(OBJ_FST_MAIN) \
 	$(OBJ_FST_PLUGIN) \
+	$(OBJ_GUI) \
+	$(OBJ_SERIALIZER) \
+	$(OBJ_SYNTH)
+
+VST3_OBJS = \
+	$(GUI_RES) \
+	$(OBJ_VST3_MAIN) \
+	$(OBJ_VST3_PLUGIN) \
 	$(OBJ_GUI) \
 	$(OBJ_SERIALIZER) \
 	$(OBJ_SYNTH)
@@ -151,6 +165,15 @@ FST_SOURCES = \
 	$(FST_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
+VST3_HEADERS = \
+	$(JS80P_HEADERS) \
+	src/vst3/plugin.hpp
+
+VST3_SOURCES = \
+	src/vst3/plugin.cpp \
+	$(VST3_MAIN_SOURCES) \
+	$(JS80P_SOURCES)
+
 GUI_HEADERS = \
 	$(GUI_PLATFORM_HEADERS) \
 	$(JS80P_HEADERS)
@@ -175,11 +198,32 @@ TEST_CXXFLAGS = \
 
 CXXINCS = $(PLATFORM_CXXINCS) $(JS80P_CXXINCS)
 
-FST_CXXFLAGS = $(CXXINCS) $(FST_CXXINCS) $(JS80P_CXXFLAGS)
+FST_CXXFLAGS = \
+	-DFST_DONT_DEPRECATE_UNKNOWN \
+	$(CXXINCS) \
+	$(FST_CXXINCS) \
+	$(JS80P_CXXFLAGS)
 
-.PHONY: all check clean dirs docs perf guiplayground
+VST3_CXXFLAGS = \
+	-DRELEASE \
+	-DJS80P_VST3_GUI_PLATFORM=$(VST3_GUI_PLATFORM) \
+	$(CXXINCS) \
+	$(VST3_CXXINCS) \
+	$(JS80P_CXXFLAGS) \
+	-Wno-class-memaccess \
+	-Wno-format \
+	-Wno-multichar \
+	-Wno-parentheses \
+	-Wno-pragmas \
+	-Wno-unknown-pragmas
 
-all: dirs $(FST_MAIN)
+.PHONY: all fst vst3 check clean dirs docs perf guiplayground
+
+all: dirs fst vst3
+
+fst: $(FST)
+
+vst3: $(VST3)
 
 dirs: $(BUILD_DIR) $(DIST_DIR) $(DOC_DIR)
 
@@ -197,8 +241,11 @@ $(DOC_DIR):
 
 clean:
 	$(RM) \
-		$(FST_MAIN) \
-		$(FST_MAIN_OBJS) \
+		$(FST) \
+		$(FST_OBJS) \
+		$(VST3) \
+		$(VST3_DLL) \
+		$(VST3_OBJS) \
 		$(TEST_BINS) \
 		$(GUI_PLAYGROUND) \
 		$(GUI_PLAYGROUND_OBJS) \
@@ -228,7 +275,7 @@ check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 
-docs: $(DOC_DIR) $(DOC_DIR)/html/index.html
+docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
 guiplayground: $(GUI_PLAYGROUND)
 
@@ -241,16 +288,24 @@ $(DOC_DIR)/html/index.html: \
 		$(GUI_SOURCES) \
 		$(FST_HEADERS) \
 		$(FST_SOURCES) \
+		$(VST3_HEADERS) \
+		$(VST3_SOURCES) \
 		| $(DOC_DIR)
 	$(DOXYGEN)
 
-$(FST_MAIN): $(FST_MAIN_OBJS) | $(FST_MAIN_DIR)
-	$(LINK_FST_MAIN) $(FST_MAIN_OBJS) -o $@ $(PLATFORM_LFLAGS)
+$(FST): $(FST_OBJS) | $(FST_DIR)
+	$(LINK_FST) $(FST_OBJS) -o $@ $(PLATFORM_LFLAGS)
 
-$(FST_MAIN_DIR): | $(FST_MAIN_OS_DIR) $(DIST_DIR)
+$(FST_DIR): | $(OS_DIR) $(DIST_DIR)
 	$(MKDIR) $@
 
-$(FST_MAIN_OS_DIR): | $(DIST_DIR)
+$(OS_DIR): | $(DIST_DIR)
+	$(MKDIR) $@
+
+$(VST3): $(VST3_OBJS) | $(VST3_DIR)
+	$(LINK_VST3) $(VST3_OBJS) -o $@ $(PLATFORM_LFLAGS)
+
+$(VST3_DIR): | $(OS_DIR) $(DIST_DIR)
 	$(MKDIR) $@
 
 $(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
@@ -274,16 +329,19 @@ $(OBJ_SERIALIZER): \
 	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
 		-c $< -o $@
 
+$(OBJ_GUI) : \
+		$(GUI_SOURCES) $(GUI_HEADERS) \
+		| $(BUILD_DIR)
+	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+
+$(GUI_RES): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
+	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
+
 $(OBJ_FST_PLUGIN): \
 		src/fst/plugin.cpp \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
-
-$(OBJ_GUI) : \
-		$(GUI_SOURCES) $(GUI_HEADERS) \
-		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
 $(OBJ_FST_MAIN): \
 		$(FST_MAIN_SOURCES) \
@@ -291,8 +349,17 @@ $(OBJ_FST_MAIN): \
 		| $(BUILD_DIR)
 	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
-$(GUI_RES): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
-	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
+$(OBJ_VST3_PLUGIN): \
+		src/vst3/plugin.cpp \
+		$(VST3_HEADERS) \
+		| $(BUILD_DIR)
+	$(CPP_PLATFORM) $(VST3_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+
+$(OBJ_VST3_MAIN): \
+		$(VST3_MAIN_SOURCES) \
+		$(VST3_HEADERS) \
+		| $(BUILD_DIR)
+	$(CPP_PLATFORM) $(VST3_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/test_example$(EXE): \
 	tests/test_example.cpp \

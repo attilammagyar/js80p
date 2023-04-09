@@ -717,9 +717,11 @@ Number GUI::clamp_ratio(Number const ratio)
 GUI::GUI(
         JS80P::GUI::PlatformData platform_data,
         JS80P::GUI::PlatformWidget parent_window,
-        Synth* synth
+        Synth* synth,
+        bool const show_vst_logo
 )
-    : dummy_widget(NULL),
+    : show_vst_logo(show_vst_logo),
+    dummy_widget(NULL),
     background(NULL),
     about_body(NULL),
     controllers_body(NULL),
@@ -744,6 +746,7 @@ GUI::GUI(
     envelopes_bitmap = dummy_widget->load_bitmap(platform_data, "ENVELOPES");
     lfos_bitmap = dummy_widget->load_bitmap(platform_data, "LFOS");
     synth_bitmap = dummy_widget->load_bitmap(platform_data, "SYNTH");
+    vst_logo_bitmap = dummy_widget->load_bitmap(platform_data, "VSTLOGO");
 
     background = new Background();
 
@@ -829,7 +832,9 @@ void GUI::build_about_body()
 
     background->own(about_body);
 
-    ((Widget*)about_body)->own(new AboutText());
+    ((Widget*)about_body)->own(
+        new AboutText(show_vst_logo ? vst_logo_bitmap : NULL)
+    );
 
     about_body->hide();
 }
@@ -1256,6 +1261,7 @@ GUI::~GUI()
     dummy_widget->delete_bitmap(envelopes_bitmap);
     dummy_widget->delete_bitmap(lfos_bitmap);
     dummy_widget->delete_bitmap(synth_bitmap);
+    dummy_widget->delete_bitmap(vst_logo_bitmap);
 
     delete dummy_widget;
 

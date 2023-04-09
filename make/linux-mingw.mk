@@ -1,6 +1,12 @@
-FST_MAIN = $(FST_MAIN_DIR)/js80p.dll
-FST_MAIN_OS = windows
+TARGET_OS = windows
+
+FST = $(FST_DIR)/js80p.dll
 FST_MAIN_SOURCES = src/fst/dll.cpp
+
+VST3 = $(VST3_DIR)/js80p.vst3
+VST3_DLL = $(BUILD_DIR)/js80p.dll
+VST3_MAIN_SOURCES = src/vst3/dll.cpp
+VST3_GUI_PLATFORM = kPlatformTypeHWND
 
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
@@ -23,9 +29,10 @@ VALGRIND ?= /usr/bin/valgrind --error-exitcode=99 --track-origins=yes --quiet
 LINK_DLL = $(CPP_PLATFORM) -Wall -s -shared -static
 LINK_EXE = $(CPP_PLATFORM) -Wall -s -static
 
-PLATFORM_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32
+PLATFORM_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32 -lole32
 
-LINK_FST_MAIN = $(LINK_DLL)
+LINK_FST = $(LINK_DLL)
+LINK_VST3 = $(LINK_DLL)
 LINK_GUI_PLAYGROUND = $(LINK_EXE)
 
 PLATFORM_CXXFLAGS =

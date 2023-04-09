@@ -20,7 +20,6 @@
 
 #include "fst/plugin.hpp"
 
-#include "debug.hpp"
 #include "midi.hpp"
 
 
@@ -69,22 +68,22 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    if (
-            op_code != effEditIdle
-            && op_code != effProcessEvents
-            && op_code != 53
-            && op_code != effGetProgram
-            && op_code != effEditGetRect
-    ) {
-        JS80P_DEBUG(
-            "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
-            (int)op_code,
-            ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
-            (int)index,
-            (int)ivalue,
-            fvalue
-        );
-    }
+    // if (
+            // op_code != effEditIdle
+            // && op_code != effProcessEvents
+            // && op_code != 53
+            // && op_code != effGetProgram
+            // && op_code != effEditGetRect
+    // ) {
+        // JS80P_DEBUG(
+            // "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
+            // (int)op_code,
+            // ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+            // (int)index,
+            // (int)ivalue,
+            // fvalue
+        // );
+    // }
 
     switch (op_code) {
         case effProcessEvents:
@@ -160,15 +159,15 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
                 return 1;
             }
 
-            JS80P_DEBUG(
-                "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
-                (int)op_code,
-                ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
-                (int)index,
-                (int)ivalue,
-                fvalue,
-                (char*)pointer
-            );
+            // JS80P_DEBUG(
+                // "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
+                // (int)op_code,
+                // ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+                // (int)index,
+                // (int)ivalue,
+                // fvalue,
+                // (char*)pointer
+            // );
             return 0;
 
         default:
@@ -359,7 +358,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size) noexcept
 void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {
     close_gui();
-    gui = new GUI(platform_data, parent_window, &synth);
+    gui = new GUI(platform_data, parent_window, &synth, false);
     gui->show();
 }
 

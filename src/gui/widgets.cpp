@@ -930,7 +930,9 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 }
 
 
-AboutText::AboutText() : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::TEXT_BOX)
+AboutText::AboutText(GUI::Bitmap logo)
+    : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::TEXT_BOX),
+    logo(logo)
 {
     std::string line = "";
 
@@ -953,15 +955,17 @@ bool AboutText::paint()
 
     fill_rectangle(0, 0, width, height, GUI::TEXT_BACKGROUND);
 
+    int const left = logo != NULL ? LOGO_WIDTH + 10 : 0;
+    int const text_width = width - left;
     int top = TEXT_TOP;
 
     for (std::vector<std::string>::const_iterator it = lines.begin(); it != lines.end(); ++it) {
         draw_text(
             it->c_str(),
             FONT_SIZE,
-            0,
+            left,
             top,
-            width,
+            text_width,
             LINE_HEIGHT,
             GUI::TEXT_COLOR,
             GUI::TEXT_BACKGROUND,
@@ -971,6 +975,10 @@ bool AboutText::paint()
         );
 
         top += it->length() == 0 ? EMPTY_LINE_HEIGHT : LINE_HEIGHT;
+    }
+
+    if (logo != NULL) {
+        draw_bitmap(logo, 5, (HEIGHT - LOGO_HEIGHT) / 2, LOGO_WIDTH, LOGO_HEIGHT);
     }
 
     return true;

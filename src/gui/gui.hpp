@@ -134,7 +134,8 @@ class GUI
         GUI(
             PlatformData platform_data,
             PlatformWidget parent_window,
-            Synth* synth
+            Synth* synth,
+            bool const show_vst_logo
         );
 
         ~GUI();
@@ -174,6 +175,8 @@ class GUI
         void build_lfos_body();
         void build_synth_body();
 
+        bool const show_vst_logo;
+
         Widget* dummy_widget;
 
         Bitmap about_bitmap;
@@ -182,6 +185,7 @@ class GUI
         Bitmap envelopes_bitmap;
         Bitmap lfos_bitmap;
         Bitmap synth_bitmap;
+        Bitmap vst_logo_bitmap;
 
         ControllerSelector* controller_selector;
         Background* background;
