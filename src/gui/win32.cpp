@@ -157,6 +157,11 @@ LRESULT Widget::process_message(
     bool is_handled = false;
 
     switch (uMsg) {
+        case WM_TIMER:
+            is_handled = widget->timer_tick();
+
+            break;
+
         case WM_PAINT: {
             PAINTSTRUCT ps;
             widget->hdc = BeginPaint((HWND)widget->get_platform_widget(), &ps);
@@ -263,7 +268,8 @@ Widget::Widget(char const* const text)
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
-    is_mouse_captured(false)
+    is_mouse_captured(false),
+    is_timer_started(false)
 {
 }
 
@@ -276,7 +282,8 @@ Widget::Widget(
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
-    is_mouse_captured(false)
+    is_mouse_captured(false),
+    is_timer_started(false)
 {
 }
 
@@ -294,7 +301,8 @@ Widget::Widget(
     text_text(text),
     dwStyle(0),
     original_window_procedure(NULL),
-    is_mouse_captured(false)
+    is_mouse_captured(false),
+    is_timer_started(false)
 {
     switch (type) {
         case Type::BACKGROUND:
@@ -316,6 +324,10 @@ Widget::~Widget()
 {
     release_captured_mouse();
     destroy_children();
+
+    if (is_timer_started) {
+        KillTimer((HWND)platform_widget, TIMER_ID);
+    }
 
     if (platform_widget != NULL) {
         DestroyWindow((HWND)platform_widget);
@@ -352,6 +364,17 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     );
 
     platform_widget = (GUI::PlatformWidget)hwnd;
+}
+
+
+void Widget::start_timer(Frequency const frequency)
+{
+    UINT const elapse = (UINT)std::ceil(1000.0 / frequency);
+
+    // TODO: GetLastError
+    SetTimer((HWND)platform_widget, TIMER_ID, elapse, NULL);
+
+    is_timer_started = true;
 }
 
 

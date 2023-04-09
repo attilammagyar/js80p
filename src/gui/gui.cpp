@@ -1275,12 +1275,6 @@ void GUI::show()
 }
 
 
-void GUI::idle()
-{
-    background->refresh();
-}
-
-
 WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
     text(text),
@@ -1427,6 +1421,12 @@ void WidgetBase::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 }
 
 
+bool WidgetBase::timer_tick()
+{
+    return false;
+}
+
+
 bool WidgetBase::paint()
 {
     if (bitmap == NULL) {
@@ -1472,6 +1472,11 @@ bool WidgetBase::mouse_leave(int const x, int const y)
 bool WidgetBase::mouse_wheel(Number const delta, bool const modifier)
 {
     return false;
+}
+
+
+void WidgetBase::start_timer(Frequency const frequency)
+{
 }
 
 
