@@ -21,6 +21,7 @@
 
 #include "js80p.hpp"
 
+#include "synth/queue.hpp"
 #include "synth/signal_producer.hpp"
 
 
