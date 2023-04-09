@@ -392,15 +392,18 @@ bool FloatParam::is_constant_until(Integer const sample_count) const noexcept
         return false;
     }
 
-    return (
-        midi_controller == NULL
-        || midi_controller->events.is_empty()
-        || !(
-            is_time_offset_before_sample_count(
-                midi_controller->events.front().time_offset, last_sample_idx
+    if (midi_controller != NULL) {
+        return (
+            midi_controller->events.is_empty()
+            || !(
+                is_time_offset_before_sample_count(
+                    midi_controller->events.front().time_offset, last_sample_idx
+                )
             )
-        )
-    );
+        );
+    }
+
+    return flexible_controller == NULL;
 }
 
 
@@ -647,15 +650,21 @@ Sample const* const* FloatParam::initialize_rendering(
             return lfo_buffer;
         }
     } else if (midi_controller != NULL) {
+        Seconds time = 0.0;
+
         for (Queue<Event>::SizeType i = 0, l = midi_controller->events.length(); i != l; ++i) {
-            schedule_value(
-                midi_controller->events[i].time_offset,
+            schedule_linear_ramp(
+                midi_controller->events[i].time_offset - time,
                 ratio_to_value(midi_controller->events[i].number_param_1)
             );
+            time = midi_controller->events[i].time_offset;
         }
     } else if (flexible_controller != NULL) {
         flexible_controller->update();
-        set_value(ratio_to_value(flexible_controller->get_value()));
+        schedule_linear_ramp(
+            (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period,
+            ratio_to_value(flexible_controller->get_value())
+        );
     }
 
     return NULL;

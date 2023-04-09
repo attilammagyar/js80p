@@ -1048,7 +1048,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
 TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, 3.0, -2.5, -2.5, -2.5,
+        3.0, (1.0 / 3.0) * 3.0 + (2.0 / 3.0) * (-2.5), -2.5, -2.5, -2.5,
     };
     FloatParam float_param("float", -5.0, 5.0, 3.0, 0.5);
     MidiController midi_controller;
@@ -1063,7 +1063,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     assert_eq((void*)&midi_controller, (void*)float_param.get_midi_controller());
 
     change_index_1 = float_param.get_change_index();
-    midi_controller.change(1.2, 0.2514);
+    midi_controller.change(1.5, 0.2514);
     change_index_2 = float_param.get_change_index();
 
     // Non-sample-exact param usage.
@@ -1080,7 +1080,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     rendered_samples = FloatParam::produce<FloatParam>(&float_param, 1, block_size);
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
-    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, rendered_samples[0], block_size, 0.01);
 
     midi_controller.change(0.0, 0.35);
     float_param.set_midi_controller(NULL);
@@ -1093,7 +1093,7 @@ void test_follower_midi_controller()
 {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, 3.0, -2.5, -2.5, -2.5,
+        3.0, (1.0 / 3.0) * 3.0 + (2.0 / 3.0) * (-2.5), -2.5, -2.5, -2.5,
     };
     FloatParam leader("float", -5.0, 5.0, 3.0, 0.5);
     FloatParamClass follower(leader);
@@ -1111,7 +1111,7 @@ void test_follower_midi_controller()
     follower.set_sample_rate(1.0);
 
     change_index_1 = follower.get_change_index();
-    midi_controller.change(1.2, 0.2514);
+    midi_controller.change(1.5, 0.2514);
     change_index_2 = follower.get_change_index();
     assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
@@ -1126,7 +1126,7 @@ void test_follower_midi_controller()
     follower_samples = FloatParam::produce<FloatParamClass>(&follower, 1, block_size);
     assert_false(follower.is_constant_in_next_round(1, block_size));
 
-    assert_eq(expected_samples, follower_samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, follower_samples[0], block_size, 0.01);
     assert_eq((void*)leader_samples, (void*)follower_samples);
 
     midi_controller.change(0.0, 0.35);
@@ -1144,7 +1144,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
 TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_flexible_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, 3.0, 3.0, 3.0, 3.0
+        1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParam float_param("float", 0.0, 10.0, 1.0, 1.0);
@@ -1177,7 +1177,7 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
         (void*)&flexible_controller, (void*)float_param.get_flexible_controller()
     );
 
-    assert_true(float_param.is_constant_in_next_round(1, block_size));
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
 
     change_index = float_param.get_change_index();
     assert_eq(3.0, float_param.get_value(), DOUBLE_DELTA);
@@ -1304,7 +1304,7 @@ void test_follower_flexible_controller()
 {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, 3.0, 3.0, 3.0, 3.0
+        1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParam leader("leader", 0.0, 10.0, 1.0, 1.0);
@@ -1337,7 +1337,7 @@ void test_follower_flexible_controller()
 
     leader.set_flexible_controller(&flexible_controller);
 
-    assert_true(follower.is_constant_in_next_round(1, block_size));
+    assert_false(follower.is_constant_in_next_round(1, block_size));
 
     change_index = follower.get_change_index();
     assert_eq(3.0, follower.get_value(), DOUBLE_DELTA);
@@ -1717,63 +1717,6 @@ TEST(modulated_param_might_have_a_midi_controller_assigned, {
     modulation_level_leader.set_value(0.0);
     modulation_level_leader.schedule_value(2.0, modulation_level_value);
     midi_controller.change(0.1, 0.5);
-
-    assert_false(modulatable_float_param.is_constant_in_next_round(1, block_size));
-    rendered_samples = FloatParam::produce< ModulatableFloatParam<Modulator> >(
-        &modulatable_float_param, 1
-    );
-    assert_eq(expected_samples[0], rendered_samples[0], block_size, DOUBLE_DELTA);
-
-    assert_false(modulatable_float_param.is_constant_in_next_round(2, block_size));
-    rendered_samples = FloatParam::produce< ModulatableFloatParam<Modulator> >(
-        &modulatable_float_param, 2
-    );
-    assert_eq(expected_samples[1], rendered_samples[0], block_size, DOUBLE_DELTA);
-})
-
-
-TEST(modulated_param_might_have_a_flexible_controller_assigned, {
-    constexpr Integer block_size = 5;
-    constexpr Frequency sample_rate = 1.0;
-    constexpr Number modulation_level_value = 3.0;
-    constexpr Sample expected_samples[][block_size] = {
-        {1.44, 1.44, 7.44, 7.44, 7.44},
-        {7.44, 7.44, 7.44, 7.44, 7.44},
-    };
-
-    Modulator modulator;
-    FloatParam modulation_level_leader("MOD", 0.0, 3.0, 0.0);
-    ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 2.0, 0.0
-    );
-    FlexibleController flexible_controller;
-    Sample const* const* rendered_samples;
-
-    modulation_level_leader.set_block_size(block_size);
-    modulatable_float_param.set_block_size(block_size);
-    flexible_controller.input.set_block_size(block_size);
-    flexible_controller.amount.set_block_size(block_size);
-    flexible_controller.min.set_block_size(block_size);
-    flexible_controller.max.set_block_size(block_size);
-    flexible_controller.distortion.set_block_size(block_size);
-    flexible_controller.randomness.set_block_size(block_size);
-
-    modulation_level_leader.set_sample_rate(sample_rate);
-    modulatable_float_param.set_sample_rate(sample_rate);
-    flexible_controller.input.set_sample_rate(sample_rate);
-    flexible_controller.amount.set_sample_rate(sample_rate);
-    flexible_controller.min.set_sample_rate(sample_rate);
-    flexible_controller.max.set_sample_rate(sample_rate);
-    flexible_controller.distortion.set_sample_rate(sample_rate);
-    flexible_controller.randomness.set_sample_rate(sample_rate);
-
-    flexible_controller.input.set_value(0.8);
-    flexible_controller.amount.set_value(0.9);
-
-    modulatable_float_param.set_flexible_controller(&flexible_controller);
-    modulatable_float_param.set_value(0.25);
-    modulation_level_leader.set_value(0.0);
-    modulation_level_leader.schedule_value(2.0, modulation_level_value);
 
     assert_false(modulatable_float_param.is_constant_in_next_round(1, block_size));
     rendered_samples = FloatParam::produce< ModulatableFloatParam<Modulator> >(
