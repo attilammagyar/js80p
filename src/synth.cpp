@@ -844,6 +844,14 @@ Sample const* const* Synth::initialize_rendering(
         &effects, round, sample_count
     );
 
+    for (int i = 0; i != FLOAT_PARAMS; ++i) {
+        FloatParam::produce_if_not_constant(float_params[i], round, get_block_size());
+    }
+
+    for (Integer i = 0; i != LFOS; ++i) {
+        lfos_rw[i]->skip_round(round, get_block_size());
+    }
+
     clear_midi_controllers();
 
     return NULL;
@@ -1119,10 +1127,6 @@ void Synth::render(
             */
             out[i] = std::min(2.8, std::max(-2.8, raw[i]));
         }
-    }
-
-    for (Integer i = 0; i != LFOS; ++i) {
-        lfos_rw[i]->skip_round(round, get_block_size());
     }
 }
 
