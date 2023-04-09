@@ -24,6 +24,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <commctrl.h>
 
 #include "js80p.hpp"
 #include "serializer.hpp"
@@ -71,16 +72,18 @@ class Widget : public WidgetBase
 
                 void set(std::string const text);
 
-                char const* c_str() const;
-                WCHAR const* c_wstr() const;
+                char* c_str() const;
+                WCHAR* c_wstr() const;
 
-                LPCTSTR get() const;
+                LPCTSTR get_const() const;
+                LPSTR get() const;
 
             private:
-                void free_wtext();
+                void free_buffers();
 
                 std::string text;
                 WCHAR* wtext;
+                char* ctext;
         };
 
         static std::string const FILTER_STR;
@@ -162,10 +165,13 @@ class Widget : public WidgetBase
 
         GUI::PlatformWidget get_platform_widget() const;
 
+        void create_tooltip(HINSTANCE hInstance, HWND parent, HWND widget);
+
         Text class_name;
         Text text_text;
         DWORD dwStyle;
         WNDPROC original_window_procedure;
+        HWND tooltip;
         bool is_mouse_captured;
         bool is_timer_started;
 };

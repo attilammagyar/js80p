@@ -37,13 +37,13 @@ std::string const Widget::FILTER_STR(
 );
 
 
-Widget::Text::Text() : wtext(NULL)
+Widget::Text::Text() : wtext(NULL), ctext(NULL)
 {
     set("");
 }
 
 
-Widget::Text::Text(std::string const text) : wtext(NULL)
+Widget::Text::Text(std::string const text) : wtext(NULL), ctext(NULL)
 {
     set(text);
 }
@@ -51,30 +51,38 @@ Widget::Text::Text(std::string const text) : wtext(NULL)
 
 Widget::Text::~Text()
 {
-    free_wtext();
+    free_buffers();
 }
 
 
-void Widget::Text::free_wtext()
+void Widget::Text::free_buffers()
 {
-    if (wtext == NULL) {
-        return;
+    if (ctext != NULL) {
+        delete[] ctext;
+        ctext = NULL;
     }
 
-    delete[] wtext;
-    wtext = NULL;
+    if (wtext != NULL) {
+        delete[] wtext;
+        wtext = NULL;
+    }
 }
 
 
 void Widget::Text::set(std::string const text)
 {
-    this->text = text;
-
-#ifdef UNICODE
     int const length = (int)text.length();
     int const size = length + 1;
 
-    free_wtext();
+    this->text = text;
+
+    free_buffers();
+
+    ctext = new char[size];
+    strncpy(ctext, text.c_str(), size);
+    ctext[length] = 0;
+
+#ifdef UNICODE
     wtext = new WCHAR[size];
 
     if (length == 0) {
@@ -89,30 +97,40 @@ void Widget::Text::set(std::string const text)
             size
         );
 
-        wtext[std::min(size - 1, length)] = 0;
+        wtext[length] = 0;
     }
 #endif
 }
 
 
-char const* Widget::Text::c_str() const
+char* Widget::Text::c_str() const
 {
-    return text.c_str();
+    return ctext;
 }
 
 
-WCHAR const* Widget::Text::c_wstr() const
+WCHAR* Widget::Text::c_wstr() const
 {
     return wtext;
 }
 
 
-LPCTSTR Widget::Text::get() const
+LPCTSTR Widget::Text::get_const() const
 {
 #ifdef UNICODE
     return (LPCTSTR)c_wstr();
 #else
     return (LPCTSTR)c_str();
+#endif
+}
+
+
+LPTSTR Widget::Text::get() const
+{
+#ifdef UNICODE
+    return (LPTSTR)c_wstr();
+#else
+    return (LPTSTR)c_str();
 #endif
 }
 
@@ -129,7 +147,12 @@ GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* nam
 
     // TODO: GetLastError()
     GUI::Bitmap bitmap = (GUI::Bitmap)LoadImage(
-        (HINSTANCE)platform_data, name_text.get(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION
+        (HINSTANCE)platform_data,               // hInst
+        name_text.get_const(),                  // name
+        IMAGE_BITMAP,                           // type
+        0,                                      // cx
+        0,                                      // cy
+        LR_CREATEDIBSECTION                     // fuLoad
     );
 
     return bitmap;
@@ -268,6 +291,7 @@ Widget::Widget(char const* const text)
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
+    tooltip(NULL),
     is_mouse_captured(false),
     is_timer_started(false)
 {
@@ -282,6 +306,7 @@ Widget::Widget(
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
+    tooltip(NULL),
     is_mouse_captured(false),
     is_timer_started(false)
 {
@@ -301,6 +326,7 @@ Widget::Widget(
     text_text(text),
     dwStyle(0),
     original_window_procedure(NULL),
+    tooltip(NULL),
     is_mouse_captured(false),
     is_timer_started(false)
 {
@@ -329,6 +355,11 @@ Widget::~Widget()
         KillTimer((HWND)platform_widget, TIMER_ID);
     }
 
+    if (tooltip != NULL) {
+        DestroyWindow(tooltip);
+        tooltip = NULL;
+    }
+
     if (platform_widget != NULL) {
         DestroyWindow((HWND)platform_widget);
         platform_widget = NULL;
@@ -340,30 +371,78 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     WidgetBase::set_up(platform_data, parent);
 
+    HWND parent_hwnd = (HWND)parent->get_platform_widget();
+
     // TODO: GetLastError()
-    HWND hwnd = CreateWindow(
-        (LPCTSTR)class_name.get(),              // lpClassName
-        (LPCTSTR)text_text.get(),               // lpWindowName
+    HWND widget_hwnd = CreateWindow(
+        (LPCTSTR)class_name.get_const(),        // lpClassName
+        (LPCTSTR)text_text.get_const(),         // lpWindowName
         dwStyle,                                // dwStyle
         left,                                   // x
         top,                                    // y
         width,                                  // nWidth
         height,                                 // nHeight
-        (HWND)parent->get_platform_widget(),    // hWndParent
+        parent_hwnd,                            // hWndParent
         NULL,                                   // hMenu
         (HINSTANCE)platform_data,               // hInstance
         NULL                                    // lpParam
     );
 
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+    if (!widget_hwnd) {
+        return;
+    }
+
+    if (type != Type::ABOUT_TEXT) {
+        create_tooltip((HINSTANCE)platform_data, parent_hwnd, widget_hwnd);
+    }
+
+    SetWindowLongPtr(widget_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
     original_window_procedure = (
         (WNDPROC)SetWindowLongPtr(
-            hwnd, GWLP_WNDPROC, (LONG_PTR)(&process_message)
+            widget_hwnd, GWLP_WNDPROC, (LONG_PTR)(&process_message)
         )
     );
 
-    platform_widget = (GUI::PlatformWidget)hwnd;
+    platform_widget = (GUI::PlatformWidget)widget_hwnd;
+}
+
+
+void Widget::create_tooltip(HINSTANCE hInstance, HWND parent, HWND widget)
+{
+    DWORD style = (
+        WS_POPUP | TTS_ALWAYSTIP | TTS_NOANIMATE | TTS_NOFADE | TTS_NOPREFIX
+    );
+
+    // TODO: GetLastError
+    tooltip = CreateWindowEx(
+        0,                                      // dwExStyle
+        TOOLTIPS_CLASS,                         // lpClassName
+        NULL,                                   // lpWindowName
+        style,                                  // dwStyle
+        CW_USEDEFAULT,                          // X
+        CW_USEDEFAULT,                          // Y
+        CW_USEDEFAULT,                          // nWidth
+        CW_USEDEFAULT,                          // nHeight
+        parent,                                 // hWndParent
+        NULL,                                   // hMenu
+        hInstance,                              // hInstance
+        NULL                                    // lpParam
+    );
+
+    if (!tooltip) {
+        return;
+    }
+
+    TOOLINFO tool_info = {0};
+    tool_info.cbSize = sizeof(tool_info);
+    tool_info.hwnd = parent;
+    tool_info.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+    tool_info.uId = (UINT_PTR)widget;
+    tool_info.lpszText = text_text.get();
+
+    // TODO: GetLastError
+    SendMessage(tooltip, TTM_ADDTOOL, 0, (LPARAM)&tool_info);
 }
 
 
@@ -455,7 +534,7 @@ void Widget::draw_text(
         format = DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOPREFIX;
     }
 
-    DrawText(hdc, text_obj.get(), -1, (LPRECT)&text_rect, format);
+    DrawText(hdc, text_obj.get_const(), -1, (LPRECT)&text_rect, format);
 
     SelectObject(hdc, orig_font);
     SetTextColor(hdc, orig_text_color);
@@ -601,11 +680,11 @@ void ImportPatchButton::click()
 
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = (HWND)platform_widget;
-    ofn.lpstrFilter = filter.get();
+    ofn.lpstrFilter = filter.get_const();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-    ofn.lpstrDefExt = ext.get();
+    ofn.lpstrDefExt = ext.get_const();
 
     if (!GetOpenFileName(&ofn)) {
         return;
@@ -684,7 +763,7 @@ void ExportPatchButton::click()
 
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = (HWND)platform_widget;
-    ofn.lpstrFilter = filter.get();
+    ofn.lpstrFilter = filter.get_const();
     ofn.lpstrFile = file_name;
     ofn.nMaxFile = MAX_PATH;
     ofn.Flags = (
@@ -694,7 +773,7 @@ void ExportPatchButton::click()
         | OFN_OVERWRITEPROMPT
         | OFN_PATHMUSTEXIST
     );
-    ofn.lpstrDefExt = ext.get();
+    ofn.lpstrDefExt = ext.get_const();
 
     if (!GetSaveFileName(&ofn)) {
         return;

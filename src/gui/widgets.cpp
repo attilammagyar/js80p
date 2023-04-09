@@ -895,7 +895,7 @@ bool ParamEditor::Knob::mouse_move(
     Widget::mouse_move(x, y, modifier);
 
     if (is_inactive) {
-        return true;
+        return false;
     }
 
     if (is_clicking) {
@@ -917,7 +917,7 @@ bool ParamEditor::Knob::mouse_move(
 
     focus();
 
-    return true;
+    return is_clicking;
 }
 
 
@@ -944,7 +944,7 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 
 
 AboutText::AboutText(GUI::Bitmap logo)
-    : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::TEXT_BOX),
+    : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::ABOUT_TEXT),
     logo(logo)
 {
     std::string line = "";

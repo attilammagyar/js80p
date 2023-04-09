@@ -37,7 +37,7 @@ Development progress: 91.5%
  * Envelopes: 100%
  * LFOs: 100%
  * Flexible Controllers: 100%
- * GUI: 90%
+ * GUI: 100%
  * Effects: 100%
  * Patch persistency: 100%
  * FST support: 100%
