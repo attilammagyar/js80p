@@ -427,7 +427,7 @@ class AboutText : public Widget
         static constexpr int LOGO_HEIGHT = 299;
 
         static constexpr int FONT_SIZE = 14;
-        static constexpr int TEXT_TOP = 45;
+        static constexpr int TEXT_TOP = 32;
         static constexpr int LINE_HEIGHT = 25;
         static constexpr int EMPTY_LINE_HEIGHT = 12;
         static constexpr int PADDING = 10;
@@ -454,7 +454,8 @@ class AboutText : public Widget
             "Click on the area below a knob to assign a controller to it.\n"
             "\n"
             "It is recommended to use a small buffer size for lower latency,\n"
-            "for example, 128 or 256 samples.\n"
+            "for example, 3-6 milliseconds, or 128 or 256 samples\n"
+            "at 44.1 kHz sample rate.\n"
         );
 
         AboutText(GUI::Bitmap logo);
