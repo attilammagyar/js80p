@@ -665,24 +665,25 @@ void FloatParam::render(
         Sample** buffer
 ) noexcept {
     if (lfo != NULL) {
-        Sample sample = 0.0;
+        Sample sample;
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            sample = ratio_to_value(lfo_buffer[0][i]);
-            buffer[0][i] = sample;
+            buffer[0][i] = sample = (Sample)ratio_to_value(lfo_buffer[0][i]);
         }
 
-        if (last_sample_index > first_sample_index) {
+        if (last_sample_index != first_sample_index) {
             store_new_value((Number)sample);
         }
     } else if (latest_event_type == EVT_LINEAR_RAMP) {
-        Sample sample = (Sample)get_raw_value();
+        Sample sample;
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             buffer[0][i] = sample = (Sample)linear_ramp_state.get_next_value();
         }
 
-        store_new_value((Number)sample);
+        if (last_sample_index != first_sample_index) {
+            store_new_value((Number)sample);
+        }
     } else {
         Param<Number>::render(round, first_sample_index, last_sample_index, buffer);
     }
