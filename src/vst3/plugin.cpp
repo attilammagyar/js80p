@@ -239,19 +239,6 @@ void Vst3Plugin::Processor::share_synth() noexcept
 }
 
 
-void Vst3Plugin::Processor::block_rendered() noexcept
-{
-    IPtr<Vst::IMessage> message = owned(allocateMessage());
-
-    if (!message) {
-        return;
-    }
-
-    message->setMessageID(MSG_BLOCK_RENDERED);
-    sendMessage(message);
-}
-
-
 tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
 {
     events.clear();
@@ -265,7 +252,6 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
     }
 
     generate_samples(data);
-    block_rendered();
 
     return kResultOk;
 }
@@ -575,8 +561,6 @@ Vst3Plugin::GUI::~GUI()
 
         gui = NULL;
     }
-
-    controller->gui_destroyed(this);
 }
 
 
@@ -635,23 +619,13 @@ void Vst3Plugin::GUI::show_if_needed()
 }
 
 
-void Vst3Plugin::GUI::update()
-{
-    if (gui == NULL) {
-        return;
-    }
-
-    gui->idle();
-}
-
-
 FUnknown* Vst3Plugin::Controller::createInstance(void* unused)
 {
     return (IEditController*)new Vst3Plugin::Controller();
 }
 
 
-Vst3Plugin::Controller::Controller() : synth(NULL), guis(8)
+Vst3Plugin::Controller::Controller() : synth(NULL)
 {
 }
 
@@ -764,23 +738,9 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
 
             return kResultOk;
         }
-    } else if (FIDStringsEqual(message->getMessageID(), MSG_BLOCK_RENDERED)) {
-        update_guis();
-
-        return kResultOk;
     }
 
     return EditController::notify(message);
-}
-
-
-void Vst3Plugin::Controller::update_guis()
-{
-    for (std::vector<GUI*>::iterator it = guis.begin(); it != guis.end(); ++it) {
-        if (*it != NULL) {
-            (*it)->update();
-        }
-    }
 }
 
 
@@ -794,30 +754,10 @@ IPlugView* PLUGIN_API Vst3Plugin::Controller::createView(FIDString name)
         GUI* gui = new GUI(this);
         gui->set_synth(synth);
 
-        for (std::vector<GUI*>::iterator it = guis.begin(); it != guis.end(); ++it) {
-            if (*it == NULL) {
-                *it = gui;
-
-                return gui;
-            }
-        }
-
-        guis.push_back(gui);
-
         return gui;
     }
 
     return NULL;
-}
-
-
-void Vst3Plugin::Controller::gui_destroyed(GUI const* gui)
-{
-    for (std::vector<GUI*>::iterator it = guis.begin(); it != guis.end(); ++it) {
-        if (*it == gui) {
-            *it = NULL;
-        }
-    }
 }
 
 

@@ -48,7 +48,6 @@ extern GUI::PlatformData* platform_data;
 class Vst3Plugin
 {
     public:
-        static constexpr char const* MSG_BLOCK_RENDERED = "JS80PRendered";
         static constexpr char const* MSG_CTL_READY = "JS80PCtl";
         static constexpr char const* MSG_SHARE_SYNTH = "JS80PSynth";
         static constexpr char const* MSG_SHARE_SYNTH_ATTR = "Synth";
@@ -162,7 +161,6 @@ class Vst3Plugin
                 virtual void removedFromParent() override;
 
                 void set_synth(Synth* synth);
-                void update();
 
             private:
                 static ViewRect const rect;
@@ -200,18 +198,13 @@ class Vst3Plugin
 
                 IPlugView* PLUGIN_API createView(FIDString name) SMTG_OVERRIDE;
 
-                void gui_destroyed(GUI const* gui);
-
             private:
                 Vst::RangeParameter* create_midi_ctl_param(
                     Synth::ControllerId const controller_id,
                     Vst::ParamID const param_id
                 ) const;
 
-                void update_guis();
-
                 Synth* synth;
-                std::vector<GUI*> guis;
 
             public:
                 OBJ_METHODS(Controller, EditController)
