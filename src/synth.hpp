@@ -399,7 +399,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MAX_PARAM_ID = 272
         };
 
-        static constexpr Integer FLOAT_PARAMS = 255;
+        static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
 
         enum ControllerId {
             NONE =                      Midi::NONE,                 ///< None
