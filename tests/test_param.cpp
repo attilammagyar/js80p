@@ -1225,6 +1225,8 @@ TEST(when_an_lfo_is_assigned_to_a_float_param_then_float_param_value_follows_the
     fast_float_param.set_sample_rate(sample_rate);
     fast_float_param.set_lfo(&lfo);
 
+    Integer const fast_float_param_change_index = fast_float_param.get_change_index();
+
     assert_eq((void*)&lfo, (void*)float_param.get_lfo());
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
@@ -1240,6 +1242,8 @@ TEST(when_an_lfo_is_assigned_to_a_float_param_then_float_param_value_follows_the
         &fast_float_param, 1, block_size
     );
     assert_eq((void*)lfo_buffer, (void*)rendered_samples);
+    assert_eq(lfo_buffer[block_size - 1], fast_float_param.get_value());
+    assert_neq((int)fast_float_param_change_index, (int)fast_float_param.get_change_index());
 })
 
 

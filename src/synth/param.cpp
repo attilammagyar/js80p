@@ -640,6 +640,10 @@ Sample const* const* FloatParam::initialize_rendering(
         lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
 
         if (is_ratio_same_as_value) {
+            if (sample_count > 0) {
+                store_new_value(lfo_buffer[0][sample_count - 1]);
+            }
+
             return lfo_buffer;
         }
     } else if (midi_controller != NULL) {
