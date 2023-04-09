@@ -64,7 +64,7 @@ namespace Constants {
 
     constexpr Number BIQUAD_FILTER_FREQUENCY_DEFAULT = 24000.0;
     constexpr Number BIQUAD_FILTER_FREQUENCY_MAX = 24000.0;
-    constexpr Number BIQUAD_FILTER_FREQUENCY_MIN = 0.1;
+    constexpr Number BIQUAD_FILTER_FREQUENCY_MIN = 1.0;
 
     constexpr Number BIQUAD_FILTER_GAIN_DEFAULT = 0.0;
     constexpr Number BIQUAD_FILTER_GAIN_MAX = 24.0;

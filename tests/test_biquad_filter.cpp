@@ -204,7 +204,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_low_pass_filter_is_no_op
 })
 
 
-/* JS80P doesn't let the frequency go below 0.1 Hz */
+/* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_minimum_then_low_pass_filter_is_silent, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
@@ -236,7 +236,7 @@ TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
 })
 
 
-/* JS80P doesn't let the frequency go below 0.1 Hz */
+/* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_min_value_then_high_pass_filter_is_no_op, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // BiquadFilter<SumOfSines>::TypeParam filter_type("");
@@ -454,7 +454,7 @@ TEST(peaking_filter_can_boost_or_attenuate_a_range_around_the_given_frequency, {
 })
 
 
-/* JS80P doesn't let the frequency go below 0.1 Hz */
+/* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_min_value_then_low_shelf_filter_is_no_op, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // BiquadFilter<SumOfSines>::TypeParam filter_type("");
@@ -544,7 +544,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_shelf_filter_is_no_
 })
 
 
-/* JS80P doesn't let the frequency go below 0.1 Hz */
+/* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_minimum_then_high_shelf_filter_is_gain, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // SumOfSines expected(0.25, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);

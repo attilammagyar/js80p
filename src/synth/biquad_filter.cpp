@@ -345,7 +345,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
 ) noexcept {
     Number const low_pass_no_op_frequency = this->low_pass_no_op_frequency;
 
-    /* JS80P doesn't let the frequency go below 0.1 Hz */
+    /* JS80P doesn't let the frequency go below 1.0 Hz */
     // Number const low_pass_silent_frequency = THRESHOLD;
 
     are_coefficients_constant = (
@@ -372,7 +372,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
 
-        /* JS80P doesn't let the frequency go below 0.1 Hz */
+        /* JS80P doesn't let the frequency go below 1.0 Hz */
         is_silent = false;
         // is_silent = frequency_value <= low_pass_silent_frequency;
 
@@ -399,7 +399,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
                 continue;
             }
 
-            /* JS80P doesn't let the frequency go below 0.1 Hz */
+            /* JS80P doesn't let the frequency go below 1.0 Hz */
             // if (UNLIKELY(frequency_value <= low_pass_silent_frequency)) {
                 // store_silent_coefficient_samples(i);
 
@@ -443,7 +443,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    /* JS80P doesn't let the frequency go below 0.1 Hz */
+    /* JS80P doesn't let the frequency go below 1.0 Hz */
     // Number const no_op_frequency = THRESHOLD;
     Frequency const silent_frequency = this->nyquist_frequency;
 
@@ -462,7 +462,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
 
-        /* JS80P doesn't let the frequency go below 0.1 Hz */
+        /* JS80P doesn't let the frequency go below 1.0 Hz */
         // if (frequency_value <= no_op_frequency) {
             // return true;
         // }
@@ -491,7 +491,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         for (Integer i = 0; i != sample_count; ++i) {
             Number const frequency_value = frequency_buffer[i];
 
-            /* JS80P doesn't let the frequency go below 0.1 Hz */
+            /* JS80P doesn't let the frequency go below 1.0 Hz */
             // if (frequency_value <= no_op_frequency) {
                 // store_no_op_coefficient_samples(i);
 
@@ -831,7 +831,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         Integer const sample_count
 ) noexcept {
     Frequency const becomes_gain_frequency = this->nyquist_frequency;
-    /* JS80P doesn't let the frequency go below 0.1 Hz */
+    /* JS80P doesn't let the frequency go below 1.0 Hz */
     // Number const no_op_frequency = THRESHOLD;
 
     are_coefficients_constant = (
@@ -849,7 +849,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
 
-        /* JS80P doesn't let the frequency go below 0.1 Hz */
+        /* JS80P doesn't let the frequency go below 1.0 Hz */
         // if (frequency_value <= no_op_frequency) {
             // return true;
         // }
@@ -878,7 +878,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         for (Integer i = 0; i != sample_count; ++i) {
             Number const frequency_value = (Number)frequency_buffer[i];
 
-            /* JS80P doesn't let the frequency go below 0.1 Hz */
+            /* JS80P doesn't let the frequency go below 1.0 Hz */
             // if (frequency_value <= no_op_frequency) {
                 // store_no_op_coefficient_samples(i);
 
@@ -948,7 +948,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         Integer const sample_count
 ) noexcept {
     Number const high_shelf_no_op_frequency = low_pass_no_op_frequency;
-    /* JS80P doesn't let the frequency go below 0.1 Hz */
+    /* JS80P doesn't let the frequency go below 1.0 Hz */
     // Number const becomes_gain_frequency = THRESHOLD;
 
     are_coefficients_constant = (
@@ -975,7 +975,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         frequency.skip_round(round, sample_count);
         gain.skip_round(round, sample_count);
 
-        /* JS80P doesn't let the frequency go below 0.1 Hz */
+        /* JS80P doesn't let the frequency go below 1.0 Hz */
         // if (UNLIKELY(frequency_value <= becomes_gain_frequency)) {
             // store_gain_coefficient_samples(0, gain_value);
 
@@ -1003,7 +1003,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
 
             Number const gain_value = gain_buffer[i];
 
-            /* JS80P doesn't let the frequency go below 0.1 Hz */
+            /* JS80P doesn't let the frequency go below 1.0 Hz */
             // if (UNLIKELY(frequency_value <= becomes_gain_frequency)) {
                 // store_gain_coefficient_samples(i, gain_value);
 
