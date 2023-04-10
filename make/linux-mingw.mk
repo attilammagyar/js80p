@@ -13,7 +13,7 @@ GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_PLATFORM_SOURCES = src/gui/win32.cpp
 
-DEBUG_LOG_FILE ?= C:\\\\debug.txt
+# DEBUG_LOG_FILE ?= C:\\\\debug.txt
 
 RM = rm -f
 MKDIR = mkdir
