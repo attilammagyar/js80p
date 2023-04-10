@@ -217,7 +217,7 @@ VST3_CXXFLAGS = \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas
 
-.PHONY: all fst vst3 check clean dirs docs perf guiplayground
+.PHONY: all check clean dirs docs fst guiplayground perf vst3
 
 all: dirs fst vst3
 
