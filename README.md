@@ -2,7 +2,6 @@ JS80P
 =====
 
 A MIDI driven, performance oriented, versatile [synthesizer VST plugin][plugin].
-(Work in progress.)
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
@@ -15,42 +14,28 @@ Table of Contents
 -----------------
 
  * [Table of Contents](#toc)
- * [Development Progress](#prog)
-    * [Future Plans](#future)
+ * [System Requirements](#system)
  * [Features](#features)
     * [Signal Chain (Simplified)](#signal)
- * [Name](#name)
+    * [Future Plans](#future)
+ * [Frequenctly Asked Questions](#faq)
+    * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
+    * [Where does the name come from?](#faq-name)
  * [Development](#dev)
     * [Tools](#dev-tools)
     * [Dependencies](#dev-dep)
     * [Theory](#dev-theory)
 
-<a name="prog"></a>
+<a name="system"></a>
 
-Development progress: 91.5%
----------------------------
+System Requirements
+-------------------
 
- * Oscillator features: 100%
- * Modulation & mixing modes: 100%
- * Filters: 100%
- * Wave folder: 100%
- * Envelopes: 100%
- * LFOs: 100%
- * Flexible Controllers: 100%
- * GUI: 100%
- * Effects: 100%
- * Patch persistency: 100%
- * FST support: 100%
- * VST3 support: 100%
- * Presets: 0%
+ * Operating System: Windows 7 or newer
+ * CPU: 64 bit, SSE2 support
+ * RAM: 50-100 MB, depending on buffer size
 
-<a name="future"></a>
-
-### Future Plans
-
- * Aftertouch support: 0%
- * LV2 support: 0%
- * Linux support: 0%
+Tested with [REAPER](https://www.reaper.fm/) 4.402, 6.78
 
 <a name="features"></a>
 
@@ -58,33 +43,40 @@ Features
 --------
 
  * 16 notes polyphony
- * 2 oscillators (waveforms: sine, sawtooth, triangle, square, inverse
-   sawtooth, custom)
- * 2 filters for each oscillator (low-pass, high-pass, band-pass, notch, bell,
-   low-shelf, high-shelf)
+ * 2 oscillators with 10 waveforms:
+    * sine
+    * sawtooth
+    * soft sawtooth
+    * inverse sawtooth
+    * soft inverse sawtooth
+    * triangle
+    * soft triangle
+    * square
+    * soft square
+    * custom
+ * 2 filters for each oscillator, 7 filter types:
+    * low-pass
+    * high-pass
+    * band-pass
+    * notch
+    * bell (peaking)
+    * low-shelf
+    * high-shelf
  * portamento
  * wave folder
+ * split keyboard
  * amplitude modulation
  * frequency modulation
  * phase modulation
  * built-in effects:
     * overdrive
     * distortion
-    * filters (low-pass, high-pass, band-pass, notch, bell, low-shelf,
-      high-shelf)
+    * 2 more filters
     * stereo echo
     * stereo reverb
  * 6 envelopes
  * 8 low-frequency oscillators (LFO)
  * configurable MIDI controllers
-
-#### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
-
-The reason for JS80P having both kinds of modulation is that they are not
-always equivalent. They are only identical when the modulator signal is a
-sinusoid, but with each added harmonic, PM and FM start to differ more and
-more. A detailed mathematical explanation of this is shown in
-[pm-fm-equivalence.md](pm-fm-equivalence.md).
 
 <a name="signal"></a>
 
@@ -104,18 +96,39 @@ more. A detailed mathematical explanation of this is shown in
     v
     Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb --> Out
 
-<a name="name"></a>
+<a name="future"></a>
 
-Name
-----
+### Future Plans
+
+ * Aftertouch support
+ * LV2 support
+ * Linux support
+
+Frequenctly Asked Questions
+---------------------------
+
+<a name="faq-pm-fm"></a>
+
+### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
+
+The reason for JS80P having both kinds of modulation is that they are not
+always equivalent. They are only identical when the modulator signal is a
+sinusoid, but with each added harmonic, PM and FM start to differ more and
+more. A detailed mathematical explanation of this is shown in
+[pm-fm-equivalence.md](pm-fm-equivalence.md).
+
+<a name="faq-name"></a>
+
+### Where does the name come from?
 
 In 2022, I started developing a browser-based synthesizer using the [Web Audio
 API][webaudio], mostly being inspired by the [Yamaha CS-80][cs80]. I named that
 project [JS-80][js80]. Then I started adding one little feature and
 customization option after the other, then it got out of hand, and I also
 started finding limitations of doing audio in the browser. So I decided to
-implement a cleaned up (and antialiased!) version of this synth in C++ as a DAW
-plugin, and so JS80P was born.
+implement a cleaned up version of this synth in C++ as a DAW plugin (with a
+better waveshaper antialiasing method than what's available in the browser),
+and so JS80P was born.
 
   [webaudio]: https://www.w3.org/TR/webaudio/
   [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80]
