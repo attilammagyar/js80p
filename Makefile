@@ -35,14 +35,14 @@ OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).o
 GUI_RES = $(BUILD_DIR)/js80p$(SUFFIX).res
 
 GUI_IMAGES = \
-	resources/about.bmp \
-	resources/controllers.bmp \
-	resources/effects.bmp \
-	resources/envelopes.bmp \
-	resources/knob_states.bmp \
-	resources/lfos.bmp \
-	resources/synth.bmp \
-	resources/vst_logo.bmp
+	gui/bmp/about.bmp \
+	gui/bmp/controllers.bmp \
+	gui/bmp/effects.bmp \
+	gui/bmp/envelopes.bmp \
+	gui/bmp/knob_states.bmp \
+	gui/bmp/lfos.bmp \
+	gui/bmp/synth.bmp \
+	gui/bmp/vst_logo.bmp
 
 include make/$(OS)-$(PLATFORM).mk
 
