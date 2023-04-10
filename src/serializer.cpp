@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__SERIALIZATION_CPP
-#define JS80P__SERIALIZATION_CPP
+#ifndef JS80P__SERIALIZER_CPP
+#define JS80P__SERIALIZER_CPP
 
 #include <algorithm>
 #include <cstring>

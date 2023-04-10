@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__SERIALIZATION_HPP
-#define JS80P__SERIALIZATION_HPP
+#ifndef JS80P__SERIALIZER_HPP
+#define JS80P__SERIALIZER_HPP
 
 #include <string>
 #include <vector>
