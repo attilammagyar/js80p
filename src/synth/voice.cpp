@@ -30,7 +30,7 @@ namespace JS80P
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
     : waveform(name + "WAV"),
-    amplitude(name + "AMP", 0.0, 1.0, 1.0),
+    amplitude(name + "AMP", 0.0, 1.0, 0.75),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
     folding(
         name + "FLD",
@@ -55,7 +55,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
     ),
     width(name + "WID", -1.0, 1.0, 0.0),
     panning(name + "PAN", -1.0, 1.0, 0.0),
-    volume(name + "VOL", 0.0, 1.0, 1.0),
+    volume(name + "VOL", 0.0, 1.0, 0.33),
 
     harmonic_0(name + "C1", -1.0, 1.0, 0.0),
     harmonic_1(name + "C2", -1.0, 1.0, 0.0),
