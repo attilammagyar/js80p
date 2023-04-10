@@ -21,6 +21,7 @@
 #include "fst/plugin.hpp"
 
 #include "midi.hpp"
+#include "serializer.hpp"
 
 
 namespace JS80P
