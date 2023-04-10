@@ -315,6 +315,8 @@ class ParamEditor : public TransparentWidget
 
         void reset_default();
 
+        Synth::ParamId const param_id;
+
     protected:
         virtual bool paint() override;
         virtual bool mouse_up(int const x, int const y) override;
@@ -338,17 +340,17 @@ class ParamEditor : public TransparentWidget
                 static constexpr int WIDTH = 48;
                 static constexpr int HEIGHT = 48;
 
-                static constexpr Number MOUSE_WHEEL_COARSE_SCALE = 1.0 / 100.0;
+                static constexpr Number MOUSE_WHEEL_COARSE_SCALE = 1.0 / 200.0;
 
                 static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
-                    MOUSE_WHEEL_COARSE_SCALE / 25.0
+                    MOUSE_WHEEL_COARSE_SCALE / 50.0
                 );
 
                 static constexpr Number MOUSE_MOVE_COARSE_SCALE = (
-                    1.0 / ((Number)HEIGHT * 3.0)
+                    1.0 / ((Number)HEIGHT * 5.0)
                 );
                 static constexpr Number MOUSE_MOVE_FINE_SCALE = (
-                    MOUSE_MOVE_COARSE_SCALE / 20.0
+                    MOUSE_MOVE_COARSE_SCALE / 50.0
                 );
 
                 Knob(
@@ -385,6 +387,7 @@ class ParamEditor : public TransparentWidget
                 Number prev_x;
                 Number prev_y;
                 Number ratio;
+                Number mouse_move_delta;
                 bool is_inactive;
         };
 
@@ -393,7 +396,6 @@ class ParamEditor : public TransparentWidget
         void update_value_str();
         void update_controller_str();
 
-        Synth::ParamId const param_id;
         char const* const format;
         double const scale;
 

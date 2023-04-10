@@ -667,7 +667,14 @@ void ParamEditor::update_editor()
 
 void ParamEditor::adjust_ratio(Number const delta)
 {
-    handle_ratio_change(ratio + delta);
+    if (param_id < Synth::FLOAT_PARAMS) {
+        handle_ratio_change(ratio + delta);
+    } else {
+        Number const discrete_delta = (
+            (delta > 0 ? 1.001 : -1.001) / synth->get_param_max_value(param_id)
+        );
+        handle_ratio_change(ratio + discrete_delta);
+    }
 }
 
 
@@ -786,6 +793,7 @@ ParamEditor::Knob::Knob(
     editor(editor),
     knob_state(NULL),
     ratio(0.0),
+    mouse_move_delta(0.0),
     is_inactive(false)
 {
 }
@@ -868,6 +876,7 @@ bool ParamEditor::Knob::mouse_down(int const x, int const y)
 
     prev_x = (Number)x;
     prev_y = (Number)y;
+    mouse_move_delta = 0.0;
 
     return true;
 }
@@ -912,7 +921,16 @@ bool ParamEditor::Knob::mouse_move(
 
         prev_x = float_x;
         prev_y = float_y;
-        editor.adjust_ratio(delta);
+
+        mouse_move_delta += delta;
+
+        if (
+                editor.param_id < Synth::FLOAT_PARAMS
+                || std::fabs(mouse_move_delta) > 0.03
+        ) {
+            editor.adjust_ratio(delta);
+            mouse_move_delta = 0.0;
+        }
     }
 
     focus();

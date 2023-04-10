@@ -780,6 +780,35 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 }
 
 
+Number Synth::get_param_max_value(ParamId const param_id) const noexcept
+{
+    if (param_id < FLOAT_PARAMS) {
+        return float_params[param_id]->get_max_value();
+    }
+
+    switch (param_id) {
+        case ParamId::MODE: return mode.get_max_value();
+        case ParamId::MWAV: return modulator_params.waveform.get_max_value();
+        case ParamId::CWAV: return carrier_params.waveform.get_max_value();
+        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_max_value();
+        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_max_value();
+        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_max_value();
+        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_max_value();
+        case ParamId::EF1TYP: return effects.filter_1_type.get_max_value();
+        case ParamId::EF2TYP: return effects.filter_2_type.get_max_value();
+        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_max_value();
+        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_max_value();
+        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_max_value();
+        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_max_value();
+        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_max_value();
+        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_max_value();
+        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_max_value();
+        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_max_value();
+        default: return 0.0; // This should neacver be rehed.
+    }
+}
+
+
 Number Synth::float_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
