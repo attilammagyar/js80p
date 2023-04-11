@@ -8,6 +8,11 @@ A MIDI driven, performance oriented, versatile [synthesizer VST plugin][plugin].
 > VST® is a trademark of Steinberg Media Technologies GmbH, registered in
 > Europe and other countries.
 
+The source code is available at https://github.com/attilammagyar/js80p under
+the terms of the GNU General Public License Version 3.
+
+<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
+
 <a name="toc"></a>
 
 Table of Contents
@@ -15,9 +20,11 @@ Table of Contents
 
  * [Table of Contents](#toc)
  * [System Requirements](#system)
+ * [Installation](#install)
  * [Features](#features)
     * [Signal Chain (Simplified)](#signal)
     * [Future Plans](#future)
+ * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
@@ -33,9 +40,22 @@ System Requirements
 
  * Operating System: Windows 7 or newer
  * CPU: 64 bit, SSE2 support
- * RAM: 50-100 MB, depending on buffer size
+ * RAM: 50-200 MB, depending on buffer size
 
-Tested with [REAPER](https://www.reaper.fm/) 4.402, 6.78
+Tested with [REAPER](https://www.reaper.fm/) 4.402 and 6.78.
+
+<a name="install"></a>
+
+Installation
+------------
+
+1. Decompress `js80p.zip`.
+2. Move `fst/js80p.dll` to the folder where you keep your VST 2.4 plugins,
+   or move `vst3/js80p.vst3` to your VST 3 folder.
+
+The `presets` folder in the archive contains a few sounds that you can load by
+clicking the _Import Patch_ icon near the top left corner of the main screen of
+the plugin.
 
 <a name="features"></a>
 
@@ -103,6 +123,14 @@ Features
  * Aftertouch support
  * LV2 support
  * Linux support
+
+<a name="bugs"></a>
+
+Bugs
+----
+
+If you find bugs, please report them at
+[https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
 
 Frequenctly Asked Questions
 ---------------------------
