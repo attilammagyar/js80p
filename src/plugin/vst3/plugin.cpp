@@ -28,7 +28,7 @@
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "public.sdk/source/vst/vstaudioprocessoralgo.h"
 
-#include "vst3/plugin.hpp"
+#include "plugin/vst3/plugin.hpp"
 
 #include "gui/gui.hpp"
 

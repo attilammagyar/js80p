@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__FST__PLUGIN_HPP
-#define JS80P__FST__PLUGIN_HPP
+#ifndef JS80P__PLUGIN__FST__PLUGIN_HPP
+#define JS80P__PLUGIN__FST__PLUGIN_HPP
 
 #include <string>
 

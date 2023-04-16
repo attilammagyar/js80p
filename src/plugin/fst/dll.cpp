@@ -18,7 +18,7 @@
 
 #include <windows.h>
 
-#include "fst/plugin.hpp"
+#include "plugin/fst/plugin.hpp"
 #include "gui/gui.hpp"
 
 

@@ -18,7 +18,7 @@
 
 #include <cstring>
 
-#include "fst/plugin.hpp"
+#include "plugin/fst/plugin.hpp"
 
 #include "midi.hpp"
 #include "serializer.hpp"

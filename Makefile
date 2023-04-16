@@ -159,19 +159,19 @@ JS80P_SOURCES = \
 
 FST_HEADERS = \
 	$(JS80P_HEADERS) \
-	src/fst/plugin.hpp
+	src/plugin/fst/plugin.hpp
 
 FST_SOURCES = \
-	src/fst/plugin.cpp \
+	src/plugin/fst/plugin.cpp \
 	$(FST_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
 VST3_HEADERS = \
 	$(JS80P_HEADERS) \
-	src/vst3/plugin.hpp
+	src/plugin/vst3/plugin.hpp
 
 VST3_SOURCES = \
-	src/vst3/plugin.cpp \
+	src/plugin/vst3/plugin.cpp \
 	$(VST3_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
@@ -339,7 +339,7 @@ $(GUI_RES): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 $(OBJ_FST_PLUGIN): \
-		src/fst/plugin.cpp \
+		src/plugin/fst/plugin.cpp \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
@@ -351,7 +351,7 @@ $(OBJ_FST_MAIN): \
 	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
 
 $(OBJ_VST3_PLUGIN): \
-		src/vst3/plugin.cpp \
+		src/plugin/vst3/plugin.cpp \
 		$(VST3_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP_PLATFORM) $(VST3_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@

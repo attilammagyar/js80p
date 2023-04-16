@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "vst3.cpp"
+#include "plugin/vst3/vst3.cpp"
+
 #include "public.sdk/source/main/dllmain.cpp"
 
 #include "gui/gui.hpp"
