@@ -76,7 +76,7 @@ class Widget : public WidgetBase
                 WCHAR* c_wstr() const;
 
                 LPCTSTR get_const() const;
-                LPSTR get() const;
+                LPTSTR get() const;
 
             private:
                 void free_buffers();
