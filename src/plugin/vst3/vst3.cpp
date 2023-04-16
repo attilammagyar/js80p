@@ -76,7 +76,9 @@
 #include <public.sdk/source/common/openurl.cpp>
 #include <public.sdk/source/common/openurl.h>
 #include <public.sdk/source/common/systemclipboard.h>
+#include <public.sdk/source/common/systemclipboard_mac.mm>
 #include <public.sdk/source/common/systemclipboard_win32.cpp>
+#include <public.sdk/source/common/threadchecker_mac.mm>
 #include <public.sdk/source/common/threadchecker_linux.cpp>
 #include <public.sdk/source/common/threadchecker_win32.cpp>
 #include <public.sdk/source/common/threadchecker.h>
