@@ -22,13 +22,13 @@
 #include <string>
 #include <vector>
 
-#include "pluginterfaces/gui/iplugview.h"
-#include "pluginterfaces/vst/ivstmessage.h"
-#include "pluginterfaces/vst/ivstmidicontrollers.h"
-#include "public.sdk/source/common/pluginview.h"
-#include "public.sdk/source/main/pluginfactory.h"
-#include "public.sdk/source/vst/vstaudioeffect.h"
-#include "public.sdk/source/vst/vsteditcontroller.h"
+#include <pluginterfaces/gui/iplugview.h>
+#include <pluginterfaces/vst/ivstmessage.h>
+#include <pluginterfaces/vst/ivstmidicontrollers.h>
+#include <public.sdk/source/common/pluginview.h>
+#include <public.sdk/source/main/pluginfactory.h>
+#include <public.sdk/source/vst/vstaudioeffect.h>
+#include <public.sdk/source/vst/vsteditcontroller.h>
 
 #include "gui/gui.hpp"
 

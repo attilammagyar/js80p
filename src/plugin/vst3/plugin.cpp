@@ -19,14 +19,14 @@
 #include <algorithm>
 #include <string>
 
-#include "base/source/fstreamer.h"
-#include "base/source/fstring.h"
-#include "pluginterfaces/base/fstrdefs.h"
-#include "pluginterfaces/base/futils.h"
-#include "pluginterfaces/base/ibstream.h"
-#include "pluginterfaces/base/ustring.h"
-#include "pluginterfaces/vst/ivstparameterchanges.h"
-#include "public.sdk/source/vst/vstaudioprocessoralgo.h"
+#include <base/source/fstreamer.h>
+#include <base/source/fstring.h>
+#include <pluginterfaces/base/fstrdefs.h>
+#include <pluginterfaces/base/futils.h>
+#include <pluginterfaces/base/ibstream.h>
+#include <pluginterfaces/base/ustring.h>
+#include <pluginterfaces/vst/ivstparameterchanges.h>
+#include <public.sdk/source/vst/vstaudioprocessoralgo.h>
 
 #include "plugin/vst3/plugin.hpp"
 
