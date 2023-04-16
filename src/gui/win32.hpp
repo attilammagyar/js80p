@@ -178,6 +178,6 @@ class Widget : public WidgetBase
 
 }
 
-#include "widgets.hpp"
+#include "gui/widgets.hpp"
 
 #endif

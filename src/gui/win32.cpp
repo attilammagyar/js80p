@@ -811,6 +811,6 @@ void ExportPatchButton::click()
 
 }
 
-#include "widgets.cpp"
+#include "gui/widgets.cpp"
 
 #endif
