@@ -1,8 +1,8 @@
-OS ?= linux
-PLATFORM ?= x86_64-w64-mingw32
+DEV_OS ?= linux
+TARGET_PLATFORM ?= x86_64-w64-mingw32
 
 BUILD_DIR_BASE ?= build
-BUILD_DIR = $(BUILD_DIR_BASE)/$(PLATFORM)
+BUILD_DIR = $(BUILD_DIR_BASE)/$(TARGET_PLATFORM)
 DIST_DIR ?= dist
 DOC_DIR ?= doc
 
@@ -12,10 +12,12 @@ JS80P_CXXINCS = \
 	-I./src
 
 FST_CXXINCS = \
-	-I./lib/fst
+	-I./lib/fst \
+	$(JS80P_CXXINCS)
 
 VST3_CXXINCS = \
-	-I./lib/vst3sdk
+	-I./lib/vst3sdk \
+	$(JS80P_CXXINCS)
 
 JS80P_CXXFLAGS = \
 	-Wall \
@@ -27,25 +29,17 @@ JS80P_CXXFLAGS = \
 # DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 DEBUG_LOG ?=
 
-OS_DIR = $(DIST_DIR)/$(TARGET_OS)$(SUFFIX)
-FST_DIR = $(OS_DIR)/fst
-VST3_DIR = $(OS_DIR)/vst3
+TARGET_OS_DIR = $(DIST_DIR)/$(TARGET_OS)$(SUFFIX)
+FST_DIR = $(TARGET_OS_DIR)/fst
+VST3_DIR = $(TARGET_OS_DIR)/vst3
 
 OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).o
 
-GUI_RES = $(BUILD_DIR)/js80p$(SUFFIX).res
+.PHONY: all check clean dirs docs fst guiplayground perf vst3
 
-GUI_IMAGES = \
-	gui/bmp/about.bmp \
-	gui/bmp/controllers.bmp \
-	gui/bmp/effects.bmp \
-	gui/bmp/envelopes.bmp \
-	gui/bmp/knob_states.bmp \
-	gui/bmp/lfos.bmp \
-	gui/bmp/synth.bmp \
-	gui/bmp/vst_logo.bmp
+all: dirs fst vst3
 
-include make/$(OS)-$(PLATFORM).mk
+include make/$(DEV_OS)-$(TARGET_PLATFORM).mk
 
 OBJ_FST_MAIN = $(BUILD_DIR)/fst-main$(SUFFIX).o
 OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
@@ -56,7 +50,7 @@ OBJ_SYNTH = $(BUILD_DIR)/synth$(SUFFIX).o
 OBJ_GUI = $(BUILD_DIR)/gui$(SUFFIX).o
 
 FST_OBJS = \
-	$(GUI_RES) \
+	$(OBJ_GUI_DATA) \
 	$(OBJ_FST_MAIN) \
 	$(OBJ_FST_PLUGIN) \
 	$(OBJ_GUI) \
@@ -64,7 +58,7 @@ FST_OBJS = \
 	$(OBJ_SYNTH)
 
 VST3_OBJS = \
-	$(GUI_RES) \
+	$(OBJ_GUI_DATA) \
 	$(OBJ_VST3_MAIN) \
 	$(OBJ_VST3_PLUGIN) \
 	$(OBJ_GUI) \
@@ -72,7 +66,7 @@ VST3_OBJS = \
 	$(OBJ_SYNTH)
 
 GUI_PLAYGROUND_OBJS = \
-	$(GUI_RES) \
+	$(OBJ_GUI_DATA) \
 	$(OBJ_GUI) \
 	$(OBJ_GUI_PLAYGROUND) \
 	$(OBJ_SERIALIZER) \
@@ -176,11 +170,11 @@ VST3_SOURCES = \
 	$(JS80P_SOURCES)
 
 GUI_HEADERS = \
-	$(GUI_PLATFORM_HEADERS) \
+	$(GUI_TARGET_PLATFORM_HEADERS) \
 	$(JS80P_HEADERS)
 
 GUI_SOURCES = \
-	$(GUI_PLATFORM_SOURCES) \
+	$(GUI_TARGET_PLATFORM_SOURCES) \
 	src/gui/widgets.cpp \
 	src/gui/gui.cpp
 
@@ -197,19 +191,13 @@ TEST_CXXFLAGS = \
 	-I./tests \
 	-g
 
-CXXINCS = $(PLATFORM_CXXINCS) $(JS80P_CXXINCS)
-
 FST_CXXFLAGS = \
 	-DFST_DONT_DEPRECATE_UNKNOWN \
-	$(CXXINCS) \
-	$(FST_CXXINCS) \
 	$(JS80P_CXXFLAGS)
 
 VST3_CXXFLAGS = \
 	-DRELEASE \
 	-DJS80P_VST3_GUI_PLATFORM=$(VST3_GUI_PLATFORM) \
-	$(CXXINCS) \
-	$(VST3_CXXINCS) \
 	$(JS80P_CXXFLAGS) \
 	-Wno-class-memaccess \
 	-Wno-format \
@@ -217,10 +205,6 @@ VST3_CXXFLAGS = \
 	-Wno-parentheses \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas
-
-.PHONY: all check clean dirs docs fst guiplayground perf vst3
-
-all: dirs fst vst3
 
 fst: $(FST)
 
@@ -245,7 +229,7 @@ clean:
 		$(FST) \
 		$(FST_OBJS) \
 		$(VST3) \
-		$(VST3_DLL) \
+		$(VST3_BIN) \
 		$(VST3_OBJS) \
 		$(TEST_BINS) \
 		$(GUI_PLAYGROUND) \
@@ -295,85 +279,95 @@ $(DOC_DIR)/html/index.html: \
 	$(DOXYGEN)
 
 $(FST): $(FST_OBJS) | $(FST_DIR)
-	$(LINK_FST) $(FST_OBJS) -o $@ $(PLATFORM_LFLAGS)
+	$(LINK_FST) $(FST_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(FST_DIR): | $(OS_DIR) $(DIST_DIR)
+$(FST_DIR): | $(TARGET_OS_DIR) $(DIST_DIR)
 	$(MKDIR) $@
 
-$(OS_DIR): | $(DIST_DIR)
+$(TARGET_OS_DIR): | $(DIST_DIR)
 	$(MKDIR) $@
 
 $(VST3): $(VST3_OBJS) | $(VST3_DIR)
-	$(LINK_VST3) $(VST3_OBJS) -o $@ $(PLATFORM_LFLAGS)
+	$(LINK_VST3) $(VST3_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(VST3_DIR): | $(OS_DIR) $(DIST_DIR)
+$(VST3_DIR): | $(TARGET_OS_DIR) $(DIST_DIR)
 	$(MKDIR) $@
 
 $(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
-	$(LINK_GUI_PLAYGROUND) $(GUI_PLAYGROUND_OBJS) -o $@ $(PLATFORM_LFLAGS)
+	$(LINK_GUI_PLAYGROUND) $(GUI_PLAYGROUND_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
 
 $(OBJ_GUI_PLAYGROUND): \
 		$(GUI_PLAYGROUND_SOURCES) \
 		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
-		-D OEMRESOURCE -c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -D OEMRESOURCE -c $< -o $@
 
 $(OBJ_SYNTH): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
-	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
-		-c src/synth.cpp -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c src/synth.cpp -o $@
 
 $(OBJ_SERIALIZER): \
 		src/serializer.cpp src/serializer.hpp \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) \
-		-c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_GUI) : \
 		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(CXXINCS) $(JS80P_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
-
-$(GUI_RES): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
-	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_FST_PLUGIN): \
 		src/plugin/fst/plugin.cpp \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(FST_CXXINCS) $(FST_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_FST_MAIN): \
 		$(FST_MAIN_SOURCES) \
 		$(FST_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(FST_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(FST_CXXINCS) $(FST_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_VST3_PLUGIN): \
 		src/plugin/vst3/plugin.cpp \
 		$(VST3_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(VST3_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(VST3_CXXINCS) $(VST3_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_VST3_MAIN): \
 		$(VST3_MAIN_SOURCES) \
 		$(VST3_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP_PLATFORM) $(VST3_CXXFLAGS) $(DEBUG_LOG) $(PLATFORM_CXXFLAGS) -c $< -o $@
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(VST3_CXXINCS) $(VST3_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(BUILD_DIR)/test_example$(EXE): \
 	tests/test_example.cpp \
 	$(TEST_LIBS) \
 	| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_envelope$(EXE): \
 		tests/test_envelope.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
@@ -382,7 +376,7 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_comb_filter$(EXE): \
 		tests/test_comb_filter.cpp \
@@ -392,7 +386,7 @@ $(BUILD_DIR)/test_comb_filter$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_delay$(EXE): \
 		tests/test_delay.cpp \
@@ -401,7 +395,7 @@ $(BUILD_DIR)/test_delay$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
@@ -410,14 +404,14 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_gui$(EXE): \
 		tests/test_gui.cpp \
@@ -426,7 +420,7 @@ $(BUILD_DIR)/test_gui$(EXE): \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_lfo$(EXE): \
 		tests/test_lfo.cpp \
@@ -434,7 +428,7 @@ $(BUILD_DIR)/test_lfo$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_math$(EXE): \
 		tests/test_math.cpp \
@@ -442,7 +436,7 @@ $(BUILD_DIR)/test_math$(EXE): \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_midi_controller$(EXE): \
 		tests/test_midi_controller.cpp \
@@ -451,7 +445,7 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
@@ -459,21 +453,21 @@ $(BUILD_DIR)/test_oscillator$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_serializer$(EXE): \
 		tests/test_serializer.cpp \
@@ -482,7 +476,7 @@ $(BUILD_DIR)/test_serializer$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_signal_producer$(EXE): \
 		tests/test_signal_producer.cpp \
@@ -491,7 +485,7 @@ $(BUILD_DIR)/test_signal_producer$(EXE): \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_synth$(EXE): \
 		tests/test_synth.cpp \
@@ -499,7 +493,7 @@ $(BUILD_DIR)/test_synth$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_voice$(EXE): \
 		tests/test_voice.cpp \
@@ -507,7 +501,7 @@ $(BUILD_DIR)/test_voice$(EXE): \
 		$(SYNTH_SOURCES) \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
@@ -516,11 +510,11 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/perf_math$(EXE): \
 		tests/performance/perf_math.cpp \
 		src/synth/math.hpp src/synth/math.cpp \
 		src/js80p.hpp \
 		| $(BUILD_DIR)
-	$(CPP) $(CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
