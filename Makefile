@@ -1,10 +1,12 @@
 DEV_OS ?= linux
 TARGET_PLATFORM ?= x86_64-w64-mingw32
 VERSION ?= dev
+FVERSION ?= dev
 
 BUILD_DIR_BASE ?= build
 BUILD_DIR = $(BUILD_DIR_BASE)/$(TARGET_PLATFORM)
-DIST_DIR ?= dist
+DIST_DIR_BASE ?= dist
+DIST_DIR_PREFIX ?= $(DIST_DIR_BASE)/js80p-$(FVERSION)-$(TARGET_OS)-$(SUFFIX)
 DOC_DIR ?= doc
 
 TEST_MAX_ARRAY_PRINT ?= 20
@@ -31,13 +33,12 @@ JS80P_CXXFLAGS = \
 # DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 DEBUG_LOG ?=
 
-TARGET_OS_DIR = $(DIST_DIR)/$(TARGET_OS)-$(SUFFIX)
-FST_DIR = $(TARGET_OS_DIR)/fst
-VST3_DIR = $(TARGET_OS_DIR)/vst3
+FST_DIR = $(DIST_DIR_PREFIX)-fst
+VST3_DIR = $(DIST_DIR_PREFIX)-vst3
 
 OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 
-.PHONY: all check clean dirs docs fst guiplayground perf vst3
+.PHONY: all check clean dirs docs fst guiplayground perf show_dist_dir_prefix vst3
 
 all: dirs fst vst3
 
@@ -208,11 +209,14 @@ VST3_CXXFLAGS = \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas
 
+show_dist_dir_prefix:
+	@echo $(DIST_DIR_PREFIX)
+
 fst: $(FST)
 
 vst3: $(VST3)
 
-dirs: $(BUILD_DIR) $(DIST_DIR) $(DOC_DIR)
+dirs: $(BUILD_DIR) $(DOC_DIR) $(FST_DIR) $(VST3_DIR)
 
 $(BUILD_DIR): | $(BUILD_DIR_BASE)
 	$(MKDIR) $@
@@ -220,7 +224,7 @@ $(BUILD_DIR): | $(BUILD_DIR_BASE)
 $(BUILD_DIR_BASE):
 	$(MKDIR) $@
 
-$(DIST_DIR):
+$(DIST_DIR_BASE):
 	$(MKDIR) $@
 
 $(DOC_DIR):
@@ -283,16 +287,13 @@ $(DOC_DIR)/html/index.html: \
 $(FST): $(FST_OBJS) | $(FST_DIR)
 	$(LINK_FST) $(FST_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(FST_DIR): | $(TARGET_OS_DIR) $(DIST_DIR)
-	$(MKDIR) $@
-
-$(TARGET_OS_DIR): | $(DIST_DIR)
+$(FST_DIR): | $(DIST_DIR_BASE)
 	$(MKDIR) $@
 
 $(VST3): $(VST3_OBJS) | $(VST3_DIR)
 	$(LINK_VST3) $(VST3_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(VST3_DIR): | $(TARGET_OS_DIR) $(DIST_DIR)
+$(VST3_DIR): | $(DIST_DIR_BASE)
 	$(MKDIR) $@
 
 $(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
