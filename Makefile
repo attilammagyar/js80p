@@ -1,5 +1,6 @@
 DEV_OS ?= linux
 TARGET_PLATFORM ?= x86_64-w64-mingw32
+VERSION ?= dev
 
 BUILD_DIR_BASE ?= build
 BUILD_DIR = $(BUILD_DIR_BASE)/$(TARGET_PLATFORM)
@@ -20,6 +21,7 @@ VST3_CXXINCS = \
 	$(JS80P_CXXINCS)
 
 JS80P_CXXFLAGS = \
+	-D JS80P_VERSION=$(VERSION) \
 	-Wall \
 	-Werror \
 	-msse2 \

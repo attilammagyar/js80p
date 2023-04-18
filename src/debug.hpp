@@ -31,9 +31,7 @@
 #include <cstdio>
 #include <cstring>
 
-
-#define _JS80P_DEBUG_TO_STRING(x) _JS80P_DEBUG_EXPAND(x)
-#define _JS80P_DEBUG_EXPAND(x) #x
+#include "js80p.hpp"
 
 
 #define _JS80P_DEBUG_CTX(debug_action) do {                                 \
@@ -41,7 +39,7 @@
     constexpr char const* basename = (                                      \
         last_slash != NULL ? last_slash + 1 : __FILE__                      \
     );                                                                      \
-    FILE* _js80p_f = fopen(_JS80P_DEBUG_TO_STRING(JS80P_DEBUG_LOG), "a+");  \
+    FILE* _js80p_f = fopen(JS80P_TO_STRING(JS80P_DEBUG_LOG), "a+");         \
                                                                             \
     if (_js80p_f) {                                                         \
         fprintf(                                                            \

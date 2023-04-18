@@ -22,6 +22,10 @@
 #include <stdint.h>
 
 
+#define JS80P_TO_STRING(x) _JS80P_EXPAND(x)
+#define _JS80P_EXPAND(x) #x
+
+
 #if defined(__GNUC__) || defined(__clang__)
   #define LIKELY(condition) __builtin_expect((condition), 1)
   #define UNLIKELY(condition) __builtin_expect((condition), 0)
