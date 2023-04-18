@@ -31,11 +31,11 @@ JS80P_CXXFLAGS = \
 # DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 DEBUG_LOG ?=
 
-TARGET_OS_DIR = $(DIST_DIR)/$(TARGET_OS)$(SUFFIX)
+TARGET_OS_DIR = $(DIST_DIR)/$(TARGET_OS)-$(SUFFIX)
 FST_DIR = $(TARGET_OS_DIR)/fst
 VST3_DIR = $(TARGET_OS_DIR)/vst3
 
-OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).o
+OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 
 .PHONY: all check clean dirs docs fst guiplayground perf vst3
 
@@ -43,13 +43,13 @@ all: dirs fst vst3
 
 include make/$(DEV_OS)-$(TARGET_PLATFORM).mk
 
-OBJ_FST_MAIN = $(BUILD_DIR)/fst-main$(SUFFIX).o
-OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin$(SUFFIX).o
-OBJ_VST3_MAIN = $(BUILD_DIR)/vst3-main$(SUFFIX).o
-OBJ_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin$(SUFFIX).o
-OBJ_SERIALIZER = $(BUILD_DIR)/serializer$(SUFFIX).o
-OBJ_SYNTH = $(BUILD_DIR)/synth$(SUFFIX).o
-OBJ_GUI = $(BUILD_DIR)/gui$(SUFFIX).o
+OBJ_FST_MAIN = $(BUILD_DIR)/fst-main-$(SUFFIX).o
+OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin-$(SUFFIX).o
+OBJ_VST3_MAIN = $(BUILD_DIR)/vst3-main-$(SUFFIX).o
+OBJ_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin-$(SUFFIX).o
+OBJ_SERIALIZER = $(BUILD_DIR)/serializer-$(SUFFIX).o
+OBJ_SYNTH = $(BUILD_DIR)/synth-$(SUFFIX).o
+OBJ_GUI = $(BUILD_DIR)/gui-$(SUFFIX).o
 
 FST_OBJS = \
 	$(OBJ_GUI_DATA) \

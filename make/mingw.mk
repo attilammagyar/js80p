@@ -10,7 +10,7 @@ VST3_BIN = $(BUILD_DIR)/js80p.dll
 VST3_MAIN_SOURCES = src/plugin/vst3/dll.cpp
 VST3_GUI_PLATFORM = kPlatformTypeHWND
 
-GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX).exe
+GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
@@ -25,7 +25,7 @@ GUI_IMAGES = \
 	gui/bmp/synth.bmp \
 	gui/bmp/vst_logo.bmp
 
-OBJ_GUI_DATA = $(BUILD_DIR)/js80p$(SUFFIX).res
+OBJ_GUI_DATA = $(BUILD_DIR)/js80p-$(SUFFIX).res
 
 $(OBJ_GUI_DATA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
