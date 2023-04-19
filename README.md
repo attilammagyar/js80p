@@ -42,7 +42,7 @@ System Requirements
 -------------------
 
  * Operating System: Windows 7 or newer
- * CPU: 64 bit, SSE2 support
+ * CPU: 32 or 64 bit, SSE2 support
  * RAM: 50-200 MB, depending on buffer size
 
 Tested with [REAPER](https://www.reaper.fm/) 6.78.
