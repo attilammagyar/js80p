@@ -34,8 +34,8 @@ VALGRIND ?=
 
 TARGET_PLATFORM_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32 -lole32
 
-LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -s -shared -static
-LINK_EXE = $(CPP_TARGET_PLATFORM) -Wall -s -static
+LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static
+LINK_EXE = $(CPP_TARGET_PLATFORM) -Wall -static
 
 LINK_FST = $(LINK_DLL)
 LINK_VST3 = $(LINK_DLL)
