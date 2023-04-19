@@ -19,6 +19,7 @@ main()
     local dist_dir
     local dist_archive
     local uncommitted
+    local date
 
     log "Verifying repository"
 
@@ -43,6 +44,11 @@ main()
         then
             error "Commit your changes first. (Will not release $version_tag from a dirty repo.)"
         fi
+
+        date="$(date '+%Y-%m-%d')"
+
+        grep "^$(echo "$version_tag" | sed 's/\./\\./g') ($date)" whatsnew.txt >/dev/null \
+            || error "Cannot find '$version_tag ($date)' in whatsnew.txt"
     fi
 
     version_str="${version_tag:1}"
@@ -75,6 +81,7 @@ main()
         scripts \
         src \
         tests \
+        whatsnew.txt \
         "dist/$source_dir/"
 
     find "dist/$source_dir/" -name ".*.swp" -delete
@@ -104,7 +111,8 @@ main()
 
             log "Copying presets, etc. to dist/$dist_dir"
 
-            cp --verbose --recursive presets LICENSE.txt README.txt "dist/$dist_dir/"
+            cp --verbose --recursive \
+                presets LICENSE.txt README.txt whatsnew.txt "dist/$dist_dir/"
 
             log "Creating release archive: dist/$dist_archive"
 

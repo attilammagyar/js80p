@@ -1,0 +1,6 @@
+v1.0.1 (2023-04-19)
+ * Improve presets/big_saw.js80p
+ * 32 bit support
+
+v1.0 (2023-04-14)
+ * First release
