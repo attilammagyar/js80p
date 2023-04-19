@@ -435,7 +435,7 @@ class AboutText : public Widget
         static constexpr int PADDING = 10;
 
         static constexpr char const* TEXT = (
-            "JS80P (version " JS80P_TO_STRING(JS80P_VERSION) ")\n"
+            "JS80P (version " JS80P_TO_STRING(JS80P_VERSION_STR) ")\n"
             "A MIDI driven, performance oriented, versatile synthesizer\n"
             "Copyright (C) 2023 Attila M. Magyar\n"
             "https://attilammagyar.github.io/js80p\n"

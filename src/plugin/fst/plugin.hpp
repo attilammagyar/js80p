@@ -37,7 +37,7 @@ class FstPlugin
 {
     public:
         static constexpr int OUT_CHANNELS = (int)Synth::OUT_CHANNELS;
-        static constexpr VstInt32 VERSION = 1000;
+        static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback,

@@ -782,7 +782,7 @@ BEGIN_FACTORY_DEF(
         JS80P::Constants::PLUGIN_NAME,
         0,
         Vst::PlugType::kInstrumentSynth,
-        JS80P::Constants::PLUGIN_VERSION,
+        JS80P::Constants::PLUGIN_VERSION_STR,
         kVstVersionString,
         JS80P::Vst3Plugin::Processor::createInstance
     )
@@ -794,7 +794,7 @@ BEGIN_FACTORY_DEF(
         "JS80PController",
         0,
         "",
-        JS80P::Constants::PLUGIN_VERSION,
+        JS80P::Constants::PLUGIN_VERSION_STR,
         kVstVersionString,
         JS80P::Vst3Plugin::Controller::createInstance
     )
