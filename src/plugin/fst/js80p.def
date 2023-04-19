@@ -1,0 +1,3 @@
+LIBRARY js80p.dll
+EXPORTS
+    VSTPluginMain   @1
