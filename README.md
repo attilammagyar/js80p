@@ -29,6 +29,7 @@ Table of Contents
     * [Future Plans](#future)
  * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
+    * [Which distribution should I download?](#faq-which)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
  * [Development](#dev)
@@ -52,7 +53,7 @@ Tested with [REAPER](https://www.reaper.fm/) 6.78.
 Installation
 ------------
 
-1. [Download JS80P from its website](https://attilammagyar.github.io/js80p/).
+1. [Download a plugin archive for your platform](https://attilammagyar.github.io/js80p/).
 2. Decompress the ZIP file.
 3. Depending on which plugin type you downloaded, copy `js80p.dll` to the
    folder where you keep your VST 2.4 plugins, or copy `js80p.vst3` to your
@@ -139,6 +140,28 @@ If you find bugs, please report them at
 
 Frequenctly Asked Questions
 ---------------------------
+
+<a name="faq-which"></a>
+
+### Which distribution should I download?
+
+Due to how MIDI works in VST 3 plugins, the recommended distribution for most
+people is the 64-bit FST plugin which can be loaded into any 64-bit DAW which
+supports VST 2.4.
+
+If your DAW does not support VST 2.4 however, then you will need the 64-bit
+VST 3 plugin.
+
+The 32-bit versions are only needed by those who deliberately use a 32-bit DAW,
+e.g. because they want to keep using some really old plugins which are not
+available for 64-bit systems.
+
+If you are in doubt, then try the 64 bit FST version, and if your DAW doesn't
+recognize it, then try the 64 bit VST 3 version, then the 32 bit FST version,
+etc.
+
+Note that all versions use the same high-precision sound synthesis engine
+internally, so the CPU architecture does not affect the sound quality.
 
 <a name="faq-pm-fm"></a>
 
