@@ -216,6 +216,8 @@ Development
 
 ### Dependencies
 
+The `lib/` directory contains code from the following projects:
+
  * [FST](https://git.iem.at/zmoelnig/FST)
  * [VST3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
