@@ -48,12 +48,12 @@ class Widget : public WidgetBase
         Widget(char const* const text);
         virtual ~Widget();
 
-        virtual GUI::Bitmap load_bitmap(
+        virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* name
         ) override;
 
-        virtual void delete_bitmap(GUI::Bitmap bitmap) override;
+        virtual void delete_image(GUI::Image image) override;
 
         virtual void show() override;
         virtual void hide() override;
@@ -129,16 +129,16 @@ class Widget : public WidgetBase
             TextAlignment const alignment = TextAlignment::CENTER
         ) override;
 
-        virtual void draw_bitmap(
-            GUI::Bitmap bitmap,
+        virtual void draw_image(
+            GUI::Image image,
             int const left,
             int const top,
             int const width,
             int const height
         ) override;
 
-        virtual GUI::Bitmap copy_bitmap_region(
-            GUI::Bitmap source,
+        virtual GUI::Image copy_image_region(
+            GUI::Image source,
             int const left,
             int const top,
             int const width,

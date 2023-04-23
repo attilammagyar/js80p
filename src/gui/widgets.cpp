@@ -173,14 +173,14 @@ void Background::refresh()
 
 TabSelector::TabSelector(
         Background* background,
-        GUI::Bitmap bitmap,
+        GUI::Image image,
         TabBody* tab_body,
         char const* const text,
         int const left
 ) : TransparentWidget(text, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
     background(background),
     tab_body(tab_body),
-    bitmap(bitmap)
+    image(image)
 {
 }
 
@@ -189,7 +189,7 @@ void TabSelector::click()
 {
     TransparentWidget::click();
 
-    background->set_bitmap(bitmap);
+    background->set_image(image);
     background->replace_body(tab_body);
 }
 
@@ -435,26 +435,26 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 
 bool ParamEditor::knob_states_initialization_complete = false;
 
-GUI::Bitmap ParamEditor::knob_states_active_bitmap = NULL;
+GUI::Image ParamEditor::knob_states_active_image = NULL;
 
-GUI::Bitmap ParamEditor::knob_states_inactive_bitmap = NULL;
+GUI::Image ParamEditor::knob_states_inactive_image = NULL;
 
-GUI::Bitmap ParamEditor::knob_states_active[KNOB_STATES_COUNT];
+GUI::Image ParamEditor::knob_states_active[KNOB_STATES_COUNT];
 
-GUI::Bitmap ParamEditor::knob_states_inactive[KNOB_STATES_COUNT];
+GUI::Image ParamEditor::knob_states_inactive[KNOB_STATES_COUNT];
 
 
 void ParamEditor::initialize_knob_states(
     WidgetBase* widget,
-    GUI::Bitmap active,
-    GUI::Bitmap inactive
+    GUI::Image active,
+    GUI::Image inactive
 ) {
-    if (knob_states_active_bitmap != NULL) {
+    if (knob_states_active_image != NULL) {
         free_knob_states(widget);
     }
 
-    knob_states_active_bitmap = active;
-    knob_states_inactive_bitmap = inactive;
+    knob_states_active_image = active;
+    knob_states_inactive_image = inactive;
 
     knob_states_initialization_complete = false;
 }
@@ -462,21 +462,21 @@ void ParamEditor::initialize_knob_states(
 
 void ParamEditor::free_knob_states(WidgetBase* widget)
 {
-    if (knob_states_active_bitmap == NULL) {
+    if (knob_states_active_image == NULL) {
         return;
     }
 
-    widget->delete_bitmap(knob_states_active_bitmap);
-    widget->delete_bitmap(knob_states_inactive_bitmap);
+    widget->delete_image(knob_states_active_image);
+    widget->delete_image(knob_states_inactive_image);
 
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        widget->delete_bitmap(knob_states_active[i]);
-        widget->delete_bitmap(knob_states_inactive[i]);
+        widget->delete_image(knob_states_active[i]);
+        widget->delete_image(knob_states_inactive[i]);
     }
 
     knob_states_initialization_complete = false;
-    knob_states_active_bitmap = NULL;
-    knob_states_inactive_bitmap = NULL;
+    knob_states_active_image = NULL;
+    knob_states_inactive_image = NULL;
 }
 
 
@@ -548,11 +548,11 @@ void ParamEditor::complete_knob_state_initialization()
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
         int const top = i * Knob::HEIGHT;
 
-        knob_states_active[i] = copy_bitmap_region(
-            knob_states_active_bitmap, 0, top, Knob::WIDTH, Knob::HEIGHT
+        knob_states_active[i] = copy_image_region(
+            knob_states_active_image, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
-        knob_states_inactive[i] = copy_bitmap_region(
-            knob_states_inactive_bitmap, 0, top, Knob::WIDTH, Knob::HEIGHT
+        knob_states_inactive[i] = copy_image_region(
+            knob_states_inactive_image, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
     }
 
@@ -817,9 +817,9 @@ void ParamEditor::Knob::update()
     int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
 
     if (is_inactive) {
-        set_bitmap(knob_states_inactive[index]);
+        set_image(knob_states_inactive[index]);
     } else {
-        set_bitmap(knob_states_active[index]);
+        set_image(knob_states_active[index]);
     }
 }
 
@@ -949,7 +949,7 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 }
 
 
-AboutText::AboutText(GUI::Bitmap logo)
+AboutText::AboutText(GUI::Image logo)
     : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::ABOUT_TEXT),
     logo(logo)
 {
@@ -997,7 +997,7 @@ bool AboutText::paint()
     }
 
     if (logo != NULL) {
-        draw_bitmap(logo, 5, (HEIGHT - LOGO_HEIGHT) / 2, LOGO_WIDTH, LOGO_HEIGHT);
+        draw_image(logo, 5, (HEIGHT - LOGO_HEIGHT) / 2, LOGO_WIDTH, LOGO_HEIGHT);
     }
 
     return true;

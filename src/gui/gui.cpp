@@ -736,24 +736,24 @@ GUI::GUI(
 
     ParamEditor::initialize_knob_states(
         dummy_widget,
-        dummy_widget->load_bitmap(platform_data, "KNOBSTATES"),
-        dummy_widget->load_bitmap(platform_data, "KNOBSTATESINACTIVE")
+        dummy_widget->load_image(platform_data, "KNOBSTATES"),
+        dummy_widget->load_image(platform_data, "KNOBSTATESINACTIVE")
     );
 
-    about_bitmap = dummy_widget->load_bitmap(platform_data, "ABOUT");
-    controllers_bitmap = dummy_widget->load_bitmap(platform_data, "CONTROLLERS");
-    effects_bitmap = dummy_widget->load_bitmap(platform_data, "EFFECTS");
-    envelopes_bitmap = dummy_widget->load_bitmap(platform_data, "ENVELOPES");
-    lfos_bitmap = dummy_widget->load_bitmap(platform_data, "LFOS");
-    synth_bitmap = dummy_widget->load_bitmap(platform_data, "SYNTH");
-    vst_logo_bitmap = dummy_widget->load_bitmap(platform_data, "VSTLOGO");
+    about_image = dummy_widget->load_image(platform_data, "ABOUT");
+    controllers_image = dummy_widget->load_image(platform_data, "CONTROLLERS");
+    effects_image = dummy_widget->load_image(platform_data, "EFFECTS");
+    envelopes_image = dummy_widget->load_image(platform_data, "ENVELOPES");
+    lfos_image = dummy_widget->load_image(platform_data, "LFOS");
+    synth_image = dummy_widget->load_image(platform_data, "SYNTH");
+    vst_logo_image = dummy_widget->load_image(platform_data, "VSTLOGO");
 
     background = new Background();
 
     this->parent_window = new ExternallyCreatedWindow(platform_data, parent_window);
     this->parent_window->own(background);
 
-    background->set_bitmap(synth_bitmap);
+    background->set_image(synth_image);
 
     controller_selector = new ControllerSelector(*background, synth);
 
@@ -767,7 +767,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            synth_bitmap,
+            synth_image,
             synth_body,
             "Synth",
             TabSelector::LEFT + TabSelector::WIDTH * 0
@@ -776,7 +776,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            effects_bitmap,
+            effects_image,
             effects_body,
             "Effects",
             TabSelector::LEFT + TabSelector::WIDTH * 1
@@ -785,7 +785,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            controllers_bitmap,
+            controllers_image,
             controllers_body,
             "Controllers",
             TabSelector::LEFT + TabSelector::WIDTH * 2
@@ -794,7 +794,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            envelopes_bitmap,
+            envelopes_image,
             envelopes_body,
             "Envelopes",
             TabSelector::LEFT + TabSelector::WIDTH * 3
@@ -803,7 +803,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            lfos_bitmap,
+            lfos_image,
             lfos_body,
             "LFOs",
             TabSelector::LEFT + TabSelector::WIDTH * 4
@@ -812,7 +812,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            about_bitmap,
+            about_image,
             about_body,
             "About",
             TabSelector::LEFT + TabSelector::WIDTH * 5
@@ -833,7 +833,7 @@ void GUI::build_about_body()
     background->own(about_body);
 
     ((Widget*)about_body)->own(
-        new AboutText(show_vst_logo ? vst_logo_bitmap : NULL)
+        new AboutText(show_vst_logo ? vst_logo_image : NULL)
     );
 
     about_body->hide();
@@ -1255,13 +1255,13 @@ GUI::~GUI()
 
     ParamEditor::free_knob_states(dummy_widget);
 
-    dummy_widget->delete_bitmap(about_bitmap);
-    dummy_widget->delete_bitmap(controllers_bitmap);
-    dummy_widget->delete_bitmap(effects_bitmap);
-    dummy_widget->delete_bitmap(envelopes_bitmap);
-    dummy_widget->delete_bitmap(lfos_bitmap);
-    dummy_widget->delete_bitmap(synth_bitmap);
-    dummy_widget->delete_bitmap(vst_logo_bitmap);
+    dummy_widget->delete_image(about_image);
+    dummy_widget->delete_image(controllers_image);
+    dummy_widget->delete_image(effects_image);
+    dummy_widget->delete_image(envelopes_image);
+    dummy_widget->delete_image(lfos_image);
+    dummy_widget->delete_image(synth_image);
+    dummy_widget->delete_image(vst_logo_image);
 
     delete dummy_widget;
 
@@ -1280,7 +1280,7 @@ WidgetBase::WidgetBase(char const* const text)
     text(text),
     platform_widget(NULL),
     platform_data(NULL),
-    bitmap(NULL),
+    image(NULL),
     parent(NULL),
     left(0),
     top(0),
@@ -1302,7 +1302,7 @@ WidgetBase::WidgetBase(
     text(text),
     platform_widget(NULL),
     platform_data(NULL),
-    bitmap(NULL),
+    image(NULL),
     parent(NULL),
     left(left),
     top(top),
@@ -1321,7 +1321,7 @@ WidgetBase::WidgetBase(
     text(""),
     platform_widget(platform_widget),
     platform_data(platform_data),
-    bitmap(NULL),
+    image(NULL),
     parent(NULL),
     left(0),
     top(0),
@@ -1345,7 +1345,7 @@ void WidgetBase::destroy_children()
 }
 
 
-GUI::Bitmap WidgetBase::load_bitmap(
+GUI::Image WidgetBase::load_image(
     GUI::PlatformData platform_data,
     char const* name
 ) {
@@ -1353,7 +1353,7 @@ GUI::Bitmap WidgetBase::load_bitmap(
 }
 
 
-void WidgetBase::delete_bitmap(GUI::Bitmap bitmap)
+void WidgetBase::delete_image(GUI::Image image)
 {
 }
 
@@ -1393,10 +1393,10 @@ WidgetBase* WidgetBase::own(WidgetBase* widget)
 }
 
 
-GUI::Bitmap WidgetBase::set_bitmap(GUI::Bitmap bitmap)
+GUI::Image WidgetBase::set_image(GUI::Image image)
 {
-    GUI::Bitmap old = this->bitmap;
-    this->bitmap = bitmap;
+    GUI::Image old = this->image;
+    this->image = image;
     redraw();
 
     return old;
@@ -1423,11 +1423,11 @@ void WidgetBase::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 
 bool WidgetBase::paint()
 {
-    if (bitmap == NULL) {
+    if (image == NULL) {
         return false;
     }
 
-    draw_bitmap(bitmap, 0, 0, width, height);
+    draw_image(image, 0, 0, width, height);
 
     return true;
 }
@@ -1495,8 +1495,8 @@ void WidgetBase::draw_text(
 }
 
 
-void WidgetBase::draw_bitmap(
-        GUI::Bitmap bitmap,
+void WidgetBase::draw_image(
+        GUI::Image image,
         int const left,
         int const top,
         int const width,
@@ -1505,8 +1505,8 @@ void WidgetBase::draw_bitmap(
 }
 
 
-GUI::Bitmap WidgetBase::copy_bitmap_region(
-    GUI::Bitmap source,
+GUI::Image WidgetBase::copy_image_region(
+    GUI::Image source,
     int const left,
     int const top,
     int const width,

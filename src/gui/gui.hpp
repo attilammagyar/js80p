@@ -46,7 +46,7 @@ class GUI
     public:
         typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
-        typedef void* Bitmap; ///< \breif GUI platform dependent bitmap.
+        typedef void* Image; ///< \breif GUI platform dependent image handle.
 
         typedef std::vector<WidgetBase*> Widgets;
 
@@ -179,13 +179,13 @@ class GUI
 
         Widget* dummy_widget;
 
-        Bitmap about_bitmap;
-        Bitmap controllers_bitmap;
-        Bitmap effects_bitmap;
-        Bitmap envelopes_bitmap;
-        Bitmap lfos_bitmap;
-        Bitmap synth_bitmap;
-        Bitmap vst_logo_bitmap;
+        Image about_image;
+        Image controllers_image;
+        Image effects_image;
+        Image envelopes_image;
+        Image lfos_image;
+        Image synth_image;
+        Image vst_logo_image;
 
         ControllerSelector* controller_selector;
         Background* background;
@@ -235,11 +235,11 @@ class WidgetBase
         WidgetBase(char const* const text);
         virtual ~WidgetBase();
 
-        virtual GUI::Bitmap load_bitmap(
+        virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* name
         );
-        virtual void delete_bitmap(GUI::Bitmap bitmap);
+        virtual void delete_image(GUI::Image image);
 
         virtual void show();
         virtual void hide();
@@ -247,7 +247,7 @@ class WidgetBase
         virtual void bring_to_top();
         virtual void redraw();
         virtual WidgetBase* own(WidgetBase* widget);
-        virtual GUI::Bitmap set_bitmap(GUI::Bitmap bitmap);
+        virtual GUI::Image set_image(GUI::Image image);
 
         virtual GUI::PlatformWidget get_platform_widget();
 
@@ -393,16 +393,16 @@ class WidgetBase
             TextAlignment const alignment = TextAlignment::CENTER
         );
 
-        virtual void draw_bitmap(
-            GUI::Bitmap bitmap,
+        virtual void draw_image(
+            GUI::Image image,
             int const left,
             int const top,
             int const width,
             int const height
         );
 
-        virtual GUI::Bitmap copy_bitmap_region(
-            GUI::Bitmap source,
+        virtual GUI::Image copy_image_region(
+            GUI::Image source,
             int const left,
             int const top,
             int const width,
@@ -415,7 +415,7 @@ class WidgetBase
         GUI::Widgets children;
         GUI::PlatformWidget platform_widget;
         GUI::PlatformData platform_data;
-        GUI::Bitmap bitmap;
+        GUI::Image image;
         WidgetBase* parent;
 
         int left;

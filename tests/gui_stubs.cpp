@@ -43,16 +43,16 @@ class Widget : public WidgetBase
             destroy_children();
         }
 
-        virtual GUI::Bitmap load_bitmap(
+        virtual GUI::Image load_image(
                 GUI::PlatformData platform_data,
                 char const* name
         ) override {
-            return (GUI::Bitmap)new DummyObject();
+            return (GUI::Image)new DummyObject();
         }
 
-        virtual void delete_bitmap(GUI::Bitmap bitmap) override
+        virtual void delete_image(GUI::Image image) override
         {
-            delete (DummyObject*)bitmap;
+            delete (DummyObject*)image;
         }
 
     protected:
@@ -75,14 +75,14 @@ class Widget : public WidgetBase
         {
         }
 
-        GUI::Bitmap copy_bitmap_region(
-                GUI::Bitmap source,
+        GUI::Image copy_image_region(
+                GUI::Image source,
                 int const left,
                 int const top,
                 int const width,
                 int const height
         ) {
-            return (GUI::Bitmap)new DummyObject();
+            return (GUI::Image)new DummyObject();
         }
 
     private:

@@ -154,7 +154,7 @@ class TabSelector : public TransparentWidget
 
         TabSelector(
             Background* background,
-            GUI::Bitmap bitmap,
+            GUI::Image image,
             TabBody* tab_body,
             char const* const text,
             int const left
@@ -167,7 +167,7 @@ class TabSelector : public TransparentWidget
         Background* background;
         TabBody* tab_body;
 
-        GUI::Bitmap bitmap;
+        GUI::Image image;
 };
 
 
@@ -251,8 +251,8 @@ class ParamEditor : public TransparentWidget
 
         static void initialize_knob_states(
             WidgetBase* widget,
-            GUI::Bitmap active,
-            GUI::Bitmap inactive
+            GUI::Image active,
+            GUI::Image inactive
         );
 
         static void free_knob_states(WidgetBase* widget);
@@ -316,11 +316,11 @@ class ParamEditor : public TransparentWidget
 
         static bool knob_states_initialization_complete;
 
-        static GUI::Bitmap knob_states_active_bitmap;
-        static GUI::Bitmap knob_states_inactive_bitmap;
+        static GUI::Image knob_states_active_image;
+        static GUI::Image knob_states_inactive_image;
 
-        static GUI::Bitmap knob_states_active[KNOB_STATES_COUNT];
-        static GUI::Bitmap knob_states_inactive[KNOB_STATES_COUNT];
+        static GUI::Image knob_states_active[KNOB_STATES_COUNT];
+        static GUI::Image knob_states_inactive[KNOB_STATES_COUNT];
 
         class Knob : public Widget
         {
@@ -371,7 +371,7 @@ class ParamEditor : public TransparentWidget
                 Number const steps;
 
                 ParamEditor& editor;
-                GUI::Bitmap knob_state;
+                GUI::Image knob_state;
                 Number prev_x;
                 Number prev_y;
                 Number ratio;
@@ -449,13 +449,13 @@ class AboutText : public Widget
             "at 44.1 kHz sample rate.\n"
         );
 
-        AboutText(GUI::Bitmap logo);
+        AboutText(GUI::Image logo);
 
     protected:
         virtual bool paint() override;
 
     private:
-        GUI::Bitmap logo;
+        GUI::Image logo;
         std::vector<std::string> lines;
 };
 

@@ -149,12 +149,12 @@ COLORREF Widget::to_colorref(GUI::Color const color)
 }
 
 
-GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* name)
+GUI::Image Widget::load_image(GUI::PlatformData platform_data, char const* name)
 {
     Text name_text(name);
 
     // TODO: GetLastError()
-    GUI::Bitmap bitmap = (GUI::Bitmap)LoadImage(
+    GUI::Image image = (GUI::Image)LoadImage(
         (HINSTANCE)platform_data,               // hInst
         name_text.get_const(),                  // name
         IMAGE_BITMAP,                           // type
@@ -163,14 +163,14 @@ GUI::Bitmap Widget::load_bitmap(GUI::PlatformData platform_data, char const* nam
         LR_CREATEDIBSECTION                     // fuLoad
     );
 
-    return bitmap;
+    return image;
 }
 
 
-void Widget::delete_bitmap(GUI::Bitmap bitmap)
+void Widget::delete_image(GUI::Image image)
 {
-    if (bitmap != NULL) {
-        DeleteObject((HGDIOBJ)bitmap);
+    if (image != NULL) {
+        DeleteObject((HGDIOBJ)image);
     }
 }
 
@@ -555,22 +555,22 @@ void Widget::draw_text(
 }
 
 
-void Widget::draw_bitmap(
-        GUI::Bitmap bitmap,
+void Widget::draw_image(
+        GUI::Image image,
         int const left,
         int const top,
         int const width,
         int const height
 ) {
-    HDC bitmap_hdc = CreateCompatibleDC(hdc);
-    SelectObject(bitmap_hdc, (HBITMAP)bitmap);
-    BitBlt(hdc, left, top, width, height, bitmap_hdc, 0, 0, SRCCOPY);
-    DeleteDC(bitmap_hdc);
+    HDC image_hdc = CreateCompatibleDC(hdc);
+    SelectObject(image_hdc, (HBITMAP)image);
+    BitBlt(hdc, left, top, width, height, image_hdc, 0, 0, SRCCOPY);
+    DeleteDC(image_hdc);
 }
 
 
-GUI::Bitmap Widget::copy_bitmap_region(
-        GUI::Bitmap source,
+GUI::Image Widget::copy_image_region(
+        GUI::Image source,
         int const left,
         int const top,
         int const width,
@@ -581,26 +581,26 @@ GUI::Bitmap Widget::copy_bitmap_region(
     HDC source_hdc = CreateCompatibleDC(hdc);
     HDC destination_hdc = CreateCompatibleDC(hdc);
 
-    GUI::Bitmap destination_bitmap = CreateCompatibleBitmap(hdc, width, height);
+    GUI::Image destination_image = CreateCompatibleBitmap(hdc, width, height);
 
-    GUI::Bitmap old_source_bitmap = (
-        (GUI::Bitmap)SelectObject(source_hdc, (HGDIOBJ)source)
+    GUI::Image old_source_image = (
+        (GUI::Image)SelectObject(source_hdc, (HGDIOBJ)source)
     );
-    GUI::Bitmap old_destination_bitmap = (
-        (GUI::Bitmap)SelectObject(destination_hdc, (HGDIOBJ)destination_bitmap)
+    GUI::Image old_destination_image = (
+        (GUI::Image)SelectObject(destination_hdc, (HGDIOBJ)destination_image)
     );
 
     BitBlt(destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY);
 
-    SelectObject(source_hdc, (HGDIOBJ)old_source_bitmap);
-    SelectObject(destination_hdc, (HGDIOBJ)old_destination_bitmap);
+    SelectObject(source_hdc, (HGDIOBJ)old_source_image);
+    SelectObject(destination_hdc, (HGDIOBJ)old_destination_image);
 
     DeleteDC(source_hdc);
     DeleteDC(destination_hdc);
 
     ReleaseDC((HWND)platform_widget, hdc);
 
-    return destination_bitmap;
+    return destination_image;
 }
 
 
