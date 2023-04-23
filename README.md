@@ -221,6 +221,20 @@ The `lib/` directory contains code from the following projects:
  * [FST](https://git.iem.at/zmoelnig/FST)
  * [VST3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
+#### Linux
+
+To compile JS80P on e.g. Ubuntu Linux 20.04, the following packages need to be
+installed:
+
+    apt-get install \
+        build-essential \
+        binutils \
+        g++ \
+        g++-multilib \
+        libx11-dev \
+        libxcb1-dev \
+        libcairo2-dev
+
 <a name="dev-theory"></a>
 
 ### Theory

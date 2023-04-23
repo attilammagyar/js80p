@@ -1278,7 +1278,7 @@ void GUI::show()
 WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
     text(text),
-    platform_widget(NULL),
+    platform_widget(JS80P_GUI_PLATFORM_WIDGET_NULL),
     platform_data(NULL),
     image(NULL),
     parent(NULL),
@@ -1300,7 +1300,7 @@ WidgetBase::WidgetBase(
         Type const type
 ) : type(type),
     text(text),
-    platform_widget(NULL),
+    platform_widget(JS80P_GUI_PLATFORM_WIDGET_NULL),
     platform_data(NULL),
     image(NULL),
     parent(NULL),
@@ -1342,6 +1342,30 @@ void WidgetBase::destroy_children()
     for (GUI::Widgets::iterator it = children.begin(); it != children.end(); ++it) {
         delete *it;
     }
+}
+
+
+int WidgetBase::get_left() const
+{
+    return left;
+}
+
+
+int WidgetBase::get_top() const
+{
+    return top;
+}
+
+
+char const* WidgetBase::get_text() const
+{
+    return text;
+}
+
+
+WidgetBase* WidgetBase::get_parent() const
+{
+    return parent;
 }
 
 
@@ -1400,6 +1424,12 @@ GUI::Image WidgetBase::set_image(GUI::Image image)
     redraw();
 
     return old;
+}
+
+
+GUI::Image WidgetBase::get_image() const
+{
+    return image;
 }
 
 

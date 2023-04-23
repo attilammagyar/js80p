@@ -38,7 +38,7 @@ ExternallyCreatedWindow::ExternallyCreatedWindow(
 
 ExternallyCreatedWindow::~ExternallyCreatedWindow()
 {
-    platform_widget = NULL;
+    platform_widget = JS80P_GUI_PLATFORM_WIDGET_NULL;
 }
 
 
@@ -56,6 +56,8 @@ TransparentWidget::TransparentWidget(
 
 bool TransparentWidget::paint()
 {
+    Widget::paint();
+
     return true;
 }
 

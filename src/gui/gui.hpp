@@ -44,7 +44,7 @@ class WidgetBase;
 class GUI
 {
     public:
-        typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
+        typedef JS80P_GUI_PLATFORM_WIDGET_TYPE PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
         typedef void* Image; ///< \breif GUI platform dependent image handle.
 
@@ -209,17 +209,17 @@ class WidgetBase
 {
     public:
         enum Type {
-            BACKGROUND = 0,
-            CONTROLLER = 1,
-            CONTROLLER_SELECTOR = 2,
-            EXPORT_PATCH_BUTTON = 3,
-            EXTERNALLY_CREATED_WINDOW = 4,
-            IMPORT_PATCH_BUTTON = 5,
-            KNOB = 6,
-            PARAM_EDITOR = 7,
-            TAB_BODY = 8,
-            TAB_SELECTOR = 9,
-            ABOUT_TEXT = 10,
+            BACKGROUND = 1,
+            CONTROLLER = 2,
+            CONTROLLER_SELECTOR = 4,
+            EXPORT_PATCH_BUTTON = 8,
+            EXTERNALLY_CREATED_WINDOW = 16,
+            IMPORT_PATCH_BUTTON = 32,
+            KNOB = 64,
+            PARAM_EDITOR = 128,
+            TAB_BODY = 256,
+            TAB_SELECTOR = 512,
+            ABOUT_TEXT = 1024,
         };
 
         enum TextAlignment {
@@ -235,6 +235,11 @@ class WidgetBase
         WidgetBase(char const* const text);
         virtual ~WidgetBase();
 
+        virtual int get_left() const;
+        virtual int get_top() const;
+        virtual char const* get_text() const;
+        virtual WidgetBase* get_parent() const;
+
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* name
@@ -247,7 +252,9 @@ class WidgetBase
         virtual void bring_to_top();
         virtual void redraw();
         virtual WidgetBase* own(WidgetBase* widget);
+
         virtual GUI::Image set_image(GUI::Image image);
+        virtual GUI::Image get_image() const;
 
         virtual GUI::PlatformWidget get_platform_widget();
 
