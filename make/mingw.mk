@@ -16,15 +16,15 @@ GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
 
 GUI_IMAGES = \
-	gui/bmp/about.bmp \
-	gui/bmp/controllers.bmp \
-	gui/bmp/effects.bmp \
-	gui/bmp/envelopes.bmp \
-	gui/bmp/knob_states.bmp \
-	gui/bmp/knob_states_inactive.bmp \
-	gui/bmp/lfos.bmp \
-	gui/bmp/synth.bmp \
-	gui/bmp/vst_logo.bmp
+	gui/img/about.bmp \
+	gui/img/controllers.bmp \
+	gui/img/effects.bmp \
+	gui/img/envelopes.bmp \
+	gui/img/knob_states.bmp \
+	gui/img/knob_states_inactive.bmp \
+	gui/img/lfos.bmp \
+	gui/img/synth.bmp \
+	gui/img/vst_logo.bmp
 
 OBJ_GUI_DATA = $(BUILD_DIR)/js80p-$(SUFFIX).res
 
