@@ -107,8 +107,6 @@ class Widget : public WidgetBase
             WidgetBase* parent
         ) override;
 
-        virtual void start_timer(Frequency const frequency) override;
-
         virtual void fill_rectangle(
             int const left,
             int const top,
@@ -150,9 +148,11 @@ class Widget : public WidgetBase
         HDC hdc;
 
     private:
-        static constexpr UINT_PTR TIMER_ID = 1;
+        static constexpr Frequency TIMER_FREQUENCY = 18.0;
 
         static constexpr Number MOUSE_WHEEL_SCALE = 1.0 / (Number)WHEEL_DELTA;
+
+        static UINT_PTR next_timer_id;
 
         LRESULT call_original_window_procedure(
             UINT uMsg,
@@ -172,6 +172,7 @@ class Widget : public WidgetBase
         DWORD dwStyle;
         WNDPROC original_window_procedure;
         HWND tooltip;
+        UINT_PTR timer_id;
         bool is_mouse_captured;
         bool is_timer_started;
 };

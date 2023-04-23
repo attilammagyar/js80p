@@ -30,11 +30,19 @@
 namespace JS80P
 {
 
+void GUI::idle()
+{
+}
+
+
 std::string const Widget::FILTER_STR(
     "JS80P Patches (*.js80p)\x00*.js80p\x00"
     "All Files (*.*)\x00*.*\x00",
     53
 );
+
+
+UINT_PTR Widget::next_timer_id = 0x4a533830;
 
 
 Widget::Text::Text() : wtext(NULL), ctext(NULL)
@@ -181,7 +189,10 @@ LRESULT Widget::process_message(
 
     switch (uMsg) {
         case WM_TIMER:
-            is_handled = widget->timer_tick();
+            if (widget->type == Type::BACKGROUND) {
+                ((Background*)widget)->refresh();
+                is_handled = true;
+            }
 
             break;
 
@@ -292,8 +303,7 @@ Widget::Widget(char const* const text)
     dwStyle(0),
     original_window_procedure(NULL),
     tooltip(NULL),
-    is_mouse_captured(false),
-    is_timer_started(false)
+    is_mouse_captured(false)
 {
 }
 
@@ -307,8 +317,7 @@ Widget::Widget(
     dwStyle(0),
     original_window_procedure(NULL),
     tooltip(NULL),
-    is_mouse_captured(false),
-    is_timer_started(false)
+    is_mouse_captured(false)
 {
 }
 
@@ -327,6 +336,7 @@ Widget::Widget(
     dwStyle(0),
     original_window_procedure(NULL),
     tooltip(NULL),
+    timer_id(0),
     is_mouse_captured(false),
     is_timer_started(false)
 {
@@ -351,8 +361,8 @@ Widget::~Widget()
     release_captured_mouse();
     destroy_children();
 
-    if (is_timer_started) {
-        KillTimer((HWND)platform_widget, TIMER_ID);
+    if (type == Type::BACKGROUND) {
+        KillTimer((HWND)platform_widget, timer_id);
     }
 
     if (tooltip != NULL) {
@@ -405,6 +415,15 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     );
 
     platform_widget = (GUI::PlatformWidget)widget_hwnd;
+
+    if (type == Type::BACKGROUND) {
+        UINT const elapse = (UINT)std::ceil(1000.0 / TIMER_FREQUENCY);
+        timer_id = ++next_timer_id;
+        is_timer_started = true;
+
+        // TODO: GetLastError
+        SetTimer(widget_hwnd, timer_id, elapse, NULL);
+    }
 }
 
 
@@ -443,17 +462,6 @@ void Widget::create_tooltip(HINSTANCE hInstance, HWND parent, HWND widget)
 
     // TODO: GetLastError
     SendMessage(tooltip, TTM_ADDTOOL, 0, (LPARAM)&tool_info);
-}
-
-
-void Widget::start_timer(Frequency const frequency)
-{
-    UINT const elapse = (UINT)std::ceil(1000.0 / frequency);
-
-    // TODO: GetLastError
-    SetTimer((HWND)platform_widget, TIMER_ID, elapse, NULL);
-
-    is_timer_started = true;
 }
 
 

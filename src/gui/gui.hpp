@@ -141,6 +141,7 @@ class GUI
         ~GUI();
 
         void show();
+        void idle();
 
     private:
         static void initialize_controllers_by_id();
@@ -272,15 +273,6 @@ class WidgetBase
         virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent);
 
         /**
-         * \brief Handle the timer tick event. Return \c true if the event was
-         *
-         * \return              Return \c true if the event was handled,
-         *                      \c false if the platform's default event handler
-         *                      needs to be run.
-         */
-        virtual bool timer_tick();
-
-        /**
          * \brief Event handler for painting the widget on the screen.
          *
          * \return              Return \c true if the event was handled,
@@ -378,8 +370,6 @@ class WidgetBase
          *                      needs to be run.
          */
         virtual bool mouse_wheel(Number const delta, bool const modifier);
-
-        virtual void start_timer(Frequency const frequency);
 
         virtual void fill_rectangle(
             int const left,

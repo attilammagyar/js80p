@@ -21,6 +21,7 @@
 #include "gui/win32.hpp"
 
 
+JS80P::GUI* gui;
 JS80P::Synth synth;
 JS80P::Integer rendering_round = 0;
 
@@ -37,6 +38,8 @@ LRESULT window_procedure(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             ++rendering_round;
             rendering_round = rendering_round & 0x7fff;
             synth.generate_samples(rendering_round, 1);
+
+            gui->idle();
 
             return 0;
     }
@@ -93,10 +96,10 @@ int WINAPI wWinMain(
 
     SetWindowLongPtr(main_window, GWLP_USERDATA, (LONG_PTR)main_window);
 
-    UINT_PTR timer_id = 1;
+    UINT_PTR timer_id = 12345;
     SetTimer(main_window, timer_id, 100, NULL);
 
-    JS80P::GUI* gui = new JS80P::GUI(
+    gui = new JS80P::GUI(
         (JS80P::GUI::PlatformData)hInstance,
         (JS80P::GUI::PlatformWidget)main_window,
         &synth,
@@ -117,6 +120,8 @@ int WINAPI wWinMain(
     KillTimer(main_window, timer_id);
 
     delete gui;
+
+    gui = NULL;
 
     return message.message;
 }

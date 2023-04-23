@@ -119,6 +119,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             fst_plugin->open_gui((GUI::PlatformWidget)pointer);
             return 1;
 
+        case effEditIdle:
+            fst_plugin->gui_idle();
+            return 0;
+
         case effEditClose:
             fst_plugin->close_gui();
             return 0;
@@ -357,6 +361,12 @@ void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
     close_gui();
     gui = new GUI(platform_data, parent_window, &synth, false);
     gui->show();
+}
+
+
+void FstPlugin::gui_idle()
+{
+    gui->idle();
 }
 
 

@@ -154,20 +154,10 @@ void Background::show_body()
 }
 
 
-void Background::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+void Background::refresh()
 {
-    Widget::set_up(platform_data, parent);
-
-    start_timer(REFRESH_RATE);
-}
-
-
-bool Background::timer_tick()
-{
-    Widget::timer_tick();
-
     if (body == NULL) {
-        return true;
+        return;
     }
 
     --next_full_refresh;
@@ -178,8 +168,6 @@ bool Background::timer_tick()
     } else {
         body->refresh_controlled_param_editors();
     }
-
-    return true;
 }
 
 

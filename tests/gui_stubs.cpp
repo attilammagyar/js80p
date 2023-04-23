@@ -26,6 +26,11 @@
 
 namespace JS80P {
 
+void GUI::idle()
+{
+}
+
+
 class Widget : public WidgetBase
 {
     public:
