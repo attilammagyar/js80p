@@ -715,8 +715,8 @@ Number GUI::clamp_ratio(Number const ratio)
 
 
 GUI::GUI(
-        JS80P::GUI::PlatformData platform_data,
-        JS80P::GUI::PlatformWidget parent_window,
+        PlatformData platform_data,
+        PlatformWidget parent_window,
         Synth* synth,
         bool const show_vst_logo
 )
