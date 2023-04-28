@@ -88,6 +88,8 @@ LINK_GUI_PLAYGROUND = $(LINK_EXE)
 TARGET_PLATFORM_CXXFLAGS = \
     -Wno-strict-aliasing \
     -Wno-int-to-pointer-cast \
-    -Wno-cpp
+    -Wno-cpp \
+    -fPIC \
+    -fvisibility=hidden
 
 TARGET_PLATFORM_CXXINCS = -I/usr/include
