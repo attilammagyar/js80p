@@ -14,8 +14,6 @@ GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
-GUI_TARGET_PLATFORM_WIDGET_TYPE = "void*"
-GUI_TARGET_PLATFORM_WIDGET_NULL = "NULL"
 
 GUI_IMAGES = \
 	gui/img/about.bmp \

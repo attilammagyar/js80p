@@ -20,8 +20,6 @@ GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX)
 GUI_PLAYGROUND_SOURCES = src/gui/xcb-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/xcb.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/xcb.cpp
-GUI_TARGET_PLATFORM_WIDGET_TYPE = "unsigned int"
-GUI_TARGET_PLATFORM_WIDGET_NULL = "0"
 
 OBJ_GUI_DATA = \
 	$(BUILD_DIR)/img_about.o \
@@ -86,5 +84,8 @@ LINK_FST = $(LINK_SO)
 LINK_VST3 = $(LINK_SO)
 LINK_GUI_PLAYGROUND = $(LINK_EXE)
 
-TARGET_PLATFORM_CXXFLAGS =
+TARGET_PLATFORM_CXXFLAGS = \
+    -Wno-strict-aliasing \
+    -Wno-int-to-pointer-cast
+
 TARGET_PLATFORM_CXXINCS = -I/usr/include

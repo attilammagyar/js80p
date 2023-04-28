@@ -1278,7 +1278,7 @@ void GUI::show()
 WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
     text(text),
-    platform_widget(JS80P_GUI_PLATFORM_WIDGET_NULL),
+    platform_widget(NULL),
     platform_data(NULL),
     image(NULL),
     parent(NULL),
@@ -1300,7 +1300,7 @@ WidgetBase::WidgetBase(
         Type const type
 ) : type(type),
     text(text),
-    platform_widget(JS80P_GUI_PLATFORM_WIDGET_NULL),
+    platform_widget(NULL),
     platform_data(NULL),
     image(NULL),
     parent(NULL),

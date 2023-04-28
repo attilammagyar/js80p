@@ -38,7 +38,7 @@ ExternallyCreatedWindow::ExternallyCreatedWindow(
 
 ExternallyCreatedWindow::~ExternallyCreatedWindow()
 {
-    platform_widget = JS80P_GUI_PLATFORM_WIDGET_NULL;
+    platform_widget = NULL;
 }
 
 

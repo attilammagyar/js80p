@@ -673,7 +673,7 @@ Widget::~Widget()
         xcb_destroy_window(xcb_connection(), window_id());
     }
 
-    platform_widget = JS80P_GUI_PLATFORM_WIDGET_NULL;
+    platform_widget = NULL;
 }
 
 
@@ -712,21 +712,23 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     need_to_destroy_window = true;
     xcb->register_widget(window_id, this);
     platform_widget = (GUI::PlatformWidget)window_id;
+    GUI::PlatformWidget parent_platform_widget = parent->get_platform_widget();
+    xcb_window_t parent_id = *((xcb_window_t*)&parent_platform_widget);
 
     xcb_create_window(
-        xcb_connection,                                 // c
-        XCB_COPY_FROM_PARENT,                           // depth
-        window_id,                                      // wid
-        (xcb_window_t)parent->get_platform_widget(),    // parent
-        left,                                           // x
-        top,                                            // y
-        width,                                          // width
-        height,                                         // height
-        0,                                              // border_width
-        XCB_WINDOW_CLASS_INPUT_OUTPUT,                  // class
-        xcb->get_screen_root_visual_id(),               // visual
-        XCB_CW_EVENT_MASK,                              // value_mask
-        &event_mask                                     // value_list
+        xcb_connection,                     // c
+        XCB_COPY_FROM_PARENT,               // depth
+        window_id,                          // wid
+        parent_id,                          // parent
+        left,                               // x
+        top,                                // y
+        width,                              // width
+        height,                             // height
+        0,                                  // border_width
+        XCB_WINDOW_CLASS_INPUT_OUTPUT,      // class
+        xcb->get_screen_root_visual_id(),   // visual
+        XCB_CW_EVENT_MASK,                  // value_mask
+        &event_mask                         // value_list
     );
 
     cairo_surface = cairo_xcb_surface_create(
@@ -987,7 +989,7 @@ xcb_connection_t* Widget::xcb_connection() const
 
 xcb_window_t Widget::window_id() const
 {
-    return (xcb_window_t)platform_widget;
+    return *(xcb_window_t*)&platform_widget;
 }
 
 

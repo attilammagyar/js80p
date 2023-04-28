@@ -44,7 +44,7 @@ class WidgetBase;
 class GUI
 {
     public:
-        typedef JS80P_GUI_PLATFORM_WIDGET_TYPE PlatformWidget; ///< \brief GUI platform dependent widget type.
+        typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
         typedef void* Image; ///< \breif GUI platform dependent image handle.
 
