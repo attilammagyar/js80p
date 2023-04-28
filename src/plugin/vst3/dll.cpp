@@ -25,5 +25,7 @@
 
 namespace JS80P
 {
-    JS80P::GUI::PlatformData* platform_data = (JS80P::GUI::PlatformData*)&moduleHandle;
+
+GUI::PlatformData* platform_data = (JS80P::GUI::PlatformData*)&moduleHandle;
+
 }
