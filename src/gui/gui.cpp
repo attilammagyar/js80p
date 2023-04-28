@@ -19,7 +19,6 @@
 #define JS80P__GUI__GUI_CPP
 
 #include <algorithm>
-#include <cstdio>
 #include <cstring>
 
 #include "gui/gui.hpp"
