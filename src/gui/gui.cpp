@@ -731,25 +731,27 @@ GUI::GUI(
     synth(synth),
     platform_data(platform_data)
 {
+    initialize();
+
     dummy_widget = new Widget("");
 
     ParamEditor::initialize_knob_states(
         dummy_widget,
-        dummy_widget->load_image(platform_data, "KNOBSTATES"),
-        dummy_widget->load_image(platform_data, "KNOBSTATESINACTIVE")
+        dummy_widget->load_image(this->platform_data, "KNOBSTATES"),
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESINACTIVE")
     );
 
-    about_image = dummy_widget->load_image(platform_data, "ABOUT");
-    controllers_image = dummy_widget->load_image(platform_data, "CONTROLLERS");
-    effects_image = dummy_widget->load_image(platform_data, "EFFECTS");
-    envelopes_image = dummy_widget->load_image(platform_data, "ENVELOPES");
-    lfos_image = dummy_widget->load_image(platform_data, "LFOS");
-    synth_image = dummy_widget->load_image(platform_data, "SYNTH");
-    vst_logo_image = dummy_widget->load_image(platform_data, "VSTLOGO");
+    about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
+    controllers_image = dummy_widget->load_image(this->platform_data, "CONTROLLERS");
+    effects_image = dummy_widget->load_image(this->platform_data, "EFFECTS");
+    envelopes_image = dummy_widget->load_image(this->platform_data, "ENVELOPES");
+    lfos_image = dummy_widget->load_image(this->platform_data, "LFOS");
+    synth_image = dummy_widget->load_image(this->platform_data, "SYNTH");
+    vst_logo_image = dummy_widget->load_image(this->platform_data, "VSTLOGO");
 
     background = new Background();
 
-    this->parent_window = new ExternallyCreatedWindow(platform_data, parent_window);
+    this->parent_window = new ExternallyCreatedWindow(this->platform_data, parent_window);
     this->parent_window->own(background);
 
     background->set_image(synth_image);
@@ -1265,6 +1267,8 @@ GUI::~GUI()
     delete dummy_widget;
 
     dummy_widget = NULL;
+
+    destroy();
 }
 
 

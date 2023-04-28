@@ -168,6 +168,9 @@ class GUI
         static Controller const* controllers_by_id[Synth::ControllerId::MAX_CONTROLLER_ID];
         static bool controllers_by_id_initialized;
 
+        void initialize();
+        void destroy();
+
         void build_about_body();
         void build_controllers_body();
         void build_effects_body();

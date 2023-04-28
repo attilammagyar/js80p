@@ -35,6 +35,16 @@ void GUI::idle()
 }
 
 
+void GUI::initialize()
+{
+}
+
+
+void GUI::destroy()
+{
+}
+
+
 std::string const Widget::FILTER_STR(
     "JS80P Patches (*.js80p)\x00*.js80p\x00"
     "All Files (*.*)\x00*.*\x00",

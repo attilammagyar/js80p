@@ -31,6 +31,16 @@ void GUI::idle()
 }
 
 
+void GUI::initialize()
+{
+}
+
+
+void GUI::destroy()
+{
+}
+
+
 class Widget : public WidgetBase
 {
     public:

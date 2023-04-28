@@ -19,7 +19,6 @@
 #ifndef JS80P__GUI__X11_CPP
 #define JS80P__GUI__X11_CPP
 
-#include <cstdio>
 #include <cstring>
 
 #include "gui/xcb.hpp"
@@ -335,15 +334,12 @@ void XcbPlatform::unregister_widget(xcb_window_t window_id)
 }
 
 
-void Widget::process_events(GUI::PlatformData platform_data)
+void Widget::process_events(XcbPlatform* xcb)
 {
-    XcbPlatform* xcb = (XcbPlatform*)platform_data;
     xcb_connection_t* xcb_connection = xcb->get_connection();
     xcb_generic_event_t* event;
 
     while ((event = xcb_poll_for_event(xcb_connection))) {
-        // fprintf(stderr, "Widget::process_events()\tevent->response_type=%d\n", event->response_type);
-
         switch (event->response_type & ~0x80) {
             case XCB_EXPOSE: handle_expose_event(xcb, (xcb_expose_event_t*)event); break;
             case XCB_BUTTON_PRESS: handle_button_press_event(xcb, (xcb_button_press_event_t*)event); break;
@@ -577,7 +573,25 @@ cairo_status_t Widget::read_png_stream_from_array(
 
 void GUI::idle()
 {
-    Widget::process_events(platform_data);
+    Widget::process_events((XcbPlatform*)platform_data);
+}
+
+
+void GUI::initialize()
+{
+    XcbPlatform* xcb = new XcbPlatform();
+
+    platform_data = (PlatformData)xcb;
+}
+
+
+void GUI::destroy()
+{
+    XcbPlatform* xcb = (XcbPlatform*)platform_data;
+
+    platform_data = NULL;
+
+    delete xcb;
 }
 
 

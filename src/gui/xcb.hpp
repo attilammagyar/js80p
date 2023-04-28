@@ -82,7 +82,7 @@ class XcbPlatform
 class Widget : public WidgetBase
 {
     public:
-        static void process_events(GUI::PlatformData platform_data);
+        static void process_events(XcbPlatform* xcb);
 
         Widget(char const* const text);
         virtual ~Widget();
