@@ -286,17 +286,17 @@ $(DOC_DIR)/html/index.html: \
 		| $(DOC_DIR)
 	$(DOXYGEN)
 
-$(FST): src/plugin/fst/js80p.def $(FST_OBJS) | $(FST_DIR)
+$(FST): $(FST_PLATFORM_OBJS) $(FST_OBJS) | $(FST_DIR)
 	$(LINK_FST) \
-		$(FST_OBJS) src/plugin/fst/js80p.def \
+		$(FST_PLATFORM_OBJS) $(FST_OBJS) \
 		-o $@ $(TARGET_PLATFORM_LFLAGS)
 
 $(FST_DIR): | $(DIST_DIR_BASE)
 	$(MKDIR) $@
 
-$(VST3): src/plugin/vst3/js80p.def $(VST3_OBJS) | $(VST3_DIR)
+$(VST3): $(VST3_PLATFORM_OBJS) $(VST3_OBJS) | $(VST3_DIR)
 	$(LINK_VST3) \
-		$(VST3_OBJS) src/plugin/vst3/js80p.def \
+		$(VST3_PLATFORM_OBJS) $(VST3_OBJS) \
 		-o $@ $(TARGET_PLATFORM_LFLAGS)
 
 $(VST3_DIR): | $(DIST_DIR_BASE)

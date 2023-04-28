@@ -4,11 +4,13 @@ TARGET_OS = windows
 
 FST = $(FST_DIR)/js80p.dll
 FST_MAIN_SOURCES = src/plugin/fst/dll.cpp
+FST_PLATFORM_OBJS = src/plugin/fst/js80p.def
 
 VST3 = $(VST3_DIR)/js80p.vst3
 VST3_BIN = $(BUILD_DIR)/js80p.dll
 VST3_MAIN_SOURCES = src/plugin/vst3/dll.cpp
 VST3_GUI_PLATFORM = kPlatformTypeHWND
+VST3_PLATFORM_OBJS = src/plugin/vst3/js80p.def
 
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
