@@ -13,11 +13,10 @@ DOC_DIR ?= doc
 TEST_MAX_ARRAY_PRINT ?= 20
 
 JS80P_CXXINCS = \
+	-I./lib \
 	-I./src
 
-FST_CXXINCS = \
-	-I./lib/fst \
-	$(JS80P_CXXINCS)
+FST_CXXINCS = $(JS80P_CXXINCS)
 
 VST3_CXXINCS = \
 	-I./lib/vst3sdk \

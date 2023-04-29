@@ -18,7 +18,7 @@
 
 #include "plugin/vst3/vst3.cpp"
 
-#include <public.sdk/source/main/dllmain.cpp>
+#include <vst3sdk/public.sdk/source/main/dllmain.cpp>
 
 #include "gui/gui.hpp"
 

@@ -21,8 +21,7 @@
 
 #include <string>
 
-#include <aeffect.h>
-#include <aeffectx.h>
+#include <fst/fst.h>
 
 #include "gui/gui.hpp"
 
