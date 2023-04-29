@@ -148,8 +148,6 @@ class Widget : public WidgetBase
         HDC hdc;
 
     private:
-        static constexpr Frequency TIMER_FREQUENCY = 18.0;
-
         static constexpr Number MOUSE_WHEEL_SCALE = 1.0 / (Number)WHEEL_DELTA;
 
         static UINT_PTR next_timer_id;

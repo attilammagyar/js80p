@@ -427,7 +427,7 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     platform_widget = (GUI::PlatformWidget)widget_hwnd;
 
     if (type == Type::BACKGROUND) {
-        UINT const elapse = (UINT)std::ceil(1000.0 / TIMER_FREQUENCY);
+        UINT const elapse = (UINT)std::ceil(1000.0 * GUI::REFRESH_RATE_SECONDS);
         timer_id = ++next_timer_id;
         is_timer_started = true;
 

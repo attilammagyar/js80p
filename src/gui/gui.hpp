@@ -74,6 +74,9 @@ class GUI
         static constexpr long int WIDTH = 980;
         static constexpr long int HEIGHT = 600;
 
+        static constexpr Frequency REFRESH_RATE = 18.0;
+        static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
+
         static constexpr int NO_CTLS = 0;
         static constexpr int ALL_CTLS = 97;
         static constexpr int LFO_CTLS = ALL_CTLS - Synth::ENVELOPES;
