@@ -574,6 +574,13 @@ cairo_status_t Widget::read_png_stream_from_array(
 void GUI::idle()
 {
     Widget::process_events((XcbPlatform*)platform_data);
+
+    if (background != NULL) {
+        XcbPlatform* xcb = (XcbPlatform*)platform_data;
+
+        background->refresh();
+        xcb_flush(xcb->get_connection());
+    }
 }
 
 
