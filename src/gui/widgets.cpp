@@ -104,15 +104,31 @@ ParamEditor* TabBody::own(ParamEditor* param_editor)
 }
 
 
+void TabBody::stop_editing()
+{
+    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+        (*it)->stop_editing();
+    }
+}
+
+
 void TabBody::refresh_controlled_param_editors()
 {
-    GUI::refresh_controlled_param_editors(param_editors);
+    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+        ParamEditor* editor = *it;
+
+        if (editor->has_controller()) {
+            editor->refresh();
+        }
+    }
 }
 
 
 void TabBody::refresh_param_editors()
 {
-    GUI::refresh_param_editors(param_editors);
+    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+        (*it)->refresh();
+    }
 }
 
 
@@ -504,7 +520,6 @@ ParamEditor::ParamEditor(
     synth(synth),
     ratio(0.0),
     knob(NULL),
-    skip_refresh_calls(0),
     has_controller_(false)
 {
     complete_knob_state_initialization();
@@ -533,7 +548,6 @@ ParamEditor::ParamEditor(
     synth(synth),
     ratio(0.0),
     knob(NULL),
-    skip_refresh_calls(0),
     controller_id(Synth::ControllerId::NONE),
     has_controller_(false)
 {
@@ -591,9 +605,7 @@ bool ParamEditor::has_controller() const
 
 void ParamEditor::refresh()
 {
-    if (skip_refresh_calls > 0) {
-        --skip_refresh_calls;
-
+    if (knob->is_editing()) {
         return;
     }
 
@@ -672,8 +684,6 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
 {
     Number const ratio = GUI::clamp_ratio(new_ratio);
 
-    skip_refresh_calls = 2;
-
     synth->push_message(
         Synth::MessageType::SET_PARAM, param_id, ratio, 0
     );
@@ -724,6 +734,12 @@ void ParamEditor::update_controller_str()
 void ParamEditor::reset_default()
 {
     handle_ratio_change(default_ratio);
+}
+
+
+void ParamEditor::stop_editing()
+{
+    knob->stop_editing();
 }
 
 
@@ -784,7 +800,8 @@ ParamEditor::Knob::Knob(
     knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
-    is_controlled(false)
+    is_controlled(false),
+    is_editing_(false)
 {
 }
 
@@ -837,6 +854,18 @@ void ParamEditor::Knob::make_controlled()
 {
     is_controlled = true;
     update();
+}
+
+
+bool ParamEditor::Knob::is_editing() const
+{
+    return is_editing_ && !is_controlled;
+}
+
+
+void ParamEditor::Knob::stop_editing()
+{
+    is_editing_ = false;
 }
 
 
@@ -893,6 +922,8 @@ bool ParamEditor::Knob::mouse_move(
 ) {
     Widget::mouse_move(x, y, modifier);
 
+    is_editing_ = true;
+
     if (is_controlled) {
         return false;
     }
@@ -926,6 +957,14 @@ bool ParamEditor::Knob::mouse_move(
     focus();
 
     return is_clicking;
+}
+
+
+bool ParamEditor::Knob::mouse_leave(int const x, int const y)
+{
+    is_editing_ = false;
+
+    return true;
 }
 
 

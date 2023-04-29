@@ -117,9 +117,6 @@ class GUI
         static Color const TEXT_HIGHLIGHT_COLOR;
         static Color const TEXT_HIGHLIGHT_BACKGROUND;
 
-        static void refresh_param_editors(ParamEditors editors);
-        static void refresh_controlled_param_editors(ParamEditors editors);
-
         static void param_ratio_to_str(
             Synth* synth,
             Synth::ParamId const param_id,

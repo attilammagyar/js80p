@@ -764,6 +764,7 @@ void ImportPatchButton::click()
 
     Serializer::import(synth, patch);
 
+    synth_gui_body->stop_editing();
     synth_gui_body->refresh_param_editors();
 }
 

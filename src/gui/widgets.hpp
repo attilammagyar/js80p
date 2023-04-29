@@ -117,6 +117,8 @@ class TabBody : public TransparentWidget
 
         ParamEditor* own(ParamEditor* param_editor);
 
+        void stop_editing();
+
         void refresh_controlled_param_editors();
         void refresh_param_editors();
 
@@ -303,6 +305,8 @@ class ParamEditor : public TransparentWidget
 
         void reset_default();
 
+        void stop_editing();
+
         Synth::ParamId const param_id;
 
     protected:
@@ -360,11 +364,15 @@ class ParamEditor : public TransparentWidget
                 void make_free();
                 void make_controlled();
 
+                bool is_editing() const;
+                void stop_editing();
+
             protected:
                 virtual bool double_click() override;
                 virtual bool mouse_down(int const x, int const y) override;
                 virtual bool mouse_up(int const x, int const y) override;
                 virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+                virtual bool mouse_leave(int const x, int const y) override;
                 virtual bool mouse_wheel(Number const delta, bool const modifier) override;
 
             private:
@@ -377,6 +385,7 @@ class ParamEditor : public TransparentWidget
                 Number ratio;
                 Number mouse_move_delta;
                 bool is_controlled;
+                bool is_editing_;
         };
 
         void complete_knob_state_initialization();
@@ -397,7 +406,6 @@ class ParamEditor : public TransparentWidget
         Number default_ratio;
         Number ratio;
         Knob* knob;
-        int skip_refresh_calls;
         char value_str[TEXT_MAX_LENGTH];
         char controller_str[TEXT_MAX_LENGTH];
         Synth::ControllerId controller_id;

@@ -587,26 +587,6 @@ constexpr GUI::ColorComponent GUI::blue(Color const color)
 }
 
 
-void GUI::refresh_param_editors(ParamEditors param_editors)
-{
-    for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
-        (*it)->refresh();
-    }
-}
-
-
-void GUI::refresh_controlled_param_editors(ParamEditors param_editors)
-{
-    for (ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
-        ParamEditor* editor = *it;
-
-        if (editor->has_controller()) {
-            editor->refresh();
-        }
-    }
-}
-
-
 void GUI::param_ratio_to_str(
         Synth* synth,
         Synth::ParamId const param_id,
