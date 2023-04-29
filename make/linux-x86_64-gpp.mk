@@ -79,8 +79,8 @@ OBJCOPY = /usr/bin/objcopy \
 	--output $(OBJ_GUI_BFDNAME) \
 	--binary-architecture $(OBJ_GUI_BFDARCH)
 
-LINK_SO = $(CPP_TARGET_PLATFORM) -Wall -s -shared
-LINK_EXE = $(CPP_TARGET_PLATFORM) -Wall #-s
+LINK_SO = $(CPP_TARGET_PLATFORM) -Wall -shared
+LINK_EXE = $(CPP_TARGET_PLATFORM) -Wall
 
 TARGET_PLATFORM_LFLAGS = -L /usr/X11R6/lib -lcairo -lxcb -lxcb-render
 
