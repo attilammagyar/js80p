@@ -16,6 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "plugin/vst3/vst3.cpp"
+#include "plugin/vst3/plugin.hpp"
 
-#include <vst3sdk/public.sdk/source/main/linuxmain.cpp>
+
+using namespace Steinberg;
+
+
+namespace JS80P
+{
+
+extern GUI::PlatformData* platform_data;
+
+
+void Vst3Plugin::GUI::initialize()
+{
+    gui = new JS80P::GUI(
+        *platform_data,
+        (JS80P::GUI::PlatformWidget)systemWindow,
+        synth,
+        true
+    );
+    gui->show();
+}
+
+
+void Vst3Plugin::GUI::removedFromParent()
+{
+    if (gui != NULL) {
+        delete gui;
+
+        gui = NULL;
+    }
+}
+
+}

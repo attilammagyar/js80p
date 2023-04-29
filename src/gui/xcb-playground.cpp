@@ -38,13 +38,14 @@ xcb_generic_event_t* const JS80P_XCB_TIMEOUT = (xcb_generic_event_t*)-1;
 
 
 xcb_generic_event_t* xcb_wait_for_event_with_timeout(
-        xcb_connection_t* xcb_connection,
+        JS80P::XcbPlatform* xcb,
         double const timeout
 )
 {
     constexpr double NANOSEC_SCALE = 1000000000.0;
     fd_set fds;
-    int xcb_fd = xcb_get_file_descriptor(xcb_connection);
+    xcb_connection_t* xcb_connection = xcb->get_connection();
+    int xcb_fd = xcb->get_fd();
 
     double timeout_int = std::floor(timeout);
     struct timespec ts_timeout;
@@ -172,7 +173,7 @@ int main(int const argc, char const* argv[])
     );
     gui->show();
 
-    while (is_running && (event = xcb_wait_for_event_with_timeout(xcb_connection, 0.05))) {
+    while (is_running && (event = xcb_wait_for_event_with_timeout(xcb, 0.05))) {
         if (event == JS80P_XCB_TIMEOUT) {
             timer_tick(synth, gui, rendering_round);
 

@@ -142,7 +142,8 @@ XcbPlatform::XcbPlatform()
     screen(NULL),
     screen_root_visual(NULL),
     font_face_normal(NULL),
-    font_face_bold(NULL)
+    font_face_bold(NULL),
+    xcb_fd(-1)
 {
 }
 
@@ -164,6 +165,7 @@ XcbPlatform::~XcbPlatform()
         connection = NULL;
         screen = NULL;
         screen_root_visual = NULL;
+        xcb_fd = -1;
     }
 }
 
@@ -183,6 +185,7 @@ xcb_connection_t* XcbPlatform::get_connection()
         if (connection != NULL) {
             screen = xcb_setup_roots_iterator(xcb_get_setup(connection)).data;
             screen_root_visual = find_screen_root_visual();
+            xcb_fd = xcb_get_file_descriptor(connection);
         }
     }
 
@@ -216,6 +219,12 @@ xcb_visualtype_t* XcbPlatform::find_screen_root_visual() const
     }
 
     return NULL;
+}
+
+
+int XcbPlatform::get_fd() const
+{
+    return xcb_fd;
 }
 
 
@@ -341,6 +350,7 @@ void Widget::process_events(XcbPlatform* xcb)
 
     while ((event = xcb_poll_for_event(xcb_connection))) {
         switch (event->response_type & ~0x80) {
+            case 0: handle_error_event(xcb, (xcb_generic_error_t*)event); break;
             case XCB_EXPOSE: handle_expose_event(xcb, (xcb_expose_event_t*)event); break;
             case XCB_BUTTON_PRESS: handle_button_press_event(xcb, (xcb_button_press_event_t*)event); break;
             case XCB_BUTTON_RELEASE: handle_button_release_event(xcb, (xcb_button_release_event_t*)event); break;
@@ -356,6 +366,22 @@ void Widget::process_events(XcbPlatform* xcb)
     }
 
     xcb_flush(xcb_connection);
+}
+
+
+void Widget::handle_error_event(
+        XcbPlatform const* xcb,
+        xcb_generic_error_t const* error
+) {
+    // fprintf(
+        // stderr,
+        // "XCB ERROR: error_code=%u, sequence=%u, resource_id=%u, major_code=%u, minor_code=%u\n",
+        // (unsigned int)error->error_code,
+        // (unsigned int)error->sequence,
+        // (unsigned int)error->resource_id,
+        // (unsigned int)error->major_code,
+        // (unsigned int)error->minor_code
+    // );
 }
 
 
@@ -586,14 +612,20 @@ void GUI::idle()
 
 void GUI::initialize()
 {
-    XcbPlatform* xcb = new XcbPlatform();
+    if (platform_data == NULL) {
+        XcbPlatform* xcb = new XcbPlatform();
 
-    platform_data = (PlatformData)xcb;
+        platform_data = (PlatformData)xcb;
+    }
 }
 
 
 void GUI::destroy()
 {
+    /*
+    The owner of the XcbPlatform object is the GUI, even if the GUI was
+    instantiated with an already created XcbPlatform object.
+    */
     XcbPlatform* xcb = (XcbPlatform*)platform_data;
 
     platform_data = NULL;
@@ -758,6 +790,13 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     cairo = cairo_create(cairo_surface);
 
     xcb_map_window(xcb_connection, window_id);
+
+    /*
+    Sometimes it can help with debugging if widget initialization is not batched,
+    and events are processed immediately.
+    */
+    // xcb_flush(xcb_connection);
+    // Widget::process_events(xcb);
 }
 
 

@@ -42,9 +42,6 @@ using namespace Steinberg;
 namespace JS80P
 {
 
-extern GUI::PlatformData* platform_data;
-
-
 class Vst3Plugin
 {
     public:
@@ -165,11 +162,16 @@ class Vst3Plugin
             private:
                 static ViewRect const rect;
 
+                void initialize();
                 void show_if_needed();
 
                 Controller* controller;
                 Synth* synth;
                 JS80P::GUI* gui;
+
+                void* run_loop;
+                void* event_handler;
+                void* timer_handler;
         };
 
         class Controller : public Vst::EditController, public Vst::IMidiMapping

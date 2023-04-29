@@ -349,7 +349,7 @@ $(OBJ_FST_MAIN): \
 		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_VST3_PLUGIN): \
-		src/plugin/vst3/plugin.cpp \
+		$(VST3_PLUGIN_SOURCES) \
 		$(VST3_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP_TARGET_PLATFORM) \

@@ -11,6 +11,9 @@ VST3_BIN = $(BUILD_DIR)/js80p.dll
 VST3_MAIN_SOURCES = src/plugin/vst3/dll.cpp
 VST3_GUI_PLATFORM = kPlatformTypeHWND
 VST3_PLATFORM_OBJS = src/plugin/vst3/js80p.def
+VST3_PLUGIN_SOURCES = \
+    src/plugin/vst3/plugin.cpp \
+    src/plugin/vst3/plugin-win32.cpp
 
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp

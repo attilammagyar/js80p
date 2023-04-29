@@ -32,6 +32,14 @@
 
 #include "gui/gui.hpp"
 
+#if SMTG_OS_LINUX
+#include "plugin/vst3/plugin-xcb.cpp"
+#elif SMTG_OS_WINDOWS
+#include "plugin/vst3/plugin-win32.cpp"
+#else
+#error "Unsupported OS, currently JS80P can be compiled only for Linux and Windows. (Or did something go wrong with the SMTG_OS_LINUX and SMTG_OS_WINDOWS macros?)"
+#endif
+
 #include "midi.hpp"
 #include "serializer.hpp"
 
@@ -549,7 +557,10 @@ Vst3Plugin::GUI::GUI(Controller* controller)
     : CPluginView(&rect),
     controller(controller),
     synth(NULL),
-    gui(NULL)
+    gui(NULL),
+    run_loop(NULL),
+    event_handler(NULL),
+    timer_handler(NULL)
 {
 }
 
@@ -586,16 +597,6 @@ void Vst3Plugin::GUI::attachedToParent()
 }
 
 
-void Vst3Plugin::GUI::removedFromParent()
-{
-    if (gui != NULL) {
-        delete gui;
-
-        gui = NULL;
-    }
-}
-
-
 void Vst3Plugin::GUI::set_synth(Synth* synth)
 {
     this->synth = synth;
@@ -609,13 +610,7 @@ void Vst3Plugin::GUI::show_if_needed()
         return;
     }
 
-    gui = new JS80P::GUI(
-        *platform_data,
-        (JS80P::GUI::PlatformWidget)systemWindow,
-        synth,
-        true
-    );
-    gui->show();
+    initialize();
 }
 
 

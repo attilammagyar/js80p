@@ -46,6 +46,7 @@ class XcbPlatform
         ~XcbPlatform();
 
         xcb_connection_t* get_connection();
+        int get_fd() const;
         xcb_screen_t* get_screen() const;
         xcb_visualid_t get_screen_root_visual_id() const;
         xcb_visualtype_t* get_screen_root_visual() const;
@@ -76,6 +77,7 @@ class XcbPlatform
         xcb_visualtype_t* screen_root_visual;
         cairo_font_face_t* font_face_normal;
         cairo_font_face_t* font_face_bold;
+        int xcb_fd;
 };
 
 
@@ -166,7 +168,6 @@ class Widget : public WidgetBase
     private:
         static constexpr xcb_timestamp_t DOUBLE_CLICK_TIME_DELTA = 500;
         static constexpr int DOUBLE_CLICK_POS_DELTA = 5;
-        static constexpr Frequency TIMER_FREQUENCY = 18.0;
         static constexpr double COLOR_COMPONENT_SCALE = 1.0 / 255.0;
         static constexpr unsigned int TRANSPARENT_WIDGETS = (
             Type::EXPORT_PATCH_BUTTON
@@ -210,6 +211,10 @@ class Widget : public WidgetBase
             unsigned int length
         );
 
+        static void handle_error_event(
+            XcbPlatform const* xcb,
+            xcb_generic_error_t const* error
+        );
         static void handle_expose_event(
             XcbPlatform const* xcb,
             xcb_expose_event_t const* event

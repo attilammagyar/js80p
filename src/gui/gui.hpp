@@ -146,6 +146,8 @@ class GUI
         void show();
         void idle();
 
+        PlatformData get_platform_data() const;
+
     private:
         static void initialize_controllers_by_id();
 

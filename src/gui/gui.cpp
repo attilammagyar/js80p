@@ -1278,6 +1278,12 @@ void GUI::show()
 }
 
 
+GUI::PlatformData GUI::get_platform_data() const
+{
+    return platform_data;
+}
+
+
 WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
     text(text),

@@ -16,6 +16,9 @@ VST3_BIN = $(BUILD_DIR)/js80p.so
 VST3_MAIN_SOURCES = src/plugin/vst3/so.cpp
 VST3_GUI_PLATFORM = kPlatformTypeX11EmbedWindowID
 VST3_PLATFORM_OBJS =
+VST3_PLUGIN_SOURCES = \
+    src/plugin/vst3/plugin.cpp \
+    src/plugin/vst3/plugin-xcb.cpp
 
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX)
 GUI_PLAYGROUND_SOURCES = src/gui/xcb-playground.cpp
