@@ -437,48 +437,48 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 
 bool ParamEditor::knob_states_initialization_complete = false;
 
-GUI::Image ParamEditor::knob_states_active_image = NULL;
+GUI::Image ParamEditor::knob_states_free_image = NULL;
 
-GUI::Image ParamEditor::knob_states_inactive_image = NULL;
+GUI::Image ParamEditor::knob_states_controlled_image = NULL;
 
-GUI::Image ParamEditor::knob_states_active[KNOB_STATES_COUNT];
+GUI::Image ParamEditor::knob_states_free_images[KNOB_STATES_COUNT];
 
-GUI::Image ParamEditor::knob_states_inactive[KNOB_STATES_COUNT];
+GUI::Image ParamEditor::knob_states_controlled_images[KNOB_STATES_COUNT];
 
 
 void ParamEditor::initialize_knob_states(
     WidgetBase* widget,
-    GUI::Image active,
-    GUI::Image inactive
+    GUI::Image knob_states_free_image,
+    GUI::Image knob_states_controlled_image
 ) {
-    if (knob_states_active_image != NULL) {
-        free_knob_states(widget);
+    if (knob_states_free_image != NULL) {
+        free_knob_state_images(widget);
     }
 
-    knob_states_active_image = active;
-    knob_states_inactive_image = inactive;
+    ParamEditor::knob_states_free_image = knob_states_free_image;
+    ParamEditor::knob_states_controlled_image = knob_states_controlled_image;
 
     knob_states_initialization_complete = false;
 }
 
 
-void ParamEditor::free_knob_states(WidgetBase* widget)
+void ParamEditor::free_knob_state_images(WidgetBase* widget)
 {
-    if (knob_states_active_image == NULL) {
+    if (knob_states_free_image == NULL) {
         return;
     }
 
-    widget->delete_image(knob_states_active_image);
-    widget->delete_image(knob_states_inactive_image);
+    widget->delete_image(knob_states_free_image);
+    widget->delete_image(knob_states_controlled_image);
 
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        widget->delete_image(knob_states_active[i]);
-        widget->delete_image(knob_states_inactive[i]);
+        widget->delete_image(knob_states_free_images[i]);
+        widget->delete_image(knob_states_controlled_images[i]);
     }
 
     knob_states_initialization_complete = false;
-    knob_states_active_image = NULL;
-    knob_states_inactive_image = NULL;
+    knob_states_free_image = NULL;
+    knob_states_controlled_image = NULL;
 }
 
 
@@ -550,11 +550,11 @@ void ParamEditor::complete_knob_state_initialization()
     for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
         int const top = i * Knob::HEIGHT;
 
-        knob_states_active[i] = copy_image_region(
-            knob_states_active_image, 0, top, Knob::WIDTH, Knob::HEIGHT
+        knob_states_free_images[i] = copy_image_region(
+            knob_states_free_image, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
-        knob_states_inactive[i] = copy_image_region(
-            knob_states_inactive_image, 0, top, Knob::WIDTH, Knob::HEIGHT
+        knob_states_controlled_images[i] = copy_image_region(
+            knob_states_controlled_image, 0, top, Knob::WIDTH, Knob::HEIGHT
         );
     }
 
@@ -646,9 +646,9 @@ void ParamEditor::update_editor()
     redraw();
 
     if (has_controller_) {
-        knob->deactivate();
+        knob->make_controlled();
     } else {
-        knob->activate();
+        knob->make_free();
     }
 
     knob->update(ratio);
@@ -784,7 +784,7 @@ ParamEditor::Knob::Knob(
     knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
-    is_inactive(false)
+    is_controlled(false)
 {
 }
 
@@ -818,24 +818,24 @@ void ParamEditor::Knob::update()
 {
     int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
 
-    if (is_inactive) {
-        set_image(knob_states_inactive[index]);
+    if (is_controlled) {
+        set_image(knob_states_controlled_images[index]);
     } else {
-        set_image(knob_states_active[index]);
+        set_image(knob_states_free_images[index]);
     }
 }
 
 
-void ParamEditor::Knob::activate()
+void ParamEditor::Knob::make_free()
 {
-    is_inactive = false;
+    is_controlled = false;
     update();
 }
 
 
-void ParamEditor::Knob::deactivate()
+void ParamEditor::Knob::make_controlled()
 {
-    is_inactive = true;
+    is_controlled = true;
     update();
 }
 
@@ -844,7 +844,7 @@ bool ParamEditor::Knob::double_click()
 {
     Widget::double_click();
 
-    if (is_inactive) {
+    if (is_controlled) {
         return true;
     }
 
@@ -860,7 +860,7 @@ bool ParamEditor::Knob::mouse_down(int const x, int const y)
 {
     Widget::mouse_down(x, y);
 
-    if (is_inactive) {
+    if (is_controlled) {
         return true;
     }
 
@@ -876,7 +876,7 @@ bool ParamEditor::Knob::mouse_up(int const x, int const y)
 {
     Widget::mouse_up(x, y);
 
-    if (is_inactive) {
+    if (is_controlled) {
         return true;
     }
 
@@ -893,7 +893,7 @@ bool ParamEditor::Knob::mouse_move(
 ) {
     Widget::mouse_move(x, y, modifier);
 
-    if (is_inactive) {
+    if (is_controlled) {
         return false;
     }
 
@@ -933,7 +933,7 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 {
     Widget::mouse_wheel(delta, modifier);
 
-    if (is_inactive) {
+    if (is_controlled) {
         return true;
     }
 

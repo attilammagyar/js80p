@@ -251,11 +251,11 @@ class ParamEditor : public TransparentWidget
 
         static void initialize_knob_states(
             WidgetBase* widget,
-            GUI::Image active,
-            GUI::Image inactive
+            GUI::Image knob_states_free_image,
+            GUI::Image knob_states_controlled_image
         );
 
-        static void free_knob_states(WidgetBase* widget);
+        static void free_knob_state_images(WidgetBase* widget);
 
         ParamEditor(
             char const* const text,
@@ -316,11 +316,11 @@ class ParamEditor : public TransparentWidget
 
         static bool knob_states_initialization_complete;
 
-        static GUI::Image knob_states_active_image;
-        static GUI::Image knob_states_inactive_image;
+        static GUI::Image knob_states_free_image;
+        static GUI::Image knob_states_controlled_image;
 
-        static GUI::Image knob_states_active[KNOB_STATES_COUNT];
-        static GUI::Image knob_states_inactive[KNOB_STATES_COUNT];
+        static GUI::Image knob_states_free_images[KNOB_STATES_COUNT];
+        static GUI::Image knob_states_controlled_images[KNOB_STATES_COUNT];
 
         class Knob : public Widget
         {
@@ -357,8 +357,8 @@ class ParamEditor : public TransparentWidget
 
                 void update(Number const ratio);
                 void update();
-                void activate();
-                void deactivate();
+                void make_free();
+                void make_controlled();
 
             protected:
                 virtual bool double_click() override;
@@ -376,7 +376,7 @@ class ParamEditor : public TransparentWidget
                 Number prev_y;
                 Number ratio;
                 Number mouse_move_delta;
-                bool is_inactive;
+                bool is_controlled;
         };
 
         void complete_knob_state_initialization();

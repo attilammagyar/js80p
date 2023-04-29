@@ -19,6 +19,36 @@ except ImportError as error:
 def main(argv):
     knob_bg = Image.open(os.path.join(os.path.dirname(argv[0]), "../gui/knob.png"))
 
+    generate_knob_states(
+        knob_bg=knob_bg,
+        glow_color_1=(72, 0, 55),
+        glow_color_2=(0, 42, 144),
+        glow_color_3=(80, 170, 255),
+        ticks_color=(144, 144, 150),
+        line_color=(200, 200, 220),
+        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-free.png")
+    )
+    generate_knob_states(
+        knob_bg=knob_bg,
+        glow_color_1=(72, 10, 0),
+        glow_color_2=(220, 60, 24),
+        glow_color_3=(255, 145, 72),
+        ticks_color=(144, 144, 150),
+        line_color=(200, 200, 220),
+        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-controlled.png")
+    )
+
+
+def generate_knob_states(
+        knob_bg,
+        glow_color_1,
+        glow_color_2,
+        glow_color_3,
+        ticks_color,
+        line_color,
+        out_file,
+):
+
     width, height = knob_bg.size;
     center = (int(round(width / 2)), int(round(height / 2)))
     angle_diff = 30.0
@@ -28,11 +58,6 @@ def main(argv):
     start_angle = 90.0 + angle_diff
     end_angle_delta = 360.0 - angle_diff * 2.0
     arc_distance = 28
-    glow_color_1 = (72, 0, 55)
-    glow_color_2 = (0, 42, 144)
-    glow_color_3 = (80, 170, 255)
-    ticks_color = (144, 144, 150)
-    line_color = (200, 200, 220)
 
     overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     canvas = ImageDraw.Draw(overlay)
@@ -109,9 +134,7 @@ def main(argv):
     knob_states = knob_states.resize(
         (int(width / 5), int(height / 5) * stages), Image.BICUBIC
     )
-    knob_states.save(
-        os.path.join(os.path.dirname(argv[0]), "../gui/knob_states.png")
-    )
+    knob_states.save(out_file)
 
     return 0
 

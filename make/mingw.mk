@@ -22,8 +22,8 @@ GUI_IMAGES = \
 	gui/img/controllers.bmp \
 	gui/img/effects.bmp \
 	gui/img/envelopes.bmp \
-	gui/img/knob_states.bmp \
-	gui/img/knob_states_inactive.bmp \
+	gui/img/knob_states-free.bmp \
+	gui/img/knob_states-controlled.bmp \
 	gui/img/lfos.bmp \
 	gui/img/synth.bmp \
 	gui/img/vst_logo.bmp

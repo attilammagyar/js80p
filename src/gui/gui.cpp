@@ -737,8 +737,8 @@ GUI::GUI(
 
     ParamEditor::initialize_knob_states(
         dummy_widget,
-        dummy_widget->load_image(this->platform_data, "KNOBSTATES"),
-        dummy_widget->load_image(this->platform_data, "KNOBSTATESINACTIVE")
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESFREE"),
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED")
     );
 
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
@@ -1254,7 +1254,7 @@ GUI::~GUI()
 {
     delete parent_window;
 
-    ParamEditor::free_knob_states(dummy_widget);
+    ParamEditor::free_knob_state_images(dummy_widget);
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(controllers_image);
