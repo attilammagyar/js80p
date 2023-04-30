@@ -35,6 +35,7 @@ Table of Contents
  * [Development](#dev)
     * [Tools](#dev-tools)
     * [Dependencies](#dev-dep)
+    * [Compiling](#dev-compile)
     * [Theory](#dev-theory)
 
 <a name="system"></a>
@@ -42,9 +43,22 @@ Table of Contents
 System Requirements
 -------------------
 
- * Operating System: Windows 7 or newer
+ * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)
  * CPU: 32 or 64 bit, SSE2 support
  * RAM: 50-200 MB, depending on buffer size
+
+On Linux, the `libxcb`, `libxcb-render` and `libcairo` libraries are required
+to run JS80P. To install them on Debian based distributions (e.g. Ubuntu), you
+can use the following command:
+
+    sudo apt-get install libxcb1 libxcb-render0 libcairo2
+
+On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
+the `kdialog` or the `zenity` application are required to run JS80P. To install
+them on Debian based distributions (e.g. Ubuntu), you can use the following
+command:
+
+    sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
 
 Tested with [REAPER](https://www.reaper.fm/) 6.78.
 
@@ -54,10 +68,10 @@ Installation
 ------------
 
 1. [Download a plugin archive for your platform](https://attilammagyar.github.io/js80p/).
-2. Decompress the ZIP file.
-3. Depending on which plugin type you downloaded, copy `js80p.dll` to the
-   folder where you keep your VST 2.4 plugins, or copy `js80p.vst3` to your
-   VST 3 folder.
+2. Extract the ZIP archive.
+3. Depending on which plugin type you downloaded, copy `js80p.dll` on Windows,
+   `js80p.so` on Linux to thee folder where you keep your VST 2.4 plugins,
+   or copy `js80p.vst3` (on both Windows and Linux) to your VST 3 folder.
 
 The `presets` folder in the archive contains a few sounds that you can load by
 clicking the _Import Patch_ icon near the top left corner of the main screen of
@@ -202,7 +216,7 @@ Development
 #### Linux
 
  * [GNU Make 4.2.1+](https://www.gnu.org/software/make/)
- * [GCC 9.3+](https://gcc.gnu.org/)
+ * [G++ 9.3+](https://gcc.gnu.org/)
  * [MinGW-w64 7.0.0+](https://www.mingw-w64.org/)
  * [Valgrind 3.15.0+](https://valgrind.org/)
  * [Doxygen 1.8.17+](https://www.doxygen.nl/)
@@ -235,6 +249,34 @@ installed:
         libx11-dev \
         libxcb1-dev \
         libxcb-render0-dev
+
+<a name="dev-compile"></a>
+
+### Compiling
+
+#### Windows
+
+Assuming that you have installed MinGW-w64 to `C:\mingw64`, you can use the
+following commands to run tests and compile JS80P for Windows:
+
+    SET PATH=C:\mingw64\bin;%PATH%
+    SET TARGET_PLATFORM=x86_64-w64-mingw32
+    SET DEV_OS=windows
+
+    mingw32-make.exe check
+    mingw32-make.exe all
+
+#### Linux
+
+Run `make check` for running tests.
+
+The following commands (on a 64 bit Linux environment) will compile JS80P for
+64 bit Windows, 32 bit Windows, 64 bit Linux, and 32 bit Linux respectively:
+
+    TARGET_PLATFORM=x86_64-w64-mingw32 make all
+    TARGET_PLATFORM=i686-w64-mingw32 make all
+    TARGET_PLATFORM=x86_64-gpp make all
+    TARGET_PLATFORM=i686-gpp make all
 
 <a name="dev-theory"></a>
 
