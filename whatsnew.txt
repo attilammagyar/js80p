@@ -1,3 +1,10 @@
+v1.1.0 (2023-05-01)
+ * Linux support
+ * Use warm colors for knobs which have associated controllers
+ * Add the "System Requirements" section to README.txt
+ * Bugfix: GUI updates will no longer flicker and interfere with editing knobs
+ * Bugfix: note pressure MIDI events will no longer trigger new notes
+
 v1.0.1 (2023-04-19)
  * Improve presets/big_saw.js80p
  * 32 bit support
