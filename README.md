@@ -47,12 +47,6 @@ System Requirements
  * CPU: 32 or 64 bit, SSE2 support
  * RAM: 50-200 MB, depending on buffer size
 
-On Linux, the `libxcb`, `libxcb-render` and `libcairo` libraries are required
-to run JS80P. To install them on Debian based distributions (e.g. Ubuntu), you
-can use the following command:
-
-    sudo apt-get install libxcb1 libxcb-render0 libcairo2
-
 On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
 the `kdialog` or the `zenity` application are required to run JS80P. To install
 them on Debian based distributions (e.g. Ubuntu), you can use the following
@@ -70,7 +64,7 @@ Installation
 1. [Download a plugin archive for your platform](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
 3. Depending on which plugin type you downloaded, copy `js80p.dll` on Windows,
-   `js80p.so` on Linux to thee folder where you keep your VST 2.4 plugins,
+   `js80p.so` on Linux to the folder where you keep your VST 2.4 plugins,
    or copy `js80p.vst3` (on both Windows and Linux) to your VST 3 folder.
 
 The `presets` folder in the archive contains a few sounds that you can load by

@@ -31,7 +31,7 @@ Installation
 1. Download JS80P from its website at https://attilammagyar.github.io/js80p
 2. Extract the ZIP archive.
 3. Depending on which plugin type you downloaded, copy "js80p.dll" on Windows,
-   or "js80p.so" on Linux to thee folder where you keep your VST 2.4 plugins,
+   or "js80p.so" on Linux to the folder where you keep your VST 2.4 plugins,
    or copy "js80p.vst3" to your VST 3 folder.
 
 The "presets" folder in the archive contains a few sounds that you can load by
