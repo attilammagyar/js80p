@@ -80,6 +80,13 @@ div.center p,
   text-align: center;
 }
 
+p.code {
+  margin: auto;
+  background-color: #08080b;
+  padding: 0.3vmin 0.6vmin;
+  border-radius: 1vmin;
+}
+
 div.section {
   max-width: 98vmin;
 }
@@ -130,21 +137,40 @@ code {
     <p class="center">
       <a href="#which">Which distribution should I download?</a>
     </p>
+    <h3>Windows</h3>
     <ul>
       <li>
-        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0.1/js80p-1_0_1-windows-64bit-fst.zip">Download (1.4M)</a>
+        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-windows-32bit-fst.zip">Download (1.5M)</a>
       </li>
       <li>
-        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0.1/js80p-1_0_1-windows-64bit-vst3.zip">Download (1.7M)</a>
+        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-windows-32bit-vst3.zip">Download (1.7M)</a>
       </li>
       <li>
-        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0.1/js80p-1_0_1-windows-32bit-fst.zip">Download (1.4M)</a>
+        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-windows-64bit-fst.zip">Download (1.5M)</a>
       </li>
       <li>
-        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0.1/js80p-1_0_1-windows-32bit-vst3.zip">Download (1.6M)</a>
+        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-windows-64bit-vst3.zip">Download (1.8M)</a>
+      </li>
+    </ul>
+    <h3>Linux</h3>
+    <ul>
+      <li>
+        Linux, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-linux-32bit-fst.zip">Download (916K)</a>
       </li>
       <li>
-        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.0.1/js80p-1_0_1-src.zip">Download (4.9M)</a>
+        Linux, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-linux-32bit-vst3.zip">Download (1.1M)</a>
+      </li>
+      <li>
+        Linux, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-linux-64bit-fst.zip">Download (900K)</a>
+      </li>
+      <li>
+        Linux, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-linux-64bit-vst3.zip">Download (1.1M)</a>
+      </li>
+    </ul>
+    <h3>Source Code</h3>
+    <ul>
+      <li>
+        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.1.0/js80p-1_1_0-src.zip">Download (5.5M)</a>
       </li>
     </ul>
     <p class="center">
@@ -198,10 +224,18 @@ code {
   <h2 class="center">System Requirements</h2>
   <div class="section">
     <ul>
-      <li>Operating System: Windows 7 or newer</li>
+      <li>Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)</li>
       <li>CPU: 32 or 64 bit, SSE2 support</li>
       <li>RAM: 50-200 MB, depending on buffer size</li>
     </ul>
+    <p>
+      On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and
+      <code>libcairo</code> libraries, and either the <code>kdialog</code> or
+      the <code>zenity</code> application are required to run JS80P. To install
+      them on Debian based distributions (e.g. Ubuntu), you can use the
+      following command:
+    </p>
+    <p class="code"><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog</code></pre>
   </div>
   <div class="section center">
     <img class="vst" src="vst_compatible.png" alt="JS80P is VST compatible (VST&reg; is a trademark of Steinberg Media Technologies GmbH, registered in Europe and other countries.)" />
@@ -213,11 +247,12 @@ code {
       <li>
         <a href="#download-anchor">Download a plugin archive for your platform</a>.
       </li>
-      <li>Decompress the ZIP file.</li>
+      <li>Extract the ZIP archive.</li>
       <li>
-        Depending on which plugin type you downloaded, copy
-        <code>js80p.dll</code> to the folder where you keep your VST 2.4
-        plugins, or copy <code>js80p.vst3</code> to your VST 3 folder.
+        Depending on which plugin type you downloaded, copy <code>js80p.dll</code>
+        on Windows, <code>js80p.so</code> on Linux to the folder where you keep
+        your VST 2.4 plugins, or copy <code>js80p.vst3</code> (on both Windows
+        and Linux) to your VST 3 folder.
       </li>
     </ol>
   </div>
