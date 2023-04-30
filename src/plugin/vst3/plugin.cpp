@@ -398,7 +398,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
             break;
 
         case Event::Type::NOTE_PRESSURE:
-            synth.note_on(
+            synth.aftertouch(
                 event.time_offset, 0, event.note_or_ctl, event.velocity_or_value
             );
             break;
