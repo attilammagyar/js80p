@@ -31,9 +31,9 @@ GUI_IMAGES = \
 	gui/img/synth.bmp \
 	gui/img/vst_logo.bmp
 
-OBJ_GUI_DATA = $(BUILD_DIR)/js80p-$(SUFFIX).res
+OBJ_GUI_EXTRA = $(BUILD_DIR)/js80p-$(SUFFIX).res
 
-$(OBJ_GUI_DATA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
+$(OBJ_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 VALGRIND ?=

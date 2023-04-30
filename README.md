@@ -227,13 +227,14 @@ To compile JS80P on e.g. Ubuntu Linux 20.04, the following packages need to be
 installed:
 
     apt-get install \
-        build-essential \
         binutils \
+        build-essential \
         g++ \
         g++-multilib \
+        libcairo2-dev \
         libx11-dev \
         libxcb1-dev \
-        libcairo2-dev
+        libxcb-render0-dev
 
 <a name="dev-theory"></a>
 
