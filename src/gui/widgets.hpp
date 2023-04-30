@@ -73,11 +73,13 @@ class ImportPatchButton : public TransparentWidget
             TabBody* synth_gui_body
         );
 
+        virtual ~ImportPatchButton();
+
     protected:
         virtual void click() override;
 
     private:
-        char buffer[Serializer::MAX_SIZE];
+        char* buffer;
         Synth* synth;
         TabBody* synth_gui_body;
 };

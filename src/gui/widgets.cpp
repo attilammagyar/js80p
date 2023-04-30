@@ -73,6 +73,13 @@ ImportPatchButton::ImportPatchButton(
     synth(synth),
     synth_gui_body(synth_gui_body)
 {
+    buffer = new char[Serializer::MAX_SIZE];
+}
+
+
+ImportPatchButton::~ImportPatchButton()
+{
+    delete[] buffer;
 }
 
 
