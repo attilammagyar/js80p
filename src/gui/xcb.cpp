@@ -19,7 +19,17 @@
 #ifndef JS80P__GUI__X11_CPP
 #define JS80P__GUI__X11_CPP
 
+#include <cerrno>
 #include <cstring>
+#include <csignal>
+#include <istream>
+#include <fstream>
+#include <ostream>
+
+#include <sys/select.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "gui/xcb.hpp"
 
@@ -44,6 +54,9 @@ extern unsigned char _binary_gui_img_synth_png_start;
 extern unsigned char _binary_gui_img_synth_png_end;
 extern unsigned char _binary_gui_img_vst_logo_png_start;
 extern unsigned char _binary_gui_img_vst_logo_png_end;
+
+
+extern "C" char** environ;
 
 
 namespace JS80P
@@ -133,6 +146,56 @@ char const* const XcbPlatform::FONTS[] = {
     "Bitstream Vera Sans",
     "DejaVu Sans",
     "Liberation Sans",
+    NULL,
+};
+
+
+char const* const XcbPlatform::KDIALOG[] = {
+    "/usr/bin/kdialog",
+    "/usr/local/bin/kdialog",
+    NULL,
+};
+
+char const* const XcbPlatform::KDIALOG_SAVE_ARGUMENTS[] = {
+    "--getsavefilename",
+    "--title",
+    "Save As",
+    ".",
+    "JS80P Patches (*.js80p)\nAll Files (*.*)",
+    NULL,
+};
+
+char const* const XcbPlatform::KDIALOG_OPEN_ARGUMENTS[] = {
+    "--getopenfilename",
+    "--title",
+    "Open",
+    ".",
+    "JS80P Patches (*.js80p)\nAll Files (*.*)",
+    NULL,
+};
+
+
+char const* const XcbPlatform::ZENITY[] = {
+    "/usr/bin/zenity",
+    "/usr/local/bin/zenity",
+    NULL,
+};
+
+char const* const XcbPlatform::ZENITY_SAVE_ARGUMENTS[] = {
+    "--file-selection",
+    "--save",
+    "--confirm-overwrite",
+    "--title=Save As",
+    "--file-filter=JS80P Patches (*.js80p) | *.js80p",
+    "--file-filter=All Files (*.*) | *.*",
+    NULL,
+};
+
+char const* const XcbPlatform::ZENITY_OPEN_ARGUMENTS[] = {
+    "--file-selection",
+    "--title=Open",
+    "--file-filter=JS80P Patches (*.js80p) | *.js80p",
+    "--file-filter=All Files (*.*) | *.*",
     NULL,
 };
 
@@ -343,6 +406,334 @@ void XcbPlatform::unregister_widget(xcb_window_t window_id)
 }
 
 
+std::string const XcbPlatform::get_save_file_name()
+{
+    char const* const zenity = find_executable(ZENITY);
+
+    if (zenity != NULL) {
+        return run_file_selector(zenity, ZENITY_SAVE_ARGUMENTS);
+    }
+
+    char const* const kdialog = find_executable(KDIALOG);
+
+    if (kdialog != NULL) {
+        return run_file_selector(kdialog, KDIALOG_SAVE_ARGUMENTS);
+    }
+
+    return "";
+}
+
+
+std::string const XcbPlatform::get_open_file_name()
+{
+    char const* const zenity = find_executable(ZENITY);
+
+    if (zenity != NULL) {
+        return run_file_selector(zenity, ZENITY_OPEN_ARGUMENTS);
+    }
+
+    char const* const kdialog = find_executable(KDIALOG);
+
+    if (kdialog != NULL) {
+        return run_file_selector(kdialog, KDIALOG_OPEN_ARGUMENTS);
+    }
+
+    return "";
+}
+
+
+char const* XcbPlatform::find_executable(char const* const* alternatives) const
+{
+    for (int i = 0; alternatives[i] != NULL; ++i) {
+        if (access(alternatives[i], X_OK) != -1) {
+            return alternatives[i];
+        }
+    }
+
+    return NULL;
+}
+
+
+std::string const XcbPlatform::run_file_selector(
+        char const* executable,
+        char const* const* arguments
+) {
+    if (is_file_selector_open) {
+        return "";
+    }
+
+    is_file_selector_open = true;
+
+    std::vector<char*> argv;
+    std::vector<char*> env;
+    Pipe pipe;
+    std::string path;
+    int exit_code;
+
+    if (!pipe.is_usable) {
+        is_file_selector_open = false;
+
+        return "";
+    }
+
+    build_argv(executable, arguments, argv);
+    build_env(env);
+
+    pid_t pid = vfork();
+
+    if (pid == -1) {
+        is_file_selector_open = false;
+
+        return "";
+    }
+
+    if (pid == 0) {
+        run_file_selector_child_process(argv, env, pipe);
+    }
+
+    pipe.close_write_fd();
+
+    path = read_file_selector_output(pipe.read_fd);
+    exit_code = wait_or_kill(pid);
+
+    for (std::vector<char*>::iterator it = argv.begin(); it != argv.end(); ++it) {
+        if (*it != NULL) {
+            delete[] *it;
+        }
+    }
+
+    for (std::vector<char*>::iterator it = env.begin(); it != env.end(); ++it) {
+        if (*it != NULL) {
+            delete[] *it;
+        }
+    }
+
+    pipe.close_read_fd();
+    pipe.write_fd = -1;
+    pipe.read_fd = -1;
+
+    if (exit_code == 0) {
+        is_file_selector_open = false;
+
+        return path;
+    }
+
+    is_file_selector_open = false;
+
+    return "";
+}
+
+
+void XcbPlatform::build_argv(
+        char const* executable,
+        char const* const* arguments,
+        std::vector<char*>& argv
+) const {
+    size_t length = strlen(executable) + 1;
+    char* copy = new char[length];
+    strncpy(copy, executable, length);
+    argv.push_back(copy);
+
+    for (int i = 0; arguments[i] != NULL; ++i) {
+        length = strlen(arguments[i]) + 1;
+        copy = new char[length];
+        strncpy(copy, arguments[i], length);
+        argv.push_back(copy);
+    }
+
+    argv.push_back(NULL);
+}
+
+
+void XcbPlatform::build_env(std::vector<char*>& env) const
+{
+    env.reserve(256);
+
+    for (char const* const* it = environ; *it != NULL; ++it) {
+        if (strncmp(*it, "LD_LIBRARY_PATH=", 16) == 0) {
+            continue;
+        }
+
+        /* Should we put our own window id into WINDOWID? */
+
+        size_t const length = strlen(*it) + 1;
+        char* copy = new char[length];
+        strncpy(copy, *it, length);
+        env.push_back(copy);
+    }
+
+    env.push_back(NULL);
+}
+
+
+void XcbPlatform::run_file_selector_child_process(
+        std::vector<char*> const& argv,
+        std::vector<char*> const& env,
+        Pipe& pipe
+) const {
+    pipe.close_read_fd();
+
+    if (dup2(pipe.write_fd, STDOUT_FILENO) == -1) {
+        _exit(1);
+    }
+
+    pipe.close_write_fd();
+
+    execve(argv[0], argv.data(), env.data());
+
+    _exit(1);
+}
+
+
+std::string const XcbPlatform::read_file_selector_output(int const read_fd)
+{
+    fd_set read_fds;
+
+    struct timespec ts_timeout;
+    ts_timeout.tv_sec = 0;
+    ts_timeout.tv_nsec = (time_t)(JS80P::XcbPlatform::NANOSEC_SCALE * 0.3);
+
+    ssize_t read_bytes;
+    char buffer[512];
+    std::string path;
+    path.reserve(512);
+
+    while (true) {
+        int result;
+
+        FD_ZERO(&read_fds);
+        FD_SET(xcb_fd, &read_fds);
+        FD_SET(read_fd, &read_fds);
+
+        result = pselect(
+            std::max(xcb_fd, read_fd) + 1, &read_fds, NULL, NULL, &ts_timeout, NULL
+        );
+
+        if (result == 0) {
+            continue;
+        }
+
+        if (result < 0) {
+            return "";
+        }
+
+        if (FD_ISSET(read_fd, &read_fds)) {
+            read_bytes = read(read_fd, buffer, sizeof(buffer));
+
+            if (read_bytes == -1 && errno == EINTR) {
+                continue;
+            }
+
+            if (read_bytes < 1) {
+                break;
+            }
+
+            path.append(buffer, read_bytes);
+        }
+
+        if (FD_ISSET(xcb_fd, &read_fds)) {
+            Widget::process_non_editing_events(this);
+        }
+    }
+
+    if (read_bytes == -1) {
+        return "";
+    }
+
+    if (path[0] != '/') {
+        return "";
+    }
+
+    if (path.back() == '\n') {
+        path.pop_back();
+    }
+
+    return path;
+}
+
+
+int XcbPlatform::wait_or_kill(pid_t const pid) const
+{
+    int status = 0;
+    pid_t result;
+
+    for (int i = 0; i < 20; ++i) {
+        result = waitpid(pid, &status, WNOHANG);
+
+        if (result == 0) {
+            usleep(50000);
+        } else if (result < 0) {
+            return -1;
+        } else if (WIFEXITED(status)) {
+            return WEXITSTATUS(status);
+        } else {
+            return -1;
+        }
+    }
+
+    result = waitpid(pid, &status, WNOHANG);
+
+    if (result == 0) {
+        kill(pid, SIGTERM);
+        waitpid(pid, NULL, 0);
+
+        return -1;
+    } else if (result < 0) {
+        return -1;
+    } else if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+
+    return -1;
+}
+
+
+XcbPlatform::Pipe::Pipe() : read_fd(-1), write_fd(-1), is_usable(false)
+{
+    int fd[2] = {-1, -1};
+
+    is_usable = pipe(fd) == 0;
+
+    if (is_usable) {
+        read_fd = fd[0];
+        write_fd = fd[1];
+    }
+}
+
+
+XcbPlatform::Pipe::Pipe(Pipe const& pipe)
+    : read_fd(pipe.read_fd),
+    write_fd(pipe.write_fd),
+    is_usable(pipe.is_usable)
+{
+}
+
+
+XcbPlatform::Pipe::~Pipe()
+{
+    is_usable = false;
+
+    close_read_fd();
+    close_write_fd();
+}
+
+
+void XcbPlatform::Pipe::close_read_fd()
+{
+    if (read_fd != -1) {
+        close(read_fd);
+    }
+}
+
+
+void XcbPlatform::Pipe::close_write_fd()
+{
+    if (write_fd != -1) {
+        close(write_fd);
+    }
+}
+
+
 void Widget::process_events(XcbPlatform* xcb)
 {
     xcb_connection_t* xcb_connection = xcb->get_connection();
@@ -357,6 +748,27 @@ void Widget::process_events(XcbPlatform* xcb)
             case XCB_ENTER_NOTIFY: handle_enter_notify_event(xcb, (xcb_enter_notify_event_t*)event); break;
             case XCB_MOTION_NOTIFY: handle_motion_notify_event(xcb, (xcb_motion_notify_event_t*)event); break;
             case XCB_LEAVE_NOTIFY: handle_leave_notify_event(xcb, (xcb_leave_notify_event_t*)event); break;
+            case XCB_CLIENT_MESSAGE: handle_client_message_event(xcb, (xcb_client_message_event_t*)event); break;
+            case XCB_DESTROY_NOTIFY: handle_destroy_notify_event(xcb, (xcb_destroy_notify_event_t*)event); break;
+            default: break;
+        }
+
+        free(event);
+    }
+
+    xcb_flush(xcb_connection);
+}
+
+
+void Widget::process_non_editing_events(XcbPlatform* xcb)
+{
+    xcb_connection_t* xcb_connection = xcb->get_connection();
+    xcb_generic_event_t* event;
+
+    while ((event = xcb_poll_for_event(xcb_connection))) {
+        switch (event->response_type & ~0x80) {
+            case 0: handle_error_event(xcb, (xcb_generic_error_t*)event); break;
+            case XCB_EXPOSE: handle_expose_event(xcb, (xcb_expose_event_t*)event); break;
             case XCB_CLIENT_MESSAGE: handle_client_message_event(xcb, (xcb_client_message_event_t*)event); break;
             case XCB_DESTROY_NOTIFY: handle_destroy_notify_event(xcb, (xcb_destroy_notify_event_t*)event); break;
             default: break;
@@ -1061,11 +1473,42 @@ XcbPlatform* Widget::xcb() const
 
 void ImportPatchButton::click()
 {
+    std::string file_name = xcb()->get_open_file_name();
+
+    if (file_name == "") {
+        return;
+    }
+
+    std::ifstream patch_file(file_name, std::ios::in | std::ios::binary);
+
+    if (!patch_file.is_open()) {
+        // TODO: handle error
+        return;
+    }
+
+    std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
+    patch_file.read(buffer, Serializer::MAX_SIZE);
+
+    import_buffer((Integer)patch_file.gcount());
 }
 
 
 void ExportPatchButton::click()
 {
+    std::string file_name = xcb()->get_save_file_name();
+
+    if (file_name == "") {
+        return;
+    }
+
+    std::ofstream patch_file(file_name, std::ios::out | std::ios::binary);
+
+    if (!patch_file.is_open()) {
+        return;
+    }
+
+    std::string const patch = Serializer::serialize(synth);
+    patch_file.write(patch.c_str(), patch.size());
 }
 
 }

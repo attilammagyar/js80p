@@ -42,7 +42,6 @@ xcb_generic_event_t* xcb_wait_for_event_with_timeout(
         double const timeout
 )
 {
-    constexpr double NANOSEC_SCALE = 1000000000.0;
     fd_set fds;
     xcb_connection_t* xcb_connection = xcb->get_connection();
     int xcb_fd = xcb->get_fd();
@@ -50,7 +49,9 @@ xcb_generic_event_t* xcb_wait_for_event_with_timeout(
     double timeout_int = std::floor(timeout);
     struct timespec ts_timeout;
     ts_timeout.tv_sec = std::max((time_t)0, (time_t)timeout_int);
-    ts_timeout.tv_nsec = std::max(0, (int)(NANOSEC_SCALE * (timeout - timeout_int)));
+    ts_timeout.tv_nsec = std::max(
+        (time_t)0, (time_t)(JS80P::XcbPlatform::NANOSEC_SCALE * (timeout - timeout_int))
+    );
 
     FD_ZERO(&fds);
     FD_SET(xcb_fd, &fds);

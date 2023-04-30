@@ -42,6 +42,8 @@ class Widget;
 class XcbPlatform
 {
     public:
+        static constexpr double NANOSEC_SCALE = 1000000000.0;
+
         XcbPlatform();
         ~XcbPlatform();
 
@@ -59,9 +61,35 @@ class XcbPlatform
         Widget* find_widget(xcb_window_t window_id) const;
         void unregister_widget(xcb_window_t window_id);
 
+        std::string const get_save_file_name();
+        std::string const get_open_file_name();
+
     private:
+        class Pipe
+        {
+            public:
+                Pipe();
+                Pipe(Pipe const& pipe);
+                ~Pipe();
+
+                void close_read_fd();
+                void close_write_fd();
+
+                int read_fd;
+                int write_fd;
+                bool is_usable;
+        };
+
         static char const* const FONT_TEST_STR;
         static char const* const FONTS[];
+
+        static char const* const KDIALOG[];
+        static char const* const KDIALOG_SAVE_ARGUMENTS[];
+        static char const* const KDIALOG_OPEN_ARGUMENTS[];
+
+        static char const* const ZENITY[];
+        static char const* const ZENITY_SAVE_ARGUMENTS[];
+        static char const* const ZENITY_OPEN_ARGUMENTS[];
 
         typedef std::map<xcb_window_t, Widget*> WindowIdToWidgetMap;
 
@@ -71,6 +99,25 @@ class XcbPlatform
             cairo_font_weight_t weight
         );
 
+        char const* find_executable(char const* const* alternatives) const;
+        std::string const run_file_selector(
+            char const* executable,
+            char const* const* arguments
+        );
+        void build_argv(
+            char const* executable,
+            char const* const* arguments,
+            std::vector<char*>& argv
+        ) const;
+        void build_env(std::vector<char*>& env) const;
+        void run_file_selector_child_process(
+            std::vector<char*> const& argv,
+            std::vector<char*> const& env,
+            Pipe& pipe
+        ) const;
+        std::string const read_file_selector_output(int read_fd);
+        int wait_or_kill(pid_t const pid) const;
+
         WindowIdToWidgetMap widgets;
         xcb_connection_t* connection;
         xcb_screen_t* screen;
@@ -78,6 +125,7 @@ class XcbPlatform
         cairo_font_face_t* font_face_normal;
         cairo_font_face_t* font_face_bold;
         int xcb_fd;
+        bool is_file_selector_open;
 };
 
 
@@ -85,6 +133,7 @@ class Widget : public WidgetBase
 {
     public:
         static void process_events(XcbPlatform* xcb);
+        static void process_non_editing_events(XcbPlatform* xcb);
 
         Widget(char const* const text);
         virtual ~Widget();
@@ -164,6 +213,8 @@ class Widget : public WidgetBase
             int const width,
             int const height
         ) override;
+
+        XcbPlatform* xcb() const;
 
     private:
         static constexpr xcb_timestamp_t DOUBLE_CLICK_TIME_DELTA = 500;
@@ -258,7 +309,6 @@ class Widget : public WidgetBase
 
         void initialize();
 
-        XcbPlatform* xcb() const;
         xcb_connection_t* xcb_connection() const;
         xcb_window_t window_id() const;
 
