@@ -5,7 +5,7 @@ set -e
 set -u
 set -o pipefail
 
-TARGET_PLATFORMS="i686-w64-mingw32 x86_64-w64-mingw32"
+TARGET_PLATFORMS="x86_64-w64-mingw32 i686-w64-mingw32 x86_64-gpp i686-gpp"
 PLUGIN_TYPES="fst vst3"
 
 main()
