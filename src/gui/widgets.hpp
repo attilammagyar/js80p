@@ -79,6 +79,8 @@ class ImportPatchButton : public TransparentWidget
         virtual void click() override;
 
     private:
+        void import_buffer(Integer const size) const;
+
         char* buffer;
         Synth* synth;
         TabBody* synth_gui_body;

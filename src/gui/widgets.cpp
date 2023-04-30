@@ -83,6 +83,23 @@ ImportPatchButton::~ImportPatchButton()
 }
 
 
+void ImportPatchButton::import_buffer(Integer const size) const
+{
+    std::string const patch(
+        buffer,
+        std::min(
+            (std::string::size_type)size,
+            (std::string::size_type)Serializer::MAX_SIZE
+        )
+    );
+
+    Serializer::import(synth, patch);
+
+    synth_gui_body->stop_editing();
+    synth_gui_body->refresh_param_editors();
+}
+
+
 ExportPatchButton::ExportPatchButton(
         int const left,
         int const top,

@@ -23,6 +23,7 @@
 
 #include "js80p.hpp"
 
+#include "serializer.cpp"
 #include "synth.cpp"
 
 #include "gui_stubs.cpp"

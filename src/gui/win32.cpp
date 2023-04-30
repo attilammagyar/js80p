@@ -754,18 +754,7 @@ void ImportPatchButton::click()
 
     CloseHandle(file);
 
-    std::string const patch(
-        buffer,
-        std::min(
-            (std::string::size_type)read,
-            (std::string::size_type)Serializer::MAX_SIZE
-        )
-    );
-
-    Serializer::import(synth, patch);
-
-    synth_gui_body->stop_editing();
-    synth_gui_body->refresh_param_editors();
+    import_buffer((Integer)read);
 }
 
 
