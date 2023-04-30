@@ -227,7 +227,6 @@ int main(int const argc, char const* argv[])
     free(wm_protocols_reply);
     free(wm_delete_window_reply);
 
-    delete gui_xcb;
     delete xcb;
 
     return ret;
