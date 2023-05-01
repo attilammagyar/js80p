@@ -44,6 +44,10 @@ class XcbPlatform
     public:
         static constexpr double NANOSEC_SCALE = 1000000000.0;
 
+        static xcb_window_t gui_platform_widget_to_xcb_window(
+            GUI::PlatformWidget platform_widget
+        );
+
         XcbPlatform();
         ~XcbPlatform();
 

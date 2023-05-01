@@ -200,6 +200,13 @@ char const* const XcbPlatform::ZENITY_OPEN_ARGUMENTS[] = {
 };
 
 
+xcb_window_t XcbPlatform::gui_platform_widget_to_xcb_window(
+        GUI::PlatformWidget platform_widget
+) {
+    return *((xcb_window_t*)&platform_widget);
+}
+
+
 XcbPlatform::XcbPlatform()
     : connection(NULL),
     screen(NULL),
@@ -1178,7 +1185,9 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     xcb->register_widget(window_id, this);
     platform_widget = (GUI::PlatformWidget)window_id;
     GUI::PlatformWidget parent_platform_widget = parent->get_platform_widget();
-    xcb_window_t parent_id = *((xcb_window_t*)&parent_platform_widget);
+    xcb_window_t parent_id = (
+        XcbPlatform::gui_platform_widget_to_xcb_window(parent_platform_widget)
+    );
 
     xcb_create_window(
         xcb_connection,                     // c
