@@ -1191,7 +1191,7 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
         height,                             // height
         0,                                  // border_width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,      // class
-        xcb->get_screen_root_visual_id(),   // visual
+        XCB_COPY_FROM_PARENT,               // visual
         XCB_CW_EVENT_MASK,                  // value_mask
         &event_mask                         // value_list
     );
