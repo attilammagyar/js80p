@@ -1,3 +1,12 @@
+v1.1.1 (2023-05-02)
+ * bugfix: opening the user interface of multiple plugin instances will no
+   longer cause a crash when the instances are running within the same process
+ * bugfix: filter states will no longer interfere with each other between
+   multiple plugin instances when running within the same process
+ * bugfix: when Reaper is started up with a project which was saved with an
+   open "FX: Track N" window, JS80P will no longer fail to display its user
+   interface
+
 v1.1.0 (2023-05-01)
  * Linux support
  * Use warm colors for knobs which have associated controllers
