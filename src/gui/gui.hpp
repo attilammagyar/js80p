@@ -34,6 +34,7 @@ class ControllerSelector;
 class ExportPatchButton;
 class ExternallyCreatedWindow;
 class ImportPatchButton;
+class ParamEditorKnobStates;
 class ParamEditor;
 class TabBody;
 class TabSelector;
@@ -174,11 +175,11 @@ class GUI
         void destroy();
 
         void build_about_body();
-        void build_controllers_body();
-        void build_effects_body();
-        void build_envelopes_body();
-        void build_lfos_body();
-        void build_synth_body();
+        void build_controllers_body(ParamEditorKnobStates* knob_states);
+        void build_effects_body(ParamEditorKnobStates* knob_states);
+        void build_envelopes_body(ParamEditorKnobStates* knob_states);
+        void build_lfos_body(ParamEditorKnobStates* knob_states);
+        void build_synth_body(ParamEditorKnobStates* knob_states);
 
         bool const show_vst_logo;
 
@@ -192,6 +193,7 @@ class GUI
         Image synth_image;
         Image vst_logo_image;
 
+        ParamEditorKnobStates* knob_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
@@ -248,6 +250,13 @@ class WidgetBase
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* name
+        );
+        virtual GUI::Image copy_image_region(
+            GUI::Image source,
+            int const left,
+            int const top,
+            int const width,
+            int const height
         );
         virtual void delete_image(GUI::Image image);
 
@@ -407,14 +416,6 @@ class WidgetBase
 
         virtual void draw_image(
             GUI::Image image,
-            int const left,
-            int const top,
-            int const width,
-            int const height
-        );
-
-        virtual GUI::Image copy_image_region(
-            GUI::Image source,
             int const left,
             int const top,
             int const width,

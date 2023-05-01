@@ -249,19 +249,36 @@ class ControllerSelector : public Widget
 };
 
 
+class ParamEditorKnobStates
+{
+    public:
+        static constexpr int COUNT = 128;
+
+        ParamEditorKnobStates(
+            WidgetBase* widget,
+            GUI::Image free_image,
+            GUI::Image controlled_image
+        );
+
+        ~ParamEditorKnobStates();
+
+        WidgetBase* widget;
+
+        GUI::Image free_image;
+        GUI::Image controlled_image;
+
+        GUI::Image free_images[COUNT];
+        GUI::Image controlled_images[COUNT];
+};
+
+
 class ParamEditor : public TransparentWidget
 {
     public:
         static constexpr int WIDTH = 58;
         static constexpr int HEIGHT = 100;
-
-        static void initialize_knob_states(
-            WidgetBase* widget,
-            GUI::Image knob_states_free_image,
-            GUI::Image knob_states_controlled_image
-        );
-
-        static void free_knob_state_images(WidgetBase* widget);
+        static constexpr int KNOB_WIDTH = 48;
+        static constexpr int KNOB_HEIGHT = 48;
 
         ParamEditor(
             char const* const text,
@@ -272,7 +289,8 @@ class ParamEditor : public TransparentWidget
             Synth::ParamId const param_id,
             int const controller_choices,
             char const* format,
-            double const scale
+            double const scale,
+            ParamEditorKnobStates* knob_states
         );
 
         ParamEditor(
@@ -284,7 +302,8 @@ class ParamEditor : public TransparentWidget
             Synth::ParamId const param_id,
             int const controller_choices,
             char const* const* const options,
-            int const number_of_options
+            int const number_of_options,
+            ParamEditorKnobStates* knob_states
         );
 
         virtual void set_up(
@@ -318,23 +337,16 @@ class ParamEditor : public TransparentWidget
         virtual bool mouse_up(int const x, int const y) override;
 
     private:
-        static constexpr int KNOB_STATES_COUNT = 128;
-        static constexpr Number KNOB_STATES_LAST_INDEX = (Number)(KNOB_STATES_COUNT - 1);
+        static constexpr Number KNOB_STATES_LAST_INDEX = (
+            (Number)(ParamEditorKnobStates::COUNT - 1)
+        );
         static constexpr int TEXT_MAX_LENGTH = 16;
-
-        static bool knob_states_initialization_complete;
-
-        static GUI::Image knob_states_free_image;
-        static GUI::Image knob_states_controlled_image;
-
-        static GUI::Image knob_states_free_images[KNOB_STATES_COUNT];
-        static GUI::Image knob_states_controlled_images[KNOB_STATES_COUNT];
 
         class Knob : public Widget
         {
             public:
-                static constexpr int WIDTH = 48;
-                static constexpr int HEIGHT = 48;
+                static constexpr int WIDTH = KNOB_WIDTH;
+                static constexpr int HEIGHT = KNOB_HEIGHT;
 
                 static constexpr Number MOUSE_WHEEL_COARSE_SCALE = 1.0 / 200.0;
 
@@ -354,7 +366,8 @@ class ParamEditor : public TransparentWidget
                     char const* const text,
                     int const left,
                     int const top,
-                    Number const steps
+                    Number const steps,
+                    ParamEditorKnobStates* knob_states
                 );
                 virtual ~Knob();
 
@@ -383,6 +396,7 @@ class ParamEditor : public TransparentWidget
                 Number const steps;
 
                 ParamEditor& editor;
+                ParamEditorKnobStates* knob_states;
                 GUI::Image knob_state;
                 Number prev_x;
                 Number prev_y;
@@ -391,8 +405,6 @@ class ParamEditor : public TransparentWidget
                 bool is_controlled;
                 bool is_editing_;
         };
-
-        void complete_knob_state_initialization();
 
         void update_value_str();
         void update_controller_str();
@@ -406,6 +418,7 @@ class ParamEditor : public TransparentWidget
         int const controller_choices;
 
         ControllerSelector& controller_selector;
+        ParamEditorKnobStates* knob_states;
         Synth* synth;
         Number default_ratio;
         Number ratio;

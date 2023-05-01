@@ -474,50 +474,42 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 }
 
 
-bool ParamEditor::knob_states_initialization_complete = false;
+ParamEditorKnobStates::ParamEditorKnobStates(
+        WidgetBase* widget,
+        GUI::Image free_image,
+        GUI::Image controlled_image
+) : widget(widget),
+    free_image(free_image),
+    controlled_image(controlled_image)
+{
+    for (int i = 0; i != COUNT; ++i) {
+        int const top = i * ParamEditor::KNOB_HEIGHT;
 
-GUI::Image ParamEditor::knob_states_free_image = NULL;
-
-GUI::Image ParamEditor::knob_states_controlled_image = NULL;
-
-GUI::Image ParamEditor::knob_states_free_images[KNOB_STATES_COUNT];
-
-GUI::Image ParamEditor::knob_states_controlled_images[KNOB_STATES_COUNT];
-
-
-void ParamEditor::initialize_knob_states(
-    WidgetBase* widget,
-    GUI::Image knob_states_free_image,
-    GUI::Image knob_states_controlled_image
-) {
-    if (knob_states_free_image != NULL) {
-        free_knob_state_images(widget);
+        free_images[i] = widget->copy_image_region(
+            free_image, 0, top, ParamEditor::KNOB_WIDTH, ParamEditor::KNOB_HEIGHT
+        );
+        controlled_images[i] = widget->copy_image_region(
+            controlled_image, 0, top, ParamEditor::KNOB_WIDTH, ParamEditor::KNOB_HEIGHT
+        );
     }
-
-    ParamEditor::knob_states_free_image = knob_states_free_image;
-    ParamEditor::knob_states_controlled_image = knob_states_controlled_image;
-
-    knob_states_initialization_complete = false;
 }
 
 
-void ParamEditor::free_knob_state_images(WidgetBase* widget)
+ParamEditorKnobStates::~ParamEditorKnobStates()
 {
-    if (knob_states_free_image == NULL) {
-        return;
+    widget->delete_image(free_image);
+    widget->delete_image(controlled_image);
+
+    for (int i = 0; i != COUNT; ++i) {
+        widget->delete_image(free_images[i]);
+        widget->delete_image(controlled_images[i]);
+
+        free_images[i] = NULL;
+        controlled_images[i] = NULL;
     }
 
-    widget->delete_image(knob_states_free_image);
-    widget->delete_image(knob_states_controlled_image);
-
-    for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        widget->delete_image(knob_states_free_images[i]);
-        widget->delete_image(knob_states_controlled_images[i]);
-    }
-
-    knob_states_initialization_complete = false;
-    knob_states_free_image = NULL;
-    knob_states_controlled_image = NULL;
+    free_image = NULL;
+    controlled_image = NULL;
 }
 
 
@@ -530,7 +522,8 @@ ParamEditor::ParamEditor(
         Synth::ParamId const param_id,
         int const controller_choices,
         char const* format,
-        double const scale
+        double const scale,
+        ParamEditorKnobStates* knob_states
 ) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(format),
@@ -540,12 +533,12 @@ ParamEditor::ParamEditor(
     value_font_size(11),
     controller_choices(controller_choices),
     controller_selector(controller_selector),
+    knob_states(knob_states),
     synth(synth),
     ratio(0.0),
     knob(NULL),
     has_controller_(false)
 {
-    complete_knob_state_initialization();
 }
 
 
@@ -558,7 +551,8 @@ ParamEditor::ParamEditor(
         Synth::ParamId const param_id,
         int const controller_choices,
         char const* const* const options,
-        int const number_of_options
+        int const number_of_options,
+        ParamEditorKnobStates* knob_states
 ) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(NULL),
@@ -568,34 +562,13 @@ ParamEditor::ParamEditor(
     value_font_size(10),
     controller_choices(controller_choices),
     controller_selector(controller_selector),
+    knob_states(knob_states),
     synth(synth),
     ratio(0.0),
     knob(NULL),
     controller_id(Synth::ControllerId::NONE),
     has_controller_(false)
 {
-    complete_knob_state_initialization();
-}
-
-
-void ParamEditor::complete_knob_state_initialization()
-{
-    if (knob_states_initialization_complete) {
-        return;
-    }
-
-    for (int i = 0; i != KNOB_STATES_COUNT; ++i) {
-        int const top = i * Knob::HEIGHT;
-
-        knob_states_free_images[i] = copy_image_region(
-            knob_states_free_image, 0, top, Knob::WIDTH, Knob::HEIGHT
-        );
-        knob_states_controlled_images[i] = copy_image_region(
-            knob_states_controlled_image, 0, top, Knob::WIDTH, Knob::HEIGHT
-        );
-    }
-
-    knob_states_initialization_complete = true;
 }
 
 
@@ -606,9 +579,10 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     knob = new Knob(
         *this,
         text,
-        (WIDTH - ParamEditor::Knob::WIDTH) / 2,
+        (WIDTH - ParamEditor::KNOB_WIDTH) / 2,
         16,
-        number_of_options > 1 ? (Number)(number_of_options - 1) : 0.0
+        number_of_options > 1 ? (Number)(number_of_options - 1) : 0.0,
+        knob_states
     );
 
     own(knob);
@@ -816,10 +790,12 @@ ParamEditor::Knob::Knob(
         char const* const text,
         int const left,
         int const top,
-        Number const steps
+        Number const steps,
+        ParamEditorKnobStates* knob_states
 ) : Widget(text, left, top, WIDTH, HEIGHT, Type::KNOB),
     steps(steps),
     editor(editor),
+    knob_states(knob_states),
     knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
@@ -859,9 +835,9 @@ void ParamEditor::Knob::update()
     int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
 
     if (is_controlled) {
-        set_image(knob_states_controlled_images[index]);
+        set_image(knob_states->controlled_images[index]);
     } else {
-        set_image(knob_states_free_images[index]);
+        set_image(knob_states->free_images[index]);
     }
 }
 
