@@ -134,9 +134,8 @@ Features
 
 ### Future Plans
 
- * Aftertouch support
  * LV2 support
- * Linux support
+ * Aftertouch support
 
 <a name="bugs"></a>
 
