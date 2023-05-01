@@ -22,6 +22,7 @@
 #include <cerrno>
 #include <cstring>
 #include <csignal>
+#include <cstdlib>
 #include <istream>
 #include <fstream>
 #include <ostream>
