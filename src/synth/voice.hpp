@@ -132,6 +132,8 @@ class Voice : public SignalProducer
             Frequency const* frequencies,
             Midi::Note const notes,
             Params& param_leaders,
+            BiquadFilterSharedCache* filter_1_shared_cache = NULL,
+            BiquadFilterSharedCache* filter_2_shared_cache = NULL,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = Oscillator_::dummy_param,
             FloatParam& frequency_modulation_level_leader = Oscillator_::dummy_param,

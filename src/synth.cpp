@@ -108,6 +108,10 @@ Synth::Synth() noexcept
 {
     initialize_supported_midi_controllers();
 
+    for (int i = 0; i != 4; ++i) {
+        biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
+    }
+
     for (int i = 0; i != FLOAT_PARAMS; ++i) {
         float_params[i] = NULL;
     }
@@ -363,7 +367,11 @@ void Synth::create_voices() noexcept
 {
     for (int i = 0; i != POLYPHONY; ++i) {
         modulators[i] = new Modulator(
-            frequencies, Midi::NOTES, modulator_params
+            frequencies,
+            Midi::NOTES,
+            modulator_params,
+            biquad_filter_shared_caches[0],
+            biquad_filter_shared_caches[1]
         );
         register_child(*modulators[i]);
 
@@ -371,6 +379,8 @@ void Synth::create_voices() noexcept
             frequencies,
             Midi::NOTES,
             carrier_params,
+            biquad_filter_shared_caches[2],
+            biquad_filter_shared_caches[3],
             &modulators[i]->modulation_out,
             amplitude_modulation_level,
             frequency_modulation_level,

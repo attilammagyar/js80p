@@ -38,6 +38,23 @@ class BiquadFilter;
 typedef BiquadFilter<SignalProducer> SimpleBiquadFilter;
 
 
+class BiquadFilterSharedCache
+{
+    public:
+        BiquadFilterSharedCache();
+
+        Integer round;
+        Sample const* b0_buffer;
+        Sample const* b1_buffer;
+        Sample const* b2_buffer;
+        Sample const* a1_buffer;
+        Sample const* a2_buffer;
+        bool are_coefficients_constant;
+        bool is_silent;
+        bool is_no_op;
+};
+
+
 template<class InputSignalProducerClass>
 class BiquadFilter : public Filter<InputSignalProducerClass>
 {
@@ -54,16 +71,6 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static constexpr Type LOW_SHELF = 5;
         static constexpr Type HIGH_SHELF = 6;
 
-        enum Unicity
-        {
-            UNIQUE = 0, ///< Filter instance should not share its calculated
-                        ///< coefficients with other instances.
-
-            CLONED = 1, ///< Filter instance should share its calculated
-                        ///< coefficients with other instances that are using
-                        ///< the same set of parameter leaders.
-        };
-
         class TypeParam : public Param<Type>
         {
             public:
@@ -74,7 +81,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            Unicity const unicity = Unicity::UNIQUE
+            BiquadFilterSharedCache* shared_cache = NULL
         ) noexcept;
         BiquadFilter(
             InputSignalProducerClass& input,
@@ -82,7 +89,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParam& frequency_leader,
             FloatParam& q_leader,
             FloatParam& gain_leader,
-            Unicity const unicity = Unicity::UNIQUE
+            BiquadFilterSharedCache* shared_cache = NULL
         ) noexcept;
         virtual ~BiquadFilter();
 
@@ -120,16 +127,6 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Constants::BIQUAD_FILTER_GAIN_SCALE / 2.0
         );
         static constexpr Number THRESHOLD = 0.000001;
-
-        static Integer shared_buffers_round;
-        static Sample const* shared_b0_buffer;
-        static Sample const* shared_b1_buffer;
-        static Sample const* shared_b2_buffer;
-        static Sample const* shared_a1_buffer;
-        static Sample const* shared_a2_buffer;
-        static bool shared_are_coefficients_constant;
-        static bool shared_is_silent;
-        static bool shared_is_no_op;
 
         void initialize_instance() noexcept;
         void update_helper_variables() noexcept;
@@ -233,7 +230,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index) noexcept;
         void store_silent_coefficient_samples(Integer const index) noexcept;
 
-        bool const has_clones;
+        BiquadFilterSharedCache* shared_cache;
 
         /*
         Notation:

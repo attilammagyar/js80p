@@ -878,6 +878,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Effects::Effects<Bus> effects;
         Sample const* const* raw_output;
         FloatParam* float_params[FLOAT_PARAMS];
+        BiquadFilterSharedCache* biquad_filter_shared_caches[4];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
         std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];
         Envelope* envelopes_rw[ENVELOPES];

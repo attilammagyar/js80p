@@ -29,32 +29,18 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
-Integer BiquadFilter<InputSignalProducerClass>::shared_buffers_round;
-
-template<class InputSignalProducerClass>
-Sample const* BiquadFilter<InputSignalProducerClass>::shared_b0_buffer;
-
-template<class InputSignalProducerClass>
-Sample const* BiquadFilter<InputSignalProducerClass>::shared_b1_buffer;
-
-template<class InputSignalProducerClass>
-Sample const* BiquadFilter<InputSignalProducerClass>::shared_b2_buffer;
-
-template<class InputSignalProducerClass>
-Sample const* BiquadFilter<InputSignalProducerClass>::shared_a1_buffer;
-
-template<class InputSignalProducerClass>
-Sample const* BiquadFilter<InputSignalProducerClass>::shared_a2_buffer;
-
-template<class InputSignalProducerClass>
-bool BiquadFilter<InputSignalProducerClass>::shared_are_coefficients_constant;
-
-template<class InputSignalProducerClass>
-bool BiquadFilter<InputSignalProducerClass>::shared_is_silent;
-
-template<class InputSignalProducerClass>
-bool BiquadFilter<InputSignalProducerClass>::shared_is_no_op;
+BiquadFilterSharedCache::BiquadFilterSharedCache()
+    : round(-1),
+    b0_buffer(NULL),
+    b1_buffer(NULL),
+    b2_buffer(NULL),
+    a1_buffer(NULL),
+    a2_buffer(NULL),
+    are_coefficients_constant(false),
+    is_silent(false),
+    is_no_op(false)
+{
+}
 
 
 template<class InputSignalProducerClass>
@@ -71,7 +57,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        Unicity const unicity
+        BiquadFilterSharedCache* shared_cache
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(
@@ -93,7 +79,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
-    has_clones(unicity == Unicity::CLONED)
+    shared_cache(shared_cache)
 {
     initialize_instance();
 }
@@ -113,8 +99,6 @@ void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
 
     reset();
     update_helper_variables();
-
-    shared_buffers_round = -1;
 }
 
 
@@ -136,14 +120,14 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParam& frequency_leader,
         FloatParam& q_leader,
         FloatParam& gain_leader,
-        Unicity const unicity
+        BiquadFilterSharedCache* shared_cache
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
     type(type),
-    has_clones(unicity == Unicity::CLONED)
+    shared_cache(shared_cache)
 {
     initialize_instance();
 }
@@ -238,9 +222,9 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    can_use_shared_coefficients = has_clones;
+    can_use_shared_coefficients = shared_cache != NULL;
 
-    if (can_use_shared_coefficients && shared_buffers_round == round) {
+    if (can_use_shared_coefficients && shared_cache->round == round) {
         return initialize_rendering_with_shared_coefficients(
             round, sample_count
         );
@@ -289,15 +273,15 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     );
 
     if (can_use_shared_coefficients) {
-        shared_buffers_round = round;
-        shared_are_coefficients_constant = are_coefficients_constant;
-        shared_is_no_op = is_no_op;
-        shared_is_silent = is_silent;
-        shared_b0_buffer = b0_buffer;
-        shared_b1_buffer = b1_buffer;
-        shared_b2_buffer = b2_buffer;
-        shared_a1_buffer = a1_buffer;
-        shared_a2_buffer = a2_buffer;
+        shared_cache->round = round;
+        shared_cache->are_coefficients_constant = are_coefficients_constant;
+        shared_cache->is_no_op = is_no_op;
+        shared_cache->is_silent = is_silent;
+        shared_cache->b0_buffer = b0_buffer;
+        shared_cache->b1_buffer = b1_buffer;
+        shared_cache->b2_buffer = b2_buffer;
+        shared_cache->a1_buffer = a1_buffer;
+        shared_cache->a2_buffer = a2_buffer;
     }
 
     if (is_no_op) {
@@ -321,7 +305,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         round, sample_count
     );
 
-    if (shared_is_no_op) {
+    if (shared_cache->is_no_op) {
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
         gain.skip_round(round, sample_count);
@@ -329,9 +313,9 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         return this->input_buffer;
     }
 
-    is_silent = shared_is_silent;
+    is_silent = shared_cache->is_silent;
     are_coefficients_constant = (
-        shared_are_coefficients_constant
+        shared_cache->are_coefficients_constant
     );
 
     return NULL;
@@ -1142,11 +1126,11 @@ void BiquadFilter<InputSignalProducerClass>::render(
         Sample b0, b1, b2, a1, a2;
 
         if (can_use_shared_coefficients) {
-            b0 = shared_b0_buffer[0];
-            b1 = shared_b1_buffer[0];
-            b2 = shared_b2_buffer[0];
-            a1 = shared_a1_buffer[0];
-            a2 = shared_a2_buffer[0];
+            b0 = shared_cache->b0_buffer[0];
+            b1 = shared_cache->b1_buffer[0];
+            b2 = shared_cache->b2_buffer[0];
+            a1 = shared_cache->a1_buffer[0];
+            a2 = shared_cache->a2_buffer[0];
         } else {
             b0 = b0_buffer[0];
             b1 = b1_buffer[0];
@@ -1192,11 +1176,11 @@ void BiquadFilter<InputSignalProducerClass>::render(
     Sample const* a2;
 
     if (can_use_shared_coefficients) {
-        b0 = shared_b0_buffer;
-        b1 = shared_b1_buffer;
-        b2 = shared_b2_buffer;
-        a1 = shared_a1_buffer;
-        a2 = shared_a2_buffer;
+        b0 = shared_cache->b0_buffer;
+        b1 = shared_cache->b1_buffer;
+        b2 = shared_cache->b2_buffer;
+        a1 = shared_cache->a1_buffer;
+        a2 = shared_cache->a2_buffer;
     } else {
         b0 = b0_buffer;
         b1 = b1_buffer;

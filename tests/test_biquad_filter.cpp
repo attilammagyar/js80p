@@ -603,45 +603,32 @@ class OtherSumOfSines : public SumOfSines
 
 
 TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
+    BiquadFilterSharedCache shared_cache;
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
-    OtherSumOfSines input_other(
-        0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS
-    );
     SumOfSines expected_clones(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
     SumOfSines expected_unique(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
-    SumOfSines expected_other(0.0, 440.0, 0.0, 3520.0, 0.33, 7040.0, CHANNELS);
     BiquadFilter<SumOfSines>::TypeParam filter_type("");
-    BiquadFilter<OtherSumOfSines>::TypeParam filter_type_other("");
     BiquadFilter<SumOfSines> filter_clone_1(
-        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::CLONED
+        "", input, filter_type, &shared_cache
     );
     BiquadFilter<SumOfSines> filter_clone_2(
-        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::CLONED
+        "", input, filter_type, &shared_cache
     );
     BiquadFilter<SumOfSines> filter_unique(
-        "", input, filter_type, BiquadFilter<SumOfSines>::Unicity::UNIQUE
-    );
-    BiquadFilter<OtherSumOfSines> filter_other(
-        "",
-        input_other,
-        filter_type_other,
-        BiquadFilter<OtherSumOfSines>::Unicity::CLONED
+        "", input, filter_type, NULL
     );
 
     filter_clone_1.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
     filter_clone_2.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
     filter_unique.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
-    filter_other.type.set_value(BiquadFilter<OtherSumOfSines>::BAND_PASS);
 
     filter_clone_1.frequency.set_value(3520.0);
     filter_clone_2.frequency.set_value(3520.0);
     filter_unique.frequency.set_value(440.0);
-    filter_other.frequency.set_value(7040.0);
 
     filter_clone_1.q.set_value(5.0);
     filter_clone_2.q.set_value(5.0);
     filter_unique.q.set_value(5.0);
-    filter_other.q.set_value(5.0);
 
     test_filter(filter_clone_1, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
@@ -649,9 +636,6 @@ TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     test_filter(filter_clone_2, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
     test_filter(filter_unique, input, expected_unique, 0.12, 1, BLOCK_SIZE);
-    test_filter<OtherSumOfSines>(
-        filter_other, input_other, expected_other, 0.12, 1, BLOCK_SIZE
-    );
 })
 
 

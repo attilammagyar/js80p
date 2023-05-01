@@ -391,6 +391,7 @@ $(BUILD_DIR)/test_comb_filter$(EXE): \
 		src/synth/comb_filter.cpp src/synth/comb_filter.hpp \
 		src/synth/delay.cpp src/synth/delay.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
+		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)

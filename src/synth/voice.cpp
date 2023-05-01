@@ -181,6 +181,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Frequency const* frequencies,
         Midi::Note const notes,
         Params& param_leaders,
+        BiquadFilterSharedCache* filter_1_shared_cache,
+        BiquadFilterSharedCache* filter_2_shared_cache,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader,
@@ -215,7 +217,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
-        Filter1::Unicity::CLONED
+        filter_1_shared_cache
     ),
     wavefolder(filter_1, param_leaders.folding),
     filter_2(
@@ -224,7 +226,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
-        Filter2::Unicity::CLONED
+        filter_2_shared_cache
     ),
     velocity_sensitivity(param_leaders.velocity_sensitivity),
     portamento_length(param_leaders.portamento_length),
