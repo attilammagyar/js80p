@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__GUI__X11_CPP
-#define JS80P__GUI__X11_CPP
+#ifndef JS80P__GUI__XCB_CPP
+#define JS80P__GUI__XCB_CPP
 
 #include <cerrno>
 #include <cstring>

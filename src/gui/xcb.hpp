@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__GUI__X11_HPP
-#define JS80P__GUI__X11_HPP
+#ifndef JS80P__GUI__XCB_HPP
+#define JS80P__GUI__XCB_HPP
 
 #include <map>
 #include <string>
