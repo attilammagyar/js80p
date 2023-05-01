@@ -795,7 +795,7 @@ void Widget::handle_error_event(
 ) {
     // fprintf(
         // stderr,
-        // "XCB ERROR: error_code=%u, sequence=%u, resource_id=%u, major_code=%u, minor_code=%u\n",
+        // "XCB ERROR: error_code=%x, sequence=%x, resource_id=%x, major_code=%x, minor_code=%x\n",
         // (unsigned int)error->error_code,
         // (unsigned int)error->sequence,
         // (unsigned int)error->resource_id,
