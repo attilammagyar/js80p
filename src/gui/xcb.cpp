@@ -1132,7 +1132,6 @@ Widget::~Widget()
     if (cairo_surface != NULL) {
         xcb()->unregister_widget(window_id());
 
-        cairo_surface_finish(cairo_surface);
         cairo_surface_destroy(cairo_surface);
         cairo_destroy(cairo);
 
