@@ -28,7 +28,7 @@
 #include <ostream>
 
 #include <sys/select.h>
-#include <sys/types.h>
+#include <sys/time.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -214,6 +214,10 @@ XcbPlatform::XcbPlatform()
     screen_root_visual(NULL),
     font_face_normal(NULL),
     font_face_bold(NULL),
+    import_patch_button(NULL),
+    active_file_selector_dialog_pipe(NULL),
+    active_file_selector_dialog_type(FileSelectorDialogType::NONE),
+    active_file_selector_dialog_pid(0),
     xcb_fd(-1)
 {
 }
@@ -238,6 +242,8 @@ XcbPlatform::~XcbPlatform()
         screen_root_visual = NULL;
         xcb_fd = -1;
     }
+
+    cancel_file_selector_dialog();
 }
 
 
@@ -414,39 +420,68 @@ void XcbPlatform::unregister_widget(xcb_window_t window_id)
 }
 
 
-std::string const XcbPlatform::get_save_file_name()
+bool XcbPlatform::is_file_selector_dialog_open() const
 {
-    char const* const zenity = find_executable(ZENITY);
-
-    if (zenity != NULL) {
-        return run_file_selector(zenity, ZENITY_SAVE_ARGUMENTS);
-    }
-
-    char const* const kdialog = find_executable(KDIALOG);
-
-    if (kdialog != NULL) {
-        return run_file_selector(kdialog, KDIALOG_SAVE_ARGUMENTS);
-    }
-
-    return "";
+    return active_file_selector_dialog_type != FileSelectorDialogType::NONE;
 }
 
 
-std::string const XcbPlatform::get_open_file_name()
+void XcbPlatform::export_patch(std::string const contents)
 {
+    if (is_file_selector_dialog_open()) {
+        return;
+    }
+
+    active_file_selector_dialog_type = FileSelectorDialogType::EXPORT;
+    file_contents = contents;
+
     char const* const zenity = find_executable(ZENITY);
 
     if (zenity != NULL) {
-        return run_file_selector(zenity, ZENITY_OPEN_ARGUMENTS);
+        start_file_selector_dialog(zenity, ZENITY_SAVE_ARGUMENTS);
+
+        return;
     }
 
     char const* const kdialog = find_executable(KDIALOG);
 
     if (kdialog != NULL) {
-        return run_file_selector(kdialog, KDIALOG_OPEN_ARGUMENTS);
+        start_file_selector_dialog(kdialog, KDIALOG_SAVE_ARGUMENTS);
+
+        return;
     }
 
-    return "";
+    clear_active_file_selector_dialog_data();
+}
+
+
+void XcbPlatform::import_patch(ImportPatchButton* import_patch_button)
+{
+    if (is_file_selector_dialog_open()) {
+        return;
+    }
+
+    active_file_selector_dialog_type = FileSelectorDialogType::IMPORT;
+    file_contents = "";
+    this->import_patch_button = import_patch_button;
+
+    char const* const zenity = find_executable(ZENITY);
+
+    if (zenity != NULL) {
+        start_file_selector_dialog(zenity, ZENITY_OPEN_ARGUMENTS);
+
+        return;
+    }
+
+    char const* const kdialog = find_executable(KDIALOG);
+
+    if (kdialog != NULL) {
+        start_file_selector_dialog(kdialog, KDIALOG_OPEN_ARGUMENTS);
+
+        return;
+    }
+
+    clear_active_file_selector_dialog_data();
 }
 
 
@@ -462,77 +497,76 @@ char const* XcbPlatform::find_executable(char const* const* alternatives) const
 }
 
 
-std::string const XcbPlatform::run_file_selector(
+void XcbPlatform::start_file_selector_dialog(
         char const* executable,
         char const* const* arguments
 ) {
-    if (is_file_selector_open) {
-        return "";
-    }
-
-    is_file_selector_open = true;
-
     std::vector<char*> argv;
     std::vector<char*> env;
-    Pipe pipe;
-    std::string path;
-    int exit_code;
 
-    if (!pipe.is_usable) {
-        is_file_selector_open = false;
+    active_file_selector_dialog_pipe = new Pipe();
 
-        return "";
+    if (!active_file_selector_dialog_pipe->is_usable) {
+        clear_active_file_selector_dialog_data();
+
+        return;
     }
 
-    build_argv(executable, arguments, argv);
-    build_env(env);
+    build_file_selector_argv(executable, arguments, argv);
+    build_file_selector_env(env);
+
+    file_path = "";
 
     pid_t pid = vfork();
 
     if (pid == -1) {
-        is_file_selector_open = false;
+        clear_active_file_selector_dialog_data();
 
-        return "";
+        return;
     }
 
     if (pid == 0) {
-        run_file_selector_child_process(argv, env, pipe);
-    }
+        run_file_selector_child_process(
+            argv, env, active_file_selector_dialog_pipe
+        );
+        /* This should never be reached */
+    } else {
+        active_file_selector_dialog_pipe->close_write_fd();
+        active_file_selector_dialog_pid = pid;
 
-    pipe.close_write_fd();
+        for (std::vector<char*>::iterator it = argv.begin(); it != argv.end(); ++it) {
+            if (*it != NULL) {
+                delete[] *it;
+            }
+        }
 
-    path = read_file_selector_output(pipe.read_fd);
-    exit_code = wait_or_kill(pid);
-
-    for (std::vector<char*>::iterator it = argv.begin(); it != argv.end(); ++it) {
-        if (*it != NULL) {
-            delete[] *it;
+        for (std::vector<char*>::iterator it = env.begin(); it != env.end(); ++it) {
+            if (*it != NULL) {
+                delete[] *it;
+            }
         }
     }
-
-    for (std::vector<char*>::iterator it = env.begin(); it != env.end(); ++it) {
-        if (*it != NULL) {
-            delete[] *it;
-        }
-    }
-
-    pipe.close_read_fd();
-    pipe.write_fd = -1;
-    pipe.read_fd = -1;
-
-    if (exit_code == 0) {
-        is_file_selector_open = false;
-
-        return path;
-    }
-
-    is_file_selector_open = false;
-
-    return "";
 }
 
 
-void XcbPlatform::build_argv(
+void XcbPlatform::clear_active_file_selector_dialog_data()
+{
+    file_path = "";
+    file_contents = "";
+    import_patch_button = NULL;
+    active_file_selector_dialog_pid = 0;
+
+    if (active_file_selector_dialog_pipe != NULL) {
+        delete active_file_selector_dialog_pipe;
+
+        active_file_selector_dialog_pipe = NULL;
+    }
+
+    active_file_selector_dialog_type = FileSelectorDialogType::NONE;
+}
+
+
+void XcbPlatform::build_file_selector_argv(
         char const* executable,
         char const* const* arguments,
         std::vector<char*>& argv
@@ -553,7 +587,7 @@ void XcbPlatform::build_argv(
 }
 
 
-void XcbPlatform::build_env(std::vector<char*>& env) const
+void XcbPlatform::build_file_selector_env(std::vector<char*>& env) const
 {
     env.reserve(256);
 
@@ -577,15 +611,15 @@ void XcbPlatform::build_env(std::vector<char*>& env) const
 void XcbPlatform::run_file_selector_child_process(
         std::vector<char*> const& argv,
         std::vector<char*> const& env,
-        Pipe& pipe
+        Pipe* pipe
 ) const {
-    pipe.close_read_fd();
+    pipe->close_read_fd();
 
-    if (dup2(pipe.write_fd, STDOUT_FILENO) == -1) {
+    if (dup2(pipe->write_fd, STDOUT_FILENO) == -1) {
         _exit(1);
     }
 
-    pipe.close_write_fd();
+    pipe->close_write_fd();
 
     execve(argv[0], argv.data(), env.data());
 
@@ -593,106 +627,163 @@ void XcbPlatform::run_file_selector_child_process(
 }
 
 
-std::string const XcbPlatform::read_file_selector_output(int const read_fd)
+void XcbPlatform::handle_file_selector_dialog()
+{
+    if (!is_file_selector_dialog_open()) {
+        return;
+    }
+
+    int file_selector_exit_code;
+
+    read_file_selector_output();
+
+    if (!has_file_selector_exited(&file_selector_exit_code)) {
+        return;
+    }
+
+    active_file_selector_dialog_pipe->close_read_fd();
+    active_file_selector_dialog_pipe->write_fd = -1;
+    active_file_selector_dialog_pipe->read_fd = -1;
+
+    if (
+            file_selector_exit_code == 0
+            && file_path.length() > 0
+            && file_path[0] == '/'
+    ) {
+        if (file_path.back() == '\n') {
+            file_path.pop_back();
+        }
+
+        switch (active_file_selector_dialog_type) {
+            case FileSelectorDialogType::EXPORT: finish_exporting_patch(); break;
+            case FileSelectorDialogType::IMPORT: finish_importing_patch(); break;
+            default: break;
+        }
+    }
+
+    clear_active_file_selector_dialog_data();
+}
+
+
+void XcbPlatform::read_file_selector_output()
 {
     fd_set read_fds;
-
-    struct timespec ts_timeout;
-    ts_timeout.tv_sec = 0;
-    ts_timeout.tv_nsec = (time_t)(JS80P::XcbPlatform::NANOSEC_SCALE * 0.3);
-
+    struct timeval timeout;
     ssize_t read_bytes;
     char buffer[512];
-    std::string path;
-    path.reserve(512);
 
     while (true) {
-        int result;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 0;
 
         FD_ZERO(&read_fds);
-        FD_SET(xcb_fd, &read_fds);
-        FD_SET(read_fd, &read_fds);
+        FD_SET(active_file_selector_dialog_pipe->read_fd, &read_fds);
 
-        result = pselect(
-            std::max(xcb_fd, read_fd) + 1, &read_fds, NULL, NULL, &ts_timeout, NULL
+        int readable_fds = select(
+            active_file_selector_dialog_pipe->read_fd + 1,
+            &read_fds,
+            NULL,
+            NULL,
+            &timeout
         );
 
-        if (result == 0) {
-            continue;
+        if (readable_fds <= 0) {
+            return;
         }
 
-        if (result < 0) {
-            return "";
-        }
-
-        if (FD_ISSET(read_fd, &read_fds)) {
-            read_bytes = read(read_fd, buffer, sizeof(buffer));
+        if (FD_ISSET(active_file_selector_dialog_pipe->read_fd, &read_fds)) {
+            read_bytes = read(
+                active_file_selector_dialog_pipe->read_fd, buffer, sizeof(buffer)
+            );
 
             if (read_bytes == -1 && errno == EINTR) {
                 continue;
             }
 
-            if (read_bytes < 1) {
+            if (read_bytes <= 0) {
                 break;
             }
 
-            path.append(buffer, read_bytes);
+            /*
+            64 KB is way too large for a path, let's not store much more of it,
+            but keep consuming the output so that the child process won't get
+            blocked.
+            */
+            if (file_path.length() < 65536) {
+                file_path.append(buffer, read_bytes);
+            }
         }
-
-        if (FD_ISSET(xcb_fd, &read_fds)) {
-            Widget::process_non_editing_events(this);
-        }
     }
-
-    if (read_bytes == -1) {
-        return "";
-    }
-
-    if (path[0] != '/') {
-        return "";
-    }
-
-    if (path.back() == '\n') {
-        path.pop_back();
-    }
-
-    return path;
 }
 
 
-int XcbPlatform::wait_or_kill(pid_t const pid) const
+bool XcbPlatform::has_file_selector_exited(int* exit_code) const
 {
     int status = 0;
-    pid_t result;
+    pid_t result = waitpid(active_file_selector_dialog_pid, &status, WNOHANG);
 
-    for (int i = 0; i < 20; ++i) {
-        result = waitpid(pid, &status, WNOHANG);
-
-        if (result == 0) {
-            usleep(50000);
-        } else if (result < 0) {
-            return -1;
-        } else if (WIFEXITED(status)) {
-            return WEXITSTATUS(status);
+    if (result > 0) {
+        if (WIFEXITED(status)) {
+            *exit_code = WEXITSTATUS(status);
         } else {
-            return -1;
+            *exit_code = 1;
         }
+
+        return true;
     }
 
-    result = waitpid(pid, &status, WNOHANG);
+    return false;
+}
+
+
+void XcbPlatform::finish_exporting_patch()
+{
+    std::ofstream patch_file(file_path, std::ios::out | std::ios::binary);
+
+    if (!patch_file.is_open()) {
+        return;
+    }
+
+    patch_file.write(file_contents.c_str(), file_contents.length());
+}
+
+
+void XcbPlatform::finish_importing_patch()
+{
+    std::ifstream patch_file(file_path, std::ios::in | std::ios::binary);
+
+    if (!patch_file.is_open()) {
+        // TODO: handle error
+        return;
+    }
+
+    char* buffer = new char[Serializer::MAX_SIZE];
+
+    std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
+    patch_file.read(buffer, Serializer::MAX_SIZE);
+
+    import_patch_button->import_patch(buffer, (Integer)patch_file.gcount());
+
+    delete[] buffer;
+}
+
+
+void XcbPlatform::cancel_file_selector_dialog()
+{
+    if (!is_file_selector_dialog_open()) {
+        return;
+    }
+
+    int status = 0;
+
+    pid_t result = waitpid(active_file_selector_dialog_pid, &status, WNOHANG);
 
     if (result == 0) {
-        kill(pid, SIGTERM);
-        waitpid(pid, NULL, 0);
-
-        return -1;
-    } else if (result < 0) {
-        return -1;
-    } else if (WIFEXITED(status)) {
-        return WEXITSTATUS(status);
+        kill(active_file_selector_dialog_pid, SIGTERM);
+        waitpid(active_file_selector_dialog_pid, NULL, 0);
     }
 
-    return -1;
+    clear_active_file_selector_dialog_data();
 }
 
 
@@ -745,6 +836,21 @@ void XcbPlatform::Pipe::close_write_fd()
 void Widget::process_events(XcbPlatform* xcb)
 {
     xcb_connection_t* xcb_connection = xcb->get_connection();
+
+    xcb->handle_file_selector_dialog();
+
+    if (xcb->is_file_selector_dialog_open()) {
+        Widget::process_non_editing_events(xcb, xcb_connection);
+    } else {
+        Widget::process_all_events(xcb, xcb_connection);
+    }
+}
+
+
+void Widget::process_all_events(
+        XcbPlatform* xcb,
+        xcb_connection_t* xcb_connection
+) {
     xcb_generic_event_t* event;
 
     while ((event = xcb_poll_for_event(xcb_connection))) {
@@ -768,9 +874,10 @@ void Widget::process_events(XcbPlatform* xcb)
 }
 
 
-void Widget::process_non_editing_events(XcbPlatform* xcb)
-{
-    xcb_connection_t* xcb_connection = xcb->get_connection();
+void Widget::process_non_editing_events(
+        XcbPlatform* xcb,
+        xcb_connection_t* xcb_connection
+) {
     xcb_generic_event_t* event;
 
     while ((event = xcb_poll_for_event(xcb_connection))) {
@@ -1482,42 +1589,13 @@ XcbPlatform* Widget::xcb() const
 
 void ImportPatchButton::click()
 {
-    std::string file_name = xcb()->get_open_file_name();
-
-    if (file_name == "") {
-        return;
-    }
-
-    std::ifstream patch_file(file_name, std::ios::in | std::ios::binary);
-
-    if (!patch_file.is_open()) {
-        // TODO: handle error
-        return;
-    }
-
-    std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
-    patch_file.read(buffer, Serializer::MAX_SIZE);
-
-    import_buffer((Integer)patch_file.gcount());
+    xcb()->import_patch(this);
 }
 
 
 void ExportPatchButton::click()
 {
-    std::string file_name = xcb()->get_save_file_name();
-
-    if (file_name == "") {
-        return;
-    }
-
-    std::ofstream patch_file(file_name, std::ios::out | std::ios::binary);
-
-    if (!patch_file.is_open()) {
-        return;
-    }
-
-    std::string const patch = Serializer::serialize(synth);
-    patch_file.write(patch.c_str(), patch.size());
+    xcb()->export_patch(Serializer::serialize(synth));
 }
 
 }

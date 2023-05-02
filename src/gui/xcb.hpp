@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <sys/types.h>
 
 #include <xcb/xcb.h>
 #include <X11/Xlib.h>
@@ -42,8 +43,6 @@ class Widget;
 class XcbPlatform
 {
     public:
-        static constexpr double NANOSEC_SCALE = 1000000000.0;
-
         static xcb_window_t gui_platform_widget_to_xcb_window(
             GUI::PlatformWidget platform_widget
         );
@@ -65,10 +64,20 @@ class XcbPlatform
         Widget* find_widget(xcb_window_t window_id) const;
         void unregister_widget(xcb_window_t window_id);
 
-        std::string const get_save_file_name();
-        std::string const get_open_file_name();
+        void export_patch(std::string const patch);
+        void import_patch(ImportPatchButton* import_patch_button);
+        void handle_file_selector_dialog();
+        void cancel_file_selector_dialog();
+        bool is_file_selector_dialog_open() const;
 
     private:
+        enum FileSelectorDialogType
+        {
+            NONE = 0,
+            EXPORT = 1,
+            IMPORT = 2,
+        };
+
         class Pipe
         {
             public:
@@ -104,32 +113,40 @@ class XcbPlatform
         );
 
         char const* find_executable(char const* const* alternatives) const;
-        std::string const run_file_selector(
+        void start_file_selector_dialog(
             char const* executable,
             char const* const* arguments
         );
-        void build_argv(
+        void clear_active_file_selector_dialog_data();
+        void build_file_selector_argv(
             char const* executable,
             char const* const* arguments,
             std::vector<char*>& argv
         ) const;
-        void build_env(std::vector<char*>& env) const;
+        void build_file_selector_env(std::vector<char*>& env) const;
         void run_file_selector_child_process(
             std::vector<char*> const& argv,
             std::vector<char*> const& env,
-            Pipe& pipe
+            Pipe* pipe
         ) const;
-        std::string const read_file_selector_output(int read_fd);
-        int wait_or_kill(pid_t const pid) const;
+        void read_file_selector_output();
+        bool has_file_selector_exited(int* exit_code) const;
+        void finish_exporting_patch();
+        void finish_importing_patch();
 
         WindowIdToWidgetMap widgets;
+        std::string file_path;
+        std::string file_contents;
         xcb_connection_t* connection;
         xcb_screen_t* screen;
         xcb_visualtype_t* screen_root_visual;
         cairo_font_face_t* font_face_normal;
         cairo_font_face_t* font_face_bold;
+        ImportPatchButton* import_patch_button;
+        Pipe* active_file_selector_dialog_pipe;
+        FileSelectorDialogType active_file_selector_dialog_type;
+        pid_t active_file_selector_dialog_pid;
         int xcb_fd;
-        bool is_file_selector_open;
 };
 
 
@@ -137,7 +154,6 @@ class Widget : public WidgetBase
 {
     public:
         static void process_events(XcbPlatform* xcb);
-        static void process_non_editing_events(XcbPlatform* xcb);
 
         Widget(char const* const text);
         virtual ~Widget();
@@ -259,6 +275,15 @@ class Widget : public WidgetBase
                 unsigned char* data;
                 unsigned char* end;
         };
+
+        static void process_all_events(
+            XcbPlatform* xcb,
+            xcb_connection_t* xcb_connection
+        );
+        static void process_non_editing_events(
+            XcbPlatform* xcb,
+            xcb_connection_t* xcb_connection
+        );
 
         static cairo_status_t read_png_stream_from_array(
             void *closure,

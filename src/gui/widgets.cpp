@@ -72,17 +72,10 @@ ImportPatchButton::ImportPatchButton(
     synth(synth),
     synth_gui_body(synth_gui_body)
 {
-    buffer = new char[Serializer::MAX_SIZE];
 }
 
 
-ImportPatchButton::~ImportPatchButton()
-{
-    delete[] buffer;
-}
-
-
-void ImportPatchButton::import_buffer(Integer const size) const
+void ImportPatchButton::import_patch(char const* buffer, Integer const size) const
 {
     std::string const patch(
         buffer,

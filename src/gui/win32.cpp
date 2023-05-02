@@ -734,6 +734,7 @@ void ImportPatchButton::click()
     }
 
     DWORD read;
+    char* buffer = new char[Serializer::MAX_SIZE];
 
     std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
 
@@ -754,7 +755,9 @@ void ImportPatchButton::click()
 
     CloseHandle(file);
 
-    import_buffer((Integer)read);
+    import_patch(buffer, (Integer)read);
+
+    delete[] buffer;
 }
 
 
