@@ -1,11 +1,15 @@
+v1.1.2 (2023-05-03)
+ * Bugfix: don't block the host's user interface while the file picker dialog
+   is open on Linux
+
 v1.1.1 (2023-05-02)
- * bugfix: opening the user interface of multiple plugin instances will no
+ * Bugfix: opening the user interface of multiple plugin instances will no
    longer cause a crash when the instances are running within the same process
- * bugfix: filter states will no longer interfere with each other between
+ * Bugfix: filter states will no longer interfere with each other between
    multiple plugin instances when running within the same process
- * bugfix: when Reaper is started up with a project which was saved with an
+ * Bugfix: when Reaper is started up with a project which was saved with an
    open "FX: Track N" window, JS80P will no longer fail to display its user
-   interface
+   interface on Linux
 
 v1.1.0 (2023-05-01)
  * Linux support
