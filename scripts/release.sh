@@ -7,6 +7,7 @@ set -o pipefail
 
 TARGET_PLATFORMS="x86_64-w64-mingw32 i686-w64-mingw32 x86_64-gpp i686-gpp"
 PLUGIN_TYPES="fst vst3"
+TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
 
 main()
 {
@@ -20,10 +21,12 @@ main()
     local dist_archive
     local uncommitted
     local date
+    local src_file
+    local dst_file
 
     log "Verifying repository"
 
-    if [[ ! -d src ]] || [[ ! -d presets ]]
+    if [[ ! -d "src" ]] || [[ ! -d "presets" ]]
     then
         error "This script must be run in the root directory of the repository."
     fi
@@ -47,8 +50,8 @@ main()
 
         date="$(date '+%Y-%m-%d')"
 
-        grep "^$(echo "$version_tag" | sed 's/\./\\./g') ($date)" whatsnew.txt >/dev/null \
-            || error "Cannot find '$version_tag ($date)' in whatsnew.txt"
+        grep "^$(echo "$version_tag" | sed 's/\./\\./g') ($date)" NEWS.txt >/dev/null \
+            || error "Cannot find '$version_tag ($date)' in NEWS.txt"
     fi
 
     version_str="${version_tag:1}"
@@ -81,7 +84,7 @@ main()
         scripts \
         src \
         tests \
-        whatsnew.txt \
+        NEWS.txt \
         "dist/$source_dir/"
 
     find "dist/$source_dir/" -name ".*.swp" -delete
@@ -111,8 +114,19 @@ main()
 
             log "Copying presets, etc. to dist/$dist_dir"
 
-            cp --verbose --recursive \
-                presets LICENSE.txt README.txt whatsnew.txt "dist/$dist_dir/"
+            cp --verbose --recursive presets "dist/$dist_dir/"
+
+            if [[ "$target_platform" =~ "-mingw32" ]]
+            then
+                for src_file in $TEXT_FILES
+                do
+                    dst_file="dist/$dist_dir/$src_file"
+                    printf "Converting %s to %s\n" "$src_file" "$dst_file"
+                    cat "$src_file" | sed 's/$/\r/g' >"$dst_file"
+                done
+            else
+                cp --verbose $TEXT_FILES "dist/$dist_dir/"
+            fi
 
             log "Creating release archive: dist/$dist_archive"
 
