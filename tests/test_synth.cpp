@@ -318,3 +318,82 @@ TEST(operating_mode, {
     test_operating_mode(OUT_VOLUME_PER_CHANNEL, 0, Synth::SPLIT_AT_C4);
     test_operating_mode(0, OUT_VOLUME_PER_CHANNEL, Synth::SPLIT_AT_C3);
 })
+
+
+TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth;
+    SumOfSines expected(
+        0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.note_on(0.0, 0, Midi::NOTE_A_5, 1.0);
+    synth.all_sound_off(1.0 / sample_rate, 1);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
+    samples = SignalProducer::produce<Synth>(&synth, 1);
+
+    assert_eq(expected_samples[0], samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples[1], samples[1], block_size, DOUBLE_DELTA);
+})
+
+
+TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
+    constexpr Integer block_size = 4096;
+    constexpr Integer half_a_second = block_size / 2;
+    constexpr Frequency sample_rate = 4096.0;
+
+    Synth synth;
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL, 110.0,
+        OUT_VOLUME_PER_CHANNEL, 220.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* samples;
+    Sample const* const* sines;
+    Sample* expected_samples = new Sample[block_size];
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(0.0);
+    synth.carrier_params.volume.set_value(0.0);
+
+    synth.note_on(0.0, 2, Midi::NOTE_A_2, 1.0);
+    synth.note_on(0.0, 3, Midi::NOTE_A_3, 1.0);
+    synth.all_notes_off(0.5, 1);
+
+    sines = SignalProducer::produce<SumOfSines>(&expected, 1);
+    samples = SignalProducer::produce<Synth>(&synth, 1);
+
+    for (Integer i = 0; i != block_size; ++i) {
+        expected_samples[i] = i < half_a_second ? sines[0][i] : 0.0;
+    }
+
+    assert_eq(expected_samples, samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, samples[1], block_size, DOUBLE_DELTA);
+
+    delete[] expected_samples;
+})

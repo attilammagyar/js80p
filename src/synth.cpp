@@ -695,6 +695,8 @@ void Synth::all_sound_off(
         Seconds const time_offset,
         Midi::Channel const channel
 ) noexcept {
+    suspend();
+    resume();
 }
 
 
@@ -709,6 +711,20 @@ void Synth::all_notes_off(
         Seconds const time_offset,
         Midi::Channel const channel
 ) noexcept {
+    for (Midi::Channel channel_ = 0; channel_ != Midi::CHANNELS; ++channel_) {
+        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+            Integer const voice = midi_note_to_voice_assignments[channel_][note];
+
+            if (voice == -1) {
+                continue;
+            }
+
+            midi_note_to_voice_assignments[channel_][note] = -1;
+
+            modulators[voice]->note_off(time_offset, note, 0.0);
+            carriers[voice]->note_off(time_offset, note, 0.0);
+        }
+    }
 }
 
 
