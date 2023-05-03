@@ -1,5 +1,3 @@
-// TODO: set_value & co. should be no-op when controllers, envelopes, etc. are assigned
-
 /*
  * This file is part of JS80P, a synthesizer plugin.
  * Copyright (C) 2023  Attila M. Magyar
