@@ -1461,16 +1461,31 @@ void Widget::draw_text(
     cairo_font_extents(cairo, &font_extents);
     cairo_text_extents(cairo, text, &text_extents);
 
-    text_left = (
-        alignment == TextAlignment::CENTER
-            ? (double)(left + padding)
+    switch (alignment) {
+        case TextAlignment::CENTER:
+            text_left = (
+                (double)(left + padding)
                 + 0.5 * ((double)(width - 2 * padding) - text_extents.width)
                 - text_extents.x_bearing
-            : (double)(left + padding)
-    );
+            );
+            break;
+
+        case TextAlignment::RIGHT:
+            text_left = width - padding - text_extents.width;
+            break;
+
+        default:
+            text_left = (double)(left + padding);
+            break;
+    }
+
     text_top = (
         (double)(top + height) - font_extents.height * 0.5 + font_extents.descent
     );
+
+    if (type == Type::STATUS_LINE) {
+        text_top -= 3.0;
+    }
 
     cairo_move_to(cairo, text_left, text_top);
 

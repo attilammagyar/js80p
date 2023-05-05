@@ -48,6 +48,8 @@ class Widget : public WidgetBase
         Widget(char const* const text);
         virtual ~Widget();
 
+        virtual void set_text(char const* text) override;
+
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* name
@@ -163,13 +165,10 @@ class Widget : public WidgetBase
 
         GUI::PlatformWidget get_platform_widget() const;
 
-        void create_tooltip(HINSTANCE hInstance, HWND parent, HWND widget);
-
         Text class_name;
         Text text_text;
         DWORD dwStyle;
         WNDPROC original_window_procedure;
-        HWND tooltip;
         UINT_PTR timer_id;
         bool is_mouse_captured;
         bool is_timer_started;

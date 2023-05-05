@@ -19,6 +19,8 @@
 #ifndef JS80P__GUI__WIN32_CPP
 #define JS80P__GUI__WIN32_CPP
 
+#include <cstdio>
+
 #include <algorithm>
 #include <cmath>
 
@@ -156,6 +158,13 @@ LPTSTR Widget::Text::get() const
 COLORREF Widget::to_colorref(GUI::Color const color)
 {
     return RGB(GUI::red(color), GUI::green(color), GUI::blue(color));
+}
+
+
+void Widget::set_text(char const* text)
+{
+    text_text.set(text);
+    WidgetBase::set_text(text);
 }
 
 
@@ -312,7 +321,6 @@ Widget::Widget(char const* const text)
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
-    tooltip(NULL),
     is_mouse_captured(false)
 {
 }
@@ -326,7 +334,6 @@ Widget::Widget(
     hdc(NULL),
     dwStyle(0),
     original_window_procedure(NULL),
-    tooltip(NULL),
     is_mouse_captured(false)
 {
 }
@@ -345,7 +352,6 @@ Widget::Widget(
     text_text(text),
     dwStyle(0),
     original_window_procedure(NULL),
-    tooltip(NULL),
     timer_id(0),
     is_mouse_captured(false),
     is_timer_started(false)
@@ -373,11 +379,6 @@ Widget::~Widget()
 
     if (type == Type::BACKGROUND) {
         KillTimer((HWND)platform_widget, timer_id);
-    }
-
-    if (tooltip != NULL) {
-        DestroyWindow(tooltip);
-        tooltip = NULL;
     }
 
     if (platform_widget != NULL) {
@@ -412,10 +413,6 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
         return;
     }
 
-    if (type != Type::ABOUT_TEXT) {
-        create_tooltip((HINSTANCE)platform_data, parent_hwnd, widget_hwnd);
-    }
-
     SetWindowLongPtr(widget_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
     original_window_procedure = (
@@ -434,44 +431,6 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
         // TODO: GetLastError
         SetTimer(widget_hwnd, timer_id, elapse, NULL);
     }
-}
-
-
-void Widget::create_tooltip(HINSTANCE hInstance, HWND parent, HWND widget)
-{
-    DWORD style = (
-        WS_POPUP | TTS_ALWAYSTIP | TTS_NOANIMATE | TTS_NOFADE | TTS_NOPREFIX
-    );
-
-    // TODO: GetLastError
-    tooltip = CreateWindowEx(
-        0,                                      // dwExStyle
-        TOOLTIPS_CLASS,                         // lpClassName
-        NULL,                                   // lpWindowName
-        style,                                  // dwStyle
-        CW_USEDEFAULT,                          // X
-        CW_USEDEFAULT,                          // Y
-        CW_USEDEFAULT,                          // nWidth
-        CW_USEDEFAULT,                          // nHeight
-        parent,                                 // hWndParent
-        NULL,                                   // hMenu
-        hInstance,                              // hInstance
-        NULL                                    // lpParam
-    );
-
-    if (!tooltip) {
-        return;
-    }
-
-    TOOLINFO tool_info = {0};
-    tool_info.cbSize = sizeof(tool_info);
-    tool_info.hwnd = parent;
-    tool_info.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-    tool_info.uId = (UINT_PTR)widget;
-    tool_info.lpszText = text_text.get();
-
-    // TODO: GetLastError
-    SendMessage(tooltip, TTM_ADDTOOL, 0, (LPARAM)&tool_info);
 }
 
 
@@ -546,10 +505,18 @@ void Widget::draw_text(
 
     UINT format;
 
-    if (alignment == TextAlignment::CENTER) {
-        format = DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX;
-    } else {
-        format = DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOPREFIX;
+    switch (alignment) {
+        case TextAlignment::CENTER:
+            format = DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX;
+            break;
+
+        case TextAlignment::RIGHT:
+            format = DT_SINGLELINE | DT_RIGHT | DT_VCENTER | DT_NOPREFIX;
+            break;
+
+        default:
+            format = DT_SINGLELINE | DT_LEFT | DT_VCENTER | DT_NOPREFIX;
+            break;
     }
 
     DrawText(hdc, text_obj.get_const(), -1, (LPRECT)&text_rect, format);

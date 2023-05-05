@@ -36,6 +36,7 @@ class ExternallyCreatedWindow;
 class ImportPatchButton;
 class ParamEditorKnobStates;
 class ParamEditor;
+class StatusLine;
 class TabBody;
 class TabSelector;
 class Widget;
@@ -117,6 +118,7 @@ class GUI
         static Color const TEXT_BACKGROUND;
         static Color const TEXT_HIGHLIGHT_COLOR;
         static Color const TEXT_HIGHLIGHT_BACKGROUND;
+        static Color const STATUS_LINE_BACKGROUND;
 
         static void param_ratio_to_str(
             Synth* synth,
@@ -143,6 +145,8 @@ class GUI
 
         void show();
         void idle();
+
+        void set_status_line(char const* text);
 
         PlatformData get_platform_data() const;
 
@@ -202,6 +206,7 @@ class GUI
         TabBody* envelopes_body;
         TabBody* lfos_body;
         TabBody* synth_body;
+        StatusLine* status_line;
 
         Synth* synth;
         JS80P::GUI::PlatformData platform_data;
@@ -227,11 +232,13 @@ class WidgetBase
             TAB_BODY = 256,
             TAB_SELECTOR = 512,
             ABOUT_TEXT = 1024,
+            STATUS_LINE = 2048,
         };
 
         enum TextAlignment {
             LEFT = 0,
             CENTER = 1,
+            RIGHT = 2,
         };
 
         enum FontWeight {
@@ -244,8 +251,10 @@ class WidgetBase
 
         virtual int get_left() const;
         virtual int get_top() const;
-        virtual char const* get_text() const;
         virtual WidgetBase* get_parent() const;
+
+        virtual void set_text(char const* text);
+        virtual char const* get_text() const;
 
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
@@ -292,6 +301,8 @@ class WidgetBase
         virtual void destroy_children();
 
         virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent);
+
+        virtual void set_gui(GUI& gui);
 
         /**
          * \brief Event handler for painting the widget on the screen.
@@ -423,13 +434,14 @@ class WidgetBase
         );
 
         Type const type;
-        char const* const text;
 
         GUI::Widgets children;
         GUI::PlatformWidget platform_widget;
         GUI::PlatformData platform_data;
         GUI::Image image;
+        GUI* gui;
         WidgetBase* parent;
+        char const* text;
 
         int left;
         int top;

@@ -65,6 +65,7 @@ class ImportPatchButton : public TransparentWidget
 {
     public:
         ImportPatchButton(
+            GUI& gui,
             int const left,
             int const top,
             int const width,
@@ -77,6 +78,8 @@ class ImportPatchButton : public TransparentWidget
 
     protected:
         virtual void click() override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
 
     private:
         Synth* synth;
@@ -88,6 +91,7 @@ class ExportPatchButton : public TransparentWidget
 {
     public:
         ExportPatchButton(
+            GUI& gui,
             int const left,
             int const top,
             int const width,
@@ -97,6 +101,8 @@ class ExportPatchButton : public TransparentWidget
 
     protected:
         virtual void click() override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
 
     private:
         Synth* synth;
@@ -278,6 +284,7 @@ class ParamEditor : public TransparentWidget
         static constexpr int KNOB_HEIGHT = 48;
 
         ParamEditor(
+            GUI& gui,
             char const* const text,
             int const left,
             int const top,
@@ -291,6 +298,7 @@ class ParamEditor : public TransparentWidget
         );
 
         ParamEditor(
+            GUI& gui,
             char const* const text,
             int const left,
             int const top,
@@ -332,6 +340,8 @@ class ParamEditor : public TransparentWidget
     protected:
         virtual bool paint() override;
         virtual bool mouse_up(int const x, int const y) override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
 
     private:
         static constexpr Number KNOB_STATES_LAST_INDEX = (
@@ -360,6 +370,7 @@ class ParamEditor : public TransparentWidget
 
                 Knob(
                     ParamEditor& editor,
+                    GUI& gui,
                     char const* const text,
                     int const left,
                     int const top,
@@ -479,6 +490,23 @@ class AboutText : public Widget
     private:
         GUI::Image logo;
         std::vector<std::string> lines;
+};
+
+
+class StatusLine : public TransparentWidget
+{
+    public:
+        static constexpr int LEFT = 690;
+        static constexpr int TOP = 0;
+        static constexpr int WIDTH = 290;
+        static constexpr int HEIGHT = 24;
+
+        StatusLine();
+
+        virtual void set_text(char const* text) override;
+
+    protected:
+        virtual bool paint() override;
 };
 
 }

@@ -62,6 +62,7 @@ bool TransparentWidget::paint()
 
 
 ImportPatchButton::ImportPatchButton(
+        GUI& gui,
         int const left,
         int const top,
         int const width,
@@ -72,6 +73,7 @@ ImportPatchButton::ImportPatchButton(
     synth(synth),
     synth_gui_body(synth_gui_body)
 {
+    set_gui(gui);
 }
 
 
@@ -92,7 +94,26 @@ void ImportPatchButton::import_patch(char const* buffer, Integer const size) con
 }
 
 
+bool ImportPatchButton::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+    gui->set_status_line(text);
+
+    return true;
+}
+
+
+bool ImportPatchButton::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+    gui->set_status_line("");
+
+    return true;
+}
+
+
 ExportPatchButton::ExportPatchButton(
+        GUI& gui,
         int const left,
         int const top,
         int const width,
@@ -101,6 +122,25 @@ ExportPatchButton::ExportPatchButton(
 ) : TransparentWidget("Export Patch", left, top, width, height, Type::EXPORT_PATCH_BUTTON),
     synth(synth)
 {
+    set_gui(gui);
+}
+
+
+bool ExportPatchButton::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+    gui->set_status_line(text);
+
+    return true;
+}
+
+
+bool ExportPatchButton::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+    gui->set_status_line("");
+
+    return true;
 }
 
 
@@ -507,6 +547,7 @@ ParamEditorKnobStates::~ParamEditorKnobStates()
 
 
 ParamEditor::ParamEditor(
+        GUI& gui,
         char const* const text,
         int const left,
         int const top,
@@ -532,10 +573,12 @@ ParamEditor::ParamEditor(
     knob(NULL),
     has_controller_(false)
 {
+    set_gui(gui);
 }
 
 
 ParamEditor::ParamEditor(
+        GUI& gui,
         char const* const text,
         int const left,
         int const top,
@@ -562,6 +605,7 @@ ParamEditor::ParamEditor(
     controller_id(Synth::ControllerId::NONE),
     has_controller_(false)
 {
+    set_gui(gui);
 }
 
 
@@ -571,6 +615,7 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 
     knob = new Knob(
         *this,
+        *gui,
         text,
         (WIDTH - ParamEditor::KNOB_WIDTH) / 2,
         16,
@@ -778,8 +823,27 @@ bool ParamEditor::mouse_up(int const x, int const y)
 }
 
 
+bool ParamEditor::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+    gui->set_status_line(text);
+
+    return true;
+}
+
+
+bool ParamEditor::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+    gui->set_status_line("");
+
+    return true;
+}
+
+
 ParamEditor::Knob::Knob(
         ParamEditor& editor,
+        GUI& gui,
         char const* const text,
         int const left,
         int const top,
@@ -795,6 +859,7 @@ ParamEditor::Knob::Knob(
     is_controlled(false),
     is_editing_(false)
 {
+    set_gui(gui);
 }
 
 
@@ -914,6 +979,8 @@ bool ParamEditor::Knob::mouse_move(
 ) {
     Widget::mouse_move(x, y, modifier);
 
+    gui->set_status_line(text);
+
     is_editing_ = true;
 
     if (is_controlled) {
@@ -954,7 +1021,9 @@ bool ParamEditor::Knob::mouse_move(
 
 bool ParamEditor::Knob::mouse_leave(int const x, int const y)
 {
-    is_editing_ = false;
+    Widget::mouse_leave(x, y);
+    stop_editing();
+    gui->set_status_line("");
 
     return true;
 }
@@ -1031,6 +1100,53 @@ bool AboutText::paint()
 
     if (logo != NULL) {
         draw_image(logo, 5, (HEIGHT - LOGO_HEIGHT) / 2, LOGO_WIDTH, LOGO_HEIGHT);
+    }
+
+    return true;
+}
+
+
+StatusLine::StatusLine()
+    : TransparentWidget("", LEFT, TOP, WIDTH, HEIGHT, Type::STATUS_LINE)
+{
+}
+
+
+void StatusLine::set_text(char const* text)
+{
+    TransparentWidget::set_text(text);
+
+    if (parent == NULL) {
+        return;
+    }
+
+    if (text[0] == '\x00') {
+        hide();
+    } else {
+        show();
+    }
+}
+
+
+bool StatusLine::paint()
+{
+    TransparentWidget::paint();
+
+    if (text[0] != '\x00') {
+        fill_rectangle(0, 0, WIDTH, HEIGHT, GUI::STATUS_LINE_BACKGROUND);
+        draw_text(
+            text,
+            9,
+            0,
+            3,
+            WIDTH,
+            20,
+            GUI::TEXT_COLOR,
+            GUI::STATUS_LINE_BACKGROUND,
+            FontWeight::NORMAL,
+            5,
+            TextAlignment::RIGHT
+        );
     }
 
     return true;

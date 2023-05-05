@@ -44,7 +44,7 @@ void GUI::destroy()
 class Widget : public WidgetBase
 {
     public:
-        Widget(char const* const text) : WidgetBase(text)
+        Widget(char const* const text) : WidgetBase(gui, text)
         {
         }
 
@@ -73,7 +73,7 @@ class Widget : public WidgetBase
                 int const width,
                 int const height,
                 Type const type
-        ) : WidgetBase(text, left, top, width, height, type)
+        ) : WidgetBase(gui, text, left, top, width, height, type)
         {
         }
 
@@ -81,7 +81,7 @@ class Widget : public WidgetBase
                 GUI::PlatformData platform_data,
                 GUI::PlatformWidget platform_widget,
                 Type const type
-        ) : WidgetBase(platform_data, platform_widget, type)
+        ) : WidgetBase(gui, platform_data, platform_widget, type)
         {
         }
 

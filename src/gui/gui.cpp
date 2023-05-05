@@ -567,6 +567,7 @@ const GUI::Color GUI::TEXT_COLOR = GUI::rgb(181, 181, 189);
 const GUI::Color GUI::TEXT_BACKGROUND = GUI::rgb(0, 0, 0);
 const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(225, 225, 235);
 const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(63, 63, 66);
+const GUI::Color GUI::STATUS_LINE_BACKGROUND = GUI::rgb(21, 21, 32);
 
 
 constexpr GUI::ColorComponent GUI::red(Color const color)
@@ -677,6 +678,7 @@ Number GUI::clamp_ratio(Number const ratio)
 #define PE(owner, left, top, param_id, ctls, varg1, varg2, ks)  \
     owner->own(                                                 \
         new ParamEditor(                                        \
+            *this,                                              \
             GUI::PARAMS[param_id],                              \
             left,                                               \
             top,                                                \
@@ -709,6 +711,7 @@ GUI::GUI(
     envelopes_body(NULL),
     lfos_body(NULL),
     synth_body(NULL),
+    status_line(NULL),
     synth(synth),
     platform_data(platform_data)
 {
@@ -736,6 +739,9 @@ GUI::GUI(
     this->parent_window->own(background);
 
     background->set_image(synth_image);
+
+    status_line = new StatusLine();
+    status_line->set_text("");
 
     controller_selector = new ControllerSelector(*background, synth);
 
@@ -803,6 +809,7 @@ GUI::GUI(
 
     background->replace_body(synth_body);
 
+    background->own(status_line);
     background->own(controller_selector);
     controller_selector->hide();
 }
@@ -1150,10 +1157,8 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
-    ((Widget*)synth_body)->own(
-        new ImportPatchButton(7, 2, 32, 32, synth, synth_body)
-    );
-    ((Widget*)synth_body)->own(new ExportPatchButton(45, 2, 32, 32, synth));
+    ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 32, synth, synth_body));
+    ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 32, synth));
 
     PE(synth_body, 14, 34 + (PE_H + 6) * 0, Synth::ParamId::MODE,   MIDI_CTLS,  md, mdc, knob_states);
     PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::MIX,    LFO_CTLS,   "%.2f", 100.0, knob_states);
@@ -1259,6 +1264,12 @@ void GUI::show()
 }
 
 
+void GUI::set_status_line(char const* text)
+{
+    status_line->set_text(text);
+}
+
+
 GUI::PlatformData GUI::get_platform_data() const
 {
     return platform_data;
@@ -1267,11 +1278,12 @@ GUI::PlatformData GUI::get_platform_data() const
 
 WidgetBase::WidgetBase(char const* const text)
     : type(Type::BACKGROUND),
-    text(text),
     platform_widget(NULL),
     platform_data(NULL),
     image(NULL),
+    gui(NULL),
     parent(NULL),
+    text(text),
     left(0),
     top(0),
     width(0),
@@ -1289,11 +1301,12 @@ WidgetBase::WidgetBase(
         int const height,
         Type const type
 ) : type(type),
-    text(text),
     platform_widget(NULL),
     platform_data(NULL),
     image(NULL),
+    gui(NULL),
     parent(NULL),
+    text(text),
     left(left),
     top(top),
     width(width),
@@ -1308,11 +1321,12 @@ WidgetBase::WidgetBase(
         GUI::PlatformWidget platform_widget,
         Type const type
 ) : type(type),
-    text(""),
     platform_widget(platform_widget),
     platform_data(platform_data),
     image(NULL),
+    gui(NULL),
     parent(NULL),
+    text(""),
     left(0),
     top(0),
     width(0),
@@ -1344,6 +1358,12 @@ int WidgetBase::get_left() const
 int WidgetBase::get_top() const
 {
     return top;
+}
+
+
+void WidgetBase::set_text(char const* text)
+{
+    this->text = text;
 }
 
 
@@ -1438,6 +1458,12 @@ void WidgetBase::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     this->platform_data = platform_data;
     this->parent = parent;
+}
+
+
+void WidgetBase::set_gui(GUI& gui)
+{
+    this->gui = &gui;
 }
 
 
