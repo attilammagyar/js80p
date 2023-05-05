@@ -538,7 +538,7 @@ void Widget::draw_text(
     text_rect.top = top;
     text_rect.right = left + width;
     text_rect.bottom = top + height;
-    HBRUSH brush = CreateSolidBrush((COLORREF)background);
+    HBRUSH brush = CreateSolidBrush(to_colorref(background));
     FillRect(hdc, (LPRECT)&text_rect, brush);
 
     text_rect.left += padding;
