@@ -230,18 +230,24 @@ The `lib/` directory contains code from the following projects:
 
 #### Linux
 
-To compile JS80P on e.g. Ubuntu Linux 20.04, the following packages need to be
-installed:
+To compile JS80P on e.g. Ubuntu Linux 20.04 for all supported platforms, the
+following packages need to be installed:
 
     apt-get install \
         binutils \
         build-essential \
         g++ \
+        gcc-multilib \
         g++-multilib \
         libcairo2-dev \
+        libcairo2-dev:i386 \
         libx11-dev \
+        libx11-dev:i386 \
         libxcb1-dev \
-        libxcb-render0-dev
+        libxcb1-dev:i386 \
+        libxcb-render0-dev \
+        libxcb-render0-dev:i386 \
+        mingw-w64
 
 <a name="dev-compile"></a>
 
