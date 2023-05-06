@@ -1,3 +1,13 @@
+v1.1.3 (2023-??-??)
+ * Respond to ALL_NOTES_OFF and ALL_SOUNDS_OFF MIDI messages
+ * Get rid of obtrusive tooltips on Windows, show long name of knobs in the
+   top right corner of the window instead
+ * New preset: chariots.js80p
+ * Bugfix: make sure that all text files in the Windows distribution use
+   Windows-style line breaks
+ * Bugfix: fix libcairo2 crash when the plugin's window is closed and opened
+   again repeatedly in quick succession on Linux
+
 v1.1.2 (2023-05-03)
  * Bugfix: don't block the host's user interface while the file picker dialog
    is open on Linux
