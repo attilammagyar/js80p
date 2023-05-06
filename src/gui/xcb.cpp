@@ -1192,6 +1192,7 @@ Widget::Widget(char const* const text) : WidgetBase(text)
 void Widget::initialize()
 {
     cairo_surface = NULL;
+    cairo_device = NULL;
     fake_transparent_background = NULL;
     fake_transparent_background_source = NULL;
     cairo = NULL;
@@ -1239,10 +1240,15 @@ Widget::~Widget()
     if (cairo_surface != NULL) {
         xcb()->unregister_widget(window_id());
 
+        cairo_device_finish(cairo_device);
+        cairo_device_destroy(cairo_device);
+
+        cairo_surface_finish(cairo_surface);
         cairo_surface_destroy(cairo_surface);
         cairo_destroy(cairo);
 
         cairo_surface = NULL;
+        cairo_device = NULL;
         cairo = NULL;
     }
 
@@ -1315,6 +1321,7 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     cairo_surface = cairo_xcb_surface_create(
         xcb_connection, window_id, xcb->get_screen_root_visual(), width, height
     );
+    cairo_device = cairo_device_reference(cairo_surface_get_device(cairo_surface));
     cairo = cairo_create(cairo_surface);
 
     xcb_map_window(xcb_connection, window_id);

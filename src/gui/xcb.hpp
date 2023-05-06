@@ -348,6 +348,7 @@ class Widget : public WidgetBase
         void destroy_fake_transparent_background();
 
         cairo_surface_t* cairo_surface;
+        cairo_device_t* cairo_device;
         cairo_surface_t* fake_transparent_background;
         cairo_surface_t* fake_transparent_background_source;
         cairo_t* cairo;
