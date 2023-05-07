@@ -1,4 +1,4 @@
-v1.1.3 (2023-??-??)
+v1.2.0 (2023-05-07)
  * Respond to ALL_NOTES_OFF and ALL_SOUNDS_OFF MIDI messages
  * Get rid of obtrusive tooltips on Windows, show long name of knobs in the
    top right corner of the window instead
