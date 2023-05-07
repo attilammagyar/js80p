@@ -722,7 +722,8 @@ GUI::GUI(
     knob_states = new ParamEditorKnobStates(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESFREE"),
-        dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED")
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED"),
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESNONE")
     );
 
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");

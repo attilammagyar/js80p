@@ -19,13 +19,16 @@ except ImportError as error:
 def main(argv):
     knob_bg = Image.open(os.path.join(os.path.dirname(argv[0]), "../gui/knob.png"))
 
+    ticks_color = (144, 144, 150)
+    line_color = (200, 200, 220)
+
     generate_knob_states(
         knob_bg=knob_bg,
         glow_color_1=(72, 0, 55),
         glow_color_2=(0, 42, 144),
         glow_color_3=(80, 170, 255),
-        ticks_color=(144, 144, 150),
-        line_color=(200, 200, 220),
+        ticks_color=ticks_color,
+        line_color=line_color,
         out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-free.png")
     )
     generate_knob_states(
@@ -33,9 +36,19 @@ def main(argv):
         glow_color_1=(72, 10, 0),
         glow_color_2=(220, 60, 24),
         glow_color_3=(255, 145, 72),
-        ticks_color=(144, 144, 150),
-        line_color=(200, 200, 220),
+        ticks_color=ticks_color,
+        line_color=line_color,
         out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-controlled.png")
+    )
+    generate_knob_states(
+        knob_bg=knob_bg,
+        glow_color_1=(0, 0, 0),
+        glow_color_2=(0, 0, 0),
+        glow_color_3=(0, 0, 0),
+        ticks_color=ticks_color,
+        line_color=None,
+        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-none.png"),
+        stages=1
     )
 
 
@@ -47,12 +60,12 @@ def generate_knob_states(
         ticks_color,
         line_color,
         out_file,
+        stages=128
 ):
 
     width, height = knob_bg.size;
     center = (int(round(width / 2)), int(round(height / 2)))
     angle_diff = 30.0
-    stages = 128
 
     # in PIL, 3 o'clock is 0 degrees
     start_angle = 90.0 + angle_diff
@@ -75,7 +88,7 @@ def generate_knob_states(
     glow_color = glow_color_1
 
     for i in range(stages):
-        progress = float(i) / (stages - 1)
+        progress = float(i) / (stages - 1) if stages > 1 else 0
         angle_delta = end_angle_delta * progress
         p1 = rotate(
             (center[0], 24), center, end_angle_delta * (progress - 0.5)
@@ -113,7 +126,9 @@ def generate_knob_states(
             (0, 5, 9, 190),
             25
         )
-        canvas.line((p2, p1), line_color, 15)
+
+        if line_color is not None:
+            canvas.line((p2, p1), line_color, 15)
 
         knob = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         knob.paste(knob_bg, (0, 0, width, height))

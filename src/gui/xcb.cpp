@@ -45,10 +45,12 @@ extern unsigned char _binary_gui_img_effects_png_start;
 extern unsigned char _binary_gui_img_effects_png_end;
 extern unsigned char _binary_gui_img_envelopes_png_start;
 extern unsigned char _binary_gui_img_envelopes_png_end;
-extern unsigned char _binary_gui_img_knob_states_free_png_start;
-extern unsigned char _binary_gui_img_knob_states_free_png_end;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_start;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_end;
+extern unsigned char _binary_gui_img_knob_states_free_png_start;
+extern unsigned char _binary_gui_img_knob_states_free_png_end;
+extern unsigned char _binary_gui_img_knob_states_none_png_start;
+extern unsigned char _binary_gui_img_knob_states_none_png_end;
 extern unsigned char _binary_gui_img_lfos_png_start;
 extern unsigned char _binary_gui_img_lfos_png_end;
 extern unsigned char _binary_gui_img_synth_png_start;
@@ -93,6 +95,13 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         )
     },
     {
+        "KNOBSTATESCONTROLLED",
+        Widget::Resource(
+            &_binary_gui_img_knob_states_controlled_png_start,
+            &_binary_gui_img_knob_states_controlled_png_end
+        )
+    },
+    {
         "KNOBSTATESFREE",
         Widget::Resource(
             &_binary_gui_img_knob_states_free_png_start,
@@ -100,10 +109,10 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         )
     },
     {
-        "KNOBSTATESCONTROLLED",
+        "KNOBSTATESNONE",
         Widget::Resource(
-            &_binary_gui_img_knob_states_controlled_png_start,
-            &_binary_gui_img_knob_states_controlled_png_end
+            &_binary_gui_img_knob_states_none_png_start,
+            &_binary_gui_img_knob_states_none_png_end
         )
     },
     {

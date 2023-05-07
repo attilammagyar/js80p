@@ -260,7 +260,8 @@ class ParamEditorKnobStates
         ParamEditorKnobStates(
             WidgetBase* widget,
             GUI::Image free_image,
-            GUI::Image controlled_image
+            GUI::Image controlled_image,
+            GUI::Image none_image
         );
 
         ~ParamEditorKnobStates();
@@ -269,6 +270,7 @@ class ParamEditorKnobStates
 
         GUI::Image free_image;
         GUI::Image controlled_image;
+        GUI::Image none_image;
 
         GUI::Image free_images[COUNT];
         GUI::Image controlled_images[COUNT];
@@ -387,7 +389,7 @@ class ParamEditor : public TransparentWidget
                 void update(Number const ratio);
                 void update();
                 void make_free();
-                void make_controlled();
+                void make_controlled(Synth::ControllerId const controller_id);
 
                 bool is_editing() const;
                 void stop_editing();
@@ -411,6 +413,7 @@ class ParamEditor : public TransparentWidget
                 Number ratio;
                 Number mouse_move_delta;
                 bool is_controlled;
+                bool is_controller_polyphonic;
                 bool is_editing_;
         };
 

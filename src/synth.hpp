@@ -532,6 +532,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Controller const controller
         ) noexcept;
 
+        static bool is_controller_polyphonic(
+            ControllerId const controller_id
+        ) noexcept;
+
         Synth() noexcept;
         virtual ~Synth() override;
 

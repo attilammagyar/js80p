@@ -25,8 +25,9 @@ OBJ_GUI_EXTRA = \
 	$(BUILD_DIR)/img_controllers.o \
 	$(BUILD_DIR)/img_effects.o \
 	$(BUILD_DIR)/img_envelopes.o \
-	$(BUILD_DIR)/img_knob_states-free.o \
 	$(BUILD_DIR)/img_knob_states-controlled.o \
+	$(BUILD_DIR)/img_knob_states-free.o \
+	$(BUILD_DIR)/img_knob_states-none.o \
 	$(BUILD_DIR)/img_lfos.o \
 	$(BUILD_DIR)/img_synth.o \
 	$(BUILD_DIR)/img_vst_logo.o
@@ -55,10 +56,13 @@ $(BUILD_DIR)/img_effects.o: gui/img/effects.png | $(BUILD_DIR)
 $(BUILD_DIR)/img_envelopes.o: gui/img/envelopes.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
+$(BUILD_DIR)/img_knob_states-controlled.o: gui/img/knob_states-controlled.png | $(BUILD_DIR)
+	$(OBJCOPY) $< $@
+
 $(BUILD_DIR)/img_knob_states-free.o: gui/img/knob_states-free.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
-$(BUILD_DIR)/img_knob_states-controlled.o: gui/img/knob_states-controlled.png | $(BUILD_DIR)
+$(BUILD_DIR)/img_knob_states-none.o: gui/img/knob_states-none.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
 $(BUILD_DIR)/img_lfos.o: gui/img/lfos.png | $(BUILD_DIR)

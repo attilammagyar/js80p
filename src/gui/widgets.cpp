@@ -510,10 +510,12 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 ParamEditorKnobStates::ParamEditorKnobStates(
         WidgetBase* widget,
         GUI::Image free_image,
-        GUI::Image controlled_image
+        GUI::Image controlled_image,
+        GUI::Image none_image
 ) : widget(widget),
     free_image(free_image),
-    controlled_image(controlled_image)
+    controlled_image(controlled_image),
+    none_image(none_image)
 {
     for (int i = 0; i != COUNT; ++i) {
         int const top = i * ParamEditor::KNOB_HEIGHT;
@@ -532,6 +534,7 @@ ParamEditorKnobStates::~ParamEditorKnobStates()
 {
     widget->delete_image(free_image);
     widget->delete_image(controlled_image);
+    widget->delete_image(none_image);
 
     for (int i = 0; i != COUNT; ++i) {
         widget->delete_image(free_images[i]);
@@ -543,6 +546,7 @@ ParamEditorKnobStates::~ParamEditorKnobStates()
 
     free_image = NULL;
     controlled_image = NULL;
+    none_image = NULL;
 }
 
 
@@ -693,7 +697,7 @@ void ParamEditor::update_editor()
     redraw();
 
     if (has_controller_) {
-        knob->make_controlled();
+        knob->make_controlled(controller_id);
     } else {
         knob->make_free();
     }
@@ -783,7 +787,7 @@ bool ParamEditor::paint()
     TransparentWidget::paint();
 
     draw_text(
-        value_str,
+        Synth::is_controller_polyphonic(controller_id) ? "" : value_str,
         value_font_size,
         1,
         HEIGHT - 20,
@@ -857,6 +861,7 @@ ParamEditor::Knob::Knob(
     ratio(0.0),
     mouse_move_delta(0.0),
     is_controlled(false),
+    is_controller_polyphonic(false),
     is_editing_(false)
 {
     set_gui(gui);
@@ -890,6 +895,12 @@ void ParamEditor::Knob::update(Number const ratio)
 
 void ParamEditor::Knob::update()
 {
+    if (is_controller_polyphonic) {
+        set_image(knob_states->none_image);
+
+        return;
+    }
+
     int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
 
     if (is_controlled) {
@@ -907,9 +918,10 @@ void ParamEditor::Knob::make_free()
 }
 
 
-void ParamEditor::Knob::make_controlled()
+void ParamEditor::Knob::make_controlled(Synth::ControllerId const controller_id)
 {
     is_controlled = true;
+    is_controller_polyphonic = Synth::is_controller_polyphonic(controller_id);
     update();
 }
 

@@ -682,6 +682,12 @@ bool Synth::is_supported_midi_controller(
 }
 
 
+bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
+{
+        return controller_id >= ControllerId::ENVELOPE_1;
+}
+
+
 void Synth::pitch_wheel_change(
         Seconds const time_offset,
         Midi::Channel const channel,
