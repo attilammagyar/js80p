@@ -7,6 +7,9 @@ v1.1.3 (2023-??-??)
    Windows-style line breaks
  * Bugfix: fix libcairo2 crash when the plugin's window is closed and opened
    again repeatedly in quick succession on Linux
+ * Bugfix: fix crash in the FST plugin when running in Ardour (and possibly
+   other hosts) which sends and effEditIdle message before sending the first
+   effEditOpen
 
 v1.1.2 (2023-05-03)
  * Bugfix: don't block the host's user interface while the file picker dialog

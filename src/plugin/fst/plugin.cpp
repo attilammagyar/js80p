@@ -366,6 +366,14 @@ void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 
 void FstPlugin::gui_idle()
 {
+    /*
+    Some hosts (e.g. Ardour 5.12.0) send an effEditIdle message before sending
+    the first effEditOpen.
+    */
+    if (gui == NULL) {
+        return;
+    }
+
     gui->idle();
 }
 
