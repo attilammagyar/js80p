@@ -122,6 +122,8 @@ class Vst3Plugin
                 void process_events() noexcept;
                 void process_event(Event const event) noexcept;
 
+                void update_bpm(Vst::ProcessData& data) noexcept;
+
                 void generate_samples(Vst::ProcessData& data) noexcept;
 
                 template<typename NumberType>

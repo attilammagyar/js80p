@@ -96,19 +96,18 @@ SignalProducer::SignalProducer(
     : channels(0 <= channels ? channels : 0),
     buffer(NULL),
     last_sample_count(0),
-    block_size(0),
+    block_size(DEFAULT_BLOCK_SIZE),
+    sample_rate(DEFAULT_SAMPLE_RATE),
+    sampling_period(1.0 / (Seconds)DEFAULT_SAMPLE_RATE),
+    nyquist_frequency(DEFAULT_SAMPLE_RATE * 0.5),
+    bpm(DEFAULT_BPM),
     current_time(0.0),
     cached_round(-1),
     cached_buffer(NULL)
 {
     children.reserve(number_of_children);
 
-    block_size = DEFAULT_BLOCK_SIZE;
     buffer = allocate_buffer();
-
-    sample_rate = DEFAULT_SAMPLE_RATE;
-    sampling_period = 1.0 / (Seconds)DEFAULT_SAMPLE_RATE;
-    nyquist_frequency = DEFAULT_SAMPLE_RATE * 0.5;
 }
 
 
@@ -216,6 +215,28 @@ void SignalProducer::reset() noexcept
     for (Children::iterator it = children.begin(); it != children.end(); ++it) {
         (*it)->reset();
     }
+}
+
+
+void SignalProducer::set_bpm(Number const new_bpm) noexcept
+{
+    constexpr Number threshold = 0.000001;
+
+    if (new_bpm < threshold || std::fabs(bpm - new_bpm) < threshold) {
+        return;
+    }
+
+    bpm = new_bpm;
+
+    for (Children::iterator it = children.begin(); it != children.end(); ++it) {
+        (*it)->set_bpm(new_bpm);
+    }
+}
+
+
+Number SignalProducer::get_bpm() const noexcept
+{
+    return bpm;
 }
 
 

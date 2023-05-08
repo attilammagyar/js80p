@@ -110,6 +110,7 @@ class FstPlugin
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
 
+        void update_bpm() noexcept;
         Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
 
         AEffect* const effect;

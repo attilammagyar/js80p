@@ -42,6 +42,20 @@ TEST(basic_properties, {
 })
 
 
+TEST(too_small_bpm_values_are_ignored, {
+    SignalProducer signal_producer(1);
+
+    signal_producer.set_bpm(0.0);
+    assert_eq(SignalProducer::DEFAULT_BPM, signal_producer.get_bpm(), DOUBLE_DELTA);
+
+    signal_producer.set_bpm(-120.0);
+    assert_eq(SignalProducer::DEFAULT_BPM, signal_producer.get_bpm(), DOUBLE_DELTA);
+
+    signal_producer.set_bpm(180.0);
+    assert_eq(180.0, signal_producer.get_bpm(), DOUBLE_DELTA);
+})
+
+
 class CompositeSignalProducer : public SignalProducer
 {
     friend class SignalProducer;
@@ -63,6 +77,11 @@ class CompositeSignalProducer : public SignalProducer
                     SignalProducer::reset();
 
                     is_clean = true;
+                }
+
+                void set_cache_test_bpm(Number const cache_test_bpm) noexcept
+                {
+                    set_bpm(cache_test_bpm);
                 }
 
                 bool is_clean;
@@ -96,12 +115,15 @@ class CompositeSignalProducer : public SignalProducer
 TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 48000.0;
+    constexpr Number bpm = 144;
+    constexpr Number cache_test_bpm = 0.123;
     constexpr Sample expected_samples[] = {0.0, 0.0, 0.0, 0.0, 0.0};
     Integer last_rendered_sample_count;
     CompositeSignalProducer composite_signal_producer;
 
     composite_signal_producer.set_block_size(block_size);
     composite_signal_producer.set_sample_rate(sample_rate);
+    composite_signal_producer.set_bpm(bpm);
     composite_signal_producer.child.schedule(
         CompositeSignalProducer::ChildSignalProducer::EVT_TEST, 0.0
     );
@@ -110,6 +132,7 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
 
     assert_eq((int)block_size, (int)composite_signal_producer.child.get_block_size());
     assert_eq(sample_rate, composite_signal_producer.child.get_sample_rate(), DOUBLE_DELTA);
+    assert_eq(bpm, composite_signal_producer.child.get_bpm(), DOUBLE_DELTA);
     assert_true(composite_signal_producer.child.is_clean);
     assert_false(composite_signal_producer.child.has_events_after(0.0));
     assert_eq(
@@ -121,6 +144,10 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
         DOUBLE_DELTA,
         "channel=0"
     );
+
+    composite_signal_producer.child.set_cache_test_bpm(cache_test_bpm);
+    composite_signal_producer.set_bpm(bpm);
+    assert_eq(cache_test_bpm, composite_signal_producer.child.get_bpm());
 })
 
 

@@ -135,6 +135,7 @@ FUnknown* Vst3Plugin::Processor::createInstance(void* unused)
 Vst3Plugin::Processor::Processor() : synth(), round(-1), events(4096)
 {
     setControllerClass(Controller::ID);
+    processContextRequirements.needTempo();
 }
 
 
@@ -259,6 +260,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
         return kResultOk;
     }
 
+    update_bpm(data);
     generate_samples(data);
 
     return kResultOk;
@@ -424,6 +426,19 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
         default:
             break;
     }
+}
+
+
+void Vst3Plugin::Processor::update_bpm(Vst::ProcessData& data) noexcept
+{
+    if (
+            data.processContext == NULL
+            || (data.processContext->state & Vst::ProcessContext::StatesAndFlags::kTempoValid) == 0
+    ) {
+        return;
+    }
+
+    synth.set_bpm((Number)data.processContext->tempo);
 }
 
 

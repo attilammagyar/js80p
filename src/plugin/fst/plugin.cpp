@@ -576,8 +576,23 @@ void FstPlugin::generate_samples(
 Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
 {
     round = (round + 1) & ROUND_MASK;
+    update_bpm();
 
     return synth.generate_samples(round, (Integer)sample_count);
+}
+
+
+void FstPlugin::update_bpm() noexcept
+{
+    VstTimeInfo const* time_info = (
+        (VstTimeInfo const*)host_callback(effect, audioMasterGetTime, 0, kVstTempoValid, NULL, 0.0f)
+    );
+
+    if (time_info == NULL || (time_info->flags & kVstTempoValid) == 0) {
+        return;
+    }
+
+    synth.set_bpm((Number)time_info->tempo);
 }
 
 

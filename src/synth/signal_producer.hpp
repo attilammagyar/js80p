@@ -62,6 +62,12 @@ class SignalProducer
         static constexpr Integer DEFAULT_BLOCK_SIZE = 128;
         static constexpr Frequency DEFAULT_SAMPLE_RATE = 44100.0;
 
+        /*
+        Default to 60, so that 1 beat = 1 second, so when no BPM info is
+        available, then toggling tempo-sync becomes no-op.
+        */
+        static constexpr Number DEFAULT_BPM = 60.0;
+
         static constexpr Event::Type EVT_CANCEL = 0;
 
         /**
@@ -112,6 +118,10 @@ class SignalProducer
         Integer get_block_size() const noexcept;
 
         virtual void reset() noexcept;
+
+        void set_bpm(Number const new_bpm) noexcept;
+        Number get_bpm() const noexcept;
+
 
         Sample const* const* get_last_rendered_block(
             Integer& sample_count
@@ -188,8 +198,9 @@ class SignalProducer
         Integer last_sample_count;
         Integer block_size;
         Frequency sample_rate;
-        Frequency nyquist_frequency;
         Seconds sampling_period;
+        Frequency nyquist_frequency;
+        Number bpm;
         Seconds current_time;
         Integer cached_round;
         Sample const* const* cached_buffer;
