@@ -43,20 +43,26 @@ constexpr Integer BLOCK_SIZE = 2048;
 constexpr Integer CHANNELS = 1;
 
 
-TEST(lfo_oscillates_between_min_and_max_times_amount, {
+void test_lfo(
+        Toggle const tempo_sync,
+        Number const bpm,
+        Frequency const frequency,
+        Frequency const expected_frequency
+) {
     constexpr Integer rounds = 20;
     constexpr Integer sample_count = BLOCK_SIZE * rounds;
-    constexpr Frequency frequency = 20.0;
     constexpr Number phase = 0.3333;
     constexpr Number min = 0.1;
     constexpr Number max = 0.7;
     constexpr Number amount = 0.75 * 0.5;
     constexpr Number range = max - min;
-    constexpr Seconds phase_seconds = phase / frequency;
+
+    Seconds const phase_seconds = phase / expected_frequency;
+
     LFO lfo("L1");
     SumOfSines expected(
         amount * range,
-        frequency,
+        expected_frequency,
         0.0,
         0.0,
         0.0,
@@ -73,6 +79,7 @@ TEST(lfo_oscillates_between_min_and_max_times_amount, {
 
     lfo.set_block_size(BLOCK_SIZE);
     lfo.set_sample_rate(SAMPLE_RATE);
+    lfo.set_bpm(bpm);
     lfo.waveform.set_value(LFO::Oscillator_::SINE);
     lfo.phase.set_value(phase - 0.000001);
     lfo.phase.schedule_value(0.001, phase);
@@ -84,6 +91,7 @@ TEST(lfo_oscillates_between_min_and_max_times_amount, {
     lfo.max.schedule_value(0.6, max);
     lfo.amount.set_value(amount - 0.000001);
     lfo.amount.schedule_value(0.8, amount);
+    lfo.tempo_sync.set_value(tempo_sync);
     lfo.start(0.0);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
@@ -92,4 +100,10 @@ TEST(lfo_oscillates_between_min_and_max_times_amount, {
     assert_eq(
         expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
     );
+}
+
+
+TEST(lfo_oscillates_between_min_and_max_times_amount, {
+    test_lfo(ToggleParam::OFF, 180.0, 2.0, 2.0);
+    test_lfo(ToggleParam::ON, 180.0, 2.0, 6.0);
 })

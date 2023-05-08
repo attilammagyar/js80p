@@ -28,7 +28,7 @@ namespace JS80P
 {
 
 LFO::LFO(std::string const name) noexcept
-    : SignalProducer(1, 9),
+    : SignalProducer(1, 10),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(name + "FRQ", 0.01, 30.0, 1.0),
     phase(name + "PHS", 0.0, 1.0, 0.0),
@@ -37,7 +37,8 @@ LFO::LFO(std::string const name) noexcept
     amount(name + "AMT", 0.0, 0.5, 0.5),
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
-    oscillator(waveform, amount, frequency, phase)
+    tempo_sync(name + "SYN", ToggleParam::OFF),
+    oscillator(waveform, amount, frequency, phase, tempo_sync)
 {
     register_child(waveform);
     register_child(frequency);
@@ -47,6 +48,7 @@ LFO::LFO(std::string const name) noexcept
     register_child(amount);
     register_child(distortion);
     register_child(randomness);
+    register_child(tempo_sync);
     register_child(oscillator);
 }
 

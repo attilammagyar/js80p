@@ -108,6 +108,21 @@ class Param : public SignalProducer
 };
 
 
+typedef Byte Toggle;
+
+
+class ToggleParam : public Param<Toggle>
+{
+    friend class SignalProducer;
+
+    public:
+        static constexpr Toggle OFF = 0;
+        static constexpr Toggle ON = 1;
+
+        ToggleParam(std::string const name, Toggle const default_value);
+};
+
+
 /**
  * \brief Parameter with floating point values. Values can be scheduled at
  *        time offsets, or can be approached linearly over a given duration of

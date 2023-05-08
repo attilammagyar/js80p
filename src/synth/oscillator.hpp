@@ -74,20 +74,23 @@ class Oscillator : public SignalProducer
         static constexpr Event::Type EVT_STOP = 2;
 
         static FloatParam dummy_param;
+        static ToggleParam dummy_toggle;
 
         Oscillator(
             WaveformParam& waveform,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
             FloatParam& frequency_modulation_level_leader = dummy_param,
-            FloatParam& phase_modulation_level_leader = dummy_param
+            FloatParam& phase_modulation_level_leader = dummy_param,
+            ToggleParam& tempo_sync = dummy_toggle
         ) noexcept;
 
         Oscillator(
             WaveformParam& waveform,
             FloatParam& amplitude_leader,
             FloatParam& frequency_leader,
-            FloatParam& phase_leader
+            FloatParam& phase_leader,
+            ToggleParam& tempo_sync = dummy_toggle
         ) noexcept;
 
         Oscillator(
@@ -161,6 +164,8 @@ class Oscillator : public SignalProducer
         static constexpr Number FREQUENCY_MAX = 24000.0;
         static constexpr Number FREQUENCY_DEFAULT = 440.0;
 
+        static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
+
         static constexpr Integer NUMBER_OF_CHILDREN = 17;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
@@ -214,6 +219,7 @@ class Oscillator : public SignalProducer
             Sample const phase
         ) noexcept;
 
+        ToggleParam& tempo_sync;
         WavetableState wavetable_state;
         Wavetable const* wavetables[WAVEFORMS];
         Wavetable const* wavetable;
@@ -228,6 +234,7 @@ class Oscillator : public SignalProducer
         Frequency computed_frequency_value;
         Number phase_value;
         Seconds start_time_offset;
+        Number frequency_scale;
         bool is_on;
         bool is_starting;
         bool computed_frequency_is_constant;

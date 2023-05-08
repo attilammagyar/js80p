@@ -32,6 +32,9 @@ namespace JS80P
 template<class ModulatorSignalProducerClass, bool positive>
 FloatParam Oscillator<ModulatorSignalProducerClass, positive>::dummy_param("", 0.0, 0.0, 0.0);
 
+template<class ModulatorSignalProducerClass, bool positive>
+ToggleParam Oscillator<ModulatorSignalProducerClass, positive>::dummy_toggle("", ToggleParam::OFF);
+
 
 template<class ModulatorSignalProducerClass, bool positive>
 Oscillator<ModulatorSignalProducerClass, positive>::WaveformParam::WaveformParam(
@@ -48,7 +51,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader,
-        FloatParam& phase_modulation_level_leader
+        FloatParam& phase_modulation_level_leader,
+        ToggleParam& tempo_sync
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -98,7 +102,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6("", -1.0, 1.0, 0.0),
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0)
+    harmonic_9("", -1.0, 1.0, 0.0),
+    tempo_sync(tempo_sync)
 {
     initialize_instance();
 }
@@ -115,6 +120,7 @@ void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() n
     computed_amplitude_buffer = NULL;
     phase_buffer = NULL;
     start_time_offset = 0.0;
+    frequency_scale = 1.0;
     is_on = false;
     is_starting = false;
 
@@ -176,7 +182,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
         WaveformParam& waveform,
         FloatParam& amplitude_leader,
         FloatParam& frequency_leader,
-        FloatParam& phase_leader
+        FloatParam& phase_leader,
+        ToggleParam& tempo_sync
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -205,7 +212,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6("", -1.0, 1.0, 0.0),
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0)
+    harmonic_9("", -1.0, 1.0, 0.0),
+    tempo_sync(tempo_sync)
 {
     initialize_instance();
 }
@@ -270,7 +278,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6(harmonic_6_leader),
     harmonic_7(harmonic_7_leader),
     harmonic_8(harmonic_8_leader),
-    harmonic_9(harmonic_9_leader)
+    harmonic_9(harmonic_9_leader),
+    tempo_sync(dummy_toggle)
 {
     initialize_instance();
 }
@@ -411,6 +420,12 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, positive>::initial
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    frequency_scale = (
+        tempo_sync.get_value() == ToggleParam::ON
+            ? bpm * TEMPO_SYNC_FREQUENCY_SCALE
+            : 1.0
+    );
+
     Waveform const waveform = this->waveform.get_value();
 
     if (waveform == CUSTOM) {
@@ -828,7 +843,9 @@ Sample Oscillator<ModulatorSignalProducerClass, positive>::render_sample(
         Sample const frequency,
         Sample const phase
 ) noexcept {
-    Sample const sample = amplitude * wavetable->lookup(&wavetable_state, frequency, phase);
+    Sample const sample = amplitude * wavetable->lookup(
+        &wavetable_state, frequency * frequency_scale, phase
+    );
 
     if (positive) {
         return sample + amplitude;

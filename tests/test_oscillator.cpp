@@ -1125,3 +1125,34 @@ TEST(resetting_the_oscillator_turns_it_off, {
         expected_samples, rendered_samples.samples[0], sample_count, DOUBLE_DELTA
     );
 })
+
+
+TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_beats_instead_of_seconds, {
+    constexpr Frequency frequency = 100.0;
+    constexpr Number scale = 3.0;
+    constexpr Number bpm = scale * 60.0;
+    constexpr Frequency expeced_frequency = scale * frequency;
+    constexpr Integer block_size = 128;
+
+    ReferenceSine reference(expeced_frequency);
+    SimpleOscillator::WaveformParam waveform_param("");
+    ToggleParam tempo_sync("SYN", ToggleParam::ON);
+    SimpleOscillator oscillator(
+        waveform_param,
+        NULL,
+        SimpleOscillator::dummy_param,
+        SimpleOscillator::dummy_param,
+        SimpleOscillator::dummy_param,
+        tempo_sync
+    );
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+    oscillator.set_bpm(bpm);
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.frequency.set_value(frequency);
+
+    assert_oscillator_output_is_close_to_reference(
+        reference, oscillator, SAMPLE_RATE, block_size, 5, 0.000001, SimpleOscillator::SINE
+    );
+});

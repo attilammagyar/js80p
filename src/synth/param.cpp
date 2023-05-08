@@ -205,6 +205,12 @@ void Param<NumberType>::render(
 }
 
 
+ToggleParam::ToggleParam(std::string const name, Toggle const default_value)
+    : Param<Toggle>(name, OFF, ON, default_value)
+{
+}
+
+
 template<class FloatParamClass>
 Sample const* const* FloatParam::produce(
         FloatParamClass* float_param,
