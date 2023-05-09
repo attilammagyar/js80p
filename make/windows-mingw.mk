@@ -5,12 +5,7 @@ TARGET_PLATFORM_CXXFLAGS = \
 	-D UNICODE \
 	-D _UNICODE
 
-TARGET_PLATFORM_CXXINCS = \
-	-I$(ROOT_DIR)/lib/gcc/x86_64-w64-mingw32/12.2.0/include \
-	-I$(ROOT_DIR)/include/c++/12.2.0/backward \
-	-I$(ROOT_DIR)/include/c++/12.2.0/x86_64-w64-mingw32 \
-	-I$(ROOT_DIR)/include/c++/12.2.0 \
-	-I$(ROOT_DIR)/include
+TARGET_PLATFORM_CXXINCS =
 
 RM = del /q
 MKDIR = mkdir
