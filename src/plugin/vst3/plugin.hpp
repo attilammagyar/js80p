@@ -132,10 +132,7 @@ class Vst3Plugin
 
                 Sample const* const* render_next_round(Integer const sample_count) noexcept;
 
-                std::string read_stream(
-                    IBStream* stream,
-                    Integer const max_size
-                ) const;
+                std::string read_serialized_patch(IBStream* stream) const;
 
                 Synth synth;
                 Integer round;

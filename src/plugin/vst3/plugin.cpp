@@ -481,7 +481,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
         return kResultFalse;
     }
 
-    std::string const serialized = read_stream(state, Serializer::MAX_SIZE);
+    std::string const serialized = read_serialized_patch(state);
 
     synth.process_messages();
     Serializer::import(&synth, serialized);
@@ -491,10 +491,8 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
 }
 
 
-std::string Vst3Plugin::Processor::read_stream(
-        IBStream* stream,
-        Integer const max_size
-) const {
+std::string Vst3Plugin::Processor::read_serialized_patch(IBStream* stream) const
+{
     /*
     Not using FStreamer::readString8(), because we need the entire string here,
     and that method stops at line breaks, handles Unix-style line breaks
@@ -504,12 +502,12 @@ std::string Vst3Plugin::Processor::read_stream(
     https://github.com/steinbergmedia/vst3_base/pull/5
     */
 
-    char* buffer = new char[max_size];
+    char* buffer = new char[Serializer::MAX_SIZE];
     Integer i;
     int32 numBytesRead;
     char8 c;
 
-    for (i = 0; i != max_size; ++i) {
+    for (i = 0; i != Serializer::MAX_SIZE; ++i) {
         stream->read(&c, sizeof(char8), &numBytesRead);
 
         if (numBytesRead != sizeof(char8) || c == '\x00') {
@@ -519,8 +517,8 @@ std::string Vst3Plugin::Processor::read_stream(
         buffer[i] = c;
     }
 
-    if (i >= max_size) {
-        i = max_size - 1;
+    if (i >= Serializer::MAX_SIZE) {
+        i = Serializer::MAX_SIZE - 1;
     }
 
     buffer[i] = '\x00';
