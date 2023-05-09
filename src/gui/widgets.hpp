@@ -122,6 +122,8 @@ class TabBody : public TransparentWidget
 
         TabBody(char const* const text);
 
+        using TransparentWidget::own;
+
         ParamEditor* own(ParamEditor* param_editor);
 
         void stop_editing();
