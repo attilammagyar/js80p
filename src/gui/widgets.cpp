@@ -914,6 +914,7 @@ void ParamEditor::Knob::update()
 void ParamEditor::Knob::make_free()
 {
     is_controlled = false;
+    is_controller_polyphonic = false;
     update();
 }
 
