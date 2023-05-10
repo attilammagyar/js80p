@@ -478,6 +478,15 @@ void Synth::create_lfos() noexcept
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L6WAV, lfos_rw[5]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
+
+    register_param<ToggleParam>(ParamId::L1SYN, lfos_rw[0]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L2SYN, lfos_rw[1]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L3SYN, lfos_rw[2]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L4SYN, lfos_rw[3]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L5SYN, lfos_rw[4]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L6SYN, lfos_rw[5]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L7SYN, lfos_rw[6]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L8SYN, lfos_rw[7]->tempo_sync);
 }
 
 
@@ -808,6 +817,14 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_default_ratio();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_default_ratio();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_default_ratio();
+        case ParamId::L1SYN: return lfos_rw[0]->tempo_sync.get_default_ratio();
+        case ParamId::L2SYN: return lfos_rw[1]->tempo_sync.get_default_ratio();
+        case ParamId::L3SYN: return lfos_rw[2]->tempo_sync.get_default_ratio();
+        case ParamId::L4SYN: return lfos_rw[3]->tempo_sync.get_default_ratio();
+        case ParamId::L5SYN: return lfos_rw[4]->tempo_sync.get_default_ratio();
+        case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_default_ratio();
+        case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_default_ratio();
+        case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_default_ratio();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -837,6 +854,14 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_max_value();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_max_value();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_max_value();
+        case ParamId::L1SYN: return lfos_rw[0]->tempo_sync.get_max_value();
+        case ParamId::L2SYN: return lfos_rw[1]->tempo_sync.get_max_value();
+        case ParamId::L3SYN: return lfos_rw[2]->tempo_sync.get_max_value();
+        case ParamId::L4SYN: return lfos_rw[3]->tempo_sync.get_max_value();
+        case ParamId::L5SYN: return lfos_rw[4]->tempo_sync.get_max_value();
+        case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_max_value();
+        case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_max_value();
+        case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_max_value();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -876,6 +901,14 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6WAV: return lfos_rw[5]->waveform.ratio_to_value(ratio);
         case ParamId::L7WAV: return lfos_rw[6]->waveform.ratio_to_value(ratio);
         case ParamId::L8WAV: return lfos_rw[7]->waveform.ratio_to_value(ratio);
+        case ParamId::L1SYN: return lfos_rw[0]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L2SYN: return lfos_rw[1]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L3SYN: return lfos_rw[2]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L4SYN: return lfos_rw[3]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L5SYN: return lfos_rw[4]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -973,6 +1006,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6WAV: lfos_rw[5]->waveform.set_ratio(ratio); break;
             case ParamId::L7WAV: lfos_rw[6]->waveform.set_ratio(ratio); break;
             case ParamId::L8WAV: lfos_rw[7]->waveform.set_ratio(ratio); break;
+            case ParamId::L1SYN: lfos_rw[0]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L2SYN: lfos_rw[1]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L3SYN: lfos_rw[2]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L4SYN: lfos_rw[3]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L5SYN: lfos_rw[4]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L6SYN: lfos_rw[5]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L7SYN: lfos_rw[6]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L8SYN: lfos_rw[7]->tempo_sync.set_ratio(ratio); break;
             default: break; // This should never be reached.
         }
     }
@@ -1148,6 +1189,14 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_ratio();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_ratio();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_ratio();
+        case ParamId::L1SYN: return lfos_rw[0]->tempo_sync.get_ratio();
+        case ParamId::L2SYN: return lfos_rw[1]->tempo_sync.get_ratio();
+        case ParamId::L3SYN: return lfos_rw[2]->tempo_sync.get_ratio();
+        case ParamId::L4SYN: return lfos_rw[3]->tempo_sync.get_ratio();
+        case ParamId::L5SYN: return lfos_rw[4]->tempo_sync.get_ratio();
+        case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_ratio();
+        case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_ratio();
+        case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }

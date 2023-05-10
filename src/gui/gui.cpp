@@ -409,6 +409,15 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L6WAV] = "LFO 6 Waveform",
     [Synth::ParamId::L7WAV] = "LFO 7 Waveform",
     [Synth::ParamId::L8WAV] = "LFO 8 Waveform",
+
+    [Synth::ParamId::L1SYN] = "LFO 1 Tempo Synchronization",
+    [Synth::ParamId::L2SYN] = "LFO 2 Tempo Synchronization",
+    [Synth::ParamId::L3SYN] = "LFO 3 Tempo Synchronization",
+    [Synth::ParamId::L4SYN] = "LFO 4 Tempo Synchronization",
+    [Synth::ParamId::L5SYN] = "LFO 5 Tempo Synchronization",
+    [Synth::ParamId::L6SYN] = "LFO 6 Tempo Synchronization",
+    [Synth::ParamId::L7SYN] = "LFO 7 Tempo Synchronization",
+    [Synth::ParamId::L8SYN] = "LFO 8 Tempo Synchronization",
 };
 
 
@@ -1094,6 +1103,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body,  16 + PE_W * 5,  32, Synth::ParamId::L1AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body,  16 + PE_W * 6,  32, Synth::ParamId::L1DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body,  16 + PE_W * 7,  32, Synth::ParamId::L1RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 372,   6, 111, 87, Synth::ParamId::L1SYN);
 
     PE(lfos_body, 496 + PE_W * 0,  32, Synth::ParamId::L2WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body, 496 + PE_W * 1,  32, Synth::ParamId::L2FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1103,6 +1113,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body, 496 + PE_W * 5,  32, Synth::ParamId::L2AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body, 496 + PE_W * 6,  32, Synth::ParamId::L2DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body, 496 + PE_W * 7,  32, Synth::ParamId::L2RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 852,   6, 111, 87, Synth::ParamId::L2SYN);
 
     PE(lfos_body,  16 + PE_W * 0, 172, Synth::ParamId::L3WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body,  16 + PE_W * 1, 172, Synth::ParamId::L3FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1112,6 +1123,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body,  16 + PE_W * 5, 172, Synth::ParamId::L3AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body,  16 + PE_W * 6, 172, Synth::ParamId::L3DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body,  16 + PE_W * 7, 172, Synth::ParamId::L3RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 372, 146, 111, 87, Synth::ParamId::L3SYN);
 
     PE(lfos_body, 496 + PE_W * 0, 172, Synth::ParamId::L4WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body, 496 + PE_W * 1, 172, Synth::ParamId::L4FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1121,6 +1133,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body, 496 + PE_W * 5, 172, Synth::ParamId::L4AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body, 496 + PE_W * 6, 172, Synth::ParamId::L4DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body, 496 + PE_W * 7, 172, Synth::ParamId::L4RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 852, 146, 111, 87, Synth::ParamId::L4SYN);
 
     PE(lfos_body,  16 + PE_W * 0, 312, Synth::ParamId::L5WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body,  16 + PE_W * 1, 312, Synth::ParamId::L5FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1130,6 +1143,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body,  16 + PE_W * 5, 312, Synth::ParamId::L5AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body,  16 + PE_W * 6, 312, Synth::ParamId::L5DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body,  16 + PE_W * 7, 312, Synth::ParamId::L5RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 372, 286, 111, 87, Synth::ParamId::L5SYN);
 
     PE(lfos_body, 496 + PE_W * 0, 312, Synth::ParamId::L6WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body, 496 + PE_W * 1, 312, Synth::ParamId::L6FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1139,6 +1153,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body, 496 + PE_W * 5, 312, Synth::ParamId::L6AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body, 496 + PE_W * 6, 312, Synth::ParamId::L6DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body, 496 + PE_W * 7, 312, Synth::ParamId::L6RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 852, 286, 111, 87, Synth::ParamId::L6SYN);
 
     PE(lfos_body,  16 + PE_W * 0, 452, Synth::ParamId::L7WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body,  16 + PE_W * 1, 452, Synth::ParamId::L7FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1148,6 +1163,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body,  16 + PE_W * 5, 452, Synth::ParamId::L7AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body,  16 + PE_W * 6, 452, Synth::ParamId::L7DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body,  16 + PE_W * 7, 452, Synth::ParamId::L7RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 372, 426, 111, 87, Synth::ParamId::L7SYN);
 
     PE(lfos_body, 496 + PE_W * 0, 452, Synth::ParamId::L8WAV,  MIDI_CTLS, wf, wfc, knob_states);
     PE(lfos_body, 496 + PE_W * 1, 452, Synth::ParamId::L8FRQ,  LFO_CTLS, "%.2f", 1.0, knob_states);
@@ -1157,6 +1173,7 @@ void GUI::build_lfos_body(ParamEditorKnobStates* knob_states)
     PE(lfos_body, 496 + PE_W * 5, 452, Synth::ParamId::L8AMT,  LFO_CTLS, "%.2f", 200.0, knob_states);
     PE(lfos_body, 496 + PE_W * 6, 452, Synth::ParamId::L8DST,  LFO_CTLS, "%.2f", 100.0, knob_states);
     PE(lfos_body, 496 + PE_W * 7, 452, Synth::ParamId::L8RND,  LFO_CTLS, "%.2f", 100.0, knob_states);
+    TS(lfos_body, 852, 426, 111, 87, Synth::ParamId::L8SYN);
 
     lfos_body->hide();
 }

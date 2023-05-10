@@ -395,8 +395,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6WAV = 269,     ///< LFO 6 Waveform
             L7WAV = 270,     ///< LFO 7 Waveform
             L8WAV = 271,     ///< LFO 8 Waveform
+            L1SYN = 272,     ///< LFO 1 Tempo Synchronization
+            L2SYN = 273,     ///< LFO 2 Tempo Synchronization
+            L3SYN = 274,     ///< LFO 3 Tempo Synchronization
+            L4SYN = 275,     ///< LFO 4 Tempo Synchronization
+            L5SYN = 276,     ///< LFO 5 Tempo Synchronization
+            L6SYN = 277,     ///< LFO 6 Tempo Synchronization
+            L7SYN = 278,     ///< LFO 7 Tempo Synchronization
+            L8SYN = 279,     ///< LFO 8 Tempo Synchronization
 
-            MAX_PARAM_ID = 272
+            MAX_PARAM_ID = 280
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
@@ -794,8 +802,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x80;
                 static constexpr Integer MASK = 0x7f;
-                static constexpr Integer MULTIPLIER = 15757;
-                static constexpr Integer SHIFT = 11;
+                static constexpr Integer MULTIPLIER = 125123;
+                static constexpr Integer SHIFT = 14;
 
                 static Integer hash(char const* name) noexcept;
 
