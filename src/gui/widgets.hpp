@@ -394,6 +394,7 @@ class ParamEditor : public TransparentWidget
                 void make_controlled(Synth::ControllerId const controller_id);
 
                 bool is_editing() const;
+                void start_editing();
                 void stop_editing();
 
             protected:

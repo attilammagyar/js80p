@@ -933,6 +933,12 @@ bool ParamEditor::Knob::is_editing() const
 }
 
 
+void ParamEditor::Knob::start_editing()
+{
+    is_editing_ = true;
+}
+
+
 void ParamEditor::Knob::stop_editing()
 {
     is_editing_ = false;
@@ -994,7 +1000,7 @@ bool ParamEditor::Knob::mouse_move(
 
     gui->set_status_line(text);
 
-    is_editing_ = true;
+    start_editing();
 
     if (is_controlled) {
         return false;
