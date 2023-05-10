@@ -20,6 +20,7 @@
 #define JS80P__SYNTH__OSCILLATOR_HPP
 
 #include <string>
+#include <type_traits>
 
 #include "js80p.hpp"
 
@@ -31,14 +32,14 @@
 namespace JS80P
 {
 
-template<class ModulatorSignalProducerClass, bool positive>
+template<class ModulatorSignalProducerClass, bool is_lfo>
 class Oscillator;
 
 
 typedef Oscillator<SignalProducer, false> SimpleOscillator;
 
 
-template<class ModulatorSignalProducerClass, bool positive = false>
+template<class ModulatorSignalProducerClass, bool is_lfo = false>
 class Oscillator : public SignalProducer
 {
     friend class SignalProducer;
@@ -174,6 +175,16 @@ class Oscillator : public SignalProducer
         void allocate_buffers(Integer const size) noexcept;
         void free_buffers() noexcept;
 
+        template<bool is_lfo_>
+        void initialize_frequency_scale(
+            typename std::enable_if<is_lfo_, Number const>::type bpm
+        ) noexcept;
+
+        template<bool is_lfo_>
+        void initialize_frequency_scale(
+            typename std::enable_if<!is_lfo_, Number const>::type bpm
+        ) noexcept;
+
         void compute_amplitude_buffer(
             Integer const round,
             Integer const sample_count
@@ -213,10 +224,18 @@ class Oscillator : public SignalProducer
             Sample** buffer
         ) noexcept;
 
+        template<bool is_lfo_>
         Sample render_sample(
-            Sample const amplitude,
-            Sample const frequency,
-            Sample const phase
+            typename std::enable_if<is_lfo_, Sample const>::type amplitude,
+            typename std::enable_if<is_lfo_, Sample const>::type frequency,
+            typename std::enable_if<is_lfo_, Sample const>::type phase
+        ) noexcept;
+
+        template<bool is_lfo_>
+        Sample render_sample(
+            typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
+            typename std::enable_if<!is_lfo_, Sample const>::type frequency,
+            typename std::enable_if<!is_lfo_, Sample const>::type phase
         ) noexcept;
 
         ToggleParam& tempo_sync;

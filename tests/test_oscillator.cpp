@@ -45,6 +45,8 @@ constexpr Seconds ALMOST_IMMEDIATELY = 0.15 / (Seconds)SAMPLE_RATE;
 SimpleOscillator::WaveformParam wavetable_cache_waveform("WAV");
 SimpleOscillator wavetable_cache(wavetable_cache_waveform);
 
+typedef Oscillator<SignalProducer, true> SimpleLFO;
+
 
 class NonBandLimitedReferenceWaveform
 {
@@ -82,7 +84,8 @@ class ReferenceSine : public NonBandLimitedReferenceWaveform
         ReferenceSine(
                 Frequency const frequency_1,
                 Frequency const frequency_2 = 0.0,
-                Seconds const chirp_duration = 0.0
+                Seconds const chirp_duration = 0.0,
+                Number const offset = 0.0
         )
             : NonBandLimitedReferenceWaveform(frequency_1),
             chirp_rate(
@@ -91,13 +94,14 @@ class ReferenceSine : public NonBandLimitedReferenceWaveform
                         (Number)(frequency_2 - frequency_1)
                         / (Number)chirp_duration
                     ) : 0.0
-            )
+            ),
+            offset(offset)
         {
         }
 
         virtual Sample generate_sample(Seconds const time) const override
         {
-            return (Sample)std::sin(
+            return offset + (Sample)std::sin(
                 Math::PI_DOUBLE * (
                     (chirp_rate / 2.0) * (Number)(time * time)
                     + (Number)frequency * (Number)time
@@ -107,6 +111,7 @@ class ReferenceSine : public NonBandLimitedReferenceWaveform
 
     private:
         Number const chirp_rate;
+        Number const offset;
 };
 
 
@@ -213,14 +218,15 @@ class ReferenceSawtoothWithDisappearingPartial : public NonBandLimitedReferenceW
 };
 
 
+template<class OscillatorClass = SimpleOscillator>
 void assert_oscillator_output_is_close_to_reference(
         NonBandLimitedReferenceWaveform const& reference,
-        SimpleOscillator& oscillator,
+        OscillatorClass& oscillator,
         Frequency const sample_rate,
         Integer const block_size,
         Integer const rounds,
         Number const tolerance,
-        SimpleOscillator::Waveform const waveform = SimpleOscillator::SINE
+        typename OscillatorClass::Waveform const waveform = OscillatorClass::SINE
 ) {
     Integer const sample_count = rounds * block_size;
     Sample expected_samples[sample_count];
@@ -233,7 +239,7 @@ void assert_oscillator_output_is_close_to_reference(
         expected_samples[i] = reference.generate_sample(time);
     }
 
-    render_rounds<SimpleOscillator>(
+    render_rounds<OscillatorClass>(
         oscillator, rendered_samples, rounds, block_size
     );
 
@@ -289,32 +295,31 @@ TEST(basic_waveforms, {
 })
 
 
-TEST(can_apply_dc_offset_to_oscillate_between_0_and_2, {
-    typedef Oscillator<SignalProducer, true> PositiveOscillator;
+TEST(low_frequency_oscillator_applies_dc_offset_to_oscillate_between_0_and_2, {
     constexpr Frequency frequency = 100.0;
     constexpr Integer block_size = 128;
     constexpr Integer rounds = 5;
     constexpr Integer sample_count = rounds * block_size;
     constexpr Sample amplitude = 0.75;
-    ReferenceSine reference(frequency);
-    PositiveOscillator::WaveformParam waveform_param("");
-    PositiveOscillator oscillator(waveform_param);
+    ReferenceSine reference(frequency, 0.0, 0.0, 1.0);
+    SimpleLFO::WaveformParam waveform_param("");
+    SimpleLFO oscillator(waveform_param);
     Sample expected_samples[sample_count];
     Buffer rendered_samples(sample_count);
 
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(SAMPLE_RATE);
-    oscillator.waveform.set_value(PositiveOscillator::SINE);
+    oscillator.waveform.set_value(SimpleLFO::SINE);
     oscillator.frequency.set_value(frequency);
     oscillator.amplitude.set_value(amplitude);
     oscillator.start(0.0);
 
     for (Integer i = 0; i != sample_count; ++i) {
         Seconds const time = (Seconds)i / (Seconds)SAMPLE_RATE;
-        expected_samples[i] = (reference.generate_sample(time) + 1.0) * amplitude;
+        expected_samples[i] = amplitude * reference.generate_sample(time);
     }
 
-    render_rounds<PositiveOscillator>(
+    render_rounds<SimpleLFO>(
         oscillator, rendered_samples, rounds, block_size
     );
 
@@ -1134,10 +1139,10 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     constexpr Frequency expeced_frequency = scale * frequency;
     constexpr Integer block_size = 128;
 
-    ReferenceSine reference(expeced_frequency);
-    SimpleOscillator::WaveformParam waveform_param("");
+    ReferenceSine reference(expeced_frequency, 0.0, 0.0, 1.0);
+    SimpleLFO::WaveformParam waveform_param("");
     ToggleParam tempo_sync("SYN", ToggleParam::ON);
-    SimpleOscillator oscillator(
+    SimpleLFO oscillator(
         waveform_param,
         NULL,
         SimpleOscillator::dummy_param,
@@ -1149,10 +1154,10 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(SAMPLE_RATE);
     oscillator.set_bpm(bpm);
-    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.waveform.set_value(SimpleLFO::SINE);
     oscillator.frequency.set_value(frequency);
 
-    assert_oscillator_output_is_close_to_reference(
+    assert_oscillator_output_is_close_to_reference<SimpleLFO>(
         reference, oscillator, SAMPLE_RATE, block_size, 5, 0.000001, SimpleOscillator::SINE
     );
 });
