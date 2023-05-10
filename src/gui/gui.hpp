@@ -221,18 +221,18 @@ class WidgetBase
 {
     public:
         enum Type {
-            BACKGROUND = 1,
-            CONTROLLER = 2,
-            CONTROLLER_SELECTOR = 4,
-            EXPORT_PATCH_BUTTON = 8,
-            EXTERNALLY_CREATED_WINDOW = 16,
-            IMPORT_PATCH_BUTTON = 32,
-            KNOB = 64,
-            PARAM_EDITOR = 128,
-            TAB_BODY = 256,
-            TAB_SELECTOR = 512,
-            ABOUT_TEXT = 1024,
-            STATUS_LINE = 2048,
+            BACKGROUND = 1 << 0,
+            CONTROLLER = 1 << 1,
+            CONTROLLER_SELECTOR = 1 << 2,
+            EXPORT_PATCH_BUTTON = 1 << 3,
+            EXTERNALLY_CREATED_WINDOW = 1 << 4,
+            IMPORT_PATCH_BUTTON = 1 << 5,
+            KNOB = 1 << 6,
+            PARAM_EDITOR = 1 << 7,
+            TAB_BODY = 1 << 8,
+            TAB_SELECTOR = 1 << 9,
+            ABOUT_TEXT = 1 << 10,
+            STATUS_LINE = 1 << 11,
         };
 
         enum TextAlignment {
