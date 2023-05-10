@@ -282,6 +282,21 @@ params = [
     "L6WAV",
     "L7WAV",
     "L8WAV",
+    "L1SYN",
+    "L2SYN",
+    "L3SYN",
+    "L4SYN",
+    "L5SYN",
+    "L6SYN",
+    "L7SYN",
+    "L8SYN",
+    "EESYN",
+    "MF1LOG",
+    "MF2LOG",
+    "CF1LOG",
+    "CF2LOG",
+    "EF1LOG",
+    "EF2LOG",
 ]
 
 
