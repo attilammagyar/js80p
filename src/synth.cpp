@@ -807,7 +807,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_default_ratio();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_default_ratio();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_default_ratio();
-        default: return 0.0; // This should neacver be rehed.
+        default: return 0.0; // This should neacver be reached.
     }
 }
 
@@ -836,7 +836,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_max_value();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_max_value();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_max_value();
-        default: return 0.0; // This should neacver be rehed.
+        default: return 0.0; // This should neacver be reached.
     }
 }
 
