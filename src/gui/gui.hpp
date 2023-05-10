@@ -39,6 +39,7 @@ class ParamEditor;
 class StatusLine;
 class TabBody;
 class TabSelector;
+class ToggleSwitch;
 class Widget;
 class WidgetBase;
 
@@ -53,6 +54,7 @@ class GUI
         typedef std::vector<WidgetBase*> Widgets;
 
         typedef std::vector<ParamEditor*> ParamEditors;
+        typedef std::vector<ToggleSwitch*> ToggleSwitches;
 
         typedef unsigned int Color;
         typedef unsigned char ColorComponent;
@@ -119,6 +121,8 @@ class GUI
         static Color const TEXT_HIGHLIGHT_COLOR;
         static Color const TEXT_HIGHLIGHT_BACKGROUND;
         static Color const STATUS_LINE_BACKGROUND;
+        static Color const TOGGLE_OFF_COLOR;
+        static Color const TOGGLE_ON_COLOR;
 
         static void param_ratio_to_str(
             Synth* synth,
@@ -233,6 +237,7 @@ class WidgetBase
             TAB_SELECTOR = 1 << 9,
             ABOUT_TEXT = 1 << 10,
             STATUS_LINE = 1 << 11,
+            TOGGLE_SWITCH = 1 << 12,
         };
 
         enum TextAlignment {

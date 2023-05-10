@@ -568,6 +568,8 @@ const GUI::Color GUI::TEXT_BACKGROUND = GUI::rgb(0, 0, 0);
 const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(225, 225, 235);
 const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(63, 63, 66);
 const GUI::Color GUI::STATUS_LINE_BACKGROUND = GUI::rgb(21, 21, 32);
+const GUI::Color GUI::TOGGLE_OFF_COLOR = GUI::rgb(0, 0, 0);
+const GUI::Color GUI::TOGGLE_ON_COLOR = GUI::rgb(150, 200, 230);
 
 
 constexpr GUI::ColorComponent GUI::red(Color const color)
@@ -694,6 +696,21 @@ Number GUI::clamp_ratio(Number const ratio)
 
 #define PE_W ParamEditor::WIDTH
 #define PE_H ParamEditor::HEIGHT
+
+
+#define TS(owner, left, top, width, box_left, param_id)         \
+    owner->own(                                                 \
+        new ToggleSwitch(                                       \
+            *this,                                              \
+            GUI::PARAMS[param_id],                              \
+            left,                                               \
+            top,                                                \
+            width,                                              \
+            box_left,                                           \
+            synth,                                              \
+            param_id                                            \
+        )                                                       \
+    )
 
 
 GUI::GUI(
