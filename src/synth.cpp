@@ -77,6 +77,7 @@ Synth::Synth() noexcept
         + 1                         // effects
         + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
+        + LFOS
     ),
     mode("MODE"),
     modulator_add_volume("MIX", 0.0, 1.0, 1.0),
