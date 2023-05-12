@@ -48,7 +48,8 @@ class CombFilter : public Filter< HighShelfDelay<InputSignalProducerClass> >
 
         CombFilter(
             InputSignalProducerClass& input,
-            StereoMode const stereo_mode
+            StereoMode const stereo_mode,
+            ToggleParam const* tempo_sync = NULL
         );
 
         CombFilter(
@@ -58,7 +59,8 @@ class CombFilter : public Filter< HighShelfDelay<InputSignalProducerClass> >
             FloatParam& delay_gain_leader,
             FloatParam& delay_time_leader,
             FloatParam& high_shelf_filter_frequency_leader,
-            FloatParam& high_shelf_filter_gain_leader
+            FloatParam& high_shelf_filter_gain_leader,
+            ToggleParam const* tempo_sync = NULL
         );
 
         CombFilter(
@@ -68,7 +70,8 @@ class CombFilter : public Filter< HighShelfDelay<InputSignalProducerClass> >
             FloatParam& delay_gain_leader,
             Seconds const delay_time,
             FloatParam& high_shelf_filter_frequency_leader,
-            FloatParam& high_shelf_filter_gain_leader
+            FloatParam& high_shelf_filter_gain_leader,
+            ToggleParam const* tempo_sync = NULL
         );
 
         virtual ~CombFilter();

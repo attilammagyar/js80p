@@ -403,8 +403,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6SYN = 277,     ///< LFO 6 Tempo Synchronization
             L7SYN = 278,     ///< LFO 7 Tempo Synchronization
             L8SYN = 279,     ///< LFO 8 Tempo Synchronization
+            EESYN = 280,     ///< Effects Echo Tempo Synchronization
 
-            MAX_PARAM_ID = 280
+            MAX_PARAM_ID = 281
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

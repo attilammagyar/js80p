@@ -30,8 +30,12 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input) noexcept
+Delay<InputSignalProducerClass>::Delay(
+        InputSignalProducerClass& input,
+        ToggleParam const* tempo_sync
+) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
+    tempo_sync(tempo_sync),
     gain(
         "",
         Constants::DELAY_GAIN_MIN,
@@ -43,6 +47,9 @@ Delay<InputSignalProducerClass>::Delay(InputSignalProducerClass& input) noexcept
         Constants::DELAY_TIME_MIN,
         Constants::DELAY_TIME_MAX,
         Constants::DELAY_TIME_DEFAULT
+    ),
+    delay_buffer_oversize(
+        tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
     )
 {
     initialize_instance();
@@ -58,7 +65,7 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
     time_buffer = NULL;
     delay_buffer_size = 0;
 
-    reallocate_delay_buffer();
+    reallocate_delay_buffer_if_needed();
     reset();
 
     this->register_child(gain);
@@ -70,11 +77,16 @@ template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
         FloatParam& gain_leader,
-        FloatParam& time_leader
+        FloatParam& time_leader,
+        ToggleParam const* tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
+    tempo_sync(tempo_sync),
     gain(gain_leader),
-    time(time_leader)
+    time(time_leader),
+    delay_buffer_oversize(
+        tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
+    )
 {
     initialize_instance();
 }
@@ -84,23 +96,28 @@ template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
         FloatParam& gain_leader,
-        Seconds const time
+        Seconds const time,
+        ToggleParam const* tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
+    tempo_sync(tempo_sync),
     gain(gain_leader),
-    time("", Constants::DELAY_TIME_MIN, Constants::DELAY_TIME_MAX, time)
+    time("", Constants::DELAY_TIME_MIN, Constants::DELAY_TIME_MAX, time),
+    delay_buffer_oversize(
+        tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
+    )
 {
     initialize_instance();
 }
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::reallocate_delay_buffer() noexcept
+void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexcept
 {
     Integer const new_delay_buffer_size = this->block_size * 2 + std::max(
         (Integer)(this->sample_rate * Constants::DELAY_TIME_MAX) + 1,
         this->block_size
-    );
+    ) * delay_buffer_oversize;
 
     if (new_delay_buffer_size != delay_buffer_size) {
         free_delay_buffer();
@@ -175,9 +192,13 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_block_size(
         Integer const new_block_size
 ) noexcept {
+    if (new_block_size == this->get_block_size()) {
+        return;
+    }
+
     SignalProducer::set_block_size(new_block_size);
 
-    reallocate_delay_buffer();
+    reallocate_delay_buffer_if_needed();
 }
 
 
@@ -187,7 +208,7 @@ void Delay<InputSignalProducerClass>::set_sample_rate(
 ) noexcept {
     SignalProducer::set_sample_rate(new_sample_rate);
 
-    reallocate_delay_buffer();
+    reallocate_delay_buffer_if_needed();
 }
 
 
@@ -217,6 +238,12 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     );
     time_buffer = FloatParam::produce_if_not_constant(
         &time, round, sample_count
+    );
+
+    time_scale = (
+        tempo_sync != NULL && tempo_sync->get_value() == ToggleParam::ON
+            ? (ONE_MINUTE / std::max(BPM_MIN, this->bpm)) * this->sample_rate
+            : this->sample_rate
     );
 
     return NULL;
@@ -334,11 +361,11 @@ void Delay<InputSignalProducerClass>::render(
     Number const read_index_float = (Number)this->read_index;
 
     if (time_buffer == NULL) {
-        Number const time_value = time.get_value();
+        Number const time_value = time.get_value() * time_scale;
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
-            Number read_index = read_index_float - time_value * this->sample_rate;
+            Number read_index = read_index_float - time_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[c][i] = Math::lookup_periodic(
@@ -349,8 +376,6 @@ void Delay<InputSignalProducerClass>::render(
             }
         }
     } else {
-        Frequency const sample_rate = this->sample_rate;
-
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
             Number read_index = read_index_float;
@@ -359,7 +384,7 @@ void Delay<InputSignalProducerClass>::render(
                 buffer[c][i] = Math::lookup_periodic(
                     delay_channel,
                     delay_buffer_size,
-                    read_index - time_buffer[i] * sample_rate
+                    read_index - time_buffer[i] * time_scale
                 );
 
                 read_index += 1.0;

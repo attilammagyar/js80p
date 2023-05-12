@@ -39,7 +39,7 @@ class Echo : public Effect<InputSignalProducerClass>
     public:
         typedef BiquadFilter<InputSignalProducerClass> HighPassInput;
         typedef CombFilter<HighPassInput> CombFilter1;
-        typedef CombFilter< HighShelfDelay< HighPassInput > > CombFilter2;
+        typedef CombFilter< HighShelfDelay<HighPassInput> > CombFilter2;
 
         Echo(std::string const name, InputSignalProducerClass& input);
 
@@ -49,6 +49,7 @@ class Echo : public Effect<InputSignalProducerClass>
         FloatParam damping_gain;
         FloatParam width;
         FloatParam high_pass_frequency;
+        ToggleParam tempo_sync;
 
     protected:
         Sample const* const* initialize_rendering(

@@ -418,6 +418,8 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L6SYN] = "LFO 6 Tempo Synchronization",
     [Synth::ParamId::L7SYN] = "LFO 7 Tempo Synchronization",
     [Synth::ParamId::L8SYN] = "LFO 8 Tempo Synchronization",
+
+    [Synth::ParamId::EESYN] = "Echo Tempo Sync",
 };
 
 
@@ -986,6 +988,7 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     PE(effects_body, 258 + PE_W * 5,   242, Synth::ParamId::EEHPF,  LFO_CTLS,   "%.1f", 1.0, knob_states);
     PE(effects_body, 258 + PE_W * 6,   242, Synth::ParamId::EEWET,  LFO_CTLS,   "%.2f", 100.0, knob_states);
     PE(effects_body, 258 + PE_W * 7,   242, Synth::ParamId::EEDRY,  LFO_CTLS,   "%.2f", 100.0, knob_states);
+    TS(effects_body, 612, 215, 111, 87, Synth::ParamId::EESYN);
 
     PE(effects_body, 287 + PE_W * 0,   428, Synth::ParamId::ERRS,   LFO_CTLS,   "%.2f", 100.0, knob_states);
     PE(effects_body, 287 + PE_W * 1,   428, Synth::ParamId::ERDF,   LFO_CTLS,   "%.1f", 1.0, knob_states);

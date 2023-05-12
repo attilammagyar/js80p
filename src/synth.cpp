@@ -353,6 +353,7 @@ void Synth::register_effects_params() noexcept
     register_float_param(ParamId::EEHPF, effects.echo.high_pass_frequency);
     register_float_param(ParamId::EEWET, effects.echo.wet);
     register_float_param(ParamId::EEDRY, effects.echo.dry);
+    register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
 
     register_float_param(ParamId::ERRS, effects.reverb.room_size);
     register_float_param(ParamId::ERDF, effects.reverb.damping_frequency);
@@ -825,6 +826,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_default_ratio();
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_default_ratio();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_default_ratio();
+        case ParamId::EESYN: return effects.echo.tempo_sync.get_default_ratio();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -862,6 +864,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_max_value();
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_max_value();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_max_value();
+        case ParamId::EESYN: return effects.echo.tempo_sync.get_max_value();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -909,6 +912,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.ratio_to_value(ratio);
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.ratio_to_value(ratio);
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::EESYN: return effects.echo.tempo_sync.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -1014,6 +1018,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6SYN: lfos_rw[5]->tempo_sync.set_ratio(ratio); break;
             case ParamId::L7SYN: lfos_rw[6]->tempo_sync.set_ratio(ratio); break;
             case ParamId::L8SYN: lfos_rw[7]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::EESYN: effects.echo.tempo_sync.set_ratio(ratio); break;
             default: break; // This should never be reached.
         }
     }
@@ -1197,6 +1202,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L6SYN: return lfos_rw[5]->tempo_sync.get_ratio();
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_ratio();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_ratio();
+        case ParamId::EESYN: return effects.echo.tempo_sync.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }
