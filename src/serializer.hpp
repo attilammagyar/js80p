@@ -33,6 +33,7 @@ class Serializer
 {
     public:
         static constexpr Integer MAX_SIZE = 256 * 1024;
+        static const std::string PROG_NAME_LINE_TAG;
 
         static std::string serialize(Synth const* synth) noexcept;
 

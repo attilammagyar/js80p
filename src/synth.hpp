@@ -561,6 +561,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void process_messages() noexcept;
 
+        const std::string& get_program_name() const noexcept;
+        void set_program_name(const std::string&);
+
         std::string get_param_name(ParamId const param_id) const noexcept;
         ParamId get_param_id(std::string const name) const noexcept;
         void get_param_id_hash_table_statistics(
@@ -894,6 +897,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Carrier* carriers[POLYPHONY];
         Integer next_voice;
         Midi::Note previous_note;
+        std::string program_name{"Init"};
 
     public:
         MidiController* const* const midi_controllers;

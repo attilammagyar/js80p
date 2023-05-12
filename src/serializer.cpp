@@ -29,11 +29,14 @@
 namespace JS80P
 {
 
+const std::string Serializer::PROG_NAME_LINE_TAG{"Name = "};
+
 std::string Serializer::serialize(Synth const* synth) noexcept
 {
     constexpr size_t line_size = 128;
     char line[line_size];
     std::string serialized("[js80p]\r\n");
+    serialized += PROG_NAME_LINE_TAG + synth->get_program_name() + "\r\n";
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
@@ -84,6 +87,7 @@ Synth::ControllerId Serializer::float_to_controller_id(
 
 void Serializer::import(Synth* synth, std::string const& serialized) noexcept
 {
+    synth->set_program_name("Init");
     reset_all_params_to_default(synth);
     std::vector<std::string>* lines = parse_lines(serialized);
     process_lines(synth, lines);
@@ -290,6 +294,10 @@ void Serializer::process_line(Synth* synth, std::string const line) noexcept
             || !parse_number(it, end, number)
             || !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
     ) {
+        auto findNameIndex{line.find(PROG_NAME_LINE_TAG)};
+        if (std::string::npos != findNameIndex) {
+            synth->set_program_name(line.substr(PROG_NAME_LINE_TAG.length()));
+        }
         return;
     }
 
