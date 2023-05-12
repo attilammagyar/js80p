@@ -868,6 +868,15 @@ void Synth::push_message(Message const& message) noexcept
     messages.push(message);
 }
 
+const std::string& Synth::get_program_name() const noexcept
+{
+    return program_name;
+}
+
+void Synth::set_program_name(const std::string& name)
+{
+    program_name = name;
+}
 
 std::string Synth::get_param_name(ParamId const param_id) const noexcept
 {

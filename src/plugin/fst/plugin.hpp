@@ -20,6 +20,7 @@
 #define JS80P__PLUGIN__FST__PLUGIN_HPP
 
 #include <string>
+#include <array>
 
 #include <fst/fst.h>
 
@@ -37,6 +38,7 @@ class FstPlugin
     public:
         static constexpr int OUT_CHANNELS = (int)Synth::OUT_CHANNELS;
         static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
+        static constexpr size_t NO_OF_PROGRAMS = JS80P::Constants::NO_OF_PROGRAMS;
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback,
@@ -98,8 +100,15 @@ class FstPlugin
             float** samples
         ) noexcept;
 
-        VstIntPtr get_chunk(void** chunk) noexcept;
-        void set_chunk(void const* chunk, VstIntPtr const size) noexcept;
+        VstIntPtr get_chunk(void** chunk, bool isPreset) noexcept;
+        void set_chunk(void const* chunk, VstIntPtr const size, bool isPreset) noexcept;
+
+        VstIntPtr get_program() const noexcept;
+        void set_program(size_t index) noexcept;
+
+        bool get_program_name_indexed(char* name, size_t index) noexcept;
+        void get_program_name(char* name) noexcept;
+        void set_program_name(const char* name);
 
         void open_gui(GUI::PlatformWidget parent_window);
         void gui_idle();
@@ -108,6 +117,9 @@ class FstPlugin
         Synth synth;
 
     private:
+        void import_serialized_program(const std::string& serialized_program) noexcept;
+        void get_program_name_short(char* name, size_t index) noexcept;
+
         static constexpr Integer ROUND_MASK = 0x7fff;
 
         void update_bpm() noexcept;
@@ -120,7 +132,11 @@ class FstPlugin
         ERect window_rect;
         Integer round;
         GUI* gui;
-        std::string serialized;
+        std::array<std::string, NO_OF_PROGRAMS> serialized_programs;
+        std::array<std::string, NO_OF_PROGRAMS> serialized_program_names;
+        size_t current_program_index{0};
+        bool store_state_of_previous_program_in_set_program{true};
+        std::string serialized_bank;
 };
 
 }

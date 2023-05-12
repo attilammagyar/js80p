@@ -60,6 +60,7 @@ namespace Constants {
     constexpr char const* PLUGIN_NAME = "JS80P";
     constexpr char const* PLUGIN_VERSION_STR = JS80P_TO_STRING(JS80P_VERSION_STR);
     constexpr int PLUGIN_VERSION_INT = JS80P_VERSION_INT;
+    constexpr size_t NO_OF_PROGRAMS = 128; // Most well implemented FST's from around 2010 have banks with this size...
 
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
 
