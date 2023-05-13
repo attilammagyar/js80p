@@ -1,3 +1,7 @@
+v1.3.0 (2023-??-??)
+ * Bugfix: Reverb and Echo should not consume any CPU when Wet Volume is 0% and
+   Dry Volume is 100%
+
 v1.2.0 (2023-05-07)
  * Respond to ALL_NOTES_OFF and ALL_SOUNDS_OFF MIDI messages
  * Get rid of obtrusive tooltips on Windows, show long name of knobs in the
