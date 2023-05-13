@@ -23,7 +23,7 @@ html, body {
 }
 
 body {
-  padding: 5vmin;
+  padding: 3vmin;
 }
 
 a {
@@ -31,22 +31,22 @@ a {
 }
 
 h1 {
-  font-size: 4.8vh;
+  font-size: 4.2vh;
   font-weight: bold;
   margin: 1vmin;
 }
 
 h2 {
-  font-size: 3.8vh;
+  font-size: 3.2vh;
   font-weight: bold;
-  margin: 2vmin;
-  margin-top: 5vmin;
+  margin: 1.2vmin;
+  margin-top: 3vmin;
 }
 
 h3 {
-  font-size: 3.2vh;
-  margin: 2vmin;
-  margin-top: 5vmin;
+  font-size: 2.8vh;
+  margin: 1.2vmin;
+  margin-top: 3vmin;
 }
 
 h1, h2, h3 {
@@ -56,23 +56,23 @@ h1, h2, h3 {
 }
 
 #tagline {
-  font-size: 3.2vh;
-  margin: 1vmin auto;
+  font-size: 2.8vh;
+  margin: 0.8vmin auto;
 }
 
 #download {
-  margin-bottom: 5vmin;
-  margin-top: 7vmin;
+  margin-bottom: 1vmin;
+  margin-top: 3vmin;
 }
 
 div {
-  font-size: 2.8vh;
-  line-height: 5vh;
-  padding-left: 2vmin;
-  padding-right: 2vmin;
+  font-size: 2.4vh;
+  line-height: 3.6vh;
+  padding-left: 1.2vmin;
+  padding-right: 1.2vmin;
   margin: auto;
   margin-top: 1vmin;
-  margin-bottom: 5vmin;
+  margin-bottom: 3vmin;
 }
 
 div.center p,
@@ -93,7 +93,7 @@ div.section {
 
 p {
   max-width: 98vmin;
-  margin: 3vmin auto;
+  margin: 2vmin auto;
 }
 
 a.download {
@@ -102,7 +102,7 @@ a.download {
   background-color: #b8c0d0;
   border: outset 0.5vh #b8c0d0;
   color: #080a10;
-  font-size: 3.2vh;
+  font-size: 2.4vh;
   padding: 0.3vmin 2vmin;
   font-weight: bold;
   text-decoration: none;
@@ -111,7 +111,7 @@ a.download {
 video {
   max-width: 90vmin;
   max-height: 90vmin;
-  margin: 2vmin;
+  margin: 1.2vmin;
 }
 
 img.vst {
@@ -125,6 +125,10 @@ code {
   padding: 0.3vmin 0.6vmin;
   border-radius: 1vmin;
 }
+
+#faq p {
+  padding-left: 2vmin;
+}
 </style>
 </head>
 <body>
@@ -132,7 +136,7 @@ code {
   <div class="center" id="tagline">
     A MIDI driven, performance oriented, versatile synthesizer plugin
   </div>
-  <h2 class="center" id="download-anchor">Download (v1.2.0)</h2>
+  <h2 class="center" id="download-anchor">Download (v1.3.0)</h2>
   <div class="section" id="download">
     <p class="center">
       <a href="#which">Which distribution should I download?</a>
@@ -140,46 +144,47 @@ code {
     <h3>Windows</h3>
     <ul>
       <li>
-        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-windows-64bit-fst.zip">Download (1.5M)</a>
+        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-64bit-fst.zip">Download (1.5M)</a>
       </li>
       <li>
-        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-windows-64bit-vst3.zip">Download (1.8M)</a>
+        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-64bit-vst3.zip">Download (1.8M)</a>
       </li>
       <li>
-        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-windows-32bit-fst.zip">Download (1.5M)</a>
+        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-32bit-fst.zip">Download (1.5M)</a>
       </li>
       <li>
-        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-windows-32bit-vst3.zip">Download (1.7M)</a>
+        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-32bit-vst3.zip">Download (1.7M)</a>
       </li>
     </ul>
-    <p class="center">
-      <strong>For FL Studio users: </strong> due to a bug in JS80P, the Echo
-      and Reverb effects produce unwanted noise with the default settings in FL
-      Studio. Until a new version of JS80P is released which solves the issue,
-      the noise can be eliminated by turning on the
-      "<a href="https://www.image-line.com/fl-studio-learning/fl-studio-online-manual/html/plugins/wrapper.htm#wrapper_troubleshooting">Use fixed size buffers</a>"
-      option for this plugin.
-    </p>
     <h3>Linux</h3>
     <ul>
       <li>
-        Linux, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-linux-64bit-fst.zip">Download (896K)</a>
+        Linux, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-64bit-fst.zip">Download (900K)</a>
       </li>
       <li>
-        Linux, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-linux-64bit-vst3.zip">Download (1.1M)</a>
+        Linux, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-64bit-vst3.zip">Download (1.1M)</a>
       </li>
       <li>
-        Linux, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-linux-32bit-fst.zip">Download (908K)</a>
+        Linux, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-32bit-fst.zip">Download (912K)</a>
       </li>
       <li>
-        Linux, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-linux-32bit-vst3.zip">Download (1.1M)</a>
+        Linux, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-32bit-vst3.zip">Download (1.1M)</a>
       </li>
     </ul>
     <h3>Source Code</h3>
     <ul>
       <li>
-        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.2.0/js80p-1_2_0-src.zip">Download (5.5M)</a>
+        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-src.zip">Download (5.5M)</a>
       </li>
+    </ul>
+    <h3 class="center">What's New in v1.3.0</h3>
+    <ul>
+      <li><p>The GUI will now indicate clearly when a parameter is fully controlled by
+      an envelope</p></li>
+      <li><p>Bugfix: eliminate noise which occurs when FL Studio is running the plugin
+      with variable buffer sizes and the Echo or Reverb effects are turned on</p></li>
+      <li><p>Bugfix: Reverb and Echo should not consume any CPU when Wet Volume is 0% and
+      Dry Volume is 100%</p></li>
     </ul>
     <p class="center">
       <a href="https://github.com/attilammagyar/js80p/releases/">Previous releases</a>
@@ -272,56 +277,58 @@ code {
     </p>
   </div>
 
-  <h2 class="center">Frequenctly Asked Questions</h2>
-  <div class="section" id="which">
-    <h3>Which distribution should I download?</h3>
-    <p>
-      Due to how MIDI works in VST 3 plugins, the recommended distribution for
-      most people is the 64-bit FST plugin which can be loaded into any 64-bit
-      DAW which supports VST 2.4.
-    </p>
-    <p>
-      If your DAW does not support VST 2.4 however, then you will need the
-      64-bit VST 3 plugin.
-    </p>
-    <p>
-      The 32-bit versions are only needed by those who deliberately use a
-      32-bit DAW, e.g. because they want to keep using some really old plugins
-      which are not available for 64-bit systems.
-    </p>
-    <p>
-      If you are in doubt, then try the 64 bit FST version, and if your
-      DAW doesn't recognize it, then try the 64 bit VST 3 version, then the 32
-      bit FST version, etc.
-    </p>
-    <p>
-      Note that all versions use the same high-precision sound synthesis engine
-      internally, so the CPU architecture does not affect the sound quality.
-    </p>
-  </div>
-  <div class="section">
-    <h3>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</h3>
-    <p>
-      The reason for JS80P having both kinds of modulation is that they are not
-      always equivalent. They are only identical when the modulator signal is a
-      sinusoid, but with each added harmonic, PM and FM start to differ more and
-      more. A detailed mathematical explanation of this is shown
-      <a href="https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md">here</a>.
-    </p>
-  </div>
-  <div class="section">
-    <h3>Where does the name come from?</h3>
-    <p>
-      In 2022, I started developing a browser-based synthesizer using the
-      <a href="https://www.w3.org/TR/webaudio/">Web Audio API</a>, mostly being
-      inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80]">Yamaha CS-80</a>.
-      I named that project <a href="https://attilammagyar.github.io/toys/js-80/">JS-80</a>.
-      Then I started adding one little feature and customization option after the
-      other, then it got out of hand, and I also started finding limitations of
-      doing audio in the browser. So I decided to implement a cleaned up version
-      of this synth in C++ as a DAW plugin (with a better waveshaper antialiasing
-      method than what's available in the browser), and so JS80P was born.
-    </p>
+  <div id="faq">
+    <h2 class="center">Frequenctly Asked Questions</h2>
+    <div class="section" id="which">
+      <h3>Which distribution should I download?</h3>
+      <p>
+        Due to how MIDI works in VST 3 plugins, the recommended distribution for
+        most people is the 64-bit FST plugin which can be loaded into any 64-bit
+        DAW which supports VST 2.4.
+      </p>
+      <p>
+        If your DAW does not support VST 2.4 however, then you will need the
+        64-bit VST 3 plugin.
+      </p>
+      <p>
+        The 32-bit versions are only needed by those who deliberately use a
+        32-bit DAW, e.g. because they want to keep using some really old plugins
+        which are not available for 64-bit systems.
+      </p>
+      <p>
+        If you are in doubt, then try the 64 bit FST version, and if your
+        DAW doesn't recognize it, then try the 64 bit VST 3 version, then the 32
+        bit FST version, etc.
+      </p>
+      <p>
+        Note that all versions use the same high-precision sound synthesis engine
+        internally, so the CPU architecture does not affect the sound quality.
+      </p>
+    </div>
+    <div class="section">
+      <h3>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</h3>
+      <p>
+        The reason for JS80P having both kinds of modulation is that they are not
+        always equivalent. They are only identical when the modulator signal is a
+        sinusoid, but with each added harmonic, PM and FM start to differ more and
+        more. A detailed mathematical explanation of this is shown
+        <a href="https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md">here</a>.
+      </p>
+    </div>
+    <div class="section">
+      <h3>Where does the name come from?</h3>
+      <p>
+        In 2022, I started developing a browser-based synthesizer using the
+        <a href="https://www.w3.org/TR/webaudio/">Web Audio API</a>, mostly being
+        inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80]">Yamaha CS-80</a>.
+        I named that project <a href="https://attilammagyar.github.io/toys/js-80/">JS-80</a>.
+        Then I started adding one little feature and customization option after the
+        other, then it got out of hand, and I also started finding limitations of
+        doing audio in the browser. So I decided to implement a cleaned up version
+        of this synth in C++ as a DAW plugin (with a better waveshaper antialiasing
+        method than what's available in the browser), and so JS80P was born.
+      </p>
+    </div>
   </div>
 </body>
 </html>
