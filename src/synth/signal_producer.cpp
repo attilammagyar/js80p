@@ -45,10 +45,9 @@ Sample const* const* SignalProducer::produce(
     Seconds const start_time = signal_producer->current_time;
     Integer const count = signal_producer->sample_count_or_block_size(sample_count);
 
-    signal_producer->last_sample_count = count;
     signal_producer->cached_round = round;
-
     signal_producer->cached_buffer = signal_producer->initialize_rendering(round, count);
+    signal_producer->last_sample_count = count;
 
     if (signal_producer->cached_buffer != NULL) {
         return signal_producer->cached_buffer;

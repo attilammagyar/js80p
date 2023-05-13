@@ -53,16 +53,13 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 {
     feedback_signal_producer = NULL;
-    feedback_signal_producer_buffer = NULL;
     delay_buffer = NULL;
     gain_buffer = NULL;
     time_buffer = NULL;
-    feedback_sample_count = 0;
-    write_index = 0;
     delay_buffer_size = 0;
-    read_index = 0.0;
 
     reallocate_delay_buffer();
+    reset();
 
     this->register_child(gain);
     this->register_child(time);
@@ -100,7 +97,7 @@ Delay<InputSignalProducerClass>::Delay(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::reallocate_delay_buffer() noexcept
 {
-    Integer const new_delay_buffer_size = std::max(
+    Integer const new_delay_buffer_size = this->block_size * 2 + std::max(
         (Integer)(this->sample_rate * Constants::DELAY_TIME_MAX) + 1,
         this->block_size
     );
@@ -108,6 +105,7 @@ void Delay<InputSignalProducerClass>::reallocate_delay_buffer() noexcept
     if (new_delay_buffer_size != delay_buffer_size) {
         free_delay_buffer();
         delay_buffer_size = new_delay_buffer_size;
+        clear_index = this->block_size;
         allocate_delay_buffer();
     }
 }
@@ -127,15 +125,14 @@ void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
     }
 
     delete[] delay_buffer;
+
+    delay_buffer = NULL;
 }
 
 
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
 {
-    delay_buffer_size_float = (Number)delay_buffer_size;
-    delay_buffer_size_inv = 1.0 / delay_buffer_size_float;
-
     if (this->channels <= 0) {
         reset();
         return;
@@ -160,8 +157,10 @@ void Delay<InputSignalProducerClass>::reset() noexcept
         std::fill_n(delay_buffer[c], delay_buffer_size, 0.0);
     }
 
-    write_index = 0;
-    read_index = 0.0;
+    write_index_input = 0;
+    write_index_feedback = 0;
+    clear_index = this->block_size;
+    is_starting = true;
 }
 
 
@@ -207,10 +206,11 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
-    initialize_feedback(round, sample_count);
+    read_index = write_index_input;
 
-    read_index = (Number)write_index;
-    merge_inputs_into_delay_buffer(sample_count);
+    clear_delay_buffer(sample_count);
+    mix_feedback_into_delay_buffer(sample_count);
+    mix_input_into_delay_buffer(sample_count);
 
     gain_buffer = FloatParam::produce_if_not_constant(
         &gain, round, sample_count
@@ -224,52 +224,17 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
 
 template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::initialize_feedback(
-        Integer const round,
-        Integer const sample_count
-) noexcept {
-    if (UNLIKELY(feedback_signal_producer == NULL)) {
-        feedback_signal_producer_buffer = NULL;
-        feedback_sample_count = 0;
-
-        return;
-    }
-
-    feedback_signal_producer_buffer = (
-        feedback_signal_producer->get_last_rendered_block(
-            feedback_sample_count
-        )
-    );
-}
-
-
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::merge_inputs_into_delay_buffer(
-        Integer const sample_count
-) noexcept {
-    copy_input_into_delay_buffer(sample_count);
-    mix_feedback_into_delay_buffer(sample_count);
-
-    write_index += sample_count;
-
-    if (write_index >= delay_buffer_size) {
-        write_index %= delay_buffer_size;
-    }
-}
-
-
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::copy_input_into_delay_buffer(
+void Delay<InputSignalProducerClass>::clear_delay_buffer(
         Integer const sample_count
 ) noexcept {
     Integer const channels = this->channels;
+    Integer delay_buffer_index = clear_index;
 
     for (Integer c = 0; c != channels; ++c) {
-        Sample const* input = this->input_buffer[c];
-        Integer delay_buffer_index = write_index;
+        delay_buffer_index = clear_index;
 
         for (Integer i = 0; i != sample_count; ++i) {
-            delay_buffer[c][delay_buffer_index] = input[i];
+            delay_buffer[c][delay_buffer_index] = 0.0;
 
             ++delay_buffer_index;
 
@@ -278,6 +243,8 @@ void Delay<InputSignalProducerClass>::copy_input_into_delay_buffer(
             }
         }
     }
+
+    clear_index = delay_buffer_index;
 }
 
 
@@ -285,19 +252,35 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
-    Integer const channels = this->channels;
-
-    if (UNLIKELY(feedback_sample_count == 0)) {
+    if (UNLIKELY(feedback_signal_producer == NULL)) {
         return;
     }
 
-    Integer const feedback_sample_count = std::min(
-        sample_count, this->feedback_sample_count
+    if (UNLIKELY(is_starting)) {
+        is_starting = false;
+        write_index_feedback += sample_count;
+
+        if (write_index_feedback >= delay_buffer_size) {
+            write_index_feedback %= delay_buffer_size;
+        }
+
+        return;
+    }
+
+    Integer feedback_sample_count = 0;
+
+    Sample const* const* feedback_signal_producer_buffer = (
+        feedback_signal_producer->get_last_rendered_block(
+            feedback_sample_count
+        )
     );
+
+    Integer const channels = this->channels;
+    Integer delay_buffer_index = write_index_feedback;
 
     for (Integer c = 0; c != channels; ++c) {
         Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-        Integer delay_buffer_index = write_index;
+        delay_buffer_index = write_index_feedback;
 
         for (Integer i = 0; i != feedback_sample_count; ++i) {
             delay_buffer[c][delay_buffer_index] += feedback_samples[i];
@@ -309,6 +292,34 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
             }
         }
     }
+
+    write_index_feedback = delay_buffer_index;
+}
+
+
+template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
+        Integer const sample_count
+) noexcept {
+    Integer const channels = this->channels;
+    Integer delay_buffer_index = write_index_input;
+
+    for (Integer c = 0; c != channels; ++c) {
+        Sample const* input = this->input_buffer[c];
+        delay_buffer_index = write_index_input;
+
+        for (Integer i = 0; i != sample_count; ++i) {
+            delay_buffer[c][delay_buffer_index] += input[i];
+
+            ++delay_buffer_index;
+
+            if (delay_buffer_index == delay_buffer_size) {
+                delay_buffer_index = 0;
+            }
+        }
+    }
+
+    write_index_input = delay_buffer_index;
 }
 
 
@@ -320,13 +331,14 @@ void Delay<InputSignalProducerClass>::render(
         Sample** buffer
 ) noexcept {
     Integer const channels = this->channels;
+    Number const read_index_float = (Number)this->read_index;
 
     if (time_buffer == NULL) {
         Number const time_value = time.get_value();
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
-            Number read_index = this->read_index - time_value * this->sample_rate;
+            Number read_index = read_index_float - time_value * this->sample_rate;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[c][i] = Math::lookup_periodic(
@@ -341,7 +353,7 @@ void Delay<InputSignalProducerClass>::render(
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
-            Number read_index = this->read_index;
+            Number read_index = read_index_float;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[c][i] = Math::lookup_periodic(
@@ -356,8 +368,6 @@ void Delay<InputSignalProducerClass>::render(
     }
 
     apply_gain(round, first_sample_index, last_sample_index, buffer);
-
-    read_index += (Number)(last_sample_index - first_sample_index);
 }
 
 

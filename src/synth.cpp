@@ -907,11 +907,11 @@ Sample const* const* Synth::initialize_rendering(
     );
 
     for (int i = 0; i != FLOAT_PARAMS; ++i) {
-        FloatParam::produce_if_not_constant(float_params[i], round, get_block_size());
+        FloatParam::produce_if_not_constant(float_params[i], round, sample_count);
     }
 
     for (Integer i = 0; i != LFOS; ++i) {
-        lfos_rw[i]->skip_round(round, get_block_size());
+        lfos_rw[i]->skip_round(round, sample_count);
     }
 
     clear_midi_controllers();

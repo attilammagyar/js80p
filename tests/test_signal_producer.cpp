@@ -520,6 +520,47 @@ TEST(cyclic_dependencies_in_rendering_initialization_are_broken_up_by_delaying_o
 })
 
 
+class FeedbackSignalProducer : public SignalProducer
+{
+    friend class SignalProducer;
+
+    public:
+        FeedbackSignalProducer() noexcept
+            : SignalProducer(1),
+            feedback_sample_count(0)
+        {
+        }
+
+        Integer feedback_sample_count;
+
+    protected:
+        Sample const* const* initialize_rendering(
+                Integer const round,
+                Integer const sample_count
+        ) noexcept {
+            get_last_rendered_block(feedback_sample_count);
+
+            return NULL;
+        }
+};
+
+
+TEST(last_rendered_block_rendered_sample_count_is_not_updated_until_initialization_is_complete, {
+    constexpr Integer sample_count_1 = 5;
+    constexpr Integer sample_count_2 = 12;
+
+    FeedbackSignalProducer signal_producer;
+
+    signal_producer.set_block_size(128);
+    signal_producer.set_sample_rate(22050.0);
+
+    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 1, sample_count_1);
+    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 2, sample_count_2);
+
+    assert_eq((int)sample_count_1, (int)signal_producer.feedback_sample_count);
+})
+
+
 class EventTestSignalProducer : public SignalProducer
 {
     friend class SignalProducer;

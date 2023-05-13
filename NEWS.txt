@@ -1,4 +1,6 @@
 v1.3.0 (2023-??-??)
+ * Bugfix: eliminate noise which occurs when FL Studio is running the plugin
+   with variable buffer sizes and the Echo or Reverb effects are turned on
  * Bugfix: Reverb and Echo should not consume any CPU when Wet Volume is 0% and
    Dry Volume is 100%
 
