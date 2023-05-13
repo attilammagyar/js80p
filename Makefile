@@ -49,6 +49,7 @@ OBJ_FST_MAIN = $(BUILD_DIR)/fst-main-$(SUFFIX).o
 OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin-$(SUFFIX).o
 OBJ_VST3_MAIN = $(BUILD_DIR)/vst3-main-$(SUFFIX).o
 OBJ_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin-$(SUFFIX).o
+OBJ_BANK = $(BUILD_DIR)/bank-$(SUFFIX).o
 OBJ_SERIALIZER = $(BUILD_DIR)/serializer-$(SUFFIX).o
 OBJ_SYNTH = $(BUILD_DIR)/synth-$(SUFFIX).o
 OBJ_GUI = $(BUILD_DIR)/gui-$(SUFFIX).o
@@ -58,6 +59,7 @@ FST_OBJS = \
 	$(OBJ_FST_MAIN) \
 	$(OBJ_FST_PLUGIN) \
 	$(OBJ_GUI) \
+	$(OBJ_BANK) \
 	$(OBJ_SERIALIZER) \
 	$(OBJ_SYNTH)
 
@@ -66,6 +68,7 @@ VST3_OBJS = \
 	$(OBJ_VST3_MAIN) \
 	$(OBJ_VST3_PLUGIN) \
 	$(OBJ_GUI) \
+	$(OBJ_BANK) \
 	$(OBJ_SERIALIZER) \
 	$(OBJ_SYNTH)
 
@@ -117,8 +120,9 @@ TESTS = \
 	test_midi_controller \
 	test_oscillator \
 	test_param \
-	test_serializer \
+	test_bank \
 	test_queue \
+	test_serializer \
 	test_signal_producer \
 	test_synth \
 	test_voice \
@@ -146,12 +150,15 @@ SYNTH_SOURCES = \
 JS80P_HEADERS = \
 	src/gui/gui.hpp \
 	src/gui/widgets.hpp \
+	src/bank.hpp \
 	src/serializer.hpp \
 	$(SYNTH_HEADERS)
 
 JS80P_SOURCES = \
 	src/gui/gui.cpp \
 	src/gui/widgets.cpp \
+	src/bank.cpp \
+	src/programs.cpp \
 	src/serializer.cpp \
 	$(SYNTH_SOURCES)
 
@@ -262,6 +269,7 @@ check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
 # 	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
 
@@ -316,6 +324,15 @@ $(OBJ_SYNTH): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
 	$(CPP_TARGET_PLATFORM) \
 		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG) -c src/synth.cpp -o $@
+
+$(OBJ_BANK): \
+		src/bank.cpp src/bank.hpp \
+		src/serializer.cpp src/serializer.hpp \
+		$(SYNTH_HEADERS) \
+		| $(BUILD_DIR)
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
 
 $(OBJ_SERIALIZER): \
 		src/serializer.cpp src/serializer.hpp \
@@ -468,6 +485,16 @@ $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_bank$(EXE): \
+		tests/test_bank.cpp \
+		src/bank.cpp src/bank.hpp \
+		src/serializer.cpp src/serializer.hpp \
+		$(TEST_LIBS) \
+		$(SYNTH_HEADERS) \
+		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 

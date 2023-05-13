@@ -1,6 +1,7 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
  * Copyright (C) 2023  Attila M. Magyar
+ * Copyright (C) 2023  Patrik Ehringer
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,15 +27,6 @@
 
 namespace JS80P
 {
-
-static const std::string BANK_PROG_SEPARATOR_START{"[Prg_"};
-static const std::string BANK_PROG_SEPARATOR_END{"]\r\n"};
-
-static const std::string WHITESPACE{"\t\n\v\f\r "};
-void trim(std::string& str) {
-    str.erase(str.find_last_not_of(WHITESPACE) + 1); // right trim
-    str.erase(0, str.find_first_not_of(WHITESPACE)); // left trim
-}
 
 static constexpr int FST_OP_CODE_NAMES_LEN = 255;
 
@@ -317,8 +309,8 @@ AEffect* FstPlugin::create_instance(
     );
     effect->magic = kEffectMagic;
     effect->numInputs = 0;
-    effect->numOutputs = (t_fstInt32)FstPlugin::OUT_CHANNELS;
-    effect->numPrograms = (t_fstInt32)FstPlugin::NO_OF_PROGRAMS;
+    effect->numOutputs = (VstInt32)FstPlugin::OUT_CHANNELS;
+    effect->numPrograms = (VstInt32)Bank::NUMBER_OF_PROGRAMS;
     effect->object = (void*)fst_plugin;
     effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
@@ -384,7 +376,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return 0;
 
         case effGetProgramNameIndexed:
-            return (VstIntPtr)fst_plugin->get_program_name_indexed((char*)pointer, (size_t)index);
+            return fst_plugin->get_program_name((char*)pointer, (size_t)index);
 
         case effSetSampleRate:
             fst_plugin->set_sample_rate(fvalue);
@@ -516,15 +508,14 @@ FstPlugin::FstPlugin(
     host_callback(host_callback),
     platform_data(platform_data),
     round(0),
-    gui(NULL)
+    gui(NULL),
+    serialized_bank(""),
+    save_current_patch_before_changing_program(false)
 {
     window_rect.top = 0;
     window_rect.left = 0;
     window_rect.bottom = GUI::HEIGHT;
     window_rect.right = GUI::WIDTH;
-
-    std::string program{Serializer::serialize(&synth)};
-    serialized_programs.fill(program);
 }
 
 
@@ -561,10 +552,8 @@ void FstPlugin::resume() noexcept
 
 void FstPlugin::process_events(VstEvents const* const events) noexcept
 {
-    VstEvent* event = NULL;
-
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
-        event = events->events[i];
+        VstEvent* event = events->events[i];
 
         if (event->type == kVstMidiType) {
             process_midi_event((VstMidiEvent*)event);
@@ -616,7 +605,9 @@ Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcep
 void FstPlugin::update_bpm() noexcept
 {
     VstTimeInfo const* time_info = (
-        (VstTimeInfo const*)host_callback(effect, audioMasterGetTime, 0, kVstTempoValid, NULL, 0.0f)
+        (VstTimeInfo const*)host_callback(
+            effect, audioMasterGetTime, 0, kVstTempoValid, NULL, 0.0f
+        )
     );
 
     if (time_info == NULL || (time_info->flags & kVstTempoValid) == 0) {
@@ -645,143 +636,121 @@ void FstPlugin::generate_and_add_samples(
 }
 
 
-void FstPlugin::import_serialized_program(const std::string& serialized_program) noexcept
+void FstPlugin::import_patch(const std::string& patch) noexcept
 {
     synth.process_messages();
-    Serializer::import(&synth, serialized_program);
+    Serializer::import(&synth, patch);
     synth.process_messages();
 }
 
 
-VstIntPtr FstPlugin::get_chunk(void** chunk, bool isPreset) noexcept
+VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 {
-    serialized_programs[current_program_index] = Serializer::serialize(&synth); // This is not only important for 'isPreset',
-                                                                                // but also for whole bank state, because for the
-                                                                                // current program, modifications as well as e.g.
-                                                                                // a patch load via js80p GUI could have happend!
-    if (isPreset) {
-        *chunk = (void*)serialized_programs[current_program_index].c_str();
-        return (VstIntPtr)serialized_programs[current_program_index].size();
+    bank.update_current_program(Serializer::serialize(&synth));
+
+    if (is_preset) {
+        return serialize_current_program(chunk);
     } else {
-        serialized_bank.clear();
-        for (size_t i{0}; i < NO_OF_PROGRAMS; ++i) {
-            serialized_bank += BANK_PROG_SEPARATOR_START + std::to_string(i) + BANK_PROG_SEPARATOR_END;
-            serialized_bank += serialized_programs[i];
-        }
-        *chunk = (void*)serialized_bank.c_str();
-        return (VstIntPtr)serialized_bank.size();
+        return serialize_bank(chunk);
     }
 }
 
 
-void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool isPreset) noexcept
+VstIntPtr FstPlugin::serialize_current_program(void** buffer) noexcept
 {
-    std::string serialized((char const*)chunk, (std::string::size_type)size);
-    store_state_of_previous_program_in_set_program = false;
-    if (isPreset) {
-        serialized_program_names[current_program_index] = "";       // It will be 'calculated' on demand!
-        serialized_programs[current_program_index] = serialized;
-        import_serialized_program(serialized);
+    std::string const& serialized = bank.get_current_program().serialize();
+    *buffer = (void*)serialized.c_str();
+
+    return (VstIntPtr)serialized.size();
+}
+
+
+VstIntPtr FstPlugin::serialize_bank(void** buffer) noexcept
+{
+    serialized_bank = bank.serialize();
+    *buffer = (void*)serialized_bank.c_str();
+
+    return (VstIntPtr)serialized_bank.size();
+}
+
+
+void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept
+{
+    save_current_patch_before_changing_program = false;
+
+    std::string buffer((char const*)chunk, (std::string::size_type)size);
+
+    if (is_preset) {
+        import_current_program(buffer);
     } else {
-        serialized_program_names.fill("");                          // They will be 'calculated' on demand!
-        std::string::size_type searchStart(0);
-        for (size_t i{0}; i < NO_OF_PROGRAMS; ++i) {
-            const std::string searchString1{BANK_PROG_SEPARATOR_START + std::to_string(i) + BANK_PROG_SEPARATOR_END};
-            auto indexStart{serialized.find(searchString1, searchStart)};
-            if (std::string::npos == indexStart) {
-                return;     	// Something is seriously wrong here!
-            }
-            indexStart += searchString1.length();
-            const std::string searchString2{BANK_PROG_SEPARATOR_START + std::to_string(i + 1) + BANK_PROG_SEPARATOR_END};
-            const auto indexEnd{serialized.find(searchString2, indexStart)};
-            if (std::string::npos == indexEnd) {
-                if (i != NO_OF_PROGRAMS - 1) {
-                    return;     // Something is seriously wrong here!
-                }
-            }
-            const std::string serialized_program{serialized.substr(indexStart, indexEnd - indexStart)};
-            serialized_programs[i] = serialized_program;
-            if (i == current_program_index) {
-                import_serialized_program(serialized_program);
-            }
-            searchStart = indexEnd;
-        }
+        import_bank(buffer);
     }
+}
+
+
+void FstPlugin::import_current_program(std::string const& buffer) noexcept
+{
+    bank.update_current_program(buffer);
+    import_patch(bank.get_current_program().serialize());
+}
+
+
+void FstPlugin::import_bank(std::string const& buffer) noexcept
+{
+    bank.import(buffer);
+    import_patch(bank.get_current_program().serialize());
 }
 
 
 VstIntPtr FstPlugin::get_program() const noexcept
 {
-    return static_cast<VstIntPtr>(current_program_index);
+    return bank.get_current_program_index();
 }
 
 
 void FstPlugin::set_program(size_t index) noexcept
 {
-    if (index < NO_OF_PROGRAMS && index != current_program_index) {
-        if (store_state_of_previous_program_in_set_program) {
-            // Store  state of current program (which soon will be previous program!)
-            serialized_programs[current_program_index] = Serializer::serialize(&synth);
-        } else {
-            store_state_of_previous_program_in_set_program = true;
-        }
-        synth.process_messages();
-        Serializer::import(&synth, serialized_programs[index]);
-        synth.process_messages();
-        current_program_index = index;
+    if (index >= Bank::NUMBER_OF_PROGRAMS || index == bank.get_current_program_index()) {
+        return;
     }
+
+
+    if (save_current_patch_before_changing_program) {
+        bank.update_current_program(Serializer::serialize(&synth));
+    } else {
+        save_current_patch_before_changing_program = true;
+    }
+
+    bank.set_current_program_index(index);
+    import_patch(bank.get_current_program().serialize());
 }
 
 
-void FstPlugin::get_program_name_short(char* name, size_t index) noexcept
+VstIntPtr FstPlugin::get_program_name(char* name, size_t index) noexcept
 {
-    std::string program_name{serialized_program_names[index].substr(0, kVstMaxProgNameLen - 1)};
-    trim(program_name);
-    size_t i{0};
-    for (; i < program_name.length(); ++i) {
-        name[i] = program_name.data()[i];
+    if (index >= Bank::NUMBER_OF_PROGRAMS) {
+        return 0;
     }
-    name[i] = '\0';
-}
 
+    strncpy(name, bank[index].get_name().c_str(), kVstMaxProgNameLen - 1);
 
-bool FstPlugin::get_program_name_indexed(char* name, size_t index) noexcept
-{
-    if (index < NO_OF_PROGRAMS) {
-        if (serialized_program_names[index].empty()) {
-            static const std::string searchString(Serializer::PROG_NAME_LINE_TAG);
-            auto startIndex{serialized_programs[index].find(searchString)};
-            if (std::string::npos != startIndex) {
-                startIndex += searchString.length();
-                auto endIndex{serialized_programs[index].find("\r\n", startIndex)};
-                if (std::string::npos != endIndex) {
-                    serialized_program_names[index] = serialized_programs[index].substr(startIndex, endIndex - startIndex);
-                }
-            }
-            if (serialized_program_names[index].empty()) {
-                serialized_program_names[index] = "???";
-            }
-        }
-        get_program_name_short(name, index);
-        return true;
-    }
-    return false;
+    return 1;
 }
 
 
 void FstPlugin::get_program_name(char* name) noexcept
 {
-    serialized_program_names[current_program_index] = synth.get_program_name(); // Get current name from synth.
-    // 'get_program_name_short' will only work correctly with properly updated 'serialized_program_names[index]'.
-    get_program_name_short(name, current_program_index);
+    strncpy(
+        name,
+        bank.get_current_program().get_name().c_str(),
+        kVstMaxProgNameLen - 1
+    );
 }
 
 
 void FstPlugin::set_program_name(const char* name)
 {
-    serialized_program_names[current_program_index] = name;
-    trim(serialized_program_names[current_program_index]);
-    synth.set_program_name(serialized_program_names[current_program_index]);
+    bank.get_current_program().set_name(name);
 }
 
 

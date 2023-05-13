@@ -132,7 +132,13 @@ FUnknown* Vst3Plugin::Processor::createInstance(void* unused)
 }
 
 
-Vst3Plugin::Processor::Processor() : synth(), round(-1), events(4096)
+Vst3Plugin::Processor::Processor()
+    : synth(),
+    bank(NULL),
+    round(-1),
+    events(4096),
+    new_program(0),
+    need_to_load_new_program(false)
 {
     setControllerClass(Controller::ID);
     processContextRequirements.needTempo();
@@ -156,13 +162,15 @@ tresult PLUGIN_API Vst3Plugin::Processor::initialize(FUnknown* context)
 
 tresult PLUGIN_API Vst3Plugin::Processor::setBusArrangements(
     Vst::SpeakerArrangement* inputs,
-    int32 numIns,
+    int32 number_of_inputs,
     Vst::SpeakerArrangement* outputs,
-    int32 numOuts
+    int32 number_of_outputs
 ) {
-    if (numIns == 0 && numOuts == 1 && outputs[0] == Vst::SpeakerArr::kStereo)
+    if (number_of_inputs == 0 && number_of_outputs == 1 && outputs[0] == Vst::SpeakerArr::kStereo)
     {
-        return AudioEffect::setBusArrangements(inputs, numIns, outputs, numOuts);
+        return AudioEffect::setBusArrangements(
+            inputs, number_of_inputs, outputs, number_of_outputs
+        );
     }
 
     return kResultFalse;
@@ -184,19 +192,32 @@ tresult PLUGIN_API Vst3Plugin::Processor::notify(Vst::IMessage* message)
         return kInvalidArgument;
     }
 
-    if (FIDStringsEqual(message->getMessageID(), MSG_CTL_READY)) {
-        share_synth();
+    if (FIDStringsEqual(message->getMessageID(), MSG_PROGRAM_CHANGE)) {
+        double program;
+
+        if (message->getAttributes()->getFloat(MSG_PROGRAM_CHANGE_PROGRAM, program) == kResultOk) {
+            events.push_back(
+                Event(Event::Type::PROGRAM_CHANGE, 0.0, 0, (Number)program)
+            );
+        }
+    } else if (FIDStringsEqual(message->getMessageID(), MSG_CTL_READY)) {
+        int64 bank_ptr;
+
+        if (message->getAttributes()->getInt(MSG_CTL_READY_BANK, bank_ptr) == kResultOk) {
+            bank = (Bank const*)bank_ptr;
+            share_synth();
+        }
     }
 
     return Vst::AudioEffect::notify(message);
 }
 
 
-tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(int32 symbolicSampleSize)
+tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(int32 symbolic_sample_size)
 {
     if (
-            symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64
-            || symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32
+            symbolic_sample_size == Vst::SymbolicSampleSizes::kSample64
+            || symbolic_sample_size == Vst::SymbolicSampleSizes::kSample32
     ) {
         return kResultTrue;
     }
@@ -242,7 +263,7 @@ void Vst3Plugin::Processor::share_synth() noexcept
     Vst::IAttributeList* attributes = message->getAttributes();
 
     if (attributes) {
-        attributes->setInt(MSG_SHARE_SYNTH_ATTR, (int64)&synth);
+        attributes->setInt(MSG_SHARE_SYNTH_SYNTH, (int64)&synth);
         sendMessage(message);
     }
 }
@@ -250,11 +271,16 @@ void Vst3Plugin::Processor::share_synth() noexcept
 
 tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
 {
-    events.clear();
     collect_param_change_events(data);
     collect_note_events(data);
     std::sort(events.begin(), events.end());
     process_events();
+    events.clear();
+
+    if (bank != NULL && need_to_load_new_program) {
+        need_to_load_new_program = false;
+        import_patch((*bank)[new_program].serialize());
+    }
 
     if (data.numOutputs == 0 || data.numSamples < 1) {
         return kResultOk;
@@ -288,6 +314,12 @@ void Vst3Plugin::Processor::collect_param_change_events(
         Vst::ParamID const param_id = param_queue->getParameterId();
 
         switch (param_id) {
+            case (Vst::ParamID)PROGRAM_LIST_ID:
+                collect_param_change_events_as(
+                    param_queue, Event::Type::PROGRAM_CHANGE, 0
+                );
+                break;
+
             case (Vst::ParamID)Vst::ControllerNumbers::kPitchBend:
                 collect_param_change_events_as(
                     param_queue, Event::Type::PITCH_WHEEL, 0
@@ -459,6 +491,12 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
             );
             break;
 
+        case Event::Type::PROGRAM_CHANGE:
+            new_program = (size_t)std::round(
+                event.velocity_or_value * FLOAT_TO_PROGRAM_SCALE
+            );
+            need_to_load_new_program = true;
+
         default:
             break;
     }
@@ -552,36 +590,36 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
         return kResultFalse;
     }
 
-    std::string const serialized = read_serialized_patch(state);
-
-    synth.process_messages();
-    Serializer::import(&synth, serialized);
-    synth.process_messages();
+    import_patch(read_stream(state));
 
     return kResultOk;
 }
 
 
-std::string Vst3Plugin::Processor::read_serialized_patch(IBStream* stream) const
+void Vst3Plugin::Processor::import_patch(std::string const& serialized) noexcept
+{
+    synth.process_messages();
+    Serializer::import(&synth, serialized);
+    synth.process_messages();
+}
+
+
+std::string Vst3Plugin::read_stream(IBStream* stream)
 {
     /*
     Not using FStreamer::readString8(), because we need the entire string here,
-    and that method stops at line breaks, handles Unix-style line breaks
-    inconsistenly, and calls strlen() for a buffer that it had just done
-    terminating with a zero byte, knowing its position perfectly well:
-
-    https://github.com/steinbergmedia/vst3_base/pull/5
+    and that method stops at line breaks.
     */
 
     char* buffer = new char[Serializer::MAX_SIZE];
     Integer i;
-    int32 numBytesRead;
+    int32 bytes_read;
     char8 c;
 
     for (i = 0; i != Serializer::MAX_SIZE; ++i) {
-        stream->read(&c, sizeof(char8), &numBytesRead);
+        stream->read(&c, sizeof(char8), &bytes_read);
 
-        if (numBytesRead != sizeof(char8) || c == '\x00') {
+        if (bytes_read != sizeof(char8) || c == '\x00') {
             break;
         }
 
@@ -689,7 +727,7 @@ FUnknown* Vst3Plugin::Controller::createInstance(void* unused)
 }
 
 
-Vst3Plugin::Controller::Controller() : synth(NULL)
+Vst3Plugin::Controller::Controller() : bank(), synth(NULL)
 {
 }
 
@@ -701,11 +739,19 @@ Vst3Plugin::Controller::~Controller()
 
 tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
 {
-    tresult result = EditController::initialize(context);
+    tresult result = EditControllerEx1::initialize(context);
 
     if (result != kResultTrue) {
         return result;
     }
+
+    addUnit(
+        new Vst::Unit(
+            STR("Root"), Vst::kRootUnitId, Vst::kNoParentUnitId, PROGRAM_LIST_ID
+        )
+    );
+
+    parameters.addParameter(set_up_program_change_param());
 
     parameters.addParameter(
         create_midi_ctl_param(
@@ -729,6 +775,55 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         parameters.addParameter(
             create_midi_ctl_param((Synth::ControllerId)cc, (Vst::ParamID)cc)
         );
+    }
+
+    return result;
+}
+
+
+Vst::Parameter* Vst3Plugin::Controller::set_up_program_change_param()
+{
+    Vst::ProgramList* program_list = new Vst::ProgramList(
+        STR("Bank"), PROGRAM_LIST_ID, Vst::kRootUnitId
+    );
+
+    for (size_t i = 0; i != Bank::NUMBER_OF_PROGRAMS; ++i) {
+        program_list->addProgram(USTRING(bank[i].get_name().c_str()));
+    }
+
+    addProgramList(program_list);
+
+    Vst::Parameter* program_change_param = program_list->getParameter();
+    Vst::ParameterInfo& param_info = program_change_param->getInfo();
+
+    param_info.flags &= ~Vst::ParameterInfo::kCanAutomate;
+    param_info.flags |= Vst::ParameterInfo::kIsProgramChange;
+
+    return program_change_param;
+}
+
+
+tresult PLUGIN_API Vst3Plugin::Controller::setParamNormalized(
+        Vst::ParamID tag,
+        Vst::ParamValue value
+) {
+    tresult result = EditControllerEx1::setParamNormalized(tag, value);
+
+    if (result == kResultOk && tag == PROGRAM_LIST_ID) {
+        IPtr<Vst::IMessage> message = owned(allocateMessage());
+
+        if (!message) {
+            return result;
+        }
+
+        message->setMessageID(MSG_PROGRAM_CHANGE);
+
+        Vst::IAttributeList* attributes = message->getAttributes();
+
+        if (attributes) {
+            attributes->setFloat(MSG_PROGRAM_CHANGE_PROGRAM, (double)value);
+            sendMessage(message);
+        }
     }
 
     return result;
@@ -759,18 +854,18 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
 
 
 tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
-        int32 busIndex,
+        int32 bus_index,
         int16 channel,
-        Vst::CtrlNumber midiControllerNumber,
+        Vst::CtrlNumber midi_controller_number,
         Vst::ParamID& id
 ) {
-    if (busIndex == 0 && midiControllerNumber < Vst::kCountCtrlNumber) {
+    if (bus_index == 0 && midi_controller_number < Vst::kCountCtrlNumber) {
         if (
-                Synth::is_supported_midi_controller((Midi::Controller)midiControllerNumber)
-                || midiControllerNumber == Vst::ControllerNumbers::kPitchBend
-                || midiControllerNumber == Vst::ControllerNumbers::kAfterTouch
+                Synth::is_supported_midi_controller((Midi::Controller)midi_controller_number)
+                || midi_controller_number == Vst::ControllerNumbers::kPitchBend
+                || midi_controller_number == Vst::ControllerNumbers::kAfterTouch
         ) {
-            id = midiControllerNumber;
+            id = midi_controller_number;
 
             return kResultTrue;
         }
@@ -782,7 +877,7 @@ tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
 
 tresult PLUGIN_API Vst3Plugin::Controller::connect(IConnectionPoint* other)
 {
-    tresult result = EditController::connect(other);
+    tresult result = EditControllerEx1::connect(other);
 
     IPtr<Vst::IMessage> message = owned(allocateMessage());
 
@@ -791,7 +886,13 @@ tresult PLUGIN_API Vst3Plugin::Controller::connect(IConnectionPoint* other)
     }
 
     message->setMessageID(MSG_CTL_READY);
-    sendMessage(message);
+
+    Vst::IAttributeList* attributes = message->getAttributes();
+
+    if (attributes) {
+        attributes->setInt(MSG_CTL_READY_BANK, (int64)&bank);
+        sendMessage(message);
+    }
 
     return result;
 }
@@ -805,14 +906,15 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
 
     if (FIDStringsEqual(message->getMessageID(), MSG_SHARE_SYNTH)) {
         int64 synth_ptr;
-        if (message->getAttributes()->getInt(MSG_SHARE_SYNTH_ATTR, synth_ptr) == kResultOk) {
+
+        if (message->getAttributes()->getInt(MSG_SHARE_SYNTH_SYNTH, synth_ptr) == kResultOk) {
             synth = (Synth*)synth_ptr;
 
             return kResultOk;
         }
     }
 
-    return EditController::notify(message);
+    return EditControllerEx1::notify(message);
 }
 
 

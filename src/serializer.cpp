@@ -30,9 +30,6 @@
 namespace JS80P
 {
 
-const std::string Serializer::PROG_NAME_LINE_TAG{"Name = "};
-
-
 std::string const Serializer::CONTROLLER_SUFFIX = "ctl";
 
 
@@ -40,8 +37,11 @@ std::string Serializer::serialize(Synth const* synth) noexcept
 {
     constexpr size_t line_size = 128;
     char line[line_size];
-    std::string serialized("[js80p]\r\n");
-    serialized += PROG_NAME_LINE_TAG + synth->get_program_name() + "\r\n";
+    std::string serialized("");
+
+    serialized += "[";
+    serialized += JS80P_SECTION_NAME;
+    serialized += "]\r\n";
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
@@ -93,9 +93,8 @@ Synth::ControllerId Serializer::float_to_controller_id(
 
 void Serializer::import(Synth* synth, std::string const& serialized) noexcept
 {
-    synth->set_program_name("Init");
     reset_all_params_to_default(synth);
-    std::vector<std::string>* lines = parse_lines(serialized);
+    Lines* lines = parse_lines(serialized);
     process_lines(synth, lines);
 
     delete lines;
@@ -123,11 +122,10 @@ void Serializer::reset_all_params_to_default(Synth* synth) noexcept
 }
 
 
-std::vector<std::string>* Serializer::parse_lines(
-        std::string const& serialized
-) noexcept {
+Serializer::Lines* Serializer::parse_lines(std::string const& serialized) noexcept
+{
     constexpr Integer max_line_pos = MAX_SIZE - 1;
-    std::vector<std::string>* lines = new std::vector<std::string>();
+    Lines* lines = new Lines();
     char* line = new char[MAX_SIZE];
     std::string::const_iterator const end = serialized.end();
     Integer line_pos = 0;
@@ -212,7 +210,7 @@ bool Serializer::is_section_name_char(char const c) noexcept
 }
 
 
-void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) noexcept
+void Serializer::process_lines(Synth* synth, Lines* lines) noexcept
 {
     typedef std::vector<Synth::Message> Messages;
 
@@ -222,13 +220,13 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
 
     messages.reserve(600);
 
-    for (std::vector<std::string>::iterator it = lines->begin(); it != lines->end(); ++it) {
+    for (Lines::const_iterator it = lines->begin(); it != lines->end(); ++it) {
         std::string line = *it;
 
         if (parse_section_name(line, section_name)) {
             inside_js80p_section = false;
 
-            if (strncmp(section_name, "js80p", 7) == 0) {
+            if (is_js80p_section_start(section_name)) {
                 inside_js80p_section = true;
                 continue;
             }
@@ -248,6 +246,12 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
             synth->push_message(*it);
         }
     }
+}
+
+
+bool Serializer::is_js80p_section_start(char const section_name[8]) noexcept
+{
+    return strncmp(section_name, JS80P_SECTION_NAME, 8) == 0;
 }
 
 
@@ -309,7 +313,6 @@ bool Serializer::parse_line_until_value(
         && parse_suffix(it, end, suffix)
         && !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
         && parse_equal_sign(it, end)
-        && !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
     );
 }
 
@@ -329,13 +332,10 @@ void Serializer::process_line(
 
     if (
             !parse_line_until_value(it, end, param_name, suffix)
+            || skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
             || !parse_number(it, end, number)
             || !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
     ) {
-        auto findNameIndex{line.find(PROG_NAME_LINE_TAG)};
-        if (std::string::npos != findNameIndex) {
-            synth->set_program_name(line.substr(PROG_NAME_LINE_TAG.length()));
-        }
         return;
     }
 
@@ -455,7 +455,7 @@ bool Serializer::parse_equal_sign(
 
     ++it;
 
-    return it != end;
+    return true;
 }
 
 

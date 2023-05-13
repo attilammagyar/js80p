@@ -32,6 +32,7 @@
 
 #include "gui/gui.hpp"
 
+#include "bank.hpp"
 #include "js80p.hpp"
 #include "synth.hpp"
 
@@ -46,8 +47,17 @@ class Vst3Plugin
 {
     public:
         static constexpr char const* MSG_CTL_READY = "JS80PCtl";
+        static constexpr char const* MSG_CTL_READY_BANK = "Bank";
+
+        static constexpr char const* MSG_PROGRAM_CHANGE = "JS80PProg";
+        static constexpr char const* MSG_PROGRAM_CHANGE_PROGRAM = "Prog";
+
         static constexpr char const* MSG_SHARE_SYNTH = "JS80PSynth";
-        static constexpr char const* MSG_SHARE_SYNTH_ATTR = "Synth";
+        static constexpr char const* MSG_SHARE_SYNTH_SYNTH = "Synth";
+
+        static constexpr Vst::ProgramListID PROGRAM_LIST_ID = Vst::kCtrlProgramChange;
+
+        static std::string read_stream(IBStream* stream);
 
         class Event
         {
@@ -60,6 +70,7 @@ class Vst3Plugin
                     PITCH_WHEEL = 4,
                     CONTROL_CHANGE = 5,
                     CHANNEL_PRESSURE = 6,
+                    PROGRAM_CHANGE = 7,
                 };
 
                 Event();
@@ -92,17 +103,18 @@ class Vst3Plugin
                 Processor();
 
                 tresult PLUGIN_API initialize(FUnknown* context) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API setBusArrangements(
                     Vst::SpeakerArrangement* inputs,
-                    int32 numIns,
+                    int32 number_of_inputs,
                     Vst::SpeakerArrangement* outputs,
-                    int32 numOuts
+                    int32 number_of_outputs
                 ) SMTG_OVERRIDE;
 
                 tresult PLUGIN_API connect(IConnectionPoint* other) SMTG_OVERRIDE;
                 tresult PLUGIN_API notify(Vst::IMessage* message) SMTG_OVERRIDE;
 
-                tresult PLUGIN_API canProcessSampleSize(int32 symbolicSampleSize) SMTG_OVERRIDE;
+                tresult PLUGIN_API canProcessSampleSize(int32 symbolic_sample_size) SMTG_OVERRIDE;
                 tresult PLUGIN_API setupProcessing(Vst::ProcessSetup& setup) SMTG_OVERRIDE;
                 tresult PLUGIN_API setActive(TBool state) SMTG_OVERRIDE;
                 tresult PLUGIN_API process(Vst::ProcessData& data) SMTG_OVERRIDE;
@@ -115,15 +127,19 @@ class Vst3Plugin
             private:
                 static constexpr Integer ROUND_MASK = 0x7fff;
 
+                static constexpr Number FLOAT_TO_PROGRAM_SCALE = (Number)(Bank::NUMBER_OF_PROGRAMS - 1);
+
                 void share_synth() noexcept;
                 void block_rendered() noexcept;
 
                 void collect_param_change_events(Vst::ProcessData& data) noexcept;
+
                 void collect_param_change_events_as(
                     Vst::IParamValueQueue* const param_queue,
                     Event::Type const event_type,
                     Midi::Byte const midi_controller
                 ) noexcept;
+
                 void collect_note_events(Vst::ProcessData& data) noexcept;
                 void process_events() noexcept;
                 void process_event(Event const event) noexcept;
@@ -135,6 +151,8 @@ class Vst3Plugin
 
                 void generate_samples(Vst::ProcessData& data) noexcept;
 
+                void import_patch(std::string const& serialized) noexcept;
+
                 template<typename NumberType>
                 void generate_samples(
                     Integer const sample_count,
@@ -143,11 +161,18 @@ class Vst3Plugin
 
                 Sample const* const* render_next_round(Integer const sample_count) noexcept;
 
-                std::string read_serialized_patch(IBStream* stream) const;
-
                 Synth synth;
+                Bank const* bank;
                 Integer round;
                 std::vector<Event> events;
+                size_t new_program;
+                bool need_to_load_new_program;
+
+            public:
+                OBJ_METHODS(Processor, Vst::AudioEffect)
+                DEFINE_INTERFACES
+                END_DEFINE_INTERFACES(Vst::AudioEffect)
+                REFCOUNT_METHODS(Vst::AudioEffect)
         };
 
         class Controller;
@@ -182,7 +207,7 @@ class Vst3Plugin
                 void* timer_handler;
         };
 
-        class Controller : public Vst::EditController, public Vst::IMidiMapping
+        class Controller : public Vst::EditControllerEx1, public Vst::IMidiMapping
         {
             public:
                 static FUID const ID;
@@ -194,34 +219,44 @@ class Vst3Plugin
                 virtual ~Controller();
 
                 tresult PLUGIN_API initialize(FUnknown* context) SMTG_OVERRIDE;
-                tresult PLUGIN_API setComponentState(IBStream* state) SMTG_OVERRIDE;
 
                 tresult PLUGIN_API connect(IConnectionPoint* other) SMTG_OVERRIDE;
                 tresult PLUGIN_API notify(Vst::IMessage* message) SMTG_OVERRIDE;
 
                 tresult PLUGIN_API getMidiControllerAssignment(
-                    int32 busIndex,
+                    int32 bus_index,
                     int16 channel,
-                    Vst::CtrlNumber midiControllerNumber,
+                    Vst::CtrlNumber midi_controller_number,
                     Vst::ParamID& id
                 ) SMTG_OVERRIDE;
 
                 IPlugView* PLUGIN_API createView(FIDString name) SMTG_OVERRIDE;
 
+                tresult PLUGIN_API setParamNormalized(
+                    Vst::ParamID tag,
+                    Vst::ParamValue value
+                ) SMTG_OVERRIDE;
+
+                tresult PLUGIN_API setComponentState(IBStream* state) SMTG_OVERRIDE;
+
             private:
+                Vst::Parameter* set_up_program_change_param();
+
                 Vst::RangeParameter* create_midi_ctl_param(
                     Synth::ControllerId const controller_id,
                     Vst::ParamID const param_id
                 ) const;
 
+                Bank const bank;
+
                 Synth* synth;
 
             public:
-                OBJ_METHODS(Controller, EditController)
+                OBJ_METHODS(Controller, Vst::EditControllerEx1)
                 DEFINE_INTERFACES
-                    DEF_INTERFACE(IMidiMapping)
-                    END_DEFINE_INTERFACES(EditController)
-                REFCOUNT_METHODS(EditController)
+                    DEF_INTERFACE(Vst::IMidiMapping)
+                END_DEFINE_INTERFACES(Vst::EditControllerEx1)
+                REFCOUNT_METHODS(Vst::EditControllerEx1)
         };
 };
 

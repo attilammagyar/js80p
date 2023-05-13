@@ -1,6 +1,7 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
  * Copyright (C) 2023  Attila M. Magyar
+ * Copyright (C) 2023  Patrik Ehringer
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +21,12 @@
 #define JS80P__PLUGIN__FST__PLUGIN_HPP
 
 #include <string>
-#include <array>
 
 #include <fst/fst.h>
 
 #include "gui/gui.hpp"
 
+#include "bank.hpp"
 #include "js80p.hpp"
 #include "synth.hpp"
 
@@ -36,9 +37,8 @@ namespace JS80P
 class FstPlugin
 {
     public:
-        static constexpr int OUT_CHANNELS = (int)Synth::OUT_CHANNELS;
+        static constexpr VstInt32 OUT_CHANNELS = (VstInt32)Synth::OUT_CHANNELS;
         static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
-        static constexpr size_t NO_OF_PROGRAMS = JS80P::Constants::NO_OF_PROGRAMS;
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback,
@@ -100,13 +100,19 @@ class FstPlugin
             float** samples
         ) noexcept;
 
-        VstIntPtr get_chunk(void** chunk, bool isPreset) noexcept;
-        void set_chunk(void const* chunk, VstIntPtr const size, bool isPreset) noexcept;
+        VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;
+        void set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept;
+
+        VstIntPtr serialize_current_program(void** buffer) noexcept;
+        void import_current_program(std::string const& buffer) noexcept;
+
+        VstIntPtr serialize_bank(void** buffer) noexcept;
+        void import_bank(std::string const& buffer) noexcept;
 
         VstIntPtr get_program() const noexcept;
         void set_program(size_t index) noexcept;
 
-        bool get_program_name_indexed(char* name, size_t index) noexcept;
+        VstIntPtr get_program_name(char* name, size_t index) noexcept;
         void get_program_name(char* name) noexcept;
         void set_program_name(const char* name);
 
@@ -117,13 +123,12 @@ class FstPlugin
         Synth synth;
 
     private:
-        void import_serialized_program(const std::string& serialized_program) noexcept;
-        void get_program_name_short(char* name, size_t index) noexcept;
-
         static constexpr Integer ROUND_MASK = 0x7fff;
 
         void update_bpm() noexcept;
         Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
+
+        void import_patch(const std::string& patch) noexcept;
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
@@ -132,11 +137,9 @@ class FstPlugin
         ERect window_rect;
         Integer round;
         GUI* gui;
-        std::array<std::string, NO_OF_PROGRAMS> serialized_programs;
-        std::array<std::string, NO_OF_PROGRAMS> serialized_program_names;
-        size_t current_program_index{0};
-        bool store_state_of_previous_program_in_set_program{true};
+        Bank bank;
         std::string serialized_bank;
+        bool save_current_patch_before_changing_program;
 };
 
 }
