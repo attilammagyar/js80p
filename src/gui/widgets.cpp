@@ -305,6 +305,7 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
     Widget::set_up(platform_data, parent);
 
     constexpr int max_top = HEIGHT - Controller::HEIGHT;
+    constexpr int group_separation = 10;
     int top = TITLE_HEIGHT;
     int left = 10;
 
@@ -312,17 +313,22 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
         Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
         char const* const text = GUI::CONTROLLERS[i].long_name;
 
-        controllers[i] = (Controller*)this->own(
-            new Controller(*this, text, left, top, id)
-        );
+        if (i == 4) {
+            /* TODO: hiding Channel Aftertouch until it's implemented */
+            controllers[i] = NULL;
+        } else {
+            controllers[i] = (Controller*)this->own(
+                new Controller(*this, text, left, top, id)
+            );
+        }
 
         top += Controller::HEIGHT;
 
-        if (i == 0 || i == 3 || i == 82 || i == 90) {
-            top += 11;
+        if (i == 0 || i == 4 || i == 5 || i == 84 || i == 92) {
+            top += group_separation;
         }
 
-        if (top > max_top || i == 72) {
+        if (top > max_top || i == 74) {
             top = TITLE_HEIGHT;
             left += Controller::WIDTH;
         }
@@ -365,10 +371,18 @@ void ControllerSelector::show(
     controllers[controller->index]->select();
 
     for (int i = 0; i != controller_choices; ++i) {
+        if (controllers[i] == NULL) {
+            continue;
+        }
+
         controllers[i]->show();
     }
 
     for (int i = controller_choices; i != GUI::ALL_CTLS; ++i) {
+        if (controllers[i] == NULL) {
+            continue;
+        }
+
         controllers[i]->hide();
     }
 

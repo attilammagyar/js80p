@@ -82,7 +82,7 @@ class GUI
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
         static constexpr int NO_CTLS = 0;
-        static constexpr int ALL_CTLS = 97;
+        static constexpr int ALL_CTLS = 99;
         static constexpr int LFO_CTLS = ALL_CTLS - Synth::ENVELOPES;
         static constexpr int FLEX_CTLS = (
             ALL_CTLS - Synth::ENVELOPES - Synth::LFOS

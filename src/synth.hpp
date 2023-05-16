@@ -514,8 +514,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ENVELOPE_4 =                152,                        ///< Envelope 4
             ENVELOPE_5 =                153,                        ///< Envelope 5
             ENVELOPE_6 =                154,                        ///< Envelope 6
+            CHANNEL_AFTERTOUCH =        155,                        ///< Channel Aftertouch
+            MIDI_LEARN =                156,                        ///< MIDI Learn
 
-            MAX_CONTROLLER_ID =         155,
+            MAX_CONTROLLER_ID =         157,
         };
 
         typedef Byte Mode;
@@ -875,7 +877,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
         void handle_refresh_param(ParamId const param_id) noexcept;
 
-        void assign_controller_to_param(
+        bool assign_controller_to_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
@@ -909,6 +911,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Carrier* carriers[POLYPHONY];
         Integer next_voice;
         Midi::Note previous_note;
+        bool is_learning;
 
     public:
         MidiController* const* const midi_controllers;

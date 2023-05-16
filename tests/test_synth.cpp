@@ -397,3 +397,50 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
 
     delete[] expected_samples;
 })
+
+
+TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_replaces_by_the_first_supported_changing_midi_controller, {
+    constexpr Midi::Controller unsupported = 125;
+
+    Synth synth;
+
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::CVOL,
+        0.0,
+        Synth::ControllerId::MIDI_LEARN
+    );
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::MVOL,
+        0.0,
+        Synth::ControllerId::MIDI_LEARN
+    );
+    synth.process_messages();
+
+    assert_eq(
+        Synth::ControllerId::MIDI_LEARN,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+    );
+    assert_eq(
+        Synth::ControllerId::MIDI_LEARN,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
+    );
+
+    synth.control_change(0.000001, 1, unsupported, 0.1);
+    synth.control_change(0.000002, 1, Midi::GENERAL_1, 0.2);
+    synth.control_change(0.000003, 1, Midi::GENERAL_2, 0.3);
+
+    assert_eq(
+        Synth::ControllerId::GENERAL_1,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+    );
+    assert_eq(
+        Synth::ControllerId::GENERAL_1,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
+    );
+    assert_neq(NULL, synth.modulator_params.volume.get_midi_controller());
+    assert_neq(NULL, synth.carrier_params.volume.get_midi_controller());
+    assert_eq(0.2, synth.modulator_params.volume.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2, synth.carrier_params.volume.get_value(), DOUBLE_DELTA);
+});

@@ -221,7 +221,7 @@ class ControllerSelector : public Widget
         {
             public:
                 static constexpr int WIDTH = 240;
-                static constexpr int HEIGHT = 22;
+                static constexpr int HEIGHT = 21;
 
                 Controller(
                     ControllerSelector& controller_selector,
