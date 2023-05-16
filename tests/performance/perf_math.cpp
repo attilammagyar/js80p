@@ -203,6 +203,22 @@ DEFINE_FUNC(MathCombine, "Math::combine(x,0.5,y)", Math::combine(x, 0.5, y), 0.0
 DEFINE_FUNC(SimpleCombine, "x*0.5+(1.0-x)*y", x * 0.5 + (1.0 - x) * y, 0.0, 1.0);
 
 
+NEW_GROUP();
+
+DEFINE_FUNC(StdPow24000, "std::pow(24000,x)", std::pow(24000.0, x), 0.0, 1.0);
+DEFINE_FUNC(
+    MathLookupLogBiquadFilterFreq,
+    "Math::lookup(Math::log_biquad_filter_freq_table(),x)",
+    Math::lookup(
+        Math::log_biquad_filter_freq_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        x * Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+    ),
+    0.0,
+    1.0
+);
+
+
 void usage(char const* name)
 {
     char const** next_func_name = &(func_names[0]);

@@ -420,6 +420,13 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L8SYN] = "LFO 8 Tempo Synchronization",
 
     [Synth::ParamId::EESYN] = "Echo Tempo Sync",
+
+    [Synth::ParamId::MF1LOG] = "Modulator Filter 1 Logarithmic Frequency",
+    [Synth::ParamId::MF2LOG] = "Modulator Filter 2 Logarithmic Frequency",
+    [Synth::ParamId::CF1LOG] = "Carrier Filter 1 Logarithmic Frequency",
+    [Synth::ParamId::CF2LOG] = "Carrier Filter 2 Logarithmic Frequency",
+    [Synth::ParamId::EF1LOG] = "Effects Filter 1 Logarithmic Frequency",
+    [Synth::ParamId::EF2LOG] = "Effects Filter 2 Logarithmic Frequency",
 };
 
 
@@ -974,11 +981,13 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     PE(effects_body, 385 + PE_W * 1,    57, Synth::ParamId::EF1FRQ, LFO_CTLS,   "%.1f", 1.0, knob_states);
     PE(effects_body, 385 + PE_W * 2,    57, Synth::ParamId::EF1Q,   LFO_CTLS,   "%.2f", 1.0, knob_states);
     PE(effects_body, 385 + PE_W * 3,    57, Synth::ParamId::EF1G,   LFO_CTLS,   "%.2f", 1.0, knob_states);
+    TS(effects_body, 459, 29, 90, 0, Synth::ParamId::EF1LOG);
 
     PE(effects_body, 690 + PE_W * 0,    57, Synth::ParamId::EF2TYP, MIDI_CTLS,  ft, ftc, knob_states);
     PE(effects_body, 690 + PE_W * 1,    57, Synth::ParamId::EF2FRQ, LFO_CTLS,   "%.1f", 1.0, knob_states);
     PE(effects_body, 690 + PE_W * 2,    57, Synth::ParamId::EF2Q,   LFO_CTLS,   "%.2f", 1.0, knob_states);
     PE(effects_body, 690 + PE_W * 3,    57, Synth::ParamId::EF2G,   LFO_CTLS,   "%.2f", 1.0, knob_states);
+    TS(effects_body, 764, 29, 90, 0, Synth::ParamId::EF2LOG);
 
     PE(effects_body, 258 + PE_W * 0,   242, Synth::ParamId::EEDEL,  LFO_CTLS,   "%.3f", 1.0, knob_states);
     PE(effects_body, 258 + PE_W * 1,   242, Synth::ParamId::EEFB,   LFO_CTLS,   "%.2f", 100.0, knob_states);
@@ -1220,6 +1229,7 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     PE(synth_body, 735 + PE_W * 1,      36, Synth::ParamId::MF1FRQ, ALL_CTLS,   "%.1f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 2,      36, Synth::ParamId::MF1Q,   ALL_CTLS,   "%.2f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 3,      36, Synth::ParamId::MF1G,   ALL_CTLS,   "%.2f", 1.0, knob_states);
+    TS(synth_body, 811, 13, 90, 0, Synth::ParamId::MF1LOG);
 
     PE(synth_body, 116 + PE_W * 0,     168, Synth::ParamId::MC1,    FLEX_CTLS,  "%.2f", 100.0, knob_states);
     PE(synth_body, 116 + PE_W * 1,     168, Synth::ParamId::MC2,    FLEX_CTLS,  "%.2f", 100.0, knob_states);
@@ -1236,6 +1246,7 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     PE(synth_body, 735 + PE_W * 1,     168, Synth::ParamId::MF2FRQ, ALL_CTLS,   "%.1f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 2,     168, Synth::ParamId::MF2Q,   ALL_CTLS,   "%.2f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 3,     168, Synth::ParamId::MF2G,   ALL_CTLS,   "%.2f", 1.0, knob_states);
+    TS(synth_body, 811, 145, 90, 0, Synth::ParamId::MF2LOG);
 
     PE(synth_body,  87 + PE_W * 0,     316, Synth::ParamId::CWAV,   MIDI_CTLS,  wf, wfc, knob_states);
     PE(synth_body,  87 + PE_W * 1,     316, Synth::ParamId::CPRT,   FLEX_CTLS,  "%.3f", 1.0, knob_states);
@@ -1253,6 +1264,7 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     PE(synth_body, 735 + PE_W * 1,     316, Synth::ParamId::CF1FRQ, ALL_CTLS,   "%.1f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 2,     316, Synth::ParamId::CF1Q,   ALL_CTLS,   "%.2f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 3,     316, Synth::ParamId::CF1G,   ALL_CTLS,   "%.2f", 1.0, knob_states);
+    TS(synth_body, 811, 293, 90, 0, Synth::ParamId::CF1LOG);
 
     PE(synth_body, 116 + PE_W * 0,     448, Synth::ParamId::CC1,    FLEX_CTLS,  "%.2f", 100.0, knob_states);
     PE(synth_body, 116 + PE_W * 1,     448, Synth::ParamId::CC2,    FLEX_CTLS,  "%.2f", 100.0, knob_states);
@@ -1269,6 +1281,7 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     PE(synth_body, 735 + PE_W * 1,     448, Synth::ParamId::CF2FRQ, ALL_CTLS,   "%.1f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 2,     448, Synth::ParamId::CF2Q,   ALL_CTLS,   "%.2f", 1.0, knob_states);
     PE(synth_body, 735 + PE_W * 3,     448, Synth::ParamId::CF2G,   ALL_CTLS,   "%.2f", 1.0, knob_states);
+    TS(synth_body, 811, 425, 90, 0, Synth::ParamId::CF2LOG);
 
     synth_body->show();
 }

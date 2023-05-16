@@ -252,9 +252,21 @@ FloatParam::FloatParam(
         Number const min_value,
         Number const max_value,
         Number const default_value,
-        Number const round_to
+        Number const round_to,
+        ToggleParam const* log_scale_toggle,
+        Number const* log_scale_table,
+        Number const* log_scale_inv_table,
+        int const log_scale_table_max_index,
+        Number const log_scale_table_scale,
+        Number const log_scale_inv_table_scale
 ) noexcept
     : Param<Number>(name, min_value, max_value, default_value),
+    log_scale_toggle(log_scale_toggle),
+    log_scale_table(log_scale_table),
+    log_scale_inv_table(log_scale_inv_table),
+    log_scale_table_max_index(log_scale_table_max_index),
+    log_scale_table_scale(log_scale_table_scale),
+    log_scale_inv_table_scale(log_scale_inv_table_scale),
     leader(NULL),
     flexible_controller(NULL),
     envelope(NULL),
@@ -277,6 +289,12 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     : Param<Number>(
         leader.name, leader.min_value, leader.max_value, leader.default_value
     ),
+    log_scale_toggle(leader.log_scale_toggle),
+    log_scale_table(leader.log_scale_table),
+    log_scale_inv_table(leader.log_scale_inv_table),
+    log_scale_table_max_index(leader.log_scale_table_max_index),
+    log_scale_table_scale(leader.log_scale_table_scale),
+    log_scale_inv_table_scale(leader.log_scale_inv_table_scale),
     leader(&leader),
     flexible_controller(NULL),
     envelope(NULL),
@@ -317,6 +335,15 @@ bool FloatParam::is_following_leader() const noexcept
 }
 
 
+bool FloatParam::is_logarithmic() const noexcept
+{
+    return (
+        log_scale_toggle != NULL
+        && log_scale_toggle->get_value() == ToggleParam::ON
+    );
+}
+
+
 void FloatParam::set_value(Number const new_value) noexcept
 {
     latest_event_type = EVT_SET_VALUE;
@@ -349,9 +376,39 @@ Number FloatParam::get_ratio() const noexcept
         flexible_controller->update();
 
         return flexible_controller->get_value();
-    } else {
-        return Param<Number>::get_ratio();
+    } else if (midi_controller != NULL) {
+        return midi_controller->get_value();
     }
+
+    return std::min(1.0, std::max(0.0, value_to_ratio(get_raw_value())));
+}
+
+
+Number FloatParam::ratio_to_value(Number const ratio) const noexcept
+{
+    if (is_logarithmic()) {
+        return Math::lookup(
+            Math::log_biquad_filter_freq_table(),
+            Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+            ratio * Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        );
+    }
+
+    return Param<Number>::ratio_to_value(ratio);
+}
+
+
+Number FloatParam::value_to_ratio(Number const value) const noexcept
+{
+    if (is_logarithmic()) {
+        Number const min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+        Number const max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+        Number const log_range = std::log2(max) - std::log2(min);
+
+        return (std::log2(value) - std::log2(min)) / log_range;
+    }
+
+    return Param<Number>::value_to_ratio(value);
 }
 
 
@@ -438,9 +495,16 @@ void FloatParam::schedule_linear_ramp(
 ) noexcept {
     Seconds const last_event_time_offset = get_last_event_time_offset();
 
-    schedule(
-        EVT_LINEAR_RAMP, last_event_time_offset, 0, duration, target_value
-    );
+    if (is_logarithmic()) {
+        schedule(
+            EVT_LOG_RAMP, last_event_time_offset, 0, duration, target_value
+        );
+    } else {
+        schedule(
+            EVT_LINEAR_RAMP, last_event_time_offset, 0, duration, target_value
+        );
+    }
+
     schedule(
         EVT_SET_VALUE, last_event_time_offset + duration, 0, 0.0, target_value
     );
@@ -458,6 +522,10 @@ void FloatParam::handle_event(Event const& event) noexcept
 
         case EVT_LINEAR_RAMP:
             handle_linear_ramp_event(event);
+            break;
+
+        case EVT_LOG_RAMP:
+            handle_log_ramp_event(event);
             break;
 
         case EVT_CANCEL:
@@ -503,7 +571,44 @@ void FloatParam::handle_linear_ramp_event(Event const& event) noexcept
         value,
         target_value,
         (Number)duration * (Number)sample_rate,
-        duration
+        duration,
+        false
+    );
+}
+
+
+void FloatParam::handle_log_ramp_event(Event const& event) noexcept
+{
+    Number const value = value_to_ratio(get_raw_value());
+    Number const done_samples = (
+        (Number)(current_time - event.time_offset) * (Number)sample_rate
+    );
+    Seconds duration = (Seconds)event.number_param_1;
+    Number target_value = value_to_ratio(event.number_param_2);
+
+    if (target_value < 0.0) {
+        Number const min_diff = 0.0 - value;
+        Number const target_diff = target_value - value;
+
+        duration *= (Seconds)(min_diff / target_diff);
+        target_value = 0.0;
+    } else if (target_value > 1.0) {
+        Number const max_diff = 1.0 - value;
+        Number const target_diff = target_value - value;
+
+        duration *= (Seconds)(max_diff / target_diff);
+        target_value = 1.0;
+    }
+
+    latest_event_type = EVT_LINEAR_RAMP;
+    linear_ramp_state.init(
+        event.time_offset,
+        done_samples,
+        value,
+        target_value,
+        (Number)duration * (Number)sample_rate,
+        duration,
+        true
     );
 }
 
@@ -511,11 +616,15 @@ void FloatParam::handle_linear_ramp_event(Event const& event) noexcept
 void FloatParam::handle_cancel_event(Event const& event) noexcept
 {
     if (latest_event_type == EVT_LINEAR_RAMP) {
-        store_new_value(
-            linear_ramp_state.get_value_at(
-                event.time_offset - linear_ramp_state.start_time_offset
-            )
+        Number const stop_value = linear_ramp_state.get_value_at(
+            event.time_offset - linear_ramp_state.start_time_offset
         );
+
+        if (linear_ramp_state.is_logarithmic) {
+            store_new_value(ratio_to_value(stop_value));
+        } else {
+            store_new_value(stop_value);
+        }
     }
 
     latest_event_type = EVT_SET_VALUE;
@@ -696,8 +805,16 @@ void FloatParam::render(
     } else if (latest_event_type == EVT_LINEAR_RAMP) {
         Sample sample;
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = sample = (Sample)linear_ramp_state.get_next_value();
+        if (linear_ramp_state.is_logarithmic) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (
+                    (Sample)ratio_to_value(linear_ramp_state.get_next_value())
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)linear_ramp_state.get_next_value();
+            }
         }
 
         if (last_sample_index != first_sample_index) {
@@ -718,6 +835,7 @@ FloatParam::LinearRampState::LinearRampState() noexcept
     duration(0.0),
     delta(0.0),
     speed(0.0),
+    is_logarithmic(false),
     is_done(false)
 {
 }
@@ -729,8 +847,11 @@ void FloatParam::LinearRampState::init(
         Number const initial_value,
         Number const target_value,
         Number const duration_in_samples,
-        Seconds const duration
+        Seconds const duration,
+        bool const is_logarithmic
 ) noexcept {
+    LinearRampState::is_logarithmic = is_logarithmic;
+
     if (duration_in_samples > 0.0) {
         is_done = false;
 

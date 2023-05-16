@@ -72,7 +72,7 @@ Synth::Synth() noexcept
     : SignalProducer(
         OUT_CHANNELS,
         6                           // MODE + MIX + PM + FM + AM + bus
-        + 29 * 2                    // Modulator::Params + Carrier::Params
+        + 31 * 2                    // Modulator::Params + Carrier::Params
         + POLYPHONY * 2             // modulators + carriers
         + 1                         // effects
         + FLEXIBLE_CONTROLLERS * 6
@@ -147,6 +147,13 @@ Synth::Synth() noexcept
     create_flexible_controllers();
     create_envelopes();
     create_lfos();
+
+    modulator_params.filter_1_log_scale.set_value(ToggleParam::ON);
+    modulator_params.filter_2_log_scale.set_value(ToggleParam::ON);
+    carrier_params.filter_1_log_scale.set_value(ToggleParam::ON);
+    carrier_params.filter_2_log_scale.set_value(ToggleParam::ON);
+    effects.filter_1_log_scale.set_value(ToggleParam::ON);
+    effects.filter_2_log_scale.set_value(ToggleParam::ON);
 
     update_param_states();
 }
@@ -273,6 +280,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Filter1::TypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
+    register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_log_scale);
     register_float_param_as_child(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
     register_float_param_as_child(ParamId::MF1Q, modulator_params.filter_1_q);
     register_float_param_as_child(ParamId::MF1G, modulator_params.filter_1_gain);
@@ -280,6 +288,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Filter2::TypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
+    register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_log_scale);
     register_float_param_as_child(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
     register_float_param_as_child(ParamId::MF2Q, modulator_params.filter_2_q);
     register_float_param_as_child(ParamId::MF2G, modulator_params.filter_2_gain);
@@ -316,6 +325,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Filter1::TypeParam>(
         ParamId::CF1TYP, carrier_params.filter_1_type
     );
+    register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_log_scale);
     register_float_param_as_child(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
     register_float_param_as_child(ParamId::CF1Q, carrier_params.filter_1_q);
     register_float_param_as_child(ParamId::CF1G, carrier_params.filter_1_gain);
@@ -323,6 +333,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Filter2::TypeParam>(
         ParamId::CF2TYP, carrier_params.filter_2_type
     );
+    register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_log_scale);
     register_float_param_as_child(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
     register_float_param_as_child(ParamId::CF2Q, carrier_params.filter_2_q);
     register_float_param_as_child(ParamId::CF2G, carrier_params.filter_2_gain);
@@ -335,12 +346,14 @@ void Synth::register_effects_params() noexcept
 
     register_float_param(ParamId::EDG, effects.distortion.level);
 
-    register_param<Effects::Filter1<Bus>::TypeParam>(EF1TYP, effects.filter_1_type);
+    register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
+    register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_log_scale);
     register_float_param(ParamId::EF1FRQ, effects.filter_1.frequency);
     register_float_param(ParamId::EF1Q, effects.filter_1.q);
     register_float_param(ParamId::EF1G, effects.filter_1.gain);
 
-    register_param<Effects::Filter2<Bus>::TypeParam>(EF2TYP, effects.filter_2_type);
+    register_param<Effects::Filter2<Bus>::TypeParam>(ParamId::EF2TYP, effects.filter_2_type);
+    register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_log_scale);
     register_float_param(ParamId::EF2FRQ, effects.filter_2.frequency);
     register_float_param(ParamId::EF2Q, effects.filter_2.q);
     register_float_param(ParamId::EF2G, effects.filter_2.gain);
@@ -827,6 +840,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_default_ratio();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_default_ratio();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_default_ratio();
+        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_default_ratio();
+        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_default_ratio();
+        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_default_ratio();
+        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_default_ratio();
+        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_default_ratio();
+        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_default_ratio();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -865,6 +884,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_max_value();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_max_value();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_max_value();
+        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_max_value();
+        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_max_value();
+        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_max_value();
+        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_max_value();
+        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_max_value();
+        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_max_value();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -913,6 +938,12 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.ratio_to_value(ratio);
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.ratio_to_value(ratio);
         case ParamId::EESYN: return effects.echo.tempo_sync.ratio_to_value(ratio);
+        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.ratio_to_value(ratio);
+        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.ratio_to_value(ratio);
+        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.ratio_to_value(ratio);
+        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.ratio_to_value(ratio);
+        case ParamId::EF1LOG: return effects.filter_1_log_scale.ratio_to_value(ratio);
+        case ParamId::EF2LOG: return effects.filter_2_log_scale.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -1019,6 +1050,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L7SYN: lfos_rw[6]->tempo_sync.set_ratio(ratio); break;
             case ParamId::L8SYN: lfos_rw[7]->tempo_sync.set_ratio(ratio); break;
             case ParamId::EESYN: effects.echo.tempo_sync.set_ratio(ratio); break;
+            case ParamId::MF1LOG: modulator_params.filter_1_log_scale.set_ratio(ratio); break;
+            case ParamId::MF2LOG: modulator_params.filter_2_log_scale.set_ratio(ratio); break;
+            case ParamId::CF1LOG: carrier_params.filter_1_log_scale.set_ratio(ratio); break;
+            case ParamId::CF2LOG: carrier_params.filter_2_log_scale.set_ratio(ratio); break;
+            case ParamId::EF1LOG: effects.filter_1_log_scale.set_ratio(ratio); break;
+            case ParamId::EF2LOG: effects.filter_2_log_scale.set_ratio(ratio); break;
             default: break; // This should never be reached.
         }
     }
@@ -1203,6 +1240,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L7SYN: return lfos_rw[6]->tempo_sync.get_ratio();
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_ratio();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_ratio();
+        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_ratio();
+        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_ratio();
+        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_ratio();
+        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_ratio();
+        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_ratio();
+        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }

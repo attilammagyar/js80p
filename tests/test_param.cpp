@@ -1364,6 +1364,86 @@ TEST(when_a_flexible_controller_is_assigned_to_the_leader_of_a_float_param_then_
 })
 
 
+TEST(a_float_param_may_use_logarithmic_scale, {
+    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+    constexpr Number log2_min = std::log2(min);
+    constexpr Number log2_max = std::log2(max);
+    constexpr Integer block_size = 15;
+    constexpr Frequency sample_rate = 14.0;
+    constexpr Sample expected_samples_log[] = {
+        0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.0, 12.0,
+    };
+    ToggleParam log_scale("log", ToggleParam::OFF);
+    FloatParam leader(
+        "freq",
+        min,
+        max,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+    );
+    FloatParam follower(leader);
+    Envelope envelope("env");
+    Sample const* rendered_samples;
+    Sample rendered_samples_log[block_size];
+
+    leader.set_sample_rate(sample_rate);
+    leader.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MIN);
+    leader.set_envelope(&envelope);
+
+    follower.set_sample_rate(sample_rate);
+    follower.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MIN);
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(1.0);
+    envelope.peak_value.set_value(std::log2(16384.0) / (log2_max - log2_min));
+
+    assert_eq(min, follower.ratio_to_value(0.0), DOUBLE_DELTA);
+    assert_eq((min + max) / 2.0, follower.ratio_to_value(0.5), DOUBLE_DELTA);
+    assert_eq(0.5, follower.value_to_ratio((min + max) / 2.0), DOUBLE_DELTA);
+    assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
+
+    log_scale.set_value(ToggleParam::ON);
+
+    leader.set_ratio(0.3);
+    assert_eq(0.3, leader.get_ratio(), 0.001);
+
+    assert_eq(min, follower.ratio_to_value(0.0), DOUBLE_DELTA);
+    assert_eq(
+        (log2_min + log2_max) / 2.0,
+        std::log2(follower.ratio_to_value(0.5)),
+        0.02
+    );
+    assert_eq(
+        0.5,
+        follower.value_to_ratio(std::pow(2.0, (log2_min + log2_max) / 2.0)),
+        DOUBLE_DELTA
+    );
+    assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
+
+    follower.start_envelope(0.0);
+    follower.cancel_events(12.0 / sample_rate);
+
+    assert_float_param_changes_during_rendering(
+        follower, 1, block_size, &rendered_samples
+    );
+
+    for (Integer i = 0; i != block_size; ++i) {
+        rendered_samples_log[i] = std::log2(rendered_samples[i]);
+    }
+
+    assert_eq(expected_samples_log, rendered_samples_log, block_size, 0.027);
+});
+
+
 class Modulator : public SignalProducer
 {
     friend class SignalProducer;

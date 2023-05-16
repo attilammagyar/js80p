@@ -404,8 +404,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L7SYN = 278,     ///< LFO 7 Tempo Synchronization
             L8SYN = 279,     ///< LFO 8 Tempo Synchronization
             EESYN = 280,     ///< Effects Echo Tempo Synchronization
+            MF1LOG = 281,    ///< Modulator Filter 1 Logarithmic Frequency
+            MF2LOG = 282,    ///< Modulator Filter 2 Logarithmic Frequency
+            CF1LOG = 283,    ///< Carrier Filter 1 Logarithmic Frequency
+            CF2LOG = 284,    ///< Carrier Filter 2 Logarithmic Frequency
+            EF1LOG = 285,    ///< Effects Filter 1 Logarithmic Frequency
+            EF2LOG = 286,    ///< Effects Filter 2 Logarithmic Frequency
 
-            MAX_PARAM_ID = 281
+            MAX_PARAM_ID = 287
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

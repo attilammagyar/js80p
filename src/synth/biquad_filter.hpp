@@ -83,6 +83,14 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             TypeParam& type,
             BiquadFilterSharedCache* shared_cache = NULL
         ) noexcept;
+
+        BiquadFilter(
+            std::string const name,
+            InputSignalProducerClass& input,
+            TypeParam& type,
+            ToggleParam const& log_scale_toggle
+        ) noexcept;
+
         BiquadFilter(
             InputSignalProducerClass& input,
             TypeParam& type,
@@ -91,14 +99,12 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParam& gain_leader,
             BiquadFilterSharedCache* shared_cache = NULL
         ) noexcept;
+
         virtual ~BiquadFilter();
 
-        virtual void set_sample_rate(
-            Frequency const new_sample_rate
-        ) noexcept override;
-        virtual void set_block_size(
-            Integer const new_block_size
-        ) noexcept override;
+        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
+
+        virtual void set_block_size(Integer const new_block_size) noexcept override;
 
         virtual void reset() noexcept override;
 
