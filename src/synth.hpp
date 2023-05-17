@@ -881,7 +881,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
-        void assign_controller_to_float_param(
+        bool assign_controller_to_float_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;

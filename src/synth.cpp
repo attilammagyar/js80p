@@ -1078,17 +1078,23 @@ void Synth::handle_assign_controller(
         ParamId const param_id,
         Byte const controller_id
 ) noexcept {
-    controller_assignments[param_id].store(controller_id);
     bool is_assigned = false;
 
     if (param_id < FLOAT_PARAMS) {
-        assign_controller_to_float_param(param_id, (ControllerId)controller_id);
-        is_assigned = true;
+        is_assigned = assign_controller_to_float_param(
+            param_id, (ControllerId)controller_id
+        );
     } else {
         is_assigned = assign_controller_to_param(param_id, (ControllerId)controller_id);
     }
 
-    if (is_assigned && (ControllerId)controller_id == ControllerId::MIDI_LEARN) {
+    if (!is_assigned) {
+        return;
+    }
+
+    controller_assignments[param_id].store(controller_id);
+
+    if ((ControllerId)controller_id == ControllerId::MIDI_LEARN) {
         is_learning = true;
     }
 }
@@ -1105,8 +1111,12 @@ bool Synth::assign_controller_to_param(
         ControllerId const controller_id
 ) noexcept {
     MidiController* midi_controller = NULL;
+    bool is_assigned = false;
+    bool is_special = false;
 
     switch (controller_id) {
+        case NONE: is_special = true; break;
+
         case PITCH_WHEEL: midi_controller = &pitch_wheel; break;
         case NOTE: midi_controller = &note; break;
         case VELOCITY: midi_controller = &velocity; break;
@@ -1139,10 +1149,10 @@ bool Synth::assign_controller_to_param(
 
         case CHANNEL_AFTERTOUCH: break; // TODO
 
-        case MIDI_LEARN: break;
+        case MIDI_LEARN: is_special = true; break;
 
         default: {
-            if (controller_id < MIDI_CONTROLLERS) {
+            if (is_supported_midi_controller(controller_id)) {
                 midi_controller = midi_controllers[controller_id];
             }
 
@@ -1151,29 +1161,31 @@ bool Synth::assign_controller_to_param(
     }
 
     switch (param_id) {
-        case ParamId::MODE: mode.set_midi_controller(midi_controller); return true;
-        case ParamId::MWAV: modulator_params.waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::CWAV: carrier_params.waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::MF1TYP: modulator_params.filter_1_type.set_midi_controller(midi_controller); return true;
-        case ParamId::MF2TYP: modulator_params.filter_2_type.set_midi_controller(midi_controller); return true;
-        case ParamId::CF1TYP: carrier_params.filter_1_type.set_midi_controller(midi_controller); return true;
-        case ParamId::CF2TYP: carrier_params.filter_2_type.set_midi_controller(midi_controller); return true;
-        case ParamId::EF1TYP: effects.filter_1_type.set_midi_controller(midi_controller); return true;
-        case ParamId::EF2TYP: effects.filter_2_type.set_midi_controller(midi_controller); return true;
-        case ParamId::L1WAV: lfos_rw[0]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L2WAV: lfos_rw[1]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L3WAV: lfos_rw[2]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L4WAV: lfos_rw[3]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L5WAV: lfos_rw[4]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L6WAV: lfos_rw[5]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L7WAV: lfos_rw[6]->waveform.set_midi_controller(midi_controller); return true;
-        case ParamId::L8WAV: lfos_rw[7]->waveform.set_midi_controller(midi_controller); return true;
-        default: return false;
+        case ParamId::MODE: mode.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::MWAV: modulator_params.waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::CWAV: carrier_params.waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::MF1TYP: modulator_params.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::MF2TYP: modulator_params.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::CF1TYP: carrier_params.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::CF2TYP: carrier_params.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::EF1TYP: effects.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::EF2TYP: effects.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L1WAV: lfos_rw[0]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L2WAV: lfos_rw[1]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L3WAV: lfos_rw[2]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L4WAV: lfos_rw[3]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L5WAV: lfos_rw[4]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L6WAV: lfos_rw[5]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L7WAV: lfos_rw[6]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        case ParamId::L8WAV: lfos_rw[7]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
+        default: break;
     }
+
+    return is_assigned && (is_special || midi_controller != NULL);
 }
 
 
-void Synth::assign_controller_to_float_param(
+bool Synth::assign_controller_to_float_param(
         ParamId const param_id,
         ControllerId const controller_id
 ) noexcept {
@@ -1185,49 +1197,55 @@ void Synth::assign_controller_to_float_param(
     param->set_lfo(NULL);
 
     switch (controller_id) {
-        case PITCH_WHEEL: param->set_midi_controller(&pitch_wheel); break;
-        case NOTE: param->set_midi_controller(&note); break;
-        case VELOCITY: param->set_midi_controller(&velocity); break;
+        case NONE: return true;
 
-        case FLEXIBLE_CONTROLLER_1: param->set_flexible_controller(flexible_controllers[0]); break;
-        case FLEXIBLE_CONTROLLER_2: param->set_flexible_controller(flexible_controllers[1]); break;
-        case FLEXIBLE_CONTROLLER_3: param->set_flexible_controller(flexible_controllers[2]); break;
-        case FLEXIBLE_CONTROLLER_4: param->set_flexible_controller(flexible_controllers[3]); break;
-        case FLEXIBLE_CONTROLLER_5: param->set_flexible_controller(flexible_controllers[4]); break;
-        case FLEXIBLE_CONTROLLER_6: param->set_flexible_controller(flexible_controllers[5]); break;
-        case FLEXIBLE_CONTROLLER_7: param->set_flexible_controller(flexible_controllers[6]); break;
-        case FLEXIBLE_CONTROLLER_8: param->set_flexible_controller(flexible_controllers[7]); break;
-        case FLEXIBLE_CONTROLLER_9: param->set_flexible_controller(flexible_controllers[8]); break;
-        case FLEXIBLE_CONTROLLER_10: param->set_flexible_controller(flexible_controllers[9]); break;
+        case PITCH_WHEEL: param->set_midi_controller(&pitch_wheel); return true;
+        case NOTE: param->set_midi_controller(&note); return true;
+        case VELOCITY: param->set_midi_controller(&velocity); return true;
 
-        case LFO_1: param->set_lfo(lfos_rw[0]); break;
-        case LFO_2: param->set_lfo(lfos_rw[1]); break;
-        case LFO_3: param->set_lfo(lfos_rw[2]); break;
-        case LFO_4: param->set_lfo(lfos_rw[3]); break;
-        case LFO_5: param->set_lfo(lfos_rw[4]); break;
-        case LFO_6: param->set_lfo(lfos_rw[5]); break;
-        case LFO_7: param->set_lfo(lfos_rw[6]); break;
-        case LFO_8: param->set_lfo(lfos_rw[7]); break;
+        case FLEXIBLE_CONTROLLER_1: param->set_flexible_controller(flexible_controllers[0]); return true;
+        case FLEXIBLE_CONTROLLER_2: param->set_flexible_controller(flexible_controllers[1]); return true;
+        case FLEXIBLE_CONTROLLER_3: param->set_flexible_controller(flexible_controllers[2]); return true;
+        case FLEXIBLE_CONTROLLER_4: param->set_flexible_controller(flexible_controllers[3]); return true;
+        case FLEXIBLE_CONTROLLER_5: param->set_flexible_controller(flexible_controllers[4]); return true;
+        case FLEXIBLE_CONTROLLER_6: param->set_flexible_controller(flexible_controllers[5]); return true;
+        case FLEXIBLE_CONTROLLER_7: param->set_flexible_controller(flexible_controllers[6]); return true;
+        case FLEXIBLE_CONTROLLER_8: param->set_flexible_controller(flexible_controllers[7]); return true;
+        case FLEXIBLE_CONTROLLER_9: param->set_flexible_controller(flexible_controllers[8]); return true;
+        case FLEXIBLE_CONTROLLER_10: param->set_flexible_controller(flexible_controllers[9]); return true;
 
-        case ENVELOPE_1: param->set_envelope(envelopes[0]); break;
-        case ENVELOPE_2: param->set_envelope(envelopes[1]); break;
-        case ENVELOPE_3: param->set_envelope(envelopes[2]); break;
-        case ENVELOPE_4: param->set_envelope(envelopes[3]); break;
-        case ENVELOPE_5: param->set_envelope(envelopes[4]); break;
-        case ENVELOPE_6: param->set_envelope(envelopes[5]); break;
+        case LFO_1: param->set_lfo(lfos_rw[0]); return true;
+        case LFO_2: param->set_lfo(lfos_rw[1]); return true;
+        case LFO_3: param->set_lfo(lfos_rw[2]); return true;
+        case LFO_4: param->set_lfo(lfos_rw[3]); return true;
+        case LFO_5: param->set_lfo(lfos_rw[4]); return true;
+        case LFO_6: param->set_lfo(lfos_rw[5]); return true;
+        case LFO_7: param->set_lfo(lfos_rw[6]); return true;
+        case LFO_8: param->set_lfo(lfos_rw[7]); return true;
 
-        case CHANNEL_AFTERTOUCH: break; // TODO
+        case ENVELOPE_1: param->set_envelope(envelopes[0]); return true;
+        case ENVELOPE_2: param->set_envelope(envelopes[1]); return true;
+        case ENVELOPE_3: param->set_envelope(envelopes[2]); return true;
+        case ENVELOPE_4: param->set_envelope(envelopes[3]); return true;
+        case ENVELOPE_5: param->set_envelope(envelopes[4]); return true;
+        case ENVELOPE_6: param->set_envelope(envelopes[5]); return true;
 
-        case MIDI_LEARN: break;
+        case CHANNEL_AFTERTOUCH: return false; // TODO
+
+        case MIDI_LEARN: return true;
 
         default: {
-            if (controller_id < MIDI_CONTROLLERS) {
+            if (is_supported_midi_controller(controller_id)) {
                 param->set_midi_controller(midi_controllers[controller_id]);
+
+                return true;
             }
 
             break;
         }
     }
+
+    return false;
 }
 
 
