@@ -198,7 +198,6 @@ void Synth::initialize_supported_midi_controllers() noexcept
     Synth::supported_midi_controllers[Synth::ControllerId::UNDEFINED_14] = true;
     Synth::supported_midi_controllers[Synth::ControllerId::UNDEFINED_15] = true;
     Synth::supported_midi_controllers[Synth::ControllerId::UNDEFINED_16] = true;
-    Synth::supported_midi_controllers[Synth::ControllerId::PORTAMENTO_AMOUNT] = true;
     Synth::supported_midi_controllers[Synth::ControllerId::SOUND_1] = true;
     Synth::supported_midi_controllers[Synth::ControllerId::SOUND_2] = true;
     Synth::supported_midi_controllers[Synth::ControllerId::SOUND_3] = true;
