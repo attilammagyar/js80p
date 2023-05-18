@@ -258,6 +258,7 @@ void Background::refresh()
     if (next_full_refresh == 0) {
         next_full_refresh = FULL_REFRESH_TICKS;
         body->refresh_param_editors();
+        body->refresh_toggle_switches();
     } else {
         body->refresh_controlled_param_editors();
     }
