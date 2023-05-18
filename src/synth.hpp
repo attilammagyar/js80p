@@ -151,7 +151,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             EOG = 56,        ///< Effects Overdrive Gain
 
-            EDG = 57,        ///< Effects Distortaion Gain
+            EDG = 57,        ///< Effects Distortion Gain
 
             EF1FRQ = 58,     ///< Effects Filter 1 Frequency
             EF1Q = 59,       ///< Effects Filter 1 Q Factor

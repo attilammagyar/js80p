@@ -160,7 +160,7 @@ char const* const GUI::PARAMS[] = {
 
     [Synth::ParamId::EOG] = "Overdrive Gain (%)",
 
-    [Synth::ParamId::EDG] = "Distortaion Gain (%)",
+    [Synth::ParamId::EDG] = "Distortion Gain (%)",
 
     [Synth::ParamId::EF1FRQ] = "Filter 1 Frequency (Hz)",
     [Synth::ParamId::EF1Q] = "Filter 1 Q Factor",

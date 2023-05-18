@@ -72,7 +72,7 @@ def print_effect_params(param_id: int) -> int:
     params = [
         ("$OG", "   ///< $ Overdrive Gain"),
 
-        ("$DG", "   ///< $ Distortaion Gain"),
+        ("$DG", "   ///< $ Distortion Gain"),
 
         ("$F1FRQ", "///< $ Filter 1 Frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor"),
