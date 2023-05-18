@@ -39,6 +39,15 @@ SimpleOscillator wavetable_cache(wavetable_cache_waveform);
 constexpr Number OUT_VOLUME_PER_CHANNEL = std::sin(Math::PI / 4.0);
 
 
+/*
+MIDI reserves CC 32-63 for the lowest 7 bits of CC 0-31 messages
+respectively. Even though JS80P doesn't read 14 bit CC messages yet, we
+don't want to allow assigning these CC numbers separately, because that
+would complicate implementing 14 bit messages.
+*/
+constexpr Midi::Controller UNSUPPORTED_CC = 33;
+
+
 TEST(communication_with_the_gui_is_lock_free, {
     Synth synth;
 
@@ -95,6 +104,17 @@ TEST(synth_rendering_is_independent_of_chunk_size, {
 })
 
 
+void assign_controller(
+        Synth& synth,
+        Synth::ParamId const param_id,
+        Byte const controller_id
+) {
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER, param_id, 0.0, controller_id
+    );
+}
+
+
 TEST(messages_get_processed_during_rendering, {
     Synth synth;
     Number const inv_saw_as_ratio = (
@@ -116,12 +136,7 @@ TEST(messages_get_processed_during_rendering, {
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0
     );
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::CVOL,
-        0.0,
-        Synth::ControllerId::ENVELOPE_3
-    );
+    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_3);
 
     assert_eq(1.0, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
     assert_eq(NULL, synth.carrier_params.volume.get_envelope());
@@ -164,30 +179,17 @@ TEST(midi_controller_changes_can_affect_parameters, {
     Midi::Controller invalid = 127;
     Midi::Controller unused = 0;
 
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::PM,
-        0.0,
-        Synth::ControllerId::VOLUME
+    assign_controller(synth, Synth::ParamId::PM, Synth::ControllerId::VOLUME);
+    assign_controller(
+        synth, Synth::ParamId::MFIN, Synth::ControllerId::PITCH_WHEEL
     );
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::MFIN,
-        0.0,
-        Synth::ControllerId::PITCH_WHEEL
+    assign_controller(
+        synth, Synth::ParamId::MAMP, Synth::ControllerId::VELOCITY
     );
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::MAMP,
-        0.0,
-        Synth::ControllerId::VELOCITY
+    assign_controller(
+        synth, Synth::ParamId::CWAV, Synth::ControllerId::MODULATION_WHEEL
     );
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::CWAV,
-        0.0,
-        Synth::ControllerId::MODULATION_WHEEL
-    );
+
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0.0
     );
@@ -200,6 +202,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0
     );
+
     synth.control_change(0.0, 1, Midi::VOLUME, 0.42);
     synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 1.0);
     synth.control_change(0.0, 1, invalid, 0.123);
@@ -399,23 +402,13 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
 })
 
 
-TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_replaces_by_the_first_supported_changing_midi_controller, {
-    constexpr Midi::Controller unsupported = 125;
-
+TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_replaced_by_the_first_supported_changing_midi_controller, {
     Synth synth;
 
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::CVOL,
-        0.0,
-        Synth::ControllerId::MIDI_LEARN
-    );
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::MVOL,
-        0.0,
-        Synth::ControllerId::MIDI_LEARN
-    );
+    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::MIDI_LEARN);
+    assign_controller(synth, Synth::ParamId::MVOL, Synth::ControllerId::MIDI_LEARN);
+    assign_controller(synth, Synth::ParamId::MWAV, Synth::ControllerId::MIDI_LEARN);
+
     synth.process_messages();
 
     assert_eq(
@@ -426,8 +419,12 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
         Synth::ControllerId::MIDI_LEARN,
         synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
     );
+    assert_eq(
+        Synth::ControllerId::MIDI_LEARN,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+    );
 
-    synth.control_change(0.000001, 1, unsupported, 0.1);
+    synth.control_change(0.000001, 1, UNSUPPORTED_CC, 0.1);
     synth.control_change(0.000002, 1, Midi::GENERAL_1, 0.2);
     synth.control_change(0.000003, 1, Midi::GENERAL_2, 0.3);
 
@@ -439,8 +436,70 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
         Synth::ControllerId::GENERAL_1,
         synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
     );
+    assert_eq(
+        Synth::ControllerId::GENERAL_1,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+    );
     assert_neq(NULL, synth.modulator_params.volume.get_midi_controller());
     assert_neq(NULL, synth.carrier_params.volume.get_midi_controller());
     assert_eq(0.2, synth.modulator_params.volume.get_value(), DOUBLE_DELTA);
     assert_eq(0.2, synth.carrier_params.volume.get_value(), DOUBLE_DELTA);
 });
+
+
+TEST(unsupported_controllers_cannot_be_assigned, {
+    Synth synth;
+
+    assign_controller(
+        synth, Synth::ParamId::MWAV, Synth::ControllerId::MODULATION_WHEEL
+    );
+    assign_controller(
+        synth, Synth::ParamId::MVOL, Synth::ControllerId::MODULATION_WHEEL
+    );
+    assign_controller(synth, Synth::ParamId::MWAV, UNSUPPORTED_CC);
+    assign_controller(synth, Synth::ParamId::MVOL, UNSUPPORTED_CC);
+    assign_controller(synth, Synth::ParamId::CWAV, UNSUPPORTED_CC);
+    assign_controller(synth, Synth::ParamId::CVOL, UNSUPPORTED_CC);
+
+    synth.process_messages();
+
+    assert_eq(
+        Synth::ControllerId::MODULATION_WHEEL,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+    );
+    assert_eq(
+        Synth::ControllerId::MODULATION_WHEEL,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CWAV)
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+    );
+})
+
+
+TEST(toggles_cannot_have_controllers_assigned_to_them, {
+    Synth synth;
+
+    assign_controller(
+        synth, Synth::ParamId::MF1LOG, Synth::ControllerId::MODULATION_WHEEL
+    );
+    assign_controller(
+        synth, Synth::ParamId::L1SYN, Synth::ControllerId::MIDI_LEARN
+    );
+
+    synth.process_messages();
+
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::MF1LOG)
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::L1SYN)
+    );
+})
