@@ -310,3 +310,32 @@ TEST(extremely_long_lines_may_be_truncated, {
         0.123, synth.get_param_ratio_atomic(Synth::ParamId::CVOL), DOUBLE_DELTA
     );
 })
+
+
+TEST(toggle_params_are_loaded_before_other_params, {
+    Synth synth;
+    Serializer serializer;
+    std::string const patch = (
+        "[js80p]\n"
+        "MF1FRQ = 0.75\n"
+        "MF1LOG = 1\n"
+        "MF2LOG = 0\n"
+        "MF2FRQ = 0.75\n"
+    );
+
+    serializer.import(&synth, patch);
+    synth.process_messages();
+
+    assert_eq(
+        ToggleParam::ON, synth.modulator_params.filter_1_log_scale.get_value(), DOUBLE_DELTA
+    );
+    assert_eq(
+        1928.2, synth.modulator_params.filter_1_frequency.get_value(), 19.282
+    );
+    assert_eq(
+        ToggleParam::OFF, synth.modulator_params.filter_2_log_scale.get_value(), DOUBLE_DELTA
+    );
+    assert_eq(
+        18000.0, synth.modulator_params.filter_2_frequency.get_value(), 1.0
+    );
+})

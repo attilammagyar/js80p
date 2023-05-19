@@ -73,7 +73,11 @@ class Serializer
         static bool is_line_break(char const c) noexcept;
         static bool is_inline_whitespace(char const c) noexcept;
         static bool is_comment_leader(char const c) noexcept;
-        static void process_line(Synth* synth, std::string const line) noexcept;
+        static void process_line(
+            std::vector<Synth::Message>& messages,
+            Synth* synth,
+            std::string const line
+        ) noexcept;
         static bool skipping_remaining_whitespace_or_comment_reaches_the_end(
             std::string::const_iterator& it,
             std::string::const_iterator const end

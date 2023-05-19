@@ -117,6 +117,9 @@ void assign_controller(
 
 TEST(messages_get_processed_during_rendering, {
     Synth synth;
+    Synth::Message message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
+    );
     Number const inv_saw_as_ratio = (
         synth.modulator_params.waveform.value_to_ratio(
             SimpleOscillator::INVERSE_SAWTOOTH
@@ -130,9 +133,7 @@ TEST(messages_get_processed_during_rendering, {
     synth.push_message(
         Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0
     );
-    synth.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
-    );
+    synth.push_message(message);
     synth.push_message(
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0
     );
@@ -148,6 +149,7 @@ TEST(messages_get_processed_during_rendering, {
         synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
     );
 
+    message.number_param = 0.321;
     synth.process_messages();
 
     assert_eq(0.123, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);

@@ -204,8 +204,13 @@ bool Serializer::is_section_name_char(char const c) noexcept
 
 void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) noexcept
 {
+    typedef std::vector<Synth::Message> Messages;
+
+    Messages messages;
     char section_name[7];
     bool inside_js80p_section = false;
+
+    messages.reserve(600);
 
     for (std::vector<std::string>::iterator it = lines->begin(); it != lines->end(); ++it) {
         std::string line = *it;
@@ -218,7 +223,19 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
                 continue;
             }
         } else if (inside_js80p_section) {
-            process_line(synth, line);
+            process_line(messages, synth, line);
+        }
+    }
+
+    for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
+        if (it->param_id > Synth::ParamId::L1SYN) {
+            synth->push_message(*it);
+        }
+    }
+
+    for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
+        if (it->param_id <= Synth::ParamId::L1SYN) {
+            synth->push_message(*it);
         }
     }
 }
@@ -270,8 +287,11 @@ bool Serializer::parse_section_name(
 }
 
 
-void Serializer::process_line(Synth* synth, std::string const line) noexcept
-{
+void Serializer::process_line(
+        std::vector<Synth::Message>& messages,
+        Synth* synth,
+        std::string const line
+) noexcept {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
     Synth::ParamId param_id;
@@ -304,14 +324,18 @@ void Serializer::process_line(Synth* synth, std::string const line) noexcept
     }
 
     if (is_controller_assignment) {
-        synth->push_message(
-            Synth::MessageType::ASSIGN_CONTROLLER,
-            param_id,
-            0.0,
-            (Byte)float_to_controller_id(number)
+        messages.push_back(
+            Synth::Message(
+                Synth::MessageType::ASSIGN_CONTROLLER,
+                param_id,
+                0.0,
+                (Byte)float_to_controller_id(number)
+            )
         );
     } else {
-        synth->push_message(Synth::MessageType::SET_PARAM, param_id, number, 0);
+        messages.push_back(
+            Synth::Message(Synth::MessageType::SET_PARAM, param_id, number, 0)
+        );
     }
 }
 

@@ -539,6 +539,26 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr int MODES = 14;
 
+        class Message
+        {
+            public:
+                Message() noexcept;
+                Message(Message const& message) noexcept;
+                Message(
+                    MessageType const type,
+                    ParamId const param_id,
+                    Number const number_param,
+                    Byte const byte_param
+                ) noexcept;
+
+                Message& operator=(Message const& message) noexcept;
+
+                MessageType type;
+                ParamId param_id;
+                Number number_param;
+                Byte byte_param;
+        };
+
         class ModeParam : public Param<Mode>
         {
             public:
@@ -575,6 +595,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number const number_param,
             Byte const byte_param
         ) noexcept;
+
+        /**
+         * \brief Thread-safe way to change the state of the synthesizer outside
+         *        the audio thread.
+         */
+        void push_message(Message const& message) noexcept;
 
         void process_messages() noexcept;
 
@@ -677,26 +703,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Frequency frequencies[Midi::NOTES];
 
     private:
-        class Message
-        {
-            public:
-                Message() noexcept;
-                Message(Message const& message) noexcept;
-                Message(
-                    MessageType const type,
-                    ParamId const param_id,
-                    Number const number_param,
-                    Byte const byte_param
-                ) noexcept;
-
-                Message& operator=(Message const& message) noexcept;
-
-                MessageType type;
-                ParamId param_id;
-                Number number_param;
-                Byte byte_param;
-        };
-
         /*
         See Timur Doumler [ACCU 2017]: Lock-free programming with modern C++
           https://www.youtube.com/watch?v=qdrp6k4rcP4

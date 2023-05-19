@@ -777,13 +777,19 @@ Sample const* const* Synth::generate_samples(
 
 
 void Synth::push_message(
-    MessageType const type,
-    ParamId const param_id,
-    Number const number_param,
-    Byte const byte_param
+        MessageType const type,
+        ParamId const param_id,
+        Number const number_param,
+        Byte const byte_param
 ) noexcept {
     Message message(type, param_id, number_param, byte_param);
 
+    push_message(message);
+}
+
+
+void Synth::push_message(Message const& message) noexcept
+{
     messages.push(message);
 }
 
