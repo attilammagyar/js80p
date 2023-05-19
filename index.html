@@ -136,7 +136,7 @@ code {
   <div class="center" id="tagline">
     A MIDI driven, performance oriented, versatile synthesizer
   </div>
-  <h2 class="center" id="download-anchor">Download (v1.3.0)</h2>
+  <h2 class="center" id="download-anchor">Download (v1.4.0)</h2>
   <div class="section" id="download">
     <p class="center">
       <a href="#which">Which distribution should I download?</a>
@@ -144,47 +144,64 @@ code {
     <h3>Windows</h3>
     <ul>
       <li>
-        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-64bit-fst.zip">Download (1.5M)</a>
+        Windows, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-windows-64bit-fst.zip">Download (1.6M)</a>
       </li>
       <li>
-        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-64bit-vst3.zip">Download (1.8M)</a>
+        Windows, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-windows-64bit-vst3.zip">Download (1.8M)</a>
       </li>
       <li>
-        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-32bit-fst.zip">Download (1.5M)</a>
+        Windows, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-windows-32bit-fst.zip">Download (1.5M)</a>
       </li>
       <li>
-        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-windows-32bit-vst3.zip">Download (1.7M)</a>
+        Windows, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-windows-32bit-vst3.zip">Download (1.8M)</a>
       </li>
     </ul>
     <h3>Linux</h3>
     <ul>
       <li>
-        Linux, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-64bit-fst.zip">Download (900K)</a>
+        Linux, 64-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-linux-64bit-fst.zip">Download (916K)</a>
       </li>
       <li>
-        Linux, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-64bit-vst3.zip">Download (1.1M)</a>
+        Linux, 64-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-linux-64bit-vst3.zip">Download (1.1M)</a>
       </li>
       <li>
-        Linux, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-32bit-fst.zip">Download (912K)</a>
+        Linux, 32-bit, FST (VST 2.4): <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-linux-32bit-fst.zip">Download (932K)</a>
       </li>
       <li>
-        Linux, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-linux-32bit-vst3.zip">Download (1.1M)</a>
+        Linux, 32-bit, VST 3: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-linux-32bit-vst3.zip">Download (1.1M)</a>
       </li>
     </ul>
     <h3>Source Code</h3>
     <ul>
       <li>
-        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.3.0/js80p-1_3_0-src.zip">Download (5.5M)</a>
+        Source: <a class="button" href="https://github.com/attilammagyar/js80p/releases/download/v1.4.0/js80p-1_4_0-src.zip">Download (5.5M)</a>
       </li>
     </ul>
-    <h3 class="center">What's New in v1.3.0</h3>
+    <h3 class="center">What's New in v1.4.0</h3>
     <ul>
-      <li><p>The GUI will now indicate clearly when a parameter is fully controlled by
-      an envelope</p></li>
-      <li><p>Bugfix: eliminate noise which occurs when FL Studio is running the plugin
-      with variable buffer sizes and the Echo or Reverb effects are turned on</p></li>
-      <li><p>Bugfix: Reverb and Echo should not consume any CPU when Wet Volume is 0% and
-      Dry Volume is 100%</p></li>
+      <li>
+        <p>
+          MIDI Learn: assign this special controller to a parameter, then move
+          a fader, knob, or the modulation wheel, etc. on your MIDI keyboard,
+          and the plugin will automatically assign that controller to the
+          parameter
+        </p>
+      </li>
+      <li><p>Cutoff frequency of filters can now use logarithmic scale</p></li>
+      <li>
+        <p>
+          LFO frequency and Echo time can now be synchronized to the host's tempo
+        </p>
+      </li>
+      <li><p>New preset: <code>sandstorm.js80p</code></p></li>
+      <li>
+        <p>
+          Bugfix: include CC 6 (Data Entry) in controller selection, and remove
+          CC 84 (Portamento), since the latter is not supposed to represent a
+          continuous controller
+        </p>
+      </li>
+      <li><p>Bugfix: fix the typo in the name of the Distortion effect</p></li>
     </ul>
     <p class="center">
       <a href="https://github.com/attilammagyar/js80p/releases/">Previous releases</a>
