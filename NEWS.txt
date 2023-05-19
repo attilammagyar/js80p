@@ -1,4 +1,4 @@
-v1.4.0 (2023-05-??)
+v1.4.0 (2023-05-20)
  * MIDI Learn: assign this special controller to a parameter, then move a
    fader, knob, or the modulation wheel, etc. on your MIDI keyboard, and the
    plugin will automatically assign that controller to the parameter
@@ -8,6 +8,7 @@ v1.4.0 (2023-05-??)
  * Bugfix: include CC 6 (Data Entry) in controller selection, and remove CC 84
    (Portamento), since the latter is not supposed to represent a continuous
    controller
+ * Bugfix: fix the typo in the name of the Distortion effect
 
 v1.3.0 (2023-05-13)
  * The GUI will now indicate clearly when a parameter is fully controlled by
