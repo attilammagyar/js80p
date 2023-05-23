@@ -1105,45 +1105,43 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 
 
 TEST(float_param_follows_midi_controller_changes_gradually, {
-    constexpr Integer block_size = 200;
-    constexpr Sample expected_samples[block_size] = {
-        0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
-        0.000, 0.003, 0.006, 0.010, 0.013, 0.016, 0.020, 0.023, 0.026, 0.030,
-        0.033, 0.036, 0.040, 0.043, 0.046, 0.050, 0.053, 0.056, 0.060, 0.063,
-        0.066, 0.070, 0.073, 0.076, 0.080, 0.083, 0.086, 0.090, 0.093, 0.096,
-        0.100, 0.100, 0.100, 0.101, 0.105, 0.108, 0.111, 0.115, 0.118, 0.121,
-        0.125, 0.128, 0.131, 0.135, 0.138, 0.141, 0.145, 0.148, 0.151, 0.155,
-        0.158, 0.161, 0.165, 0.168, 0.171, 0.175, 0.178, 0.181, 0.185, 0.188,
-        0.191, 0.195, 0.198, 0.201, 0.205, 0.208, 0.211, 0.215, 0.218, 0.221,
-        0.225, 0.228, 0.231, 0.235, 0.238, 0.241, 0.245, 0.248, 0.251, 0.255,
-        0.258, 0.261, 0.265, 0.268, 0.271, 0.275, 0.278, 0.281, 0.285, 0.288,
-        0.291, 0.295, 0.298, 0.301, 0.305, 0.308, 0.311, 0.315, 0.318, 0.321,
-        0.325, 0.328, 0.331, 0.335, 0.338, 0.341, 0.345, 0.348, 0.351, 0.355,
-        0.358, 0.361, 0.365, 0.368, 0.371, 0.375, 0.378, 0.381, 0.385, 0.388,
-        0.391, 0.395, 0.398, 0.401, 0.405, 0.408, 0.411, 0.415, 0.418, 0.421,
-        0.425, 0.428, 0.431, 0.435, 0.438, 0.441, 0.445, 0.448, 0.451, 0.455,
-        0.458, 0.461, 0.465, 0.468, 0.471, 0.475, 0.478, 0.481, 0.485, 0.488,
-        0.491, 0.495, 0.498, 0.501, 0.505, 0.508, 0.511, 0.515, 0.518, 0.521,
-        0.525, 0.528, 0.531, 0.535, 0.538, 0.541, 0.545, 0.548, 0.551, 0.555,
-        0.558, 0.561, 0.565, 0.568, 0.571, 0.575, 0.578, 0.581, 0.585, 0.588,
-        0.591, 0.595, 0.598, 0.600, 0.600, 0.600, 0.600, 0.600, 0.600, 0.600,
-    };
-    FloatParam float_param("float", 0.0, 1.0, 0.0);
+    constexpr Integer block_size = 1000;
+    constexpr Frequency sample_rate = 5000.0;
+    FloatParam reference_float_param("reference", 0.0, 10.0, 0.0);
+    FloatParam float_param("float", 0.0, 10.0, 0.0);
     MidiController midi_controller;
+    Sample const* expected_samples;
     Sample const* rendered_samples;
 
     midi_controller.change(0.0, 0.0);
+    midi_controller.clear();
 
     float_param.set_block_size(block_size);
-    float_param.set_sample_rate(5000.0);
+    float_param.set_sample_rate(sample_rate);
     float_param.set_midi_controller(&midi_controller);
 
     midi_controller.change(0.002, 0.000);
-    midi_controller.change(0.002, 0.050);
+    midi_controller.change(0.002, 0.010);
+    midi_controller.change(0.002, 0.025);
     midi_controller.change(0.002, 0.100);
     midi_controller.change(0.002, 0.100);
-    midi_controller.change(0.002, 0.600);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.101);
+    midi_controller.change(0.002, 0.601);
 
+    reference_float_param.set_block_size(block_size);
+    reference_float_param.set_sample_rate(sample_rate);
+
+    reference_float_param.set_value(0.0);
+    reference_float_param.schedule_value(0.002, 0.0);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.1);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.25);
+    reference_float_param.schedule_linear_ramp(0.20 * 0.075, 1.0);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 1.01);
+    reference_float_param.schedule_linear_ramp(0.20 * 0.5, 6.01);
+
+    expected_samples = FloatParam::produce_if_not_constant(&reference_float_param, 1, block_size);
     rendered_samples = FloatParam::produce_if_not_constant(&float_param, 1, block_size);
 
     assert_eq(expected_samples, rendered_samples, block_size, 0.001);

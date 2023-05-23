@@ -288,10 +288,9 @@ class FloatParam : public Param<Number>
         bool is_following_leader() const noexcept;
 
         Seconds smooth_change_duration(
+            Number const previous_value,
             Number const controller_value,
-            Seconds const duration,
-            Number const range_factor,
-            Number& controller_previous_value
+            Seconds const duration
         ) const noexcept;
 
         ToggleParam const* const log_scale_toggle;
@@ -307,8 +306,6 @@ class FloatParam : public Param<Number>
         Envelope const* envelope;
         LFO* lfo;
         Sample const* const* lfo_buffer;
-
-        Number controller_previous_value;
 
         bool const should_round;
         bool const is_ratio_same_as_value;

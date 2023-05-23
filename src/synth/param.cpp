@@ -650,10 +650,7 @@ void FloatParam::set_midi_controller(
             set_value(ratio_to_value(this->midi_controller->get_value()));
         }
     } else {
-        Number const controller_value = midi_controller->get_value();
-
-        controller_previous_value = controller_value;
-        set_value(ratio_to_value(controller_value));
+        set_value(ratio_to_value(midi_controller->get_value()));
     }
 
     this->midi_controller = midi_controller;
@@ -671,11 +668,7 @@ void FloatParam::set_flexible_controller(
         }
     } else {
         flexible_controller->update();
-
-        Number const controller_value = flexible_controller->get_value();
-
-        controller_previous_value = controller_value;
-        set_value(ratio_to_value(controller_value));
+        set_value(ratio_to_value(flexible_controller->get_value()));
         flexible_controller_change_index = flexible_controller->get_change_index();
     }
 
@@ -793,22 +786,29 @@ Sample const* const* FloatParam::initialize_rendering(
             return lfo_buffer;
         }
     } else if (midi_controller != NULL) {
-        Seconds time = 0.0;
-        Number controller_previous_value = this->controller_previous_value;
+        Queue<Event>::SizeType const number_of_ctl_events = (
+            midi_controller->events.length()
+        );
 
-        for (Queue<Event>::SizeType i = 0, l = midi_controller->events.length(); i != l; ++i) {
-            Number const controller_value = midi_controller->events[i].number_param_1;
-            Seconds const duration = smooth_change_duration(
-                controller_value,
-                midi_controller->events[i].time_offset - time,
-                0.0083,
-                controller_previous_value
-            );
-            schedule_linear_ramp(duration, ratio_to_value(controller_value));
-            time += duration;
+        if (number_of_ctl_events != 0) {
+            cancel_events(0.0);
+
+            Seconds previous_time_offset = 0.0;
+            Number previous_value = value_to_ratio(get_raw_value());
+
+            for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+                Number const controller_value = midi_controller->events[i].number_param_1;
+                Number const time_offset = midi_controller->events[i].time_offset;
+                Seconds const duration = smooth_change_duration(
+                    previous_value,
+                    controller_value,
+                    time_offset - previous_time_offset
+                );
+                previous_value = controller_value;
+                schedule_linear_ramp(duration, ratio_to_value(controller_value));
+                previous_time_offset = time_offset;
+            }
         }
-
-        this->controller_previous_value = controller_previous_value;
     } else if (flexible_controller != NULL) {
         flexible_controller->update();
 
@@ -821,10 +821,9 @@ Sample const* const* FloatParam::initialize_rendering(
 
             Number const controller_value = flexible_controller->get_value();
             Seconds const duration = smooth_change_duration(
+                value_to_ratio(get_raw_value()),
                 controller_value,
-                (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period,
-                0.083,
-                this->controller_previous_value
+                (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period
             );
             schedule_linear_ramp(duration, ratio_to_value(controller_value));
         }
@@ -835,10 +834,9 @@ Sample const* const* FloatParam::initialize_rendering(
 
 
 Seconds FloatParam::smooth_change_duration(
+        Number const previous_value,
         Number const controller_value,
-        Seconds const duration,
-        Number const range_factor,
-        Number& controller_previous_value
+        Seconds const duration
 ) const noexcept {
     /*
     Some MIDI controllers seem to send multiple changes of the same value with
@@ -846,13 +844,18 @@ Seconds FloatParam::smooth_change_duration(
     ramps and sudden jumps, we force every value change to take place gradually,
     over a duration which correlates with the magnitude of the change.
     */
-    constexpr Seconds big_change_duration = 0.06;
-    Seconds const small_change_duration = big_change_duration * range_factor;
+    constexpr Seconds big_change_duration = 0.20;
+    constexpr Seconds small_change_duration = big_change_duration / 30.0;
 
-    Number const change = std::fabs(controller_previous_value - controller_value);
-    Seconds const min_duration = std::max(small_change_duration, big_change_duration * change);
+    Number const change = std::fabs(previous_value - controller_value);
 
-    controller_previous_value = controller_value;
+    if (change < 0.000001) {
+        return std::max(duration, big_change_duration * change);
+    }
+
+    Seconds const min_duration = (
+        std::max(small_change_duration, big_change_duration * change)
+    );
 
     return std::max(min_duration, duration);
 }
