@@ -185,16 +185,29 @@ TEST(param_clamps_integer_value_to_be_between_min_and_max, {
 
 TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[] = {
+        2, 2, 2, 2, 2,
+    };
     Param<int> param("int", -10, 10, 0);
     MidiController midi_controller;
+    Sample const* const* rendered_samples;
     Integer change_index_1;
     Integer change_index_2;
+
+    midi_controller.change(0.0, 0.6);
+    midi_controller.clear();
 
     param.set_block_size(block_size);
     param.set_sample_rate(1.0);
     param.set_midi_controller(&midi_controller);
 
     assert_eq((void*)&midi_controller, (void*)param.get_midi_controller());
+    assert_eq(2, param.get_value());
+    assert_eq(0.6, param.get_ratio());
+
+    rendered_samples = SignalProducer::produce< Param<int> >(&param, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
 
     change_index_1 = param.get_change_index();
     midi_controller.change(0.0, 0.2514);
@@ -1056,6 +1069,9 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     Integer change_index_2;
     Sample const* const* rendered_samples;
 
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
+
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(1.0);
     float_param.set_midi_controller(&midi_controller);
@@ -1088,6 +1104,52 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 })
 
 
+TEST(float_param_follows_midi_controller_changes_gradually, {
+    constexpr Integer block_size = 200;
+    constexpr Sample expected_samples[block_size] = {
+        0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000,
+        0.000, 0.003, 0.006, 0.010, 0.013, 0.016, 0.020, 0.023, 0.026, 0.030,
+        0.033, 0.036, 0.040, 0.043, 0.046, 0.050, 0.053, 0.056, 0.060, 0.063,
+        0.066, 0.070, 0.073, 0.076, 0.080, 0.083, 0.086, 0.090, 0.093, 0.096,
+        0.100, 0.100, 0.100, 0.101, 0.105, 0.108, 0.111, 0.115, 0.118, 0.121,
+        0.125, 0.128, 0.131, 0.135, 0.138, 0.141, 0.145, 0.148, 0.151, 0.155,
+        0.158, 0.161, 0.165, 0.168, 0.171, 0.175, 0.178, 0.181, 0.185, 0.188,
+        0.191, 0.195, 0.198, 0.201, 0.205, 0.208, 0.211, 0.215, 0.218, 0.221,
+        0.225, 0.228, 0.231, 0.235, 0.238, 0.241, 0.245, 0.248, 0.251, 0.255,
+        0.258, 0.261, 0.265, 0.268, 0.271, 0.275, 0.278, 0.281, 0.285, 0.288,
+        0.291, 0.295, 0.298, 0.301, 0.305, 0.308, 0.311, 0.315, 0.318, 0.321,
+        0.325, 0.328, 0.331, 0.335, 0.338, 0.341, 0.345, 0.348, 0.351, 0.355,
+        0.358, 0.361, 0.365, 0.368, 0.371, 0.375, 0.378, 0.381, 0.385, 0.388,
+        0.391, 0.395, 0.398, 0.401, 0.405, 0.408, 0.411, 0.415, 0.418, 0.421,
+        0.425, 0.428, 0.431, 0.435, 0.438, 0.441, 0.445, 0.448, 0.451, 0.455,
+        0.458, 0.461, 0.465, 0.468, 0.471, 0.475, 0.478, 0.481, 0.485, 0.488,
+        0.491, 0.495, 0.498, 0.501, 0.505, 0.508, 0.511, 0.515, 0.518, 0.521,
+        0.525, 0.528, 0.531, 0.535, 0.538, 0.541, 0.545, 0.548, 0.551, 0.555,
+        0.558, 0.561, 0.565, 0.568, 0.571, 0.575, 0.578, 0.581, 0.585, 0.588,
+        0.591, 0.595, 0.598, 0.600, 0.600, 0.600, 0.600, 0.600, 0.600, 0.600,
+    };
+    FloatParam float_param("float", 0.0, 1.0, 0.0);
+    MidiController midi_controller;
+    Sample const* rendered_samples;
+
+    midi_controller.change(0.0, 0.0);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(5000.0);
+    float_param.set_midi_controller(&midi_controller);
+
+    midi_controller.change(0.002, 0.000);
+    midi_controller.change(0.002, 0.050);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.600);
+
+    rendered_samples = FloatParam::produce_if_not_constant(&float_param, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples, block_size, 0.001);
+})
+
+
 template<class FloatParamClass>
 void test_follower_midi_controller()
 {
@@ -1102,6 +1164,9 @@ void test_follower_midi_controller()
     Integer change_index_2;
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
+
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
@@ -1147,7 +1212,7 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
         1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
-    FloatParam float_param("float", 0.0, 10.0, 1.0, 1.0);
+    FloatParam float_param("float", 0.0, 10.0, 9.0, 1.0);
     FlexibleController flexible_controller;
     Integer change_index;
     Sample const* const* rendered_samples;
@@ -1168,7 +1233,7 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
     flexible_controller.distortion.set_sample_rate(sample_rate);
     flexible_controller.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.64);
+    flexible_controller.input.set_value(0.2);
     flexible_controller.amount.set_value(0.5);
 
     float_param.set_flexible_controller(&flexible_controller);
@@ -1176,6 +1241,9 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
     assert_eq(
         (void*)&flexible_controller, (void*)float_param.get_flexible_controller()
     );
+    assert_eq(1.0, float_param.get_value());
+
+    flexible_controller.input.set_value(0.64);
 
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
@@ -1307,7 +1375,7 @@ void test_follower_flexible_controller()
         1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
-    FloatParam leader("leader", 0.0, 10.0, 1.0, 1.0);
+    FloatParam leader("leader", 0.0, 10.0, 9.0, 1.0);
     FloatParamClass follower(leader);
     FlexibleController flexible_controller;
     Integer change_index;
@@ -1332,10 +1400,14 @@ void test_follower_flexible_controller()
     flexible_controller.distortion.set_sample_rate(sample_rate);
     flexible_controller.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.64);
+    flexible_controller.input.set_value(0.2);
     flexible_controller.amount.set_value(0.5);
 
     leader.set_flexible_controller(&flexible_controller);
+
+    assert_eq(1.0, follower.get_value());
+
+    flexible_controller.input.set_value(0.64);
 
     assert_false(follower.is_constant_in_next_round(1, block_size));
 

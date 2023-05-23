@@ -177,9 +177,13 @@ TEST(messages_get_processed_during_rendering, {
 
 
 TEST(midi_controller_changes_can_affect_parameters, {
+    constexpr Integer block_size = 2048;
+
     Synth synth;
     Midi::Controller invalid = 127;
     Midi::Controller unused = 0;
+
+    synth.set_block_size(block_size);
 
     assign_controller(synth, Synth::ParamId::PM, Synth::ControllerId::VOLUME);
     assign_controller(
@@ -212,7 +216,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
     synth.pitch_wheel_change(0.0, 1, 0.75);
     synth.note_on(0.0, 1, 69, 0.9);
 
-    SignalProducer::produce<Synth>(&synth, 1, 1);
+    SignalProducer::produce<Synth>(&synth, 1);
 
     assert_eq(0.42, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
     assert_eq(0.9, synth.modulator_params.amplitude.get_ratio(), DOUBLE_DELTA);

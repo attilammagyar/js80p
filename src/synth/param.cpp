@@ -175,8 +175,12 @@ template<typename NumberType>
 void Param<NumberType>::set_midi_controller(
         MidiController const* midi_controller
 ) noexcept {
-    if (midi_controller == NULL && this->midi_controller != NULL) {
-        set_value(ratio_to_value(this->midi_controller->get_value()));
+    if (midi_controller == NULL) {
+        if (this->midi_controller != NULL) {
+            set_value(ratio_to_value(this->midi_controller->get_value()));
+        }
+    } else {
+        set_value(ratio_to_value(midi_controller->get_value()));
     }
 
     this->midi_controller = midi_controller;
@@ -269,6 +273,7 @@ FloatParam::FloatParam(
     log_scale_inv_table_scale(log_scale_inv_table_scale),
     leader(NULL),
     flexible_controller(NULL),
+    flexible_controller_change_index(-1),
     envelope(NULL),
     lfo(NULL),
     should_round(round_to > 0.0),
@@ -466,7 +471,13 @@ bool FloatParam::is_constant_until(Integer const sample_count) const noexcept
         );
     }
 
-    return flexible_controller == NULL;
+    if (flexible_controller != NULL) {
+        flexible_controller->update();
+
+        return flexible_controller->get_change_index() == flexible_controller_change_index;
+    }
+
+    return true;
 }
 
 
@@ -634,8 +645,15 @@ void FloatParam::handle_cancel_event(Event const& event) noexcept
 void FloatParam::set_midi_controller(
         MidiController const* midi_controller
 ) noexcept {
-    if (midi_controller == NULL && this->midi_controller != NULL) {
-        set_value(ratio_to_value(this->midi_controller->get_value()));
+    if (midi_controller == NULL) {
+        if (this->midi_controller != NULL) {
+            set_value(ratio_to_value(this->midi_controller->get_value()));
+        }
+    } else {
+        Number const controller_value = midi_controller->get_value();
+
+        controller_previous_value = controller_value;
+        set_value(ratio_to_value(controller_value));
     }
 
     this->midi_controller = midi_controller;
@@ -645,10 +663,20 @@ void FloatParam::set_midi_controller(
 void FloatParam::set_flexible_controller(
         FlexibleController* flexible_controller
 ) noexcept {
-    if (flexible_controller == NULL && this->flexible_controller != NULL) {
-        this->flexible_controller->update();
+    if (flexible_controller == NULL) {
+        if (this->flexible_controller != NULL) {
+            this->flexible_controller->update();
 
-        set_value(ratio_to_value(this->flexible_controller->get_value()));
+            set_value(ratio_to_value(this->flexible_controller->get_value()));
+        }
+    } else {
+        flexible_controller->update();
+
+        Number const controller_value = flexible_controller->get_value();
+
+        controller_previous_value = controller_value;
+        set_value(ratio_to_value(controller_value));
+        flexible_controller_change_index = flexible_controller->get_change_index();
     }
 
     this->flexible_controller = flexible_controller;
@@ -766,23 +794,67 @@ Sample const* const* FloatParam::initialize_rendering(
         }
     } else if (midi_controller != NULL) {
         Seconds time = 0.0;
+        Number controller_previous_value = this->controller_previous_value;
 
         for (Queue<Event>::SizeType i = 0, l = midi_controller->events.length(); i != l; ++i) {
-            schedule_linear_ramp(
+            Number const controller_value = midi_controller->events[i].number_param_1;
+            Seconds const duration = smooth_change_duration(
+                controller_value,
                 midi_controller->events[i].time_offset - time,
-                ratio_to_value(midi_controller->events[i].number_param_1)
+                0.0083,
+                controller_previous_value
             );
-            time = midi_controller->events[i].time_offset;
+            schedule_linear_ramp(duration, ratio_to_value(controller_value));
+            time += duration;
         }
+
+        this->controller_previous_value = controller_previous_value;
     } else if (flexible_controller != NULL) {
         flexible_controller->update();
-        schedule_linear_ramp(
-            (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period,
-            ratio_to_value(flexible_controller->get_value())
-        );
+
+        Integer const new_change_index = flexible_controller->get_change_index();
+
+        if (new_change_index != flexible_controller_change_index) {
+            flexible_controller_change_index = new_change_index;
+
+            cancel_events(0.0);
+
+            Number const controller_value = flexible_controller->get_value();
+            Seconds const duration = smooth_change_duration(
+                controller_value,
+                (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period,
+                0.083,
+                this->controller_previous_value
+            );
+            schedule_linear_ramp(duration, ratio_to_value(controller_value));
+        }
     }
 
     return NULL;
+}
+
+
+Seconds FloatParam::smooth_change_duration(
+        Number const controller_value,
+        Seconds const duration,
+        Number const range_factor,
+        Number& controller_previous_value
+) const noexcept {
+    /*
+    Some MIDI controllers seem to send multiple changes of the same value with
+    the same timestamp (on the same channel). In order to avoid zero duration
+    ramps and sudden jumps, we force every value change to take place gradually,
+    over a duration which correlates with the magnitude of the change.
+    */
+    constexpr Seconds big_change_duration = 0.06;
+    Seconds const small_change_duration = big_change_duration * range_factor;
+
+    Number const change = std::fabs(controller_previous_value - controller_value);
+    Seconds const min_duration = std::max(small_change_duration, big_change_duration * change);
+
+    controller_previous_value = controller_value;
+
+    return std::max(min_duration, duration);
 }
 
 
