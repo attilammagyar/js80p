@@ -19,13 +19,16 @@
 #ifndef JS80P__MIDI_HPP
 #define JS80P__MIDI_HPP
 
+#include <cstdint>
+
 #include "js80p.hpp"
 
 
 namespace JS80P { namespace Midi
 {
 
-typedef unsigned char Byte;
+typedef uint8_t Byte;
+typedef uint16_t Word;
 
 typedef Byte Note;
 typedef Byte Channel;
@@ -40,34 +43,34 @@ class EventHandler
             Seconds const time_offset,
             Channel const channel,
             Note const note,
-            Number const velocity
+            Byte const velocity
         ) noexcept {}
 
         void aftertouch(
             Seconds const time_offset,
             Channel const channel,
             Note const note,
-            Number const pressure
+            Byte const pressure
         ) noexcept {}
 
         void note_off(
             Seconds const time_offset,
             Channel const channel,
             Note const note,
-            Number const velocity
+            Byte const velocity
         ) noexcept {}
 
         void control_change(
             Seconds const time_offset,
             Channel const channel,
             Controller const controller,
-            Number const new_value
+            Byte const new_value
         ) noexcept {}
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Channel const channel,
-            Number const new_value
+            Word const new_value
         ) noexcept {}
 
         void all_sound_off(
@@ -93,10 +96,6 @@ class Dispatcher
             Seconds const time_offset,
             Byte const bytes[4]
         ) noexcept;
-
-    private:
-        static constexpr Number PITCH_BEND_SCALE = 1.0 / 16384.0;
-        static constexpr Number FLOAT_SCALE = 1.0 / 127.0;
 };
 
 
@@ -483,31 +482,20 @@ void Dispatcher::dispatch(
 
     switch (msg_type) {
         case NOTE_ON:
-            event_handler.note_on(
-                time_offset, channel, (Note)d1, (Number)d2 * FLOAT_SCALE
-            );
+            event_handler.note_on(time_offset, channel, (Note)d1, d2);
             break;
 
         case AFTERTOUCH:
-            event_handler.aftertouch(
-                time_offset, channel, (Note)d1, (Number)d2 * FLOAT_SCALE
-            );
+            event_handler.aftertouch(time_offset, channel, (Note)d1, d2);
             break;
 
         case NOTE_OFF:
-            event_handler.note_off(
-                time_offset, channel, (Note)d1, (Number)d2 * FLOAT_SCALE
-            );
+            event_handler.note_off(time_offset, channel, (Note)d1, d2);
             break;
 
         case CONTROL_CHANGE:
             if (d1 < CONTROL_CHANGE_ALL_SOUND_OFF) {
-                event_handler.control_change(
-                    time_offset,
-                    channel,
-                    (Controller)d1,
-                    (Number)d2 * FLOAT_SCALE
-                );
+                event_handler.control_change(time_offset, channel, (Controller)d1, d2);
             } else {
                 switch ((Command)d1) {
                     case CONTROL_CHANGE_ALL_SOUND_OFF:
@@ -527,9 +515,7 @@ void Dispatcher::dispatch(
             break;
 
         case PITCH_BEND_CHANGE:
-            event_handler.pitch_wheel_change(
-                time_offset, channel, (Number)((d2 << 7) | d1) * PITCH_BEND_SCALE
-            );
+            event_handler.pitch_wheel_change(time_offset, channel, (d2 << 7) | d1);
             break;
     }
 }

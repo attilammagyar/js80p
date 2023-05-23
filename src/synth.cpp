@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <sstream>
 
 #include "js80p.hpp"
@@ -602,10 +603,12 @@ void Synth::note_on(
         Seconds const time_offset,
         Midi::Channel const channel,
         Midi::Note const note,
-        Number const velocity
+        Midi::Byte const velocity
 ) noexcept {
-    this->note.change(time_offset, (Number)note * NOTE_TO_PARAM_SCALE);
-    this->velocity.change(time_offset, velocity);
+    Number const velocity_float = midi_byte_to_float(velocity);
+
+    this->velocity.change(time_offset, velocity_float);
+    this->note.change(time_offset, midi_byte_to_float(note));
 
     if (midi_note_to_voice_assignments[channel][note] != -1) {
         return;
@@ -629,13 +632,13 @@ void Synth::note_on(
         Mode const mode = this->mode.get_value();
 
         if (mode == MIX_AND_MOD) {
-            modulators[next_voice]->note_on(time_offset, note, velocity, previous_note);
-            carriers[next_voice]->note_on(time_offset, note, velocity, previous_note);
+            modulators[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
+            carriers[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
         } else {
             if (note < mode + Midi::NOTE_B_2) {
-                modulators[next_voice]->note_on(time_offset, note, velocity, previous_note);
+                modulators[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
             } else {
-                carriers[next_voice]->note_on(time_offset, note, velocity, previous_note);
+                carriers[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
             }
         }
 
@@ -646,13 +649,25 @@ void Synth::note_on(
 }
 
 
+Number Synth::midi_byte_to_float(Midi::Byte const midi_byte) const noexcept
+{
+    return (Number)midi_byte * MIDI_BYTE_SCALE;
+}
+
+
+Number Synth::midi_word_to_float(Midi::Word const midi_word) const noexcept
+{
+    return (Number)midi_word * MIDI_WORD_SCALE;
+}
+
+
 void Synth::aftertouch(
         Seconds const time_offset,
         Midi::Channel const channel,
         Midi::Note const note,
-        Number const pressure
+        Midi::Byte const pressure
 ) noexcept {
-    this->note.change(time_offset, (Number)note * NOTE_TO_PARAM_SCALE);
+    this->note.change(time_offset, midi_byte_to_float(note));
 
     if (midi_note_to_voice_assignments[channel][note] == -1) {
         return;
@@ -662,11 +677,33 @@ void Synth::aftertouch(
 }
 
 
+bool Synth::is_repeated_midi_controller_message(
+        ControllerId const controller_id,
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Word const value
+) noexcept {
+    /*
+    By default, FL Studio sends pitch bends separately on all channels, but it's
+    enough for JS80P to handle only one of those.
+    */
+    MidiControllerMessage const message(time_offset, value);
+
+    if (previous_controller_message[controller_id] == message) {
+        return true;
+    }
+
+    previous_controller_message[controller_id] = message;
+
+    return false;
+}
+
+
 void Synth::note_off(
         Seconds const time_offset,
         Midi::Channel const channel,
         Midi::Note const note,
-        Number const velocity
+        Midi::Byte const velocity
 ) noexcept {
     if (midi_note_to_voice_assignments[channel][note] == -1) {
         return;
@@ -676,8 +713,10 @@ void Synth::note_off(
 
     midi_note_to_voice_assignments[channel][note] = -1;
 
-    modulators[voice]->note_off(time_offset, note, velocity);
-    carriers[voice]->note_off(time_offset, note, velocity);
+    Number const velocity_float = midi_byte_to_float(velocity);
+
+    modulators[voice]->note_off(time_offset, note, velocity_float);
+    carriers[voice]->note_off(time_offset, note, velocity_float);
 }
 
 
@@ -685,9 +724,17 @@ void Synth::control_change(
         Seconds const time_offset,
         Midi::Channel const channel,
         Midi::Controller const controller,
-        Number const new_value
+        Midi::Byte const new_value
 ) noexcept {
     if (!is_supported_midi_controller(controller)) {
+        return;
+    }
+
+    if (
+            is_repeated_midi_controller_message(
+                (ControllerId)controller, time_offset, channel, new_value
+            )
+    ) {
         return;
     }
 
@@ -701,7 +748,7 @@ void Synth::control_change(
         is_learning = false;
     }
 
-    midi_controllers_rw[controller]->change(time_offset, new_value);
+    midi_controllers_rw[controller]->change(time_offset, midi_byte_to_float(new_value));
 }
 
 
@@ -725,9 +772,17 @@ bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
 void Synth::pitch_wheel_change(
         Seconds const time_offset,
         Midi::Channel const channel,
-        Number const new_value
+        Midi::Word const new_value
 ) noexcept {
-    pitch_wheel.change(time_offset, new_value);
+    if (
+            is_repeated_midi_controller_message(
+                ControllerId::PITCH_WHEEL, time_offset, channel, new_value
+            )
+    ) {
+        return;
+    }
+
+    pitch_wheel.change(time_offset, midi_word_to_float(new_value));
 }
 
 
@@ -1816,6 +1871,47 @@ void Synth::ParamIdHashTable::Entry::set(
     std::fill_n(this->name, NAME_SIZE, '\x00');
     strncpy(this->name, name, NAME_MAX_INDEX);
     this->param_id = param_id;
+}
+
+
+Synth::MidiControllerMessage::MidiControllerMessage() : time_offset(-INFINITY), value(0)
+{
+}
+
+
+Synth::MidiControllerMessage::MidiControllerMessage(
+        Seconds const time_offset,
+        Midi::Word const value
+) : time_offset(time_offset),
+    value(value)
+{
+}
+
+
+bool Synth::MidiControllerMessage::operator==(
+        MidiControllerMessage const& message
+) const noexcept {
+    return value == message.value && time_offset == message.time_offset;
+}
+
+
+Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
+        MidiControllerMessage const& message
+) noexcept {
+    time_offset = message.time_offset;
+    value = message.value;
+
+    return *this;
+}
+
+
+Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
+        MidiControllerMessage const&& message
+) noexcept {
+    time_offset = message.time_offset;
+    value = message.value;
+
+    return *this;
 }
 
 }

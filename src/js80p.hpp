@@ -19,7 +19,7 @@
 #ifndef JS80P__JS80P_HPP
 #define JS80P__JS80P_HPP
 
-#include <stdint.h>
+#include <cstdint>
 
 
 #define JS80P_TO_STRING(x) _JS80P_EXPAND(x)

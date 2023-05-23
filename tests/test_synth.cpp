@@ -85,10 +85,10 @@ TEST(twelve_tone_equal_temperament_440_hz, {
 void set_up_chunk_size_independent_test(Synth& synth, Frequency const sample_rate)
 {
     synth.set_sample_rate(sample_rate);
-    synth.note_on(0.05, 1, 69, 0.9);
-    synth.note_on(0.25, 1, 127, 0.9);
-    synth.note_off(0.05 + 3.0, 1, 69, 0.9);
-    synth.note_off(0.25 + 2.9, 1, 127, 0.9);
+    synth.note_on(0.05, 1, 69, 114);
+    synth.note_on(0.25, 1, 127, 114);
+    synth.note_off(0.05 + 3.0, 1, 69, 114);
+    synth.note_off(0.25 + 2.9, 1, 127, 114);
 }
 
 
@@ -209,18 +209,18 @@ TEST(midi_controller_changes_can_affect_parameters, {
         Synth::MessageType::REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0
     );
 
-    synth.control_change(0.0, 1, Midi::VOLUME, 0.42);
-    synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 1.0);
-    synth.control_change(0.0, 1, invalid, 0.123);
-    synth.control_change(0.0, 1, unused, 0.123);
-    synth.pitch_wheel_change(0.0, 1, 0.75);
-    synth.note_on(0.0, 1, 69, 0.9);
+    synth.control_change(0.0, 1, Midi::VOLUME, 53);
+    synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 127);
+    synth.control_change(0.0, 1, invalid, 16);
+    synth.control_change(0.0, 1, unused, 16);
+    synth.pitch_wheel_change(0.0, 1, 12288);
+    synth.note_on(0.0, 1, 69, 114);
 
     SignalProducer::produce<Synth>(&synth, 1);
 
-    assert_eq(0.42, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
-    assert_eq(0.9, synth.modulator_params.amplitude.get_ratio(), DOUBLE_DELTA);
-    assert_eq(0.75, synth.modulator_params.fine_detune.get_ratio(), DOUBLE_DELTA);
+    assert_eq(53.0 / 127.0, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
+    assert_eq(114.0 / 127.0, synth.modulator_params.amplitude.get_ratio(), DOUBLE_DELTA);
+    assert_eq(12288.0 / 16384, synth.modulator_params.fine_detune.get_ratio(), DOUBLE_DELTA);
     assert_eq(SimpleOscillator::CUSTOM, synth.carrier_params.waveform.get_value());
 
     assert_true(synth.phase_modulation_level.is_constant_in_next_round(2, 1));
@@ -296,7 +296,7 @@ void test_operating_mode(
     synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
     synth.carrier_params.width.set_value(0.0);
 
-    synth.note_on(0.0, 0, Midi::NOTE_A_3, 1.0);
+    synth.note_on(0.0, 0, Midi::NOTE_A_3, 127);
 
     expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
     samples = SignalProducer::produce<Synth>(&synth, 1);
@@ -349,7 +349,7 @@ TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
     expected.set_block_size(block_size);
     expected.set_sample_rate(sample_rate);
 
-    synth.note_on(0.0, 0, Midi::NOTE_A_5, 1.0);
+    synth.note_on(0.0, 0, Midi::NOTE_A_5, 127);
     synth.all_sound_off(1.0 / sample_rate, 1);
 
     expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
@@ -390,8 +390,8 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
     synth.carrier_params.amplitude.set_value(0.0);
     synth.carrier_params.volume.set_value(0.0);
 
-    synth.note_on(0.0, 2, Midi::NOTE_A_2, 1.0);
-    synth.note_on(0.0, 3, Midi::NOTE_A_3, 1.0);
+    synth.note_on(0.0, 2, Midi::NOTE_A_2, 127);
+    synth.note_on(0.0, 3, Midi::NOTE_A_3, 127);
     synth.all_notes_off(0.5, 1);
 
     sines = SignalProducer::produce<SumOfSines>(&expected, 1);
@@ -430,9 +430,9 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
         synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
     );
 
-    synth.control_change(0.000001, 1, UNSUPPORTED_CC, 0.1);
-    synth.control_change(0.000002, 1, Midi::GENERAL_1, 0.2);
-    synth.control_change(0.000003, 1, Midi::GENERAL_2, 0.3);
+    synth.control_change(0.000001, 1, UNSUPPORTED_CC, 12);
+    synth.control_change(0.000002, 1, Midi::GENERAL_1, 25);
+    synth.control_change(0.000003, 1, Midi::GENERAL_2, 38);
 
     assert_eq(
         Synth::ControllerId::GENERAL_1,
@@ -448,8 +448,8 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
     );
     assert_neq(NULL, synth.modulator_params.volume.get_midi_controller());
     assert_neq(NULL, synth.carrier_params.volume.get_midi_controller());
-    assert_eq(0.2, synth.modulator_params.volume.get_value(), DOUBLE_DELTA);
-    assert_eq(0.2, synth.carrier_params.volume.get_value(), DOUBLE_DELTA);
+    assert_eq(25.0 / 127.0, synth.modulator_params.volume.get_value(), DOUBLE_DELTA);
+    assert_eq(25.0 / 127.0, synth.carrier_params.volume.get_value(), DOUBLE_DELTA);
 });
 
 
@@ -508,4 +508,19 @@ TEST(toggles_cannot_have_controllers_assigned_to_them, {
         Synth::ControllerId::NONE,
         synth.get_param_controller_id_atomic(Synth::ParamId::L1SYN)
     );
+})
+
+
+TEST(when_the_same_controller_message_is_received_over_multiple_channels_then_only_one_is_processed, {
+    Synth synth;
+
+    synth.control_change(0.1, 1, Midi::VOLUME, 53);
+    synth.control_change(0.1, 2, Midi::VOLUME, 53);
+    synth.pitch_wheel_change(0.1, 1, 10000);
+    synth.control_change(0.1, 3, Midi::VOLUME, 53);
+    synth.pitch_wheel_change(0.1, 2, 10000);
+    synth.pitch_wheel_change(0.1, 3, 10000);
+
+    assert_eq(1, synth.midi_controllers[Midi::VOLUME]->events.length());
+    assert_eq(1, synth.pitch_wheel.events.length());
 })

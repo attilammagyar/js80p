@@ -632,34 +632,34 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const velocity
+            Midi::Byte const velocity
         ) noexcept;
 
         void aftertouch(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const pressure
+            Midi::Byte const pressure
         ) noexcept;
 
         void note_off(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const velocity
+            Midi::Byte const velocity
         ) noexcept;
 
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
-            Number const new_value
+            Midi::Byte const new_value
         ) noexcept;
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Midi::Channel const channel,
-            Number const new_value
+            Midi::Word const new_value
         ) noexcept;
 
         void all_sound_off(
@@ -832,10 +832,27 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Entry entries[ENTRIES];
         };
 
+        class MidiControllerMessage
+        {
+            public:
+                MidiControllerMessage();
+
+                MidiControllerMessage(Seconds const time_offset, Midi::Word const value);
+
+                bool operator==(MidiControllerMessage const& message) const noexcept;
+                MidiControllerMessage& operator=(MidiControllerMessage const& message) noexcept;
+                MidiControllerMessage& operator=(MidiControllerMessage const&& message) noexcept;
+
+            private:
+                Seconds time_offset;
+                Midi::Word value;
+        };
+
+        static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
+        static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
+
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
-
-        static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
 
         static std::vector<bool> supported_midi_controllers;
         static bool supported_midi_controllers_initialized;
@@ -873,6 +890,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             FloatParam& float_param
         ) noexcept;
 
+        Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
+        Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
+
+        bool is_repeated_midi_controller_message(
+            ControllerId const controller_id,
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Word const value
+        ) noexcept;
+
         void handle_set_param(
             ParamId const param_id,
             Number const ratio
@@ -904,6 +931,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Bus bus;
         Effects::Effects<Bus> effects;
         Sample const* const* raw_output;
+        MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
         FloatParam* float_params[FLOAT_PARAMS];
         BiquadFilterSharedCache* biquad_filter_shared_caches[4];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
