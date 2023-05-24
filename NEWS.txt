@@ -1,3 +1,8 @@
+v1.5.0 (2023-??-??)
+ * Improved MIDI CC smoothing
+ * Bugfix: the VST3 plugin will now process all controller changes within a
+   block, not just the last one
+
 v1.4.0 (2023-05-20)
  * MIDI Learn: assign this special controller to a parameter, then move a
    fader, knob, or the modulation wheel, etc. on your MIDI keyboard, and the

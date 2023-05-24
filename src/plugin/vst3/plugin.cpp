@@ -292,7 +292,7 @@ void Vst3Plugin::Processor::collect_param_change_events(
 
         if (param_id == (Vst::ParamID)Vst::ControllerNumbers::kPitchBend) {
             for (int32 i = 0; i != numPoints; ++i) {
-                if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) != kResultTrue) {
+                if (paramQueue->getPoint(i, sampleOffset, value) != kResultTrue) {
                     continue;
                 }
 
@@ -307,7 +307,7 @@ void Vst3Plugin::Processor::collect_param_change_events(
             }
         } else if (Synth::is_supported_midi_controller((Midi::Controller)param_id)) {
             for (int32 i = 0; i != numPoints; ++i) {
-                if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) != kResultTrue) {
+                if (paramQueue->getPoint(i, sampleOffset, value) != kResultTrue) {
                     continue;
                 }
 
