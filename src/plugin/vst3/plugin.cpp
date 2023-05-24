@@ -277,50 +277,58 @@ void Vst3Plugin::Processor::collect_param_change_events(
     int32 numParamsChanged = data.inputParameterChanges->getParameterCount();
 
     for (int32 i = 0; i != numParamsChanged; i++) {
-        Vst::IParamValueQueue* paramQueue = (
+        Vst::IParamValueQueue* param_queue = (
             data.inputParameterChanges->getParameterData(i)
         );
 
-        if (!paramQueue) {
+        if (!param_queue) {
             continue;
         }
 
-        Vst::ParamID const param_id = paramQueue->getParameterId();
-        Vst::ParamValue value;
-        int32 sampleOffset;
-        int32 numPoints = paramQueue->getPointCount();
+        Vst::ParamID const param_id = param_queue->getParameterId();
 
-        if (param_id == (Vst::ParamID)Vst::ControllerNumbers::kPitchBend) {
-            for (int32 i = 0; i != numPoints; ++i) {
-                if (paramQueue->getPoint(i, sampleOffset, value) != kResultTrue) {
-                    continue;
-                }
-
-                events.push_back(
-                    Event(
-                        Event::PITCH_WHEEL,
-                        synth.sample_count_to_time_offset(sampleOffset),
-                        0,
-                        value
-                    )
+        switch (param_id) {
+            case (Vst::ParamID)Vst::ControllerNumbers::kPitchBend:
+                collect_param_change_events_as(
+                    param_queue, Event::Type::PITCH_WHEEL, 0
                 );
-            }
-        } else if (Synth::is_supported_midi_controller((Midi::Controller)param_id)) {
-            for (int32 i = 0; i != numPoints; ++i) {
-                if (paramQueue->getPoint(i, sampleOffset, value) != kResultTrue) {
-                    continue;
-                }
+                break;
 
-                events.push_back(
-                    Event(
-                        Event::CONTROL_CHANGE,
-                        synth.sample_count_to_time_offset(sampleOffset),
-                        (Midi::Byte)param_id,
-                        value
-                    )
-                );
-            }
+            default:
+                if (Synth::is_supported_midi_controller((Midi::Controller)param_id)) {
+                    collect_param_change_events_as(
+                        param_queue, Event::Type::CONTROL_CHANGE, (Midi::Byte)param_id
+                    );
+                }
+                break;
         }
+    }
+}
+
+
+void Vst3Plugin::Processor::collect_param_change_events_as(
+        Vst::IParamValueQueue* const param_queue,
+        Event::Type const event_type,
+        Midi::Byte const midi_controller
+) noexcept {
+    int32 const number_of_points = param_queue->getPointCount();
+
+    Vst::ParamValue value;
+    int32 sample_offset;
+
+    for (int32 i = 0; i != number_of_points; ++i) {
+        if (param_queue->getPoint(i, sample_offset, value) != kResultTrue) {
+            continue;
+        }
+
+        events.push_back(
+            Event(
+                event_type,
+                synth.sample_count_to_time_offset(sample_offset),
+                midi_controller,
+                (Number)value
+            )
+        );
     }
 }
 
@@ -345,7 +353,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
             case Vst::Event::EventTypes::kNoteOnEvent:
                 events.push_back(
                     Event(
-                        Event::NOTE_ON,
+                        Event::Type::NOTE_ON,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.noteOn.pitch,
                         (Number)event.noteOn.velocity
@@ -356,7 +364,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
             case Vst::Event::EventTypes::kNoteOffEvent:
                 events.push_back(
                     Event(
-                        Event::NOTE_OFF,
+                        Event::Type::NOTE_OFF,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.noteOff.pitch,
                         (Number)event.noteOff.velocity
@@ -367,7 +375,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
             case Vst::Event::EventTypes::kPolyPressureEvent:
                 events.push_back(
                     Event(
-                        Event::NOTE_PRESSURE,
+                        Event::Type::NOTE_PRESSURE,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.polyPressure.pitch,
                         (Number)event.polyPressure.pressure
@@ -395,37 +403,71 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
     switch (event.type) {
         case Event::Type::NOTE_ON:
             synth.note_on(
-                event.time_offset, 0, event.note_or_ctl, event.velocity_or_value
+                event.time_offset,
+                0,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
             );
             break;
 
         case Event::Type::NOTE_PRESSURE:
             synth.aftertouch(
-                event.time_offset, 0, event.note_or_ctl, event.velocity_or_value
+                event.time_offset,
+                0,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
             );
             break;
 
         case Event::Type::NOTE_OFF:
             synth.note_off(
-                event.time_offset, 0, event.note_or_ctl, event.velocity_or_value
+                event.time_offset,
+                0,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
             );
             break;
 
         case Event::Type::PITCH_WHEEL:
             synth.pitch_wheel_change(
-                event.time_offset, 0, event.velocity_or_value
+                event.time_offset,
+                0,
+                float_to_midi_word(event.velocity_or_value)
             );
             break;
 
         case Event::Type::CONTROL_CHANGE:
             synth.control_change(
-                event.time_offset, 0, event.note_or_ctl, event.velocity_or_value
+                event.time_offset,
+                0,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
             );
             break;
 
         default:
             break;
     }
+}
+
+
+Midi::Byte Vst3Plugin::Processor::float_to_midi_byte(
+        Number const number
+) const noexcept {
+    return std::min(
+        (Midi::Byte)127,
+        std::max((Midi::Byte)0, (Midi::Byte)std::round(number * 127.0))
+    );
+}
+
+
+Midi::Word Vst3Plugin::Processor::float_to_midi_word(
+        Number const number
+) const noexcept {
+    return std::min(
+        (Midi::Word)16384,
+        std::max((Midi::Word)0, (Midi::Word)std::round(number * 16384.0))
+    );
 }
 
 
