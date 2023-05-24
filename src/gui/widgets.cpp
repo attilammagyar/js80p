@@ -310,18 +310,16 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
     int top = TITLE_HEIGHT;
     int left = 10;
 
-    for (int i = 0; i != GUI::ALL_CTLS; ++i) {
+    for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
         Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
         char const* const text = GUI::CONTROLLERS[i].long_name;
+        GUI::ControllerCapability const required_capability = (
+            GUI::CONTROLLERS[i].required_capability
+        );
 
-        if (i == 4) {
-            /* TODO: hiding Channel Aftertouch until it's implemented */
-            controllers[i] = NULL;
-        } else {
-            controllers[i] = (Controller*)this->own(
-                new Controller(*this, text, left, top, id)
-            );
-        }
+        controllers[i] = (Controller*)this->own(
+            new Controller(*this, required_capability, text, left, top, id)
+        );
 
         top += Controller::HEIGHT;
 
@@ -371,20 +369,15 @@ void ControllerSelector::show(
 
     controllers[controller->index]->select();
 
-    for (int i = 0; i != controller_choices; ++i) {
-        if (controllers[i] == NULL) {
-            continue;
+    for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
+        if (
+                controllers[i]->required_capability == 0
+                || (controllers[i]->required_capability & controller_choices) != 0
+        ) {
+            controllers[i]->show();
+        } else {
+            controllers[i]->hide();
         }
-
-        controllers[i]->show();
-    }
-
-    for (int i = controller_choices; i != GUI::ALL_CTLS; ++i) {
-        if (controllers[i] == NULL) {
-            continue;
-        }
-
-        controllers[i]->hide();
     }
 
     redraw();
@@ -439,11 +432,13 @@ bool ControllerSelector::paint()
 
 ControllerSelector::Controller::Controller(
         ControllerSelector& controller_selector,
+        GUI::ControllerCapability const required_capability,
         char const* const text,
         int const left,
         int const top,
         Synth::ControllerId const controller_id
 ) : Widget(text, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
+    required_capability(required_capability),
     controller_id(controller_id),
     controller_selector(controller_selector),
     is_selected(false),

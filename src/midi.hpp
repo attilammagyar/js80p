@@ -53,6 +53,12 @@ class EventHandler
             Byte const pressure
         ) noexcept {}
 
+        void channel_pressure(
+            Seconds const time_offset,
+            Channel const channel,
+            Byte const pressure
+        ) noexcept {}
+
         void note_off(
             Seconds const time_offset,
             Channel const channel,
@@ -462,6 +468,7 @@ constexpr Command NOTE_OFF                          = 0x80;
 constexpr Command NOTE_ON                           = 0x90;
 constexpr Command AFTERTOUCH                        = 0xa0;
 constexpr Command CONTROL_CHANGE                    = 0xb0;
+constexpr Command CHANNEL_PRESSURE                  = 0xd0;
 constexpr Command PITCH_BEND_CHANGE                 = 0xe0;
 
 constexpr Command CONTROL_CHANGE_ALL_SOUND_OFF          = 0x78;
@@ -487,6 +494,10 @@ void Dispatcher::dispatch(
 
         case AFTERTOUCH:
             event_handler.aftertouch(time_offset, channel, (Note)d1, d2);
+            break;
+
+        case CHANNEL_PRESSURE:
+            event_handler.channel_pressure(time_offset, channel, d1);
             break;
 
         case NOTE_OFF:

@@ -157,6 +157,9 @@ Synth::Synth() noexcept
     effects.filter_1_log_scale.set_value(ToggleParam::ON);
     effects.filter_2_log_scale.set_value(ToggleParam::ON);
 
+    channel_pressure_ctl.change(0.0, 0.0);
+    channel_pressure_ctl.clear();
+
     update_param_states();
 }
 
@@ -674,6 +677,23 @@ void Synth::aftertouch(
     }
 
     // Integer const voice = midi_note_to_voice_assignments[channel][note];
+}
+
+
+void Synth::channel_pressure(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Byte const pressure
+) noexcept {
+    if (
+            is_repeated_midi_controller_message(
+                ControllerId::CHANNEL_PRESSURE, time_offset, channel, pressure
+            )
+    ) {
+        return;
+    }
+
+    channel_pressure_ctl.change(time_offset, midi_byte_to_float(pressure));
 }
 
 
@@ -1208,7 +1228,7 @@ bool Synth::assign_controller_to_param(
         case ENVELOPE_6:
             break;
 
-        case CHANNEL_AFTERTOUCH: break; // TODO
+        case CHANNEL_PRESSURE: break;
 
         case MIDI_LEARN: is_special = true; break;
 
@@ -1291,7 +1311,7 @@ bool Synth::assign_controller_to_float_param(
         case ENVELOPE_5: param->set_envelope(envelopes[4]); return true;
         case ENVELOPE_6: param->set_envelope(envelopes[5]); return true;
 
-        case CHANNEL_AFTERTOUCH: return false; // TODO
+        case CHANNEL_PRESSURE: param->set_midi_controller(&channel_pressure_ctl); return true;
 
         case MIDI_LEARN: return true;
 
@@ -1359,6 +1379,7 @@ void Synth::clear_midi_controllers() noexcept
     pitch_wheel.clear();
     note.clear();
     velocity.clear();
+    channel_pressure_ctl.clear();
 
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
         if (midi_controllers[i] != NULL) {

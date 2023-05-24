@@ -519,8 +519,12 @@ TEST(when_the_same_controller_message_is_received_over_multiple_channels_then_on
     synth.pitch_wheel_change(0.1, 1, 10000);
     synth.control_change(0.1, 3, Midi::VOLUME, 53);
     synth.pitch_wheel_change(0.1, 2, 10000);
+    synth.channel_pressure(0.1, 1, 100);
     synth.pitch_wheel_change(0.1, 3, 10000);
+    synth.channel_pressure(0.1, 2, 100);
+    synth.channel_pressure(0.1, 3, 100);
 
     assert_eq(1, synth.midi_controllers[Midi::VOLUME]->events.length());
     assert_eq(1, synth.pitch_wheel.events.length());
+    assert_eq(1, synth.channel_pressure_ctl.events.length());
 })

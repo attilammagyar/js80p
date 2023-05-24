@@ -59,11 +59,21 @@ class GUI
         typedef unsigned int Color;
         typedef unsigned char ColorComponent;
 
+        enum ControllerCapability {
+            NONE                = 0,
+            MIDI_CONTROLLER     = 1 << 0,
+            FLEXIBLE_CONTROLLER = 1 << 1,
+            LFO                 = 1 << 2,
+            ENVELOPE            = 1 << 3,
+            CHANNEL_PRESSURE    = 1 << 4,
+        };
+
         class Controller
         {
             public:
                 Controller(
                     int const index,
+                    ControllerCapability const required_capability,
                     Synth::ControllerId const id,
                     char const* const long_name,
                     char const* const short_name
@@ -71,6 +81,7 @@ class GUI
 
                 char const* const long_name;
                 char const* const short_name;
+                ControllerCapability const required_capability;
                 int const index;
                 Synth::ControllerId const id;
         };
@@ -81,16 +92,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int NO_CTLS = 0;
-        static constexpr int ALL_CTLS = 99;
-        static constexpr int LFO_CTLS = ALL_CTLS - Synth::ENVELOPES;
-        static constexpr int FLEX_CTLS = (
-            ALL_CTLS - Synth::ENVELOPES - Synth::LFOS
-        );
-        static constexpr int MIDI_CTLS = (
-            ALL_CTLS
-            - Synth::ENVELOPES - Synth::LFOS - Synth::FLEXIBLE_CONTROLLERS
-        );
+        static constexpr int CONTROLLERS_COUNT = 99;
 
         static char const* const MODES[];
         static int const MODES_COUNT;

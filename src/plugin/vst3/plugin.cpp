@@ -294,6 +294,12 @@ void Vst3Plugin::Processor::collect_param_change_events(
                 );
                 break;
 
+            case (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch:
+                collect_param_change_events_as(
+                    param_queue, Event::Type::CHANNEL_PRESSURE, 0
+                );
+                break;
+
             default:
                 if (Synth::is_supported_midi_controller((Midi::Controller)param_id)) {
                     collect_param_change_events_as(
@@ -441,6 +447,14 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
                 event.time_offset,
                 0,
                 event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
+            );
+            break;
+
+        case Event::Type::CHANNEL_PRESSURE:
+            synth.channel_pressure(
+                event.time_offset,
+                0,
                 float_to_midi_byte(event.velocity_or_value)
             );
             break;
@@ -697,6 +711,13 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         create_midi_ctl_param(
             Synth::ControllerId::PITCH_WHEEL,
             (Vst::ParamID)Vst::ControllerNumbers::kPitchBend
+        )
+    );
+
+    parameters.addParameter(
+        create_midi_ctl_param(
+            Synth::ControllerId::CHANNEL_PRESSURE,
+            (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch
         )
     );
 

@@ -514,7 +514,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ENVELOPE_4 =                152,                        ///< Envelope 4
             ENVELOPE_5 =                153,                        ///< Envelope 5
             ENVELOPE_6 =                154,                        ///< Envelope 6
-            CHANNEL_AFTERTOUCH =        155,                        ///< Channel Aftertouch
+            CHANNEL_PRESSURE =          155,                        ///< Channel Pressure
             MIDI_LEARN =                156,                        ///< MIDI Learn
 
             MAX_CONTROLLER_ID =         157,
@@ -642,6 +642,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Byte const pressure
         ) noexcept;
 
+        void channel_pressure(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Byte const pressure
+        ) noexcept;
+
         void note_off(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -686,6 +692,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         MidiController pitch_wheel;
         MidiController note;
         MidiController velocity;
+        MidiController channel_pressure_ctl;
 
     protected:
         Sample const* const* initialize_rendering(

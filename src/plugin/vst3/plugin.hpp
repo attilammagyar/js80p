@@ -59,6 +59,7 @@ class Vst3Plugin
                     NOTE_OFF = 3,
                     PITCH_WHEEL = 4,
                     CONTROL_CHANGE = 5,
+                    CHANNEL_PRESSURE = 6,
                 };
 
                 Event();

@@ -225,6 +225,7 @@ class ControllerSelector : public Widget
 
                 Controller(
                     ControllerSelector& controller_selector,
+                    GUI::ControllerCapability const required_capability,
                     char const* const text,
                     int const left,
                     int const top,
@@ -234,6 +235,8 @@ class ControllerSelector : public Widget
                 void select();
                 void unselect();
 
+                GUI::ControllerCapability const required_capability;
+
             protected:
                 virtual bool paint() override;
                 virtual bool mouse_up(int const x, int const y) override;
@@ -242,6 +245,7 @@ class ControllerSelector : public Widget
 
             private:
                 Synth::ControllerId const controller_id;
+
                 ControllerSelector& controller_selector;
                 bool is_selected;
                 bool is_mouse_over;
@@ -251,7 +255,7 @@ class ControllerSelector : public Widget
         Background& background;
         Synth* synth;
         ParamEditor* param_editor;
-        Controller* controllers[GUI::ALL_CTLS];
+        Controller* controllers[GUI::CONTROLLERS_COUNT];
         Synth::ParamId param_id;
         Synth::ControllerId selected_controller_id;
 };
