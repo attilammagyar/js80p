@@ -768,6 +768,7 @@ tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
         if (
                 Synth::is_supported_midi_controller((Midi::Controller)midiControllerNumber)
                 || midiControllerNumber == Vst::ControllerNumbers::kPitchBend
+                || midiControllerNumber == Vst::ControllerNumbers::kAfterTouch
         ) {
             id = midiControllerNumber;
 

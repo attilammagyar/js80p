@@ -1,8 +1,6 @@
 v1.5.0 (2023-??-??)
  * Improved MIDI CC smoothing
  * Parameters can now be controlled via Channel Aftertouch (Channel Pressure).
-   (Though many VST3 hosts require manually assigning the Channel Pressure MIDI
-   message to the VST3 plugin's Channel Aftertouch parameter for this to work.)
  * Bugfix: the VST3 plugin will now process all controller changes within a
    block, not just the last one
 
