@@ -1,5 +1,3 @@
-ROOT_DIR = C:/mingw64
-
 TARGET_PLATFORM_CXXFLAGS = \
 	-mwindows \
 	-D UNICODE \
