@@ -296,6 +296,7 @@ static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
     "UNKNOWN",
 };
 
+#if (defined (_OLD_PARAM_HANDLING))
 const FstPlugin::float_param_infos_t FstPlugin::float_param_infos {
     // Synth - Global
       FloatParamInfo{"MIX Oh"}
@@ -669,6 +670,23 @@ const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
 };
 #endif  // #ifdef N_T_C
 
+#else   // #if (!defined (_OLD_PARAM_HANDLING))
+
+const FstPlugin::param_infos_t FstPlugin::param_infos {
+    // Synth - Global - Mode
+      new IntParamInfo{Synth::ParamId::MODE, "MODE", JS80P::GUI::MODES, JS80P::GUI::MODES_COUNT}
+    // Synth - Modulator (Oscillator 1) Waveform
+    , new FloatParamInfo{Synth::ParamId::MF1Q, "MF1Q", 1.0, "%.2f", ""}
+    , new FloatParamInfo{Synth::ParamId::MF1G, "MF1G", 1.0, "%.2f", "dB"}
+    , new FloatParamInfo{Synth::ParamId::MF2FRQ, "MF2FRQ", 1.0, "%.1f", "Hz"}
+    , new FloatParamInfo{Synth::ParamId::MF2Q, "MF2Q", 1.0, "%.2f", ""}
+    , new FloatParamInfo{Synth::ParamId::MF2G, "MF2G", 1.0, "%.2f", "dB"}
+    , new FloatParamInfo{Synth::ParamId::MF1FRQ, "MF1FRQ", 1.0, "%.1f", "Hz"}
+};
+
+#endif  // #if (!defined (_OLD_PARAM_HANDLING))
+
+
 AEffect* FstPlugin::create_instance(
         audioMasterCallback const host_callback,
         GUI::PlatformData const platform_data
@@ -691,7 +709,11 @@ AEffect* FstPlugin::create_instance(
     effect->numInputs = 0;
     effect->numOutputs = (t_fstInt32)FstPlugin::OUT_CHANNELS;
     effect->numPrograms = (t_fstInt32)FstPlugin::NO_OF_PROGRAMS;
+#if (defined (_OLD_PARAM_HANDLING))
     effect->numParams = (t_fstInt32)FstPlugin::NO_OF_PARAMS;
+#else   // #if (!defined (_OLD_PARAM_HANDLING))
+    effect->numParams = (t_fstInt32)FstPlugin::param_infos.size();
+#endif  // #if (!defined (_OLD_PARAM_HANDLING))
     effect->object = (void*)fst_plugin;
     effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
@@ -773,8 +795,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             fst_plugin->get_parameter_name((size_t)index, (char*)pointer);
             return 0;
 
+#if (defined (_OLD_PARAM_HANDLING))
         case effCanBeAutomated:
             return (VstIntPtr)fst_plugin->can_parameter_be_automated((size_t)index);
+#endif  // #if (defined (_OLD_PARAM_HANDLING))
 
         case effSetSampleRate:
             fst_plugin->set_sample_rate(fvalue);
@@ -1180,6 +1204,7 @@ void FstPlugin::set_program_name(const char* name)
 }
 
 
+#if (defined (_OLD_PARAM_HANDLING))
 float FstPlugin::get_parameter(size_t index) const noexcept
 {
     return synth.get_param_ratio_atomic(static_cast<Synth::ParamId>(index));
@@ -1260,6 +1285,80 @@ bool FstPlugin::can_parameter_be_automated(size_t index) const noexcept
     return true;
 }
 
+
+#else   // #if (!defined (_OLD_PARAM_HANDLING))
+
+
+float FstPlugin::get_parameter(size_t index) const noexcept
+{
+    if (index < param_infos.size()) {
+        const auto* param_info{param_infos[index]};
+        if (param_info) {
+            return index < param_infos.size() ? synth.get_param_ratio_atomic(param_info->id) : 0.0;
+        }
+    }
+    return 0.0;
+}
+
+
+void FstPlugin::set_parameter(size_t index, float fvalue) noexcept
+{
+    if (index < param_infos.size()) {
+        const auto* param_info{param_infos[index]};
+        if (param_info) {
+            synth.push_message(Synth::MessageType::SET_PARAM, param_info->id, fvalue, 0);
+        }
+    }
+}
+
+
+void FstPlugin::get_parameter_label(size_t index, char* label) const noexcept
+{
+    // Use only 'label' to display something like e.g. 'Sine', 'Soft Tri' for 'MWAV'.
+    // Use 'label' together with 'display' to display something like '2400.00 Hz' where 'Hz' would be the 'label'.
+    if (index < param_infos.size()) {
+        const auto* param_info{param_infos[index]};
+        if (param_info) {
+            param_info->fillLabel(label);
+        } else {
+            strncpy(label, "nl at i", 8);
+        }
+        return;
+    }
+    strncpy(label, "i index", 8);
+}
+
+
+void FstPlugin::get_parameter_display(size_t index, char* display) const noexcept
+{
+    if (index < param_infos.size()) {
+        const auto* param_info{param_infos[index]};
+        if (param_info) {
+            param_info->fillDisplay(synth, display);
+        } else {
+            strncpy(display, "nl at i", 8);
+        }
+        return;
+    }
+    strncpy(display, "i index", 8);
+}
+
+
+void FstPlugin::get_parameter_name(size_t index, char* name) const noexcept
+{
+    if (index < param_infos.size()) {
+        const auto* param_info{param_infos[index]};
+        if (param_info) {
+            param_info->fillName(name);
+        } else {
+            strncpy(name, "nl at i", 8);
+        }
+        return;
+    }
+    strncpy(name, "i index", 8);
+}
+
+#endif  // #if (!defined (_OLD_PARAM_HANDLING))
 
 void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {

@@ -19,6 +19,8 @@
 #ifndef JS80P__PLUGIN__FST__PLUGIN_HPP
 #define JS80P__PLUGIN__FST__PLUGIN_HPP
 
+#define _OLD_PARAM_HANDLING
+
 #include <string>
 #include <array>
 
@@ -128,7 +130,9 @@ class FstPlugin
         void get_parameter_label(size_t index, char* label) const noexcept;
         void get_parameter_display(size_t index, char* display) const noexcept;
         void get_parameter_name(size_t index, char* name) const noexcept;
+#if (defined (_OLD_PARAM_HANDLING))
         bool can_parameter_be_automated(size_t index) const noexcept;
+#endif  // #if (defined (_OLD_PARAM_HANDLING))
 
         void open_gui(GUI::PlatformWidget parent_window);
         void gui_idle();
@@ -157,6 +161,7 @@ class FstPlugin
         bool store_state_of_previous_program_in_set_program{true};
         std::string serialized_bank;
 
+#if (defined (_OLD_PARAM_HANDLING))
         struct FloatParamInfo {
             FloatParamInfo(std::string_view n, double s = 100.0, std::string_view f = "%.2f", std::string_view l = "%")
             : name(n), label(l), format(f), scale(s) {
@@ -195,6 +200,81 @@ class FstPlugin
 #endif  // #ifndef N_T_C
         using int_param_infos_t = std::array<IntParamInfo, Synth::MAX_PARAM_ID - Synth::FLOAT_PARAMS>;
         static const int_param_infos_t int_param_infos;
+
+#else   // #if (!defined (_OLD_PARAM_HANDLING))
+
+        struct ParamInfo {
+            ParamInfo(Synth::ParamId i, std::string_view n)
+                : id(i), name(n) {
+            }
+            void fillName(char* out_name) const noexcept {
+                const std::string param_name{name.substr(0, Constants::PARAM_NAME_MAX_LENGTH)};
+                size_t i{0};
+                for (; i < param_name.length(); ++i) {
+                    out_name[i] = param_name.data()[i];
+                }
+                out_name[i] = '\0';
+            }
+            virtual void fillLabel(char* out_label) const noexcept = 0;
+            virtual void fillDisplay(const Synth& synth, char* out_display) const noexcept = 0;
+            Synth::ParamId id;
+            std::string name; // friendly, should not be longer than 16 bytes including 0 terminator!
+        };
+        struct FloatParamInfo : public ParamInfo {
+            FloatParamInfo(Synth::ParamId i
+                         , std::string_view n
+                         , double s = 100.0
+                         , std::string_view f = "%.2f"
+                         , std::string_view l = "%")
+                : ParamInfo(i, n), label(l), format(f), scale(s) {
+            }
+            virtual void fillLabel(char* out_label) const noexcept override {
+                snprintf(out_label, 9, "%s", label.c_str());
+            }
+            virtual void fillDisplay(const Synth& synth, char* out_display) const noexcept override {
+                Number ratio{synth.get_param_ratio_atomic(id)};
+                snprintf(out_display, 9, format.c_str(), synth.float_param_ratio_to_display_value(id, ratio) * scale);
+            }
+            std::string label;
+            std::string format;
+            double scale;
+        };
+        struct IntParamInfo : public ParamInfo {
+            IntParamInfo(Synth::ParamId i
+                         , std::string_view n
+                         , char const* const* const o
+                         , int no_of_o)
+                : ParamInfo(i, n), options(0), number_of_options(no_of_o) {
+            }
+            virtual void fillLabel(char* out_label) const noexcept override {
+                out_label[0] = '\0';
+            }
+            virtual void fillDisplay(const Synth& synth, char* out_display) const noexcept override {
+                Number ratio{synth.get_param_ratio_atomic(id)};
+                /*
+                auto value{synth.int_param_ratio_to_display_value(id, ratio)};
+#ifdef N_T_C
+                if (value < options->size()) {
+                    snprintf(out_display, 9, "%s", options->at(value).c_str());
+#else
+                if (value < number_of_options) {
+                    snprintf(out_display, 9, "%s", options[value]);
+#endif
+                } else {
+                    strncpy(out_display, "???", 4);
+                }
+                */
+                synth.int_param_ratio_to_display_value(id, ratio);
+                //snprintf(out_display, 16, "%d-%p", number_of_options, (void*)options);
+                snprintf(out_display, 16, "%d", number_of_options);
+            }
+            char const* const* const options{nullptr};
+            int const number_of_options{0};
+        };
+        using param_infos_t = std::array<const ParamInfo*, 7>;
+        static const param_infos_t param_infos;
+
+#endif  // #if (!defined (_OLD_PARAM_HANDLING))
 };
 
 }
