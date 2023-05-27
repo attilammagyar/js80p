@@ -151,7 +151,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             EOG = 56,        ///< Effects Overdrive Gain
 
-            EDG = 57,        ///< Effects Distortaion Gain
+            EDG = 57,        ///< Effects Distortion Gain
 
             EF1FRQ = 58,     ///< Effects Filter 1 Frequency
             EF1Q = 59,       ///< Effects Filter 1 Q Factor
@@ -395,8 +395,23 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6WAV = 269,     ///< LFO 6 Waveform
             L7WAV = 270,     ///< LFO 7 Waveform
             L8WAV = 271,     ///< LFO 8 Waveform
+            L1SYN = 272,     ///< LFO 1 Tempo Synchronization
+            L2SYN = 273,     ///< LFO 2 Tempo Synchronization
+            L3SYN = 274,     ///< LFO 3 Tempo Synchronization
+            L4SYN = 275,     ///< LFO 4 Tempo Synchronization
+            L5SYN = 276,     ///< LFO 5 Tempo Synchronization
+            L6SYN = 277,     ///< LFO 6 Tempo Synchronization
+            L7SYN = 278,     ///< LFO 7 Tempo Synchronization
+            L8SYN = 279,     ///< LFO 8 Tempo Synchronization
+            EESYN = 280,     ///< Effects Echo Tempo Synchronization
+            MF1LOG = 281,    ///< Modulator Filter 1 Logarithmic Frequency
+            MF2LOG = 282,    ///< Modulator Filter 2 Logarithmic Frequency
+            CF1LOG = 283,    ///< Carrier Filter 1 Logarithmic Frequency
+            CF2LOG = 284,    ///< Carrier Filter 2 Logarithmic Frequency
+            EF1LOG = 285,    ///< Effects Filter 1 Logarithmic Frequency
+            EF2LOG = 286,    ///< Effects Filter 2 Logarithmic Frequency
 
-            MAX_PARAM_ID = 272
+            MAX_PARAM_ID = 287
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
@@ -408,6 +423,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             UNDEFINED_1 =               Midi::UNDEFINED_1,          ///< Undefined (CC 3)
             FOOT_PEDAL =                Midi::FOOT_PEDAL,           ///< Foot Pedal (CC 4)
             PORTAMENTO_TIME =           Midi::PORTAMENTO_TIME,      ///< Portamento Time (CC 5)
+            DATA_ENTRY =                Midi::DATA_ENTRY,           ///< Data Entry (CC 6)
             VOLUME =                    Midi::VOLUME,               ///< Volume (CC 7)
             BALANCE =                   Midi::BALANCE,              ///< Balance (CC 8)
             UNDEFINED_2 =               Midi::UNDEFINED_2,          ///< Undefined (CC 9)
@@ -433,7 +449,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             UNDEFINED_14 =              Midi::UNDEFINED_14,         ///< Undefined (CC 29)
             UNDEFINED_15 =              Midi::UNDEFINED_15,         ///< Undefined (CC 30)
             UNDEFINED_16 =              Midi::UNDEFINED_16,         ///< Undefined (CC 31)
-            PORTAMENTO_AMOUNT =         Midi::PORTAMENTO_AMOUNT,    ///< Portamento (CC 84)
             SOUND_1 =                   Midi::SOUND_1,              ///< Sound 1 (CC 70)
             SOUND_2 =                   Midi::SOUND_2,              ///< Sound 2 (CC 71)
             SOUND_3 =                   Midi::SOUND_3,              ///< Sound 3 (CC 72)
@@ -499,8 +514,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ENVELOPE_4 =                152,                        ///< Envelope 4
             ENVELOPE_5 =                153,                        ///< Envelope 5
             ENVELOPE_6 =                154,                        ///< Envelope 6
+            CHANNEL_PRESSURE =          155,                        ///< Channel Pressure
+            MIDI_LEARN =                156,                        ///< MIDI Learn
 
-            MAX_CONTROLLER_ID =         155,
+            MAX_CONTROLLER_ID =         157,
         };
 
         typedef Byte Mode;
@@ -521,6 +538,26 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Mode SPLIT_AT_C4 = 13;
 
         static constexpr int MODES = 14;
+
+        class Message
+        {
+            public:
+                Message() noexcept;
+                Message(Message const& message) noexcept;
+                Message(
+                    MessageType const type,
+                    ParamId const param_id,
+                    Number const number_param,
+                    Byte const byte_param
+                ) noexcept;
+
+                Message& operator=(Message const& message) noexcept;
+
+                MessageType type;
+                ParamId param_id;
+                Number number_param;
+                Byte byte_param;
+        };
 
         class ModeParam : public Param<Mode>
         {
@@ -559,6 +596,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Byte const byte_param
         ) noexcept;
 
+        /**
+         * \brief Thread-safe way to change the state of the synthesizer outside
+         *        the audio thread.
+         */
+        void push_message(Message const& message) noexcept;
+
         void process_messages() noexcept;
 
         const std::string& get_program_name() const noexcept;
@@ -592,34 +635,40 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const velocity
+            Midi::Byte const velocity
         ) noexcept;
 
         void aftertouch(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const pressure
+            Midi::Byte const pressure
+        ) noexcept;
+
+        void channel_pressure(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Byte const pressure
         ) noexcept;
 
         void note_off(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const velocity
+            Midi::Byte const velocity
         ) noexcept;
 
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
-            Number const new_value
+            Midi::Byte const new_value
         ) noexcept;
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Midi::Channel const channel,
-            Number const new_value
+            Midi::Word const new_value
         ) noexcept;
 
         void all_sound_off(
@@ -646,6 +695,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         MidiController pitch_wheel;
         MidiController note;
         MidiController velocity;
+        MidiController channel_pressure_ctl;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -663,26 +713,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Frequency frequencies[Midi::NOTES];
 
     private:
-        class Message
-        {
-            public:
-                Message() noexcept;
-                Message(Message const& message) noexcept;
-                Message(
-                    MessageType const type,
-                    ParamId const param_id,
-                    Number const number_param,
-                    Byte const byte_param
-                ) noexcept;
-
-                Message& operator=(Message const& message) noexcept;
-
-                MessageType type;
-                ParamId param_id;
-                Number number_param;
-                Byte byte_param;
-        };
-
         /*
         See Timur Doumler [ACCU 2017]: Lock-free programming with modern C++
           https://www.youtube.com/watch?v=qdrp6k4rcP4
@@ -797,8 +827,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x80;
                 static constexpr Integer MASK = 0x7f;
-                static constexpr Integer MULTIPLIER = 15757;
-                static constexpr Integer SHIFT = 11;
+                static constexpr Integer MULTIPLIER = 125123;
+                static constexpr Integer SHIFT = 14;
 
                 static Integer hash(char const* name) noexcept;
 
@@ -812,10 +842,27 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Entry entries[ENTRIES];
         };
 
+        class MidiControllerMessage
+        {
+            public:
+                MidiControllerMessage();
+
+                MidiControllerMessage(Seconds const time_offset, Midi::Word const value);
+
+                bool operator==(MidiControllerMessage const& message) const noexcept;
+                MidiControllerMessage& operator=(MidiControllerMessage const& message) noexcept;
+                MidiControllerMessage& operator=(MidiControllerMessage const&& message) noexcept;
+
+            private:
+                Seconds time_offset;
+                Midi::Word value;
+        };
+
+        static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
+        static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
+
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
-
-        static constexpr Number NOTE_TO_PARAM_SCALE = 1.0 / 127.0;
 
         static std::vector<bool> supported_midi_controllers;
         static bool supported_midi_controllers_initialized;
@@ -853,6 +900,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             FloatParam& float_param
         ) noexcept;
 
+        Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
+        Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
+
+        bool is_repeated_midi_controller_message(
+            ControllerId const controller_id,
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Word const value
+        ) noexcept;
+
         void handle_set_param(
             ParamId const param_id,
             Number const ratio
@@ -863,11 +920,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
         void handle_refresh_param(ParamId const param_id) noexcept;
 
-        void assign_controller_to_param(
+        bool assign_controller_to_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
-        void assign_controller_to_float_param(
+        bool assign_controller_to_float_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
@@ -884,6 +941,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Bus bus;
         Effects::Effects<Bus> effects;
         Sample const* const* raw_output;
+        MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
         FloatParam* float_params[FLOAT_PARAMS];
         BiquadFilterSharedCache* biquad_filter_shared_caches[4];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
@@ -897,6 +955,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Carrier* carriers[POLYPHONY];
         Integer next_voice;
         Midi::Note previous_note;
+        bool is_learning;
         std::string program_name{"Init"};
 
     public:

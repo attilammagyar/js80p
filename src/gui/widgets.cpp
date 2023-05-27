@@ -91,6 +91,7 @@ void ImportPatchButton::import_patch(char const* buffer, Integer const size) con
 
     synth_gui_body->stop_editing();
     synth_gui_body->refresh_param_editors();
+    synth_gui_body->refresh_toggle_switches();
 }
 
 
@@ -160,6 +161,16 @@ ParamEditor* TabBody::own(ParamEditor* param_editor)
 }
 
 
+ToggleSwitch* TabBody::own(ToggleSwitch* toggle_switch)
+{
+    Widget::own(toggle_switch);
+
+    toggle_switches.push_back(toggle_switch);
+
+    return toggle_switch;
+}
+
+
 void TabBody::stop_editing()
 {
     for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
@@ -183,6 +194,14 @@ void TabBody::refresh_controlled_param_editors()
 void TabBody::refresh_param_editors()
 {
     for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+        (*it)->refresh();
+    }
+}
+
+
+void TabBody::refresh_toggle_switches()
+{
+    for (GUI::ToggleSwitches::iterator it = toggle_switches.begin(); it != toggle_switches.end(); ++it) {
         (*it)->refresh();
     }
 }
@@ -239,6 +258,7 @@ void Background::refresh()
     if (next_full_refresh == 0) {
         next_full_refresh = FULL_REFRESH_TICKS;
         body->refresh_param_editors();
+        body->refresh_toggle_switches();
     } else {
         body->refresh_controlled_param_editors();
     }
@@ -286,24 +306,28 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
     Widget::set_up(platform_data, parent);
 
     constexpr int max_top = HEIGHT - Controller::HEIGHT;
+    constexpr int group_separation = 10;
     int top = TITLE_HEIGHT;
     int left = 10;
 
-    for (int i = 0; i != GUI::ALL_CTLS; ++i) {
+    for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
         Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
         char const* const text = GUI::CONTROLLERS[i].long_name;
+        GUI::ControllerCapability const required_capability = (
+            GUI::CONTROLLERS[i].required_capability
+        );
 
         controllers[i] = (Controller*)this->own(
-            new Controller(*this, text, left, top, id)
+            new Controller(*this, required_capability, text, left, top, id)
         );
 
         top += Controller::HEIGHT;
 
-        if (i == 0 || i == 3 || i == 82 || i == 90) {
-            top += 11;
+        if (i == 0 || i == 4 || i == 5 || i == 84 || i == 92) {
+            top += group_separation;
         }
 
-        if (top > max_top || i == 72) {
+        if (top > max_top || i == 74) {
             top = TITLE_HEIGHT;
             left += Controller::WIDTH;
         }
@@ -345,12 +369,15 @@ void ControllerSelector::show(
 
     controllers[controller->index]->select();
 
-    for (int i = 0; i != controller_choices; ++i) {
-        controllers[i]->show();
-    }
-
-    for (int i = controller_choices; i != GUI::ALL_CTLS; ++i) {
-        controllers[i]->hide();
+    for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
+        if (
+                controllers[i]->required_capability == 0
+                || (controllers[i]->required_capability & controller_choices) != 0
+        ) {
+            controllers[i]->show();
+        } else {
+            controllers[i]->hide();
+        }
     }
 
     redraw();
@@ -405,11 +432,13 @@ bool ControllerSelector::paint()
 
 ControllerSelector::Controller::Controller(
         ControllerSelector& controller_selector,
+        GUI::ControllerCapability const required_capability,
         char const* const text,
         int const left,
         int const top,
         Synth::ControllerId const controller_id
 ) : Widget(text, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
+    required_capability(required_capability),
     controller_id(controller_id),
     controller_selector(controller_selector),
     is_selected(false),
@@ -1169,6 +1198,122 @@ bool StatusLine::paint()
     }
 
     return true;
+}
+
+
+ToggleSwitch::ToggleSwitch(
+        GUI& gui,
+        char const* const text,
+        int const left,
+        int const top,
+        int const width,
+        int const box_left,
+        Synth* synth,
+        Synth::ParamId const param_id
+) : TransparentWidget(text, left, top, width, HEIGHT, Type::PARAM_EDITOR),
+    param_id(param_id),
+    box_left(box_left),
+    synth(synth),
+    is_editing_(false)
+{
+    set_gui(gui);
+}
+
+
+void ToggleSwitch::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+{
+    TransparentWidget::set_up(platform_data, parent);
+
+    default_ratio = synth->get_param_default_ratio(param_id);
+    ratio = default_ratio;
+    refresh();
+    redraw();
+}
+
+
+void ToggleSwitch::refresh()
+{
+    if (is_editing()) {
+        return;
+    }
+
+    Number const new_ratio = synth->get_param_ratio_atomic(param_id);
+
+    if (new_ratio != ratio) {
+        ratio = GUI::clamp_ratio(new_ratio);
+        redraw();
+    } else {
+        synth->push_message(
+            Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
+        );
+    }
+}
+
+
+bool ToggleSwitch::paint()
+{
+    TransparentWidget::paint();
+
+    Toggle const toggle = synth->int_param_ratio_to_display_value(param_id, ratio);
+    GUI::Color const color = (
+        toggle == ToggleParam::ON ? GUI::TOGGLE_ON_COLOR : GUI::TOGGLE_OFF_COLOR
+    );
+
+    fill_rectangle(box_left + 5, 8, 11, 8, color);
+
+    return true;
+}
+
+
+bool ToggleSwitch::mouse_up(int const x, int const y)
+{
+    ratio = ratio < 0.5 ? 1.0 : 0.0;
+    synth->push_message(
+        Synth::MessageType::SET_PARAM, param_id, ratio, 0
+    );
+    redraw();
+
+    return true;
+}
+
+
+bool ToggleSwitch::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+
+    gui->set_status_line(text);
+    start_editing();
+
+    return true;
+}
+
+
+bool ToggleSwitch::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+
+    gui->set_status_line("");
+    stop_editing();
+
+    return true;
+}
+
+
+bool ToggleSwitch::is_editing() const
+{
+    return is_editing_;
+}
+
+
+void ToggleSwitch::start_editing()
+{
+    is_editing_ = true;
+}
+
+
+void ToggleSwitch::stop_editing()
+{
+    is_editing_ = false;
 }
 
 }

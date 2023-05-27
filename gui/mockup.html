@@ -176,6 +176,41 @@ h1 {
   font-weight: bold;
 }
 
+.block h1 label {
+  display: inline-block;
+  height: 16px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: normal;
+  vertical-align: bottom;
+}
+
+.block h1 label.freq {
+  position: relative;
+  left: 14px;
+}
+
+.block h1 label.sync {
+  margin-right: 3px;
+  float: right;
+  margin-top: 2px;
+}
+
+.block h1 input {
+  position: relative;
+  background-color: black;
+  border: inset 2px #889;
+  width: 17px;
+  height: 12px;
+  border-radius: 5px;
+  top: -1px;
+  filter: none;
+}
+
+#osc-2 .block h1 input {
+  top: 0px;
+}
+
 .knob {
   display: inline-block;
   width: 58px;
@@ -313,9 +348,6 @@ svg.icon {
   text-align: left;
 }
 
-.label {
-}
-
 .border > span {
   font-size: 12px;
   z-index: 2000;
@@ -449,26 +481,38 @@ svg.icon {
         <h1>Oscillator 1 (modulator)</h1>
         <div id="osc-1-main" class="osc-main block"></div>
         <div id="osc-1-filter-1" class="block osc-filter">
-          <h1>Filter 1</h1>
+          <h1>
+            Filter 1
+            <label class="freq"><input type="text" /> LOG FREQ</label>
+          </h1>
         </div>
         <div id="osc-1-wave" class="osc-main block">
           <h1>Custom waveform harmonics</h1>
         </div>
         <div id="osc-1-filter-2" class="block osc-filter">
-          <h1>Filter 2</h1>
+          <h1>
+            Filter 2
+            <label class="freq"><input type="text" /> LOG FREQ</label>
+          </h1>
         </div>
       </div>
       <div id="osc-2" class="osc main-block block">
         <h1>Oscillator 2 (carrier)</h1>
         <div id="osc-2-main" class="osc-main block"></div>
         <div id="osc-2-filter-1" class="block">
-          <h1>Filter 1</h1>
+          <h1>
+            Filter 1
+            <label class="freq"><input type="text" /> LOG FREQ</label>
+          </h1>
         </div>
         <div id="osc-2-wave" class="osc-main block">
           <h1>Custom waveform harmonics</h1>
         </div>
         <div id="osc-2-filter-2" class="block">
-          <h1>Filter 2</h1>
+          <h1>
+            Filter 2
+            <label class="freq"><input type="text" /> LOG FREQ</label>
+          </h1>
         </div>
       </div>
     </div>
@@ -488,15 +532,24 @@ svg.icon {
         <div id="distortion-params" class="block"></div>
       </div>
       <div id="low-shelf" class="effect main-block block">
-        <h1>Filter 1</h1>
+        <h1>
+          Filter 1
+          <label class="freq"><input type="text" /> LOG FREQ</label>
+        </h1>
         <div id="low-shelf-params" class="block"></div>
       </div>
       <div id="high-shelf" class="effect main-block block">
-        <h1>Filter 2</h1>
+        <h1>
+          Filter 2
+          <label class="freq"><input type="text" /> LOG FREQ</label>
+        </h1>
         <div id="high-shelf-params" class="block"></div>
       </div>
       <div id="echo" class="effect main-block block">
-        <h1>Echo</h1>
+        <h1>
+          Echo
+          <label class="sync">TEMPO SYNC <input type="text" /></label>
+        </h1>
         <div id="echo-params" class="block"></div>
       </div>
       <div id="reverb" class="effect main-block block">
@@ -587,7 +640,7 @@ function create_knob(container, label_text, value_text, controller_text, without
 
 window.onload = function ()
 {
-    var i, o, s, d, h, k1, k2, k3;
+    var i, o, s, d, h, k1, k2, k3, l, n;
 
     if (String(window.location).match(/#hide/)) {
         document.getElementsByTagName("body")[0].setAttribute("class", "hide-objects");
@@ -736,11 +789,18 @@ window.onload = function ()
         k1.setAttribute("class", "block");
         h = document.createElement("h1");
         h.innerHTML = "LFO " + String(i);
+        l = document.createElement("label");
+        l.innerHTML = "TEMPO SYNC ";
+        l.setAttribute("class", "sync");
+        n = document.createElement("input");
+        n.setAttribute("type", "text");
+        l.appendChild(n);
+        h.appendChild(l);
         d.appendChild(h);
         d.appendChild(k1);
 
         create_knob(k1, "WAV", "triangle");
-        create_knob(k1, "FRQ Hz", "0.01");
+        create_knob(k1, "FREQ Hz", "0.01");
         create_knob(k1, "PHS deg", "50");
         create_knob(k1, "MIN %", "50");
         create_knob(k1, "MAX %", "50");

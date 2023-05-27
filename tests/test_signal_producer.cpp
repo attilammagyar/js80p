@@ -42,6 +42,20 @@ TEST(basic_properties, {
 })
 
 
+TEST(too_small_bpm_values_are_ignored, {
+    SignalProducer signal_producer(1);
+
+    signal_producer.set_bpm(0.0);
+    assert_eq(SignalProducer::DEFAULT_BPM, signal_producer.get_bpm(), DOUBLE_DELTA);
+
+    signal_producer.set_bpm(-120.0);
+    assert_eq(SignalProducer::DEFAULT_BPM, signal_producer.get_bpm(), DOUBLE_DELTA);
+
+    signal_producer.set_bpm(180.0);
+    assert_eq(180.0, signal_producer.get_bpm(), DOUBLE_DELTA);
+})
+
+
 class CompositeSignalProducer : public SignalProducer
 {
     friend class SignalProducer;
@@ -63,6 +77,11 @@ class CompositeSignalProducer : public SignalProducer
                     SignalProducer::reset();
 
                     is_clean = true;
+                }
+
+                void set_cache_test_bpm(Number const cache_test_bpm) noexcept
+                {
+                    set_bpm(cache_test_bpm);
                 }
 
                 bool is_clean;
@@ -96,12 +115,15 @@ class CompositeSignalProducer : public SignalProducer
 TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 48000.0;
+    constexpr Number bpm = 144;
+    constexpr Number cache_test_bpm = 0.123;
     constexpr Sample expected_samples[] = {0.0, 0.0, 0.0, 0.0, 0.0};
     Integer last_rendered_sample_count;
     CompositeSignalProducer composite_signal_producer;
 
     composite_signal_producer.set_block_size(block_size);
     composite_signal_producer.set_sample_rate(sample_rate);
+    composite_signal_producer.set_bpm(bpm);
     composite_signal_producer.child.schedule(
         CompositeSignalProducer::ChildSignalProducer::EVT_TEST, 0.0
     );
@@ -110,6 +132,7 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
 
     assert_eq((int)block_size, (int)composite_signal_producer.child.get_block_size());
     assert_eq(sample_rate, composite_signal_producer.child.get_sample_rate(), DOUBLE_DELTA);
+    assert_eq(bpm, composite_signal_producer.child.get_bpm(), DOUBLE_DELTA);
     assert_true(composite_signal_producer.child.is_clean);
     assert_false(composite_signal_producer.child.has_events_after(0.0));
     assert_eq(
@@ -121,6 +144,10 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
         DOUBLE_DELTA,
         "channel=0"
     );
+
+    composite_signal_producer.child.set_cache_test_bpm(cache_test_bpm);
+    composite_signal_producer.set_bpm(bpm);
+    assert_eq(cache_test_bpm, composite_signal_producer.child.get_bpm());
 })
 
 
@@ -517,6 +544,47 @@ TEST(cyclic_dependencies_in_rendering_initialization_are_broken_up_by_delaying_o
     assert_eq(3, signal_producer_1.value);
     assert_eq(2, signal_producer_2.value);
     assert_eq(1, signal_producer_3.value);
+})
+
+
+class FeedbackSignalProducer : public SignalProducer
+{
+    friend class SignalProducer;
+
+    public:
+        FeedbackSignalProducer() noexcept
+            : SignalProducer(1),
+            feedback_sample_count(0)
+        {
+        }
+
+        Integer feedback_sample_count;
+
+    protected:
+        Sample const* const* initialize_rendering(
+                Integer const round,
+                Integer const sample_count
+        ) noexcept {
+            get_last_rendered_block(feedback_sample_count);
+
+            return NULL;
+        }
+};
+
+
+TEST(last_rendered_block_rendered_sample_count_is_not_updated_until_initialization_is_complete, {
+    constexpr Integer sample_count_1 = 5;
+    constexpr Integer sample_count_2 = 12;
+
+    FeedbackSignalProducer signal_producer;
+
+    signal_producer.set_block_size(128);
+    signal_producer.set_sample_rate(22050.0);
+
+    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 1, sample_count_1);
+    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 2, sample_count_2);
+
+    assert_eq((int)sample_count_1, (int)signal_producer.feedback_sample_count);
 })
 
 

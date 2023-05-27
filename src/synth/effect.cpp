@@ -55,7 +55,7 @@ Sample const* const* Effect<InputSignalProducerClass>::initialize_rendering(
 
     is_dry = wet_buffer == NULL && wet.get_value() < 0.000001;
 
-    if (is_dry && wet_buffer == NULL && wet.get_value() > 0.99999) {
+    if (is_dry && dry_buffer == NULL && dry.get_value() > 0.99999) {
         return this->input_buffer;
     }
 

@@ -9,7 +9,7 @@ main()
 
     if [[ "$platform" = "" ]]
     then
-        platform="x86_64-w64-mingw32"
+        platform="x86_64-gpp"
     fi
 
     executable=./build/"$platform"/perf_math
@@ -17,6 +17,7 @@ main()
     if [[ ! -x "$executable" ]]
     then
         echo "Unable to find $executable, run \"make check\" first" >&2
+        echo "or pass a platform name in the first argument." >&2
         return 1
     fi
 

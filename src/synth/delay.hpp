@@ -37,17 +37,30 @@ class Delay : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
 
+    private:
+        static constexpr Integer OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC = 2;
+
     public:
-        Delay(InputSignalProducerClass& input) noexcept;
+        static constexpr Seconds ONE_MINUTE = 60.0;
+        static constexpr Number BPM_MIN = (
+            ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
+        );
+
         Delay(
             InputSignalProducerClass& input,
-            FloatParam& gain_leader,
-            FloatParam& time_leader
+            ToggleParam const* tempo_sync = NULL
         ) noexcept;
         Delay(
             InputSignalProducerClass& input,
             FloatParam& gain_leader,
-            Seconds const time
+            FloatParam& time_leader,
+            ToggleParam const* tempo_sync = NULL
+        ) noexcept;
+        Delay(
+            InputSignalProducerClass& input,
+            FloatParam& gain_leader,
+            Seconds const time,
+            ToggleParam const* tempo_sync = NULL
         ) noexcept;
         virtual ~Delay();
 
@@ -62,6 +75,8 @@ class Delay : public Filter<InputSignalProducerClass>
         void set_feedback_signal_producer(
             SignalProducer const* feedback_signal_producer
         ) noexcept;
+
+        ToggleParam const* const tempo_sync;
 
         FloatParam gain;
         FloatParam time;
@@ -82,18 +97,13 @@ class Delay : public Filter<InputSignalProducerClass>
     private:
         void initialize_instance() noexcept;
 
-        void reallocate_delay_buffer() noexcept;
+        void reallocate_delay_buffer_if_needed() noexcept;
         void free_delay_buffer() noexcept;
         void allocate_delay_buffer() noexcept;
 
-        void initialize_feedback(
-            Integer const round,
-            Integer const sample_count
-        ) noexcept;
-
-        void merge_inputs_into_delay_buffer(Integer const sample_count) noexcept;
-        void copy_input_into_delay_buffer(Integer const sample_count) noexcept;
+        void clear_delay_buffer(Integer const sample_count) noexcept;
         void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
+        void mix_input_into_delay_buffer(Integer const sample_count) noexcept;
 
         void apply_gain(
             Integer const round,
@@ -102,18 +112,21 @@ class Delay : public Filter<InputSignalProducerClass>
             Sample** buffer
         ) noexcept;
 
+        Integer const delay_buffer_oversize;
+
         SignalProducer const* feedback_signal_producer;
-        Sample const* const* feedback_signal_producer_buffer;
         Sample** delay_buffer;
         Sample const* gain_buffer;
         Sample const* time_buffer;
+        Sample time_scale;
         Number feedback_value;
-        Integer feedback_sample_count;
-        Integer write_index;
+        Integer write_index_input;
+        Integer write_index_feedback;
+        Integer read_index;
+        Integer clear_index;
         Integer delay_buffer_size;
-        Number delay_buffer_size_float;
         Number delay_buffer_size_inv;
-        Number read_index;
+        bool is_starting;
 };
 
 }

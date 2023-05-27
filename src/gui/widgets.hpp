@@ -125,14 +125,17 @@ class TabBody : public TransparentWidget
         using TransparentWidget::own;
 
         ParamEditor* own(ParamEditor* param_editor);
+        ToggleSwitch* own(ToggleSwitch* param_editor);
 
         void stop_editing();
 
         void refresh_controlled_param_editors();
         void refresh_param_editors();
+        void refresh_toggle_switches();
 
     private:
         GUI::ParamEditors param_editors;
+        GUI::ToggleSwitches toggle_switches;
 };
 
 
@@ -218,10 +221,11 @@ class ControllerSelector : public Widget
         {
             public:
                 static constexpr int WIDTH = 240;
-                static constexpr int HEIGHT = 22;
+                static constexpr int HEIGHT = 21;
 
                 Controller(
                     ControllerSelector& controller_selector,
+                    GUI::ControllerCapability const required_capability,
                     char const* const text,
                     int const left,
                     int const top,
@@ -231,6 +235,8 @@ class ControllerSelector : public Widget
                 void select();
                 void unselect();
 
+                GUI::ControllerCapability const required_capability;
+
             protected:
                 virtual bool paint() override;
                 virtual bool mouse_up(int const x, int const y) override;
@@ -239,6 +245,7 @@ class ControllerSelector : public Widget
 
             private:
                 Synth::ControllerId const controller_id;
+
                 ControllerSelector& controller_selector;
                 bool is_selected;
                 bool is_mouse_over;
@@ -248,7 +255,7 @@ class ControllerSelector : public Widget
         Background& background;
         Synth* synth;
         ParamEditor* param_editor;
-        Controller* controllers[GUI::ALL_CTLS];
+        Controller* controllers[GUI::CONTROLLERS_COUNT];
         Synth::ParamId param_id;
         Synth::ControllerId selected_controller_id;
 };
@@ -513,6 +520,52 @@ class StatusLine : public TransparentWidget
 
     protected:
         virtual bool paint() override;
+};
+
+
+class ToggleSwitch : public TransparentWidget
+{
+    public:
+        static constexpr int HEIGHT = 24;
+
+        ToggleSwitch(
+            GUI& gui,
+            char const* const text,
+            int const left,
+            int const top,
+            int const width,
+            int const box_left,
+            Synth* synth,
+            Synth::ParamId const param_id
+        );
+
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
+
+        void refresh();
+
+        Synth::ParamId const param_id;
+
+    protected:
+        virtual bool paint() override;
+        virtual bool mouse_up(int const x, int const y) override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
+
+    private:
+        bool is_editing() const;
+        void start_editing();
+        void stop_editing();
+
+        int const box_left;
+
+        Synth* synth;
+
+        Number default_ratio;
+        Number ratio;
+        bool is_editing_;
 };
 
 }

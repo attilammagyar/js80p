@@ -108,6 +108,21 @@ class Param : public SignalProducer
 };
 
 
+typedef Byte Toggle;
+
+
+class ToggleParam : public Param<Toggle>
+{
+    friend class SignalProducer;
+
+    public:
+        static constexpr Toggle OFF = 0;
+        static constexpr Toggle ON = 1;
+
+        ToggleParam(std::string const name, Toggle const default_value);
+};
+
+
 /**
  * \brief Parameter with floating point values. Values can be scheduled at
  *        time offsets, or can be approached linearly over a given duration of
@@ -120,6 +135,7 @@ class FloatParam : public Param<Number>
     public:
         static constexpr Event::Type EVT_SET_VALUE = 1;
         static constexpr Event::Type EVT_LINEAR_RAMP = 2;
+        static constexpr Event::Type EVT_LOG_RAMP = 3;
 
         /**
          * \brief Orchestrate rendering signals and handling events.
@@ -160,7 +176,13 @@ class FloatParam : public Param<Number>
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0,
-            Number const round_to = 0.0
+            Number const round_to = 0.0,
+            ToggleParam const* log_scale_toggle = NULL,
+            Number const* log_scale_table = NULL,
+            Number const* log_scale_inv_table = NULL,
+            int const log_scale_table_max_index = 0,
+            Number const log_scale_table_scale = 0.0,
+            Number const log_scale_inv_table_scale = 0.0
         ) noexcept;
 
         /**
@@ -170,10 +192,16 @@ class FloatParam : public Param<Number>
          */
         FloatParam(FloatParam& leader) noexcept;
 
+        bool is_logarithmic() const noexcept;
+
         void set_value(Number const new_value) noexcept;
         Number get_value() const noexcept;
         void set_ratio(Number const ratio) noexcept;
         Number get_ratio() const noexcept;
+
+        Number ratio_to_value(Number const ratio) const noexcept;
+        Number value_to_ratio(Number const value) const noexcept;
+
         Integer get_change_index() const noexcept;
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
@@ -231,7 +259,8 @@ class FloatParam : public Param<Number>
                     Number const initial_value,
                     Number const target_value,
                     Number const duration_in_samples,
-                    Seconds const duration
+                    Seconds const duration,
+                    bool const is_logarithmic
                 ) noexcept;
 
                 Number get_next_value() noexcept;
@@ -245,6 +274,7 @@ class FloatParam : public Param<Number>
                 Seconds duration;
                 Number delta;
                 Number speed;
+                bool is_logarithmic;
                 bool is_done;
         };
 
@@ -252,12 +282,27 @@ class FloatParam : public Param<Number>
 
         void handle_set_value_event(Event const& event) noexcept;
         void handle_linear_ramp_event(Event const& event) noexcept;
+        void handle_log_ramp_event(Event const& event) noexcept;
         void handle_cancel_event(Event const& event) noexcept;
 
         bool is_following_leader() const noexcept;
 
+        Seconds smooth_change_duration(
+            Number const previous_value,
+            Number const controller_value,
+            Seconds const duration
+        ) const noexcept;
+
+        ToggleParam const* const log_scale_toggle;
+        Number const* const log_scale_table;
+        Number const* const log_scale_inv_table;
+        int const log_scale_table_max_index;
+        Number const log_scale_table_scale;
+        Number const log_scale_inv_table_scale;
+
         FloatParam* const leader;
         FlexibleController* flexible_controller;
+        Integer flexible_controller_change_index;
         Envelope const* envelope;
         LFO* lfo;
         Sample const* const* lfo_buffer;

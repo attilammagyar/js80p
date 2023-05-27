@@ -146,6 +146,7 @@ class FstPlugin
 
         static constexpr Integer ROUND_MASK = 0x7fff;
 
+        void update_bpm() noexcept;
         Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
 
         AEffect* const effect;
@@ -180,6 +181,7 @@ class FstPlugin
         static const options_t modes;
         static const options_t waveforms;
         static const options_t biquad_filter_types;
+        static const options_t off_on;
     private:
         struct IntParamInfo {
             IntParamInfo(std::string_view n, const options_t* o)
@@ -189,6 +191,9 @@ class FstPlugin
             const options_t* options;
         };
 #else   // #ifndef N_T_C
+        static char const* const OFF_ON[];
+        static int const OFF_ON_COUNT;
+
         struct IntParamInfo {
             IntParamInfo(std::string_view n, char const* const* const o, int no_of_o)
             : name(n), options(o), number_of_options(no_of_o) {

@@ -613,6 +613,10 @@ const FstPlugin::options_t biquad_filter_types {
     , "LS"
     , "HS"
 };
+const FstPlugin::options_t off_on {
+    "Off"
+    , "On"
+};
 
 const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
     // Synth - Global - Mode
@@ -642,6 +646,14 @@ const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
 };
 
 #else   // #ifdef N_T_C
+
+char const* const FstPlugin::OFF_ON[] = {
+    "Off",
+    "On"
+};
+int const FstPlugin::OFF_ON_COUNT = 2;
+
+
 const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
     // Synth - Global - Mode
       IntParamInfo{"MODE", JS80P::GUI::MODES, JS80P::GUI::MODES_COUNT}
@@ -649,16 +661,16 @@ const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
     , IntParamInfo{"MWAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
     // Synth - Carrier (Oscillator 2) Waveform
     , IntParamInfo{"CWAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
-    // Synth - Modulator Filters 1 & 2 Types
+    // Synth - Modulator Filters 1 & 2 Type
     , IntParamInfo{"MF1TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
     , IntParamInfo{"MF2TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
-    // Synth - Carrier Filters 1 & 2 Types
+    // Synth - Carrier Filters 1 & 2 Type
     , IntParamInfo{"CF1TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
     , IntParamInfo{"CF2TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
-    // Effects - Filters 1 & 2 Types
+    // Effects - Filters 1 & 2 Type
     , IntParamInfo{"EF1TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
     , IntParamInfo{"EF2TYP", JS80P::GUI::BIQUAD_FILTER_TYPES, JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT}
-    // LFOs - LFO 1 - 8 Waveforms
+    // LFOs - LFO 1 - 8 Waveform
     , IntParamInfo{"L1WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
     , IntParamInfo{"L2WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
     , IntParamInfo{"L3WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
@@ -667,6 +679,26 @@ const FstPlugin::int_param_infos_t FstPlugin::int_param_infos {
     , IntParamInfo{"L6WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
     , IntParamInfo{"L7WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
     , IntParamInfo{"L8WAV", JS80P::GUI::WAVEFORMS, JS80P::GUI::WAVEFORMS_COUNT}
+    // LFOs - LFO 1 - 8 Tempo Synchronization
+    , IntParamInfo{"L1SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L2SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L3SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L4SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L5SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L6SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L7SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"L8SYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    // Effects - Echo Tempo Synchronization
+    , IntParamInfo{"EESYN", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    // Synth - Modulator Filters 1 & 2 Logarithmic Frequency
+    , IntParamInfo{"MF1LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"MF2LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    // Synth - Carrier Filters 1 & 2 Logarithmic Frequency
+    , IntParamInfo{"CF1LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"CF2LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    // Effects - Filters 1 & 2 Logarithmic Frequency
+    , IntParamInfo{"EF1LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
+    , IntParamInfo{"EF2LOG", FstPlugin::OFF_ON, JS80P::FstPlugin::OFF_ON_COUNT}
 };
 #endif  // #ifdef N_T_C
 
@@ -1041,8 +1073,23 @@ void FstPlugin::generate_samples(
 Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
 {
     round = (round + 1) & ROUND_MASK;
+    update_bpm();
 
     return synth.generate_samples(round, (Integer)sample_count);
+}
+
+
+void FstPlugin::update_bpm() noexcept
+{
+    VstTimeInfo const* time_info = (
+        (VstTimeInfo const*)host_callback(effect, audioMasterGetTime, 0, kVstTempoValid, NULL, 0.0f)
+    );
+
+    if (time_info == NULL || (time_info->flags & kVstTempoValid) == 0) {
+        return;
+    }
+
+    synth.set_bpm((Number)time_info->tempo);
 }
 
 

@@ -248,6 +248,7 @@ class Widget : public WidgetBase
             | Type::TAB_BODY
             | Type::TAB_SELECTOR
             | Type::STATUS_LINE
+            | Type::TOGGLE_SWITCH
         );
 
         class Resource;

@@ -35,6 +35,7 @@ Math::Math() noexcept
     init_sines();
     init_randoms();
     init_distortion();
+    init_log_biquad_filter_freq();
 }
 
 
@@ -77,6 +78,28 @@ void Math::init_distortion() noexcept
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
         Number const x = 2.0 * ((Number)i * max_inv) - 1.0;
         distortion[i] = std::tanh(8.0 * x) * 0.5 + 0.5;
+    }
+}
+
+
+void Math::init_log_biquad_filter_freq() noexcept
+{
+    constexpr Number max_inv = 1.0 / (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX;
+    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+    constexpr Number range = max - min;
+    constexpr Number log2_min = std::log2(min);
+    constexpr Number log2_max = std::log2(Constants::BIQUAD_FILTER_FREQUENCY_MAX);
+    constexpr Number log2_range = log2_max - log2_min;
+    constexpr Number log2_range_inv = 1.0 / log2_range;
+
+    for (int i = 0; i != LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE; ++i) {
+        Number const x = (Number)i * max_inv;
+
+        log_biquad_filter_freq_inv[i] = (
+            (std::log2(min + range * x) - log2_min) * log2_range_inv
+        );
+        log_biquad_filter_freq[i] = std::pow(2.0, log2_min + log2_range * x);
     }
 }
 
@@ -141,6 +164,18 @@ Number Math::pow_10(Number const x) noexcept
 Number Math::pow_10_inv(Number const x) noexcept
 {
     return iterate_exp(x, POW_10_INV_SCALE);
+}
+
+
+Number const* Math::log_biquad_filter_freq_table() noexcept
+{
+    return math.log_biquad_filter_freq;
+}
+
+
+Number const* Math::log_biquad_filter_freq_inv_table() noexcept
+{
+    return math.log_biquad_filter_freq_inv;
 }
 
 

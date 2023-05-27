@@ -112,6 +112,45 @@ void BiquadFilter<InputSignalProducerClass>::update_helper_variables() noexcept
 }
 
 
+template<class InputSignalProducerClass>
+BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+        std::string const name,
+        InputSignalProducerClass& input,
+        TypeParam& type,
+        ToggleParam const& log_scale_toggle
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 3),
+    frequency(
+        name + "FRQ",
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale_toggle,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+    ),
+    q(
+        name + "Q",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
+    ),
+    gain(
+        name + "G",
+        Constants::BIQUAD_FILTER_GAIN_MIN,
+        Constants::BIQUAD_FILTER_GAIN_MAX,
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT
+    ),
+    type(type),
+    shared_cache(NULL)
+{
+    initialize_instance();
+}
+
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(

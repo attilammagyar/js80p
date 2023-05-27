@@ -86,7 +86,11 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
 })
 
 
-TEST(repeats_input_samples_with_delay, {
+void test_basic_delay(
+        Number const time_scale,
+        Number const bpm,
+        Toggle const tempo_sync_state
+) {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
     constexpr Integer sample_count = rounds * block_size;
@@ -105,16 +109,23 @@ TEST(repeats_input_samples_with_delay, {
     };
     FixedSignalProducer input(input_buffer);
     Buffer output(sample_count, CHANNELS);
-    Delay<FixedSignalProducer> delay(input);
+    ToggleParam tempo_sync("SYN", tempo_sync_state);
+    Delay<FixedSignalProducer> delay(input, &tempo_sync);
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
 
     input.set_sample_rate(sample_rate);
     input.set_block_size(block_size);
+    input.set_bpm(bpm);
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
     delay.gain.set_value(0.5);
-    delay.time.set_value(0.25);
-    delay.time.schedule_value(0.71, 0.4);
+    delay.time.set_value(0.25 * time_scale);
+    delay.time.schedule_value(0.71, 0.4 * time_scale);
 
     render_rounds< Delay<FixedSignalProducer> >(delay, output, rounds);
 
@@ -124,12 +135,20 @@ TEST(repeats_input_samples_with_delay, {
             output.samples[c],
             sample_count,
             0.001,
-            "channel=%d",
-            (int)c
+            "unexpected delay; channel=%d, bpm=%f, tempo_sync=%s",
+            (int)c,
+            bpm,
+            tempo_sync.get_value() == ToggleParam::ON ? "ON" : "OFF"
         );
     }
 
-    assert_eq(0.4, delay.time.get_value(), DOUBLE_DELTA);
+    assert_eq(0.4 * time_scale, delay.time.get_value(), DOUBLE_DELTA);
+}
+
+
+TEST(repeats_input_samples_with_delay, {
+    test_basic_delay(1.0, 120.0, ToggleParam::OFF);
+    test_basic_delay(2.0, 120.0, ToggleParam::ON);
 })
 
 
@@ -143,8 +162,8 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
         {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.6},
     };
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.1, 0.1, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3, 0.1, 0.1, 0.1, 0.1},
-        {0.2, 0.2, 0.6, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.6, 0.2, 0.2, 0.2, 0.2},
+        {0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3, 0.1, 0.1, 0.1, 0.1},
+        {0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.6, 0.2, 0.2, 0.2, 0.2},
     };
     Sample const* input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -177,7 +196,11 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
 })
 
 
-TEST(feedback_signal_is_merged_into_the_delay_buffer, {
+void test_delay_with_feedback(
+        Number const time_scale,
+        Number const bpm,
+        Toggle const tempo_sync_state
+) {
     constexpr Integer block_size = 3;
     constexpr Integer rounds = 4;
     constexpr Integer sample_count = rounds * block_size;
@@ -192,8 +215,8 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
     };
     /* output = gain * (input + feedback) */
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.00, 0.00, 0.06, 0.12, 0.18, 0.12, 0.24, 0.36, 0.12, 0.24, 0.36, 0.12},
-        {0.00, 0.00, 0.12, 0.24, 0.36, 0.24, 0.48, 0.72, 0.24, 0.48, 0.72, 0.24},
+        {0.00, 0.00, 0.05, 0.10, 0.15, 0.06, 0.12, 0.36, 0.12, 0.24, 0.36, 0.12},
+        {0.00, 0.00, 0.10, 0.20, 0.30, 0.12, 0.24, 0.72, 0.24, 0.48, 0.72, 0.24},
     };
     Sample const* input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -206,20 +229,28 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
     FixedSignalProducer input(input_buffer);
     FixedSignalProducer feedback(feedback_buffer);
     Buffer output(sample_count, CHANNELS);
-    Delay<FixedSignalProducer> delay(input);
+    ToggleParam tempo_sync("SYN", tempo_sync_state);
+    Delay<FixedSignalProducer> delay(input, &tempo_sync);
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
 
     input.set_sample_rate(sample_rate);
     input.set_block_size(block_size);
+    input.set_bpm(bpm);
 
     feedback.set_sample_rate(sample_rate);
     feedback.set_block_size(block_size);
+    feedback.set_bpm(bpm);
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
     delay.set_feedback_signal_producer(&feedback);
     delay.gain.set_value(0.5);
-    delay.time.set_value(0.2);
-    delay.gain.schedule_value(0.5, 1.0);
+    delay.time.set_value(0.2 * time_scale);
+    delay.gain.schedule_value(0.7, 1.0);
 
     SignalProducer::produce<FixedSignalProducer>(&feedback, 12345);
 
@@ -231,12 +262,95 @@ TEST(feedback_signal_is_merged_into_the_delay_buffer, {
             output.samples[c],
             sample_count,
             0.001,
-            "channel=%d",
-            (int)c
+            "unexpected delay with feedback; channel=%d, bpm=%f, tempo_sync=%s",
+            (int)c,
+            bpm,
+            tempo_sync.get_value() == ToggleParam::ON ? "ON" : "OFF"
         );
     }
 
     assert_eq(1.0, delay.gain.get_value(), DOUBLE_DELTA);
+}
+
+
+TEST(feedback_signal_is_merged_into_the_delay_buffer, {
+    test_delay_with_feedback(1.0, 120.0, ToggleParam::OFF);
+    test_delay_with_feedback(2.0, 120.0, ToggleParam::ON);
+})
+
+
+TEST(feedback_signal_merging_is_independent_of_rendered_sample_count, {
+    constexpr Integer block_size = 5;
+    constexpr Integer sample_count = 15;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.99, 0.99},
+        {0.20, 0.40, 0.60, 0.99, 0.99},
+    };
+    constexpr Sample feedback_samples[CHANNELS][block_size] = {
+        {0.01, 0.02, 0.03, 0.099, 0.099},
+        {0.02, 0.04, 0.06, 0.099, 0.099},
+    };
+    constexpr Sample expected_output[CHANNELS][sample_count] = {
+        {0.00, 0.00, 0.10, 0.20, 0.30, 0.11, 0.12, 0.23, 0.31, 0.11, 0.22, 0.13, 0.11, 0.22, 0.11},
+        {0.00, 0.00, 0.20, 0.40, 0.60, 0.22, 0.24, 0.46, 0.62, 0.22, 0.44, 0.26, 0.22, 0.44, 0.22},
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    Sample const* feedback_buffer[CHANNELS] = {
+        (Sample const*)&feedback_samples[0],
+        (Sample const*)&feedback_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    FixedSignalProducer feedback(feedback_buffer);
+    Buffer output(sample_count, 2);
+    Delay<FixedSignalProducer> delay(input);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+
+    feedback.set_sample_rate(sample_rate);
+    feedback.set_block_size(block_size);
+
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_feedback_signal_producer(&feedback);
+    delay.gain.set_value(1.0);
+    delay.time.set_value(0.2);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 1, 3), 3);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 1, 3);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 2, 1), 1);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 2, 1);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 3, 3), 3);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 3, 3);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 4, 2), 2);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 4, 2);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 5, 1), 1);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 5, 1);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 6, 2), 2);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 6, 2);
+
+    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(&delay, 7, 3), 3);
+    SignalProducer::produce<FixedSignalProducer>(&feedback, 7, 3);
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            0.001,
+            "channel=%d",
+            (int)c
+        );
+    }
 })
 
 
@@ -285,4 +399,28 @@ TEST(reset_clears_the_delay_buffer, {
             (int)c
         );
     }
+})
+
+
+TEST(when_tempo_sync_is_on_then_delay_time_is_measured_in_beats_instead_of_seconds, {
+    test_basic_delay(1.0, 120.0, ToggleParam::OFF);
+    test_delay_with_feedback(1.0, 180.0, ToggleParam::OFF);
+    test_delay_with_feedback(1.0, 30.0, ToggleParam::OFF);
+
+    test_basic_delay(2.0, 120.0, ToggleParam::ON);
+    test_delay_with_feedback(3.0, 180.0, ToggleParam::ON);
+    test_delay_with_feedback(0.5, 30.0, ToggleParam::ON);
+})
+
+
+TEST(when_tempo_sync_is_on_but_tempo_is_too_slow_then_the_minimum_tempo_is_used, {
+    constexpr Number time_scale = (
+        Delay<FixedSignalProducer>::BPM_MIN / Delay<FixedSignalProducer>::ONE_MINUTE
+    );
+
+    test_basic_delay(1.0, 0.1, ToggleParam::OFF);
+    test_delay_with_feedback(1.0, 0.1, ToggleParam::OFF);
+
+    test_basic_delay(time_scale, 0.1, ToggleParam::ON);
+    test_delay_with_feedback(time_scale, 0.1, ToggleParam::ON);
 })

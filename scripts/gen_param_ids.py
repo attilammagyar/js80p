@@ -72,7 +72,7 @@ def print_effect_params(param_id: int) -> int:
     params = [
         ("$OG", "   ///< $ Overdrive Gain"),
 
-        ("$DG", "   ///< $ Distortaion Gain"),
+        ("$DG", "   ///< $ Distortion Gain"),
 
         ("$F1FRQ", "///< $ Filter 1 Frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor"),
@@ -168,6 +168,25 @@ def print_special_params(param_id: int) -> int:
         ("L6WAV", " ///< LFO 6 Waveform"),
         ("L7WAV", " ///< LFO 7 Waveform"),
         ("L8WAV", " ///< LFO 8 Waveform"),
+
+        ("L1SYN", " ///< LFO 1 Tempo Synchronization"),
+        ("L2SYN", " ///< LFO 2 Tempo Synchronization"),
+        ("L3SYN", " ///< LFO 3 Tempo Synchronization"),
+        ("L4SYN", " ///< LFO 4 Tempo Synchronization"),
+        ("L5SYN", " ///< LFO 5 Tempo Synchronization"),
+        ("L6SYN", " ///< LFO 6 Tempo Synchronization"),
+        ("L7SYN", " ///< LFO 7 Tempo Synchronization"),
+        ("L8SYN", " ///< LFO 8 Tempo Synchronization"),
+
+        ("EESYN", " ///< Effects Echo Tempo Synchronization"),
+
+        ("MF1LOG", "///< Modulator Filter 1 Logarithmic Frequency"),
+        ("MF2LOG", "///< Modulator Filter 2 Logarithmic Frequency"),
+        ("CF1LOG", "///< Carrier Filter 1 Logarithmic Frequency"),
+        ("CF2LOG", "///< Carrier Filter 2 Logarithmic Frequency"),
+
+        ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency"),
+        ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency"),
     ]
 
     return print_params(param_id, "", "", 1, params)

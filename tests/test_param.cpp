@@ -185,16 +185,29 @@ TEST(param_clamps_integer_value_to_be_between_min_and_max, {
 
 TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[] = {
+        2, 2, 2, 2, 2,
+    };
     Param<int> param("int", -10, 10, 0);
     MidiController midi_controller;
+    Sample const* const* rendered_samples;
     Integer change_index_1;
     Integer change_index_2;
+
+    midi_controller.change(0.0, 0.6);
+    midi_controller.clear();
 
     param.set_block_size(block_size);
     param.set_sample_rate(1.0);
     param.set_midi_controller(&midi_controller);
 
     assert_eq((void*)&midi_controller, (void*)param.get_midi_controller());
+    assert_eq(2, param.get_value());
+    assert_eq(0.6, param.get_ratio());
+
+    rendered_samples = SignalProducer::produce< Param<int> >(&param, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
 
     change_index_1 = param.get_change_index();
     midi_controller.change(0.0, 0.2514);
@@ -1056,6 +1069,9 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     Integer change_index_2;
     Sample const* const* rendered_samples;
 
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
+
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(1.0);
     float_param.set_midi_controller(&midi_controller);
@@ -1088,6 +1104,50 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 })
 
 
+TEST(float_param_follows_midi_controller_changes_gradually, {
+    constexpr Integer block_size = 1000;
+    constexpr Frequency sample_rate = 5000.0;
+    FloatParam reference_float_param("reference", 0.0, 10.0, 0.0);
+    FloatParam float_param("float", 0.0, 10.0, 0.0);
+    MidiController midi_controller;
+    Sample const* expected_samples;
+    Sample const* rendered_samples;
+
+    midi_controller.change(0.0, 0.0);
+    midi_controller.clear();
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_midi_controller(&midi_controller);
+
+    midi_controller.change(0.002, 0.000);
+    midi_controller.change(0.002, 0.010);
+    midi_controller.change(0.002, 0.025);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.100);
+    midi_controller.change(0.002, 0.101);
+    midi_controller.change(0.002, 0.601);
+
+    reference_float_param.set_block_size(block_size);
+    reference_float_param.set_sample_rate(sample_rate);
+
+    reference_float_param.set_value(0.0);
+    reference_float_param.schedule_value(0.002, 0.0);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.1);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.25);
+    reference_float_param.schedule_linear_ramp(0.20 * 0.075, 1.0);
+    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 1.01);
+    reference_float_param.schedule_linear_ramp(0.20 * 0.5, 6.01);
+
+    expected_samples = FloatParam::produce_if_not_constant(&reference_float_param, 1, block_size);
+    rendered_samples = FloatParam::produce_if_not_constant(&float_param, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples, block_size, 0.001);
+})
+
+
 template<class FloatParamClass>
 void test_follower_midi_controller()
 {
@@ -1102,6 +1162,9 @@ void test_follower_midi_controller()
     Integer change_index_2;
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
+
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
@@ -1147,7 +1210,7 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
         1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
-    FloatParam float_param("float", 0.0, 10.0, 1.0, 1.0);
+    FloatParam float_param("float", 0.0, 10.0, 9.0, 1.0);
     FlexibleController flexible_controller;
     Integer change_index;
     Sample const* const* rendered_samples;
@@ -1168,7 +1231,7 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
     flexible_controller.distortion.set_sample_rate(sample_rate);
     flexible_controller.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.64);
+    flexible_controller.input.set_value(0.2);
     flexible_controller.amount.set_value(0.5);
 
     float_param.set_flexible_controller(&flexible_controller);
@@ -1176,6 +1239,9 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
     assert_eq(
         (void*)&flexible_controller, (void*)float_param.get_flexible_controller()
     );
+    assert_eq(1.0, float_param.get_value());
+
+    flexible_controller.input.set_value(0.64);
 
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
@@ -1307,7 +1373,7 @@ void test_follower_flexible_controller()
         1.0, 1.55, 2.1, 2.65, 3.0
     };
     constexpr Frequency sample_rate = 1.0;
-    FloatParam leader("leader", 0.0, 10.0, 1.0, 1.0);
+    FloatParam leader("leader", 0.0, 10.0, 9.0, 1.0);
     FloatParamClass follower(leader);
     FlexibleController flexible_controller;
     Integer change_index;
@@ -1332,10 +1398,14 @@ void test_follower_flexible_controller()
     flexible_controller.distortion.set_sample_rate(sample_rate);
     flexible_controller.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.64);
+    flexible_controller.input.set_value(0.2);
     flexible_controller.amount.set_value(0.5);
 
     leader.set_flexible_controller(&flexible_controller);
+
+    assert_eq(1.0, follower.get_value());
+
+    flexible_controller.input.set_value(0.64);
 
     assert_false(follower.is_constant_in_next_round(1, block_size));
 
@@ -1362,6 +1432,86 @@ TEST(when_a_flexible_controller_is_assigned_to_the_leader_of_a_float_param_then_
     test_follower_flexible_controller<FloatParam>();
     test_follower_flexible_controller< ModulatableFloatParam<SignalProducer> >();
 })
+
+
+TEST(a_float_param_may_use_logarithmic_scale, {
+    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+    constexpr Number log2_min = std::log2(min);
+    constexpr Number log2_max = std::log2(max);
+    constexpr Integer block_size = 15;
+    constexpr Frequency sample_rate = 14.0;
+    constexpr Sample expected_samples_log[] = {
+        0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.0, 12.0,
+    };
+    ToggleParam log_scale("log", ToggleParam::OFF);
+    FloatParam leader(
+        "freq",
+        min,
+        max,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+    );
+    FloatParam follower(leader);
+    Envelope envelope("env");
+    Sample const* rendered_samples;
+    Sample rendered_samples_log[block_size];
+
+    leader.set_sample_rate(sample_rate);
+    leader.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MIN);
+    leader.set_envelope(&envelope);
+
+    follower.set_sample_rate(sample_rate);
+    follower.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MIN);
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(1.0);
+    envelope.peak_value.set_value(std::log2(16384.0) / (log2_max - log2_min));
+
+    assert_eq(min, follower.ratio_to_value(0.0), DOUBLE_DELTA);
+    assert_eq((min + max) / 2.0, follower.ratio_to_value(0.5), DOUBLE_DELTA);
+    assert_eq(0.5, follower.value_to_ratio((min + max) / 2.0), DOUBLE_DELTA);
+    assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
+
+    log_scale.set_value(ToggleParam::ON);
+
+    leader.set_ratio(0.3);
+    assert_eq(0.3, leader.get_ratio(), 0.001);
+
+    assert_eq(min, follower.ratio_to_value(0.0), DOUBLE_DELTA);
+    assert_eq(
+        (log2_min + log2_max) / 2.0,
+        std::log2(follower.ratio_to_value(0.5)),
+        0.02
+    );
+    assert_eq(
+        0.5,
+        follower.value_to_ratio(std::pow(2.0, (log2_min + log2_max) / 2.0)),
+        DOUBLE_DELTA
+    );
+    assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
+
+    follower.start_envelope(0.0);
+    follower.cancel_events(12.0 / sample_rate);
+
+    assert_float_param_changes_during_rendering(
+        follower, 1, block_size, &rendered_samples
+    );
+
+    for (Integer i = 0; i != block_size; ++i) {
+        rendered_samples_log[i] = std::log2(rendered_samples[i]);
+    }
+
+    assert_eq(expected_samples_log, rendered_samples_log, block_size, 0.027);
+});
 
 
 class Modulator : public SignalProducer

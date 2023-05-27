@@ -135,7 +135,6 @@ Features
 ### Future Plans
 
  * LV2 support
- * Aftertouch support
 
 <a name="bugs"></a>
 

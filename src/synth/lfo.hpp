@@ -61,6 +61,7 @@ class LFO : public SignalProducer
         FloatParam amount;
         FloatParam distortion;
         FloatParam randomness;
+        ToggleParam tempo_sync;
 
     protected:
         Sample const* const* initialize_rendering(

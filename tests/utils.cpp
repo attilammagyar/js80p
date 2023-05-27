@@ -38,7 +38,9 @@ class Buffer
     public:
         Buffer(Integer const size, Integer const channels = 1)
             : size(size),
-            channels(channels)
+            channels(channels),
+            samples(NULL),
+            append_index(0)
         {
             samples = new Sample*[channels];
 
@@ -60,9 +62,27 @@ class Buffer
             delete[] samples;
         }
 
-        Sample** samples;
+        void append(Sample const* const* samples, Integer const sample_count)
+        {
+            for (Integer channel = 0; channel != channels; ++channel) {
+                for (Integer i = 0; i != sample_count; ++i) {
+                    this->samples[channel][append_index + i] = samples[channel][i];
+                }
+            }
+
+            append_index += sample_count;
+        }
+
+        void reset()
+        {
+            append_index = 0;
+        }
+
         Integer const size;
         Integer const channels;
+
+        Sample** samples;
+        Integer append_index;
 };
 
 
@@ -224,10 +244,11 @@ void render_rounds(
         Integer const chunk_size = 0,
         Integer const first_round = 1
 ) {
-    Integer const channels = signal_producer.get_channels();
     Integer const size = (
         0 < chunk_size ? chunk_size : signal_producer.get_block_size()
     );
+
+    buffer.reset();
 
     for (Integer i = 0; i != rounds; ++i) {
         Sample const* const* block = (
@@ -236,11 +257,7 @@ void render_rounds(
             )
         );
 
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer b = 0; b != size; ++b) {
-                buffer.samples[c][i * size + b] = block[c][b];
-            }
-        }
+        buffer.append(block, size);
     }
 }
 

@@ -71,6 +71,17 @@ class Math
             std::max(LN_OF_10 * POW_10_MAX, -1.0 * LN_OF_10 * POW_10_INV_MIN)
         ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
+        static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE = 0x0400;
+        static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX = (
+            LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE - 1
+        );
+        static constexpr Number LOG_BIQUAD_FILTER_FREQ_SCALE = (
+            (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE
+        );
+        static constexpr Number LOG_BIQUAD_FILTER_FREQ_INV_SCALE = (
+            1.0 / (Constants::BIQUAD_FILTER_FREQUENCY_MAX - Constants::BIQUAD_FILTER_FREQUENCY_MIN)
+        );
+
         /**
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.
@@ -86,6 +97,9 @@ class Math
         static Number exp(Number const x) noexcept;
         static Number pow_10(Number const x) noexcept;
         static Number pow_10_inv(Number const x) noexcept;
+
+        static Number const* log_biquad_filter_freq_table() noexcept;
+        static Number const* log_biquad_filter_freq_inv_table() noexcept;
 
         static Frequency detune(
             Frequency const frequency,
@@ -187,12 +201,15 @@ class Math
         void init_sines() noexcept;
         void init_randoms() noexcept;
         void init_distortion() noexcept;
+        void init_log_biquad_filter_freq() noexcept;
 
         Number sin_impl(Number const x) const noexcept;
 
         Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
         Number distortion[DISTORTION_TABLE_SIZE];
+        Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
+        Number log_biquad_filter_freq_inv[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
 };
 
 }

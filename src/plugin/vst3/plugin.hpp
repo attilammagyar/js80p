@@ -59,6 +59,7 @@ class Vst3Plugin
                     NOTE_OFF = 3,
                     PITCH_WHEEL = 4,
                     CONTROL_CHANGE = 5,
+                    CHANNEL_PRESSURE = 6,
                 };
 
                 Event();
@@ -118,9 +119,19 @@ class Vst3Plugin
                 void block_rendered() noexcept;
 
                 void collect_param_change_events(Vst::ProcessData& data) noexcept;
+                void collect_param_change_events_as(
+                    Vst::IParamValueQueue* const param_queue,
+                    Event::Type const event_type,
+                    Midi::Byte const midi_controller
+                ) noexcept;
                 void collect_note_events(Vst::ProcessData& data) noexcept;
                 void process_events() noexcept;
                 void process_event(Event const event) noexcept;
+
+                Midi::Byte float_to_midi_byte(Number const number) const noexcept;
+                Midi::Word float_to_midi_word(Number const number) const noexcept;
+
+                void update_bpm(Vst::ProcessData& data) noexcept;
 
                 void generate_samples(Vst::ProcessData& data) noexcept;
 

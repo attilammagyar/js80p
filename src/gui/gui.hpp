@@ -39,6 +39,7 @@ class ParamEditor;
 class StatusLine;
 class TabBody;
 class TabSelector;
+class ToggleSwitch;
 class Widget;
 class WidgetBase;
 
@@ -53,15 +54,26 @@ class GUI
         typedef std::vector<WidgetBase*> Widgets;
 
         typedef std::vector<ParamEditor*> ParamEditors;
+        typedef std::vector<ToggleSwitch*> ToggleSwitches;
 
         typedef unsigned int Color;
         typedef unsigned char ColorComponent;
+
+        enum ControllerCapability {
+            NONE                = 0,
+            MIDI_CONTROLLER     = 1 << 0,
+            FLEXIBLE_CONTROLLER = 1 << 1,
+            LFO                 = 1 << 2,
+            ENVELOPE            = 1 << 3,
+            CHANNEL_PRESSURE    = 1 << 4,
+        };
 
         class Controller
         {
             public:
                 Controller(
                     int const index,
+                    ControllerCapability const required_capability,
                     Synth::ControllerId const id,
                     char const* const long_name,
                     char const* const short_name
@@ -69,6 +81,7 @@ class GUI
 
                 char const* const long_name;
                 char const* const short_name;
+                ControllerCapability const required_capability;
                 int const index;
                 Synth::ControllerId const id;
         };
@@ -79,16 +92,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int NO_CTLS = 0;
-        static constexpr int ALL_CTLS = 97;
-        static constexpr int LFO_CTLS = ALL_CTLS - Synth::ENVELOPES;
-        static constexpr int FLEX_CTLS = (
-            ALL_CTLS - Synth::ENVELOPES - Synth::LFOS
-        );
-        static constexpr int MIDI_CTLS = (
-            ALL_CTLS
-            - Synth::ENVELOPES - Synth::LFOS - Synth::FLEXIBLE_CONTROLLERS
-        );
+        static constexpr int CONTROLLERS_COUNT = 99;
 
         static char const* const MODES[];
         static int const MODES_COUNT;
@@ -119,6 +123,8 @@ class GUI
         static Color const TEXT_HIGHLIGHT_COLOR;
         static Color const TEXT_HIGHLIGHT_BACKGROUND;
         static Color const STATUS_LINE_BACKGROUND;
+        static Color const TOGGLE_OFF_COLOR;
+        static Color const TOGGLE_ON_COLOR;
 
         static void param_ratio_to_str(
             Synth* synth,
@@ -233,6 +239,7 @@ class WidgetBase
             TAB_SELECTOR = 1 << 9,
             ABOUT_TEXT = 1 << 10,
             STATUS_LINE = 1 << 11,
+            TOGGLE_SWITCH = 1 << 12,
         };
 
         enum TextAlignment {

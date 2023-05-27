@@ -29,7 +29,7 @@ template<class InputSignalProducerClass>
 Echo<InputSignalProducerClass>::Echo(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 12),
+) : Effect<InputSignalProducerClass>(name, input, 13),
     delay_time(
         name + "DEL",
         Constants::DELAY_TIME_MIN,
@@ -56,6 +56,7 @@ Echo<InputSignalProducerClass>::Echo(
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         20.0
     ),
+    tempo_sync(name + "SYN", ToggleParam::OFF),
     high_pass_filter_type(""),
     high_pass_filter_q(
         "",
@@ -83,7 +84,8 @@ Echo<InputSignalProducerClass>::Echo(
         feedback,
         delay_time,
         damping_frequency,
-        damping_gain
+        damping_gain,
+        &tempo_sync
     ),
     comb_filter_2(
         comb_filter_1.high_shelf_filter,
@@ -92,7 +94,8 @@ Echo<InputSignalProducerClass>::Echo(
         feedback,
         delay_time,
         damping_frequency,
-        damping_gain
+        damping_gain,
+        &tempo_sync
     ),
     comb_filter_1_buffer(NULL),
     comb_filter_2_buffer(NULL)
@@ -103,6 +106,7 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(damping_gain);
     this->register_child(width);
     this->register_child(high_pass_frequency);
+    this->register_child(tempo_sync);
 
     this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_q);

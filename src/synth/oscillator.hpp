@@ -20,6 +20,7 @@
 #define JS80P__SYNTH__OSCILLATOR_HPP
 
 #include <string>
+#include <type_traits>
 
 #include "js80p.hpp"
 
@@ -31,14 +32,14 @@
 namespace JS80P
 {
 
-template<class ModulatorSignalProducerClass, bool positive>
+template<class ModulatorSignalProducerClass, bool is_lfo>
 class Oscillator;
 
 
 typedef Oscillator<SignalProducer, false> SimpleOscillator;
 
 
-template<class ModulatorSignalProducerClass, bool positive = false>
+template<class ModulatorSignalProducerClass, bool is_lfo = false>
 class Oscillator : public SignalProducer
 {
     friend class SignalProducer;
@@ -74,20 +75,23 @@ class Oscillator : public SignalProducer
         static constexpr Event::Type EVT_STOP = 2;
 
         static FloatParam dummy_param;
+        static ToggleParam dummy_toggle;
 
         Oscillator(
             WaveformParam& waveform,
             ModulatorSignalProducerClass* modulator = NULL,
             FloatParam& amplitude_modulation_level_leader = dummy_param,
             FloatParam& frequency_modulation_level_leader = dummy_param,
-            FloatParam& phase_modulation_level_leader = dummy_param
+            FloatParam& phase_modulation_level_leader = dummy_param,
+            ToggleParam& tempo_sync = dummy_toggle
         ) noexcept;
 
         Oscillator(
             WaveformParam& waveform,
             FloatParam& amplitude_leader,
             FloatParam& frequency_leader,
-            FloatParam& phase_leader
+            FloatParam& phase_leader,
+            ToggleParam& tempo_sync = dummy_toggle
         ) noexcept;
 
         Oscillator(
@@ -161,6 +165,8 @@ class Oscillator : public SignalProducer
         static constexpr Number FREQUENCY_MAX = 24000.0;
         static constexpr Number FREQUENCY_DEFAULT = 440.0;
 
+        static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
+
         static constexpr Integer NUMBER_OF_CHILDREN = 17;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
@@ -168,6 +174,16 @@ class Oscillator : public SignalProducer
         void initialize_instance() noexcept;
         void allocate_buffers(Integer const size) noexcept;
         void free_buffers() noexcept;
+
+        template<bool is_lfo_>
+        void initialize_frequency_scale(
+            typename std::enable_if<is_lfo_, Number const>::type bpm
+        ) noexcept;
+
+        template<bool is_lfo_>
+        void initialize_frequency_scale(
+            typename std::enable_if<!is_lfo_, Number const>::type bpm
+        ) noexcept;
 
         void compute_amplitude_buffer(
             Integer const round,
@@ -208,12 +224,21 @@ class Oscillator : public SignalProducer
             Sample** buffer
         ) noexcept;
 
+        template<bool is_lfo_>
         Sample render_sample(
-            Sample const amplitude,
-            Sample const frequency,
-            Sample const phase
+            typename std::enable_if<is_lfo_, Sample const>::type amplitude,
+            typename std::enable_if<is_lfo_, Sample const>::type frequency,
+            typename std::enable_if<is_lfo_, Sample const>::type phase
         ) noexcept;
 
+        template<bool is_lfo_>
+        Sample render_sample(
+            typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
+            typename std::enable_if<!is_lfo_, Sample const>::type frequency,
+            typename std::enable_if<!is_lfo_, Sample const>::type phase
+        ) noexcept;
+
+        ToggleParam& tempo_sync;
         WavetableState wavetable_state;
         Wavetable const* wavetables[WAVEFORMS];
         Wavetable const* wavetable;
@@ -228,6 +253,7 @@ class Oscillator : public SignalProducer
         Frequency computed_frequency_value;
         Number phase_value;
         Seconds start_time_offset;
+        Number frequency_scale;
         bool is_on;
         bool is_starting;
         bool computed_frequency_is_constant;

@@ -30,7 +30,8 @@ namespace JS80P
 template<class InputSignalProducerClass>
 CombFilter<InputSignalProducerClass>::CombFilter(
         InputSignalProducerClass& input,
-        StereoMode const stereo_mode
+        StereoMode const stereo_mode,
+        ToggleParam const* tempo_sync
 ) : Filter< HighShelfDelay<InputSignalProducerClass> >(
         high_shelf_filter,
         5,
@@ -47,7 +48,7 @@ CombFilter<InputSignalProducerClass>::CombFilter(
     stereo_gain_buffer(NULL),
     panning_buffer(NULL),
     panning("", -1.0, 1.0, 0.0),
-    delay(input),
+    delay(input, tempo_sync),
     high_shelf_filter("", delay, high_shelf_filter_type)
 {
     initialize_instance();
@@ -66,7 +67,8 @@ CombFilter<InputSignalProducerClass>::CombFilter(
         FloatParam& delay_gain_leader,
         FloatParam& delay_time_leader,
         FloatParam& high_shelf_filter_frequency_leader,
-        FloatParam& high_shelf_filter_gain_leader
+        FloatParam& high_shelf_filter_gain_leader,
+        ToggleParam const* tempo_sync
 ) : Filter< HighShelfDelay<InputSignalProducerClass> >(
         high_shelf_filter,
         5,
@@ -83,7 +85,7 @@ CombFilter<InputSignalProducerClass>::CombFilter(
     stereo_gain_buffer(NULL),
     panning_buffer(NULL),
     panning(panning_leader),
-    delay(input, delay_gain_leader, delay_time_leader),
+    delay(input, delay_gain_leader, delay_time_leader, tempo_sync),
     high_shelf_filter(
         delay,
         high_shelf_filter_type,
@@ -104,7 +106,8 @@ CombFilter<InputSignalProducerClass>::CombFilter(
         FloatParam& delay_gain_leader,
         Seconds const delay_time,
         FloatParam& high_shelf_filter_frequency_leader,
-        FloatParam& high_shelf_filter_gain_leader
+        FloatParam& high_shelf_filter_gain_leader,
+        ToggleParam const* tempo_sync
 ) : Filter< HighShelfDelay<InputSignalProducerClass> >(
         high_shelf_filter,
         5,
@@ -121,7 +124,7 @@ CombFilter<InputSignalProducerClass>::CombFilter(
     stereo_gain_buffer(NULL),
     panning_buffer(NULL),
     panning(panning_leader),
-    delay(input, delay_gain_leader, delay_time),
+    delay(input, delay_gain_leader, delay_time, tempo_sync),
     high_shelf_filter(
         delay,
         high_shelf_filter_type,

@@ -29,12 +29,15 @@
 namespace JS80P
 {
 
-template<class ModulatorSignalProducerClass, bool positive>
-FloatParam Oscillator<ModulatorSignalProducerClass, positive>::dummy_param("", 0.0, 0.0, 0.0);
+template<class ModulatorSignalProducerClass, bool is_lfo>
+FloatParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_param("", 0.0, 0.0, 0.0);
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+ToggleParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_toggle("", ToggleParam::OFF);
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Oscillator<ModulatorSignalProducerClass, positive>::WaveformParam::WaveformParam(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::WaveformParam::WaveformParam(
         std::string const name,
         Waveform const max_value
 ) noexcept : Param<Waveform>(name, SINE, max_value, SINE)
@@ -42,13 +45,14 @@ Oscillator<ModulatorSignalProducerClass, positive>::WaveformParam::WaveformParam
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
         ModulatorSignalProducerClass* modulator,
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader,
-        FloatParam& phase_modulation_level_leader
+        FloatParam& phase_modulation_level_leader,
+        ToggleParam& tempo_sync
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -98,14 +102,15 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6("", -1.0, 1.0, 0.0),
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0)
+    harmonic_9("", -1.0, 1.0, 0.0),
+    tempo_sync(tempo_sync)
 {
     initialize_instance();
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() noexcept
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noexcept
 {
     Number const custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS] = {
         0.0, 0.0, 0.0, 0.0, 0.0,
@@ -115,6 +120,7 @@ void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() n
     computed_amplitude_buffer = NULL;
     phase_buffer = NULL;
     start_time_offset = 0.0;
+    frequency_scale = 1.0;
     is_on = false;
     is_starting = false;
 
@@ -171,12 +177,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::initialize_instance() n
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
         FloatParam& amplitude_leader,
         FloatParam& frequency_leader,
-        FloatParam& phase_leader
+        FloatParam& phase_leader,
+        ToggleParam& tempo_sync
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -205,14 +212,15 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6("", -1.0, 1.0, 0.0),
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0)
+    harmonic_9("", -1.0, 1.0, 0.0),
+    tempo_sync(tempo_sync)
 {
     initialize_instance();
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
         FloatParam& amplitude_leader,
         FloatParam& detune_leader,
@@ -270,14 +278,15 @@ Oscillator<ModulatorSignalProducerClass, positive>::Oscillator(
     harmonic_6(harmonic_6_leader),
     harmonic_7(harmonic_7_leader),
     harmonic_8(harmonic_8_leader),
-    harmonic_9(harmonic_9_leader)
+    harmonic_9(harmonic_9_leader),
+    tempo_sync(dummy_toggle)
 {
     initialize_instance();
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Oscillator<ModulatorSignalProducerClass, positive>::~Oscillator()
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::~Oscillator()
 {
     delete custom_waveform;
     custom_waveform = NULL;
@@ -286,8 +295,8 @@ Oscillator<ModulatorSignalProducerClass, positive>::~Oscillator()
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::allocate_buffers(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::allocate_buffers(
         Integer const size
 ) noexcept {
     computed_frequency_buffer = new Frequency[size];
@@ -296,8 +305,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::allocate_buffers(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::free_buffers() noexcept
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::free_buffers() noexcept
 {
     if (computed_frequency_buffer != NULL) {
         delete[] computed_frequency_buffer;
@@ -311,8 +320,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::free_buffers() noexcept
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::set_block_size(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     if (new_block_size != get_block_size()) {
@@ -324,8 +333,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::set_block_size(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::reset() noexcept
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::reset() noexcept
 {
     SignalProducer::reset();
 
@@ -335,24 +344,24 @@ void Oscillator<ModulatorSignalProducerClass, positive>::reset() noexcept
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::start(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::start(
         Seconds const time_offset
 ) noexcept {
     schedule(EVT_START, time_offset, 0, 0.0, 0.0);
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::stop(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::stop(
         Seconds const time_offset
 ) noexcept {
     schedule(EVT_STOP, time_offset, 0, 0.0, 0.0);
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::skip_round(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::skip_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -391,8 +400,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::skip_round(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::initialize_first_round(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_first_round(
         Frequency const frequency
 ) noexcept {
     is_starting = false;
@@ -406,11 +415,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::initialize_first_round(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Sample const* const* Oscillator<ModulatorSignalProducerClass, positive>::initialize_rendering(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    initialize_frequency_scale<is_lfo>(bpm);
+
     Waveform const waveform = this->waveform.get_value();
 
     if (waveform == CUSTOM) {
@@ -448,8 +459,29 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, positive>::initial
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::compute_amplitude_buffer(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+template<bool is_lfo_>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_frequency_scale(
+        typename std::enable_if<is_lfo_, Number const>::type bpm
+) noexcept {
+    frequency_scale = (
+        tempo_sync.get_value() == ToggleParam::ON
+            ? bpm * TEMPO_SYNC_FREQUENCY_SCALE
+            : 1.0
+    );
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+template<bool is_lfo_>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_frequency_scale(
+        typename std::enable_if<!is_lfo_, Number const>::type bpm
+) noexcept {
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -502,8 +534,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::compute_amplitude_buffe
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency_buffer(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -668,8 +700,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency_buffe
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Frequency Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Frequency Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency(
         Number const frequency,
         Number const detune,
         Number const fine_detune
@@ -678,8 +710,8 @@ Frequency Oscillator<ModulatorSignalProducerClass, positive>::compute_frequency(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::compute_phase_buffer(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -698,8 +730,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::compute_phase_buffer(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::render(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -725,8 +757,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_frequency(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_frequency(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -741,13 +773,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_fr
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_value, computed_frequency_value, phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_value, computed_frequency_value, phase_buffer[i]
                 );
             }
@@ -755,13 +787,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_fr
     } else {
         if (phase_is_constant) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_buffer[i], computed_frequency_value, phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_buffer[i], computed_frequency_value, phase_buffer[i]
                 );
             }
@@ -770,8 +802,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_constant_fr
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_frequency(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_frequency(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -793,13 +825,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_fr
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     amplitude_value, computed_frequency_buffer[i], phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     amplitude_value, computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
@@ -807,13 +839,13 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_fr
     } else {
         if (phase_is_constant) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample(
+                buffer[0][i] = render_sample<is_lfo>(
                     computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
@@ -822,24 +854,32 @@ void Oscillator<ModulatorSignalProducerClass, positive>::render_with_changing_fr
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-Sample Oscillator<ModulatorSignalProducerClass, positive>::render_sample(
-        Sample const amplitude,
-        Sample const frequency,
-        Sample const phase
+template<class ModulatorSignalProducerClass, bool is_lfo>
+template<bool is_lfo_>
+Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
+        typename std::enable_if<is_lfo_, Sample const>::type amplitude,
+        typename std::enable_if<is_lfo_, Sample const>::type frequency,
+        typename std::enable_if<is_lfo_, Sample const>::type phase
 ) noexcept {
-    Sample const sample = amplitude * wavetable->lookup(&wavetable_state, frequency, phase);
-
-    if (positive) {
-        return sample + amplitude;
-    }
-
-    return sample;
+    return amplitude + amplitude * wavetable->lookup(
+        &wavetable_state, frequency * frequency_scale, phase
+    );
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::handle_event(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+template<bool is_lfo_>
+Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
+        typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
+        typename std::enable_if<!is_lfo_, Sample const>::type frequency,
+        typename std::enable_if<!is_lfo_, Sample const>::type phase
+) noexcept {
+    return amplitude * wavetable->lookup(&wavetable_state, frequency, phase);
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_event(
         Event const& event
 ) noexcept {
     SignalProducer::handle_event(event);
@@ -856,8 +896,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::handle_event(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::handle_start_event(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_start_event(
         Event const& event
 ) noexcept {
     is_on = true;
@@ -866,8 +906,8 @@ void Oscillator<ModulatorSignalProducerClass, positive>::handle_start_event(
 }
 
 
-template<class ModulatorSignalProducerClass, bool positive>
-void Oscillator<ModulatorSignalProducerClass, positive>::handle_stop_event(
+template<class ModulatorSignalProducerClass, bool is_lfo>
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_stop_event(
         Event const& event
 ) noexcept {
     is_on = false;
