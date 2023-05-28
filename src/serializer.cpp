@@ -211,7 +211,7 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
     typedef std::vector<Synth::Message> Messages;
 
     Messages messages;
-    char section_name[7];
+    char section_name[8];
     bool inside_js80p_section = false;
 
     messages.reserve(600);
@@ -246,14 +246,14 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
 
 
 bool Serializer::parse_section_name(
-        std::string const line,
-        char* section_name
+        std::string const& line,
+        char section_name[8]
 ) noexcept {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
     Integer pos = 0;
 
-    std::fill_n(section_name, 7, '\x00');
+    std::fill_n(section_name, 8, '\x00');
 
     if (skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)) {
         return false;
@@ -291,10 +291,27 @@ bool Serializer::parse_section_name(
 }
 
 
+bool Serializer::parse_line_until_value(
+        std::string::const_iterator& it,
+        std::string::const_iterator const end,
+        char param_name[Constants::PARAM_NAME_MAX_LENGTH],
+        char suffix[4]
+) noexcept {
+    return (
+        !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
+        && parse_param_name(it, end, param_name)
+        && parse_suffix(it, end, suffix)
+        && !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
+        && parse_equal_sign(it, end)
+        && !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
+    );
+}
+
+
 void Serializer::process_line(
         std::vector<Synth::Message>& messages,
         Synth* synth,
-        std::string const line
+        std::string const& line
 ) noexcept {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
@@ -305,12 +322,7 @@ void Serializer::process_line(
     bool is_controller_assignment;
 
     if (
-            skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
-            || !parse_param_name(it, end, &param_name[0])
-            || !parse_suffix(it, end, &suffix[0])
-            || skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
-            || !parse_equal_sign(it, end)
-            || skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
+            !parse_line_until_value(it, end, param_name, suffix)
             || !parse_number(it, end, number)
             || !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
     ) {
@@ -473,7 +485,7 @@ bool Serializer::parse_number(
 }
 
 
-Number Serializer::to_number(std::string const text) noexcept
+Number Serializer::to_number(std::string const& text) noexcept
 {
     std::istringstream s(text);
     Number n;
