@@ -64,9 +64,12 @@ class Serializer
             1.0 / FLOAT_TO_CONTROLLER_ID_SCALE
         );
 
+        static std::string const CONTROLLER_SUFFIX;
+
         static Number controller_id_to_float(
             Synth::ControllerId const controller_id
         ) noexcept;
+
         static Synth::ControllerId float_to_controller_id(
             Number const controller_id
         ) noexcept;

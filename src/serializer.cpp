@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cctype>
 #include <sstream>
 
 #include "serializer.hpp"
@@ -30,6 +31,10 @@ namespace JS80P
 {
 
 const std::string Serializer::PROG_NAME_LINE_TAG{"Name = "};
+
+
+std::string const Serializer::CONTROLLER_SUFFIX = "ctl";
+
 
 std::string Serializer::serialize(Synth const* synth) noexcept
 {
@@ -55,8 +60,9 @@ std::string Serializer::serialize(Synth const* synth) noexcept
             snprintf(
                 line,
                 line_size,
-                "%sctl = %.15f\r\n",
+                "%s%s = %.15f\r\n",
                 param_name.c_str(),
+                CONTROLLER_SUFFIX.c_str(),
                 controller_id_to_float(
                     synth->get_param_controller_id_atomic(param_id)
                 )
@@ -334,7 +340,7 @@ void Serializer::process_line(
     }
 
     param_id = synth->get_param_id(param_name);
-    is_controller_assignment = strncmp(suffix, "ctl", 4) == 0;
+    is_controller_assignment = CONTROLLER_SUFFIX == suffix;
 
     if (
             param_id == Synth::ParamId::MAX_PARAM_ID
@@ -398,8 +404,12 @@ bool Serializer::parse_param_name(
 
     std::fill_n(param_name, Constants::PARAM_NAME_MAX_LENGTH, '\x00');
 
-    while (is_capital_letter(*it) || is_digit(*it)) {
-        param_name[param_name_pos++] = *(it++);
+    while (is_capital_letter(*it) || is_digit(*it) || is_lowercase_letter(*it)) {
+        if (strncmp(&(*it), CONTROLLER_SUFFIX.c_str(), CONTROLLER_SUFFIX.length()) == 0) {
+            break;
+        }
+
+        param_name[param_name_pos++] = toupper(*(it++));
 
         if (param_name_pos == param_name_pos_max || it == end) {
             return false;

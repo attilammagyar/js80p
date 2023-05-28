@@ -339,3 +339,42 @@ TEST(toggle_params_are_loaded_before_other_params, {
         18000.0, synth.modulator_params.filter_2_frequency.get_value(), 1.0
     );
 })
+
+
+TEST(param_names_are_parsed_case_insensitively_and_converted_to_upper_case, {
+    Synth synth;
+    Serializer serializer;
+    std::string const patch = (
+        "[js80p]\n"
+        "cVol = 0.5\n"
+        "cVolctl = 0.123\n"
+    );
+    std::string const line_with_ctl = "cVolctl = 0.1";
+    std::string const line_without_ctl = "cVol = 0.1";
+    char param_name[Constants::PARAM_NAME_MAX_LENGTH];
+    char suffix[4];
+    std::string::const_iterator line_with_ctl_it = line_with_ctl.begin();
+    std::string::const_iterator line_without_ctl_it = line_without_ctl.begin();
+
+    serializer.import(&synth, patch);
+    synth.process_messages();
+
+    assert_eq(
+        0.5, synth.get_param_ratio_atomic(Synth::ParamId::CVOL), DOUBLE_DELTA
+    );
+
+    Serializer::parse_line_until_value(
+        line_with_ctl_it, line_with_ctl.end(), param_name, suffix
+    );
+    assert_eq("CVOL", param_name);
+    assert_eq("ctl", suffix);
+
+    param_name[0] = 'x';
+    suffix[0] = 'x';
+
+    Serializer::parse_line_until_value(
+        line_without_ctl_it, line_without_ctl.end(), param_name, suffix
+    );
+    assert_eq("CVOL", param_name);
+    assert_eq("", suffix);
+})
