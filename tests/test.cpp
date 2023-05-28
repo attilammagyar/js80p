@@ -492,7 +492,7 @@ int main(int argc, char* argv[])
 #define _TEST_LLINT_F "%lld (0x%llx)"
 #define _TEST_PTR_F "%p"
 #define _TEST_DBL_F "%.9f (%.12e)"
-#define _TEST_CSTR_F "n%s"
+#define _TEST_CSTR_F "%s"
 
 
 #define _TEST_PASS() do { ++_test_assertions; } while (false)
