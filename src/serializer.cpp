@@ -232,13 +232,13 @@ void Serializer::process_lines(Synth* synth, std::vector<std::string>* lines) no
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (it->param_id > Synth::ParamId::L1SYN) {
+        if (synth->is_toggle_param(it->param_id)) {
             synth->push_message(*it);
         }
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (it->param_id <= Synth::ParamId::L1SYN) {
+        if (!synth->is_toggle_param(it->param_id)) {
             synth->push_message(*it);
         }
     }

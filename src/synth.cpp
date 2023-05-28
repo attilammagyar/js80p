@@ -951,6 +951,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 }
 
 
+bool Synth::is_toggle_param(ParamId const param_id) const noexcept
+{
+    return param_id >= ParamId::L1SYN && param_id < ParamId::MAX_PARAM_ID;
+}
+
+
 Number Synth::get_param_max_value(ParamId const param_id) const noexcept
 {
     if (param_id < FLOAT_PARAMS) {
