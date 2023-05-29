@@ -244,7 +244,7 @@ clean:
 		$(PERF_TEST_BINS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
-check: $(BUILD_DIR) perf $(TEST_LIBS) $(TEST_BINS)
+check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 	$(BUILD_DIR)/test_math$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_queue$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
