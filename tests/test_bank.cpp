@@ -201,6 +201,24 @@ TEST(current_program_number_cannot_be_more_than_number_of_programs, {
 })
 
 
+TEST(can_update_a_program, {
+    constexpr size_t program = 122;
+
+    Bank bank;
+
+    bank[program].import("[js80p]\nMIX = 2.0");
+
+    assert_eq(
+        (
+            "[js80p]\r\n"
+            "NAME = Blank Slot 123\r\n"
+            "MIX = 2.0\r\n"
+        ),
+        bank[program].serialize()
+    );
+})
+
+
 TEST(serialization, {
     std::string const serialized_bank = (
         "[someblock]\n"
@@ -297,30 +315,5 @@ TEST(serialization, {
     assert_eq(
         expeced_serialized,
         bank.serialize().substr(0, expeced_serialized.length()).c_str()
-    );
-})
-
-
-TEST(can_update_current_program, {
-    Bank bank;
-
-    bank.set_current_program_index(122);
-    bank.update_current_program("[js80p]\nMIX = 2.0");
-
-    assert_eq(
-        (
-            "[js80p]\r\n"
-            "NAME = Blank Slot 123\r\n"
-            "MIX = 2.0\r\n"
-        ),
-        bank[122].serialize()
-    );
-    assert_eq(
-        (
-            "[js80p]\r\n"
-            "NAME = Blank Slot 123\r\n"
-            "MIX = 2.0\r\n"
-        ),
-        bank.get_current_program().serialize()
     );
 })

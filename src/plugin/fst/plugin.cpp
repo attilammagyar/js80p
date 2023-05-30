@@ -510,6 +510,7 @@ FstPlugin::FstPlugin(
     round(0),
     gui(NULL),
     serialized_bank(""),
+    next_program(0),
     save_current_patch_before_changing_program(false)
 {
     window_rect.top = 0;
@@ -595,6 +596,20 @@ void FstPlugin::generate_samples(
 
 Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
 {
+    size_t const next_program = this->next_program;
+    size_t const current_program = bank.get_current_program_index();
+
+    if (next_program != current_program) {
+        if (save_current_patch_before_changing_program) {
+            bank[current_program].import(Serializer::serialize(&synth));
+        } else {
+            save_current_patch_before_changing_program = true;
+        }
+
+        bank.set_current_program_index(next_program);
+        import_patch(bank[next_program].serialize());
+    }
+
     round = (round + 1) & ROUND_MASK;
     update_bpm();
 
@@ -646,31 +661,22 @@ void FstPlugin::import_patch(const std::string& patch) noexcept
 
 VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 {
-    bank.update_current_program(Serializer::serialize(&synth));
+    size_t const current_program = bank.get_current_program_index();
+
+
+    bank[current_program].import(Serializer::serialize(&synth));
 
     if (is_preset) {
-        return serialize_current_program(chunk);
+        std::string const& serialized = bank[current_program].serialize();
+        *chunk = (void*)serialized.c_str();
+
+        return (VstIntPtr)serialized.size();
     } else {
-        return serialize_bank(chunk);
+        serialized_bank = bank.serialize();
+        *chunk = (void*)serialized_bank.c_str();
+
+        return (VstIntPtr)serialized_bank.size();
     }
-}
-
-
-VstIntPtr FstPlugin::serialize_current_program(void** buffer) noexcept
-{
-    std::string const& serialized = bank.get_current_program().serialize();
-    *buffer = (void*)serialized.c_str();
-
-    return (VstIntPtr)serialized.size();
-}
-
-
-VstIntPtr FstPlugin::serialize_bank(void** buffer) noexcept
-{
-    serialized_bank = bank.serialize();
-    *buffer = (void*)serialized_bank.c_str();
-
-    return (VstIntPtr)serialized_bank.size();
 }
 
 
@@ -681,24 +687,14 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
     std::string buffer((char const*)chunk, (std::string::size_type)size);
 
     if (is_preset) {
-        import_current_program(buffer);
+        size_t const current_program = bank.get_current_program_index();
+
+        bank[current_program].import(buffer);
+        import_patch(bank[current_program].serialize());
     } else {
-        import_bank(buffer);
+        bank.import(buffer);
+        import_patch(bank[bank.get_current_program_index()].serialize());
     }
-}
-
-
-void FstPlugin::import_current_program(std::string const& buffer) noexcept
-{
-    bank.update_current_program(buffer);
-    import_patch(bank.get_current_program().serialize());
-}
-
-
-void FstPlugin::import_bank(std::string const& buffer) noexcept
-{
-    bank.import(buffer);
-    import_patch(bank.get_current_program().serialize());
 }
 
 
@@ -715,14 +711,7 @@ void FstPlugin::set_program(size_t index) noexcept
     }
 
 
-    if (save_current_patch_before_changing_program) {
-        bank.update_current_program(Serializer::serialize(&synth));
-    } else {
-        save_current_patch_before_changing_program = true;
-    }
-
-    bank.set_current_program_index(index);
-    import_patch(bank.get_current_program().serialize());
+    next_program = index;
 }
 
 
@@ -742,7 +731,7 @@ void FstPlugin::get_program_name(char* name) noexcept
 {
     strncpy(
         name,
-        bank.get_current_program().get_name().c_str(),
+        bank[bank.get_current_program_index()].get_name().c_str(),
         kVstMaxProgNameLen - 1
     );
 }
@@ -750,7 +739,7 @@ void FstPlugin::get_program_name(char* name) noexcept
 
 void FstPlugin::set_program_name(const char* name)
 {
-    bank.get_current_program().set_name(name);
+    bank[bank.get_current_program_index()].set_name(name);
 }
 
 

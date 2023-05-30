@@ -625,7 +625,7 @@ class EventTestSignalProducer : public SignalProducer
 
         void handle_event(Event const& event) noexcept
         {
-            if (event.type != SignalProducer::EVT_CANCEL) {
+            if (event.type == SET_VALUE) {
                 value = event.number_param_1;
             }
         }
@@ -633,6 +633,34 @@ class EventTestSignalProducer : public SignalProducer
     private:
         Number value;
 };
+
+
+TEST(resetting_a_signal_producer_drops_all_events, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[] = {
+        0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0,
+    };
+    EventTestSignalProducer signal_producer;
+    Sample const* const* rendered;
+
+    signal_producer.set_sample_rate(10.0);
+    signal_producer.set_block_size(block_size);
+
+    signal_producer.schedule(-0.1, 1.0);
+    signal_producer.schedule(0.1, 2.0);
+    signal_producer.schedule(0.2, 3.0);
+
+    signal_producer.reset();
+
+    assert_false(signal_producer.has_events_after(0.0));
+
+    rendered = SignalProducer::produce<EventTestSignalProducer>(
+        &signal_producer, 1, block_size
+    );
+
+    assert_eq(expected_samples, rendered[0], block_size);
+})
 
 
 typedef struct

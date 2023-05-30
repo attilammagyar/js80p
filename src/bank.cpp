@@ -320,18 +320,6 @@ Bank::Program const& Bank::operator[](size_t const index) const
 }
 
 
-Bank::Program& Bank::get_current_program()
-{
-    return programs[current_program_index];
-}
-
-
-Bank::Program const& Bank::get_current_program() const
-{
-    return programs[current_program_index];
-}
-
-
 size_t Bank::get_current_program_index() const
 {
     return current_program_index;
@@ -345,12 +333,6 @@ void Bank::set_current_program_index(size_t const new_index)
     } else {
         current_program_index = new_index;
     }
-}
-
-
-void Bank::update_current_program(std::string const& serialized_program)
-{
-    programs[current_program_index].import(serialized_program);
 }
 
 

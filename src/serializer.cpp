@@ -103,22 +103,9 @@ void Serializer::import(Synth* synth, std::string const& serialized) noexcept
 
 void Serializer::reset_all_params_to_default(Synth* synth) noexcept
 {
-    for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
-        Synth::ParamId const param_id = (Synth::ParamId)i;
-
-        synth->push_message(
-            Synth::MessageType::SET_PARAM,
-            param_id,
-            synth->get_param_default_ratio(param_id),
-            0
-        );
-        synth->push_message(
-            Synth::MessageType::ASSIGN_CONTROLLER,
-            param_id,
-            0,
-            (Byte)Synth::ControllerId::NONE
-        );
-    }
+    synth->push_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+    );
 }
 
 

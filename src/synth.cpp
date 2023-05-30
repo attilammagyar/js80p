@@ -1097,16 +1097,21 @@ void Synth::process_messages() noexcept
         }
 
         switch (message.type) {
-            case SET_PARAM:
+            case MessageType::SET_PARAM:
                 handle_set_param(message.param_id, message.number_param);
                 break;
 
-            case ASSIGN_CONTROLLER:
+            case MessageType::ASSIGN_CONTROLLER:
                 handle_assign_controller(message.param_id, message.byte_param);
                 break;
 
-            case REFRESH_PARAM:
+            case MessageType::REFRESH_PARAM:
                 handle_refresh_param(message.param_id);
+                break;
+
+            case MessageType::CLEAR:
+                handle_clear();
+                break;
 
             default:
                 break;
@@ -1190,6 +1195,21 @@ void Synth::handle_assign_controller(
 void Synth::handle_refresh_param(ParamId const param_id) noexcept
 {
     param_ratios[param_id].store(get_param_ratio(param_id));
+}
+
+
+void Synth::handle_clear() noexcept
+{
+    constexpr Byte no_controller = (Byte)ControllerId::NONE;
+
+    reset();
+
+    for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
+        Synth::ParamId const param_id = (Synth::ParamId)i;
+
+        handle_assign_controller(param_id, no_controller);
+        handle_set_param(param_id, get_param_default_ratio(param_id));
+    }
 }
 
 

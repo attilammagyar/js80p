@@ -6,6 +6,9 @@ v1.5.0 (2023-??-??)
    having to browse the file system.
  * Bugfix: the VST3 plugin will now process all controller changes within a
    block, not just the last one
+ * Bugfix: make sure that before a patch (or program or bank) is imported, all
+   parameter controllers are released, and all scheduled parameter values are
+   cleared, so that they will not override the imported values.
 
 v1.4.0 (2023-05-20)
  * MIDI Learn: assign this special controller to a parameter, then move a

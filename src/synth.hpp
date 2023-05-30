@@ -80,6 +80,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                                     ///< will return the most recent value of
                                     ///< the given parameter.
 
+            CLEAR = 4,              ///< Clear all buffers, release all
+                                    ///< controller assignments, and reset all
+                                    ///< parameters to their default values.
+
             INVALID,
         };
 
@@ -913,11 +917,15 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const ratio
         ) noexcept;
+
         void handle_assign_controller(
             ParamId const param_id,
             Byte const controller_id
         ) noexcept;
+
         void handle_refresh_param(ParamId const param_id) noexcept;
+
+        void handle_clear() noexcept;
 
         bool assign_controller_to_param(
             ParamId const param_id,

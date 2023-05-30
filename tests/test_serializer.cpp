@@ -378,3 +378,51 @@ TEST(param_names_are_parsed_case_insensitively_and_converted_to_upper_case, {
     assert_eq("CVOL", param_name);
     assert_eq("", suffix);
 })
+
+
+TEST(params_which_are_missing_from_the_patch_are_cleared_and_reset_to_default, {
+    Synth synth;
+    Serializer serializer;
+    std::string const patch = (
+        "[js80p]\n"
+        "AM = 0.42\n"
+    );
+
+    synth.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::AM, 0.123, 0
+    );
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::AM,
+        0.0,
+        Synth::ControllerId::MODULATION_WHEEL
+    );
+    synth.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
+    );
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::PM,
+        0.0,
+        Synth::ControllerId::MODULATION_WHEEL
+    );
+    SignalProducer::produce<Synth>(&synth, 1);
+
+    synth.control_change(0.0, 0, Midi::MODULATION_WHEEL, 100);
+    SignalProducer::produce<Synth>(&synth, 2);
+
+    serializer.import(&synth, patch);
+
+    SignalProducer::produce<Synth>(&synth, 3);
+
+    assert_eq(
+        0.42, synth.get_param_ratio_atomic(Synth::ParamId::AM), DOUBLE_DELTA
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+    );
+    assert_eq(
+        0.00, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
+    );
+})

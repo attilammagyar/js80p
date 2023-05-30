@@ -103,12 +103,6 @@ class FstPlugin
         VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;
         void set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept;
 
-        VstIntPtr serialize_current_program(void** buffer) noexcept;
-        void import_current_program(std::string const& buffer) noexcept;
-
-        VstIntPtr serialize_bank(void** buffer) noexcept;
-        void import_bank(std::string const& buffer) noexcept;
-
         VstIntPtr get_program() const noexcept;
         void set_program(size_t index) noexcept;
 
@@ -139,6 +133,7 @@ class FstPlugin
         GUI* gui;
         Bank bank;
         std::string serialized_bank;
+        size_t next_program;
         bool save_current_patch_before_changing_program;
 };
 

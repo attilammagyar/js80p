@@ -138,6 +138,8 @@ class SignalProducer
             Number const number_param_1 = 0.0,
             Number const number_param_2 = 0.0
         ) noexcept;
+
+        void cancel_events() noexcept;
         void cancel_events(Seconds const time_offset) noexcept;
         bool has_events_after(Seconds const time_offset) const noexcept;
         Seconds get_last_event_time_offset() const noexcept;
@@ -182,13 +184,16 @@ class SignalProducer
         ) noexcept;
 
         bool has_upcoming_events(Integer const sample_count) const noexcept;
+
         bool is_time_offset_before_sample_count(
             Seconds const time_offset,
             Integer const sample_count
         ) const noexcept;
+
         Integer sample_count_or_block_size(
             Integer const sample_count = -1
         ) const noexcept;
+
         void register_child(SignalProducer& signal_producer) noexcept;
 
         Integer const channels;

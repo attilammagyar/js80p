@@ -94,13 +94,8 @@ class Bank
         Program& operator[](size_t const index);
         Program const& operator[](size_t const index) const;
 
-        Program& get_current_program();
-        Program const& get_current_program() const;
-
         size_t get_current_program_index() const;
         void set_current_program_index(size_t const new_index);
-
-        void update_current_program(std::string const& serialized_program);
 
         void import(std::string const& serialized_bank);
         std::string serialize() const;

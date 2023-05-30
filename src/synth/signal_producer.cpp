@@ -208,7 +208,7 @@ Integer SignalProducer::get_block_size() const noexcept
 
 void SignalProducer::reset() noexcept
 {
-    cancel_events(0.0);
+    cancel_events();
 
     render_silence(-1, 0, block_size, buffer);
 
@@ -273,6 +273,13 @@ void SignalProducer::schedule(
 
     Event event(type, time, int_param, number_param_1, number_param_2);
     events.push(event);
+}
+
+
+void SignalProducer::cancel_events() noexcept
+{
+    events.drop(0);
+    schedule(EVT_CANCEL, 0.0);
 }
 
 
