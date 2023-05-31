@@ -89,6 +89,13 @@ class Bank
 
         static constexpr size_t NUMBER_OF_PROGRAMS = 128;
 
+        static size_t normalized_parameter_value_to_program_index(
+            Number const parameter_value
+        );
+        static Number program_index_to_normalized_parameter_value(
+            size_t const index
+        );
+
         Bank();
 
         Program& operator[](size_t const index);
@@ -103,6 +110,12 @@ class Bank
     private:
         static size_t const NUMBER_OF_BUILT_IN_PROGRAMS;
         static Program const BUILT_IN_PROGRAMS[];
+        static constexpr Number FLOAT_TO_PROGRAM_INDEX_SCALE = (
+            (Number)(NUMBER_OF_PROGRAMS - 1)
+        );
+        static constexpr Number PROGRAM_INDEX_TO_FLOAT_SCALE = (
+            1.0 / (Number)(NUMBER_OF_PROGRAMS - 1)
+        );
 
         void reset();
 

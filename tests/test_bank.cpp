@@ -180,11 +180,11 @@ TEST(bank_is_initialized_with_built_in_programs, {
     assert_eq("Blank", bank[0].get_name().c_str());
     assert_false(bank[0].is_blank());
 
-    assert_eq("Blank Slot 128", bank[127].get_name().c_str());
+    assert_eq("Prog128", bank[127].get_name().c_str());
     assert_true(bank[127].is_blank());
 
-    assert_eq("Blank Slot 128", bank[128].get_name().c_str());
-    assert_eq("Blank Slot 128", bank[500].get_name().c_str());
+    assert_eq("Prog128", bank[128].get_name().c_str());
+    assert_eq("Prog128", bank[500].get_name().c_str());
 })
 
 
@@ -211,7 +211,7 @@ TEST(can_update_a_program, {
     assert_eq(
         (
             "[js80p]\r\n"
-            "NAME = Blank Slot 123\r\n"
+            "NAME = Prog123\r\n"
             "MIX = 2.0\r\n"
         ),
         bank[program].serialize()
@@ -250,7 +250,7 @@ TEST(serialization, {
         "MIX = 1.0\r\n"
         "\r\n"
         "[js80p]\r\n"
-        "NAME = Blank Slot 2\r\n"
+        "NAME = Prog002\r\n"
         "; default name\r\n"
         "MIX = 2.0\r\n"
         "\r\n"
@@ -280,11 +280,11 @@ TEST(serialization, {
         bank[0].serialize()
     );
 
-    assert_eq("Blank Slot 2", bank[1].get_name().c_str());
+    assert_eq("Prog002", bank[1].get_name().c_str());
     assert_eq(
         (
             "[js80p]\r\n"
-            "NAME = Blank Slot 2\r\n"
+            "NAME = Prog002\r\n"
             "; default name\r\n"
             "MIX = 2.0\r\n"
         ),
@@ -315,5 +315,51 @@ TEST(serialization, {
     assert_eq(
         expeced_serialized,
         bank.serialize().substr(0, expeced_serialized.length()).c_str()
+    );
+})
+
+
+TEST(can_convert_normalized_parameter_value_to_program_index, {
+    assert_eq(0, (int)Bank::normalized_parameter_value_to_program_index(-0.5));
+
+    assert_eq(0, (int)Bank::normalized_parameter_value_to_program_index(0.0));
+    assert_eq(
+        0.0, Bank::program_index_to_normalized_parameter_value(0), DOUBLE_DELTA
+    );
+
+    assert_eq(
+        (int)(Bank::NUMBER_OF_PROGRAMS / 2),
+        (int)Bank::normalized_parameter_value_to_program_index(0.5)
+    );
+    assert_eq(
+        0.5,
+        Bank::program_index_to_normalized_parameter_value(
+            Bank::NUMBER_OF_PROGRAMS / 2
+        ),
+        0.005
+    );
+
+    assert_eq(
+        (int)(Bank::NUMBER_OF_PROGRAMS - 1),
+        (int)Bank::normalized_parameter_value_to_program_index(1.0)
+    );
+    assert_eq(
+        1.0,
+        Bank::program_index_to_normalized_parameter_value(
+            Bank::NUMBER_OF_PROGRAMS - 1
+        ),
+        DOUBLE_DELTA
+    );
+
+    assert_eq(
+        (int)(Bank::NUMBER_OF_PROGRAMS - 1),
+        (int)Bank::normalized_parameter_value_to_program_index(2.0)
+    );
+    assert_eq(
+        1.0,
+        Bank::program_index_to_normalized_parameter_value(
+            Bank::NUMBER_OF_PROGRAMS + 1
+        ),
+        DOUBLE_DELTA
     );
 })

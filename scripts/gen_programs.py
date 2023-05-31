@@ -79,7 +79,7 @@ def main(argv):
                 .replace("demo-", "demo ")
                 .title()
         )
-        default_name = f"Blank Slot {i+1}"
+        default_name = f"Prog{i+1:03}"
 
         if len(name) > kVstMaxProgNameLen:
             raise ValueError(

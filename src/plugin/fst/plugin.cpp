@@ -21,7 +21,6 @@
 
 #include "plugin/fst/plugin.hpp"
 
-#include "midi.hpp"
 #include "serializer.hpp"
 
 
@@ -311,10 +310,13 @@ AEffect* FstPlugin::create_instance(
     effect->numInputs = 0;
     effect->numOutputs = (VstInt32)FstPlugin::OUT_CHANNELS;
     effect->numPrograms = (VstInt32)Bank::NUMBER_OF_PROGRAMS;
+    effect->numParams = NUMBER_OF_PARAMETERS;
     effect->object = (void*)fst_plugin;
     effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
     effect->processDoubleReplacing = &process_double_replacing;
+    effect->getParameter = &get_parameter;
+    effect->setParameter = &set_parameter;
     effect->uniqueID = CCONST('a', 'm', 'j', '8');
     effect->version = FstPlugin::VERSION;
 
@@ -377,6 +379,21 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
         case effGetProgramNameIndexed:
             return fst_plugin->get_program_name((char*)pointer, (size_t)index);
+
+        case effGetParamLabel:
+            fst_plugin->get_param_label((size_t)index, (char*)pointer);
+            return 0;
+
+        case effGetParamDisplay:
+            fst_plugin->get_param_display((size_t)index, (char*)pointer);
+            return 0;
+
+        case effGetParamName:
+            fst_plugin->get_param_name((size_t)index, (char*)pointer);
+            return 0;
+
+        case effCanBeAutomated:
+            return 1;
 
         case effSetSampleRate:
             fst_plugin->set_sample_rate(fvalue);
@@ -498,6 +515,25 @@ void VSTCALLBACK FstPlugin::process_double_replacing(
 }
 
 
+float VSTCALLBACK FstPlugin::get_parameter(AEffect* effect, VstInt32 index)
+{
+    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+
+    return fst_plugin->get_parameter((size_t)index);
+}
+
+
+void VSTCALLBACK FstPlugin::set_parameter(
+        AEffect* effect,
+        VstInt32 index,
+        float fvalue
+) {
+    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+
+    fst_plugin->set_parameter((size_t)index, fvalue);
+}
+
+
 FstPlugin::FstPlugin(
         AEffect* const effect,
         audioMasterCallback const host_callback,
@@ -511,12 +547,35 @@ FstPlugin::FstPlugin(
     gui(NULL),
     serialized_bank(""),
     next_program(0),
-    save_current_patch_before_changing_program(false)
+    save_current_patch_before_changing_program(false),
+    had_midi_cc_event(false)
 {
     window_rect.top = 0;
     window_rect.left = 0;
     window_rect.bottom = GUI::HEIGHT;
     window_rect.right = GUI::WIDTH;
+
+    parameters[0] = Parameter("Program", NULL);
+    parameters[1] = create_midi_ctl_param(
+        Synth::ControllerId::PITCH_WHEEL, &synth.pitch_wheel
+    );
+    parameters[2] = create_midi_ctl_param(
+        Synth::ControllerId::CHANNEL_PRESSURE, &synth.channel_pressure_ctl
+    );
+
+    size_t index = 3;
+
+    for (Integer cc = 0; cc != Synth::MIDI_CONTROLLERS; ++cc) {
+        if (!Synth::is_supported_midi_controller((Midi::Controller)cc)) {
+            continue;
+        }
+
+        parameters[index] = create_midi_ctl_param(
+            (Synth::ControllerId)cc,
+            synth.midi_controllers[cc]
+        );
+        ++index;
+    }
 }
 
 
@@ -553,12 +612,18 @@ void FstPlugin::resume() noexcept
 
 void FstPlugin::process_events(VstEvents const* const events) noexcept
 {
+    had_midi_cc_event = false;
+
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
         VstEvent* event = events->events[i];
 
         if (event->type == kVstMidiType) {
             process_midi_event((VstMidiEvent*)event);
         }
+    }
+
+    if (had_midi_cc_event) {
+        update_host_display();
     }
 }
 
@@ -568,10 +633,10 @@ void FstPlugin::process_midi_event(VstMidiEvent const* const event) noexcept
     Seconds const time_offset = (
         synth.sample_count_to_time_offset((Integer)event->deltaFrames)
     );
+    Midi::Byte const* const midi_bytes = (Midi::Byte const*)event->midiData;
 
-    Midi::Dispatcher::dispatch<Synth>(
-        synth, time_offset, (Midi::Byte*)event->midiData
-    );
+    Midi::Dispatcher::dispatch<FstPlugin>(*this, time_offset, midi_bytes);
+    Midi::Dispatcher::dispatch<Synth>(synth, time_offset, midi_bytes);
 }
 
 
@@ -591,13 +656,42 @@ void FstPlugin::generate_samples(
             samples[c][i] = (NumberType)buffer[c][i];
         }
     }
+
+    /*
+    It would be nice to notify the host about param changes that originate from
+    the plugin, but since these parameters only ever change due to MIDI CC
+    messages, we don't want the host to record them both as MIDI CC and as
+    parameter automation.
+    */
+    // for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
+        // if (UNLIKELY(parameters[i].needs_host_update())) {
+            // host_callback(
+                // effect,
+                // audioMasterAutomate,
+                // (VstInt32)i,
+                // 0,
+                // NULL,
+                // parameters[i].get_value()
+            // );
+        // }
+    // }
 }
 
 
 Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
 {
+    if (parameters[0].is_dirty()) {
+        this->next_program = Bank::normalized_parameter_value_to_program_index(
+            (Number)parameters[0].get_value()
+        );
+    }
+
     size_t const next_program = this->next_program;
     size_t const current_program = bank.get_current_program_index();
+
+    for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
+        parameters[i].update_midi_controller_if_dirty();
+    }
 
     if (next_program != current_program) {
         if (save_current_patch_before_changing_program) {
@@ -630,6 +724,23 @@ void FstPlugin::update_bpm() noexcept
     }
 
     synth.set_bpm((Number)time_info->tempo);
+}
+
+
+void FstPlugin::update_host_display() noexcept
+{
+    constexpr int audioMasterUpdateDisplay = FST_HOST_UPDATE_DISPLAY_OPCODE;
+
+    host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
+
+    // VstIntPtr result = host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
+    // fprintf(
+        // stderr,
+        // "FstPlugin::update_host_display(); host_callback(%p, %d, 0, 0, NULL, 0.0f) returned: %lld\n",
+        // (void*)effect,
+        // audioMasterUpdateDisplay,
+        // (long long int)result
+    // );
 }
 
 
@@ -682,19 +793,63 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 
 void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept
 {
+    size_t current_program = 0;
+
     save_current_patch_before_changing_program = false;
 
     std::string buffer((char const*)chunk, (std::string::size_type)size);
 
     if (is_preset) {
-        size_t const current_program = bank.get_current_program_index();
-
+        current_program = bank.get_current_program_index();
         bank[current_program].import(buffer);
         import_patch(bank[current_program].serialize());
     } else {
         bank.import(buffer);
-        import_patch(bank[bank.get_current_program_index()].serialize());
+        current_program = bank.get_current_program_index();
+        import_patch(bank[current_program].serialize());
     }
+
+    parameters[0].set_value(
+        (float)Bank::program_index_to_normalized_parameter_value(current_program)
+    );
+}
+
+
+void FstPlugin::control_change(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Controller const controller,
+        Midi::Byte const new_value
+) noexcept {
+    had_midi_cc_event = true;
+}
+
+
+void FstPlugin::program_change(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Byte const new_program
+) noexcept {
+    set_program((size_t)new_program);
+    had_midi_cc_event = true;
+}
+
+
+void FstPlugin::channel_pressure(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Byte const pressure
+) noexcept {
+    had_midi_cc_event = true;
+}
+
+
+void FstPlugin::pitch_wheel_change(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Word const new_value
+) noexcept {
+    had_midi_cc_event = true;
 }
 
 
@@ -710,8 +865,10 @@ void FstPlugin::set_program(size_t index) noexcept
         return;
     }
 
-
     next_program = index;
+    parameters[0].set_value(
+        (float)Bank::program_index_to_normalized_parameter_value(index)
+    );
 }
 
 
@@ -774,6 +931,208 @@ void FstPlugin::close_gui()
     delete gui;
 
     gui = NULL;
+}
+
+
+FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
+        Synth::ControllerId const controller_id,
+        MidiController* midi_controller
+) noexcept {
+    return Parameter(
+        GUI::get_controller(controller_id)->short_name,
+        midi_controller != NULL
+            ? midi_controller
+            : synth.midi_controllers[controller_id]
+    );
+}
+
+
+FstPlugin::Parameter::Parameter()
+    : midi_controller(NULL),
+    name("unknown"),
+    // change_index(-1),
+    value(0.5f),
+    is_dirty_(false)
+{
+}
+
+
+FstPlugin::Parameter::Parameter(char const* name, MidiController* midi_controller)
+    : midi_controller(midi_controller),
+    name(name),
+    // change_index(-1),
+    value(0.5f),
+    is_dirty_(false)
+{
+}
+
+
+FstPlugin::Parameter::Parameter(Parameter const& parameter)
+    : midi_controller(parameter.midi_controller),
+    name(parameter.name),
+    // change_index(parameter.change_index),
+    value(parameter.value),
+    is_dirty_(parameter.is_dirty_)
+{
+}
+
+
+FstPlugin::Parameter::Parameter(Parameter const&& parameter)
+    : midi_controller(parameter.midi_controller),
+    name(parameter.name),
+    // change_index(parameter.change_index),
+    value(parameter.value),
+    is_dirty_(parameter.is_dirty_)
+{
+}
+
+
+FstPlugin::Parameter& FstPlugin::Parameter::operator=(
+        Parameter const& parameter
+) noexcept {
+    if (this != &parameter) {
+        midi_controller = parameter.midi_controller;
+        name = parameter.name;
+        // change_index = parameter.change_index;
+        value = parameter.value;
+        is_dirty_ = parameter.is_dirty_;
+    }
+
+    return *this;
+}
+
+
+FstPlugin::Parameter& FstPlugin::Parameter::operator=(
+        Parameter const&& parameter
+) noexcept {
+    if (this != &parameter) {
+        midi_controller = parameter.midi_controller;
+        name = parameter.name;
+        // change_index = parameter.change_index;
+        value = parameter.value;
+        is_dirty_ = parameter.is_dirty_;
+    }
+
+    return *this;
+}
+
+
+char const* FstPlugin::Parameter::get_name() const noexcept
+{
+    return name;
+}
+
+
+MidiController* FstPlugin::Parameter::get_midi_controller() const noexcept
+{
+    return midi_controller;
+}
+
+
+// bool FstPlugin::Parameter::needs_host_update() const noexcept
+// {
+    // if (UNLIKELY(midi_controller == NULL)) {
+        // return false;
+    // }
+
+    // return change_index != midi_controller->get_change_index();
+// }
+
+
+float FstPlugin::Parameter::get_value() noexcept
+{
+    if (UNLIKELY(midi_controller == NULL)) {
+        return this->value;
+    }
+
+    float const value = (float)midi_controller->get_value();
+
+    // change_index=  midi_controller->get_change_index();
+
+    return value;
+}
+
+
+void FstPlugin::Parameter::set_value(float const value) noexcept
+{
+    this->value = value;
+    is_dirty_ = true;
+}
+
+
+void FstPlugin::Parameter::update_midi_controller_if_dirty() noexcept
+{
+    if (LIKELY(!is_dirty_)) {
+        return;
+    }
+
+    is_dirty_ = false;
+
+    if (UNLIKELY(midi_controller == NULL)) {
+        return;
+    }
+
+    midi_controller->change(0.0, (Number)value);
+}
+
+
+bool FstPlugin::Parameter::is_dirty() const noexcept
+{
+    return is_dirty_;
+}
+
+
+float FstPlugin::get_parameter(size_t index) noexcept
+{
+    return parameters[index].get_value();
+}
+
+
+void FstPlugin::set_parameter(size_t index, float value) noexcept
+{
+    parameters[index].set_value(value);
+}
+
+
+void FstPlugin::get_param_label(size_t index, char* buffer) const noexcept
+{
+    strncpy(buffer, index == 0 ? "" : "%", kVstMaxParamStrLen);
+    buffer[kVstMaxParamStrLen - 1] = '\x00';
+}
+
+
+void FstPlugin::get_param_display(size_t index, char* buffer) noexcept
+{
+    if (index == 0) {
+        size_t const program_index = (
+            Bank::normalized_parameter_value_to_program_index(
+                (Number)parameters[0].get_value()
+            )
+        );
+
+        if (program_index < Bank::NUMBER_OF_PROGRAMS) {
+            strncpy(
+                buffer,
+                bank[program_index].get_name().c_str(),
+                kVstMaxParamStrLen - 1
+            );
+        } else {
+            strncpy(buffer, "???", kVstMaxParamStrLen - 1);
+        }
+    } else {
+        float const value = get_parameter(index);
+
+        snprintf(buffer, kVstMaxParamStrLen, "%.2f", value * 100.0f);
+    }
+
+    buffer[kVstMaxParamStrLen - 1] = '\x00';
+}
+
+
+void FstPlugin::get_param_name(size_t index, char* buffer) const noexcept
+{
+    strncpy(buffer, parameters[index].get_name(), kVstMaxParamStrLen);
+    buffer[kVstMaxParamStrLen - 1] = '\x00';
 }
 
 }

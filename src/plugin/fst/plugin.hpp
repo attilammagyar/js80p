@@ -28,17 +28,19 @@
 
 #include "bank.hpp"
 #include "js80p.hpp"
+#include "midi.hpp"
 #include "synth.hpp"
 
 
 namespace JS80P
 {
 
-class FstPlugin
+class FstPlugin : public Midi::EventHandler
 {
     public:
         static constexpr VstInt32 OUT_CHANNELS = (VstInt32)Synth::OUT_CHANNELS;
         static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
+        static constexpr VstInt32 NUMBER_OF_PARAMETERS = 71;
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback,
@@ -75,6 +77,17 @@ class FstPlugin
             VstInt32 frames
         );
 
+        static float VSTCALLBACK get_parameter(
+            AEffect* effect,
+            VstInt32 index
+        );
+
+        static void VSTCALLBACK set_parameter(
+            AEffect* effect,
+            VstInt32 index,
+            float fvalue
+        );
+
         FstPlugin(
             AEffect* const effect,
             audioMasterCallback const host_callback,
@@ -103,12 +116,44 @@ class FstPlugin
         VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;
         void set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept;
 
+        void control_change(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Controller const controller,
+            Midi::Byte const new_value
+        ) noexcept;
+
+        void program_change(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Byte const new_program
+        ) noexcept;
+
+        void channel_pressure(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Byte const pressure
+        ) noexcept;
+
+        void pitch_wheel_change(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Word const new_value
+        ) noexcept;
+
         VstIntPtr get_program() const noexcept;
         void set_program(size_t index) noexcept;
 
         VstIntPtr get_program_name(char* name, size_t index) noexcept;
         void get_program_name(char* name) noexcept;
         void set_program_name(const char* name);
+
+        float get_parameter(size_t index) noexcept;
+        void set_parameter(size_t index, float value) noexcept;
+
+        void get_param_label(size_t index, char* buffer) const noexcept;
+        void get_param_display(size_t index, char* buffer) noexcept;
+        void get_param_name(size_t index, char* buffer) const noexcept;
 
         void open_gui(GUI::PlatformWidget parent_window);
         void gui_idle();
@@ -119,10 +164,50 @@ class FstPlugin
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
 
+        class Parameter
+        {
+            public:
+                Parameter();
+                Parameter(char const* name, MidiController* midi_controller);
+                Parameter(Parameter const& parameter);
+                Parameter(Parameter const&& parameter);
+
+                Parameter& operator=(Parameter const& parameter) noexcept;
+                Parameter& operator=(Parameter const&& parameter) noexcept;
+
+                char const* get_name() const noexcept;
+                MidiController* get_midi_controller() const noexcept;
+
+                // bool needs_host_update() const noexcept;
+
+                float get_value() noexcept;
+                void set_value(float const value) noexcept;
+
+                void update_midi_controller_if_dirty() noexcept;
+
+                bool is_dirty() const noexcept;
+
+            private:
+                MidiController* midi_controller;
+                char const* name;
+                Integer change_index;
+                float value;
+                bool is_dirty_;
+        };
+
+        Parameter create_midi_ctl_param(
+            Synth::ControllerId const controller_id,
+            MidiController* midi_controller
+        ) noexcept;
+
         void update_bpm() noexcept;
+        void update_host_display() noexcept;
+
         Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
 
         void import_patch(const std::string& patch) noexcept;
+
+        Parameter parameters[NUMBER_OF_PARAMETERS];
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
@@ -135,6 +220,7 @@ class FstPlugin
         std::string serialized_bank;
         size_t next_program;
         bool save_current_patch_before_changing_program;
+        bool had_midi_cc_event;
 };
 
 }

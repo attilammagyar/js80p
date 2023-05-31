@@ -274,6 +274,27 @@ void Bank::Program::import_without_update(
 }
 
 
+size_t Bank::normalized_parameter_value_to_program_index(
+        Number const parameter_value
+) {
+    return std::min(
+        NUMBER_OF_PROGRAMS - 1,
+        (size_t)std::max(
+            0.0, std::round(parameter_value * FLOAT_TO_PROGRAM_INDEX_SCALE)
+        )
+    );
+}
+
+
+Number Bank::program_index_to_normalized_parameter_value(size_t const index)
+{
+    return std::min(
+        1.0,
+        std::max(0.0, (Number)index * PROGRAM_INDEX_TO_FLOAT_SCALE)
+    );
+}
+
+
 Bank::Bank() : current_program_index(0)
 {
     reset();
@@ -296,7 +317,7 @@ void Bank::reset()
         snprintf(
             default_name,
             Program::NAME_MAX_LENGTH,
-            "Blank Slot %lu", (long unsigned int)(i + 1)
+            "Prog%03lu", (long unsigned int)(i + 1)
         );
         default_name[Program::NAME_MAX_LENGTH - 1] = '\x00';
         programs[i] = Program("", default_name, "");

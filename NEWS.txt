@@ -1,9 +1,11 @@
-v1.5.0 (2023-??-??)
+v1.5.0 (2023-06-??)
  * Improved MIDI CC smoothing
  * Parameters can now be controlled via Channel Aftertouch (Channel Pressure).
  * With the help of Patrik Ehringer (ZonderP), program and bank management is
    implemented, and presets are accessible via the host application, without
    having to browse the file system.
+ * The FST plugin now exports its MIDI CC input as host-automatable parameters,
+   just like the VST3 version.
  * Bugfix: the VST3 plugin will now process all controller changes within a
    block, not just the last one
  * Bugfix: make sure that before a patch (or program or bank) is imported, all

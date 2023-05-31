@@ -635,6 +635,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id
         ) const noexcept;
 
+        void note_off(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Midi::Byte const velocity
+        ) noexcept;
+
         void note_on(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -649,24 +656,17 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Byte const pressure
         ) noexcept;
 
-        void channel_pressure(
-            Seconds const time_offset,
-            Midi::Channel const channel,
-            Midi::Byte const pressure
-        ) noexcept;
-
-        void note_off(
-            Seconds const time_offset,
-            Midi::Channel const channel,
-            Midi::Note const note,
-            Midi::Byte const velocity
-        ) noexcept;
-
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
             Midi::Byte const new_value
+        ) noexcept;
+
+        void channel_pressure(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Byte const pressure
         ) noexcept;
 
         void pitch_wheel_change(

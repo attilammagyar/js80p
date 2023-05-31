@@ -496,8 +496,8 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
             break;
 
         case Event::Type::PROGRAM_CHANGE:
-            new_program = (size_t)std::round(
-                event.velocity_or_value * FLOAT_TO_PROGRAM_SCALE
+            new_program = Bank::normalized_parameter_value_to_program_index(
+                event.velocity_or_value
             );
             need_to_load_new_program = true;
 
@@ -788,7 +788,7 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
 Vst::Parameter* Vst3Plugin::Controller::set_up_program_change_param()
 {
     Vst::ProgramList* program_list = new Vst::ProgramList(
-        STR("Bank"), PROGRAM_LIST_ID, Vst::kRootUnitId
+        STR("Program"), PROGRAM_LIST_ID, Vst::kRootUnitId
     );
 
     for (size_t i = 0; i != Bank::NUMBER_OF_PROGRAMS; ++i) {

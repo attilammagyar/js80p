@@ -42,7 +42,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Blank",
-        "Blank Slot 1",
+        "Prog001",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -624,7 +624,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Bright Organ",
-        "Blank Slot 2",
+        "Prog002",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -1206,7 +1206,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Chariots",
-        "Blank Slot 3",
+        "Prog003",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -1788,7 +1788,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Demo 1",
-        "Blank Slot 4",
+        "Prog004",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -2370,7 +2370,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Demo 2",
-        "Blank Slot 5",
+        "Prog005",
         (
             "[js80p]\n"
             "MIX = 0.958916622974723\n"
@@ -2952,7 +2952,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Rock Organ",
-        "Blank Slot 6",
+        "Prog006",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -3534,7 +3534,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Sandstorm",
-        "Blank Slot 7",
+        "Prog007",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"
@@ -4116,7 +4116,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
     Program(
         "Stereo Saw",
-        "Blank Slot 8",
+        "Prog008",
         (
             "[js80p]\n"
             "MIX = 1.000000000000000\n"

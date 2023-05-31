@@ -127,8 +127,6 @@ class Vst3Plugin
             private:
                 static constexpr Integer ROUND_MASK = 0x7fff;
 
-                static constexpr Number FLOAT_TO_PROGRAM_SCALE = (Number)(Bank::NUMBER_OF_PROGRAMS - 1);
-
                 void share_synth() noexcept;
                 void block_rendered() noexcept;
 

@@ -39,6 +39,13 @@ typedef Byte Command;
 class EventHandler
 {
     public:
+        void note_off(
+            Seconds const time_offset,
+            Channel const channel,
+            Note const note,
+            Byte const velocity
+        ) noexcept {}
+
         void note_on(
             Seconds const time_offset,
             Channel const channel,
@@ -53,24 +60,23 @@ class EventHandler
             Byte const pressure
         ) noexcept {}
 
-        void channel_pressure(
-            Seconds const time_offset,
-            Channel const channel,
-            Byte const pressure
-        ) noexcept {}
-
-        void note_off(
-            Seconds const time_offset,
-            Channel const channel,
-            Note const note,
-            Byte const velocity
-        ) noexcept {}
-
         void control_change(
             Seconds const time_offset,
             Channel const channel,
             Controller const controller,
             Byte const new_value
+        ) noexcept {}
+
+        void program_change(
+            Seconds const time_offset,
+            Channel const channel,
+            Byte const new_program
+        ) noexcept {}
+
+        void channel_pressure(
+            Seconds const time_offset,
+            Channel const channel,
+            Byte const pressure
         ) noexcept {}
 
         void pitch_wheel_change(
@@ -468,6 +474,7 @@ constexpr Command NOTE_OFF                          = 0x80;
 constexpr Command NOTE_ON                           = 0x90;
 constexpr Command AFTERTOUCH                        = 0xa0;
 constexpr Command CONTROL_CHANGE                    = 0xb0;
+constexpr Command PROGRAM_CHANGE                    = 0xc0;
 constexpr Command CHANNEL_PRESSURE                  = 0xd0;
 constexpr Command PITCH_BEND_CHANGE                 = 0xe0;
 
@@ -488,20 +495,16 @@ void Dispatcher::dispatch(
     Byte d2 = bytes[2] & 0x7f;
 
     switch (msg_type) {
+        case NOTE_OFF:
+            event_handler.note_off(time_offset, channel, (Note)d1, d2);
+            break;
+
         case NOTE_ON:
             event_handler.note_on(time_offset, channel, (Note)d1, d2);
             break;
 
         case AFTERTOUCH:
             event_handler.aftertouch(time_offset, channel, (Note)d1, d2);
-            break;
-
-        case CHANNEL_PRESSURE:
-            event_handler.channel_pressure(time_offset, channel, d1);
-            break;
-
-        case NOTE_OFF:
-            event_handler.note_off(time_offset, channel, (Note)d1, d2);
             break;
 
         case CONTROL_CHANGE:
@@ -523,6 +526,14 @@ void Dispatcher::dispatch(
                 }
             }
 
+            break;
+
+        case PROGRAM_CHANGE:
+            event_handler.program_change(time_offset, channel, d1);
+            break;
+
+        case CHANNEL_PRESSURE:
+            event_handler.channel_pressure(time_offset, channel, d1);
             break;
 
         case PITCH_BEND_CHANGE:

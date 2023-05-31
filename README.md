@@ -30,6 +30,7 @@ Table of Contents
  * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
+    * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
  * [Development](#dev)
@@ -172,6 +173,30 @@ etc.
 
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
+
+<a name="faq-automation"></a>
+
+### How can parameters be automated? What parameters does the plugin export?
+
+The intended way of automating JS80P's parameters is to assign a
+[MIDI Control Change][midicc] (MIDI CC) message to a parameter (or use _MIDI
+Learn_), and turn the corresponding knob on your MIDI keyboard while playing,
+or edit the MIDI CC events in your host application's MIDI editor.
+
+However, the VST3 plugin format requires plugins to export a parameter for each
+MIDI CC message that they want to receive, and as a side-effect, these
+parameters can also be automated using the host application's usual automation
+editor. For the sake of consistency, the FST plugin also exports automatable
+parameters for each supported MIDI CC message.
+
+  [midicc]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
+
+For example, in both plugin types, you might assign the
+`MIDI CC 1 (Modulation Wheel)` controller to the Phase Modulation (PM)
+parameter of the synthesizer, and then add automation in the host application
+to the `MIDI CC 1 (Modulation Wheel)` (VST3) or `ModWh` (FST) parameter. JS80P
+will then interpret the changes of this parameter the same way as if you were
+turning the modulation wheel on a MIDI keyboard.
 
 <a name="faq-pm-fm"></a>
 
