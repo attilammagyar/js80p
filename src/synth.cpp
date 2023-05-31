@@ -1958,8 +1958,10 @@ bool Synth::MidiControllerMessage::operator==(
 Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
         MidiControllerMessage const& message
 ) noexcept {
-    time_offset = message.time_offset;
-    value = message.value;
+    if (this != &message) {
+        time_offset = message.time_offset;
+        value = message.value;
+    }
 
     return *this;
 }
@@ -1968,8 +1970,10 @@ Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
 Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
         MidiControllerMessage const&& message
 ) noexcept {
-    time_offset = message.time_offset;
-    value = message.value;
+    if (this != &message) {
+        time_offset = message.time_offset;
+        value = message.value;
+    }
 
     return *this;
 }

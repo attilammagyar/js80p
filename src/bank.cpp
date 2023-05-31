@@ -145,10 +145,12 @@ Bank::Program::Program(Program const&& program)
 
 Bank::Program& Bank::Program::operator=(Program const& program)
 {
-    name = program.name;
-    serialized = program.serialized;
-    default_name = program.default_name;
-    params_start = program.params_start;
+    if (this != &program) {
+        name = program.name;
+        serialized = program.serialized;
+        default_name = program.default_name;
+        params_start = program.params_start;
+    }
 
     return *this;
 }
@@ -156,10 +158,12 @@ Bank::Program& Bank::Program::operator=(Program const& program)
 
 Bank::Program& Bank::Program::operator=(Program const&& program)
 {
-    name = program.name;
-    serialized = program.serialized;
-    default_name = program.default_name;
-    params_start = program.params_start;
+    if (this != &program) {
+        name = program.name;
+        serialized = program.serialized;
+        default_name = program.default_name;
+        params_start = program.params_start;
+    }
 
     return *this;
 }
