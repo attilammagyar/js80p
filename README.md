@@ -111,6 +111,10 @@ Features
  * 6 envelopes
  * 8 low-frequency oscillators (LFO)
  * configurable MIDI controllers
+ * channel pressure (aftertouch)
+ * MIDI learn
+ * logarithmic and linear scale filter frequencies
+ * LFO and Echo tempo synchronization
 
 <a name="signal"></a>
 
