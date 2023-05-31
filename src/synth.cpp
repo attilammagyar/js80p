@@ -1496,6 +1496,19 @@ Synth::Message& Synth::Message::operator=(Message const& message) noexcept
 }
 
 
+Synth::Message& Synth::Message::operator=(Message const&& message) noexcept
+{
+    if (this != &message) {
+        type = message.type;
+        param_id = message.param_id;
+        number_param = message.number_param;
+        byte_param = message.byte_param;
+    }
+
+    return *this;
+}
+
+
 Synth::SingleProducerSingleConsumerMessageQueue::SingleProducerSingleConsumerMessageQueue() noexcept
     : next_push(0),
     next_pop(0)

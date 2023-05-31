@@ -556,6 +556,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ) noexcept;
 
                 Message& operator=(Message const& message) noexcept;
+                Message& operator=(Message const&& message) noexcept;
 
                 MessageType type;
                 ParamId param_id;
