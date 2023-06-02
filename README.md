@@ -30,6 +30,7 @@ Table of Contents
  * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
+    * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
@@ -173,6 +174,18 @@ etc.
 
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
+
+<a name="faq-custom-wave"></a>
+
+### The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?
+
+To hear the effect of those knobs, you have to select the _Custom_ waveworm
+using the `WAV` knob in the top left corner of the Oscillator sections.
+
+(Note that these parameters are CPU-intensive to process, so they are not
+sample accurate, they are not smoothed, and they are processed only once for
+each rendering block. Due to this, if you change them while a note is playing,
+or assign a controller to them, then you might hear "steps" or even clicks.)
 
 <a name="faq-automation"></a>
 
