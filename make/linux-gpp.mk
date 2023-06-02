@@ -1,4 +1,5 @@
 TARGET_OS = linux
+DIR_SEP = /
 
 FST = $(FST_DIR)/js80p.so
 FST_MAIN_SOURCES = src/plugin/fst/so.cpp

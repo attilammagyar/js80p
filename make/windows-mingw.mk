@@ -1,4 +1,5 @@
 ROOT_DIR ?= C:/mingw64
+DIR_SEP = \\
 
 TARGET_PLATFORM_CXXFLAGS = \
 	-mwindows \

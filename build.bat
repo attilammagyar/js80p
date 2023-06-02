@@ -1,4 +1,5 @@
-SET ROOT_DIR = C:/mingw64
+SET PATH=C:\mingw64\bin;%PATH%
+SET ROOT_DIR = C:\mingw64
 SET DEV_OS=windows
 
 SET TARGET_PLATFORM=x86_64-w64-mingw32
