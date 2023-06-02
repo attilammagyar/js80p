@@ -94,8 +94,12 @@ void test_lfo(
     lfo.tempo_sync.set_value(tempo_sync);
     lfo.start(0.0);
 
+    assert_false(lfo.is_on());
+
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<LFO>(lfo, actual_output, rounds);
+
+    assert_true(lfo.is_on());
 
     assert_eq(
         expected_output.samples[0], actual_output.samples[0], sample_count, 0.001

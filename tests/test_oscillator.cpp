@@ -1105,6 +1105,8 @@ TEST(resetting_the_oscillator_turns_it_off, {
     Sample expected_samples[sample_count];
     Buffer rendered_samples(sample_count);
 
+    assert_false(oscillator.is_on());
+
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(SAMPLE_RATE);
     oscillator.waveform.set_value(SimpleOscillator::SINE);
@@ -1120,11 +1122,15 @@ TEST(resetting_the_oscillator_turns_it_off, {
         oscillator, rendered_samples, rounds, block_size
     );
 
+    assert_true(oscillator.is_on());
+
     oscillator.reset();
 
     render_rounds<SimpleOscillator>(
         oscillator, rendered_samples, rounds, block_size
     );
+
+    assert_false(oscillator.is_on());
 
     assert_close(
         expected_samples, rendered_samples.samples[0], sample_count, DOUBLE_DELTA

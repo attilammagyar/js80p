@@ -85,10 +85,10 @@ TEST(twelve_tone_equal_temperament_440_hz, {
 void set_up_chunk_size_independent_test(Synth& synth, Frequency const sample_rate)
 {
     synth.set_sample_rate(sample_rate);
-    synth.note_on(0.05, 1, 69, 114);
-    synth.note_on(0.25, 1, 127, 114);
-    synth.note_off(0.05 + 3.0, 1, 69, 114);
-    synth.note_off(0.25 + 2.9, 1, 127, 114);
+    synth.note_on(0.05, 1, Midi::NOTE_A_4, 114);
+    synth.note_on(0.25, 1, Midi::NOTE_G_9, 114);
+    synth.note_off(0.05 + 3.0, 1, Midi::NOTE_A_4, 114);
+    synth.note_off(0.25 + 2.9, 1, Midi::NOTE_G_9, 114);
 }
 
 
@@ -214,7 +214,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
     synth.control_change(0.0, 1, invalid, 16);
     synth.control_change(0.0, 1, unused, 16);
     synth.pitch_wheel_change(0.0, 1, 12288);
-    synth.note_on(0.0, 1, 69, 114);
+    synth.note_on(0.0, 1, Midi::NOTE_A_4, 114);
 
     SignalProducer::produce<Synth>(&synth, 1);
 
@@ -527,4 +527,23 @@ TEST(when_the_same_controller_message_is_received_over_multiple_channels_then_on
     assert_eq(1, synth.midi_controllers[Midi::VOLUME]->events.length());
     assert_eq(1, synth.pitch_wheel.events.length());
     assert_eq(1, synth.channel_pressure_ctl.events.length());
+})
+
+
+TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
+    Synth synth;
+
+    synth.resume();
+
+    assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
+    SignalProducer::produce<Synth>(&synth, 1);
+    assert_true(synth.lfos[0]->is_on());
+
+    synth.push_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+    );
+    assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
+    SignalProducer::produce<Synth>(&synth, 2);
+
+    assert_true(synth.lfos[0]->is_on());
 })

@@ -914,6 +914,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Word const value
         ) noexcept;
 
+        void stop_lfos() noexcept;
+        void start_lfos() noexcept;
+
         void handle_set_param(
             ParamId const param_id,
             Number const ratio

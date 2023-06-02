@@ -122,6 +122,7 @@ class Oscillator : public SignalProducer
 
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
+        bool is_on() const noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
@@ -254,7 +255,7 @@ class Oscillator : public SignalProducer
         Number phase_value;
         Seconds start_time_offset;
         Number frequency_scale;
-        bool is_on;
+        bool is_on_;
         bool is_starting;
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;

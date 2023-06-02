@@ -48,6 +48,8 @@ class LFO : public SignalProducer
 
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
+        bool is_on() const noexcept;
+
         void skip_round(
             Integer const round,
             Integer const sample_count

@@ -582,12 +582,17 @@ bool Synth::is_lock_free() const noexcept
 
 void Synth::suspend() noexcept
 {
+    stop_lfos();
+    this->reset();
+    clear_midi_controllers();
+}
+
+
+void Synth::stop_lfos() noexcept
+{
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->stop(0.0);
     }
-
-    this->reset();
-    clear_midi_controllers();
 }
 
 
@@ -595,7 +600,12 @@ void Synth::resume() noexcept
 {
     this->reset();
     clear_midi_controllers();
+    start_lfos();
+}
 
+
+void Synth::start_lfos() noexcept
+{
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->start(0.0);
     }
@@ -1203,6 +1213,7 @@ void Synth::handle_clear() noexcept
     constexpr Byte no_controller = (Byte)ControllerId::NONE;
 
     reset();
+    start_lfos();
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;

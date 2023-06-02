@@ -73,6 +73,12 @@ void LFO::stop(Seconds const time_offset) noexcept
 }
 
 
+bool LFO::is_on() const noexcept
+{
+    return oscillator.is_on();
+}
+
+
 void LFO::skip_round(Integer const round, Integer const sample_count) noexcept
 {
     oscillator.skip_round(round, sample_count);

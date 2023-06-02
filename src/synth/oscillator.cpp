@@ -121,7 +121,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
     phase_buffer = NULL;
     start_time_offset = 0.0;
     frequency_scale = 1.0;
-    is_on = false;
+    is_on_ = false;
     is_starting = false;
 
     register_child(waveform);
@@ -338,7 +338,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::reset() noexcept
 {
     SignalProducer::reset();
 
-    is_on = false;
+    is_on_ = false;
     is_starting = false;
     start_time_offset = 0.0;
 }
@@ -357,6 +357,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::stop(
         Seconds const time_offset
 ) noexcept {
     schedule(EVT_STOP, time_offset, 0, 0.0, 0.0);
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+bool Oscillator<ModulatorSignalProducerClass, is_lfo>::is_on() const noexcept
+{
+    return is_on_;
 }
 
 
@@ -737,7 +744,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (!is_on) {
+    if (!is_on_) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             buffer[0][i] = 0.0;
         }
@@ -900,7 +907,7 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_start_event(
         Event const& event
 ) noexcept {
-    is_on = true;
+    is_on_ = true;
     is_starting = true;
     start_time_offset = current_time - event.time_offset;
 }
@@ -910,7 +917,7 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_stop_event(
         Event const& event
 ) noexcept {
-    is_on = false;
+    is_on_ = false;
 }
 
 }
