@@ -485,7 +485,9 @@ void FloatParam::skip_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (cached_round != round && !events.is_empty()) {
+    if (is_following_leader()) {
+        leader->skip_round(round, sample_count);
+    } else if (cached_round != round && !events.is_empty()) {
         current_time += (Seconds)sample_count * sampling_period;
         cached_round = round;
     }

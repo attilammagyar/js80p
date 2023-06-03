@@ -807,6 +807,56 @@ TEST(float_param_can_automatically_skip_constant_rounds, {
 })
 
 
+TEST(auto_skipping_a_follower_float_param_advances_the_clock_of_the_leader, {
+    constexpr Integer block_size = 10;
+    constexpr Integer short_round_length = 6;
+    constexpr Sample expected_samples[] = {
+        /* -1.0, -1.0, -1.0, -1.0, -1.0, */
+        -1.0, 0.125, 0.375, 0.625,
+        0.875, 1.0,
+        /* 1.0, 1.0, 1.0, 1.0, 1.0, */
+    };
+    FloatParam leader("float", -1.0, 1.0, 0.0);
+    FloatParam follower(leader);
+    Sample const* first_round;
+    Sample const* second_round_1;
+    Sample const* second_round_2;
+    Sample const* third_round_1;
+    Sample const* third_round_2;
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(2.0);
+    leader.set_value(-1.0);
+    leader.schedule_value(6.25, 0.0);
+    leader.schedule_linear_ramp(2.0, 1.0);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(2.0);
+
+    first_round = FloatParam::produce_if_not_constant(
+        &follower, 0, short_round_length
+    );
+    second_round_1 = FloatParam::produce_if_not_constant(
+        &follower, 1, short_round_length
+    );
+    second_round_2 = FloatParam::produce_if_not_constant<FloatParam>(
+        &follower, 1, short_round_length
+    );
+    third_round_1 = FloatParam::produce_if_not_constant<FloatParam>(
+        &follower, 2, short_round_length
+    );
+    third_round_2 = FloatParam::produce_if_not_constant<FloatParam>(
+        &follower, 2, short_round_length
+    );
+
+    assert_eq(NULL, first_round);
+    assert_eq(NULL, second_round_1);
+    assert_eq(NULL, second_round_2);
+    assert_eq(expected_samples, third_round_1, short_round_length, DOUBLE_DELTA);
+    assert_eq(expected_samples, third_round_2, short_round_length, DOUBLE_DELTA);
+})
+
+
 template<class FloatParamClass>
 void test_follower_signal()
 {

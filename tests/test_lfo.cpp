@@ -84,7 +84,7 @@ void test_lfo(
     lfo.phase.set_value(phase - 0.000001);
     lfo.phase.schedule_value(0.001, phase);
     lfo.frequency.set_value(frequency - 0.000001);
-    lfo.frequency.schedule_value(0.2, phase);
+    lfo.frequency.schedule_value(0.2, frequency);
     lfo.min.set_value(min - 0.000001);
     lfo.min.schedule_value(0.4, min);
     lfo.max.set_value(max - 0.000001);
