@@ -2,10 +2,10 @@
 // Flags       : clang-format SMTGSequencer
 // Project     : VST SDK
 //
-// Category    : Validator
-// Filename    : public.sdk/source/vst/testsuite/processing/process.h
-// Created by  : Steinberg, 04/2005
-// Description : VST Test Suite
+// Category    : readfile
+// Filename    : public.sdk/source/common/readfile.h
+// Created by  : Steinberg, 3/2023
+// Description : read file routine
 //
 //-----------------------------------------------------------------------------
 // LICENSE
@@ -31,51 +31,25 @@
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
+// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 
 #pragma once
 
-#include "public.sdk/source/vst/hosting/processdata.h"
-#include "public.sdk/source/vst/testsuite/testbase.h"
+#include <string>
 
-//------------------------------------------------------------------------
 namespace Steinberg {
-namespace Vst {
 
 //------------------------------------------------------------------------
-/** Test Process Test.
-\ingroup TestClass */
-//------------------------------------------------------------------------
-class ProcessTest : public TestEnh
-{
-public:
-//------------------------------------------------------------------------
-	ProcessTest (ITestPlugProvider* plugProvider, ProcessSampleSize sampl);
+/** Reads entire file content
+\ingroup sdkBase
 
-	DECLARE_VSTTEST ("Process Test")
-
-	// ITest
-	bool PLUGIN_API setup () SMTG_OVERRIDE;
-	bool PLUGIN_API run (ITestResult* testResult) SMTG_OVERRIDE;
-	bool PLUGIN_API teardown () SMTG_OVERRIDE;
+Returns entire file content at the given path
+\endcode
+*/
+std::string readFile (const std::string& path);
 
 //------------------------------------------------------------------------
-protected:
-	virtual bool prepareProcessing (); ///< setup ProcessData and allocate buffers
-	virtual bool unprepareProcessing (); ///< free dynamic memory of ProcessData
-	virtual bool preProcess (ITestResult* testResult); ///< is called just before the process call
-	virtual bool postProcess (ITestResult* testResult); ///< is called right after the process call
 
-	bool setupBuffers (int32 numBusses, AudioBusBuffers* audioBuffers, BusDirection dir);
-	bool setupBuffers (AudioBusBuffers& audioBuffers);
-	bool freeBuffers (int32 numBuses, AudioBusBuffers* buses);
-	bool canProcessSampleSize (ITestResult* testResult); ///< audioEffect has to be available
-
-	HostProcessData processData;
-};
-
-//------------------------------------------------------------------------
-} // Vst
-} // Steinberg
+} // namespace Steinberg

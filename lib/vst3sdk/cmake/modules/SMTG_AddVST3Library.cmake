@@ -73,7 +73,7 @@ function(smtg_target_create_module_info_file target)
     add_dependencies(${target} moduleinfotool)
 
     get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
-    set(SMTG_MODULEINFO_PATH_INSIDE_BUNDLE Contents/moduleinfo.json)
+    set(SMTG_MODULEINFO_PATH_INSIDE_BUNDLE Contents/Resources/moduleinfo.json)
 
     if(DEFINED PARAMS_MODULEINFO_COMPATIBILITY)
         add_custom_command(

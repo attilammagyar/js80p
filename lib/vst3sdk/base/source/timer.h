@@ -9,7 +9,7 @@
 // 
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2022, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -39,6 +39,10 @@
 
 #include "fobject.h"
 #include <limits>
+
+#if SMTG_CPP17
+#include <functional>
+#endif
 
 namespace Steinberg {
 class Timer;
@@ -87,6 +91,27 @@ ITimerCallback* newTimerCallback (const Call& call)
 	};
 	return NEW Callback (call);
 }
+
+#if SMTG_CPP17
+//------------------------------------------------------------------------
+/** @class TimerCallback
+ *
+ *  a timer callback object using a funtion for the timer call
+ */
+struct TimerCallback final : ITimerCallback
+{
+    using CallbackFunc = std::function<void (Timer*)>;
+
+    TimerCallback (CallbackFunc&& f) : f (std::move (f)) {}
+    TimerCallback (const CallbackFunc& f) : f (f) {}
+
+	void onTimer (Timer* timer) override { f (timer); }
+
+private:
+	CallbackFunc f;
+};
+
+#endif // SMTG_CPP17
 
 // -----------------------------------------------------------------
 /** @class Timer

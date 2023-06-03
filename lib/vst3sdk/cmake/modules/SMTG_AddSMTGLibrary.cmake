@@ -418,7 +418,23 @@ function(smtg_target_make_plugin_package target pkg_name extension)
             smtg_target_strip_symbols_with_dbg(${target})
         endif()
     endif(SMTG_MAC)
+
+    smtg_target_create_resources_folder(${target})
 endfunction(smtg_target_make_plugin_package)
+
+#------------------------------------------------------------------------
+# Create "Resources" folder for a target 
+#
+# @param target cmake target
+function(smtg_target_create_resources_folder target)
+    get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
+    get_target_property(PLUGIN_PACKAGE_RESOURCES ${target} SMTG_PLUGIN_PACKAGE_RESOURCES)
+    set(resources_folder "${PLUGIN_PACKAGE_PATH}/${PLUGIN_PACKAGE_RESOURCES}")
+    add_custom_command(
+            TARGET ${target} PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${resources_folder}"
+    )
+endfunction()
 
 #------------------------------------------------------------------------
 # Adds a resource for a target 
@@ -451,8 +467,9 @@ function(smtg_target_add_plugin_resource target input_file)
             PRIVATE
                 ${input_file}
         )
-
-        if(MSVC)
+        
+        # CMAKE_VS_MSBUILD_COMMAND is not defined when using "-G Ninja" generator but resolves to msbuild.exe when using "-G Visual Studio..."
+        if(CMAKE_VS_MSBUILD_COMMAND)
             # Hacky workaround: replace all SMTG_PLUGIN_PACKAGE_NAME (e.g. again.vst3) 
             # occurences by a MSVS macro $(TargetFileName). Using the cmake only approach does not work.
             get_target_property(PLUGIN_PACKAGE_NAME ${target} SMTG_PLUGIN_PACKAGE_NAME)

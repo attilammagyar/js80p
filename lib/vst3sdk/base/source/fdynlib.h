@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2022, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -92,7 +92,7 @@ public:
 
 #if SMTG_OS_MACOS
 	/** Returns @c true if the library is a bundle (Mac only). */
-	bool isBundleLib () const {return isBundle;}
+	bool isBundleLib () const { return isBundle; }
 #endif
 
 //------------------------------------------------------------------------

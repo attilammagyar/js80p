@@ -2,8 +2,8 @@
 // Flags       : clang-format SMTGSequencer
 //
 // Project     : Steinberg Plug-In SDK
-// Filename    : public.sdk/source/common/systemclipboard.h
-// Created by  : Steinberg 04.2020
+// Filename    : public.sdk/source/common/systemclipboard_linux.cpp
+// Created by  : Steinberg 04.2023
 // Description : Simple helper allowing to copy/retrieve text to/from the system clipboard
 //
 //-----------------------------------------------------------------------------
@@ -31,32 +31,31 @@
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 
-#pragma once
+#include "systemclipboard.h"
+#include "pluginterfaces/base/fplatform.h"
 
-#include <string>
+#if SMTG_OS_LINUX
 
 //------------------------------------------------------------------------
 namespace Steinberg {
 namespace SystemClipboard {
 
 //-----------------------------------------------------------------------------
-/** Copies the given text into the system clipboard
-\ingroup sdkBase
-
-\param text UTF-8 encoded text
-\return true on success
-*/
-bool copyTextToClipboard (const std::string& text);
+bool copyTextToClipboard (const std::string& text)
+{
+	// TODO
+	return false;
+}
 
 //-----------------------------------------------------------------------------
-/** Retrieves the current text from the system clipboard
-\ingroup sdkBase
+bool getTextFromClipboard (std::string& text)
+{
+	// TODO
+	return false;
+}
 
-\param text UTF-8 encoded text
-\return true on success
-*/
-bool getTextFromClipboard (std::string& text);
-
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------
 } // namespace SystemClipboard
 } // namespace Steinberg
+
+#endif // SMTG_OS_LINUX

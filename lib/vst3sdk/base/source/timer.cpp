@@ -9,7 +9,7 @@
 // 
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2022, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -359,7 +359,6 @@ uint64 getTicks64 ()
 //------------------------------------------------------------------------
 Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 {
-#warning DEPRECATED No Linux implementation
 	assert (false && "DEPRECATED No Linux implementation");
 	return nullptr;
 }
