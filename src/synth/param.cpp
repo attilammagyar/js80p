@@ -844,8 +844,8 @@ Seconds FloatParam::smooth_change_duration(
     ramps and sudden jumps, we force every value change to take place gradually,
     over a duration which correlates with the magnitude of the change.
     */
-    constexpr Seconds big_change_duration = 0.20;
-    constexpr Seconds small_change_duration = big_change_duration / 30.0;
+    constexpr Seconds big_change_duration = 0.18;
+    constexpr Seconds small_change_duration = big_change_duration / 3.6;
 
     Number const change = std::fabs(previous_value - controller_value);
 

@@ -1105,7 +1105,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 
 
 TEST(float_param_follows_midi_controller_changes_gradually, {
-    constexpr Integer block_size = 1000;
+    constexpr Integer block_size = 2000;
     constexpr Frequency sample_rate = 5000.0;
     FloatParam reference_float_param("reference", 0.0, 10.0, 0.0);
     FloatParam float_param("float", 0.0, 10.0, 0.0);
@@ -1123,23 +1123,25 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
     midi_controller.change(0.002, 0.000);
     midi_controller.change(0.002, 0.010);
     midi_controller.change(0.002, 0.025);
-    midi_controller.change(0.002, 0.100);
-    midi_controller.change(0.002, 0.100);
-    midi_controller.change(0.002, 0.100);
-    midi_controller.change(0.002, 0.100);
-    midi_controller.change(0.002, 0.101);
-    midi_controller.change(0.002, 0.601);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.325);
+    midi_controller.change(0.002, 0.330);
+    midi_controller.change(0.002, 0.830);
 
     reference_float_param.set_block_size(block_size);
     reference_float_param.set_sample_rate(sample_rate);
 
     reference_float_param.set_value(0.0);
     reference_float_param.schedule_value(0.002, 0.0);
-    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.1);
-    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 0.25);
-    reference_float_param.schedule_linear_ramp(0.20 * 0.075, 1.0);
-    reference_float_param.schedule_linear_ramp(0.20 / 30.0, 1.01);
-    reference_float_param.schedule_linear_ramp(0.20 * 0.5, 6.01);
+    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 0.1);
+    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 0.25);
+    reference_float_param.schedule_linear_ramp(0.18 * 0.3, 3.25);
+    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 3.30);
+    reference_float_param.schedule_linear_ramp(0.18 * 0.5, 8.30);
 
     expected_samples = FloatParam::produce_if_not_constant(&reference_float_param, 1, block_size);
     rendered_samples = FloatParam::produce_if_not_constant(&float_param, 1, block_size);
