@@ -87,7 +87,7 @@ main()
 }
 
 
-replace_in()
+replace_in_dir()
 {
     local built_plugin="$1"
     local dir
