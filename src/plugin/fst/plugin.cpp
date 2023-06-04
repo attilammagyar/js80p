@@ -729,18 +729,34 @@ void FstPlugin::update_bpm() noexcept
 
 void FstPlugin::update_host_display() noexcept
 {
-    constexpr int audioMasterUpdateDisplay = FST_HOST_UPDATE_DISPLAY_OPCODE;
+    /*
+    Opcode value obtained by trial and error:
+
+    Based on its name, audioMasterUpdateDisplay might be a host callback to be
+    used for asking the host to update its generic plugin parameter UI, whenever
+    the plugin changes some of its parameters internally. Unfortunately, fst.h
+    doesn't define the opcode for audioMasterUpdateDisplay at the moment.
+
+    Looking at the JuceVSTWrapper::HostChangeUpdater::handleAsyncUpdate() method
+    in the modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp file in
+    JUCE 7.0.5, it seems that audioMasterUpdateDisplay can be called with all
+    arguments set to zero.
+
+    As of writing this, there are 17 known and 32 unknown host opcodes in
+    fst.h, and the known ones seem to be numbered consecutively, without large
+    gaps between the enum values. The opcode with the highest known enum value
+    is audioMasterEndEdit = 44.
+
+    These findings suggest that simply trying the currently unassigned enum
+    values in fst.h between 0 and 50 might reveal the value of the opcode. And
+    indeed, the answer to Life, the Universe, Everything, and the
+    audioMasterUpdateDisplay opcode seems to be 42 - Reaper 6.79 responds with
+    success to this call, and exhibits the desired behaviour of updating its
+    generic plugin parameter UI.
+    */
+    constexpr int audioMasterUpdateDisplay = 42;
 
     host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
-
-    // VstIntPtr result = host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
-    // fprintf(
-        // stderr,
-        // "FstPlugin::update_host_display(); host_callback(%p, %d, 0, 0, NULL, 0.0f) returned: %lld\n",
-        // (void*)effect,
-        // audioMasterUpdateDisplay,
-        // (long long int)result
-    // );
 }
 
 
