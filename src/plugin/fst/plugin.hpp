@@ -168,7 +168,11 @@ class FstPlugin : public Midi::EventHandler
         {
             public:
                 Parameter();
-                Parameter(char const* name, MidiController* midi_controller);
+                Parameter(
+                    char const* name,
+                    MidiController* midi_controller,
+                    Midi::Controller const controller_id
+                );
                 Parameter(Parameter const& parameter);
                 Parameter(Parameter const&& parameter);
 
@@ -177,20 +181,22 @@ class FstPlugin : public Midi::EventHandler
 
                 char const* get_name() const noexcept;
                 MidiController* get_midi_controller() const noexcept;
+                Midi::Controller get_controller_id() const noexcept;
 
                 // bool needs_host_update() const noexcept;
 
                 float get_value() noexcept;
+                float get_last_set_value() noexcept;
                 void set_value(float const value) noexcept;
 
-                void update_midi_controller_if_dirty() noexcept;
-
+                void clear() noexcept;
                 bool is_dirty() const noexcept;
 
             private:
                 MidiController* midi_controller;
                 char const* name;
-                Integer change_index;
+                Midi::Controller controller_id;
+                // Integer change_index;
                 float value;
                 bool is_dirty_;
         };
@@ -204,6 +210,10 @@ class FstPlugin : public Midi::EventHandler
         void update_host_display() noexcept;
 
         Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
+        void handle_program_change() noexcept;
+        void handle_parameter_changes() noexcept;
+
+        Midi::Byte float_to_midi_byte(float const value) const noexcept;
 
         void import_patch(const std::string& patch) noexcept;
 
