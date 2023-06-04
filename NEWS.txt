@@ -6,6 +6,8 @@ v1.5.0 (2023-06-??)
    having to browse the file system.
  * The FST plugin now exports its MIDI CC input as host-automatable parameters,
    just like the VST3 version.
+ * LFOs can now oscillate around the midpoint between the minimum and maximum
+   value.
  * Bugfix: the VST3 plugin will now process all controller changes within a
    block, not just the last one
  * Bugfix: make sure that before a patch (or program or bank) is imported, all
