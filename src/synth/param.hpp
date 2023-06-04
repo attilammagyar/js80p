@@ -137,6 +137,17 @@ class FloatParam : public Param<Number>
         static constexpr Event::Type EVT_LINEAR_RAMP = 2;
         static constexpr Event::Type EVT_LOG_RAMP = 3;
 
+        /*
+        Some MIDI controllers seem to send multiple changes of the same value with
+        the same timestamp (on the same channel). In order to avoid zero duration
+        ramps and sudden jumps, we force every value change to take place gradually,
+        over a duration which correlates with the magnitude of the change.
+        */
+        static constexpr Seconds MIDI_CTL_BIG_CHANGE_DURATION = 0.20;
+        static constexpr Seconds MIDI_CTL_SMALL_CHANGE_DURATION = (
+            MIDI_CTL_BIG_CHANGE_DURATION / 2.5
+        );
+
         /**
          * \brief Orchestrate rendering signals and handling events.
          *        See \c SignalProducer::process()

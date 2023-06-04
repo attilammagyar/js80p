@@ -793,20 +793,38 @@ Sample const* const* FloatParam::initialize_rendering(
         );
 
         if (number_of_ctl_events != 0) {
+            Queue<Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
+
             cancel_events(0.0);
 
             Seconds previous_time_offset = 0.0;
-            Number previous_value = value_to_ratio(get_raw_value());
+            Number previous_ratio = value_to_ratio(get_raw_value());
 
             for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+                Seconds time_offset = midi_controller->events[i].time_offset;
+
+                while (i != last_ctl_event_index) {
+                    ++i;
+
+                    Seconds const delta = std::fabs(
+                        midi_controller->events[i].time_offset - time_offset
+                    );
+
+                    if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
+                        --i;
+                        break;
+                    }
+                }
+
+                time_offset = midi_controller->events[i].time_offset;
+
                 Number const controller_value = midi_controller->events[i].number_param_1;
-                Number const time_offset = midi_controller->events[i].time_offset;
                 Seconds const duration = smooth_change_duration(
-                    previous_value,
+                    previous_ratio,
                     controller_value,
                     time_offset - previous_time_offset
                 );
-                previous_value = controller_value;
+                previous_ratio = controller_value;
                 schedule_linear_ramp(duration, ratio_to_value(controller_value));
                 previous_time_offset = time_offset;
             }
@@ -840,23 +858,17 @@ Seconds FloatParam::smooth_change_duration(
         Number const controller_value,
         Seconds const duration
 ) const noexcept {
-    /*
-    Some MIDI controllers seem to send multiple changes of the same value with
-    the same timestamp (on the same channel). In order to avoid zero duration
-    ramps and sudden jumps, we force every value change to take place gradually,
-    over a duration which correlates with the magnitude of the change.
-    */
-    constexpr Seconds big_change_duration = 0.18;
-    constexpr Seconds small_change_duration = big_change_duration / 3.6;
-
     Number const change = std::fabs(previous_value - controller_value);
 
     if (change < 0.000001) {
-        return std::max(duration, big_change_duration * change);
+        return std::max(duration, MIDI_CTL_BIG_CHANGE_DURATION * change);
     }
 
     Seconds const min_duration = (
-        std::max(small_change_duration, big_change_duration * change)
+        std::max(
+            MIDI_CTL_SMALL_CHANGE_DURATION,
+            MIDI_CTL_BIG_CHANGE_DURATION * change
+        )
     );
 
     return std::max(min_duration, duration);

@@ -1156,7 +1156,10 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 
 TEST(float_param_follows_midi_controller_changes_gradually, {
     constexpr Integer block_size = 2000;
-    constexpr Frequency sample_rate = 5000.0;
+    constexpr Frequency sample_rate = 3000.0;
+    constexpr Seconds big_change_duration = FloatParam::MIDI_CTL_BIG_CHANGE_DURATION;
+    constexpr Seconds small_change_duration = FloatParam::MIDI_CTL_SMALL_CHANGE_DURATION;
+
     FloatParam reference_float_param("reference", 0.0, 10.0, 0.0);
     FloatParam float_param("float", 0.0, 10.0, 0.0);
     MidiController midi_controller;
@@ -1170,33 +1173,32 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
     float_param.set_sample_rate(sample_rate);
     float_param.set_midi_controller(&midi_controller);
 
-    midi_controller.change(0.002, 0.000);
-    midi_controller.change(0.002, 0.010);
-    midi_controller.change(0.002, 0.025);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.325);
-    midi_controller.change(0.002, 0.330);
-    midi_controller.change(0.002, 0.830);
+    midi_controller.change(0.01, 0.001);
+    midi_controller.change(0.02, 0.005);
+    midi_controller.change(0.03, 0.010);
+    midi_controller.change(0.31, 0.025);
+    midi_controller.change(0.31, 0.325);
+    midi_controller.change(0.31, 0.325);
+    midi_controller.change(0.31, 0.325);
+    midi_controller.change(0.32, 0.325);
+    midi_controller.change(0.33, 0.325);
+    midi_controller.change(0.33, 0.325);
+    midi_controller.change(0.33, 0.330);
+    midi_controller.change(0.41, 0.960);
 
     reference_float_param.set_block_size(block_size);
     reference_float_param.set_sample_rate(sample_rate);
 
     reference_float_param.set_value(0.0);
-    reference_float_param.schedule_value(0.002, 0.0);
-    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 0.1);
-    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 0.25);
-    reference_float_param.schedule_linear_ramp(0.18 * 0.3, 3.25);
-    reference_float_param.schedule_linear_ramp(0.18 / 3.6, 3.30);
-    reference_float_param.schedule_linear_ramp(0.18 * 0.5, 8.30);
+
+    reference_float_param.schedule_linear_ramp(small_change_duration, 0.1);
+    reference_float_param.schedule_linear_ramp(0.3, 3.3);
+    reference_float_param.schedule_linear_ramp(big_change_duration * 0.63, 9.6);
 
     expected_samples = FloatParam::produce_if_not_constant(&reference_float_param, 1, block_size);
     rendered_samples = FloatParam::produce_if_not_constant(&float_param, 1, block_size);
 
-    assert_eq(expected_samples, rendered_samples, block_size, 0.001);
+    assert_eq(expected_samples, rendered_samples, block_size, DOUBLE_DELTA);
 })
 
 
