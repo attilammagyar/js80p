@@ -235,7 +235,7 @@ better waveshaper antialiasing method than what's available in the browser),
 and so JS80P was born.
 
   [webaudio]: https://www.w3.org/TR/webaudio/
-  [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80]
+  [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80
   [js80]: https://attilammagyar.github.io/toys/js-80/
 
 <a name="dev"></a>
