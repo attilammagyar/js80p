@@ -4,8 +4,14 @@ v1.5.0 (2023-06-??)
  * With the help of Patrik Ehringer (ZonderP), program and bank management is
    implemented, and presets are accessible via the host application, without
    having to browse the file system.
- * The FST plugin now exports its MIDI CC input as host-automatable parameters,
-   just like the VST3 version.
+ * The FST plugin now exports its MIDI Control Change (MIDI CC) inputs as
+   host-automatable parameters, just like the VST3 version does.
+ * MIDI Learn now listens for changes in these new MIDI CC proxy parameters
+   as well, which is useful for hosts that refuse to send the raw MIDI CC
+   events to plugins, but allow automating parameters via MIDI CC. One
+   example of such a host is FL Studio which only sends the modulation wheel's
+   MIDI CC messages as actual MIDI CC data, and forces users to manually assign
+   all other MIDI CC events to plugin parameters.
  * LFOs can now oscillate around the midpoint between the minimum and maximum
    value.
  * Bugfix: the VST3 plugin will now process all controller changes within a

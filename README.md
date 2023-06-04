@@ -32,6 +32,8 @@ Table of Contents
     * [Which distribution should I download?](#faq-which)
     * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
+    * [How to assign a MIDI CC to a JS80P parameter in FL Studio?](#faq-flstudio-midicc)
+    * [How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?](#faq-flstudio-aftertouch)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
  * [Development](#dev)
@@ -196,8 +198,8 @@ The intended way of automating JS80P's parameters is to assign a
 Learn_), and turn the corresponding knob on your MIDI keyboard while playing,
 or edit the MIDI CC events in your host application's MIDI editor.
 
-However, the VST3 plugin format requires plugins to export a parameter for each
-MIDI CC message that they want to receive, and as a side-effect, these
+However, the VST3 plugin format requires plugins to export a proxy parameter
+for each MIDI CC message that they want to receive, and as a side-effect, these
 parameters can also be automated using the host application's usual automation
 editor. For the sake of consistency, the FST plugin also exports automatable
 parameters for each supported MIDI CC message.
@@ -210,6 +212,74 @@ parameter of the synthesizer, and then add automation in the host application
 to the `MIDI CC 1 (Modulation Wheel)` (VST3) or `ModWh` (FST) parameter. JS80P
 will then interpret the changes of this parameter the same way as if you were
 turning the modulation wheel on a MIDI keyboard.
+
+<a name="faq-flstudio-midicc"></a>
+
+### How to assign a MIDI CC to a JS80P parameter in FL Studio?
+
+Unlike decent audio software, FL Studio does not send all MIDI events that
+come out of your MIDI keyboard to plugins, and unfortunately,
+[MIDI Control Change][midicc2] (MIDI CC) messages are among the kinds of MIDI
+data that it swallows. To make everything work, you have to assign the MIDI CC
+events to a plugin parameter.
+
+  [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
+
+JS80P does not directly export its parameters (in order to avoid conflict
+between the host's automations and JS80P's internal control assignments), but
+it exports proxy parameters which represent MIDI CC messages that it handles.
+
+For example, let's say a physical knob on your MIDI keyboard is configured to
+send its values in `MIDI CC 7` messages. To make this knob turn the _Phase
+Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
+
+1. Click on the small triangle in the top left corner of the plugin window of
+   JS80P, and select the "_Browse parameters_" menu item.
+
+2. Find the parameter named "_Vol_" (FST) or "_MIDI CC 7 (Volume)_" (VST3) in
+   the browser. Click on it with the right mouse button.
+
+3. Select the "_Link to controller..._" menu item.
+
+4. Turn the knob on your MIDI keyboard until FL Studio recognizes it.
+
+5. Now click on the area below the _Phase Modulation (PM)_ virtual knob in
+   JS80P's interface.
+
+6. Select either the "_MIDI CC 7 (Volume)_" option, or the "_MIDI Learn_"
+   option, and turn the physical knob on your MIDI keyboard again.
+
+<a name="faq-flstudio-aftertouch"></a>
+
+### How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?
+
+Unlike decent audio software, FL Studio does not send all MIDI events that come
+out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
+known as Channel Aftertouch)  messages are among the kinds MIDI data that it
+swallows.
+
+Getting the Channel Pressure (also known as Channel Aftertouch) to work in
+FL Studio is a similar, but slightly more complicated procedure than setting up
+MIDI CC:
+
+1. Click on the small triangle in the top left corner of the plugin window of
+   JS80P, and select the "_Browse parameters_" menu item.
+
+2. Press a piano key on your MIDI keyboard, and hold it down without triggering
+   aftertouch.
+
+3. While holding the piano key down, find the parameter named "_Ch AT_" (FST)
+   or "_Channel Aftertouch_" (VST3) in FL Studio's browser. Click on it with
+   the right mouse button.
+
+4. Select the "_Link to controller..._" menu item (keep holding the piano key).
+
+5. Now push the piano key harder to trigger aftertouch.
+
+6. Click on the area below the _Phase Modulation (PM)_ virtual knob in
+   JS80P's interface.
+
+7. Select the "_Channel Aftertouch_" option.
 
 <a name="faq-pm-fm"></a>
 
