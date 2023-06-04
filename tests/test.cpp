@@ -206,13 +206,19 @@ void test_ ## name()                                                        \
     body, ## __VA_ARGS__                                                    \
 }                                                                           \
                                                                             \
-class _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                        \
+class _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__) : public _Test         \
 {                                                                           \
     public:                                                                 \
         _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)()                    \
+            : _Test(#name, __FILE__, __LINE__)                              \
         {                                                                   \
-            _TestScope _test_memo(#name, __FILE__, __LINE__);               \
+        }                                                                   \
+                                                                            \
+        virtual void run(int const argc, char const* const* argv) override  \
+        {                                                                   \
+            initialize(argc, argv);                                         \
             test_ ## name();                                                \
+            finalize();                                                     \
         }                                                                   \
 };                                                                          \
 _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
@@ -442,11 +448,16 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <vector>
 
 
 #define _TEST_CONCAT(a, b) a ## b
 #define _TEST_EXPAND_CONCAT(a, b) _TEST_CONCAT(a, b)
 #define _TEST_CONCAT_ID(a, b) _TEST_EXPAND_CONCAT(a, b)
+
+
+#define _TEST_STR_OR(str, null_value) (str ? str : null_value)
+#define _TEST_NULL_PTR_STR "<NULL>"
 
 
 int _test_result = 0;
@@ -458,14 +469,81 @@ char const* _test_name = NULL;
 char const* _test_file = NULL;
 int _test_line = -1;
 
-
-#define _TEST_STR_OR(str, null_value) (str ? str : null_value)
-#define _TEST_NULL_PTR_STR "<NULL>"
+std::vector<std::string> TEST_ARGV;
 
 
-int main(int argc, char* argv[])
+class _Test;
+typedef std::vector<_Test*> _Tests;
+_Tests _tests;
+
+
+class _Test
 {
-    if (_test_started < 1) {
+    public:
+        _Test(
+                char const* const name,
+                char const* const file,
+                int const line
+        ) : name(name),
+            file(file),
+            line(line)
+        {
+            _tests.push_back(this);
+        }
+
+        void initialize(int const argc, char const* const* argv)
+        {
+            _test_name = name;
+            _test_file = file;
+            _test_line = line;
+            _test_current_test_passed = true;
+            ++_test_started;
+
+            TEST_ARGV.clear();
+
+            for (int i = 0; i < argc; ++i) {
+                TEST_ARGV.push_back(argv[i]);
+            }
+
+            if (_test_started == 1) {
+                fprintf(
+                    stderr,
+                    "\nRunning tests from %s\n",
+                    _TEST_STR_OR(_test_file, "UNKNOWN")
+                );
+            }
+
+        }
+
+        virtual void run(int const argc, char const* const* argv)
+        {
+        }
+
+        void finalize()
+        {
+            if (_test_current_test_passed) {
+                fprintf(
+                    stderr,
+                    " pass (%s:%d %s)\n",
+                    _TEST_STR_OR(_test_file, "UNKNOWN"),
+                    _test_line,
+                    _TEST_STR_OR(_test_name, "UNKNOWN")
+                );
+            }
+
+            _test_name = NULL;
+            _test_line = -1;
+        }
+
+        char const* const name;
+        char const* const file;
+        int const line;
+};
+
+
+int main(int argc, char const* argv[])
+{
+    if (_tests.size() < 1) {
         fprintf(
             stderr,
             "\nFAIL: No tests found in %s\n\n",
@@ -473,6 +551,34 @@ int main(int argc, char* argv[])
         );
 
         return 2;
+    }
+
+    if (argc > 1) {
+        bool found = false;
+
+        for (_Tests::const_iterator it = _tests.begin(); it != _tests.end(); ++it) {
+            _Test* test = *it;
+            std::string const name(test->name);
+
+            if (name == argv[1]) {
+                found = true;
+                test->run(argc, argv);
+            }
+        }
+
+        if (!found) {
+            fprintf(
+                stderr,
+                "Test not found in %s: \"%s\"\n",
+                _TEST_STR_OR(_test_file, argv[0]),
+                argv[1]
+            );
+        }
+    } else {
+        for (_Tests::const_iterator it = _tests.begin(); it != _tests.end(); ++it) {
+            _Test* test = *it;
+            test->run(argc, argv);
+        }
     }
 
     fprintf(
@@ -551,45 +657,6 @@ int main(int argc, char* argv[])
     }                                                                       \
     fprintf(stderr, "\n");                                                  \
 } while (false)
-
-
-class _TestScope
-{
-    public:
-        _TestScope(char const* const name, char const* const file, int const line)
-        {
-            _test_name = name;
-            _test_file = file;
-            _test_line = line;
-            _test_current_test_passed = true;
-            ++_test_started;
-
-            if (_test_started == 1) {
-                fprintf(
-                    stderr,
-                    "\nRunning tests from %s\n",
-                    _TEST_STR_OR(_test_file, "UNKNOWN")
-                );
-            }
-
-        }
-
-        ~_TestScope()
-        {
-            if (_test_current_test_passed) {
-                fprintf(
-                    stderr,
-                    " pass (%s:%d %s)\n",
-                    _TEST_STR_OR(_test_file, "UNKNOWN"),
-                    _test_line,
-                    _TEST_STR_OR(_test_name, "UNKNOWN")
-                );
-            }
-
-            _test_name = NULL;
-            _test_line = -1;
-        }
-};
 
 
 #define _TEST_ARGS char const* const file, int const line
