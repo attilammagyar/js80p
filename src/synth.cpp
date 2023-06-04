@@ -505,6 +505,15 @@ void Synth::create_lfos() noexcept
     register_param<ToggleParam>(ParamId::L6SYN, lfos_rw[5]->tempo_sync);
     register_param<ToggleParam>(ParamId::L7SYN, lfos_rw[6]->tempo_sync);
     register_param<ToggleParam>(ParamId::L8SYN, lfos_rw[7]->tempo_sync);
+
+    register_param<ToggleParam>(ParamId::L1CEN, lfos_rw[0]->center);
+    register_param<ToggleParam>(ParamId::L2CEN, lfos_rw[1]->center);
+    register_param<ToggleParam>(ParamId::L3CEN, lfos_rw[2]->center);
+    register_param<ToggleParam>(ParamId::L4CEN, lfos_rw[3]->center);
+    register_param<ToggleParam>(ParamId::L5CEN, lfos_rw[4]->center);
+    register_param<ToggleParam>(ParamId::L6CEN, lfos_rw[5]->center);
+    register_param<ToggleParam>(ParamId::L7CEN, lfos_rw[6]->center);
+    register_param<ToggleParam>(ParamId::L8CEN, lfos_rw[7]->center);
 }
 
 
@@ -947,6 +956,14 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_default_ratio();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_default_ratio();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_default_ratio();
+        case ParamId::L1CEN: return lfos_rw[0]->center.get_default_ratio();
+        case ParamId::L2CEN: return lfos_rw[1]->center.get_default_ratio();
+        case ParamId::L3CEN: return lfos_rw[2]->center.get_default_ratio();
+        case ParamId::L4CEN: return lfos_rw[3]->center.get_default_ratio();
+        case ParamId::L5CEN: return lfos_rw[4]->center.get_default_ratio();
+        case ParamId::L6CEN: return lfos_rw[5]->center.get_default_ratio();
+        case ParamId::L7CEN: return lfos_rw[6]->center.get_default_ratio();
+        case ParamId::L8CEN: return lfos_rw[7]->center.get_default_ratio();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -997,6 +1014,14 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_max_value();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_max_value();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_max_value();
+        case ParamId::L1CEN: return lfos_rw[0]->center.get_max_value();
+        case ParamId::L2CEN: return lfos_rw[1]->center.get_max_value();
+        case ParamId::L3CEN: return lfos_rw[2]->center.get_max_value();
+        case ParamId::L4CEN: return lfos_rw[3]->center.get_max_value();
+        case ParamId::L5CEN: return lfos_rw[4]->center.get_max_value();
+        case ParamId::L6CEN: return lfos_rw[5]->center.get_max_value();
+        case ParamId::L7CEN: return lfos_rw[6]->center.get_max_value();
+        case ParamId::L8CEN: return lfos_rw[7]->center.get_max_value();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -1051,6 +1076,14 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.ratio_to_value(ratio);
         case ParamId::EF1LOG: return effects.filter_1_log_scale.ratio_to_value(ratio);
         case ParamId::EF2LOG: return effects.filter_2_log_scale.ratio_to_value(ratio);
+        case ParamId::L1CEN: return lfos_rw[0]->center.ratio_to_value(ratio);
+        case ParamId::L2CEN: return lfos_rw[1]->center.ratio_to_value(ratio);
+        case ParamId::L3CEN: return lfos_rw[2]->center.ratio_to_value(ratio);
+        case ParamId::L4CEN: return lfos_rw[3]->center.ratio_to_value(ratio);
+        case ParamId::L5CEN: return lfos_rw[4]->center.ratio_to_value(ratio);
+        case ParamId::L6CEN: return lfos_rw[5]->center.ratio_to_value(ratio);
+        case ParamId::L7CEN: return lfos_rw[6]->center.ratio_to_value(ratio);
+        case ParamId::L8CEN: return lfos_rw[7]->center.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -1168,6 +1201,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2LOG: carrier_params.filter_2_log_scale.set_ratio(ratio); break;
             case ParamId::EF1LOG: effects.filter_1_log_scale.set_ratio(ratio); break;
             case ParamId::EF2LOG: effects.filter_2_log_scale.set_ratio(ratio); break;
+            case ParamId::L1CEN: lfos_rw[0]->center.set_ratio(ratio); break;
+            case ParamId::L2CEN: lfos_rw[1]->center.set_ratio(ratio); break;
+            case ParamId::L3CEN: lfos_rw[2]->center.set_ratio(ratio); break;
+            case ParamId::L4CEN: lfos_rw[3]->center.set_ratio(ratio); break;
+            case ParamId::L5CEN: lfos_rw[4]->center.set_ratio(ratio); break;
+            case ParamId::L6CEN: lfos_rw[5]->center.set_ratio(ratio); break;
+            case ParamId::L7CEN: lfos_rw[6]->center.set_ratio(ratio); break;
+            case ParamId::L8CEN: lfos_rw[7]->center.set_ratio(ratio); break;
             default: break; // This should never be reached.
         }
     }
@@ -1406,6 +1447,14 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_ratio();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_ratio();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_ratio();
+        case ParamId::L1CEN: return lfos_rw[0]->center.get_ratio();
+        case ParamId::L2CEN: return lfos_rw[1]->center.get_ratio();
+        case ParamId::L3CEN: return lfos_rw[2]->center.get_ratio();
+        case ParamId::L4CEN: return lfos_rw[3]->center.get_ratio();
+        case ParamId::L5CEN: return lfos_rw[4]->center.get_ratio();
+        case ParamId::L6CEN: return lfos_rw[5]->center.get_ratio();
+        case ParamId::L7CEN: return lfos_rw[6]->center.get_ratio();
+        case ParamId::L8CEN: return lfos_rw[7]->center.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }

@@ -52,7 +52,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParam& amplitude_modulation_level_leader,
         FloatParam& frequency_modulation_level_leader,
         FloatParam& phase_modulation_level_leader,
-        ToggleParam& tempo_sync
+        ToggleParam& tempo_sync,
+        ToggleParam& center
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -103,7 +104,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
     harmonic_9("", -1.0, 1.0, 0.0),
-    tempo_sync(tempo_sync)
+    tempo_sync(tempo_sync),
+    center(center)
 {
     initialize_instance();
 }
@@ -183,7 +185,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParam& amplitude_leader,
         FloatParam& frequency_leader,
         FloatParam& phase_leader,
-        ToggleParam& tempo_sync
+        ToggleParam& tempo_sync,
+        ToggleParam& center
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -213,7 +216,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
     harmonic_9("", -1.0, 1.0, 0.0),
-    tempo_sync(tempo_sync)
+    tempo_sync(tempo_sync),
+    center(center)
 {
     initialize_instance();
 }
@@ -279,7 +283,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     harmonic_7(harmonic_7_leader),
     harmonic_8(harmonic_8_leader),
     harmonic_9(harmonic_9_leader),
-    tempo_sync(dummy_toggle)
+    tempo_sync(dummy_toggle),
+    center(dummy_toggle)
 {
     initialize_instance();
 }
@@ -427,7 +432,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    initialize_frequency_scale<is_lfo>(bpm);
+    apply_toggle_params<is_lfo>(bpm);
 
     Waveform const waveform = this->waveform.get_value();
 
@@ -468,7 +473,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 template<bool is_lfo_>
-void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_frequency_scale(
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::apply_toggle_params(
         typename std::enable_if<is_lfo_, Number const>::type bpm
 ) noexcept {
     frequency_scale = (
@@ -476,12 +481,14 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_frequency_scal
             ? bpm * TEMPO_SYNC_FREQUENCY_SCALE
             : 1.0
     );
+
+    is_centered_lfo = center.get_value() == ToggleParam::ON;
 }
 
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 template<bool is_lfo_>
-void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_frequency_scale(
+void Oscillator<ModulatorSignalProducerClass, is_lfo>::apply_toggle_params(
         typename std::enable_if<!is_lfo_, Number const>::type bpm
 ) noexcept {
 }
@@ -868,9 +875,11 @@ Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
         typename std::enable_if<is_lfo_, Sample const>::type frequency,
         typename std::enable_if<is_lfo_, Sample const>::type phase
 ) noexcept {
-    return amplitude + amplitude * wavetable->lookup(
+    Sample const sample = amplitude * wavetable->lookup(
         &wavetable_state, frequency * frequency_scale, phase
     );
+
+    return is_centered_lfo ? sample : amplitude + sample;
 }
 
 

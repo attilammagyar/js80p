@@ -414,8 +414,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CF2LOG = 284,    ///< Carrier Filter 2 Logarithmic Frequency
             EF1LOG = 285,    ///< Effects Filter 1 Logarithmic Frequency
             EF2LOG = 286,    ///< Effects Filter 2 Logarithmic Frequency
+            L1CEN = 287,     ///< LFO 1 Center
+            L2CEN = 288,     ///< LFO 2 Center
+            L3CEN = 289,     ///< LFO 3 Center
+            L4CEN = 290,     ///< LFO 4 Center
+            L5CEN = 291,     ///< LFO 5 Center
+            L6CEN = 292,     ///< LFO 6 Center
+            L7CEN = 293,     ///< LFO 7 Center
+            L8CEN = 294,     ///< LFO 8 Center
 
-            MAX_PARAM_ID = 287
+            MAX_PARAM_ID = 295
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

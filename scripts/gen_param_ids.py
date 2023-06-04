@@ -187,6 +187,15 @@ def print_special_params(param_id: int) -> int:
 
         ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency"),
         ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency"),
+
+        ("L1CEN", " ///< LFO 1 Center"),
+        ("L2CEN", " ///< LFO 2 Center"),
+        ("L3CEN", " ///< LFO 3 Center"),
+        ("L4CEN", " ///< LFO 4 Center"),
+        ("L5CEN", " ///< LFO 5 Center"),
+        ("L6CEN", " ///< LFO 6 Center"),
+        ("L7CEN", " ///< LFO 7 Center"),
+        ("L8CEN", " ///< LFO 8 Center"),
     ]
 
     return print_params(param_id, "", "", 1, params)

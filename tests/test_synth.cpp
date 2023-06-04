@@ -244,7 +244,7 @@ TEST(can_look_up_param_id_by_name, {
     );
 
     assert_lte((int)max_collisions, 5);
-    assert_lte(avg_bucket_size, 2.27);
+    assert_lte(avg_bucket_size, 2.5);
     assert_lte(avg_collisions, 2.9);
 
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(""));

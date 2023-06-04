@@ -38,7 +38,8 @@ LFO::LFO(std::string const name) noexcept
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
-    oscillator(waveform, amount, frequency, phase, tempo_sync)
+    center(name + "CEN", ToggleParam::OFF),
+    oscillator(waveform, amount, frequency, phase, tempo_sync, center)
 {
     register_child(waveform);
     register_child(frequency);
@@ -49,6 +50,7 @@ LFO::LFO(std::string const name) noexcept
     register_child(distortion);
     register_child(randomness);
     register_child(tempo_sync);
+    register_child(center);
     register_child(oscillator);
 }
 
@@ -119,6 +121,22 @@ void LFO::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
+    if (center.get_value() == ToggleParam::ON) {
+        apply_range_centered(round, first_sample_index, last_sample_index, buffer);
+    } else {
+        apply_range(round, first_sample_index, last_sample_index, buffer);
+    }
+
+    apply_distortions(round, first_sample_index, last_sample_index, buffer);
+}
+
+
+void LFO::apply_range(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) {
     if (min_buffer == NULL) {
         Sample const min_value = (Sample)min.get_value();
 
@@ -161,7 +179,74 @@ void LFO::render(
             }
         }
     }
+}
 
+
+void LFO::apply_range_centered(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) {
+    if (min_buffer == NULL) {
+        Sample const min_value = (Sample)min.get_value();
+
+        if (max_buffer == NULL) {
+            Sample const max_value = (Sample)max.get_value();
+            Sample const center = (min_value + max_value) * 0.5;
+            Sample const range = max_value - min_value;
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = (
+                    center + range * (oscillator_buffer[0][i])
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                Sample const max_value = max_buffer[i];
+                Sample const center = (min_value + max_value) * 0.5;
+                Sample const range = max_value - min_value;
+
+                buffer[0][i] = (
+                    center + range * (oscillator_buffer[0][i])
+                );
+            }
+        }
+    } else {
+        if (max_buffer == NULL) {
+            Sample const max_value = (Sample)max.get_value();
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                Sample const min_value = min_buffer[i];
+                Sample const center = (min_value + max_value) * 0.5;
+                Sample const range = max_value - min_value;
+
+                buffer[0][i] = (
+                    center + range * (oscillator_buffer[0][i])
+                );
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                Sample const min_value = min_buffer[i];
+                Sample const max_value = max_buffer[i];
+                Sample const center = (min_value + max_value) * 0.5;
+                Sample const range = max_value - min_value;
+
+                buffer[0][i] = (
+                    center + range * (oscillator_buffer[0][i])
+                );
+            }
+        }
+    }
+}
+
+
+void LFO::apply_distortions(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) {
     if (distortion_buffer == NULL) {
         Number const distortion = this->distortion.get_value();
 

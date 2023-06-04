@@ -83,7 +83,8 @@ class Oscillator : public SignalProducer
             FloatParam& amplitude_modulation_level_leader = dummy_param,
             FloatParam& frequency_modulation_level_leader = dummy_param,
             FloatParam& phase_modulation_level_leader = dummy_param,
-            ToggleParam& tempo_sync = dummy_toggle
+            ToggleParam& tempo_sync = dummy_toggle,
+            ToggleParam& center = dummy_toggle
         ) noexcept;
 
         Oscillator(
@@ -91,7 +92,8 @@ class Oscillator : public SignalProducer
             FloatParam& amplitude_leader,
             FloatParam& frequency_leader,
             FloatParam& phase_leader,
-            ToggleParam& tempo_sync = dummy_toggle
+            ToggleParam& tempo_sync = dummy_toggle,
+            ToggleParam& center = dummy_toggle
         ) noexcept;
 
         Oscillator(
@@ -177,12 +179,12 @@ class Oscillator : public SignalProducer
         void free_buffers() noexcept;
 
         template<bool is_lfo_>
-        void initialize_frequency_scale(
+        void apply_toggle_params(
             typename std::enable_if<is_lfo_, Number const>::type bpm
         ) noexcept;
 
         template<bool is_lfo_>
-        void initialize_frequency_scale(
+        void apply_toggle_params(
             typename std::enable_if<!is_lfo_, Number const>::type bpm
         ) noexcept;
 
@@ -240,6 +242,7 @@ class Oscillator : public SignalProducer
         ) noexcept;
 
         ToggleParam& tempo_sync;
+        ToggleParam& center;
         WavetableState wavetable_state;
         Wavetable const* wavetables[WAVEFORMS];
         Wavetable const* wavetable;
@@ -260,6 +263,7 @@ class Oscillator : public SignalProducer
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
         bool phase_is_constant;
+        bool is_centered_lfo;
 };
 
 }

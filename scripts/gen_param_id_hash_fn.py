@@ -297,6 +297,14 @@ params = [
     "CF2LOG",
     "EF1LOG",
     "EF2LOG",
+    "L1CEN",
+    "L2CEN",
+    "L3CEN",
+    "L4CEN",
+    "L5CEN",
+    "L6CEN",
+    "L7CEN",
+    "L8CEN",
 ]
 
 
