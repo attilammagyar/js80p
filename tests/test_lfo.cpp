@@ -169,3 +169,58 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
         expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
     );
 })
+
+
+TEST(lfo_performance, {
+    /*
+    Usage: ./build/x86_64-gpp/test_lfo-scale lfo_performance ON|OFF number-of-samples-to-render
+    */
+    LFO lfo("L1");
+
+    if (TEST_ARGV.size() < 3) {
+        return;
+    }
+
+    Integer const rounds = atoi(TEST_ARGV.back().c_str());
+
+    assert_gt(rounds, 0, "Number of rounds to render must be positive");
+
+    TEST_ARGV.pop_back();
+
+    std::string const center = TEST_ARGV.back();
+
+    if (center == "ON") {
+        lfo.center.set_value(ToggleParam::ON);
+    } else if (center == "OFF") {
+        lfo.center.set_value(ToggleParam::OFF);
+    } else {
+        assert_true(
+            false,
+            "Unknown setting for LFO::center: \"%s\" - must be \"ON\" or \"OFF\"\n",
+            TEST_ARGV[2]
+        );
+    }
+
+    lfo.set_block_size(BLOCK_SIZE);
+    lfo.set_sample_rate(SAMPLE_RATE);
+    lfo.amount.set_value(0.99);
+    lfo.amount.schedule_linear_ramp(5.0, 1.0);
+
+    Number const total_sample_count = (Number)(BLOCK_SIZE * rounds);
+
+    Integer number_of_rendered_samples = 0;
+    Number sum = 0.0;
+
+    for (Integer round = 0; round != rounds; ++round) {
+        Sample const* const* const rendered_samples = (
+            SignalProducer::produce<LFO>(&lfo, round)
+        );
+        number_of_rendered_samples += BLOCK_SIZE;
+
+        for (Integer i = 0; i != BLOCK_SIZE; ++i) {
+            sum += rendered_samples[0][i];
+        }
+    }
+
+    assert_lt(-100000.0, sum / total_sample_count);
+})

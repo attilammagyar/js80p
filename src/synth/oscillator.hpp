@@ -258,12 +258,12 @@ class Oscillator : public SignalProducer
         Number phase_value;
         Seconds start_time_offset;
         Number frequency_scale;
+        Sample sample_offset_scale;
         bool is_on_;
         bool is_starting;
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
         bool phase_is_constant;
-        bool is_centered_lfo;
 };
 
 }

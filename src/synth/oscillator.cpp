@@ -482,7 +482,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::apply_toggle_params(
             : 1.0
     );
 
-    is_centered_lfo = center.get_value() == ToggleParam::ON;
+    sample_offset_scale = center.get_value() == ToggleParam::ON ? 0.0 : 1.0;
 }
 
 
@@ -875,11 +875,16 @@ Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
         typename std::enable_if<is_lfo_, Sample const>::type frequency,
         typename std::enable_if<is_lfo_, Sample const>::type phase
 ) noexcept {
-    Sample const sample = amplitude * wavetable->lookup(
+    /*
+    We could set a bool flag in apply_toggle_params() to indicate if the offset
+    has to be added, so no multiplication would be necessary, but in practice,
+    there doesn't seem to be a significant performance difference between the
+    two approaches.
+    */
+
+    return amplitude * sample_offset_scale + amplitude * wavetable->lookup(
         &wavetable_state, frequency * frequency_scale, phase
     );
-
-    return is_centered_lfo ? sample : amplitude + sample;
 }
 
 
