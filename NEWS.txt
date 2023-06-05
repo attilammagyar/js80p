@@ -19,6 +19,9 @@ v1.5.0 (2023-06-??)
  * Bugfix: make sure that before a patch (or program or bank) is imported, all
    parameter controllers are released, and all scheduled parameter values are
    cleared, so that they will not override the imported values.
+ * Bugfix: unlike the Fine Detune parameter, the Detune parameter should not
+   be smoothed when it has a MIDI Controller or a Flexible Controller assigned
+   to it.
 
 v1.4.0 (2023-05-20)
  * MIDI Learn: assign this special controller to a parameter, then move a

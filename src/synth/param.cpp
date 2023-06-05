@@ -778,75 +778,122 @@ Sample const* const* FloatParam::initialize_rendering(
     Param<Number>::initialize_rendering(round, sample_count);
 
     if (lfo != NULL) {
-        lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
-
-        if (is_ratio_same_as_value) {
-            if (sample_count > 0) {
-                store_new_value(lfo_buffer[0][sample_count - 1]);
-            }
-
-            return lfo_buffer;
-        }
+        return process_lfo(round, sample_count);
     } else if (midi_controller != NULL) {
-        Queue<Event>::SizeType const number_of_ctl_events = (
-            midi_controller->events.length()
-        );
+        return process_midi_controller_events();
+    } else if (flexible_controller != NULL) {
+        return process_flexible_controller(sample_count);
+    }
 
-        if (number_of_ctl_events != 0) {
-            Queue<Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
+    return NULL;
+}
 
-            cancel_events(0.0);
 
-            Seconds previous_time_offset = 0.0;
-            Number previous_ratio = value_to_ratio(get_raw_value());
+Sample const* const* FloatParam::process_lfo(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
 
-            for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
-                Seconds time_offset = midi_controller->events[i].time_offset;
+    if (is_ratio_same_as_value) {
+        if (sample_count > 0) {
+            store_new_value(lfo_buffer[0][sample_count - 1]);
+        }
 
-                while (i != last_ctl_event_index) {
-                    ++i;
+        return lfo_buffer;
+    }
 
-                    Seconds const delta = std::fabs(
-                        midi_controller->events[i].time_offset - time_offset
-                    );
+    return NULL;
+}
 
-                    if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
-                        --i;
-                        break;
-                    }
-                }
 
-                time_offset = midi_controller->events[i].time_offset;
+Sample const* const* FloatParam::process_midi_controller_events() noexcept
+{
+    Queue<Event>::SizeType const number_of_ctl_events = (
+        midi_controller->events.length()
+    );
 
-                Number const controller_value = midi_controller->events[i].number_param_1;
-                Seconds const duration = smooth_change_duration(
-                    previous_ratio,
-                    controller_value,
-                    time_offset - previous_time_offset
-                );
-                previous_ratio = controller_value;
-                schedule_linear_ramp(duration, ratio_to_value(controller_value));
-                previous_time_offset = time_offset;
+    if (number_of_ctl_events == 0) {
+        return NULL;
+    }
+
+    cancel_events(0.0);
+
+    if (should_round) {
+        for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+            Seconds const time_offset = midi_controller->events[i].time_offset;
+            Number const controller_value = midi_controller->events[i].number_param_1;
+
+            schedule_value(time_offset, ratio_to_value(controller_value));
+        }
+
+        return NULL;
+    }
+
+    Queue<Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
+
+    Seconds previous_time_offset = 0.0;
+    Number previous_ratio = value_to_ratio(get_raw_value());
+
+    for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+        Seconds time_offset = midi_controller->events[i].time_offset;
+
+        while (i != last_ctl_event_index) {
+            ++i;
+
+            Seconds const delta = std::fabs(
+                midi_controller->events[i].time_offset - time_offset
+            );
+
+            if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
+                --i;
+                break;
             }
         }
-    } else if (flexible_controller != NULL) {
-        flexible_controller->update();
 
-        Integer const new_change_index = flexible_controller->get_change_index();
+        time_offset = midi_controller->events[i].time_offset;
 
-        if (new_change_index != flexible_controller_change_index) {
-            flexible_controller_change_index = new_change_index;
+        Number const controller_value = midi_controller->events[i].number_param_1;
+        Seconds const duration = smooth_change_duration(
+            previous_ratio,
+            controller_value,
+            time_offset - previous_time_offset
+        );
+        previous_ratio = controller_value;
+        schedule_linear_ramp(duration, ratio_to_value(controller_value));
+        previous_time_offset = time_offset;
+    }
 
-            cancel_events(0.0);
+    return NULL;
+}
 
-            Number const controller_value = flexible_controller->get_value();
-            Seconds const duration = smooth_change_duration(
-                value_to_ratio(get_raw_value()),
-                controller_value,
-                (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period
-            );
-            schedule_linear_ramp(duration, ratio_to_value(controller_value));
-        }
+
+Sample const* const* FloatParam::process_flexible_controller(
+        Integer const sample_count
+) noexcept {
+    flexible_controller->update();
+
+    Integer const new_change_index = flexible_controller->get_change_index();
+
+    if (new_change_index == flexible_controller_change_index) {
+        return NULL;
+    }
+
+    flexible_controller_change_index = new_change_index;
+
+    cancel_events(0.0);
+
+    Number const controller_value = flexible_controller->get_value();
+
+    if (should_round) {
+        set_value(ratio_to_value(controller_value));
+    } else {
+        Seconds const duration = smooth_change_duration(
+            value_to_ratio(get_raw_value()),
+            controller_value,
+            (Seconds)std::max((Integer)0, sample_count - 1) * sampling_period
+        );
+        schedule_linear_ramp(duration, ratio_to_value(controller_value));
     }
 
     return NULL;

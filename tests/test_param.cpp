@@ -1111,7 +1111,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
 TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, (1.0 / 3.0) * 3.0 + (2.0 / 3.0) * (-2.5), -2.5, -2.5, -2.5,
+        3.0, 3.0, -2.5, -2.5, -2.5,
     };
     FloatParam float_param("float", -5.0, 5.0, 3.0, 0.5);
     MidiController midi_controller;
@@ -1207,7 +1207,7 @@ void test_follower_midi_controller()
 {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        3.0, (1.0 / 3.0) * 3.0 + (2.0 / 3.0) * (-2.5), -2.5, -2.5, -2.5,
+        3.0, 3.0, -2.5, -2.5, -2.5,
     };
     FloatParam leader("float", -5.0, 5.0, 3.0, 0.5);
     FloatParamClass follower(leader);
@@ -1261,7 +1261,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
 TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_flexible_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        1.0, 1.55, 2.1, 2.65, 3.0
+        3.0, 3.0, 3.0, 3.0, 3.0,
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParam float_param("float", 0.0, 10.0, 9.0, 1.0);
@@ -1415,16 +1415,12 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 })
 
 
-
-
-
-
 template<class FloatParamClass>
 void test_follower_flexible_controller()
 {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        1.0, 1.55, 2.1, 2.65, 3.0
+        3.0, 3.0, 3.0, 3.0, 3.0,
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParam leader("leader", 0.0, 10.0, 9.0, 1.0);

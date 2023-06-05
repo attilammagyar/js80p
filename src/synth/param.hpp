@@ -214,15 +214,20 @@ class FloatParam : public Param<Number>
         Number value_to_ratio(Number const value) const noexcept;
 
         Integer get_change_index() const noexcept;
+
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
         ) noexcept;
+
         bool is_constant_until(Integer const sample_count) const noexcept;
+
         void skip_round(Integer const round, Integer const sample_count) noexcept;
+
         void schedule_value(
             Seconds const time_offset,
             Number const new_value
         ) noexcept;
+
         void schedule_linear_ramp(
             Seconds const duration,
             Number const target_value
@@ -233,6 +238,7 @@ class FloatParam : public Param<Number>
         void set_flexible_controller(
             FlexibleController* flexible_controller
         ) noexcept;
+
         FlexibleController const* get_flexible_controller() const noexcept;
 
         void set_envelope(Envelope const* const envelope) noexcept;
@@ -297,6 +303,17 @@ class FloatParam : public Param<Number>
         void handle_cancel_event(Event const& event) noexcept;
 
         bool is_following_leader() const noexcept;
+
+        Sample const* const* process_lfo(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
+        Sample const* const* process_midi_controller_events() noexcept;
+
+        Sample const* const* process_flexible_controller(
+            Integer const sample_count
+        ) noexcept;
 
         Seconds smooth_change_duration(
             Number const previous_value,
