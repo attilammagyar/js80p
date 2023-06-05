@@ -69,7 +69,9 @@ main()
 
     mkdir -p "dist/$source_dir"
     cp --verbose --recursive \
-        build.* \
+        build.bat \
+        build.ps1 \
+        build.sh \
         Doxyfile \
         gui \
         js80p.png \
