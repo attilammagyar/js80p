@@ -25,7 +25,7 @@
 #define FST_fst_h_
 
 #define FST_MAJOR_VERSION 0
-#define FST_MINOR_VERSION 122
+#define FST_MINOR_VERSION 123
 #define FST_MICRO_VERSION 0
 
 #define FST_VERSIONNUM(X, Y, Z)                                         \
@@ -36,13 +36,13 @@
 #define _FST_STRING2(x) #x
 #define _FST_STRING(x) _FST_STRING2(x)
 #define _FST_PRAGMA(x) _Pragma(#x)
-// #if defined(__GNUC__) || defined(__clang__)
-/* # define FST_WARNING(x) _FST_PRAGMA(GCC warning x) */
-/* #elif defined _MSC_VER */
-/* # define FST_WARNING(x) __pragma(message(__FILE__ ":" _FST_STRING(__LINE__) ": warning: " x)) */
-/* #else */
+#if defined(__GNUC__) || defined(__clang__)
+# define FST_WARNING(x) _FST_PRAGMA(GCC warning x)
+#elif defined _MSC_VER
+# define FST_WARNING(x) __pragma(message(__FILE__ ":" _FST_STRING(__LINE__) ": warning: " x))
+#else
 # define FST_WARNING(x)
-/* #endif */
+#endif
 
 
 /* helper macros for marking values as compatible with the original SDK */
@@ -159,7 +159,7 @@ typedef enum {
 
 
 
-
+  FST_HOST_OPCODE(UpdateDisplay, 42), /* return 1; triggers effGetProgram* */
   FST_HOST_OPCODE(BeginEdit, 43), /* IN:index, return 0 */
   FST_HOST_OPCODE(EndEdit, 44), /* IN:index, return 0 */
 
@@ -169,7 +169,6 @@ typedef enum {
   FST_HOST_OPCODE_UNKNOWN(CloseWindow), /* ?, return 0 */
   FST_HOST_OPCODE_UNKNOWN(OpenWindow), /* ?, return 0 */
   FST_HOST_OPCODE_UNKNOWN(SetIcon), /* ?, return 0 */
-  FST_HOST_OPCODE_UNKNOWN(UpdateDisplay), /* return 0 */
 
   FST_HOST_OPCODE_UNKNOWN(GetParameterQuantization), /* ?, return 0 */
   FST_HOST_OPCODE_UNKNOWN(GetNumAutomatableParameters),

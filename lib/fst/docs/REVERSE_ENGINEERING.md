@@ -4030,6 +4030,64 @@ NOTE: while this makes the *ArpeggiatorTutorial* and friends work,
 they still crash when opening a second JUCE plugin. hmmm...
 
 
+## audioMasterUpdateDisplay
+Sometimes later (2023-06-01) somebody complained that `audioMasterUpdateDisplay` is not implemented by FST,
+and therefore some DAWs (like REAPER) do not update the display of any parameters that change "under the hood".
+
+Checking the JUCE source code ("modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp"),
+we see that the `audioMasterUpdateDisplay` opcode is used whenever
+- a "parameter info" changes
+- a "program change" occurs
+(we also see that if there is a "latency change", JUCE is going to call the `audioMasterIOChanged` opcode).
+
+So we need to find a host-opcode, that in turn triggers a re-query of the plugin's program and parameter info.
+
+In JUCE, the `audioMasterUpdateDisplay` opcode is called with all parameters set to `0`:
+```
+constexpr FlagPair pairs[] { { Vst2::audioMasterUpdateDisplay, audioMasterUpdateDisplayBit },
+                             { Vst2::audioMasterIOChanged,     audioMasterIOChangedBit } };
+
+for (const auto& pair : pairs)
+    if ((callbacksToFire & pair.bit) != 0)
+    callback (&owner.vstEffect, pair.opcode, 0, 0, nullptr, 0);
+```
+
+So we hook something like the following in a callback (e.g. to `effEditClose`),
+assuming that the opcode has an ID lower than 256 (which seems to be a safe assumption,
+given that the highest audioMaster opcode we've seen so far is 44...):
+
+
+```C
+for(size_t opcode=0; opcode<256; opcode++) {
+    int res;
+    if(hostKnown(opcode))
+      continue;
+    printf("test opcode(%d)", opcode);
+    res =  dispatch_v(eff, opcode, 0, 0, NULL, 0.0);
+    printf("test opcode(%d) -> %d\n", opcode, res);
+}
+```
+
+Only two opcodes have any interesting results:
+
+| opcode | return | side-effect                                   |
+|--------|--------|-----------------------------------------------|
+| 11     | 3      |                                               |
+| 12     | 1      |                                               |
+| 13     | 1      |                                               |
+| 19     | 0x600  |                                               |
+| 42     | 1      | calls `effGetProgram` and `effGetProgramName` |
+| other  | 0      |                                               |
+
+So, opcode `42` rescans the the current program and retrieces its name,
+which closely matches our expectation of what `audioMasterUpdateDisplay`
+is supposed to do ("triggers a re-query of the plugin's program [...] info.").
+
+So for now, we assume that we have found a new audioMaster opcode:
+
+| opcode                            | value |
+|-----------------------------------|-------|
+| audioMasterUpdateDisplay          | 42    |
 
 
 # Summary
@@ -4050,7 +4108,6 @@ Trying to compile JUCE plugins or plugin-hosts, we still miss a considerable num
 | `audioMasterNeedIdle`                    |
 | `audioMasterPinConnected`                |
 | `audioMasterSetOutputSampleRate`         |
-| `audioMasterUpdateDisplay`               |
 |------------------------------------------|
 | `effConnect(In,Out)put`                  |
 | `effEdit(Draw,Mouse,Sleep,Top)`          |
@@ -4079,12 +4136,14 @@ that we don't know yet:
 | audioHost* | 3     |
 | audioHost* | 13    |
 | audioHost* | 14    |
-| audioHost* | 42    |
 |------------|-------|
 | eff*       | 53    |
 | eff*       | 56    |
 | eff*       | 62    |
 | eff*       | 66    |
+
+
+
 
 
 # misc
@@ -4094,7 +4153,6 @@ LATER move this to proper sections
 ## hostCode:3
 ## hostCode:13
 ## hostCode:14
-## hostCode:42
 
 ## effCode:53
 
@@ -4150,6 +4208,28 @@ Unfortunately we do not now the opcode name for this.
 Given that there's a `effGetCurrentMidiProgram` opcode,
 my guess would be something along the lines of `effGetMidiNoteName`.
 
+## effEditDraw
+
+The `reaper_plugin_fx_embed.h` shipped with JUCE says, about REAPER
+
+```md
+* to support via VST2: canDo("hasCockosEmbeddedUI") should return 0xbeef0000
+* dispatcher will be called with opcode=effVendorSpecific, index=effEditDraw, value=parm2, ptr=(void*)(INT_PTR)parm3, opt=message (REAPER_FXEMBED_WM_*)
+```
+
+This should give us a good guess on `effEditDraw`.
+Arming our dummy plugin to output `0xBEEF0000` when it is asked whether it can do "hasCockosEmbeddedUI", should make REAPER send it an `effVendorSpecific` opcode with the index being some meaningful opcode.
+
+Unfortunately, a quick check shows, that REAPER will send exactly the same to `index` values with the `effVendorSpecific` opcodes as when we answer the "hasCockosEmbeddedUI" with `0x0`:
+
+| opcode            | index      | value      | ptr            | opt |
+|-------------------|------------|------------|----------------|-----|
+| effVendorSpecific | 0x73744341 | 0x46554944 | 0x7ffc4fd12ea0 | 0.0 |
+```
+Fst::host2plugin(FstPlugin, effVendorSpecific[50], 1936999233=0x73744341, 1179994436=0x46554944, 0x7ffc4fd12ea0, 0.000000)
+Fst::host2plugin(FstPlugin, effVendorSpecific[50], 45=0x2D, 80=0x50, 0x7ffc4fd133a0, 0.000000)
+```
+
 
 ## even more symbols
 
@@ -4163,4 +4243,3 @@ my guess would be something along the lines of `effGetMidiNoteName`.
 | member         | VstTimeInfo.samplesToNextClock | vstplugin~ |
 |----------------|--------------------------------|------------|
 | type           | VstAEffectFlags                | vstplugin~ |
-
