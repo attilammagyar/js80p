@@ -1,4 +1,4 @@
-v1.5.0 (2023-06-??)
+v1.5.0 (2023-06-06)
  * Improved MIDI CC smoothing
  * Parameters can now be controlled via Channel Aftertouch (Channel Pressure).
  * With the help of Patrik Ehringer (ZonderP), program and bank management is
@@ -14,6 +14,9 @@ v1.5.0 (2023-06-??)
    all other MIDI CC events to plugin parameters.
  * LFOs can now oscillate around the midpoint between the minimum and maximum
    value.
+ * New presets: kalimba.js80p, chariots-aftertouch.js80p
+ * Presets that have both pitch bends and vibrato now use LFO centering so that
+   they won't go out of tune.
  * Bugfix: the VST3 plugin will now process all controller changes within a
    block, not just the last one
  * Bugfix: make sure that before a patch (or program or bank) is imported, all
