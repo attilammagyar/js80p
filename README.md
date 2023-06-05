@@ -258,9 +258,8 @@ out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
 known as Channel Aftertouch)  messages are among the kinds MIDI data that it
 swallows.
 
-Getting the Channel Pressure (also known as Channel Aftertouch) to work in
-FL Studio is a similar, but slightly more complicated procedure than setting up
-MIDI CC:
+Getting the Channel Pressure to work in FL Studio is a similar, but slightly
+more complicated procedure than setting up MIDI CC:
 
 1. Click on the small triangle in the top left corner of the plugin window of
    JS80P, and select the "_Browse parameters_" menu item.
