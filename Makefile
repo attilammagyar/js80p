@@ -381,16 +381,26 @@ $(OBJ_VST3_MAIN): \
 		$(TARGET_PLATFORM_CXXINCS) $(VST3_CXXINCS) $(VST3_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG) -c $< -o $@
 
+$(BUILD_DIR)/perf_math$(EXE): \
+		tests/performance/perf_math.cpp \
+		src/synth/math.hpp src/synth/math.cpp \
+		src/js80p.hpp \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
 $(BUILD_DIR)/test_example$(EXE): \
 	tests/test_example.cpp \
 	$(TEST_LIBS) \
 	| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/test_envelope$(EXE): \
-		tests/test_envelope.cpp \
-		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+$(BUILD_DIR)/test_bank$(EXE): \
+		tests/test_bank.cpp \
+		src/bank.cpp src/bank.hpp \
+		src/serializer.cpp src/serializer.hpp \
 		$(TEST_LIBS) \
+		$(SYNTH_HEADERS) \
+		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
@@ -427,6 +437,13 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
 		src/synth/distortion.cpp src/synth/distortion.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_envelope$(EXE): \
+		tests/test_envelope.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -488,16 +505,6 @@ $(BUILD_DIR)/test_param$(EXE): \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/test_bank$(EXE): \
-		tests/test_bank.cpp \
-		src/bank.cpp src/bank.hpp \
-		src/serializer.cpp src/serializer.hpp \
-		$(TEST_LIBS) \
-		$(SYNTH_HEADERS) \
-		$(SYNTH_SOURCES) \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
-
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
@@ -545,12 +552,5 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 		src/synth/wavefolder.cpp src/synth/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
-
-$(BUILD_DIR)/perf_math$(EXE): \
-		tests/performance/perf_math.cpp \
-		src/synth/math.hpp src/synth/math.cpp \
-		src/js80p.hpp \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
