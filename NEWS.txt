@@ -1,3 +1,7 @@
+v1.5.1 (2023-06-07)
+ * Bugfix: eliminate noise in FL Studio when the delay time for the Echo effect
+   is set to extremely low values (few milliseconds).
+
 v1.5.0 (2023-06-06)
  * Improved MIDI CC smoothing
  * Parameters can now be controlled via Channel Aftertouch (Channel Pressure).

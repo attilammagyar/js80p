@@ -138,8 +138,8 @@ FUnknown* Vst3Plugin::Processor::createInstance(void* unused)
 
 Vst3Plugin::Processor::Processor()
     : synth(),
+    renderer(synth),
     bank(NULL),
-    round(-1),
     events(4096),
     new_program(0),
     need_to_load_new_program(false)
@@ -234,6 +234,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::setupProcessing(Vst::ProcessSetup& set
 {
     synth.set_block_size((Integer)setup.maxSamplesPerBlock);
     synth.set_sample_rate((Frequency)setup.sampleRate);
+    renderer.reset();
 
     return AudioEffect::setupProcessing(setup);
 }
@@ -244,10 +245,12 @@ tresult PLUGIN_API Vst3Plugin::Processor::setActive(TBool state)
     if (state)
     {
         synth.resume();
+        renderer.reset();
     }
     else
     {
         synth.suspend();
+        renderer.reset();
     }
 
     return AudioEffect::setActive(state);
@@ -543,42 +546,18 @@ void Vst3Plugin::Processor::update_bpm(Vst::ProcessData& data) noexcept
 void Vst3Plugin::Processor::generate_samples(Vst::ProcessData& data) noexcept
 {
     if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64) {
-        generate_samples<double>(
-            data.numSamples,
+        renderer.write_next_round<double>(
+            (Integer)data.numSamples,
             (double**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32) {
-        generate_samples<float>(
-            data.numSamples,
+        renderer.write_next_round<float>(
+            (Integer)data.numSamples,
             (float**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else {
         return;
     }
-}
-
-
-template<typename NumberType>
-void Vst3Plugin::Processor::generate_samples(
-        Integer const sample_count,
-        NumberType** samples
-) noexcept {
-    Sample const* const* buffer = render_next_round(sample_count);
-
-    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
-        for (Integer i = 0; i != sample_count; ++i) {
-            samples[c][i] = (NumberType)buffer[c][i];
-        }
-    }
-}
-
-
-Sample const* const* Vst3Plugin::Processor::render_next_round(
-        Integer const sample_count
-) noexcept {
-    round = (round + 1) & ROUND_MASK;
-
-    return synth.generate_samples(round, (Integer)sample_count);
 }
 
 

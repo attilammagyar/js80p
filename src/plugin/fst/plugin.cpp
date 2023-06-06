@@ -366,8 +366,8 @@ FstPlugin::FstPlugin(
     effect(effect),
     host_callback(host_callback),
     platform_data(platform_data),
-    round(0),
     gui(NULL),
+    renderer(synth),
     serialized_bank(""),
     next_program(0),
     save_current_patch_before_changing_program(false),
@@ -417,18 +417,21 @@ void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
 void FstPlugin::set_block_size(VstIntPtr const new_block_size) noexcept
 {
     synth.set_block_size((Integer)new_block_size);
+    renderer.reset();
 }
 
 
 void FstPlugin::suspend() noexcept
 {
     synth.suspend();
+    renderer.reset();
 }
 
 
 void FstPlugin::resume() noexcept
 {
     synth.resume();
+    renderer.reset();
     host_callback(effect, audioMasterWantMidi, 0, 1, NULL, 0.0f);
 }
 
@@ -472,13 +475,11 @@ void FstPlugin::generate_samples(
         return;
     }
 
-    Sample const* const* buffer = render_next_round(sample_count);
+    handle_program_change();
+    handle_parameter_changes();
+    update_bpm();
 
-    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
-        for (VstInt32 i = 0; i != sample_count; ++i) {
-            samples[c][i] = (NumberType)buffer[c][i];
-        }
-    }
+    renderer.write_next_round<NumberType>(sample_count, samples);
 
     /*
     It would be nice to notify the host about param changes that originate from
@@ -498,18 +499,6 @@ void FstPlugin::generate_samples(
             // );
         // }
     // }
-}
-
-
-Sample const* const* FstPlugin::render_next_round(VstInt32 sample_count) noexcept
-{
-    handle_program_change();
-    handle_parameter_changes();
-
-    round = (round + 1) & ROUND_MASK;
-    update_bpm();
-
-    return synth.generate_samples(round, (Integer)sample_count);
 }
 
 
@@ -617,13 +606,11 @@ void FstPlugin::generate_and_add_samples(
         return;
     }
 
-    Sample const* const* buffer = render_next_round(sample_count);
+    handle_program_change();
+    handle_parameter_changes();
+    update_bpm();
 
-    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
-        for (VstInt32 i = 0; i != sample_count; ++i) {
-            samples[c][i] += (float)buffer[c][i];
-        }
-    }
+    renderer.add_next_round<float>(sample_count, samples);
 }
 
 
@@ -632,6 +619,7 @@ void FstPlugin::import_patch(const std::string& patch) noexcept
     synth.process_messages();
     Serializer::import(&synth, patch);
     synth.process_messages();
+    renderer.reset();
 }
 
 

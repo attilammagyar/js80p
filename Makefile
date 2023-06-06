@@ -122,6 +122,7 @@ TESTS = \
 	test_param \
 	test_bank \
 	test_queue \
+	test_renderer \
 	test_serializer \
 	test_signal_producer \
 	test_synth \
@@ -151,6 +152,7 @@ JS80P_HEADERS = \
 	src/gui/gui.hpp \
 	src/gui/widgets.hpp \
 	src/bank.hpp \
+	src/renderer.hpp \
 	src/serializer.hpp \
 	$(SYNTH_HEADERS)
 
@@ -268,6 +270,7 @@ check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
@@ -509,6 +512,15 @@ $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
 		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_renderer$(EXE): \
+		tests/test_renderer.cpp \
+		src/renderer.hpp \
+		$(TEST_LIBS) \
+		$(SYNTH_HEADERS) \
+		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 

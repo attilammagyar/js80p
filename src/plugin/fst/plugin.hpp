@@ -29,6 +29,7 @@
 #include "bank.hpp"
 #include "js80p.hpp"
 #include "midi.hpp"
+#include "renderer.hpp"
 #include "synth.hpp"
 
 
@@ -162,8 +163,6 @@ class FstPlugin : public Midi::EventHandler
         Synth synth;
 
     private:
-        static constexpr Integer ROUND_MASK = 0x7fff;
-
         class Parameter
         {
             public:
@@ -209,7 +208,6 @@ class FstPlugin : public Midi::EventHandler
         void update_bpm() noexcept;
         void update_host_display() noexcept;
 
-        Sample const* const* render_next_round(VstInt32 sample_count) noexcept;
         void handle_program_change() noexcept;
         void handle_parameter_changes() noexcept;
 
@@ -224,8 +222,8 @@ class FstPlugin : public Midi::EventHandler
         GUI::PlatformData const platform_data;
 
         ERect window_rect;
-        Integer round;
         GUI* gui;
+        Renderer renderer;
         Bank bank;
         std::string serialized_bank;
         size_t next_program;

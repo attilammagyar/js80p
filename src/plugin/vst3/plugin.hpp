@@ -34,6 +34,7 @@
 
 #include "bank.hpp"
 #include "js80p.hpp"
+#include "renderer.hpp"
 #include "synth.hpp"
 
 
@@ -125,8 +126,6 @@ class Vst3Plugin
                 tresult PLUGIN_API getState(IBStream* state) SMTG_OVERRIDE;
 
             private:
-                static constexpr Integer ROUND_MASK = 0x7fff;
-
                 void share_synth() noexcept;
                 void block_rendered() noexcept;
 
@@ -151,17 +150,9 @@ class Vst3Plugin
 
                 void import_patch(std::string const& serialized) noexcept;
 
-                template<typename NumberType>
-                void generate_samples(
-                    Integer const sample_count,
-                    NumberType** samples
-                ) noexcept;
-
-                Sample const* const* render_next_round(Integer const sample_count) noexcept;
-
                 Synth synth;
+                Renderer renderer;
                 Bank const* bank;
-                Integer round;
                 std::vector<Event> events;
                 size_t new_program;
                 bool need_to_load_new_program;
