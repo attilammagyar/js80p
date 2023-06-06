@@ -189,9 +189,10 @@ code {
       <li><p>MIDI Learn now listens for changes in these new MIDI CC proxy parameters
       as well, which is useful for hosts that refuse to send the raw MIDI CC
       events to plugins, but allow automating parameters via MIDI CC. One
-      example of such a host is FL Studio which only sends the modulation wheel's
-      MIDI CC messages as actual MIDI CC data, and forces users to manually assign
-      all other MIDI CC events to plugin parameters.</p></li>
+      example of such a host is <a href="https://www.image-line.com/fl-studio/">FL Studio</a>
+      which only sends the modulation wheel's MIDI CC messages as actual MIDI
+      CC data, and forces users to manually assign all other MIDI CC events to
+      plugin parameters.</p></li>
       <li><p>LFOs can now oscillate around the midpoint between the minimum and maximum
       value.</p></li>
       <li><p>New presets: kalimba.js80p, chariots-aftertouch.js80p</p></li>
@@ -363,11 +364,13 @@ code {
     <div class="section" id="faq-flstudio-midicc">
       <h3>How to assign a MIDI CC to a JS80P parameter in FL Studio?</h3>
 
-      <p>Unlike decent audio software, FL Studio does not send all MIDI events that
+      <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/">Reaper</a>),
+      <a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI events that
       come out of your MIDI keyboard to plugins, and unfortunately,
-      <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2">MIDI Control Change</a> (MIDI CC) messages are among the kinds of MIDI
-      data that it swallows. To make everything work, you have to assign the MIDI CC
-      events to a plugin parameter.</p>
+      <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2">MIDI Control Change (MIDI CC)</a>
+      messages are among the kinds of MIDI data that it swallows. To make
+      everything work, you have to assign the MIDI CC events to a plugin
+      parameter.</p>
 
       <p>JS80P does not directly export its parameters (in order to avoid conflict
       between the host's automations and JS80P's internal control assignments), but
@@ -393,8 +396,9 @@ code {
     <div class="section" id="faq-flstudio-aftertouch">
       <h3>How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?</h3>
 
-      <p>Unlike decent audio software, FL Studio does not send all MIDI events that come
-      out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
+      <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/">Reaper</a>),
+      <a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI events that
+      come out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
       known as Channel Aftertouch)  messages are among the kinds MIDI data that it
       swallows.</p>
 
