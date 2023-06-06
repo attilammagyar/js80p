@@ -217,11 +217,12 @@ turning the modulation wheel on a MIDI keyboard.
 
 ### How to assign a MIDI CC to a JS80P parameter in FL Studio?
 
-Unlike decent audio software, FL Studio does not send all MIDI events that
-come out of your MIDI keyboard to plugins, and unfortunately,
-[MIDI Control Change][midicc2] (MIDI CC) messages are among the kinds of MIDI
-data that it swallows. To make everything work, you have to assign the MIDI CC
-events to a plugin parameter.
+Unlike decent audio software (like for example
+[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
+does not send all MIDI events that come out of your MIDI keyboard to plugins,
+and unfortunately, [MIDI Control Change (MIDI CC)][midicc2] messages are among
+the kinds of MIDI data that it swallows. To make everything work, you have to
+assign the MIDI CC events to a plugin parameter.
 
   [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
 
@@ -253,10 +254,11 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 
 ### How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?
 
-Unlike decent audio software, FL Studio does not send all MIDI events that come
-out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
-known as Channel Aftertouch)  messages are among the kinds MIDI data that it
-swallows.
+Unlike decent audio software (like for example
+[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
+does not send all MIDI events that come out of your MIDI keyboard to plugins,
+and unfortunately, Channel Pressure (also known as Channel Aftertouch)
+messages are among the kinds MIDI data that it swallows.
 
 Getting the Channel Pressure to work in FL Studio is a similar, but slightly
 more complicated procedure than setting up MIDI CC:
