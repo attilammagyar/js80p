@@ -18,6 +18,7 @@ except ImportError as error:
 def main(argv):
     if len(argv) < 3:
         print(f"Usage: {os.path.basename(argv[0])} source.bmp destination.png", file=sys.stderr)
+        return 1
 
     src = Image.open(argv[1])
     src.save(argv[2])
