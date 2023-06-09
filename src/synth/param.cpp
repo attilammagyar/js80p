@@ -221,6 +221,12 @@ Sample const* const* FloatParam::produce(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    Envelope* envelope = float_param->get_envelope();
+
+    if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+        envelope->update();
+    }
+
     if (float_param->is_following_leader()) {
         return SignalProducer::produce<FloatParam>(
             float_param->leader, round, sample_count
@@ -274,8 +280,11 @@ FloatParam::FloatParam(
     leader(NULL),
     flexible_controller(NULL),
     flexible_controller_change_index(-1),
-    envelope(NULL),
     lfo(NULL),
+    envelope(NULL),
+    envelope_change_index(-1),
+    envelope_stage(EnvelopeStage::NONE),
+    envelope_end_scheduled(false),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         std::fabs(min_value - 0.0) < 0.000001
@@ -302,8 +311,11 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     log_scale_inv_table_scale(leader.log_scale_inv_table_scale),
     leader(&leader),
     flexible_controller(NULL),
-    envelope(NULL),
     lfo(NULL),
+    envelope(NULL),
+    envelope_change_index(-1),
+    envelope_stage(EnvelopeStage::NONE),
+    envelope_end_scheduled(false),
     should_round(false),
     is_ratio_same_as_value(
         std::fabs(min_value - 0.0) < 0.000001
@@ -460,6 +472,14 @@ bool FloatParam::is_constant_until(Integer const sample_count) const noexcept
         return false;
     }
 
+    Envelope* envelope = get_envelope();
+
+    if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+        envelope->update();
+
+        return envelope_change_index == envelope->get_change_index();
+    }
+
     if (midi_controller != NULL) {
         return (
             midi_controller->events.is_empty()
@@ -490,6 +510,16 @@ void FloatParam::skip_round(
     } else if (cached_round != round && !events.is_empty()) {
         current_time += (Seconds)sample_count * sampling_period;
         cached_round = round;
+
+        if (envelope_stage != EnvelopeStage::NONE) {
+            Seconds const offset = sample_count_to_relative_time_offset(sample_count);
+
+            envelope_position += offset;
+
+            if (envelope_end_scheduled) {
+                envelope_end_time_offset -= offset;
+            }
+        }
     }
 }
 
@@ -539,6 +569,14 @@ void FloatParam::handle_event(Event const& event) noexcept
 
         case EVT_LOG_RAMP:
             handle_log_ramp_event(event);
+            break;
+
+        case EVT_ENVELOPE_START:
+            handle_envelope_start_event(event);
+            break;
+
+        case EVT_ENVELOPE_END:
+            handle_envelope_end_event(event);
             break;
 
         case EVT_CANCEL:
@@ -626,6 +664,19 @@ void FloatParam::handle_log_ramp_event(Event const& event) noexcept
 }
 
 
+void FloatParam::handle_envelope_start_event(Event const& event) noexcept
+{
+    envelope_stage = EnvelopeStage::DAHDS;
+    envelope_position = current_time - event.time_offset;
+}
+
+
+void FloatParam::handle_envelope_end_event(Event const& event) noexcept
+{
+    envelope_stage = EnvelopeStage::R;
+}
+
+
 void FloatParam::handle_cancel_event(Event const& event) noexcept
 {
     if (latest_event_type == EVT_LINEAR_RAMP) {
@@ -684,13 +735,23 @@ FlexibleController const* FloatParam::get_flexible_controller() const noexcept
 }
 
 
-void FloatParam::set_envelope(Envelope const* const envelope) noexcept
+void FloatParam::set_envelope(Envelope* const envelope) noexcept
 {
     this->envelope = envelope;
+
+    if (envelope != NULL) {
+        envelope->update();
+        envelope_change_index = envelope->get_change_index();
+    }
+
+    envelope_stage = EnvelopeStage::NONE;
+    envelope_end_scheduled = false;
+    envelope_position = 0.0;
+    envelope_end_time_offset = 0.0;
 }
 
 
-Envelope const* FloatParam::get_envelope() const noexcept
+Envelope* FloatParam::get_envelope() const noexcept
 {
     return leader == NULL ? envelope : leader->envelope;
 }
@@ -699,8 +760,6 @@ Envelope const* FloatParam::get_envelope() const noexcept
 void FloatParam::start_envelope(Seconds const time_offset) noexcept
 {
     Seconds next_event_time_offset;
-    Seconds attack;
-    Number amount;
     Number next_value;
     Envelope const* const envelope = get_envelope();
 
@@ -708,11 +767,18 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
         return;
     }
 
+    envelope_stage = EnvelopeStage::NONE;
+    envelope_end_scheduled = false;
+    envelope_position = 0.0;
+    envelope_end_time_offset = 0.0;
+
     // initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
 
     cancel_events(time_offset);
 
-    amount = envelope->amount.get_value();
+    schedule(EVT_ENVELOPE_START, time_offset);
+
+    Number const amount = envelope->amount.get_value();
     next_value = ratio_to_value(amount * envelope->initial_value.get_value());
 
     schedule_value(time_offset, next_value);
@@ -721,7 +787,7 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
     );
     schedule_value(next_event_time_offset, next_value);
 
-    attack = (Seconds)envelope->attack_time.get_value();
+    Seconds const attack = (Seconds)envelope->attack_time.get_value();
     next_value = ratio_to_value(amount * envelope->peak_value.get_value());
     schedule_linear_ramp(attack, next_value);
 
@@ -743,19 +809,22 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
         return 0.0;
     }
 
-    Seconds const release_time = (Seconds)envelope->release_time.get_value();
+    envelope_release_time = (Seconds)envelope->release_time.get_value();
+    envelope_end_scheduled = true;
+    envelope_end_time_offset = time_offset;
 
     // current-v ==release-t==> release-v
 
     cancel_events(time_offset);
+    schedule(EVT_ENVELOPE_END, time_offset);
     schedule_linear_ramp(
-        release_time,
+        envelope_release_time,
         ratio_to_value(
             envelope->amount.get_value() * envelope->final_value.get_value()
         )
     );
 
-    return release_time;
+    return envelope_release_time;
 }
 
 
@@ -783,6 +852,12 @@ Sample const* const* FloatParam::initialize_rendering(
         return process_midi_controller_events();
     } else if (flexible_controller != NULL) {
         return process_flexible_controller(sample_count);
+    } else {
+        Envelope* const envelope = get_envelope();
+
+        if (envelope != NULL) {
+            return process_envelope(envelope);
+        }
     }
 
     return NULL;
@@ -922,6 +997,107 @@ Seconds FloatParam::smooth_change_duration(
 }
 
 
+
+Sample const* const* FloatParam::process_envelope(
+        Envelope* const envelope
+) noexcept {
+    if (envelope_stage == EnvelopeStage::NONE) {
+        return NULL;
+    }
+
+    if (envelope->dynamic.get_value() != ToggleParam::ON) {
+        return NULL;
+    }
+
+    Integer const new_change_index = envelope->get_change_index();
+    bool const has_changed = new_change_index != envelope_change_index;
+
+    envelope_change_index = new_change_index;
+
+    Number const amount = envelope->amount.get_value();
+
+    if (envelope_stage == EnvelopeStage::DAHDS) {
+        cancel_events(0.0);
+
+        if (envelope_position > envelope->get_dahd_length()) {
+            Number const sustain_value = ratio_to_value(
+                amount * envelope->sustain_value.get_value()
+            );
+
+            if (std::fabs(get_raw_value() - sustain_value) > 0.000001) {
+                schedule_linear_ramp(0.1, sustain_value);
+            }
+        } else {
+            Seconds next_event_time_offset = -envelope_position;
+
+            next_event_time_offset = schedule_envelope_value_if_not_reached(
+                next_event_time_offset,
+                envelope->delay_time,
+                envelope->initial_value,
+                amount
+            );
+            next_event_time_offset = schedule_envelope_value_if_not_reached(
+                next_event_time_offset,
+                envelope->attack_time,
+                envelope->peak_value,
+                amount
+            );
+            next_event_time_offset = schedule_envelope_value_if_not_reached(
+                next_event_time_offset,
+                envelope->hold_time,
+                envelope->peak_value,
+                amount
+            );
+            next_event_time_offset = schedule_envelope_value_if_not_reached(
+                next_event_time_offset,
+                envelope->decay_time,
+                envelope->sustain_value,
+                amount
+            );
+        }
+    }
+
+    if (envelope_end_scheduled && (has_changed || envelope_stage == EnvelopeStage::DAHDS)) {
+        if (envelope_end_time_offset < 0.0) {
+            envelope_end_time_offset = 0.0;
+        }
+
+        envelope_release_time = std::min(
+            envelope_release_time, (Seconds)envelope->release_time.get_value()
+        );
+
+        cancel_events(envelope_end_time_offset);
+        schedule(EVT_ENVELOPE_END, envelope_end_time_offset);
+        schedule_linear_ramp(
+            envelope_release_time,
+            ratio_to_value(amount * envelope->final_value.get_value())
+        );
+    }
+
+    return NULL;
+}
+
+
+Seconds FloatParam::schedule_envelope_value_if_not_reached(
+        Seconds const next_event_time_offset,
+        FloatParam const& time_param,
+        FloatParam const& value_param,
+        Number const amount
+) noexcept {
+    Seconds const duration = next_event_time_offset + time_param.get_value();
+
+    if (duration >= 0.0) {
+        schedule_linear_ramp(
+            duration, ratio_to_value(amount * value_param.get_value())
+        );
+
+        return 0.0;
+    }
+
+    return duration;
+}
+
+
 void FloatParam::render(
         Integer const round,
         Integer const first_sample_index,
@@ -958,6 +1134,18 @@ void FloatParam::render(
         }
     } else {
         Param<Number>::render(round, first_sample_index, last_sample_index, buffer);
+    }
+
+    if (envelope_stage != EnvelopeStage::NONE) {
+        Seconds const time_delta = sample_count_to_relative_time_offset(
+            last_sample_index - first_sample_index
+        );
+
+        envelope_position += time_delta;
+
+        if (envelope_end_scheduled) {
+            envelope_end_time_offset -= time_delta;
+        }
     }
 }
 

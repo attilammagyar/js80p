@@ -438,6 +438,13 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::L6CEN] = "LFO 6 Center",
     [Synth::ParamId::L7CEN] = "LFO 7 Center",
     [Synth::ParamId::L8CEN] = "LFO 8 Center",
+
+    [Synth::ParamId::N1DYN] = "Envelope 1 Dynamic",
+    [Synth::ParamId::N2DYN] = "Envelope 2 Dynamic",
+    [Synth::ParamId::N3DYN] = "Envelope 3 Dynamic",
+    [Synth::ParamId::N4DYN] = "Envelope 4 Dynamic",
+    [Synth::ParamId::N5DYN] = "Envelope 5 Dynamic",
+    [Synth::ParamId::N6DYN] = "Envelope 6 Dynamic",
 };
 
 
@@ -1081,6 +1088,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body,  37 + PE_W * 3, 164, Synth::ParamId::N1DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body,  37 + PE_W * 4, 164, Synth::ParamId::N1REL,  MF___,     "%.3f", 1.0, knob_states);
 
+    TS(envelopes_body, 235,  16, 92, 71, Synth::ParamId::N1DYN);
+
 
     PE(envelopes_body, 343 + PE_W * 0,  44, Synth::ParamId::N2AMT,  MF___,     "%.2f", 100.0, knob_states);
     PE(envelopes_body, 343 + PE_W * 1,  44, Synth::ParamId::N2INI,  MF___,     "%.2f", 100.0, knob_states);
@@ -1093,6 +1102,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body, 343 + PE_W * 2, 164, Synth::ParamId::N2HLD,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 343 + PE_W * 3, 164, Synth::ParamId::N2DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 343 + PE_W * 4, 164, Synth::ParamId::N2REL,  MF___,     "%.3f", 1.0, knob_states);
+
+    TS(envelopes_body, 541,  16, 92, 71, Synth::ParamId::N2DYN);
 
 
     PE(envelopes_body, 649 + PE_W * 0,  44, Synth::ParamId::N3AMT,  MF___,     "%.2f", 100.0, knob_states);
@@ -1107,6 +1118,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body, 649 + PE_W * 3, 164, Synth::ParamId::N3DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 649 + PE_W * 4, 164, Synth::ParamId::N3REL,  MF___,     "%.3f", 1.0, knob_states);
 
+    TS(envelopes_body, 847,  16, 92, 71, Synth::ParamId::N3DYN);
+
 
     PE(envelopes_body,  37 + PE_W * 0, 324, Synth::ParamId::N4AMT,  MF___,     "%.2f", 100.0, knob_states);
     PE(envelopes_body,  37 + PE_W * 1, 324, Synth::ParamId::N4INI,  MF___,     "%.2f", 100.0, knob_states);
@@ -1119,6 +1132,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body,  37 + PE_W * 2, 444, Synth::ParamId::N4HLD,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body,  37 + PE_W * 3, 444, Synth::ParamId::N4DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body,  37 + PE_W * 4, 444, Synth::ParamId::N4REL,  MF___,     "%.3f", 1.0, knob_states);
+
+    TS(envelopes_body, 235, 296, 92, 71, Synth::ParamId::N4DYN);
 
 
     PE(envelopes_body, 343 + PE_W * 0, 324, Synth::ParamId::N5AMT,  MF___,     "%.2f", 100.0, knob_states);
@@ -1133,6 +1148,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body, 343 + PE_W * 3, 444, Synth::ParamId::N5DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 343 + PE_W * 4, 444, Synth::ParamId::N5REL,  MF___,     "%.3f", 1.0, knob_states);
 
+    TS(envelopes_body, 541, 296, 92, 71, Synth::ParamId::N5DYN);
+
 
     PE(envelopes_body, 649 + PE_W * 0, 324, Synth::ParamId::N6AMT,  MF___,     "%.2f", 100.0, knob_states);
     PE(envelopes_body, 649 + PE_W * 1, 324, Synth::ParamId::N6INI,  MF___,     "%.2f", 100.0, knob_states);
@@ -1145,6 +1162,8 @@ void GUI::build_envelopes_body(ParamEditorKnobStates* knob_states)
     PE(envelopes_body, 649 + PE_W * 2, 444, Synth::ParamId::N6HLD,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 649 + PE_W * 3, 444, Synth::ParamId::N6DEC,  MF___,     "%.3f", 1.0, knob_states);
     PE(envelopes_body, 649 + PE_W * 4, 444, Synth::ParamId::N6REL,  MF___,     "%.3f", 1.0, knob_states);
+
+    TS(envelopes_body, 847, 296, 92, 71, Synth::ParamId::N6DYN);
 
     envelopes_body->hide();
 }

@@ -36,17 +36,55 @@
 using namespace JS80P;
 
 
-TEST(an_envelope_is_a_collection_of_float_params, {
-    Envelope envelope("E1");
+TEST(an_envelope_is_a_collection_of_params, {
+    Envelope envelope("N1");
 
-    assert_eq("E1AMT", envelope.amount.get_name());
-    assert_eq("E1INI", envelope.initial_value.get_name());
-    assert_eq("E1DEL", envelope.delay_time.get_name());
-    assert_eq("E1ATK", envelope.attack_time.get_name());
-    assert_eq("E1PK", envelope.peak_value.get_name());
-    assert_eq("E1HLD", envelope.hold_time.get_name());
-    assert_eq("E1DEC", envelope.decay_time.get_name());
-    assert_eq("E1SUS", envelope.sustain_value.get_name());
-    assert_eq("E1REL", envelope.release_time.get_name());
-    assert_eq("E1FIN", envelope.final_value.get_name());
+    assert_eq("N1DYN", envelope.dynamic.get_name());
+    assert_eq("N1AMT", envelope.amount.get_name());
+    assert_eq("N1INI", envelope.initial_value.get_name());
+    assert_eq("N1DEL", envelope.delay_time.get_name());
+    assert_eq("N1ATK", envelope.attack_time.get_name());
+    assert_eq("N1PK", envelope.peak_value.get_name());
+    assert_eq("N1HLD", envelope.hold_time.get_name());
+    assert_eq("N1DEC", envelope.decay_time.get_name());
+    assert_eq("N1SUS", envelope.sustain_value.get_name());
+    assert_eq("N1REL", envelope.release_time.get_name());
+    assert_eq("N1FIN", envelope.final_value.get_name());
+})
+
+
+TEST(can_calculate_dahd_length, {
+    Envelope envelope("E");
+
+    envelope.amount.set_value(0.1);
+    envelope.initial_value.set_value(0.2);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(2.0);
+    envelope.peak_value.set_value(0.3);
+    envelope.hold_time.set_value(3.0);
+    envelope.decay_time.set_value(4.0);
+    envelope.sustain_value.set_value(0.5);
+    envelope.release_time.set_value(5.0);
+    envelope.final_value.set_value(0.6);
+
+    envelope.update();
+
+    assert_eq(10.0, envelope.get_dahd_length(), DOUBLE_DELTA);
+})
+
+
+TEST(when_a_param_of_an_envelope_changes_then_the_change_index_of_the_envelope_is_changed, {
+    Envelope envelope("E");
+    Integer old_change_index;
+
+    old_change_index = envelope.get_change_index();
+    envelope.amount.set_value(0.99);
+    envelope.dynamic.set_value(ToggleParam::OFF);
+    envelope.update();
+    assert_neq((int)old_change_index, (int)envelope.get_change_index());
+
+    old_change_index = envelope.get_change_index();
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.update();
+    assert_neq((int)old_change_index, (int)envelope.get_change_index());
 })

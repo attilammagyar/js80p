@@ -545,9 +545,9 @@ void schedule_100hz_tuning(
         Integer const rounds
 ) {
     Seconds const time_offset = (
-        oscillator.sample_count_to_time_offset(rounds * block_size) / 2.0
+        oscillator.sample_count_to_relative_time_offset(rounds * block_size) / 2.0
     );
-    Seconds const one_block = oscillator.sample_count_to_time_offset(block_size);
+    Seconds const one_block = oscillator.sample_count_to_relative_time_offset(block_size);
 
     oscillator.frequency.schedule_value(time_offset, 50.0);
     oscillator.detune.schedule_value(time_offset, 1600.0);

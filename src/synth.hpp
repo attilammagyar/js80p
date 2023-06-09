@@ -422,8 +422,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6CEN = 292,     ///< LFO 6 Center
             L7CEN = 293,     ///< LFO 7 Center
             L8CEN = 294,     ///< LFO 8 Center
+            N1DYN = 295,     ///< Envelope 1 Dynamic
+            N2DYN = 296,     ///< Envelope 2 Dynamic
+            N3DYN = 297,     ///< Envelope 3 Dynamic
+            N4DYN = 298,     ///< Envelope 4 Dynamic
+            N5DYN = 299,     ///< Envelope 5 Dynamic
+            N6DYN = 300,     ///< Envelope 6 Dynamic
 
-            MAX_PARAM_ID = 295
+            MAX_PARAM_ID = 301
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

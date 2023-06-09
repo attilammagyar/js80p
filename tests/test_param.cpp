@@ -1108,6 +1108,86 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
 })
 
 
+template<class FloatParamClass>
+void test_follower_dynamic_envelope()
+{
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_dahd_samples[block_size] = {
+        0.0, 1.0, 2.0, 3.0, 3.0,
+        3.0, 2.5, 2.0, 1.5, 1.0,
+    };
+    constexpr Sample expected_r_samples[block_size] = {
+        1.0, 1.0, 1.0, 1.0, 1.0,
+        0.5, 0.0, 0.0, 0.0, 0.0,
+    };
+    FloatParam leader("follow", -5.0, 5.0, 0.0);
+    FloatParamClass follower(leader);
+    Envelope envelope("env");
+    Sample const* rendered_samples;
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_envelope(&envelope);
+    leader.set_value(0.2);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+
+    assert_eq((void*)&envelope, (void*)follower.get_envelope());
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(0.1);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(5.7);
+    envelope.attack_time.set_value(0.1);
+    envelope.peak_value.set_value(0.1);
+    envelope.hold_time.set_value(0.1);
+    envelope.decay_time.set_value(0.1);
+    envelope.sustain_value.set_value(0.1);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.625);
+
+    follower.start_envelope(0.3);
+    follower.end_envelope(29.0);
+
+    FloatParam::produce<FloatParamClass>(&follower, 1, 6);
+
+    envelope.amount.set_value(0.8);
+    envelope.initial_value.set_value(0.625);
+    envelope.delay_time.set_value(5.7);
+    envelope.attack_time.set_value(3.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(2.0);
+    envelope.decay_time.set_value(4.0);
+    envelope.sustain_value.set_value(0.75);
+    envelope.release_time.set_value(6.0);
+
+    assert_false(follower.is_constant_until(2));
+
+    rendered_samples = FloatParam::produce_if_not_constant<FloatParamClass>(
+        &follower, 2, block_size
+    );
+    assert_eq(expected_dahd_samples, rendered_samples, block_size, DOUBLE_DELTA);
+
+    assert_true(follower.is_constant_until(block_size));
+    rendered_samples = FloatParam::produce_if_not_constant<FloatParamClass>(
+        &follower, 3, block_size
+    );
+    assert_eq(NULL, rendered_samples, block_size, DOUBLE_DELTA);
+
+    rendered_samples = FloatParam::produce_if_not_constant<FloatParamClass>(
+        &follower, 4, block_size
+    );
+    assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
+}
+
+
+TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_dahds, {
+    test_follower_dynamic_envelope<FloatParam>();
+    test_follower_dynamic_envelope< ModulatableFloatParam<SignalProducer> >();
+})
+
+
 TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {

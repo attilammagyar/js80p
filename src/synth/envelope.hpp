@@ -40,6 +40,11 @@ class Envelope
     public:
         Envelope(std::string const name) noexcept;
 
+        void update() noexcept;
+        Integer get_change_index() const noexcept;
+        Seconds get_dahd_length() const noexcept;
+
+        ToggleParam dynamic;
         FloatParam amount;
         FloatParam initial_value;
         FloatParam delay_time;
@@ -50,6 +55,25 @@ class Envelope
         FloatParam sustain_value;
         FloatParam release_time;
         FloatParam final_value;
+
+    private:
+        template<class ParamType>
+        bool update_change_index(ParamType const& param, Integer& change_index);
+
+        Integer dynamic_change_index;
+        Integer amount_change_index;
+        Integer initial_value_change_index;
+        Integer delay_time_change_index;
+        Integer attack_time_change_index;
+        Integer peak_value_change_index;
+        Integer hold_time_change_index;
+        Integer decay_time_change_index;
+        Integer sustain_value_change_index;
+        Integer release_time_change_index;
+        Integer final_value_change_index;
+        Integer change_index;
+
+        Seconds dahd_length;
 };
 
 }

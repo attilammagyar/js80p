@@ -467,6 +467,13 @@ void Synth::create_envelopes() noexcept
         register_float_param_as_child((ParamId)next_id++, envelope->release_time);
         register_float_param_as_child((ParamId)next_id++, envelope->final_value);
     }
+
+    register_param_as_child<ToggleParam>(ParamId::N1DYN, envelopes_rw[0]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N2DYN, envelopes_rw[1]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N3DYN, envelopes_rw[2]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N4DYN, envelopes_rw[3]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N5DYN, envelopes_rw[4]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N6DYN, envelopes_rw[5]->dynamic);
 }
 
 
@@ -964,6 +971,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6CEN: return lfos_rw[5]->center.get_default_ratio();
         case ParamId::L7CEN: return lfos_rw[6]->center.get_default_ratio();
         case ParamId::L8CEN: return lfos_rw[7]->center.get_default_ratio();
+        case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_default_ratio();
+        case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_default_ratio();
+        case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_default_ratio();
+        case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_default_ratio();
+        case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_default_ratio();
+        case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -1022,6 +1035,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6CEN: return lfos_rw[5]->center.get_max_value();
         case ParamId::L7CEN: return lfos_rw[6]->center.get_max_value();
         case ParamId::L8CEN: return lfos_rw[7]->center.get_max_value();
+        case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_max_value();
+        case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_max_value();
+        case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_max_value();
+        case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_max_value();
+        case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_max_value();
+        case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
         default: return 0.0; // This should neacver be reached.
     }
 }
@@ -1084,6 +1103,12 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6CEN: return lfos_rw[5]->center.ratio_to_value(ratio);
         case ParamId::L7CEN: return lfos_rw[6]->center.ratio_to_value(ratio);
         case ParamId::L8CEN: return lfos_rw[7]->center.ratio_to_value(ratio);
+        case ParamId::N1DYN: return envelopes_rw[0]->dynamic.ratio_to_value(ratio);
+        case ParamId::N2DYN: return envelopes_rw[1]->dynamic.ratio_to_value(ratio);
+        case ParamId::N3DYN: return envelopes_rw[2]->dynamic.ratio_to_value(ratio);
+        case ParamId::N4DYN: return envelopes_rw[3]->dynamic.ratio_to_value(ratio);
+        case ParamId::N5DYN: return envelopes_rw[4]->dynamic.ratio_to_value(ratio);
+        case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
         default: return 0; // This should never be reached.
     }
 }
@@ -1209,6 +1234,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6CEN: lfos_rw[5]->center.set_ratio(ratio); break;
             case ParamId::L7CEN: lfos_rw[6]->center.set_ratio(ratio); break;
             case ParamId::L8CEN: lfos_rw[7]->center.set_ratio(ratio); break;
+            case ParamId::N1DYN: envelopes_rw[0]->dynamic.set_ratio(ratio); break;
+            case ParamId::N2DYN: envelopes_rw[1]->dynamic.set_ratio(ratio); break;
+            case ParamId::N3DYN: envelopes_rw[2]->dynamic.set_ratio(ratio); break;
+            case ParamId::N4DYN: envelopes_rw[3]->dynamic.set_ratio(ratio); break;
+            case ParamId::N5DYN: envelopes_rw[4]->dynamic.set_ratio(ratio); break;
+            case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
             default: break; // This should never be reached.
         }
     }
@@ -1455,6 +1486,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L6CEN: return lfos_rw[5]->center.get_ratio();
         case ParamId::L7CEN: return lfos_rw[6]->center.get_ratio();
         case ParamId::L8CEN: return lfos_rw[7]->center.get_ratio();
+        case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_ratio();
+        case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_ratio();
+        case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_ratio();
+        case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_ratio();
+        case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_ratio();
+        case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
         default: return 0.0; // This should never be reached.
     }
 }

@@ -190,6 +190,7 @@ h1 {
   left: 14px;
 }
 
+.block h1 label.dynamic,
 .block h1 label.sync {
   margin-right: 3px;
   float: right;
@@ -757,6 +758,15 @@ window.onload = function ()
         d.setAttribute("class", "block main-block");
         h = document.createElement("h1");
         h.innerHTML = "Envelope " + String(i);
+
+        l = document.createElement("label");
+        l.innerHTML = "DYNANMIC ";
+        l.setAttribute("class", "dynamic");
+        n = document.createElement("input");
+        n.setAttribute("type", "text");
+        l.appendChild(n);
+        h.appendChild(l);
+
         d.appendChild(h);
 
         k3 = document.createElement("div");

@@ -258,7 +258,14 @@ Sample const* const* SignalProducer::get_last_rendered_block(
 Seconds SignalProducer::sample_count_to_time_offset(
         Integer const sample_count
 ) const noexcept {
-    return current_time + (Seconds)sample_count * sampling_period;
+    return current_time + sample_count_to_relative_time_offset(sample_count);
+}
+
+
+Seconds SignalProducer::sample_count_to_relative_time_offset(
+        Integer const sample_count
+) const noexcept {
+    return (Seconds)sample_count * sampling_period;
 }
 
 

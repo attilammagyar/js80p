@@ -196,6 +196,13 @@ def print_special_params(param_id: int) -> int:
         ("L6CEN", " ///< LFO 6 Center"),
         ("L7CEN", " ///< LFO 7 Center"),
         ("L8CEN", " ///< LFO 8 Center"),
+
+        ("N1DYN", " ///< Envelope 1 Dynamic"),
+        ("N2DYN", " ///< Envelope 2 Dynamic"),
+        ("N3DYN", " ///< Envelope 3 Dynamic"),
+        ("N4DYN", " ///< Envelope 4 Dynamic"),
+        ("N5DYN", " ///< Envelope 5 Dynamic"),
+        ("N6DYN", " ///< Envelope 6 Dynamic"),
     ]
 
     return print_params(param_id, "", "", 1, params)

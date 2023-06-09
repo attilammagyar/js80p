@@ -117,10 +117,10 @@ void schedule_small_param_changes(
         Number const gain
 ) {
     Seconds const two_blocks = (
-        2.0 * filter.sample_count_to_time_offset(BLOCK_SIZE)
+        2.0 * filter.sample_count_to_relative_time_offset(BLOCK_SIZE)
     );
     Seconds time_offset = (
-        filter.sample_count_to_time_offset(SAMPLE_COUNT) / 3.0
+        filter.sample_count_to_relative_time_offset(SAMPLE_COUNT) / 3.0
     );
 
     filter.frequency.schedule_value(time_offset, frequency);

@@ -225,12 +225,22 @@ TEST(can_convert_sample_number_to_time_offset, {
     SignalProducer signal_producer(1);
     signal_producer.set_sample_rate(4);
 
-    assert_eq(0.0, signal_producer.sample_count_to_time_offset(0), DOUBLE_DELTA);
-    assert_eq(0.25, signal_producer.sample_count_to_time_offset(1), DOUBLE_DELTA);
-    assert_eq(0.5, signal_producer.sample_count_to_time_offset(2), DOUBLE_DELTA);
-    assert_eq(0.75, signal_producer.sample_count_to_time_offset(3), DOUBLE_DELTA);
-    assert_eq(1.0, signal_producer.sample_count_to_time_offset(4), DOUBLE_DELTA);
-    assert_eq(1.25, signal_producer.sample_count_to_time_offset(5), DOUBLE_DELTA);
+    signal_producer.cancel_events(10.0);
+    SignalProducer::produce<SignalProducer>(&signal_producer, 1, 1);
+
+    assert_eq(0.00, signal_producer.sample_count_to_relative_time_offset(0), DOUBLE_DELTA);
+    assert_eq(0.25, signal_producer.sample_count_to_relative_time_offset(1), DOUBLE_DELTA);
+    assert_eq(0.50, signal_producer.sample_count_to_relative_time_offset(2), DOUBLE_DELTA);
+    assert_eq(0.75, signal_producer.sample_count_to_relative_time_offset(3), DOUBLE_DELTA);
+    assert_eq(1.00, signal_producer.sample_count_to_relative_time_offset(4), DOUBLE_DELTA);
+    assert_eq(1.25, signal_producer.sample_count_to_relative_time_offset(5), DOUBLE_DELTA);
+
+    assert_eq(0.25, signal_producer.sample_count_to_time_offset(0), DOUBLE_DELTA);
+    assert_eq(0.50, signal_producer.sample_count_to_time_offset(1), DOUBLE_DELTA);
+    assert_eq(0.75, signal_producer.sample_count_to_time_offset(2), DOUBLE_DELTA);
+    assert_eq(1.00, signal_producer.sample_count_to_time_offset(3), DOUBLE_DELTA);
+    assert_eq(1.25, signal_producer.sample_count_to_time_offset(4), DOUBLE_DELTA);
+    assert_eq(1.50, signal_producer.sample_count_to_time_offset(5), DOUBLE_DELTA);
 })
 
 

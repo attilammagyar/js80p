@@ -131,6 +131,10 @@ class SignalProducer
             Integer const sample_count
         ) const noexcept;
 
+        Seconds sample_count_to_relative_time_offset(
+            Integer const sample_count
+        ) const noexcept;
+
         void schedule(
             Event::Type const type,
             Seconds const time_offset,

@@ -136,6 +136,8 @@ class FloatParam : public Param<Number>
         static constexpr Event::Type EVT_SET_VALUE = 1;
         static constexpr Event::Type EVT_LINEAR_RAMP = 2;
         static constexpr Event::Type EVT_LOG_RAMP = 3;
+        static constexpr Event::Type EVT_ENVELOPE_START = 4;
+        static constexpr Event::Type EVT_ENVELOPE_END = 5;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -241,8 +243,8 @@ class FloatParam : public Param<Number>
 
         FlexibleController const* get_flexible_controller() const noexcept;
 
-        void set_envelope(Envelope const* const envelope) noexcept;
-        Envelope const* get_envelope() const noexcept;
+        void set_envelope(Envelope* const envelope) noexcept;
+        Envelope* get_envelope() const noexcept;
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
 
@@ -265,6 +267,12 @@ class FloatParam : public Param<Number>
         void handle_event(Event const& event) noexcept;
 
     private:
+        enum EnvelopeStage {
+            NONE = 0,
+            DAHDS = 1,
+            R = 2,
+        };
+
         class LinearRampState
         {
             public:
@@ -300,6 +308,8 @@ class FloatParam : public Param<Number>
         void handle_set_value_event(Event const& event) noexcept;
         void handle_linear_ramp_event(Event const& event) noexcept;
         void handle_log_ramp_event(Event const& event) noexcept;
+        void handle_envelope_start_event(Event const& event) noexcept;
+        void handle_envelope_end_event(Event const& event) noexcept;
         void handle_cancel_event(Event const& event) noexcept;
 
         bool is_following_leader() const noexcept;
@@ -321,6 +331,19 @@ class FloatParam : public Param<Number>
             Seconds const duration
         ) const noexcept;
 
+        Sample const* const* process_envelope(
+            Envelope* const envelope
+        ) noexcept;
+
+        Seconds schedule_envelope_value_if_not_reached(
+            Seconds const next_event_time_offset,
+            FloatParam const& time_param,
+            FloatParam const& value_param,
+            Number const amount
+        ) noexcept;
+
+        void update_envelope();
+
         ToggleParam const* const log_scale_toggle;
         Number const* const log_scale_table;
         Number const* const log_scale_inv_table;
@@ -329,11 +352,20 @@ class FloatParam : public Param<Number>
         Number const log_scale_inv_table_scale;
 
         FloatParam* const leader;
+
         FlexibleController* flexible_controller;
         Integer flexible_controller_change_index;
-        Envelope const* envelope;
+
         LFO* lfo;
         Sample const* const* lfo_buffer;
+
+        Envelope* envelope;
+        Integer envelope_change_index;
+        Seconds envelope_end_time_offset;
+        Seconds envelope_position;
+        Seconds envelope_release_time;
+        EnvelopeStage envelope_stage;
+        bool envelope_end_scheduled;
 
         bool const should_round;
         bool const is_ratio_same_as_value;
