@@ -197,7 +197,7 @@ Frequency Math::detune(Frequency const frequency, Number const cents) noexcept
 
 
 void Math::compute_statistics(
-        std::vector<Number> const numbers,
+        std::vector<Number> const& numbers,
         Statistics& statistics
 ) noexcept {
     std::vector<Number>::size_type const size = numbers.size();

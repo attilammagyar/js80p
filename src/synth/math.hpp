@@ -156,7 +156,7 @@ class Math
         class Statistics;
 
         static void compute_statistics(
-            std::vector<Number> const numbers,
+            std::vector<Number> const& numbers,
             Statistics& statistics
         ) noexcept;
 
