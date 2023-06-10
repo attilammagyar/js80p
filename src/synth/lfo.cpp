@@ -121,13 +121,13 @@ void LFO::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
+    apply_distortions(round, first_sample_index, last_sample_index, buffer);
+
     if (center.get_value() == ToggleParam::ON) {
         apply_range_centered(round, first_sample_index, last_sample_index, buffer);
     } else {
         apply_range(round, first_sample_index, last_sample_index, buffer);
     }
-
-    apply_distortions(round, first_sample_index, last_sample_index, buffer);
 }
 
 

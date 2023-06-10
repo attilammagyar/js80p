@@ -224,3 +224,32 @@ TEST(lfo_performance, {
 
     assert_lt(-100000.0, sum / total_sample_count);
 })
+
+
+TEST(distortion_and_randomness_respect_min_and_max_values, {
+    LFO lfo("L1");
+    std::vector<Number> numbers;
+    Sample const* const* rendered_samples;
+    Math::Statistics stats;
+
+    lfo.set_block_size(BLOCK_SIZE);
+    lfo.set_sample_rate(SAMPLE_RATE);
+    lfo.min.set_value(0.25);
+    lfo.max.set_value(0.75);
+    lfo.randomness.set_value(1.0);
+    lfo.distortion.set_value(1.0);
+    lfo.frequency.set_value(30.0);
+    lfo.start(0.0);
+
+    rendered_samples = SignalProducer::produce<LFO>(&lfo, 1);
+
+    numbers.reserve(BLOCK_SIZE);
+
+    for (Integer i = 0; i != BLOCK_SIZE; ++i) {
+        numbers.push_back(rendered_samples[0][i]);
+    }
+
+    Math::compute_statistics(numbers, stats);
+
+    assert_statistics(true, 0.25, 0.5, 0.75, 0.5, 0.125, stats, 0.06);
+})
