@@ -1,3 +1,21 @@
+v1.6.0 (2023-06-11)
+ * Envelopes can now be configured to affect notes that are already sounding.
+ * New presets:
+    * Acid Lead 1
+    * Acid Lead 2
+    * Acid Lead 3
+    * Bells 1
+    * Bells 2
+    * Flute
+    * FM Womp 1
+    * FM Womp 2
+    * FM Womp 3
+    * Tech Noir Lead 1
+    * Tech Noir Lead 2
+    * Tech Noir Lead 3
+ * Bugfix: LFOs now respect min, max, amount, etc. range settings when
+   distortion and randomness are in use.
+
 v1.5.1 (2023-06-07)
  * Bugfix: eliminate noise in FL Studio when the delay time for the Echo effect
    is set to extremely low values (few milliseconds).
