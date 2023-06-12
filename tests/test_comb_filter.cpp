@@ -40,31 +40,28 @@
 using namespace JS80P;
 
 
-constexpr Integer CHANNELS = 2;
-
-
-TEST(output_may_be_panned, {
+template<class CombFilterClass>
+void test_comb_filter_panning()
+{
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
     constexpr Integer sample_count = rounds * block_size;
     constexpr Frequency sample_rate = 10.0;
-    constexpr Sample input_samples[CHANNELS][block_size] = {
+    constexpr Sample input_samples[FixedSignalProducer::CHANNELS][block_size] = {
         {0.10, 0.20, 0.30, 0.40, 0.50},
         {0.20, 0.40, 0.60, 0.80, 1.00},
     };
-    constexpr Sample expected_output[CHANNELS][sample_count] = {
+    constexpr Sample expected_output[FixedSignalProducer::CHANNELS][sample_count] = {
         {0.000, 0.000, 0.075, 0.150, 0.225, 0.000, 0.000, 0.000, 0.000, 0.000},
         {0.000, 0.000, 0.150, 0.300, 0.450, 0.900, 1.125, 0.225, 0.450, 0.675},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* input_buffer[FixedSignalProducer::CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
     FixedSignalProducer input(input_buffer);
-    Buffer output(sample_count, CHANNELS);
-    CombFilter<FixedSignalProducer> comb_filter(
-        input, CombFilter<FixedSignalProducer>::StereoMode::FLIPPED
-    );
+    Buffer output(sample_count, FixedSignalProducer::CHANNELS);
+    CombFilterClass comb_filter(input, CombFilterStereoMode::FLIPPED);
 
     input.set_sample_rate(sample_rate);
     input.set_block_size(block_size);
@@ -76,9 +73,11 @@ TEST(output_may_be_panned, {
     comb_filter.panning.set_value(0.0);
     comb_filter.panning.schedule_value(0.45, -1.0);
 
-    render_rounds< CombFilter<FixedSignalProducer> >(comb_filter, output, rounds);
+    assert_eq((int)input.get_channels(), (int)comb_filter.get_channels());
 
-    for (Integer c = 0; c != CHANNELS; ++c) {
+    render_rounds<CombFilterClass>(comb_filter, output, rounds);
+
+    for (Integer c = 0; c != FixedSignalProducer::CHANNELS; ++c) {
         assert_eq(
             expected_output[c],
             output.samples[c],
@@ -90,4 +89,10 @@ TEST(output_may_be_panned, {
     }
 
     assert_eq(-1.0, comb_filter.panning.get_value(), DOUBLE_DELTA);
+}
+
+
+TEST(output_may_be_panned, {
+    test_comb_filter_panning< HighShelfPannedCombFilter<FixedSignalProducer> >();
+    test_comb_filter_panning< PannedCombFilter<FixedSignalProducer> >();
 })

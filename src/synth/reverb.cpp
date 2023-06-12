@@ -83,11 +83,9 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(high_pass_filter);
 
     for (Integer i = 0; i != COMB_FILTERS; ++i) {
-        comb_filters[i] = new HighPassCombFilter(
+        comb_filters[i] = new HighPassInputHighShelfPannedCombFilter(
             high_pass_filter,
-            i & 1
-                ? HighPassCombFilter::StereoMode::FLIPPED
-                : HighPassCombFilter::StereoMode::NORMAL,
+            i & 1 ? CombFilterStereoMode::FLIPPED : CombFilterStereoMode::NORMAL,
             width,
             room_size,
             TUNINGS[i],
@@ -130,8 +128,10 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
     }
 
     for (Integer i = 0; i != COMB_FILTERS; ++i) {
-        comb_filter_buffers[i] = SignalProducer::produce<HighPassCombFilter>(
-            comb_filters[i], round, sample_count
+        comb_filter_buffers[i] = (
+            SignalProducer::produce<HighPassInputHighShelfPannedCombFilter>(
+                comb_filters[i], round, sample_count
+            )
         );
     }
 

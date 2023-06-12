@@ -38,8 +38,8 @@ class Echo : public Effect<InputSignalProducerClass>
 
     public:
         typedef BiquadFilter<InputSignalProducerClass> HighPassInput;
-        typedef CombFilter<HighPassInput> CombFilter1;
-        typedef CombFilter< HighShelfDelay<HighPassInput> > CombFilter2;
+        typedef HighShelfPannedCombFilter<HighPassInput> CombFilter1;
+        typedef HighShelfPannedCombFilter< HighShelfDelay<HighPassInput> > CombFilter2;
 
         Echo(std::string const name, InputSignalProducerClass& input);
 

@@ -26,143 +26,105 @@
 namespace JS80P
 {
 
-
-template<class InputSignalProducerClass>
-CombFilter<InputSignalProducerClass>::CombFilter(
-        InputSignalProducerClass& input,
-        StereoMode const stereo_mode,
-        ToggleParam const* tempo_sync
-) : Filter< HighShelfDelay<InputSignalProducerClass> >(
-        high_shelf_filter,
-        5,
-        input.get_channels()
-    ),
-    is_flipped(stereo_mode == StereoMode::FLIPPED),
-    high_shelf_filter_type(""),
-    high_shelf_filter_q(
-        "",
-        Constants::BIQUAD_FILTER_Q_MIN,
-        Constants::BIQUAD_FILTER_Q_MAX,
-        Constants::BIQUAD_FILTER_Q_DEFAULT
-    ),
-    stereo_gain_buffer(NULL),
-    panning_buffer(NULL),
-    panning("", -1.0, 1.0, 0.0),
-    delay(input, tempo_sync),
-    high_shelf_filter("", delay, high_shelf_filter_type)
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedCombFilter<InputSignalProducerClass, FilterInputClass>::PannedCombFilter(
+    InputSignalProducerClass& input,
+    CombFilterStereoMode const stereo_mode,
+    ToggleParam const* tempo_sync
+) : PannedCombFilter<InputSignalProducerClass, FilterInputClass>(
+        input, delay, stereo_mode, tempo_sync
+    )
 {
-    initialize_instance();
-
-    high_shelf_filter.frequency.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MAX);
-    high_shelf_filter.q.set_value(Constants::BIQUAD_FILTER_Q_DEFAULT);
-    high_shelf_filter.gain.set_value(0.0);
 }
 
 
-template<class InputSignalProducerClass>
-CombFilter<InputSignalProducerClass>::CombFilter(
-        InputSignalProducerClass& input,
-        StereoMode const stereo_mode,
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedCombFilter<InputSignalProducerClass, FilterInputClass>::PannedCombFilter(
+        InputSignalProducerClass& delay_input,
+        FilterInputClass& filter_input,
+        CombFilterStereoMode const stereo_mode,
+        ToggleParam const* tempo_sync,
+        Integer const number_of_children
+) : Filter<FilterInputClass>(
+        filter_input,
+        number_of_children + NUMBER_OF_CHILDREN,
+        delay_input.get_channels()
+    ),
+    is_flipped(stereo_mode == CombFilterStereoMode::FLIPPED),
+    panning("", -1.0, 1.0, 0.0),
+    delay(delay_input, tempo_sync)
+{
+    initialize_instance(stereo_mode);
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedCombFilter<InputSignalProducerClass, FilterInputClass>::PannedCombFilter(
+        InputSignalProducerClass& delay_input,
+        FilterInputClass& filter_input,
+        CombFilterStereoMode const stereo_mode,
         FloatParam& panning_leader,
         FloatParam& delay_gain_leader,
         FloatParam& delay_time_leader,
-        FloatParam& high_shelf_filter_frequency_leader,
-        FloatParam& high_shelf_filter_gain_leader,
-        ToggleParam const* tempo_sync
+        ToggleParam const* tempo_sync,
+        Integer const number_of_children
 ) : Filter< HighShelfDelay<InputSignalProducerClass> >(
-        high_shelf_filter,
-        5,
-        input.get_channels()
+        filter_input,
+        number_of_children + NUMBER_OF_CHILDREN,
+        delay_input.get_channels()
     ),
-    is_flipped(stereo_mode == StereoMode::FLIPPED),
-    high_shelf_filter_type(""),
-    high_shelf_filter_q(
-        "",
-        Constants::BIQUAD_FILTER_Q_MIN,
-        Constants::BIQUAD_FILTER_Q_MAX,
-        Constants::BIQUAD_FILTER_Q_DEFAULT
-    ),
-    stereo_gain_buffer(NULL),
-    panning_buffer(NULL),
+    is_flipped(stereo_mode == CombFilterStereoMode::FLIPPED),
     panning(panning_leader),
-    delay(input, delay_gain_leader, delay_time_leader, tempo_sync),
-    high_shelf_filter(
-        delay,
-        high_shelf_filter_type,
-        high_shelf_filter_frequency_leader,
-        high_shelf_filter_q,
-        high_shelf_filter_gain_leader
-    )
+    delay(delay_input, delay_gain_leader, delay_time_leader, tempo_sync)
 {
-    initialize_instance();
+    initialize_instance(stereo_mode);
 }
 
 
-template<class InputSignalProducerClass>
-CombFilter<InputSignalProducerClass>::CombFilter(
-        InputSignalProducerClass& input,
-        StereoMode const stereo_mode,
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedCombFilter<InputSignalProducerClass, FilterInputClass>::PannedCombFilter(
+        InputSignalProducerClass& delay_input,
+        FilterInputClass& filter_input,
+        CombFilterStereoMode const stereo_mode,
         FloatParam& panning_leader,
         FloatParam& delay_gain_leader,
         Seconds const delay_time,
-        FloatParam& high_shelf_filter_frequency_leader,
-        FloatParam& high_shelf_filter_gain_leader,
-        ToggleParam const* tempo_sync
-) : Filter< HighShelfDelay<InputSignalProducerClass> >(
-        high_shelf_filter,
-        5,
-        input.get_channels()
+        ToggleParam const* tempo_sync,
+        Integer const number_of_children
+) : Filter<FilterInputClass>(
+        filter_input,
+        number_of_children + NUMBER_OF_CHILDREN,
+        delay_input.get_channels()
     ),
-    is_flipped(stereo_mode == StereoMode::FLIPPED),
-    high_shelf_filter_type(""),
-    high_shelf_filter_q(
-        "",
-        Constants::BIQUAD_FILTER_Q_MIN,
-        Constants::BIQUAD_FILTER_Q_MAX,
-        Constants::BIQUAD_FILTER_Q_DEFAULT
-    ),
-    stereo_gain_buffer(NULL),
-    panning_buffer(NULL),
+    is_flipped(stereo_mode == CombFilterStereoMode::FLIPPED),
     panning(panning_leader),
-    delay(input, delay_gain_leader, delay_time, tempo_sync),
-    high_shelf_filter(
-        delay,
-        high_shelf_filter_type,
-        high_shelf_filter_frequency_leader,
-        high_shelf_filter_q,
-        high_shelf_filter_gain_leader
-    )
+    delay(delay_input, delay_gain_leader, delay_time, tempo_sync)
 {
-    initialize_instance();
+    initialize_instance(stereo_mode);
 }
 
 
-template<class InputSignalProducerClass>
-void CombFilter<InputSignalProducerClass>::initialize_instance() noexcept
-{
+template<class InputSignalProducerClass, class FilterInputClass>
+void PannedCombFilter<InputSignalProducerClass, FilterInputClass>::initialize_instance(
+        CombFilterStereoMode const stereo_mode
+) noexcept {
+    panning_buffer = NULL;
     stereo_gain_buffer = SignalProducer::allocate_buffer();
 
-    high_shelf_filter_type.set_value(
-        HighShelfDelay<InputSignalProducerClass>::HIGH_SHELF
-    );
-
-    this->register_child(high_shelf_filter_type);
-    this->register_child(high_shelf_filter_q);
     this->register_child(panning);
     this->register_child(delay);
-    this->register_child(high_shelf_filter);
 }
 
 
-template<class InputSignalProducerClass>
-CombFilter<InputSignalProducerClass>::~CombFilter()
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedCombFilter<InputSignalProducerClass, FilterInputClass>::~PannedCombFilter()
 {
     SignalProducer::free_buffer(stereo_gain_buffer);
 }
 
 
-template<class InputSignalProducerClass>
-void CombFilter<InputSignalProducerClass>::set_block_size(
+template<class InputSignalProducerClass, class FilterInputClass>
+void PannedCombFilter<InputSignalProducerClass, FilterInputClass>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     SignalProducer::set_block_size(new_block_size);
@@ -171,14 +133,12 @@ void CombFilter<InputSignalProducerClass>::set_block_size(
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* CombFilter<InputSignalProducerClass>::initialize_rendering(
+template<class InputSignalProducerClass, class FilterInputClass>
+Sample const* const* PannedCombFilter<InputSignalProducerClass, FilterInputClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
 ) noexcept {
-    Filter< HighShelfDelay<InputSignalProducerClass> >::initialize_rendering(
-        round, sample_count
-    );
+    Filter<FilterInputClass>::initialize_rendering(round, sample_count);
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
@@ -216,8 +176,8 @@ Sample const* const* CombFilter<InputSignalProducerClass>::initialize_rendering(
 }
 
 
-template<class InputSignalProducerClass>
-void CombFilter<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, class FilterInputClass>
+void PannedCombFilter<InputSignalProducerClass, FilterInputClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -276,6 +236,118 @@ void CombFilter<InputSignalProducerClass>::render(
             }
         }
     }
+}
+
+
+template<class InputSignalProducerClass>
+HighShelfPannedCombFilter<InputSignalProducerClass>::HighShelfPannedCombFilter(
+    InputSignalProducerClass& input,
+    CombFilterStereoMode const stereo_mode,
+    ToggleParam const* tempo_sync
+) : HighShelfPannedCombFilterBase<InputSignalProducerClass>(
+        input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
+    ),
+    high_shelf_filter_type(""),
+    high_shelf_filter_q(
+        "",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
+    ),
+    high_shelf_filter(
+        "",
+        HighShelfPannedCombFilterBase<InputSignalProducerClass>::delay,
+        high_shelf_filter_type
+    )
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+HighShelfPannedCombFilter<InputSignalProducerClass>::HighShelfPannedCombFilter(
+    InputSignalProducerClass& input,
+    CombFilterStereoMode const stereo_mode,
+    FloatParam& panning_leader,
+    FloatParam& delay_gain_leader,
+    FloatParam& delay_time_leader,
+    FloatParam& high_shelf_filter_frequency_leader,
+    FloatParam& high_shelf_filter_gain_leader,
+    ToggleParam const* tempo_sync
+) : HighShelfPannedCombFilterBase<InputSignalProducerClass>(
+        input,
+        high_shelf_filter,
+        stereo_mode,
+        panning_leader,
+        delay_gain_leader,
+        delay_time_leader,
+        tempo_sync,
+        NUMBER_OF_CHILDREN
+    ),
+    high_shelf_filter_type(""),
+    high_shelf_filter_q(
+        "",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
+    ),
+    high_shelf_filter(
+        HighShelfPannedCombFilterBase<InputSignalProducerClass>::delay,
+        high_shelf_filter_type,
+        high_shelf_filter_frequency_leader,
+        high_shelf_filter_q,
+        high_shelf_filter_gain_leader
+    )
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+HighShelfPannedCombFilter<InputSignalProducerClass>::HighShelfPannedCombFilter(
+    InputSignalProducerClass& input,
+    CombFilterStereoMode const stereo_mode,
+    FloatParam& panning_leader,
+    FloatParam& delay_gain_leader,
+    Seconds const delay_time,
+    FloatParam& high_shelf_filter_frequency_leader,
+    FloatParam& high_shelf_filter_gain_leader,
+    ToggleParam const* tempo_sync
+) : HighShelfPannedCombFilterBase<InputSignalProducerClass>(
+        input,
+        high_shelf_filter,
+        stereo_mode,
+        panning_leader,
+        delay_gain_leader,
+        delay_time,
+        tempo_sync,
+        NUMBER_OF_CHILDREN
+    ),
+    high_shelf_filter_type(""),
+    high_shelf_filter_q(
+        "",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
+    ),
+    high_shelf_filter(
+        HighShelfPannedCombFilterBase<InputSignalProducerClass>::delay,
+        high_shelf_filter_type,
+        high_shelf_filter_frequency_leader,
+        high_shelf_filter_q,
+        high_shelf_filter_gain_leader
+    )
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+void HighShelfPannedCombFilter<InputSignalProducerClass>::initialize_instance() noexcept
+{
+    this->register_child(high_shelf_filter_type);
+    this->register_child(high_shelf_filter_q);
+    this->register_child(high_shelf_filter);
 }
 
 }

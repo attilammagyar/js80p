@@ -425,7 +425,10 @@ $(BUILD_DIR)/test_comb_filter$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(CPP_DEV_PLATFORM) \
+		$(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) \
+		-Wno-maybe-uninitialized \
+		-o $@ $<
 
 $(BUILD_DIR)/test_delay$(EXE): \
 		tests/test_delay.cpp \

@@ -38,7 +38,7 @@ class Reverb : public Effect<InputSignalProducerClass>
 
     public:
         typedef BiquadFilter<InputSignalProducerClass> HighPassInput;
-        typedef CombFilter<HighPassInput> HighPassCombFilter;
+        typedef HighShelfPannedCombFilter<HighPassInput> HighPassInputHighShelfPannedCombFilter;
 
         Reverb(std::string const name, InputSignalProducerClass& input);
 
@@ -82,7 +82,7 @@ class Reverb : public Effect<InputSignalProducerClass>
         FloatParam high_pass_filter_gain;
 
         BiquadFilter<InputSignalProducerClass> high_pass_filter;
-        HighPassCombFilter* comb_filters[COMB_FILTERS];
+        HighPassInputHighShelfPannedCombFilter* comb_filters[COMB_FILTERS];
 
         Sample const* const* comb_filter_buffers[COMB_FILTERS];
 };

@@ -79,7 +79,7 @@ Echo<InputSignalProducerClass>::Echo(
     ),
     comb_filter_1(
         high_pass_filter,
-        CombFilter1::StereoMode::NORMAL,
+        CombFilterStereoMode::NORMAL,
         width,
         feedback,
         delay_time,
@@ -89,7 +89,7 @@ Echo<InputSignalProducerClass>::Echo(
     ),
     comb_filter_2(
         comb_filter_1.high_shelf_filter,
-        CombFilter2::StereoMode::FLIPPED,
+        CombFilterStereoMode::FLIPPED,
         width,
         feedback,
         delay_time,
