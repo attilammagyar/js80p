@@ -28,7 +28,6 @@
 #include "synth.hpp"
 
 #include "synth/biquad_filter.cpp"
-#include "synth/comb_filter.cpp"
 #include "synth/delay.cpp"
 #include "synth/distortion.cpp"
 #include "synth/echo.cpp"
@@ -40,6 +39,7 @@
 #include "synth/lfo.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"
+#include "synth/mixer.cpp"
 #include "synth/oscillator.cpp"
 #include "synth/param.cpp"
 #include "synth/reverb.cpp"

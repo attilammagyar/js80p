@@ -424,3 +424,61 @@ TEST(when_tempo_sync_is_on_but_tempo_is_too_slow_then_the_minimum_tempo_is_used,
     test_basic_delay(time_scale, 0.1, ToggleParam::ON);
     test_delay_with_feedback(time_scale, 0.1, ToggleParam::ON);
 })
+
+
+template<class PannedDelayClass>
+void test_panned_delay()
+{
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Sample input_samples[FixedSignalProducer::CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+    constexpr Sample expected_output[FixedSignalProducer::CHANNELS][sample_count] = {
+        {0.000, 0.000, 0.075, 0.150, 0.225, 0.000, 0.000, 0.000, 0.000, 0.000},
+        {0.000, 0.000, 0.150, 0.300, 0.450, 0.900, 1.125, 0.225, 0.450, 0.675},
+    };
+    Sample const* input_buffer[FixedSignalProducer::CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Buffer output(sample_count, FixedSignalProducer::CHANNELS);
+    PannedDelayClass panned_delay(input, PannedDelayStereoMode::FLIPPED);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+
+    panned_delay.set_sample_rate(sample_rate);
+    panned_delay.set_block_size(block_size);
+    panned_delay.delay.gain.set_value(0.75);
+    panned_delay.delay.time.set_value(0.2);
+    panned_delay.panning.set_value(0.0);
+    panned_delay.panning.schedule_value(0.45, -1.0);
+
+    assert_eq((int)input.get_channels(), (int)panned_delay.get_channels());
+
+    render_rounds<PannedDelayClass>(panned_delay, output, rounds);
+
+    for (Integer c = 0; c != FixedSignalProducer::CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            DOUBLE_DELTA,
+            "channel=%d",
+            (int)c
+        );
+    }
+
+    assert_eq(-1.0, panned_delay.panning.get_value(), DOUBLE_DELTA);
+}
+
+
+TEST(output_may_be_panned, {
+    test_panned_delay< HighShelfPannedDelay<FixedSignalProducer> >();
+    test_panned_delay< PannedDelay<FixedSignalProducer> >();
+})

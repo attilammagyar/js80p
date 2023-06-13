@@ -94,13 +94,13 @@ SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
 	synth/biquad_filter \
-	synth/comb_filter \
 	synth/delay \
 	synth/distortion \
 	synth/echo \
 	synth/effect \
 	synth/effects \
 	synth/filter \
+	synth/mixer \
 	synth/reverb \
 	synth/voice \
 	synth/wavefolder \
@@ -109,7 +109,6 @@ SYNTH_COMPONENTS = \
 TESTS = \
 	test_example \
 	test_biquad_filter \
-	test_comb_filter \
 	test_delay \
 	test_distortion \
 	test_envelope \
@@ -118,6 +117,7 @@ TESTS = \
 	test_lfo \
 	test_math \
 	test_midi_controller \
+	test_mixer \
 	test_oscillator \
 	test_param \
 	test_bank \
@@ -265,10 +265,10 @@ check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_comb_filter$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
@@ -416,9 +416,8 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/test_comb_filter$(EXE): \
-		tests/test_comb_filter.cpp \
-		src/synth/comb_filter.cpp src/synth/comb_filter.hpp \
+$(BUILD_DIR)/test_delay$(EXE): \
+		tests/test_delay.cpp \
 		src/synth/delay.cpp src/synth/delay.hpp \
 		src/synth/filter.cpp src/synth/filter.hpp \
 		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
@@ -429,15 +428,6 @@ $(BUILD_DIR)/test_comb_filter$(EXE): \
 		$(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) \
 		-Wno-maybe-uninitialized \
 		-o $@ $<
-
-$(BUILD_DIR)/test_delay$(EXE): \
-		tests/test_delay.cpp \
-		src/synth/delay.cpp src/synth/delay.hpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
-		$(PARAM_HEADERS) $(PARAM_SOURCES) \
-		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
@@ -491,6 +481,15 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 		tests/test_midi_controller.cpp \
 		src/synth/midi_controller.cpp src/synth/midi_controller.hpp \
 		src/synth/queue.cpp src/synth/queue.hpp \
+		src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_mixer$(EXE): \
+		tests/test_mixer.cpp \
+		src/synth/mixer.cpp src/synth/mixer.hpp \
+		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)

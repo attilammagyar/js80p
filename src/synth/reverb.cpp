@@ -33,7 +33,7 @@ template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::Reverb(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 9 + COMB_FILTERS),
+) : Effect<InputSignalProducerClass>(name, input, 10 + COMB_FILTERS),
     room_size(name + "RS", 0.0, 0.999, 0.75),
     damping_frequency(
         name + "DF",
@@ -49,6 +49,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         20.0
     ),
+    mixer(input.get_channels()),
     high_pass_filter_type(""),
     high_pass_filter_q(
         "",
@@ -70,6 +71,8 @@ Reverb<InputSignalProducerClass>::Reverb(
         high_pass_filter_gain
     )
 {
+    this->register_child(mixer);
+
     this->register_child(room_size);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
@@ -83,9 +86,9 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(high_pass_filter);
 
     for (Integer i = 0; i != COMB_FILTERS; ++i) {
-        comb_filters[i] = new HighPassInputHighShelfPannedCombFilter(
+        comb_filters[i] = new CombFilter(
             high_pass_filter,
-            i & 1 ? CombFilterStereoMode::FLIPPED : CombFilterStereoMode::NORMAL,
+            i & 1 ? PannedDelayStereoMode::FLIPPED : PannedDelayStereoMode::NORMAL,
             width,
             room_size,
             TUNINGS[i],
@@ -96,11 +99,11 @@ Reverb<InputSignalProducerClass>::Reverb(
             &comb_filters[i]->high_shelf_filter
         );
 
+        mixer.add(*comb_filters[i]);
         this->register_child(*comb_filters[i]);
-        comb_filter_buffers[i] = NULL;
     }
 
-    high_pass_filter_type.set_value(HighPassInput::HIGH_PASS);
+    high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 }
 
 
@@ -127,40 +130,10 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
         return buffer;
     }
 
-    for (Integer i = 0; i != COMB_FILTERS; ++i) {
-        comb_filter_buffers[i] = (
-            SignalProducer::produce<HighPassInputHighShelfPannedCombFilter>(
-                comb_filters[i], round, sample_count
-            )
-        );
-    }
+    mixer.set_output_buffer(this->buffer);
+    SignalProducer::produce< Mixer<CombFilter> >(&mixer, round, sample_count);
 
     return NULL;
-}
-
-
-template<class InputSignalProducerClass>
-void Reverb<InputSignalProducerClass>::render(
-        Integer const round,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
-) noexcept {
-    Integer const channels = this->channels;
-
-    for (Integer c = 0; c != channels; ++c) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = 0.0;
-
-            for (Integer j = 0; j != COMB_FILTERS; ++j) {
-                buffer[c][i] += comb_filter_buffers[j][c][i];
-            }
-        }
-    }
-
-    Effect<InputSignalProducerClass>::render(
-        round, first_sample_index, last_sample_index, buffer
-    );
 }
 
 }

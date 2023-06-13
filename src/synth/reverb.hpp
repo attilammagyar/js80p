@@ -22,8 +22,9 @@
 #include "js80p.hpp"
 
 #include "synth/biquad_filter.hpp"
-#include "synth/comb_filter.hpp"
+#include "synth/delay.hpp"
 #include "synth/effect.hpp"
+#include "synth/mixer.hpp"
 #include "synth/param.hpp"
 #include "synth/signal_producer.hpp"
 
@@ -37,8 +38,8 @@ class Reverb : public Effect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef BiquadFilter<InputSignalProducerClass> HighPassInput;
-        typedef HighShelfPannedCombFilter<HighPassInput> HighPassInputHighShelfPannedCombFilter;
+        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
+        typedef HighShelfPannedDelay<HighPassedInput> CombFilter;
 
         Reverb(std::string const name, InputSignalProducerClass& input);
 
@@ -56,13 +57,6 @@ class Reverb : public Effect<InputSignalProducerClass>
             Integer const sample_count
         ) noexcept;
 
-        void render(
-            Integer const round,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample** buffer
-        ) noexcept;
-
     private:
         static constexpr Integer COMB_FILTERS = 8;
 
@@ -77,14 +71,14 @@ class Reverb : public Effect<InputSignalProducerClass>
             1116.0 / 44100.0,
         };
 
-        typename BiquadFilter<InputSignalProducerClass>::TypeParam high_pass_filter_type;
+        Mixer<CombFilter> mixer;
+
+        typename HighPassedInput::TypeParam high_pass_filter_type;
         FloatParam high_pass_filter_q;
         FloatParam high_pass_filter_gain;
 
-        BiquadFilter<InputSignalProducerClass> high_pass_filter;
-        HighPassInputHighShelfPannedCombFilter* comb_filters[COMB_FILTERS];
-
-        Sample const* const* comb_filter_buffers[COMB_FILTERS];
+        HighPassedInput high_pass_filter;
+        CombFilter* comb_filters[COMB_FILTERS];
 };
 
 }

@@ -28,7 +28,6 @@
 
 #include "synth/envelope.hpp"
 #include "synth/biquad_filter.hpp"
-#include "synth/comb_filter.hpp"
 #include "synth/delay.hpp"
 #include "synth/distortion.hpp"
 #include "synth/echo.hpp"
@@ -39,6 +38,7 @@
 #include "synth/lfo.hpp"
 #include "synth/math.hpp"
 #include "synth/midi_controller.hpp"
+#include "synth/mixer.hpp"
 #include "synth/oscillator.hpp"
 #include "synth/param.hpp"
 #include "synth/reverb.hpp"
@@ -774,6 +774,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     FloatParam& modulator_add_volume
                 ) noexcept;
 
+            protected:
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count

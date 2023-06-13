@@ -16,15 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__SYNTH__ECHO_HPP
-#define JS80P__SYNTH__ECHO_HPP
+#ifndef JS80P__SYNTH__MIXER_HPP
+#define JS80P__SYNTH__MIXER_HPP
+
+#include <vector>
 
 #include "js80p.hpp"
 
-#include "synth/biquad_filter.hpp"
-#include "synth/delay.hpp"
-#include "synth/effect.hpp"
-#include "synth/param.hpp"
 #include "synth/signal_producer.hpp"
 
 
@@ -32,24 +30,15 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-class Echo : public Effect<InputSignalProducerClass>
+class Mixer : public SignalProducer
 {
     friend class SignalProducer;
 
     public:
-        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
-        typedef HighShelfPannedDelay<HighPassedInput> CombFilter1;
-        typedef HighShelfPannedDelay< HighShelfDelay<HighPassedInput> > CombFilter2;
+        Mixer(Integer const channels) noexcept;
 
-        Echo(std::string const name, InputSignalProducerClass& input);
-
-        FloatParam delay_time;
-        FloatParam feedback;
-        FloatParam damping_frequency;
-        FloatParam damping_gain;
-        FloatParam width;
-        FloatParam high_pass_frequency;
-        ToggleParam tempo_sync;
+        void add(InputSignalProducerClass& input) noexcept;
+        void set_output_buffer(Sample** output) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -65,16 +54,21 @@ class Echo : public Effect<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParam high_pass_filter_q;
-        FloatParam high_pass_filter_gain;
+        class Input {
+            public:
+                Input(InputSignalProducerClass* input);
+                Input(Input const& input);
+                Input(Input const&& input);
 
-        HighPassedInput high_pass_filter;
-        CombFilter1 comb_filter_1;
-        CombFilter2 comb_filter_2;
+                Input& operator=(Input const& input);
+                Input& operator=(Input const&& input);
 
-        Sample const* const* comb_filter_1_buffer;
-        Sample const* const* comb_filter_2_buffer;
+                InputSignalProducerClass* input;
+                Sample const* const* buffer;
+        };
+
+        Sample** output;
+        std::vector<Input> inputs;
 };
 
 }
