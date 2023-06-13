@@ -348,6 +348,10 @@ void HighShelfPannedCombFilter<InputSignalProducerClass>::initialize_instance() 
     this->register_child(high_shelf_filter_type);
     this->register_child(high_shelf_filter_q);
     this->register_child(high_shelf_filter);
+
+    high_shelf_filter_type.set_value(
+        HighShelfDelay<InputSignalProducerClass>::HIGH_SHELF
+    );
 }
 
 }
