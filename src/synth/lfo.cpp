@@ -152,12 +152,18 @@ void LFO::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    apply_distortions(round, first_sample_index, last_sample_index, buffer);
+    apply_distortions(
+        round, first_sample_index, last_sample_index, oscillator_buffer, buffer
+    );
 
     if (center.get_value() == ToggleParam::ON) {
-        apply_range_centered(round, first_sample_index, last_sample_index, buffer);
+        apply_range_centered(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
     } else {
-        apply_range(round, first_sample_index, last_sample_index, buffer);
+        apply_range(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
     }
 }
 
@@ -166,7 +172,8 @@ void LFO::apply_range(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample const* const* source_buffer,
+        Sample** target_buffer
 ) {
     if (min_buffer == NULL) {
         Sample const min_value = (Sample)min.get_value();
@@ -176,16 +183,16 @@ void LFO::apply_range(
             Sample const range = max_value - min_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = (
-                    min_value + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    min_value + range * (source_buffer[0][i])
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 Sample const range = max_buffer[i] - min_value;
 
-                buffer[0][i] = (
-                    min_value + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    min_value + range * (source_buffer[0][i])
                 );
             }
         }
@@ -196,16 +203,16 @@ void LFO::apply_range(
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 Sample const range = max_value - min_buffer[i];
 
-                buffer[0][i] = (
-                    min_buffer[i] + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    min_buffer[i] + range * (source_buffer[0][i])
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 Sample const range = max_buffer[i] - min_buffer[i];
 
-                buffer[0][i] = (
-                    min_buffer[i] + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    min_buffer[i] + range * (source_buffer[0][i])
                 );
             }
         }
@@ -217,7 +224,8 @@ void LFO::apply_range_centered(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample const* const* source_buffer,
+        Sample** target_buffer
 ) {
     if (min_buffer == NULL) {
         Sample const min_value = (Sample)min.get_value();
@@ -228,8 +236,8 @@ void LFO::apply_range_centered(
             Sample const range = max_value - min_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = (
-                    center + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    center + range * (source_buffer[0][i])
                 );
             }
         } else {
@@ -238,8 +246,8 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                buffer[0][i] = (
-                    center + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    center + range * (source_buffer[0][i])
                 );
             }
         }
@@ -252,8 +260,8 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                buffer[0][i] = (
-                    center + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    center + range * (source_buffer[0][i])
                 );
             }
         } else {
@@ -263,8 +271,8 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                buffer[0][i] = (
-                    center + range * (oscillator_buffer[0][i])
+                target_buffer[0][i] = (
+                    center + range * (source_buffer[0][i])
                 );
             }
         }
@@ -276,7 +284,8 @@ void LFO::apply_distortions(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample const* const* source_buffer,
+        Sample** target_buffer
 ) {
     if (distortion_buffer == NULL) {
         Number const distortion = this->distortion.get_value();
@@ -285,14 +294,16 @@ void LFO::apply_distortions(
             Number const randomness = this->randomness.get_value();
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = Math::randomize(
-                    randomness, Math::distort(distortion, buffer[0][i])
+                target_buffer[0][i] = Math::randomize(
+                    randomness,
+                    Math::distort(distortion, source_buffer[0][i])
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = Math::randomize(
-                    randomness_buffer[i], Math::distort(distortion, buffer[0][i])
+                target_buffer[0][i] = Math::randomize(
+                    randomness_buffer[i],
+                    Math::distort(distortion, source_buffer[0][i])
                 );
             }
         }
@@ -301,15 +312,16 @@ void LFO::apply_distortions(
             Number const randomness = this->randomness.get_value();
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = Math::randomize(
-                    randomness, Math::distort(distortion_buffer[i], buffer[0][i])
+                target_buffer[0][i] = Math::randomize(
+                    randomness,
+                    Math::distort(distortion_buffer[i], source_buffer[0][i])
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = Math::randomize(
+                target_buffer[0][i] = Math::randomize(
                     randomness_buffer[i],
-                    Math::distort(distortion_buffer[i], buffer[0][i])
+                    Math::distort(distortion_buffer[i], source_buffer[0][i])
                 );
             }
         }

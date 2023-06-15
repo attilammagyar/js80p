@@ -310,7 +310,8 @@ void assert_statistics(
         Number const expected_mean,
         Number const expected_standard_deviation,
         Math::Statistics const& statistics,
-        Number const tolerance = DOUBLE_DELTA
+        Number const tolerance = DOUBLE_DELTA,
+        char const* message = ""
 ) {
     if (!expected_validity) {
         assert_false(statistics.is_valid);
@@ -318,13 +319,16 @@ void assert_statistics(
         return;
     }
 
-    assert_true(statistics.is_valid);
-    assert_eq(expected_min, statistics.min, tolerance);
-    assert_eq(expected_median, statistics.median, tolerance);
-    assert_eq(expected_max, statistics.max, tolerance);
-    assert_eq(expected_mean, statistics.mean, tolerance);
+    assert_true(statistics.is_valid, message);
+    assert_eq(expected_min, statistics.min, tolerance, message);
+    assert_eq(expected_median, statistics.median, tolerance, message);
+    assert_eq(expected_max, statistics.max, tolerance, message);
+    assert_eq(expected_mean, statistics.mean, tolerance, message);
     assert_eq(
-        expected_standard_deviation, statistics.standard_deviation, tolerance
+        expected_standard_deviation,
+        statistics.standard_deviation,
+        tolerance,
+        message
     );
 }
 

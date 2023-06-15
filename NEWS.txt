@@ -1,5 +1,7 @@
 v1.7.0 (2023-06-16)
  * New effect: chorus
+ * Bugfix: LFO distortion and randomness now have effect again, and the min,
+   max, amount, etc. range settings are respected.
 
 v1.6.0 (2023-06-11)
  * Envelopes can now be configured to affect notes that are already sounding.

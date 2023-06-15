@@ -19,6 +19,7 @@
 #include "test.cpp"
 #include "utils.cpp"
 
+#include <cstring>
 #include <vector>
 
 #include "js80p.hpp"
@@ -226,18 +227,26 @@ TEST(lfo_performance, {
 })
 
 
-TEST(distortion_and_randomness_respect_min_and_max_values, {
+void test_lfo_modifier_statistics(
+        Number const distortion,
+        Number const randomness,
+        Number const tolerance
+) {
     LFO lfo("L1");
     std::vector<Number> numbers;
     Sample const* const* rendered_samples;
     Math::Statistics stats;
+    char message[128];
+
+    snprintf(message, 128, "distortion=%f, randomness=%f", distortion, randomness);
 
     lfo.set_block_size(BLOCK_SIZE);
     lfo.set_sample_rate(SAMPLE_RATE);
+    lfo.waveform.set_value(LFO::Oscillator_::TRIANGLE);
     lfo.min.set_value(0.25);
     lfo.max.set_value(0.75);
-    lfo.randomness.set_value(1.0);
-    lfo.distortion.set_value(1.0);
+    lfo.distortion.set_value(distortion);
+    lfo.distortion.set_value(randomness);
     lfo.frequency.set_value(30.0);
     lfo.start(0.0);
 
@@ -251,5 +260,15 @@ TEST(distortion_and_randomness_respect_min_and_max_values, {
 
     Math::compute_statistics(numbers, stats);
 
-    assert_statistics(true, 0.25, 0.5, 0.75, 0.5, 0.125, stats, 0.06);
+    assert_statistics(true, 0.25, 0.5, 0.75, 0.5, 0.125, stats, tolerance, message);
+    assert_gte(0.75, stats.max);
+    assert_lte(0.25, stats.min);
+}
+
+
+TEST(distortion_and_randomness_respect_min_and_max_values, {
+    test_lfo_modifier_statistics(0.0, 0.0, 0.02);
+    test_lfo_modifier_statistics(1.0, 0.0, 0.02);
+    test_lfo_modifier_statistics(0.0, 1.0, 0.14);
+    test_lfo_modifier_statistics(1.0, 1.0, 0.14);
 })
