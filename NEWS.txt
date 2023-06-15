@@ -1,5 +1,6 @@
 v1.7.0 (2023-06-16)
  * New effect: chorus
+ * New preset: derezzed
  * Bugfix: LFO distortion and randomness now have effect again, and the min,
    max, amount, etc. range settings are respected.
 
