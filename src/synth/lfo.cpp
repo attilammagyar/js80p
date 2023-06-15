@@ -41,6 +41,12 @@ LFO::LFO(std::string const name) noexcept
     center(name + "CEN", ToggleParam::OFF),
     oscillator(waveform, amount, frequency, phase, tempo_sync, center)
 {
+    initialize_instance();
+}
+
+
+void LFO::initialize_instance() noexcept
+{
     register_child(waveform);
     register_child(frequency);
     register_child(phase);
@@ -52,6 +58,31 @@ LFO::LFO(std::string const name) noexcept
     register_child(tempo_sync);
     register_child(center);
     register_child(oscillator);
+}
+
+
+LFO::LFO(
+        std::string const name,
+        FloatParam& frequency_leader,
+        FloatParam& max_leader,
+        FloatParam& amount_leader,
+        ToggleParam& tempo_sync_,
+        Number const phase_offset
+) noexcept
+    : SignalProducer(1, 10),
+    waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    frequency(frequency_leader),
+    phase(name + "PHS", 0.0, 1.0, phase_offset),
+    min(name + "MIN", 0.0, 1.0, 0.0),
+    max(max_leader),
+    amount(amount_leader),
+    distortion(name + "DST", 0.0, 1.0, 0.0),
+    randomness(name + "RND", 0.0, 1.0, 0.0),
+    tempo_sync(name + "SYN", ToggleParam::OFF),
+    center(name + "CEN", ToggleParam::OFF),
+    oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
+{
+    initialize_instance();
 }
 
 

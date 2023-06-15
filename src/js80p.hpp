@@ -81,6 +81,11 @@ namespace Constants {
     constexpr Number BIQUAD_FILTER_Q_MIN = 0.0;
     constexpr Number BIQUAD_FILTER_Q_SCALE = 1.0 / 20.0;
 
+    constexpr Number CHORUS_DELAY_TIME_DEFAULT = 0.015625;
+    constexpr Number CHORUS_DELAY_TIME_MAX = 1.0;
+
+    constexpr Integer CHORUS_FEEDBACK_SCALE = 4;
+
     constexpr Number DELAY_GAIN_DEFAULT = 0.5;
     constexpr Number DELAY_GAIN_MIN = 0.0;
     constexpr Number DELAY_GAIN_MAX = 1.0;

@@ -82,6 +82,17 @@ def print_effect_params(param_id: int) -> int:
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
 
+        ("$CDEL", " ///< $ Chorus Delay"),
+        ("$CFRQ", " ///< $ Chorus LFO Frequency"),
+        ("$CDPT", " ///< $ Chorus Depth"),
+        ("$CFB", "  ///< $ Chorus Feedback"),
+        ("$CDF", "  ///< $ Chorus Dampening Frequency"),
+        ("$CDG", "  ///< $ Chorus Dampening Gain"),
+        ("$CWID", " ///< $ Chorus Stereo Width"),
+        ("$CHPF", " ///< $ Chorus Highpass Frequency"),
+        ("$CWET", " ///< $ Chorus Wet Volume"),
+        ("$CDRY", " ///< $ Chorus Dry Volume"),
+
         ("$EDEL", " ///< $ Echo Delay"),
         ("$EFB", "  ///< $ Echo Feedback"),
         ("$EDF", "  ///< $ Echo Dampening Frequency"),
@@ -169,6 +180,15 @@ def print_special_params(param_id: int) -> int:
         ("L7WAV", " ///< LFO 7 Waveform"),
         ("L8WAV", " ///< LFO 8 Waveform"),
 
+        ("L1CEN", " ///< LFO 1 Center"),
+        ("L2CEN", " ///< LFO 2 Center"),
+        ("L3CEN", " ///< LFO 3 Center"),
+        ("L4CEN", " ///< LFO 4 Center"),
+        ("L5CEN", " ///< LFO 5 Center"),
+        ("L6CEN", " ///< LFO 6 Center"),
+        ("L7CEN", " ///< LFO 7 Center"),
+        ("L8CEN", " ///< LFO 8 Center"),
+
         ("L1SYN", " ///< LFO 1 Tempo Synchronization"),
         ("L2SYN", " ///< LFO 2 Tempo Synchronization"),
         ("L3SYN", " ///< LFO 3 Tempo Synchronization"),
@@ -178,24 +198,18 @@ def print_special_params(param_id: int) -> int:
         ("L7SYN", " ///< LFO 7 Tempo Synchronization"),
         ("L8SYN", " ///< LFO 8 Tempo Synchronization"),
 
+        ("ECSYN", " ///< Effects Chorus Tempo Synchronization"),
+
         ("EESYN", " ///< Effects Echo Tempo Synchronization"),
 
         ("MF1LOG", "///< Modulator Filter 1 Logarithmic Frequency"),
         ("MF2LOG", "///< Modulator Filter 2 Logarithmic Frequency"),
+
         ("CF1LOG", "///< Carrier Filter 1 Logarithmic Frequency"),
         ("CF2LOG", "///< Carrier Filter 2 Logarithmic Frequency"),
 
         ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency"),
         ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency"),
-
-        ("L1CEN", " ///< LFO 1 Center"),
-        ("L2CEN", " ///< LFO 2 Center"),
-        ("L3CEN", " ///< LFO 3 Center"),
-        ("L4CEN", " ///< LFO 4 Center"),
-        ("L5CEN", " ///< LFO 5 Center"),
-        ("L6CEN", " ///< LFO 6 Center"),
-        ("L7CEN", " ///< LFO 7 Center"),
-        ("L8CEN", " ///< LFO 8 Center"),
 
         ("N1DYN", " ///< Envelope 1 Dynamic"),
         ("N2DYN", " ///< Envelope 2 Dynamic"),

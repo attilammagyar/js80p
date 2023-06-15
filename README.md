@@ -110,6 +110,7 @@ Features
     * overdrive
     * distortion
     * 2 more filters
+    * chorus
     * stereo echo
     * stereo reverb
  * 6 envelopes
@@ -133,10 +134,10 @@ Features
       v                                                 (x16)  |       |
       Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
                                                                        |
-    +------------------------------------------------------------------+
+    Overdrive <--------------------------------------------------------+
     |
     v
-    Overdrive --> Distortion --> Filter --> Filter --> Echo --> Reverb --> Out
+    Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
 
 <a name="future"></a>
 

@@ -1,3 +1,6 @@
+v1.7.0 (2023-06-16)
+ * New effect: chorus
+
 v1.6.0 (2023-06-11)
  * Envelopes can now be configured to affect notes that are already sounding.
  * New presets:

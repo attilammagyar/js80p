@@ -28,6 +28,7 @@
 
 #include "synth/envelope.hpp"
 #include "synth/biquad_filter.hpp"
+#include "synth/chorus.hpp"
 #include "synth/delay.hpp"
 #include "synth/distortion.hpp"
 #include "synth/echo.hpp"
@@ -35,6 +36,7 @@
 #include "synth/effects.hpp"
 #include "synth/flexible_controller.hpp"
 #include "synth/filter.hpp"
+#include "synth/gain.hpp"
 #include "synth/lfo.hpp"
 #include "synth/math.hpp"
 #include "synth/midi_controller.hpp"
@@ -89,6 +91,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         enum ParamId {
             MIX = 0,         ///< Modulator Additive Volume
+
             PM = 1,          ///< Phase Modulation
             FM = 2,          ///< Frequency Modulation
             AM = 3,          ///< Amplitude Modulation
@@ -165,271 +168,292 @@ class Synth : public Midi::EventHandler, public SignalProducer
             EF2Q = 62,       ///< Effects Filter 2 Q Factor
             EF2G = 63,       ///< Effects Filter 2 Gain
 
-            EEDEL = 64,      ///< Effects Echo Delay
-            EEFB = 65,       ///< Effects Echo Feedback
-            EEDF = 66,       ///< Effects Echo Dampening Frequency
-            EEDG = 67,       ///< Effects Echo Dampening Gain
-            EEWID = 68,      ///< Effects Echo Stereo Width
-            EEHPF = 69,      ///< Effects Echo Highpass Frequency
-            EEWET = 70,      ///< Effects Echo Wet Volume
-            EEDRY = 71,      ///< Effects Echo Dry Volume
+            ECDEL = 64,      ///< Effects Chorus Delay
+            ECFRQ = 65,      ///< Effects Chorus LFO Frequency
+            ECDPT = 66,      ///< Effects Chorus Depth
+            ECFB = 67,       ///< Effects Chorus Feedback
+            ECDF = 68,       ///< Effects Chorus Dampening Frequency
+            ECDG = 69,       ///< Effects Chorus Dampening Gain
+            ECWID = 70,      ///< Effects Chorus Stereo Width
+            ECHPF = 71,      ///< Effects Chorus Highpass Frequency
+            ECWET = 72,      ///< Effects Chorus Wet Volume
+            ECDRY = 73,      ///< Effects Chorus Dry Volume
 
-            ERRS = 72,       ///< Effects Reverb Room Size
-            ERDF = 73,       ///< Effects Reverb Dampening Frequency
-            ERDG = 74,       ///< Effects Reverb Dampening Gain
-            ERWID = 75,      ///< Effects Reverb Stereo Width
-            ERHPF = 76,      ///< Effects Reverb Highpass Frequency
-            ERWET = 77,      ///< Effects Reverb Wet Volume
-            ERDRY = 78,      ///< Effects Reverb Dry Volume
+            EEDEL = 74,      ///< Effects Echo Delay
+            EEFB = 75,       ///< Effects Echo Feedback
+            EEDF = 76,       ///< Effects Echo Dampening Frequency
+            EEDG = 77,       ///< Effects Echo Dampening Gain
+            EEWID = 78,      ///< Effects Echo Stereo Width
+            EEHPF = 79,      ///< Effects Echo Highpass Frequency
+            EEWET = 80,      ///< Effects Echo Wet Volume
+            EEDRY = 81,      ///< Effects Echo Dry Volume
 
-            F1IN = 79,       ///< Flexible Controller 1 Input
-            F1MIN = 80,      ///< Flexible Controller 1 Minimum Value
-            F1MAX = 81,      ///< Flexible Controller 1 Maximum Value
-            F1AMT = 82,      ///< Flexible Controller 1 Amount
-            F1DST = 83,      ///< Flexible Controller 1 Distortion
-            F1RND = 84,      ///< Flexible Controller 1 Randomness
+            ERRS = 82,       ///< Effects Reverb Room Size
+            ERDF = 83,       ///< Effects Reverb Dampening Frequency
+            ERDG = 84,       ///< Effects Reverb Dampening Gain
+            ERWID = 85,      ///< Effects Reverb Stereo Width
+            ERHPF = 86,      ///< Effects Reverb Highpass Frequency
+            ERWET = 87,      ///< Effects Reverb Wet Volume
+            ERDRY = 88,      ///< Effects Reverb Dry Volume
 
-            F2IN = 85,       ///< Flexible Controller 2 Input
-            F2MIN = 86,      ///< Flexible Controller 2 Minimum Value
-            F2MAX = 87,      ///< Flexible Controller 2 Maximum Value
-            F2AMT = 88,      ///< Flexible Controller 2 Amount
-            F2DST = 89,      ///< Flexible Controller 2 Distortion
-            F2RND = 90,      ///< Flexible Controller 2 Randomness
+            F1IN = 89,       ///< Flexible Controller 1 Input
+            F1MIN = 90,      ///< Flexible Controller 1 Minimum Value
+            F1MAX = 91,      ///< Flexible Controller 1 Maximum Value
+            F1AMT = 92,      ///< Flexible Controller 1 Amount
+            F1DST = 93,      ///< Flexible Controller 1 Distortion
+            F1RND = 94,      ///< Flexible Controller 1 Randomness
 
-            F3IN = 91,       ///< Flexible Controller 3 Input
-            F3MIN = 92,      ///< Flexible Controller 3 Minimum Value
-            F3MAX = 93,      ///< Flexible Controller 3 Maximum Value
-            F3AMT = 94,      ///< Flexible Controller 3 Amount
-            F3DST = 95,      ///< Flexible Controller 3 Distortion
-            F3RND = 96,      ///< Flexible Controller 3 Randomness
+            F2IN = 95,       ///< Flexible Controller 2 Input
+            F2MIN = 96,      ///< Flexible Controller 2 Minimum Value
+            F2MAX = 97,      ///< Flexible Controller 2 Maximum Value
+            F2AMT = 98,      ///< Flexible Controller 2 Amount
+            F2DST = 99,      ///< Flexible Controller 2 Distortion
+            F2RND = 100,     ///< Flexible Controller 2 Randomness
 
-            F4IN = 97,       ///< Flexible Controller 4 Input
-            F4MIN = 98,      ///< Flexible Controller 4 Minimum Value
-            F4MAX = 99,      ///< Flexible Controller 4 Maximum Value
-            F4AMT = 100,     ///< Flexible Controller 4 Amount
-            F4DST = 101,     ///< Flexible Controller 4 Distortion
-            F4RND = 102,     ///< Flexible Controller 4 Randomness
+            F3IN = 101,      ///< Flexible Controller 3 Input
+            F3MIN = 102,     ///< Flexible Controller 3 Minimum Value
+            F3MAX = 103,     ///< Flexible Controller 3 Maximum Value
+            F3AMT = 104,     ///< Flexible Controller 3 Amount
+            F3DST = 105,     ///< Flexible Controller 3 Distortion
+            F3RND = 106,     ///< Flexible Controller 3 Randomness
 
-            F5IN = 103,      ///< Flexible Controller 5 Input
-            F5MIN = 104,     ///< Flexible Controller 5 Minimum Value
-            F5MAX = 105,     ///< Flexible Controller 5 Maximum Value
-            F5AMT = 106,     ///< Flexible Controller 5 Amount
-            F5DST = 107,     ///< Flexible Controller 5 Distortion
-            F5RND = 108,     ///< Flexible Controller 5 Randomness
+            F4IN = 107,      ///< Flexible Controller 4 Input
+            F4MIN = 108,     ///< Flexible Controller 4 Minimum Value
+            F4MAX = 109,     ///< Flexible Controller 4 Maximum Value
+            F4AMT = 110,     ///< Flexible Controller 4 Amount
+            F4DST = 111,     ///< Flexible Controller 4 Distortion
+            F4RND = 112,     ///< Flexible Controller 4 Randomness
 
-            F6IN = 109,      ///< Flexible Controller 6 Input
-            F6MIN = 110,     ///< Flexible Controller 6 Minimum Value
-            F6MAX = 111,     ///< Flexible Controller 6 Maximum Value
-            F6AMT = 112,     ///< Flexible Controller 6 Amount
-            F6DST = 113,     ///< Flexible Controller 6 Distortion
-            F6RND = 114,     ///< Flexible Controller 6 Randomness
+            F5IN = 113,      ///< Flexible Controller 5 Input
+            F5MIN = 114,     ///< Flexible Controller 5 Minimum Value
+            F5MAX = 115,     ///< Flexible Controller 5 Maximum Value
+            F5AMT = 116,     ///< Flexible Controller 5 Amount
+            F5DST = 117,     ///< Flexible Controller 5 Distortion
+            F5RND = 118,     ///< Flexible Controller 5 Randomness
 
-            F7IN = 115,      ///< Flexible Controller 7 Input
-            F7MIN = 116,     ///< Flexible Controller 7 Minimum Value
-            F7MAX = 117,     ///< Flexible Controller 7 Maximum Value
-            F7AMT = 118,     ///< Flexible Controller 7 Amount
-            F7DST = 119,     ///< Flexible Controller 7 Distortion
-            F7RND = 120,     ///< Flexible Controller 7 Randomness
+            F6IN = 119,      ///< Flexible Controller 6 Input
+            F6MIN = 120,     ///< Flexible Controller 6 Minimum Value
+            F6MAX = 121,     ///< Flexible Controller 6 Maximum Value
+            F6AMT = 122,     ///< Flexible Controller 6 Amount
+            F6DST = 123,     ///< Flexible Controller 6 Distortion
+            F6RND = 124,     ///< Flexible Controller 6 Randomness
 
-            F8IN = 121,      ///< Flexible Controller 8 Input
-            F8MIN = 122,     ///< Flexible Controller 8 Minimum Value
-            F8MAX = 123,     ///< Flexible Controller 8 Maximum Value
-            F8AMT = 124,     ///< Flexible Controller 8 Amount
-            F8DST = 125,     ///< Flexible Controller 8 Distortion
-            F8RND = 126,     ///< Flexible Controller 8 Randomness
+            F7IN = 125,      ///< Flexible Controller 7 Input
+            F7MIN = 126,     ///< Flexible Controller 7 Minimum Value
+            F7MAX = 127,     ///< Flexible Controller 7 Maximum Value
+            F7AMT = 128,     ///< Flexible Controller 7 Amount
+            F7DST = 129,     ///< Flexible Controller 7 Distortion
+            F7RND = 130,     ///< Flexible Controller 7 Randomness
 
-            F9IN = 127,      ///< Flexible Controller 9 Input
-            F9MIN = 128,     ///< Flexible Controller 9 Minimum Value
-            F9MAX = 129,     ///< Flexible Controller 9 Maximum Value
-            F9AMT = 130,     ///< Flexible Controller 9 Amount
-            F9DST = 131,     ///< Flexible Controller 9 Distortion
-            F9RND = 132,     ///< Flexible Controller 9 Randomness
+            F8IN = 131,      ///< Flexible Controller 8 Input
+            F8MIN = 132,     ///< Flexible Controller 8 Minimum Value
+            F8MAX = 133,     ///< Flexible Controller 8 Maximum Value
+            F8AMT = 134,     ///< Flexible Controller 8 Amount
+            F8DST = 135,     ///< Flexible Controller 8 Distortion
+            F8RND = 136,     ///< Flexible Controller 8 Randomness
 
-            F10IN = 133,     ///< Flexible Controller 10 Input
-            F10MIN = 134,    ///< Flexible Controller 10 Minimum Value
-            F10MAX = 135,    ///< Flexible Controller 10 Maximum Value
-            F10AMT = 136,    ///< Flexible Controller 10 Amount
-            F10DST = 137,    ///< Flexible Controller 10 Distortion
-            F10RND = 138,    ///< Flexible Controller 10 Randomness
+            F9IN = 137,      ///< Flexible Controller 9 Input
+            F9MIN = 138,     ///< Flexible Controller 9 Minimum Value
+            F9MAX = 139,     ///< Flexible Controller 9 Maximum Value
+            F9AMT = 140,     ///< Flexible Controller 9 Amount
+            F9DST = 141,     ///< Flexible Controller 9 Distortion
+            F9RND = 142,     ///< Flexible Controller 9 Randomness
 
-            N1AMT = 139,     ///< Envelope 1 Amount
-            N1INI = 140,     ///< Envelope 1 Initial Level
-            N1DEL = 141,     ///< Envelope 1 Delay Time
-            N1ATK = 142,     ///< Envelope 1 Attack Time
-            N1PK = 143,      ///< Envelope 1 Peak Level
-            N1HLD = 144,     ///< Envelope 1 Hold Time
-            N1DEC = 145,     ///< Envelope 1 Decay Time
-            N1SUS = 146,     ///< Envelope 1 Sustain Level
-            N1REL = 147,     ///< Envelope 1 Release Time
-            N1FIN = 148,     ///< Envelope 1 Final Level
+            F10IN = 143,      ///< Flexible Controller 10 Input
+            F10MIN = 144,     ///< Flexible Controller 10 Minimum Value
+            F10MAX = 145,     ///< Flexible Controller 10 Maximum Value
+            F10AMT = 146,     ///< Flexible Controller 10 Amount
+            F10DST = 147,     ///< Flexible Controller 10 Distortion
+            F10RND = 148,     ///< Flexible Controller 10 Randomness
 
-            N2AMT = 149,     ///< Envelope 2 Amount
-            N2INI = 150,     ///< Envelope 2 Initial Level
-            N2DEL = 151,     ///< Envelope 2 Delay Time
-            N2ATK = 152,     ///< Envelope 2 Attack Time
-            N2PK = 153,      ///< Envelope 2 Peak Level
-            N2HLD = 154,     ///< Envelope 2 Hold Time
-            N2DEC = 155,     ///< Envelope 2 Decay Time
-            N2SUS = 156,     ///< Envelope 2 Sustain Level
-            N2REL = 157,     ///< Envelope 2 Release Time
-            N2FIN = 158,     ///< Envelope 2 Final Level
+            N1AMT = 149,     ///< Envelope 1 Amount
+            N1INI = 150,     ///< Envelope 1 Initial Level
+            N1DEL = 151,     ///< Envelope 1 Delay Time
+            N1ATK = 152,     ///< Envelope 1 Attack Time
+            N1PK = 153,      ///< Envelope 1 Peak Level
+            N1HLD = 154,     ///< Envelope 1 Hold Time
+            N1DEC = 155,     ///< Envelope 1 Decay Time
+            N1SUS = 156,     ///< Envelope 1 Sustain Level
+            N1REL = 157,     ///< Envelope 1 Release Time
+            N1FIN = 158,     ///< Envelope 1 Final Level
 
-            N3AMT = 159,     ///< Envelope 3 Amount
-            N3INI = 160,     ///< Envelope 3 Initial Level
-            N3DEL = 161,     ///< Envelope 3 Delay Time
-            N3ATK = 162,     ///< Envelope 3 Attack Time
-            N3PK = 163,      ///< Envelope 3 Peak Level
-            N3HLD = 164,     ///< Envelope 3 Hold Time
-            N3DEC = 165,     ///< Envelope 3 Decay Time
-            N3SUS = 166,     ///< Envelope 3 Sustain Level
-            N3REL = 167,     ///< Envelope 3 Release Time
-            N3FIN = 168,     ///< Envelope 3 Final Level
+            N2AMT = 159,     ///< Envelope 2 Amount
+            N2INI = 160,     ///< Envelope 2 Initial Level
+            N2DEL = 161,     ///< Envelope 2 Delay Time
+            N2ATK = 162,     ///< Envelope 2 Attack Time
+            N2PK = 163,      ///< Envelope 2 Peak Level
+            N2HLD = 164,     ///< Envelope 2 Hold Time
+            N2DEC = 165,     ///< Envelope 2 Decay Time
+            N2SUS = 166,     ///< Envelope 2 Sustain Level
+            N2REL = 167,     ///< Envelope 2 Release Time
+            N2FIN = 168,     ///< Envelope 2 Final Level
 
-            N4AMT = 169,     ///< Envelope 4 Amount
-            N4INI = 170,     ///< Envelope 4 Initial Level
-            N4DEL = 171,     ///< Envelope 4 Delay Time
-            N4ATK = 172,     ///< Envelope 4 Attack Time
-            N4PK = 173,      ///< Envelope 4 Peak Level
-            N4HLD = 174,     ///< Envelope 4 Hold Time
-            N4DEC = 175,     ///< Envelope 4 Decay Time
-            N4SUS = 176,     ///< Envelope 4 Sustain Level
-            N4REL = 177,     ///< Envelope 4 Release Time
-            N4FIN = 178,     ///< Envelope 4 Final Level
+            N3AMT = 169,     ///< Envelope 3 Amount
+            N3INI = 170,     ///< Envelope 3 Initial Level
+            N3DEL = 171,     ///< Envelope 3 Delay Time
+            N3ATK = 172,     ///< Envelope 3 Attack Time
+            N3PK = 173,      ///< Envelope 3 Peak Level
+            N3HLD = 174,     ///< Envelope 3 Hold Time
+            N3DEC = 175,     ///< Envelope 3 Decay Time
+            N3SUS = 176,     ///< Envelope 3 Sustain Level
+            N3REL = 177,     ///< Envelope 3 Release Time
+            N3FIN = 178,     ///< Envelope 3 Final Level
 
-            N5AMT = 179,     ///< Envelope 5 Amount
-            N5INI = 180,     ///< Envelope 5 Initial Level
-            N5DEL = 181,     ///< Envelope 5 Delay Time
-            N5ATK = 182,     ///< Envelope 5 Attack Time
-            N5PK = 183,      ///< Envelope 5 Peak Level
-            N5HLD = 184,     ///< Envelope 5 Hold Time
-            N5DEC = 185,     ///< Envelope 5 Decay Time
-            N5SUS = 186,     ///< Envelope 5 Sustain Level
-            N5REL = 187,     ///< Envelope 5 Release Time
-            N5FIN = 188,     ///< Envelope 5 Final Level
+            N4AMT = 179,     ///< Envelope 4 Amount
+            N4INI = 180,     ///< Envelope 4 Initial Level
+            N4DEL = 181,     ///< Envelope 4 Delay Time
+            N4ATK = 182,     ///< Envelope 4 Attack Time
+            N4PK = 183,      ///< Envelope 4 Peak Level
+            N4HLD = 184,     ///< Envelope 4 Hold Time
+            N4DEC = 185,     ///< Envelope 4 Decay Time
+            N4SUS = 186,     ///< Envelope 4 Sustain Level
+            N4REL = 187,     ///< Envelope 4 Release Time
+            N4FIN = 188,     ///< Envelope 4 Final Level
 
-            N6AMT = 189,     ///< Envelope 6 Amount
-            N6INI = 190,     ///< Envelope 6 Initial Level
-            N6DEL = 191,     ///< Envelope 6 Delay Time
-            N6ATK = 192,     ///< Envelope 6 Attack Time
-            N6PK = 193,      ///< Envelope 6 Peak Level
-            N6HLD = 194,     ///< Envelope 6 Hold Time
-            N6DEC = 195,     ///< Envelope 6 Decay Time
-            N6SUS = 196,     ///< Envelope 6 Sustain Level
-            N6REL = 197,     ///< Envelope 6 Release Time
-            N6FIN = 198,     ///< Envelope 6 Final Level
+            N5AMT = 189,     ///< Envelope 5 Amount
+            N5INI = 190,     ///< Envelope 5 Initial Level
+            N5DEL = 191,     ///< Envelope 5 Delay Time
+            N5ATK = 192,     ///< Envelope 5 Attack Time
+            N5PK = 193,      ///< Envelope 5 Peak Level
+            N5HLD = 194,     ///< Envelope 5 Hold Time
+            N5DEC = 195,     ///< Envelope 5 Decay Time
+            N5SUS = 196,     ///< Envelope 5 Sustain Level
+            N5REL = 197,     ///< Envelope 5 Release Time
+            N5FIN = 198,     ///< Envelope 5 Final Level
 
-            L1FRQ = 199,     ///< LFO 1 Frequency
-            L1PHS = 200,     ///< LFO 1 Phase
-            L1MIN = 201,     ///< LFO 1 Minimum Value
-            L1MAX = 202,     ///< LFO 1 Maximum Value
-            L1AMT = 203,     ///< LFO 1 Amount
-            L1DST = 204,     ///< LFO 1 Distortion
-            L1RND = 205,     ///< LFO 1 Randomness
+            N6AMT = 199,     ///< Envelope 6 Amount
+            N6INI = 200,     ///< Envelope 6 Initial Level
+            N6DEL = 201,     ///< Envelope 6 Delay Time
+            N6ATK = 202,     ///< Envelope 6 Attack Time
+            N6PK = 203,      ///< Envelope 6 Peak Level
+            N6HLD = 204,     ///< Envelope 6 Hold Time
+            N6DEC = 205,     ///< Envelope 6 Decay Time
+            N6SUS = 206,     ///< Envelope 6 Sustain Level
+            N6REL = 207,     ///< Envelope 6 Release Time
+            N6FIN = 208,     ///< Envelope 6 Final Level
 
-            L2FRQ = 206,     ///< LFO 2 Frequency
-            L2PHS = 207,     ///< LFO 2 Phase
-            L2MIN = 208,     ///< LFO 2 Minimum Value
-            L2MAX = 209,     ///< LFO 2 Maximum Value
-            L2AMT = 210,     ///< LFO 2 Amount
-            L2DST = 211,     ///< LFO 2 Distortion
-            L2RND = 212,     ///< LFO 2 Randomness
+            L1FRQ = 209,     ///< LFO 1 Frequency
+            L1PHS = 210,     ///< LFO 1 Phase
+            L1MIN = 211,     ///< LFO 1 Minimum Value
+            L1MAX = 212,     ///< LFO 1 Maximum Value
+            L1AMT = 213,     ///< LFO 1 Amount
+            L1DST = 214,     ///< LFO 1 Distortion
+            L1RND = 215,     ///< LFO 1 Randomness
 
-            L3FRQ = 213,     ///< LFO 3 Frequency
-            L3PHS = 214,     ///< LFO 3 Phase
-            L3MIN = 215,     ///< LFO 3 Minimum Value
-            L3MAX = 216,     ///< LFO 3 Maximum Value
-            L3AMT = 217,     ///< LFO 3 Amount
-            L3DST = 218,     ///< LFO 3 Distortion
-            L3RND = 219,     ///< LFO 3 Randomness
+            L2FRQ = 216,     ///< LFO 2 Frequency
+            L2PHS = 217,     ///< LFO 2 Phase
+            L2MIN = 218,     ///< LFO 2 Minimum Value
+            L2MAX = 219,     ///< LFO 2 Maximum Value
+            L2AMT = 220,     ///< LFO 2 Amount
+            L2DST = 221,     ///< LFO 2 Distortion
+            L2RND = 222,     ///< LFO 2 Randomness
 
-            L4FRQ = 220,     ///< LFO 4 Frequency
-            L4PHS = 221,     ///< LFO 4 Phase
-            L4MIN = 222,     ///< LFO 4 Minimum Value
-            L4MAX = 223,     ///< LFO 4 Maximum Value
-            L4AMT = 224,     ///< LFO 4 Amount
-            L4DST = 225,     ///< LFO 4 Distortion
-            L4RND = 226,     ///< LFO 4 Randomness
+            L3FRQ = 223,     ///< LFO 3 Frequency
+            L3PHS = 224,     ///< LFO 3 Phase
+            L3MIN = 225,     ///< LFO 3 Minimum Value
+            L3MAX = 226,     ///< LFO 3 Maximum Value
+            L3AMT = 227,     ///< LFO 3 Amount
+            L3DST = 228,     ///< LFO 3 Distortion
+            L3RND = 229,     ///< LFO 3 Randomness
 
-            L5FRQ = 227,     ///< LFO 5 Frequency
-            L5PHS = 228,     ///< LFO 5 Phase
-            L5MIN = 229,     ///< LFO 5 Minimum Value
-            L5MAX = 230,     ///< LFO 5 Maximum Value
-            L5AMT = 231,     ///< LFO 5 Amount
-            L5DST = 232,     ///< LFO 5 Distortion
-            L5RND = 233,     ///< LFO 5 Randomness
+            L4FRQ = 230,     ///< LFO 4 Frequency
+            L4PHS = 231,     ///< LFO 4 Phase
+            L4MIN = 232,     ///< LFO 4 Minimum Value
+            L4MAX = 233,     ///< LFO 4 Maximum Value
+            L4AMT = 234,     ///< LFO 4 Amount
+            L4DST = 235,     ///< LFO 4 Distortion
+            L4RND = 236,     ///< LFO 4 Randomness
 
-            L6FRQ = 234,     ///< LFO 6 Frequency
-            L6PHS = 235,     ///< LFO 6 Phase
-            L6MIN = 236,     ///< LFO 6 Minimum Value
-            L6MAX = 237,     ///< LFO 6 Maximum Value
-            L6AMT = 238,     ///< LFO 6 Amount
-            L6DST = 239,     ///< LFO 6 Distortion
-            L6RND = 240,     ///< LFO 6 Randomness
+            L5FRQ = 237,     ///< LFO 5 Frequency
+            L5PHS = 238,     ///< LFO 5 Phase
+            L5MIN = 239,     ///< LFO 5 Minimum Value
+            L5MAX = 240,     ///< LFO 5 Maximum Value
+            L5AMT = 241,     ///< LFO 5 Amount
+            L5DST = 242,     ///< LFO 5 Distortion
+            L5RND = 243,     ///< LFO 5 Randomness
 
-            L7FRQ = 241,     ///< LFO 7 Frequency
-            L7PHS = 242,     ///< LFO 7 Phase
-            L7MIN = 243,     ///< LFO 7 Minimum Value
-            L7MAX = 244,     ///< LFO 7 Maximum Value
-            L7AMT = 245,     ///< LFO 7 Amount
-            L7DST = 246,     ///< LFO 7 Distortion
-            L7RND = 247,     ///< LFO 7 Randomness
+            L6FRQ = 244,     ///< LFO 6 Frequency
+            L6PHS = 245,     ///< LFO 6 Phase
+            L6MIN = 246,     ///< LFO 6 Minimum Value
+            L6MAX = 247,     ///< LFO 6 Maximum Value
+            L6AMT = 248,     ///< LFO 6 Amount
+            L6DST = 249,     ///< LFO 6 Distortion
+            L6RND = 250,     ///< LFO 6 Randomness
 
-            L8FRQ = 248,     ///< LFO 8 Frequency
-            L8PHS = 249,     ///< LFO 8 Phase
-            L8MIN = 250,     ///< LFO 8 Minimum Value
-            L8MAX = 251,     ///< LFO 8 Maximum Value
-            L8AMT = 252,     ///< LFO 8 Amount
-            L8DST = 253,     ///< LFO 8 Distortion
-            L8RND = 254,     ///< LFO 8 Randomness
+            L7FRQ = 251,     ///< LFO 7 Frequency
+            L7PHS = 252,     ///< LFO 7 Phase
+            L7MIN = 253,     ///< LFO 7 Minimum Value
+            L7MAX = 254,     ///< LFO 7 Maximum Value
+            L7AMT = 255,     ///< LFO 7 Amount
+            L7DST = 256,     ///< LFO 7 Distortion
+            L7RND = 257,     ///< LFO 7 Randomness
 
-            MODE = 255,      ///< Mode
-            MWAV = 256,      ///< Modulator Waveform
-            CWAV = 257,      ///< Carrier Waveform
-            MF1TYP = 258,    ///< Modulator Filter 1 Type
-            MF2TYP = 259,    ///< Modulator Filter 2 Type
-            CF1TYP = 260,    ///< Carrier Filter 1 Type
-            CF2TYP = 261,    ///< Carrier Filter 2 Type
-            EF1TYP = 262,    ///< Effects Filter 1 Type
-            EF2TYP = 263,    ///< Effects Filter 2 Type
-            L1WAV = 264,     ///< LFO 1 Waveform
-            L2WAV = 265,     ///< LFO 2 Waveform
-            L3WAV = 266,     ///< LFO 3 Waveform
-            L4WAV = 267,     ///< LFO 4 Waveform
-            L5WAV = 268,     ///< LFO 5 Waveform
-            L6WAV = 269,     ///< LFO 6 Waveform
-            L7WAV = 270,     ///< LFO 7 Waveform
-            L8WAV = 271,     ///< LFO 8 Waveform
-            L1SYN = 272,     ///< LFO 1 Tempo Synchronization
-            L2SYN = 273,     ///< LFO 2 Tempo Synchronization
-            L3SYN = 274,     ///< LFO 3 Tempo Synchronization
-            L4SYN = 275,     ///< LFO 4 Tempo Synchronization
-            L5SYN = 276,     ///< LFO 5 Tempo Synchronization
-            L6SYN = 277,     ///< LFO 6 Tempo Synchronization
-            L7SYN = 278,     ///< LFO 7 Tempo Synchronization
-            L8SYN = 279,     ///< LFO 8 Tempo Synchronization
-            EESYN = 280,     ///< Effects Echo Tempo Synchronization
-            MF1LOG = 281,    ///< Modulator Filter 1 Logarithmic Frequency
-            MF2LOG = 282,    ///< Modulator Filter 2 Logarithmic Frequency
-            CF1LOG = 283,    ///< Carrier Filter 1 Logarithmic Frequency
-            CF2LOG = 284,    ///< Carrier Filter 2 Logarithmic Frequency
-            EF1LOG = 285,    ///< Effects Filter 1 Logarithmic Frequency
-            EF2LOG = 286,    ///< Effects Filter 2 Logarithmic Frequency
-            L1CEN = 287,     ///< LFO 1 Center
-            L2CEN = 288,     ///< LFO 2 Center
-            L3CEN = 289,     ///< LFO 3 Center
-            L4CEN = 290,     ///< LFO 4 Center
-            L5CEN = 291,     ///< LFO 5 Center
-            L6CEN = 292,     ///< LFO 6 Center
-            L7CEN = 293,     ///< LFO 7 Center
-            L8CEN = 294,     ///< LFO 8 Center
-            N1DYN = 295,     ///< Envelope 1 Dynamic
-            N2DYN = 296,     ///< Envelope 2 Dynamic
-            N3DYN = 297,     ///< Envelope 3 Dynamic
-            N4DYN = 298,     ///< Envelope 4 Dynamic
-            N5DYN = 299,     ///< Envelope 5 Dynamic
-            N6DYN = 300,     ///< Envelope 6 Dynamic
+            L8FRQ = 258,     ///< LFO 8 Frequency
+            L8PHS = 259,     ///< LFO 8 Phase
+            L8MIN = 260,     ///< LFO 8 Minimum Value
+            L8MAX = 261,     ///< LFO 8 Maximum Value
+            L8AMT = 262,     ///< LFO 8 Amount
+            L8DST = 263,     ///< LFO 8 Distortion
+            L8RND = 264,     ///< LFO 8 Randomness
 
-            MAX_PARAM_ID = 301
+            MODE = 265,      ///< Mode
+
+            MWAV = 266,      ///< Modulator Waveform
+            CWAV = 267,      ///< Carrier Waveform
+
+            MF1TYP = 268,    ///< Modulator Filter 1 Type
+            MF2TYP = 269,    ///< Modulator Filter 2 Type
+            CF1TYP = 270,    ///< Carrier Filter 1 Type
+            CF2TYP = 271,    ///< Carrier Filter 2 Type
+            EF1TYP = 272,    ///< Effects Filter 1 Type
+            EF2TYP = 273,    ///< Effects Filter 2 Type
+
+            L1WAV = 274,     ///< LFO 1 Waveform
+            L2WAV = 275,     ///< LFO 2 Waveform
+            L3WAV = 276,     ///< LFO 3 Waveform
+            L4WAV = 277,     ///< LFO 4 Waveform
+            L5WAV = 278,     ///< LFO 5 Waveform
+            L6WAV = 279,     ///< LFO 6 Waveform
+            L7WAV = 280,     ///< LFO 7 Waveform
+            L8WAV = 281,     ///< LFO 8 Waveform
+
+            L1CEN = 282,     ///< LFO 1 Center
+            L2CEN = 283,     ///< LFO 2 Center
+            L3CEN = 284,     ///< LFO 3 Center
+            L4CEN = 285,     ///< LFO 4 Center
+            L5CEN = 286,     ///< LFO 5 Center
+            L6CEN = 287,     ///< LFO 6 Center
+            L7CEN = 288,     ///< LFO 7 Center
+            L8CEN = 289,     ///< LFO 8 Center
+
+            L1SYN = 290,     ///< LFO 1 Tempo Synchronization
+            L2SYN = 291,     ///< LFO 2 Tempo Synchronization
+            L3SYN = 292,     ///< LFO 3 Tempo Synchronization
+            L4SYN = 293,     ///< LFO 4 Tempo Synchronization
+            L5SYN = 294,     ///< LFO 5 Tempo Synchronization
+            L6SYN = 295,     ///< LFO 6 Tempo Synchronization
+            L7SYN = 296,     ///< LFO 7 Tempo Synchronization
+            L8SYN = 297,     ///< LFO 8 Tempo Synchronization
+
+            ECSYN = 298,     ///< Effects Chorus Tempo Synchronization
+
+            EESYN = 299,     ///< Effects Echo Tempo Synchronization
+
+            MF1LOG = 300,    ///< Modulator Filter 1 Logarithmic Frequency
+            MF2LOG = 301,    ///< Modulator Filter 2 Logarithmic Frequency
+            CF1LOG = 302,    ///< Carrier Filter 1 Logarithmic Frequency
+            CF2LOG = 303,    ///< Carrier Filter 2 Logarithmic Frequency
+            EF1LOG = 304,    ///< Effects Filter 1 Logarithmic Frequency
+            EF2LOG = 305,    ///< Effects Filter 2 Logarithmic Frequency
+
+            N1DYN = 306,     ///< Envelope 1 Dynamic
+            N2DYN = 307,     ///< Envelope 2 Dynamic
+            N3DYN = 308,     ///< Envelope 3 Dynamic
+            N4DYN = 309,     ///< Envelope 4 Dynamic
+            N5DYN = 310,     ///< Envelope 5 Dynamic
+            N6DYN = 311,     ///< Envelope 6 Dynamic
+
+            MAX_PARAM_ID = 312
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

@@ -50,7 +50,8 @@ Delay<InputSignalProducerClass>::Delay(
     ),
     delay_buffer_oversize(
         tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
-    )
+    ),
+    is_gain_constant_1(false)
 {
     initialize_instance();
 }
@@ -76,6 +77,25 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
+        FloatParam& time_leader,
+        ToggleParam const* tempo_sync
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 2),
+    tempo_sync(tempo_sync),
+    gain("", 0.0, 1.0, 1.0),
+    time(time_leader),
+    delay_buffer_oversize(
+        tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
+    ),
+    is_gain_constant_1(true)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+Delay<InputSignalProducerClass>::Delay(
+        InputSignalProducerClass& input,
         FloatParam& gain_leader,
         FloatParam& time_leader,
         ToggleParam const* tempo_sync
@@ -86,7 +106,8 @@ Delay<InputSignalProducerClass>::Delay(
     time(time_leader),
     delay_buffer_oversize(
         tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
-    )
+    ),
+    is_gain_constant_1(false)
 {
     initialize_instance();
 }
@@ -105,7 +126,8 @@ Delay<InputSignalProducerClass>::Delay(
     time("", Constants::DELAY_TIME_MIN, Constants::DELAY_TIME_MAX, time),
     delay_buffer_oversize(
         tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
-    )
+    ),
+    is_gain_constant_1(false)
 {
     initialize_instance();
 }
@@ -233,9 +255,16 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     mix_feedback_into_delay_buffer(sample_count);
     mix_input_into_delay_buffer(sample_count);
 
-    gain_buffer = FloatParam::produce_if_not_constant(
-        &gain, round, sample_count
-    );
+    if (is_gain_constant_1) {
+        gain_buffer = NULL;
+        need_gain = false;
+    } else {
+        gain_buffer = FloatParam::produce_if_not_constant(
+            &gain, round, sample_count
+        );
+        need_gain = gain_buffer != NULL || std::fabs(1.0 - gain.get_value()) > 0.000001;
+    }
+
     time_buffer = FloatParam::produce_if_not_constant(
         &time, round, sample_count
     );
@@ -392,7 +421,9 @@ void Delay<InputSignalProducerClass>::render(
         }
     }
 
-    apply_gain(round, first_sample_index, last_sample_index, buffer);
+    if (need_gain) {
+        apply_gain(round, first_sample_index, last_sample_index, buffer);
+    }
 }
 
 
@@ -425,11 +456,47 @@ void Delay<InputSignalProducerClass>::apply_gain(
 
 template<class InputSignalProducerClass, class FilterInputClass>
 PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
-    InputSignalProducerClass& input,
-    PannedDelayStereoMode const stereo_mode,
-    ToggleParam const* tempo_sync
+        InputSignalProducerClass& input,
+        PannedDelayStereoMode const stereo_mode,
+        ToggleParam const* tempo_sync
 ) : PannedDelay<InputSignalProducerClass, FilterInputClass>(
         input, delay, stereo_mode, tempo_sync
+    )
+{
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+        InputSignalProducerClass& input,
+        PannedDelayStereoMode const stereo_mode,
+        FloatParam& delay_time_leader,
+        ToggleParam const* tempo_sync
+) :  Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, input.get_channels()),
+    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning("", -1.0, 1.0, 0.0),
+    delay(input, delay_time_leader, tempo_sync)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+        InputSignalProducerClass& input,
+        PannedDelayStereoMode const stereo_mode,
+        FloatParam& panning_leader,
+        FloatParam& delay_time_leader,
+        ToggleParam const* tempo_sync,
+        Integer const number_of_children
+) : PannedDelay<InputSignalProducerClass, FilterInputClass>(
+        input,
+        delay,
+        stereo_mode,
+        panning_leader,
+        delay_time_leader,
+        tempo_sync,
+        number_of_children
     )
 {
 }
@@ -450,6 +517,28 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning("", -1.0, 1.0, 0.0),
     delay(delay_input, tempo_sync)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+        InputSignalProducerClass& delay_input,
+        FilterInputClass& filter_input,
+        PannedDelayStereoMode const stereo_mode,
+        FloatParam& panning_leader,
+        FloatParam& delay_time_leader,
+        ToggleParam const* tempo_sync,
+        Integer const number_of_children
+) : Filter<FilterInputClass>(
+        filter_input,
+        number_of_children + NUMBER_OF_CHILDREN,
+        delay_input.get_channels()
+    ),
+    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning(panning_leader),
+    delay(delay_input, delay_time_leader, tempo_sync)
 {
     initialize_instance();
 }

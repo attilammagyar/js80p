@@ -46,7 +46,10 @@ template<class InputSignalProducerClass>
 using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Echo = JS80P::Echo< Filter2<InputSignalProducerClass> >;
+using Chorus = JS80P::Chorus< Filter2<InputSignalProducerClass> >;
+
+template<class InputSignalProducerClass>
+using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Reverb = JS80P::Reverb< Echo<InputSignalProducerClass> >;
@@ -66,6 +69,7 @@ class Effects : public Filter< Reverb<InputSignalProducerClass> >
         ToggleParam filter_2_log_scale;
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
+        Chorus<InputSignalProducerClass> chorus;
         Echo<InputSignalProducerClass> echo;
         Reverb<InputSignalProducerClass> reverb;
 };

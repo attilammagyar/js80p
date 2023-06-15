@@ -162,7 +162,7 @@ TEST(portamento, {
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], block_size, 0.03
+        expected_output.samples[0], actual_output.samples[0], sample_count, 0.03
     );
 })
 
@@ -199,7 +199,7 @@ TEST(resetting_a_voice_turns_it_off, {
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], block_size, DOUBLE_DELTA
+        expected_output.samples[0], actual_output.samples[0], sample_count, DOUBLE_DELTA
     );
     assert_false(voice.is_on());
     assert_true(voice.is_off_after(0.0));

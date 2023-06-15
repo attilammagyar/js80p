@@ -26,6 +26,7 @@
 #include "synth/envelope.cpp"
 #include "synth/filter.cpp"
 #include "synth/flexible_controller.cpp"
+#include "synth/gain.cpp"
 #include "synth/lfo.cpp"
 #include "synth/math.cpp"
 #include "synth/midi_controller.cpp"

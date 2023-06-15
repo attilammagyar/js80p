@@ -50,18 +50,27 @@ class Delay : public Filter<InputSignalProducerClass>
             InputSignalProducerClass& input,
             ToggleParam const* tempo_sync = NULL
         ) noexcept;
+
+        Delay(
+            InputSignalProducerClass& input,
+            FloatParam& time_leader,
+            ToggleParam const* tempo_sync = NULL
+        ) noexcept;
+
         Delay(
             InputSignalProducerClass& input,
             FloatParam& gain_leader,
             FloatParam& time_leader,
             ToggleParam const* tempo_sync = NULL
         ) noexcept;
+
         Delay(
             InputSignalProducerClass& input,
             FloatParam& gain_leader,
             Seconds const time,
             ToggleParam const* tempo_sync = NULL
         ) noexcept;
+
         virtual ~Delay();
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
@@ -113,6 +122,7 @@ class Delay : public Filter<InputSignalProducerClass>
         ) noexcept;
 
         Integer const delay_buffer_oversize;
+        bool const is_gain_constant_1;
 
         SignalProducer const* feedback_signal_producer;
         Sample** delay_buffer;
@@ -127,12 +137,13 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer delay_buffer_size;
         Number delay_buffer_size_inv;
         bool is_starting;
+        bool need_gain;
 };
 
 
 enum PannedDelayStereoMode {
     NORMAL = 0,
-    FLIPPED = 1,
+    FLIPPED = 1
 };
 
 
@@ -148,6 +159,22 @@ class PannedDelay : public Filter<FilterInputClass>
             ToggleParam const* tempo_sync = NULL
         );
 
+        PannedDelay(
+            InputSignalProducerClass& input,
+            PannedDelayStereoMode const stereo_mode,
+            FloatParam& delay_time_leader,
+            ToggleParam const* tempo_sync = NULL
+        );
+
+        PannedDelay(
+            InputSignalProducerClass& input,
+            PannedDelayStereoMode const stereo_mode,
+            FloatParam& panning_leader,
+            FloatParam& delay_time_leader,
+            ToggleParam const* tempo_sync = NULL,
+            Integer const number_of_children = 0
+        );
+
         virtual ~PannedDelay();
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
@@ -157,6 +184,16 @@ class PannedDelay : public Filter<FilterInputClass>
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
             PannedDelayStereoMode const stereo_mode,
+            ToggleParam const* tempo_sync = NULL,
+            Integer const number_of_children = 0
+        );
+
+        PannedDelay(
+            InputSignalProducerClass& delay_input,
+            FilterInputClass& filter_input,
+            PannedDelayStereoMode const stereo_mode,
+            FloatParam& panning_leader,
+            FloatParam& delay_time_leader,
             ToggleParam const* tempo_sync = NULL,
             Integer const number_of_children = 0
         );

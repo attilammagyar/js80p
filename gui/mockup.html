@@ -354,6 +354,11 @@ svg.icon {
   text-align: left;
 }
 
+#echo, #reverb {
+  margin: 24px 12px;
+  padding: 2px 6px;
+}
+
 .border > span {
   font-size: 12px;
   z-index: 2000;
@@ -551,6 +556,13 @@ svg.icon {
         </h1>
         <div id="high-shelf-params" class="block"></div>
       </div>
+      <div id="chorus" class="effect main-block block">
+        <h1>
+          Chorus
+          <label class="sync">TEMPO SYNC <input type="text" /></label>
+        </h1>
+        <div id="chorus-params" class="block"></div>
+      </div>
       <div id="echo" class="effect main-block block">
         <h1>
           Echo
@@ -709,6 +721,17 @@ window.onload = function ()
     create_knob("high-shelf-params", "FREQ Hz", "200");
     create_knob("high-shelf-params", "Q", "1.0");
     create_knob("high-shelf-params", "GAIN dB", "0.0");
+
+    create_knob("chorus-params", "DEL s", "0.5");
+    create_knob("chorus-params", "FRQ Hz", "1.5");
+    create_knob("chorus-params", "DPT %", "0.5");
+    create_knob("chorus-params", "FB %", "70");
+    create_knob("chorus-params", "DF Hz", "6000");
+    create_knob("chorus-params", "DG dB", "-6");
+    create_knob("chorus-params", "WID %", "-100");
+    create_knob("chorus-params", "HP Hz", "100");
+    create_knob("chorus-params", "WET %", "50");
+    create_knob("chorus-params", "DRY %", "60");
 
     create_knob("echo-params", "DEL s", "0.5");
     create_knob("echo-params", "FB %", "70");

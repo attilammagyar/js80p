@@ -94,12 +94,14 @@ SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
 	synth/biquad_filter \
+	synth/chorus \
 	synth/delay \
 	synth/distortion \
 	synth/echo \
 	synth/effect \
 	synth/effects \
 	synth/filter \
+	synth/gain \
 	synth/mixer \
 	synth/reverb \
 	synth/voice \
@@ -113,6 +115,7 @@ TESTS = \
 	test_distortion \
 	test_envelope \
 	test_flexible_controller \
+	test_gain \
 	test_gui \
 	test_lfo \
 	test_math \
@@ -267,6 +270,7 @@ check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
+	$(VALGRIND) $(BUILD_DIR)/test_gain$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
@@ -448,6 +452,14 @@ $(BUILD_DIR)/test_envelope$(EXE): \
 $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/test_gain$(EXE): \
+		tests/test_gain.cpp \
+		src/synth/gain.cpp src/synth/gain.hpp \
+		src/synth/filter.cpp src/synth/filter.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
