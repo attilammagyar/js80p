@@ -370,6 +370,8 @@ FstPlugin::FstPlugin(
     renderer(synth),
     serialized_bank(""),
     next_program(0),
+    min_samples_before_next_cc_ui_update(8192),
+    remaining_samples_before_next_cc_ui_update(0),
     save_current_patch_before_changing_program(false),
     had_midi_cc_event(false)
 {
@@ -410,6 +412,13 @@ FstPlugin::~FstPlugin()
 
 void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
 {
+    if (new_sample_rate > HOST_CC_UI_UPDATE_FREQUENCY) {
+        min_samples_before_next_cc_ui_update = 1 + (Integer)(
+            new_sample_rate * HOST_CC_UI_UPDATE_FREQUENCY_INV
+        );
+        remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
+    }
+
     synth.set_sample_rate((Frequency)new_sample_rate);
 }
 
@@ -438,8 +447,6 @@ void FstPlugin::resume() noexcept
 
 void FstPlugin::process_events(VstEvents const* const events) noexcept
 {
-    had_midi_cc_event = false;
-
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
         VstEvent* event = events->events[i];
 
@@ -448,7 +455,9 @@ void FstPlugin::process_events(VstEvents const* const events) noexcept
         }
     }
 
-    if (had_midi_cc_event) {
+    if (had_midi_cc_event && remaining_samples_before_next_cc_ui_update == 0) {
+        had_midi_cc_event = false;
+        remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
         update_host_display();
     }
 }
@@ -475,10 +484,7 @@ void FstPlugin::generate_samples(
         return;
     }
 
-    handle_program_change();
-    handle_parameter_changes();
-    update_bpm();
-
+    prepare_rendering(sample_count);
     renderer.write_next_round<NumberType>(sample_count, samples);
 
     /*
@@ -499,6 +505,22 @@ void FstPlugin::generate_samples(
             // );
         // }
     // }
+}
+
+
+void FstPlugin::prepare_rendering(Integer const sample_count) noexcept
+{
+    handle_program_change();
+    handle_parameter_changes();
+    update_bpm();
+
+    if (had_midi_cc_event) {
+        if (remaining_samples_before_next_cc_ui_update >= sample_count) {
+            remaining_samples_before_next_cc_ui_update -= sample_count;
+        } else {
+            remaining_samples_before_next_cc_ui_update = 0;
+        }
+    }
 }
 
 
@@ -606,10 +628,7 @@ void FstPlugin::generate_and_add_samples(
         return;
     }
 
-    handle_program_change();
-    handle_parameter_changes();
-    update_bpm();
-
+    prepare_rendering(sample_count);
     renderer.add_next_round<float>(sample_count, samples);
 }
 

@@ -94,6 +94,7 @@ class FstPlugin : public Midi::EventHandler
             audioMasterCallback const host_callback,
             GUI::PlatformData const platform_data
         ) noexcept;
+
         ~FstPlugin();
 
         void set_sample_rate(float const new_sample_rate) noexcept;
@@ -163,6 +164,11 @@ class FstPlugin : public Midi::EventHandler
         Synth synth;
 
     private:
+        static constexpr Frequency HOST_CC_UI_UPDATE_FREQUENCY = 6.0;
+        static constexpr Frequency HOST_CC_UI_UPDATE_FREQUENCY_INV = (
+            1.0 / HOST_CC_UI_UPDATE_FREQUENCY
+        );
+
         class Parameter
         {
             public:
@@ -205,6 +211,8 @@ class FstPlugin : public Midi::EventHandler
             MidiController* midi_controller
         ) noexcept;
 
+        void prepare_rendering(Integer const sample_count) noexcept;
+
         void update_bpm() noexcept;
         void update_host_display() noexcept;
 
@@ -227,6 +235,8 @@ class FstPlugin : public Midi::EventHandler
         Bank bank;
         std::string serialized_bank;
         size_t next_program;
+        Integer min_samples_before_next_cc_ui_update;
+        Integer remaining_samples_before_next_cc_ui_update;
         bool save_current_patch_before_changing_program;
         bool had_midi_cc_event;
 };

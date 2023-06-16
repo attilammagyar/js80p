@@ -1,3 +1,7 @@
+v1.7.1 (2023-06-17)
+ * FST: reduce CPU usage of host UI parameter updates due to MIDI Control
+   Change (CC) events
+
 v1.7.0 (2023-06-16)
  * New effect: chorus
  * New preset: derezzed
