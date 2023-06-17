@@ -1,8 +1,14 @@
 v1.7.3 (2023-06-18)
  * Highlight different controller types with different colors
+ * New presets:
+    * Ambient Pad 1
+    * Ambient Pad 2
+    * Ambient Pad 3
+    * Saw Piano
+    * Saw Piano Reversed
 
 v1.7.2 (2023-06-17)
- * Bugfix: centered LFOs will not handle distortion and randomness correctly.
+ * Bugfix: centered LFOs will now handle distortion and randomness correctly.
 
 v1.7.1 (2023-06-17)
  * FST: reduce CPU usage of host UI parameter updates due to MIDI Control
