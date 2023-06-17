@@ -757,7 +757,7 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
     Number const ratio = GUI::clamp_ratio(new_ratio);
 
     synth->push_message(
-        Synth::MessageType::RAMP_PARAM, param_id, ratio, 0
+        Synth::MessageType::SET_PARAM, param_id, ratio, 0
     );
     update_editor(ratio);
 }

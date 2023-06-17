@@ -55,11 +55,9 @@
 namespace JS80P
 {
 
-bool Synth::bool_vectors_initialized = false;
-
 std::vector<bool> Synth::supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
 
-std::vector<bool> Synth::smooth_parameters(Synth::MAX_PARAM_ID, false);
+bool Synth::supported_midi_controllers_initialized = false;
 
 
 Synth::ParamIdHashTable Synth::param_id_hash_table;
@@ -114,9 +112,6 @@ Synth::Synth() noexcept
     lfos((LFO* const*)lfos_rw)
 {
     initialize_supported_midi_controllers();
-    initialize_smooth_parameters();
-
-    bool_vectors_initialized = true;
 
     for (int i = 0; i != 4; ++i) {
         biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
@@ -173,9 +168,11 @@ Synth::Synth() noexcept
 
 void Synth::initialize_supported_midi_controllers() noexcept
 {
-    if (bool_vectors_initialized) {
+    if (supported_midi_controllers_initialized) {
         return;
     }
+
+    supported_midi_controllers_initialized = true;
 
     supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
     supported_midi_controllers[ControllerId::BREATH] = true;
@@ -245,130 +242,6 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_37] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_38] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
-}
-
-
-void Synth::initialize_smooth_parameters() noexcept
-{
-    if (bool_vectors_initialized) {
-        return;
-    }
-
-    smooth_parameters[ParamId::MIX] = true;
-    smooth_parameters[ParamId::PM] = true;
-    smooth_parameters[ParamId::FM] = true;
-    smooth_parameters[ParamId::AM] = true;
-    smooth_parameters[ParamId::MAMP] = true;
-    smooth_parameters[ParamId::MFLD] = true;
-    smooth_parameters[ParamId::MFIN] = true;
-    smooth_parameters[ParamId::MPAN] = true;
-    smooth_parameters[ParamId::MVOL] = true;
-    smooth_parameters[ParamId::MF1FRQ] = true;
-    smooth_parameters[ParamId::MF1Q] = true;
-    smooth_parameters[ParamId::MF1G] = true;
-    smooth_parameters[ParamId::MF2FRQ] = true;
-    smooth_parameters[ParamId::MF2Q] = true;
-    smooth_parameters[ParamId::MF2G] = true;
-    smooth_parameters[ParamId::CAMP] = true;
-    smooth_parameters[ParamId::CFLD] = true;
-    smooth_parameters[ParamId::CFIN] = true;
-    smooth_parameters[ParamId::CPAN] = true;
-    smooth_parameters[ParamId::CVOL] = true;
-    smooth_parameters[ParamId::CF1FRQ] = true;
-    smooth_parameters[ParamId::CF1Q] = true;
-    smooth_parameters[ParamId::CF1G] = true;
-    smooth_parameters[ParamId::CF2FRQ] = true;
-    smooth_parameters[ParamId::CF2Q] = true;
-    smooth_parameters[ParamId::CF2G] = true;
-    smooth_parameters[ParamId::EOG] = true;
-    smooth_parameters[ParamId::EDG] = true;
-    smooth_parameters[ParamId::EF1FRQ] = true;
-    smooth_parameters[ParamId::EF1Q] = true;
-    smooth_parameters[ParamId::EF1G] = true;
-    smooth_parameters[ParamId::EF2FRQ] = true;
-    smooth_parameters[ParamId::EF2Q] = true;
-    smooth_parameters[ParamId::EF2G] = true;
-    smooth_parameters[ParamId::ECDEL] = true;
-    smooth_parameters[ParamId::ECFRQ] = true;
-    smooth_parameters[ParamId::ECDPT] = true;
-    smooth_parameters[ParamId::ECFB] = true;
-    smooth_parameters[ParamId::ECDF] = true;
-    smooth_parameters[ParamId::ECDG] = true;
-    smooth_parameters[ParamId::ECWID] = true;
-    smooth_parameters[ParamId::ECHPF] = true;
-    smooth_parameters[ParamId::ECWET] = true;
-    smooth_parameters[ParamId::ECDRY] = true;
-    smooth_parameters[ParamId::EEDEL] = true;
-    smooth_parameters[ParamId::EEFB] = true;
-    smooth_parameters[ParamId::EEDF] = true;
-    smooth_parameters[ParamId::EEDG] = true;
-    smooth_parameters[ParamId::EEWID] = true;
-    smooth_parameters[ParamId::EEHPF] = true;
-    smooth_parameters[ParamId::EEWET] = true;
-    smooth_parameters[ParamId::EEDRY] = true;
-    smooth_parameters[ParamId::ERRS] = true;
-    smooth_parameters[ParamId::ERDF] = true;
-    smooth_parameters[ParamId::ERDG] = true;
-    smooth_parameters[ParamId::ERWID] = true;
-    smooth_parameters[ParamId::ERHPF] = true;
-    smooth_parameters[ParamId::ERWET] = true;
-    smooth_parameters[ParamId::ERDRY] = true;
-    smooth_parameters[ParamId::L1FRQ] = true;
-    smooth_parameters[ParamId::L1PHS] = true;
-    smooth_parameters[ParamId::L1MIN] = true;
-    smooth_parameters[ParamId::L1MAX] = true;
-    smooth_parameters[ParamId::L1AMT] = true;
-    smooth_parameters[ParamId::L1DST] = true;
-    smooth_parameters[ParamId::L1RND] = true;
-    smooth_parameters[ParamId::L2FRQ] = true;
-    smooth_parameters[ParamId::L2PHS] = true;
-    smooth_parameters[ParamId::L2MIN] = true;
-    smooth_parameters[ParamId::L2MAX] = true;
-    smooth_parameters[ParamId::L2AMT] = true;
-    smooth_parameters[ParamId::L2DST] = true;
-    smooth_parameters[ParamId::L2RND] = true;
-    smooth_parameters[ParamId::L3FRQ] = true;
-    smooth_parameters[ParamId::L3PHS] = true;
-    smooth_parameters[ParamId::L3MIN] = true;
-    smooth_parameters[ParamId::L3MAX] = true;
-    smooth_parameters[ParamId::L3AMT] = true;
-    smooth_parameters[ParamId::L3DST] = true;
-    smooth_parameters[ParamId::L3RND] = true;
-    smooth_parameters[ParamId::L4FRQ] = true;
-    smooth_parameters[ParamId::L4PHS] = true;
-    smooth_parameters[ParamId::L4MIN] = true;
-    smooth_parameters[ParamId::L4MAX] = true;
-    smooth_parameters[ParamId::L4AMT] = true;
-    smooth_parameters[ParamId::L4DST] = true;
-    smooth_parameters[ParamId::L4RND] = true;
-    smooth_parameters[ParamId::L5FRQ] = true;
-    smooth_parameters[ParamId::L5PHS] = true;
-    smooth_parameters[ParamId::L5MIN] = true;
-    smooth_parameters[ParamId::L5MAX] = true;
-    smooth_parameters[ParamId::L5AMT] = true;
-    smooth_parameters[ParamId::L5DST] = true;
-    smooth_parameters[ParamId::L5RND] = true;
-    smooth_parameters[ParamId::L6FRQ] = true;
-    smooth_parameters[ParamId::L6PHS] = true;
-    smooth_parameters[ParamId::L6MIN] = true;
-    smooth_parameters[ParamId::L6MAX] = true;
-    smooth_parameters[ParamId::L6AMT] = true;
-    smooth_parameters[ParamId::L6DST] = true;
-    smooth_parameters[ParamId::L6RND] = true;
-    smooth_parameters[ParamId::L7FRQ] = true;
-    smooth_parameters[ParamId::L7PHS] = true;
-    smooth_parameters[ParamId::L7MIN] = true;
-    smooth_parameters[ParamId::L7MAX] = true;
-    smooth_parameters[ParamId::L7AMT] = true;
-    smooth_parameters[ParamId::L7DST] = true;
-    smooth_parameters[ParamId::L7RND] = true;
-    smooth_parameters[ParamId::L8FRQ] = true;
-    smooth_parameters[ParamId::L8PHS] = true;
-    smooth_parameters[ParamId::L8MIN] = true;
-    smooth_parameters[ParamId::L8MAX] = true;
-    smooth_parameters[ParamId::L8AMT] = true;
-    smooth_parameters[ParamId::L8DST] = true;
-    smooth_parameters[ParamId::L8RND] = true;
 }
 
 
@@ -1325,10 +1198,6 @@ void Synth::process_messages() noexcept
                 handle_set_param(message.param_id, message.number_param);
                 break;
 
-            case MessageType::RAMP_PARAM:
-                handle_ramp_param(message.param_id, message.number_param);
-                break;
-
             case MessageType::ASSIGN_CONTROLLER:
                 handle_assign_controller(message.param_id, message.byte_param);
                 break;
@@ -1406,33 +1275,6 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
     }
 
     handle_refresh_param(param_id);
-}
-
-
-void Synth::handle_ramp_param(ParamId const param_id, Number const ratio) noexcept
-{
-    if (!is_smooth_param(param_id)) {
-        handle_set_param(param_id, ratio);
-
-        return;
-    }
-
-    FloatParam* param = float_params[param_id];
-
-    param->cancel_events(0.0);
-    param->schedule_linear_ramp(0.005, param->ratio_to_value(ratio));
-
-    param_ratios[param_id].store(get_param_ratio(param_id));
-}
-
-
-bool Synth::is_smooth_param(ParamId const param_id) const noexcept
-{
-    if ((Integer)param_id >= MAX_PARAM_ID) {
-        return false;
-    }
-
-    return smooth_parameters[param_id];
 }
 
 
