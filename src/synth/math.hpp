@@ -122,12 +122,24 @@ class Math
         static Number distort(Number const level, Number const number) noexcept;
 
         /**
+         * \brief Same as \c Math::distort(), but input and output are between
+         *        -0.5 and 0.5.
+         */
+        static Number distort_centered_lfo(Number const level, Number const number) noexcept;
+
+        /**
          * \brief Return a pseudo random number between 0.0 and 1.0, based on
          *        the given number between 0.0 and 1.0. The return value is
          *        deterministic, the same input number will always generate the
          *        same result.
          */
         static Number randomize(Number const level, Number const number) noexcept;
+
+        /**
+         * \brief Same as \c Math::randomize(), but input and output are between
+         *        -0.5 and 0.5.
+         */
+        static Number randomize_centered_lfo(Number const level, Number const number) noexcept;
 
         /**
          * \brief Look up the given floating point, non-negative \c index in the
@@ -207,7 +219,9 @@ class Math
 
         Number sines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
+        Number randoms_centered_lfo[RANDOMS];
         Number distortion[DISTORTION_TABLE_SIZE];
+        Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
         Number log_biquad_filter_freq_inv[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
 };

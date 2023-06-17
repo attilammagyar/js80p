@@ -253,43 +253,70 @@ TEST(statistics, {
 })
 
 
+void assert_distorted(
+        Number const expected,
+        Number const level,
+        Number const number,
+        Number const tolerance
+) {
+    assert_eq(
+        expected,
+        Math::distort(level, number),
+        tolerance,
+        "level=%f, number=%f",
+        level,
+        number
+    );
+    assert_eq(
+        expected - 0.5,
+        Math::distort_centered_lfo(level, number - 0.5),
+        tolerance,
+        "level=%f, number=%f",
+        level,
+        number
+    );
+}
+
+
 TEST(distort, {
     constexpr Number tolerance = 0.01;
 
-    assert_eq(0.0, Math::distort(1.0, 0.0), DOUBLE_DELTA);
-    assert_eq(1.0, Math::distort(1.0, 1.0), tolerance);
-    assert_eq(0.0, Math::distort(1.0, 0.1), tolerance);
-    assert_eq(0.0, Math::distort(1.0, 0.2), tolerance);
-    assert_eq(0.5, Math::distort(1.0, 0.5), tolerance);
-    assert_eq(1.0, Math::distort(1.0, 0.8), tolerance);
-    assert_eq(1.0, Math::distort(1.0, 0.9), tolerance);
+    assert_distorted(0.0, 1.0, 0.0, DOUBLE_DELTA);
+    assert_distorted(1.0, 1.0, 1.0, tolerance);
+    assert_distorted(0.0, 1.0, 0.1, tolerance);
+    assert_distorted(0.0, 1.0, 0.2, tolerance);
+    assert_distorted(0.5, 1.0, 0.5, tolerance);
+    assert_distorted(1.0, 1.0, 0.8, tolerance);
+    assert_distorted(1.0, 1.0, 0.9, tolerance);
 
-    assert_eq(0.0, Math::distort(0.5, 0.0), DOUBLE_DELTA);
+    assert_distorted(0.0, 0.5, 0.0, DOUBLE_DELTA);
     assert_gt(0.1, Math::distort(0.5, 0.1));
     assert_gt(0.2, Math::distort(0.5, 0.2));
-    assert_eq(0.5, Math::distort(0.5, 0.5), tolerance);
+    assert_distorted(0.5, 0.5, 0.5, tolerance);
     assert_lt(0.8, Math::distort(0.5, 0.8));
     assert_lt(0.9, Math::distort(0.5, 0.9));
-    assert_eq(1.0, Math::distort(0.5, 1.0), DOUBLE_DELTA);
+    assert_distorted(1.0, 0.5, 1.0, DOUBLE_DELTA);
 
-    assert_eq(0.0, Math::distort(0.0, 0.0), DOUBLE_DELTA);
-    assert_eq(0.1, Math::distort(0.0, 0.1), DOUBLE_DELTA);
-    assert_eq(0.2, Math::distort(0.0, 0.2), DOUBLE_DELTA);
-    assert_eq(0.5, Math::distort(0.0, 0.5), DOUBLE_DELTA);
-    assert_eq(0.8, Math::distort(0.0, 0.8), DOUBLE_DELTA);
-    assert_eq(0.9, Math::distort(0.0, 0.9), DOUBLE_DELTA);
-    assert_eq(1.0, Math::distort(0.0, 1.0), DOUBLE_DELTA);
+    assert_distorted(0.0, 0.0, 0.0, DOUBLE_DELTA);
+    assert_distorted(0.1, 0.0, 0.1, DOUBLE_DELTA);
+    assert_distorted(0.2, 0.0, 0.2, DOUBLE_DELTA);
+    assert_distorted(0.5, 0.0, 0.5, DOUBLE_DELTA);
+    assert_distorted(0.8, 0.0, 0.8, DOUBLE_DELTA);
+    assert_distorted(0.9, 0.0, 0.9, DOUBLE_DELTA);
+    assert_distorted(1.0, 0.0, 1.0, DOUBLE_DELTA);
 })
 
 
 TEST(randomize, {
     constexpr Integer last_probe = 500;
     std::vector<Number> numbers(last_probe + 1);
+    std::vector<Number> numbers_centered_lfo(last_probe + 1);
     Math::Statistics statistics;
 
     for (Integer i = 0; i != last_probe; ++i) {
         Number const number = (Number)i / (Number)last_probe;
         numbers[i] = Math::randomize(1.0, number);
+        numbers_centered_lfo[i] = Math::randomize_centered_lfo(1.0, number);
         assert_eq(number, Math::randomize(0.2, number), 0.21);
     }
 

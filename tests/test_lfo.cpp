@@ -230,6 +230,7 @@ TEST(lfo_performance, {
 void test_lfo_modifier_statistics(
         Number const distortion,
         Number const randomness,
+        Toggle const centered,
         Number const tolerance
 ) {
     LFO lfo("L1");
@@ -238,7 +239,14 @@ void test_lfo_modifier_statistics(
     Math::Statistics stats;
     char message[128];
 
-    snprintf(message, 128, "distortion=%f, randomness=%f", distortion, randomness);
+    snprintf(
+        message,
+        128,
+        "distortion=%f, randomness=%f, centered=%s",
+        distortion,
+        randomness,
+        centered == ToggleParam::ON ? "ON" : "OFF"
+    );
 
     lfo.set_block_size(BLOCK_SIZE);
     lfo.set_sample_rate(SAMPLE_RATE);
@@ -248,6 +256,7 @@ void test_lfo_modifier_statistics(
     lfo.distortion.set_value(distortion);
     lfo.distortion.set_value(randomness);
     lfo.frequency.set_value(30.0);
+    lfo.center.set_value(centered);
     lfo.start(0.0);
 
     rendered_samples = SignalProducer::produce<LFO>(&lfo, 1);
@@ -267,8 +276,12 @@ void test_lfo_modifier_statistics(
 
 
 TEST(distortion_and_randomness_respect_min_and_max_values, {
-    test_lfo_modifier_statistics(0.0, 0.0, 0.02);
-    test_lfo_modifier_statistics(1.0, 0.0, 0.02);
-    test_lfo_modifier_statistics(0.0, 1.0, 0.14);
-    test_lfo_modifier_statistics(1.0, 1.0, 0.14);
+    test_lfo_modifier_statistics(0.0, 0.0, ToggleParam::OFF, 0.02);
+    test_lfo_modifier_statistics(1.0, 0.0, ToggleParam::OFF, 0.02);
+    test_lfo_modifier_statistics(0.0, 1.0, ToggleParam::OFF, 0.14);
+    test_lfo_modifier_statistics(1.0, 1.0, ToggleParam::OFF, 0.14);
+    test_lfo_modifier_statistics(0.0, 0.0, ToggleParam::ON, 0.02);
+    test_lfo_modifier_statistics(1.0, 0.0, ToggleParam::ON, 0.02);
+    test_lfo_modifier_statistics(0.0, 1.0, ToggleParam::ON, 0.14);
+    test_lfo_modifier_statistics(1.0, 1.0, ToggleParam::ON, 0.14);
 })

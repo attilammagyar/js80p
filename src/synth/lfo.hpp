@@ -91,28 +91,36 @@ class LFO : public SignalProducer
     private:
         void initialize_instance() noexcept;
 
+        void apply_distortions(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* source_buffer,
+            Sample* target_buffer
+        );
+
         void apply_range(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* const* source_buffer,
-            Sample** target_buffer
+            Sample const* source_buffer,
+            Sample* target_buffer
+        );
+
+        void apply_distortions_centered(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* source_buffer,
+            Sample* target_buffer
         );
 
         void apply_range_centered(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* const* source_buffer,
-            Sample** target_buffer
-        );
-
-        void apply_distortions(
-            Integer const round,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample const* const* source_buffer,
-            Sample** target_buffer
+            Sample const* source_buffer,
+            Sample* target_buffer
         );
 
         Oscillator_ oscillator;

@@ -67,6 +67,7 @@ void Math::init_randoms() noexcept
         x = x & 0xffff;
 
         randoms[i] = (Number)x * scale;
+        randoms_centered_lfo[i] = randoms[i] - 0.5;
     }
 }
 
@@ -77,7 +78,8 @@ void Math::init_distortion() noexcept
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
         Number const x = 2.0 * ((Number)i * max_inv) - 1.0;
-        distortion[i] = std::tanh(8.0 * x) * 0.5 + 0.5;
+        distortion_centered_lfo[i] = std::tanh(8.0 * x) * 0.5;
+        distortion[i] = distortion_centered_lfo[i] + 0.5;
     }
 }
 
@@ -282,14 +284,44 @@ Number Math::distort(Number const level, Number const number) noexcept
 }
 
 
-Number Math::randomize(Number const level, Number const number) noexcept
+Number Math::distort_centered_lfo(Number const level, Number const number) noexcept
 {
     if (level < 0.0001) {
         return number;
     }
 
+    return combine(
+        level,
+        lookup(
+            math.distortion_centered_lfo, DISTORTION_TABLE_MAX_INDEX, (number + 0.5) * DISTORTION_SCALE
+        ),
+        number
+    );
+}
+
+
+Number Math::randomize(Number const level, Number const number) noexcept
+{
+    if (level < 0.000001) {
+        return number;
+    }
+
     Number const random = lookup(
         math.randoms, RANDOMS_MAX_INDEX, number * RANDOM_SCALE
+    );
+
+    return combine(level, random, number);
+}
+
+
+Number Math::randomize_centered_lfo(Number const level, Number const number) noexcept
+{
+    if (level < 0.000001) {
+        return number;
+    }
+
+    Number const random = lookup(
+        math.randoms_centered_lfo, RANDOMS_MAX_INDEX, (number + 0.5) * RANDOM_SCALE
     );
 
     return combine(level, random, number);
