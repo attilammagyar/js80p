@@ -72,7 +72,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer LFOS = 8;
 
         enum MessageType {
-            SET_PARAM = 1,          ///< Set the given parameter's value to
+            SET_PARAM = 1,          ///< Set the given parameter's ratio to
                                     ///< \c number_param.
 
             ASSIGN_CONTROLLER = 2,  ///< Assign the controller identified by
@@ -259,12 +259,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             F9DST = 141,     ///< Flexible Controller 9 Distortion
             F9RND = 142,     ///< Flexible Controller 9 Randomness
 
-            F10IN = 143,      ///< Flexible Controller 10 Input
-            F10MIN = 144,     ///< Flexible Controller 10 Minimum Value
-            F10MAX = 145,     ///< Flexible Controller 10 Maximum Value
-            F10AMT = 146,     ///< Flexible Controller 10 Amount
-            F10DST = 147,     ///< Flexible Controller 10 Distortion
-            F10RND = 148,     ///< Flexible Controller 10 Randomness
+            F10IN = 143,     ///< Flexible Controller 10 Input
+            F10MIN = 144,    ///< Flexible Controller 10 Minimum Value
+            F10MAX = 145,    ///< Flexible Controller 10 Maximum Value
+            F10AMT = 146,    ///< Flexible Controller 10 Amount
+            F10DST = 147,    ///< Flexible Controller 10 Distortion
+            F10RND = 148,    ///< Flexible Controller 10 Randomness
 
             N1AMT = 149,     ///< Envelope 1 Amount
             N1INI = 150,     ///< Envelope 1 Initial Level
@@ -649,6 +649,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         std::string get_param_name(ParamId const param_id) const noexcept;
         ParamId get_param_id(std::string const name) const noexcept;
+
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
             Number& avg_collisions,
@@ -659,6 +660,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const ratio
         ) const noexcept;
+
         Byte int_param_ratio_to_display_value(
             ParamId const param_id,
             Number const ratio
@@ -669,6 +671,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Number get_param_max_value(ParamId const param_id) const noexcept;
         Number get_param_ratio_atomic(ParamId const param_id) const noexcept;
         Number get_param_default_ratio(ParamId const param_id) const noexcept;
+
         ControllerId get_param_controller_id_atomic(
             ParamId const param_id
         ) const noexcept;
@@ -974,6 +977,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
+
         bool assign_controller_to_float_param(
             ParamId const param_id,
             ControllerId const controller_id
