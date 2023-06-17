@@ -616,11 +616,36 @@ constexpr GUI::Color GUI::rgb(
 
 const GUI::Color GUI::TEXT_COLOR = GUI::rgb(181, 181, 189);
 const GUI::Color GUI::TEXT_BACKGROUND = GUI::rgb(0, 0, 0);
-const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(225, 225, 235);
-const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(63, 63, 66);
+const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(230, 230, 235);
+const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(82, 82, 86);
 const GUI::Color GUI::STATUS_LINE_BACKGROUND = GUI::rgb(21, 21, 32);
 const GUI::Color GUI::TOGGLE_OFF_COLOR = GUI::rgb(0, 0, 0);
 const GUI::Color GUI::TOGGLE_ON_COLOR = GUI::rgb(150, 200, 230);
+
+
+const GUI::Color GUI::CTL_COLOR_NONE_TEXT = TEXT_COLOR;
+const GUI::Color GUI::CTL_COLOR_NONE_BG = TEXT_HIGHLIGHT_BACKGROUND;
+
+const GUI::Color GUI::CTL_COLOR_MIDI_CC_TEXT = GUI::rgb(255, 255, 120);
+const GUI::Color GUI::CTL_COLOR_MIDI_CC_BG = GUI::rgb(145, 145, 68);
+
+const GUI::Color GUI::CTL_COLOR_MIDI_SPECIAL_TEXT = GUI::rgb(255, 220, 150);
+const GUI::Color GUI::CTL_COLOR_MIDI_SPECIAL_BG = GUI::rgb(145, 125, 85);
+
+const GUI::Color GUI::CTL_COLOR_MIDI_LEARN_TEXT = GUI::rgb(90, 120, 230);
+const GUI::Color GUI::CTL_COLOR_MIDI_LEARN_BG = GUI::rgb(51, 68, 131);
+
+const GUI::Color GUI::CTL_COLOR_AFTERTOUCH_TEXT = GUI::rgb(255, 160, 110);
+const GUI::Color GUI::CTL_COLOR_AFTERTOUCH_BG = GUI::rgb(145, 91, 63);
+
+const GUI::Color GUI::CTL_COLOR_FLEX_TEXT = GUI::rgb(120, 210, 255);
+const GUI::Color GUI::CTL_COLOR_FLEX_BG = GUI::rgb(68, 120, 145);
+
+const GUI::Color GUI::CTL_COLOR_LFO_TEXT = GUI::rgb(230, 100, 255);
+const GUI::Color GUI::CTL_COLOR_LFO_BG = GUI::rgb(131, 57, 145);
+
+const GUI::Color GUI::CTL_COLOR_ENVELOPE_TEXT = GUI::rgb(120, 255, 220);
+const GUI::Color GUI::CTL_COLOR_ENVELOPE_BG = GUI::rgb(68, 145, 125);
 
 
 constexpr GUI::ColorComponent GUI::red(Color const color)
@@ -725,6 +750,110 @@ void GUI::param_ratio_to_str_int(
 Number GUI::clamp_ratio(Number const ratio)
 {
     return std::min(1.0, std::max(0.0, ratio));
+}
+
+
+GUI::Color GUI::controller_id_to_text_color(Synth::ControllerId const controller_id)
+{
+    switch (controller_id) {
+        case Synth::ControllerId::NONE:
+            return CTL_COLOR_NONE_TEXT;
+
+        case Synth::ControllerId::PITCH_WHEEL:
+        case Synth::ControllerId::NOTE:
+        case Synth::ControllerId::VELOCITY:
+            return CTL_COLOR_MIDI_SPECIAL_TEXT;
+
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_1:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_2:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_3:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_4:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_5:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_6:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_7:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_8:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_9:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_10:
+            return CTL_COLOR_FLEX_TEXT;
+
+        case Synth::ControllerId::LFO_1:
+        case Synth::ControllerId::LFO_2:
+        case Synth::ControllerId::LFO_3:
+        case Synth::ControllerId::LFO_4:
+        case Synth::ControllerId::LFO_5:
+        case Synth::ControllerId::LFO_6:
+        case Synth::ControllerId::LFO_7:
+        case Synth::ControllerId::LFO_8:
+            return CTL_COLOR_LFO_TEXT;
+
+        case Synth::ControllerId::ENVELOPE_1:
+        case Synth::ControllerId::ENVELOPE_2:
+        case Synth::ControllerId::ENVELOPE_3:
+        case Synth::ControllerId::ENVELOPE_4:
+        case Synth::ControllerId::ENVELOPE_5:
+        case Synth::ControllerId::ENVELOPE_6:
+            return CTL_COLOR_ENVELOPE_TEXT;
+
+        case Synth::ControllerId::CHANNEL_PRESSURE:
+            return CTL_COLOR_AFTERTOUCH_TEXT;
+
+        case Synth::ControllerId::MIDI_LEARN:
+            return CTL_COLOR_MIDI_LEARN_TEXT;
+
+        default: return CTL_COLOR_MIDI_CC_TEXT;
+    };
+}
+
+
+GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_id)
+{
+    switch (controller_id) {
+        case Synth::ControllerId::NONE:
+            return CTL_COLOR_NONE_BG;
+
+        case Synth::ControllerId::PITCH_WHEEL:
+        case Synth::ControllerId::NOTE:
+        case Synth::ControllerId::VELOCITY:
+            return CTL_COLOR_MIDI_SPECIAL_BG;
+
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_1:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_2:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_3:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_4:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_5:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_6:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_7:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_8:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_9:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_10:
+            return CTL_COLOR_FLEX_BG;
+
+        case Synth::ControllerId::LFO_1:
+        case Synth::ControllerId::LFO_2:
+        case Synth::ControllerId::LFO_3:
+        case Synth::ControllerId::LFO_4:
+        case Synth::ControllerId::LFO_5:
+        case Synth::ControllerId::LFO_6:
+        case Synth::ControllerId::LFO_7:
+        case Synth::ControllerId::LFO_8:
+            return CTL_COLOR_LFO_BG;
+
+        case Synth::ControllerId::ENVELOPE_1:
+        case Synth::ControllerId::ENVELOPE_2:
+        case Synth::ControllerId::ENVELOPE_3:
+        case Synth::ControllerId::ENVELOPE_4:
+        case Synth::ControllerId::ENVELOPE_5:
+        case Synth::ControllerId::ENVELOPE_6:
+            return CTL_COLOR_ENVELOPE_BG;
+
+        case Synth::ControllerId::CHANNEL_PRESSURE:
+            return CTL_COLOR_AFTERTOUCH_BG;
+
+        case Synth::ControllerId::MIDI_LEARN:
+            return CTL_COLOR_MIDI_LEARN_BG;
+
+        default: return CTL_COLOR_MIDI_CC_BG;
+    };
 }
 
 

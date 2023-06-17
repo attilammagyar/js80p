@@ -126,6 +126,23 @@ class GUI
         static Color const TOGGLE_OFF_COLOR;
         static Color const TOGGLE_ON_COLOR;
 
+        static Color const CTL_COLOR_NONE_TEXT;
+        static Color const CTL_COLOR_NONE_BG;
+        static Color const CTL_COLOR_MIDI_CC_TEXT;
+        static Color const CTL_COLOR_MIDI_CC_BG;
+        static Color const CTL_COLOR_MIDI_SPECIAL_TEXT;
+        static Color const CTL_COLOR_MIDI_SPECIAL_BG;
+        static Color const CTL_COLOR_MIDI_LEARN_TEXT;
+        static Color const CTL_COLOR_MIDI_LEARN_BG;
+        static Color const CTL_COLOR_AFTERTOUCH_TEXT;
+        static Color const CTL_COLOR_AFTERTOUCH_BG;
+        static Color const CTL_COLOR_FLEX_TEXT;
+        static Color const CTL_COLOR_FLEX_BG;
+        static Color const CTL_COLOR_LFO_TEXT;
+        static Color const CTL_COLOR_LFO_BG;
+        static Color const CTL_COLOR_ENVELOPE_TEXT;
+        static Color const CTL_COLOR_ENVELOPE_BG;
+
         static void param_ratio_to_str(
             Synth* synth,
             Synth::ParamId const param_id,
@@ -139,6 +156,10 @@ class GUI
         );
 
         static Number clamp_ratio(Number const ratio);
+
+        static Color controller_id_to_text_color(Synth::ControllerId const controller_id);
+
+        static Color controller_id_to_bg_color(Synth::ControllerId const controller_id);
 
         GUI(
             PlatformData platform_data,

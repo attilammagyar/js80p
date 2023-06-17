@@ -1,3 +1,6 @@
+v1.7.3 (2023-06-18)
+ * Highlight different controller types with different colors
+
 v1.7.2 (2023-06-17)
  * Bugfix: centered LFOs will not handle distortion and randomness correctly.
 

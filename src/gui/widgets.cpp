@@ -468,15 +468,19 @@ bool ControllerSelector::Controller::paint()
     GUI::Color background;
     GUI::Color color;
 
-    if (is_selected) {
-        background = GUI::TEXT_COLOR;
-        color = GUI::TEXT_BACKGROUND;
-    } else if (is_mouse_over) {
-        background = GUI::TEXT_HIGHLIGHT_BACKGROUND;
+    if (is_mouse_over) {
+        background = GUI::controller_id_to_bg_color(controller_id);
         color = GUI::TEXT_HIGHLIGHT_COLOR;
+    } else if (is_selected) {
+        background = GUI::controller_id_to_bg_color(controller_id);
+        color = (
+            controller_id == Synth::ControllerId::NONE
+                ? GUI::TEXT_COLOR
+                : GUI::TEXT_BACKGROUND
+        );
     } else {
         background = GUI::TEXT_BACKGROUND;
-        color = GUI::TEXT_COLOR;
+        color = GUI::controller_id_to_text_color(controller_id);
     }
 
     draw_text(
@@ -822,7 +826,7 @@ bool ParamEditor::paint()
         HEIGHT - 20,
         WIDTH - 2,
         20,
-        GUI::TEXT_COLOR,
+        GUI::controller_id_to_text_color(controller_id),
         GUI::TEXT_BACKGROUND
     );
 
@@ -835,7 +839,9 @@ bool ParamEditor::paint()
             WIDTH - 2,
             16,
             has_controller_ ? GUI::TEXT_BACKGROUND : GUI::TEXT_COLOR,
-            has_controller_ ? GUI::rgb(145, 145, 151) : GUI::TEXT_BACKGROUND,
+            has_controller_
+                ? GUI::controller_id_to_bg_color(controller_id)
+                : GUI::TEXT_BACKGROUND,
             has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
         );
     }
