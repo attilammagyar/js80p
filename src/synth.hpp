@@ -75,14 +75,20 @@ class Synth : public Midi::EventHandler, public SignalProducer
             SET_PARAM = 1,          ///< Set the given parameter's ratio to
                                     ///< \c number_param.
 
-            ASSIGN_CONTROLLER = 2,  ///< Assign the controller identified by
+            RAMP_PARAM = 2,         ///< Start a short linear ramp towards the
+                                    ///< ratio specified in \c number_param.
+                                    ///< If the parameter is not a smooth one,
+                                    ///< then \c RAMP_PARAM is equivalent to
+                                    ///< \c SET_PARAM.
+
+            ASSIGN_CONTROLLER = 3,  ///< Assign the controller identified by
                                     ///< \c byte_param to the given parameter.
 
-            REFRESH_PARAM = 3,      ///< Make sure that \c get_param_ratio_atomic()
+            REFRESH_PARAM = 4,      ///< Make sure that \c get_param_ratio_atomic()
                                     ///< will return the most recent value of
                                     ///< the given parameter.
 
-            CLEAR = 4,              ///< Clear all buffers, release all
+            CLEAR = 5,              ///< Clear all buffers, release all
                                     ///< controller assignments, and reset all
                                     ///< parameters to their default values.
 
@@ -910,13 +916,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
+        static bool bool_vectors_initialized;
+
         static std::vector<bool> supported_midi_controllers;
-        static bool supported_midi_controllers_initialized;
+        static std::vector<bool> smooth_parameters;
 
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
         void initialize_supported_midi_controllers() noexcept;
+        void initialize_smooth_parameters() noexcept;
         void register_main_params() noexcept;
         void register_modulator_params() noexcept;
         void register_carrier_params() noexcept;
@@ -963,6 +972,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamId const param_id,
             Number const ratio
         ) noexcept;
+
+        void handle_ramp_param(
+            ParamId const param_id,
+            Number const ratio
+        ) noexcept;
+
+        bool is_smooth_param(ParamId const param_id) const noexcept;
 
         void handle_assign_controller(
             ParamId const param_id,
