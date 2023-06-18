@@ -120,7 +120,7 @@ Features
     * low-shelf
     * high-shelf
  * portamento
- * wave folder
+ * wavefolder
  * split keyboard
  * amplitude modulation
  * frequency modulation

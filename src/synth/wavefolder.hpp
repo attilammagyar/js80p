@@ -30,7 +30,7 @@ namespace JS80P
 {
 
 /**
- * \brief Antialiased waveshaper based wave folder, using Antiderivative
+ * \brief Antialiased waveshaper based wavefolder, using Antiderivative
  *        Antialiasing (ADAA). See:
  *        <a href="https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf">
  *        Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time Convolution
