@@ -25,9 +25,8 @@ Table of Contents
  * [System Requirements](#system)
  * [Installation](#install)
  * [Usage](#usage)
+ * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
-    * [Signal Chain (Simplified)](#signal)
-    * [Future Plans](#future)
  * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
@@ -94,6 +93,24 @@ Usage
  * It is recommended to use a small buffer size for lower latency, for example,
    3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
 
+<a name="signal"></a>
+
+### Signal Chain (Simplified)
+
+                                                        (x16)
+    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
+                                                  |            ^       |
+        (Frequency & Amplitude Modulation)        |            |       |
+      +-------------------------------------------+            |       |
+      |                                                        |       |
+      v                                                 (x16)  |       |
+      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
+                                                                       |
+    Overdrive <--------------------------------------------------------+
+    |
+    v
+    Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
+
 <a name="features"></a>
 
 Features
@@ -139,24 +156,6 @@ Features
  * MIDI learn
  * logarithmic and linear scale filter frequencies
  * LFO and effects tempo synchronization
-
-<a name="signal"></a>
-
-### Signal Chain (Simplified)
-
-                                                        (x16)
-    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
-                                                  |            ^       |
-        (Frequency & Amplitude Modulation)        |            |       |
-      +-------------------------------------------+            |       |
-      |                                                        |       |
-      v                                                 (x16)  |       |
-      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
-                                                                       |
-    Overdrive <--------------------------------------------------------+
-    |
-    v
-    Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
 
 <a name="bugs"></a>
 
