@@ -5,16 +5,16 @@ A MIDI driven, performance oriented, versatile [synthesizer VST plugin][plugin].
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
-> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-> Europe and other countries.
-
 To download JS80P, visit its website at
 [https://attilammagyar.github.io/js80p/](https://attilammagyar.github.io/js80p/).
+
+<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
 
 The source code is available at https://github.com/attilammagyar/js80p under
 the terms of the GNU General Public License Version 3.
 
-<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
+> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
+> Europe and other countries.
 
 <a name="toc"></a>
 
@@ -24,6 +24,7 @@ Table of Contents
  * [Table of Contents](#toc)
  * [System Requirements](#system)
  * [Installation](#install)
+ * [Usage](#usage)
  * [Features](#features)
     * [Signal Chain (Simplified)](#signal)
     * [Future Plans](#future)
@@ -75,6 +76,24 @@ The `presets` folder in the archive contains a few sounds that you can load by
 clicking the _Import Patch_ icon near the top left corner of the main screen of
 the plugin.
 
+<a name="usage"></a>
+
+Usage
+-----
+
+ * Move the cursor over a knob, and use the mouse wheel for adjusting its
+   value, or start dragging it.
+
+ * Hold down the Control key while adjusting a knob for fine grained
+   adjustments.
+
+ * Double click on a knob to reset it to its default value.
+
+ * Click on the area below a knob to assign a controller to it.
+
+ * It is recommended to use a small buffer size for lower latency, for example,
+   3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
+
 <a name="features"></a>
 
 Features
@@ -119,7 +138,7 @@ Features
  * channel pressure (aftertouch)
  * MIDI learn
  * logarithmic and linear scale filter frequencies
- * LFO and Echo tempo synchronization
+ * LFO and effects tempo synchronization
 
 <a name="signal"></a>
 
@@ -138,12 +157,6 @@ Features
     |
     v
     Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
-
-<a name="future"></a>
-
-### Future Plans
-
- * LV2 support
 
 <a name="bugs"></a>
 

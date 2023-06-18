@@ -3,13 +3,13 @@ JS80P
 
 A MIDI driven, performance oriented, versatile synthesizer VST plugin.
 
-VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-Europe and other countries.
-
 To download JS80P, visit its website at https://attilammagyar.github.io/js80p/
 
 The source code is available at https://github.com/attilammagyar/js80p under
 the terms of the GNU General Public License Version 3.
+
+VST® is a trademark of Steinberg Media Technologies GmbH, registered in
+Europe and other countries.
 
 System Requirements
 -------------------
@@ -37,6 +37,22 @@ Installation
 The "presets" folder in the archive contains a few sounds that you can load by
 clicking the Import Patch icon near the top left corner of the main screen of
 the plugin.
+
+Usage
+-----
+
+ * Move the cursor over a knob, and use the mouse wheel for adjusting its
+   value, or start dragging it.
+
+ * Hold down the Control key while adjusting a knob for fine grained
+   adjustments.
+
+ * Double click on a knob to reset it to its default value.
+
+ * Click on the area below a knob to assign a controller to it.
+
+ * It is recommended to use a small buffer size for lower latency, for example,
+   3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
 
 Bugs
 ----
