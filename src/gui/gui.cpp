@@ -638,14 +638,14 @@ const GUI::Color GUI::CTL_COLOR_MIDI_LEARN_BG = GUI::rgb(51, 68, 131);
 const GUI::Color GUI::CTL_COLOR_AFTERTOUCH_TEXT = GUI::rgb(255, 160, 110);
 const GUI::Color GUI::CTL_COLOR_AFTERTOUCH_BG = GUI::rgb(145, 91, 63);
 
-const GUI::Color GUI::CTL_COLOR_FLEX_TEXT = GUI::rgb(120, 210, 255);
-const GUI::Color GUI::CTL_COLOR_FLEX_BG = GUI::rgb(68, 120, 145);
+const GUI::Color GUI::CTL_COLOR_FLEX_TEXT = GUI::rgb(110, 190, 255);
+const GUI::Color GUI::CTL_COLOR_FLEX_BG = GUI::rgb(63, 108, 145);
 
 const GUI::Color GUI::CTL_COLOR_LFO_TEXT = GUI::rgb(230, 100, 255);
 const GUI::Color GUI::CTL_COLOR_LFO_BG = GUI::rgb(131, 57, 145);
 
-const GUI::Color GUI::CTL_COLOR_ENVELOPE_TEXT = GUI::rgb(120, 255, 220);
-const GUI::Color GUI::CTL_COLOR_ENVELOPE_BG = GUI::rgb(68, 145, 125);
+const GUI::Color GUI::CTL_COLOR_ENVELOPE_TEXT = GUI::rgb(110, 255, 150);
+const GUI::Color GUI::CTL_COLOR_ENVELOPE_BG = GUI::rgb(63, 145, 85);
 
 
 constexpr GUI::ColorComponent GUI::red(Color const color)

@@ -7,9 +7,9 @@ def main(argv):
         ("CTL_COLOR_MIDI_SPECIAL", rgb(255, 220, 150)),
         ("CTL_COLOR_MIDI_LEARN", rgb(90, 120, 230)),
         ("CTL_COLOR_AFTERTOUCH", rgb(255, 160, 110)),
-        ("CTL_COLOR_FLEX", rgb(120, 210, 255)),
+        ("CTL_COLOR_FLEX", rgb(110, 190, 255)),
         ("CTL_COLOR_LFO", rgb(230, 100, 255)),
-        ("CTL_COLOR_ENVELOPE", rgb(120, 255, 220)),
+        ("CTL_COLOR_ENVELOPE", rgb(110, 255, 150)),
     )
 
     for name, text_color in colors:
