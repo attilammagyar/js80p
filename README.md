@@ -25,9 +25,9 @@ Table of Contents
  * [System Requirements](#system)
  * [Installation](#install)
  * [Usage](#usage)
+ * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
- * [Bugs](#bugs)
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
     * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
@@ -93,6 +93,14 @@ Usage
  * It is recommended to use a small buffer size for lower latency, for example,
    3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
 
+<a name="bugs"></a>
+
+Bugs
+----
+
+If you find bugs, please report them at
+[https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
+
 <a name="signal"></a>
 
 ### Signal Chain (Simplified)
@@ -156,14 +164,6 @@ Features
  * MIDI learn
  * logarithmic and linear scale filter frequencies
  * LFO and effects tempo synchronization
-
-<a name="bugs"></a>
-
-Bugs
-----
-
-If you find bugs, please report them at
-[https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
 
 Frequenctly Asked Questions
 ---------------------------
