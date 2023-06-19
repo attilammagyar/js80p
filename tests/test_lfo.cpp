@@ -184,7 +184,7 @@ TEST(lfo_performance, {
 
     Integer const rounds = atoi(TEST_ARGV.back().c_str());
 
-    assert_gt(rounds, 0, "Number of rounds to render must be positive");
+    assert_gt((int)rounds, 0, "Number of rounds to render must be positive");
 
     TEST_ARGV.pop_back();
 
