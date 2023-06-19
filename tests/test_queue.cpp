@@ -19,7 +19,7 @@
 #include "test.cpp"
 #include "utils.cpp"
 
-#include "synth/queue.cpp"
+#include "dsp/queue.cpp"
 
 
 using namespace JS80P;

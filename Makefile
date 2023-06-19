@@ -80,33 +80,33 @@ GUI_PLAYGROUND_OBJS = \
 	$(OBJ_SYNTH)
 
 PARAM_COMPONENTS = \
-	synth/envelope \
-	synth/flexible_controller \
-	synth/lfo \
-	synth/math \
-	synth/midi_controller \
-	synth/oscillator \
-	synth/param \
-	synth/queue \
-	synth/signal_producer
+	dsp/envelope \
+	dsp/flexible_controller \
+	dsp/lfo \
+	dsp/math \
+	dsp/midi_controller \
+	dsp/oscillator \
+	dsp/param \
+	dsp/queue \
+	dsp/signal_producer
 
 SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
-	synth/biquad_filter \
-	synth/chorus \
-	synth/delay \
-	synth/distortion \
-	synth/echo \
-	synth/effect \
-	synth/effects \
-	synth/filter \
-	synth/gain \
-	synth/mixer \
-	synth/reverb \
-	synth/voice \
-	synth/wavefolder \
-	synth/wavetable
+	dsp/biquad_filter \
+	dsp/chorus \
+	dsp/delay \
+	dsp/distortion \
+	dsp/echo \
+	dsp/effect \
+	dsp/effects \
+	dsp/filter \
+	dsp/gain \
+	dsp/mixer \
+	dsp/reverb \
+	dsp/voice \
+	dsp/wavefolder \
+	dsp/wavetable
 
 TESTS = \
 	test_example \
@@ -390,7 +390,7 @@ $(OBJ_VST3_MAIN): \
 
 $(BUILD_DIR)/perf_math$(EXE): \
 		tests/performance/perf_math.cpp \
-		src/synth/math.hpp src/synth/math.cpp \
+		src/dsp/math.hpp src/dsp/math.cpp \
 		src/js80p.hpp \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -413,8 +413,8 @@ $(BUILD_DIR)/test_bank$(EXE): \
 
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
-		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -422,9 +422,9 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 
 $(BUILD_DIR)/test_delay$(EXE): \
 		tests/test_delay.cpp \
-		src/synth/delay.cpp src/synth/delay.hpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
-		src/synth/biquad_filter.cpp src/synth/biquad_filter.hpp \
+		src/dsp/delay.cpp src/dsp/delay.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -435,8 +435,8 @@ $(BUILD_DIR)/test_delay$(EXE): \
 
 $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
-		src/synth/distortion.cpp src/synth/distortion.hpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
+		src/dsp/distortion.cpp src/dsp/distortion.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -458,8 +458,8 @@ $(BUILD_DIR)/test_flexible_controller$(EXE): \
 
 $(BUILD_DIR)/test_gain$(EXE): \
 		tests/test_gain.cpp \
-		src/synth/gain.cpp src/synth/gain.hpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
+		src/dsp/gain.cpp src/dsp/gain.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -475,7 +475,7 @@ $(BUILD_DIR)/test_gui$(EXE): \
 
 $(BUILD_DIR)/test_lfo$(EXE): \
 		tests/test_lfo.cpp \
-		src/synth/wavetable.cpp src/synth/wavetable.hpp \
+		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -483,7 +483,7 @@ $(BUILD_DIR)/test_lfo$(EXE): \
 
 $(BUILD_DIR)/test_math$(EXE): \
 		tests/test_math.cpp \
-		src/synth/math.cpp src/synth/math.hpp \
+		src/dsp/math.cpp src/dsp/math.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -491,8 +491,8 @@ $(BUILD_DIR)/test_math$(EXE): \
 
 $(BUILD_DIR)/test_midi_controller$(EXE): \
 		tests/test_midi_controller.cpp \
-		src/synth/midi_controller.cpp src/synth/midi_controller.hpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
+		src/dsp/midi_controller.cpp src/dsp/midi_controller.hpp \
+		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -500,8 +500,8 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 
 $(BUILD_DIR)/test_mixer$(EXE): \
 		tests/test_mixer.cpp \
-		src/synth/mixer.cpp src/synth/mixer.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
+		src/dsp/mixer.cpp src/dsp/mixer.hpp \
+		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -509,7 +509,7 @@ $(BUILD_DIR)/test_mixer$(EXE): \
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
-		src/synth/wavetable.cpp src/synth/wavetable.hpp \
+		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -524,7 +524,7 @@ $(BUILD_DIR)/test_param$(EXE): \
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
+		src/dsp/queue.cpp src/dsp/queue.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
@@ -549,8 +549,8 @@ $(BUILD_DIR)/test_serializer$(EXE): \
 
 $(BUILD_DIR)/test_signal_producer$(EXE): \
 		tests/test_signal_producer.cpp \
-		src/synth/queue.cpp src/synth/queue.hpp \
-		src/synth/signal_producer.cpp src/synth/signal_producer.hpp \
+		src/dsp/queue.cpp src/dsp/queue.hpp \
+		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
@@ -574,8 +574,8 @@ $(BUILD_DIR)/test_voice$(EXE): \
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
-		src/synth/filter.cpp src/synth/filter.hpp \
-		src/synth/wavefolder.cpp src/synth/wavefolder.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)

@@ -21,7 +21,7 @@
 
 #include "js80p.hpp"
 
-#include "synth/midi_controller.cpp"
+#include "dsp/midi_controller.cpp"
 
 
 using namespace JS80P;

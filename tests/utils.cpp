@@ -21,9 +21,9 @@
 
 #include "js80p.hpp"
 
-#include "synth/math.cpp"
-#include "synth/queue.cpp"
-#include "synth/signal_producer.cpp"
+#include "dsp/math.cpp"
+#include "dsp/queue.cpp"
+#include "dsp/signal_producer.cpp"
 
 
 namespace JS80P

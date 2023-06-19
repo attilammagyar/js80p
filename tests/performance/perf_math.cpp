@@ -4,7 +4,7 @@
 
 #include "js80p.hpp"
 
-#include "synth/math.cpp"
+#include "dsp/math.cpp"
 
 
 using namespace JS80P;

@@ -21,8 +21,8 @@
 
 #include "js80p.hpp"
 
-#include "synth/mixer.cpp"
-#include "synth/signal_producer.cpp"
+#include "dsp/mixer.cpp"
+#include "dsp/signal_producer.cpp"
 
 
 using namespace JS80P;
