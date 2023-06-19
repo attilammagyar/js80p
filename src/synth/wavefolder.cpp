@@ -113,7 +113,7 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
     folding_buffer = FloatParam::produce_if_not_constant(
-        &folding, round, sample_count
+        folding, round, sample_count
     );
 
     if (folding_buffer == NULL)

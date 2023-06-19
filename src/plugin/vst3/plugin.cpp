@@ -582,7 +582,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
 void Vst3Plugin::Processor::import_patch(std::string const& serialized) noexcept
 {
     synth.process_messages();
-    Serializer::import(&synth, serialized);
+    Serializer::import(synth, serialized);
     synth.process_messages();
 }
 
@@ -629,7 +629,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::getState(IBStream* state)
         return kResultFalse;
     }
 
-    std::string const serialized = Serializer::serialize(&synth);
+    std::string const& serialized = Serializer::serialize(synth);
     int32 const size = serialized.size();
     int32 numBytesWritten;
 
@@ -643,10 +643,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::getState(IBStream* state)
 }
 
 
-Vst3Plugin::GUI::GUI(Controller* controller)
+Vst3Plugin::GUI::GUI(Synth& synth)
     : CPluginView(&rect),
-    controller(controller),
-    synth(NULL),
+    synth(synth),
     gui(NULL),
     run_loop(NULL),
     event_handler(NULL),
@@ -687,16 +686,9 @@ void Vst3Plugin::GUI::attachedToParent()
 }
 
 
-void Vst3Plugin::GUI::set_synth(Synth* synth)
-{
-    this->synth = synth;
-    show_if_needed();
-}
-
-
 void Vst3Plugin::GUI::show_if_needed()
 {
-    if (synth == NULL || !isAttached()) {
+    if (!isAttached()) {
         return;
     }
 
@@ -908,8 +900,7 @@ IPlugView* PLUGIN_API Vst3Plugin::Controller::createView(FIDString name)
             return NULL;
         }
 
-        GUI* gui = new GUI(this);
-        gui->set_synth(synth);
+        GUI* gui = new GUI(*synth);
 
         return gui;
     }

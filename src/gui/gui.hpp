@@ -144,7 +144,7 @@ class GUI
         static Color const CTL_COLOR_ENVELOPE_BG;
 
         static void param_ratio_to_str(
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -164,7 +164,7 @@ class GUI
         GUI(
             PlatformData platform_data,
             PlatformWidget parent_window,
-            Synth* synth,
+            Synth& synth,
             bool const show_vst_logo
         );
 
@@ -181,7 +181,7 @@ class GUI
         static void initialize_controllers_by_id();
 
         static void param_ratio_to_str_float(
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -190,7 +190,7 @@ class GUI
             size_t const buffer_size
         );
         static void param_ratio_to_str_int(
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             char const* const* const options,
@@ -235,7 +235,7 @@ class GUI
         TabBody* synth_body;
         StatusLine* status_line;
 
-        Synth* synth;
+        Synth& synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
 };

@@ -216,7 +216,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
     synth.pitch_wheel_change(0.0, 1, 12288);
     synth.note_on(0.0, 1, Midi::NOTE_A_4, 114);
 
-    SignalProducer::produce<Synth>(&synth, 1);
+    SignalProducer::produce<Synth>(synth, 1);
 
     assert_eq(53.0 / 127.0, synth.phase_modulation_level.get_ratio(), DOUBLE_DELTA);
     assert_eq(114.0 / 127.0, synth.modulator_params.amplitude.get_ratio(), DOUBLE_DELTA);
@@ -298,8 +298,8 @@ void test_operating_mode(
 
     synth.note_on(0.0, 0, Midi::NOTE_A_3, 127);
 
-    expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
-    samples = SignalProducer::produce<Synth>(&synth, 1);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    samples = SignalProducer::produce<Synth>(synth, 1);
 
     assert_close(
         expected_samples[0],
@@ -352,8 +352,8 @@ TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
     synth.note_on(0.0, 0, Midi::NOTE_A_5, 127);
     synth.all_sound_off(1.0 / sample_rate, 1);
 
-    expected_samples = SignalProducer::produce<SumOfSines>(&expected, 1);
-    samples = SignalProducer::produce<Synth>(&synth, 1);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    samples = SignalProducer::produce<Synth>(synth, 1);
 
     assert_eq(expected_samples[0], samples[0], block_size, DOUBLE_DELTA);
     assert_eq(expected_samples[1], samples[1], block_size, DOUBLE_DELTA);
@@ -394,8 +394,8 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
     synth.note_on(0.0, 3, Midi::NOTE_A_3, 127);
     synth.all_notes_off(0.5, 1);
 
-    sines = SignalProducer::produce<SumOfSines>(&expected, 1);
-    samples = SignalProducer::produce<Synth>(&synth, 1);
+    sines = SignalProducer::produce<SumOfSines>(expected, 1);
+    samples = SignalProducer::produce<Synth>(synth, 1);
 
     for (Integer i = 0; i != block_size; ++i) {
         expected_samples[i] = i < half_a_second ? sines[0][i] : 0.0;
@@ -536,14 +536,14 @@ TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
     synth.resume();
 
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
-    SignalProducer::produce<Synth>(&synth, 1);
+    SignalProducer::produce<Synth>(synth, 1);
     assert_true(synth.lfos[0]->is_on());
 
     synth.push_message(
         Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
     );
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
-    SignalProducer::produce<Synth>(&synth, 2);
+    SignalProducer::produce<Synth>(synth, 2);
 
     assert_true(synth.lfos[0]->is_on());
 })

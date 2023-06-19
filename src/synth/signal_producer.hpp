@@ -97,7 +97,7 @@ class SignalProducer
          */
         template<class SignalProducerClass>
         static Sample const* const* produce(
-            SignalProducerClass* signal_producer,
+            SignalProducerClass& signal_producer,
             Integer const round,
             Integer const sample_count = -1
         ) noexcept;
@@ -219,7 +219,7 @@ class SignalProducer
 
         template<class SignalProducerClass>
         static void handle_events(
-            SignalProducerClass* signal_producer,
+            SignalProducerClass& signal_producer,
             Integer const current_sample_index,
             Integer const sample_count,
             Integer& next_stop

@@ -30,34 +30,34 @@ namespace JS80P
 
 template<class SignalProducerClass>
 Sample const* const* SignalProducer::produce(
-        SignalProducerClass* signal_producer,
+        SignalProducerClass& signal_producer,
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (UNLIKELY(signal_producer->channels == 0)) {
+    if (UNLIKELY(signal_producer.channels == 0)) {
         return NULL;
     }
 
-    if (signal_producer->cached_round == round) {
-        return signal_producer->cached_buffer;
+    if (signal_producer.cached_round == round) {
+        return signal_producer.cached_buffer;
     }
 
-    Seconds const start_time = signal_producer->current_time;
-    Integer const count = signal_producer->sample_count_or_block_size(sample_count);
+    Seconds const start_time = signal_producer.current_time;
+    Integer const count = signal_producer.sample_count_or_block_size(sample_count);
 
-    signal_producer->cached_round = round;
-    signal_producer->cached_buffer = signal_producer->initialize_rendering(round, count);
-    signal_producer->last_sample_count = count;
+    signal_producer.cached_round = round;
+    signal_producer.cached_buffer = signal_producer.initialize_rendering(round, count);
+    signal_producer.last_sample_count = count;
 
-    if (signal_producer->cached_buffer != NULL) {
-        return signal_producer->cached_buffer;
+    if (signal_producer.cached_buffer != NULL) {
+        return signal_producer.cached_buffer;
     }
 
-    Sample** buffer = signal_producer->buffer;
+    Sample** buffer = signal_producer.buffer;
 
-    signal_producer->cached_buffer = buffer;
+    signal_producer.cached_buffer = buffer;
 
-    if (signal_producer->has_upcoming_events(count)) {
+    if (signal_producer.has_upcoming_events(count)) {
         Integer current_sample_index = 0;
         Integer next_stop;
 
@@ -65,24 +65,24 @@ Sample const* const* SignalProducer::produce(
             handle_events<SignalProducerClass>(
                 signal_producer, current_sample_index, count, next_stop
             );
-            signal_producer->render(
+            signal_producer.render(
                 round, current_sample_index, next_stop, buffer
             );
             current_sample_index = next_stop;
-            signal_producer->current_time = (
+            signal_producer.current_time = (
                 start_time
-                + (Seconds)current_sample_index * signal_producer->sampling_period
+                + (Seconds)current_sample_index * signal_producer.sampling_period
             );
         }
     } else {
-        signal_producer->render(round, 0, count, buffer);
-        signal_producer->current_time += (
-            (Seconds)count * signal_producer->sampling_period
+        signal_producer.render(round, 0, count, buffer);
+        signal_producer.current_time += (
+            (Seconds)count * signal_producer.sampling_period
         );
     }
 
-    if (signal_producer->events.is_empty()) {
-        signal_producer->current_time = 0.0;
+    if (signal_producer.events.is_empty()) {
+        signal_producer.current_time = 0.0;
     }
 
     return buffer;
@@ -438,20 +438,20 @@ SignalProducer::Event& SignalProducer::Event::operator=(Event const& event) noex
 
 template<class SignalProducerClass>
 void SignalProducer::handle_events(
-        SignalProducerClass* signal_producer,
+        SignalProducerClass& signal_producer,
         Integer const current_sample_index,
         Integer const sample_count,
         Integer& next_stop
 ) noexcept {
-    Seconds const handle_until = signal_producer->current_time;
+    Seconds const handle_until = signal_producer.current_time;
 
-    while (!signal_producer->events.is_empty()) {
-        Event const& next_event = signal_producer->events.front();
+    while (!signal_producer.events.is_empty()) {
+        Event const& next_event = signal_producer.events.front();
 
         if (next_event.time_offset > handle_until) {
             next_stop = current_sample_index + (Integer)std::ceil(
-                (next_event.time_offset - signal_producer->current_time)
-                * signal_producer->sample_rate
+                (next_event.time_offset - signal_producer.current_time)
+                * signal_producer.sample_rate
             );
 
             if (next_stop > sample_count) {
@@ -461,8 +461,8 @@ void SignalProducer::handle_events(
             return;
         }
 
-        signal_producer->handle_event(next_event);
-        signal_producer->events.pop();
+        signal_producer.handle_event(next_event);
+        signal_producer.events.pop();
     }
 
     next_stop = sample_count;

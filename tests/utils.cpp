@@ -253,7 +253,7 @@ void render_rounds(
     for (Integer i = 0; i != rounds; ++i) {
         Sample const* const* block = (
             SignalProducer::produce<SignalProducerClass>(
-                &signal_producer, i + first_round, size
+                signal_producer, i + first_round, size
             )
         );
 

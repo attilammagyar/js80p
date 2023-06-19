@@ -136,10 +136,10 @@ Sample const* const* Echo<InputSignalProducerClass>::initialize_rendering(
     }
 
     comb_filter_1_buffer = SignalProducer::produce<CombFilter1>(
-        &comb_filter_1, round, sample_count
+        comb_filter_1, round, sample_count
     );
     comb_filter_2_buffer = SignalProducer::produce<CombFilter2>(
-        &comb_filter_2, round, sample_count
+        comb_filter_2, round, sample_count
     );
 
     return NULL;

@@ -156,7 +156,7 @@ TEST(portamento, {
 
     voice.note_on(note_start, 1, 1.0, 1);
 
-    SignalProducer::produce<SimpleVoice>(&voice, 999999, block_size);
+    SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -191,7 +191,7 @@ TEST(resetting_a_voice_turns_it_off, {
 
     voice.note_on(0.0, 1, 1.0, 1);
 
-    SignalProducer::produce<SimpleVoice>(&voice, 999999, block_size);
+    SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
     voice.reset();
 

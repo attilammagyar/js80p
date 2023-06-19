@@ -157,7 +157,7 @@ Wavetable::~Wavetable()
 
 
 Sample Wavetable::lookup(
-        WavetableState* state,
+        WavetableState& state,
         Frequency const frequency,
         Number const phase_offset
 ) const noexcept {
@@ -167,27 +167,27 @@ Sample Wavetable::lookup(
         return 1.0;
     }
 
-    if (UNLIKELY(abs_frequency > state->nyquist_frequency)) {
+    if (UNLIKELY(abs_frequency > state.nyquist_frequency)) {
         return 0.0;
     }
 
-    Number const sample_index = state->sample_index;
+    Number const sample_index = state.sample_index;
 
-    state->sample_index = wrap_around(
-        sample_index + state->scale * (Number)frequency
+    state.sample_index = wrap_around(
+        sample_index + state.scale * (Number)frequency
     );
 
     Integer const partials = this->partials;
 
     if (partials == 1) {
-        state->needs_table_interpolation = false;
-        state->table_indices[0] = 0;
+        state.needs_table_interpolation = false;
+        state.table_indices[0] = 0;
 
         return interpolate(state, abs_frequency, sample_index + phase_offset);
     }
 
     Sample const max_partials = (
-        (Sample)(state->nyquist_frequency / abs_frequency)
+        (Sample)(state.nyquist_frequency / abs_frequency)
     );
     Integer const more_partials_index = (
         std::max((Integer)0, std::min(partials, (Integer)max_partials) - 1)
@@ -196,17 +196,17 @@ Sample Wavetable::lookup(
         std::max((Integer)0, more_partials_index - 1)
     );
 
-    state->table_indices[0] = fewer_partials_index;
+    state.table_indices[0] = fewer_partials_index;
 
     if (more_partials_index == fewer_partials_index) {
-        state->needs_table_interpolation = false;
+        state.needs_table_interpolation = false;
 
         return interpolate(state, abs_frequency, sample_index + phase_offset);
     }
 
-    state->needs_table_interpolation = true;
-    state->table_indices[1] = more_partials_index;
-    state->fewer_partials_weight = max_partials - std::floor(max_partials);
+    state.needs_table_interpolation = true;
+    state.table_indices[1] = more_partials_index;
+    state.fewer_partials_weight = max_partials - std::floor(max_partials);
 
     return interpolate(state, abs_frequency, sample_index + phase_offset);
 }
@@ -219,11 +219,11 @@ Number Wavetable::wrap_around(Number const index) const noexcept
 
 
 Sample Wavetable::interpolate(
-        WavetableState const* state,
+        WavetableState const& state,
         Frequency const frequency,
         Number const sample_index
 ) const noexcept {
-    if (frequency >= state->interpolation_limit) {
+    if (frequency >= state.interpolation_limit) {
         return interpolate_sample_linear(state, sample_index);
     } else {
         return interpolate_sample_lagrange(state, sample_index);
@@ -232,7 +232,7 @@ Sample Wavetable::interpolate(
 
 
 Sample Wavetable::interpolate_sample_linear(
-        WavetableState const* state,
+        WavetableState const& state,
         Number const sample_index
 ) const noexcept {
     /*
@@ -246,18 +246,18 @@ Sample Wavetable::interpolate_sample_linear(
     Integer const sample_1_index = (Integer)sample_index & MASK;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
 
-    Sample const* table_1 = samples[state->table_indices[0]];
+    Sample const* table_1 = samples[state.table_indices[0]];
 
-    if (!state->needs_table_interpolation) {
+    if (!state.needs_table_interpolation) {
         return Math::combine(
             sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
         );
     }
 
-    Sample const* table_2 = samples[state->table_indices[1]];
+    Sample const* table_2 = samples[state.table_indices[1]];
 
     return Math::combine(
-        state->fewer_partials_weight,
+        state.fewer_partials_weight,
         Math::combine(
             sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
         ),
@@ -269,14 +269,14 @@ Sample Wavetable::interpolate_sample_linear(
 
 
 Sample Wavetable::interpolate_sample_lagrange(
-        WavetableState const* state,
+        WavetableState const& state,
         Number const sample_index
 ) const noexcept {
     Integer const sample_1_index = (Integer)sample_index & MASK;
     Integer const sample_2_index = (sample_1_index + 1) & MASK;
     Integer const sample_3_index = (sample_2_index + 1) & MASK;
 
-    Sample const* table_1 = samples[state->table_indices[0]];
+    Sample const* table_1 = samples[state.table_indices[0]];
 
     // Formula and notation from http://dlmf.nist.gov/3.3#ii
 
@@ -291,18 +291,18 @@ Sample Wavetable::interpolate_sample_lagrange(
     Sample const a_2 = 1.0 - t_sqr;
     Sample const a_3 = 0.5 * (t_sqr + t);
 
-    if (!state->needs_table_interpolation) {
+    if (!state.needs_table_interpolation) {
         return a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3;
     }
 
-    Sample const* table_2 = samples[state->table_indices[1]];
+    Sample const* table_2 = samples[state.table_indices[1]];
 
     Sample const f_2_1 = table_2[sample_1_index];
     Sample const f_2_2 = table_2[sample_2_index];
     Sample const f_2_3 = table_2[sample_3_index];
 
     return Math::combine(
-        state->fewer_partials_weight,
+        state.fewer_partials_weight,
         a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3,
         a_1 * f_2_1 + a_2 * f_2_2 + a_3 * f_2_3
     );

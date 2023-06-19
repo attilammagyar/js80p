@@ -67,7 +67,7 @@ ImportPatchButton::ImportPatchButton(
         int const top,
         int const width,
         int const height,
-        Synth* synth,
+        Synth& synth,
         TabBody* synth_gui_body
 ) : TransparentWidget("Import Patch", left, top, width, height, Type::IMPORT_PATCH_BUTTON),
     synth(synth),
@@ -119,7 +119,7 @@ ExportPatchButton::ExportPatchButton(
         int const top,
         int const width,
         int const height,
-        Synth* synth
+        Synth& synth
 ) : TransparentWidget("Export Patch", left, top, width, height, Type::EXPORT_PATCH_BUTTON),
     synth(synth)
 {
@@ -290,7 +290,7 @@ void TabSelector::click()
 
 ControllerSelector::ControllerSelector(
         Background& background,
-        Synth* synth
+        Synth& synth
 ) : Widget("Select controller", LEFT, TOP, WIDTH, HEIGHT, Type::CONTROLLER_SELECTOR),
     background(background),
     synth(synth),
@@ -341,7 +341,7 @@ void ControllerSelector::show(
         ParamEditor* param_editor
 ) {
     Synth::ControllerId const selected_controller_id = (
-        synth->get_param_controller_id_atomic(param_id)
+        synth.get_param_controller_id_atomic(param_id)
     );
 
     GUI::Controller const* const controller = GUI::get_controller(
@@ -589,7 +589,7 @@ ParamEditor::ParamEditor(
         int const left,
         int const top,
         ControllerSelector& controller_selector,
-        Synth* synth,
+        Synth& synth,
         Synth::ParamId const param_id,
         int const controller_choices,
         char const* format,
@@ -620,7 +620,7 @@ ParamEditor::ParamEditor(
         int const left,
         int const top,
         ControllerSelector& controller_selector,
-        Synth* synth,
+        Synth& synth,
         Synth::ParamId const param_id,
         int const controller_choices,
         char const* const* const options,
@@ -661,10 +661,10 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     );
 
     own(knob);
-    default_ratio = synth->get_param_default_ratio(param_id);
+    default_ratio = synth.get_param_default_ratio(param_id);
     update_editor(
-        synth->get_param_ratio_atomic(param_id),
-        synth->get_param_controller_id_atomic(param_id)
+        synth.get_param_ratio_atomic(param_id),
+        synth.get_param_controller_id_atomic(param_id)
     );
 }
 
@@ -682,16 +682,16 @@ void ParamEditor::refresh()
     }
 
     Synth::ControllerId const new_controller_id = (
-        synth->get_param_controller_id_atomic(param_id)
+        synth.get_param_controller_id_atomic(param_id)
     );
-    Number const new_ratio = synth->get_param_ratio_atomic(param_id);
+    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
 
     has_controller_ = new_controller_id > Synth::Synth::ControllerId::NONE;
 
     if (new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);
     } else {
-        synth->push_message(
+        synth.push_message(
             Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
         );
     }
@@ -745,7 +745,7 @@ void ParamEditor::adjust_ratio(Number const delta)
         handle_ratio_change(ratio + delta);
     } else {
         Number const discrete_delta = (
-            (delta > 0 ? 1.001 : -1.001) / synth->get_param_max_value(param_id)
+            (delta > 0 ? 1.001 : -1.001) / synth.get_param_max_value(param_id)
         );
         handle_ratio_change(ratio + discrete_delta);
     }
@@ -756,7 +756,7 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
 {
     Number const ratio = GUI::clamp_ratio(new_ratio);
 
-    synth->push_message(
+    synth.push_message(
         Synth::MessageType::SET_PARAM, param_id, ratio, 0
     );
     update_editor(ratio);
@@ -765,7 +765,7 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
 
 void ParamEditor::handle_controller_change(Synth::ControllerId const new_controller_id)
 {
-    synth->push_message(
+    synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
         param_id,
         0.0,
@@ -1214,7 +1214,7 @@ ToggleSwitch::ToggleSwitch(
         int const top,
         int const width,
         int const box_left,
-        Synth* synth,
+        Synth& synth,
         Synth::ParamId const param_id
 ) : TransparentWidget(text, left, top, width, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
@@ -1230,7 +1230,7 @@ void ToggleSwitch::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     TransparentWidget::set_up(platform_data, parent);
 
-    default_ratio = synth->get_param_default_ratio(param_id);
+    default_ratio = synth.get_param_default_ratio(param_id);
     ratio = default_ratio;
     refresh();
     redraw();
@@ -1243,13 +1243,13 @@ void ToggleSwitch::refresh()
         return;
     }
 
-    Number const new_ratio = synth->get_param_ratio_atomic(param_id);
+    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
 
     if (new_ratio != ratio) {
         ratio = GUI::clamp_ratio(new_ratio);
         redraw();
     } else {
-        synth->push_message(
+        synth.push_message(
             Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
         );
     }
@@ -1260,7 +1260,7 @@ bool ToggleSwitch::paint()
 {
     TransparentWidget::paint();
 
-    Toggle const toggle = synth->int_param_ratio_to_display_value(param_id, ratio);
+    Toggle const toggle = synth.int_param_ratio_to_display_value(param_id, ratio);
     GUI::Color const color = (
         toggle == ToggleParam::ON ? GUI::TOGGLE_ON_COLOR : GUI::TOGGLE_OFF_COLOR
     );
@@ -1274,7 +1274,7 @@ bool ToggleSwitch::paint()
 bool ToggleSwitch::mouse_up(int const x, int const y)
 {
     ratio = ratio < 0.5 ? 1.0 : 0.0;
-    synth->push_message(
+    synth.push_message(
         Synth::MessageType::SET_PARAM, param_id, ratio, 0
     );
     redraw();

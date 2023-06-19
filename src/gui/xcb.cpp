@@ -435,7 +435,7 @@ bool XcbPlatform::is_file_selector_dialog_open() const
 }
 
 
-void XcbPlatform::export_patch(std::string const contents)
+void XcbPlatform::export_patch(std::string const& contents)
 {
     if (is_file_selector_dialog_open()) {
         return;

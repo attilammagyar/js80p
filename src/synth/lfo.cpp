@@ -130,16 +130,16 @@ Sample const* const* LFO::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    min_buffer = FloatParam::produce_if_not_constant(&min, round, sample_count);
-    max_buffer = FloatParam::produce_if_not_constant(&max, round, sample_count);
+    min_buffer = FloatParam::produce_if_not_constant(min, round, sample_count);
+    max_buffer = FloatParam::produce_if_not_constant(max, round, sample_count);
     distortion_buffer = FloatParam::produce_if_not_constant(
-        &distortion, round, sample_count
+        distortion, round, sample_count
     );
     randomness_buffer = FloatParam::produce_if_not_constant(
-        &randomness, round, sample_count
+        randomness, round, sample_count
     );
     oscillator_buffer = SignalProducer::produce<Oscillator_>(
-        &oscillator, round, sample_count
+        oscillator, round, sample_count
     );
 
     return NULL;

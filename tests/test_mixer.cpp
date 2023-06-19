@@ -74,7 +74,7 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
     mixer.set_block_size(block_size);
 
     mixer.set_output_buffer(output);
-    SignalProducer::produce< Mixer<FixedSignalProducer> >(&mixer, 1);
+    SignalProducer::produce< Mixer<FixedSignalProducer> >(mixer, 1);
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_eq(

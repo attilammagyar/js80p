@@ -67,14 +67,14 @@ xcb_generic_event_t* xcb_wait_for_event_with_timeout(
 
 
 void timer_tick(
-        JS80P::Synth* synth,
-        JS80P::GUI* gui,
+        JS80P::Synth& synth,
+        JS80P::GUI& gui,
         JS80P::Integer& rendering_round
 ) {
     ++rendering_round;
     rendering_round = rendering_round & 0x7fff;
-    synth->generate_samples(rendering_round, 1);
-    gui->idle();
+    synth.generate_samples(rendering_round, 1);
+    gui.idle();
 }
 
 
@@ -121,9 +121,6 @@ int main(int const argc, char const* argv[])
 
     xcb_generic_event_t* event;
 
-    JS80P::Synth* synth;
-    JS80P::GUI* gui;
-
     xcb_window_t window_id;
 
     cairo_surface_t* cairo_surface;
@@ -167,8 +164,9 @@ int main(int const argc, char const* argv[])
 
     xcb_flush(xcb_connection);
 
-    synth = new JS80P::Synth();
-    gui = new JS80P::GUI(
+    JS80P::Synth synth;
+
+    JS80P::GUI* gui = new JS80P::GUI(
         (JS80P::GUI::PlatformData)gui_xcb,
         (JS80P::GUI::PlatformWidget)window_id,
         synth,
@@ -178,7 +176,7 @@ int main(int const argc, char const* argv[])
 
     while (is_running && (event = xcb_wait_for_event_with_timeout(xcb, 0.05))) {
         if (event == JS80P_XCB_TIMEOUT) {
-            timer_tick(synth, gui, rendering_round);
+            timer_tick(synth, *gui, rendering_round);
 
             continue;
         }
@@ -216,12 +214,11 @@ int main(int const argc, char const* argv[])
 
         free(event);
 
-        timer_tick(synth, gui, rendering_round);
+        timer_tick(synth, *gui, rendering_round);
         xcb_flush(xcb_connection);
     }
 
     delete gui;
-    delete synth;
 
     cairo_surface_finish(cairo_surface);
     cairo_surface_destroy(cairo_surface);

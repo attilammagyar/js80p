@@ -44,21 +44,21 @@ class Serializer
 
         static bool parse_line_until_value(
             std::string::const_iterator& it,
-            std::string::const_iterator const end,
+            std::string::const_iterator const& end,
             char param_name[Constants::PARAM_NAME_MAX_LENGTH],
             char suffix[4]
         ) noexcept;
 
         static bool skipping_remaining_whitespace_or_comment_reaches_the_end(
             std::string::const_iterator& it,
-            std::string::const_iterator const end
+            std::string::const_iterator const& end
         ) noexcept;
 
         static bool is_js80p_section_start(char const section_name[8]) noexcept;
 
-        static std::string serialize(Synth const* synth) noexcept;
+        static std::string serialize(Synth const& synth) noexcept;
 
-        static void import(Synth* synth, std::string const& serialized) noexcept;
+        static void import(Synth& synth, std::string const& serialized) noexcept;
 
     private:
         /*
@@ -82,9 +82,9 @@ class Serializer
             Number const controller_id
         ) noexcept;
 
-        static void reset_all_params_to_default(Synth* synth) noexcept;
+        static void reset_all_params_to_default(Synth& synth) noexcept;
 
-        static void process_lines(Synth* synth, Lines* lines) noexcept;
+        static void process_lines(Synth& synth, Lines* lines) noexcept;
 
         static bool is_section_name_char(char const c) noexcept;
         static bool is_digit(char const c) noexcept;
@@ -96,30 +96,30 @@ class Serializer
 
         static void process_line(
             std::vector<Synth::Message>& messages,
-            Synth* synth,
+            Synth& synth,
             std::string const& line
         ) noexcept;
 
         static bool parse_param_name(
             std::string::const_iterator& it,
-            std::string::const_iterator const end,
+            std::string::const_iterator const& end,
             char* param_name
         ) noexcept;
 
         static bool parse_suffix(
             std::string::const_iterator& it,
-            std::string::const_iterator const end,
+            std::string::const_iterator const& end,
             char* suffix
         ) noexcept;
 
         static bool parse_equal_sign(
             std::string::const_iterator& it,
-            std::string::const_iterator const end
+            std::string::const_iterator const& end
         ) noexcept;
 
         static bool parse_number(
             std::string::const_iterator& it,
-            std::string::const_iterator const end,
+            std::string::const_iterator const& end,
             Number& number
         ) noexcept;
 

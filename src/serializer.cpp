@@ -33,7 +33,7 @@ namespace JS80P
 std::string const Serializer::CONTROLLER_SUFFIX = "ctl";
 
 
-std::string Serializer::serialize(Synth const* synth) noexcept
+std::string Serializer::serialize(Synth const& synth) noexcept
 {
     constexpr size_t line_size = 128;
     char line[line_size];
@@ -45,7 +45,7 @@ std::string Serializer::serialize(Synth const* synth) noexcept
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
-        std::string const param_name = synth->get_param_name(param_id);
+        std::string const param_name = synth.get_param_name(param_id);
 
         if (param_name.length() > 0) {
             snprintf(
@@ -53,7 +53,7 @@ std::string Serializer::serialize(Synth const* synth) noexcept
                 line_size,
                 "%s = %.15f\r\n",
                 param_name.c_str(),
-                synth->get_param_ratio_atomic(param_id)
+                synth.get_param_ratio_atomic(param_id)
             );
             serialized += line;
 
@@ -64,7 +64,7 @@ std::string Serializer::serialize(Synth const* synth) noexcept
                 param_name.c_str(),
                 CONTROLLER_SUFFIX.c_str(),
                 controller_id_to_float(
-                    synth->get_param_controller_id_atomic(param_id)
+                    synth.get_param_controller_id_atomic(param_id)
                 )
             );
             serialized += line;
@@ -91,7 +91,7 @@ Synth::ControllerId Serializer::float_to_controller_id(
 }
 
 
-void Serializer::import(Synth* synth, std::string const& serialized) noexcept
+void Serializer::import(Synth& synth, std::string const& serialized) noexcept
 {
     reset_all_params_to_default(synth);
     Lines* lines = parse_lines(serialized);
@@ -101,9 +101,9 @@ void Serializer::import(Synth* synth, std::string const& serialized) noexcept
 }
 
 
-void Serializer::reset_all_params_to_default(Synth* synth) noexcept
+void Serializer::reset_all_params_to_default(Synth& synth) noexcept
 {
-    synth->push_message(
+    synth.push_message(
         Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
     );
 }
@@ -197,7 +197,7 @@ bool Serializer::is_section_name_char(char const c) noexcept
 }
 
 
-void Serializer::process_lines(Synth* synth, Lines* lines) noexcept
+void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
 {
     typedef std::vector<Synth::Message> Messages;
 
@@ -223,14 +223,14 @@ void Serializer::process_lines(Synth* synth, Lines* lines) noexcept
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (synth->is_toggle_param(it->param_id)) {
-            synth->push_message(*it);
+        if (synth.is_toggle_param(it->param_id)) {
+            synth.push_message(*it);
         }
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (!synth->is_toggle_param(it->param_id)) {
-            synth->push_message(*it);
+        if (!synth.is_toggle_param(it->param_id)) {
+            synth.push_message(*it);
         }
     }
 }
@@ -290,7 +290,7 @@ bool Serializer::parse_section_name(
 
 bool Serializer::parse_line_until_value(
         std::string::const_iterator& it,
-        std::string::const_iterator const end,
+        std::string::const_iterator const& end,
         char param_name[Constants::PARAM_NAME_MAX_LENGTH],
         char suffix[4]
 ) noexcept {
@@ -306,7 +306,7 @@ bool Serializer::parse_line_until_value(
 
 void Serializer::process_line(
         std::vector<Synth::Message>& messages,
-        Synth* synth,
+        Synth& synth,
         std::string const& line
 ) noexcept {
     std::string::const_iterator it = line.begin();
@@ -326,7 +326,7 @@ void Serializer::process_line(
         return;
     }
 
-    param_id = synth->get_param_id(param_name);
+    param_id = synth.get_param_id(param_name);
     is_controller_assignment = CONTROLLER_SUFFIX == suffix;
 
     if (
@@ -355,7 +355,7 @@ void Serializer::process_line(
 
 bool Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
         std::string::const_iterator& it,
-        std::string::const_iterator const end
+        std::string::const_iterator const& end
 ) noexcept {
     if (it == end) {
         return true;
@@ -383,7 +383,7 @@ bool Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
 
 bool Serializer::parse_param_name(
         std::string::const_iterator& it,
-        std::string::const_iterator const end,
+        std::string::const_iterator const& end,
         char* param_name
 ) noexcept {
     constexpr Integer param_name_pos_max = Constants::PARAM_NAME_MAX_LENGTH - 1;
@@ -409,7 +409,7 @@ bool Serializer::parse_param_name(
 
 bool Serializer::parse_suffix(
         std::string::const_iterator& it,
-        std::string::const_iterator const end,
+        std::string::const_iterator const& end,
         char* suffix
 ) noexcept {
     Integer suffix_pos = 0;
@@ -434,7 +434,7 @@ bool Serializer::parse_suffix(
 
 bool Serializer::parse_equal_sign(
         std::string::const_iterator& it,
-        std::string::const_iterator const end
+        std::string::const_iterator const& end
 ) noexcept {
     if (*it != '=') {
         return false;
@@ -448,7 +448,7 @@ bool Serializer::parse_equal_sign(
 
 bool Serializer::parse_number(
         std::string::const_iterator& it,
-        std::string::const_iterator const end,
+        std::string::const_iterator const& end,
         Number& number
 ) noexcept {
     std::string number_text;

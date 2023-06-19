@@ -69,10 +69,10 @@ class Widget : public WidgetBase
         {
             public:
                 Text();
-                Text(std::string const text);
+                Text(std::string const& text);
                 ~Text();
 
-                void set(std::string const text);
+                void set(std::string const& text);
 
                 char* c_str() const;
                 WCHAR* c_wstr() const;

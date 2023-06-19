@@ -259,15 +259,11 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
         gain_buffer = NULL;
         need_gain = false;
     } else {
-        gain_buffer = FloatParam::produce_if_not_constant(
-            &gain, round, sample_count
-        );
+        gain_buffer = FloatParam::produce_if_not_constant(gain, round, sample_count);
         need_gain = gain_buffer != NULL || std::fabs(1.0 - gain.get_value()) > 0.000001;
     }
 
-    time_buffer = FloatParam::produce_if_not_constant(
-        &time, round, sample_count
-    );
+    time_buffer = FloatParam::produce_if_not_constant(time, round, sample_count);
 
     time_scale = (
         tempo_sync != NULL && tempo_sync->get_value() == ToggleParam::ON
@@ -627,9 +623,7 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
-    panning_buffer = FloatParam::produce_if_not_constant(
-        &panning, round, sample_count
-    );
+    panning_buffer = FloatParam::produce_if_not_constant(panning, round, sample_count);
 
     if (panning_buffer == NULL) {
         panning_value = is_flipped ? -panning.get_value() : panning.get_value();

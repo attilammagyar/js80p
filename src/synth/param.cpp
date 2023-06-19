@@ -49,7 +49,7 @@ Param<NumberType>::Param(
 
 
 template<typename NumberType>
-std::string const Param<NumberType>::get_name() const noexcept
+std::string const& Param<NumberType>::get_name() const noexcept
 {
     return name;
 }
@@ -217,19 +217,19 @@ ToggleParam::ToggleParam(std::string const name, Toggle const default_value)
 
 template<class FloatParamClass>
 Sample const* const* FloatParam::produce(
-        FloatParamClass* float_param,
+        FloatParamClass& float_param,
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Envelope* envelope = float_param->get_envelope();
+    Envelope* envelope = float_param.get_envelope();
 
     if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
         envelope->update();
     }
 
-    if (float_param->is_following_leader()) {
+    if (float_param.is_following_leader()) {
         return SignalProducer::produce<FloatParam>(
-            float_param->leader, round, sample_count
+            *float_param.leader, round, sample_count
         );
     }
 
@@ -241,12 +241,12 @@ Sample const* const* FloatParam::produce(
 
 template<class FloatParamClass>
 Sample const* FloatParam::produce_if_not_constant(
-        FloatParamClass* float_param,
+        FloatParamClass& float_param,
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (float_param->is_constant_in_next_round(round, sample_count)) {
-        float_param->skip_round(round, sample_count);
+    if (float_param.is_constant_in_next_round(round, sample_count)) {
+        float_param.skip_round(round, sample_count);
 
         return NULL;
     }
@@ -868,7 +868,7 @@ Sample const* const* FloatParam::process_lfo(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
+    lfo_buffer = SignalProducer::produce<LFO>(*lfo, round, sample_count);
 
     if (is_ratio_same_as_value) {
         if (sample_count > 0) {
@@ -1285,7 +1285,7 @@ Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initia
     }
 
     modulation_level_buffer = FloatParam::produce_if_not_constant(
-        &modulation_level, round, sample_count
+        modulation_level, round, sample_count
     );
 
     if (modulation_level_buffer == NULL) {
@@ -1293,13 +1293,13 @@ Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initia
 
         if (!is_no_op) {
             modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-                modulator, round, sample_count
+                *modulator, round, sample_count
             )[0];
         }
     } else {
         is_no_op = false;
         modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-            modulator, round, sample_count
+            *modulator, round, sample_count
         )[0];
     }
 

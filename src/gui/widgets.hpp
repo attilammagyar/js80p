@@ -70,7 +70,7 @@ class ImportPatchButton : public TransparentWidget
             int const top,
             int const width,
             int const height,
-            Synth* synth,
+            Synth& synth,
             TabBody* synth_gui_body
         );
 
@@ -82,7 +82,7 @@ class ImportPatchButton : public TransparentWidget
         virtual bool mouse_leave(int const x, int const y) override;
 
     private:
-        Synth* synth;
+        Synth& synth;
         TabBody* synth_gui_body;
 };
 
@@ -96,7 +96,7 @@ class ExportPatchButton : public TransparentWidget
             int const top,
             int const width,
             int const height,
-            Synth* synth
+            Synth& synth
         );
 
     protected:
@@ -105,7 +105,7 @@ class ExportPatchButton : public TransparentWidget
         virtual bool mouse_leave(int const x, int const y) override;
 
     private:
-        Synth* synth;
+        Synth& synth;
 };
 
 
@@ -194,7 +194,7 @@ class ControllerSelector : public Widget
         static constexpr int HEIGHT = GUI::HEIGHT;
         static constexpr int TITLE_HEIGHT = 30;
 
-        ControllerSelector(Background& background, Synth* synth);
+        ControllerSelector(Background& background, Synth& synth);
 
         void show(
             Synth::ParamId const param_id,
@@ -253,7 +253,7 @@ class ControllerSelector : public Widget
 
         char title[TITLE_SIZE];
         Background& background;
-        Synth* synth;
+        Synth& synth;
         ParamEditor* param_editor;
         Controller* controllers[GUI::CONTROLLERS_COUNT];
         Synth::ParamId param_id;
@@ -300,7 +300,7 @@ class ParamEditor : public TransparentWidget
             int const left,
             int const top,
             ControllerSelector& controller_selector,
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id,
             int const controller_choices,
             char const* format,
@@ -314,7 +314,7 @@ class ParamEditor : public TransparentWidget
             int const left,
             int const top,
             ControllerSelector& controller_selector,
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id,
             int const controller_choices,
             char const* const* const options,
@@ -440,7 +440,7 @@ class ParamEditor : public TransparentWidget
 
         ControllerSelector& controller_selector;
         ParamEditorKnobStates* knob_states;
-        Synth* synth;
+        Synth& synth;
         Number default_ratio;
         Number ratio;
         Knob* knob;
@@ -535,7 +535,7 @@ class ToggleSwitch : public TransparentWidget
             int const top,
             int const width,
             int const box_left,
-            Synth* synth,
+            Synth& synth,
             Synth::ParamId const param_id
         );
 
@@ -561,7 +561,7 @@ class ToggleSwitch : public TransparentWidget
 
         int const box_left;
 
-        Synth* synth;
+        Synth& synth;
 
         Number default_ratio;
         Number ratio;

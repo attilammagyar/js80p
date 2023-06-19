@@ -214,7 +214,7 @@ TEST(lfo_performance, {
 
     for (Integer round = 0; round != rounds; ++round) {
         Sample const* const* const rendered_samples = (
-            SignalProducer::produce<LFO>(&lfo, round)
+            SignalProducer::produce<LFO>(lfo, round)
         );
         number_of_rendered_samples += BLOCK_SIZE;
 
@@ -259,7 +259,7 @@ void test_lfo_modifier_statistics(
     lfo.center.set_value(centered);
     lfo.start(0.0);
 
-    rendered_samples = SignalProducer::produce<LFO>(&lfo, 1);
+    rendered_samples = SignalProducer::produce<LFO>(lfo, 1);
 
     numbers.reserve(BLOCK_SIZE);
 

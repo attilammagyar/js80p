@@ -169,7 +169,7 @@ class Vst3Plugin
         class GUI : public CPluginView
         {
             public:
-                GUI(Controller* controller);
+                GUI(Synth& synth);
 
                 virtual ~GUI();
 
@@ -179,16 +179,13 @@ class Vst3Plugin
                 virtual void attachedToParent() override;
                 virtual void removedFromParent() override;
 
-                void set_synth(Synth* synth);
-
             private:
                 static ViewRect const rect;
 
                 void initialize();
                 void show_if_needed();
 
-                Controller* controller;
-                Synth* synth;
+                Synth& synth;
                 JS80P::GUI* gui;
 
                 void* run_loop;

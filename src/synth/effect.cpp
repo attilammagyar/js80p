@@ -50,8 +50,8 @@ Sample const* const* Effect<InputSignalProducerClass>::initialize_rendering(
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
-    dry_buffer = FloatParam::produce_if_not_constant(&dry, round, sample_count);
-    wet_buffer = FloatParam::produce_if_not_constant(&wet, round, sample_count);
+    dry_buffer = FloatParam::produce_if_not_constant(dry, round, sample_count);
+    wet_buffer = FloatParam::produce_if_not_constant(wet, round, sample_count);
 
     is_dry = wet_buffer == NULL && wet.get_value() < 0.000001;
 

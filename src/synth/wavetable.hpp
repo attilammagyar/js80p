@@ -79,7 +79,7 @@ class Wavetable
         ~Wavetable();
 
         Sample lookup(
-            WavetableState* state,
+            WavetableState& state,
             Frequency const frequency,
             Number const phase_offset
         ) const noexcept;
@@ -111,18 +111,18 @@ class Wavetable
         Number wrap_around(Number const index) const noexcept;
 
         Sample interpolate(
-            WavetableState const* state,
+            WavetableState const& state,
             Frequency const frequency,
             Number const sample_index
         ) const noexcept;
 
         Sample interpolate_sample_linear(
-            WavetableState const* state,
+            WavetableState const& state,
             Number const sample_index
         ) const noexcept;
 
         Sample interpolate_sample_lagrange(
-            WavetableState const* state,
+            WavetableState const& state,
             Number const sample_index
         ) const noexcept;
 

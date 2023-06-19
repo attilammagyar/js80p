@@ -448,14 +448,10 @@ TEST(oscillator_can_be_started_and_stopped_between_samples, {
     oscillator.start((Seconds)(1.0 - time_offset));
     oscillator.stop((Seconds)(2.0 - time_offset - sample_period));
 
-    block = SignalProducer::produce<SimpleOscillator>(
-        &oscillator, 1, block_size
-    );
+    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
     assert_eq(expected_samples[0], block[0], block_size, DOUBLE_DELTA);
 
-    block = SignalProducer::produce<SimpleOscillator>(
-        &oscillator, 2, block_size
-    );
+    block = SignalProducer::produce<SimpleOscillator>(oscillator, 2, block_size);
     assert_eq(expected_samples[1], block[0], block_size, DOUBLE_DELTA);
 })
 
@@ -524,9 +520,7 @@ void assert_amplitude_and_frequency_automation_are_independent_of_each_other(
 
     oscillator.start(0.0);
 
-    block = SignalProducer::produce<SimpleOscillator>(
-        &oscillator, 1, block_size
-    );
+    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
     assert_eq(expected_samples, block[0], block_size, DOUBLE_DELTA);
 }
 

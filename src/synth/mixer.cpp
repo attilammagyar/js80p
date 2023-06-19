@@ -53,7 +53,7 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
     Integer const sample_count
 ) noexcept {
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        it->buffer = SignalProducer::produce<InputSignalProducerClass>(it->input, round, sample_count);
+        it->buffer = SignalProducer::produce<InputSignalProducerClass>(*it->input, round, sample_count);
     }
 
     return NULL;

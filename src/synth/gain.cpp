@@ -45,7 +45,7 @@ Sample const* const* Gain<InputSignalProducerClass>::initialize_rendering(
     Sample const* const* const input_buffer = (
         Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count)
     );
-    gain_buffer = FloatParam::produce_if_not_constant(&gain, round, sample_count);
+    gain_buffer = FloatParam::produce_if_not_constant(gain, round, sample_count);
 
     if (gain_buffer == NULL && std::fabs(1.0 - gain.get_value()) < 0.000001) {
         return input_buffer;

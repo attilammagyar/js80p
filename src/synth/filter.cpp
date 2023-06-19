@@ -44,7 +44,7 @@ Sample const* const* Filter<InputSignalProducerClass>::initialize_rendering(
     Integer const sample_count
 ) noexcept {
     input_buffer = SignalProducer::produce<InputSignalProducerClass>(
-        &input, round, sample_count
+        input, round, sample_count
     );
 
     return input_buffer;

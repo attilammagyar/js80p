@@ -148,7 +148,7 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initial
     Filter<Filter2>::initialize_rendering(round, sample_count);
 
     volume_buffer = FloatParam::produce_if_not_constant<FloatParam>(
-        &volume, round, sample_count
+        volume, round, sample_count
     );
 
     if (volume_buffer == NULL) {
@@ -450,11 +450,11 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     volume_applier_buffer = SignalProducer::produce<VolumeApplier>(
-        &volume_applier, round, sample_count
+        volume_applier, round, sample_count
     )[0];
 
     panning_buffer = FloatParam::produce_if_not_constant<FloatParam>(
-        &panning, round, sample_count
+        panning, round, sample_count
     );
 
     if (panning_buffer == NULL) {

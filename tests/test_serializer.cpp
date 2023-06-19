@@ -111,8 +111,8 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
     synth_2.process_messages();
 
-    serialized = serializer.serialize(&synth_1);
-    serializer.import(&synth_2, serialized);
+    serialized = serializer.serialize(synth_1);
+    serializer.import(synth_2, serialized);
     synth_2.process_messages();
 
     assert_in("\r\nPM = 0.123", serialized);
@@ -154,7 +154,7 @@ TEST(importing_a_patch_ignores_comments_and_whitespace_and_unknown_sections, {
         "PM = 0.123\n"
     );
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -203,7 +203,7 @@ TEST(importing_a_patch_ignores_invalid_lines_and_unknown_sections, {
         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA = 0.83\n"
     );
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -242,7 +242,7 @@ TEST(importing_a_patch_does_not_require_terminating_new_line, {
         "PM = 0.42"
     );
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -259,7 +259,7 @@ TEST(imported_values_are_clamped, {
         "PM = 2.1\n"
     );
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -293,7 +293,7 @@ TEST(extremely_long_lines_may_be_truncated, {
         "MVOL = 0.42\n"
         "CVOL = 0.123\n"
     );
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -323,7 +323,7 @@ TEST(toggle_params_are_loaded_before_other_params, {
         "MF2FRQ = 0.75\n"
     );
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -356,7 +356,7 @@ TEST(param_names_are_parsed_case_insensitively_and_converted_to_upper_case, {
     std::string::const_iterator line_with_ctl_it = line_with_ctl.begin();
     std::string::const_iterator line_without_ctl_it = line_without_ctl.begin();
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
     synth.process_messages();
 
     assert_eq(
@@ -406,14 +406,14 @@ TEST(params_which_are_missing_from_the_patch_are_cleared_and_reset_to_default, {
         0.0,
         Synth::ControllerId::MODULATION_WHEEL
     );
-    SignalProducer::produce<Synth>(&synth, 1);
+    SignalProducer::produce<Synth>(synth, 1);
 
     synth.control_change(0.0, 0, Midi::MODULATION_WHEEL, 100);
-    SignalProducer::produce<Synth>(&synth, 2);
+    SignalProducer::produce<Synth>(synth, 2);
 
-    serializer.import(&synth, patch);
+    serializer.import(synth, patch);
 
-    SignalProducer::produce<Synth>(&synth, 3);
+    SignalProducer::produce<Synth>(synth, 3);
 
     assert_eq(
         0.42, synth.get_param_ratio_atomic(Synth::ParamId::AM), DOUBLE_DELTA

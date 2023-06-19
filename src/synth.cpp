@@ -551,9 +551,9 @@ void Synth::register_param_as_child(
 template<class ParamClass>
 void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
 {
-    std::string const name = param.get_name();
+    std::string const& name = param.get_name();
 
-    param_id_hash_table.add(name.c_str(), param_id);
+    param_id_hash_table.add(name, param_id);
     param_names_by_id[param_id] = name;
 }
 
@@ -895,7 +895,7 @@ Sample const* const* Synth::generate_samples(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    return SignalProducer::produce<Synth>(this, round, sample_count);
+    return SignalProducer::produce<Synth>(*this, round, sample_count);
 }
 
 
@@ -917,15 +917,15 @@ void Synth::push_message(Message const& message) noexcept
 }
 
 
-std::string Synth::get_param_name(ParamId const param_id) const noexcept
+std::string const& Synth::get_param_name(ParamId const param_id) const noexcept
 {
     return param_names_by_id[param_id];
 }
 
 
-Synth::ParamId Synth::get_param_id(std::string const name) const noexcept
+Synth::ParamId Synth::get_param_id(std::string const& name) const noexcept
 {
-    return param_id_hash_table.lookup(name.c_str());
+    return param_id_hash_table.lookup(name);
 }
 
 
@@ -1161,11 +1161,11 @@ Sample const* const* Synth::initialize_rendering(
     process_messages();
 
     raw_output = SignalProducer::produce< Effects::Effects<Bus> >(
-        &effects, round, sample_count
+        effects, round, sample_count
     );
 
     for (int i = 0; i != FLOAT_PARAMS; ++i) {
-        FloatParam::produce_if_not_constant(float_params[i], round, sample_count);
+        FloatParam::produce_if_not_constant(*float_params[i], round, sample_count);
     }
 
     for (Integer i = 0; i != LFOS; ++i) {
@@ -1735,7 +1735,7 @@ Sample const* const* Synth::Bus::initialize_rendering(
         if (modulators_on[v]) {
             is_silent = false;
             SignalProducer::produce<Modulator>(
-                modulators[v], round, sample_count
+                *modulators[v], round, sample_count
             );
         }
 
@@ -1743,7 +1743,7 @@ Sample const* const* Synth::Bus::initialize_rendering(
 
         if (carriers_on[v]) {
             is_silent = false;
-            SignalProducer::produce<Carrier>(carriers[v], round, sample_count);
+            SignalProducer::produce<Carrier>(*carriers[v], round, sample_count);
         }
     }
 
@@ -1752,7 +1752,7 @@ Sample const* const* Synth::Bus::initialize_rendering(
     }
 
     modulator_add_volume_buffer = FloatParam::produce_if_not_constant(
-        &modulator_add_volume, round, sample_count
+        modulator_add_volume, round, sample_count
     );
 
     return NULL;
@@ -1801,7 +1801,7 @@ void Synth::Bus::mix_modulators(
             }
 
             Sample const* const* const modulator_output = (
-                SignalProducer::produce<Modulator>(modulators[v], round)
+                SignalProducer::produce<Modulator>(*modulators[v], round)
             );
 
             for (Integer c = 0; c != channels; ++c) {
@@ -1820,7 +1820,7 @@ void Synth::Bus::mix_modulators(
             }
 
             Sample const* const* const modulator_output = (
-                SignalProducer::produce<Modulator>(modulators[v], round)
+                SignalProducer::produce<Modulator>(*modulators[v], round)
             );
 
             for (Integer c = 0; c != channels; ++c) {
@@ -1847,7 +1847,7 @@ void Synth::Bus::mix_carriers(
         }
 
         Sample const* const* const carrier_output = (
-            SignalProducer::produce<Carrier>(carriers[v], round)
+            SignalProducer::produce<Carrier>(*carriers[v], round)
         );
 
         for (Integer c = 0; c != channels; ++c) {
@@ -1869,7 +1869,7 @@ Synth::ParamIdHashTable::~ParamIdHashTable() noexcept
 }
 
 
-void Synth::ParamIdHashTable::add(char const* name, ParamId const param_id) noexcept
+void Synth::ParamIdHashTable::add(std::string const& name, ParamId const param_id) noexcept
 {
     Entry* root;
     Entry* parent;
@@ -1882,21 +1882,22 @@ void Synth::ParamIdHashTable::add(char const* name, ParamId const param_id) noex
     }
 
     if (parent != NULL) {
-        parent->next = new Entry(name, param_id);
+        parent->next = new Entry(name.c_str(), param_id);
 
         return;
     }
 
-    root->set(name, param_id);
+    root->set(name.c_str(), param_id);
 }
 
 
 void Synth::ParamIdHashTable::lookup(
-        char const* name,
+        std::string const& name,
         Entry** root,
         Entry** parent,
         Entry** entry
 ) noexcept {
+    char const* const name_ptr = name.c_str();
     Integer const hash = this->hash(name);
     *root = &entries[hash];
 
@@ -1910,7 +1911,7 @@ void Synth::ParamIdHashTable::lookup(
 
     *entry = *root;
 
-    while (strncmp((*entry)->name, name, Entry::NAME_SIZE) != 0) {
+    while (strncmp((*entry)->name, name_ptr, Entry::NAME_SIZE) != 0) {
         *parent = *entry;
         *entry = (*entry)->next;
 
@@ -1921,7 +1922,7 @@ void Synth::ParamIdHashTable::lookup(
 }
 
 
-Synth::ParamId Synth::ParamIdHashTable::lookup(char const* name) noexcept
+Synth::ParamId Synth::ParamIdHashTable::lookup(std::string const& name) noexcept
 {
     Entry* root;
     Entry* parent;
@@ -1981,7 +1982,7 @@ void Synth::ParamIdHashTable::get_statistics(
 /*
 Inspiration from https://orlp.net/blog/worlds-smallest-hash-table/
 */
-Integer Synth::ParamIdHashTable::hash(char const* name) noexcept
+Integer Synth::ParamIdHashTable::hash(std::string const& name) noexcept
 {
     /*
     We only care about the 36 characters which are used in param names: capital
@@ -1991,15 +1992,17 @@ Integer Synth::ParamIdHashTable::hash(char const* name) noexcept
     constexpr char letter_offset = 'A' - 10;
     constexpr char number_offset = '0';
 
-    if (*name == '\x00') {
+    char const* name_ptr = name.c_str();
+
+    if (*name_ptr == '\x00') {
         return 0;
     }
 
     Integer i;
     Integer hash = 0;
 
-    for (i = -1; *name != '\x00'; ++name) {
-        char c = *name;
+    for (i = -1; *name_ptr != '\x00'; ++name_ptr) {
+        char c = *name_ptr;
 
         if (c >= letter_offset) {
             c -= letter_offset;

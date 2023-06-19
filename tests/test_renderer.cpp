@@ -104,7 +104,7 @@ void test_varaible_size_rounds(RenderMode const mode)
         next_round_start += sample_count;
     }
 
-    expected_samples = SignalProducer::produce<SumOfSines>(&reference, 1);
+    expected_samples = SignalProducer::produce<SumOfSines>(reference, 1);
 
     for (Integer c = 0; c != channels; ++c) {
         assert_eq(expected_samples[c], buffer[c], buffer_size, DOUBLE_DELTA);

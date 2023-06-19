@@ -56,7 +56,7 @@ class Param : public SignalProducer
             NumberType const default_value
         ) noexcept;
 
-        std::string const get_name() const noexcept;
+        std::string const& get_name() const noexcept;
         NumberType get_default_value() const noexcept;
         NumberType get_value() const noexcept;
         NumberType get_min_value() const noexcept;
@@ -156,7 +156,7 @@ class FloatParam : public Param<Number>
          */
         template<class FloatParamClass>
         static Sample const* const* produce(
-            FloatParamClass* float_param,
+            FloatParamClass& float_param,
             Integer const round,
             Integer const sample_count = -1
         ) noexcept;
@@ -179,7 +179,7 @@ class FloatParam : public Param<Number>
          */
         template<class FloatParamClass = FloatParam>
         static Sample const* produce_if_not_constant(
-            FloatParamClass* float_param,
+            FloatParamClass& float_param,
             Integer const round,
             Integer const sample_count
         ) noexcept;

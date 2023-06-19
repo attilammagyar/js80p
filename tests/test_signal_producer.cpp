@@ -127,7 +127,7 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
     composite_signal_producer.child.schedule(
         CompositeSignalProducer::ChildSignalProducer::EVT_TEST, 0.0
     );
-    SignalProducer::produce<CompositeSignalProducer>(&composite_signal_producer, 1);
+    SignalProducer::produce<CompositeSignalProducer>(composite_signal_producer, 1);
     composite_signal_producer.reset();
 
     assert_eq((int)block_size, (int)composite_signal_producer.child.get_block_size());
@@ -159,8 +159,8 @@ TEST(zero_channels_signal_producer_does_not_produce_anything, {
     signal_producer.set_block_size(block_size);
     signal_producer.set_sample_rate(22050.0);
 
-    rendered_samples = SignalProducer::produce<SignalProducer>(
-        &signal_producer, 1, block_size
+    rendered_samples = (
+        SignalProducer::produce<SignalProducer>(signal_producer, 1, block_size)
     );
 
     assert_eq(NULL, rendered_samples);
@@ -204,7 +204,7 @@ TEST(allocates_memory_for_the_given_channels_and_block_size, {
 
     signal_producer.set_block_size(block_size);
     rendered_samples = (
-        SignalProducer::produce<SignalProducer>(&signal_producer, 2, block_size)
+        SignalProducer::produce<SignalProducer>(signal_producer, 2, block_size)
     );
 
     assert_eq((int)block_size, (int)signal_producer.get_block_size());
@@ -226,7 +226,7 @@ TEST(can_convert_sample_number_to_time_offset, {
     signal_producer.set_sample_rate(4);
 
     signal_producer.cancel_events(10.0);
-    SignalProducer::produce<SignalProducer>(&signal_producer, 1, 1);
+    SignalProducer::produce<SignalProducer>(signal_producer, 1, 1);
 
     assert_eq(0.00, signal_producer.sample_count_to_relative_time_offset(0), DOUBLE_DELTA);
     assert_eq(0.25, signal_producer.sample_count_to_relative_time_offset(1), DOUBLE_DELTA);
@@ -279,10 +279,10 @@ TEST(rendering_is_done_only_once_per_round, {
     CachingTestSignalProducer signal_producer;
     signal_producer.set_block_size(2);
 
-    SignalProducer::produce<CachingTestSignalProducer>(&signal_producer, 1, 2);
-    SignalProducer::produce<CachingTestSignalProducer>(&signal_producer, 2, 2);
+    SignalProducer::produce<CachingTestSignalProducer>(signal_producer, 1, 2);
+    SignalProducer::produce<CachingTestSignalProducer>(signal_producer, 2, 2);
     rendered_samples = (
-        SignalProducer::produce<CachingTestSignalProducer>(&signal_producer, 2, 2)
+        SignalProducer::produce<CachingTestSignalProducer>(signal_producer, 2, 2)
     );
 
     assert_eq(2.0, rendered_samples[0][0], DOUBLE_DELTA);
@@ -320,7 +320,7 @@ class DelegatingSignalProducer : public SignalProducer
 
             if (delegate != NULL) {
                 return SignalProducer::produce<DelegatingSignalProducer>(
-                    delegate, round, sample_count
+                    *delegate, round, sample_count
                 );
             }
 
@@ -356,7 +356,7 @@ TEST(can_query_last_rendered_block, {
     assert_eq(NULL, (void*)delegator.get_last_rendered_block(sample_count));
     assert_eq(0, (int)sample_count);
 
-    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(&delegate, 123, 5);
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(delegate, 123, 5);
     delegate.set_block_size(10);
     delegator.set_block_size(10);
 
@@ -368,7 +368,7 @@ TEST(can_query_last_rendered_block, {
     assert_eq(NULL, (void*)delegator.get_last_rendered_block(sample_count));
     assert_eq(0, (int)sample_count);
 
-    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(&delegate, 1, 5);
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(delegate, 1, 5);
     assert_eq(
         (void*)rendered_samples,
         (void*)delegate.get_last_rendered_block(sample_count)
@@ -376,9 +376,7 @@ TEST(can_query_last_rendered_block, {
     assert_eq(5, (int)sample_count);
 
     sample_count = 42;
-    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(
-        &delegator, 1, 5
-    );
+    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(delegator, 1, 5);
     assert_eq(
         (void*)rendered_samples,
         (void*)delegator.get_last_rendered_block(sample_count)
@@ -408,10 +406,10 @@ TEST(a_signal_producer_may_delegate_rendering_to_another_during_initialization, 
     delegator.set_block_size(block_size);
 
     delegate_output = SignalProducer::produce<DelegatingSignalProducer>(
-        &delegate, 1, block_size
+        delegate, 1, block_size
     );
     delegator_output = SignalProducer::produce<DelegatingSignalProducer>(
-        &delegator, 1, block_size
+        delegator, 1, block_size
     );
 
     assert_eq(expected_samples, delegate_output[0], block_size, DOUBLE_DELTA);
@@ -419,7 +417,7 @@ TEST(a_signal_producer_may_delegate_rendering_to_another_during_initialization, 
     assert_eq((void*)delegate_output, (void*)delegator_output);
 
     SignalProducer::produce<DelegatingSignalProducer>(
-        &delegator, 1, block_size
+        delegator, 1, block_size
     );
 
     assert_eq(1, (int)delegate.initialize_rendering_calls);
@@ -449,7 +447,7 @@ class RendererWithCircularDependecy : public SignalProducer
                 Sample** buffer
         ) noexcept {
             Sample const* const* other_buffer = (
-                SignalProducer::produce<RendererWithCircularDependecy>(dependency, round)
+                SignalProducer::produce<RendererWithCircularDependecy>(*dependency, round)
             );
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -484,13 +482,13 @@ TEST(cyclic_dependencies_in_rendering_are_broken_up_by_delaying_one_of_the_signa
     signal_producer_3.dependency = &signal_producer_1;
 
     samples_1 = SignalProducer::produce<RendererWithCircularDependecy>(
-        &signal_producer_1, 1
+        signal_producer_1, 1
     );
     samples_2 = SignalProducer::produce<RendererWithCircularDependecy>(
-        &signal_producer_2, 1
+        signal_producer_2, 1
     );
     samples_3 = SignalProducer::produce<RendererWithCircularDependecy>(
-        &signal_producer_3, 1
+        signal_producer_3, 1
     );
 
     assert_eq(expected_samples_1, samples_1[0], block_size);
@@ -519,7 +517,7 @@ class PreparerWithCircularDependecy : public SignalProducer
                 Integer const sample_count
         ) noexcept {
             SignalProducer::produce<PreparerWithCircularDependecy>(
-                dependency, round
+                *dependency, round
             );
 
             value = dependency->value + 1;
@@ -547,9 +545,9 @@ TEST(cyclic_dependencies_in_rendering_initialization_are_broken_up_by_delaying_o
     signal_producer_2.dependency = &signal_producer_3;
     signal_producer_3.dependency = &signal_producer_1;
 
-    SignalProducer::produce<PreparerWithCircularDependecy>(&signal_producer_1, 1);
-    SignalProducer::produce<PreparerWithCircularDependecy>(&signal_producer_2, 1);
-    SignalProducer::produce<PreparerWithCircularDependecy>(&signal_producer_3, 1);
+    SignalProducer::produce<PreparerWithCircularDependecy>(signal_producer_1, 1);
+    SignalProducer::produce<PreparerWithCircularDependecy>(signal_producer_2, 1);
+    SignalProducer::produce<PreparerWithCircularDependecy>(signal_producer_3, 1);
 
     assert_eq(3, signal_producer_1.value);
     assert_eq(2, signal_producer_2.value);
@@ -591,8 +589,8 @@ TEST(last_rendered_block_rendered_sample_count_is_not_updated_until_initializati
     signal_producer.set_block_size(128);
     signal_producer.set_sample_rate(22050.0);
 
-    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 1, sample_count_1);
-    SignalProducer::produce<FeedbackSignalProducer>(&signal_producer, 2, sample_count_2);
+    SignalProducer::produce<FeedbackSignalProducer>(signal_producer, 1, sample_count_1);
+    SignalProducer::produce<FeedbackSignalProducer>(signal_producer, 2, sample_count_2);
 
     assert_eq((int)sample_count_1, (int)signal_producer.feedback_sample_count);
 })
@@ -666,7 +664,7 @@ TEST(resetting_a_signal_producer_drops_all_events, {
     assert_false(signal_producer.has_events_after(0.0));
 
     rendered = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, 1, block_size
+        signal_producer, 1, block_size
     );
 
     assert_eq(expected_samples, rendered[0], block_size);
@@ -728,7 +726,7 @@ void test_event_handling(
 
     for (Integer round = 0; round != rounds; ++round) {
         block = SignalProducer::produce<EventTestSignalProducer>(
-            &signal_producer, round, block_size
+            signal_producer, round, block_size
         );
 
         for (Integer i = 0; i != block_size; ++i) {
@@ -894,7 +892,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
     signal_producer.schedule(1.0, 2.0);
     signal_producer.schedule(1000.0, 1000.0);
     block = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, round++, block_size
+        signal_producer, round++, block_size
     );
 
     for (Integer i = 0; i != block_size; ++i) {
@@ -912,7 +910,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
     assert_eq(1000.0, signal_producer.get_last_event_time_offset(), DOUBLE_DELTA);
 
     block = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, round++, block_size
+        signal_producer, round++, block_size
     );
 
     for (Integer i = 0; i != block_size; ++i) {
@@ -925,7 +923,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
     signal_producer.schedule(2.0, 5.0);
     signal_producer.schedule(1000.0, 1000.0);
     block = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, round++, block_size
+        signal_producer, round++, block_size
     );
 
     for (Integer i = 0; i != block_size; ++i) {
@@ -936,7 +934,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
     signal_producer.schedule(2.0, 6.0);
     signal_producer.schedule(1000.0, 1000.0);
     block = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, round++, block_size
+        signal_producer, round++, block_size
     );
 
     for (Integer i = 0; i != block_size; ++i) {
@@ -945,7 +943,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
 
     signal_producer.cancel_events(0.5);
     block = SignalProducer::produce<EventTestSignalProducer>(
-        &signal_producer, round++, block_size
+        signal_producer, round++, block_size
     );
 
     for (Integer i = 0; i != block_size; ++i) {

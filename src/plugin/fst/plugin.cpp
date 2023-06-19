@@ -540,7 +540,7 @@ void FstPlugin::handle_program_change() noexcept
     }
 
     if (save_current_patch_before_changing_program) {
-        bank[current_program].import(Serializer::serialize(&synth));
+        bank[current_program].import(Serializer::serialize(synth));
     } else {
         save_current_patch_before_changing_program = true;
     }
@@ -636,7 +636,7 @@ void FstPlugin::generate_and_add_samples(
 void FstPlugin::import_patch(const std::string& patch) noexcept
 {
     synth.process_messages();
-    Serializer::import(&synth, patch);
+    Serializer::import(synth, patch);
     synth.process_messages();
     renderer.reset();
 }
@@ -647,7 +647,7 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
     size_t const current_program = bank.get_current_program_index();
 
 
-    bank[current_program].import(Serializer::serialize(&synth));
+    bank[current_program].import(Serializer::serialize(synth));
 
     if (is_preset) {
         std::string const& serialized = bank[current_program].serialize();
@@ -775,7 +775,7 @@ void FstPlugin::set_program_name(const char* name)
 void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {
     close_gui();
-    gui = new GUI(platform_data, parent_window, &synth, false);
+    gui = new GUI(platform_data, parent_window, synth, false);
     gui->show();
 }
 

@@ -647,8 +647,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void process_messages() noexcept;
 
-        std::string get_param_name(ParamId const param_id) const noexcept;
-        ParamId get_param_id(std::string const name) const noexcept;
+        std::string const& get_param_name(ParamId const param_id) const noexcept;
+        ParamId get_param_id(std::string const& name) const noexcept;
 
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
@@ -845,8 +845,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ParamIdHashTable() noexcept;
                 ~ParamIdHashTable();
 
-                void add(char const* name, ParamId const param_id) noexcept;
-                ParamId lookup(char const* name) noexcept;
+                void add(std::string const& name, ParamId const param_id) noexcept;
+                ParamId lookup(std::string const& name) noexcept;
                 void get_statistics(
                     Integer& max_collisions,
                     Number& avg_collisions,
@@ -876,10 +876,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 static constexpr Integer MULTIPLIER = 125123;
                 static constexpr Integer SHIFT = 14;
 
-                static Integer hash(char const* name) noexcept;
+                static Integer hash(std::string const& name) noexcept;
 
                 void lookup(
-                    char const* name,
+                    std::string const& name,
                     Entry** root,
                     Entry** parent,
                     Entry** entry

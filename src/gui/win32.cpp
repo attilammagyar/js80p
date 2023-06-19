@@ -63,7 +63,7 @@ Widget::Text::Text() : wtext(NULL), ctext(NULL)
 }
 
 
-Widget::Text::Text(std::string const text) : wtext(NULL), ctext(NULL)
+Widget::Text::Text(std::string const& text) : wtext(NULL), ctext(NULL)
 {
     set(text);
 }
@@ -89,10 +89,10 @@ void Widget::Text::free_buffers()
 }
 
 
-void Widget::Text::set(std::string const text)
+void Widget::Text::set(std::string const& text)
 {
-    int const length = (int)text.length();
-    int const size = length + 1;
+    size_t const length = (size_t)text.length();
+    size_t const size = length + 1;
 
     this->text = text;
 
@@ -773,7 +773,7 @@ void ExportPatchButton::click()
         return;
     }
 
-    std::string const patch = Serializer::serialize(synth);
+    std::string const& patch = Serializer::serialize(synth);
     DWORD written;
 
     if (

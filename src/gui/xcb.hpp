@@ -64,7 +64,7 @@ class XcbPlatform
         Widget* find_widget(xcb_window_t window_id) const;
         void unregister_widget(xcb_window_t window_id);
 
-        void export_patch(std::string const patch);
+        void export_patch(std::string const& patch);
         void import_patch(ImportPatchButton* import_patch_button);
         void handle_file_selector_dialog();
         void cancel_file_selector_dialog();
