@@ -103,8 +103,8 @@ If you find bugs, please report them at
 
 <a name="signal"></a>
 
-### Signal Chain (Simplified)
-
+Signal Chain (Simplified)
+-------------------------
                                                         (x16)
     Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
                                                   |            ^       |
