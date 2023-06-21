@@ -79,7 +79,12 @@ class Delay : public Filter<InputSignalProducerClass>
 
         /**
          * \warning The number of channels of the \c feedback \c SignalProducer
-         *          must be the same as the \c input.
+         *          must be the same as the \c input, and the feedback signal
+         *          producer must follow the \c Delay object in the signal
+         *          chain, and the \c Delay's signal must be rendered before
+         *          the signal of the feedback object is rendered (so that the
+         *          \c Delay can use the previously rendered block of the
+         *          feedback object).
          */
         void set_feedback_signal_producer(
             SignalProducer const* feedback_signal_producer
