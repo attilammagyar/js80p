@@ -24,9 +24,11 @@
 #include "js80p.hpp"
 
 #include "dsp/biquad_filter.hpp"
+#include "dsp/chorus.hpp"
 #include "dsp/distortion.hpp"
 #include "dsp/echo.hpp"
 #include "dsp/filter.hpp"
+#include "dsp/phaser.hpp"
 #include "dsp/reverb.hpp"
 
 
@@ -46,7 +48,10 @@ template<class InputSignalProducerClass>
 using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Chorus = JS80P::Chorus< Filter2<InputSignalProducerClass> >;
+using Phaser = JS80P::Phaser< Filter2<InputSignalProducerClass> >;
+
+template<class InputSignalProducerClass>
+using Chorus = JS80P::Chorus< Phaser<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
@@ -69,6 +74,7 @@ class Effects : public Filter< Reverb<InputSignalProducerClass> >
         ToggleParam filter_2_log_scale;
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
+        Phaser<InputSignalProducerClass> phaser;
         Chorus<InputSignalProducerClass> chorus;
         Echo<InputSignalProducerClass> echo;
         Reverb<InputSignalProducerClass> reverb;

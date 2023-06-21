@@ -103,6 +103,7 @@ SYNTH_COMPONENTS = \
 	dsp/filter \
 	dsp/gain \
 	dsp/mixer \
+	dsp/phaser \
 	dsp/reverb \
 	dsp/voice \
 	dsp/wavefolder \

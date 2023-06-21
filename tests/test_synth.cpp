@@ -237,8 +237,8 @@ TEST(can_look_up_param_id_by_name, {
     );
 
     assert_lte((int)max_collisions, 7);
-    assert_lte(avg_bucket_size, 2.5);
-    assert_lte(avg_collisions, 2.95);
+    assert_lte(avg_bucket_size, 2.55);
+    assert_lte(avg_collisions, 3.03);
 
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(""));
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(" \n"));
@@ -570,6 +570,9 @@ TEST(effects, {
     synth.push_message(SET_PARAM, Synth::ParamId::EDG, 0.2, 0);
     synth.push_message(SET_PARAM, Synth::ParamId::EF1FRQ, 0.75, 0);
     synth.push_message(SET_PARAM, Synth::ParamId::EF2FRQ, 0.75, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EPDPT, 1.0, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EPWET, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EPDRY, 0.5, 0);
     synth.push_message(SET_PARAM, Synth::ParamId::ECDPT, 1.0, 0);
     synth.push_message(SET_PARAM, Synth::ParamId::ECWET, 0.5, 0);
     synth.push_message(SET_PARAM, Synth::ParamId::ECDRY, 0.5, 0);

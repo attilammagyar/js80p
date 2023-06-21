@@ -346,7 +346,7 @@ svg.icon {
 
 .effect {
   text-align: center;
-  margin: 24px 28px;
+  margin: 1px 28px;
   padding: 2px 6px;
 }
 
@@ -354,8 +354,13 @@ svg.icon {
   text-align: left;
 }
 
+#chorus, #phaser {
+  margin: 1px 1px;
+  padding: 2px 6px;
+}
+
 #echo, #reverb {
-  margin: 24px 12px;
+  margin: 1px 12px;
   padding: 2px 6px;
 }
 
@@ -556,6 +561,14 @@ svg.icon {
         </h1>
         <div id="high-shelf-params" class="block"></div>
       </div>
+      <div id="phaser" class="effect main-block block">
+        <h1>
+          Phaser
+          <label class="freq"><input type="text" /> LOG FREQ</label>
+          <label class="sync">TEMPO SYNC <input type="text" /></label>
+        </h1>
+        <div id="phaser-params" class="block"></div>
+      </div>
       <div id="chorus" class="effect main-block block">
         <h1>
           Chorus
@@ -721,6 +734,17 @@ window.onload = function ()
     create_knob("high-shelf-params", "FREQ Hz", "200");
     create_knob("high-shelf-params", "Q", "1.0");
     create_knob("high-shelf-params", "GAIN dB", "0.0");
+
+    create_knob("phaser-params", "FRQ Hz", "1.5");
+    create_knob("phaser-params", "CNTR %", "70");
+    create_knob("phaser-params", "Q", "1.0");
+    create_knob("phaser-params", "DPT %", "0.5");
+    create_knob("phaser-params", "DF Hz", "6000");
+    create_knob("phaser-params", "DG dB", "-6");
+    create_knob("phaser-params", "PHS deg", "70");
+    create_knob("phaser-params", "HP Hz", "100");
+    create_knob("phaser-params", "WET %", "50");
+    create_knob("phaser-params", "DRY %", "60");
 
     create_knob("chorus-params", "DEL s", "0.5");
     create_knob("chorus-params", "FRQ Hz", "1.5");

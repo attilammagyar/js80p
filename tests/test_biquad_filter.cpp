@@ -578,28 +578,78 @@ TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequenc
 })
 
 
-class OtherSumOfSines : public SumOfSines
-{
-    public:
-        OtherSumOfSines(
-                Number const amplitude_1,
-                Frequency const frequency_1,
-                Number const amplitude_2,
-                Frequency const frequency_2,
-                Number const amplitude_3,
-                Frequency const frequency_3,
-                Integer const channels
-        ) : SumOfSines(
-            amplitude_1,
-            frequency_1,
-            amplitude_2,
-            frequency_2,
-            amplitude_3,
-            frequency_3,
-            channels
-        ) {
-        }
-};
+TEST(all_pass_filter_lets_all_frequencies_through_but_may_change_phase, {
+    SumOfSines input(0.33, 440.0, 0.33, 2000.0, 0.33, 7000.0, CHANNELS);
+    SumOfSines expected(0.33, 440.0, 0.33, 2000.0, 0.33, 7000.0, CHANNELS);
+    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilter<SumOfSines> filter("", input, filter_type);
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::ALL_PASS);
+    filter.frequency.set_value(2000.0);
+    filter.q.set_value(1.0);
+
+    schedule_small_param_changes(filter, 2000.0, 1.0, 0.0);
+
+    test_filter(filter, input, expected, 0.00003);
+
+    assert_completed(filter, 2000.0, 1.0, 0.0);
+})
+
+
+TEST(when_only_one_channel_is_requested_then_others_are_zeroed, {
+    constexpr Integer rounds = 1;
+    constexpr Integer sample_count = rounds * BLOCK_SIZE;
+
+    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    SumOfSines expected_filtered(0.5, 440.0, 0.0, 7040.0, 0.0, 0.0, 1, -0.0001875);
+    SumOfSines expected_zero(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1);
+    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilter<SumOfSines> filter("", input, filter_type, NULL, 1);
+    Buffer expected_filtered_output(sample_count, 1);
+    Buffer expected_zero_output(sample_count, 1);
+    Buffer actual_output(sample_count, CHANNELS);
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
+    filter.frequency.set_value(1000.0);
+
+    filter.set_block_size(BLOCK_SIZE);
+    input.set_block_size(BLOCK_SIZE);
+    expected_filtered.set_block_size(BLOCK_SIZE);
+    expected_zero.set_block_size(BLOCK_SIZE);
+
+    filter.set_sample_rate(SAMPLE_RATE);
+    input.set_sample_rate(SAMPLE_RATE);
+    expected_filtered.set_sample_rate(SAMPLE_RATE);
+    expected_zero.set_sample_rate(SAMPLE_RATE);
+
+    render_rounds<SumOfSines>(expected_filtered, expected_filtered_output, rounds);
+    render_rounds<SumOfSines>(expected_zero, expected_zero_output, rounds);
+
+    input.reset();
+    render_rounds< BiquadFilter<SumOfSines> >(filter, actual_output, rounds);
+
+    assert_eq(
+        expected_zero_output.samples[0],
+        actual_output.samples[0],
+        sample_count,
+        DOUBLE_DELTA,
+        "channel=0"
+    );
+    assert_close(
+        expected_filtered_output.samples[0],
+        actual_output.samples[1],
+        sample_count,
+        0.05,
+        "channel=1"
+    );
+    assert_eq(
+        expected_zero_output.samples[0],
+        actual_output.samples[2],
+        sample_count,
+        DOUBLE_DELTA,
+        "channel=0"
+    );
+})
 
 
 TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {

@@ -82,6 +82,17 @@ def print_effect_params(param_id: int) -> int:
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
 
+        ("$PFRQ", " ///< $ Phaser LFO Frequency"),
+        ("$PCNTR", "///< $ Phaser Filter Frequency Center"),
+        ("$PQ", "   ///< $ Phaser Filter Q Factor"),
+        ("$PDPT", " ///< $ Phaser Depth"),
+        ("$PDF", "  ///< $ Phaser Dampening Frequency"),
+        ("$PDG", "  ///< $ Phaser Dampening Gain"),
+        ("$PPHS", " ///< $ Phaser Stereo Phase Difference"),
+        ("$PHPF", " ///< $ Phaser Highpass Frequency"),
+        ("$PWET", " ///< $ Phaser Wet Volume"),
+        ("$PDRY", " ///< $ Phaser Dry Volume"),
+
         ("$CDEL", " ///< $ Chorus Delay"),
         ("$CFRQ", " ///< $ Chorus LFO Frequency"),
         ("$CDPT", " ///< $ Chorus Depth"),
@@ -198,6 +209,8 @@ def print_special_params(param_id: int) -> int:
         ("L7SYN", " ///< LFO 7 Tempo Synchronization"),
         ("L8SYN", " ///< LFO 8 Tempo Synchronization"),
 
+        ("EPSYN", " ///< Effects Phaser Tempo Synchronization"),
+
         ("ECSYN", " ///< Effects Chorus Tempo Synchronization"),
 
         ("EESYN", " ///< Effects Echo Tempo Synchronization"),
@@ -210,6 +223,7 @@ def print_special_params(param_id: int) -> int:
 
         ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency"),
         ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency"),
+        ("EPLOG", " ///< Effects Phaser Logarithmic Frequency Center"),
 
         ("N1DYN", " ///< Envelope 1 Dynamic"),
         ("N2DYN", " ///< Envelope 2 Dynamic"),

@@ -51,8 +51,17 @@ class LFO : public SignalProducer
             FloatParam& frequency_leader,
             FloatParam& max_leader,
             FloatParam& amount_leader,
-            ToggleParam& tempo_sync_,
-            Number const phase_offset
+            Number const phase_offset,
+            ToggleParam& tempo_sync_
+        ) noexcept;
+
+        LFO(
+            std::string const name,
+            FloatParam& frequency_leader,
+            FloatParam& max_leader,
+            FloatParam& amount_leader,
+            FloatParam& phase_leader,
+            ToggleParam& tempo_sync_
         ) noexcept;
 
         void start(Seconds const time_offset) noexcept;

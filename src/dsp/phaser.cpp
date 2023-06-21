@@ -16,34 +16,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__CHORUS_CPP
-#define JS80P__DSP__CHORUS_CPP
+#ifndef JS80P__DSP__PHASER_CPP
+#define JS80P__DSP__PHASER_CPP
 
-#include "dsp/chorus.hpp"
+#include "dsp/phaser.hpp"
+
+#include "dsp/math.hpp"
 
 
 namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-Chorus<InputSignalProducerClass>::Chorus(
+Phaser<InputSignalProducerClass>::Phaser(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 26),
-    delay_time(
-        name + "DEL",
-        0.0,
-        1.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT / Constants::CHORUS_DELAY_TIME_MAX
+) : Effect<InputSignalProducerClass>(name, input, 22),
+    tempo_sync(name + "SYN", ToggleParam::OFF),
+    phaser_filter_log_scale(name + "LOG", ToggleParam::ON),
+    lfo_frequency(name + "FRQ", 0.001, 20.0, 0.35),
+    // TODO: waveform? feedback? more stages?
+    phaser_filter_frequency(name + "CNTR", 0.0, 0.5, 0.35),
+    phaser_filter_q(
+        name + "Q",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
-    frequency(name + "FRQ", 0.001, 20.0, 0.15),
-    /*
-    The depth parameter will lead the amount parameter of the LFOs which is
-    expected to be scaled by 0.5 so that the LFO's oscillation range is not
-    greater than 1.0. (The Oscillator oscillates between -1.0 and 1.0.)
-    */
-    depth(name + "DPT", 0.0, 0.5, 0.15 * 0.5),
-    feedback(name + "FB", 0.0, 0.999 * FEEDBACK_SCALE_INV, 0.0),
+    depth(name + "DPT", 0.0, 1.0, 0.45),
     damping_frequency(
         name + "DF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
@@ -51,17 +51,15 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
     ),
     damping_gain(name + "DG", -36.0, -0.01, -6.0),
-    width(name + "WID", -1.0, 1.0, 0.6),
+    phase_difference(name + "PHS", 0.0, 1.0, 0.0),
     high_pass_frequency(
         name + "HPF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         20.0
     ),
-    tempo_sync(name + "SYN", ToggleParam::OFF),
-    lfo_1(name + "LFO1", frequency, delay_time, depth, 0.0 / 3.0, tempo_sync),
-    lfo_2(name + "LFO2", frequency, delay_time, depth, 1.0 / 3.0, tempo_sync),
-    lfo_3(name + "LFO3", frequency, delay_time, depth, 2.0 / 3.0, tempo_sync),
+    lfo_1(name + "LFO1", lfo_frequency, phaser_filter_frequency, depth, 0.0, tempo_sync),
+    lfo_2(name + "LFO2", lfo_frequency, phaser_filter_frequency, depth, phase_difference, tempo_sync),
     biquad_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -82,50 +80,22 @@ Chorus<InputSignalProducerClass>::Chorus(
         biquad_filter_q,
         high_pass_filter_gain
     ),
-    /*
-    The delay_time parameter controls the maximum of the centered LFOs which
-    control the actual delay time of the delay lines, but for the chorus effect,
-    we want to control the midpoint of the oscillation instead of the maximum.
-    Thus, the actual delay time range needs to be twice as large as the delay
-    time range that we present to the user.
-    */
-    delay_time_1(
-        name + "DEL1",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    delay_time_2(
-        name + "DEL2",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    delay_time_3(
-        name + "DEL3",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    comb_filter_1(
+    phaser_filter_type(""),
+    phaser_filter_1(
+        name + "F1",
         high_pass_filter,
-        PannedDelayStereoMode::NORMAL,
-        width,
-        delay_time_1,
-        &tempo_sync
+        phaser_filter_type,
+        phaser_filter_q,
+        phaser_filter_log_scale,
+        0
     ),
-    comb_filter_2(
+    phaser_filter_2(
+        name + "F2",
         high_pass_filter,
-        PannedDelayStereoMode::FLIPPED,
-        width,
-        delay_time_2,
-        &tempo_sync
-    ),
-    comb_filter_3(
-        high_pass_filter,
-        PannedDelayStereoMode::NORMAL,
-        delay_time_3,
-        &tempo_sync
+        phaser_filter_type,
+        phaser_filter_q,
+        phaser_filter_log_scale,
+        1
     ),
     mixer(input.get_channels()),
     high_shelf_filter_type(""),
@@ -135,22 +105,22 @@ Chorus<InputSignalProducerClass>::Chorus(
         damping_frequency,
         biquad_filter_q,
         damping_gain
-    ),
-    feedback_gain(high_shelf_filter, feedback)
+    )
 {
-    this->register_child(delay_time);
-    this->register_child(frequency);
+    this->register_child(tempo_sync);
+    this->register_child(phaser_filter_log_scale);
+
+    this->register_child(lfo_frequency);
+    this->register_child(phaser_filter_frequency);
+    this->register_child(phaser_filter_q);
     this->register_child(depth);
-    this->register_child(feedback);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
-    this->register_child(width);
+    this->register_child(phase_difference);
     this->register_child(high_pass_frequency);
-    this->register_child(tempo_sync);
 
     this->register_child(lfo_1);
     this->register_child(lfo_2);
-    this->register_child(lfo_3);
 
     this->register_child(biquad_filter_q);
 
@@ -158,20 +128,15 @@ Chorus<InputSignalProducerClass>::Chorus(
     this->register_child(high_pass_filter_gain);
     this->register_child(high_pass_filter);
 
-    this->register_child(delay_time_1);
-    this->register_child(delay_time_2);
-    this->register_child(delay_time_3);
+    this->register_child(phaser_filter_type);
 
-    this->register_child(comb_filter_1);
-    this->register_child(comb_filter_2);
-    this->register_child(comb_filter_3);
+    this->register_child(phaser_filter_1);
+    this->register_child(phaser_filter_2);
 
     this->register_child(mixer);
 
     this->register_child(high_shelf_filter_type);
     this->register_child(high_shelf_filter);
-
-    this->register_child(feedback_gain);
 
     high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 
@@ -179,24 +144,17 @@ Chorus<InputSignalProducerClass>::Chorus(
 
     lfo_1.center.set_value(ToggleParam::ON);
     lfo_2.center.set_value(ToggleParam::ON);
-    lfo_3.center.set_value(ToggleParam::ON);
 
-    delay_time_1.set_lfo(&lfo_1);
-    delay_time_2.set_lfo(&lfo_2);
-    delay_time_3.set_lfo(&lfo_3);
+    phaser_filter_1.frequency.set_lfo(&lfo_1);
+    phaser_filter_2.frequency.set_lfo(&lfo_2);
 
-    comb_filter_1.delay.set_feedback_signal_producer(&feedback_gain);
-    comb_filter_2.delay.set_feedback_signal_producer(&feedback_gain);
-    comb_filter_3.delay.set_feedback_signal_producer(&feedback_gain);
-
-    mixer.add(comb_filter_1);
-    mixer.add(comb_filter_2);
-    mixer.add(comb_filter_3);
+    mixer.add(phaser_filter_1);
+    mixer.add(phaser_filter_2);
 }
 
 
 template<class InputSignalProducerClass>
-Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
+Sample const* const* Phaser<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -208,15 +166,16 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
         return buffer;
     }
 
-    chorused = SignalProducer::produce<HighShelfFilter>(high_shelf_filter, round, sample_count);
-    SignalProducer::produce< Gain<HighShelfFilter> >(feedback_gain, round, sample_count);
+    phaser_filtered = SignalProducer::produce<HighShelfFilter>(
+        high_shelf_filter, round, sample_count
+    );
 
     return NULL;
 }
 
 
 template<class InputSignalProducerClass>
-void Chorus<InputSignalProducerClass>::render(
+void Phaser<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -226,7 +185,7 @@ void Chorus<InputSignalProducerClass>::render(
 
     for (Integer c = 0; c != channels; ++c) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = chorused[c][i];
+            buffer[c][i] = phaser_filtered[c][i];
         }
     }
 

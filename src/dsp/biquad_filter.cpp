@@ -45,9 +45,10 @@ BiquadFilterSharedCache::BiquadFilterSharedCache()
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
-        std::string const name
+        std::string const name,
+        Type const max_type
 ) noexcept
-    : Param<Type>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
+    : Param<Type>(name, LOW_PASS, max_type, LOW_PASS)
 {
 }
 
@@ -57,7 +58,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        BiquadFilterSharedCache* shared_cache
+        BiquadFilterSharedCache* const shared_cache,
+        Integer const channel
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(
@@ -79,6 +81,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
+    channels_begin(channel >= 0 ? channel : 0),
+    channels_end(channel >= 0 ? channel + 1 : input.get_channels()),
     shared_cache(shared_cache)
 {
     initialize_instance();
@@ -117,7 +121,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        ToggleParam const& log_scale_toggle
+        ToggleParam const& log_scale_toggle,
+        Integer const channel
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(
@@ -146,6 +151,47 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
+    channels_begin(channel >= 0 ? channel : 0),
+    channels_end(channel >= 0 ? channel + 1 : input.get_channels()),
+    shared_cache(NULL)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+        std::string const name,
+        InputSignalProducerClass& input,
+        TypeParam& type,
+        FloatParam& q_leader,
+        ToggleParam const& log_scale_toggle,
+        Integer const channel
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 3),
+    frequency(
+        name + "FRQ",
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale_toggle,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+    ),
+    q(q_leader),
+    gain(
+        name + "G",
+        Constants::BIQUAD_FILTER_GAIN_MIN,
+        Constants::BIQUAD_FILTER_GAIN_MAX,
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT
+    ),
+    type(type),
+    channels_begin(channel >= 0 ? channel : 0),
+    channels_end(channel >= 0 ? channel + 1 : input.get_channels()),
     shared_cache(NULL)
 {
     initialize_instance();
@@ -159,13 +205,16 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParam& frequency_leader,
         FloatParam& q_leader,
         FloatParam& gain_leader,
-        BiquadFilterSharedCache* shared_cache
+        BiquadFilterSharedCache* const shared_cache,
+        Integer const channel
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
     type(type),
+    channels_begin(channel >= 0 ? channel : 0),
+    channels_end(channel >= 0 ? channel + 1 : input.get_channels()),
     shared_cache(shared_cache)
 {
     initialize_instance();
@@ -300,6 +349,10 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
         case HIGH_SHELF:
             is_no_op = initialize_high_shelf_rendering(round, sample_count);
+            break;
+
+        case ALL_PASS:
+            is_no_op = initialize_all_pass_rendering(round, sample_count);
             break;
 
         default:
@@ -1083,6 +1136,88 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
 
 
 template<class InputSignalProducerClass>
+bool BiquadFilter<InputSignalProducerClass>::initialize_all_pass_rendering(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    Number const all_pass_no_op_frequency = this->low_pass_no_op_frequency;
+
+    are_coefficients_constant = (
+        frequency.is_constant_in_next_round(round, sample_count)
+        && q.is_constant_in_next_round(round, sample_count)
+    );
+    can_use_shared_coefficients = (
+        can_use_shared_coefficients
+        && frequency.get_envelope() == NULL
+        && q.get_envelope() == NULL
+    );
+
+    FloatParam::produce_if_not_constant(gain, round, sample_count);
+
+    if (are_coefficients_constant) {
+        Number const frequency_value = frequency.get_value();
+
+        if (frequency_value >= all_pass_no_op_frequency) {
+            return true;
+        }
+
+        Number const q_value = q.get_value();
+
+        frequency.skip_round(round, sample_count);
+        q.skip_round(round, sample_count);
+
+        is_silent = false;
+
+        store_all_pass_coefficient_samples(0, frequency_value, q_value);
+
+    } else {
+        Sample const* frequency_buffer = (
+            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+        );
+        Sample const* q_buffer = (
+            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+        );
+
+        for (Integer i = 0; i != sample_count; ++i) {
+            Number const frequency_value = frequency_buffer[i];
+
+            if (frequency_value >= all_pass_no_op_frequency) {
+                store_no_op_coefficient_samples(i);
+
+                continue;
+            }
+
+            store_all_pass_coefficient_samples(
+                i, frequency_value, (Number)q_buffer[i]
+            );
+        }
+    }
+
+    return false;
+}
+
+
+template<class InputSignalProducerClass>
+void BiquadFilter<InputSignalProducerClass>::store_all_pass_coefficient_samples(
+        Integer const index,
+        Number const frequency_value,
+        Number const q_value
+) noexcept {
+    Sample const w0 = w0_scale * frequency_value;
+    Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
+    Sample const cos_w0 = Math::cos(w0);
+
+    Sample const b0_a2 = 1.0 - alpha_q;
+    Sample const b1_a1 = -2.0 * cos_w0;
+    Sample const b2_a0 = 1.0 + alpha_q;
+
+    store_normalized_coefficient_samples(
+        index, b0_a2, b1_a1, b2_a0, b2_a0, b1_a1, b0_a2
+    );
+}
+
+
+template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
         Integer const index,
         Number const gain_value
@@ -1158,7 +1293,6 @@ void BiquadFilter<InputSignalProducerClass>::render(
         return;
     }
 
-    Integer const channels = this->channels;
     Sample const* const* const input_buffer = this->input_buffer;
 
     if (are_coefficients_constant) {
@@ -1178,7 +1312,7 @@ void BiquadFilter<InputSignalProducerClass>::render(
             a2 = a2_buffer[0];
         }
 
-        for (Integer c = 0; c != channels; ++c) {
+        for (Integer c = channels_begin; c != channels_end; ++c) {
             Sample x_n_m1 = this->x_n_m1[c];
             Sample x_n_m2 = this->x_n_m2[c];
             Sample y_n_m1 = this->y_n_m1[c];
@@ -1228,7 +1362,7 @@ void BiquadFilter<InputSignalProducerClass>::render(
         a2 = a2_buffer;
     }
 
-    for (Integer c = 0; c != channels; ++c) {
+    for (Integer c = channels_begin; c != channels_end; ++c) {
         Sample x_n_m1 = this->x_n_m1[c];
         Sample x_n_m2 = this->x_n_m2[c];
         Sample y_n_m1 = this->y_n_m1[c];

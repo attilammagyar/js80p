@@ -70,25 +70,40 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static constexpr Type PEAKING = 4;
         static constexpr Type LOW_SHELF = 5;
         static constexpr Type HIGH_SHELF = 6;
+        static constexpr Type ALL_PASS = 7;
 
         class TypeParam : public Param<Type>
         {
             public:
-                TypeParam(std::string const name) noexcept;
+                TypeParam(
+                    std::string const name,
+                    Type const max_type = HIGH_SHELF
+                ) noexcept;
         };
 
         BiquadFilter(
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            BiquadFilterSharedCache* shared_cache = NULL
+            BiquadFilterSharedCache* const shared_cache = NULL,
+            Integer const channel = -1
         ) noexcept;
 
         BiquadFilter(
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            ToggleParam const& log_scale_toggle
+            ToggleParam const& log_scale_toggle,
+            Integer const channel = -1
+        ) noexcept;
+
+        BiquadFilter(
+            std::string const name,
+            InputSignalProducerClass& input,
+            TypeParam& type,
+            FloatParam& q_leader,
+            ToggleParam const& log_scale_toggle,
+            Integer const channel = -1
         ) noexcept;
 
         BiquadFilter(
@@ -97,7 +112,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParam& frequency_leader,
             FloatParam& q_leader,
             FloatParam& gain_leader,
-            BiquadFilterSharedCache* shared_cache = NULL
+            BiquadFilterSharedCache* const shared_cache = NULL,
+            Integer const channel = -1
         ) noexcept;
 
         virtual ~BiquadFilter();
@@ -151,6 +167,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_low_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -161,6 +178,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_high_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -171,6 +189,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_low_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -181,6 +200,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_high_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -191,6 +211,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_band_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -201,6 +222,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_notch_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -211,11 +233,23 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
         void store_peaking_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value,
             Number const gain_value
+        ) noexcept;
+
+        bool initialize_all_pass_rendering(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
+        void store_all_pass_coefficient_samples(
+            Integer const index,
+            Number const frequency_value,
+            Number const q_value
         ) noexcept;
 
         void store_gain_coefficient_samples(
@@ -236,7 +270,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index) noexcept;
         void store_silent_coefficient_samples(Integer const index) noexcept;
 
-        BiquadFilterSharedCache* shared_cache;
+        Integer const channels_begin;
+        Integer const channels_end;
+
+        BiquadFilterSharedCache* const shared_cache;
 
         /*
         Notation:
