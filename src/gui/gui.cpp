@@ -1192,7 +1192,7 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
 
     PE(effects_body, 200 + PE_W * 0,   242, Synth::ParamId::ECDEL,  MFL__,      "%.4f", 1.0, knob_states);
     PE(effects_body, 200 + PE_W * 1,   242, Synth::ParamId::ECFRQ,  MFL_C,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 2,   242, Synth::ParamId::ECDPT,  MFL_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 200 + PE_W * 2,   242, Synth::ParamId::ECDPT,  MFL_C,      "%.2f", 200.0, knob_states);
     PE(effects_body, 200 + PE_W * 3,   242, Synth::ParamId::ECFB,   MFL_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
     PE(effects_body, 200 + PE_W * 4,   242, Synth::ParamId::ECDF,   MFL__,      "%.1f", 1.0, knob_states);
     PE(effects_body, 200 + PE_W * 5,   242, Synth::ParamId::ECDG,   MFL_C,      "%.2f", 1.0, knob_states);

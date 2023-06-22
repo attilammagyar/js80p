@@ -37,7 +37,12 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::CHORUS_DELAY_TIME_DEFAULT
     ),
     frequency(name + "FRQ", 0.001, 20.0, 0.15),
-    depth(name + "DPT", 0.0, 1.0, 0.15),
+    /*
+    The depth parameter will lead the amount parameter of the LFOs which is
+    expected to be scaled by 0.5 so that the LFO's oscillation range is not
+    greater than 1.0. (The Oscillator oscillates between -1.0 and 1.0.)
+    */
+    depth(name + "DPT", 0.0, 0.5, 0.15 * 0.5),
     feedback(name + "FB", 0.0, 0.999 * FEEDBACK_SCALE_INV, 0.0),
     damping_frequency(
         name + "DF",

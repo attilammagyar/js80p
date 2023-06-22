@@ -48,6 +48,12 @@ would complicate implementing 14 bit messages.
 constexpr Midi::Controller UNSUPPORTED_CC = 33;
 
 
+constexpr Synth::MessageType SET_PARAM = Synth::MessageType::SET_PARAM;
+constexpr Synth::MessageType REFRESH_PARAM = Synth::MessageType::REFRESH_PARAM;
+constexpr Synth::MessageType ASSIGN_CONTROLLER = Synth::MessageType::ASSIGN_CONTROLLER;
+constexpr Synth::MessageType CLEAR = Synth::MessageType::CLEAR;
+
+
 TEST(communication_with_the_gui_is_lock_free, {
     Synth synth;
 
@@ -85,6 +91,7 @@ TEST(twelve_tone_equal_temperament_440_hz, {
 void set_up_chunk_size_independent_test(Synth& synth, Frequency const sample_rate)
 {
     synth.set_sample_rate(sample_rate);
+    synth.resume();
     synth.note_on(0.05, 1, Midi::NOTE_A_4, 114);
     synth.note_on(0.25, 1, Midi::NOTE_G_9, 114);
     synth.note_off(0.05 + 3.0, 1, Midi::NOTE_A_4, 114);
@@ -109,17 +116,13 @@ void assign_controller(
         Synth::ParamId const param_id,
         Byte const controller_id
 ) {
-    synth.push_message(
-        Synth::MessageType::ASSIGN_CONTROLLER, param_id, 0.0, controller_id
-    );
+    synth.push_message(ASSIGN_CONTROLLER, param_id, 0.0, controller_id);
 }
 
 
 TEST(messages_get_processed_during_rendering, {
     Synth synth;
-    Synth::Message message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
-    );
+    Synth::Message message(SET_PARAM, Synth::ParamId::PM, 0.123, 0);
     Number const inv_saw_as_ratio = (
         synth.modulator_params.waveform.value_to_ratio(
             SimpleOscillator::INVERSE_SAWTOOTH
@@ -130,13 +133,9 @@ TEST(messages_get_processed_during_rendering, {
     synth.modulator_add_volume.set_value(0.42);
     synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
 
-    synth.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0
-    );
+    synth.push_message(SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0);
     synth.push_message(message);
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0
-    );
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0);
     assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_3);
 
     assert_eq(1.0, synth.phase_modulation_level.get_value(), DOUBLE_DELTA);
@@ -183,6 +182,8 @@ TEST(midi_controller_changes_can_affect_parameters, {
     Midi::Controller invalid = 127;
     Midi::Controller unused = 0;
 
+    synth.resume();
+
     synth.set_block_size(block_size);
 
     assign_controller(synth, Synth::ParamId::PM, Synth::ControllerId::VOLUME);
@@ -196,18 +197,10 @@ TEST(midi_controller_changes_can_affect_parameters, {
         synth, Synth::ParamId::CWAV, Synth::ControllerId::MODULATION_WHEEL
     );
 
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0.0
-    );
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0.0
-    );
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0.0
-    );
-    synth.push_message(
-        Synth::MessageType::REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0
-    );
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0.0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0.0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0.0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0);
 
     synth.control_change(0.0, 1, Midi::VOLUME, 53);
     synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 127);
@@ -346,6 +339,8 @@ TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
     synth.set_block_size(block_size);
     synth.set_sample_rate(sample_rate);
 
+    synth.resume();
+
     expected.set_block_size(block_size);
     expected.set_sample_rate(sample_rate);
 
@@ -378,6 +373,8 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
 
     synth.set_block_size(block_size);
     synth.set_sample_rate(sample_rate);
+
+    synth.resume();
 
     expected.set_block_size(block_size);
     expected.set_sample_rate(sample_rate);
@@ -539,11 +536,52 @@ TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
     SignalProducer::produce<Synth>(synth, 1);
     assert_true(synth.lfos[0]->is_on());
 
-    synth.push_message(
-        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
-    );
+    synth.push_message(CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0);
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
     SignalProducer::produce<Synth>(synth, 2);
 
     assert_true(synth.lfos[0]->is_on());
+})
+
+
+TEST(effects, {
+    constexpr Frequency sample_rate = 22050.0;
+    constexpr Integer block_size = 2048;
+    constexpr Integer rounds = 10;
+    constexpr Integer buffer_size = rounds * block_size;
+
+    Synth synth;
+    Buffer buffer(buffer_size, synth.get_channels());
+
+    Number const inv_saw_as_ratio = (
+        synth.modulator_params.waveform.value_to_ratio(
+            SimpleOscillator::INVERSE_SAWTOOTH
+        )
+    );
+
+    synth.set_sample_rate(sample_rate);
+    synth.set_block_size(block_size);
+
+    synth.resume();
+
+    synth.push_message(SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::CWAV, inv_saw_as_ratio, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EOG, 0.2, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EDG, 0.2, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EF1FRQ, 0.75, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EF2FRQ, 0.75, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::ECDPT, 1.0, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::ECWET, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::ECDRY, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EEWET, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::EEDRY, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::ERWET, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::ERDRY, 0.5, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::L1CEN, 1.0, 0);
+    assign_controller(synth, Synth::ParamId::EF1Q, Synth::ControllerId::LFO_1);
+    synth.note_on(0.0, 1, Midi::NOTE_A_4, 114);
+
+    synth.process_messages();
+
+    render_rounds<Synth>(synth, buffer, rounds, block_size);
 })

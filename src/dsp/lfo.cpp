@@ -19,6 +19,10 @@
 #ifndef JS80P__DSP__LFO_CPP
 #define JS80P__DSP__LFO_CPP
 
+#ifdef JS80P_ASSERTIONS
+#include <cassert>
+#endif
+
 #include "dsp/lfo.hpp"
 
 #include "dsp/math.hpp"
@@ -228,6 +232,13 @@ void LFO::apply_distortions(
 }
 
 
+#ifdef JS80P_ASSERTIONS
+#define lfo_assert(condition) assert(condition)
+#else
+#define lfo_assert(condition)
+#endif
+
+
 void LFO::apply_range(
         Integer const round,
         Integer const first_sample_index,
@@ -246,6 +257,9 @@ void LFO::apply_range(
                 target_buffer[i] = (
                     min_value + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -254,6 +268,9 @@ void LFO::apply_range(
                 target_buffer[i] = (
                     min_value + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_buffer[i]);
             }
         }
     } else {
@@ -266,6 +283,9 @@ void LFO::apply_range(
                 target_buffer[i] = (
                     min_buffer[i] + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_buffer[i]);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -274,6 +294,9 @@ void LFO::apply_range(
                 target_buffer[i] = (
                     min_buffer[i] + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_buffer[i]);
+                lfo_assert(target_buffer[i] <= max_buffer[i]);
             }
         }
     }
@@ -356,6 +379,9 @@ void LFO::apply_range_centered(
                 target_buffer[i] = (
                     center + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -366,6 +392,9 @@ void LFO::apply_range_centered(
                 target_buffer[i] = (
                     center + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         }
     } else {
@@ -380,6 +409,9 @@ void LFO::apply_range_centered(
                 target_buffer[i] = (
                     center + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -391,6 +423,9 @@ void LFO::apply_range_centered(
                 target_buffer[i] = (
                     center + range * (source_buffer[i])
                 );
+
+                lfo_assert(target_buffer[i] >= min_value);
+                lfo_assert(target_buffer[i] <= max_value);
             }
         }
     }
