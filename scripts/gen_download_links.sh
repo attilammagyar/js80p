@@ -22,9 +22,9 @@ main()
             plugin_type="$(printf "%s\n" "$zip" | cut -d"-" -f5 | cut -d"." -f1 | sed "s/fst/FST (VST 2.4)/ ; s/vst3/VST 3/")"
             size="$(du -hs "$REPLY" | cut -f1)"
             cat <<HTML
-      <li>
-        $os, $arch-bit, $plugin_type: <a class="button" href="$uri">Download ($size)</a>
-      </li>
+          <li>
+            $os, $arch-bit, $plugin_type: <a class="button" href="$uri">Download ($size)</a>
+          </li>
 HTML
         done
 
@@ -36,9 +36,9 @@ HTML
             uri="https://github.com/attilammagyar/js80p/releases/download/$version/$zip"
             size="$(du -hs "$REPLY" | cut -f1)"
             cat <<HTML
-      <li>
-        Source: <a class="button" href="$uri">Download ($size)</a>
-      </li>
+          <li>
+            Source: <a class="button" href="$uri">Download ($size)</a>
+          </li>
 HTML
         done
 }
