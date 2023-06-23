@@ -1,3 +1,7 @@
+v1.7.5 (2023-06-23)
+ * increase the effect of the mod wheel and utilize the channel pressure
+   (aftertouch) more in presets
+
 v1.7.4 (2023-06-23)
  * make Envelope and Flexible Controller colors easier to distinguish
  * extend REAME.txt with usage tips
