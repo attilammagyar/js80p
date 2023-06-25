@@ -98,7 +98,7 @@ static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
     "UNKNOWN-65",                   // 65
     "GetMidiNoteName",              // 66
     "UNKNOWN-67",                   // 67
-    "UNKNOWN-67",                   // 67
+    "UNKNOWN-68",                   // 68
     "GetSpeakerArrangement",        // 69
     "ShellGetNextPlugin",           // 70
     "StartProcess",                 // 71
@@ -645,7 +645,6 @@ void FstPlugin::import_patch(const std::string& patch) noexcept
 VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 {
     size_t const current_program = bank.get_current_program_index();
-
 
     bank[current_program].import(Serializer::serialize(synth));
 
