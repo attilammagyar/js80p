@@ -726,7 +726,7 @@ void FstPlugin::pitch_wheel_change(
 
 VstIntPtr FstPlugin::get_program() const noexcept
 {
-    return bank.get_current_program_index();
+    return next_program;
 }
 
 
@@ -757,17 +757,13 @@ VstIntPtr FstPlugin::get_program_name(char* name, size_t index) noexcept
 
 void FstPlugin::get_program_name(char* name) noexcept
 {
-    strncpy(
-        name,
-        bank[bank.get_current_program_index()].get_name().c_str(),
-        kVstMaxProgNameLen - 1
-    );
+    strncpy(name, bank[next_program].get_name().c_str(), kVstMaxProgNameLen - 1);
 }
 
 
 void FstPlugin::set_program_name(const char* name)
 {
-    bank[bank.get_current_program_index()].set_name(name);
+    bank[next_program].set_name(name);
 }
 
 
