@@ -347,7 +347,7 @@ div.section > p {
         <h3>System Requirements</h3>
         <ul>
           <li>Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)</li>
-          <li>CPU: 32 or 64 bit, SSE2 support</li>
+          <li>CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)</li>
           <li>RAM: 50-200 MB, depending on buffer size</li>
         </ul>
         <p>
@@ -557,7 +557,7 @@ div.section > p {
         Learn</em>), and turn the corresponding knob on your MIDI keyboard while playing,
         or edit the MIDI CC events in your host application's MIDI editor.</p>
 
-        <p>However, the VST3 plugin format requires plugins to export a proxy parameter
+        <p>However, the VST 3 plugin format requires plugins to export a proxy parameter
         for each MIDI CC message that they want to receive, and as a side-effect, these
         parameters can also be automated using the host application's usual automation
         editor. For the sake of consistency, the FST plugin also exports automatable
@@ -566,7 +566,7 @@ div.section > p {
         <p>For example, in both plugin types, you might assign the
         <code>MIDI CC 1 (Modulation Wheel)</code> controller to the Phase Modulation (PM)
         parameter of the synthesizer, and then add automation in the host application
-        to the <code>MIDI CC 1 (Modulation Wheel)</code> (VST3) or <code>ModWh</code> (FST) parameter. JS80P
+        to the <code>MIDI CC 1 (Modulation Wheel)</code> (VST 3) or <code>ModWh</code> (FST) parameter. JS80P
         will then interpret the changes of this parameter the same way as if you were
         turning the modulation wheel on a MIDI keyboard.</p>
       </div>
@@ -593,7 +593,7 @@ div.section > p {
         <ol>
         <li><p>Click on the small triangle in the top left corner of the plugin window of
         JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-        <li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST3) in
+        <li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST 3) in
         the browser. Click on it with the right mouse button.</p></li>
         <li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
         <li><p>Turn the knob on your MIDI keyboard until FL Studio recognizes it.</p></li>
@@ -622,7 +622,7 @@ div.section > p {
         <li><p>Press a piano key on your MIDI keyboard, and hold it down without triggering
         aftertouch.</p></li>
         <li><p>While holding the piano key down, find the parameter named "<em>Ch AT</em>" (FST)
-        or "<em>Channel Aftertouch</em>" (VST3) in FL Studio's browser. Click on it with
+        or "<em>Channel Aftertouch</em>" (VST 3) in FL Studio's browser. Click on it with
         the right mouse button.</p></li>
         <li><p>Select the "<em>Link to controller...</em>" menu item (keep holding the piano key).</p></li>
         <li><p>Now push the piano key harder to trigger aftertouch.</p></li>
