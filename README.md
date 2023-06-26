@@ -48,7 +48,7 @@ System Requirements
 -------------------
 
  * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)
- * CPU: 32 or 64 bit, SSE2 support
+ * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
  * RAM: 50-200 MB, depending on buffer size
 
 On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
@@ -211,7 +211,7 @@ The intended way of automating JS80P's parameters is to assign a
 Learn_), and turn the corresponding knob on your MIDI keyboard while playing,
 or edit the MIDI CC events in your host application's MIDI editor.
 
-However, the VST3 plugin format requires plugins to export a proxy parameter
+However, the VST 3 plugin format requires plugins to export a proxy parameter
 for each MIDI CC message that they want to receive, and as a side-effect, these
 parameters can also be automated using the host application's usual automation
 editor. For the sake of consistency, the FST plugin also exports automatable
@@ -222,7 +222,7 @@ parameters for each supported MIDI CC message.
 For example, in both plugin types, you might assign the
 `MIDI CC 1 (Modulation Wheel)` controller to the Phase Modulation (PM)
 parameter of the synthesizer, and then add automation in the host application
-to the `MIDI CC 1 (Modulation Wheel)` (VST3) or `ModWh` (FST) parameter. JS80P
+to the `MIDI CC 1 (Modulation Wheel)` (VST 3) or `ModWh` (FST) parameter. JS80P
 will then interpret the changes of this parameter the same way as if you were
 turning the modulation wheel on a MIDI keyboard.
 
@@ -250,7 +250,7 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 1. Click on the small triangle in the top left corner of the plugin window of
    JS80P, and select the "_Browse parameters_" menu item.
 
-2. Find the parameter named "_Vol_" (FST) or "_MIDI CC 7 (Volume)_" (VST3) in
+2. Find the parameter named "_Vol_" (FST) or "_MIDI CC 7 (Volume)_" (VST 3) in
    the browser. Click on it with the right mouse button.
 
 3. Select the "_Link to controller..._" menu item.
@@ -283,7 +283,7 @@ more complicated procedure than setting up MIDI CC:
    aftertouch.
 
 3. While holding the piano key down, find the parameter named "_Ch AT_" (FST)
-   or "_Channel Aftertouch_" (VST3) in FL Studio's browser. Click on it with
+   or "_Channel Aftertouch_" (VST 3) in FL Studio's browser. Click on it with
    the right mouse button.
 
 4. Select the "_Link to controller..._" menu item (keep holding the piano key).
@@ -351,7 +351,7 @@ Development
 The `lib/` directory contains code from the following projects:
 
  * [FST](https://git.iem.at/zmoelnig/FST)
- * [VST3 SDK](https://github.com/steinbergmedia/vst3sdk)
+ * [VST 3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
 #### Linux
 

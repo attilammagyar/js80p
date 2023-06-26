@@ -15,7 +15,7 @@ System Requirements
 -------------------
 
  * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)
- * CPU: 32 or 64 bit, SSE2 support
+ * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
  * RAM: 50-200 MB, depending on buffer size
 
 On Linux, the "libxcb", "libxcb-render", and "libcairo" libraries, and either
