@@ -1,3 +1,7 @@
+v1.7.6 (2023-06-27)
+ * Bugfix: in some host applications (e.g. energyXT, SAVIHost), the name of the
+   current program was reported to the host application incorrectly
+
 v1.7.5 (2023-06-23)
  * increase the effect of the mod wheel and utilize the channel pressure
    (aftertouch) more in presets
