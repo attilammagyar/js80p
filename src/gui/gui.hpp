@@ -92,7 +92,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int CONTROLLERS_COUNT = 99;
+        static constexpr int CONTROLLERS_COUNT = 109;
 
         static char const* const MODES[];
         static int const MODES_COUNT;
@@ -206,7 +206,8 @@ class GUI
         void destroy();
 
         void build_about_body();
-        void build_controllers_body(ParamEditorKnobStates* knob_states);
+        void build_controllers_1_body(ParamEditorKnobStates* knob_states);
+        void build_controllers_2_body(ParamEditorKnobStates* knob_states);
         void build_effects_body(ParamEditorKnobStates* knob_states);
         void build_envelopes_body(ParamEditorKnobStates* knob_states);
         void build_lfos_body(ParamEditorKnobStates* knob_states);
@@ -217,7 +218,8 @@ class GUI
         Widget* dummy_widget;
 
         Image about_image;
-        Image controllers_image;
+        Image controllers_1_image;
+        Image controllers_2_image;
         Image effects_image;
         Image envelopes_image;
         Image lfos_image;
@@ -228,7 +230,8 @@ class GUI
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
-        TabBody* controllers_body;
+        TabBody* controllers_1_body;
+        TabBody* controllers_2_body;
         TabBody* effects_body;
         TabBody* envelopes_body;
         TabBody* lfos_body;

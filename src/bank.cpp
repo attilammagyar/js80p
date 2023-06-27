@@ -390,7 +390,7 @@ std::string Bank::serialize() const
 
     std::string result;
 
-    result.reserve(non_blank_programs * 16384);
+    result.reserve(non_blank_programs * 32768);
 
     for (size_t i = 0; i != NUMBER_OF_PROGRAMS; ++i) {
         result += programs[i].serialize();

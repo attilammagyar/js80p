@@ -1,5 +1,6 @@
 ABOUT BITMAP "gui/img/about.bmp"
-CONTROLLERS BITMAP "gui/img/controllers.bmp"
+CONTROLLERS1 BITMAP "gui/img/controllers1.bmp"
+CONTROLLERS2 BITMAP "gui/img/controllers2.bmp"
 EFFECTS BITMAP "gui/img/effects.bmp"
 ENVELOPES BITMAP "gui/img/envelopes.bmp"
 KNOBSTATESCONTROLLED BITMAP "gui/img/knob_states-controlled.bmp"

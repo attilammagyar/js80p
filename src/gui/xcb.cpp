@@ -39,8 +39,10 @@
 
 extern unsigned char _binary_gui_img_about_png_start;
 extern unsigned char _binary_gui_img_about_png_end;
-extern unsigned char _binary_gui_img_controllers_png_start;
-extern unsigned char _binary_gui_img_controllers_png_end;
+extern unsigned char _binary_gui_img_controllers1_png_start;
+extern unsigned char _binary_gui_img_controllers1_png_end;
+extern unsigned char _binary_gui_img_controllers2_png_start;
+extern unsigned char _binary_gui_img_controllers2_png_end;
 extern unsigned char _binary_gui_img_effects_png_start;
 extern unsigned char _binary_gui_img_effects_png_end;
 extern unsigned char _binary_gui_img_envelopes_png_start;
@@ -74,10 +76,17 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         )
     },
     {
-        "CONTROLLERS",
+        "CONTROLLERS1",
         Widget::Resource(
-            &_binary_gui_img_controllers_png_start,
-            &_binary_gui_img_controllers_png_end
+            &_binary_gui_img_controllers1_png_start,
+            &_binary_gui_img_controllers1_png_end
+        )
+    },
+    {
+        "CONTROLLERS2",
+        Widget::Resource(
+            &_binary_gui_img_controllers2_png_start,
+            &_binary_gui_img_controllers2_png_end
         )
     },
     {

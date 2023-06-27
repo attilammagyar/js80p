@@ -1351,6 +1351,15 @@ bool Synth::assign_controller_to_param(
         case FLEXIBLE_CONTROLLER_8:
         case FLEXIBLE_CONTROLLER_9:
         case FLEXIBLE_CONTROLLER_10:
+        case FLEXIBLE_CONTROLLER_11:
+        case FLEXIBLE_CONTROLLER_12:
+        case FLEXIBLE_CONTROLLER_13:
+        case FLEXIBLE_CONTROLLER_14:
+        case FLEXIBLE_CONTROLLER_15:
+        case FLEXIBLE_CONTROLLER_16:
+        case FLEXIBLE_CONTROLLER_17:
+        case FLEXIBLE_CONTROLLER_18:
+        case FLEXIBLE_CONTROLLER_19:
         case LFO_1:
         case LFO_2:
         case LFO_3:
@@ -1433,6 +1442,16 @@ bool Synth::assign_controller_to_float_param(
         case FLEXIBLE_CONTROLLER_8: param->set_flexible_controller(flexible_controllers[7]); return true;
         case FLEXIBLE_CONTROLLER_9: param->set_flexible_controller(flexible_controllers[8]); return true;
         case FLEXIBLE_CONTROLLER_10: param->set_flexible_controller(flexible_controllers[9]); return true;
+        case FLEXIBLE_CONTROLLER_11: param->set_flexible_controller(flexible_controllers[10]); return true;
+        case FLEXIBLE_CONTROLLER_12: param->set_flexible_controller(flexible_controllers[11]); return true;
+        case FLEXIBLE_CONTROLLER_13: param->set_flexible_controller(flexible_controllers[12]); return true;
+        case FLEXIBLE_CONTROLLER_14: param->set_flexible_controller(flexible_controllers[13]); return true;
+        case FLEXIBLE_CONTROLLER_15: param->set_flexible_controller(flexible_controllers[14]); return true;
+        case FLEXIBLE_CONTROLLER_16: param->set_flexible_controller(flexible_controllers[15]); return true;
+        case FLEXIBLE_CONTROLLER_17: param->set_flexible_controller(flexible_controllers[16]); return true;
+        case FLEXIBLE_CONTROLLER_18: param->set_flexible_controller(flexible_controllers[17]); return true;
+        case FLEXIBLE_CONTROLLER_19: param->set_flexible_controller(flexible_controllers[18]); return true;
+        case FLEXIBLE_CONTROLLER_20: param->set_flexible_controller(flexible_controllers[19]); return true;
 
         case LFO_1: param->set_lfo(lfos_rw[0]); return true;
         case LFO_2: param->set_lfo(lfos_rw[1]); return true;

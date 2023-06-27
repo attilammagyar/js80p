@@ -42,17 +42,20 @@ html, body {
   padding: 1px 2px;
 }
 
-#controllers .main-block,
+#controllers-1 .main-block,
+#controllers-2 .main-block,
 #envelopes .main-block {
   margin: 12px 2px;
   padding: 1px 2px;
 }
 
-#controllers .main-block {
+#controllers-1 .main-block,
+#controllers-2 .main-block {
   width: 180px;
 }
 
-#controllers .block .group:nth-child(2),
+#controllers-1 .block .group:nth-child(2),
+#controllers-2 .block .group:nth-child(2),
 #envelopes .block .group:nth-child(2) {
   margin-top: 20px;
 }
@@ -290,7 +293,7 @@ body.hide-objects .knob span:nth-child(4) {
   font-family: Verdana, Sans-serif;
   font-size: 14px;
   background: #202030;
-  width: 100px;
+  width: 83px;
   height: 20px;
   line-height: 20px;
   margin: 0;
@@ -302,7 +305,7 @@ body.hide-objects .knob span:nth-child(4) {
   color: #a0a0b0;
 }
 
-.tab:nth-child(1) {
+.tab:nth-child(2) {
   margin-left: 0;
 }
 
@@ -446,9 +449,35 @@ svg.icon {
 </head>
 <body>
 
+<script type="text/javascript">
+<!--
+function make_tabs(active)
+{
+    var tabs = [
+            "Synth",
+            "Effects",
+            "Ctls 1-10",
+            "Ctls 11-20",
+            "Envelopes",
+            "LFOs",
+            "About"
+        ],
+        i, l;
+
+    for (i = 0, l = tabs.length; i < l; ++i) {
+        document.write(
+            '<div class="tab' + (active === i ? ' active' : '') + '">' + tabs[i] + '</div>'
+        );
+    }
+
+    document.write('<div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>');;
+}
+//-->
+</script>
+
   <div class="background">
     <div class="tabs">
-      <div class="tab active">Synth</div><div class="tab">Effects</div><div class="tab">Controllers</div><div class="tab">Envelopes</div><div class="tab">LFOs</div><div class="tab">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(0);</script>
     </div>
     <div class="border">
       <span class="sc11">1</span>
@@ -531,7 +560,7 @@ svg.icon {
 
   <div class="background">
     <div class="tabs">
-      <div class="tab">Synth</div><div class="tab active">Effects</div><div class="tab">Controllers</div><div class="tab">Envelopes</div><div class="tab">LFOs</div><div class="tab">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(1);</script>
     </div>
     <div class="border" id="effects">
       <div id="overdrive" class="effect main-block block">
@@ -579,15 +608,23 @@ svg.icon {
 
   <div class="background">
     <div class="tabs">
-      <div class="tab">Synth</div><div class="tab">Effects</div><div class="tab active">Controllers</div><div class="tab">Envelopes</div><div class="tab">LFOs</div><div class="tab">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(2);</script>
     </div>
-    <div class="border" id="controllers">
+    <div class="border" id="controllers-1">
     </div>
   </div>
 
   <div class="background">
     <div class="tabs">
-      <div class="tab">Synth</div><div class="tab">Effects</div><div class="tab">Controllers</div><div class="tab active">Envelopes</div><div class="tab">LFOs</div><div class="tab">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(3);</script>
+    </div>
+    <div class="border" id="controllers-2">
+    </div>
+  </div>
+
+  <div class="background">
+    <div class="tabs">
+      <script type="text/javascript">make_tabs(4);</script>
     </div>
     <div class="border" id="envelopes">
     </div>
@@ -595,7 +632,7 @@ svg.icon {
 
   <div class="background">
     <div class="tabs">
-      <div class="tab">Synth</div><div class="tab">Effects</div><div class="tab">Controllers</div><div class="tab">Envelopes</div><div class="tab active">LFOs</div><div class="tab">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(5);</script>
     </div>
     <div class="border" id="lfos">
     </div>
@@ -603,7 +640,7 @@ svg.icon {
 
   <div class="background">
     <div class="tabs">
-      <div class="tab">Synth</div><div class="tab">Effects</div><div class="tab">Controllers</div><div class="tab">Envelopes</div><div class="tab">LFOs</div><div class="tab active">About</div><div class="last-tab"><strong>JS80P</strong> (GPLv3)</div>
+      <script type="text/javascript">make_tabs(6);</script>
     </div>
     <div class="border" id="about">
     </div>
@@ -750,30 +787,32 @@ window.onload = function ()
     create_knob("reverb-params", "WET %", "50");
     create_knob("reverb-params", "DRY %", "60");
 
-    for (i = 1; i <= 10; ++i) {
-        d = document.createElement("div");
-        d.setAttribute("class", "main-block block");
-        k1 = document.createElement("div");
-        k1.setAttribute("class", "block");
-        k2 = document.createElement("div");
-        k2.setAttribute("class", "group");
-        k3 = document.createElement("div");
-        k3.setAttribute("class", "group");
-        h = document.createElement("h1");
-        h.innerHTML = "Flexible Controller " + String(i);
-        d.appendChild(h);
-        k1.appendChild(k2);
-        k1.appendChild(k3);
-        d.appendChild(k1);
+    for (o = 0; o <= 1; ++o) {
+        for (i = 1; i <= 10; ++i) {
+            d = document.createElement("div");
+            d.setAttribute("class", "main-block block");
+            k1 = document.createElement("div");
+            k1.setAttribute("class", "block");
+            k2 = document.createElement("div");
+            k2.setAttribute("class", "group");
+            k3 = document.createElement("div");
+            k3.setAttribute("class", "group");
+            h = document.createElement("h1");
+            h.innerHTML = "Flexible Controller " + String(o * 10 + i);
+            d.appendChild(h);
+            k1.appendChild(k2);
+            k1.appendChild(k3);
+            d.appendChild(k1);
 
-        create_knob(k2, "IN %", "50");
-        create_knob(k2, "MIN %", "50");
-        create_knob(k2, "MAX %", "50");
-        create_knob(k3, "AMT %", "50");
-        create_knob(k3, "DIST %", "50");
-        create_knob(k3, "RAND %", "50");
+            create_knob(k2, "IN %", "50");
+            create_knob(k2, "MIN %", "50");
+            create_knob(k2, "MAX %", "50");
+            create_knob(k3, "AMT %", "50");
+            create_knob(k3, "DIST %", "50");
+            create_knob(k3, "RAND %", "50");
 
-        $("controllers").appendChild(d);
+            $("controllers-" + String(o + 1)).appendChild(d);
+        }
     }
 
     for (i = 1; i <= 6; ++i) {

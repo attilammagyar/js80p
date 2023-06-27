@@ -163,7 +163,7 @@ class TabSelector : public TransparentWidget
     public:
         static constexpr int LEFT = 3;
         static constexpr int TOP = 2;
-        static constexpr int WIDTH = 114;
+        static constexpr int WIDTH = 97;
         static constexpr int HEIGHT = 28;
 
         TabSelector(
@@ -221,7 +221,7 @@ class ControllerSelector : public Widget
         {
             public:
                 static constexpr int WIDTH = 240;
-                static constexpr int HEIGHT = 21;
+                static constexpr int HEIGHT = 19;
 
                 Controller(
                     ControllerSelector& controller_selector,

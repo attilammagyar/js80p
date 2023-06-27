@@ -270,6 +270,76 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::F10DST] = "Flexible Controller 10 Distortion (%)",
     [Synth::ParamId::F10RND] = "Flexible Controller 10 Randomness (%)",
 
+    [Synth::ParamId::F11IN] = "Flexible Controller 11 Input (%)",
+    [Synth::ParamId::F11MIN] = "Flexible Controller 11 Minimum Value (%)",
+    [Synth::ParamId::F11MAX] = "Flexible Controller 11 Maximum Value (%)",
+    [Synth::ParamId::F11AMT] = "Flexible Controller 11 Amount (%)",
+    [Synth::ParamId::F11DST] = "Flexible Controller 11 Distortion (%)",
+    [Synth::ParamId::F11RND] = "Flexible Controller 11 Randomness (%)",
+
+    [Synth::ParamId::F12IN] = "Flexible Controller 12 Input (%)",
+    [Synth::ParamId::F12MIN] = "Flexible Controller 12 Minimum Value (%)",
+    [Synth::ParamId::F12MAX] = "Flexible Controller 12 Maximum Value (%)",
+    [Synth::ParamId::F12AMT] = "Flexible Controller 12 Amount (%)",
+    [Synth::ParamId::F12DST] = "Flexible Controller 12 Distortion (%)",
+    [Synth::ParamId::F12RND] = "Flexible Controller 12 Randomness (%)",
+
+    [Synth::ParamId::F13IN] = "Flexible Controller 13 Input (%)",
+    [Synth::ParamId::F13MIN] = "Flexible Controller 13 Minimum Value (%)",
+    [Synth::ParamId::F13MAX] = "Flexible Controller 13 Maximum Value (%)",
+    [Synth::ParamId::F13AMT] = "Flexible Controller 13 Amount (%)",
+    [Synth::ParamId::F13DST] = "Flexible Controller 13 Distortion (%)",
+    [Synth::ParamId::F13RND] = "Flexible Controller 13 Randomness (%)",
+
+    [Synth::ParamId::F14IN] = "Flexible Controller 14 Input (%)",
+    [Synth::ParamId::F14MIN] = "Flexible Controller 14 Minimum Value (%)",
+    [Synth::ParamId::F14MAX] = "Flexible Controller 14 Maximum Value (%)",
+    [Synth::ParamId::F14AMT] = "Flexible Controller 14 Amount (%)",
+    [Synth::ParamId::F14DST] = "Flexible Controller 14 Distortion (%)",
+    [Synth::ParamId::F14RND] = "Flexible Controller 14 Randomness (%)",
+
+    [Synth::ParamId::F15IN] = "Flexible Controller 15 Input (%)",
+    [Synth::ParamId::F15MIN] = "Flexible Controller 15 Minimum Value (%)",
+    [Synth::ParamId::F15MAX] = "Flexible Controller 15 Maximum Value (%)",
+    [Synth::ParamId::F15AMT] = "Flexible Controller 15 Amount (%)",
+    [Synth::ParamId::F15DST] = "Flexible Controller 15 Distortion (%)",
+    [Synth::ParamId::F15RND] = "Flexible Controller 15 Randomness (%)",
+
+    [Synth::ParamId::F16IN] = "Flexible Controller 16 Input (%)",
+    [Synth::ParamId::F16MIN] = "Flexible Controller 16 Minimum Value (%)",
+    [Synth::ParamId::F16MAX] = "Flexible Controller 16 Maximum Value (%)",
+    [Synth::ParamId::F16AMT] = "Flexible Controller 16 Amount (%)",
+    [Synth::ParamId::F16DST] = "Flexible Controller 16 Distortion (%)",
+    [Synth::ParamId::F16RND] = "Flexible Controller 16 Randomness (%)",
+
+    [Synth::ParamId::F17IN] = "Flexible Controller 17 Input (%)",
+    [Synth::ParamId::F17MIN] = "Flexible Controller 17 Minimum Value (%)",
+    [Synth::ParamId::F17MAX] = "Flexible Controller 17 Maximum Value (%)",
+    [Synth::ParamId::F17AMT] = "Flexible Controller 17 Amount (%)",
+    [Synth::ParamId::F17DST] = "Flexible Controller 17 Distortion (%)",
+    [Synth::ParamId::F17RND] = "Flexible Controller 17 Randomness (%)",
+
+    [Synth::ParamId::F18IN] = "Flexible Controller 18 Input (%)",
+    [Synth::ParamId::F18MIN] = "Flexible Controller 18 Minimum Value (%)",
+    [Synth::ParamId::F18MAX] = "Flexible Controller 18 Maximum Value (%)",
+    [Synth::ParamId::F18AMT] = "Flexible Controller 18 Amount (%)",
+    [Synth::ParamId::F18DST] = "Flexible Controller 18 Distortion (%)",
+    [Synth::ParamId::F18RND] = "Flexible Controller 18 Randomness (%)",
+
+    [Synth::ParamId::F19IN] = "Flexible Controller 19 Input (%)",
+    [Synth::ParamId::F19MIN] = "Flexible Controller 19 Minimum Value (%)",
+    [Synth::ParamId::F19MAX] = "Flexible Controller 19 Maximum Value (%)",
+    [Synth::ParamId::F19AMT] = "Flexible Controller 19 Amount (%)",
+    [Synth::ParamId::F19DST] = "Flexible Controller 19 Distortion (%)",
+    [Synth::ParamId::F19RND] = "Flexible Controller 19 Randomness (%)",
+
+    [Synth::ParamId::F20IN] = "Flexible Controller 20 Input (%)",
+    [Synth::ParamId::F20MIN] = "Flexible Controller 20 Minimum Value (%)",
+    [Synth::ParamId::F20MAX] = "Flexible Controller 20 Maximum Value (%)",
+    [Synth::ParamId::F20AMT] = "Flexible Controller 20 Amount (%)",
+    [Synth::ParamId::F20DST] = "Flexible Controller 20 Distortion (%)",
+    [Synth::ParamId::F20RND] = "Flexible Controller 20 Randomness (%)",
+
     [Synth::ParamId::N1AMT] = "Envelope 1 Amount (%)",
     [Synth::ParamId::N1INI] = "Envelope 1 Initial Level (%)",
     [Synth::ParamId::N1DEL] = "Envelope 1 Delay Time (s)",
@@ -551,22 +621,32 @@ GUI::Controller const GUI::CONTROLLERS[] = {
     Controller(82, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_8, "Flexible Controller 8", "FC 8"),
     Controller(83, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_9, "Flexible Controller 9", "FC 9"),
     Controller(84, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_10, "Flexible Controller 10", "FC 10"),
+    Controller(85, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_11, "Flexible Controller 11", "FC 11"),
+    Controller(86, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_12, "Flexible Controller 12", "FC 12"),
+    Controller(87, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_13, "Flexible Controller 13", "FC 13"),
+    Controller(88, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_14, "Flexible Controller 14", "FC 14"),
+    Controller(89, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_15, "Flexible Controller 15", "FC 15"),
+    Controller(90, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_16, "Flexible Controller 16", "FC 16"),
+    Controller(91, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_17, "Flexible Controller 17", "FC 17"),
+    Controller(92, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_18, "Flexible Controller 18", "FC 18"),
+    Controller(93, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_19, "Flexible Controller 19", "FC 19"),
+    Controller(94, ControllerCapability::FLEXIBLE_CONTROLLER, Synth::ControllerId::FLEXIBLE_CONTROLLER_20, "Flexible Controller 20", "FC 20"),
 
-    Controller(85, ControllerCapability::LFO, Synth::ControllerId::LFO_1, "LFO 1", "LFO 1"),
-    Controller(86, ControllerCapability::LFO, Synth::ControllerId::LFO_2, "LFO 2", "LFO 2"),
-    Controller(87, ControllerCapability::LFO, Synth::ControllerId::LFO_3, "LFO 3", "LFO 3"),
-    Controller(88, ControllerCapability::LFO, Synth::ControllerId::LFO_4, "LFO 4", "LFO 4"),
-    Controller(89, ControllerCapability::LFO, Synth::ControllerId::LFO_5, "LFO 5", "LFO 5"),
-    Controller(90, ControllerCapability::LFO, Synth::ControllerId::LFO_6, "LFO 6", "LFO 6"),
-    Controller(91, ControllerCapability::LFO, Synth::ControllerId::LFO_7, "LFO 7", "LFO 7"),
-    Controller(92, ControllerCapability::LFO, Synth::ControllerId::LFO_8, "LFO 8", "LFO 8"),
+    Controller(95, ControllerCapability::LFO, Synth::ControllerId::LFO_1, "LFO 1", "LFO 1"),
+    Controller(96, ControllerCapability::LFO, Synth::ControllerId::LFO_2, "LFO 2", "LFO 2"),
+    Controller(97, ControllerCapability::LFO, Synth::ControllerId::LFO_3, "LFO 3", "LFO 3"),
+    Controller(98, ControllerCapability::LFO, Synth::ControllerId::LFO_4, "LFO 4", "LFO 4"),
+    Controller(99, ControllerCapability::LFO, Synth::ControllerId::LFO_5, "LFO 5", "LFO 5"),
+    Controller(100, ControllerCapability::LFO, Synth::ControllerId::LFO_6, "LFO 6", "LFO 6"),
+    Controller(101, ControllerCapability::LFO, Synth::ControllerId::LFO_7, "LFO 7", "LFO 7"),
+    Controller(102, ControllerCapability::LFO, Synth::ControllerId::LFO_8, "LFO 8", "LFO 8"),
 
-    Controller(93, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_1, "Envelope 1", "ENV 1"),
-    Controller(94, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_2, "Envelope 2", "ENV 2"),
-    Controller(95, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_3, "Envelope 3", "ENV 3"),
-    Controller(96, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_4, "Envelope 4", "ENV 4"),
-    Controller(97, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_5, "Envelope 5", "ENV 5"),
-    Controller(98, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_6, "Envelope 6", "ENV 6"),
+    Controller(103, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_1, "Envelope 1", "ENV 1"),
+    Controller(104, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_2, "Envelope 2", "ENV 2"),
+    Controller(105, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_3, "Envelope 3", "ENV 3"),
+    Controller(106, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_4, "Envelope 4", "ENV 4"),
+    Controller(107, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_5, "Envelope 5", "ENV 5"),
+    Controller(108, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_6, "Envelope 6", "ENV 6"),
 };
 
 
@@ -774,6 +854,16 @@ GUI::Color GUI::controller_id_to_text_color(Synth::ControllerId const controller
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_8:
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_9:
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_10:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_11:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_12:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_13:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_14:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_15:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_16:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_17:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_18:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_19:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_20:
             return CTL_COLOR_FLEX_TEXT;
 
         case Synth::ControllerId::LFO_1:
@@ -826,6 +916,16 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_8:
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_9:
         case Synth::ControllerId::FLEXIBLE_CONTROLLER_10:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_11:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_12:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_13:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_14:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_15:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_16:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_17:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_18:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_19:
+        case Synth::ControllerId::FLEXIBLE_CONTROLLER_20:
             return CTL_COLOR_FLEX_BG;
 
         case Synth::ControllerId::LFO_1:
@@ -942,7 +1042,8 @@ GUI::GUI(
     dummy_widget(NULL),
     background(NULL),
     about_body(NULL),
-    controllers_body(NULL),
+    controllers_1_body(NULL),
+    controllers_2_body(NULL),
     effects_body(NULL),
     envelopes_body(NULL),
     lfos_body(NULL),
@@ -963,7 +1064,8 @@ GUI::GUI(
     );
 
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
-    controllers_image = dummy_widget->load_image(this->platform_data, "CONTROLLERS");
+    controllers_1_image = dummy_widget->load_image(this->platform_data, "CONTROLLERS1");
+    controllers_2_image = dummy_widget->load_image(this->platform_data, "CONTROLLERS2");
     effects_image = dummy_widget->load_image(this->platform_data, "EFFECTS");
     envelopes_image = dummy_widget->load_image(this->platform_data, "ENVELOPES");
     lfos_image = dummy_widget->load_image(this->platform_data, "LFOS");
@@ -983,7 +1085,8 @@ GUI::GUI(
     controller_selector = new ControllerSelector(*background, synth);
 
     build_about_body();
-    build_controllers_body(knob_states);
+    build_controllers_1_body(knob_states);
+    build_controllers_2_body(knob_states);
     build_effects_body(knob_states);
     build_envelopes_body(knob_states);
     build_lfos_body(knob_states);
@@ -1010,10 +1113,19 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            controllers_image,
-            controllers_body,
-            "Controllers",
+            controllers_1_image,
+            controllers_1_body,
+            "Ctls 1-10",
             TabSelector::LEFT + TabSelector::WIDTH * 2
+        )
+    );
+    background->own(
+        new TabSelector(
+            background,
+            controllers_2_image,
+            controllers_2_body,
+            "Ctls 11-20",
+            TabSelector::LEFT + TabSelector::WIDTH * 3
         )
     );
     background->own(
@@ -1022,7 +1134,7 @@ GUI::GUI(
             envelopes_image,
             envelopes_body,
             "Envelopes",
-            TabSelector::LEFT + TabSelector::WIDTH * 3
+            TabSelector::LEFT + TabSelector::WIDTH * 4
         )
     );
     background->own(
@@ -1031,7 +1143,7 @@ GUI::GUI(
             lfos_image,
             lfos_body,
             "LFOs",
-            TabSelector::LEFT + TabSelector::WIDTH * 4
+            TabSelector::LEFT + TabSelector::WIDTH * 5
         )
     );
     background->own(
@@ -1040,7 +1152,7 @@ GUI::GUI(
             about_image,
             about_body,
             "About",
-            TabSelector::LEFT + TabSelector::WIDTH * 5
+            TabSelector::LEFT + TabSelector::WIDTH * 6
         )
     );
 
@@ -1066,102 +1178,201 @@ void GUI::build_about_body()
 }
 
 
-void GUI::build_controllers_body(ParamEditorKnobStates* knob_states)
+void GUI::build_controllers_1_body(ParamEditorKnobStates* knob_states)
 {
-    controllers_body = new TabBody("Controllers");
+    controllers_1_body = new TabBody("Ctls 1-10");
 
-    background->own(controllers_body);
+    background->own(controllers_1_body);
 
-    PE(controllers_body,  21 + PE_W * 0,  44, Synth::ParamId::F1IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 1,  44, Synth::ParamId::F1MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 2,  44, Synth::ParamId::F1MAX,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 0,  44, Synth::ParamId::F1IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 1,  44, Synth::ParamId::F1MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 2,  44, Synth::ParamId::F1MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body,  21 + PE_W * 0, 164, Synth::ParamId::F1AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 1, 164, Synth::ParamId::F1DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 2, 164, Synth::ParamId::F1RND,    MF__C,     "%.2f", 100.0, knob_states);
-
-
-    PE(controllers_body, 211 + PE_W * 0,  44, Synth::ParamId::F2IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 1,  44, Synth::ParamId::F2MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 2,  44, Synth::ParamId::F2MAX,    MF__C,     "%.2f", 100.0, knob_states);
-
-    PE(controllers_body, 211 + PE_W * 0, 164, Synth::ParamId::F2AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 1, 164, Synth::ParamId::F2DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 2, 164, Synth::ParamId::F2RND,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 0, 164, Synth::ParamId::F1AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 1, 164, Synth::ParamId::F1DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 2, 164, Synth::ParamId::F1RND,  MF__C,  "%.2f", 100.0, knob_states);
 
 
-    PE(controllers_body, 401 + PE_W * 0,  44, Synth::ParamId::F3IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 1,  44, Synth::ParamId::F3MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 2,  44, Synth::ParamId::F3MAX,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 0,  44, Synth::ParamId::F2IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 1,  44, Synth::ParamId::F2MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 2,  44, Synth::ParamId::F2MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body, 401 + PE_W * 0, 164, Synth::ParamId::F3AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 1, 164, Synth::ParamId::F3DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 2, 164, Synth::ParamId::F3RND,    MF__C,     "%.2f", 100.0, knob_states);
-
-
-    PE(controllers_body, 591 + PE_W * 0,  44, Synth::ParamId::F4IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 1,  44, Synth::ParamId::F4MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 2,  44, Synth::ParamId::F4MAX,    MF__C,     "%.2f", 100.0, knob_states);
-
-    PE(controllers_body, 591 + PE_W * 0, 164, Synth::ParamId::F4AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 1, 164, Synth::ParamId::F4DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 2, 164, Synth::ParamId::F4RND,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 0, 164, Synth::ParamId::F2AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 1, 164, Synth::ParamId::F2DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 2, 164, Synth::ParamId::F2RND,  MF__C,  "%.2f", 100.0, knob_states);
 
 
-    PE(controllers_body, 781 + PE_W * 0,  44, Synth::ParamId::F5IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 1,  44, Synth::ParamId::F5MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 2,  44, Synth::ParamId::F5MAX,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 0,  44, Synth::ParamId::F3IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 1,  44, Synth::ParamId::F3MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 2,  44, Synth::ParamId::F3MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body, 781 + PE_W * 0, 164, Synth::ParamId::F5AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 1, 164, Synth::ParamId::F5DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 2, 164, Synth::ParamId::F5RND,    MF__C,     "%.2f", 100.0, knob_states);
-
-
-    PE(controllers_body,  21 + PE_W * 0, 324, Synth::ParamId::F6IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 1, 324, Synth::ParamId::F6MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 2, 324, Synth::ParamId::F6MAX,    MF__C,     "%.2f", 100.0, knob_states);
-
-    PE(controllers_body,  21 + PE_W * 0, 444, Synth::ParamId::F6AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 1, 444, Synth::ParamId::F6DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body,  21 + PE_W * 2, 444, Synth::ParamId::F6RND,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 0, 164, Synth::ParamId::F3AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 1, 164, Synth::ParamId::F3DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 2, 164, Synth::ParamId::F3RND,  MF__C,  "%.2f", 100.0, knob_states);
 
 
-    PE(controllers_body, 211 + PE_W * 0, 324, Synth::ParamId::F7IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 1, 324, Synth::ParamId::F7MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 2, 324, Synth::ParamId::F7MAX,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 0,  44, Synth::ParamId::F4IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 1,  44, Synth::ParamId::F4MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 2,  44, Synth::ParamId::F4MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body, 211 + PE_W * 0, 444, Synth::ParamId::F7AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 1, 444, Synth::ParamId::F7DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 211 + PE_W * 2, 444, Synth::ParamId::F7RND,    MF__C,     "%.2f", 100.0, knob_states);
-
-
-    PE(controllers_body, 401 + PE_W * 0, 324, Synth::ParamId::F8IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 1, 324, Synth::ParamId::F8MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 2, 324, Synth::ParamId::F8MAX,    MF__C,     "%.2f", 100.0, knob_states);
-
-    PE(controllers_body, 401 + PE_W * 0, 444, Synth::ParamId::F8AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 1, 444, Synth::ParamId::F8DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 401 + PE_W * 2, 444, Synth::ParamId::F8RND,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 0, 164, Synth::ParamId::F4AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 1, 164, Synth::ParamId::F4DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 2, 164, Synth::ParamId::F4RND,  MF__C,  "%.2f", 100.0, knob_states);
 
 
-    PE(controllers_body, 591 + PE_W * 0, 324, Synth::ParamId::F9IN,     MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 1, 324, Synth::ParamId::F9MIN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 2, 324, Synth::ParamId::F9MAX,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 0,  44, Synth::ParamId::F5IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 1,  44, Synth::ParamId::F5MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 2,  44, Synth::ParamId::F5MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body, 591 + PE_W * 0, 444, Synth::ParamId::F9AMT,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 1, 444, Synth::ParamId::F9DST,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 591 + PE_W * 2, 444, Synth::ParamId::F9RND,    MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 0, 164, Synth::ParamId::F5AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 1, 164, Synth::ParamId::F5DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 2, 164, Synth::ParamId::F5RND,  MF__C,  "%.2f", 100.0, knob_states);
 
 
-    PE(controllers_body, 781 + PE_W * 0, 324, Synth::ParamId::F10IN,    MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 1, 324, Synth::ParamId::F10MIN,   MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 2, 324, Synth::ParamId::F10MAX,   MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 0, 324, Synth::ParamId::F6IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 1, 324, Synth::ParamId::F6MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 2, 324, Synth::ParamId::F6MAX,  MF__C,  "%.2f", 100.0, knob_states);
 
-    PE(controllers_body, 781 + PE_W * 0, 444, Synth::ParamId::F10AMT,   MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 1, 444, Synth::ParamId::F10DST,   MF__C,     "%.2f", 100.0, knob_states);
-    PE(controllers_body, 781 + PE_W * 2, 444, Synth::ParamId::F10RND,   MF__C,     "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 0, 444, Synth::ParamId::F6AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 1, 444, Synth::ParamId::F6DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body,  21 + PE_W * 2, 444, Synth::ParamId::F6RND,  MF__C,  "%.2f", 100.0, knob_states);
 
-    controllers_body->hide();
+
+    PE(controllers_1_body, 211 + PE_W * 0, 324, Synth::ParamId::F7IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 1, 324, Synth::ParamId::F7MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 2, 324, Synth::ParamId::F7MAX,  MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_1_body, 211 + PE_W * 0, 444, Synth::ParamId::F7AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 1, 444, Synth::ParamId::F7DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 211 + PE_W * 2, 444, Synth::ParamId::F7RND,  MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_1_body, 401 + PE_W * 0, 324, Synth::ParamId::F8IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 1, 324, Synth::ParamId::F8MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 2, 324, Synth::ParamId::F8MAX,  MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_1_body, 401 + PE_W * 0, 444, Synth::ParamId::F8AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 1, 444, Synth::ParamId::F8DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 401 + PE_W * 2, 444, Synth::ParamId::F8RND,  MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_1_body, 591 + PE_W * 0, 324, Synth::ParamId::F9IN,   MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 1, 324, Synth::ParamId::F9MIN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 2, 324, Synth::ParamId::F9MAX,  MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_1_body, 591 + PE_W * 0, 444, Synth::ParamId::F9AMT,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 1, 444, Synth::ParamId::F9DST,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 591 + PE_W * 2, 444, Synth::ParamId::F9RND,  MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_1_body, 781 + PE_W * 0, 324, Synth::ParamId::F10IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 1, 324, Synth::ParamId::F10MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 2, 324, Synth::ParamId::F10MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_1_body, 781 + PE_W * 0, 444, Synth::ParamId::F10AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 1, 444, Synth::ParamId::F10DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_1_body, 781 + PE_W * 2, 444, Synth::ParamId::F10RND, MF__C,  "%.2f", 100.0, knob_states);
+
+    controllers_1_body->hide();
+}
+
+
+void GUI::build_controllers_2_body(ParamEditorKnobStates* knob_states)
+{
+    controllers_2_body = new TabBody("Ctls 11-20");
+
+    background->own(controllers_2_body);
+
+    PE(controllers_2_body,  21 + PE_W * 0,  44, Synth::ParamId::F11IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 1,  44, Synth::ParamId::F11MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 2,  44, Synth::ParamId::F11MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body,  21 + PE_W * 0, 164, Synth::ParamId::F11AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 1, 164, Synth::ParamId::F11DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 2, 164, Synth::ParamId::F11RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 211 + PE_W * 0,  44, Synth::ParamId::F12IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 1,  44, Synth::ParamId::F12MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 2,  44, Synth::ParamId::F12MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 211 + PE_W * 0, 164, Synth::ParamId::F12AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 1, 164, Synth::ParamId::F12DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 2, 164, Synth::ParamId::F12RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 401 + PE_W * 0,  44, Synth::ParamId::F13IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 1,  44, Synth::ParamId::F13MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 2,  44, Synth::ParamId::F13MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 401 + PE_W * 0, 164, Synth::ParamId::F13AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 1, 164, Synth::ParamId::F13DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 2, 164, Synth::ParamId::F13RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 591 + PE_W * 0,  44, Synth::ParamId::F14IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 1,  44, Synth::ParamId::F14MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 2,  44, Synth::ParamId::F14MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 591 + PE_W * 0, 164, Synth::ParamId::F14AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 1, 164, Synth::ParamId::F14DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 2, 164, Synth::ParamId::F14RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 781 + PE_W * 0,  44, Synth::ParamId::F15IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 1,  44, Synth::ParamId::F15MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 2,  44, Synth::ParamId::F15MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 781 + PE_W * 0, 164, Synth::ParamId::F15AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 1, 164, Synth::ParamId::F15DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 2, 164, Synth::ParamId::F15RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body,  21 + PE_W * 0, 324, Synth::ParamId::F16IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 1, 324, Synth::ParamId::F16MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 2, 324, Synth::ParamId::F16MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body,  21 + PE_W * 0, 444, Synth::ParamId::F16AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 1, 444, Synth::ParamId::F16DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body,  21 + PE_W * 2, 444, Synth::ParamId::F16RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 211 + PE_W * 0, 324, Synth::ParamId::F17IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 1, 324, Synth::ParamId::F17MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 2, 324, Synth::ParamId::F17MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 211 + PE_W * 0, 444, Synth::ParamId::F17AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 1, 444, Synth::ParamId::F17DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 211 + PE_W * 2, 444, Synth::ParamId::F17RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 401 + PE_W * 0, 324, Synth::ParamId::F18IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 1, 324, Synth::ParamId::F18MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 2, 324, Synth::ParamId::F18MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 401 + PE_W * 0, 444, Synth::ParamId::F18AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 1, 444, Synth::ParamId::F18DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 401 + PE_W * 2, 444, Synth::ParamId::F18RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 591 + PE_W * 0, 324, Synth::ParamId::F19IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 1, 324, Synth::ParamId::F19MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 2, 324, Synth::ParamId::F19MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 591 + PE_W * 0, 444, Synth::ParamId::F19AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 1, 444, Synth::ParamId::F19DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 591 + PE_W * 2, 444, Synth::ParamId::F19RND, MF__C,  "%.2f", 100.0, knob_states);
+
+
+    PE(controllers_2_body, 781 + PE_W * 0, 324, Synth::ParamId::F20IN,  MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 1, 324, Synth::ParamId::F20MIN, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 2, 324, Synth::ParamId::F20MAX, MF__C,  "%.2f", 100.0, knob_states);
+
+    PE(controllers_2_body, 781 + PE_W * 0, 444, Synth::ParamId::F20AMT, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 1, 444, Synth::ParamId::F20DST, MF__C,  "%.2f", 100.0, knob_states);
+    PE(controllers_2_body, 781 + PE_W * 2, 444, Synth::ParamId::F20RND, MF__C,  "%.2f", 100.0, knob_states);
+
+    controllers_2_body->hide();
 }
 
 
@@ -1527,7 +1738,8 @@ GUI::~GUI()
     delete knob_states;
 
     dummy_widget->delete_image(about_image);
-    dummy_widget->delete_image(controllers_image);
+    dummy_widget->delete_image(controllers_1_image);
+    dummy_widget->delete_image(controllers_2_image);
     dummy_widget->delete_image(effects_image);
     dummy_widget->delete_image(envelopes_image);
     dummy_widget->delete_image(lfos_image);

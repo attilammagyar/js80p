@@ -124,7 +124,7 @@ def print_flexible_controllers_params(param_id: int) -> int:
         ("$#RND", " ///< $ # Randomness"),
     ]
 
-    return print_params(param_id, "Flexible Controller", "F", 10, params)
+    return print_params(param_id, "Flexible Controller", "F", 20, params)
 
 
 def print_envelopes_params(param_id: int) -> int:

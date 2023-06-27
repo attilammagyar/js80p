@@ -323,11 +323,11 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 
         top += Controller::HEIGHT;
 
-        if (i == 0 || i == 4 || i == 5 || i == 84 || i == 92) {
+        if (i == 0 || i == 4 || i == 5 || i == 74 || i == 94 || i == 102) {
             top += group_separation;
         }
 
-        if (top > max_top || i == 74) {
+        if (top > max_top || i == 84) {
             top = TITLE_HEIGHT;
             left += Controller::WIDTH;
         }
