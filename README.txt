@@ -18,12 +18,20 @@ System Requirements
  * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
  * RAM: 50-200 MB, depending on buffer size
 
+Dependencies on Linux
+---------------------
+
 On Linux, the "libxcb", "libxcb-render", and "libcairo" libraries, and either
 the "kdialog" or the "zenity" application are required to run JS80P. To install
 them on Debian based distributions (e.g. Ubuntu), you can use the following
 command:
 
     sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
+
+Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
+then you will have to install the 32 bit version of the libraries, for example:
+
+    sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
 
 Installation
 ------------
