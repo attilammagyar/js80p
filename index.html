@@ -55,7 +55,13 @@ h3 {
   margin-top: 12px;
 }
 
-h1, h2, h3 {
+h4 {
+  font-size: 18px;
+  margin: 6px;
+  margin-top: 12px;
+}
+
+h1, h2, h3, h4 {
   font-family: Arial, Sans-serif;
 }
 
@@ -89,6 +95,7 @@ pre {
   background-color: #1c1c22;
   padding: 6px 12px;
   border-radius: 12px;
+  overflow: auto;
 }
 
 div.section {
@@ -359,6 +366,7 @@ div.section > p {
           <li>CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)</li>
           <li>RAM: 50-200 MB, depending on buffer size</li>
         </ul>
+        <h4>Dependencies on Linux</h4>
         <p>
           On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and
           <code>libcairo</code> libraries, and either the <code>kdialog</code> or
@@ -367,6 +375,12 @@ div.section > p {
           following command:
         </p>
         <pre class="code"><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog</code></pre>
+        <p>
+          Note that if you want to run the 32 bit version of JS80P on a 64 bit
+          system, then you will have to install the 32 bit version of the
+          libraries, for example:
+        </p>
+        <pre class="code"><code>sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog</code></pre>
       </div>
 
       <div class="section">
