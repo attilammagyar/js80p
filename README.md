@@ -182,20 +182,16 @@ Frequenctly Asked Questions
 
 ### Which distribution should I download?
 
-Due to how MIDI works in VST 3 plugins, the recommended distribution for most
-people is the 64-bit FST plugin which can be loaded into any 64-bit DAW which
-supports VST 2.4.
+You can either try the 64 bit VST 3 version if your DAW supports VST 3 plugins,
+or you can go with the 64 bit FST version if you prefer VST 2.4.
 
-If your DAW does not support VST 2.4 however, then you will need the 64-bit
-VST 3 plugin.
-
-The 32-bit versions are only needed by those who deliberately use a 32-bit DAW,
+The 32 bit versions are only needed by those who deliberately use a 32 bit DAW,
 e.g. because they want to keep using some really old plugins which are not
-available for 64-bit systems.
+available for 64 bit systems.
 
-If you are in doubt, then try the 64 bit FST version, and if your DAW doesn't
-recognize it, then try the 64 bit VST 3 version, then the 32 bit FST version,
-etc.
+If you are in doubt, then try the 64 bit VST 3 version, and if your DAW doesn't
+recognize it, then try the 64 bit FST version, then the 32 bit VST 3 version,
+and so on.
 
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
