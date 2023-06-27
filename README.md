@@ -25,7 +25,12 @@ Table of Contents
  * [System Requirements](#system)
     * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
+    * [FST (VST 2.4) on Windows](#fst-windows)
+    * [VST 3 on Windows](#vst3-windows)
+    * [FST (VST 2.4) on Linux](#fst-linux)
+    * [VST 3 on Linux](#vst3-linux)
  * [Usage](#usage)
+ * [Presets](#presets)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -75,15 +80,38 @@ then you will have to install the 32 bit version of the libraries, for example:
 Installation
 ------------
 
-1. [Download a plugin archive for your platform](https://attilammagyar.github.io/js80p/).
-2. Extract the ZIP archive.
-3. Depending on which plugin type you downloaded, copy `js80p.dll` on Windows,
-   `js80p.so` on Linux to the folder where you keep your VST 2.4 plugins,
-   or copy `js80p.vst3` (on both Windows and Linux) to your VST 3 folder.
+<a name="fst-windows"></a>
 
-The `presets` folder in the archive contains a few sounds that you can load by
-clicking the _Import Patch_ icon near the top left corner of the main screen of
-the plugin.
+### FST (VST 2.4) on Windows
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy `js80p.dll` to the directory where you keep your VST 2.4 plugins.
+
+<a name="vst3-windows"></a>
+
+### VST 3 on Windows
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy `js80p.vst3` to your VST 3 directory which is usually
+   `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+
+<a name="fst-linux"></a>
+
+### FST (VST 2.4) on Linux
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy `js80p.so` to the directory where you keep your VST 2.4 plugins.
+
+<a name="vst3-linux"></a>
+
+### VST 3 on Linux
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy `js80p.vst3` to your VST 3 directory which is usually `~/.vst3`.
 
 <a name="usage"></a>
 
@@ -102,6 +130,17 @@ Usage
 
  * It is recommended to use a small buffer size for lower latency, for example,
    3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
+
+<a name="presets"></a>
+
+Presets
+-------
+
+JS80P has a few built-in presets, and in case you don't like your DAW's preset
+browser, you can load and save them as ordinary files. For each plugin type,
+you can find these presets in the `presets` folder in the ZIP archive, and you
+can load them into JS80P by clicking on the _Import Patch_ icon near the top
+left corner of the main screen of the plugin.
 
 <a name="bugs"></a>
 
