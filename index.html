@@ -56,7 +56,7 @@ h3 {
 }
 
 h4 {
-  font-size: 18px;
+  font-size: 17px;
   margin: 6px;
   margin-top: 12px;
 }
@@ -102,6 +102,10 @@ div.section {
   max-width: 960px;
 }
 
+div.indent {
+  padding-left: 12px;
+}
+
 p {
   max-width: 960px;
   margin: 6px auto;
@@ -136,8 +140,10 @@ code {
   background-color: #1c1c22;
   padding: 6px 3px;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
+div.indent > p,
 div.section > p {
   padding-left: 18px;
 }
@@ -323,7 +329,9 @@ small {
             <a href="demo/js80p-demo-3.webm">WEBM</a>
         </video>
         <br/>
-        <a href="demo/js80p-demo-3.mp3">MP3</a> |
+        Demo 3: JS80P v1.7.3 in Reaper 6.79
+        <br/>
+        Download: <a href="demo/js80p-demo-3.mp3">MP3</a> |
         <a href="demo/js80p-demo-3.flac">FLAC</a> |
         <a href="demo/js80p-demo-3.mid">MIDI</a> |
         <a href="demo/js80p-demo-3.js80p">patch</a>
@@ -338,7 +346,9 @@ small {
             <a href="demo/js80p-demo-2.webm">WEBM</a>
         </video>
         <br/>
-        <a href="demo/js80p-demo-2.mp3">MP3</a> |
+        Demo 2: JS80P v1.0 in Reaper 4.402
+        <br/>
+        Download: <a href="demo/js80p-demo-2.mp3">MP3</a> |
         <a href="demo/js80p-demo-2.flac">FLAC</a> |
         <a href="demo/js80p-demo-2.mid">MIDI</a> |
         <a href="demo/js80p-demo-2.js80p">patch</a>
@@ -353,7 +363,9 @@ small {
             <a href="demo/js80p-demo-1.webm">WEBM</a>
         </video>
         <br/>
-        <a href="demo/js80p-demo-1.mp3">MP3</a> |
+        Demo 1: JS80P v1.0 in Reaper 4.402
+        <br/>
+        Download: <a href="demo/js80p-demo-1.mp3">MP3</a> |
         <a href="demo/js80p-demo-1.flac">FLAC</a> |
         <a href="demo/js80p-demo-1.mid">MIDI</a> |
         <a href="demo/js80p-demo-1.js80p">patch</a>
@@ -370,42 +382,65 @@ small {
           <li>CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)</li>
           <li>RAM: 50-200 MB, depending on buffer size</li>
         </ul>
-        <h4>Dependencies on Linux</h4>
-        <p>
-          On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and
-          <code>libcairo</code> libraries, and either the <code>kdialog</code> or
-          the <code>zenity</code> application are required to run JS80P. To install
-          them on Debian based distributions (e.g. Ubuntu), you can use the
-          following command:
-        </p>
-        <pre class="code"><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog</code></pre>
-        <p>
-          Note that if you want to run the 32 bit version of JS80P on a 64 bit
-          system, then you will have to install the 32 bit version of the
-          libraries, for example:
-        </p>
-        <pre class="code"><code>sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog</code></pre>
+
+        <div class="indent">
+          <h4>Dependencies on Linux</h4>
+          <p>
+            On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and
+            <code>libcairo</code> libraries, and either the <code>kdialog</code> or
+            the <code>zenity</code> application are required to run JS80P. To install
+            them on Debian based distributions (e.g. Ubuntu), you can use the
+            following command:
+          </p>
+          <pre class="code"><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog</code></pre>
+          <p>
+            Note that if you want to run the 32 bit version of JS80P on a 64 bit
+            system, then you will have to install the 32 bit version of the
+            libraries, for example:
+          </p>
+          <pre class="code"><code>sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog</code></pre>
+        </div>
       </div>
 
       <div class="section">
         <h3>Installation</h3>
-        <ol>
+        <ul>
           <li>
-            <a href="#download">Download a plugin archive for your platform</a>.
+            <h4>FST (VST 2.4) on Windows</h4>
+            <ol>
+              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li>Extract the ZIP archive.</li>
+              <li>Copy <code>js80p.dll</code> to the directory where you keep your VST 2.4 plugins.</li>
+            </ol>
           </li>
-          <li>Extract the ZIP archive.</li>
           <li>
-            Depending on which plugin type you downloaded, copy <code>js80p.dll</code>
-            on Windows, <code>js80p.so</code> on Linux to the folder where you keep
-            your VST 2.4 plugins, or copy <code>js80p.vst3</code> (on both Windows
-            and Linux) to your VST 3 folder.
+            <h4>VST 3 on Windows</h4>
+            <ol>
+              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li>Extract the ZIP archive.</li>
+              <li>
+                Copy <code>js80p.vst3</code> to your VST 3 directory which is usually
+                <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.
+              </li>
+            </ol>
           </li>
-        </ol>
-        <p>
-          The <code>presets</code> folder in the archive contains a few sounds that
-          you can load by clicking the <em>Import Patch</em> icon near the top left
-          corner of the main screen of the plugin.
-        </p>
+          <li>
+            <h4>FST (VST 2.4) on Linux</h4>
+            <ol>
+              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li>Extract the ZIP archive.</li>
+              <li>Copy <code>js80p.so</code> to the directory where you keep your VST 2.4 plugins.</li>
+            </ol>
+          </li>
+          <li>
+            <h4>VST 3 on Linux</h4>
+            <ol>
+              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li>Extract the ZIP archive.</li>
+              <li>Copy <code>js80p.vst3</code> to your VST 3 directory which is usually <code>~/.vst3</code>.</li>
+            </ol>
+          </li>
+        </ul>
       </div>
 
       <div class="section">
@@ -432,6 +467,15 @@ small {
             </p>
           </li>
         </ul>
+      </div>
+
+      <div class="section">
+        <h3>Presets</h3>
+        <p>JS80P has a few built-in presets, and in case you don't like your DAW's preset
+        browser, you can load and save them as ordinary files. For each plugin type,
+        you can find these presets in the <code>presets</code> folder in the ZIP archive, and you
+        can load them into JS80P by clicking on the <em>Import Patch</em> icon near the top
+        left corner of the main screen of the plugin.</p>
       </div>
 
       <div class="section">
@@ -545,20 +589,16 @@ small {
       <div class="section" id="faq-which">
         <h3>Which distribution should I download?</h3>
 
-        <p>Due to how MIDI works in VST 3 plugins, the recommended distribution for most
-        people is the 64-bit FST plugin which can be loaded into any 64-bit DAW which
-        supports VST 2.4.</p>
+        <p>You can either try the 64 bit VST 3 version if your DAW supports VST 3 plugins,
+        or you can go with the 64 bit FST version if you prefer VST 2.4.</p>
 
-        <p>If your DAW does not support VST 2.4 however, then you will need the 64-bit
-        VST 3 plugin.</p>
-
-        <p>The 32-bit versions are only needed by those who deliberately use a 32-bit DAW,
+        <p>The 32 bit versions are only needed by those who deliberately use a 32 bit DAW,
         e.g. because they want to keep using some really old plugins which are not
-        available for 64-bit systems.</p>
+        available for 64 bit systems.</p>
 
-        <p>If you are in doubt, then try the 64 bit FST version, and if your DAW doesn't
-        recognize it, then try the 64 bit VST 3 version, then the 32 bit FST version,
-        etc.</p>
+        <p>If you are in doubt, then try the 64 bit VST 3 version, and if your DAW doesn't
+        recognize it, then try the 64 bit FST version, then the 32 bit VST 3 version,
+        and so on.</p>
 
         <p>Note that all versions use the same high-precision sound synthesis engine
         internally, so the CPU architecture does not affect the sound quality.</p>
