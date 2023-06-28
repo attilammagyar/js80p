@@ -819,7 +819,7 @@ FstPlugin::Parameter::Parameter()
     : midi_controller(NULL),
     name("unknown"),
     controller_id(0),
-    // change_index(-1),
+    // change_index(-1), /* See FstPlugin::generate_samples() */
     value(0.5f),
     is_dirty_(false)
 {
@@ -833,7 +833,7 @@ FstPlugin::Parameter::Parameter(
 ) : midi_controller(midi_controller),
     name(name),
     controller_id(controller_id),
-    // change_index(-1),
+    // change_index(-1), /* See FstPlugin::generate_samples() */
     value(0.5f),
     is_dirty_(false)
 {
@@ -844,7 +844,7 @@ FstPlugin::Parameter::Parameter(Parameter const& parameter)
     : midi_controller(parameter.midi_controller),
     name(parameter.name),
     controller_id(parameter.controller_id),
-    // change_index(-1),
+    // change_index(-1), /* See FstPlugin::generate_samples() */
     value(parameter.value),
     is_dirty_(parameter.is_dirty_)
 {
@@ -855,7 +855,7 @@ FstPlugin::Parameter::Parameter(Parameter const&& parameter)
     : midi_controller(parameter.midi_controller),
     name(parameter.name),
     controller_id(parameter.controller_id),
-    // change_index(-1),
+    // change_index(-1), /* See FstPlugin::generate_samples() */
     value(parameter.value),
     is_dirty_(parameter.is_dirty_)
 {
@@ -869,7 +869,7 @@ FstPlugin::Parameter& FstPlugin::Parameter::operator=(
         midi_controller = parameter.midi_controller;
         name = parameter.name;
         controller_id = parameter.controller_id;
-        // change_index = parameter.change_index;
+        // change_index = parameter.change_index; /* See FstPlugin::generate_samples() */
         value = parameter.value;
         is_dirty_ = parameter.is_dirty_;
     }
@@ -885,7 +885,7 @@ FstPlugin::Parameter& FstPlugin::Parameter::operator=(
         midi_controller = parameter.midi_controller;
         name = parameter.name;
         controller_id = parameter.controller_id;
-        // change_index = parameter.change_index;
+        // change_index = parameter.change_index; /* See FstPlugin::generate_samples() */
         value = parameter.value;
         is_dirty_ = parameter.is_dirty_;
     }
@@ -912,6 +912,7 @@ Midi::Controller FstPlugin::Parameter::get_controller_id() const noexcept
 }
 
 
+/* See FstPlugin::generate_samples() */
 // bool FstPlugin::Parameter::needs_host_update() const noexcept
 // {
     // if (UNLIKELY(midi_controller == NULL)) {
@@ -930,6 +931,7 @@ float FstPlugin::Parameter::get_value() noexcept
 
     float const value = (float)midi_controller->get_value();
 
+    /* See FstPlugin::generate_samples() */
     // change_index=  midi_controller->get_change_index();
 
     return value;
