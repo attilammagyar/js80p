@@ -36,10 +36,28 @@ main()
         for architecture in "32" "64"
         do
             info="plugin_type='$plugin_type', architecture='$architecture'"
-            run_test_wine "$src_dir" "$plugin_type" "$suffix" "$architecture" "platform='wine', $info"
-            run_test_linux "$src_dir" "$plugin_type" "$suffix" "$architecture" "platform='linux', $info"
+
+            run_test_wine \
+                "$src_dir" \
+                "-windows-${architecture}bit" \
+                "$plugin_type" \
+                "$suffix" \
+                "$architecture" \
+                "platform='wine', $info"
+
+            run_test_linux \
+                "$src_dir" \
+                "-linux-${architecture}bit" \
+                "$plugin_type" \
+                "$suffix" \
+                "$architecture" \
+                "platform='linux', $info"
         done
     done
+
+    info="plugin_type='vst3', architecture='64'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "64" "platform='wine', $info"
+    run_test_linux "$src_dir" "" "vst3" "_bundle" "64" "platform='linux', $info"
 
     return 0
 }
@@ -48,10 +66,11 @@ main()
 run_test_wine()
 {
     local src_dir="$1"
-    local plugin_type="$2"
-    local suffix="$3"
-    local architecture="$4"
-    local msg_info="$5"
+    local infix="$2"
+    local plugin_type="$3"
+    local suffix="$4"
+    local architecture="$5"
+    local msg_info="$6"
     local reaper_exe="$WINE_DIR/reaper$architecture/reaper.exe"
     local rendered_wav="$WINE_TEST_DIR/test.wav"
 
@@ -60,7 +79,7 @@ run_test_wine()
     rm -vrf "$WINE_TEST_DIR"/{test.{rpp,wav},js80p.{dll,vst3}}
     cp -v "$src_dir/smoke-test-"$plugin_type".rpp" "$WINE_TEST_DIR/test.rpp"
     cp -vr \
-        "$src_dir/../.."/dist/js80p-*-windows-"$architecture"bit-"$plugin_type$suffix"/js80p.* \
+        "$src_dir/../.."/dist/js80p-*$infix-"$plugin_type$suffix"/js80p.* \
         "$WINE_TEST_DIR/"
 
     if [[ ! -f "$reaper_exe" ]]
@@ -80,10 +99,11 @@ run_test_wine()
 run_test_linux()
 {
     local src_dir="$1"
-    local plugin_type="$2"
-    local suffix="$3"
-    local architecture="$4"
-    local msg_info="$5"
+    local infix="$2"
+    local plugin_type="$3"
+    local suffix="$4"
+    local architecture="$5"
+    local msg_info="$6"
     local reaper_exe=~/"reaper$architecture/reaper"
     local rendered_wav="$LINUX_TEST_DIR/test.wav"
 
@@ -96,7 +116,7 @@ run_test_linux()
         "s|RENDER_FILE \"[^\"]*\"|RENDER_FILE \"$LINUX_TEST_DIR/test.wav\"|" \
         "$LINUX_TEST_DIR/test.rpp"
     cp -vr \
-        "$src_dir/../.."/dist/js80p-*-linux-"$architecture"bit-"$plugin_type$suffix"/js80p.* \
+        "$src_dir/../.."/dist/js80p-*$infix-"$plugin_type$suffix"/js80p.* \
         "$LINUX_TEST_DIR/"
 
     if [[ ! -x "$reaper_exe" ]]

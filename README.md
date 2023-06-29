@@ -25,10 +25,12 @@ Table of Contents
  * [System Requirements](#system)
     * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
-    * [FST (VST 2.4) on Windows](#fst-windows)
+    * [VST 3 Bundle on Windows](#vst3-bundle-windows)
+    * [VST 3 Bundle on Linux](#vst3-bundle-linux)
     * [VST 3 Single File on Windows](#vst3-single-windows)
-    * [FST (VST 2.4) on Linux](#fst-linux)
     * [VST 3 Single File on Linux](#vst3-single-linux)
+    * [FST (VST 2.4) on Windows](#fst-windows)
+    * [FST (VST 2.4) on Linux](#fst-linux)
  * [Usage](#usage)
  * [Presets](#presets)
  * [Bugs](#bugs)
@@ -58,7 +60,7 @@ System Requirements
  * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
  * RAM: 50-200 MB, depending on buffer size
 
-Tested with [REAPER](https://www.reaper.fm/) 6.78.
+Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
 <a name="linux-deps"></a>
 
@@ -81,14 +83,33 @@ then you will have to install the 32 bit version of the libraries, for example:
 Installation
 ------------
 
-<a name="fst-windows"></a>
+If your plugin host application does not support VST 3, but does support VST
+2.4, then you have to download and install the FST version of JS80P. Otherwise,
+you should go with the VST 3 bundle on all supported operating systems.
 
-### FST (VST 2.4) on Windows
+If your plugin host application fails to recognize JS80P from the VST 3 bundle,
+then you have to download and install the VST 3 Single File version that
+matches the CPU architecture for which your plugin host application was built.
+(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+recognize VST 3 bundles when running on a 64 bit system.)
+
+<a name="vst3-bundle-windows"></a>
+
+### VST 3 Bundle on Windows
 
 1. [Download the plugin](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
-3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
-   plugins.
+3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
+   usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+
+<a name="vst3-bundle-linux"></a>
+
+### VST 3 Bundle on Linux
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
+   usually `~/.vst3`.
 
 <a name="vst3-single-windows"></a>
 
@@ -99,15 +120,6 @@ Installation
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
-<a name="fst-linux"></a>
-
-### FST (VST 2.4) on Linux
-
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
-2. Extract the ZIP archive.
-3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
-   plugins.
-
 <a name="vst3-single-linux"></a>
 
 ### VST 3 Single File on Linux
@@ -116,6 +128,24 @@ Installation
 2. Extract the ZIP archive.
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
+
+<a name="fst-windows"></a>
+
+### FST (VST 2.4) on Windows
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
+   plugins.
+
+<a name="fst-linux"></a>
+
+### FST (VST 2.4) on Linux
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
+   plugins.
 
 <a name="usage"></a>
 
@@ -140,11 +170,11 @@ Usage
 Presets
 -------
 
-JS80P has a few built-in presets, and in case you don't like your DAW's preset
-browser, you can load and save them as ordinary files. For each plugin type,
-you can find these presets in the `presets` folder in the ZIP archive, and you
-can load them into JS80P by clicking on the _Import Patch_ icon near the top
-left corner of the main screen of the plugin.
+JS80P has a few built-in presets, and in case you don't like your plugin host
+application's preset browser, you can load and save them as ordinary files. For
+each plugin type, you can find these presets in the `presets` folder in the ZIP
+archive, and you can load them into JS80P by clicking on the _Import Patch_
+icon near the top left corner of the main screen of the plugin.
 
 <a name="bugs"></a>
 
@@ -225,16 +255,23 @@ Frequenctly Asked Questions
 
 ### Which distribution should I download?
 
-You can either try the 64 bit VST 3 version if your DAW supports VST 3 plugins,
-or you can go with the 64 bit FST version if you prefer VST 2.4.
+If your plugin host application does not support VST 3, but does support VST
+2.4, then you have to download and install the FST version of JS80P. Otherwise,
+you should go with the VST 3 bundle on all supported operating systems.
 
-The 32 bit versions are only needed by those who deliberately use a 32 bit DAW,
-e.g. because they want to keep using some really old plugins which are not
-available for 64 bit systems.
+If your plugin host application fails to recognize JS80P from the VST 3 bundle,
+then you have to download and install the VST 3 Single File version that
+matches the CPU architecture for which your plugin host application was built.
+(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+recognize VST 3 bundles when running on a 64 bit system.)
 
-If you are in doubt, then try the 64 bit VST 3 version, and if your DAW doesn't
-recognize it, then try the 64 bit FST version, then the 32 bit VST 3 version,
-and so on.
+The 32 bit versions are usually only needed by those who deliberately use a 32
+bit plugin host application, e.g. because they want to keep using some really
+old plugins which are not available for 64 bit systems.
+
+If you are in doubt, then try the VST 3 bundle, and if your plugin host
+application doesn't recognize it, then try the 64 bit VST 3 version, then the
+64 bit FST version, then the 32 bit VST 3 version, and so on.
 
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.

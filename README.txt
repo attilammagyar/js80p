@@ -33,13 +33,18 @@ then you will have to install the 32 bit version of the libraries, for example:
 
     sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
 
-Installing the FST (VST 2.4) Version on Windows
------------------------------------------------
+Before Installing
+-----------------
 
-1. Download JS80P from its website at https://attilammagyar.github.io/js80p
-2. Extract the ZIP archive.
-3. Copy the "js80p.dll" file to the directory where you keep your VST 2.4
-   plugins.
+If your plugin host application does not support VST 3, but does support VST
+2.4, then you have to download and install the FST version of JS80P. Otherwise,
+you should go with the VST 3 bundle on all supported operating systems.
+
+If your plugin host application fails to recognize JS80P from the VST 3 bundle,
+then you have to download and install the VST 3 Single File version that
+matches the CPU architecture for which your plugin host application was built.
+(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+recognize VST 3 bundles when running on a 64 bit system.)
 
 Installing the VST 3 Single File Version on Windows
 ---------------------------------------------------
@@ -49,14 +54,6 @@ Installing the VST 3 Single File Version on Windows
 3. Copy the "js80p.vst3" file to your VST 3 directory which is usually
    "C:\Users\YourUserName\AppData\Local\Programs\Common\VST3".
 
-Installing the FST (VST 2.4) Version on Linux
----------------------------------------------
-
-1. Download JS80P from its website at https://attilammagyar.github.io/js80p
-2. Extract the ZIP archive.
-3. Copy the "js80p.so" file to the directory where you keep your VST 2.4
-   plugins.
-
 Installing the VST 3 Single File Version on Linux
 -------------------------------------------------
 
@@ -64,6 +61,22 @@ Installing the VST 3 Single File Version on Linux
 2. Extract the ZIP archive.
 3. Copy the "js80p.vst3" file to your VST 3 directory which is usually
    "~/.vst3".
+
+Installing the FST (VST 2.4) Version on Windows
+-----------------------------------------------
+
+1. Download JS80P from its website at https://attilammagyar.github.io/js80p
+2. Extract the ZIP archive.
+3. Copy the "js80p.dll" file to the directory where you keep your VST 2.4
+   plugins.
+
+Installing the FST (VST 2.4) Version on Linux
+---------------------------------------------
+
+1. Download JS80P from its website at https://attilammagyar.github.io/js80p
+2. Extract the ZIP archive.
+3. Copy the "js80p.so" file to the directory where you keep your VST 2.4
+   plugins.
 
 Usage
 -----

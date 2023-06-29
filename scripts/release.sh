@@ -60,7 +60,6 @@ main()
     log "Cleaning up"
 
     cleanup "$DIST_DIR_BASE"
-    cleanup "$DIST_DIR_BASE/$source_dir"
 
     log "Copying source"
 
@@ -108,6 +107,8 @@ main()
         package_fst "$target_platform" "$version_str"
         package_vst3_single_file "$target_platform" "$version_str"
     done
+
+    package_vst3_bundle "$version_as_file_name"
 
     log "Done"
 }
@@ -259,6 +260,58 @@ package_vst3_single_file()
     else
         finalize_package "$dist_dir" ""
     fi
+}
+
+package_vst3_bundle()
+{
+    local version_as_file_name="$1"
+    local dist_dir="js80p-$version_as_file_name-vst3_bundle"
+    local vst3_base_dir="$DIST_DIR_BASE/$dist_dir"
+    local proc_id
+    local doc_dir="$vst3_base_dir/js80p.vst3/Resources/Documentation"
+
+    proc_id="$(get_vst3_snapshot_id)"
+
+    mkdir --verbose --parents "$vst3_base_dir/js80p.vst3/Contents"
+    mkdir --verbose --parents "$vst3_base_dir/js80p.vst3/Resources/Snapshots"
+    mkdir --verbose --parents "$doc_dir"
+
+    cp --verbose "js80p.png" "$vst3_base_dir/js80p.vst3/Resources/Snapshots/${proc_id}_snapshot.png"
+
+    copy_vst3 "$version_as_file_name" "linux-32bit" "$vst3_base_dir" "i686-linux" "js80p.so"
+    copy_vst3 "$version_as_file_name" "linux-64bit" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+    copy_vst3 "$version_as_file_name" "windows-32bit" "$vst3_base_dir" "x86-win" "js80p.vst3"
+    copy_vst3 "$version_as_file_name" "windows-64bit" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+
+    for src_file in $TEXT_FILES
+    do
+        dst_file="$doc_dir/$src_file"
+        convert_text_file "$src_file" "$dst_file"
+    done
+
+    finalize_package "$dist_dir" "convert"
+}
+
+get_vst3_snapshot_id()
+{
+    grep "Vst3Plugin::Processor::ID(.*);" src/plugin/vst3/plugin.cpp \
+        | sed -r "s/^.*\\((.*)\\).*/\\1/g ; s/^0x//g ; s/, 0x//g" \
+        | tr [[:lower:]] [[:upper:]]
+}
+
+copy_vst3()
+{
+    local version_as_file_name="$1"
+    local src_dir="$2"
+    local base_dir="$3"
+    local dst_dir="$4"
+    local dst_file="$5"
+    local dir="$base_dir/js80p.vst3/Contents/$dst_dir"
+
+    mkdir --verbose --parents "$dir"
+    cp --verbose \
+        "$DIST_DIR_BASE/js80p-$version_as_file_name-$src_dir-vst3_single_file/js80p.vst3" \
+        "$dir/$dst_file"
 }
 
 main "$@"
