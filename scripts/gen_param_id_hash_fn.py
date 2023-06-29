@@ -376,6 +376,12 @@ params = [
     "CF2LOG",
     "EF1LOG",
     "EF2LOG",
+    "N1DYN",
+    "N2DYN",
+    "N3DYN",
+    "N4DYN",
+    "N5DYN",
+    "N6DYN",
 ]
 
 

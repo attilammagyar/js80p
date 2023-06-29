@@ -953,8 +953,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x80;
                 static constexpr Integer MASK = 0x7f;
-                static constexpr Integer MULTIPLIER = 125123;
-                static constexpr Integer SHIFT = 14;
+                static constexpr Integer MULTIPLIER = 1443;
+                static constexpr Integer SHIFT = 10;
 
                 static Integer hash(std::string const& name) noexcept;
 
