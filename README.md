@@ -26,9 +26,9 @@ Table of Contents
     * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
     * [FST (VST 2.4) on Windows](#fst-windows)
-    * [VST 3 on Windows](#vst3-windows)
+    * [VST 3 Single File on Windows](#vst3-single-windows)
     * [FST (VST 2.4) on Linux](#fst-linux)
-    * [VST 3 on Linux](#vst3-linux)
+    * [VST 3 Single File on Linux](#vst3-single-linux)
  * [Usage](#usage)
  * [Presets](#presets)
  * [Bugs](#bugs)
@@ -86,15 +86,16 @@ Installation
 
 1. [Download the plugin](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
-3. Copy `js80p.dll` to the directory where you keep your VST 2.4 plugins.
+3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
+   plugins.
 
-<a name="vst3-windows"></a>
+<a name="vst3-single-windows"></a>
 
-### VST 3 on Windows
+### VST 3 Single File on Windows
 
 1. [Download the plugin](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
-3. Copy `js80p.vst3` to your VST 3 directory which is usually
+3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
 <a name="fst-linux"></a>
@@ -103,15 +104,17 @@ Installation
 
 1. [Download the plugin](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
-3. Copy `js80p.so` to the directory where you keep your VST 2.4 plugins.
+3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
+   plugins.
 
-<a name="vst3-linux"></a>
+<a name="vst3-single-linux"></a>
 
-### VST 3 on Linux
+### VST 3 Single File on Linux
 
 1. [Download the plugin](https://attilammagyar.github.io/js80p/).
 2. Extract the ZIP archive.
-3. Copy `js80p.vst3` to your VST 3 directory which is usually `~/.vst3`.
+3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
+   `~/.vst3`.
 
 <a name="usage"></a>
 

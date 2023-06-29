@@ -6,9 +6,6 @@ set -u
 set -o pipefail
 
 
-PLUGIN_TYPES="fst vst3"
-ARCHITECTURES="32 64"
-
 WINE_DIR=~/.wine/drive_c
 WINE_TEST_DIR="$WINE_DIR"/test
 
@@ -20,18 +17,27 @@ main()
     local self="$1"
     local src_dir
     local plugin_type
+    local suffix
     local architecture
     local info
 
     src_dir="$(dirname "$self")"
 
-    for plugin_type in $PLUGIN_TYPES
+    for plugin_type in "fst" "vst3_single_file"
     do
-        for architecture in $ARCHITECTURES
+        if [[ $plugin_type =~ _ ]]
+        then
+            suffix="_$(printf "%s" "$plugin_type" | cut -d"_" -f2-)"
+            plugin_type="$(printf "%s" "$plugin_type" | cut -d"_" -f1)"
+        else
+            suffix=""
+        fi
+
+        for architecture in "32" "64"
         do
             info="plugin_type='$plugin_type', architecture='$architecture'"
-            run_test_wine "$src_dir" "$plugin_type" "$architecture" "platform='wine', $info"
-            run_test_linux "$src_dir" "$plugin_type" "$architecture" "platform='linux', $info"
+            run_test_wine "$src_dir" "$plugin_type" "$suffix" "$architecture" "platform='wine', $info"
+            run_test_linux "$src_dir" "$plugin_type" "$suffix" "$architecture" "platform='linux', $info"
         done
     done
 
@@ -43,17 +49,18 @@ run_test_wine()
 {
     local src_dir="$1"
     local plugin_type="$2"
-    local architecture="$3"
-    local msg_info="$4"
+    local suffix="$3"
+    local architecture="$4"
+    local msg_info="$5"
     local reaper_exe="$WINE_DIR/reaper$architecture/reaper.exe"
     local rendered_wav="$WINE_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
 
-    rm -vf "$WINE_TEST_DIR"/{test.{rpp,wav},js80p.{dll,vst3}}
+    rm -vrf "$WINE_TEST_DIR"/{test.{rpp,wav},js80p.{dll,vst3}}
     cp -v "$src_dir/smoke-test-"$plugin_type".rpp" "$WINE_TEST_DIR/test.rpp"
-    cp -v \
-        "$src_dir/../.."/dist/js80p-*-windows-"$architecture"bit-"$plugin_type"/js80p.* \
+    cp -vr \
+        "$src_dir/../.."/dist/js80p-*-windows-"$architecture"bit-"$plugin_type$suffix"/js80p.* \
         "$WINE_TEST_DIR/"
 
     if [[ ! -f "$reaper_exe" ]]
@@ -74,21 +81,22 @@ run_test_linux()
 {
     local src_dir="$1"
     local plugin_type="$2"
-    local architecture="$3"
-    local msg_info="$4"
+    local suffix="$3"
+    local architecture="$4"
+    local msg_info="$5"
     local reaper_exe=~/"reaper$architecture/reaper"
     local rendered_wav="$LINUX_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
 
-    rm -vf "$LINUX_TEST_DIR"/{test.{rpp,wav},js80p.{so,vst3}}
+    rm -vrf "$LINUX_TEST_DIR"/{test.{rpp,wav},js80p.{so,vst3}}
     mkdir -v -p "$LINUX_TEST_DIR"
     cp -v "$src_dir/smoke-test-"$plugin_type".rpp" "$LINUX_TEST_DIR/test.rpp"
     sed -i \
         "s|RENDER_FILE \"[^\"]*\"|RENDER_FILE \"$LINUX_TEST_DIR/test.wav\"|" \
         "$LINUX_TEST_DIR/test.rpp"
-    cp -v \
-        "$src_dir/../.."/dist/js80p-*-linux-"$architecture"bit-"$plugin_type"/js80p.* \
+    cp -vr \
+        "$src_dir/../.."/dist/js80p-*-linux-"$architecture"bit-"$plugin_type$suffix"/js80p.* \
         "$LINUX_TEST_DIR/"
 
     if [[ ! -x "$reaper_exe" ]]

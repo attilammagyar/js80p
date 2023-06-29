@@ -8,6 +8,7 @@ set -o pipefail
 TARGET_PLATFORMS="x86_64-w64-mingw32 i686-w64-mingw32 x86_64-gpp i686-gpp"
 PLUGIN_TYPES="fst vst3"
 TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
+DIST_DIR_BASE="dist"
 
 main()
 {
@@ -17,12 +18,8 @@ main()
     local target_platform
     local source_dir
     local source_archive
-    local dist_dir
-    local dist_archive
     local uncommitted
     local date
-    local src_file
-    local dst_file
 
     log "Verifying repository"
 
@@ -62,12 +59,12 @@ main()
 
     log "Cleaning up"
 
-    cleanup "dist"
-    cleanup "dist/$source_dir"
+    cleanup "$DIST_DIR_BASE"
+    cleanup "$DIST_DIR_BASE/$source_dir"
 
     log "Copying source"
 
-    mkdir -p "dist/$source_dir"
+    mkdir -p "$DIST_DIR_BASE/$source_dir"
     cp --verbose --recursive \
         build.bat \
         build.ps1 \
@@ -87,13 +84,13 @@ main()
         src \
         tests \
         NEWS.txt \
-        "dist/$source_dir/"
+        "$DIST_DIR_BASE/$source_dir/"
 
-    find "dist/$source_dir/" -name ".*.swp" -delete
+    find "$DIST_DIR_BASE/$source_dir/" -name ".*.swp" -delete
 
     log "Creating source archive"
 
-    cd dist
+    cd "$DIST_DIR_BASE"
     zip --recurse-paths -9 "$source_archive" "$source_dir"
     cd ..
 
@@ -108,34 +105,8 @@ main()
         call_make "$target_platform" "$version_str" clean
         call_make "$target_platform" "$version_str" all
 
-        for plugin_type in $PLUGIN_TYPES
-        do
-            dist_dir="$(call_make "$target_platform" "$version_str" show_dist_dir_prefix)-$plugin_type"
-            dist_dir="$(basename "$dist_dir")"
-            dist_archive="$dist_dir.zip"
-
-            log "Copying presets, etc. to dist/$dist_dir"
-
-            cp --verbose --recursive presets "dist/$dist_dir/"
-
-            if [[ "$target_platform" =~ "-mingw32" ]]
-            then
-                for src_file in $TEXT_FILES
-                do
-                    dst_file="dist/$dist_dir/$src_file"
-                    printf "Converting %s to %s\n" "$src_file" "$dst_file"
-                    cat "$src_file" | sed 's/$/\r/g' >"$dst_file"
-                done
-            else
-                cp --verbose $TEXT_FILES "dist/$dist_dir/"
-            fi
-
-            log "Creating release archive: dist/$dist_archive"
-
-            cd dist
-            zip --recurse-paths -9 "$dist_archive" "$dist_dir"
-            cd ..
-        done
+        package_fst "$target_platform" "$version_str"
+        package_vst3_single_file "$target_platform" "$version_str"
     done
 
     log "Done"
@@ -206,6 +177,88 @@ call_make()
         VERSION_INT="$version_int" \
         VERSION_AS_FILE_NAME="$version_as_file_name" \
         make "$@"
+}
+
+package_fst()
+{
+    local target_platform="$1"
+    local version_str="$2"
+    local dist_dir
+
+    dist_dir=$(get_dist_dir "$target_platform" "$version_str" "show_fst_dir")
+
+    if [[ "$target_platform" =~ "-mingw32" ]]
+    then
+        finalize_package "$dist_dir" "convert"
+    else
+        finalize_package "$dist_dir" ""
+    fi
+}
+
+get_dist_dir()
+{
+    local target_platform="$1"
+    local version_str="$2"
+    local make_target="$3"
+
+    basename "$(call_make "$target_platform" "$version_str" "$make_target")"
+}
+
+finalize_package()
+{
+    local dist_dir="$1"
+    local convert_newlines="$2"
+    local dist_archive
+    local src_file
+    local dst_file
+
+    log "Copying presets, etc. to $DIST_DIR_BASE/$dist_dir"
+
+    cp --verbose --recursive presets "$DIST_DIR_BASE/$dist_dir/"
+
+    if [[ "$convert_newlines" = "convert" ]]
+    then
+        for src_file in $TEXT_FILES
+        do
+            dst_file="$DIST_DIR_BASE/$dist_dir/$src_file"
+            convert_text_file "$src_file" "$dst_file"
+        done
+    else
+        cp --verbose $TEXT_FILES "$DIST_DIR_BASE/$dist_dir/"
+    fi
+
+    dist_archive="$dist_dir.zip"
+
+    log "Creating release archive: $DIST_DIR_BASE/$dist_archive"
+
+    cd dist
+    zip --recurse-paths -9 "$dist_archive" "$dist_dir"
+    cd ..
+}
+
+convert_text_file()
+{
+    local src_file="$1"
+    local dst_file="$2"
+
+    printf "Converting %s to %s\n" "$src_file" "$dst_file"
+    cat "$src_file" | sed 's/$/\r/g' >"$dst_file"
+}
+
+package_vst3_single_file()
+{
+    local target_platform="$1"
+    local version_str="$2"
+    local dist_dir
+
+    dist_dir=$(get_dist_dir "$target_platform" "$version_str" "show_vst3_dir")
+
+    if [[ "$target_platform" =~ "-mingw32" ]]
+    then
+        finalize_package "$dist_dir" "convert"
+    else
+        finalize_package "$dist_dir" ""
+    fi
 }
 
 main "$@"

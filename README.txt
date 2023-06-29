@@ -38,14 +38,15 @@ Installing the FST (VST 2.4) Version on Windows
 
 1. Download JS80P from its website at https://attilammagyar.github.io/js80p
 2. Extract the ZIP archive.
-3. Copy "js80p.dll" to the directory where you keep your VST 2.4 plugins.
+3. Copy the "js80p.dll" file to the directory where you keep your VST 2.4
+   plugins.
 
-Installing the VST 3 Version on Windows
----------------------------------------
+Installing the VST 3 Single File Version on Windows
+---------------------------------------------------
 
 1. Download JS80P from its website at https://attilammagyar.github.io/js80p
 2. Extract the ZIP archive.
-3. Copy "js80p.vst3" to your VST 3 directory which is usually
+3. Copy the "js80p.vst3" file to your VST 3 directory which is usually
    "C:\Users\YourUserName\AppData\Local\Programs\Common\VST3".
 
 Installing the FST (VST 2.4) Version on Linux
@@ -53,14 +54,16 @@ Installing the FST (VST 2.4) Version on Linux
 
 1. Download JS80P from its website at https://attilammagyar.github.io/js80p
 2. Extract the ZIP archive.
-3. Copy "js80p.so" to the directory where you keep your VST 2.4 plugins.
+3. Copy the "js80p.so" file to the directory where you keep your VST 2.4
+   plugins.
 
-Installing the VST 3 Version on Linux
--------------------------------------
+Installing the VST 3 Single File Version on Linux
+-------------------------------------------------
 
 1. Download JS80P from its website at https://attilammagyar.github.io/js80p
 2. Extract the ZIP archive.
-3. Copy "js80p.vst3" to your VST 3 directory which is usually "~/.vst3".
+3. Copy the "js80p.vst3" file to your VST 3 directory which is usually
+   "~/.vst3".
 
 Usage
 -----
