@@ -260,14 +260,15 @@ $(DOC_DIR):
 
 clean:
 	$(RM) \
+		$(DEV_PLATFORM_CLEAN) \
 		$(FST) \
 		$(FST_OBJS) \
-		$(VST3) \
-		$(VST3_OBJS) \
-		$(TEST_BINS) \
 		$(GUI_PLAYGROUND) \
 		$(GUI_PLAYGROUND_OBJS) \
-		$(PERF_TEST_BINS)
+		$(PERF_TEST_BINS) \
+		$(TEST_BINS) \
+		$(VST3) \
+		$(VST3_OBJS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
 check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)

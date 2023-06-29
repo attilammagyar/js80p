@@ -12,6 +12,22 @@ VST3_PLUGIN_SOURCES = \
 	src/plugin/vst3/plugin.cpp \
 	src/plugin/vst3/plugin-xcb.cpp
 
+VST3_MODULE_INFO_TOOL = $(BUILD_DIR)$(DIR_SEP)vst3_module_info_tool
+VST3_MODULE_INFO_LFLAGS = -pthread -Wl,--no-as-needed -ldl
+
+DEV_PLATFORM_CLEAN = $(VST3_MODULE_INFO_TOOL)
+
+.PHONY: vst3moduleinfo
+
+vst3moduleinfo: $(VST3_MODULE_INFO_TOOL)
+
+$(VST3_MODULE_INFO_TOOL): src/plugin/vst3/moduleinfo.cpp | $(BUILD_DIR)
+	$(CPP_TARGET_PLATFORM) \
+		$(JS80P_CXXINCS) $(VST3_CXXINCS) $(VST3_CXXFLAGS) $(JS80P_CXXFLAGS) \
+		-std=c++17 \
+		$(VST3_MODULE_INFO_LFLAGS) \
+		$< -o $@
+
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX)
 GUI_PLAYGROUND_SOURCES = src/gui/xcb-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/xcb.hpp

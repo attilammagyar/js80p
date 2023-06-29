@@ -14,6 +14,8 @@ VST3_PLUGIN_SOURCES = \
     src/plugin/vst3/plugin.cpp \
     src/plugin/vst3/plugin-win32.cpp
 
+DEV_PLATFORM_CLEAN =
+
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
