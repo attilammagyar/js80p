@@ -34,7 +34,8 @@ using namespace JS80P;
 
 TEST(long_program_names_are_trimmed_and_truncated, {
     constexpr char const* long_name = "a long program name, way over the limit";
-    constexpr char const* truncated = "a long program name,...";
+    constexpr char const* truncated = "a long program name,..t";
+    constexpr char const* truncated_short = "a lo..t";
     constexpr char const* just_below_the_limit = "   just below length limit   ";
     constexpr char const* just_below_the_limit_trimmed = "just below length limit";
     constexpr char const* becomes_empty = "    [\\]   ";
@@ -43,17 +44,21 @@ TEST(long_program_names_are_trimmed_and_truncated, {
     Bank::Program empty_default("   ", " [] ", "");
 
     assert_eq(truncated, program.get_name());
+    assert_eq(truncated_short, program.get_short_name());
 
     program.set_name(long_name);
     assert_eq(truncated, program.get_name());
+    assert_eq(truncated_short, program.get_short_name());
 
     program.set_name(just_below_the_limit);
     assert_eq(just_below_the_limit_trimmed, program.get_name());
 
     program.set_name(becomes_empty);
     assert_eq("Default Name", program.get_name());
+    assert_eq("Defa..e", program.get_short_name());
 
     assert_eq("", empty_default.get_name());
+    assert_eq("", empty_default.get_short_name());
 })
 
 
@@ -65,7 +70,7 @@ TEST(only_latin_printable_characters_are_allowed_in_program_names, {
     assert_eq("_rvztr-Tkrfrgp,;:. (#1)", program.get_name());
 
     program.set_name("[long name with disallowed characters]");
-    assert_eq("long name with disal...", program.get_name());
+    assert_eq("long name with disal..s", program.get_name());
 })
 
 
@@ -89,11 +94,11 @@ TEST(program_can_be_imported, {
         "\n"
     );
 
-    assert_eq("this is the name tha...", program.get_name());
+    assert_eq("this is the name tha..r", program.get_name());
     assert_eq(
         (
             "[js80p]\r\n"
-            "NAME = this is the name tha...\r\n"
+            "NAME = this is the name tha..r\r\n"
             "NAMENOT = not the program name again\r\n"
             "NAMEctl = also not the program name\r\n"
             "MIX = 1.0\r\n"

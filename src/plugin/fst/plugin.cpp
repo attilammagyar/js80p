@@ -994,7 +994,7 @@ void FstPlugin::get_param_display(size_t index, char* buffer) noexcept
         if (program_index < Bank::NUMBER_OF_PROGRAMS) {
             strncpy(
                 buffer,
-                bank[program_index].get_name().c_str(),
+                bank[program_index].get_short_name().c_str(),
                 kVstMaxParamStrLen - 1
             );
         } else {

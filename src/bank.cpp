@@ -35,9 +35,9 @@ Bank::Program::Program(
         std::string const& name,
         std::string const& default_name,
         std::string const& serialized
-) : name(""), default_name(""), serialized(""), params_start(0)
+) : name(""), short_name(""), default_name(""), serialized(""), params_start(0)
 {
-    this->default_name = sanitize(default_name);
+    this->default_name = truncate(sanitize_name(default_name), NAME_MAX_LENGTH);
     import_without_update(serialized);
     set_name(name);
 }
@@ -52,13 +52,16 @@ void Bank::Program::set_name(std::string const& new_name)
 
 void Bank::Program::set_name_without_update(std::string const& new_name)
 {
-    name = sanitize(new_name);
+    std::string const sanitized_name = sanitize_name(new_name);
+
+    name = truncate(sanitized_name, NAME_MAX_LENGTH);
+    short_name = truncate(sanitized_name, SHORT_NAME_MAX_LENGTH);
 }
 
 
-std::string Bank::Program::sanitize(std::string const& name) const
+std::string Bank::Program::sanitize_name(std::string const& name) const
 {
-    constexpr Integer buffer_size = NAME_MAX_LENGTH + 2;
+    Integer const buffer_size = name.length() + 1;
 
     char filtered[buffer_size];
     Integer next = 0;
@@ -68,11 +71,6 @@ std::string Bank::Program::sanitize(std::string const& name) const
     for (std::string::const_iterator it = name.begin(); it != name.end(); ++it) {
         if (is_allowed_char(*it) && (next > 0 || *it != ' ')) {
             filtered[next++] = *it;
-
-            if (next > NAME_MAX_LENGTH) {
-                filtered[next] = '\x00';
-                break;
-            }
         }
     }
 
@@ -82,16 +80,43 @@ std::string Bank::Program::sanitize(std::string const& name) const
         filtered[next--] = '\x00';
     }
 
-    std::string sanitized(filtered);
+    std::string sanitized(filtered, next + 1);
 
-    if (sanitized.length() >= NAME_MAX_LENGTH) {
-        sanitized.erase(20);
-        sanitized += "...";
-    } else if (sanitized.length() == 0) {
+    if (sanitized.length() == 0) {
         sanitized = default_name;
     }
 
     return sanitized;
+}
+
+
+std::string Bank::Program::truncate(
+        std::string const& text,
+        std::string::size_type const max_length
+) const {
+    std::string::size_type const length = text.length();
+
+    if (length < max_length) {
+        return text;
+    }
+
+    if (max_length < 1) {
+        return "";
+    }
+
+    std::string truncated(text.c_str(), max_length);
+
+    if (max_length >= 6) {
+        char const last_char = text[length - 1];
+
+        truncated.erase(max_length - 4);
+        truncated += "..";
+        truncated += last_char;
+    } else {
+        truncated.erase(max_length);
+    }
+
+    return truncated;
 }
 
 
@@ -172,6 +197,12 @@ Bank::Program& Bank::Program::operator=(Program const&& program)
 std::string const& Bank::Program::get_name() const
 {
     return name;
+}
+
+
+std::string const& Bank::Program::get_short_name() const
+{
+    return short_name;
 }
 
 

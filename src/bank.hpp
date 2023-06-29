@@ -37,6 +37,7 @@ class Bank
         {
             public:
                 static constexpr Integer NAME_MAX_LENGTH = 24;
+                static constexpr Integer SHORT_NAME_MAX_LENGTH = 8;
 
                 Program();
 
@@ -53,6 +54,7 @@ class Bank
                 Program& operator=(Program const&& program);
 
                 std::string const& get_name() const;
+                std::string const& get_short_name() const;
                 void set_name(std::string const& new_name);
 
                 bool is_blank() const;
@@ -67,7 +69,13 @@ class Bank
                 );
 
             private:
-                std::string sanitize(std::string const& name) const;
+                std::string sanitize_name(std::string const& name) const;
+
+                std::string truncate(
+                    std::string const& text,
+                    std::string::size_type const max_length
+                ) const;
+
                 bool is_allowed_char(char const c) const;
 
                 void set_name_without_update(std::string const& new_name);
@@ -82,6 +90,7 @@ class Bank
                 void update();
 
                 std::string name;
+                std::string short_name;
                 std::string default_name;
                 std::string serialized;
                 std::string::size_type params_start;
