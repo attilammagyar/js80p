@@ -732,7 +732,7 @@ VstIntPtr FstPlugin::get_program() const noexcept
 
 void FstPlugin::set_program(size_t index) noexcept
 {
-    if (index >= Bank::NUMBER_OF_PROGRAMS || index == bank.get_current_program_index()) {
+    if (index >= Bank::NUMBER_OF_PROGRAMS || index == next_program) {
         return;
     }
 
