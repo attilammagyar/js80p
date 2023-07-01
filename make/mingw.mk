@@ -41,6 +41,8 @@ $(OBJ_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 
 VALGRIND ?=
 
+MINGW_CXXFLAGS = -D OEMRESOURCE
+
 TARGET_PLATFORM_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32 -lole32
 
 LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static

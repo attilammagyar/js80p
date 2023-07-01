@@ -3,6 +3,7 @@ DIR_SEP = \\
 
 TARGET_PLATFORM_CXXFLAGS = \
 	-mwindows \
+	$(MINGW_CXXFLAGS) \
 	-D UNICODE \
 	-D _UNICODE
 
