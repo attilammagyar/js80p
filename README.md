@@ -83,9 +83,10 @@ then you will have to install the 32 bit version of the libraries, for example:
 Installation
 ------------
 
-If your plugin host application does not support VST 3, but does support VST
-2.4, then you have to download and install the FST version of JS80P. Otherwise,
-you should go with the VST 3 bundle on all supported operating systems.
+If your plugin host application does not support VST 3, but does support
+VST 2.4, then you have to download and install the FST version of JS80P.
+Otherwise, you should go with the VST 3 bundle on all supported operating
+systems.
 
 If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
@@ -255,9 +256,10 @@ Frequenctly Asked Questions
 
 ### Which distribution should I download?
 
-If your plugin host application does not support VST 3, but does support VST
-2.4, then you have to download and install the FST version of JS80P. Otherwise,
-you should go with the VST 3 bundle on all supported operating systems.
+If your plugin host application does not support VST 3, but does support
+VST 2.4, then you have to download and install the FST version of JS80P.
+Otherwise, you should go with the VST 3 bundle on all supported operating
+systems.
 
 If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that

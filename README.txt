@@ -36,15 +36,32 @@ then you will have to install the 32 bit version of the libraries, for example:
 Before Installing
 -----------------
 
-If your plugin host application does not support VST 3, but does support VST
-2.4, then you have to download and install the FST version of JS80P. Otherwise,
-you should go with the VST 3 bundle on all supported operating systems.
+If your plugin host application does not support VST 3, but does support
+VST 2.4, then you have to download and install the FST version of JS80P.
+Otherwise, you should go with the VST 3 bundle on all supported operating
+systems.
 
 If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
 recognize VST 3 bundles when running on a 64 bit system.)
+
+Installing the VST 3 Bundle on Windows
+--------------------------------------
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
+   usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+
+Installing the VST 3 Bundle on Linux
+------------------------------------
+
+1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+2. Extract the ZIP archive.
+3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
+   usually `~/.vst3`.
 
 Installing the VST 3 Single File Version on Windows
 ---------------------------------------------------
