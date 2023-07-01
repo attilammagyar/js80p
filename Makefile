@@ -370,6 +370,7 @@ $(OBJ_SYNTH): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
 
 $(OBJ_BANK): \
 		src/bank.cpp src/bank.hpp \
+		src/programs.cpp \
 		src/serializer.cpp src/serializer.hpp \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
