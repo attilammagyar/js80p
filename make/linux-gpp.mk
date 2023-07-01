@@ -28,7 +28,7 @@ $(VST3_MODULE_INFO_TOOL): src/plugin/vst3/moduleinfo.cpp | $(BUILD_DIR)
 		$(VST3_MODULE_INFO_LFLAGS) \
 		$< -o $@
 
-GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground$(SUFFIX)
+GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX)
 GUI_PLAYGROUND_SOURCES = src/gui/xcb-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/xcb.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/xcb.cpp

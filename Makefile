@@ -46,7 +46,7 @@ OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 	dirs \
 	docs \
 	fst \
-	guiplayground \
+	gui_playground \
 	perf \
 	show_fst_dir \
 	show_vst3_dir \
@@ -299,7 +299,7 @@ perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
-guiplayground: $(GUI_PLAYGROUND)
+gui_playground: $(GUI_PLAYGROUND)
 
 $(DOC_DIR)/html/index.html: \
 		Doxyfile \
