@@ -462,13 +462,14 @@ class AboutText : public Widget
         static constexpr int LOGO_HEIGHT = 299;
 
         static constexpr int FONT_SIZE = 14;
-        static constexpr int TEXT_TOP = 23;
+        static constexpr int TEXT_TOP = 10;
         static constexpr int LINE_HEIGHT = 25;
         static constexpr int EMPTY_LINE_HEIGHT = 12;
         static constexpr int PADDING = 10;
 
         static constexpr char const* TEXT = (
-            "JS80P (version " JS80P_TO_STRING(JS80P_VERSION_STR) ")\n"
+            "JS80P\n"
+            "(version " JS80P_TO_STRING(JS80P_VERSION_STR) ", " JS80P_TO_STRING(JS80P_TARGET_PLATFORM) ")\n"
             "A MIDI driven, performance oriented, versatile synthesizer\n"
             "Copyright (C) 2023 Attila M. Magyar\n"
             "https://attilammagyar.github.io/js80p\n"
