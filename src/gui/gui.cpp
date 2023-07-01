@@ -481,8 +481,8 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::CF1TYP] = "Carrier Filter 1 Type",
     [Synth::ParamId::CF2TYP] = "Carrier Filter 2 Type",
 
-    [Synth::ParamId::EF1TYP] = "Effects Filter 1 Type",
-    [Synth::ParamId::EF2TYP] = "Effects Filter 2 Type",
+    [Synth::ParamId::EF1TYP] = "Filter 1 Type",
+    [Synth::ParamId::EF2TYP] = "Filter 2 Type",
 
     [Synth::ParamId::L1WAV] = "LFO 1 Waveform",
     [Synth::ParamId::L2WAV] = "LFO 2 Waveform",
@@ -519,11 +519,11 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::MF2LOG] = "Modulator Filter 2 Logarithmic Frequency",
     [Synth::ParamId::CF1LOG] = "Carrier Filter 1 Logarithmic Frequency",
     [Synth::ParamId::CF2LOG] = "Carrier Filter 2 Logarithmic Frequency",
-    [Synth::ParamId::EF1LOG] = "Effects Filter 1 Logarithmic Frequency",
-    [Synth::ParamId::EF2LOG] = "Effects Filter 2 Logarithmic Frequency",
-    [Synth::ParamId::ECLOG] = "Effects Chorus Logarithmic Filter Frequencies",
-    [Synth::ParamId::EELOG] = "Effects Echo Logarithmic Filter Frequencies",
-    [Synth::ParamId::ERLOG] = "Effects Reverb Logarithmic Filter Frequencies",
+    [Synth::ParamId::EF1LOG] = "Filter 1 Logarithmic Frequency",
+    [Synth::ParamId::EF2LOG] = "Filter 2 Logarithmic Frequency",
+    [Synth::ParamId::ECLOG] = "Chorus Logarithmic Filter Frequencies",
+    [Synth::ParamId::EELOG] = "Echo Logarithmic Filter Frequencies",
+    [Synth::ParamId::ERLOG] = "Reverb Logarithmic Filter Frequencies",
 
     [Synth::ParamId::N1DYN] = "Envelope 1 Dynamic",
     [Synth::ParamId::N2DYN] = "Envelope 2 Dynamic",
