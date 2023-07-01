@@ -36,6 +36,7 @@ Table of Contents
  * [Features](#features)
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
+    * [Mac version?](#faq-mac)
     * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [How to assign a MIDI CC to a JS80P parameter in FL Studio?](#faq-flstudio-midicc)
@@ -237,6 +238,18 @@ and so on.
 
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
+
+<a name="faq-mac"></a>
+
+### Mac version?
+
+Sorry, it's not likely to happen anytime soon, unless someone is willing to
+create and maintain a Mac fork of JS80P. For me to do it, it would require
+quite a large investment, both in terms of effort and financially. If MacOS
+would be available (at a reasonable price) for installing it in a virtual
+machine that could be used for testing, I'd consider that. But as long as it
+cannot be obtained (legally) without also buying a Mac, and I'm happy with my
+current computer, I'm not going to invest in a new one.
 
 <a name="faq-custom-wave"></a>
 
