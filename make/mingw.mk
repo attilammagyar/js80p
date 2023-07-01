@@ -39,6 +39,8 @@ OBJ_GUI_EXTRA = $(BUILD_DIR)/js80p-$(SUFFIX).res
 $(OBJ_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
+UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).exe
+
 VALGRIND ?=
 
 MINGW_CXXFLAGS = -D OEMRESOURCE
@@ -51,3 +53,4 @@ LINK_EXE = $(CPP_TARGET_PLATFORM) -Wall -static
 LINK_FST = $(LINK_DLL)
 LINK_VST3 = $(LINK_DLL)
 LINK_GUI_PLAYGROUND = $(LINK_EXE)
+LINK_UPGRADE_PATCH = $(LINK_EXE)

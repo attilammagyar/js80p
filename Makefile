@@ -39,6 +39,8 @@ VST3_DIR = $(DIST_DIR_PREFIX)-vst3_single_file
 
 OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 
+OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
+
 .PHONY: \
 	all \
 	check \
@@ -50,6 +52,7 @@ OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 	perf \
 	show_fst_dir \
 	show_vst3_dir \
+	upgrade_patch \
 	vst3
 
 all: dirs fst vst3
@@ -89,6 +92,11 @@ GUI_PLAYGROUND_OBJS = \
 	$(OBJ_GUI_PLAYGROUND) \
 	$(OBJ_SERIALIZER) \
 	$(OBJ_SYNTH)
+
+UPGRADE_PATCH_OBJS = \
+	$(OBJ_SERIALIZER) \
+	$(OBJ_SYNTH) \
+	$(OBJ_UPGRADE_PATCH)
 
 PARAM_COMPONENTS = \
 	dsp/envelope \
@@ -205,6 +213,8 @@ GUI_SOURCES = \
 	src/gui/widgets.cpp \
 	src/gui/gui.cpp
 
+UPGRADE_PATCH_SOURCES = src/upgrade_patch.cpp
+
 TEST_LIBS = \
 	tests/test.cpp \
 	tests/utils.cpp
@@ -267,6 +277,7 @@ clean:
 		$(GUI_PLAYGROUND_OBJS) \
 		$(PERF_TEST_BINS) \
 		$(TEST_BINS) \
+		$(UPGRADE_PATCH) \
 		$(VST3) \
 		$(VST3_OBJS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
@@ -300,6 +311,8 @@ perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
 gui_playground: $(GUI_PLAYGROUND)
+
+upgrade_patch: $(UPGRADE_PATCH)
 
 $(DOC_DIR)/html/index.html: \
 		Doxyfile \
@@ -338,6 +351,14 @@ $(OBJ_GUI_PLAYGROUND): \
 		$(GUI_PLAYGROUND_SOURCES) \
 		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
+	$(CPP_TARGET_PLATFORM) \
+		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(DEBUG_LOG) -c $< -o $@
+
+$(UPGRADE_PATCH): $(UPGRADE_PATCH_OBJS) | $(BUILD_DIR)
+	$(LINK_UPGRADE_PATCH) $(UPGRADE_PATCH_OBJS) -o $@
+
+$(OBJ_UPGRADE_PATCH): $(UPGRADE_PATCH_SOURCES) | $(BUILD_DIR)
 	$(CPP_TARGET_PLATFORM) \
 		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG) -c $< -o $@
