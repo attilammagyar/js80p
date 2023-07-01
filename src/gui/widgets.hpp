@@ -441,7 +441,6 @@ class ParamEditor : public TransparentWidget
         ControllerSelector& controller_selector;
         ParamEditorKnobStates* knob_states;
         Synth& synth;
-        Number default_ratio;
         Number ratio;
         Knob* knob;
         char value_str[TEXT_MAX_LENGTH];

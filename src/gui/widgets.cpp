@@ -661,7 +661,6 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     );
 
     own(knob);
-    default_ratio = synth.get_param_default_ratio(param_id);
     update_editor(
         synth.get_param_ratio_atomic(param_id),
         synth.get_param_controller_id_atomic(param_id)
@@ -805,7 +804,7 @@ void ParamEditor::update_controller_str()
 
 void ParamEditor::reset_default()
 {
-    handle_ratio_change(default_ratio);
+    handle_ratio_change(synth.get_param_default_ratio(param_id));
 }
 
 

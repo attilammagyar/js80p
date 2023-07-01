@@ -55,6 +55,7 @@ class Chorus : public Effect<InputSignalProducerClass>
         FloatParam width;
         FloatParam high_pass_frequency;
         ToggleParam tempo_sync;
+        ToggleParam log_scale_frequencies;
 
         LFO lfo_1;
         LFO lfo_2;

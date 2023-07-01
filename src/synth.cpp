@@ -375,6 +375,7 @@ void Synth::register_effects_params() noexcept
     register_float_param(ParamId::ECWET, effects.chorus.wet);
     register_float_param(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
+    register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_frequencies);
 
     register_float_param(ParamId::EEDEL, effects.echo.delay_time);
     register_float_param(ParamId::EEFB, effects.echo.feedback);
@@ -385,6 +386,7 @@ void Synth::register_effects_params() noexcept
     register_float_param(ParamId::EEWET, effects.echo.wet);
     register_float_param(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
+    register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
 
     register_float_param(ParamId::ERRS, effects.reverb.room_size);
     register_float_param(ParamId::ERDF, effects.reverb.damping_frequency);
@@ -393,6 +395,7 @@ void Synth::register_effects_params() noexcept
     register_float_param(ParamId::ERHPF, effects.reverb.high_pass_frequency);
     register_float_param(ParamId::ERWET, effects.reverb.wet);
     register_float_param(ParamId::ERDRY, effects.reverb.dry);
+    register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
 }
 
 
@@ -994,6 +997,9 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_default_ratio();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_default_ratio();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_default_ratio();
+        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_default_ratio();
+        case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_default_ratio();
+        case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_default_ratio();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_default_ratio();
         case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_default_ratio();
         case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_default_ratio();
@@ -1059,6 +1065,9 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_max_value();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_max_value();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_max_value();
+        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_max_value();
+        case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_max_value();
+        case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_max_value();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_max_value();
         case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_max_value();
         case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_max_value();
@@ -1128,6 +1137,9 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.ratio_to_value(ratio);
         case ParamId::EF1LOG: return effects.filter_1_log_scale.ratio_to_value(ratio);
         case ParamId::EF2LOG: return effects.filter_2_log_scale.ratio_to_value(ratio);
+        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.ratio_to_value(ratio);
+        case ParamId::EELOG: return effects.echo.log_scale_frequencies.ratio_to_value(ratio);
+        case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.ratio_to_value(ratio);
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.ratio_to_value(ratio);
         case ParamId::N2DYN: return envelopes_rw[1]->dynamic.ratio_to_value(ratio);
         case ParamId::N3DYN: return envelopes_rw[2]->dynamic.ratio_to_value(ratio);
@@ -1264,6 +1276,9 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2LOG: carrier_params.filter_2_log_scale.set_ratio(ratio); break;
             case ParamId::EF1LOG: effects.filter_1_log_scale.set_ratio(ratio); break;
             case ParamId::EF2LOG: effects.filter_2_log_scale.set_ratio(ratio); break;
+            case ParamId::ECLOG: effects.chorus.log_scale_frequencies.set_ratio(ratio); break;
+            case ParamId::EELOG: effects.echo.log_scale_frequencies.set_ratio(ratio); break;
+            case ParamId::ERLOG: effects.reverb.log_scale_frequencies.set_ratio(ratio); break;
             case ParamId::N1DYN: envelopes_rw[0]->dynamic.set_ratio(ratio); break;
             case ParamId::N2DYN: envelopes_rw[1]->dynamic.set_ratio(ratio); break;
             case ParamId::N3DYN: envelopes_rw[2]->dynamic.set_ratio(ratio); break;
@@ -1536,6 +1551,9 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_ratio();
         case ParamId::EF1LOG: return effects.filter_1_log_scale.get_ratio();
         case ParamId::EF2LOG: return effects.filter_2_log_scale.get_ratio();
+        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_ratio();
+        case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_ratio();
+        case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_ratio();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_ratio();
         case ParamId::N2DYN: return envelopes_rw[1]->dynamic.get_ratio();
         case ParamId::N3DYN: return envelopes_rw[2]->dynamic.get_ratio();

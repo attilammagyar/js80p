@@ -204,12 +204,13 @@ def print_special_params(param_id: int) -> int:
 
         ("MF1LOG", "///< Modulator Filter 1 Logarithmic Frequency"),
         ("MF2LOG", "///< Modulator Filter 2 Logarithmic Frequency"),
-
         ("CF1LOG", "///< Carrier Filter 1 Logarithmic Frequency"),
         ("CF2LOG", "///< Carrier Filter 2 Logarithmic Frequency"),
-
         ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency"),
         ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency"),
+        ("ECLOG", " ///< Effects Chorus Logarithmic Filter Frequencies"),
+        ("EELOG", " ///< Effects Echo Logarithmic Filter Frequencies"),
+        ("ERLOG", " ///< Effects Reverb Logarithmic Filter Frequencies"),
 
         ("N1DYN", " ///< Envelope 1 Dynamic"),
         ("N2DYN", " ///< Envelope 2 Dynamic"),

@@ -21,6 +21,8 @@
 
 #include "dsp/chorus.hpp"
 
+#include "dsp/math.hpp"
+
 
 namespace JS80P
 {
@@ -29,7 +31,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 26),
+) : Effect<InputSignalProducerClass>(name, input, 27),
     delay_time(
         name + "DEL",
         0.0,
@@ -48,7 +50,14 @@ Chorus<InputSignalProducerClass>::Chorus(
         name + "DF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale_frequencies,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
     ),
     damping_gain(name + "DG", -36.0, -0.01, -6.0),
     width(name + "WID", -1.0, 1.0, 0.6),
@@ -56,9 +65,17 @@ Chorus<InputSignalProducerClass>::Chorus(
         name + "HPF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        20.0
+        20.0,
+        0.0,
+        &log_scale_frequencies,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
+    log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     lfo_1(name, frequency, delay_time, depth, tempo_sync, 0.0 / 3.0),
     lfo_2(name, frequency, delay_time, depth, tempo_sync, 1.0 / 3.0),
     lfo_3(name, frequency, delay_time, depth, tempo_sync, 2.0 / 3.0),
@@ -147,6 +164,7 @@ Chorus<InputSignalProducerClass>::Chorus(
     this->register_child(width);
     this->register_child(high_pass_frequency);
     this->register_child(tempo_sync);
+    this->register_child(log_scale_frequencies);
 
     this->register_child(lfo_1);
     this->register_child(lfo_2);

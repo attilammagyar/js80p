@@ -50,6 +50,7 @@ class Reverb : public Effect<InputSignalProducerClass>
         FloatParam damping_gain;
         FloatParam width;
         FloatParam high_pass_frequency;
+        ToggleParam log_scale_frequencies;
 
     protected:
         Sample const* const* initialize_rendering(

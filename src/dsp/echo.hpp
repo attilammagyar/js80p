@@ -50,6 +50,7 @@ class Echo : public Effect<InputSignalProducerClass>
         FloatParam width;
         FloatParam high_pass_frequency;
         ToggleParam tempo_sync;
+        ToggleParam log_scale_frequencies;
 
     protected:
         Sample const* const* initialize_rendering(

@@ -21,6 +21,8 @@
 
 #include "dsp/echo.hpp"
 
+#include "dsp/math.hpp"
+
 
 namespace JS80P
 {
@@ -29,7 +31,7 @@ template<class InputSignalProducerClass>
 Echo<InputSignalProducerClass>::Echo(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 13),
+) : Effect<InputSignalProducerClass>(name, input, 14),
     delay_time(
         name + "DEL",
         Constants::DELAY_TIME_MIN,
@@ -46,7 +48,14 @@ Echo<InputSignalProducerClass>::Echo(
         name + "DF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        &log_scale_frequencies,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
     ),
     damping_gain(name + "DG", -36.0, -0.01, -6.0),
     width(name + "WID", -1.0, 1.0, 0.0),
@@ -54,9 +63,17 @@ Echo<InputSignalProducerClass>::Echo(
         name + "HPF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
-        20.0
+        20.0,
+        0.0,
+        &log_scale_frequencies,
+        Math::log_biquad_filter_freq_table(),
+        Math::log_biquad_filter_freq_inv_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
+        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
+    log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     high_pass_filter_type(""),
     high_pass_filter_q(
         "",
@@ -107,6 +124,7 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(width);
     this->register_child(high_pass_frequency);
     this->register_child(tempo_sync);
+    this->register_child(log_scale_frequencies);
 
     this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_q);

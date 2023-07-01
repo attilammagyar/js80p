@@ -515,15 +515,18 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CF2LOG = 363,    ///< Carrier Filter 2 Logarithmic Frequency
             EF1LOG = 364,    ///< Effects Filter 1 Logarithmic Frequency
             EF2LOG = 365,    ///< Effects Filter 2 Logarithmic Frequency
+            ECLOG = 366,     ///< Effects Chorus Logarithmic Filter Frequencies
+            EELOG = 367,     ///< Effects Echo Logarithmic Filter Frequencies
+            ERLOG = 368,     ///< Effects Reverb Logarithmic Filter Frequencies
 
-            N1DYN = 366,     ///< Envelope 1 Dynamic
-            N2DYN = 367,     ///< Envelope 2 Dynamic
-            N3DYN = 368,     ///< Envelope 3 Dynamic
-            N4DYN = 369,     ///< Envelope 4 Dynamic
-            N5DYN = 370,     ///< Envelope 5 Dynamic
-            N6DYN = 371,     ///< Envelope 6 Dynamic
+            N1DYN = 369,     ///< Envelope 1 Dynamic
+            N2DYN = 370,     ///< Envelope 2 Dynamic
+            N3DYN = 371,     ///< Envelope 3 Dynamic
+            N4DYN = 372,     ///< Envelope 4 Dynamic
+            N5DYN = 373,     ///< Envelope 5 Dynamic
+            N6DYN = 374,     ///< Envelope 6 Dynamic
 
-            MAX_PARAM_ID = 372
+            MAX_PARAM_ID = 375
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

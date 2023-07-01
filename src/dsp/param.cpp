@@ -401,6 +401,12 @@ Number FloatParam::get_ratio() const noexcept
 }
 
 
+Number FloatParam::get_default_ratio() const noexcept
+{
+    return value_to_ratio(get_default_value());
+}
+
+
 Number FloatParam::ratio_to_value(Number const ratio) const noexcept
 {
     if (is_logarithmic()) {

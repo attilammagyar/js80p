@@ -211,6 +211,7 @@ class FloatParam : public Param<Number>
         Number get_value() const noexcept;
         void set_ratio(Number const ratio) noexcept;
         Number get_ratio() const noexcept;
+        Number get_default_ratio() const noexcept;
 
         Number ratio_to_value(Number const ratio) const noexcept;
         Number value_to_ratio(Number const value) const noexcept;

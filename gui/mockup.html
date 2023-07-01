@@ -193,6 +193,14 @@ h1 {
   left: 14px;
 }
 
+#chorus h1 label.freq {
+  left: 191px;
+}
+
+#echo h1 label.freq {
+  left: 94px;
+}
+
 .block h1 label.dynamic,
 .block h1 label.sync {
   margin-right: 3px;
@@ -588,6 +596,7 @@ function make_tabs(active)
       <div id="chorus" class="effect main-block block">
         <h1>
           Chorus
+          <label class="freq"><input type="text" /> LOG FREQS</label>
           <label class="sync">TEMPO SYNC <input type="text" /></label>
         </h1>
         <div id="chorus-params" class="block"></div>
@@ -595,12 +604,16 @@ function make_tabs(active)
       <div id="echo" class="effect main-block block">
         <h1>
           Echo
+          <label class="freq"><input type="text" /> LOG FREQS</label>
           <label class="sync">TEMPO SYNC <input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
       </div>
       <div id="reverb" class="effect main-block block">
-        <h1>Reverb</h1>
+        <h1>
+          Reverb
+          <label class="freq"><input type="text" /> LOG FREQS</label>
+        </h1>
         <div id="reverb-params" class="block"></div>
       </div>
     </div>
