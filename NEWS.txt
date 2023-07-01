@@ -1,6 +1,14 @@
+v1.8.0 (2023-07-01)
+ * 20 Flexible Controllers instead of 10, allowing more complex patches
+ * Logarithmic Filter Frequencies toggle for the filters of delay-based effects
+ * VST3: build legacy single file and bundle packages as well
+ * FST: when program names need to be truncated, shorten the middle of the text
+   instead of the end
+
 v1.7.6 (2023-06-27)
  * Bugfix: in some host applications (e.g. energyXT, SAVIHost), the name of the
-   current program was reported to the host application incorrectly
+   current program was reported to the host application incorrectly by the FST
+   plugin
 
 v1.7.5 (2023-06-23)
  * increase the effect of the mod wheel and utilize the channel pressure
