@@ -17,7 +17,7 @@ main()
         do
             zip="$(basename "$REPLY")"
             version="$(zip_to_version "$zip")"
-            uri="$DOWNLOAD_URL/$version/$zip"
+            uri="$DOWNLOAD_URL/v$version/$zip"
             size="$(get_size "$REPLY")"
             cat <<HTML
           <li>
@@ -34,7 +34,7 @@ HTML
         do
             zip="$(basename "$REPLY")"
             version="$(zip_to_version "$zip")"
-            uri="$DOWNLOAD_URL/$version/$zip"
+            uri="$DOWNLOAD_URL/v$version/$zip"
             os="$(zip_to_os_name "$zip")"
             arch="$(zip_to_arch_name "$zip")"
             plugin_type="$(zip_to_plugin_type "$zip")"
@@ -51,7 +51,7 @@ HTML
         do
             zip="$(basename "$REPLY")"
             version="$(zip_to_version "$zip")"
-            uri="$DOWNLOAD_URL/$version/$zip"
+            uri="$DOWNLOAD_URL/v$version/$zip"
             size="$(get_size "$REPLY")"
             cat <<HTML
           <li>
