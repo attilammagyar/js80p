@@ -1109,6 +1109,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void clear_midi_note_to_voice_assignments() noexcept;
 
+        void clear_sustain() noexcept;
+
         void update_param_states() noexcept;
 
         std::string const to_string(Integer const) const noexcept;

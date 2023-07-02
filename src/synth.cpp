@@ -619,6 +619,7 @@ void Synth::suspend() noexcept
     this->reset();
     clear_midi_controllers();
     clear_midi_note_to_voice_assignments();
+    clear_sustain();
 }
 
 
@@ -640,6 +641,7 @@ void Synth::resume() noexcept
     clear_midi_controllers();
     clear_midi_note_to_voice_assignments();
     start_lfos();
+    clear_sustain();
 }
 
 
@@ -1370,6 +1372,7 @@ void Synth::handle_clear() noexcept
     start_lfos();
 
     clear_midi_note_to_voice_assignments();
+    clear_sustain();
 
     for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
         ParamId const param_id = (ParamId)i;
@@ -1626,6 +1629,13 @@ void Synth::clear_midi_note_to_voice_assignments() noexcept
             midi_note_to_voice_assignments[channel][note] = -1;
         }
     }
+}
+
+
+void Synth::clear_sustain() noexcept
+{
+    is_sustaining = false;
+    delayed_note_offs.clear();
 }
 
 
