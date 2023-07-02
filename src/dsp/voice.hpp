@@ -153,6 +153,7 @@ class Voice : public SignalProducer
             Number const velocity,
             Midi::Note const previous_note
         ) noexcept;
+
         void note_off(
             Seconds const time_offset,
             Midi::Note const note,
