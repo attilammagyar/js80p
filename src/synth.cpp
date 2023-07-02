@@ -425,11 +425,7 @@ void Synth::create_voices() noexcept
         register_child(*carriers[i]);
     }
 
-    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
-        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            midi_note_to_voice_assignments[channel][note] = -1;
-        }
-    }
+    clear_midi_note_to_voice_assignments();
 }
 
 
@@ -618,6 +614,7 @@ void Synth::suspend() noexcept
     stop_lfos();
     this->reset();
     clear_midi_controllers();
+    clear_midi_note_to_voice_assignments();
 }
 
 
@@ -637,6 +634,7 @@ void Synth::resume() noexcept
 {
     this->reset();
     clear_midi_controllers();
+    clear_midi_note_to_voice_assignments();
     start_lfos();
 }
 
@@ -1575,6 +1573,16 @@ void Synth::clear_midi_controllers() noexcept
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
         if (midi_controllers[i] != NULL) {
             midi_controllers[i]->clear();
+        }
+    }
+}
+
+
+void Synth::clear_midi_note_to_voice_assignments() noexcept
+{
+    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
+        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+            midi_note_to_voice_assignments[channel][note] = -1;
         }
     }
 }
