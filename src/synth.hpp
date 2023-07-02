@@ -1033,6 +1033,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer NEXT_VOICE_MASK = 0x0f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
+        static constexpr Integer INVALID_VOICE = -1;
+
         static std::vector<bool> supported_midi_controllers;
         static bool supported_midi_controllers_initialized;
 

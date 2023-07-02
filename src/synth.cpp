@@ -668,7 +668,7 @@ void Synth::note_on(
     this->velocity.change(time_offset, velocity_float);
     this->note.change(time_offset, midi_byte_to_float(note));
 
-    if (midi_note_to_voice_assignments[channel][note] != -1) {
+    if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
         return;
     }
 
@@ -727,7 +727,7 @@ void Synth::aftertouch(
 ) noexcept {
     this->note.change(time_offset, midi_byte_to_float(note));
 
-    if (midi_note_to_voice_assignments[channel][note] == -1) {
+    if (midi_note_to_voice_assignments[channel][note] == INVALID_VOICE) {
         return;
     }
 
@@ -780,13 +780,13 @@ void Synth::note_off(
         Midi::Note const note,
         Midi::Byte const velocity
 ) noexcept {
-    if (midi_note_to_voice_assignments[channel][note] == -1) {
+    if (midi_note_to_voice_assignments[channel][note] == INVALID_VOICE) {
         return;
     }
 
     Integer const voice = midi_note_to_voice_assignments[channel][note];
 
-    midi_note_to_voice_assignments[channel][note] = -1;
+    midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
 
     if (UNLIKELY(is_sustaining)) {
         DelayedNoteOff const delayed_note_off(channel, note, velocity, voice);
@@ -851,7 +851,7 @@ void Synth::sustain_off(
         DelayedNoteOff const& delayed_note_off = *it;
         Integer const voice = delayed_note_off.get_voice();
 
-        if (voice > -1) {
+        if (voice != INVALID_VOICE) {
             Midi::Note const note = delayed_note_off.get_note();
             Number const velocity = midi_byte_to_float(delayed_note_off.get_velocity());
 
@@ -922,11 +922,11 @@ void Synth::all_notes_off(
         for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
             Integer const voice = midi_note_to_voice_assignments[channel_][note];
 
-            if (voice == -1) {
+            if (voice == INVALID_VOICE) {
                 continue;
             }
 
-            midi_note_to_voice_assignments[channel_][note] = -1;
+            midi_note_to_voice_assignments[channel_][note] = INVALID_VOICE;
 
             modulators[voice]->note_off(time_offset, note, 0.0);
             carriers[voice]->note_off(time_offset, note, 0.0);
@@ -1628,7 +1628,7 @@ void Synth::clear_midi_note_to_voice_assignments() noexcept
 {
     for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
         for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            midi_note_to_voice_assignments[channel][note] = -1;
+            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
         }
     }
 }
@@ -2208,7 +2208,11 @@ Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
 }
 
 
-Synth::DelayedNoteOff::DelayedNoteOff() : voice(-1), channel(0), note(0), velocity(0)
+Synth::DelayedNoteOff::DelayedNoteOff()
+    : voice(INVALID_VOICE),
+    channel(0),
+    note(0),
+    velocity(0)
 {
 }
 
