@@ -11,8 +11,8 @@ FST_DIRS_LINUX_64="$BASE_DIR/vst"
 FST_DIRS_WINE_32="$BASE_DIR/.wine/drive_c/vst"
 FST_DIRS_WINE_64="$BASE_DIR/.wine/drive_c/vst"
 
-VST3_DIRS_LINUX_32="$BASE_DIR/vst"
-VST3_DIRS_LINUX_64="$BASE_DIR/vst"
+VST3_DIRS_LINUX_32="$BASE_DIR/vst $BASE_DIR/.vst3"
+VST3_DIRS_LINUX_64="$BASE_DIR/vst $BASE_DIR/.vst3"
 
 VST3_DIRS_WINE_32="$BASE_DIR/.wine/drive_c/vst $BASE_DIR/.wine/drive_c/Program*Files/Common*Files/VST3"
 VST3_DIRS_WINE_64="$BASE_DIR/.wine/drive_c/vst $BASE_DIR/.wine/drive_c/Program*Files/Common*Files/VST3"
@@ -25,6 +25,7 @@ main()
     local arch="$3"
     local target_platform=""
     local built_plugin=""
+    local suffix=""
 
     if [[ "$plugin_type$target_os$arch" = "" ]]
     then
@@ -35,6 +36,8 @@ main()
     if [[ "$plugin_type" = "" ]]; then plugin_type="fst"; fi
     if [[ "$target_os" = "" ]]; then target_os="linux"; fi
     if [[ "$arch" = "" ]]; then arch="64bit"; fi
+
+    if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
 
     case "$arch" in
         "32bit") target_platform="i686" ;;
@@ -54,7 +57,7 @@ main()
             ;;
     esac
 
-    built_plugin="dist/js80p-dev-$target_os-$arch-$plugin_type"
+    built_plugin="dist/js80p-dev-$target_os-$arch-$plugin_type$suffix"
 
     case "$target_os-$plugin_type" in
         "linux-fst") built_plugin="$built_plugin/js80p.so" ;;
@@ -99,7 +102,7 @@ replace_in_dir()
         dir="$1"
         echo ""
         echo "Replacing JS80P; dir=\"$dir\""
-        rm -fv "$dir"/js80p.*
+        rm -rfv "$dir"/js80p.*
         cp -v "$built_plugin" "$dir/"
         shift
     done
