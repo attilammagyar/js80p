@@ -41,9 +41,6 @@ using namespace JS80P;
 constexpr Integer CHANNELS = 2;
 
 
-// TODO: the gain of the Delay-s in the Chorus should be constant 1, and the feedback of the chorus should be a Gain<HighShelf>, and ECFB should control the gain of this!
-
-
 TEST(multiplies_input_signals_by_the_value_of_the_gain_parameter, {
     constexpr Integer rounds = 2;
     constexpr Integer block_size = 5;
