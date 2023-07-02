@@ -1330,6 +1330,8 @@ void Synth::handle_clear() noexcept
     reset();
     start_lfos();
 
+    clear_midi_note_to_voice_assignments();
+
     for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
         ParamId const param_id = (ParamId)i;
 
