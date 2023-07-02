@@ -564,6 +564,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             UNDEFINED_14 =              Midi::UNDEFINED_14,         ///< Undefined (CC 29)
             UNDEFINED_15 =              Midi::UNDEFINED_15,         ///< Undefined (CC 30)
             UNDEFINED_16 =              Midi::UNDEFINED_16,         ///< Undefined (CC 31)
+            SUSTAIN_PEDAL =             Midi::SUSTAIN_PEDAL,        ///< Sustain Pedal (CC 64)
             SOUND_1 =                   Midi::SOUND_1,              ///< Sound 1 (CC 70)
             SOUND_2 =                   Midi::SOUND_2,              ///< Sound 2 (CC 71)
             SOUND_3 =                   Midi::SOUND_3,              ///< Sound 3 (CC 72)
@@ -787,6 +788,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Byte const new_value
         ) noexcept;
 
+        void sustain_on(
+            Seconds const time_offset,
+            Midi::Channel const channel
+        ) noexcept;
+
+        void sustain_off(
+            Seconds const time_offset,
+            Midi::Channel const channel
+        ) noexcept;
+
         void channel_pressure(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -987,6 +998,32 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Midi::Word value;
         };
 
+        class DelayedNoteOff
+        {
+            public:
+                DelayedNoteOff();
+                DelayedNoteOff(DelayedNoteOff const& delayed_note_off);
+                DelayedNoteOff(DelayedNoteOff const&& delayed_note_off);
+
+                DelayedNoteOff(
+                    Midi::Channel const channel,
+                    Midi::Note const note,
+                    Midi::Byte const velocity
+                );
+
+                DelayedNoteOff& operator=(DelayedNoteOff const& delayed_note_off) noexcept;
+                DelayedNoteOff& operator=(DelayedNoteOff const&& delayed_note_off) noexcept;
+
+                Midi::Channel get_channel() const noexcept;
+                Midi::Channel get_note() const noexcept;
+                Midi::Channel get_velocity() const noexcept;
+
+            private:
+                Midi::Channel channel;
+                Midi::Note note;
+                Midi::Byte velocity;
+        };
+
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
         static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
 
@@ -1076,6 +1113,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         std::string const to_string(Integer const) const noexcept;
 
+        std::vector<DelayedNoteOff> delayed_note_offs;
         SingleProducerSingleConsumerMessageQueue messages;
         Bus bus;
         Effects::Effects<Bus> effects;
@@ -1095,6 +1133,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer next_voice;
         Midi::Note previous_note;
         bool is_learning;
+        bool is_sustaining;
 
     public:
         MidiController* const* const midi_controllers;

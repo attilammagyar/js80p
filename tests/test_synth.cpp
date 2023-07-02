@@ -585,3 +585,47 @@ TEST(effects, {
 
     render_rounds<Synth>(synth, buffer, rounds, block_size);
 })
+
+
+TEST(sustain_pedal, {
+    constexpr Frequency sample_rate = 3000.0;
+    constexpr Seconds note_on = 0.0;
+    constexpr Seconds sustain_on = 0.1;
+    constexpr Seconds note_off = 0.2;
+    constexpr Seconds sustain_off = 1.0;
+    constexpr Integer block_size = 4196;
+    Synth synth_1;
+    Synth synth_2;
+    Sample const* const* synth_1_samples;
+    Sample const* const* synth_2_samples;
+
+    synth_1.set_sample_rate(sample_rate);
+    synth_2.set_sample_rate(sample_rate);
+
+    synth_1.set_block_size(block_size);
+    synth_2.set_block_size(block_size);
+
+    synth_1.resume();
+    synth_2.resume();
+
+    synth_1.note_on(note_on, 1, Midi::NOTE_A_3, 114);
+    synth_1.note_off(sustain_off, 1, Midi::NOTE_A_3, 114);
+
+    synth_2.note_on(note_on, 1, Midi::NOTE_A_3, 114);
+    synth_2.sustain_on(sustain_on, 1);
+    synth_2.note_off(note_off, 1, Midi::NOTE_A_3, 114);
+    synth_2.sustain_off(sustain_off, 1);
+
+    synth_1_samples = SignalProducer::produce<Synth>(synth_1, 1);
+    synth_2_samples = SignalProducer::produce<Synth>(synth_2, 1);
+
+    for (Integer c = 0; c != synth_1.get_channels(); ++c) {
+        assert_eq(
+            synth_1_samples[c],
+            synth_2_samples[c],
+            block_size,
+            "channel=%d",
+            (int)c
+        );
+    }
+})

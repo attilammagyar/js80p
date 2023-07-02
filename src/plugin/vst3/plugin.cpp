@@ -481,14 +481,21 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
             );
             break;
 
-        case Event::Type::CONTROL_CHANGE:
-            synth.control_change(
-                event.time_offset,
-                0,
-                event.note_or_ctl,
-                float_to_midi_byte(event.velocity_or_value)
-            );
+        case Event::Type::CONTROL_CHANGE: {
+            Midi::Byte const value = float_to_midi_byte(event.velocity_or_value);
+
+            synth.control_change(event.time_offset, 0, event.note_or_ctl, value);
+
+            if (event.note_or_ctl == Midi::SUSTAIN_PEDAL) {
+                if (value < 64) {
+                    synth.sustain_off(event.time_offset, 0);
+                } else {
+                    synth.sustain_on(event.time_offset, 0);
+                }
+            }
+
             break;
+        }
 
         case Event::Type::CHANNEL_PRESSURE:
             synth.channel_pressure(

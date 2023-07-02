@@ -106,11 +106,14 @@ Synth::Synth() noexcept
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
     is_learning(false),
+    is_sustaining(false),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
     envelopes((Envelope* const*)envelopes_rw),
     lfos((LFO* const*)lfos_rw)
 {
+    delayed_note_offs.reserve(POLYPHONY);
+
     initialize_supported_midi_controllers();
 
     for (int i = 0; i != 4; ++i) {
@@ -204,6 +207,7 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_14] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_15] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_16] = true;
+    supported_midi_controllers[ControllerId::SUSTAIN_PEDAL] = true;
     supported_midi_controllers[ControllerId::SOUND_1] = true;
     supported_midi_controllers[ControllerId::SOUND_2] = true;
     supported_midi_controllers[ControllerId::SOUND_3] = true;
@@ -778,14 +782,20 @@ void Synth::note_off(
         return;
     }
 
-    Integer const voice = midi_note_to_voice_assignments[channel][note];
+    if (UNLIKELY(is_sustaining)) {
+        DelayedNoteOff const delayed_note_off(channel, note, velocity);
 
-    midi_note_to_voice_assignments[channel][note] = -1;
+        delayed_note_offs.push_back(delayed_note_off);
+    } else {
+        Integer const voice = midi_note_to_voice_assignments[channel][note];
 
-    Number const velocity_float = midi_byte_to_float(velocity);
+        midi_note_to_voice_assignments[channel][note] = -1;
 
-    modulators[voice]->note_off(time_offset, note, velocity_float);
-    carriers[voice]->note_off(time_offset, note, velocity_float);
+        Number const velocity_float = midi_byte_to_float(velocity);
+
+        modulators[voice]->note_off(time_offset, note, velocity_float);
+        carriers[voice]->note_off(time_offset, note, velocity_float);
+    }
 }
 
 
@@ -818,6 +828,33 @@ void Synth::control_change(
     }
 
     midi_controllers_rw[controller]->change(time_offset, midi_byte_to_float(new_value));
+}
+
+
+void Synth::sustain_on(
+        Seconds const time_offset,
+        Midi::Channel const channel
+) noexcept {
+    is_sustaining = true;
+}
+
+
+void Synth::sustain_off(
+        Seconds const time_offset,
+        Midi::Channel const channel
+) noexcept {
+    is_sustaining = false;
+
+    for (std::vector<DelayedNoteOff>::const_iterator it = delayed_note_offs.begin(); it != delayed_note_offs.end(); ++it) {
+        DelayedNoteOff const& delayed_note_off = *it;
+
+        note_off(
+            time_offset,
+            delayed_note_off.get_channel(),
+            delayed_note_off.get_note(),
+            delayed_note_off.get_velocity()
+        );
+    }
 }
 
 
@@ -2155,5 +2192,81 @@ Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
 
     return *this;
 }
+
+
+Synth::DelayedNoteOff::DelayedNoteOff() : channel(0), note(0), velocity(0)
+{
+}
+
+
+Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const& delayed_note_off)
+    : channel(delayed_note_off.channel),
+    note(delayed_note_off.note),
+    velocity(delayed_note_off.velocity)
+{
+}
+
+
+Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const&& delayed_note_off)
+    : channel(delayed_note_off.channel),
+    note(delayed_note_off.note),
+    velocity(delayed_note_off.velocity)
+{
+}
+
+
+Synth::DelayedNoteOff::DelayedNoteOff(
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Midi::Byte const velocity
+) : channel(channel), note(note), velocity(velocity)
+{
+}
+
+
+Synth::DelayedNoteOff& Synth::DelayedNoteOff::operator=(
+        DelayedNoteOff const& delayed_note_off
+) noexcept {
+    if (this != &delayed_note_off) {
+        channel = delayed_note_off.channel;
+        note = delayed_note_off.note;
+        velocity = delayed_note_off.velocity;
+    }
+
+    return *this;
+}
+
+
+Synth::DelayedNoteOff& Synth::DelayedNoteOff::operator=(
+        DelayedNoteOff const&& delayed_note_off
+) noexcept {
+    if (this != &delayed_note_off) {
+        channel = delayed_note_off.channel;
+        note = delayed_note_off.note;
+        velocity = delayed_note_off.velocity;
+    }
+
+    return *this;
+}
+
+
+Midi::Channel Synth::DelayedNoteOff::get_channel() const noexcept
+{
+    return channel;
+}
+
+
+Midi::Channel Synth::DelayedNoteOff::get_note() const noexcept
+{
+    return note;
+}
+
+
+Midi::Channel Synth::DelayedNoteOff::get_velocity() const noexcept
+{
+    return velocity;
+}
+
+
 
 }
