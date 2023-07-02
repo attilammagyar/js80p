@@ -784,15 +784,15 @@ void Synth::note_off(
         return;
     }
 
+    Integer const voice = midi_note_to_voice_assignments[channel][note];
+
+    midi_note_to_voice_assignments[channel][note] = -1;
+
     if (UNLIKELY(is_sustaining)) {
-        DelayedNoteOff const delayed_note_off(channel, note, velocity);
+        DelayedNoteOff const delayed_note_off(channel, note, velocity, voice);
 
         delayed_note_offs.push_back(delayed_note_off);
     } else {
-        Integer const voice = midi_note_to_voice_assignments[channel][note];
-
-        midi_note_to_voice_assignments[channel][note] = -1;
-
         Number const velocity_float = midi_byte_to_float(velocity);
 
         modulators[voice]->note_off(time_offset, note, velocity_float);
@@ -849,13 +849,15 @@ void Synth::sustain_off(
 
     for (std::vector<DelayedNoteOff>::const_iterator it = delayed_note_offs.begin(); it != delayed_note_offs.end(); ++it) {
         DelayedNoteOff const& delayed_note_off = *it;
+        Integer const voice = delayed_note_off.get_voice();
 
-        note_off(
-            time_offset,
-            delayed_note_off.get_channel(),
-            delayed_note_off.get_note(),
-            delayed_note_off.get_velocity()
-        );
+        if (voice > -1) {
+            Midi::Note const note = delayed_note_off.get_note();
+            Number const velocity = midi_byte_to_float(delayed_note_off.get_velocity());
+
+            modulators[voice]->note_off(time_offset, note, velocity);
+            carriers[voice]->note_off(time_offset, note, velocity);
+        }
     }
 
     delayed_note_offs.clear();
@@ -2206,13 +2208,14 @@ Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
 }
 
 
-Synth::DelayedNoteOff::DelayedNoteOff() : channel(0), note(0), velocity(0)
+Synth::DelayedNoteOff::DelayedNoteOff() : voice(-1), channel(0), note(0), velocity(0)
 {
 }
 
 
 Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const& delayed_note_off)
-    : channel(delayed_note_off.channel),
+    : voice(delayed_note_off.voice),
+    channel(delayed_note_off.channel),
     note(delayed_note_off.note),
     velocity(delayed_note_off.velocity)
 {
@@ -2220,7 +2223,8 @@ Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const& delayed_note_off)
 
 
 Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const&& delayed_note_off)
-    : channel(delayed_note_off.channel),
+    : voice(delayed_note_off.voice),
+    channel(delayed_note_off.channel),
     note(delayed_note_off.note),
     velocity(delayed_note_off.velocity)
 {
@@ -2230,8 +2234,9 @@ Synth::DelayedNoteOff::DelayedNoteOff(DelayedNoteOff const&& delayed_note_off)
 Synth::DelayedNoteOff::DelayedNoteOff(
         Midi::Channel const channel,
         Midi::Note const note,
-        Midi::Byte const velocity
-) : channel(channel), note(note), velocity(velocity)
+        Midi::Byte const velocity,
+        Integer const voice
+) : voice(voice), channel(channel), note(note), velocity(velocity)
 {
 }
 
@@ -2240,6 +2245,7 @@ Synth::DelayedNoteOff& Synth::DelayedNoteOff::operator=(
         DelayedNoteOff const& delayed_note_off
 ) noexcept {
     if (this != &delayed_note_off) {
+        voice = delayed_note_off.voice;
         channel = delayed_note_off.channel;
         note = delayed_note_off.note;
         velocity = delayed_note_off.velocity;
@@ -2253,6 +2259,7 @@ Synth::DelayedNoteOff& Synth::DelayedNoteOff::operator=(
         DelayedNoteOff const&& delayed_note_off
 ) noexcept {
     if (this != &delayed_note_off) {
+        voice = delayed_note_off.voice;
         channel = delayed_note_off.channel;
         note = delayed_note_off.note;
         velocity = delayed_note_off.velocity;
@@ -2280,5 +2287,9 @@ Midi::Byte Synth::DelayedNoteOff::get_velocity() const noexcept
 }
 
 
+Integer Synth::DelayedNoteOff::get_voice() const noexcept
+{
+    return voice;
+}
 
 }
