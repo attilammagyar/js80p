@@ -855,6 +855,8 @@ void Synth::sustain_off(
             delayed_note_off.get_velocity()
         );
     }
+
+    delayed_note_offs.clear();
 }
 
 
