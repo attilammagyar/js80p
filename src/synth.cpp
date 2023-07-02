@@ -2256,13 +2256,13 @@ Midi::Channel Synth::DelayedNoteOff::get_channel() const noexcept
 }
 
 
-Midi::Channel Synth::DelayedNoteOff::get_note() const noexcept
+Midi::Note Synth::DelayedNoteOff::get_note() const noexcept
 {
     return note;
 }
 
 
-Midi::Channel Synth::DelayedNoteOff::get_velocity() const noexcept
+Midi::Byte Synth::DelayedNoteOff::get_velocity() const noexcept
 {
     return velocity;
 }

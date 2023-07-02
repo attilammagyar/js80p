@@ -1015,8 +1015,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 DelayedNoteOff& operator=(DelayedNoteOff const&& delayed_note_off) noexcept;
 
                 Midi::Channel get_channel() const noexcept;
-                Midi::Channel get_note() const noexcept;
-                Midi::Channel get_velocity() const noexcept;
+                Midi::Note get_note() const noexcept;
+                Midi::Byte get_velocity() const noexcept;
 
             private:
                 Midi::Channel channel;
