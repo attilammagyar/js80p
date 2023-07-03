@@ -411,9 +411,9 @@ Number FloatParam::ratio_to_value(Number const ratio) const noexcept
 {
     if (is_logarithmic()) {
         return Math::lookup(
-            Math::log_biquad_filter_freq_table(),
-            Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-            ratio * Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+            log_scale_table,
+            log_scale_table_max_index,
+            ratio * log_scale_table_scale
         );
     }
 
@@ -424,8 +424,8 @@ Number FloatParam::ratio_to_value(Number const ratio) const noexcept
 Number FloatParam::value_to_ratio(Number const value) const noexcept
 {
     if (is_logarithmic()) {
-        Number const min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
-        Number const max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+        Number const min = this->min_value;
+        Number const max = this->max_value;
         Number const log_range = std::log2(max) - std::log2(min);
 
         return (std::log2(value) - std::log2(min)) / log_range;
