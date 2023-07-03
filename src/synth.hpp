@@ -1030,7 +1030,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
         static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
 
-        static constexpr Integer NEXT_VOICE_MASK = 0x0f;
+        static constexpr Integer NEXT_VOICE_MASK = 0x3f;
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
         static constexpr Integer INVALID_VOICE = -1;
