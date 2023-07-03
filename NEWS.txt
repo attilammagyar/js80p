@@ -1,3 +1,12 @@
+v1.9.0 (2023-07-04)
+ * Sustain pedal is now supported
+ * Sustain pedal can also be used to control parameters (e.g. it can adjust
+   Envelopes via a Flexible Controller)
+ * Presets are adjusted to take advantage of the sustain pedal as well
+ * Polyphony increased to 64 voices
+ * Include version, platform, and SDK version in the information shown on the
+   About tab
+
 v1.8.0 (2023-07-01)
  * 20 Flexible Controllers instead of 10, allowing more complex patches
  * Logarithmic Filter Frequencies toggle for the filters of delay-based effects
