@@ -787,7 +787,7 @@ void FstPlugin::set_program_name(const char* name)
 void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 {
     close_gui();
-    gui = new GUI(platform_data, parent_window, synth, false);
+    gui = new GUI(FST_H_VERSION, platform_data, parent_window, synth, false);
     gui->show();
 }
 

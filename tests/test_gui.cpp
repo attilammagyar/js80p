@@ -114,6 +114,6 @@ TEST(clamp_ratio, {
 
 
 TEST(gui_initialization, {
-    GUI gui(NULL, NULL, synth, false);
+    GUI gui(NULL, NULL, NULL, synth, false);
     gui.show();
 })

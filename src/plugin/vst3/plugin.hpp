@@ -25,6 +25,7 @@
 #include <vst3sdk/pluginterfaces/gui/iplugview.h>
 #include <vst3sdk/pluginterfaces/vst/ivstmessage.h>
 #include <vst3sdk/pluginterfaces/vst/ivstmidicontrollers.h>
+#include <vst3sdk/pluginterfaces/vst/vsttypes.h>
 #include <vst3sdk/public.sdk/source/common/pluginview.h>
 #include <vst3sdk/public.sdk/source/main/pluginfactory.h>
 #include <vst3sdk/public.sdk/source/vst/vstaudioeffect.h>

@@ -31,6 +31,7 @@ extern GUI::PlatformData* platform_data;
 void Vst3Plugin::GUI::initialize()
 {
     gui = new JS80P::GUI(
+        kVstVersionString,
         *platform_data,
         (JS80P::GUI::PlatformWidget)systemWindow,
         synth,

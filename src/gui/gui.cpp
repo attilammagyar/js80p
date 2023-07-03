@@ -1037,6 +1037,7 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
 
 
 GUI::GUI(
+        char const* sdk_version,
         PlatformData platform_data,
         PlatformWidget parent_window,
         Synth& synth,
@@ -1088,7 +1089,7 @@ GUI::GUI(
 
     controller_selector = new ControllerSelector(*background, synth);
 
-    build_about_body();
+    build_about_body(sdk_version);
     build_controllers_1_body(knob_states);
     build_controllers_2_body(knob_states);
     build_effects_body(knob_states);
@@ -1168,14 +1169,14 @@ GUI::GUI(
 }
 
 
-void GUI::build_about_body()
+void GUI::build_about_body(char const* sdk_version)
 {
     about_body = new TabBody("About");
 
     background->own(about_body);
 
     ((Widget*)about_body)->own(
-        new AboutText(show_vst_logo ? vst_logo_image : NULL)
+        new AboutText(sdk_version, show_vst_logo ? vst_logo_image : NULL)
     );
 
     about_body->hide();

@@ -104,6 +104,7 @@ void Vst3Plugin::GUI::initialize()
     }
 
     gui = new JS80P::GUI(
+        kVstVersionString,
         (JS80P::GUI::PlatformData)xcb,
         (JS80P::GUI::PlatformWidget)systemWindow,
         synth,

@@ -100,6 +100,7 @@ int WINAPI wWinMain(
     SetTimer(main_window, timer_id, 100, NULL);
 
     gui = new JS80P::GUI(
+        NULL,
         (JS80P::GUI::PlatformData)hInstance,
         (JS80P::GUI::PlatformWidget)main_window,
         synth,

@@ -1104,11 +1104,25 @@ bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 }
 
 
-AboutText::AboutText(GUI::Image logo)
+AboutText::AboutText(char const* sdk_version, GUI::Image logo)
     : Widget(TEXT, LEFT, TOP, WIDTH, HEIGHT, Type::ABOUT_TEXT),
     logo(logo)
 {
-    std::string line = "";
+    std::string line("(Version: ");
+
+    line += VERSION;
+
+    if (sdk_version != NULL) {
+        line += ", SDK: ";
+        line += sdk_version;
+    }
+
+    line += ")";
+
+    lines.push_back(NAME);
+    lines.push_back(line);
+
+    line = "";
 
     for (char const* c = TEXT; *c != '\x00'; ++c) {
         if (*c == '\n') {
