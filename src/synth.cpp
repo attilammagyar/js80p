@@ -405,7 +405,7 @@ void Synth::register_effects_params() noexcept
 
 void Synth::create_voices() noexcept
 {
-    for (int i = 0; i != POLYPHONY; ++i) {
+    for (Integer i = 0; i != POLYPHONY; ++i) {
         modulators[i] = new Modulator(
             frequencies,
             Midi::NOTES,
