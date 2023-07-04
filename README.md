@@ -437,7 +437,7 @@ pedal's MIDI CC events to the plugin parameter where JS80P expects them.
 
   [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
 
-1. Open _Options / MIDI settings_ from the main menu.
+1. Open "_Options / MIDI settings_" from the main menu.
 
 2. Turn off the "_Foot pedal controls note off_" option.
 
