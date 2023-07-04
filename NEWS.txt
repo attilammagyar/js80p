@@ -1,3 +1,13 @@
+v1.9.1 (2023-07-05)
+ * Voices which decay completely into silence during their envelope sustain
+   phase are now turned off automatically, in order to be reused for new notes,
+   and to save CPU time.
+ * Bugfix: non-dynamic envelopes will use the release time that was in effect
+   at the moment when the note was triggered, only dynamic envelopes will
+   update the release time for already sounding notes
+ * Bugfix: the FST plugin now handles the sustain pedal's messages correctly
+   in FL Studio as well.
+
 v1.9.0 (2023-07-04)
  * Sustain pedal is now supported
  * Sustain pedal can also be used to control parameters (e.g. it can adjust
