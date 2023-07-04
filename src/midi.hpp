@@ -67,16 +67,6 @@ class EventHandler
             Byte const new_value
         ) noexcept {}
 
-        void sustain_on(
-            Seconds const time_offset,
-            Channel const channel
-        ) noexcept {}
-
-        void sustain_off(
-            Seconds const time_offset,
-            Channel const channel
-        ) noexcept {}
-
         void program_change(
             Seconds const time_offset,
             Channel const channel,
@@ -520,18 +510,17 @@ void Dispatcher::dispatch(
 
         case CONTROL_CHANGE:
             if (d1 < CONTROL_CHANGE_ALL_SOUND_OFF) {
+                /*
+                Some hosts (e.g. FL Studio 21) swallow most MIDI CC messages,
+                so the interpretation logic of those with special meanings (e.g.
+                sustain pedal) is better performed in the control_change()
+                method of the event handler, which also handles exported plugin
+                parameters.
+                */
+
                 Controller const controller = (Controller)d1;
 
                 event_handler.control_change(time_offset, channel, controller, d2);
-
-                if (controller == SUSTAIN_PEDAL) {
-                    if (d2 < 64) {
-                        event_handler.sustain_off(time_offset, channel);
-                    } else {
-                        event_handler.sustain_on(time_offset, channel);
-                    }
-                }
-
             } else {
                 switch ((Command)d1) {
                     case CONTROL_CHANGE_ALL_SOUND_OFF:

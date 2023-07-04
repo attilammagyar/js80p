@@ -690,13 +690,13 @@ void Synth::note_on(
         Mode const mode = this->mode.get_value();
 
         if (mode == MIX_AND_MOD) {
-            modulators[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
-            carriers[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
+            modulators[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
+            carriers[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
         } else {
             if (note < mode + Midi::NOTE_B_2) {
-                modulators[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
+                modulators[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
             } else {
-                carriers[next_voice]->note_on(time_offset, note, velocity_float, previous_note);
+                carriers[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
             }
         }
 
@@ -759,8 +759,9 @@ bool Synth::is_repeated_midi_controller_message(
         Midi::Word const value
 ) noexcept {
     /*
-    By default, FL Studio sends pitch bends separately on all channels, but it's
-    enough for JS80P to handle only one of those.
+    By default, FL Studio 21 sends multiple clones of the same pitch bend event
+    separately on all channels, but it's enough for JS80P to handle only one of
+    those.
     */
     MidiControllerMessage const message(time_offset, value);
 
@@ -830,21 +831,25 @@ void Synth::control_change(
     }
 
     midi_controllers_rw[controller]->change(time_offset, midi_byte_to_float(new_value));
+
+    if (controller == Midi::SUSTAIN_PEDAL) {
+        if (new_value < 64) {
+            sustain_off(time_offset);
+        } else {
+            sustain_on(time_offset);
+        }
+    }
 }
 
 
-void Synth::sustain_on(
-        Seconds const time_offset,
-        Midi::Channel const channel
-) noexcept {
+void Synth::sustain_on(Seconds const time_offset) noexcept
+{
     is_sustaining = true;
 }
 
 
-void Synth::sustain_off(
-        Seconds const time_offset,
-        Midi::Channel const channel
-) noexcept {
+void Synth::sustain_off(Seconds const time_offset) noexcept
+{
     is_sustaining = false;
 
     for (std::vector<DelayedNoteOff>::const_iterator it = delayed_note_offs.begin(); it != delayed_note_offs.end(); ++it) {

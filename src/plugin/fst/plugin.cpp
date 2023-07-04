@@ -582,9 +582,9 @@ void FstPlugin::handle_parameter_changes() noexcept
 
         if (Synth::is_supported_midi_controller(controller_id)) {
             /*
-            Some hosts (e.g. FL Studio) swallow most MIDI CC messages, and the
-            only way to make physical knobs and faders on a MIDI keyboard work
-            in the plugin is to export parameters to which those MIDI CC
+            Some hosts (e.g. FL Studio 21) swallow most MIDI CC messages, and
+            the only way to make physical knobs and faders on a MIDI keyboard
+            work in the plugin is to export parameters to which those MIDI CC
             messages can be assigned in the host, and then interpret the
             changes of these parameters as if the corresponding MIDI CC message
             had been received.

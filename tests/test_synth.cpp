@@ -612,9 +612,9 @@ TEST(sustain_pedal, {
     synth_1.note_off(sustain_off, 1, Midi::NOTE_A_3, 114);
 
     synth_2.note_on(note_on, 1, Midi::NOTE_A_3, 114);
-    synth_2.sustain_on(sustain_on, 1);
+    synth_2.control_change(sustain_on, 1, Midi::SUSTAIN_PEDAL, 127);
     synth_2.note_off(note_off, 1, Midi::NOTE_A_3, 114);
-    synth_2.sustain_off(sustain_off, 1);
+    synth_2.control_change(sustain_off, 1, Midi::SUSTAIN_PEDAL, 0);
 
     synth_1_samples = SignalProducer::produce<Synth>(synth_1, 1);
     synth_2_samples = SignalProducer::produce<Synth>(synth_2, 1);

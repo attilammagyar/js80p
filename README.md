@@ -41,10 +41,11 @@ Table of Contents
     * [Mac version?](#faq-mac)
     * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
-    * [How to assign a MIDI CC to a JS80P parameter in FL Studio?](#faq-flstudio-midicc)
-    * [How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?](#faq-flstudio-aftertouch)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
+    * [FL Studio: How to assign a MIDI CC to a JS80P parameter?](#faq-flstudio-midicc)
+    * [FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?](#faq-flstudio-aftertouch)
+    * [FL Studio: How to use the Sustain Pedal?](#faq-flstudio-sustain)
  * [Development](#dev)
     * [Tools](#dev-tools)
     * [Dependencies](#dev-dep)
@@ -326,9 +327,36 @@ to the `MIDI CC 1 (Modulation Wheel)` (VST 3) or `ModWh` (FST) parameter. JS80P
 will then interpret the changes of this parameter the same way as if you were
 turning the modulation wheel on a MIDI keyboard.
 
+<a name="faq-pm-fm"></a>
+
+### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
+
+The reason for JS80P having both kinds of modulation is that they are not
+always equivalent. They are only identical when the modulator signal is a
+sinusoid, but with each added harmonic, PM and FM start to differ more and
+more. A detailed mathematical explanation of this is shown in
+[pm-fm-equivalence.md](pm-fm-equivalence.md).
+
+<a name="faq-name"></a>
+
+### Where does the name come from?
+
+In 2022, I started developing a browser-based synthesizer using the [Web Audio
+API][webaudio], mostly being inspired by the [Yamaha CS-80][cs80]. I named that
+project [JS-80][js80]. Then I started adding one little feature and
+customization option after the other, then it got out of hand, and I also
+started finding limitations of doing audio in the browser. So I decided to
+implement a cleaned up version of this synth in C++ as a DAW plugin (with a
+better waveshaper antialiasing method than what's available in the browser),
+and so JS80P was born.
+
+  [webaudio]: https://www.w3.org/TR/webaudio/
+  [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80
+  [js80]: https://attilammagyar.github.io/toys/js-80/
+
 <a name="faq-flstudio-midicc"></a>
 
-### How to assign a MIDI CC to a JS80P parameter in FL Studio?
+### FL Studio: How to assign a MIDI CC to a JS80P parameter?
 
 Unlike decent audio software (like for example
 [REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
@@ -365,7 +393,7 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 
 <a name="faq-flstudio-aftertouch"></a>
 
-### How to assign Channel Pressure (Aftertouch) to a JS80P parameter in FL Studio?
+### FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?
 
 Unlike decent audio software (like for example
 [REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
@@ -395,32 +423,35 @@ more complicated procedure than setting up MIDI CC:
 
 7. Select the "_Channel Aftertouch_" option.
 
-<a name="faq-pm-fm"></a>
+<a name="faq-flstudio-sustain"></a>
 
-### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
+### FL Studio: How to use the Sustain Pedal?
 
-The reason for JS80P having both kinds of modulation is that they are not
-always equivalent. They are only identical when the modulator signal is a
-sinusoid, but with each added harmonic, PM and FM start to differ more and
-more. A detailed mathematical explanation of this is shown in
-[pm-fm-equivalence.md](pm-fm-equivalence.md).
+Unlike decent audio software (like for example
+[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
+does not send all MIDI events that come out of your MIDI keyboard to plugins,
+and unfortunately, the [MIDI Control Change (MIDI CC)][midicc2] message which
+contains information about the sustain pedal's state is among the kinds of MIDI
+data that it swallows. To make everything work, you have to assign the sustain
+pedal's MIDI CC events to the plugin parameter where JS80P expects them.
 
-<a name="faq-name"></a>
+  [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
 
-### Where does the name come from?
+1. Open _Options / MIDI settings_ from the main menu.
 
-In 2022, I started developing a browser-based synthesizer using the [Web Audio
-API][webaudio], mostly being inspired by the [Yamaha CS-80][cs80]. I named that
-project [JS-80][js80]. Then I started adding one little feature and
-customization option after the other, then it got out of hand, and I also
-started finding limitations of doing audio in the browser. So I decided to
-implement a cleaned up version of this synth in C++ as a DAW plugin (with a
-better waveshaper antialiasing method than what's available in the browser),
-and so JS80P was born.
+2. Turn off the "_Foot pedal controls note off_" option.
 
-  [webaudio]: https://www.w3.org/TR/webaudio/
-  [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80
-  [js80]: https://attilammagyar.github.io/toys/js-80/
+3. Close the _Settings_ dialog window.
+
+4. Click on the small triangle in the top left corner of the plugin window of
+   JS80P, and select the "_Browse parameters_" menu item.
+
+5. Find the parameter named "_Sustn_" (FST) or "_MIDI CC 64 (Sustain Pedal)_"
+   (VST 3) in the browser. Click on it with the right mouse button.
+
+6. Select the "_Link to controller..._" menu item.
+
+7. Press the pedal.
 
 <a name="dev"></a>
 

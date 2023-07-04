@@ -788,16 +788,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Byte const new_value
         ) noexcept;
 
-        void sustain_on(
-            Seconds const time_offset,
-            Midi::Channel const channel
-        ) noexcept;
-
-        void sustain_off(
-            Seconds const time_offset,
-            Midi::Channel const channel
-        ) noexcept;
-
         void channel_pressure(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -1073,6 +1063,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
+
+        void sustain_on(Seconds const time_offset) noexcept;
+        void sustain_off(Seconds const time_offset) noexcept;
 
         bool is_repeated_midi_controller_message(
             ControllerId const controller_id,
