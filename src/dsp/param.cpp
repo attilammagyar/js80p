@@ -804,6 +804,8 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
         (Seconds)envelope->decay_time.get_value(),
         ratio_to_value(amount * envelope->sustain_value.get_value())
     );
+
+    envelope_release_time = (Seconds)envelope->release_time.get_value();
 }
 
 
@@ -815,7 +817,10 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
         return 0.0;
     }
 
-    envelope_release_time = (Seconds)envelope->release_time.get_value();
+    if (envelope->dynamic.get_value() == ToggleParam::ON) {
+        envelope_release_time = (Seconds)envelope->release_time.get_value();
+    }
+
     envelope_end_scheduled = true;
     envelope_end_time_offset = time_offset;
 

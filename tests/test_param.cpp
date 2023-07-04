@@ -1057,6 +1057,46 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
 })
 
 
+TEST(envelope_release_time_is_saved_when_the_envelope_is_started, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 0.0, 1.0, 2.0, 3.0,
+        1.5, 0.0, 0.0, 0.0, 0.0,
+    };
+    FloatParam float_param("float", -5.0, 5.0, 0.0);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(1.0);
+    float_param.set_envelope(&envelope);
+
+    envelope.amount.set_value(0.8);
+    envelope.initial_value.set_value(0.625);
+    envelope.delay_time.set_value(0.7);
+    envelope.attack_time.set_value(3.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(1.0);
+    envelope.decay_time.set_value(2.0);
+    envelope.sustain_value.set_value(0.75);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.625);
+
+    float_param.start_envelope(0.3);
+
+    envelope.release_time.set_value(0.123);
+
+    assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
+
+    assert_true(float_param.is_constant_until(1));
+    assert_false(float_param.is_constant_until(2));
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
+
+    rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
 template<class FloatParamClass>
 void test_follower_envelope()
 {
@@ -1092,6 +1132,9 @@ void test_follower_envelope()
     envelope.final_value.set_value(0.625);
 
     follower.start_envelope(0.3);
+
+    envelope.release_time.set_value(0.123);
+
     assert_eq(2.0, follower.end_envelope(4.0), DOUBLE_DELTA);
 
     assert_true(follower.is_constant_until(1));
@@ -1144,11 +1187,14 @@ void test_follower_dynamic_envelope()
     envelope.hold_time.set_value(0.1);
     envelope.decay_time.set_value(0.1);
     envelope.sustain_value.set_value(0.1);
-    envelope.release_time.set_value(2.0);
+    envelope.release_time.set_value(0.123);
     envelope.final_value.set_value(0.625);
 
     follower.start_envelope(0.3);
-    follower.end_envelope(29.0);
+
+    envelope.release_time.set_value(2.0);
+
+    assert_eq(2.0, follower.end_envelope(29.0));
 
     FloatParam::produce<FloatParamClass>(follower, 1, 6);
 
