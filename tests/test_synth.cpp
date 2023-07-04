@@ -111,6 +111,12 @@ TEST(synth_rendering_is_independent_of_chunk_size, {
 })
 
 
+void set_param(Synth& synth, Synth::ParamId const param_id, Number const ratio)
+{
+    synth.push_message(SET_PARAM, param_id, ratio, 0);
+}
+
+
 void assign_controller(
         Synth& synth,
         Synth::ParamId const param_id,
@@ -564,21 +570,23 @@ TEST(effects, {
 
     synth.resume();
 
-    synth.push_message(SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::CWAV, inv_saw_as_ratio, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EOG, 0.2, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EDG, 0.2, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EF1FRQ, 0.75, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EF2FRQ, 0.75, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::ECDPT, 1.0, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::ECWET, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::ECDRY, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EEWET, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::EEDRY, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::ERWET, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::ERDRY, 0.5, 0);
-    synth.push_message(SET_PARAM, Synth::ParamId::L1CEN, 1.0, 0);
+    set_param(synth, Synth::ParamId::MWAV, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::CWAV, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::EOG, 0.2);
+    set_param(synth, Synth::ParamId::EDG, 0.2);
+    set_param(synth, Synth::ParamId::EF1FRQ, 0.75);
+    set_param(synth, Synth::ParamId::EF2FRQ, 0.75);
+    set_param(synth, Synth::ParamId::ECDPT, 1.0);
+    set_param(synth, Synth::ParamId::ECWET, 0.5);
+    set_param(synth, Synth::ParamId::ECDRY, 0.5);
+    set_param(synth, Synth::ParamId::EEWET, 0.5);
+    set_param(synth, Synth::ParamId::EEDRY, 0.5);
+    set_param(synth, Synth::ParamId::ERWET, 0.5);
+    set_param(synth, Synth::ParamId::ERDRY, 0.5);
+    set_param(synth, Synth::ParamId::L1CEN, 1.0);
+
     assign_controller(synth, Synth::ParamId::EF1Q, Synth::ControllerId::LFO_1);
+
     synth.note_on(0.0, 1, Midi::NOTE_A_4, 114);
 
     synth.process_messages();
