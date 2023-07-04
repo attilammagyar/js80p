@@ -252,6 +252,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, velocity, volume),
     frequencies(frequencies),
     state(OFF),
+    note(0),
+    channel(0),
     modulation_out((ModulationOut&)volume_applier)
 {
     register_child(velocity_sensitivity);
@@ -274,6 +276,8 @@ void Voice<ModulatorSignalProducerClass>::reset() noexcept
     SignalProducer::reset();
 
     state = OFF;
+    note = 0;
+    channel = 0;
 }
 
 
@@ -296,6 +300,7 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::note_on(
         Seconds const time_offset,
         Midi::Note const note,
+        Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
@@ -306,6 +311,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     state = ON;
 
     this->note = note;
+    this->channel = channel;
     this->velocity = calculate_velocity(velocity);
 
     /* note_panning = 2.0 * (note / 127.0) - 1.0; */
@@ -441,6 +447,50 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     filter_2.frequency.end_envelope(time_offset);
     filter_2.q.end_envelope(time_offset);
     filter_2.gain.end_envelope(time_offset);
+}
+
+
+template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() const noexcept
+{
+    return (
+        state == ON
+        && (has_decayed(volume) || has_decayed(oscillator.amplitude))
+    );
+}
+
+
+template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::has_decayed(
+        FloatParam const& param
+) const noexcept {
+    constexpr Number threshold = 0.000001;
+
+    Envelope* envelope = param.get_envelope();
+
+    if (envelope == NULL) {
+        return false;
+    }
+
+    return (
+        !param.has_events_after(0.0)
+        && param.get_value() < threshold
+        && envelope->final_value.get_value() < threshold
+    );
+}
+
+
+template<class ModulatorSignalProducerClass>
+Midi::Note Voice<ModulatorSignalProducerClass>::get_note() const noexcept
+{
+    return note;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Midi::Note Voice<ModulatorSignalProducerClass>::get_channel() const noexcept
+{
+    return channel;
 }
 
 

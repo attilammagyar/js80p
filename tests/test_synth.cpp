@@ -637,3 +637,67 @@ TEST(sustain_pedal, {
         );
     }
 })
+
+
+TEST(decaying_voices_are_garbage_collected, {
+    constexpr Seconds note_start = 0.002;
+    constexpr Seconds decay_time = 0.001;
+    constexpr Seconds hold_time = 1.0;
+    constexpr Seconds sustain_start = note_start + hold_time + decay_time;
+
+    Synth synth;
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL, 220.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+    Integer number_of_rendered = 0;
+    Integer round = 0;
+
+    Integer const sustain_start_samples = (
+        (Integer)std::ceil(sustain_start * synth.get_sample_rate())
+    );
+
+    set_param(synth, Synth::ParamId::MAMP, 0.5);
+    set_param(synth, Synth::ParamId::CAMP, 0.5);
+
+    set_param(synth, Synth::ParamId::N1DYN, 0.0);
+    set_param(synth, Synth::ParamId::N1AMT, 1.0);
+    set_param(synth, Synth::ParamId::N1INI, 0.0);
+    set_param(synth, Synth::ParamId::N1DEL, 0.0);
+    set_param(synth, Synth::ParamId::N1ATK, 0.0);
+    set_param(synth, Synth::ParamId::N1PK, 1.0);
+    set_param(synth, Synth::ParamId::N1HLD, synth.envelopes[0]->hold_time.value_to_ratio(hold_time));
+    set_param(synth, Synth::ParamId::N1DEC, synth.envelopes[0]->decay_time.value_to_ratio(decay_time));
+    set_param(synth, Synth::ParamId::N1SUS, 0.0);
+    set_param(synth, Synth::ParamId::N1REL, 1.0);
+    set_param(synth, Synth::ParamId::N1FIN, 0.0);
+
+    assign_controller(synth, Synth::ParamId::MVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_1);
+
+    synth.process_messages();
+
+    synth.control_change(note_start, 1, Midi::SUSTAIN_PEDAL, 127);
+
+    for (Integer i = 0; i != Synth::POLYPHONY; ++i) {
+        synth.note_on(note_start, 1, Midi::NOTE_A_5, 100);
+    }
+
+    while (number_of_rendered < sustain_start_samples) {
+        SignalProducer::produce<Synth>(synth, round);
+        number_of_rendered += synth.get_block_size();
+        ++round;
+    }
+
+    synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
+
+    rendered_samples = SignalProducer::produce<Synth>(synth, round);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, round);
+
+    assert_eq(expected_samples[0], rendered_samples[0], synth.get_block_size(), DOUBLE_DELTA);
+    assert_eq(expected_samples[0], rendered_samples[1], synth.get_block_size(), DOUBLE_DELTA);
+})

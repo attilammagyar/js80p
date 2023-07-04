@@ -1217,6 +1217,7 @@ Sample const* const* Synth::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     process_messages();
+    garbage_collect_voices();
 
     raw_output = SignalProducer::produce< Effects::Effects<Bus> >(
         effects, round, sample_count
@@ -1237,6 +1238,37 @@ Sample const* const* Synth::initialize_rendering(
     clear_midi_controllers();
 
     return NULL;
+}
+
+
+void Synth::garbage_collect_voices() noexcept
+{
+    for (Integer v = 0; v != POLYPHONY; ++v) {
+        Midi::Channel channel;
+        Midi::Note note;
+
+        Modulator* const modulator = modulators[v];
+        bool const modulator_decayed = modulator->has_decayed_during_envelope_dahds();
+
+        if (modulator_decayed) {
+            note = modulator->get_note();
+            channel = modulator->get_channel();
+            modulator->reset();
+        }
+
+        Carrier* const carrier = carriers[v];
+        bool const carrier_decayed = carrier->has_decayed_during_envelope_dahds();
+
+        if (carrier_decayed) {
+            note = carrier->get_note();
+            channel = carrier->get_channel();
+            carrier->reset();
+        }
+
+        if (modulator_decayed && carrier_decayed) {
+            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+        }
+    }
 }
 
 

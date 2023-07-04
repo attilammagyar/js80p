@@ -60,9 +60,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
 {
     friend class SignalProducer;
 
+    private:
+        static constexpr Integer NEXT_VOICE_MASK = 0x3f;
+
     public:
         typedef Voice<SignalProducer> Modulator;
         typedef Voice<Modulator::ModulationOut> Carrier;
+
+        static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
@@ -1020,9 +1025,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
         static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
 
-        static constexpr Integer NEXT_VOICE_MASK = 0x3f;
-        static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
-
         static constexpr Integer INVALID_VOICE = -1;
 
         static std::vector<bool> supported_midi_controllers;
@@ -1110,6 +1112,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void clear_sustain() noexcept;
 
         void update_param_states() noexcept;
+
+        void garbage_collect_voices() noexcept;
 
         std::string const to_string(Integer const) const noexcept;
 

@@ -66,10 +66,10 @@ TEST(rendering_is_independent_of_chunk_size, {
     voice_1.set_sample_rate(sample_rate);
     voice_2.set_sample_rate(sample_rate);
 
-    voice_1.note_on(0.12, 1, 0.5, 1);
+    voice_1.note_on(0.12, 1, 0, 0.5, 1);
     voice_1.note_off(0.12 + 1.0, 1, 0.5);
 
-    voice_2.note_on(0.12, 1, 0.5, 1);
+    voice_2.note_on(0.12, 1, 0, 0.5, 1);
     voice_2.note_off(0.12 + 1.0, 1, 0.5);
 
     assert_rendering_is_independent_from_chunk_size<SimpleVoice>(
@@ -154,7 +154,7 @@ TEST(portamento, {
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(note_start, 1, 1.0, 1);
+    voice.note_on(note_start, 1, 0, 1.0, 1);
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -189,7 +189,7 @@ TEST(resetting_a_voice_turns_it_off, {
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(0.0, 1, 1.0, 1);
+    voice.note_on(0.0, 1, 0, 1.0, 1);
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -203,4 +203,78 @@ TEST(resetting_a_voice_turns_it_off, {
     );
     assert_false(voice.is_on());
     assert_true(voice.is_off_after(0.0));
+})
+
+
+TEST(can_tell_if_note_decayed_during_envelope_dahds, {
+    constexpr Seconds note_start = 0.002;
+    constexpr Seconds short_time = 0.001;
+    constexpr Seconds sustain_start = note_start + short_time * 4.0;
+
+    Envelope envelope("E");
+    SimpleVoice::Params params("V");
+    SimpleVoice decaying_voice(FREQUENCIES, NOTE_MAX, params);
+    SimpleVoice non_decaying_voice(FREQUENCIES, NOTE_MAX, params);
+    Integer rendered_samples = 0;
+    Integer round = 0;
+
+    Integer const sustain_start_samples = (
+        (Integer)std::ceil(sustain_start * decaying_voice.get_sample_rate())
+    );
+
+    params.waveform.set_value(SimpleOscillator::SINE);
+    params.amplitude.set_value(1.0);
+    params.volume.set_value(1.0);
+
+    params.amplitude.set_envelope(&envelope);
+
+    envelope.dynamic.set_value(ToggleParam::OFF);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.001);
+    envelope.attack_time.set_value(0.001);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.001);
+    envelope.decay_time.set_value(0.001);
+    envelope.sustain_value.set_value(0.0);
+    envelope.release_time.set_value(envelope.release_time.get_max_value());
+    envelope.final_value.set_value(0.0);
+
+    decaying_voice.note_on(note_start, 1, 0, 1.0, 1);
+
+    envelope.sustain_value.set_value(0.5);
+    non_decaying_voice.note_on(note_start, 1, 0, 1.0, 1);
+
+    while (rendered_samples < sustain_start_samples) {
+        assert_false(
+            decaying_voice.has_decayed_during_envelope_dahds(),
+            "rendered_samples=%d, round=%d",
+            (int)rendered_samples,
+            (int)round
+        );
+        assert_false(
+            non_decaying_voice.has_decayed_during_envelope_dahds(),
+            "rendered_samples=%d, round=%d",
+            (int)rendered_samples,
+            (int)round
+        );
+        SignalProducer::produce<SimpleVoice>(decaying_voice, round);
+        SignalProducer::produce<SimpleVoice>(non_decaying_voice, round);
+        rendered_samples += decaying_voice.get_block_size();
+        ++round;
+    }
+
+    assert_true(decaying_voice.has_decayed_during_envelope_dahds());
+    assert_false(non_decaying_voice.has_decayed_during_envelope_dahds());
+
+    envelope.final_value.set_value(0.5);
+
+    assert_false(
+        decaying_voice.has_decayed_during_envelope_dahds(),
+        "after envelope final value modification"
+    );
+    assert_false(
+        non_decaying_voice.has_decayed_during_envelope_dahds(),
+        "after envelope final value modification"
+    );
 })
