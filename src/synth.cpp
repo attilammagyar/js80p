@@ -112,7 +112,7 @@ Synth::Synth() noexcept
     envelopes((Envelope* const*)envelopes_rw),
     lfos((LFO* const*)lfos_rw)
 {
-    delayed_note_offs.reserve(POLYPHONY);
+    delayed_note_offs.reserve(2 * POLYPHONY);
 
     initialize_supported_midi_controllers();
 
@@ -856,13 +856,28 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
         DelayedNoteOff const& delayed_note_off = *it;
         Integer const voice = delayed_note_off.get_voice();
 
-        if (voice != INVALID_VOICE) {
-            Midi::Note const note = delayed_note_off.get_note();
-            Number const velocity = midi_byte_to_float(delayed_note_off.get_velocity());
-
-            modulators[voice]->note_off(time_offset, note, velocity);
-            carriers[voice]->note_off(time_offset, note, velocity);
+        if (UNLIKELY(voice == INVALID_VOICE)) {
+            /* This should never happen, but safety first! */
+            continue;
         }
+
+        Midi::Channel const channel = delayed_note_off.get_channel();
+        Midi::Note const note = delayed_note_off.get_note();
+
+        if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
+            /*
+            The voice might have decayed and got garbage collected after the
+            note-off event, and then it might have been assigned to play a new
+            note for which the key is still being held down. If that's the
+            case, then the voice shold keep ringing.
+            */
+            continue;
+        }
+
+        Number const velocity = midi_byte_to_float(delayed_note_off.get_velocity());
+
+        modulators[voice]->note_off(time_offset, note, velocity);
+        carriers[voice]->note_off(time_offset, note, velocity);
     }
 
     delayed_note_offs.clear();
@@ -1243,11 +1258,11 @@ Sample const* const* Synth::initialize_rendering(
 
 void Synth::garbage_collect_voices() noexcept
 {
-    for (Integer v = 0; v != POLYPHONY; ++v) {
+    for (Integer voice = 0; voice != POLYPHONY; ++voice) {
         Midi::Channel channel;
         Midi::Note note;
 
-        Modulator* const modulator = modulators[v];
+        Modulator* const modulator = modulators[voice];
         bool const modulator_decayed = modulator->has_decayed_during_envelope_dahds();
 
         if (modulator_decayed) {
@@ -1256,7 +1271,7 @@ void Synth::garbage_collect_voices() noexcept
             modulator->reset();
         }
 
-        Carrier* const carrier = carriers[v];
+        Carrier* const carrier = carriers[voice];
         bool const carrier_decayed = carrier->has_decayed_during_envelope_dahds();
 
         if (carrier_decayed) {
@@ -1266,7 +1281,18 @@ void Synth::garbage_collect_voices() noexcept
         }
 
         if (modulator_decayed && carrier_decayed) {
-            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+            Integer const assigned = midi_note_to_voice_assignments[channel][note];
+
+            /*
+            The note's key might have been released and triggered again while
+            the sustain pedal was engaged. If that's the case, then it is
+            assigned to a different voice which was free at the time. If so, we
+            don't want to de-assign that other voice.
+            */
+
+            if (voice == assigned) {
+                midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+            }
         }
     }
 }
