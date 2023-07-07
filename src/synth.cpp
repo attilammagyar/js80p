@@ -71,7 +71,7 @@ Synth::ModeParam::ModeParam(std::string const name) noexcept
 }
 
 
-Synth::Synth() noexcept
+Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         6                           // MODE + MIX + PM + FM + AM + bus
@@ -103,6 +103,8 @@ Synth::Synth() noexcept
         modulator_add_volume
     ),
     effects("E", bus),
+    samples_since_gc(0),
+    samples_between_gc(samples_between_gc),
     next_voice(0),
     previous_note(Midi::NOTE_MAX + 1),
     is_learning(false),
@@ -595,6 +597,14 @@ Synth::~Synth()
             delete midi_controllers_rw[i];
         }
     }
+}
+
+
+void Synth::set_sample_rate(Frequency const new_sample_rate) noexcept
+{
+    SignalProducer::set_sample_rate(new_sample_rate);
+
+    samples_between_gc = std::max((Integer)5000, (Integer)(new_sample_rate * 0.2));
 }
 
 
@@ -1232,7 +1242,13 @@ Sample const* const* Synth::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     process_messages();
-    garbage_collect_voices();
+
+    samples_since_gc += sample_count;
+
+    if (samples_since_gc > samples_between_gc) {
+        garbage_collect_voices();
+        samples_since_gc = 0;
+    }
 
     raw_output = SignalProducer::produce< Effects::Effects<Bus> >(
         effects, round, sample_count

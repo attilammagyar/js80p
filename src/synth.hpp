@@ -705,8 +705,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ControllerId const controller_id
         ) noexcept;
 
-        Synth() noexcept;
+        Synth(Integer const samples_between_gc = 8000) noexcept;
         virtual ~Synth() override;
+
+        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
 
         bool is_lock_free() const noexcept;
 
@@ -1134,6 +1136,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
+        Integer samples_since_gc;
+        Integer samples_between_gc;
         Integer next_voice;
         Midi::Note previous_note;
         bool is_learning;

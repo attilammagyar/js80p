@@ -645,7 +645,7 @@ TEST(decaying_voices_are_garbage_collected, {
     constexpr Seconds hold_time = 1.0;
     constexpr Seconds sustain_start = note_start + hold_time + decay_time;
 
-    Synth synth;
+    Synth synth(0);
     SumOfSines expected(
         OUT_VOLUME_PER_CHANNEL, 220.0,
         0.0, 0.0,
@@ -725,7 +725,7 @@ void set_up_quickly_decaying_envelope(Synth& synth)
 TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decayed_clone_while_sustaining, {
     constexpr Integer block_size = 2048;
 
-    Synth synth;
+    Synth synth(0);
     Sample const* const* rendered_samples = SignalProducer::produce<Synth>(synth, 3);
     Sample* expected_samples;
 
@@ -769,7 +769,7 @@ TEST(garbage_collected_voices_are_not_released_again_when_sustain_pedal_is_lifte
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
 
-    Synth synth;
+    Synth synth(0);
     SumOfSines expected(
         OUT_VOLUME_PER_CHANNEL, 220.0,
         0.0, 0.0,
