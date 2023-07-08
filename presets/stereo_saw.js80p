@@ -1,3 +1,6 @@
+; A little bit metallic sounding sawtooth wave. Note velocity slightly affects
+; the timbre, mod wheel and aftertouch add wavefolding. The volume knob
+; adjusts an LFO which controls filter resonance.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

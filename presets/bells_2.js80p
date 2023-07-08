@@ -1,3 +1,5 @@
+; A slightly darker bell sound. Aftertouch and mod wheel increase the vibrato,
+; the sustain pedal lengthens the decay.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

@@ -1,3 +1,6 @@
+; A little darker, distorted, Hammond-like organ sound. Aftertouch and mod wheel
+; increase the vibrato. The softer you play, the slower the attack, the harder
+; you play, the harder the attack.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

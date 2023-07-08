@@ -1,3 +1,9 @@
+; The patch from the second demo video of JS80P. This split keyboard patch has
+; slow tremolo bass notes below Gb3, with extremely long release (just press a
+; key, and you're good for about 2 measures with your left hand being free, even
+; without a sustain pedal), and plucky lead notes, with the mod wheel and the
+; volume knob (CC 7) controlling the timbre. (However, it is not recommended
+; with this patch to adjust the mod wheel while a right hand note is playing.)
 [js80p]
 MIX = 0.968069646816538
 MIXctl = 0.550781250000000

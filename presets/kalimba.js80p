@@ -1,3 +1,5 @@
+; A simple kalimba sound with percussive attack and short decay. The sustain
+; pedal adds more reverb and echo, and lengthens note decay.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

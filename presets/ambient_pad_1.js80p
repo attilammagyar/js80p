@@ -1,3 +1,5 @@
+; Slowly evolving pad sound with sci-fi vibe. The mod wheel destabilizes
+; the tuning, the aftertouch increases that effect, and adds slight distortions.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

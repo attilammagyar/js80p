@@ -1,3 +1,8 @@
+; A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
+; and inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
+; depending on the velocity. The harder you play, the longer it takes for the
+; wavefolder to kick in. The mod wheel controls the vibrato of notes above
+; C3, and the pitch wheel also affects only these notes.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

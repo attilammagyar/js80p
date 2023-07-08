@@ -1,3 +1,8 @@
+; A sawtooth wave based sound where high notes decay quickly, lower notes
+; decay slowly, but decay time is also affected by note velocity. The harder
+; you play, the brighter and richer the timbre, and the harder the note attack.
+; Mod wheel controls the vibrato, and aftertouch controls filtering. The
+; sustain pedal lengthens note decay.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

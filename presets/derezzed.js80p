@@ -1,3 +1,7 @@
+; This Daft Punk inspired patch is built around sawtooth waves with lots of
+; distortions. Mod wheel makes upcoming notes brighter (without affecting
+; the currently sounding ones), and it increases the distortion. Aftertouch
+; adds vibrato.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

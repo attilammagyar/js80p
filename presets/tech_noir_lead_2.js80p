@@ -1,3 +1,6 @@
+; A brass sound for futuristic sci-fi dystopias with a harsher filter sweep at
+; the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+; aftertouch adds emphasis and brightness.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

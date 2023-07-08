@@ -1,3 +1,7 @@
+; A more distorted FM sound where the modulator and the carrier use different
+; envelopes, so the notes start with a slight "wah" effect. Aftertouch and mod
+; wheel increase the vibrato. Aftertouch also adds more modulation, making the
+; sound brighter and more distorted.
 [js80p]
 MIX = 0.000000000000000
 MIXctl = 0.000000000000000

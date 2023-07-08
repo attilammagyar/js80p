@@ -1,3 +1,6 @@
+; The patch from the first demo video of JS80P. The mod wheel makes the sound
+; brighter, the volume knob (CC 7) adjusts the inverse sawtooth LFO which
+; controls the filter before the wavefolder.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000
