@@ -9,8 +9,7 @@ TARGET_PLATFORMS="x86_64-w64-mingw32 i686-w64-mingw32 x86_64-gpp i686-gpp"
 PLUGIN_TYPES="fst vst3"
 TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
 DIST_DIR_BASE="dist"
-BUILD_DIR="build"
-README_HTML="$BUILD_DIR/README.html"
+README_HTML="$DIST_DIR_BASE/README.html"
 
 main()
 {
@@ -62,8 +61,7 @@ main()
     log "Cleaning up"
 
     cleanup "$DIST_DIR_BASE"
-
-    build_readme_html >"$README_HTML"
+    cleanup "$README_HTML"
 
     log "Copying source"
 
@@ -90,6 +88,10 @@ main()
         "$DIST_DIR_BASE/$source_dir/"
 
     find "$DIST_DIR_BASE/$source_dir/" -name ".*.swp" -delete
+
+    log "Generating $README_HTML"
+
+    build_readme_html >"$README_HTML"
 
     log "Creating source archive"
 
