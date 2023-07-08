@@ -41,7 +41,8 @@ std::string Serializer::serialize(Synth const& synth) noexcept
 
     serialized += "[";
     serialized += JS80P_SECTION_NAME;
-    serialized += "]\r\n";
+    serialized += "]";
+    serialized += LINE_END;
 
     for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
@@ -51,9 +52,10 @@ std::string Serializer::serialize(Synth const& synth) noexcept
             snprintf(
                 line,
                 line_size,
-                "%s = %.15f\r\n",
+                "%s = %.15f%s",
                 param_name.c_str(),
-                synth.get_param_ratio_atomic(param_id)
+                synth.get_param_ratio_atomic(param_id),
+                LINE_END
             );
             serialized += line;
 

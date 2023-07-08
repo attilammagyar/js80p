@@ -49,12 +49,49 @@ bool read_patch(char const* file_path, std::string& result)
 }
 
 
-bool write_patch(char const* file_path, std::string const& patch)
+bool is_whole_line_comment_or_white_space(std::string const& line)
 {
+    std::string::const_iterator it = line.begin();
+
+    return JS80P::Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
+        it, line.end()
+    );
+}
+
+
+void collect_comments(std::string const& patch, JS80P::Serializer::Lines& comments)
+{
+    JS80P::Serializer::Lines* lines = JS80P::Serializer::parse_lines(patch);
+
+    for (JS80P::Serializer::Lines::const_iterator it = lines->begin(); it != lines->end(); ++it) {
+        std::string const& line = *it;
+
+        if (is_whole_line_comment_or_white_space(line)) {
+            comments.push_back(line);
+        }
+    }
+}
+
+
+bool write_patch(
+        char const* file_path,
+        std::string const& patch,
+        JS80P::Serializer::Lines const& comments
+) {
     std::ofstream patch_file(file_path, std::ios::out | std::ios::binary);
 
     if (!patch_file.is_open()) {
         return false;
+    }
+
+    std::string const line_end = JS80P::Serializer::LINE_END;
+
+    for (JS80P::Serializer::Lines::const_iterator it = comments.begin(); it != comments.end(); ++it) {
+        std::string const& comment = *it;
+        fprintf(stderr, "c: %s\n", comment.c_str());
+
+        patch_file.write(comment.c_str(), comment.length());
+        patch_file.write(line_end.c_str(), line_end.length());
     }
 
     patch_file.write(patch.c_str(), patch.length());
@@ -88,11 +125,14 @@ int upgrade_patch(char const* const patch_file)
     }
 
     JS80P::Synth synth;
+    JS80P::Serializer::Lines comments;
+
     JS80P::Serializer::import(synth, patch);
 
+    collect_comments(patch, comments);
     synth.process_messages();
 
-    if (!write_patch(patch_file, JS80P::Serializer::serialize(synth))) {
+    if (!write_patch(patch_file, JS80P::Serializer::serialize(synth), comments)) {
         return error("Error writing patch file", patch_file);
     }
 

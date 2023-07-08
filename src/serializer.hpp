@@ -34,6 +34,8 @@ class Serializer
     public:
         static constexpr Integer MAX_SIZE = 256 * 1024;
 
+        static constexpr char const* LINE_END = "\r\n";
+
         typedef std::vector<std::string> Lines;
 
         static Lines* parse_lines(std::string const& serialized) noexcept;
