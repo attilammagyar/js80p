@@ -266,31 +266,39 @@ small {
       </div>
 
       <div class="section">
-        <h3>What's New in v1.9</h3>
+        <h3>What's New in v1.9.2</h3>
         <ul>
-          <li><p>Sustain pedal is now supported</p></li>
-          <li><p>Sustain pedal can also be used to control parameters (e.g. it can adjust
-          Envelopes via a Flexible Controller)</p></li>
-          <li><p>Presets are adjusted to take advantage of the sustain pedal as well</p></li>
           <li><p>Increase the effect of note velocity on the timbre of the Saw Piano and
           Saw Piano Reversed patches</p></li>
-          <li><p>Polyphony increased to 64 voices</p></li>
-          <li><p>Include version, platform, and SDK version in the information shown on the
-          About tab</p></li>
           <li><p>Include more detailed, HTML documentation in distribution packages</p></li>
+          <li><p>Bugfix: when the sustain pedal was released, occasionally a few notes would
+          remain sounding, and sometimes notes could get released which should have
+          remained sounding due to their corresponding key being held down. Now those
+          and only those voices remain sounding after a pedal release which belong to
+          held down keys.</p></li>
+        </ul>
+
+        <h3>What's New in v1.9.1</h3>
+        <ul>
           <li><p>Voices which decay completely into silence during their envelope sustain
           phase are now turned off automatically, in order to be reused for new notes,
           and to save CPU time.</p></li>
           <li><p>Bugfix: non-dynamic envelopes will use the release time that was in effect
           at the moment when the note was triggered, only dynamic envelopes will
           update the release time for already sounding notes</p></li>
-          <li><p>Bugfix (v1.9.1): the FST plugin now handles the sustain pedal's messages correctly
+          <li><p>Bugfix: the FST plugin now handles the sustain pedal's messages correctly
           in FL Studio as well.</p></li>
-          <li><p>Bugfix (v1.9.2): when the sustain pedal was released, occasionally a few notes would
-          remain sounding, and sometimes notes could get released which should have
-          remained sounding due to their corresponding key being held down. Now those
-          and only those voices remain sounding after a pedal release which belong to
-          held down keys.</p></li>
+        </ul>
+
+        <h3>What's New in v1.9.0</h3>
+        <ul>
+          <li><p>Sustain pedal is now supported</p></li>
+          <li><p>Sustain pedal can also be used to control parameters (e.g. it can adjust
+          Envelopes via a Flexible Controller)</p></li>
+          <li><p>Presets are adjusted to take advantage of the sustain pedal as well</p></li>
+          <li><p>Polyphony increased to 64 voices</p></li>
+          <li><p>Include version, platform, and SDK version in the information shown on the
+          About tab</p></li>
         </ul>
       </div>
 
