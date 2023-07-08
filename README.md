@@ -92,7 +92,7 @@ System Requirements
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
-<a id="linux-deps" href="#toc">Table of Contents</a>
+<a id="linux-deps"></a>
 
 ### Dependencies on Linux
 
@@ -124,7 +124,7 @@ matches the CPU architecture for which your plugin host application was built.
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
 recognize VST 3 bundles when running on a 64 bit system.)
 
-<a id="vst3-bundle-windows" href="#toc">Table of Contents</a>
+<a id="vst3-bundle-windows"></a>
 
 ### VST 3 Bundle on Windows
 
@@ -133,7 +133,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
-<a id="vst3-bundle-linux" href="#toc">Table of Contents</a>
+<a id="vst3-bundle-linux"></a>
 
 ### VST 3 Bundle on Linux
 
@@ -142,7 +142,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `~/.vst3`.
 
-<a id="vst3-single-windows" href="#toc">Table of Contents</a>
+<a id="vst3-single-windows"></a>
 
 ### VST 3 Single File on Windows
 
@@ -151,7 +151,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
-<a id="vst3-single-linux" href="#toc">Table of Contents</a>
+<a id="vst3-single-linux"></a>
 
 ### VST 3 Single File on Linux
 
@@ -160,7 +160,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
 
-<a id="fst-windows" href="#toc">Table of Contents</a>
+<a id="fst-windows"></a>
 
 ### FST (VST 2.4) on Windows
 
@@ -169,7 +169,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
    plugins.
 
-<a id="fst-linux" href="#toc">Table of Contents</a>
+<a id="fst-linux"></a>
 
 ### FST (VST 2.4) on Linux
 
@@ -507,7 +507,7 @@ Features
 Frequenctly Asked Questions
 ---------------------------
 
-<a id="faq-which" href="#toc">Table of Contents</a>
+<a id="faq-which"></a>
 
 ### Which distribution should I download?
 
@@ -712,7 +712,7 @@ pedal's MIDI CC events to the plugin parameter where JS80P expects them.
 Development
 -----------
 
-<a id="dev-tools" href="#toc">Table of Contents</a>
+<a id="dev-tools"></a>
 
 ### Tools
 
@@ -729,7 +729,7 @@ Development
  * [WinLibs MinGW-w64 7.0.0+ (MSVCRT)](https://winlibs.com/)
  * [Doxygen 1.8.17+](https://www.doxygen.nl/)
 
-<a id="dev-dep" href="#toc">Table of Contents</a>
+<a id="dev-dep"></a>
 
 ### Dependencies
 
@@ -759,7 +759,7 @@ following packages need to be installed:
         libxcb-render0-dev:i386 \
         mingw-w64
 
-<a id="dev-compile" href="#toc">Table of Contents</a>
+<a id="dev-compile"></a>
 
 ### Compiling
 
