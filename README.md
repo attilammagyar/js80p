@@ -10,19 +10,20 @@ To download JS80P, visit its website at
 
 <img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
 
-The source code is available at https://github.com/attilammagyar/js80p under
-the terms of the GNU General Public License Version 3.
+The source code is available at
+[https://github.com/attilammagyar/js80p](https://github.com/attilammagyar/js80p)
+under the terms of the GNU General Public License Version 3.
 
 > VST® is a trademark of Steinberg Media Technologies GmbH, registered in
 > Europe and other countries.
 
-<a name="toc"></a>
+<a id="toc"></a>
 
 Table of Contents
 -----------------
 
  * [Table of Contents](#toc)
- * [System Requirements](#system)
+ * [System Requirements](#system-reqs)
     * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
     * [VST 3 Bundle on Windows](#vst3-bundle-windows)
@@ -80,7 +81,7 @@ Table of Contents
     * [Compiling](#dev-compile)
     * [Theory](#dev-theory)
 
-<a name="system"></a>
+<a id="system-reqs"></a>
 
 System Requirements
 -------------------
@@ -91,7 +92,7 @@ System Requirements
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
-<a name="linux-deps"></a>
+<a id="linux-deps" href="#toc">Table of Contents</a>
 
 ### Dependencies on Linux
 
@@ -107,7 +108,7 @@ then you will have to install the 32 bit version of the libraries, for example:
 
     sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
 
-<a name="install"></a>
+<a id="install" href="#toc">Table of Contents</a>
 
 Installation
 ------------
@@ -123,7 +124,7 @@ matches the CPU architecture for which your plugin host application was built.
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
 recognize VST 3 bundles when running on a 64 bit system.)
 
-<a name="vst3-bundle-windows"></a>
+<a id="vst3-bundle-windows" href="#toc">Table of Contents</a>
 
 ### VST 3 Bundle on Windows
 
@@ -132,7 +133,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
-<a name="vst3-bundle-linux"></a>
+<a id="vst3-bundle-linux" href="#toc">Table of Contents</a>
 
 ### VST 3 Bundle on Linux
 
@@ -141,7 +142,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `~/.vst3`.
 
-<a name="vst3-single-windows"></a>
+<a id="vst3-single-windows" href="#toc">Table of Contents</a>
 
 ### VST 3 Single File on Windows
 
@@ -150,7 +151,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
-<a name="vst3-single-linux"></a>
+<a id="vst3-single-linux" href="#toc">Table of Contents</a>
 
 ### VST 3 Single File on Linux
 
@@ -159,7 +160,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
 
-<a name="fst-windows"></a>
+<a id="fst-windows" href="#toc">Table of Contents</a>
 
 ### FST (VST 2.4) on Windows
 
@@ -168,7 +169,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
    plugins.
 
-<a name="fst-linux"></a>
+<a id="fst-linux" href="#toc">Table of Contents</a>
 
 ### FST (VST 2.4) on Linux
 
@@ -177,7 +178,7 @@ recognize VST 3 bundles when running on a 64 bit system.)
 3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
    plugins.
 
-<a name="usage"></a>
+<a id="usage" href="#toc">Table of Contents</a>
 
 Usage
 -----
@@ -195,7 +196,7 @@ Usage
  * It is recommended to use a small buffer size for lower latency, for example,
    3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
 
-<a name="presets"></a>
+<a id="presets" href="#toc">Table of Contents</a>
 
 Presets
 -------
@@ -431,7 +432,7 @@ a recording backwards. The time it takes for notes to un-decay depends on
 note pitch and velocity. The harder you play, the brighter and richer the
 sound gets. Mod wheel control the vibrato, aftertouch adjusts the filtering.
 
-<a name="bugs"></a>
+<a id="bugs" href="#toc">Table of Contents</a>
 
 Bugs
 ----
@@ -439,7 +440,7 @@ Bugs
 If you find bugs, please report them at
 [https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
 
-<a name="signal"></a>
+<a id="signal" href="#toc">Table of Contents</a>
 
 Signal Chain (Simplified)
 -------------------------
@@ -457,7 +458,7 @@ Signal Chain (Simplified)
     v
     Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
 
-<a name="features"></a>
+<a id="features" href="#toc">Table of Contents</a>
 
 Features
 --------
@@ -506,7 +507,7 @@ Features
 Frequenctly Asked Questions
 ---------------------------
 
-<a name="faq-which"></a>
+<a id="faq-which" href="#toc">Table of Contents</a>
 
 ### Which distribution should I download?
 
@@ -532,7 +533,7 @@ application doesn't recognize it, then try the 64 bit VST 3 version, then the
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
 
-<a name="faq-mac"></a>
+<a id="faq-mac" href="#toc">Table of Contents</a>
 
 ### Mac version?
 
@@ -544,7 +545,7 @@ machine that could be used for testing, I'd consider that. But as long as it
 cannot be obtained (legally) without also buying a Mac, and I'm happy with my
 current computer, I'm not going to invest in a new one.
 
-<a name="faq-custom-wave"></a>
+<a id="faq-custom-wave" href="#toc">Table of Contents</a>
 
 ### The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?
 
@@ -556,7 +557,7 @@ sample accurate, they are not smoothed, and they are processed only once for
 each rendering block. Due to this, if you change them while a note is playing,
 or assign a controller to them, then you might hear "steps" or even clicks.)
 
-<a name="faq-automation"></a>
+<a id="faq-automation" href="#toc">Table of Contents</a>
 
 ### How can parameters be automated? What parameters does the plugin export?
 
@@ -580,7 +581,7 @@ to the `MIDI CC 1 (Modulation Wheel)` (VST 3) or `ModWh` (FST) parameter. JS80P
 will then interpret the changes of this parameter the same way as if you were
 turning the modulation wheel on a MIDI keyboard.
 
-<a name="faq-pm-fm"></a>
+<a id="faq-pm-fm" href="#toc">Table of Contents</a>
 
 ### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
 
@@ -588,9 +589,9 @@ The reason for JS80P having both kinds of modulation is that they are not
 always equivalent. They are only identical when the modulator signal is a
 sinusoid, but with each added harmonic, PM and FM start to differ more and
 more. A detailed mathematical explanation of this is shown in
-[pm-fm-equivalence.md](pm-fm-equivalence.md).
+[pm-fm-equivalence.md](https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md).
 
-<a name="faq-name"></a>
+<a id="faq-name" href="#toc">Table of Contents</a>
 
 ### Where does the name come from?
 
@@ -607,7 +608,7 @@ and so JS80P was born.
   [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80
   [js80]: https://attilammagyar.github.io/toys/js-80/
 
-<a name="faq-flstudio-midicc"></a>
+<a id="faq-flstudio-midicc" href="#toc">Table of Contents</a>
 
 ### FL Studio: How to assign a MIDI CC to a JS80P parameter?
 
@@ -644,7 +645,7 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 6. Select either the "_MIDI CC 7 (Volume)_" option, or the "_MIDI Learn_"
    option, and turn the physical knob on your MIDI keyboard again.
 
-<a name="faq-flstudio-aftertouch"></a>
+<a id="faq-flstudio-aftertouch" href="#toc">Table of Contents</a>
 
 ### FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?
 
@@ -676,7 +677,7 @@ more complicated procedure than setting up MIDI CC:
 
 7. Select the "_Channel Aftertouch_" option.
 
-<a name="faq-flstudio-sustain"></a>
+<a id="faq-flstudio-sustain" href="#toc">Table of Contents</a>
 
 ### FL Studio: How to use the Sustain Pedal?
 
@@ -706,12 +707,12 @@ pedal's MIDI CC events to the plugin parameter where JS80P expects them.
 
 7. Press the pedal.
 
-<a name="dev"></a>
+<a id="dev" href="#toc">Table of Contents</a>
 
 Development
 -----------
 
-<a name="dev-tools"></a>
+<a id="dev-tools" href="#toc">Table of Contents</a>
 
 ### Tools
 
@@ -728,7 +729,7 @@ Development
  * [WinLibs MinGW-w64 7.0.0+ (MSVCRT)](https://winlibs.com/)
  * [Doxygen 1.8.17+](https://www.doxygen.nl/)
 
-<a name="dev-dep"></a>
+<a id="dev-dep" href="#toc">Table of Contents</a>
 
 ### Dependencies
 
@@ -758,7 +759,7 @@ following packages need to be installed:
         libxcb-render0-dev:i386 \
         mingw-w64
 
-<a name="dev-compile"></a>
+<a id="dev-compile" href="#toc">Table of Contents</a>
 
 ### Compiling
 
@@ -786,7 +787,7 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
     TARGET_PLATFORM=x86_64-gpp make all
     TARGET_PLATFORM=i686-gpp make all
 
-<a name="dev-theory"></a>
+<a id="dev-theory" href="#toc">Table of Contents</a>
 
 ### Theory
 
@@ -818,3 +819,5 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
  * [Multiply-with-carry pseudorandom number generator](https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator)
 
  * [The World's Smallest Hash Table by Orson Peters](https://orlp.net/blog/worlds-smallest-hash-table/)
+
+<a href="#toc">Table of Contents</a>
