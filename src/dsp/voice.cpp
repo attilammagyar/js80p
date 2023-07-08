@@ -451,6 +451,40 @@ void Voice<ModulatorSignalProducerClass>::note_off(
 
 
 template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
+{
+    if (state != ON) {
+        return;
+    }
+
+    state = OFF;
+
+    oscillator.amplitude.cancel_events();
+    volume.cancel_events();
+
+    oscillator.cancel_events();
+    oscillator.stop(0.0);
+
+    wavefolder.folding.cancel_events();
+
+    panning.cancel_events();
+
+    oscillator.modulated_amplitude.cancel_events();
+    oscillator.frequency.cancel_events();
+    oscillator.phase.cancel_events();
+    oscillator.fine_detune.cancel_events();
+
+    filter_1.frequency.cancel_events();
+    filter_1.q.cancel_events();
+    filter_1.gain.cancel_events();
+
+    filter_2.frequency.cancel_events();
+    filter_2.q.cancel_events();
+    filter_2.gain.cancel_events();
+}
+
+
+template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() const noexcept
 {
     return (

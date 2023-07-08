@@ -17,6 +17,7 @@
  */
 
 #include <cmath>
+#include <functional>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -167,7 +168,8 @@ TEST(portamento, {
 })
 
 
-TEST(resetting_a_voice_turns_it_off, {
+void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
+{
     constexpr Frequency sample_rate = 44100.0;
     constexpr Integer block_size = 8196;
     constexpr Integer rounds = 1;
@@ -193,7 +195,7 @@ TEST(resetting_a_voice_turns_it_off, {
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
-    voice.reset();
+    reset(voice);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -203,6 +205,12 @@ TEST(resetting_a_voice_turns_it_off, {
     );
     assert_false(voice.is_on());
     assert_true(voice.is_off_after(0.0));
+}
+
+
+TEST(voice_can_be_turned_off_immediately, {
+    test_turning_off_voice([](SimpleVoice& voice) { voice.reset(); });
+    test_turning_off_voice([](SimpleVoice& voice) { voice.cancel_note(); });
 })
 
 

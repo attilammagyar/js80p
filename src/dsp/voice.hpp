@@ -161,6 +161,8 @@ class Voice : public SignalProducer
             Number const velocity
         ) noexcept;
 
+        void cancel_note() noexcept;
+
         bool has_decayed_during_envelope_dahds() const noexcept;
 
         Midi::Note get_note() const noexcept;

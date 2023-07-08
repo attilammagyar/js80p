@@ -1284,7 +1284,7 @@ void Synth::garbage_collect_voices() noexcept
         if (modulator_decayed) {
             note = modulator->get_note();
             channel = modulator->get_channel();
-            modulator->reset();
+            modulator->cancel_note();
         }
 
         Carrier* const carrier = carriers[voice];
@@ -1293,7 +1293,7 @@ void Synth::garbage_collect_voices() noexcept
         if (carrier_decayed) {
             note = carrier->get_note();
             channel = carrier->get_channel();
-            carrier->reset();
+            carrier->cancel_note();
         }
 
         if (modulator_decayed && carrier_decayed) {
