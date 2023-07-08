@@ -120,9 +120,13 @@ you can find these presets in the "presets" folder in the ZIP archive, and you
 can load them into JS80P by clicking on the Import Patch icon near the top left
 corner of the main screen of the plugin.
 
-
 Bugs
 ----
 
 If you find bugs, please report them at
 https://github.com/attilammagyar/js80p/issues
+
+Documentation
+-------------
+
+See "README.html" for more information.
