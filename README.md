@@ -270,7 +270,7 @@ pedal adds more reverb and echo, and lengthens note decay.
 
 ### Rock Organ
 
-A little darker, distorted, Hammond-like organ sound. Aftertouch and mod wheel
+A little darker, overdriven Hammond-like organ sound. Aftertouch and mod wheel
 increase the vibrato. The softer you play, the slower the attack, the harder
 you play, the harder the attack.
 
