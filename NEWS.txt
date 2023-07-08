@@ -1,13 +1,13 @@
 v1.9.2 (2023-07-08)
- * Reduce CPU usage while collecting decayed voices
- * Include more detailed, HTML documentation
+ * Include more detailed, HTML documentation in distribution packages
  * Increase the effect of note velocity on the timbre of the Saw Piano and
    Saw Piano Reversed patches
+ * Reduce CPU usage while collecting decayed voices
  * Bugfix: when the sustain pedal was released, occasionally a few notes would
    remain sounding, and sometimes notes could get released which should have
    remained sounding due to their corresponding key being held down. Now those
    and only those voices remain sounding after a pedal release which belong to
-   held down keys.
+   held down keys
 
 v1.9.1 (2023-07-05)
  * Voices which decay completely into silence during their envelope sustain
