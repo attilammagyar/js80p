@@ -33,6 +33,34 @@ Table of Contents
     * [FST (VST 2.4) on Linux](#fst-linux)
  * [Usage](#usage)
  * [Presets](#presets)
+    * [Blank](#preset-blank)
+    * [Bright Organ](#preset-bright-organ)
+    * [Chariots-Aftertouch](#preset-chariots-aftertouch)
+    * [Chariots](#preset-chariots)
+    * [Demo 1](#preset-demo-1)
+    * [Demo 2](#preset-demo-2)
+    * [Kalimba](#preset-kalimba)
+    * [Rock Organ](#preset-rock-organ)
+    * [Sandstorm](#preset-sandstorm)
+    * [Stereo Saw](#preset-stereo-saw)
+    * [Acid Lead 1](#preset-acid-lead-1)
+    * [Acid Lead 2](#preset-acid-lead-2)
+    * [Acid Lead 3](#preset-acid-lead-3)
+    * [Bells 1](#preset-bells-1)
+    * [Bells 2](#preset-bells-2)
+    * [Flute](#preset-flute)
+    * [FM Womp 1](#preset-fm-womp-1)
+    * [FM Womp 2](#preset-fm-womp-2)
+    * [FM Womp 3](#preset-fm-womp-3)
+    * [Tech Noir Lead 1](#preset-tech-noir-lead-1)
+    * [Tech Noir Lead 2](#preset-tech-noir-lead-2)
+    * [Tech Noir Lead 3](#preset-tech-noir-lead-3)
+    * [Derezzed](#preset-derezzed)
+    * [Ambient Pad 1](#preset-ambient-pad-1)
+    * [Ambient Pad 2](#preset-ambient-pad-2)
+    * [Ambient Pad 3](#preset-ambient-pad-3)
+    * [Saw Piano](#preset-saw-piano)
+    * [Saw Piano Reversed](#preset-saw-piano-reversed)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -177,6 +205,231 @@ application's preset browser, you can load and save them as ordinary files. For
 each plugin type, you can find these presets in the `presets` folder in the ZIP
 archive, and you can load them into JS80P by clicking on the _Import Patch_
 icon near the top left corner of the main screen of the plugin.
+
+<a id="preset-blank"></a>
+
+### Blank
+
+The default, empty patch, a blank canvas.
+
+<a id="preset-bright-organ"></a>
+
+### Bright Organ
+
+A bright, clean, Hammond-like organ sound. Aftertouch and mod wheel increase
+the vibrato. The softer you play, the slower the attack, the harder you play,
+the harder the attack.
+
+<a id="preset-chariots-aftertouch"></a>
+
+### Chariots-Aftertouch
+
+A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
+and inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
+you use aftertouch. The mod wheel controls the vibrato of notes above C3, and
+the pitch wheel also affects only these notes.
+
+<a id="preset-chariots"></a>
+
+### Chariots
+
+A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
+and inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
+depending on the velocity. The harder you play, the longer it takes for the
+wavefolder to kick in. The mod wheel controls the vibrato of notes above
+C3, and the pitch wheel also affects only these notes.
+
+<a id="preset-demo-1"></a>
+
+### Demo 1
+
+The patch from the first demo video of JS80P. The mod wheel makes the sound
+brighter, the volume knob (CC 7) adjusts the inverse sawtooth LFO which
+controls the filter before the wavefolder.
+
+<a id="preset-demo-2"></a>
+
+### Demo 2
+
+The patch from the second demo video of JS80P. This split keyboard patch has
+slow tremolo bass notes below Gb3, with extremely long release (just press a
+key, and you're good for about 2 measures with your left hand being free, even
+without a sustain pedal), and plucky lead notes, with the mod wheel and the
+volume knob (CC 7) controlling the timbre. (However, it is not recommended
+with this patch to adjust the mod wheel while a right hand note is playing.)
+
+<a id="preset-kalimba"></a>
+
+### Kalimba
+
+A simple kalimba sound with percussive attack and short decay. The sustain
+pedal adds more reverb and echo, and lengthens note decay.
+
+<a id="preset-rock-organ"></a>
+
+### Rock Organ
+
+A little darker, distorted, Hammond-like organ sound. Aftertouch and mod wheel
+increase the vibrato. The softer you play, the slower the attack, the harder
+you play, the harder the attack.
+
+<a id="preset-sandstorm"></a>
+
+### Sandstorm
+
+A dirty, harsh, detuned FM lead sound. Mod wheel and aftertouch make it even
+dirtier and harsher.
+
+<a id="preset-stereo-saw"></a>
+
+### Stereo Saw
+
+A little bit metallic sounding sawtooth wave. Note velocity slightly affects
+the timbre, mod wheel and aftertouch add wavefolding. The volume knob
+adjusts an LFO which controls filter resonance.
+
+<a id="preset-acid-lead-1"></a>
+
+### Acid Lead 1
+
+Sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.
+
+<a id="preset-acid-lead-2"></a>
+
+### Acid Lead 2
+
+Square wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.
+
+<a id="preset-acid-lead-3"></a>
+
+### Acid Lead 3
+
+Another sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.
+
+<a id="preset-bells-1"></a>
+
+### Bells 1
+
+A bright bell sound. Aftertouch and mod wheel increase the vibrato,
+the sustain pedal lengthens the decay.
+
+<a id="preset-bells-2"></a>
+
+### Bells 2
+
+A slightly darker bell sound. Aftertouch and mod wheel increase the vibrato,
+the sustain pedal lengthens the decay.
+
+<a id="preset-flute"></a>
+
+### Flute
+
+A synth flute sound with a couple of tricks: the pitch of the notes decreases
+slightly when they end, and the mod wheel adds a little embellishment to the
+beginning of each note. Aftertouch ads more emphasis to the note.
+
+<a id="preset-fm-womp-1"></a>
+
+### FM Womp 1
+
+A clean FM sound where the modulator and the carrier use different envelopes,
+so the notes start with a slight "wah" effect. Aftertouch and mod wheel
+increase the vibrato. Aftertouch also adds more modulation.
+
+<a id="preset-fm-womp-2"></a>
+
+### FM Womp 2
+
+A slightly distorted FM sound where the modulator and the carrier use
+different envelopes, so the notes start with a slight "wah" effect. Aftertouch
+and mod wheel increase the vibrato. Aftertouch also adds more modulation,
+making the sound brighter and more distorted.
+
+<a id="preset-fm-womp-3"></a>
+
+### FM Womp 3
+
+A more distorted FM sound where the modulator and the carrier use different
+envelopes, so the notes start with a slight "wah" effect. Aftertouch and mod
+wheel increase the vibrato. Aftertouch also adds more modulation, making the
+sound brighter and more distorted.
+
+<a id="preset-tech-noir-lead-1"></a>
+
+### Tech Noir Lead 1
+
+A brass sound for futuristic sci-fi dystopias with a slower filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.
+
+<a id="preset-tech-noir-lead-2"></a>
+
+### Tech Noir Lead 2
+
+A brass sound for futuristic sci-fi dystopias with a harsher filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.
+
+<a id="preset-tech-noir-lead-3"></a>
+
+### Tech Noir Lead 3
+
+A darker brass sound for futuristic sci-fi dystopias with a filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.
+
+<a id="preset-derezzed"></a>
+
+### Derezzed
+
+This Daft Punk inspired patch is built around sawtooth waves with lots of
+distortions. Mod wheel makes upcoming notes brighter (without affecting
+the currently sounding ones), and it increases the distortion. Aftertouch
+adds vibrato.
+
+<a id="preset-ambient-pad-1"></a>
+
+### Ambient Pad 1
+
+Slowly evolving pad sound with sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds slight distortions.
+
+<a id="preset-ambient-pad-2"></a>
+
+### Ambient Pad 2
+
+Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds slight distortions.
+
+<a id="preset-ambient-pad-3"></a>
+
+### Ambient Pad 3
+
+Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds ghostly, distant
+screams.
+
+<a id="preset-saw-piano"></a>
+
+### Saw Piano
+
+A sawtooth wave based sound where high notes decay quickly, lower notes
+decay slowly, but decay time is also affected by note velocity. The harder
+you play, the brighter and richer the timbre, and the harder the note attack.
+Mod wheel controls the vibrato, and aftertouch controls filtering. The
+sustain pedal lengthens note decay.
+
+<a id="preset-saw-piano-reversed"></a>
+
+### Saw Piano Reversed
+
+A sawtooth wave based sound which sounds like as if you were playing
+a recording backwards. The time it takes for notes to un-decay depends on
+note pitch and velocity. The harder you play, the brighter and richer the
+sound gets. Mod wheel control the vibrato, aftertouch adjusts the filtering.
 
 <a name="bugs"></a>
 

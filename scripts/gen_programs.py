@@ -23,7 +23,7 @@ WARNING = """\
 */"""
 
 
-Preset = collections.namedtuple("Preset", ("basename", "path", "program_name"))
+Preset = collections.namedtuple("Preset", ("basename", "path", "program_name", "lines", "comments"))
 
 
 def main(argv):
@@ -56,8 +56,10 @@ def main(argv):
 
     programs = []
     presets = collect_presets(presets_dir, programs_cpp)
+    readme_toc = []
+    readme_presets = []
 
-    for i, (preset_file_name, preset_file_path, preset_name) in enumerate(presets):
+    for i, (preset_file_name, preset_file_path, preset_name, preset_lines, preset_comments) in enumerate(presets):
         if i == number_of_programs:
             break
 
@@ -68,23 +70,27 @@ def main(argv):
                 f"Name too long; preset_name={preset_name!r}, length={len(preset_name)}, max_length={kVstMaxProgNameLen}"
             )
 
-        with open(preset_file_path, "r") as preset_file:
-            program = (
-                [
-                    "",
-                    f"{INDENT_PROGRAM}{PROGRAM_START}",
-                    f"{INDENT_PROGRAM_BODY}\"{preset_name}\",",
-                    f"{INDENT_PROGRAM_BODY}\"{default_name}\",",
-                    f"{INDENT_PROGRAM_BODY}(",
-                ]
-                + [f"{INDENT_PROGRAM_BODY_CONT}\"{line.strip()}\\n\"" for line in preset_file]
-                + [
-                    f"{INDENT_PROGRAM_BODY})",
-                    f"{INDENT_PROGRAM}),"
-                ]
-            )
+        program = (
+            [
+                "",
+                f"{INDENT_PROGRAM}{PROGRAM_START}",
+                f"{INDENT_PROGRAM_BODY}\"{preset_name}\",",
+                f"{INDENT_PROGRAM_BODY}\"{default_name}\",",
+                f"{INDENT_PROGRAM_BODY}(",
+            ]
+            + [f"{INDENT_PROGRAM_BODY_CONT}\"{line.strip()}\\n\"" for line in preset_lines]
+            + [
+                f"{INDENT_PROGRAM_BODY})",
+                f"{INDENT_PROGRAM}),"
+            ]
+        )
 
         programs.append("\n".join(program))
+
+        anchor = "preset-" + preset_file_name.replace(".js80p", "").replace("_", "-")
+        readme_toc.append(f"    * [{preset_name}](#{anchor})")
+        readme_presets.append(f"\n<a id=\"{anchor}\"></a>\n\n### {preset_name}\n")
+        readme_presets.append("\n".join(preset_comments))
 
     with open(programs_cpp, "w") as f:
         print(
@@ -95,6 +101,9 @@ def main(argv):
             ),
             file=f
         )
+
+    print("\n".join(readme_toc))
+    print("\n".join(readme_presets))
 
     return 0
 
@@ -119,7 +128,7 @@ def collect_presets(presets_dir, programs_cpp):
         if program_name in presets_by_program_name:
             raise Exception(f"Non-unique program names: {presets_by_program_name[program_name].basename} vs {basename}")
 
-        preset = Preset(basename, path, program_name)
+        preset = make_preset(basename, path, program_name)
         presets_by_program_name[program_name] = preset
         all_presets.append(preset)
 
@@ -142,7 +151,7 @@ def collect_presets(presets_dir, programs_cpp):
         pass
 
     return (
-        [Preset(BLANK_PRESET_NAME, blank_preset_file_path, "Blank")]
+        [make_preset(BLANK_PRESET_NAME, blank_preset_file_path, "Blank")]
         + [
             presets_by_program_name[program_name]
             for program_name in existing_programs_order
@@ -154,6 +163,26 @@ def collect_presets(presets_dir, programs_cpp):
                 if preset.program_name not in existing_programs
         ]
     )
+
+
+def make_preset(basename, file_path, program_name):
+    lines = []
+    comments = []
+
+    for line in read_lines(file_path):
+        s = line.strip()
+
+        if not s or s.startswith(";"):
+            comments.append(line.lstrip("; ").strip())
+        else:
+            lines.append(line)
+
+    return Preset(basename, file_path, program_name, lines, comments)
+
+
+def read_lines(file_path):
+    with open(file_path, "r") as f:
+        return [line for line in f]
 
 
 def preset_file_name_to_program_name(file_name):
