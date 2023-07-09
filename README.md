@@ -430,7 +430,7 @@ sustain pedal lengthens note decay.
 A sawtooth wave based sound which sounds like as if you were playing
 a recording backwards. The time it takes for notes to un-decay depends on
 note pitch and velocity. The harder you play, the brighter and richer the
-sound gets. Mod wheel control the vibrato, aftertouch adjusts the filtering.
+sound gets. Mod wheel controls the vibrato, aftertouch adjusts the filtering.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
