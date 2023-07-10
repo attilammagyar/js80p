@@ -297,6 +297,7 @@ package_vst3_bundle()
 
     cp --verbose "$README_HTML" "$doc_dir/README.html"
 
+    copy_vst3 "$version_as_file_name" "linux-32bit" "$vst3_base_dir" "i386-linux" "js80p.so"
     copy_vst3 "$version_as_file_name" "linux-32bit" "$vst3_base_dir" "i686-linux" "js80p.so"
     copy_vst3 "$version_as_file_name" "linux-64bit" "$vst3_base_dir" "x86_64-linux" "js80p.so"
     copy_vst3 "$version_as_file_name" "windows-32bit" "$vst3_base_dir" "x86-win" "js80p.vst3"
