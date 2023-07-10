@@ -7,13 +7,13 @@
 
 <style>
 html, body {
-  background: #1c1c22;
-  color: #b8b8c0;
+  background: #0c0c12;
+  color: #c8c8d0;
   font-family: Verdana, Sans-Serif;
 }
 
 a {
-  color: #70c0e8;
+  color: #80d0f8;
 }
 
 p {
@@ -28,9 +28,9 @@ p a[href="#toc"] {
 
 pre {
   margin: auto;
-  background: #0c0c12;
+  background: #000000;
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: 6px;
   overflow: auto;
 }
 
@@ -40,7 +40,7 @@ code {
 }
 
 blockquote {
-  background: #0c0c12;
+  background: #000000;
   padding: 2px;
   padding-left: 12px;
   border-left: solid 3px #2c2c32;
