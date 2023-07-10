@@ -21,7 +21,7 @@ main()
             size="$(get_size "$REPLY")"
             cat <<HTML
           <li>
-            VST 3 Bundle: <a class="button" href="$uri">Download ($size)</a>
+            VST 3 Bundle: <a href="$uri">Download ($size)</a>
           </li>
 HTML
         done
@@ -41,7 +41,7 @@ HTML
             size="$(get_size "$REPLY")"
             cat <<HTML
           <li>
-            $os, $arch-bit, $plugin_type: <a class="button" href="$uri">Download ($size)</a>
+            $os, $arch-bit, $plugin_type: <a href="$uri">Download ($size)</a>
           </li>
 HTML
         done
@@ -55,7 +55,7 @@ HTML
             size="$(get_size "$REPLY")"
             cat <<HTML
           <li>
-            Source: <a class="button" href="$uri">Download ($size)</a>
+            Source: <a href="$uri">Download ($size)</a>
           </li>
 HTML
         done
