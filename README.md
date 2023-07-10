@@ -712,6 +712,9 @@ pedal's MIDI CC events to the plugin parameter where JS80P expects them.
 Development
 -----------
 
+This section contains information for those who downloaded the source code of
+JS80P and want to compile it themselves.
+
 <a id="dev-tools"></a>
 
 ### Tools
@@ -737,6 +740,9 @@ The `lib/` directory contains code from the following projects:
 
  * [FST](https://git.iem.at/zmoelnig/FST)
  * [VST 3 SDK](https://github.com/steinbergmedia/vst3sdk)
+
+Note that the `lib/` directory does not include the whole SDK packages, it only
+contains what's required for compiling JS80P.
 
 #### Linux
 
