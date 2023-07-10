@@ -330,7 +330,7 @@ the sustain pedal lengthens the decay.
 
 A synth flute sound with a couple of tricks: the pitch of the notes decreases
 slightly when they end, and the mod wheel adds a little embellishment to the
-beginning of each note. Aftertouch ads more emphasis to the note.
+beginning of each note. Aftertouch adds more emphasis to the note.
 
 <a id="preset-fm-womp-1"></a>
 
