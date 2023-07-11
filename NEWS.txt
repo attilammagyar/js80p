@@ -2,7 +2,7 @@ v1.9.3 (2023-07-11)
  * Documentation clarifications and typo fixes
  * Improve VST 3 bundle compatibility with 32 bit hosts on Linux
  * Bugfix: reduce unwanted noise in the Overdrive and Distortion effects which
-   became noticable when the input signal was already rich in harmonics, and
+   became noticeable when the input signal was already rich in harmonics, and
    the distortion was cranked up to 11
 
 v1.9.2 (2023-07-08)
