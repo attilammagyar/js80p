@@ -70,7 +70,7 @@ class Distortion : public Filter<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        static constexpr int TABLE_SIZE = 0x0800;
+        static constexpr int TABLE_SIZE = 0x2000;
         static constexpr int MAX_INDEX = TABLE_SIZE - 1;
 
         static constexpr Sample INPUT_MAX = 3.0;
