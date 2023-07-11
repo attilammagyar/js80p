@@ -59,6 +59,14 @@ main()
     run_test_wine "$src_dir" "" "vst3" "_bundle" "64" "platform='wine', $info"
     run_test_linux "$src_dir" "" "vst3" "_bundle" "64" "platform='linux', $info"
 
+    info="plugin_type='vst3', architecture='32'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "32" "platform='wine', $info"
+    # run_test_linux "$src_dir" "" "vst3" "_bundle" "32" "platform='linux', $info"
+
+    # As of VST 3.7.8, loading the 32 bit plugin into a 32 bit host application
+    # from a VST 3 bundle on a 64 bit Linux system is broken:
+    # https://github.com/steinbergmedia/vst3sdk/issues/115
+
     return 0
 }
 
