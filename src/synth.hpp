@@ -1003,6 +1003,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 DeferredNoteOff(DeferredNoteOff const&& deferred_note_off);
 
                 DeferredNoteOff(
+                    Integer const note_id,
                     Midi::Channel const channel,
                     Midi::Note const note,
                     Midi::Byte const velocity,
@@ -1012,6 +1013,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 DeferredNoteOff& operator=(DeferredNoteOff const& deferred_note_off) noexcept;
                 DeferredNoteOff& operator=(DeferredNoteOff const&& deferred_note_off) noexcept;
 
+                Integer get_note_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;
                 Midi::Note get_note() const noexcept;
                 Midi::Byte get_velocity() const noexcept;
@@ -1019,6 +1021,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             private:
                 Integer voice;
+                Integer note_id;
                 Midi::Channel channel;
                 Midi::Note note;
                 Midi::Byte velocity;
@@ -1028,6 +1031,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
 
         static constexpr Integer INVALID_VOICE = -1;
+
+        static constexpr Integer NOTE_ID_MASK = 0x7fffffff;
 
         static std::vector<bool> supported_midi_controllers;
         static bool supported_midi_controllers_initialized;
@@ -1139,6 +1144,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer samples_since_gc;
         Integer samples_between_gc;
         Integer next_voice;
+        Integer next_note_id;
         Midi::Note previous_note;
         bool is_learning;
         bool is_sustaining;

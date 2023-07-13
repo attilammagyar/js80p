@@ -760,7 +760,7 @@ TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decay
 })
 
 
-TEST(garbage_collected_voices_are_not_released_again_when_sustain_pedal_is_lifted, {
+TEST(garbage_collected_and_deferred_stopped_reallocated_notes_are_not_released_again_when_sustain_pedal_is_lifted, {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
 
@@ -799,6 +799,95 @@ TEST(garbage_collected_voices_are_not_released_again_when_sustain_pedal_is_lifte
 
     synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
     synth.control_change(0.000001, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should keep ringing */
+
+    rendered_samples = SignalProducer::produce<Synth>(synth, 3);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 3);
+
+    assert_eq(expected_samples[0], rendered_samples[0], block_size, 0.001);
+    assert_eq(expected_samples[1], rendered_samples[1], block_size, 0.001);
+})
+
+
+TEST(note_off_stops_notes_that_are_triggered_multiple_times_during_sustaining, {
+    constexpr Frequency sample_rate = 3000.0;
+    constexpr Integer block_size = 3000;
+    Synth synth;
+    Constant expected(0.0, synth.get_channels());
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_sample_rate(sample_rate);
+    synth.set_block_size(block_size);
+
+    expected.set_sample_rate(sample_rate);
+    expected.set_block_size(block_size);
+
+    synth.resume();
+
+    synth.control_change(0.01, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_on(0.02, 1, Midi::NOTE_A_3, 127);
+    synth.note_off(0.03, 1, Midi::NOTE_A_3, 127);
+    synth.note_on(0.04, 1, Midi::NOTE_A_3, 127);
+    synth.note_off(0.05, 1, Midi::NOTE_A_3, 127);
+    synth.note_on(0.06, 1, Midi::NOTE_A_3, 127);
+    synth.control_change(0.07, 1, Midi::SUSTAIN_PEDAL, 0);
+    synth.note_off(0.08, 1, Midi::NOTE_A_3, 127);
+
+    SignalProducer::produce<Synth>(synth, 1, block_size / 10);
+
+    rendered_samples = SignalProducer::produce<Synth>(synth, 2);
+    expected_samples = SignalProducer::produce<Constant>(expected, 2);
+
+    for (Integer c = 0; c != synth.get_channels(); ++c) {
+        assert_eq(
+            expected_samples[c],
+            rendered_samples[c],
+            block_size,
+            "channel=%d",
+            (int)c
+        );
+    }
+})
+
+
+TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_note_ringing_if_key_is_still_held_down, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth(0);
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL, 220.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    set_param(synth, Synth::ParamId::MAMP, 0.5);
+    set_param(synth, Synth::ParamId::CAMP, 0.5);
+
+    set_up_quickly_decaying_envelope(synth);
+
+    synth.process_messages();
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_on(0.000001, 1, Midi::NOTE_A_3, 127);
+    SignalProducer::produce<Synth>(synth, 1); /* note starts then decays */
+    SignalProducer::produce<Synth>(synth, 2); /* voice gets garbage collected */
+
+    set_param(synth, Synth::ParamId::N1HLD, 1.0);
+    synth.process_messages();
+
+    synth.note_off(0.0, 1, Midi::NOTE_A_3, 127); /* note off is deferred due to sustain pedal */
+    synth.note_on(0.0000001, 1, Midi::NOTE_A_3, 127); /* new voice allocated to the note */
+    synth.control_change(0.0000002, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should keep ringing */
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
     expected_samples = SignalProducer::produce<SumOfSines>(expected, 3);

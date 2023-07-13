@@ -106,6 +106,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     samples_since_gc(0),
     samples_between_gc(samples_between_gc),
     next_voice(0),
+    next_note_id(0),
     previous_note(Midi::NOTE_MAX + 1),
     is_learning(false),
     is_sustaining(false),
@@ -699,14 +700,16 @@ void Synth::note_on(
 
         Mode const mode = this->mode.get_value();
 
+        next_note_id = (next_note_id + 1) & NOTE_ID_MASK;
+
         if (mode == MIX_AND_MOD) {
-            modulators[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
-            carriers[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
+            modulators[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
+            carriers[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
         } else {
             if (note < mode + Midi::NOTE_B_2) {
-                modulators[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
+                modulators[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
             } else {
-                carriers[next_voice]->note_on(time_offset, note, channel, velocity_float, previous_note);
+                carriers[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
             }
         }
 
@@ -791,23 +794,42 @@ void Synth::note_off(
         Midi::Note const note,
         Midi::Byte const velocity
 ) noexcept {
-    if (midi_note_to_voice_assignments[channel][note] == INVALID_VOICE) {
+    Integer const voice = midi_note_to_voice_assignments[channel][note];
+
+    if (voice == INVALID_VOICE) {
         return;
     }
 
-    Integer const voice = midi_note_to_voice_assignments[channel][note];
-
     midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
 
-    if (UNLIKELY(is_sustaining)) {
-        DeferredNoteOff const deferred_note_off(channel, note, velocity, voice);
+    Modulator* const modulator = modulators[voice];
 
-        deferred_note_offs.push_back(deferred_note_off);
+    if (is_sustaining) {
+        Integer note_id;
+
+        if (modulator->is_on()) {
+            note_id = modulator->get_note_id();
+        } else {
+            Carrier* const carrier = carriers[voice];
+
+            if (!carrier->is_on()) {
+                return;
+            }
+
+            note_id = carriers[voice]->get_note_id();
+        }
+
+        deferred_note_offs.push_back(
+            DeferredNoteOff(note_id, channel, note, velocity, voice)
+        );
     } else {
         Number const velocity_float = midi_byte_to_float(velocity);
 
-        modulators[voice]->note_off(time_offset, note, velocity_float);
-        carriers[voice]->note_off(time_offset, note, velocity_float);
+        modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
+
+        Carrier* const carrier = carriers[voice];
+
+        carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
     }
 }
 
@@ -871,23 +893,12 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
             continue;
         }
 
-        Midi::Channel const channel = deferred_note_off.get_channel();
+        Integer const note_id = deferred_note_off.get_note_id();
         Midi::Note const note = deferred_note_off.get_note();
-
-        if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
-            /*
-            The voice might have decayed and got garbage collected after the
-            note-off event, and then it might have been assigned to play a new
-            note for which the key is still being held down. If that's the
-            case, then the voice should keep ringing.
-            */
-            continue;
-        }
-
         Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
 
-        modulators[voice]->note_off(time_offset, note, velocity);
-        carriers[voice]->note_off(time_offset, note, velocity);
+        modulators[voice]->note_off(time_offset, note_id, note, velocity);
+        carriers[voice]->note_off(time_offset, note_id, note, velocity);
     }
 
     deferred_note_offs.clear();
@@ -958,8 +969,13 @@ void Synth::all_notes_off(
 
             midi_note_to_voice_assignments[channel_][note] = INVALID_VOICE;
 
-            modulators[voice]->note_off(time_offset, note, 0.0);
-            carriers[voice]->note_off(time_offset, note, 0.0);
+            Modulator* const modulator = modulators[voice];
+
+            modulator->note_off(time_offset, modulator->get_note_id(), note, 0.0);
+
+            Carrier* const carrier = carriers[voice];
+
+            carrier->note_off(time_offset, carrier->get_note_id(), note, 0.0);
         }
     }
 }
@@ -2289,6 +2305,7 @@ Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
 
 Synth::DeferredNoteOff::DeferredNoteOff()
     : voice(INVALID_VOICE),
+    note_id(0),
     channel(0),
     note(0),
     velocity(0)
@@ -2298,6 +2315,7 @@ Synth::DeferredNoteOff::DeferredNoteOff()
 
 Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const& deferred_note_off)
     : voice(deferred_note_off.voice),
+    note_id(deferred_note_off.note_id),
     channel(deferred_note_off.channel),
     note(deferred_note_off.note),
     velocity(deferred_note_off.velocity)
@@ -2307,6 +2325,7 @@ Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const& deferred_note_off
 
 Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const&& deferred_note_off)
     : voice(deferred_note_off.voice),
+    note_id(deferred_note_off.note_id),
     channel(deferred_note_off.channel),
     note(deferred_note_off.note),
     velocity(deferred_note_off.velocity)
@@ -2315,11 +2334,12 @@ Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const&& deferred_note_of
 
 
 Synth::DeferredNoteOff::DeferredNoteOff(
+        Integer const note_id,
         Midi::Channel const channel,
         Midi::Note const note,
         Midi::Byte const velocity,
         Integer const voice
-) : voice(voice), channel(channel), note(note), velocity(velocity)
+) : voice(voice), note_id(note_id), channel(channel), note(note), velocity(velocity)
 {
 }
 
@@ -2329,6 +2349,7 @@ Synth::DeferredNoteOff& Synth::DeferredNoteOff::operator=(
 ) noexcept {
     if (this != &deferred_note_off) {
         voice = deferred_note_off.voice;
+        note_id = deferred_note_off.note_id;
         channel = deferred_note_off.channel;
         note = deferred_note_off.note;
         velocity = deferred_note_off.velocity;
@@ -2343,12 +2364,19 @@ Synth::DeferredNoteOff& Synth::DeferredNoteOff::operator=(
 ) noexcept {
     if (this != &deferred_note_off) {
         voice = deferred_note_off.voice;
+        note_id = deferred_note_off.note_id;
         channel = deferred_note_off.channel;
         note = deferred_note_off.note;
         velocity = deferred_note_off.velocity;
     }
 
     return *this;
+}
+
+
+Integer Synth::DeferredNoteOff::get_note_id() const noexcept
+{
+    return note_id;
 }
 
 

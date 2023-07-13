@@ -149,6 +149,7 @@ class Voice : public SignalProducer
 
         void note_on(
             Seconds const time_offset,
+            Integer const note_id,
             Midi::Note const note,
             Midi::Channel const channel,
             Number const velocity,
@@ -157,6 +158,7 @@ class Voice : public SignalProducer
 
         void note_off(
             Seconds const time_offset,
+            Integer const note_id,
             Midi::Note const note,
             Number const velocity
         ) noexcept;
@@ -165,6 +167,7 @@ class Voice : public SignalProducer
 
         bool has_decayed_during_envelope_dahds() const noexcept;
 
+        Integer get_note_id() const noexcept;
         Midi::Note get_note() const noexcept;
         Midi::Channel get_channel() const noexcept;
 
@@ -213,6 +216,7 @@ class Voice : public SignalProducer
         Number panning_value;
         Number note_panning;
         State state;
+        Integer note_id;
         Midi::Note note;
         Midi::Channel channel;
 

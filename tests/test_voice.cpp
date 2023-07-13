@@ -52,6 +52,23 @@ constexpr Number FREQUENCIES[NOTE_MAX + 1] = {
 };
 
 
+TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
+    SimpleVoice::Params params("");
+    SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);
+
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1);
+
+    voice.note_off(0.12 + 1.0, 123, 1, 0.5);
+    assert_false(voice.is_off_after(2.0));
+
+    voice.note_off(0.12 + 1.0, 42, 2, 0.5);
+    assert_false(voice.is_off_after(2.0));
+
+    voice.note_off(0.12 + 1.0, 42, 1, 0.5);
+    assert_true(voice.is_off_after(2.0));
+})
+
+
 TEST(rendering_is_independent_of_chunk_size, {
     constexpr Frequency sample_rate = 44100.0;
 
@@ -67,11 +84,11 @@ TEST(rendering_is_independent_of_chunk_size, {
     voice_1.set_sample_rate(sample_rate);
     voice_2.set_sample_rate(sample_rate);
 
-    voice_1.note_on(0.12, 1, 0, 0.5, 1);
-    voice_1.note_off(0.12 + 1.0, 1, 0.5);
+    voice_1.note_on(0.12, 42, 1, 0, 0.5, 1);
+    voice_1.note_off(0.12 + 1.0, 42, 1, 0.5);
 
-    voice_2.note_on(0.12, 1, 0, 0.5, 1);
-    voice_2.note_off(0.12 + 1.0, 1, 0.5);
+    voice_2.note_on(0.12, 123, 1, 0, 0.5, 1);
+    voice_2.note_off(0.12 + 1.0, 123, 1, 0.5);
 
     assert_rendering_is_independent_from_chunk_size<SimpleVoice>(
         voice_1, voice_2
@@ -155,7 +172,7 @@ TEST(portamento, {
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(note_start, 1, 0, 1.0, 1);
+    voice.note_on(note_start, 123, 1, 0, 1.0, 1);
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -191,7 +208,11 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(0.0, 1, 0, 1.0, 1);
+    voice.note_on(0.0, 123, 2, 3, 1.0, 1);
+
+    assert_eq(123, voice.get_note_id());
+    assert_eq(2, voice.get_note());
+    assert_eq(3, voice.get_channel());
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -248,10 +269,10 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
     envelope.release_time.set_value(envelope.release_time.get_max_value());
     envelope.final_value.set_value(0.0);
 
-    decaying_voice.note_on(note_start, 1, 0, 1.0, 1);
+    decaying_voice.note_on(note_start, 42, 1, 0, 1.0, 1);
 
     envelope.sustain_value.set_value(0.5);
-    non_decaying_voice.note_on(note_start, 1, 0, 1.0, 1);
+    non_decaying_voice.note_on(note_start, 123, 1, 0, 1.0, 1);
 
     while (rendered_samples < sustain_start_samples) {
         assert_false(

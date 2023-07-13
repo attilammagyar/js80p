@@ -252,6 +252,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, velocity, volume),
     frequencies(frequencies),
     state(OFF),
+    note_id(0),
     note(0),
     channel(0),
     modulation_out((ModulationOut&)volume_applier)
@@ -276,6 +277,7 @@ void Voice<ModulatorSignalProducerClass>::reset() noexcept
     SignalProducer::reset();
 
     state = OFF;
+    note_id = 0;
     note = 0;
     channel = 0;
 }
@@ -299,6 +301,7 @@ bool Voice<ModulatorSignalProducerClass>::is_off_after(
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::note_on(
         Seconds const time_offset,
+        Integer const note_id,
         Midi::Note const note,
         Midi::Channel const channel,
         Number const velocity,
@@ -310,6 +313,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     state = ON;
 
+    this->note_id = note_id;
     this->note = note;
     this->channel = channel;
     this->velocity = calculate_velocity(velocity);
@@ -414,10 +418,11 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::note_off(
         Seconds const time_offset,
+        Integer const note_id,
         Midi::Note const note,
         Number const velocity
 ) noexcept {
-    if (state != ON) {
+    if (state != ON || note_id != this->note_id || note != this->note) {
         return;
     }
 
@@ -457,6 +462,7 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
         return;
     }
 
+    note_id = 0;
     note = 0;
     channel = 0;
 
@@ -514,6 +520,13 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed(
         && param.get_value() < threshold
         && envelope->final_value.get_value() < threshold
     );
+}
+
+
+template<class ModulatorSignalProducerClass>
+Integer Voice<ModulatorSignalProducerClass>::get_note_id() const noexcept
+{
+    return note_id;
 }
 
 
