@@ -1,3 +1,9 @@
+v1.9.4 (2023-07-14)
+ * Bugfix: when the same note was triggered on multiple voices while holding
+   down the sustain pedal, then releasing the pedal failed to release some
+   of the voices, keeping the note ringing. Now these stuck notes are correctly
+   released
+
 v1.9.3 (2023-07-11)
  * Documentation clarifications and typo fixes
  * Improve VST 3 bundle compatibility with 32 bit hosts on Linux
