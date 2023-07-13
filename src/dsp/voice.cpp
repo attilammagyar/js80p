@@ -457,6 +457,9 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
         return;
     }
 
+    note = 0;
+    channel = 0;
+
     state = OFF;
 
     oscillator.amplitude.cancel_events();
