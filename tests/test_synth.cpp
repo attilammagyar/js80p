@@ -746,11 +746,11 @@ TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decay
     set_param(synth, Synth::ParamId::N1DEC, 0.03);
     synth.process_messages();
 
-    synth.note_off(0.0, 1, Midi::NOTE_A_3, 100); /* note off is delayed due to sustain pedal */
+    synth.note_off(0.0, 1, Midi::NOTE_A_3, 100); /* note off is deferred due to sustain pedal */
     synth.note_on(0.001, 1, Midi::NOTE_A_3, 100); /* second voice assigned to the same note */
     SignalProducer::produce<Synth>(synth, 2); /* first voice gets garbage collected */
 
-    synth.note_off(0.0, 1, Midi::NOTE_A_3, 100); /* also delayed */
+    synth.note_off(0.0, 1, Midi::NOTE_A_3, 100); /* also deferred */
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should be released */
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
@@ -796,7 +796,7 @@ TEST(garbage_collected_voices_are_not_released_again_when_sustain_pedal_is_lifte
     synth.note_on(0.000001, 1, Midi::NOTE_A_3, 127);
     SignalProducer::produce<Synth>(synth, 1); /* note starts then decays */
 
-    synth.note_off(0.0, 1, Midi::NOTE_A_3, 127); /* note off is delayed due to sustain pedal */
+    synth.note_off(0.0, 1, Midi::NOTE_A_3, 127); /* note off is deferred due to sustain pedal */
     SignalProducer::produce<Synth>(synth, 2); /* voice gets garbage collected */
 
     set_param(synth, Synth::ParamId::N1HLD, 1.0);

@@ -995,22 +995,22 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Midi::Word value;
         };
 
-        class DelayedNoteOff
+        class DeferredNoteOff
         {
             public:
-                DelayedNoteOff();
-                DelayedNoteOff(DelayedNoteOff const& delayed_note_off);
-                DelayedNoteOff(DelayedNoteOff const&& delayed_note_off);
+                DeferredNoteOff();
+                DeferredNoteOff(DeferredNoteOff const& deferred_note_off);
+                DeferredNoteOff(DeferredNoteOff const&& deferred_note_off);
 
-                DelayedNoteOff(
+                DeferredNoteOff(
                     Midi::Channel const channel,
                     Midi::Note const note,
                     Midi::Byte const velocity,
                     Integer const voice
                 );
 
-                DelayedNoteOff& operator=(DelayedNoteOff const& delayed_note_off) noexcept;
-                DelayedNoteOff& operator=(DelayedNoteOff const&& delayed_note_off) noexcept;
+                DeferredNoteOff& operator=(DeferredNoteOff const& deferred_note_off) noexcept;
+                DeferredNoteOff& operator=(DeferredNoteOff const&& deferred_note_off) noexcept;
 
                 Midi::Channel get_channel() const noexcept;
                 Midi::Note get_note() const noexcept;
@@ -1119,7 +1119,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         std::string const to_string(Integer const) const noexcept;
 
-        std::vector<DelayedNoteOff> delayed_note_offs;
+        std::vector<DeferredNoteOff> deferred_note_offs;
         SingleProducerSingleConsumerMessageQueue messages;
         Bus bus;
         Effects::Effects<Bus> effects;
