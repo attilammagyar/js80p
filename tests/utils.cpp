@@ -91,8 +91,8 @@ class Constant : public SignalProducer
     friend class SignalProducer;
 
     public:
-        Constant(Sample const value) noexcept
-            : SignalProducer(1, 0),
+        Constant(Sample const value, Integer const channels = 1) noexcept
+            : SignalProducer(channels, 0),
             value(value)
         {
         }

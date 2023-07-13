@@ -333,12 +333,7 @@ TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
     constexpr Frequency sample_rate = 22050.0;
 
     Synth synth;
-    SumOfSines expected(
-        0.0, 0.0,
-        0.0, 0.0,
-        0.0, 0.0,
-        synth.get_channels()
-    );
+    Constant expected(0.0, synth.get_channels());
     Sample const* const* rendered_samples;
     Sample const* const* expected_samples;
 
@@ -353,7 +348,7 @@ TEST(all_sound_off_message_turns_off_all_sounds_immediately, {
     synth.note_on(0.0, 0, Midi::NOTE_A_5, 127);
     synth.all_sound_off(1.0 / sample_rate, 1);
 
-    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    expected_samples = SignalProducer::produce<Constant>(expected, 1);
     rendered_samples = SignalProducer::produce<Synth>(synth, 1);
 
     assert_eq(expected_samples[0], rendered_samples[0], block_size, DOUBLE_DELTA);

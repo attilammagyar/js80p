@@ -1040,7 +1040,7 @@ TEST(phase_can_be_controlled, {
 TEST(can_skip_a_round_without_rendering, {
     constexpr Integer block_size = 2048;
     constexpr Frequency frequency = 440.0;
-    SumOfSines zero(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1);
+    Constant zero(0.0);
     SumOfSines sine(1.0, frequency, 0.0, 0.0, 0.0, 0.0, 1);
     SimpleOscillator::WaveformParam waveform_param("");
     SimpleOscillator oscillator(waveform_param);
@@ -1061,7 +1061,7 @@ TEST(can_skip_a_round_without_rendering, {
 
     oscillator.skip_round(1, block_size);
     oscillator.skip_round(1, block_size);
-    render_rounds<SumOfSines>(zero, expected_samples, 1, block_size, 1);
+    render_rounds<Constant>(zero, expected_samples, 1, block_size, 1);
     render_rounds<SimpleOscillator>(
         oscillator, rendered_samples, 1, block_size, 1
     );

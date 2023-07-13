@@ -177,7 +177,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
 
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
-    SumOfSines expected(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, SimpleVoice::CHANNELS);
+    Constant expected(0.0, SimpleVoice::CHANNELS);
     SimpleVoice::Params params("");
     SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);
 
@@ -197,7 +197,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
 
     reset(voice);
 
-    render_rounds<SumOfSines>(expected, expected_output, rounds);
+    render_rounds<Constant>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
