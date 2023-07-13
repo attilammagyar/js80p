@@ -879,7 +879,7 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
             The voice might have decayed and got garbage collected after the
             note-off event, and then it might have been assigned to play a new
             note for which the key is still being held down. If that's the
-            case, then the voice shold keep ringing.
+            case, then the voice should keep ringing.
             */
             continue;
         }
