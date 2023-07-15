@@ -1,5 +1,5 @@
 ; Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
-; the filter and adds a tremolo effect. Filtering also reacts to note velocity.
+; the filter and adds a tremolo effect. Filtering also responds to note velocity.
 [js80p]
 MIX = 1.000000000000000
 MIXctl = 0.000000000000000

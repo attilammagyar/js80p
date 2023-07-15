@@ -62,6 +62,8 @@ Table of Contents
     * [Ambient Pad 3](#preset-ambient-pad-3)
     * [Saw Piano](#preset-saw-piano)
     * [Saw Piano Reversed](#preset-saw-piano-reversed)
+    * [Nightmare Lead](#preset-nightmare-lead)
+    * [Tremolo Lead](#preset-tremolo-lead)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -431,6 +433,21 @@ A sawtooth wave based sound which sounds like as if you were playing
 a recording backwards. The time it takes for notes to un-decay depends on
 note pitch and velocity. The harder you play, the brighter and richer the
 sound gets. Mod wheel controls the vibrato, aftertouch adjusts the filtering.
+
+<a id="preset-nightmare-lead"></a>
+
+### Nightmare Lead
+
+Starts out as a nice, filtered sawtooth wave, but as you begin to turn the mod
+wheel and add some aftertouch, it becomes more and more menacing and distorted,
+until it finally descends into madness.
+
+<a id="preset-tremolo-lead"></a>
+
+### Tremolo Lead
+
+Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
+the filter and adds a tremolo effect. Filtering also responds to note velocity.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
