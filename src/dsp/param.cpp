@@ -805,6 +805,7 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
         ratio_to_value(amount * envelope->sustain_value.get_value())
     );
 
+    envelope_final_value = amount * envelope->final_value.get_value();
     envelope_release_time = (Seconds)envelope->release_time.get_value();
 }
 
@@ -818,6 +819,9 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
     }
 
     if (envelope->dynamic.get_value() == ToggleParam::ON) {
+        envelope_final_value = (
+            envelope->amount.get_value() * envelope->final_value.get_value()
+        );
         envelope_release_time = (Seconds)envelope->release_time.get_value();
     }
 
@@ -828,12 +832,7 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 
     cancel_events(time_offset);
     schedule(EVT_ENVELOPE_END, time_offset);
-    schedule_linear_ramp(
-        envelope_release_time,
-        ratio_to_value(
-            envelope->amount.get_value() * envelope->final_value.get_value()
-        )
-    );
+    schedule_linear_ramp(envelope_release_time, ratio_to_value(envelope_final_value));
 
     return envelope_release_time;
 }

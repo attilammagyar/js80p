@@ -1057,7 +1057,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
 })
 
 
-TEST(envelope_release_time_is_saved_when_the_envelope_is_started, {
+TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_samples[block_size] = {
         0.0, 0.0, 1.0, 2.0, 3.0,
@@ -1085,6 +1085,8 @@ TEST(envelope_release_time_is_saved_when_the_envelope_is_started, {
     float_param.start_envelope(0.3);
 
     envelope.release_time.set_value(0.123);
+    envelope.amount.set_value(1.0);
+    envelope.final_value.set_value(1.0);
 
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
 

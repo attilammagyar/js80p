@@ -365,6 +365,7 @@ class FloatParam : public Param<Number>
         Seconds envelope_end_time_offset;
         Seconds envelope_position;
         Seconds envelope_release_time;
+        Number envelope_final_value;
         EnvelopeStage envelope_stage;
         bool envelope_end_scheduled;
 
