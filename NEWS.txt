@@ -1,3 +1,10 @@
+v1.9.5 (2023-07-15)
+ * 2 new presets: Nightmare Lead and Tremolo Lead
+ * Bugfix: along with the release time, non-dynamic envelopes will also use the
+   final value and amount that was in effect at the moment when the note was
+   triggered, and only dynamic envelopes will update their final value and
+   amount for already sounding notes
+
 v1.9.4 (2023-07-14)
  * Bugfix: when the same note was triggered on multiple voices while holding
    down the sustain pedal, then releasing the pedal failed to release some
