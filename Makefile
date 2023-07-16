@@ -45,6 +45,10 @@ OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
 .PHONY: \
 	all \
 	check \
+	check_basic \
+	check_dsp \
+	check_param \
+	test_example \
 	clean \
 	dirs \
 	docs \
@@ -128,29 +132,37 @@ SYNTH_COMPONENTS = \
 	dsp/wavefolder \
 	dsp/wavetable
 
-TESTS = \
-	test_example \
+TESTS_BASIC = \
+	test_math \
+	test_queue \
+	test_signal_producer
+
+TESTS_PARAM = \
+	test_envelope \
+	test_flexible_controller \
+	test_lfo \
+	test_midi_controller \
+	test_oscillator \
+	test_param
+
+TESTS_DSP = \
 	test_biquad_filter \
 	test_delay \
 	test_distortion \
-	test_envelope \
-	test_flexible_controller \
 	test_gain \
-	test_gui \
-	test_lfo \
-	test_math \
-	test_midi_controller \
 	test_mixer \
-	test_oscillator \
-	test_param \
+	test_wavefolder
+
+TESTS = \
+	$(TESTS_BASIC) \
+	$(TESTS_PARAM) \
+	$(TESTS_DSP) \
+	test_gui \
 	test_bank \
-	test_queue \
 	test_renderer \
 	test_serializer \
-	test_signal_producer \
 	test_synth \
-	test_voice \
-	test_wavefolder
+	test_voice
 
 PERF_TESTS = \
 	perf_math
@@ -222,6 +234,9 @@ TEST_LIBS = \
 
 TEST_CPPS = $(foreach TEST,$(TESTS),tests/$(TEST).cpp)
 TEST_BINS = $(foreach TEST,$(TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_BASIC_BINS = $(foreach TEST,$(TESTS_BASIC),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_PARAM_BINS = $(foreach TEST,$(TESTS_PARAM),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_DSP_BINS = $(foreach TEST,$(TESTS_DSP),$(BUILD_DIR)/$(TEST)$(EXE))
 PERF_TEST_BINS = $(foreach TEST,$(PERF_TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
 
 TEST_CXXFLAGS = \
@@ -284,28 +299,11 @@ clean:
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
 check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
-	$(BUILD_DIR)/test_math$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_queue$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_midi_controller$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_flexible_controller$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_gain$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
-	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
-# 	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
+check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(BUILD_DIR)
+check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(BUILD_DIR)
+check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(BUILD_DIR)
+
+test_example: $(BUILD_DIR)/test_example$(EXE) | $(BUILD_DIR)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 
@@ -438,16 +436,19 @@ $(BUILD_DIR)/test_example$(EXE): \
 	$(TEST_LIBS) \
 	| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
 
 $(BUILD_DIR)/test_bank$(EXE): \
 		tests/test_bank.cpp \
 		src/bank.cpp src/bank.hpp \
 		src/serializer.cpp src/serializer.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
 
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
@@ -455,8 +456,10 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
 
 $(BUILD_DIR)/test_delay$(EXE): \
 		tests/test_delay.cpp \
@@ -465,11 +468,13 @@ $(BUILD_DIR)/test_delay$(EXE): \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) \
 		$(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) \
 		-Wno-maybe-uninitialized \
 		-o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
 
 $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
@@ -477,47 +482,59 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
 
 $(BUILD_DIR)/test_envelope$(EXE): \
 		tests/test_envelope.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
 
 $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_flexible_controller$(EXE)
 
 $(BUILD_DIR)/test_gain$(EXE): \
 		tests/test_gain.cpp \
 		src/dsp/gain.cpp src/dsp/gain.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_gain$(EXE)
 
 $(BUILD_DIR)/test_gui$(EXE): \
 		tests/test_gui.cpp \
 		tests/gui_stubs.cpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
 
 $(BUILD_DIR)/test_lfo$(EXE): \
 		tests/test_lfo.cpp \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_BASIC_BINS) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
 
 $(BUILD_DIR)/test_math$(EXE): \
 		tests/test_math.cpp \
@@ -526,6 +543,7 @@ $(BUILD_DIR)/test_math$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(BUILD_DIR)/test_math$(EXE)
 
 $(BUILD_DIR)/test_midi_controller$(EXE): \
 		tests/test_midi_controller.cpp \
@@ -533,8 +551,10 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_midi_controller$(EXE)
 
 $(BUILD_DIR)/test_mixer$(EXE): \
 		tests/test_mixer.cpp \
@@ -542,23 +562,29 @@ $(BUILD_DIR)/test_mixer$(EXE): \
 		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
 
 $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
@@ -566,24 +592,29 @@ $(BUILD_DIR)/test_queue$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_queue$(EXE)
 
 $(BUILD_DIR)/test_renderer$(EXE): \
 		tests/test_renderer.cpp \
 		src/renderer.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
 
 $(BUILD_DIR)/test_serializer$(EXE): \
 		tests/test_serializer.cpp \
 		src/serializer.cpp src/serializer.hpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
 
 $(BUILD_DIR)/test_signal_producer$(EXE): \
 		tests/test_signal_producer.cpp \
@@ -593,22 +624,27 @@ $(BUILD_DIR)/test_signal_producer$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
 
 $(BUILD_DIR)/test_synth$(EXE): \
 		tests/test_synth.cpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
 
 $(BUILD_DIR)/test_voice$(EXE): \
 		tests/test_voice.cpp \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS) \
 		$(SYNTH_SOURCES) \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
@@ -616,5 +652,7 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
+		$(TEST_BASIC_BINS) \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
