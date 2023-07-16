@@ -144,7 +144,7 @@ class GUI
         static Color const CTL_COLOR_ENVELOPE_BG;
 
         static void param_ratio_to_str(
-            Synth& synth,
+            Synth const& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -182,7 +182,7 @@ class GUI
         static void initialize_controllers_by_id();
 
         static void param_ratio_to_str_float(
-            Synth& synth,
+            Synth const& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             Number const scale,
@@ -191,7 +191,7 @@ class GUI
             size_t const buffer_size
         );
         static void param_ratio_to_str_int(
-            Synth& synth,
+            Synth const& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             char const* const* const options,

@@ -751,7 +751,7 @@ constexpr GUI::ColorComponent GUI::blue(Color const color)
 
 
 void GUI::param_ratio_to_str(
-        Synth& synth,
+        Synth const& synth,
         Synth::ParamId const param_id,
         Number const ratio,
         Number const scale,
@@ -776,7 +776,7 @@ void GUI::param_ratio_to_str(
 
 
 void GUI::param_ratio_to_str_float(
-        Synth& synth,
+        Synth const& synth,
         Synth::ParamId const param_id,
         Number const ratio,
         Number const scale,
@@ -809,7 +809,7 @@ void GUI::param_ratio_to_str_float(
 
 
 void GUI::param_ratio_to_str_int(
-        Synth& synth,
+        Synth const& synth,
         Synth::ParamId const param_id,
         Number const ratio,
         char const* const* const options,
