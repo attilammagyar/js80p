@@ -329,7 +329,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         )
     ) * param_leaders.width.get_value();
 
-    oscillator.cancel_events(time_offset);
+    oscillator.cancel_events_at(time_offset);
 
     wavefolder.folding.start_envelope(time_offset);
 
@@ -385,7 +385,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     Number const portamento_length = this->portamento_length.get_value();
     Frequency const note_frequency = frequencies[note];
 
-    oscillator.frequency.cancel_events(time_offset);
+    oscillator.frequency.cancel_events_at(time_offset);
 
     /*
     Though we never assign an envelope to Oscillator.frequency, its modulation
@@ -431,7 +431,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         volume.end_envelope(time_offset)
     );
 
-    oscillator.cancel_events(off_after);
+    oscillator.cancel_events_at(off_after);
     oscillator.stop(off_after);
 
     state = OFF;

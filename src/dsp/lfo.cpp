@@ -100,13 +100,13 @@ void LFO::stop(Seconds const time_offset) noexcept
 {
     oscillator.stop(time_offset);
 
-    frequency.cancel_events(time_offset);
-    phase.cancel_events(time_offset);
-    min.cancel_events(time_offset);
-    max.cancel_events(time_offset);
-    amount.cancel_events(time_offset);
-    distortion.cancel_events(time_offset);
-    randomness.cancel_events(time_offset);
+    frequency.cancel_events_at(time_offset);
+    phase.cancel_events_at(time_offset);
+    min.cancel_events_at(time_offset);
+    max.cancel_events_at(time_offset);
+    amount.cancel_events_at(time_offset);
+    distortion.cancel_events_at(time_offset);
+    randomness.cancel_events_at(time_offset);
 }
 
 

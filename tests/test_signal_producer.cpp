@@ -225,7 +225,7 @@ TEST(can_convert_sample_number_to_time_offset, {
     SignalProducer signal_producer(1);
     signal_producer.set_sample_rate(4);
 
-    signal_producer.cancel_events(10.0);
+    signal_producer.cancel_events_at(10.0);
     SignalProducer::produce<SignalProducer>(signal_producer, 1, 1);
 
     assert_eq(0.00, signal_producer.sample_count_to_relative_time_offset(0), DOUBLE_DELTA);
@@ -678,13 +678,25 @@ typedef struct
 } TestEvent;
 
 
+typedef struct
+{
+    enum Type {
+        AT_MOMENT = 0,
+        AFTER_MOMENT = 1,
+    };
+
+    Seconds const time_offset;
+    Type const type;
+} Cancellation;
+
+
 void test_event_handling(
         EventTestSignalProducer& signal_producer,
         Integer const block_size,
         Integer const rounds,
         TestEvent const events[],
         Integer const events_length,
-        Seconds const cancellations[],
+        Cancellation const cancellations[],
         Integer const cancellations_length,
         Sample const expected_samples[]
 ) {
@@ -711,14 +723,19 @@ void test_event_handling(
     }
 
     for (Integer i = 0; i != cancellations_length; ++i) {
-        signal_producer.cancel_events(cancellations[i]);
-        assert_false(signal_producer.has_events_after(cancellations[i]));
+        if (cancellations[i].type == Cancellation::AT_MOMENT) {
+            signal_producer.cancel_events_at(cancellations[i].time_offset);
+        } else {
+            signal_producer.cancel_events_after(cancellations[i].time_offset);
+        }
+
+        assert_false(signal_producer.has_events_after(cancellations[i].time_offset));
         assert_true(signal_producer.has_events_after(0.0));
         assert_true(
-            signal_producer.has_events_after(cancellations[i] - DOUBLE_DELTA)
+            signal_producer.has_events_after(cancellations[i].time_offset - DOUBLE_DELTA)
         );
         assert_eq(
-            cancellations[i],
+            cancellations[i].time_offset,
             signal_producer.get_last_event_time_offset(),
             DOUBLE_DELTA
         );
@@ -830,6 +847,25 @@ TEST(an_event_may_occur_between_samples, {
 })
 
 
+TEST(events_may_be_cancelled_at_a_given_point_in_time, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 1;
+    constexpr TestEvent events[] = {
+        {0.1, 1.0},
+        {0.2, 2.0},
+        {0.3, 3.0},
+    };
+    constexpr Cancellation cancellations[] = {{0.2, Cancellation::AT_MOMENT}};
+    constexpr Sample expected_samples[] = {0.0, 1.0, 1.0, 1.0, 1.0};
+    EventTestSignalProducer signal_producer;
+    signal_producer.set_sample_rate(10.0);
+
+    test_event_handling(
+        signal_producer, block_size, rounds, events, 3, cancellations, 1, expected_samples
+    );
+})
+
+
 TEST(events_may_be_cancelled_following_a_given_point_in_time, {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 1;
@@ -838,8 +874,8 @@ TEST(events_may_be_cancelled_following_a_given_point_in_time, {
         {0.2, 2.0},
         {0.3, 3.0},
     };
-    constexpr Seconds cancellations[] = {0.2};
-    constexpr Sample expected_samples[] = {0.0, 1.0, 1.0, 1.0, 1.0};
+    constexpr Cancellation cancellations[] = {{0.2, Cancellation::AFTER_MOMENT}};
+    constexpr Sample expected_samples[] = {0.0, 1.0, 2.0, 2.0, 2.0};
     EventTestSignalProducer signal_producer;
     signal_producer.set_sample_rate(10.0);
 
@@ -900,7 +936,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
     }
 
     assert_eq(998.5, signal_producer.get_last_event_time_offset(), DOUBLE_DELTA);
-    signal_producer.cancel_events(0.0);
+    signal_producer.cancel_events_at(0.0);
     assert_eq(0.0, signal_producer.get_last_event_time_offset(), DOUBLE_DELTA);
     signal_producer.schedule(0.0, 3.0);
     assert_eq(0.0, signal_producer.get_last_event_time_offset(), DOUBLE_DELTA);
@@ -919,7 +955,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
 
     assert_eq(998.5, signal_producer.get_last_event_time_offset(), DOUBLE_DELTA);
 
-    signal_producer.cancel_events(1.0);
+    signal_producer.cancel_events_at(1.0);
     signal_producer.schedule(2.0, 5.0);
     signal_producer.schedule(1000.0, 1000.0);
     block = SignalProducer::produce<EventTestSignalProducer>(
@@ -930,7 +966,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
         rendered.samples[0][next_sample_index++] = block[0][i];
     }
 
-    signal_producer.cancel_events(2.0);
+    signal_producer.cancel_events_at(2.0);
     signal_producer.schedule(2.0, 6.0);
     signal_producer.schedule(1000.0, 1000.0);
     block = SignalProducer::produce<EventTestSignalProducer>(
@@ -941,7 +977,7 @@ TEST(event_scheduling_is_relative_to_current_time, {
         rendered.samples[0][next_sample_index++] = block[0][i];
     }
 
-    signal_producer.cancel_events(0.5);
+    signal_producer.cancel_events_at(0.5);
     block = SignalProducer::produce<EventTestSignalProducer>(
         signal_producer, round++, block_size
     );

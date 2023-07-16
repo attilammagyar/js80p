@@ -1,3 +1,10 @@
+v1.9.6 (2023-07-16)
+ * Bugfix: when a note was immediately cancelled after being triggered, it
+   could happen that parameters would start their envelope release stage from
+   the parameter's last set value instead of the envelope's initial value; now
+   if and envelope is released immediately then it will gradually change from
+   its initial value to its final value
+
 v1.9.5 (2023-07-15)
  * 2 new presets: Nightmare Lead and Tremolo Lead
  * Bugfix: along with the release time, non-dynamic envelopes will also use the

@@ -346,7 +346,7 @@ TEST(float_param_can_cancel_scheduled_value, {
     float_param.set_sample_rate(1.0);
     float_param.set_value(0.5);
     float_param.schedule_value(2.0, 1.1);
-    float_param.cancel_events(1.0);
+    float_param.cancel_events_at(1.0);
 
     assert_float_param_does_not_change_during_rendering(
         float_param, 1, block_size, &rendered_samples
@@ -364,7 +364,7 @@ TEST(float_param_can_cancel_scheduled_value_between_samples, {
     float_param.set_sample_rate(2.0);
     float_param.set_value(0.5);
     float_param.schedule_value(1.0, 1.1);
-    float_param.cancel_events(0.9);
+    float_param.cancel_events_at(0.9);
 
     assert_float_param_does_not_change_during_rendering(
         float_param, 1, block_size, &rendered_samples
@@ -457,7 +457,7 @@ TEST(when_float_param_linear_ramping_is_canceled_then_last_calculated_value_is_h
     float_param.set_value(-0.1);
     float_param.schedule_value(5.0, 0.0);
     float_param.schedule_linear_ramp(15.0, 1.5);
-    float_param.cancel_events(10.0);
+    float_param.cancel_events_at(10.0);
 
     assert_float_param_changes_during_rendering(
         float_param, 1, block_size, &rendered_samples
@@ -524,7 +524,7 @@ TEST(float_param_linear_ramps_may_stretch_over_several_rendering_rounds, {
         }
 
         if (round == 1) {
-            float_param.cancel_events(3.0);
+            float_param.cancel_events_at(3.0);
         }
     }
 
@@ -545,7 +545,7 @@ TEST(when_float_param_linear_ramp_is_canceled_between_samples_then_in_between_sa
     float_param.set_value(-0.1);
     float_param.schedule_value(0.5, -1.0);
     float_param.schedule_linear_ramp(2.0, 1.0);
-    float_param.cancel_events(2.25);
+    float_param.cancel_events_at(2.25);
     rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
 
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
@@ -565,7 +565,7 @@ TEST(when_float_param_linear_ramp_is_canceled_between_samples_then_in_between_sa
     float_param.set_value(-0.1);
     float_param.schedule_value(0.5, -1.0);
     float_param.schedule_linear_ramp(10.0, 9.0);
-    float_param.cancel_events(2.75);
+    float_param.cancel_events_at(2.75);
     rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
 
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
@@ -1047,6 +1047,45 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
 
     float_param.start_envelope(0.3);
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
+
+    assert_true(float_param.is_constant_until(1));
+    assert_false(float_param.is_constant_until(2));
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
+
+    rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
+TEST(a_float_param_envelope_may_be_released_immediately, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        5.0, 0.0, -1.0, -2.0, -2.0,
+        -2.0, -2.0, -2.0, -2.0, -2.0,
+    };
+    FloatParam float_param("float", -5.0, 5.0, 0.0);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(1.0);
+
+    float_param.set_value(5.0);
+    float_param.set_envelope(&envelope);
+
+    envelope.amount.set_value(0.8);
+    envelope.initial_value.set_value(0.625);
+    envelope.delay_time.set_value(0.5);
+    envelope.attack_time.set_value(3.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(1.0);
+    envelope.decay_time.set_value(2.0);
+    envelope.sustain_value.set_value(0.75);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.375);
+
+    float_param.start_envelope(1.0);
+    assert_eq(2.0, float_param.end_envelope(1.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
     assert_false(float_param.is_constant_until(2));
@@ -1678,7 +1717,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
     follower.start_envelope(0.0);
-    follower.cancel_events(12.0 / sample_rate);
+    follower.cancel_events_at(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
         follower, 1, block_size, &rendered_samples

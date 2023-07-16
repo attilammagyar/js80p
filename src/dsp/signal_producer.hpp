@@ -144,7 +144,8 @@ class SignalProducer
         ) noexcept;
 
         void cancel_events() noexcept;
-        void cancel_events(Seconds const time_offset) noexcept;
+        void cancel_events_at(Seconds const time_offset) noexcept;
+        void cancel_events_after(Seconds const time_offset) noexcept;
         bool has_events_after(Seconds const time_offset) const noexcept;
         Seconds get_last_event_time_offset() const noexcept;
 

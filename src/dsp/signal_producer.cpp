@@ -290,12 +290,27 @@ void SignalProducer::cancel_events() noexcept
 }
 
 
-void SignalProducer::cancel_events(Seconds const time_offset) noexcept
+void SignalProducer::cancel_events_at(Seconds const time_offset) noexcept
 {
     Seconds const time = time_offset + current_time;
 
     for (Queue<Event>::SizeType i = 0, l = events.length(); i != l; ++i) {
         if (events[i].time_offset >= time) {
+            events.drop(i);
+            break;
+        }
+    }
+
+    schedule(EVT_CANCEL, time_offset);
+}
+
+
+void SignalProducer::cancel_events_after(Seconds const time_offset) noexcept
+{
+    Seconds const time = time_offset + current_time;
+
+    for (Queue<Event>::SizeType i = 0, l = events.length(); i != l; ++i) {
+        if (events[i].time_offset > time) {
             events.drop(i);
             break;
         }

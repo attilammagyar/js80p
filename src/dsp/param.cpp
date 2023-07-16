@@ -780,7 +780,7 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
 
     // initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
 
-    cancel_events(time_offset);
+    cancel_events_after(time_offset);
 
     schedule(EVT_ENVELOPE_START, time_offset);
 
@@ -830,7 +830,7 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 
     // current-v ==release-t==> release-v
 
-    cancel_events(time_offset);
+    cancel_events_after(time_offset);
     schedule(EVT_ENVELOPE_END, time_offset);
     schedule_linear_ramp(envelope_release_time, ratio_to_value(envelope_final_value));
 
@@ -902,7 +902,7 @@ Sample const* const* FloatParam::process_midi_controller_events() noexcept
         return NULL;
     }
 
-    cancel_events(0.0);
+    cancel_events_at(0.0);
 
     if (should_round) {
         for (Queue<Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
@@ -966,7 +966,7 @@ Sample const* const* FloatParam::process_flexible_controller(
 
     flexible_controller_change_index = new_change_index;
 
-    cancel_events(0.0);
+    cancel_events_at(0.0);
 
     Number const controller_value = flexible_controller->get_value();
 
@@ -1027,7 +1027,7 @@ Sample const* const* FloatParam::process_envelope(
     Number const amount = envelope->amount.get_value();
 
     if (envelope_stage == EnvelopeStage::DAHDS) {
-        cancel_events(0.0);
+        cancel_events_at(0.0);
 
         if (envelope_position > envelope->get_dahd_length()) {
             Number const sustain_value = ratio_to_value(
@@ -1076,7 +1076,7 @@ Sample const* const* FloatParam::process_envelope(
             envelope_release_time, (Seconds)envelope->release_time.get_value()
         );
 
-        cancel_events(envelope_end_time_offset);
+        cancel_events_at(envelope_end_time_offset);
         schedule(EVT_ENVELOPE_END, envelope_end_time_offset);
         schedule_linear_ramp(
             envelope_release_time,
