@@ -55,6 +55,7 @@ class XcbPlatform
         xcb_screen_t* get_screen() const;
         xcb_visualid_t get_screen_root_visual_id() const;
         xcb_visualtype_t* get_screen_root_visual() const;
+
         cairo_font_face_t* get_font_face(
             cairo_t* cairo,
             WidgetBase::FontWeight const weight
@@ -107,28 +108,35 @@ class XcbPlatform
         typedef std::map<xcb_window_t, Widget*> WindowIdToWidgetMap;
 
         xcb_visualtype_t* find_screen_root_visual() const;
+
         cairo_font_face_t* find_narrowest_font(
             cairo_t* cairo,
             cairo_font_weight_t weight
         );
 
         char const* find_executable(char const* const* alternatives) const;
+
         void start_file_selector_dialog(
             char const* executable,
             char const* const* arguments
         );
+
         void clear_active_file_selector_dialog_data();
+
         void build_file_selector_argv(
             char const* executable,
             char const* const* arguments,
             std::vector<char*>& argv
         ) const;
+
         void build_file_selector_env(std::vector<char*>& env) const;
+
         void run_file_selector_child_process(
             std::vector<char*> const& argv,
             std::vector<char*> const& env,
             Pipe* pipe
         ) const;
+
         void read_file_selector_output();
         bool has_file_selector_exited(int* exit_code) const;
         void finish_exporting_patch();
