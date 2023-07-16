@@ -180,7 +180,7 @@ char const* const XcbPlatform::KDIALOG_SAVE_ARGUMENTS[] = {
     "--title",
     "Save As",
     ".",
-    "JS80P Patches (*.js80p)\nAll Files (*.*)",
+    "JS80P Patches (*.js80p)\nAll Files (*)",
     NULL,
 };
 
@@ -189,7 +189,7 @@ char const* const XcbPlatform::KDIALOG_OPEN_ARGUMENTS[] = {
     "--title",
     "Open",
     ".",
-    "JS80P Patches (*.js80p)\nAll Files (*.*)",
+    "JS80P Patches (*.js80p)\nAll Files (*)",
     NULL,
 };
 
@@ -206,7 +206,7 @@ char const* const XcbPlatform::ZENITY_SAVE_ARGUMENTS[] = {
     "--confirm-overwrite",
     "--title=Save As",
     "--file-filter=JS80P Patches (*.js80p) | *.js80p",
-    "--file-filter=All Files (*.*) | *.*",
+    "--file-filter=All Files (*) | *",
     NULL,
 };
 
@@ -214,7 +214,7 @@ char const* const XcbPlatform::ZENITY_OPEN_ARGUMENTS[] = {
     "--file-selection",
     "--title=Open",
     "--file-filter=JS80P Patches (*.js80p) | *.js80p",
-    "--file-filter=All Files (*.*) | *.*",
+    "--file-filter=All Files (*) | *",
     NULL,
 };
 

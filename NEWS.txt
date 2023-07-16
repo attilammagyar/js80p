@@ -4,6 +4,8 @@ v1.9.6 (2023-07-16)
    the parameter's last set value instead of the envelope's initial value; now
    if and envelope is released immediately then it will gradually change from
    its initial value to its final value
+ * Bugfix: the All Files option in file selector dialogs will actually show all
+   files on Linux, not just the ones with a dot in their name
 
 v1.9.5 (2023-07-15)
  * 2 new presets: Nightmare Lead and Tremolo Lead
