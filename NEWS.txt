@@ -1,11 +1,12 @@
 v1.9.6 (2023-07-16)
- * Bugfix: when a note was immediately cancelled after being triggered, it
-   could happen that parameters would start their envelope release stage from
-   the parameter's last set value instead of the envelope's initial value; now
-   if and envelope is released immediately then it will gradually change from
-   its initial value to its final value
+ * Bugfix: when a note was immediately released after being triggered, it could
+   happen that its parameters that were controlled by envelopes would start
+   their release from the parameter's last set value instead of the envelope's
+   initial value. Now if a note is released immediately after getting triggered
+   then its parameters that have an envelope assigned to them will gradually
+   change from the envelope's initial value to its final value.
  * Bugfix: the All Files option in file selector dialogs will actually show all
-   files on Linux, not just the ones with a dot in their name
+   files on Linux, not just the ones with a dot in their name.
 
 v1.9.5 (2023-07-15)
  * 2 new presets: Nightmare Lead and Tremolo Lead
