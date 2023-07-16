@@ -210,9 +210,9 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
 
     voice.note_on(0.0, 123, 2, 3, 1.0, 1);
 
-    assert_eq(123, voice.get_note_id());
-    assert_eq(2, voice.get_note());
-    assert_eq(3, voice.get_channel());
+    assert_eq(123, (int)voice.get_note_id());
+    assert_eq(2, (int)voice.get_note());
+    assert_eq(3, (int)voice.get_channel());
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
