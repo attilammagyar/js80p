@@ -90,6 +90,7 @@ System Requirements
 
  * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)
  * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
+    * separate packages are available for AVX capable 64 bit processors
  * RAM: 150-300 MB per instance, depending on buffer sizes, etc.
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
@@ -117,14 +118,21 @@ Installation
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with the VST 3 bundle on all supported operating
-systems.
+Otherwise, you should go with the VST 3 bundle on both Windows and Linux.
+
+If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
+and you use a 64 bit plugin host application, then you should download a JS80P
+package that is optimized for AVX compatible processors. If you have an older
+computer, or if you experience crashes, then you should go with one of the
+[SSE2](https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
 
 If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
+
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
-recognize VST 3 bundles when running on a 64 bit system.)
+recognize VST 3 bundles when running on a 64 bit Linux system, so you would
+have to download the 32 bit VST 3 Single File JS80P package.)
 
 <a id="vst3-bundle-windows"></a>
 
@@ -530,14 +538,21 @@ Frequenctly Asked Questions
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with the VST 3 bundle on all supported operating
-systems.
+Otherwise, you should go with the VST 3 bundle on both Windows and Linux.
+
+If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
+and you use a 64 bit plugin host application, then you should download a JS80P
+package that is optimized for AVX compatible processors. If you have an older
+computer, or if you experience crashes, then you should go with one of the
+[SSE2](https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
 
 If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
+
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
-recognize VST 3 bundles when running on a 64 bit system.)
+recognize VST 3 bundles when running on a 64 bit Linux system, so you would
+have to download the 32 bit VST 3 Single File JS80P package.)
 
 The 32 bit versions are usually only needed by those who deliberately use a 32
 bit plugin host application, e.g. because they want to keep using some really

@@ -470,7 +470,9 @@ class AboutText : public Widget
         static constexpr char const* NAME = "JS80P";
 
         static constexpr char const* VERSION = (
-            JS80P_TO_STRING(JS80P_VERSION_STR) ", " JS80P_TO_STRING(JS80P_TARGET_PLATFORM)
+            JS80P_TO_STRING(JS80P_VERSION_STR) ", "
+            JS80P_TO_STRING(JS80P_TARGET_PLATFORM) ", "
+            JS80P_TO_STRING(JS80P_INSTRUCTION_SET)
         );
 
         static constexpr char const* TEXT = (

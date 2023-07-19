@@ -33,13 +33,13 @@ main()
             suffix=""
         fi
 
-        for architecture in "32" "64"
+        for architecture in "32:sse2" "64:sse2" "64:avx"
         do
             info="plugin_type='$plugin_type', architecture='$architecture'"
 
             run_test_wine \
                 "$src_dir" \
-                "-windows-${architecture}bit" \
+                "-windows" \
                 "$plugin_type" \
                 "$suffix" \
                 "$architecture" \
@@ -47,7 +47,7 @@ main()
 
             run_test_linux \
                 "$src_dir" \
-                "-linux-${architecture}bit" \
+                "-linux" \
                 "$plugin_type" \
                 "$suffix" \
                 "$architecture" \
@@ -55,13 +55,17 @@ main()
         done
     done
 
-    info="plugin_type='vst3', architecture='64'"
-    run_test_wine "$src_dir" "" "vst3" "_bundle" "64" "platform='wine', $info"
-    run_test_linux "$src_dir" "" "vst3" "_bundle" "64" "platform='linux', $info"
+    info="plugin_type='vst3', architecture='64:avx'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "64:avx" "platform='wine', $info"
+    run_test_linux "$src_dir" "" "vst3" "_bundle" "64:avx" "platform='linux', $info"
 
-    info="plugin_type='vst3', architecture='32'"
-    run_test_wine "$src_dir" "" "vst3" "_bundle" "32" "platform='wine', $info"
-    # run_test_linux "$src_dir" "" "vst3" "_bundle" "32" "platform='linux', $info"
+    info="plugin_type='vst3', architecture='64:sse2'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "64:sse2" "platform='wine', $info"
+    run_test_linux "$src_dir" "" "vst3" "_bundle" "64:sse2" "platform='linux', $info"
+
+    info="plugin_type='vst3', architecture='32:sse2'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "32:sse2" "platform='wine', $info"
+    # run_test_linux "$src_dir" "" "vst3" "_bundle" "32:sse2" "platform='linux', $info"
 
     # As of VST 3.7.8, loading the 32 bit plugin into a 32 bit host application
     # from a VST 3 bundle on a 64 bit Linux system is broken:
@@ -79,15 +83,26 @@ run_test_wine()
     local suffix="$4"
     local architecture="$5"
     local msg_info="$6"
-    local reaper_exe="$WINE_DIR/reaper$architecture/reaper.exe"
-    local rendered_wav="$WINE_TEST_DIR/test.wav"
+    local instruction_set
+    local reaper_exe
+    local rendered_wav
+
+    instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
+    architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
+    reaper_exe="$WINE_DIR/reaper$architecture/reaper.exe"
+    rendered_wav="$WINE_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
+
+    if [[ "$infix" != "" ]]
+    then
+        infix="$infix-${architecture}bit"
+    fi
 
     rm -vrf "$WINE_TEST_DIR"/{test.{rpp,wav},js80p.{dll,vst3}}
     cp -v "$src_dir/smoke-test-"$plugin_type".rpp" "$WINE_TEST_DIR/test.rpp"
     cp -vr \
-        "$src_dir/../.."/dist/js80p-*$infix-"$plugin_type$suffix"/js80p.* \
+        "$src_dir/../.."/dist/js80p-*$infix-$instruction_set-"$plugin_type$suffix"/js80p.* \
         "$WINE_TEST_DIR/"
 
     if [[ ! -f "$reaper_exe" ]]
@@ -112,10 +127,21 @@ run_test_linux()
     local suffix="$4"
     local architecture="$5"
     local msg_info="$6"
-    local reaper_exe=~/"reaper$architecture/reaper"
-    local rendered_wav="$LINUX_TEST_DIR/test.wav"
+    local instruction_set
+    local reaper_exe
+    local rendered_wav
+
+    instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
+    architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
+    reaper_exe=~/"reaper$architecture/reaper"
+    rendered_wav="$LINUX_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
+
+    if [[ "$infix" != "" ]]
+    then
+        infix="$infix-${architecture}bit"
+    fi
 
     rm -vrf "$LINUX_TEST_DIR"/{test.{rpp,wav},js80p.{so,vst3}}
     mkdir -v -p "$LINUX_TEST_DIR"
@@ -124,7 +150,7 @@ run_test_linux()
         "s|RENDER_FILE \"[^\"]*\"|RENDER_FILE \"$LINUX_TEST_DIR/test.wav\"|" \
         "$LINUX_TEST_DIR/test.rpp"
     cp -vr \
-        "$src_dir/../.."/dist/js80p-*$infix-"$plugin_type$suffix"/js80p.* \
+        "$src_dir/../.."/dist/js80p-*$infix-$instruction_set-"$plugin_type$suffix"/js80p.* \
         "$LINUX_TEST_DIR/"
 
     if [[ ! -x "$reaper_exe" ]]

@@ -5,7 +5,7 @@ set -e
 set -u
 set -o pipefail
 
-TARGET_PLATFORMS="x86_64-w64-mingw32 i686-w64-mingw32 x86_64-gpp i686-gpp"
+TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2"
 PLUGIN_TYPES="fst vst3"
 TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
 DIST_DIR_BASE="dist"
@@ -17,6 +17,7 @@ main()
     local version_str
     local version_int
     local target_platform
+    local instruction_set
     local source_dir
     local source_archive
     local uncommitted
@@ -101,20 +102,24 @@ main()
 
     log "Running unit tests"
 
-    call_make "x86_64-w64-mingw32" "$version_str" check
+    call_make "x86_64-w64-mingw32" "avx" "$version_str" check
 
     for target_platform in $TARGET_PLATFORMS
     do
         log "Building for target: $target_platform"
 
-        call_make "$target_platform" "$version_str" clean
-        call_make "$target_platform" "$version_str" all
+        instruction_set="$(printf "%s\n" "$target_platform" | cut -d ":" -f 2)"
+        target_platform="$(printf "%s\n" "$target_platform" | cut -d ":" -f 1)"
 
-        package_fst "$target_platform" "$version_str"
-        package_vst3_single_file "$target_platform" "$version_str"
+        call_make "$target_platform" "$instruction_set" "$version_str" clean
+        call_make "$target_platform" "$instruction_set" "$version_str" all
+
+        package_fst "$target_platform" "$instruction_set" "$version_str"
+        package_vst3_single_file "$target_platform" "$instruction_set" "$version_str"
     done
 
-    package_vst3_bundle "$version_as_file_name"
+    package_vst3_bundle "$version_as_file_name" "sse2"
+    package_vst3_bundle "$version_as_file_name" "avx"
 
     log "Done"
 }
@@ -179,10 +184,12 @@ version_str_to_file_name()
 call_make()
 {
     local target_platform="$1"
-    local version_str="$2"
+    local instruction_set="$2"
+    local version_str="$3"
     local version_int
     local version_as_file_name
 
+    shift
     shift
     shift
 
@@ -190,6 +197,7 @@ call_make()
     version_as_file_name="$(version_str_to_file_name "$version_str")"
 
     TARGET_PLATFORM="$target_platform" \
+        INSTRUCTION_SET="$instruction_set" \
         VERSION_STR="$version_str" \
         VERSION_INT="$version_int" \
         VERSION_AS_FILE_NAME="$version_as_file_name" \
@@ -199,10 +207,11 @@ call_make()
 package_fst()
 {
     local target_platform="$1"
-    local version_str="$2"
+    local instruction_set="$2"
+    local version_str="$3"
     local dist_dir
 
-    dist_dir=$(get_dist_dir "$target_platform" "$version_str" "show_fst_dir")
+    dist_dir=$(get_dist_dir "$target_platform" "$instruction_set" "$version_str" "show_fst_dir")
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
@@ -215,10 +224,11 @@ package_fst()
 get_dist_dir()
 {
     local target_platform="$1"
-    local version_str="$2"
-    local make_target="$3"
+    local instruction_set="$2"
+    local version_str="$3"
+    local make_target="$4"
 
-    basename "$(call_make "$target_platform" "$version_str" "$make_target")"
+    basename "$(call_make "$target_platform" "$instruction_set" "$version_str" "$make_target")"
 }
 
 finalize_package()
@@ -266,10 +276,11 @@ convert_text_file()
 package_vst3_single_file()
 {
     local target_platform="$1"
-    local version_str="$2"
+    local instruction_set="$2"
+    local version_str="$3"
     local dist_dir
 
-    dist_dir=$(get_dist_dir "$target_platform" "$version_str" "show_vst3_dir")
+    dist_dir=$(get_dist_dir "$target_platform" "$instruction_set" "$version_str" "show_vst3_dir")
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
@@ -282,7 +293,8 @@ package_vst3_single_file()
 package_vst3_bundle()
 {
     local version_as_file_name="$1"
-    local dist_dir="js80p-$version_as_file_name-vst3_bundle"
+    local instruction_set="$2"
+    local dist_dir="js80p-$version_as_file_name-$instruction_set-vst3_bundle"
     local vst3_base_dir="$DIST_DIR_BASE/$dist_dir"
     local proc_id
     local doc_dir="$vst3_base_dir/js80p.vst3/Resources/Documentation"
@@ -297,11 +309,15 @@ package_vst3_bundle()
 
     cp --verbose "$README_HTML" "$doc_dir/README.html"
 
-    copy_vst3 "$version_as_file_name" "linux-32bit" "$vst3_base_dir" "i386-linux" "js80p.so"
-    copy_vst3 "$version_as_file_name" "linux-32bit" "$vst3_base_dir" "i686-linux" "js80p.so"
-    copy_vst3 "$version_as_file_name" "linux-64bit" "$vst3_base_dir" "x86_64-linux" "js80p.so"
-    copy_vst3 "$version_as_file_name" "windows-32bit" "$vst3_base_dir" "x86-win" "js80p.vst3"
-    copy_vst3 "$version_as_file_name" "windows-64bit" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+    if [[ "$instruction_set" = "sse2" ]]
+    then
+        copy_vst3 "$version_as_file_name" "linux-32bit-sse2" "$vst3_base_dir" "i386-linux" "js80p.so"
+        copy_vst3 "$version_as_file_name" "linux-32bit-sse2" "$vst3_base_dir" "i686-linux" "js80p.so"
+        copy_vst3 "$version_as_file_name" "windows-32bit-sse2" "$vst3_base_dir" "x86-win" "js80p.vst3"
+    fi
+
+    copy_vst3 "$version_as_file_name" "linux-64bit-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+    copy_vst3 "$version_as_file_name" "windows-64bit-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
 
     for src_file in $TEXT_FILES
     do

@@ -23,19 +23,21 @@ main()
     local plugin_type="$1"
     local target_os="$2"
     local arch="$3"
+    local instruction_set="$4"
     local target_platform=""
     local built_plugin=""
     local suffix=""
 
     if [[ "$plugin_type$target_os$arch" = "" ]]
     then
-        echo "Usage: $0 fst|vst3 linux|windows 64bit|32bit" >&2
+        echo "Usage: $0 fst|vst3 linux|windows 64bit|32bit [sse2|avx]" >&2
         return 1
     fi
 
     if [[ "$plugin_type" = "" ]]; then plugin_type="fst"; fi
     if [[ "$target_os" = "" ]]; then target_os="linux"; fi
     if [[ "$arch" = "" ]]; then arch="64bit"; fi
+    if [[ "$instruction_set" = "" ]]; then instruction_set="sse2"; fi
 
     if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
 
@@ -57,7 +59,7 @@ main()
             ;;
     esac
 
-    built_plugin="dist/js80p-dev-$target_os-$arch-$plugin_type$suffix"
+    built_plugin="dist/js80p-dev-$target_os-$arch-$instruction_set-$plugin_type$suffix"
 
     case "$target_os-$plugin_type" in
         "linux-fst") built_plugin="$built_plugin/js80p.so" ;;
@@ -69,9 +71,9 @@ main()
             ;;
     esac
 
-    echo "Building; plugin_type=\"$plugin_type\", target_os=\"$target_os\", arch=\"$arch\"" >&2
+    echo "Building; plugin_type=\"$plugin_type\", target_os=\"$target_os\", arch=\"$arch\", instruction_set=\"$instruction_set\"" >&2
 
-    TARGET_PLATFORM="$target_platform" make
+    TARGET_PLATFORM="$target_platform" INSTRUCTION_SET="$instruction_set" make
 
     case "$target_os-$plugin_type-$arch" in
         "linux-fst-64bit")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
