@@ -47,11 +47,11 @@ class Bank
                     std::string const& serialized
                 );
 
-                Program(Program const& program);
-                Program(Program const&& program);
+                Program(Program const& program) = default;
+                Program(Program&& program) = default;
 
-                Program& operator=(Program const& program);
-                Program& operator=(Program const&& program);
+                Program& operator=(Program const& program) = default;
+                Program& operator=(Program&& program) = default;
 
                 std::string const& get_name() const;
                 std::string const& get_short_name() const;

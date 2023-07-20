@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <string>
+#include <utility>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -71,6 +72,31 @@ TEST(only_latin_printable_characters_are_allowed_in_program_names, {
 
     program.set_name("[long name with disallowed characters]");
     assert_eq("long name with disal..s", program.get_name());
+})
+
+
+TEST(program_copy_and_move, {
+    Bank::Program orig("Some Program Name", "Default Name", "");
+    Bank::Program ctor_copy(orig);
+    Bank::Program op_copy("Other Program Name", "Other Default Name", "");
+    Bank::Program op_move("Other Program Name", "Other Default Name", "");
+
+    op_copy = orig;
+
+    assert_eq("Some Program Name", ctor_copy.get_name());
+    assert_eq("Some..e", ctor_copy.get_short_name());
+
+    assert_eq("Some Program Name", op_copy.get_name());
+    assert_eq("Some..e", op_copy.get_short_name());
+
+    Bank::Program ctor_move(std::move(ctor_copy));
+    op_move = std::move(op_copy);
+
+    assert_eq("Some Program Name", ctor_move.get_name());
+    assert_eq("Some..e", ctor_move.get_short_name());
+
+    assert_eq("Some Program Name", op_move.get_name());
+    assert_eq("Some..e", op_move.get_short_name());
 })
 
 

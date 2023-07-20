@@ -150,50 +150,6 @@ Bank::Program::Program()
 }
 
 
-Bank::Program::Program(Program const& program)
-    : name(program.name),
-    default_name(program.default_name),
-    serialized(program.serialized),
-    params_start(program.params_start)
-{
-}
-
-
-Bank::Program::Program(Program const&& program)
-    : name(program.name),
-    default_name(program.default_name),
-    serialized(program.serialized),
-    params_start(program.params_start)
-{
-}
-
-
-Bank::Program& Bank::Program::operator=(Program const& program)
-{
-    if (this != &program) {
-        name = program.name;
-        serialized = program.serialized;
-        default_name = program.default_name;
-        params_start = program.params_start;
-    }
-
-    return *this;
-}
-
-
-Bank::Program& Bank::Program::operator=(Program const&& program)
-{
-    if (this != &program) {
-        name = program.name;
-        serialized = program.serialized;
-        default_name = program.default_name;
-        params_start = program.params_start;
-    }
-
-    return *this;
-}
-
-
 std::string const& Bank::Program::get_name() const
 {
     return name;
