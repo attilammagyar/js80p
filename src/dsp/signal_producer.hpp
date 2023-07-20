@@ -41,7 +41,9 @@ class SignalProducer
                 typedef Byte Type;
 
                 Event(Type const type) noexcept;
-                Event(Event const& event) noexcept;
+                Event(Event const& event) noexcept = default;
+                Event(Event&& event) noexcept = default;
+
                 Event(
                     Type const type,
                     Seconds const time_offset,
@@ -50,7 +52,8 @@ class SignalProducer
                     Number const number_param_2 = 0.0
                 ) noexcept;
 
-                Event& operator=(Event const& event) noexcept;
+                Event& operator=(Event const& event) noexcept = default;
+                Event& operator=(Event&& event) noexcept = default;
 
                 Seconds time_offset;
                 Integer int_param;

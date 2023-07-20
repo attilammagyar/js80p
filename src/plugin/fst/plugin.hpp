@@ -187,17 +187,17 @@ class FstPlugin : public Midi::EventHandler
                     MidiController* midi_controller,
                     Midi::Controller const controller_id
                 );
-                Parameter(Parameter const& parameter);
-                Parameter(Parameter const&& parameter);
+                Parameter(Parameter const& parameter) = default;
+                Parameter(Parameter&& parameter) = default;
 
-                Parameter& operator=(Parameter const& parameter) noexcept;
-                Parameter& operator=(Parameter const&& parameter) noexcept;
+                Parameter& operator=(Parameter const& parameter) noexcept = default;
+                Parameter& operator=(Parameter&& parameter) noexcept = default;
 
                 char const* get_name() const noexcept;
                 MidiController* get_midi_controller() const noexcept;
                 Midi::Controller get_controller_id() const noexcept;
 
-                // bool needs_host_update() const noexcept;
+                // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
 
                 float get_value() noexcept;
                 float get_last_set_value() noexcept;
@@ -210,7 +210,7 @@ class FstPlugin : public Midi::EventHandler
                 MidiController* midi_controller;
                 char const* name;
                 Midi::Controller controller_id;
-                // Integer change_index;
+                // Integer change_index; /* See FstPlugin::generate_samples() */
                 float value;
                 bool is_dirty_;
         };

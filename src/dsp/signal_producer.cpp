@@ -411,16 +411,6 @@ SignalProducer::Event::Event(Type const type) noexcept
 }
 
 
-SignalProducer::Event::Event(Event const& event) noexcept
-    : time_offset(event.time_offset),
-    int_param(event.int_param),
-    number_param_1(event.number_param_1),
-    number_param_2(event.number_param_2),
-    type(event.type)
-{
-}
-
-
 SignalProducer::Event::Event(
         Type const type,
         Seconds const time_offset,
@@ -434,20 +424,6 @@ SignalProducer::Event::Event(
     number_param_2(number_param_2),
     type(type)
 {
-}
-
-
-SignalProducer::Event& SignalProducer::Event::operator=(Event const& event) noexcept
-{
-    if (this != &event) {
-        type = event.type;
-        time_offset = event.time_offset;
-        int_param = event.int_param;
-        number_param_1 = event.number_param_1;
-        number_param_2 = event.number_param_2;
-    }
-
-    return *this;
 }
 
 

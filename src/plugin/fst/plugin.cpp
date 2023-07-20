@@ -857,60 +857,6 @@ FstPlugin::Parameter::Parameter(
 }
 
 
-FstPlugin::Parameter::Parameter(Parameter const& parameter)
-    : midi_controller(parameter.midi_controller),
-    name(parameter.name),
-    controller_id(parameter.controller_id),
-    // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(parameter.value),
-    is_dirty_(parameter.is_dirty_)
-{
-}
-
-
-FstPlugin::Parameter::Parameter(Parameter const&& parameter)
-    : midi_controller(parameter.midi_controller),
-    name(parameter.name),
-    controller_id(parameter.controller_id),
-    // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(parameter.value),
-    is_dirty_(parameter.is_dirty_)
-{
-}
-
-
-FstPlugin::Parameter& FstPlugin::Parameter::operator=(
-        Parameter const& parameter
-) noexcept {
-    if (this != &parameter) {
-        midi_controller = parameter.midi_controller;
-        name = parameter.name;
-        controller_id = parameter.controller_id;
-        // change_index = parameter.change_index; /* See FstPlugin::generate_samples() */
-        value = parameter.value;
-        is_dirty_ = parameter.is_dirty_;
-    }
-
-    return *this;
-}
-
-
-FstPlugin::Parameter& FstPlugin::Parameter::operator=(
-        Parameter const&& parameter
-) noexcept {
-    if (this != &parameter) {
-        midi_controller = parameter.midi_controller;
-        name = parameter.name;
-        controller_id = parameter.controller_id;
-        // change_index = parameter.change_index; /* See FstPlugin::generate_samples() */
-        value = parameter.value;
-        is_dirty_ = parameter.is_dirty_;
-    }
-
-    return *this;
-}
-
-
 char const* FstPlugin::Parameter::get_name() const noexcept
 {
     return name;

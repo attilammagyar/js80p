@@ -80,50 +80,6 @@ Vst3Plugin::Event::Event(
 }
 
 
-Vst3Plugin::Event::Event(Event const& event)
-    : time_offset(event.time_offset),
-    velocity_or_value(event.velocity_or_value),
-    type(event.type),
-    note_or_ctl(event.note_or_ctl)
-{
-}
-
-
-Vst3Plugin::Event::Event(Event const&& event)
-    : time_offset(event.time_offset),
-    velocity_or_value(event.velocity_or_value),
-    type(event.type),
-    note_or_ctl(event.note_or_ctl)
-{
-}
-
-
-Vst3Plugin::Event& Vst3Plugin::Event::operator=(Event const& event) noexcept
-{
-    if (this != &event) {
-        time_offset = event.time_offset;
-        velocity_or_value = event.velocity_or_value;
-        type = event.type;
-        note_or_ctl = event.note_or_ctl;
-    }
-
-    return *this;
-}
-
-
-Vst3Plugin::Event& Vst3Plugin::Event::operator=(Event const&& event) noexcept
-{
-    if (this != &event) {
-        time_offset = event.time_offset;
-        velocity_or_value = event.velocity_or_value;
-        type = event.type;
-        note_or_ctl = event.note_or_ctl;
-    }
-
-    return *this;
-}
-
-
 bool Vst3Plugin::Event::operator<(Event const& event) const noexcept
 {
     return time_offset < event.time_offset;

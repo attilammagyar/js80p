@@ -57,11 +57,11 @@ class Mixer : public SignalProducer
         class Input {
             public:
                 Input(InputSignalProducerClass* input);
-                Input(Input const& input);
-                Input(Input const&& input);
+                Input(Input const& input) = default;
+                Input(Input&& input) = default;
 
-                Input& operator=(Input const& input);
-                Input& operator=(Input const&& input);
+                Input& operator=(Input const& input) = default;
+                Input& operator=(Input&& input) = default;
 
                 InputSignalProducerClass* input;
                 Sample const* const* buffer;

@@ -28,24 +28,12 @@ using namespace JS80P;
 class TestObj
 {
     public:
-        TestObj(int const v = 0)
+        TestObj(int const v = 0) : value(v)
         {
-            value = v;
         }
 
-        TestObj(TestObj const& o)
-        {
-            value = o.value;
-        }
-
-        TestObj& operator=(TestObj const& o)
-        {
-            if (this != &o) {
-                value = o.value;
-            }
-
-            return *this;
-        }
+        TestObj(TestObj const& o) = default;
+        TestObj& operator=(TestObj const& o) = default;
 
         int value;
 };

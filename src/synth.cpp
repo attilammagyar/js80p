@@ -1781,15 +1781,6 @@ Synth::Message::Message() noexcept
 }
 
 
-Synth::Message::Message(Message const& message) noexcept
-    : type(message.type),
-    param_id(message.param_id),
-    number_param(message.number_param),
-    byte_param(message.byte_param)
-{
-}
-
-
 Synth::Message::Message(
         MessageType const type,
         ParamId const param_id,
@@ -1801,32 +1792,6 @@ Synth::Message::Message(
     number_param(number_param),
     byte_param(byte_param)
 {
-}
-
-
-Synth::Message& Synth::Message::operator=(Message const& message) noexcept
-{
-    if (this != &message) {
-        type = message.type;
-        param_id = message.param_id;
-        number_param = message.number_param;
-        byte_param = message.byte_param;
-    }
-
-    return *this;
-}
-
-
-Synth::Message& Synth::Message::operator=(Message const&& message) noexcept
-{
-    if (this != &message) {
-        type = message.type;
-        param_id = message.param_id;
-        number_param = message.number_param;
-        byte_param = message.byte_param;
-    }
-
-    return *this;
 }
 
 
@@ -2279,56 +2244,12 @@ bool Synth::MidiControllerMessage::operator==(
 }
 
 
-Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
-        MidiControllerMessage const& message
-) noexcept {
-    if (this != &message) {
-        time_offset = message.time_offset;
-        value = message.value;
-    }
-
-    return *this;
-}
-
-
-Synth::MidiControllerMessage& Synth::MidiControllerMessage::operator=(
-        MidiControllerMessage const&& message
-) noexcept {
-    if (this != &message) {
-        time_offset = message.time_offset;
-        value = message.value;
-    }
-
-    return *this;
-}
-
-
 Synth::DeferredNoteOff::DeferredNoteOff()
     : voice(INVALID_VOICE),
     note_id(0),
     channel(0),
     note(0),
     velocity(0)
-{
-}
-
-
-Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const& deferred_note_off)
-    : voice(deferred_note_off.voice),
-    note_id(deferred_note_off.note_id),
-    channel(deferred_note_off.channel),
-    note(deferred_note_off.note),
-    velocity(deferred_note_off.velocity)
-{
-}
-
-
-Synth::DeferredNoteOff::DeferredNoteOff(DeferredNoteOff const&& deferred_note_off)
-    : voice(deferred_note_off.voice),
-    note_id(deferred_note_off.note_id),
-    channel(deferred_note_off.channel),
-    note(deferred_note_off.note),
-    velocity(deferred_note_off.velocity)
 {
 }
 
@@ -2341,36 +2262,6 @@ Synth::DeferredNoteOff::DeferredNoteOff(
         Integer const voice
 ) : voice(voice), note_id(note_id), channel(channel), note(note), velocity(velocity)
 {
-}
-
-
-Synth::DeferredNoteOff& Synth::DeferredNoteOff::operator=(
-        DeferredNoteOff const& deferred_note_off
-) noexcept {
-    if (this != &deferred_note_off) {
-        voice = deferred_note_off.voice;
-        note_id = deferred_note_off.note_id;
-        channel = deferred_note_off.channel;
-        note = deferred_note_off.note;
-        velocity = deferred_note_off.velocity;
-    }
-
-    return *this;
-}
-
-
-Synth::DeferredNoteOff& Synth::DeferredNoteOff::operator=(
-        DeferredNoteOff const&& deferred_note_off
-) noexcept {
-    if (this != &deferred_note_off) {
-        voice = deferred_note_off.voice;
-        note_id = deferred_note_off.note_id;
-        channel = deferred_note_off.channel;
-        note = deferred_note_off.note;
-        velocity = deferred_note_off.velocity;
-    }
-
-    return *this;
 }
 
 

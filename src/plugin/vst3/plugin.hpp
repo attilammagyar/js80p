@@ -82,11 +82,11 @@ class Vst3Plugin
                     Midi::Byte const note_or_ctl,
                     Number const velocity_or_value
                 );
-                Event(Event const& event);
-                Event(Event const&& event);
+                Event(Event const& event) = default;
+                Event(Event&& event) = default;
 
-                Event& operator=(Event const& event) noexcept;
-                Event& operator=(Event const&& event) noexcept;
+                Event& operator=(Event const& event) noexcept = default;
+                Event& operator=(Event&& event) noexcept = default;
                 bool operator<(Event const& event) const noexcept;
 
                 Seconds time_offset;

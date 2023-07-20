@@ -31,7 +31,7 @@ using namespace JS80P;
 constexpr Integer CHANNELS = 2;
 
 
-TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
+TEST(adds_input_signals_together, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 10.0;
     constexpr Sample input_samples_1[CHANNELS][block_size] = {

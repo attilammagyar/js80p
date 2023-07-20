@@ -674,7 +674,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 Message() noexcept;
-                Message(Message const& message) noexcept;
+                Message(Message const& message) noexcept = default;
+                Message(Message&& message) noexcept = default;
+
                 Message(
                     MessageType const type,
                     ParamId const param_id,
@@ -682,8 +684,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Byte const byte_param
                 ) noexcept;
 
-                Message& operator=(Message const& message) noexcept;
-                Message& operator=(Message const&& message) noexcept;
+                Message& operator=(Message const& message) noexcept = default;
+                Message& operator=(Message&& message) noexcept = default;
 
                 MessageType type;
                 ParamId param_id;
@@ -983,12 +985,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 MidiControllerMessage();
+                MidiControllerMessage(MidiControllerMessage const& message) = default;
+                MidiControllerMessage(MidiControllerMessage&& message) = default;
 
                 MidiControllerMessage(Seconds const time_offset, Midi::Word const value);
 
                 bool operator==(MidiControllerMessage const& message) const noexcept;
-                MidiControllerMessage& operator=(MidiControllerMessage const& message) noexcept;
-                MidiControllerMessage& operator=(MidiControllerMessage const&& message) noexcept;
+                MidiControllerMessage& operator=(MidiControllerMessage const& message) noexcept = default;
+                MidiControllerMessage& operator=(MidiControllerMessage&& message) noexcept = default;
 
             private:
                 Seconds time_offset;
@@ -999,8 +1003,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 DeferredNoteOff();
-                DeferredNoteOff(DeferredNoteOff const& deferred_note_off);
-                DeferredNoteOff(DeferredNoteOff const&& deferred_note_off);
+                DeferredNoteOff(DeferredNoteOff const& deferred_note_off) = default;
+                DeferredNoteOff(DeferredNoteOff&& deferred_note_off) = default;
 
                 DeferredNoteOff(
                     Integer const note_id,
@@ -1010,8 +1014,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const voice
                 );
 
-                DeferredNoteOff& operator=(DeferredNoteOff const& deferred_note_off) noexcept;
-                DeferredNoteOff& operator=(DeferredNoteOff const&& deferred_note_off) noexcept;
+                DeferredNoteOff& operator=(DeferredNoteOff const& deferred_note_off) noexcept = default;
+                DeferredNoteOff& operator=(DeferredNoteOff&& deferred_note_off) noexcept = default;
 
                 Integer get_note_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;

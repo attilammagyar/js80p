@@ -90,46 +90,6 @@ Mixer<InputSignalProducerClass>::Input::Input(InputSignalProducerClass* input)
 }
 
 
-template<class InputSignalProducerClass>
-Mixer<InputSignalProducerClass>::Input::Input(Input const& input)
-    : input(input.input),
-    buffer(input.buffer)
-{
-}
-
-
-template<class InputSignalProducerClass>
-Mixer<InputSignalProducerClass>::Input::Input(Input const&& input)
-    : input(input.input),
-    buffer(input.buffer)
-{
-}
-
-template<class InputSignalProducerClass>
-typename Mixer<InputSignalProducerClass>::Input& Mixer<InputSignalProducerClass>::Input::operator=(
-        Input const& input
-) {
-    if (this != &input) {
-        this->input = input.input;
-        this->buffer = input.buffer;
-    }
-
-    return *this;
-}
-
-
-template<class InputSignalProducerClass>
-typename Mixer<InputSignalProducerClass>::Input& Mixer<InputSignalProducerClass>::Input::operator=(
-        Input const&& input
-) {
-    if (this != &input) {
-        this->input = input.input;
-        this->buffer = input.buffer;
-    }
-
-    return *this;
-}
-
 }
 
 #endif
