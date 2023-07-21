@@ -30,14 +30,14 @@ main()
 
     if [[ "$plugin_type$target_os$arch" = "" ]]
     then
-        echo "Usage: $0 fst|vst3 linux|windows 64bit|32bit [sse2|avx]" >&2
+        echo "Usage: $0 fst|vst3 linux|windows 64bit|32bit [avx|sse2]" >&2
         return 1
     fi
 
     if [[ "$plugin_type" = "" ]]; then plugin_type="fst"; fi
     if [[ "$target_os" = "" ]]; then target_os="linux"; fi
     if [[ "$arch" = "" ]]; then arch="64bit"; fi
-    if [[ "$instruction_set" = "" ]]; then instruction_set="sse2"; fi
+    if [[ "$instruction_set" = "" ]]; then instruction_set="avx"; fi
 
     if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
 
