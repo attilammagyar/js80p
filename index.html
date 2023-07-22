@@ -75,6 +75,11 @@ h1, h2, h3, h4 {
   margin-top: 20px;
 }
 
+#download div.indent ul {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
 div {
   font-size: 16px;
   line-height: 24px;
@@ -88,6 +93,24 @@ div {
 div.center p,
 .center {
   text-align: center;
+}
+
+div.columns {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  margin: 12px 0;
+  padding: 0;
+}
+
+div.column {
+  width: 48%;
+  min-width: 450px;
+  padding: 0;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  margin-left: 0;
+  margin-right: 3px;
 }
 
 pre {
@@ -107,7 +130,7 @@ div.section {
 }
 
 div.indent {
-  padding-left: 12px;
+  padding-left: 16px;
 }
 
 p {
@@ -204,56 +227,110 @@ small {
     </div>
 
     <div id="download">
-      <h2 class="center">Download (v1.9.6)</h2>
+      <h2 class="center">Download (v1.9.7)</h2>
       <div class="section">
         <p class="center">
           <a href="#faq-which">Which distribution should I download?</a>
         </p>
-        <h3>Windows and Linux, 64 bit and 32 bit</h3>
-        <ul>
-          <li>
-            VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-vst3_bundle.zip">Download (7.8M)</a>
-          </li>
-        </ul>
-        <h3>Windows</h3>
-        <ul>
-          <li>
-            Windows, 64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-windows-64bit-fst.zip">Download (1.8M)</a>
-          </li>
-          <li>
-            Windows, 64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-windows-64bit-vst3_single_file.zip">Download (2.0M)</a>
-          </li>
-          <li>
-            Windows, 32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-windows-32bit-fst.zip">Download (1.7M)</a>
-          </li>
-          <li>
-            Windows, 32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-windows-32bit-vst3_single_file.zip">Download (2.0M)</a>
-          </li>
-        </ul>
-        <h3>Linux</h3>
-        <ul>
-          <li>
-            Linux, 64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-linux-64bit-fst.zip">Download (1.2M)</a>
-          </li>
-          <li>
-            Linux, 64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-linux-64bit-vst3_single_file.zip">Download (1.4M)</a>
-          </li>
-          <li>
-            Linux, 32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-linux-32bit-fst.zip">Download (1.2M)</a>
-          </li>
-          <li>
-            Linux, 32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-linux-32bit-vst3_single_file.zip">Download (1.4M)</a>
-          </li>
-        </ul>
+
+        <div class="columns">
+          <div class="column">
+            <h3>For newer CPUs with AVX</h3>
+
+            <div class="indent">
+              <h4>Windows and Linux, 64 bit</h4>
+              <ul>
+                <li>
+                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-avx-vst3_bundle.zip">Download (3.5M)</a>
+                </li>
+              </ul>
+
+              <h4>Windows</h4>
+              <ul>
+                <li>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-64bit-avx-vst3_single_file.zip">Download (2.0M)</a>
+                </li>
+                <li>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-64bit-avx-fst.zip">Download (1.8M)</a>
+                </li>
+              </ul>
+
+              <h4>Linux</h4>
+              <ul>
+                <li>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-64bit-avx-vst3_single_file.zip">Download (1.4M)</a>
+                </li>
+                <li>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-64bit-avx-fst.zip">Download (1.2M)</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="column">
+            <h3>For older CPUs with SSE2</h3>
+
+            <div class="indent">
+              <h4>Windows and Linux, 64 bit and 32 bit</h4>
+              <ul>
+                <li>
+                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-sse2-vst3_bundle.zip">Download (7.8M)</a>
+                </li>
+              </ul>
+
+              <h4>Windows</h4>
+              <ul>
+                <li>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-64bit-sse2-vst3_single_file.zip">Download (2.0M)</a>
+                </li>
+                <li>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-64bit-sse2-fst.zip">Download (1.8M)</a>
+                </li>
+                <li>
+                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-32bit-sse2-vst3_single_file.zip">Download (2.0M)</a>
+                </li>
+                <li>
+                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-windows-32bit-sse2-fst.zip">Download (1.8M)</a>
+                </li>
+              </ul>
+
+              <h4>Linux</h4>
+              <ul>
+                <li>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-64bit-sse2-vst3_single_file.zip">Download (1.4M)</a>
+                </li>
+                <li>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-64bit-sse2-fst.zip">Download (1.2M)</a>
+                </li>
+                <li>
+                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-32bit-sse2-vst3_single_file.zip">Download (1.4M)</a>
+                </li>
+                <li>
+                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-linux-32bit-sse2-fst.zip">Download (1.2M)</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <h3>Source Code</h3>
         <ul>
-          <li>
-            Source: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.6/js80p-1_9_6-src.zip">Download (6.1M)</a>
-          </li>
+            <li>
+              Source: <a href="https://github.com/attilammagyar/js80p/releases/download/v1.9.7/js80p-1_9_7-src.zip">Download (6.1M)</a>
+            </li>
         </ul>
       </div>
 
       <div class="section">
+        <h3>What's New in v1.9.7</h3>
+        <ul>
+          <li><p>Build separate versions of the plugin for newer CPUs which
+          support the AVX instruction set</p></li>
+          <li><p>Bugfix: make sure that the FST plugin always reports the short
+          name of the current program correctly to the host
+          application</p></li>
+        </ul>
+
         <h3>What's New in v1.9.6</h3>
         <ul>
           <li><p>Bugfix: when a note was immediately released after being triggered, it could
@@ -397,7 +474,12 @@ small {
         <h3>System Requirements</h3>
         <ul>
           <li>Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)</li>
-          <li>CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)</li>
+          <li>
+            CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
+            <ul>
+              <li>separate packages are available for AVX capable 64 bit processors</li>
+            </ul>
+          </li>
           <li>RAM: 150-300 MB per instance, depending on buffer sizes, etc.</li>
         </ul>
 
@@ -425,14 +507,21 @@ small {
 
         <p>If your plugin host application does not support VST 3, but does support
         VST 2.4, then you have to download and install the FST version of JS80P.
-        Otherwise, you should go with the VST 3 bundle on all supported operating
-        systems.</p>
+        Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
+
+        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
+        and you use a 64 bit plugin host application, then you should download a JS80P
+        package that is optimized for AVX compatible processors. If you have an older
+        computer, or if you experience crashes, then you should go with one of the
+        <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
 
         <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
         then you have to download and install the VST 3 Single File version that
-        matches the CPU architecture for which your plugin host application was built.
-        (For example, some 32 bit (i686) versions of Reaper are known to be unable to
-        recognize VST 3 bundles when running on a 64 bit system.)</p>
+        matches the CPU architecture for which your plugin host application was built.</p>
+
+        <p>(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+        recognize VST 3 bundles when running on a 64 bit Linux system, so you would
+        have to download the 32 bit VST 3 Single File JS80P package.)</p>
       </div>
 
       <div class="section">
@@ -887,14 +976,21 @@ small {
 
         <p>If your plugin host application does not support VST 3, but does support
         VST 2.4, then you have to download and install the FST version of JS80P.
-        Otherwise, you should go with the VST 3 bundle on all supported operating
-        systems.</p>
+        Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
+
+        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
+        and you use a 64 bit plugin host application, then you should download a JS80P
+        package that is optimized for AVX compatible processors. If you have an older
+        computer, or if you experience crashes, then you should go with one of the
+        <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
 
         <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
         then you have to download and install the VST 3 Single File version that
-        matches the CPU architecture for which your plugin host application was built.
-        (For example, some 32 bit (i686) versions of Reaper are known to be unable to
-        recognize VST 3 bundles when running on a 64 bit system.)</p>
+        matches the CPU architecture for which your plugin host application was built.</p>
+
+        <p>(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+        recognize VST 3 bundles when running on a 64 bit Linux system, so you would
+        have to download the 32 bit VST 3 Single File JS80P package.)</p>
 
         <p>The 32 bit versions are usually only needed by those who deliberately use a 32
         bit plugin host application, e.g. because they want to keep using some really
