@@ -1,3 +1,9 @@
+v1.9.7 (2023-07-22)
+ * Build separate versions of the plugin for newer CPUs which support the AVX
+   instruction set
+ * Bugfix: make sure that the FST plugin always reports the short name of the
+   current program correctly to the host application
+
 v1.9.6 (2023-07-16)
  * Bugfix: when a note was immediately released after being triggered, it could
    happen that its parameters that were controlled by envelopes would start
