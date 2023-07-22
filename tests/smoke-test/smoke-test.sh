@@ -133,7 +133,7 @@ run_test_linux()
 
     instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
     architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
-    reaper_exe=~/"reaper$architecture/reaper"
+    reaper_exe=~/programs/"reaper$architecture/reaper"
     rendered_wav="$LINUX_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
