@@ -9,7 +9,7 @@ main()
 
     if [[ "$platform" = "" ]]
     then
-        platform="x86_64-gpp"
+        platform="x86_64-gpp-avx"
     fi
 
     executable=./build/"$platform"/perf_math
