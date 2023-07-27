@@ -78,9 +78,6 @@ class Math
         static constexpr Number LOG_BIQUAD_FILTER_FREQ_SCALE = (
             (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE
         );
-        static constexpr Number LOG_BIQUAD_FILTER_FREQ_INV_SCALE = (
-            1.0 / (Constants::BIQUAD_FILTER_FREQUENCY_MAX - Constants::BIQUAD_FILTER_FREQUENCY_MIN)
-        );
 
         /**
          * \warning Negative numbers close to multiples of PI are not handled
@@ -99,7 +96,6 @@ class Math
         static Number pow_10_inv(Number const x) noexcept;
 
         static Number const* log_biquad_filter_freq_table() noexcept;
-        static Number const* log_biquad_filter_freq_inv_table() noexcept;
 
         static Frequency detune(
             Frequency const frequency,
@@ -223,7 +219,6 @@ class Math
         Number distortion[DISTORTION_TABLE_SIZE];
         Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
-        Number log_biquad_filter_freq_inv[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
 };
 
 }

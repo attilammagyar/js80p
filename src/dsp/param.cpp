@@ -265,18 +265,14 @@ FloatParam::FloatParam(
         Number const round_to,
         ToggleParam const* log_scale_toggle,
         Number const* log_scale_table,
-        Number const* log_scale_inv_table,
         int const log_scale_table_max_index,
-        Number const log_scale_table_scale,
-        Number const log_scale_inv_table_scale
+        Number const log_scale_table_scale
 ) noexcept
     : Param<Number>(name, min_value, max_value, default_value),
     log_scale_toggle(log_scale_toggle),
     log_scale_table(log_scale_table),
-    log_scale_inv_table(log_scale_inv_table),
     log_scale_table_max_index(log_scale_table_max_index),
     log_scale_table_scale(log_scale_table_scale),
-    log_scale_inv_table_scale(log_scale_inv_table_scale),
     log_min_minus(log_scale_toggle != NULL ? -std::log2(min_value) : 0.0),
     log_range_inv(
         log_scale_toggle != NULL
@@ -311,10 +307,8 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     ),
     log_scale_toggle(leader.log_scale_toggle),
     log_scale_table(leader.log_scale_table),
-    log_scale_inv_table(leader.log_scale_inv_table),
     log_scale_table_max_index(leader.log_scale_table_max_index),
     log_scale_table_scale(leader.log_scale_table_scale),
-    log_scale_inv_table_scale(leader.log_scale_inv_table_scale),
     log_min_minus(log_scale_toggle != NULL ? -std::log2(min_value) : 0.0),
     log_range_inv(
         log_scale_toggle != NULL

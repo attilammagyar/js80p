@@ -45,10 +45,8 @@ Reverb<InputSignalProducerClass>::Reverb(
         0.0,
         &log_scale_frequencies,
         Math::log_biquad_filter_freq_table(),
-        Math::log_biquad_filter_freq_inv_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
-        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
     ),
     damping_gain(name + "DG", -36.0, -0.01, -6.0),
     width(name + "WID", -1.0, 1.0, 0.0),
@@ -60,10 +58,8 @@ Reverb<InputSignalProducerClass>::Reverb(
         0.0,
         &log_scale_frequencies,
         Math::log_biquad_filter_freq_table(),
-        Math::log_biquad_filter_freq_inv_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
-        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
     ),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     mixer(input.get_channels()),

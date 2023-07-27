@@ -1670,10 +1670,8 @@ TEST(a_float_param_may_use_logarithmic_scale, {
         0.0,
         &log_scale,
         Math::log_biquad_filter_freq_table(),
-        Math::log_biquad_filter_freq_inv_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE,
-        Math::LOG_BIQUAD_FILTER_FREQ_INV_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
     );
     FloatParam follower(leader);
     Envelope envelope("env");

@@ -192,10 +192,8 @@ class FloatParam : public Param<Number>
             Number const round_to = 0.0,
             ToggleParam const* log_scale_toggle = NULL,
             Number const* log_scale_table = NULL,
-            Number const* log_scale_inv_table = NULL,
             int const log_scale_table_max_index = 0,
-            Number const log_scale_table_scale = 0.0,
-            Number const log_scale_inv_table_scale = 0.0
+            Number const log_scale_table_scale = 0.0
         ) noexcept;
 
         /**
@@ -347,10 +345,8 @@ class FloatParam : public Param<Number>
 
         ToggleParam const* const log_scale_toggle;
         Number const* const log_scale_table;
-        Number const* const log_scale_inv_table;
         int const log_scale_table_max_index;
         Number const log_scale_table_scale;
-        Number const log_scale_inv_table_scale;
         Number const log_min_minus;
         Number const log_range_inv;
 
