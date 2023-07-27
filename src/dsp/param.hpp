@@ -351,6 +351,8 @@ class FloatParam : public Param<Number>
         int const log_scale_table_max_index;
         Number const log_scale_table_scale;
         Number const log_scale_inv_table_scale;
+        Number const log_min_minus;
+        Number const log_range_inv;
 
         FloatParam* const leader;
 

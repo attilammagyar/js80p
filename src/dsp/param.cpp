@@ -277,6 +277,12 @@ FloatParam::FloatParam(
     log_scale_table_max_index(log_scale_table_max_index),
     log_scale_table_scale(log_scale_table_scale),
     log_scale_inv_table_scale(log_scale_inv_table_scale),
+    log_min_minus(log_scale_toggle != NULL ? -std::log2(min_value) : 0.0),
+    log_range_inv(
+        log_scale_toggle != NULL
+            ? 1.0 / (std::log2(max_value) + log_min_minus)
+            : 1.0
+    ),
     leader(NULL),
     flexible_controller(NULL),
     flexible_controller_change_index(-1),
@@ -309,6 +315,12 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     log_scale_table_max_index(leader.log_scale_table_max_index),
     log_scale_table_scale(leader.log_scale_table_scale),
     log_scale_inv_table_scale(leader.log_scale_inv_table_scale),
+    log_min_minus(log_scale_toggle != NULL ? -std::log2(min_value) : 0.0),
+    log_range_inv(
+        log_scale_toggle != NULL
+            ? 1.0 / (std::log2(max_value) + log_min_minus)
+            : 1.0
+    ),
     leader(&leader),
     flexible_controller(NULL),
     lfo(NULL),
@@ -424,11 +436,7 @@ Number FloatParam::ratio_to_value(Number const ratio) const noexcept
 Number FloatParam::value_to_ratio(Number const value) const noexcept
 {
     if (is_logarithmic()) {
-        Number const min = this->min_value;
-        Number const max = this->max_value;
-        Number const log_range = std::log2(max) - std::log2(min);
-
-        return (std::log2(value) - std::log2(min)) / log_range;
+        return (std::log2(value) + log_min_minus) * log_range_inv;
     }
 
     return Param<Number>::value_to_ratio(value);
