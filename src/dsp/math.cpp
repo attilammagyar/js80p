@@ -93,11 +93,14 @@ void Math::init_log_biquad_filter_freq() noexcept
     constexpr Number log2_max = std::log2(Constants::BIQUAD_FILTER_FREQUENCY_MAX);
     constexpr Number log2_range = log2_max - log2_min;
 
-    for (int i = 0; i != LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE; ++i) {
+    for (int i = 1; i != LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX; ++i) {
         Number const x = (Number)i * max_inv;
 
         log_biquad_filter_freq[i] = std::pow(2.0, log2_min + log2_range * x);
     }
+
+    log_biquad_filter_freq[0] = min;
+    log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX] = max;
 }
 
 

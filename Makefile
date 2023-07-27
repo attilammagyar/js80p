@@ -155,6 +155,7 @@ TESTS_DSP = \
 	test_distortion \
 	test_gain \
 	test_mixer \
+	test_param_slow \
 	test_wavefolder
 
 TESTS = \
@@ -589,6 +590,15 @@ $(BUILD_DIR)/test_param$(EXE): \
 		$(TEST_BASIC_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
+
+$(BUILD_DIR)/test_param_slow$(EXE): \
+		tests/test_param_slow.cpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR) \
+		$(TEST_BASIC_BINS)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(BUILD_DIR)/test_param_slow$(EXE)
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
