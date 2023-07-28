@@ -596,7 +596,7 @@ $(BUILD_DIR)/test_param_slow$(EXE): \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS)
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(BUILD_DIR)/test_param_slow$(EXE)
 
