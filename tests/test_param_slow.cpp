@@ -37,8 +37,9 @@ using namespace JS80P;
 
 
 TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_param_is_small_and_stable, {
-    constexpr int resolution = 5000;
+    constexpr int resolution = 20000;
     constexpr int iterations = 50000;
+    constexpr Number tolerance_percent = 0.0021; /* 0.21% */
     constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
     constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
     constexpr Number range = max - min;
@@ -70,7 +71,7 @@ TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_p
             assert_eq(
                 value,
                 param.get_value(),
-                value * 0.005,
+                value * tolerance_percent,
                 "i=%d (%d), j=%d (%d)",
                 i,
                 resolution,

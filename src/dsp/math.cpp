@@ -89,17 +89,34 @@ void Math::init_log_biquad_filter_freq() noexcept
     constexpr Number max_inv = 1.0 / (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX;
     constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
     constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
-    constexpr Number log2_min = std::log2(min);
-    constexpr Number log2_max = std::log2(Constants::BIQUAD_FILTER_FREQUENCY_MAX);
-    constexpr Number log2_range = log2_max - log2_min;
+    constexpr Number range = max / min;
 
-    for (int i = 1; i != LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX; ++i) {
-        Number const x = (Number)i * max_inv;
-
-        log_biquad_filter_freq[i] = std::pow(2.0, log2_min + log2_range * x);
-    }
+    Number prev = min;
+    Number prev_idx = 0.0;
 
     log_biquad_filter_freq[0] = min;
+
+    for (int i = 1; i != LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX; ++i) {
+        Number const current_idx = (Number)i;
+        Number const current = min * std::pow(range, current_idx * max_inv);
+
+        /*
+        The error of the piece-wise linear interpolation of this exponential
+        curve is always positive. By slightly shifting the linear pieces
+        downward, parts of the line segments go below the curve, introducing
+        negative errors which help balance out the positive ones, reducing the
+        overall, integrated error.
+        */
+        Number const diff = std::abs(
+            (current + prev) * 0.5
+            - min * std::pow(range, (prev_idx + 0.5) * max_inv)
+        );
+
+        log_biquad_filter_freq[i] = current - diff * 0.7;
+        prev = current;
+        prev_idx = current_idx;
+    }
+
     log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX] = max;
 }
 
