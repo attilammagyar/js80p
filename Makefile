@@ -670,3 +670,10 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 		$(TEST_BASIC_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
+
+$(BUILD_DIR)/log_freq_error_tsv$(EXE): \
+		scripts/log_freq_error_tsv.cpp \
+		src/dsp/math.cpp src/dsp/math.hpp \
+		src/js80p.hpp \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<

@@ -86,38 +86,49 @@ void Math::init_distortion() noexcept
 
 void Math::init_log_biquad_filter_freq() noexcept
 {
-    constexpr Number max_inv = 1.0 / (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX;
-    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
-    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
-    constexpr Number range = max / min;
-
-    Number prev = min;
     Number prev_idx = 0.0;
+    Number prev = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
 
-    log_biquad_filter_freq[0] = min;
+    log_biquad_filter_freq[0] = prev;
 
     for (int i = 1; i != LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX; ++i) {
         Number const current_idx = (Number)i;
-        Number const current = min * std::pow(range, current_idx * max_inv);
+        Number const ratio = current_idx * LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV;
+        Number const current = ratio_to_exact_log_biquad_filter_frequency(ratio);
 
         /*
         The error of the piece-wise linear interpolation of this exponential
-        curve is always positive. By slightly shifting the linear pieces
-        downward, parts of the line segments go below the curve, introducing
-        negative errors which help balance out the positive ones, reducing the
-        overall, integrated error.
+        curve is positive on the whole domain. By slightly shifting the line
+        segments downward, parts of them go below the exact curve, introducing
+        negative errors, which balance things out, reducing the overall,
+        integrated error. The constant scaler is picked so that the integrated
+        error is sufficiently close to 0.
         */
-        Number const diff = std::abs(
+        Number const correction = -0.6683106 * std::abs(
             (current + prev) * 0.5
-            - min * std::pow(range, (prev_idx + 0.5) * max_inv)
+            - ratio_to_exact_log_biquad_filter_frequency(
+                (prev_idx + 0.5) * LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV
+            )
         );
 
-        log_biquad_filter_freq[i] = current - diff * 0.7;
+        log_biquad_filter_freq[i] = current + correction;
         prev = current;
         prev_idx = current_idx;
     }
 
-    log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX] = max;
+    log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX] = (
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+    );
+}
+
+
+Number Math::ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept
+{
+    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+    constexpr Number range = max / min;
+
+    return min * std::pow(range, ratio);
 }
 
 

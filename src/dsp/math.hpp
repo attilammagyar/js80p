@@ -77,6 +77,10 @@ class Math
             LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE - 1
         );
 
+        static constexpr Number LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV = (
+            1.0 / (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
+        );
+
         static constexpr Number LOG_BIQUAD_FILTER_FREQ_SCALE = (
             (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
         );
@@ -98,6 +102,13 @@ class Math
         static Number pow_10_inv(Number const x) noexcept;
 
         static Number const* log_biquad_filter_freq_table() noexcept;
+
+        /**
+         * \brief Calcualte the exact biquad filter frequency value using a
+         *        logarithmic scale for a given ratio between 0.0 and 1.0.
+         *        Intended for testing purposes.
+         */
+        static Number ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept;
 
         static Frequency detune(
             Frequency const frequency,

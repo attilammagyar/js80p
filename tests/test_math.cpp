@@ -328,3 +328,17 @@ TEST(randomize, {
 
     assert_eq(Math::randomize(1.0, 1.0), Math::randomize(1.0, 99999.0));
 })
+
+
+TEST(ratio_to_exact_log_biquad_filter_frequency, {
+    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
+
+    assert_eq(min, Math::ratio_to_exact_log_biquad_filter_frequency(0.0), DOUBLE_DELTA);
+    assert_eq(max, Math::ratio_to_exact_log_biquad_filter_frequency(1.0), DOUBLE_DELTA);
+    assert_eq(
+        std::sqrt(min * (max / min)),
+        Math::ratio_to_exact_log_biquad_filter_frequency(0.5),
+        DOUBLE_DELTA
+    );
+})
