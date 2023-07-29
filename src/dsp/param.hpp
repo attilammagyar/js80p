@@ -20,6 +20,7 @@
 #define JS80P__DSP__PARAM_HPP
 
 #include <string>
+#include <type_traits>
 
 #include "js80p.hpp"
 
@@ -102,6 +103,20 @@ class Param : public SignalProducer
         NumberType const default_value;
 
     private:
+        template<typename DummyType = NumberType>
+        NumberType ratio_to_value_for_number_type(
+            typename std::enable_if<
+                std::is_floating_point<DummyType>::value, Number const
+            >::type ratio
+        ) const noexcept;
+
+        template<typename DummyType = NumberType>
+        NumberType ratio_to_value_for_number_type(
+            typename std::enable_if<
+                !std::is_floating_point<DummyType>::value, Number const
+            >::type ratio
+        ) const noexcept;
+
         Number const range_inv;
         Integer change_index;
         NumberType value;

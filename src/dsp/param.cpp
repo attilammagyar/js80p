@@ -156,11 +156,29 @@ Integer Param<NumberType>::get_change_index() const noexcept
 template<typename NumberType>
 NumberType Param<NumberType>::ratio_to_value(Number const ratio) const noexcept
 {
-    if (std::is_floating_point<NumberType>::value) {
-        return clamp(min_value + (NumberType)((Number)range * ratio));
-    }
+    return ratio_to_value_for_number_type(ratio);
+}
 
-    return clamp(min_value + (NumberType)std::round((Number)range * ratio));
+
+template<typename NumberType>
+template<typename DummyType>
+NumberType Param<NumberType>::ratio_to_value_for_number_type(
+        typename std::enable_if<
+            std::is_floating_point<DummyType>::value, Number const
+        >::type ratio
+) const noexcept {
+    return clamp(min_value + (DummyType)((Number)range * ratio));
+}
+
+
+template<typename NumberType>
+template<typename DummyType>
+NumberType Param<NumberType>::ratio_to_value_for_number_type(
+        typename std::enable_if<
+            !std::is_floating_point<DummyType>::value, Number const
+        >::type ratio
+) const noexcept {
+    return clamp(min_value + (DummyType)std::round((Number)range * ratio));
 }
 
 
