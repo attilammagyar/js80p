@@ -1,3 +1,9 @@
+v1.9.8 (2023-07-29)
+ * Bugfix: fixed logarithmic scale filter frequency persistency. When a
+   logarithmic scale filter frequency parameter had no controller assigned to
+   it, then patch save and load operations, and DAW project save and reopen
+   operations caused the filter frequency to significantly drift upwards.
+
 v1.9.7 (2023-07-22)
  * Build separate versions of the plugin for newer CPUs which support the AVX
    instruction set
