@@ -59,6 +59,7 @@ OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
 	fst \
 	gui_playground \
 	perf \
+	log_freq_error_tsv \
 	show_fst_dir \
 	show_vst3_dir \
 	upgrade_patch \
@@ -311,6 +312,8 @@ check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(BUILD_DIR)
 test_example: $(BUILD_DIR)/test_example$(EXE) | $(BUILD_DIR)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
+
+log_freq_error_tsv: $(BUILD_DIR)/log_freq_error_tsv$(EXE)
 
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
