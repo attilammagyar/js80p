@@ -100,11 +100,15 @@ void Math::init_log_biquad_filter_freq() noexcept
         The error of the piece-wise linear interpolation of this exponential
         curve is positive on the whole domain. By slightly shifting the line
         segments downward, parts of them go below the exact curve, introducing
-        negative errors, which balance things out, reducing the overall,
-        integrated error. The constant scaler is picked so that the integrated
+        negative errors which balance things out, reducing the overall,
+        integrated error.
+
+        The correction term is based on the error at the midpoint of the line
+        segment, ie. the difference between the linearly interpolated value and
+        the exact value. The constant scaler is picked so that the integrated
         error is sufficiently close to 0.
         */
-        Number const correction = -0.6683106 * std::abs(
+        Number const correction = -0.6683106 * (
             (current + prev) * 0.5
             - ratio_to_exact_log_biquad_filter_frequency(
                 (prev_idx + 0.5) * LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV
