@@ -168,6 +168,9 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     channel_pressure_ctl.change(0.0, 0.0);
     channel_pressure_ctl.clear();
 
+    midi_controllers_rw[Midi::SUSTAIN_PEDAL]->change(0.0, 0.0);
+    midi_controllers_rw[Midi::SUSTAIN_PEDAL]->clear();
+
     update_param_states();
 }
 
