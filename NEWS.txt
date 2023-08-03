@@ -1,3 +1,9 @@
+v1.9.9 (2023-08-03)
+ * Bugfix: initialize MIDI CC 64 (sustain pedal) to 0% instead of 50%. The
+   basic sound of patches that utilize the sustain pedal (like some of the
+   built-in presets) are usually designed with the pedal being released, so
+   that's how they should sound when the plugin is used without one.
+
 v1.9.8 (2023-07-29)
  * Bugfix: fixed logarithmic scale filter frequency persistency. When a
    logarithmic scale filter frequency parameter had no controller assigned to
