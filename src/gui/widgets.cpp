@@ -1226,10 +1226,11 @@ ToggleSwitch::ToggleSwitch(
         int const left,
         int const top,
         int const width,
+        int const height,
         int const box_left,
         Synth& synth,
         Synth::ParamId const param_id
-) : TransparentWidget(text, left, top, width, HEIGHT, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, width, height, Type::PARAM_EDITOR),
     param_id(param_id),
     box_left(box_left),
     synth(synth),

@@ -532,14 +532,13 @@ class StatusLine : public TransparentWidget
 class ToggleSwitch : public TransparentWidget
 {
     public:
-        static constexpr int HEIGHT = 24;
-
         ToggleSwitch(
             GUI& gui,
             char const* const text,
             int const left,
             int const top,
             int const width,
+            int const height,
             int const box_left,
             Synth& synth,
             Synth::ParamId const param_id
