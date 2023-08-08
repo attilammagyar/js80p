@@ -305,6 +305,7 @@ FloatParam::FloatParam(
     envelope_change_index(-1),
     envelope_stage(EnvelopeStage::NONE),
     envelope_end_scheduled(false),
+    envelope_canceled(false),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         std::fabs(min_value - 0.0) < 0.000001
@@ -340,6 +341,7 @@ FloatParam::FloatParam(FloatParam& leader) noexcept
     envelope_change_index(-1),
     envelope_stage(EnvelopeStage::NONE),
     envelope_end_scheduled(false),
+    envelope_canceled(false),
     should_round(false),
     is_ratio_same_as_value(
         std::fabs(min_value - 0.0) < 0.000001
@@ -605,6 +607,10 @@ void FloatParam::handle_event(Event const& event) noexcept
             handle_envelope_end_event(event);
             break;
 
+        case EVT_ENVELOPE_CANCEL:
+            handle_envelope_cancel_event(event);
+            break;
+
         case EVT_CANCEL:
             handle_cancel_event(event);
             break;
@@ -703,6 +709,12 @@ void FloatParam::handle_envelope_end_event(Event const& event) noexcept
 }
 
 
+void FloatParam::handle_envelope_cancel_event(Event const& event) noexcept
+{
+    envelope_stage = EnvelopeStage::R;
+}
+
+
 void FloatParam::handle_cancel_event(Event const& event) noexcept
 {
     if (latest_event_type == EVT_LINEAR_RAMP) {
@@ -772,6 +784,7 @@ void FloatParam::set_envelope(Envelope* const envelope) noexcept
 
     envelope_stage = EnvelopeStage::NONE;
     envelope_end_scheduled = false;
+    envelope_canceled = false;
     envelope_position = 0.0;
     envelope_end_time_offset = 0.0;
 }
@@ -795,6 +808,7 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
 
     envelope_stage = EnvelopeStage::NONE;
     envelope_end_scheduled = false;
+    envelope_canceled = false;
     envelope_position = 0.0;
     envelope_end_time_offset = 0.0;
 
@@ -832,6 +846,17 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
 
 Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 {
+    if (envelope_canceled) {
+        return envelope_cancel_duration;
+    }
+
+    return end_envelope<EVT_ENVELOPE_END>(time_offset);
+}
+
+
+template<SignalProducer::Event::Type event>
+Seconds FloatParam::end_envelope(Seconds const time_offset, Seconds const duration) noexcept
+{
     Envelope const* const envelope = get_envelope();
 
     if (envelope == NULL) {
@@ -842,7 +867,12 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
         envelope_final_value = (
             envelope->amount.get_value() * envelope->final_value.get_value()
         );
+
         envelope_release_time = (Seconds)envelope->release_time.get_value();
+    }
+
+    if (event == EVT_ENVELOPE_CANCEL) {
+        envelope_release_time = duration;
     }
 
     envelope_end_scheduled = true;
@@ -851,10 +881,18 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
     // current-v ==release-t==> release-v
 
     cancel_events_after(time_offset);
-    schedule(EVT_ENVELOPE_END, time_offset);
+    schedule(event, time_offset);
     schedule_linear_ramp(envelope_release_time, ratio_to_value(envelope_final_value));
 
     return envelope_release_time;
+}
+
+
+void FloatParam::cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept
+{
+    envelope_canceled = true;
+    envelope_cancel_duration = duration;
+    end_envelope<EVT_ENVELOPE_CANCEL>(time_offset, duration);
 }
 
 
@@ -1087,7 +1125,11 @@ Sample const* const* FloatParam::process_envelope(
         }
     }
 
-    if (envelope_end_scheduled && (has_changed || envelope_stage == EnvelopeStage::DAHDS)) {
+    if (
+            envelope_end_scheduled
+            && !envelope_canceled
+            && (has_changed || envelope_stage == EnvelopeStage::DAHDS)
+    ) {
         if (envelope_end_time_offset < 0.0) {
             envelope_end_time_offset = 0.0;
         }
@@ -1398,6 +1440,19 @@ Seconds ModulatableFloatParam<ModulatorSignalProducerClass>::end_envelope(
     );
 
     return std::max(envelope_end, modulation_level_envelope_end);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void ModulatableFloatParam<ModulatorSignalProducerClass>::cancel_envelope(
+        Seconds const time_offset,
+        Seconds const duration
+) noexcept {
+    FloatParam::cancel_envelope(time_offset, duration);
+
+    if (modulator != NULL) {
+        modulation_level.cancel_envelope(time_offset, duration);
+    }
 }
 
 

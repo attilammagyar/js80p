@@ -153,6 +153,7 @@ class FloatParam : public Param<Number>
         static constexpr Event::Type EVT_LOG_RAMP = 3;
         static constexpr Event::Type EVT_ENVELOPE_START = 4;
         static constexpr Event::Type EVT_ENVELOPE_END = 5;
+        static constexpr Event::Type EVT_ENVELOPE_CANCEL = 6;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -261,6 +262,7 @@ class FloatParam : public Param<Number>
         Envelope* get_envelope() const noexcept;
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
+        void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
 
         void set_lfo(LFO* lfo) noexcept;
         LFO const* get_lfo() const noexcept;
@@ -324,6 +326,7 @@ class FloatParam : public Param<Number>
         void handle_log_ramp_event(Event const& event) noexcept;
         void handle_envelope_start_event(Event const& event) noexcept;
         void handle_envelope_end_event(Event const& event) noexcept;
+        void handle_envelope_cancel_event(Event const& event) noexcept;
         void handle_cancel_event(Event const& event) noexcept;
 
         bool is_following_leader() const noexcept;
@@ -358,6 +361,12 @@ class FloatParam : public Param<Number>
 
         void update_envelope();
 
+        template<Event::Type event>
+        Seconds end_envelope(
+            Seconds const time_offset,
+            Seconds const duration = 0.0
+        ) noexcept;
+
         ToggleParam const* const log_scale_toggle;
         Number const* const log_scale_table;
         int const log_scale_table_max_index;
@@ -378,9 +387,11 @@ class FloatParam : public Param<Number>
         Seconds envelope_end_time_offset;
         Seconds envelope_position;
         Seconds envelope_release_time;
+        Seconds envelope_cancel_duration;
         Number envelope_final_value;
         EnvelopeStage envelope_stage;
         bool envelope_end_scheduled;
+        bool envelope_canceled;
 
         bool const should_round;
         bool const is_ratio_same_as_value;
@@ -425,6 +436,7 @@ class ModulatableFloatParam : public FloatParam
 
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
+        void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(

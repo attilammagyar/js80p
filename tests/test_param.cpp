@@ -1138,6 +1138,43 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
 })
 
 
+TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 0.0, 1.0, 2.0, 3.0,
+        1.5, 0.0, 0.0, 0.0, 0.0,
+    };
+    FloatParam float_param("float", -5.0, 5.0, 0.0);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(1.0);
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(0.8);
+    envelope.initial_value.set_value(0.625);
+    envelope.delay_time.set_value(0.7);
+    envelope.attack_time.set_value(3.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(1.0);
+    envelope.decay_time.set_value(2.0);
+    envelope.sustain_value.set_value(0.75);
+    envelope.release_time.set_value(0.1);
+    envelope.final_value.set_value(0.625);
+
+    float_param.set_envelope(&envelope);
+
+    envelope.release_time.set_value(0.01);
+
+    float_param.start_envelope(0.3);
+    float_param.cancel_envelope(4.0, 2.0);
+
+    rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
 template<class FloatParamClass>
 void test_follower_envelope()
 {
@@ -1189,6 +1226,62 @@ void test_follower_envelope()
 TEST(follower_float_param_follows_the_leaders_envelope, {
     test_follower_envelope<FloatParam>();
     test_follower_envelope< ModulatableFloatParam<SignalProducer> >();
+})
+
+
+template<class FloatParamClass>
+void test_follower_envelope_cancellation()
+{
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 0.0, 1.0, 2.0, 3.0,
+        1.5, 0.0, 0.0, 0.0, 0.0,
+    };
+    FloatParam leader("follow", -5.0, 5.0, 0.0);
+    FloatParamClass follower(leader);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_envelope(&envelope);
+    leader.set_value(0.2);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+
+    assert_eq((void*)&envelope, (void*)follower.get_envelope());
+
+    envelope.amount.set_value(0.8);
+    envelope.initial_value.set_value(0.625);
+    envelope.delay_time.set_value(0.7);
+    envelope.attack_time.set_value(3.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(1.0);
+    envelope.decay_time.set_value(2.0);
+    envelope.sustain_value.set_value(0.75);
+    envelope.release_time.set_value(6.0);
+    envelope.final_value.set_value(0.625);
+
+    follower.start_envelope(0.3);
+
+    envelope.release_time.set_value(0.123);
+
+    follower.end_envelope(4.0);
+    follower.cancel_envelope(4.001, 1.999);
+    assert_eq(1.999, follower.end_envelope(5.0), DOUBLE_DELTA);
+
+    assert_true(follower.is_constant_until(1));
+    assert_false(follower.is_constant_until(2));
+
+    rendered_samples = FloatParam::produce<FloatParamClass>(follower, 1, block_size);
+    assert_eq(expected_samples, rendered_samples[0], block_size, 0.001);
+}
+
+
+TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_time, {
+    test_follower_envelope_cancellation<FloatParam>();
+    test_follower_envelope_cancellation< ModulatableFloatParam<SignalProducer> >();
 })
 
 
