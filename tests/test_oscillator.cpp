@@ -456,6 +456,47 @@ TEST(oscillator_can_be_started_and_stopped_between_samples, {
 })
 
 
+TEST(repeated_start_and_stop_calls_are_ignored, {
+    constexpr Sample frequency = 1.0;
+    constexpr Frequency sample_rate = 6.0;
+    constexpr Integer block_size = 6;
+    constexpr Sample sample_period = 1.0 / (Seconds)sample_rate;
+    constexpr Sample time_offset = 0.5 * sample_period;
+    constexpr Sample pi_double = (Sample)Math::PI_DOUBLE;
+    Sample const* const* block;
+    Sample expected_samples[2][block_size] = {
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+        {
+            /* sin(2 * pi * frequency * time) */
+            std::sin(pi_double * frequency * (0.0 * sample_period + time_offset)),
+            std::sin(pi_double * frequency * (1.0 * sample_period + time_offset)),
+            std::sin(pi_double * frequency * (2.0 * sample_period + time_offset)),
+            std::sin(pi_double * frequency * (3.0 * sample_period + time_offset)),
+            std::sin(pi_double * frequency * (4.0 * sample_period + time_offset)),
+            0.0,
+        },
+    };
+
+    SimpleOscillator::WaveformParam waveform("");
+    SimpleOscillator oscillator(waveform);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(sample_rate);
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+    oscillator.frequency.set_value((Number)frequency);
+    oscillator.start(1.0 - time_offset);
+    oscillator.start(0.42);
+    oscillator.stop(2.0 - time_offset - sample_period);
+    oscillator.stop(1.23);
+
+    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
+    assert_eq(expected_samples[0], block[0], block_size, DOUBLE_DELTA);
+
+    block = SignalProducer::produce<SimpleOscillator>(oscillator, 2, block_size);
+    assert_eq(expected_samples[1], block[0], block_size, DOUBLE_DELTA);
+})
+
+
 TEST(harmonics_above_the_nyquist_frequency_disappear, {
     test_basic_waveform<ReferenceSine>(
         SimpleOscillator::SAWTOOTH,

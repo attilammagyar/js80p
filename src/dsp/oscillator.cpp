@@ -921,6 +921,10 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::handle_start_event(
         Event const& event
 ) noexcept {
+    if (is_on_) {
+        return;
+    }
+
     is_on_ = true;
     is_starting = true;
     start_time_offset = current_time - event.time_offset;
