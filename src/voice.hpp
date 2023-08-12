@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__VOICE_HPP
-#define JS80P__DSP__VOICE_HPP
+#ifndef JS80P__VOICE_HPP
+#define JS80P__VOICE_HPP
 
 #include <string>
 

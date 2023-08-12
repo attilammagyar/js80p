@@ -25,6 +25,7 @@
 
 #include "js80p.hpp"
 #include "midi.hpp"
+#include "voice.hpp"
 
 #include "dsp/envelope.hpp"
 #include "dsp/biquad_filter.hpp"
@@ -46,7 +47,6 @@
 #include "dsp/reverb.hpp"
 #include "dsp/queue.hpp"
 #include "dsp/signal_producer.hpp"
-#include "dsp/voice.hpp"
 
 
 namespace JS80P

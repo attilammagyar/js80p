@@ -122,6 +122,7 @@ PARAM_COMPONENTS = \
 SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
+	voice \
 	dsp/biquad_filter \
 	dsp/chorus \
 	dsp/delay \
@@ -133,7 +134,6 @@ SYNTH_COMPONENTS = \
 	dsp/gain \
 	dsp/mixer \
 	dsp/reverb \
-	dsp/voice \
 	dsp/wavefolder \
 	dsp/wavetable
 

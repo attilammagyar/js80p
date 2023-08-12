@@ -36,9 +36,10 @@
 #include "dsp/param.cpp"
 #include "dsp/queue.cpp"
 #include "dsp/signal_producer.cpp"
-#include "dsp/voice.cpp"
 #include "dsp/wavefolder.cpp"
 #include "dsp/wavetable.cpp"
+
+#include "voice.cpp"
 
 
 using namespace JS80P;

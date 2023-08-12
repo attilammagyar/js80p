@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__VOICE_CPP
-#define JS80P__DSP__VOICE_CPP
-
-#include "dsp/voice.hpp"
+#ifndef JS80P__VOICE_CPP
+#define JS80P__VOICE_CPP
 
 #include "dsp/math.hpp"
+
+#include "voice.hpp"
 
 
 namespace JS80P
