@@ -96,9 +96,62 @@ TEST(rendering_is_independent_of_chunk_size, {
 })
 
 
+void set_up_voice(
+        SimpleVoice& voice,
+        SimpleVoice::Params& params,
+        Integer const block_size,
+        Frequency const sample_rate
+) {
+    voice.set_sample_rate(sample_rate);
+    voice.set_block_size(block_size);
+
+    params.amplitude.set_value(1.0);
+    params.volume.set_value(1.0);
+    params.width.set_value(0.0);
+
+    params.portamento_length.set_sample_rate(sample_rate);
+    params.portamento_length.set_block_size(block_size);
+
+    params.portamento_depth.set_sample_rate(sample_rate);
+    params.portamento_depth.set_block_size(block_size);
+
+    params.fine_detune.set_sample_rate(sample_rate);
+    params.fine_detune.set_block_size(block_size);
+}
+
+
+void set_up_envelope(
+        Envelope& envelope,
+        Integer const block_size,
+        Frequency const sample_rate
+) {
+    envelope.amount.set_block_size(block_size);
+    envelope.initial_value.set_block_size(block_size);
+    envelope.delay_time.set_block_size(block_size);
+    envelope.attack_time.set_block_size(block_size);
+    envelope.peak_value.set_block_size(block_size);
+    envelope.hold_time.set_block_size(block_size);
+    envelope.decay_time.set_block_size(block_size);
+    envelope.sustain_value.set_block_size(block_size);
+    envelope.release_time.set_block_size(block_size);
+    envelope.final_value.set_block_size(block_size);
+
+    envelope.amount.set_sample_rate(sample_rate);
+    envelope.initial_value.set_sample_rate(sample_rate);
+    envelope.delay_time.set_sample_rate(sample_rate);
+    envelope.attack_time.set_sample_rate(sample_rate);
+    envelope.peak_value.set_sample_rate(sample_rate);
+    envelope.hold_time.set_sample_rate(sample_rate);
+    envelope.decay_time.set_sample_rate(sample_rate);
+    envelope.sustain_value.set_sample_rate(sample_rate);
+    envelope.release_time.set_sample_rate(sample_rate);
+    envelope.final_value.set_sample_rate(sample_rate);
+}
+
+
 TEST(portamento, {
     constexpr Frequency sample_rate = 44100.0;
-    constexpr Integer block_size = 8196;
+    constexpr Integer block_size = 8192;
     constexpr Integer rounds = 1;
     constexpr Integer sample_count = block_size * rounds;
     constexpr Seconds portamento_length = 1.0;
@@ -124,37 +177,10 @@ TEST(portamento, {
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
 
-    params.portamento_length.set_sample_rate(sample_rate);
-    params.portamento_length.set_block_size(block_size);
+    set_up_voice(voice, params, block_size, sample_rate);
+    set_up_envelope(envelope, block_size, sample_rate);
 
-    params.portamento_depth.set_sample_rate(sample_rate);
-    params.portamento_depth.set_block_size(block_size);
-
-    params.fine_detune.set_sample_rate(sample_rate);
-    params.fine_detune.set_block_size(block_size);
     params.fine_detune.set_envelope(&envelope);
-
-    envelope.amount.set_block_size(block_size);
-    envelope.initial_value.set_block_size(block_size);
-    envelope.delay_time.set_block_size(block_size);
-    envelope.attack_time.set_block_size(block_size);
-    envelope.peak_value.set_block_size(block_size);
-    envelope.hold_time.set_block_size(block_size);
-    envelope.decay_time.set_block_size(block_size);
-    envelope.sustain_value.set_block_size(block_size);
-    envelope.release_time.set_block_size(block_size);
-    envelope.final_value.set_block_size(block_size);
-
-    envelope.amount.set_sample_rate(sample_rate);
-    envelope.initial_value.set_sample_rate(sample_rate);
-    envelope.delay_time.set_sample_rate(sample_rate);
-    envelope.attack_time.set_sample_rate(sample_rate);
-    envelope.peak_value.set_sample_rate(sample_rate);
-    envelope.hold_time.set_sample_rate(sample_rate);
-    envelope.decay_time.set_sample_rate(sample_rate);
-    envelope.sustain_value.set_sample_rate(sample_rate);
-    envelope.release_time.set_sample_rate(sample_rate);
-    envelope.final_value.set_sample_rate(sample_rate);
 
     envelope.attack_time.set_value(portamento_length);
     envelope.initial_value.set_value(
@@ -163,14 +189,8 @@ TEST(portamento, {
     envelope.peak_value.set_value(params.fine_detune.value_to_ratio(0.0));
 
     params.waveform.set_value(SimpleOscillator::SINE);
-    params.amplitude.set_value(1.0);
-    params.volume.set_value(1.0);
-    params.width.set_value(0.0);
     params.portamento_length.set_value(portamento_length);
     params.portamento_depth.set_value(portamento_depth);
-
-    voice.set_sample_rate(sample_rate);
-    voice.set_block_size(block_size);
 
     voice.note_on(note_start, 123, 1, 0, 1.0, 1);
 
@@ -188,7 +208,7 @@ TEST(portamento, {
 void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
 {
     constexpr Frequency sample_rate = 44100.0;
-    constexpr Integer block_size = 8196;
+    constexpr Integer block_size = 8192;
     constexpr Integer rounds = 1;
     constexpr Integer sample_count = block_size * rounds;
 
@@ -305,5 +325,66 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
     assert_false(
         non_decaying_voice.has_decayed_during_envelope_dahds(),
         "after envelope final value modification"
+    );
+})
+
+
+TEST(can_glide_smoothly_to_a_new_note, {
+    constexpr Frequency sample_rate = 44100.0;
+    constexpr Integer block_size = 8192;
+    constexpr Integer rounds = 1;
+    constexpr Integer sample_count = block_size * rounds;
+    constexpr Seconds note_start = 0.0;
+    constexpr Seconds glide_start = 0.05;
+    constexpr Seconds glide_duration = 0.05;
+
+    Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
+    Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
+    SimpleVoice::Params params_ref("R");
+    SimpleVoice::Params params("P");
+    Envelope envelope("E");
+    SimpleVoice reference(FREQUENCIES, NOTE_MAX, params_ref);
+    SimpleVoice voice(FREQUENCIES, NOTE_MAX, params);
+
+    set_up_voice(voice, params, block_size, sample_rate);
+    set_up_voice(reference, params_ref, block_size, sample_rate);
+    set_up_envelope(envelope, block_size, sample_rate);
+
+    params_ref.volume.set_envelope(&envelope);
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.5);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(glide_duration);
+    envelope.peak_value.set_value(0.5);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(0.0);
+    envelope.sustain_value.set_value(0.5);
+    envelope.release_time.set_value(0.0);
+    envelope.final_value.set_value(0.5);
+
+    params.waveform.set_value(SimpleOscillator::SINE);
+    params_ref.waveform.set_value(SimpleOscillator::SINE);
+
+    params.portamento_length.set_value(glide_duration);
+    params_ref.portamento_length.set_value(glide_duration);
+
+    reference.note_on(note_start, 123, 0, 0, 1.0, 0);
+    reference.note_off(glide_start, 123, 0, 1.0);
+
+    envelope.peak_value.set_value(1.0);
+    envelope.sustain_value.set_value(1.0);
+    envelope.final_value.set_value(1.0);
+
+    reference.note_on(glide_start, 42, 1, 0, 1.0, 0);
+
+    voice.note_on(note_start, 123, 0, 0, 0.5, 0);
+    voice.glide_to(glide_start, 42, 1, 0, 1.0);
+
+    render_rounds<SimpleVoice>(reference, expected_output, rounds);
+    render_rounds<SimpleVoice>(voice, actual_output, rounds);
+
+    assert_close(
+        expected_output.samples[0], actual_output.samples[0], sample_count, 0.03
     );
 })

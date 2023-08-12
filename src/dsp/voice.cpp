@@ -126,7 +126,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
         Filter2& input,
-        Number& velocity,
+        FloatParam& velocity,
         FloatParam& volume
 ) noexcept
     : Filter<Filter2>(input),
@@ -148,7 +148,15 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initial
     );
 
     if (volume_buffer == NULL) {
-        volume_value = volume.get_value();
+        volume_value = (Sample)volume.get_value();
+    }
+
+    velocity_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+        velocity, round, sample_count
+    );
+
+    if (velocity_buffer == NULL) {
+        velocity_value = (Sample)velocity.get_value();
     }
 
     return NULL;
@@ -163,17 +171,39 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Sample** buffer
 ) noexcept {
     Integer const channels = this->channels;
-    Sample const velocity = (Sample)this->velocity;
     Sample const* volume_buffer = this->volume_buffer;
+    Sample const* velocity_buffer = this->velocity_buffer;
 
     if (volume_buffer == NULL) {
-        Sample volume_value = (Sample)this->volume_value;
+        Sample const volume_value = this->volume_value;
+
+        if (LIKELY(velocity_buffer == NULL)) {
+            Sample const velocity_value = this->velocity_value;
+
+            for (Integer c = 0; c != channels; ++c) {
+                Sample const* const input = this->input_buffer[c];
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[c][i] = velocity_value * volume_value * input[i];
+                }
+            }
+        } else {
+            for (Integer c = 0; c != channels; ++c) {
+                Sample const* const input = this->input_buffer[c];
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[c][i] = velocity_buffer[i] * volume_value * input[i];
+                }
+            }
+        }
+    } else if (LIKELY(velocity_buffer == NULL)) {
+        Sample const velocity_value = this->velocity_value;
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const input = this->input_buffer[c];
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = velocity * volume_value * input[i];
+                buffer[c][i] = velocity_value * volume_buffer[i] * input[i];
             }
         }
     } else {
@@ -181,7 +211,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
             Sample const* const input = this->input_buffer[c];
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = velocity * volume_buffer[i] * input[i];
+                buffer[c][i] = velocity_buffer[i] * volume_buffer[i] * input[i];
             }
         }
     }
@@ -200,7 +230,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParam& frequency_modulation_level_leader,
         FloatParam& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(CHANNELS, 10),
+    : SignalProducer(CHANNELS, 12),
     notes(notes),
     param_leaders(param_leaders),
     oscillator(
@@ -241,11 +271,13 @@ Voice<ModulatorSignalProducerClass>::Voice(
         filter_2_shared_cache
     ),
     velocity_sensitivity(param_leaders.velocity_sensitivity),
+    note_velocity("NV", 0.0, 1.0, 1.0),
+    note_panning("NP", -1.0, 1.0, 0.0),
     portamento_length(param_leaders.portamento_length),
     portamento_depth(param_leaders.portamento_depth),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
-    volume_applier(filter_2, velocity, volume),
+    volume_applier(filter_2, note_velocity, volume),
     frequencies(frequencies),
     state(OFF),
     note_id(0),
@@ -254,6 +286,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
     modulation_out((ModulationOut&)volume_applier)
 {
     register_child(velocity_sensitivity);
+    register_child(note_velocity);
+    register_child(note_panning);
     register_child(portamento_length);
     register_child(portamento_depth);
     register_child(panning);
@@ -290,7 +324,14 @@ template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::is_off_after(
         Seconds const time_offset
 ) const noexcept {
-    return state == OFF && !oscillator.has_events_after(time_offset);
+    return is_released() && !oscillator.has_events_after(time_offset);
+}
+
+
+template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::is_released() const noexcept
+{
+    return state == OFF;
 }
 
 
@@ -309,21 +350,13 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     state = ON;
 
-    this->note_id = note_id;
-    this->note = note;
-    this->channel = channel;
-    this->velocity = calculate_velocity(velocity);
+    save_note_info(note_id, note, channel);
 
-    /* note_panning = 2.0 * (note / 127.0) - 1.0; */
-    note_panning = std::min(
-        1.0,
-        std::max(
-            -1.0,
-            NOTE_PANNING_SCALE * (
-                note + param_leaders.detune.get_value() * Constants::DETUNE_SCALE
-            ) - 1.0
-        )
-    ) * param_leaders.width.get_value();
+    note_velocity.cancel_events_at(time_offset);
+    note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
+
+    note_panning.cancel_events_at(time_offset);
+    note_panning.schedule_value(time_offset, calculate_note_panning(note));
 
     oscillator.cancel_events_at(time_offset);
 
@@ -353,7 +386,19 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
 
 template<class ModulatorSignalProducerClass>
-Number Voice<ModulatorSignalProducerClass>::calculate_velocity(
+void Voice<ModulatorSignalProducerClass>::save_note_info(
+        Integer const note_id,
+        Midi::Note const note,
+        Midi::Channel const channel
+) noexcept {
+    this->note_id = note_id;
+    this->note = note;
+    this->channel = channel;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::calculate_note_velocity(
         Number const raw_velocity
 ) const noexcept {
     Number const sensitivity = velocity_sensitivity.get_value();
@@ -369,6 +414,24 @@ Number Voice<ModulatorSignalProducerClass>::calculate_velocity(
         raw_velocity
         + oversensitivity * (velocity_sqr * velocity_sqr - raw_velocity)
     );
+}
+
+
+template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::calculate_note_panning(
+        Midi::Note const note
+) const noexcept {
+    /* note_panning = 2.0 * (note / 127.0) - 1.0; */
+
+    return std::min(
+        1.0,
+        std::max(
+            -1.0,
+            NOTE_PANNING_SCALE * (
+                note + param_leaders.detune.get_value() * Constants::DETUNE_SCALE
+            ) - 1.0
+        )
+    ) * param_leaders.width.get_value();
 }
 
 
@@ -408,6 +471,87 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     oscillator.frequency.schedule_linear_ramp(
         portamento_length, (Number)note_frequency
     );
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::retrigger(
+        Seconds const time_offset,
+        Integer const note_id,
+        Midi::Note const note,
+        Midi::Channel const channel,
+        Number const velocity,
+        Midi::Note const previous_note
+) noexcept {
+    constexpr Seconds envelope_cancellation_duration = 0.01;
+
+    if (note >= notes) {
+        return;
+    }
+
+    state = OFF;
+
+    wavefolder.folding.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    panning.cancel_envelope(time_offset, envelope_cancellation_duration);
+    volume.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    oscillator.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    oscillator.modulated_amplitude.cancel_envelope(time_offset, envelope_cancellation_duration);
+    oscillator.amplitude.cancel_envelope(time_offset, envelope_cancellation_duration);
+    oscillator.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
+    oscillator.phase.cancel_envelope(time_offset, envelope_cancellation_duration);
+    oscillator.fine_detune.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    filter_1.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
+    filter_1.q.cancel_envelope(time_offset, envelope_cancellation_duration);
+    filter_1.gain.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    filter_2.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
+    filter_2.q.cancel_envelope(time_offset, envelope_cancellation_duration);
+    filter_2.gain.cancel_envelope(time_offset, envelope_cancellation_duration);
+
+    note_on(
+        time_offset + envelope_cancellation_duration,
+        note_id,
+        note,
+        channel,
+        velocity,
+        previous_note
+    );
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::glide_to(
+        Seconds const time_offset,
+        Integer const note_id,
+        Midi::Note const note,
+        Midi::Channel const channel,
+        Number const velocity
+) noexcept {
+    if (note >= notes) {
+        return;
+    }
+
+    save_note_info(note_id, note, channel);
+
+    note_velocity.cancel_events_at(time_offset);
+    note_panning.cancel_events_at(time_offset);
+    oscillator.frequency.cancel_events_at(time_offset);
+
+    Number const portamento_length = this->portamento_length.get_value();
+
+    if (UNLIKELY(portamento_length <= sampling_period)) {
+        note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
+        note_panning.schedule_value(time_offset, calculate_note_panning(note));
+        oscillator.frequency.schedule_value(time_offset, frequencies[note]);
+    } else {
+        note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
+        note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
+        oscillator.frequency.schedule_linear_ramp(portamento_length, frequencies[note]);
+    }
 }
 
 
@@ -557,6 +701,14 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         panning_value = panning.get_value();
     }
 
+    note_panning_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+        note_panning, round, sample_count
+    );
+
+    if (note_panning_buffer == NULL) {
+        note_panning_value = note_panning.get_value();
+    }
+
     return NULL;
 }
 
@@ -571,23 +723,50 @@ void Voice<ModulatorSignalProducerClass>::render(
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
     Sample const* const panning_buffer = this->panning_buffer;
+    Sample const* const note_panning_buffer = this->note_panning_buffer;
 
-    if (panning_buffer == NULL) {
-        Number const panning = std::min(
-            1.0, std::max(panning_value + note_panning, -1.0)
-        );
-        Number const x = (panning + 1.0) * Math::PI_QUARTER;
-        Sample const left_gain = Math::cos(x);
-        Sample const right_gain = Math::sin(x);
+    if (LIKELY(note_panning_buffer == NULL)) {
+        if (panning_buffer == NULL) {
+            Number const panning = std::min(
+                1.0, std::max(panning_value + note_panning_value, -1.0)
+            );
+            Number const x = (panning + 1.0) * Math::PI_QUARTER;
+            Sample const left_gain = Math::cos(x);
+            Sample const right_gain = Math::sin(x);
 
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = left_gain * volume_applier_buffer[i];
+                buffer[1][i] = right_gain * volume_applier_buffer[i];
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                Number const panning = std::min(
+                    1.0, std::max(panning_buffer[i] + note_panning_value, -1.0)
+                );
+                Number const x = (panning + 1.0) * Math::PI_QUARTER;
+                Sample const left_gain = Math::cos(x);
+                Sample const right_gain = Math::sin(x);
+
+                buffer[0][i] = left_gain * volume_applier_buffer[i];
+                buffer[1][i] = right_gain * volume_applier_buffer[i];
+            }
+        }
+    } else if (panning_buffer == NULL) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            Number const panning = std::min(
+                1.0, std::max(panning_value + note_panning_buffer[i], -1.0)
+            );
+            Number const x = (panning + 1.0) * Math::PI_QUARTER;
+            Sample const left_gain = Math::cos(x);
+            Sample const right_gain = Math::sin(x);
+
             buffer[0][i] = left_gain * volume_applier_buffer[i];
             buffer[1][i] = right_gain * volume_applier_buffer[i];
         }
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             Number const panning = std::min(
-                1.0, std::max(panning_buffer[i] + note_panning, -1.0)
+                1.0, std::max(panning_buffer[i] + note_panning_buffer[i], -1.0)
             );
             Number const x = (panning + 1.0) * Math::PI_QUARTER;
             Sample const left_gain = Math::cos(x);

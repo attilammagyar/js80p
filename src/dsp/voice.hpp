@@ -103,7 +103,7 @@ class Voice : public SignalProducer
             public:
                 VolumeApplier(
                     Filter2& input,
-                    Number& velocity,
+                    FloatParam& velocity,
                     FloatParam& volume
                 ) noexcept;
 
@@ -122,10 +122,12 @@ class Voice : public SignalProducer
 
             private:
                 FloatParam& volume;
-                Number& velocity;
+                FloatParam& velocity;
 
                 Sample const* volume_buffer;
-                Number volume_value;
+                Sample const* velocity_buffer;
+                Sample volume_value;
+                Sample velocity_value;
         };
 
         static constexpr Integer CHANNELS = 2;
@@ -146,6 +148,7 @@ class Voice : public SignalProducer
 
         bool is_on() const noexcept;
         bool is_off_after(Seconds const time_offset) const noexcept;
+        bool is_released() const noexcept;
 
         void note_on(
             Seconds const time_offset,
@@ -154,6 +157,23 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note
+        ) noexcept;
+
+        void retrigger(
+            Seconds const time_offset,
+            Integer const note_id,
+            Midi::Note const note,
+            Midi::Channel const channel,
+            Number const velocity,
+            Midi::Note const previous_note
+        ) noexcept;
+
+        void glide_to(
+            Seconds const time_offset,
+            Integer const note_id,
+            Midi::Note const note,
+            Midi::Channel const channel,
+            Number const velocity
         ) noexcept;
 
         void note_off(
@@ -187,7 +207,15 @@ class Voice : public SignalProducer
     private:
         static constexpr Number NOTE_PANNING_SCALE = 2.0 / (Number)Midi::NOTE_MAX;
 
-        Number calculate_velocity(Number const raw_velocity) const noexcept;
+        void save_note_info(
+            Integer const note_id,
+            Midi::Note const note,
+            Midi::Channel const channel
+        ) noexcept;
+
+        Number calculate_note_velocity(Number const raw_velocity) const noexcept;
+        Number calculate_note_panning(Midi::Note const note) const noexcept;
+
         void set_up_oscillator_frequency(
             Seconds const time_offset,
             Midi::Note const note,
@@ -204,6 +232,8 @@ class Voice : public SignalProducer
         Wavefolder_ wavefolder;
         Filter2 filter_2;
         FloatParam velocity_sensitivity;
+        FloatParam note_velocity;
+        FloatParam note_panning;
         FloatParam portamento_length;
         FloatParam portamento_depth;
         FloatParam panning;
@@ -211,10 +241,10 @@ class Voice : public SignalProducer
         VolumeApplier volume_applier;
         Sample const* volume_applier_buffer;
         Sample const* panning_buffer;
+        Sample const* note_panning_buffer;
         Frequency const* frequencies;
-        Number velocity;
         Number panning_value;
-        Number note_panning;
+        Number note_panning_value;
         State state;
         Integer note_id;
         Midi::Note note;
