@@ -483,37 +483,13 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
-    constexpr Seconds envelope_cancellation_duration = 0.01;
-
     if (note >= notes) {
         return;
     }
 
-    state = OFF;
-
-    wavefolder.folding.cancel_envelope(time_offset, envelope_cancellation_duration);
-
-    panning.cancel_envelope(time_offset, envelope_cancellation_duration);
-    volume.cancel_envelope(time_offset, envelope_cancellation_duration);
-
-    oscillator.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
-
-    oscillator.modulated_amplitude.cancel_envelope(time_offset, envelope_cancellation_duration);
-    oscillator.amplitude.cancel_envelope(time_offset, envelope_cancellation_duration);
-    oscillator.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
-    oscillator.phase.cancel_envelope(time_offset, envelope_cancellation_duration);
-    oscillator.fine_detune.cancel_envelope(time_offset, envelope_cancellation_duration);
-
-    filter_1.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
-    filter_1.q.cancel_envelope(time_offset, envelope_cancellation_duration);
-    filter_1.gain.cancel_envelope(time_offset, envelope_cancellation_duration);
-
-    filter_2.frequency.cancel_envelope(time_offset, envelope_cancellation_duration);
-    filter_2.q.cancel_envelope(time_offset, envelope_cancellation_duration);
-    filter_2.gain.cancel_envelope(time_offset, envelope_cancellation_duration);
-
+    cancel_note_smoothly(time_offset);
     note_on(
-        time_offset + envelope_cancellation_duration,
+        time_offset + SMOOTH_NOTE_CANCELLATION_DURATION,
         note_id,
         note,
         channel,
@@ -630,6 +606,36 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
     filter_2.frequency.cancel_events();
     filter_2.q.cancel_events();
     filter_2.gain.cancel_events();
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
+        Seconds const time_offset
+) noexcept {
+    state = OFF;
+
+    wavefolder.folding.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    panning.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    volume.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.stop(time_offset + SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    oscillator.modulated_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.phase.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.fine_detune.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    filter_1.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_1.q.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_1.gain.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    filter_2.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_2.q.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_2.gain.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 }
 
 

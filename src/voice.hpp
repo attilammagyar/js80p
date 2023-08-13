@@ -185,6 +185,8 @@ class Voice : public SignalProducer
 
         void cancel_note() noexcept;
 
+        void cancel_note_smoothly(Seconds const time_offset) noexcept;
+
         bool has_decayed_during_envelope_dahds() const noexcept;
 
         Integer get_note_id() const noexcept;
@@ -206,6 +208,8 @@ class Voice : public SignalProducer
 
     private:
         static constexpr Number NOTE_PANNING_SCALE = 2.0 / (Number)Midi::NOTE_MAX;
+
+        static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
 
         void save_note_info(
             Integer const note_id,
