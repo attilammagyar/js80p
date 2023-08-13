@@ -955,7 +955,7 @@ TEST(when_a_float_param_is_following_another_then_it_is_constant_if_the_leader_i
 })
 
 
-TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_noop, {
+TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_op, {
     constexpr Integer block_size = 10;
     constexpr Integer rounds = 1;
     constexpr Integer sample_count = block_size * rounds;
