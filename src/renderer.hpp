@@ -46,7 +46,7 @@ class Renderer
 Some hosts do use variable size buffers, and we don't want delay feedback
 buffers to run out of samples when a long batch is rendered after a shorter one.
 */
-#define _RENDER_SPLIT_BATCH(sample_count, buffer, op)                       \
+#define _JS80P_RENDER_SPLIT_BATCH(sample_count, buffer, op)                 \
 {                                                                           \
     if (sample_count < 0) {                                                 \
         return;                                                             \
@@ -83,16 +83,16 @@ buffers to run out of samples when a long batch is rendered after a shorter one.
         template<typename NumberType>
         void add_next_round(Integer const sample_count, NumberType** buffer)
         {
-            _RENDER_SPLIT_BATCH(sample_count, buffer, +=);
+            _JS80P_RENDER_SPLIT_BATCH(sample_count, buffer, +=);
         }
 
         template<typename NumberType>
         void write_next_round(Integer const sample_count, NumberType** buffer)
         {
-            _RENDER_SPLIT_BATCH(sample_count, buffer, =);
+            _JS80P_RENDER_SPLIT_BATCH(sample_count, buffer, =);
         }
 
-#undef _RENDER_SPLIT_BATCH
+#undef _JS80P_RENDER_SPLIT_BATCH
 
     private:
         static constexpr Integer ROUND_MASK = 0x7fff;
