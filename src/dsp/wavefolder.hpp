@@ -22,6 +22,7 @@
 #include "js80p.hpp"
 
 #include "dsp/filter.hpp"
+#include "dsp/math.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
