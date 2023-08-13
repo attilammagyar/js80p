@@ -122,6 +122,7 @@ PARAM_COMPONENTS = \
 SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
+	note_stack \
 	voice \
 	dsp/biquad_filter \
 	dsp/chorus \
@@ -165,6 +166,7 @@ TESTS = \
 	$(TESTS_DSP) \
 	test_gui \
 	test_bank \
+	test_note_stack \
 	test_renderer \
 	test_serializer \
 	test_synth \
@@ -574,6 +576,16 @@ $(BUILD_DIR)/test_mixer$(EXE): \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
+
+$(BUILD_DIR)/test_note_stack$(EXE): \
+		tests/test_note_stack.cpp \
+		src/note_stack.hpp src/note_stack.cpp \
+		src/js80p.hpp \
+		src/midi.hpp \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_note_stack$(EXE)
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \

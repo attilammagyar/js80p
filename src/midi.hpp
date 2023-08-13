@@ -116,6 +116,7 @@ constexpr Channel CHANNELS                          = CHANNEL_MAX + 1;
 
 constexpr Note NOTE_MAX                             = 127;
 constexpr Note NOTES                                = NOTE_MAX + 1;
+constexpr Note INVALID_NOTE                         = 255;
 
 constexpr Note NOTE_G_9                             = 127;
 constexpr Note NOTE_F_SHARP_9                       = 126;
