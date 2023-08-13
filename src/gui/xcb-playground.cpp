@@ -129,19 +129,19 @@ int main(int const argc, char const* argv[])
     window_id = xcb_generate_id(xcb_connection);
 
     xcb_create_window(
-        xcb_connection,                 // c
-        XCB_COPY_FROM_PARENT,           // depth
-        window_id,                      // wid
-        screen->root,                   // parent
-        20,                             // x
-        20,                             // y
-        WIDTH,                          // width
-        HEIGHT,                         // height
-        10,                             // border_width
-        XCB_WINDOW_CLASS_INPUT_OUTPUT,  // class
-        screen->root_visual,            // visual
-        XCB_CW_EVENT_MASK,              // value_mask
-        &event_mask                     // value_list
+        xcb_connection,                 /* c            */
+        XCB_COPY_FROM_PARENT,           /* depth        */
+        window_id,                      /* wid          */
+        screen->root,                   /* parent       */
+        20,                             /* x            */
+        20,                             /* y            */
+        WIDTH,                          /* width        */
+        HEIGHT,                         /* height       */
+        10,                             /* border_width */
+        XCB_WINDOW_CLASS_INPUT_OUTPUT,  /* class        */
+        screen->root_visual,            /* visual       */
+        XCB_CW_EVENT_MASK,              /* value_mask   */
+        &event_mask                     /* value_list   */
     );
 
     xcb_change_property(

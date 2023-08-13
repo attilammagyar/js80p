@@ -75,10 +75,10 @@ Synth::ModeParam::ModeParam(std::string const name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        6                           // MODE + MIX + PM + FM + AM + bus
-        + 31 * 2                    // Modulator::Params + Carrier::Params
-        + POLYPHONY * 2             // modulators + carriers
-        + 1                         // effects
+        6                           /* MODE + MIX + PM + FM + AM + bus          */
+        + 31 * 2                    /* Modulator::Params + Carrier::Params      */
+        + POLYPHONY * 2             /* modulators + carriers                    */
+        + 1                         /* effects                                  */
         + FLEXIBLE_CONTROLLERS * 6
         + ENVELOPES * 10
         + LFOS
@@ -1097,7 +1097,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_default_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_default_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
-        default: return 0.0; // This should neacver be reached.
+        default: return 0.0; /* This should never be reached. */
     }
 }
 
@@ -1165,7 +1165,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_max_value();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_max_value();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
-        default: return 0.0; // This should neacver be reached.
+        default: return 0.0; /* This should never be reached. */
     }
 }
 
@@ -1237,7 +1237,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.ratio_to_value(ratio);
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.ratio_to_value(ratio);
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
-        default: return 0; // This should never be reached.
+        default: return 0; /* This should never be reached. */
     }
 }
 
@@ -1425,7 +1425,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::N4DYN: envelopes_rw[3]->dynamic.set_ratio(ratio); break;
             case ParamId::N5DYN: envelopes_rw[4]->dynamic.set_ratio(ratio); break;
             case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
-            default: break; // This should never be reached.
+            default: break; /* This should never be reached. */
         }
     }
 
@@ -1703,7 +1703,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
-        default: return 0.0; // This should never be reached.
+        default: return 0.0; /* This should never be reached. */
     }
 }
 

@@ -1321,19 +1321,19 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
     );
 
     xcb_create_window(
-        xcb_connection,                     // c
-        XCB_COPY_FROM_PARENT,               // depth
-        window_id,                          // wid
-        parent_id,                          // parent
-        left,                               // x
-        top,                                // y
-        width,                              // width
-        height,                             // height
-        0,                                  // border_width
-        XCB_WINDOW_CLASS_INPUT_OUTPUT,      // class
-        XCB_COPY_FROM_PARENT,               // visual
-        XCB_CW_EVENT_MASK,                  // value_mask
-        &event_mask                         // value_list
+        xcb_connection,                     /* c            */
+        XCB_COPY_FROM_PARENT,               /* depth        */
+        window_id,                          /* wid          */
+        parent_id,                          /* parent       */
+        left,                               /* x            */
+        top,                                /* y            */
+        width,                              /* width        */
+        height,                             /* height       */
+        0,                                  /* border_width */
+        XCB_WINDOW_CLASS_INPUT_OUTPUT,      /* class        */
+        XCB_COPY_FROM_PARENT,               /* visual       */
+        XCB_CW_EVENT_MASK,                  /* value_mask   */
+        &event_mask                         /* value_list   */
     );
 
     cairo_surface = cairo_xcb_surface_create(

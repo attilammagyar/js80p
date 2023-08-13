@@ -174,12 +174,12 @@ GUI::Image Widget::load_image(GUI::PlatformData platform_data, char const* name)
 
     // TODO: GetLastError()
     GUI::Image image = (GUI::Image)LoadImage(
-        (HINSTANCE)platform_data,               // hInst
-        name_text.get_const(),                  // name
-        IMAGE_BITMAP,                           // type
-        0,                                      // cx
-        0,                                      // cy
-        LR_CREATEDIBSECTION                     // fuLoad
+        (HINSTANCE)platform_data,               /* hInst    */
+        name_text.get_const(),                  /* name     */
+        IMAGE_BITMAP,                           /* type     */
+        0,                                      /* cx       */
+        0,                                      /* cy       */
+        LR_CREATEDIBSECTION                     /* fuLoad   */
     );
 
     return image;
@@ -396,17 +396,17 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 
     // TODO: GetLastError()
     HWND widget_hwnd = CreateWindow(
-        (LPCTSTR)class_name.get_const(),        // lpClassName
-        (LPCTSTR)text_text.get_const(),         // lpWindowName
-        dwStyle,                                // dwStyle
-        left,                                   // x
-        top,                                    // y
-        width,                                  // nWidth
-        height,                                 // nHeight
-        parent_hwnd,                            // hWndParent
-        NULL,                                   // hMenu
-        (HINSTANCE)platform_data,               // hInstance
-        NULL                                    // lpParam
+        (LPCTSTR)class_name.get_const(),        /* lpClassName  */
+        (LPCTSTR)text_text.get_const(),         /* lpWindowName */
+        dwStyle,                                /* dwStyle      */
+        left,                                   /* x            */
+        top,                                    /* y            */
+        width,                                  /* nWidth       */
+        height,                                 /* nHeight      */
+        parent_hwnd,                            /* hWndParent   */
+        NULL,                                   /* hMenu        */
+        (HINSTANCE)platform_data,               /* hInstance    */
+        NULL                                    /* lpParam      */
     );
 
     if (!widget_hwnd) {
@@ -466,24 +466,25 @@ void Widget::draw_text(
         TextAlignment const alignment
 ) {
     int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
+    int const height = -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 
     Text text_obj(text);
 
     HFONT font = CreateFont(
-        -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72), // cHeight
-        0,                              // cWidth
-        0,                              // cEscapement
-        0,                              // cOrientation
-        weight,                         // cWeight
-        FALSE,                          // bItalic
-        FALSE,                          // bUnderline
-        FALSE,                          // bStrikeOut
-        ANSI_CHARSET,                   // iCharSet
-        OUT_DEFAULT_PRECIS,             // iOutPrecision
-        CLIP_DEFAULT_PRECIS,            // iClipPrecision
-        ANTIALIASED_QUALITY,            // iQuality
-        DEFAULT_PITCH | FF_DONTCARE,    // iPitchAndFamily
-        TEXT("Arial")                   // pszFaceName
+        height,                         /* cHeight          */
+        0,                              /* cWidth           */
+        0,                              /* cEscapement      */
+        0,                              /* cOrientation     */
+        weight,                         /* cWeight          */
+        FALSE,                          /* bItalic          */
+        FALSE,                          /* bUnderline       */
+        FALSE,                          /* bStrikeOut       */
+        ANSI_CHARSET,                   /* iCharSet         */
+        OUT_DEFAULT_PRECIS,             /* iOutPrecision    */
+        CLIP_DEFAULT_PRECIS,            /* iClipPrecision   */
+        ANTIALIASED_QUALITY,            /* iQuality         */
+        DEFAULT_PITCH | FF_DONTCARE,    /* iPitchAndFamily  */
+        TEXT("Arial")                   /* pszFaceName      */
     );
 
     int orig_bk_mode = SetBkMode(hdc, OPAQUE);
@@ -677,13 +678,13 @@ void ImportPatchButton::click()
 
     HANDLE file;
     file = CreateFile(
-        file_name,              // lpFileName
-        GENERIC_READ,           // dwDesiredAccess
-        FILE_SHARE_READ,        // dwShareMode
-        NULL,                   // lpSecurityAttributes
-        OPEN_EXISTING,          // dwCreationDisposition
-        FILE_ATTRIBUTE_NORMAL,  // dwFlagsAndAttributes
-        NULL                    // hTemplateFile
+        file_name,              /* lpFileName               */
+        GENERIC_READ,           /* dwDesiredAccess          */
+        FILE_SHARE_READ,        /* dwShareMode              */
+        NULL,                   /* lpSecurityAttributes     */
+        OPEN_EXISTING,          /* dwCreationDisposition    */
+        FILE_ATTRIBUTE_NORMAL,  /* dwFlagsAndAttributes     */
+        NULL                    /* hTemplateFile            */
     );
 
     // TODO: GetLastError
@@ -759,13 +760,13 @@ void ExportPatchButton::click()
 
     HANDLE file;
     file = CreateFile(
-        file_name,              // lpFileName
-        GENERIC_WRITE,          // dwDesiredAccess
-        0,                      // dwShareMode
-        NULL,                   // lpSecurityAttributes
-        CREATE_ALWAYS,          // dwCreationDisposition
-        FILE_ATTRIBUTE_NORMAL,  // dwFlagsAndAttributes
-        NULL                    // hTemplateFile
+        file_name,              /* lpFileName               */
+        GENERIC_WRITE,          /* dwDesiredAccess          */
+        0,                      /* dwShareMode              */
+        NULL,                   /* lpSecurityAttributes     */
+        CREATE_ALWAYS,          /* dwCreationDisposition    */
+        FILE_ATTRIBUTE_NORMAL,  /* dwFlagsAndAttributes     */
+        NULL                    /* hTemplateFile            */
     );
 
     // TODO: GetLastError

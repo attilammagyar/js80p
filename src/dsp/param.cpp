@@ -812,7 +812,9 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
     envelope_position = 0.0;
     envelope_end_time_offset = 0.0;
 
-    // initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
+    /*
+    initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
+    */
 
     cancel_events_after(time_offset);
 
@@ -878,7 +880,7 @@ Seconds FloatParam::end_envelope(Seconds const time_offset, Seconds const durati
     envelope_end_scheduled = true;
     envelope_end_time_offset = time_offset;
 
-    // current-v ==release-t==> release-v
+    /* current-v ==release-t==> release-v */
 
     cancel_events_after(time_offset);
     schedule(event, time_offset);

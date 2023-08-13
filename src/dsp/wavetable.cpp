@@ -278,7 +278,7 @@ Sample Wavetable::interpolate_sample_lagrange(
 
     Sample const* table_1 = samples[state.table_indices[0]];
 
-    // Formula and notation from http://dlmf.nist.gov/3.3#ii
+    /* Formula and notation from http://dlmf.nist.gov/3.3#ii */
 
     Sample const f_1_1 = table_1[sample_1_index];
     Sample const f_1_2 = table_1[sample_2_index];

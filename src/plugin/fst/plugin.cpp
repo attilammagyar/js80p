@@ -30,84 +30,84 @@ namespace JS80P
 static constexpr int FST_OP_CODE_NAMES_LEN = 78;
 
 static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
-    "Open",                         // 0
-    "Close",                        // 1
-    "SetProgram",                   // 2
-    "GetProgram",                   // 3
-    "SetProgramName",               // 4
-    "GetProgramName",               // 5
-    "GetParamLabel",                // 6
-    "GetParamDisplay",              // 7
-    "GetParamName",                 // 8
-    "UNKNOWN-9",                    // 9
-    "SetSampleRate",                // 10
-    "SetBlockSize",                 // 11
-    "MainsChanged",                 // 12
-    "EditGetRect",                  // 13
-    "EditOpen",                     // 14
-    "EditClose",                    // 15
-    "UNKNOWN-16",                   // 16
-    "UNKNOWN-17",                   // 17
-    "UNKNOWN-18",                   // 18
-    "EditIdle",                     // 19
-    "UNKNOWN-20",                   // 20
-    "UNKNOWN-21",                   // 21
-    "Identify",                     // 22
-    "GetChunk",                     // 23
-    "SetChunk",                     // 24
-    "ProcessEvents",                // 25
-    "CanBeAutomated",               // 26
-    "String2Parameter",             // 27
-    "UNKNOWN-28",                   // 28
-    "GetProgramNameIndexed",        // 29
-    "UNKNOWN-30",                   // 30
-    "UNKNOWN-31",                   // 31
-    "UNKNOWN-32",                   // 32
-    "GetInputProperties",           // 33
-    "GetOutputProperties",          // 34
-    "GetPlugCategory",              // 35
-    "UNKNOWN-36",                   // 36
-    "UNKNOWN-37",                   // 37
-    "UNKNOWN-38",                   // 38
-    "UNKNOWN-39",                   // 39
-    "UNKNOWN-40",                   // 40
-    "UNKNOWN-41",                   // 41
-    "SetSpeakerArrangement",        // 42
-    "UNKNOWN-43",                   // 43
-    "UNKNOWN-44",                   // 44
-    "GetEffectName",                // 45
-    "UNKNOWN-46",                   // 46
-    "GetVendorString",              // 47
-    "GetProductString",             // 48
-    "GetVendorVersion",             // 49
-    "VendorSpecific",               // 50
-    "CanDo",                        // 51
-    "UNKNOWN-52",                   // 52
-    "UNKNOWN-53",                   // 53
-    "UNKNOWN-54",                   // 54
-    "UNKNOWN-55",                   // 55
-    "UNKNOWN-56",                   // 56
-    "UNKNOWN-57",                   // 57
-    "GetVstVersion",                // 58
-    "UNKNOWN-59",                   // 59
-    "UNKNOWN-60",                   // 60
-    "UNKNOWN-61",                   // 61
-    "UNKNOWN-62",                   // 62
-    "GetCurrentMidiProgram",        // 63
-    "UNKNOWN-64",                   // 64
-    "UNKNOWN-65",                   // 65
-    "GetMidiNoteName",              // 66
-    "UNKNOWN-67",                   // 67
-    "UNKNOWN-68",                   // 68
-    "GetSpeakerArrangement",        // 69
-    "ShellGetNextPlugin",           // 70
-    "StartProcess",                 // 71
-    "StopProcess",                  // 72
-    "SetTotalSampleToProcess",      // 73
-    "UNKNOWN-74",                   // 74
-    "UNKNOWN-75",                   // 75
-    "UNKNOWN-76",                   // 76
-    "SetProcessPrecision",          // 77
+    "Open",                         /*    0 */
+    "Close",                        /*    1 */
+    "SetProgram",                   /*    2 */
+    "GetProgram",                   /*    3 */
+    "SetProgramName",               /*    4 */
+    "GetProgramName",               /*    5 */
+    "GetParamLabel",                /*    6 */
+    "GetParamDisplay",              /*    7 */
+    "GetParamName",                 /*    8 */
+    "UNKNOWN-9",                    /*    9 */
+    "SetSampleRate",                /*   10 */
+    "SetBlockSize",                 /*   11 */
+    "MainsChanged",                 /*   12 */
+    "EditGetRect",                  /*   13 */
+    "EditOpen",                     /*   14 */
+    "EditClose",                    /*   15 */
+    "UNKNOWN-16",                   /*   16 */
+    "UNKNOWN-17",                   /*   17 */
+    "UNKNOWN-18",                   /*   18 */
+    "EditIdle",                     /*   19 */
+    "UNKNOWN-20",                   /*   20 */
+    "UNKNOWN-21",                   /*   21 */
+    "Identify",                     /*   22 */
+    "GetChunk",                     /*   23 */
+    "SetChunk",                     /*   24 */
+    "ProcessEvents",                /*   25 */
+    "CanBeAutomated",               /*   26 */
+    "String2Parameter",             /*   27 */
+    "UNKNOWN-28",                   /*   28 */
+    "GetProgramNameIndexed",        /*   29 */
+    "UNKNOWN-30",                   /*   30 */
+    "UNKNOWN-31",                   /*   31 */
+    "UNKNOWN-32",                   /*   32 */
+    "GetInputProperties",           /*   33 */
+    "GetOutputProperties",          /*   34 */
+    "GetPlugCategory",              /*   35 */
+    "UNKNOWN-36",                   /*   36 */
+    "UNKNOWN-37",                   /*   37 */
+    "UNKNOWN-38",                   /*   38 */
+    "UNKNOWN-39",                   /*   39 */
+    "UNKNOWN-40",                   /*   40 */
+    "UNKNOWN-41",                   /*   41 */
+    "SetSpeakerArrangement",        /*   42 */
+    "UNKNOWN-43",                   /*   43 */
+    "UNKNOWN-44",                   /*   44 */
+    "GetEffectName",                /*   45 */
+    "UNKNOWN-46",                   /*   46 */
+    "GetVendorString",              /*   47 */
+    "GetProductString",             /*   48 */
+    "GetVendorVersion",             /*   49 */
+    "VendorSpecific",               /*   50 */
+    "CanDo",                        /*   51 */
+    "UNKNOWN-52",                   /*   52 */
+    "UNKNOWN-53",                   /*   53 */
+    "UNKNOWN-54",                   /*   54 */
+    "UNKNOWN-55",                   /*   55 */
+    "UNKNOWN-56",                   /*   56 */
+    "UNKNOWN-57",                   /*   57 */
+    "GetVstVersion",                /*   58 */
+    "UNKNOWN-59",                   /*   59 */
+    "UNKNOWN-60",                   /*   60 */
+    "UNKNOWN-61",                   /*   61 */
+    "UNKNOWN-62",                   /*   62 */
+    "GetCurrentMidiProgram",        /*   63 */
+    "UNKNOWN-64",                   /*   64 */
+    "UNKNOWN-65",                   /*   65 */
+    "GetMidiNoteName",              /*   66 */
+    "UNKNOWN-67",                   /*   67 */
+    "UNKNOWN-68",                   /*   68 */
+    "GetSpeakerArrangement",        /*   69 */
+    "ShellGetNextPlugin",           /*   70 */
+    "StartProcess",                 /*   71 */
+    "StopProcess",                  /*   72 */
+    "SetTotalSampleToProcess",      /*   73 */
+    "UNKNOWN-74",                   /*   74 */
+    "UNKNOWN-75",                   /*   75 */
+    "UNKNOWN-76",                   /*   76 */
+    "SetProcessPrecision",          /*   77 */
 };
 
 

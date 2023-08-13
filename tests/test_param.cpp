@@ -1392,7 +1392,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     midi_controller.change(1.5, 0.2514);
     change_index_2 = float_param.get_change_index();
 
-    // Non-sample-exact param usage.
+    /* Non-sample-exact param usage. */
     assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
 
@@ -1401,7 +1401,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     assert_true(float_param.is_constant_until(2));
     assert_false(float_param.is_constant_until(3));
 
-    // Sample-exact param usage.
+    /* Sample-exact param usage. */
     assert_false(float_param.is_constant_in_next_round(1, block_size));
     rendered_samples = FloatParam::produce<FloatParam>(float_param, 1, block_size);
     assert_false(float_param.is_constant_in_next_round(1, block_size));
