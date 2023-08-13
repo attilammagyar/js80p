@@ -466,12 +466,12 @@ void Widget::draw_text(
         TextAlignment const alignment
 ) {
     int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
-    int const height = -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+    int const font_height = -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 
     Text text_obj(text);
 
     HFONT font = CreateFont(
-        height,                         /* cHeight          */
+        font_height,                    /* cHeight          */
         0,                              /* cWidth           */
         0,                              /* cEscapement      */
         0,                              /* cOrientation     */
