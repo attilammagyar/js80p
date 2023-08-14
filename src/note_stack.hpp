@@ -37,24 +37,55 @@ class NoteStack
     public:
         NoteStack() noexcept;
 
-        bool is_empty() const noexcept;
         void clear() noexcept;
-        Midi::Note const top() const noexcept;
-        void push(Midi::Note const note) noexcept;
-        Midi::Note const pop() noexcept;
-        void remove(Midi::Note const note) noexcept;
+        bool is_empty() const noexcept;
+        bool is_top(Midi::Channel const channel, Midi::Note const note) const noexcept;
+
+        void top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept;
+
+        void push(
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const velocity
+        ) noexcept;
+
+        void pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) noexcept;
+
+        void remove(Midi::Channel const channel, Midi::Note const note) noexcept;
 
     private:
+        static constexpr Midi::Word INVALID_ITEM = Midi::INVALID_NOTE;
+
+        static constexpr size_t ITEMS = Midi::CHANNELS * Midi::NOTES;
+
+        static Midi::Word encode(
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) noexcept;
+
+        static void decode(
+            Midi::Word const word,
+            Midi::Channel& channel,
+            Midi::Note& note
+        ) noexcept;
+
         // void dump() const noexcept;
-        bool is_already_pushed(Midi::Note const note) const noexcept;
+
+        bool is_invalid(Midi::Channel const channel, Midi::Note const note) const noexcept;
+
+        void remove(Midi::Word const word) noexcept;
+
+        bool is_already_pushed(Midi::Word const word) const noexcept;
 
         /* linked_list[X] = Y if and only if Y is the next element after X */
-        Midi::Note linked_list[Midi::NOTES];
+        Midi::Word linked_list[ITEMS];
 
-        /* note_index[X] = Y if and only if linked_list[Y] = X */
-        Midi::Note note_index[Midi::NOTES];
+        /* index[X] = Y if and only if linked_list[Y] = X */
+        Midi::Word index[ITEMS];
 
-        Midi::Note top_;
+        Number velocities[ITEMS];
+
+        Midi::Word top_;
 };
 
 }

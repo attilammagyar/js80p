@@ -113,6 +113,7 @@ class Dispatcher
 
 constexpr Channel CHANNEL_MAX                       = 15;
 constexpr Channel CHANNELS                          = CHANNEL_MAX + 1;
+constexpr Channel INVALID_CHANNEL                   = 255;
 
 constexpr Note NOTE_MAX                             = 127;
 constexpr Note NOTES                                = NOTE_MAX + 1;
