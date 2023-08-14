@@ -81,7 +81,7 @@ html, body {
 }
 
 #main .knob {
-  margin-top: 6px;
+  margin-top: 1px;
 }
 
 .block {
@@ -179,6 +179,7 @@ h1 {
   font-weight: bold;
 }
 
+#main div label,
 .block h1 label {
   display: inline-block;
   height: 16px;
@@ -202,6 +203,7 @@ h1 {
 }
 
 .block h1 label.dynamic,
+.block h1 label.poly,
 .block h1 label.sync {
   margin-right: 3px;
   float: right;
@@ -213,6 +215,7 @@ h1 {
   margin-top: 2px;
 }
 
+#main div input,
 .block h1 input {
   position: relative;
   background-color: black;
@@ -334,7 +337,7 @@ body.hide-objects .knob span:nth-child(4) {
 }
 
 #export-import {
-  height: 27px;
+  height: 25px;
   text-align: center;
 }
 
@@ -523,6 +526,9 @@ function make_tabs(active)
               stroke="#b8b8c0" fill="none"/>
            </g>
           </svg>
+        </div>
+        <div>
+          <label class="poly"><input type="text" /> POLY</label>
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">

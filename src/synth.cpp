@@ -50,6 +50,7 @@
 #include "dsp/wavefolder.cpp"
 #include "dsp/wavetable.cpp"
 
+#include "note_stack.cpp"
 #include "voice.cpp"
 
 
@@ -75,7 +76,7 @@ Synth::ModeParam::ModeParam(std::string const name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        6                           /* MODE + MIX + PM + FM + AM + bus          */
+        7                           /* POLY + MODE + MIX + PM + FM + AM + bus   */
         + 31 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
@@ -83,6 +84,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + ENVELOPES * 10
         + LFOS
     ),
+    polyphonic("POLY", ToggleParam::ON),
     mode("MODE"),
     modulator_add_volume("MIX", 0.0, 1.0, 1.0),
     phase_modulation_level(
@@ -111,6 +113,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     previous_note(Midi::NOTE_MAX + 1),
     is_learning(false),
     is_sustaining(false),
+    is_polyphonic(true),
+    was_polyphonic(true),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
     envelopes((Envelope* const*)envelopes_rw),
@@ -258,6 +262,8 @@ void Synth::initialize_supported_midi_controllers() noexcept
 
 void Synth::register_main_params() noexcept
 {
+    register_param_as_child<ToggleParam>(ParamId::POLY, polyphonic);
+
     register_param_as_child(ParamId::MODE, mode);
 
     register_float_param_as_child(ParamId::MIX, modulator_add_volume);
@@ -635,6 +641,7 @@ void Synth::suspend() noexcept
     clear_midi_controllers();
     clear_midi_note_to_voice_assignments();
     clear_sustain();
+    note_stack.clear();
 }
 
 
@@ -657,6 +664,7 @@ void Synth::resume() noexcept
     clear_midi_note_to_voice_assignments();
     start_lfos();
     clear_sustain();
+    note_stack.clear();
 }
 
 
@@ -680,9 +688,25 @@ void Synth::note_on(
 ) noexcept {
     Number const velocity_float = midi_byte_to_float(velocity);
 
-    this->velocity.change(time_offset, velocity_float);
-    this->note.change(time_offset, midi_byte_to_float(note));
+    note_stack.push(channel, note, velocity_float);
 
+    if (polyphonic.get_value() == ToggleParam::ON) {
+        this->velocity.change(time_offset, velocity_float);
+        this->note.change(time_offset, midi_byte_to_float(note));
+
+        note_on_polyphonic(time_offset, channel, note, velocity_float);
+    } else {
+        note_on_monophonic(time_offset, channel, note, velocity_float, true);
+    }
+}
+
+
+void Synth::note_on_polyphonic(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Number const velocity
+) noexcept {
     if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
         return;
     }
@@ -696,30 +720,121 @@ void Synth::note_on(
             continue;
         }
 
-        if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
-            previous_note = note;
-        }
-
-        midi_note_to_voice_assignments[channel][note] = next_voice;
-
-        Mode const mode = this->mode.get_value();
-
-        next_note_id = (next_note_id + 1) & NOTE_ID_MASK;
-
-        if (mode == MIX_AND_MOD) {
-            modulators[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
-            carriers[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
-        } else {
-            if (note < mode + Midi::NOTE_B_2) {
-                modulators[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
-            } else {
-                carriers[next_voice]->note_on(time_offset, next_note_id, note, channel, velocity_float, previous_note);
-            }
-        }
-
-        previous_note = note;
+        trigger_note_on_voice(next_voice, time_offset, channel, note, velocity);
 
         break;
+    }
+}
+
+
+void Synth::trigger_note_on_voice(
+        Integer const voice,
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Number const velocity
+) noexcept {
+    assign_voice_and_note_id(voice, channel, note);
+
+    Mode const mode = this->mode.get_value();
+
+    if (mode == MIX_AND_MOD) {
+        modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+        carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+    } else {
+        if (note < mode + Midi::NOTE_B_2) {
+            modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+        } else {
+            carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+        }
+    }
+
+    previous_note = note;
+}
+
+
+void Synth::assign_voice_and_note_id(
+        Integer const voice,
+        Midi::Channel const channel,
+        Midi::Note const note
+) noexcept {
+    if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
+        previous_note = note;
+    }
+
+    midi_note_to_voice_assignments[channel][note] = voice;
+    next_note_id = (next_note_id + 1) & NOTE_ID_MASK;
+}
+
+
+void Synth::note_on_monophonic(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Number const velocity,
+        bool const trigger_if_off
+) noexcept {
+    this->velocity.change(time_offset, velocity);
+    this->note.change(time_offset, midi_byte_to_float(note));
+
+    Modulator* const modulator = modulators[0];
+    Carrier* const carrier = carriers[0];
+
+    bool const modulator_off = modulator->is_off_after(time_offset);
+    bool const carrier_off = carrier->is_off_after(time_offset);
+
+    if (modulator_off && carrier_off) {
+        if (trigger_if_off) {
+            trigger_note_on_voice(0, time_offset, channel, note, velocity);
+        }
+
+        return;
+    }
+
+    assign_voice_and_note_id(0, channel, note);
+
+    Mode const mode = this->mode.get_value();
+
+    if (mode == MIX_AND_MOD) {
+        trigger_note_on_voice_monophonic<Modulator>(
+            *modulator, modulator_off, time_offset, channel, note, velocity
+        );
+        trigger_note_on_voice_monophonic<Carrier>(
+            *carrier, carrier_off, time_offset, channel, note, velocity
+        );
+    } else {
+        if (note < mode + Midi::NOTE_B_2) {
+            trigger_note_on_voice_monophonic<Modulator>(
+                *modulator, modulator_off, time_offset, channel, note, velocity
+            );
+            carrier->cancel_note_smoothly(time_offset);
+        } else {
+            modulator->cancel_note_smoothly(time_offset);
+            trigger_note_on_voice_monophonic<Carrier>(
+                *carrier, carrier_off, time_offset, channel, note, velocity
+            );
+        }
+    }
+
+    previous_note = note;
+}
+
+
+template<class VoiceClass>
+void Synth::trigger_note_on_voice_monophonic(
+        VoiceClass& voice,
+        bool const is_off,
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Number const velocity
+) noexcept {
+    if (is_off) {
+        voice.note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+    } else if (voice.is_released()) {
+        voice.retrigger(time_offset, next_note_id, note, channel, velocity, previous_note);
+    } else {
+        voice.glide_to(time_offset, next_note_id, note, channel, velocity);
     }
 }
 
@@ -799,12 +914,17 @@ void Synth::note_off(
         Midi::Byte const velocity
 ) noexcept {
     Integer const voice = midi_note_to_voice_assignments[channel][note];
+    bool const was_note_stack_top = note_stack.is_top(channel, note);
+
+    note_stack.remove(channel, note);
 
     if (voice == INVALID_VOICE) {
         return;
     }
 
     midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+
+    bool const is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
 
     Modulator* const modulator = modulators[voice];
 
@@ -823,18 +943,34 @@ void Synth::note_off(
             note_id = carriers[voice]->get_note_id();
         }
 
-        deferred_note_offs.push_back(
-            DeferredNoteOff(note_id, channel, note, velocity, voice)
-        );
-    } else {
-        Number const velocity_float = midi_byte_to_float(velocity);
+        if (is_polyphonic || was_note_stack_top) {
+            deferred_note_offs.push_back(
+                DeferredNoteOff(note_id, channel, note, velocity, voice)
+            );
+        }
 
-        modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
-
-        Carrier* const carrier = carriers[voice];
-
-        carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
+        return;
     }
+
+    if (!is_polyphonic && was_note_stack_top && !note_stack.is_empty()) {
+        Number previous_velocity;
+        Midi::Channel previous_channel;
+        Midi::Note previous_note;
+
+        note_stack.top(previous_channel, previous_note, previous_velocity);
+
+        note_on_monophonic(time_offset, previous_channel, previous_note, previous_velocity, false);
+
+        return;
+    }
+
+    Number const velocity_float = midi_byte_to_float(velocity);
+
+    modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
+
+    Carrier* const carrier = carriers[voice];
+
+    carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
 }
 
 
@@ -886,23 +1022,41 @@ void Synth::sustain_on(Seconds const time_offset) noexcept
 
 void Synth::sustain_off(Seconds const time_offset) noexcept
 {
+    bool const is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
     is_sustaining = false;
 
-    for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
-        DeferredNoteOff const& deferred_note_off = *it;
-        Integer const voice = deferred_note_off.get_voice();
+    if (is_polyphonic || note_stack.is_empty()) {
+        for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
+            DeferredNoteOff const& deferred_note_off = *it;
+            Integer const voice = deferred_note_off.get_voice();
 
-        if (UNLIKELY(voice == INVALID_VOICE)) {
-            /* This should never happen, but safety first! */
-            continue;
+            if (UNLIKELY(voice == INVALID_VOICE)) {
+                /* This should never happen, but safety first! */
+                continue;
+            }
+
+            Integer const note_id = deferred_note_off.get_note_id();
+            Midi::Note const note = deferred_note_off.get_note();
+            Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
+
+            modulators[voice]->note_off(time_offset, note_id, note, velocity);
+            carriers[voice]->note_off(time_offset, note_id, note, velocity);
         }
+    } else if (!is_polyphonic) {
+        for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
+            DeferredNoteOff const& deferred_note_off = *it;
+            Integer const note_id = deferred_note_off.get_note_id();
 
-        Integer const note_id = deferred_note_off.get_note_id();
-        Midi::Note const note = deferred_note_off.get_note();
-        Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
+            if (modulators[0]->get_note_id() == note_id || carriers[0]->get_note_id() == note_id) {
+                Number previous_velocity;
+                Midi::Channel previous_channel;
+                Midi::Note previous_note;
 
-        modulators[voice]->note_off(time_offset, note_id, note, velocity);
-        carriers[voice]->note_off(time_offset, note_id, note, velocity);
+                note_stack.top(previous_channel, previous_note, previous_velocity);
+
+                note_on_monophonic(time_offset, previous_channel, previous_note, previous_velocity, false);
+            }
+        }
     }
 
     deferred_note_offs.clear();
@@ -1097,6 +1251,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_default_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_default_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
+        case ParamId::POLY: return polyphonic.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1165,6 +1320,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_max_value();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_max_value();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
+        case ParamId::POLY: return polyphonic.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1237,6 +1393,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.ratio_to_value(ratio);
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.ratio_to_value(ratio);
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
+        case ParamId::POLY: return polyphonic.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -1262,6 +1419,13 @@ Sample const* const* Synth::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     process_messages();
+
+    was_polyphonic = is_polyphonic;
+    is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
+
+    if (was_polyphonic && !is_polyphonic) {
+        stop_polyphonic_notes();
+    }
 
     samples_since_gc += sample_count;
 
@@ -1289,6 +1453,40 @@ Sample const* const* Synth::initialize_rendering(
     clear_midi_controllers();
 
     return NULL;
+}
+
+
+void Synth::stop_polyphonic_notes() noexcept
+{
+    bool found_note = false;
+    Midi::Channel channel = 0;
+    Midi::Note note = 0;
+
+    for (Integer voice = 1; voice != POLYPHONY; ++voice) {
+        found_note = false;
+
+        Modulator* const modulator = modulators[voice];
+
+        if (modulator->is_on()) {
+            note = modulator->get_note();
+            channel = modulator->get_channel();
+            found_note = true;
+            modulator->note_off(0.0, modulator->get_note_id(), note, 0.0);
+        }
+
+        Carrier* const carrier = carriers[voice];
+
+        if (carrier->is_on()) {
+            note = carrier->get_note();
+            channel = carrier->get_channel();
+            found_note = true;
+            carrier->note_off(0.0, carrier->get_note_id(), note, 0.0);
+        }
+
+        if (found_note) {
+            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+        }
+    }
 }
 
 
@@ -1425,6 +1623,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::N4DYN: envelopes_rw[3]->dynamic.set_ratio(ratio); break;
             case ParamId::N5DYN: envelopes_rw[4]->dynamic.set_ratio(ratio); break;
             case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
+            case ParamId::POLY: polyphonic.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -1703,6 +1902,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
+        case ParamId::POLY: return polyphonic.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }

@@ -25,6 +25,7 @@
 
 #include "js80p.hpp"
 #include "midi.hpp"
+#include "note_stack.hpp"
 #include "voice.hpp"
 
 #include "dsp/envelope.hpp"
@@ -531,7 +532,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N5DYN = 373,     ///< Envelope 5 Dynamic
             N6DYN = 374,     ///< Envelope 6 Dynamic
 
-            MAX_PARAM_ID = 375
+            POLY = 375,      ///< Polyphonic
+
+            MAX_PARAM_ID = 376
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
@@ -821,6 +824,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset, Midi::Channel const channel
         ) noexcept;
 
+        ToggleParam polyphonic;
         ModeParam mode;
         FloatParam modulator_add_volume;
         FloatParam phase_modulation_level;
@@ -1122,6 +1126,47 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void clear_sustain() noexcept;
 
+        void note_on_polyphonic(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const velocity
+        ) noexcept;
+
+        void note_on_monophonic(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const velocity,
+            bool const trigger_if_off
+        ) noexcept;
+
+        void trigger_note_on_voice(
+            Integer const voice,
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const velocity
+        ) noexcept;
+
+        template<class VoiceClass>
+        void trigger_note_on_voice_monophonic(
+            VoiceClass& voice,
+            bool const is_off,
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Number const velocity
+        ) noexcept;
+
+        void assign_voice_and_note_id(
+            Integer const voice,
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) noexcept;
+
+        void stop_polyphonic_notes() noexcept;
+
         void update_param_states() noexcept;
 
         void garbage_collect_voices() noexcept;
@@ -1132,6 +1177,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         SingleProducerSingleConsumerMessageQueue messages;
         Bus bus;
         Effects::Effects<Bus> effects;
+        NoteStack note_stack;
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
         FloatParam* float_params[FLOAT_PARAMS];
@@ -1152,6 +1198,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Midi::Note previous_note;
         bool is_learning;
         bool is_sustaining;
+        bool is_polyphonic;
+        bool was_polyphonic;
 
     public:
         MidiController* const* const midi_controllers;

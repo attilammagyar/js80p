@@ -385,6 +385,7 @@ params = [
     "N4DYN",
     "N5DYN",
     "N6DYN",
+    "POLY",
 ]
 
 

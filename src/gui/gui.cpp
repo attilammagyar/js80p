@@ -531,6 +531,8 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::N4DYN] = "Envelope 4 Dynamic",
     [Synth::ParamId::N5DYN] = "Envelope 5 Dynamic",
     [Synth::ParamId::N6DYN] = "Envelope 6 Dynamic",
+
+    [Synth::ParamId::POLY] = "Polyphonic",
 };
 
 
@@ -1657,14 +1659,16 @@ void GUI::build_synth_body(ParamEditorKnobStates* knob_states)
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
-    ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 32, synth, synth_body));
-    ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 32, synth));
+    ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
+    ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
-    PE(synth_body, 14, 34 + (PE_H + 6) * 0, Synth::ParamId::MODE,   M____,      md, mdc, knob_states);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 1, Synth::ParamId::MIX,    MFL_C,      "%.2f", 100.0, knob_states);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 2, Synth::ParamId::PM,     MFLEC,      "%.2f", 100.0 / Constants::PM_MAX, knob_states);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 3, Synth::ParamId::FM,     MFLEC,      "%.2f", 100.0 / Constants::FM_MAX, knob_states);
-    PE(synth_body, 14, 34 + (PE_H + 6) * 4, Synth::ParamId::AM,     MFLEC,      "%.2f", 100.0 / Constants::AM_MAX, knob_states);
+    TS(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
+
+    PE(synth_body, 14, 51 + (PE_H + 1) * 0, Synth::ParamId::MODE,   M____,      md, mdc, knob_states);
+    PE(synth_body, 14, 51 + (PE_H + 1) * 1, Synth::ParamId::MIX,    MFL_C,      "%.2f", 100.0, knob_states);
+    PE(synth_body, 14, 51 + (PE_H + 1) * 2, Synth::ParamId::PM,     MFLEC,      "%.2f", 100.0 / Constants::PM_MAX, knob_states);
+    PE(synth_body, 14, 51 + (PE_H + 1) * 3, Synth::ParamId::FM,     MFLEC,      "%.2f", 100.0 / Constants::FM_MAX, knob_states);
+    PE(synth_body, 14, 51 + (PE_H + 1) * 4, Synth::ParamId::AM,     MFLEC,      "%.2f", 100.0 / Constants::AM_MAX, knob_states);
 
     PE(synth_body,  87 + PE_W * 0,      36, Synth::ParamId::MWAV,   M____,      wf, wfc, knob_states);
     PE(synth_body,  87 + PE_W * 1,      36, Synth::ParamId::MPRT,   MF___,      "%.3f", 1.0, knob_states);
