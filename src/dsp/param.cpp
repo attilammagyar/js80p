@@ -901,6 +901,22 @@ void FloatParam::cancel_envelope(Seconds const time_offset, Seconds const durati
 }
 
 
+void FloatParam::update_envelope(Seconds const time_offset) noexcept
+{
+    Envelope* envelope = get_envelope();
+
+    if (envelope != NULL) {
+        envelope->update();
+        process_envelope(*envelope, time_offset);
+
+        if (!envelope_end_scheduled) {
+            envelope_final_value = envelope->amount.get_value() * envelope->final_value.get_value();
+            envelope_release_time = (Seconds)envelope->release_time.get_value();
+        }
+    }
+}
+
+
 void FloatParam::set_lfo(LFO* lfo) noexcept
 {
     this->lfo = lfo;
@@ -1070,7 +1086,7 @@ Seconds FloatParam::smooth_change_duration(
 }
 
 
-void FloatParam::process_envelope(Envelope& envelope) noexcept
+void FloatParam::process_envelope(Envelope& envelope, Seconds const time_offset) noexcept
 {
     if (envelope_stage == EnvelopeStage::NONE) {
         return;
@@ -1084,7 +1100,7 @@ void FloatParam::process_envelope(Envelope& envelope) noexcept
     Number const amount = envelope.amount.get_value();
 
     if (envelope_stage == EnvelopeStage::DAHDS) {
-        cancel_events_at(0.0);
+        cancel_events_at(time_offset);
 
         if (envelope_position > envelope.get_dahd_length()) {
             Number const sustain_value = ratio_to_value(
@@ -1449,6 +1465,18 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::cancel_envelope(
 
     if (modulator != NULL) {
         modulation_level.cancel_envelope(time_offset, duration);
+    }
+}
+
+
+template<class ModulatorSignalProducerClass>
+void ModulatableFloatParam<ModulatorSignalProducerClass>::update_envelope(
+        Seconds const time_offset
+) noexcept {
+    FloatParam::update_envelope(time_offset);
+
+    if (modulator != NULL) {
+        modulation_level.update_envelope(time_offset);
     }
 }
 

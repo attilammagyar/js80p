@@ -263,6 +263,7 @@ class FloatParam : public Param<Number>
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
+        void update_envelope(Seconds const time_offset) noexcept;
 
         void set_lfo(LFO* lfo) noexcept;
         LFO const* get_lfo() const noexcept;
@@ -348,7 +349,7 @@ class FloatParam : public Param<Number>
             Seconds const duration
         ) const noexcept;
 
-        void process_envelope(Envelope& envelope) noexcept;
+        void process_envelope(Envelope& envelope, Seconds const time_offset = 0.0) noexcept;
 
         Seconds schedule_envelope_value_if_not_reached(
             Seconds const next_event_time_offset,
@@ -433,6 +434,7 @@ class ModulatableFloatParam : public FloatParam
         void start_envelope(Seconds const time_offset) noexcept;
         Seconds end_envelope(Seconds const time_offset) noexcept;
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
+        void update_envelope(Seconds const time_offset) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
