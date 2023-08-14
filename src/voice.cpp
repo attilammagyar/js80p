@@ -509,8 +509,33 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     save_note_info(note_id, note, channel);
 
+    wavefolder.folding.update_envelope(time_offset);
+
+    panning.update_envelope(time_offset);
+    volume.update_envelope(time_offset);
+
+    /*
+    Though we never assign an envelope to some Oscillator parameters, their
+    modulation level parameter might have one (through the leader).
+    */
+    oscillator.modulated_amplitude.update_envelope(time_offset);
+    oscillator.amplitude.update_envelope(time_offset);
+    oscillator.frequency.update_envelope(time_offset);
+    oscillator.phase.update_envelope(time_offset);
+
+    oscillator.fine_detune.update_envelope(time_offset);
+
+    filter_1.frequency.update_envelope(time_offset);
+    filter_1.q.update_envelope(time_offset);
+    filter_1.gain.update_envelope(time_offset);
+
+    filter_2.frequency.update_envelope(time_offset);
+    filter_2.q.update_envelope(time_offset);
+    filter_2.gain.update_envelope(time_offset);
+
     note_velocity.cancel_events_at(time_offset);
     note_panning.cancel_events_at(time_offset);
+
     oscillator.frequency.cancel_events_at(time_offset);
 
     Number const portamento_length = this->portamento_length.get_value();
