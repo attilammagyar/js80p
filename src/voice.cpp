@@ -367,10 +367,15 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     set_up_oscillator_frequency(time_offset, note, previous_note);
 
+    /*
+    Though we never assign an envelope to some Oscillator parameters, their
+    modulation level parameter might have one (through the leader).
+    */
     oscillator.modulated_amplitude.start_envelope(time_offset);
     oscillator.amplitude.start_envelope(time_offset);
     oscillator.frequency.start_envelope(time_offset);
     oscillator.phase.start_envelope(time_offset);
+
     oscillator.fine_detune.start_envelope(time_offset);
 
     filter_1.frequency.start_envelope(time_offset);
@@ -446,15 +451,8 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
     oscillator.frequency.cancel_events_at(time_offset);
 
-    /*
-    Though we never assign an envelope to Oscillator.frequency, its modulation
-    level might have one (through its leader).
-    */
-    oscillator.frequency.start_envelope(time_offset);
-
     if (portamento_length <= sampling_period) {
-        oscillator.frequency.set_value((Number)note_frequency);
-
+        oscillator.frequency.schedule_value(time_offset, (Number)note_frequency);
         return;
     }
 
@@ -465,9 +463,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
             : Math::detune(note_frequency, portamento_depth)
     );
 
-    oscillator.frequency.schedule_value(
-        time_offset, (Number)start_frequency
-    );
+    oscillator.frequency.schedule_value(time_offset, (Number)start_frequency);
     oscillator.frequency.schedule_linear_ramp(
         portamento_length, (Number)note_frequency
     );
@@ -542,6 +538,14 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         return;
     }
 
+    /*
+    Though we never assign an envelope to some Oscillator parameters, their
+    modulation level parameter might have one (through the leader).
+    */
+    oscillator.modulated_amplitude.end_envelope(time_offset);
+    oscillator.frequency.end_envelope(time_offset);
+    oscillator.phase.end_envelope(time_offset);
+
     Seconds off_after = time_offset + std::max(
         oscillator.amplitude.end_envelope(time_offset),
         volume.end_envelope(time_offset)
@@ -556,9 +560,6 @@ void Voice<ModulatorSignalProducerClass>::note_off(
 
     panning.end_envelope(time_offset);
 
-    oscillator.modulated_amplitude.end_envelope(time_offset);
-    oscillator.frequency.end_envelope(time_offset);
-    oscillator.phase.end_envelope(time_offset);
     oscillator.fine_detune.end_envelope(time_offset);
 
     filter_1.frequency.end_envelope(time_offset);
@@ -620,13 +621,17 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     panning.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     volume.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
-    oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    oscillator.stop(time_offset + SMOOTH_NOTE_CANCELLATION_DURATION);
-
+    /*
+    Though we never assign an envelope to some Oscillator parameters, their
+    modulation level parameter might have one (through the leader).
+    */
     oscillator.modulated_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     oscillator.amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     oscillator.phase.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    oscillator.stop(time_offset + SMOOTH_NOTE_CANCELLATION_DURATION);
+
     oscillator.fine_detune.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
     filter_1.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
