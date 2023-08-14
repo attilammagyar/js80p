@@ -587,6 +587,10 @@ void FloatParam::handle_event(Event const& event) noexcept
     Param<Number>::handle_event(event);
 
     switch (event.type) {
+        case EVT_CANCEL:
+            handle_cancel_event(event);
+            break;
+
         case EVT_SET_VALUE:
             handle_set_value_event(event);
             break;
@@ -604,15 +608,14 @@ void FloatParam::handle_event(Event const& event) noexcept
             break;
 
         case EVT_ENVELOPE_END:
-            handle_envelope_end_event(event);
+            handle_envelope_end_event();
             break;
 
         case EVT_ENVELOPE_CANCEL:
-            handle_envelope_cancel_event(event);
+            handle_envelope_cancel_event();
             break;
 
-        case EVT_CANCEL:
-            handle_cancel_event(event);
+        default:
             break;
     }
 }
@@ -703,13 +706,13 @@ void FloatParam::handle_envelope_start_event(Event const& event) noexcept
 }
 
 
-void FloatParam::handle_envelope_end_event(Event const& event) noexcept
+void FloatParam::handle_envelope_end_event() noexcept
 {
     envelope_stage = EnvelopeStage::R;
 }
 
 
-void FloatParam::handle_envelope_cancel_event(Event const& event) noexcept
+void FloatParam::handle_envelope_cancel_event() noexcept
 {
     envelope_stage = EnvelopeStage::R;
 }
@@ -923,10 +926,10 @@ Sample const* const* FloatParam::initialize_rendering(
     } else if (flexible_controller != NULL) {
         return process_flexible_controller(sample_count);
     } else {
-        Envelope* const envelope = get_envelope();
+        Envelope* envelope = get_envelope();
 
-        if (envelope != NULL) {
-            return process_envelope(envelope);
+        if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+            process_envelope(*envelope);
         }
     }
 
@@ -1067,31 +1070,25 @@ Seconds FloatParam::smooth_change_duration(
 }
 
 
-
-Sample const* const* FloatParam::process_envelope(
-        Envelope* const envelope
-) noexcept {
+void FloatParam::process_envelope(Envelope& envelope) noexcept
+{
     if (envelope_stage == EnvelopeStage::NONE) {
-        return NULL;
+        return;
     }
 
-    if (envelope->dynamic.get_value() != ToggleParam::ON) {
-        return NULL;
-    }
-
-    Integer const new_change_index = envelope->get_change_index();
+    Integer const new_change_index = envelope.get_change_index();
     bool const has_changed = new_change_index != envelope_change_index;
 
     envelope_change_index = new_change_index;
 
-    Number const amount = envelope->amount.get_value();
+    Number const amount = envelope.amount.get_value();
 
     if (envelope_stage == EnvelopeStage::DAHDS) {
         cancel_events_at(0.0);
 
-        if (envelope_position > envelope->get_dahd_length()) {
+        if (envelope_position > envelope.get_dahd_length()) {
             Number const sustain_value = ratio_to_value(
-                amount * envelope->sustain_value.get_value()
+                amount * envelope.sustain_value.get_value()
             );
 
             if (std::fabs(get_raw_value() - sustain_value) > 0.000001) {
@@ -1102,26 +1099,26 @@ Sample const* const* FloatParam::process_envelope(
 
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope->delay_time,
-                envelope->initial_value,
+                envelope.delay_time,
+                envelope.initial_value,
                 amount
             );
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope->attack_time,
-                envelope->peak_value,
+                envelope.attack_time,
+                envelope.peak_value,
                 amount
             );
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope->hold_time,
-                envelope->peak_value,
+                envelope.hold_time,
+                envelope.peak_value,
                 amount
             );
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope->decay_time,
-                envelope->sustain_value,
+                envelope.decay_time,
+                envelope.sustain_value,
                 amount
             );
         }
@@ -1137,18 +1134,16 @@ Sample const* const* FloatParam::process_envelope(
         }
 
         envelope_release_time = std::min(
-            envelope_release_time, (Seconds)envelope->release_time.get_value()
+            envelope_release_time, (Seconds)envelope.release_time.get_value()
         );
 
         cancel_events_at(envelope_end_time_offset);
         schedule(EVT_ENVELOPE_END, envelope_end_time_offset);
         schedule_linear_ramp(
             envelope_release_time,
-            ratio_to_value(amount * envelope->final_value.get_value())
+            ratio_to_value(amount * envelope.final_value.get_value())
         );
     }
-
-    return NULL;
 }
 
 

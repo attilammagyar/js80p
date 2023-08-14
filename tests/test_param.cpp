@@ -1328,7 +1328,7 @@ void test_follower_dynamic_envelope()
 
     envelope.release_time.set_value(2.0);
 
-    assert_eq(2.0, follower.end_envelope(29.0));
+    assert_eq(2.0, follower.end_envelope(29.0), DOUBLE_DELTA);
 
     FloatParam::produce<FloatParamClass>(follower, 1, 6);
 
@@ -2091,7 +2091,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
 
     modulatable_float_param.set_value(param_value);
     modulatable_float_param.start_envelope(6.0);
-    assert_eq(3.0, modulatable_float_param.end_envelope(12.0));
+    assert_eq(3.0, modulatable_float_param.end_envelope(12.0), DOUBLE_DELTA);
 
     assert_eq(
         NULL,

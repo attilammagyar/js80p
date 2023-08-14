@@ -321,13 +321,13 @@ class FloatParam : public Param<Number>
 
         Number round_value(Number const value) const noexcept;
 
+        void handle_cancel_event(Event const& event) noexcept;
         void handle_set_value_event(Event const& event) noexcept;
         void handle_linear_ramp_event(Event const& event) noexcept;
         void handle_log_ramp_event(Event const& event) noexcept;
         void handle_envelope_start_event(Event const& event) noexcept;
-        void handle_envelope_end_event(Event const& event) noexcept;
-        void handle_envelope_cancel_event(Event const& event) noexcept;
-        void handle_cancel_event(Event const& event) noexcept;
+        void handle_envelope_end_event() noexcept;
+        void handle_envelope_cancel_event() noexcept;
 
         bool is_following_leader() const noexcept;
 
@@ -348,9 +348,7 @@ class FloatParam : public Param<Number>
             Seconds const duration
         ) const noexcept;
 
-        Sample const* const* process_envelope(
-            Envelope* const envelope
-        ) noexcept;
+        void process_envelope(Envelope& envelope) noexcept;
 
         Seconds schedule_envelope_value_if_not_reached(
             Seconds const next_event_time_offset,
@@ -358,8 +356,6 @@ class FloatParam : public Param<Number>
             FloatParam const& value_param,
             Number const amount
         ) noexcept;
-
-        void update_envelope();
 
         template<Event::Type event>
         Seconds end_envelope(
