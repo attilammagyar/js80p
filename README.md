@@ -92,7 +92,7 @@ System Requirements
  * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 20.04 or newer)
  * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
     * separate packages are available for AVX capable 64 bit processors
- * RAM: 150-300 MB per instance, depending on buffer sizes, etc.
+ * RAM: 150-500 MB per instance, depending on buffer sizes, etc.
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
