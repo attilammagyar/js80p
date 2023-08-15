@@ -1,3 +1,7 @@
+v2.0.0 (2023-08-16)
+ * Implemented monophonic mode for smooth legato playing
+ * New preset: Monophonic Saw
+
 v1.9.9 (2023-08-03)
  * Bugfix: initialize MIDI CC 64 (sustain pedal) to 0% instead of 50%. The
    basic sound of patches that utilize the sustain pedal (like some of the
