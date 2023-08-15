@@ -499,6 +499,9 @@ Features
 --------
 
  * 64 notes polyphony
+ * last-note priority monophonic mode
+    * legato playing will either retrigger or smoothly glide to the next note,
+      depending on the portamento length setting
  * 2 oscillators with 10 waveforms:
     * sine
     * sawtooth
