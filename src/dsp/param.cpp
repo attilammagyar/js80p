@@ -803,7 +803,7 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
 {
     Seconds next_event_time_offset;
     Number next_value;
-    Envelope const* const envelope = get_envelope();
+    Envelope* const envelope = get_envelope();
 
     if (envelope == NULL) {
         return;
@@ -814,6 +814,9 @@ void FloatParam::start_envelope(Seconds const time_offset) noexcept
     envelope_canceled = false;
     envelope_position = 0.0;
     envelope_end_time_offset = 0.0;
+
+    envelope->update();
+    envelope_change_index = envelope->get_change_index();
 
     /*
     initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
@@ -862,13 +865,16 @@ Seconds FloatParam::end_envelope(Seconds const time_offset) noexcept
 template<SignalProducer::Event::Type event>
 Seconds FloatParam::end_envelope(Seconds const time_offset, Seconds const duration) noexcept
 {
-    Envelope const* const envelope = get_envelope();
+    Envelope* const envelope = get_envelope();
 
     if (envelope == NULL) {
         return 0.0;
     }
 
     if (envelope->dynamic.get_value() == ToggleParam::ON) {
+        envelope->update();
+        envelope_change_index = envelope->get_change_index();
+
         envelope_final_value = (
             envelope->amount.get_value() * envelope->final_value.get_value()
         );
