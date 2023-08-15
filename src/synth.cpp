@@ -834,7 +834,7 @@ void Synth::trigger_note_on_voice_monophonic(
     } else if (voice.is_released()) {
         voice.retrigger(time_offset, next_note_id, note, channel, velocity, previous_note);
     } else {
-        voice.glide_to(time_offset, next_note_id, note, channel, velocity);
+        voice.glide_to(time_offset, next_note_id, note, channel, velocity, previous_note);
     }
 }
 

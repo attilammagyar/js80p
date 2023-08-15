@@ -380,7 +380,7 @@ TEST(can_glide_smoothly_to_a_new_note, {
     reference.note_on(glide_start, 42, 1, 0, 1.0, 0);
 
     voice.note_on(note_start, 123, 0, 0, 0.5, 0);
-    voice.glide_to(glide_start, 42, 1, 0, 1.0);
+    voice.glide_to(glide_start, 42, 1, 0, 1.0, 123);
 
     render_rounds<SimpleVoice>(reference, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);

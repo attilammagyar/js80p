@@ -173,7 +173,8 @@ class Voice : public SignalProducer
             Integer const note_id,
             Midi::Note const note,
             Midi::Channel const channel,
-            Number const velocity
+            Number const velocity,
+            Midi::Note const previous_note
         ) noexcept;
 
         void note_off(

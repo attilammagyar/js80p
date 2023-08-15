@@ -501,9 +501,18 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Integer const note_id,
         Midi::Note const note,
         Midi::Channel const channel,
-        Number const velocity
+        Number const velocity,
+        Midi::Note const previous_note
 ) noexcept {
     if (note >= notes) {
+        return;
+    }
+
+    Number const portamento_length = this->portamento_length.get_value();
+
+    if (portamento_length <= 0.000001) {
+        retrigger(time_offset, note_id, note, channel, velocity, previous_note);
+
         return;
     }
 
@@ -538,17 +547,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     oscillator.frequency.cancel_events_at(time_offset);
 
-    Number const portamento_length = this->portamento_length.get_value();
-
-    if (UNLIKELY(portamento_length <= sampling_period)) {
-        note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
-        note_panning.schedule_value(time_offset, calculate_note_panning(note));
-        oscillator.frequency.schedule_value(time_offset, frequencies[note]);
-    } else {
-        note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
-        note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
-        oscillator.frequency.schedule_linear_ramp(portamento_length, frequencies[note]);
-    }
+    note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
+    note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
+    oscillator.frequency.schedule_linear_ramp(portamento_length, frequencies[note]);
 }
 
 
