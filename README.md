@@ -64,6 +64,7 @@ Table of Contents
     * [Saw Piano Reversed](#preset-saw-piano-reversed)
     * [Nightmare Lead](#preset-nightmare-lead)
     * [Tremolo Lead](#preset-tremolo-lead)
+    * [Monophonic Saw](#preset-monophonic-saw)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -456,6 +457,15 @@ until it finally descends into madness.
 
 Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
 the filter and adds a tremolo effect. Filtering also responds to note velocity.
+
+<a id="preset-monophonic-saw"></a>
+
+### Monophonic Saw
+
+A sawtooth wave based monophonic, sustained sound with smooth legato glides.
+The harder you play, the brighter and richer the timbre, and the harder the
+note attack. Mod wheel controls the vibrato, and aftertouch controls the
+filtering and the wavefolder. The sustain pedal lengthens note decay.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
