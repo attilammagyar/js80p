@@ -34,10 +34,6 @@ Sample const* const* SignalProducer::produce(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (UNLIKELY(signal_producer.channels == 0)) {
-        return NULL;
-    }
-
     if (signal_producer.cached_round == round) {
         return signal_producer.cached_buffer;
     }

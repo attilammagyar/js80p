@@ -603,10 +603,10 @@ class EventTestSignalProducer : public SignalProducer
     public:
         static constexpr Event::Type SET_VALUE = 1;
 
-        EventTestSignalProducer() noexcept
-            : SignalProducer(1),
-            render_calls(0),
-            value(0.0)
+        EventTestSignalProducer(Integer const channels = 1) noexcept
+            : SignalProducer(channels),
+            value(0.0),
+            render_calls(0)
         {
         }
 
@@ -615,6 +615,7 @@ class EventTestSignalProducer : public SignalProducer
             SignalProducer::schedule(SET_VALUE, time_offset, 0, param, param);
         }
 
+        Number value;
         int render_calls;
 
     protected:
@@ -626,8 +627,10 @@ class EventTestSignalProducer : public SignalProducer
         ) noexcept {
             ++render_calls;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = value;
+            for (Integer c = 0; c != channels; ++c) {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[c][i] = value;
+                }
             }
         }
 
@@ -637,9 +640,6 @@ class EventTestSignalProducer : public SignalProducer
                 value = event.number_param_1;
             }
         }
-
-    private:
-        Number value;
 };
 
 
@@ -701,8 +701,9 @@ void test_event_handling(
         Sample const expected_samples[]
 ) {
     Integer const sample_count = rounds * block_size;
+    Integer const channels = signal_producer.get_channels();
     Sample const* const* block;
-    Buffer buffer(sample_count);
+    Buffer buffer(sample_count, channels);
     Integer next_sample_index = 0;
 
     signal_producer.set_block_size(block_size);
@@ -741,17 +742,26 @@ void test_event_handling(
         );
     }
 
+
     for (Integer round = 0; round != rounds; ++round) {
         block = SignalProducer::produce<EventTestSignalProducer>(
             signal_producer, round, block_size
         );
 
-        for (Integer i = 0; i != block_size; ++i) {
-            buffer.samples[0][next_sample_index++] = block[0][i];
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = 0; i != block_size; ++i) {
+                buffer.samples[c][next_sample_index++] = block[c][i];
+            }
         }
     }
 
-    assert_eq(expected_samples, buffer.samples[0], sample_count);
+    for (Integer c = 0; c != channels; ++c) {
+        assert_eq(expected_samples, buffer.samples[c], sample_count);
+    }
+
+    if (sample_count > 0) {
+        assert_eq(expected_samples[sample_count - 1], signal_producer.value);
+    }
 }
 
 
@@ -772,6 +782,31 @@ TEST(events_may_be_scheduled_multiple_rounds_in_the_future, {
         3.0, 3.0, 3.0,
     };
     EventTestSignalProducer signal_producer;
+    signal_producer.set_sample_rate(10.0);
+
+    test_event_handling(
+        signal_producer, block_size, rounds, events, 3, NULL, 0, expected_samples
+    );
+})
+
+
+TEST(events_are_evaluated_even_if_the_signal_producer_does_not_produce_audio, {
+    constexpr Integer block_size = 3;
+    constexpr Integer rounds = 6;
+    constexpr TestEvent events[] = {
+        {0.3, 1.0},
+        {1.1, 2.0},
+        {1.3, 3.0},
+    };
+    constexpr Sample expected_samples[] = {
+        0.0, 0.0, 0.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 2.0,
+        2.0, 3.0, 3.0,
+        3.0, 3.0, 3.0,
+    };
+    EventTestSignalProducer signal_producer(0);
     signal_producer.set_sample_rate(10.0);
 
     test_event_handling(

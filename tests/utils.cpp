@@ -42,7 +42,11 @@ class Buffer
             samples(NULL),
             append_index(0)
         {
-            samples = new Sample*[channels];
+            if (channels > 0) {
+                samples = new Sample*[channels];
+            } else {
+                samples = NULL;
+            }
 
             for (Integer channel = 0; channel != channels; ++channel) {
                 samples[channel] = new Sample[size];
@@ -55,6 +59,10 @@ class Buffer
 
         ~Buffer()
         {
+            if (samples == NULL) {
+                return;
+            }
+
             for (Integer channel = 0; channel != channels; ++channel) {
                 delete[] samples[channel];
             }
