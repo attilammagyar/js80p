@@ -224,6 +224,33 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
 })
 
 
+TEST(when_param_is_evaluated_once_per_rendering_block_then_no_buffer_is_allocated, {
+    Param<Number, ParamEvaluation::BLOCK> block_evaluated_param("BEP", 0.0, 1.0, 0.5);
+    ToggleParam toggle_param("T", ToggleParam::OFF);
+    FloatParamTpl<ParamEvaluation::BLOCK> block_evaluated_float_param("BEFP", 0.0, 1.0, 0.5);
+    FloatParamTpl<ParamEvaluation::BLOCK> float_param("F", 0.0, 1.0, 0.5);
+    FloatParamTpl<ParamEvaluation::BLOCK, ParamEvaluation::BLOCK> follower(float_param);
+
+    assert_eq(
+        NULL,
+        SignalProducer::produce< Param<Number, ParamEvaluation::BLOCK> >(
+            block_evaluated_param, 1, 1
+        )
+    );
+    assert_eq(
+        NULL,
+        FloatParamTpl<ParamEvaluation::BLOCK>::produce< FloatParamTpl<ParamEvaluation::BLOCK> >(
+            block_evaluated_float_param, 1, 1
+        )
+    );
+    assert_eq(NULL, SignalProducer::produce<ToggleParam>(toggle_param, 1, 1));
+
+    assert_eq((int)ParamEvaluation::BLOCK, (int)block_evaluated_param.get_evaluation());
+    assert_eq((int)ParamEvaluation::BLOCK, (int)toggle_param.get_evaluation());
+    assert_eq((int)ParamEvaluation::BLOCK, (int)follower.get_evaluation());
+})
+
+
 void assert_float_param_does_not_change_during_rendering(
         FloatParam& float_param,
         Integer const round,

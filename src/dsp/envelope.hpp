@@ -29,9 +29,6 @@
 namespace JS80P
 {
 
-class FloatParam;
-
-
 /**
  * \brief A collection of parameters specifying an envelope.
  */

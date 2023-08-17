@@ -30,9 +30,6 @@
 namespace JS80P
 {
 
-class FloatParam;
-
-
 /**
  * \brief Adjust the value of the \c input \c FloatParam, so that if that has a
  *        \c MidiController assigned, then the \c FlexibleController can be used
