@@ -246,6 +246,7 @@ class FstPlugin : public Midi::EventHandler
         size_t next_program;
         Integer min_samples_before_next_cc_ui_update;
         Integer remaining_samples_before_next_cc_ui_update;
+        VstInt32 prev_logged_op_code;
         bool save_current_patch_before_changing_program;
         bool had_midi_cc_event;
 };

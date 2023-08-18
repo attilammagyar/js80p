@@ -160,14 +160,16 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
     // if (
             // true
             // && op_code != effEditIdle
-            // && op_code != effProcessEvents
+            // && (op_code != effProcessEvents || fst_plugin->prev_logged_op_code != effProcessEvents)
             // && op_code != 53
             // && op_code != effGetProgram
             // && op_code != effEditGetRect
+            // && op_code != effGetProgramNameIndexed
     // ) {
-        // fprintf(
-            // stderr,
-            // "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f\n",
+        // fst_plugin->prev_logged_op_code = op_code;
+        // JS80P_DEBUG(
+            // "plugin=%p, op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
+            // effect->object,
             // (int)op_code,
             // ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
             // (int)index,
@@ -372,6 +374,7 @@ FstPlugin::FstPlugin(
     next_program(0),
     min_samples_before_next_cc_ui_update(8192),
     remaining_samples_before_next_cc_ui_update(0),
+    prev_logged_op_code(-1),
     save_current_patch_before_changing_program(false),
     had_midi_cc_event(false)
 {
