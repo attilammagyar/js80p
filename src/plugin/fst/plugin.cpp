@@ -686,21 +686,18 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 
 void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept
 {
-    size_t current_program = 0;
+    size_t const current_program = bank.get_current_program_index();
+    std::string buffer((char const*)chunk, (std::string::size_type)size);
 
     save_current_patch_before_changing_program = false;
 
-    std::string buffer((char const*)chunk, (std::string::size_type)size);
-
     if (is_preset) {
-        current_program = bank.get_current_program_index();
         bank[current_program].import(buffer);
-        import_patch(bank[current_program].serialize());
     } else {
         bank.import(buffer);
-        current_program = bank.get_current_program_index();
-        import_patch(bank[current_program].serialize());
     }
+
+    import_patch(bank[current_program].serialize());
 
     parameters[0].set_value(
         (float)Bank::program_index_to_normalized_parameter_value(current_program)
