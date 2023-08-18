@@ -146,12 +146,12 @@ class ToggleParam : public Param<Toggle, ParamEvaluation::BLOCK>
 };
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
+template<ParamEvaluation evaluation>
 class FloatParam;
 
 
-typedef FloatParam<ParamEvaluation::SAMPLE, ParamEvaluation::SAMPLE> FloatParamS;
-typedef FloatParam<ParamEvaluation::BLOCK, ParamEvaluation::BLOCK> FloatParamB;
+typedef FloatParam<ParamEvaluation::SAMPLE> FloatParamS;
+typedef FloatParam<ParamEvaluation::BLOCK> FloatParamB;
 
 
 /**
@@ -159,7 +159,7 @@ typedef FloatParam<ParamEvaluation::BLOCK, ParamEvaluation::BLOCK> FloatParamB;
  *        time offsets, or can be approached linearly over a given duration of
  *        time.
  */
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation = ParamEvaluation::SAMPLE>
+template<ParamEvaluation evaluation>
 class FloatParam : public Param<Number, evaluation>
 {
     friend class SignalProducer;
@@ -231,9 +231,11 @@ class FloatParam : public Param<Number, evaluation>
 
         /**
          * \warning When the leader needs to be rendered, it will be rendered as
-         *          a \c FloatParam<leader_evaluation>.
+         *          a \c FloatParam<evaluation>, even if it's a descendant.
+         *          Practically, this means that only \c FloatParam objects can
+         *          be leaders.
          */
-        FloatParam(FloatParam<leader_evaluation>& leader) noexcept;
+        FloatParam(FloatParam<evaluation>& leader) noexcept;
 
         bool is_logarithmic() const noexcept;
 
@@ -392,7 +394,7 @@ class FloatParam : public Param<Number, evaluation>
         Number const log_min_minus;
         Number const log_range_inv;
 
-        FloatParam<leader_evaluation>* const leader;
+        FloatParam<evaluation>* const leader;
 
         FlexibleController* flexible_controller;
         Integer flexible_controller_change_index;

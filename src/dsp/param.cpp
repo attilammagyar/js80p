@@ -242,9 +242,9 @@ ToggleParam::ToggleParam(std::string const name, Toggle const default_value)
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
+template<ParamEvaluation evaluation>
 template<class FloatParamClass>
-Sample const* const* FloatParam<evaluation, leader_evaluation>::produce(
+Sample const* const* FloatParam<evaluation>::produce(
         FloatParamClass& float_param,
         Integer const round,
         Integer const sample_count
@@ -256,7 +256,7 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::produce(
     }
 
     if (float_param.is_following_leader()) {
-        return SignalProducer::produce< FloatParam<leader_evaluation> >(
+        return SignalProducer::produce< FloatParam<evaluation> >(
             *float_param.leader, round, sample_count
         );
     }
@@ -267,9 +267,9 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::produce(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
+template<ParamEvaluation evaluation>
 template<class FloatParamClass>
-Sample const* FloatParam<evaluation, leader_evaluation>::produce_if_not_constant(
+Sample const* FloatParam<evaluation>::produce_if_not_constant(
         FloatParamClass& float_param,
         Integer const round,
         Integer const sample_count
@@ -281,7 +281,7 @@ Sample const* FloatParam<evaluation, leader_evaluation>::produce_if_not_constant
     }
 
     Sample const* const* const rendered = (
-        FloatParam<evaluation, leader_evaluation>::produce<FloatParamClass>(
+        FloatParam<evaluation>::produce<FloatParamClass>(
             float_param, round, sample_count
         )
     );
@@ -294,8 +294,8 @@ Sample const* FloatParam<evaluation, leader_evaluation>::produce_if_not_constant
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-FloatParam<evaluation, leader_evaluation>::FloatParam(
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::FloatParam(
         std::string const name,
         Number const min_value,
         Number const max_value,
@@ -340,10 +340,8 @@ FloatParam<evaluation, leader_evaluation>::FloatParam(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-FloatParam<evaluation, leader_evaluation>::FloatParam(
-        FloatParam<leader_evaluation>& leader
-) noexcept
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     : Param<Number, evaluation>(
         leader.get_name(),
         leader.get_min_value(),
@@ -382,8 +380,8 @@ FloatParam<evaluation, leader_evaluation>::FloatParam(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::get_value() const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::get_value() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_value();
@@ -399,15 +397,15 @@ Number FloatParam<evaluation, leader_evaluation>::get_value() const noexcept
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-bool FloatParam<evaluation, leader_evaluation>::is_following_leader() const noexcept
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_following_leader() const noexcept
 {
     return leader != NULL && leader->get_envelope() == NULL;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-bool FloatParam<evaluation, leader_evaluation>::is_logarithmic() const noexcept
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_logarithmic() const noexcept
 {
     return (
         log_scale_toggle != NULL
@@ -416,8 +414,8 @@ bool FloatParam<evaluation, leader_evaluation>::is_logarithmic() const noexcept
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_value(Number const new_value) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_value(Number const new_value) noexcept
 {
     latest_event_type = EVT_SET_VALUE;
 
@@ -425,8 +423,8 @@ void FloatParam<evaluation, leader_evaluation>::set_value(Number const new_value
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::round_value(Number const value) const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::round_value(Number const value) const noexcept
 {
     if (should_round) {
         return std::round(value * round_to_inv) * round_to;
@@ -436,15 +434,15 @@ Number FloatParam<evaluation, leader_evaluation>::round_value(Number const value
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_ratio(Number const ratio) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_ratio(Number const ratio) noexcept
 {
     set_value(ratio_to_value(ratio));
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::get_ratio() const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::get_ratio() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_ratio();
@@ -460,43 +458,43 @@ Number FloatParam<evaluation, leader_evaluation>::get_ratio() const noexcept
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::get_default_ratio() const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::get_default_ratio() const noexcept
 {
     return value_to_ratio(this->get_default_value());
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-ToggleParam const* FloatParam<evaluation, leader_evaluation>::get_log_scale_toggle() const noexcept
+template<ParamEvaluation evaluation>
+ToggleParam const* FloatParam<evaluation>::get_log_scale_toggle() const noexcept
 {
     return log_scale_toggle;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number const* FloatParam<evaluation, leader_evaluation>::get_log_scale_table() const noexcept
+template<ParamEvaluation evaluation>
+Number const* FloatParam<evaluation>::get_log_scale_table() const noexcept
 {
     return log_scale_table;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-int FloatParam<evaluation, leader_evaluation>::get_log_scale_table_max_index() const noexcept
+template<ParamEvaluation evaluation>
+int FloatParam<evaluation>::get_log_scale_table_max_index() const noexcept
 {
     return log_scale_table_max_index;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::get_log_scale_table_scale() const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::get_log_scale_table_scale() const noexcept
 {
     return log_scale_table_scale;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::ratio_to_value(Number const ratio) const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::ratio_to_value(Number const ratio) const noexcept
 {
     if (is_logarithmic()) {
         return Math::lookup(
@@ -510,8 +508,8 @@ Number FloatParam<evaluation, leader_evaluation>::ratio_to_value(Number const ra
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::value_to_ratio(Number const value) const noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::value_to_ratio(Number const value) const noexcept
 {
     if (is_logarithmic()) {
         return (std::log2(value) + log_min_minus) * log_range_inv;
@@ -521,8 +519,8 @@ Number FloatParam<evaluation, leader_evaluation>::value_to_ratio(Number const va
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Integer FloatParam<evaluation, leader_evaluation>::get_change_index() const noexcept
+template<ParamEvaluation evaluation>
+Integer FloatParam<evaluation>::get_change_index() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_change_index();
@@ -536,9 +534,10 @@ Integer FloatParam<evaluation, leader_evaluation>::get_change_index() const noex
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-bool FloatParam<evaluation, leader_evaluation>::is_constant_in_next_round(
-        Integer const round, Integer const sample_count
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_constant_in_next_round(
+        Integer const round,
+        Integer const sample_count
 ) noexcept {
     if (round == constantness_round) {
         return constantness;
@@ -550,9 +549,10 @@ bool FloatParam<evaluation, leader_evaluation>::is_constant_in_next_round(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-bool FloatParam<evaluation, leader_evaluation>::is_constant_until(Integer const sample_count) const noexcept
-{
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_constant_until(
+        Integer const sample_count
+) const noexcept {
     if (is_following_leader()) {
         return leader->is_constant_until(sample_count);
     }
@@ -596,8 +596,8 @@ bool FloatParam<evaluation, leader_evaluation>::is_constant_until(Integer const 
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::skip_round(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::skip_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -620,8 +620,8 @@ void FloatParam<evaluation, leader_evaluation>::skip_round(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::schedule_value(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::schedule_value(
         Seconds const time_offset,
         Number const new_value
 ) noexcept {
@@ -629,8 +629,8 @@ void FloatParam<evaluation, leader_evaluation>::schedule_value(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::schedule_linear_ramp(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::schedule_linear_ramp(
         Seconds const duration,
         Number const target_value
 ) noexcept {
@@ -652,9 +652,10 @@ void FloatParam<evaluation, leader_evaluation>::schedule_linear_ramp(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_event(
+        SignalProducer::Event const& event
+) noexcept {
     Param<Number, evaluation>::handle_event(event);
 
     switch (event.type) {
@@ -692,16 +693,18 @@ void FloatParam<evaluation, leader_evaluation>::handle_event(SignalProducer::Eve
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_set_value_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_set_value_event(
+        SignalProducer::Event const& event
+) noexcept {
     set_value(event.number_param_2);
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_linear_ramp_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_linear_ramp_event(
+        SignalProducer::Event const& event
+) noexcept {
     Number const value = this->get_raw_value();
     Number const done_samples = (
         (Number)(this->current_time - event.time_offset) * (Number)this->sample_rate
@@ -736,9 +739,10 @@ void FloatParam<evaluation, leader_evaluation>::handle_linear_ramp_event(SignalP
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_log_ramp_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_log_ramp_event(
+        SignalProducer::Event const& event
+) noexcept {
     Number const value = value_to_ratio(this->get_raw_value());
     Number const done_samples = (
         (Number)(this->current_time - event.time_offset) * (Number)this->sample_rate
@@ -773,31 +777,33 @@ void FloatParam<evaluation, leader_evaluation>::handle_log_ramp_event(SignalProd
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_envelope_start_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_envelope_start_event(
+        SignalProducer::Event const& event
+) noexcept {
     envelope_stage = EnvelopeStage::DAHDS;
     envelope_position = this->current_time - event.time_offset;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_envelope_end_event() noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_envelope_end_event() noexcept
 {
     envelope_stage = EnvelopeStage::R;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_envelope_cancel_event() noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_envelope_cancel_event() noexcept
 {
     envelope_stage = EnvelopeStage::R;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::handle_cancel_event(SignalProducer::Event const& event) noexcept
-{
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_cancel_event(
+        SignalProducer::Event const& event
+) noexcept {
     if (latest_event_type == EVT_LINEAR_RAMP) {
         Number const stop_value = linear_ramp_state.get_value_at(
             event.time_offset - linear_ramp_state.start_time_offset
@@ -814,8 +820,8 @@ void FloatParam<evaluation, leader_evaluation>::handle_cancel_event(SignalProduc
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_midi_controller(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_midi_controller(
         MidiController const* midi_controller
 ) noexcept {
     if (midi_controller == NULL) {
@@ -830,8 +836,8 @@ void FloatParam<evaluation, leader_evaluation>::set_midi_controller(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_flexible_controller(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_flexible_controller(
         FlexibleController* flexible_controller
 ) noexcept {
     if (flexible_controller == NULL) {
@@ -850,15 +856,15 @@ void FloatParam<evaluation, leader_evaluation>::set_flexible_controller(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-FlexibleController const* FloatParam<evaluation, leader_evaluation>::get_flexible_controller() const noexcept
+template<ParamEvaluation evaluation>
+FlexibleController const* FloatParam<evaluation>::get_flexible_controller() const noexcept
 {
     return flexible_controller;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_envelope(Envelope* const envelope) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
 {
     this->envelope = envelope;
 
@@ -875,15 +881,15 @@ void FloatParam<evaluation, leader_evaluation>::set_envelope(Envelope* const env
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Envelope* FloatParam<evaluation, leader_evaluation>::get_envelope() const noexcept
+template<ParamEvaluation evaluation>
+Envelope* FloatParam<evaluation>::get_envelope() const noexcept
 {
     return leader == NULL ? envelope : leader->get_envelope();
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::start_envelope(Seconds const time_offset) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::start_envelope(Seconds const time_offset) noexcept
 {
     Seconds next_event_time_offset;
     Number next_value;
@@ -936,8 +942,8 @@ void FloatParam<evaluation, leader_evaluation>::start_envelope(Seconds const tim
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Seconds FloatParam<evaluation, leader_evaluation>::end_envelope(Seconds const time_offset) noexcept
+template<ParamEvaluation evaluation>
+Seconds FloatParam<evaluation>::end_envelope(Seconds const time_offset) noexcept
 {
     if (envelope_canceled) {
         return envelope_cancel_duration;
@@ -947,9 +953,9 @@ Seconds FloatParam<evaluation, leader_evaluation>::end_envelope(Seconds const ti
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
+template<ParamEvaluation evaluation>
 template<SignalProducer::Event::Type event>
-Seconds FloatParam<evaluation, leader_evaluation>::end_envelope(
+Seconds FloatParam<evaluation>::end_envelope(
         Seconds const time_offset,
         Seconds const duration
 ) noexcept {
@@ -987,8 +993,8 @@ Seconds FloatParam<evaluation, leader_evaluation>::end_envelope(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::cancel_envelope(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::cancel_envelope(
         Seconds const time_offset,
         Seconds const duration
 ) noexcept {
@@ -998,8 +1004,8 @@ void FloatParam<evaluation, leader_evaluation>::cancel_envelope(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::update_envelope(Seconds const time_offset) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
 {
     Envelope* envelope = get_envelope();
 
@@ -1017,22 +1023,22 @@ void FloatParam<evaluation, leader_evaluation>::update_envelope(Seconds const ti
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::set_lfo(LFO* lfo) noexcept
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_lfo(LFO* lfo) noexcept
 {
     this->lfo = lfo;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-LFO const* FloatParam<evaluation, leader_evaluation>::get_lfo() const noexcept
+template<ParamEvaluation evaluation>
+LFO const* FloatParam<evaluation>::get_lfo() const noexcept
 {
     return lfo;
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Sample const* const* FloatParam<evaluation, leader_evaluation>::initialize_rendering(
+template<ParamEvaluation evaluation>
+Sample const* const* FloatParam<evaluation>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1056,8 +1062,8 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::initialize_rende
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Sample const* const* FloatParam<evaluation, leader_evaluation>::process_lfo(
+template<ParamEvaluation evaluation>
+Sample const* const* FloatParam<evaluation>::process_lfo(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1075,8 +1081,8 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::process_lfo(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Sample const* const* FloatParam<evaluation, leader_evaluation>::process_midi_controller_events() noexcept
+template<ParamEvaluation evaluation>
+Sample const* const* FloatParam<evaluation>::process_midi_controller_events() noexcept
 {
     Queue<SignalProducer::Event>::SizeType const number_of_ctl_events = (
         this->midi_controller->events.length()
@@ -1137,8 +1143,8 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::process_midi_con
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Sample const* const* FloatParam<evaluation, leader_evaluation>::process_flexible_controller(
+template<ParamEvaluation evaluation>
+Sample const* const* FloatParam<evaluation>::process_flexible_controller(
         Integer const sample_count
 ) noexcept {
     flexible_controller->update();
@@ -1170,8 +1176,8 @@ Sample const* const* FloatParam<evaluation, leader_evaluation>::process_flexible
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Seconds FloatParam<evaluation, leader_evaluation>::smooth_change_duration(
+template<ParamEvaluation evaluation>
+Seconds FloatParam<evaluation>::smooth_change_duration(
         Number const previous_value,
         Number const controller_value,
         Seconds const duration
@@ -1193,8 +1199,8 @@ Seconds FloatParam<evaluation, leader_evaluation>::smooth_change_duration(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::process_envelope(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::process_envelope(
         Envelope& envelope,
         Seconds const time_offset
 ) noexcept {
@@ -1273,8 +1279,8 @@ void FloatParam<evaluation, leader_evaluation>::process_envelope(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Seconds FloatParam<evaluation, leader_evaluation>::schedule_envelope_value_if_not_reached(
+template<ParamEvaluation evaluation>
+Seconds FloatParam<evaluation>::schedule_envelope_value_if_not_reached(
         Seconds const next_event_time_offset,
         FloatParamB const& time_param,
         FloatParamB const& value_param,
@@ -1295,8 +1301,8 @@ Seconds FloatParam<evaluation, leader_evaluation>::schedule_envelope_value_if_no
 
 
 // TODO: enable_if
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::render(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1374,8 +1380,8 @@ void FloatParam<evaluation, leader_evaluation>::render(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-FloatParam<evaluation, leader_evaluation>::LinearRampState::LinearRampState() noexcept
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::LinearRampState::LinearRampState() noexcept
     : start_time_offset(0.0),
     done_samples(0.0),
     initial_value(0.0),
@@ -1390,8 +1396,8 @@ FloatParam<evaluation, leader_evaluation>::LinearRampState::LinearRampState() no
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-void FloatParam<evaluation, leader_evaluation>::LinearRampState::init(
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::LinearRampState::init(
         Seconds const start_time_offset,
         Number const done_samples,
         Number const initial_value,
@@ -1421,8 +1427,8 @@ void FloatParam<evaluation, leader_evaluation>::LinearRampState::init(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::LinearRampState::advance() noexcept
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::LinearRampState::advance() noexcept
 {
     if (is_done) {
         return target_value;
@@ -1440,8 +1446,8 @@ Number FloatParam<evaluation, leader_evaluation>::LinearRampState::advance() noe
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::LinearRampState::advance(
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::LinearRampState::advance(
         Integer const skip_samples
 ) noexcept {
     if (is_done) {
@@ -1468,8 +1474,8 @@ Number FloatParam<evaluation, leader_evaluation>::LinearRampState::advance(
 }
 
 
-template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
-Number FloatParam<evaluation, leader_evaluation>::LinearRampState::get_value_at(
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::LinearRampState::get_value_at(
         Seconds const time_offset
 ) const noexcept {
     if (duration > 0.0 && time_offset <= duration) {
