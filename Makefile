@@ -52,6 +52,7 @@ OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
 	check_basic \
 	check_dsp \
 	check_param \
+	check_synth \
 	test_example \
 	clean \
 	dirs \
@@ -160,17 +161,20 @@ TESTS_DSP = \
 	test_param_slow \
 	test_wavefolder
 
-TESTS = \
-	$(TESTS_BASIC) \
-	$(TESTS_PARAM) \
-	$(TESTS_DSP) \
-	test_gui \
-	test_bank \
+TESTS_SYNTH = \
 	test_note_stack \
 	test_renderer \
-	test_serializer \
 	test_synth \
 	test_voice
+
+TESTS = \
+	$(TESTS_BASIC) \
+	$(TESTS_DSP) \
+	$(TESTS_PARAM) \
+	$(TESTS_SYNTH) \
+	test_gui \
+	test_bank \
+	test_serializer
 
 PERF_TESTS = \
 	perf_math
@@ -243,8 +247,9 @@ TEST_LIBS = \
 TEST_CPPS = $(foreach TEST,$(TESTS),tests/$(TEST).cpp)
 TEST_BINS = $(foreach TEST,$(TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
 TEST_BASIC_BINS = $(foreach TEST,$(TESTS_BASIC),$(BUILD_DIR)/$(TEST)$(EXE))
-TEST_PARAM_BINS = $(foreach TEST,$(TESTS_PARAM),$(BUILD_DIR)/$(TEST)$(EXE))
 TEST_DSP_BINS = $(foreach TEST,$(TESTS_DSP),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_PARAM_BINS = $(foreach TEST,$(TESTS_PARAM),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_SYNTH_BINS = $(foreach TEST,$(TESTS_SYNTH),$(BUILD_DIR)/$(TEST)$(EXE))
 PERF_TEST_BINS = $(foreach TEST,$(PERF_TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
 
 TEST_CXXFLAGS = \
@@ -310,6 +315,7 @@ check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(BUILD_DIR)
 check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(BUILD_DIR)
 check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(BUILD_DIR)
+check_synth: perf $(TEST_LIBS) $(TEST_SYNTH_BINS) | $(BUILD_DIR)
 
 test_example: $(BUILD_DIR)/test_example$(EXE) | $(BUILD_DIR)
 
@@ -456,7 +462,7 @@ $(BUILD_DIR)/test_bank$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
 
@@ -532,7 +538,7 @@ $(BUILD_DIR)/test_gui$(EXE): \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
 
@@ -630,7 +636,7 @@ $(BUILD_DIR)/test_renderer$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
 
@@ -641,7 +647,7 @@ $(BUILD_DIR)/test_serializer$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
 
@@ -661,7 +667,7 @@ $(BUILD_DIR)/test_synth$(EXE): \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
 
@@ -671,7 +677,7 @@ $(BUILD_DIR)/test_voice$(EXE): \
 		$(SYNTH_SOURCES) \
 		$(SYNTH_HEADERS) \
 		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS) $(TEST_DSP_BINS)
+		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
 
