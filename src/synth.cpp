@@ -277,8 +277,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::MFLD, modulator_params.folding);
-    register_param_as_child<FloatParamS>(ParamId::MPRT, modulator_params.portamento_length);
-    register_param_as_child<FloatParamS>(ParamId::MPRD, modulator_params.portamento_depth);
+    register_param_as_child<FloatParamB>(ParamId::MPRT, modulator_params.portamento_length);
+    register_param_as_child<FloatParamB>(ParamId::MPRD, modulator_params.portamento_depth);
     register_param_as_child<FloatParamS>(ParamId::MDTN, modulator_params.detune);
     register_param_as_child<FloatParamS>(ParamId::MFIN, modulator_params.fine_detune);
     register_param_as_child<FloatParamB>(ParamId::MWID, modulator_params.width);
@@ -322,8 +322,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::CFLD, carrier_params.folding);
-    register_param_as_child<FloatParamS>(ParamId::CPRT, carrier_params.portamento_length);
-    register_param_as_child<FloatParamS>(ParamId::CPRD, carrier_params.portamento_depth);
+    register_param_as_child<FloatParamB>(ParamId::CPRT, carrier_params.portamento_length);
+    register_param_as_child<FloatParamB>(ParamId::CPRD, carrier_params.portamento_depth);
     register_param_as_child<FloatParamS>(ParamId::CDTN, carrier_params.detune);
     register_param_as_child<FloatParamS>(ParamId::CFIN, carrier_params.fine_detune);
     register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
@@ -1831,8 +1831,8 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(modulator_params.amplitude, round, sample_count);
     FloatParamB::produce_if_not_constant(modulator_params.velocity_sensitivity, round, sample_count);
     FloatParamS::produce_if_not_constant(modulator_params.folding, round, sample_count);
-    FloatParamS::produce_if_not_constant(modulator_params.portamento_length, round, sample_count);
-    FloatParamS::produce_if_not_constant(modulator_params.portamento_depth, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.portamento_length, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.portamento_depth, round, sample_count);
     FloatParamS::produce_if_not_constant(modulator_params.detune, round, sample_count);
     FloatParamS::produce_if_not_constant(modulator_params.fine_detune, round, sample_count);
     FloatParamB::produce_if_not_constant(modulator_params.width, round, sample_count);
@@ -1861,8 +1861,8 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(carrier_params.amplitude, round, sample_count);
     FloatParamB::produce_if_not_constant(carrier_params.velocity_sensitivity, round, sample_count);
     FloatParamS::produce_if_not_constant(carrier_params.folding, round, sample_count);
-    FloatParamS::produce_if_not_constant(carrier_params.portamento_length, round, sample_count);
-    FloatParamS::produce_if_not_constant(carrier_params.portamento_depth, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.portamento_length, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.portamento_depth, round, sample_count);
     FloatParamS::produce_if_not_constant(carrier_params.detune, round, sample_count);
     FloatParamS::produce_if_not_constant(carrier_params.fine_detune, round, sample_count);
     FloatParamB::produce_if_not_constant(carrier_params.width, round, sample_count);
@@ -2314,8 +2314,8 @@ void Synth::handle_assign_controller(
             case ParamId::MAMP: is_assigned = assign_controller<FloatParamS>(modulator_params.amplitude, (ControllerId)controller_id); break;;
             case ParamId::MVS: is_assigned = assign_controller<FloatParamB>(modulator_params.velocity_sensitivity, (ControllerId)controller_id); break;;
             case ParamId::MFLD: is_assigned = assign_controller<FloatParamS>(modulator_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::MPRT: is_assigned = assign_controller<FloatParamS>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::MPRD: is_assigned = assign_controller<FloatParamS>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::MPRT: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::MPRD: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
             case ParamId::MDTN: is_assigned = assign_controller<FloatParamS>(modulator_params.detune, (ControllerId)controller_id); break;;
             case ParamId::MFIN: is_assigned = assign_controller<FloatParamS>(modulator_params.fine_detune, (ControllerId)controller_id); break;;
             case ParamId::MWID: is_assigned = assign_controller<FloatParamB>(modulator_params.width, (ControllerId)controller_id); break;;
@@ -2340,8 +2340,8 @@ void Synth::handle_assign_controller(
             case ParamId::CAMP: is_assigned = assign_controller<FloatParamS>(carrier_params.amplitude, (ControllerId)controller_id); break;;
             case ParamId::CVS: is_assigned = assign_controller<FloatParamB>(carrier_params.velocity_sensitivity, (ControllerId)controller_id); break;;
             case ParamId::CFLD: is_assigned = assign_controller<FloatParamS>(carrier_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::CPRT: is_assigned = assign_controller<FloatParamS>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::CPRD: is_assigned = assign_controller<FloatParamS>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::CPRT: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::CPRD: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
             case ParamId::CDTN: is_assigned = assign_controller<FloatParamS>(carrier_params.detune, (ControllerId)controller_id); break;;
             case ParamId::CFIN: is_assigned = assign_controller<FloatParamS>(carrier_params.fine_detune, (ControllerId)controller_id); break;;
             case ParamId::CWID: is_assigned = assign_controller<FloatParamB>(carrier_params.width, (ControllerId)controller_id); break;;

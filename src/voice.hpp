@@ -64,8 +64,8 @@ class Voice : public SignalProducer
                 FloatParamS amplitude;
                 FloatParamB velocity_sensitivity;
                 FloatParamS folding;
-                FloatParamS portamento_length;
-                FloatParamS portamento_depth;
+                FloatParamB portamento_length;
+                FloatParamB portamento_depth;
                 FloatParamS detune;
                 FloatParamS fine_detune;
                 FloatParamB width;
@@ -239,8 +239,8 @@ class Voice : public SignalProducer
         FloatParamB velocity_sensitivity;
         FloatParamS note_velocity;
         FloatParamS note_panning;
-        FloatParamS portamento_length;
-        FloatParamS portamento_depth;
+        FloatParamB portamento_length;
+        FloatParamB portamento_depth;
         FloatParamS panning;
         FloatParamS volume;
         VolumeApplier volume_applier;
