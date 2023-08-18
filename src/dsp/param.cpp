@@ -1375,34 +1375,6 @@ void FloatParam<evaluation>::render(
         typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type last_sample_index,
         typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Sample**>::type buffer
 ) noexcept {
-    // if (lfo != NULL) {
-        // if (last_sample_index != first_sample_index) {
-            // this->store_new_value(
-                // (Number)ratio_to_value(lfo_buffer[0][last_sample_index - 1])
-            // );
-        // }
-    // } else if (latest_event_type == EVT_LINEAR_RAMP) {
-        // if (first_sample_index != last_sample_index) {
-            // Sample sample;
-            // Integer const skip_samples = last_sample_index - first_sample_index - 1;
-
-            // if (linear_ramp_state.is_logarithmic) {
-                // sample = (Sample)ratio_to_value(
-                    // linear_ramp_state.advance(skip_samples)
-                // );
-            // } else {
-                // sample = (Sample)linear_ramp_state.advance(skip_samples);
-            // }
-
-            // this->store_new_value((Number)sample);
-        // }
-    // } else {
-        // Param<Number, evaluation>::render(
-            // round, first_sample_index, last_sample_index, buffer
-        // );
-    // }
-
-    // advance_envelope(first_sample_index, last_sample_index);
 }
 
 
