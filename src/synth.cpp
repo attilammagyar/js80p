@@ -128,10 +128,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
     }
 
-    for (int i = 0; i != FLOAT_PARAMS; ++i) {
-        float_params[i] = NULL;
-    }
-
     for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
         param_ratios[i].store(0.0);
         controller_assignments[i].store(ControllerId::NONE);
@@ -266,10 +262,10 @@ void Synth::register_main_params() noexcept
 
     register_param_as_child(ParamId::MODE, mode);
 
-    register_float_param_as_child(ParamId::MIX, modulator_add_volume);
-    register_float_param_as_child(ParamId::PM, phase_modulation_level);
-    register_float_param_as_child(ParamId::FM, frequency_modulation_level);
-    register_float_param_as_child(ParamId::AM, amplitude_modulation_level);
+    register_param_as_child<FloatParam>(ParamId::MIX, modulator_add_volume);
+    register_param_as_child<FloatParam>(ParamId::PM, phase_modulation_level);
+    register_param_as_child<FloatParam>(ParamId::FM, frequency_modulation_level);
+    register_param_as_child<FloatParam>(ParamId::AM, amplitude_modulation_level);
 }
 
 
@@ -278,43 +274,43 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(
         ParamId::MWAV, modulator_params.waveform
     );
-    register_float_param_as_child(ParamId::MAMP, modulator_params.amplitude);
-    register_float_param_as_child(ParamId::MVS, modulator_params.velocity_sensitivity);
-    register_float_param_as_child(ParamId::MFLD, modulator_params.folding);
-    register_float_param_as_child(ParamId::MPRT, modulator_params.portamento_length);
-    register_float_param_as_child(ParamId::MPRD, modulator_params.portamento_depth);
-    register_float_param_as_child(ParamId::MDTN, modulator_params.detune);
-    register_float_param_as_child(ParamId::MFIN, modulator_params.fine_detune);
-    register_float_param_as_child(ParamId::MWID, modulator_params.width);
-    register_float_param_as_child(ParamId::MPAN, modulator_params.panning);
-    register_float_param_as_child(ParamId::MVOL, modulator_params.volume);
+    register_param_as_child<FloatParam>(ParamId::MAMP, modulator_params.amplitude);
+    register_param_as_child<FloatParam>(ParamId::MVS, modulator_params.velocity_sensitivity);
+    register_param_as_child<FloatParam>(ParamId::MFLD, modulator_params.folding);
+    register_param_as_child<FloatParam>(ParamId::MPRT, modulator_params.portamento_length);
+    register_param_as_child<FloatParam>(ParamId::MPRD, modulator_params.portamento_depth);
+    register_param_as_child<FloatParam>(ParamId::MDTN, modulator_params.detune);
+    register_param_as_child<FloatParam>(ParamId::MFIN, modulator_params.fine_detune);
+    register_param_as_child<FloatParam>(ParamId::MWID, modulator_params.width);
+    register_param_as_child<FloatParam>(ParamId::MPAN, modulator_params.panning);
+    register_param_as_child<FloatParam>(ParamId::MVOL, modulator_params.volume);
 
-    register_float_param_as_child(ParamId::MC1, modulator_params.harmonic_0);
-    register_float_param_as_child(ParamId::MC2, modulator_params.harmonic_1);
-    register_float_param_as_child(ParamId::MC3, modulator_params.harmonic_2);
-    register_float_param_as_child(ParamId::MC4, modulator_params.harmonic_3);
-    register_float_param_as_child(ParamId::MC5, modulator_params.harmonic_4);
-    register_float_param_as_child(ParamId::MC6, modulator_params.harmonic_5);
-    register_float_param_as_child(ParamId::MC7, modulator_params.harmonic_6);
-    register_float_param_as_child(ParamId::MC8, modulator_params.harmonic_7);
-    register_float_param_as_child(ParamId::MC9, modulator_params.harmonic_8);
-    register_float_param_as_child(ParamId::MC10, modulator_params.harmonic_9);
+    register_param_as_child<FloatParam>(ParamId::MC1, modulator_params.harmonic_0);
+    register_param_as_child<FloatParam>(ParamId::MC2, modulator_params.harmonic_1);
+    register_param_as_child<FloatParam>(ParamId::MC3, modulator_params.harmonic_2);
+    register_param_as_child<FloatParam>(ParamId::MC4, modulator_params.harmonic_3);
+    register_param_as_child<FloatParam>(ParamId::MC5, modulator_params.harmonic_4);
+    register_param_as_child<FloatParam>(ParamId::MC6, modulator_params.harmonic_5);
+    register_param_as_child<FloatParam>(ParamId::MC7, modulator_params.harmonic_6);
+    register_param_as_child<FloatParam>(ParamId::MC8, modulator_params.harmonic_7);
+    register_param_as_child<FloatParam>(ParamId::MC9, modulator_params.harmonic_8);
+    register_param_as_child<FloatParam>(ParamId::MC10, modulator_params.harmonic_9);
 
     register_param_as_child<Modulator::Filter1::TypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_log_scale);
-    register_float_param_as_child(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
-    register_float_param_as_child(ParamId::MF1Q, modulator_params.filter_1_q);
-    register_float_param_as_child(ParamId::MF1G, modulator_params.filter_1_gain);
+    register_param_as_child<FloatParam>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
+    register_param_as_child<FloatParam>(ParamId::MF1Q, modulator_params.filter_1_q);
+    register_param_as_child<FloatParam>(ParamId::MF1G, modulator_params.filter_1_gain);
 
     register_param_as_child<Modulator::Filter2::TypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_log_scale);
-    register_float_param_as_child(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
-    register_float_param_as_child(ParamId::MF2Q, modulator_params.filter_2_q);
-    register_float_param_as_child(ParamId::MF2G, modulator_params.filter_2_gain);
+    register_param_as_child<FloatParam>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
+    register_param_as_child<FloatParam>(ParamId::MF2Q, modulator_params.filter_2_q);
+    register_param_as_child<FloatParam>(ParamId::MF2G, modulator_params.filter_2_gain);
 }
 
 
@@ -323,95 +319,95 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(
         ParamId::CWAV, carrier_params.waveform
     );
-    register_float_param_as_child(ParamId::CAMP, carrier_params.amplitude);
-    register_float_param_as_child(ParamId::CVS, carrier_params.velocity_sensitivity);
-    register_float_param_as_child(ParamId::CFLD, carrier_params.folding);
-    register_float_param_as_child(ParamId::CPRT, carrier_params.portamento_length);
-    register_float_param_as_child(ParamId::CPRD, carrier_params.portamento_depth);
-    register_float_param_as_child(ParamId::CDTN, carrier_params.detune);
-    register_float_param_as_child(ParamId::CFIN, carrier_params.fine_detune);
-    register_float_param_as_child(ParamId::CWID, carrier_params.width);
-    register_float_param_as_child(ParamId::CPAN, carrier_params.panning);
-    register_float_param_as_child(ParamId::CVOL, carrier_params.volume);
+    register_param_as_child<FloatParam>(ParamId::CAMP, carrier_params.amplitude);
+    register_param_as_child<FloatParam>(ParamId::CVS, carrier_params.velocity_sensitivity);
+    register_param_as_child<FloatParam>(ParamId::CFLD, carrier_params.folding);
+    register_param_as_child<FloatParam>(ParamId::CPRT, carrier_params.portamento_length);
+    register_param_as_child<FloatParam>(ParamId::CPRD, carrier_params.portamento_depth);
+    register_param_as_child<FloatParam>(ParamId::CDTN, carrier_params.detune);
+    register_param_as_child<FloatParam>(ParamId::CFIN, carrier_params.fine_detune);
+    register_param_as_child<FloatParam>(ParamId::CWID, carrier_params.width);
+    register_param_as_child<FloatParam>(ParamId::CPAN, carrier_params.panning);
+    register_param_as_child<FloatParam>(ParamId::CVOL, carrier_params.volume);
 
-    register_float_param_as_child(ParamId::CC1, carrier_params.harmonic_0);
-    register_float_param_as_child(ParamId::CC2, carrier_params.harmonic_1);
-    register_float_param_as_child(ParamId::CC3, carrier_params.harmonic_2);
-    register_float_param_as_child(ParamId::CC4, carrier_params.harmonic_3);
-    register_float_param_as_child(ParamId::CC5, carrier_params.harmonic_4);
-    register_float_param_as_child(ParamId::CC6, carrier_params.harmonic_5);
-    register_float_param_as_child(ParamId::CC7, carrier_params.harmonic_6);
-    register_float_param_as_child(ParamId::CC8, carrier_params.harmonic_7);
-    register_float_param_as_child(ParamId::CC9, carrier_params.harmonic_8);
-    register_float_param_as_child(ParamId::CC10, carrier_params.harmonic_9);
+    register_param_as_child<FloatParam>(ParamId::CC1, carrier_params.harmonic_0);
+    register_param_as_child<FloatParam>(ParamId::CC2, carrier_params.harmonic_1);
+    register_param_as_child<FloatParam>(ParamId::CC3, carrier_params.harmonic_2);
+    register_param_as_child<FloatParam>(ParamId::CC4, carrier_params.harmonic_3);
+    register_param_as_child<FloatParam>(ParamId::CC5, carrier_params.harmonic_4);
+    register_param_as_child<FloatParam>(ParamId::CC6, carrier_params.harmonic_5);
+    register_param_as_child<FloatParam>(ParamId::CC7, carrier_params.harmonic_6);
+    register_param_as_child<FloatParam>(ParamId::CC8, carrier_params.harmonic_7);
+    register_param_as_child<FloatParam>(ParamId::CC9, carrier_params.harmonic_8);
+    register_param_as_child<FloatParam>(ParamId::CC10, carrier_params.harmonic_9);
 
     register_param_as_child<Carrier::Filter1::TypeParam>(
         ParamId::CF1TYP, carrier_params.filter_1_type
     );
     register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_log_scale);
-    register_float_param_as_child(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
-    register_float_param_as_child(ParamId::CF1Q, carrier_params.filter_1_q);
-    register_float_param_as_child(ParamId::CF1G, carrier_params.filter_1_gain);
+    register_param_as_child<FloatParam>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
+    register_param_as_child<FloatParam>(ParamId::CF1Q, carrier_params.filter_1_q);
+    register_param_as_child<FloatParam>(ParamId::CF1G, carrier_params.filter_1_gain);
 
     register_param_as_child<Carrier::Filter2::TypeParam>(
         ParamId::CF2TYP, carrier_params.filter_2_type
     );
     register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_log_scale);
-    register_float_param_as_child(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
-    register_float_param_as_child(ParamId::CF2Q, carrier_params.filter_2_q);
-    register_float_param_as_child(ParamId::CF2G, carrier_params.filter_2_gain);
+    register_param_as_child<FloatParam>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
+    register_param_as_child<FloatParam>(ParamId::CF2Q, carrier_params.filter_2_q);
+    register_param_as_child<FloatParam>(ParamId::CF2G, carrier_params.filter_2_gain);
 }
 
 
 void Synth::register_effects_params() noexcept
 {
-    register_float_param(ParamId::EOG, effects.overdrive.level);
+    register_param<FloatParam>(ParamId::EOG, effects.overdrive.level);
 
-    register_float_param(ParamId::EDG, effects.distortion.level);
+    register_param<FloatParam>(ParamId::EDG, effects.distortion.level);
 
     register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
     register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_log_scale);
-    register_float_param(ParamId::EF1FRQ, effects.filter_1.frequency);
-    register_float_param(ParamId::EF1Q, effects.filter_1.q);
-    register_float_param(ParamId::EF1G, effects.filter_1.gain);
+    register_param<FloatParam>(ParamId::EF1FRQ, effects.filter_1.frequency);
+    register_param<FloatParam>(ParamId::EF1Q, effects.filter_1.q);
+    register_param<FloatParam>(ParamId::EF1G, effects.filter_1.gain);
 
     register_param<Effects::Filter2<Bus>::TypeParam>(ParamId::EF2TYP, effects.filter_2_type);
     register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_log_scale);
-    register_float_param(ParamId::EF2FRQ, effects.filter_2.frequency);
-    register_float_param(ParamId::EF2Q, effects.filter_2.q);
-    register_float_param(ParamId::EF2G, effects.filter_2.gain);
+    register_param<FloatParam>(ParamId::EF2FRQ, effects.filter_2.frequency);
+    register_param<FloatParam>(ParamId::EF2Q, effects.filter_2.q);
+    register_param<FloatParam>(ParamId::EF2G, effects.filter_2.gain);
 
-    register_float_param(ParamId::ECDEL, effects.chorus.delay_time);
-    register_float_param(ParamId::ECFRQ, effects.chorus.frequency);
-    register_float_param(ParamId::ECDPT, effects.chorus.depth);
-    register_float_param(ParamId::ECFB, effects.chorus.feedback);
-    register_float_param(ParamId::ECDF, effects.chorus.damping_frequency);
-    register_float_param(ParamId::ECDG, effects.chorus.damping_gain);
-    register_float_param(ParamId::ECWID, effects.chorus.width);
-    register_float_param(ParamId::ECHPF, effects.chorus.high_pass_frequency);
-    register_float_param(ParamId::ECWET, effects.chorus.wet);
-    register_float_param(ParamId::ECDRY, effects.chorus.dry);
+    register_param<FloatParam>(ParamId::ECDEL, effects.chorus.delay_time);
+    register_param<FloatParam>(ParamId::ECFRQ, effects.chorus.frequency);
+    register_param<FloatParam>(ParamId::ECDPT, effects.chorus.depth);
+    register_param<FloatParam>(ParamId::ECFB, effects.chorus.feedback);
+    register_param<FloatParam>(ParamId::ECDF, effects.chorus.damping_frequency);
+    register_param<FloatParam>(ParamId::ECDG, effects.chorus.damping_gain);
+    register_param<FloatParam>(ParamId::ECWID, effects.chorus.width);
+    register_param<FloatParam>(ParamId::ECHPF, effects.chorus.high_pass_frequency);
+    register_param<FloatParam>(ParamId::ECWET, effects.chorus.wet);
+    register_param<FloatParam>(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
     register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_frequencies);
 
-    register_float_param(ParamId::EEDEL, effects.echo.delay_time);
-    register_float_param(ParamId::EEFB, effects.echo.feedback);
-    register_float_param(ParamId::EEDF, effects.echo.damping_frequency);
-    register_float_param(ParamId::EEDG, effects.echo.damping_gain);
-    register_float_param(ParamId::EEWID, effects.echo.width);
-    register_float_param(ParamId::EEHPF, effects.echo.high_pass_frequency);
-    register_float_param(ParamId::EEWET, effects.echo.wet);
-    register_float_param(ParamId::EEDRY, effects.echo.dry);
+    register_param<FloatParam>(ParamId::EEDEL, effects.echo.delay_time);
+    register_param<FloatParam>(ParamId::EEFB, effects.echo.feedback);
+    register_param<FloatParam>(ParamId::EEDF, effects.echo.damping_frequency);
+    register_param<FloatParam>(ParamId::EEDG, effects.echo.damping_gain);
+    register_param<FloatParam>(ParamId::EEWID, effects.echo.width);
+    register_param<FloatParam>(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_param<FloatParam>(ParamId::EEWET, effects.echo.wet);
+    register_param<FloatParam>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
     register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
 
-    register_float_param(ParamId::ERRS, effects.reverb.room_size);
-    register_float_param(ParamId::ERDF, effects.reverb.damping_frequency);
-    register_float_param(ParamId::ERDG, effects.reverb.damping_gain);
-    register_float_param(ParamId::ERWID, effects.reverb.width);
-    register_float_param(ParamId::ERHPF, effects.reverb.high_pass_frequency);
-    register_float_param(ParamId::ERWET, effects.reverb.wet);
-    register_float_param(ParamId::ERDRY, effects.reverb.dry);
+    register_param<FloatParam>(ParamId::ERRS, effects.reverb.room_size);
+    register_param<FloatParam>(ParamId::ERDF, effects.reverb.damping_frequency);
+    register_param<FloatParam>(ParamId::ERDG, effects.reverb.damping_gain);
+    register_param<FloatParam>(ParamId::ERWID, effects.reverb.width);
+    register_param<FloatParam>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_param<FloatParam>(ParamId::ERWET, effects.reverb.wet);
+    register_param<FloatParam>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
 }
 
@@ -468,12 +464,12 @@ void Synth::create_flexible_controllers() noexcept
         );
         flexible_controllers_rw[i] = flexible_controller;
 
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->input);
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->min);
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->max);
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->amount);
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->distortion);
-        register_float_param_as_child((ParamId)next_id++, flexible_controller->randomness);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->input);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->min);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->max);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->amount);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->distortion);
+        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->randomness);
     }
 }
 
@@ -486,16 +482,16 @@ void Synth::create_envelopes() noexcept
         Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
         envelopes_rw[i] = envelope;
 
-        register_float_param_as_child((ParamId)next_id++, envelope->amount);
-        register_float_param_as_child((ParamId)next_id++, envelope->initial_value);
-        register_float_param_as_child((ParamId)next_id++, envelope->delay_time);
-        register_float_param_as_child((ParamId)next_id++, envelope->attack_time);
-        register_float_param_as_child((ParamId)next_id++, envelope->peak_value);
-        register_float_param_as_child((ParamId)next_id++, envelope->hold_time);
-        register_float_param_as_child((ParamId)next_id++, envelope->decay_time);
-        register_float_param_as_child((ParamId)next_id++, envelope->sustain_value);
-        register_float_param_as_child((ParamId)next_id++, envelope->release_time);
-        register_float_param_as_child((ParamId)next_id++, envelope->final_value);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->amount);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->initial_value);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->delay_time);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->attack_time);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->peak_value);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->hold_time);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->decay_time);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->sustain_value);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->release_time);
+        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->final_value);
     }
 
     register_param_as_child<ToggleParam>(ParamId::N1DYN, envelopes_rw[0]->dynamic);
@@ -516,13 +512,13 @@ void Synth::create_lfos() noexcept
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
-        register_float_param((ParamId)next_id++, lfo->frequency);
-        register_float_param((ParamId)next_id++, lfo->phase);
-        register_float_param((ParamId)next_id++, lfo->min);
-        register_float_param((ParamId)next_id++, lfo->max);
-        register_float_param((ParamId)next_id++, lfo->amount);
-        register_float_param((ParamId)next_id++, lfo->distortion);
-        register_float_param((ParamId)next_id++, lfo->randomness);
+        register_param<FloatParam>((ParamId)next_id++, lfo->frequency);
+        register_param<FloatParam>((ParamId)next_id++, lfo->phase);
+        register_param<FloatParam>((ParamId)next_id++, lfo->min);
+        register_param<FloatParam>((ParamId)next_id++, lfo->max);
+        register_param<FloatParam>((ParamId)next_id++, lfo->amount);
+        register_param<FloatParam>((ParamId)next_id++, lfo->distortion);
+        register_param<FloatParam>((ParamId)next_id++, lfo->randomness);
     }
 
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L1WAV, lfos_rw[0]->waveform);
@@ -571,24 +567,6 @@ void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
 
     param_id_hash_table.add(name, param_id);
     param_names_by_id[param_id] = name;
-}
-
-
-void Synth::register_float_param_as_child(
-        ParamId const param_id,
-        FloatParam& float_param
-) noexcept {
-    register_param_as_child<FloatParam>(param_id, float_param);
-    float_params[param_id] = &float_param;
-}
-
-
-void Synth::register_float_param(
-        ParamId const param_id,
-        FloatParam& float_param
-) noexcept {
-    float_params[param_id] = &float_param;
-    register_param<FloatParam>(param_id, float_param);
 }
 
 
@@ -1196,11 +1174,145 @@ Number Synth::get_param_ratio_atomic(ParamId const param_id) const noexcept
 
 Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 {
-    if (param_id < FLOAT_PARAMS) {
-        return float_params[param_id]->get_default_ratio();
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_default_ratio();
+            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_default_ratio();
+            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_default_ratio();
+            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_default_ratio();
+            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_default_ratio();
+            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_default_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return envelopes_rw[envelope_idx]->amount.get_default_ratio();
+            case 1: return envelopes_rw[envelope_idx]->initial_value.get_default_ratio();
+            case 2: return envelopes_rw[envelope_idx]->delay_time.get_default_ratio();
+            case 3: return envelopes_rw[envelope_idx]->attack_time.get_default_ratio();
+            case 4: return envelopes_rw[envelope_idx]->peak_value.get_default_ratio();
+            case 5: return envelopes_rw[envelope_idx]->hold_time.get_default_ratio();
+            case 6: return envelopes_rw[envelope_idx]->decay_time.get_default_ratio();
+            case 7: return envelopes_rw[envelope_idx]->sustain_value.get_default_ratio();
+            case 8: return envelopes_rw[envelope_idx]->release_time.get_default_ratio();
+            case 9: return envelopes_rw[envelope_idx]->final_value.get_default_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return lfos_rw[lfo_idx]->frequency.get_default_ratio();
+            case 1: return lfos_rw[lfo_idx]->phase.get_default_ratio();
+            case 2: return lfos_rw[lfo_idx]->min.get_default_ratio();
+            case 3: return lfos_rw[lfo_idx]->max.get_default_ratio();
+            case 4: return lfos_rw[lfo_idx]->amount.get_default_ratio();
+            case 5: return lfos_rw[lfo_idx]->distortion.get_default_ratio();
+            case 6: return lfos_rw[lfo_idx]->randomness.get_default_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
     }
 
     switch (param_id) {
+        case ParamId::MIX: return modulator_add_volume.get_default_ratio();
+        case ParamId::PM: return phase_modulation_level.get_default_ratio();
+        case ParamId::FM: return frequency_modulation_level.get_default_ratio();
+        case ParamId::AM: return amplitude_modulation_level.get_default_ratio();
+        case ParamId::MAMP: return modulator_params.amplitude.get_default_ratio();
+        case ParamId::MVS: return modulator_params.velocity_sensitivity.get_default_ratio();
+        case ParamId::MFLD: return modulator_params.folding.get_default_ratio();
+        case ParamId::MPRT: return modulator_params.portamento_length.get_default_ratio();
+        case ParamId::MPRD: return modulator_params.portamento_depth.get_default_ratio();
+        case ParamId::MDTN: return modulator_params.detune.get_default_ratio();
+        case ParamId::MFIN: return modulator_params.fine_detune.get_default_ratio();
+        case ParamId::MWID: return modulator_params.width.get_default_ratio();
+        case ParamId::MPAN: return modulator_params.panning.get_default_ratio();
+        case ParamId::MVOL: return modulator_params.volume.get_default_ratio();
+        case ParamId::MC1: return modulator_params.harmonic_0.get_default_ratio();
+        case ParamId::MC2: return modulator_params.harmonic_1.get_default_ratio();
+        case ParamId::MC3: return modulator_params.harmonic_2.get_default_ratio();
+        case ParamId::MC4: return modulator_params.harmonic_3.get_default_ratio();
+        case ParamId::MC5: return modulator_params.harmonic_4.get_default_ratio();
+        case ParamId::MC6: return modulator_params.harmonic_5.get_default_ratio();
+        case ParamId::MC7: return modulator_params.harmonic_6.get_default_ratio();
+        case ParamId::MC8: return modulator_params.harmonic_7.get_default_ratio();
+        case ParamId::MC9: return modulator_params.harmonic_8.get_default_ratio();
+        case ParamId::MC10: return modulator_params.harmonic_9.get_default_ratio();
+        case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_default_ratio();
+        case ParamId::MF1Q: return modulator_params.filter_1_q.get_default_ratio();
+        case ParamId::MF1G: return modulator_params.filter_1_gain.get_default_ratio();
+        case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_default_ratio();
+        case ParamId::MF2Q: return modulator_params.filter_2_q.get_default_ratio();
+        case ParamId::MF2G: return modulator_params.filter_2_gain.get_default_ratio();
+        case ParamId::CAMP: return carrier_params.amplitude.get_default_ratio();
+        case ParamId::CVS: return carrier_params.velocity_sensitivity.get_default_ratio();
+        case ParamId::CFLD: return carrier_params.folding.get_default_ratio();
+        case ParamId::CPRT: return carrier_params.portamento_length.get_default_ratio();
+        case ParamId::CPRD: return carrier_params.portamento_depth.get_default_ratio();
+        case ParamId::CDTN: return carrier_params.detune.get_default_ratio();
+        case ParamId::CFIN: return carrier_params.fine_detune.get_default_ratio();
+        case ParamId::CWID: return carrier_params.width.get_default_ratio();
+        case ParamId::CPAN: return carrier_params.panning.get_default_ratio();
+        case ParamId::CVOL: return carrier_params.volume.get_default_ratio();
+        case ParamId::CC1: return carrier_params.harmonic_0.get_default_ratio();
+        case ParamId::CC2: return carrier_params.harmonic_1.get_default_ratio();
+        case ParamId::CC3: return carrier_params.harmonic_2.get_default_ratio();
+        case ParamId::CC4: return carrier_params.harmonic_3.get_default_ratio();
+        case ParamId::CC5: return carrier_params.harmonic_4.get_default_ratio();
+        case ParamId::CC6: return carrier_params.harmonic_5.get_default_ratio();
+        case ParamId::CC7: return carrier_params.harmonic_6.get_default_ratio();
+        case ParamId::CC8: return carrier_params.harmonic_7.get_default_ratio();
+        case ParamId::CC9: return carrier_params.harmonic_8.get_default_ratio();
+        case ParamId::CC10: return carrier_params.harmonic_9.get_default_ratio();
+        case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_default_ratio();
+        case ParamId::CF1Q: return carrier_params.filter_1_q.get_default_ratio();
+        case ParamId::CF1G: return carrier_params.filter_1_gain.get_default_ratio();
+        case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_default_ratio();
+        case ParamId::CF2Q: return carrier_params.filter_2_q.get_default_ratio();
+        case ParamId::CF2G: return carrier_params.filter_2_gain.get_default_ratio();
+        case ParamId::EOG: return effects.overdrive.level.get_default_ratio();
+        case ParamId::EDG: return effects.distortion.level.get_default_ratio();
+        case ParamId::EF1FRQ: return effects.filter_1.frequency.get_default_ratio();
+        case ParamId::EF1Q: return effects.filter_1.q.get_default_ratio();
+        case ParamId::EF1G: return effects.filter_1.gain.get_default_ratio();
+        case ParamId::EF2FRQ: return effects.filter_2.frequency.get_default_ratio();
+        case ParamId::EF2Q: return effects.filter_2.q.get_default_ratio();
+        case ParamId::EF2G: return effects.filter_2.gain.get_default_ratio();
+        case ParamId::ECDEL: return effects.chorus.delay_time.get_default_ratio();
+        case ParamId::ECFRQ: return effects.chorus.frequency.get_default_ratio();
+        case ParamId::ECDPT: return effects.chorus.depth.get_default_ratio();
+        case ParamId::ECFB: return effects.chorus.feedback.get_default_ratio();
+        case ParamId::ECDF: return effects.chorus.damping_frequency.get_default_ratio();
+        case ParamId::ECDG: return effects.chorus.damping_gain.get_default_ratio();
+        case ParamId::ECWID: return effects.chorus.width.get_default_ratio();
+        case ParamId::ECHPF: return effects.chorus.high_pass_frequency.get_default_ratio();
+        case ParamId::ECWET: return effects.chorus.wet.get_default_ratio();
+        case ParamId::ECDRY: return effects.chorus.dry.get_default_ratio();
+        case ParamId::EEDEL: return effects.echo.delay_time.get_default_ratio();
+        case ParamId::EEFB: return effects.echo.feedback.get_default_ratio();
+        case ParamId::EEDF: return effects.echo.damping_frequency.get_default_ratio();
+        case ParamId::EEDG: return effects.echo.damping_gain.get_default_ratio();
+        case ParamId::EEWID: return effects.echo.width.get_default_ratio();
+        case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_default_ratio();
+        case ParamId::EEWET: return effects.echo.wet.get_default_ratio();
+        case ParamId::EEDRY: return effects.echo.dry.get_default_ratio();
+        case ParamId::ERRS: return effects.reverb.room_size.get_default_ratio();
+        case ParamId::ERDF: return effects.reverb.damping_frequency.get_default_ratio();
+        case ParamId::ERDG: return effects.reverb.damping_gain.get_default_ratio();
+        case ParamId::ERWID: return effects.reverb.width.get_default_ratio();
+        case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_default_ratio();
+        case ParamId::ERWET: return effects.reverb.wet.get_default_ratio();
+        case ParamId::ERDRY: return effects.reverb.dry.get_default_ratio();
         case ParamId::MODE: return mode.get_default_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
@@ -1265,11 +1377,145 @@ bool Synth::is_toggle_param(ParamId const param_id) const noexcept
 
 Number Synth::get_param_max_value(ParamId const param_id) const noexcept
 {
-    if (param_id < FLOAT_PARAMS) {
-        return float_params[param_id]->get_max_value();
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_max_value();
+            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_max_value();
+            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_max_value();
+            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_max_value();
+            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_max_value();
+            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_max_value();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return envelopes_rw[envelope_idx]->amount.get_max_value();
+            case 1: return envelopes_rw[envelope_idx]->initial_value.get_max_value();
+            case 2: return envelopes_rw[envelope_idx]->delay_time.get_max_value();
+            case 3: return envelopes_rw[envelope_idx]->attack_time.get_max_value();
+            case 4: return envelopes_rw[envelope_idx]->peak_value.get_max_value();
+            case 5: return envelopes_rw[envelope_idx]->hold_time.get_max_value();
+            case 6: return envelopes_rw[envelope_idx]->decay_time.get_max_value();
+            case 7: return envelopes_rw[envelope_idx]->sustain_value.get_max_value();
+            case 8: return envelopes_rw[envelope_idx]->release_time.get_max_value();
+            case 9: return envelopes_rw[envelope_idx]->final_value.get_max_value();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return lfos_rw[lfo_idx]->frequency.get_max_value();
+            case 1: return lfos_rw[lfo_idx]->phase.get_max_value();
+            case 2: return lfos_rw[lfo_idx]->min.get_max_value();
+            case 3: return lfos_rw[lfo_idx]->max.get_max_value();
+            case 4: return lfos_rw[lfo_idx]->amount.get_max_value();
+            case 5: return lfos_rw[lfo_idx]->distortion.get_max_value();
+            case 6: return lfos_rw[lfo_idx]->randomness.get_max_value();
+            default: return 0.0; /* This should never be reached. */
+        }
     }
 
     switch (param_id) {
+        case ParamId::MIX: return modulator_add_volume.get_max_value();
+        case ParamId::PM: return phase_modulation_level.get_max_value();
+        case ParamId::FM: return frequency_modulation_level.get_max_value();
+        case ParamId::AM: return amplitude_modulation_level.get_max_value();
+        case ParamId::MAMP: return modulator_params.amplitude.get_max_value();
+        case ParamId::MVS: return modulator_params.velocity_sensitivity.get_max_value();
+        case ParamId::MFLD: return modulator_params.folding.get_max_value();
+        case ParamId::MPRT: return modulator_params.portamento_length.get_max_value();
+        case ParamId::MPRD: return modulator_params.portamento_depth.get_max_value();
+        case ParamId::MDTN: return modulator_params.detune.get_max_value();
+        case ParamId::MFIN: return modulator_params.fine_detune.get_max_value();
+        case ParamId::MWID: return modulator_params.width.get_max_value();
+        case ParamId::MPAN: return modulator_params.panning.get_max_value();
+        case ParamId::MVOL: return modulator_params.volume.get_max_value();
+        case ParamId::MC1: return modulator_params.harmonic_0.get_max_value();
+        case ParamId::MC2: return modulator_params.harmonic_1.get_max_value();
+        case ParamId::MC3: return modulator_params.harmonic_2.get_max_value();
+        case ParamId::MC4: return modulator_params.harmonic_3.get_max_value();
+        case ParamId::MC5: return modulator_params.harmonic_4.get_max_value();
+        case ParamId::MC6: return modulator_params.harmonic_5.get_max_value();
+        case ParamId::MC7: return modulator_params.harmonic_6.get_max_value();
+        case ParamId::MC8: return modulator_params.harmonic_7.get_max_value();
+        case ParamId::MC9: return modulator_params.harmonic_8.get_max_value();
+        case ParamId::MC10: return modulator_params.harmonic_9.get_max_value();
+        case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_max_value();
+        case ParamId::MF1Q: return modulator_params.filter_1_q.get_max_value();
+        case ParamId::MF1G: return modulator_params.filter_1_gain.get_max_value();
+        case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_max_value();
+        case ParamId::MF2Q: return modulator_params.filter_2_q.get_max_value();
+        case ParamId::MF2G: return modulator_params.filter_2_gain.get_max_value();
+        case ParamId::CAMP: return carrier_params.amplitude.get_max_value();
+        case ParamId::CVS: return carrier_params.velocity_sensitivity.get_max_value();
+        case ParamId::CFLD: return carrier_params.folding.get_max_value();
+        case ParamId::CPRT: return carrier_params.portamento_length.get_max_value();
+        case ParamId::CPRD: return carrier_params.portamento_depth.get_max_value();
+        case ParamId::CDTN: return carrier_params.detune.get_max_value();
+        case ParamId::CFIN: return carrier_params.fine_detune.get_max_value();
+        case ParamId::CWID: return carrier_params.width.get_max_value();
+        case ParamId::CPAN: return carrier_params.panning.get_max_value();
+        case ParamId::CVOL: return carrier_params.volume.get_max_value();
+        case ParamId::CC1: return carrier_params.harmonic_0.get_max_value();
+        case ParamId::CC2: return carrier_params.harmonic_1.get_max_value();
+        case ParamId::CC3: return carrier_params.harmonic_2.get_max_value();
+        case ParamId::CC4: return carrier_params.harmonic_3.get_max_value();
+        case ParamId::CC5: return carrier_params.harmonic_4.get_max_value();
+        case ParamId::CC6: return carrier_params.harmonic_5.get_max_value();
+        case ParamId::CC7: return carrier_params.harmonic_6.get_max_value();
+        case ParamId::CC8: return carrier_params.harmonic_7.get_max_value();
+        case ParamId::CC9: return carrier_params.harmonic_8.get_max_value();
+        case ParamId::CC10: return carrier_params.harmonic_9.get_max_value();
+        case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_max_value();
+        case ParamId::CF1Q: return carrier_params.filter_1_q.get_max_value();
+        case ParamId::CF1G: return carrier_params.filter_1_gain.get_max_value();
+        case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_max_value();
+        case ParamId::CF2Q: return carrier_params.filter_2_q.get_max_value();
+        case ParamId::CF2G: return carrier_params.filter_2_gain.get_max_value();
+        case ParamId::EOG: return effects.overdrive.level.get_max_value();
+        case ParamId::EDG: return effects.distortion.level.get_max_value();
+        case ParamId::EF1FRQ: return effects.filter_1.frequency.get_max_value();
+        case ParamId::EF1Q: return effects.filter_1.q.get_max_value();
+        case ParamId::EF1G: return effects.filter_1.gain.get_max_value();
+        case ParamId::EF2FRQ: return effects.filter_2.frequency.get_max_value();
+        case ParamId::EF2Q: return effects.filter_2.q.get_max_value();
+        case ParamId::EF2G: return effects.filter_2.gain.get_max_value();
+        case ParamId::ECDEL: return effects.chorus.delay_time.get_max_value();
+        case ParamId::ECFRQ: return effects.chorus.frequency.get_max_value();
+        case ParamId::ECDPT: return effects.chorus.depth.get_max_value();
+        case ParamId::ECFB: return effects.chorus.feedback.get_max_value();
+        case ParamId::ECDF: return effects.chorus.damping_frequency.get_max_value();
+        case ParamId::ECDG: return effects.chorus.damping_gain.get_max_value();
+        case ParamId::ECWID: return effects.chorus.width.get_max_value();
+        case ParamId::ECHPF: return effects.chorus.high_pass_frequency.get_max_value();
+        case ParamId::ECWET: return effects.chorus.wet.get_max_value();
+        case ParamId::ECDRY: return effects.chorus.dry.get_max_value();
+        case ParamId::EEDEL: return effects.echo.delay_time.get_max_value();
+        case ParamId::EEFB: return effects.echo.feedback.get_max_value();
+        case ParamId::EEDF: return effects.echo.damping_frequency.get_max_value();
+        case ParamId::EEDG: return effects.echo.damping_gain.get_max_value();
+        case ParamId::EEWID: return effects.echo.width.get_max_value();
+        case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_max_value();
+        case ParamId::EEWET: return effects.echo.wet.get_max_value();
+        case ParamId::EEDRY: return effects.echo.dry.get_max_value();
+        case ParamId::ERRS: return effects.reverb.room_size.get_max_value();
+        case ParamId::ERDF: return effects.reverb.damping_frequency.get_max_value();
+        case ParamId::ERDG: return effects.reverb.damping_gain.get_max_value();
+        case ParamId::ERWID: return effects.reverb.width.get_max_value();
+        case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_max_value();
+        case ParamId::ERWET: return effects.reverb.wet.get_max_value();
+        case ParamId::ERDRY: return effects.reverb.dry.get_max_value();
         case ParamId::MODE: return mode.get_max_value();
         case ParamId::MWAV: return modulator_params.waveform.get_max_value();
         case ParamId::CWAV: return carrier_params.waveform.get_max_value();
@@ -1330,8 +1576,146 @@ Number Synth::float_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
 ) const noexcept {
-    if (param_id < FLOAT_PARAMS) {
-        return float_params[param_id]->ratio_to_value(ratio);
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.ratio_to_value(ratio);
+            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.ratio_to_value(ratio);
+            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.ratio_to_value(ratio);
+            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.ratio_to_value(ratio);
+            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.ratio_to_value(ratio);
+            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.ratio_to_value(ratio);
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return envelopes_rw[envelope_idx]->amount.ratio_to_value(ratio);
+            case 1: return envelopes_rw[envelope_idx]->initial_value.ratio_to_value(ratio);
+            case 2: return envelopes_rw[envelope_idx]->delay_time.ratio_to_value(ratio);
+            case 3: return envelopes_rw[envelope_idx]->attack_time.ratio_to_value(ratio);
+            case 4: return envelopes_rw[envelope_idx]->peak_value.ratio_to_value(ratio);
+            case 5: return envelopes_rw[envelope_idx]->hold_time.ratio_to_value(ratio);
+            case 6: return envelopes_rw[envelope_idx]->decay_time.ratio_to_value(ratio);
+            case 7: return envelopes_rw[envelope_idx]->sustain_value.ratio_to_value(ratio);
+            case 8: return envelopes_rw[envelope_idx]->release_time.ratio_to_value(ratio);
+            case 9: return envelopes_rw[envelope_idx]->final_value.ratio_to_value(ratio);
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return lfos_rw[lfo_idx]->frequency.ratio_to_value(ratio);
+            case 1: return lfos_rw[lfo_idx]->phase.ratio_to_value(ratio);
+            case 2: return lfos_rw[lfo_idx]->min.ratio_to_value(ratio);
+            case 3: return lfos_rw[lfo_idx]->max.ratio_to_value(ratio);
+            case 4: return lfos_rw[lfo_idx]->amount.ratio_to_value(ratio);
+            case 5: return lfos_rw[lfo_idx]->distortion.ratio_to_value(ratio);
+            case 6: return lfos_rw[lfo_idx]->randomness.ratio_to_value(ratio);
+            default: return 0.0; /* This should never be reached. */
+        }
+    }
+
+    switch (param_id) {
+        case ParamId::MIX: return modulator_add_volume.ratio_to_value(ratio);
+        case ParamId::PM: return phase_modulation_level.ratio_to_value(ratio);
+        case ParamId::FM: return frequency_modulation_level.ratio_to_value(ratio);
+        case ParamId::AM: return amplitude_modulation_level.ratio_to_value(ratio);
+        case ParamId::MAMP: return modulator_params.amplitude.ratio_to_value(ratio);
+        case ParamId::MVS: return modulator_params.velocity_sensitivity.ratio_to_value(ratio);
+        case ParamId::MFLD: return modulator_params.folding.ratio_to_value(ratio);
+        case ParamId::MPRT: return modulator_params.portamento_length.ratio_to_value(ratio);
+        case ParamId::MPRD: return modulator_params.portamento_depth.ratio_to_value(ratio);
+        case ParamId::MDTN: return modulator_params.detune.ratio_to_value(ratio);
+        case ParamId::MFIN: return modulator_params.fine_detune.ratio_to_value(ratio);
+        case ParamId::MWID: return modulator_params.width.ratio_to_value(ratio);
+        case ParamId::MPAN: return modulator_params.panning.ratio_to_value(ratio);
+        case ParamId::MVOL: return modulator_params.volume.ratio_to_value(ratio);
+        case ParamId::MC1: return modulator_params.harmonic_0.ratio_to_value(ratio);
+        case ParamId::MC2: return modulator_params.harmonic_1.ratio_to_value(ratio);
+        case ParamId::MC3: return modulator_params.harmonic_2.ratio_to_value(ratio);
+        case ParamId::MC4: return modulator_params.harmonic_3.ratio_to_value(ratio);
+        case ParamId::MC5: return modulator_params.harmonic_4.ratio_to_value(ratio);
+        case ParamId::MC6: return modulator_params.harmonic_5.ratio_to_value(ratio);
+        case ParamId::MC7: return modulator_params.harmonic_6.ratio_to_value(ratio);
+        case ParamId::MC8: return modulator_params.harmonic_7.ratio_to_value(ratio);
+        case ParamId::MC9: return modulator_params.harmonic_8.ratio_to_value(ratio);
+        case ParamId::MC10: return modulator_params.harmonic_9.ratio_to_value(ratio);
+        case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.ratio_to_value(ratio);
+        case ParamId::MF1Q: return modulator_params.filter_1_q.ratio_to_value(ratio);
+        case ParamId::MF1G: return modulator_params.filter_1_gain.ratio_to_value(ratio);
+        case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.ratio_to_value(ratio);
+        case ParamId::MF2Q: return modulator_params.filter_2_q.ratio_to_value(ratio);
+        case ParamId::MF2G: return modulator_params.filter_2_gain.ratio_to_value(ratio);
+        case ParamId::CAMP: return carrier_params.amplitude.ratio_to_value(ratio);
+        case ParamId::CVS: return carrier_params.velocity_sensitivity.ratio_to_value(ratio);
+        case ParamId::CFLD: return carrier_params.folding.ratio_to_value(ratio);
+        case ParamId::CPRT: return carrier_params.portamento_length.ratio_to_value(ratio);
+        case ParamId::CPRD: return carrier_params.portamento_depth.ratio_to_value(ratio);
+        case ParamId::CDTN: return carrier_params.detune.ratio_to_value(ratio);
+        case ParamId::CFIN: return carrier_params.fine_detune.ratio_to_value(ratio);
+        case ParamId::CWID: return carrier_params.width.ratio_to_value(ratio);
+        case ParamId::CPAN: return carrier_params.panning.ratio_to_value(ratio);
+        case ParamId::CVOL: return carrier_params.volume.ratio_to_value(ratio);
+        case ParamId::CC1: return carrier_params.harmonic_0.ratio_to_value(ratio);
+        case ParamId::CC2: return carrier_params.harmonic_1.ratio_to_value(ratio);
+        case ParamId::CC3: return carrier_params.harmonic_2.ratio_to_value(ratio);
+        case ParamId::CC4: return carrier_params.harmonic_3.ratio_to_value(ratio);
+        case ParamId::CC5: return carrier_params.harmonic_4.ratio_to_value(ratio);
+        case ParamId::CC6: return carrier_params.harmonic_5.ratio_to_value(ratio);
+        case ParamId::CC7: return carrier_params.harmonic_6.ratio_to_value(ratio);
+        case ParamId::CC8: return carrier_params.harmonic_7.ratio_to_value(ratio);
+        case ParamId::CC9: return carrier_params.harmonic_8.ratio_to_value(ratio);
+        case ParamId::CC10: return carrier_params.harmonic_9.ratio_to_value(ratio);
+        case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.ratio_to_value(ratio);
+        case ParamId::CF1Q: return carrier_params.filter_1_q.ratio_to_value(ratio);
+        case ParamId::CF1G: return carrier_params.filter_1_gain.ratio_to_value(ratio);
+        case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.ratio_to_value(ratio);
+        case ParamId::CF2Q: return carrier_params.filter_2_q.ratio_to_value(ratio);
+        case ParamId::CF2G: return carrier_params.filter_2_gain.ratio_to_value(ratio);
+        case ParamId::EOG: return effects.overdrive.level.ratio_to_value(ratio);
+        case ParamId::EDG: return effects.distortion.level.ratio_to_value(ratio);
+        case ParamId::EF1FRQ: return effects.filter_1.frequency.ratio_to_value(ratio);
+        case ParamId::EF1Q: return effects.filter_1.q.ratio_to_value(ratio);
+        case ParamId::EF1G: return effects.filter_1.gain.ratio_to_value(ratio);
+        case ParamId::EF2FRQ: return effects.filter_2.frequency.ratio_to_value(ratio);
+        case ParamId::EF2Q: return effects.filter_2.q.ratio_to_value(ratio);
+        case ParamId::EF2G: return effects.filter_2.gain.ratio_to_value(ratio);
+        case ParamId::ECDEL: return effects.chorus.delay_time.ratio_to_value(ratio);
+        case ParamId::ECFRQ: return effects.chorus.frequency.ratio_to_value(ratio);
+        case ParamId::ECDPT: return effects.chorus.depth.ratio_to_value(ratio);
+        case ParamId::ECFB: return effects.chorus.feedback.ratio_to_value(ratio);
+        case ParamId::ECDF: return effects.chorus.damping_frequency.ratio_to_value(ratio);
+        case ParamId::ECDG: return effects.chorus.damping_gain.ratio_to_value(ratio);
+        case ParamId::ECWID: return effects.chorus.width.ratio_to_value(ratio);
+        case ParamId::ECHPF: return effects.chorus.high_pass_frequency.ratio_to_value(ratio);
+        case ParamId::ECWET: return effects.chorus.wet.ratio_to_value(ratio);
+        case ParamId::ECDRY: return effects.chorus.dry.ratio_to_value(ratio);
+        case ParamId::EEDEL: return effects.echo.delay_time.ratio_to_value(ratio);
+        case ParamId::EEFB: return effects.echo.feedback.ratio_to_value(ratio);
+        case ParamId::EEDF: return effects.echo.damping_frequency.ratio_to_value(ratio);
+        case ParamId::EEDG: return effects.echo.damping_gain.ratio_to_value(ratio);
+        case ParamId::EEWID: return effects.echo.width.ratio_to_value(ratio);
+        case ParamId::EEHPF: return effects.echo.high_pass_frequency.ratio_to_value(ratio);
+        case ParamId::EEWET: return effects.echo.wet.ratio_to_value(ratio);
+        case ParamId::EEDRY: return effects.echo.dry.ratio_to_value(ratio);
+        case ParamId::ERRS: return effects.reverb.room_size.ratio_to_value(ratio);
+        case ParamId::ERDF: return effects.reverb.damping_frequency.ratio_to_value(ratio);
+        case ParamId::ERDG: return effects.reverb.damping_gain.ratio_to_value(ratio);
+        case ParamId::ERWID: return effects.reverb.width.ratio_to_value(ratio);
+        case ParamId::ERHPF: return effects.reverb.high_pass_frequency.ratio_to_value(ratio);
+        case ParamId::ERWET: return effects.reverb.wet.ratio_to_value(ratio);
+        case ParamId::ERDRY: return effects.reverb.dry.ratio_to_value(ratio);
+        default: return 0.0; /* This should never be reached. */
     }
 
     return 0.0;
@@ -1438,9 +1822,95 @@ Sample const* const* Synth::initialize_rendering(
         effects, round, sample_count
     );
 
-    for (int i = 0; i != FLOAT_PARAMS; ++i) {
-        FloatParam::produce_if_not_constant(*float_params[i], round, sample_count);
-    }
+    FloatParam::produce_if_not_constant(modulator_add_volume, round, sample_count);
+    FloatParam::produce_if_not_constant(phase_modulation_level, round, sample_count);
+    FloatParam::produce_if_not_constant(frequency_modulation_level, round, sample_count);
+    FloatParam::produce_if_not_constant(amplitude_modulation_level, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.amplitude, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.velocity_sensitivity, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.folding, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.portamento_length, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.portamento_depth, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.detune, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.fine_detune, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.width, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.panning, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.volume, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_0, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_1, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_2, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_3, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_4, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_5, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_6, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_7, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_8, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.harmonic_9, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_1_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_1_q, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_1_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_2_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_2_q, round, sample_count);
+    FloatParam::produce_if_not_constant(modulator_params.filter_2_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.amplitude, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.velocity_sensitivity, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.folding, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.portamento_length, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.portamento_depth, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.detune, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.fine_detune, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.width, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.panning, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.volume, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_0, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_1, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_2, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_3, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_4, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_5, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_6, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_7, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_8, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.harmonic_9, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_1_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_1_q, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_1_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_2_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_2_q, round, sample_count);
+    FloatParam::produce_if_not_constant(carrier_params.filter_2_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.overdrive.level, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.distortion.level, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_1.frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_1.q, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_1.gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_2.frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_2.q, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.filter_2.gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.delay_time, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.depth, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.feedback, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.damping_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.damping_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.width, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.high_pass_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.wet, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.chorus.dry, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.delay_time, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.feedback, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.damping_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.damping_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.width, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.high_pass_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.wet, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.echo.dry, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.room_size, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.damping_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.damping_gain, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.width, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.high_pass_frequency, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.wet, round, sample_count);
+    FloatParam::produce_if_not_constant(effects.reverb.dry, round, sample_count);
 
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->skip_round(round, sample_count);
@@ -1569,10 +2039,144 @@ void Synth::process_messages() noexcept
 
 void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcept
 {
-    if (param_id < FLOAT_PARAMS) {
-        float_params[param_id]->set_ratio(ratio);
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: flexible_controllers_rw[flex_ctl_idx]->input.set_ratio(ratio); break;
+            case 1: flexible_controllers_rw[flex_ctl_idx]->min.set_ratio(ratio); break;
+            case 2: flexible_controllers_rw[flex_ctl_idx]->max.set_ratio(ratio); break;
+            case 3: flexible_controllers_rw[flex_ctl_idx]->amount.set_ratio(ratio); break;
+            case 4: flexible_controllers_rw[flex_ctl_idx]->distortion.set_ratio(ratio); break;
+            case 5: flexible_controllers_rw[flex_ctl_idx]->randomness.set_ratio(ratio); break;
+            default: break; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: envelopes_rw[envelope_idx]->amount.set_ratio(ratio); break;
+            case 1: envelopes_rw[envelope_idx]->initial_value.set_ratio(ratio); break;
+            case 2: envelopes_rw[envelope_idx]->delay_time.set_ratio(ratio); break;
+            case 3: envelopes_rw[envelope_idx]->attack_time.set_ratio(ratio); break;
+            case 4: envelopes_rw[envelope_idx]->peak_value.set_ratio(ratio); break;
+            case 5: envelopes_rw[envelope_idx]->hold_time.set_ratio(ratio); break;
+            case 6: envelopes_rw[envelope_idx]->decay_time.set_ratio(ratio); break;
+            case 7: envelopes_rw[envelope_idx]->sustain_value.set_ratio(ratio); break;
+            case 8: envelopes_rw[envelope_idx]->release_time.set_ratio(ratio); break;
+            case 9: envelopes_rw[envelope_idx]->final_value.set_ratio(ratio); break;
+            default: break; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: lfos_rw[lfo_idx]->frequency.set_ratio(ratio); break;
+            case 1: lfos_rw[lfo_idx]->phase.set_ratio(ratio); break;
+            case 2: lfos_rw[lfo_idx]->min.set_ratio(ratio); break;
+            case 3: lfos_rw[lfo_idx]->max.set_ratio(ratio); break;
+            case 4: lfos_rw[lfo_idx]->amount.set_ratio(ratio); break;
+            case 5: lfos_rw[lfo_idx]->distortion.set_ratio(ratio); break;
+            case 6: lfos_rw[lfo_idx]->randomness.set_ratio(ratio); break;
+            default: break; /* This should never be reached. */
+        }
     } else {
         switch (param_id) {
+            case ParamId::MIX: modulator_add_volume.set_ratio(ratio); break;
+            case ParamId::PM: phase_modulation_level.set_ratio(ratio); break;
+            case ParamId::FM: frequency_modulation_level.set_ratio(ratio); break;
+            case ParamId::AM: amplitude_modulation_level.set_ratio(ratio); break;
+            case ParamId::MAMP: modulator_params.amplitude.set_ratio(ratio); break;
+            case ParamId::MVS: modulator_params.velocity_sensitivity.set_ratio(ratio); break;
+            case ParamId::MFLD: modulator_params.folding.set_ratio(ratio); break;
+            case ParamId::MPRT: modulator_params.portamento_length.set_ratio(ratio); break;
+            case ParamId::MPRD: modulator_params.portamento_depth.set_ratio(ratio); break;
+            case ParamId::MDTN: modulator_params.detune.set_ratio(ratio); break;
+            case ParamId::MFIN: modulator_params.fine_detune.set_ratio(ratio); break;
+            case ParamId::MWID: modulator_params.width.set_ratio(ratio); break;
+            case ParamId::MPAN: modulator_params.panning.set_ratio(ratio); break;
+            case ParamId::MVOL: modulator_params.volume.set_ratio(ratio); break;
+            case ParamId::MC1: modulator_params.harmonic_0.set_ratio(ratio); break;
+            case ParamId::MC2: modulator_params.harmonic_1.set_ratio(ratio); break;
+            case ParamId::MC3: modulator_params.harmonic_2.set_ratio(ratio); break;
+            case ParamId::MC4: modulator_params.harmonic_3.set_ratio(ratio); break;
+            case ParamId::MC5: modulator_params.harmonic_4.set_ratio(ratio); break;
+            case ParamId::MC6: modulator_params.harmonic_5.set_ratio(ratio); break;
+            case ParamId::MC7: modulator_params.harmonic_6.set_ratio(ratio); break;
+            case ParamId::MC8: modulator_params.harmonic_7.set_ratio(ratio); break;
+            case ParamId::MC9: modulator_params.harmonic_8.set_ratio(ratio); break;
+            case ParamId::MC10: modulator_params.harmonic_9.set_ratio(ratio); break;
+            case ParamId::MF1FRQ: modulator_params.filter_1_frequency.set_ratio(ratio); break;
+            case ParamId::MF1Q: modulator_params.filter_1_q.set_ratio(ratio); break;
+            case ParamId::MF1G: modulator_params.filter_1_gain.set_ratio(ratio); break;
+            case ParamId::MF2FRQ: modulator_params.filter_2_frequency.set_ratio(ratio); break;
+            case ParamId::MF2Q: modulator_params.filter_2_q.set_ratio(ratio); break;
+            case ParamId::MF2G: modulator_params.filter_2_gain.set_ratio(ratio); break;
+            case ParamId::CAMP: carrier_params.amplitude.set_ratio(ratio); break;
+            case ParamId::CVS: carrier_params.velocity_sensitivity.set_ratio(ratio); break;
+            case ParamId::CFLD: carrier_params.folding.set_ratio(ratio); break;
+            case ParamId::CPRT: carrier_params.portamento_length.set_ratio(ratio); break;
+            case ParamId::CPRD: carrier_params.portamento_depth.set_ratio(ratio); break;
+            case ParamId::CDTN: carrier_params.detune.set_ratio(ratio); break;
+            case ParamId::CFIN: carrier_params.fine_detune.set_ratio(ratio); break;
+            case ParamId::CWID: carrier_params.width.set_ratio(ratio); break;
+            case ParamId::CPAN: carrier_params.panning.set_ratio(ratio); break;
+            case ParamId::CVOL: carrier_params.volume.set_ratio(ratio); break;
+            case ParamId::CC1: carrier_params.harmonic_0.set_ratio(ratio); break;
+            case ParamId::CC2: carrier_params.harmonic_1.set_ratio(ratio); break;
+            case ParamId::CC3: carrier_params.harmonic_2.set_ratio(ratio); break;
+            case ParamId::CC4: carrier_params.harmonic_3.set_ratio(ratio); break;
+            case ParamId::CC5: carrier_params.harmonic_4.set_ratio(ratio); break;
+            case ParamId::CC6: carrier_params.harmonic_5.set_ratio(ratio); break;
+            case ParamId::CC7: carrier_params.harmonic_6.set_ratio(ratio); break;
+            case ParamId::CC8: carrier_params.harmonic_7.set_ratio(ratio); break;
+            case ParamId::CC9: carrier_params.harmonic_8.set_ratio(ratio); break;
+            case ParamId::CC10: carrier_params.harmonic_9.set_ratio(ratio); break;
+            case ParamId::CF1FRQ: carrier_params.filter_1_frequency.set_ratio(ratio); break;
+            case ParamId::CF1Q: carrier_params.filter_1_q.set_ratio(ratio); break;
+            case ParamId::CF1G: carrier_params.filter_1_gain.set_ratio(ratio); break;
+            case ParamId::CF2FRQ: carrier_params.filter_2_frequency.set_ratio(ratio); break;
+            case ParamId::CF2Q: carrier_params.filter_2_q.set_ratio(ratio); break;
+            case ParamId::CF2G: carrier_params.filter_2_gain.set_ratio(ratio); break;
+            case ParamId::EOG: effects.overdrive.level.set_ratio(ratio); break;
+            case ParamId::EDG: effects.distortion.level.set_ratio(ratio); break;
+            case ParamId::EF1FRQ: effects.filter_1.frequency.set_ratio(ratio); break;
+            case ParamId::EF1Q: effects.filter_1.q.set_ratio(ratio); break;
+            case ParamId::EF1G: effects.filter_1.gain.set_ratio(ratio); break;
+            case ParamId::EF2FRQ: effects.filter_2.frequency.set_ratio(ratio); break;
+            case ParamId::EF2Q: effects.filter_2.q.set_ratio(ratio); break;
+            case ParamId::EF2G: effects.filter_2.gain.set_ratio(ratio); break;
+            case ParamId::ECDEL: effects.chorus.delay_time.set_ratio(ratio); break;
+            case ParamId::ECFRQ: effects.chorus.frequency.set_ratio(ratio); break;
+            case ParamId::ECDPT: effects.chorus.depth.set_ratio(ratio); break;
+            case ParamId::ECFB: effects.chorus.feedback.set_ratio(ratio); break;
+            case ParamId::ECDF: effects.chorus.damping_frequency.set_ratio(ratio); break;
+            case ParamId::ECDG: effects.chorus.damping_gain.set_ratio(ratio); break;
+            case ParamId::ECWID: effects.chorus.width.set_ratio(ratio); break;
+            case ParamId::ECHPF: effects.chorus.high_pass_frequency.set_ratio(ratio); break;
+            case ParamId::ECWET: effects.chorus.wet.set_ratio(ratio); break;
+            case ParamId::ECDRY: effects.chorus.dry.set_ratio(ratio); break;
+            case ParamId::EEDEL: effects.echo.delay_time.set_ratio(ratio); break;
+            case ParamId::EEFB: effects.echo.feedback.set_ratio(ratio); break;
+            case ParamId::EEDF: effects.echo.damping_frequency.set_ratio(ratio); break;
+            case ParamId::EEDG: effects.echo.damping_gain.set_ratio(ratio); break;
+            case ParamId::EEWID: effects.echo.width.set_ratio(ratio); break;
+            case ParamId::EEHPF: effects.echo.high_pass_frequency.set_ratio(ratio); break;
+            case ParamId::EEWET: effects.echo.wet.set_ratio(ratio); break;
+            case ParamId::EEDRY: effects.echo.dry.set_ratio(ratio); break;
+            case ParamId::ERRS: effects.reverb.room_size.set_ratio(ratio); break;
+            case ParamId::ERDF: effects.reverb.damping_frequency.set_ratio(ratio); break;
+            case ParamId::ERDG: effects.reverb.damping_gain.set_ratio(ratio); break;
+            case ParamId::ERWID: effects.reverb.width.set_ratio(ratio); break;
+            case ParamId::ERHPF: effects.reverb.high_pass_frequency.set_ratio(ratio); break;
+            case ParamId::ERWET: effects.reverb.wet.set_ratio(ratio); break;
+            case ParamId::ERDRY: effects.reverb.dry.set_ratio(ratio); break;
             case ParamId::MODE: mode.set_ratio(ratio); break;
             case ParamId::MWAV: modulator_params.waveform.set_ratio(ratio); break;
             case ParamId::CWAV: carrier_params.waveform.set_ratio(ratio); break;
@@ -1638,12 +2242,150 @@ void Synth::handle_assign_controller(
 ) noexcept {
     bool is_assigned = false;
 
-    if (param_id < FLOAT_PARAMS) {
-        is_assigned = assign_controller_to_float_param(
-            param_id, (ControllerId)controller_id
-        );
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->input, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->min, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->max, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->amount, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->distortion, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->randomness, (ControllerId)controller_id); break;;
+            default: break; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->amount, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->initial_value, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->delay_time, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->attack_time, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->peak_value, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->hold_time, (ControllerId)controller_id); break;;
+            case 6: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->decay_time, (ControllerId)controller_id); break;;
+            case 7: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->sustain_value, (ControllerId)controller_id); break;;
+            case 8: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->release_time, (ControllerId)controller_id); break;;
+            case 9: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->final_value, (ControllerId)controller_id); break;;
+            default: break; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->frequency, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->phase, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->min, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->max, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->amount, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->distortion, (ControllerId)controller_id); break;;
+            case 6: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->randomness, (ControllerId)controller_id); break;;
+            default: break; /* This should never be reached. */
+        }
+    } else if (param_id < FLOAT_PARAMS) {
+        switch (param_id) {
+            case ParamId::MIX: is_assigned = assign_controller<FloatParam>(modulator_add_volume, (ControllerId)controller_id); break;;
+            case ParamId::PM: is_assigned = assign_controller<FloatParam>(phase_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::FM: is_assigned = assign_controller<FloatParam>(frequency_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::AM: is_assigned = assign_controller<FloatParam>(amplitude_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::MAMP: is_assigned = assign_controller<FloatParam>(modulator_params.amplitude, (ControllerId)controller_id); break;;
+            case ParamId::MVS: is_assigned = assign_controller<FloatParam>(modulator_params.velocity_sensitivity, (ControllerId)controller_id); break;;
+            case ParamId::MFLD: is_assigned = assign_controller<FloatParam>(modulator_params.folding, (ControllerId)controller_id); break;;
+            case ParamId::MPRT: is_assigned = assign_controller<FloatParam>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::MPRD: is_assigned = assign_controller<FloatParam>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::MDTN: is_assigned = assign_controller<FloatParam>(modulator_params.detune, (ControllerId)controller_id); break;;
+            case ParamId::MFIN: is_assigned = assign_controller<FloatParam>(modulator_params.fine_detune, (ControllerId)controller_id); break;;
+            case ParamId::MWID: is_assigned = assign_controller<FloatParam>(modulator_params.width, (ControllerId)controller_id); break;;
+            case ParamId::MPAN: is_assigned = assign_controller<FloatParam>(modulator_params.panning, (ControllerId)controller_id); break;;
+            case ParamId::MVOL: is_assigned = assign_controller<FloatParam>(modulator_params.volume, (ControllerId)controller_id); break;;
+            case ParamId::MC1: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_0, (ControllerId)controller_id); break;;
+            case ParamId::MC2: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_1, (ControllerId)controller_id); break;;
+            case ParamId::MC3: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_2, (ControllerId)controller_id); break;;
+            case ParamId::MC4: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_3, (ControllerId)controller_id); break;;
+            case ParamId::MC5: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_4, (ControllerId)controller_id); break;;
+            case ParamId::MC6: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_5, (ControllerId)controller_id); break;;
+            case ParamId::MC7: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_6, (ControllerId)controller_id); break;;
+            case ParamId::MC8: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_7, (ControllerId)controller_id); break;;
+            case ParamId::MC9: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_8, (ControllerId)controller_id); break;;
+            case ParamId::MC10: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_9, (ControllerId)controller_id); break;;
+            case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_frequency, (ControllerId)controller_id); break;;
+            case ParamId::MF1Q: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_q, (ControllerId)controller_id); break;;
+            case ParamId::MF1G: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_gain, (ControllerId)controller_id); break;;
+            case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_frequency, (ControllerId)controller_id); break;;
+            case ParamId::MF2Q: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_q, (ControllerId)controller_id); break;;
+            case ParamId::MF2G: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_gain, (ControllerId)controller_id); break;;
+            case ParamId::CAMP: is_assigned = assign_controller<FloatParam>(carrier_params.amplitude, (ControllerId)controller_id); break;;
+            case ParamId::CVS: is_assigned = assign_controller<FloatParam>(carrier_params.velocity_sensitivity, (ControllerId)controller_id); break;;
+            case ParamId::CFLD: is_assigned = assign_controller<FloatParam>(carrier_params.folding, (ControllerId)controller_id); break;;
+            case ParamId::CPRT: is_assigned = assign_controller<FloatParam>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::CPRD: is_assigned = assign_controller<FloatParam>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::CDTN: is_assigned = assign_controller<FloatParam>(carrier_params.detune, (ControllerId)controller_id); break;;
+            case ParamId::CFIN: is_assigned = assign_controller<FloatParam>(carrier_params.fine_detune, (ControllerId)controller_id); break;;
+            case ParamId::CWID: is_assigned = assign_controller<FloatParam>(carrier_params.width, (ControllerId)controller_id); break;;
+            case ParamId::CPAN: is_assigned = assign_controller<FloatParam>(carrier_params.panning, (ControllerId)controller_id); break;;
+            case ParamId::CVOL: is_assigned = assign_controller<FloatParam>(carrier_params.volume, (ControllerId)controller_id); break;;
+            case ParamId::CC1: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_0, (ControllerId)controller_id); break;;
+            case ParamId::CC2: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_1, (ControllerId)controller_id); break;;
+            case ParamId::CC3: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_2, (ControllerId)controller_id); break;;
+            case ParamId::CC4: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_3, (ControllerId)controller_id); break;;
+            case ParamId::CC5: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_4, (ControllerId)controller_id); break;;
+            case ParamId::CC6: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_5, (ControllerId)controller_id); break;;
+            case ParamId::CC7: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_6, (ControllerId)controller_id); break;;
+            case ParamId::CC8: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_7, (ControllerId)controller_id); break;;
+            case ParamId::CC9: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_8, (ControllerId)controller_id); break;;
+            case ParamId::CC10: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_9, (ControllerId)controller_id); break;;
+            case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_frequency, (ControllerId)controller_id); break;;
+            case ParamId::CF1Q: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_q, (ControllerId)controller_id); break;;
+            case ParamId::CF1G: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_gain, (ControllerId)controller_id); break;;
+            case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_frequency, (ControllerId)controller_id); break;;
+            case ParamId::CF2Q: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_q, (ControllerId)controller_id); break;;
+            case ParamId::CF2G: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_gain, (ControllerId)controller_id); break;;
+            case ParamId::EOG: is_assigned = assign_controller<FloatParam>(effects.overdrive.level, (ControllerId)controller_id); break;;
+            case ParamId::EDG: is_assigned = assign_controller<FloatParam>(effects.distortion.level, (ControllerId)controller_id); break;;
+            case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParam>(effects.filter_1.frequency, (ControllerId)controller_id); break;;
+            case ParamId::EF1Q: is_assigned = assign_controller<FloatParam>(effects.filter_1.q, (ControllerId)controller_id); break;;
+            case ParamId::EF1G: is_assigned = assign_controller<FloatParam>(effects.filter_1.gain, (ControllerId)controller_id); break;;
+            case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParam>(effects.filter_2.frequency, (ControllerId)controller_id); break;;
+            case ParamId::EF2Q: is_assigned = assign_controller<FloatParam>(effects.filter_2.q, (ControllerId)controller_id); break;;
+            case ParamId::EF2G: is_assigned = assign_controller<FloatParam>(effects.filter_2.gain, (ControllerId)controller_id); break;;
+            case ParamId::ECDEL: is_assigned = assign_controller<FloatParam>(effects.chorus.delay_time, (ControllerId)controller_id); break;;
+            case ParamId::ECFRQ: is_assigned = assign_controller<FloatParam>(effects.chorus.frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECDPT: is_assigned = assign_controller<FloatParam>(effects.chorus.depth, (ControllerId)controller_id); break;;
+            case ParamId::ECFB: is_assigned = assign_controller<FloatParam>(effects.chorus.feedback, (ControllerId)controller_id); break;;
+            case ParamId::ECDF: is_assigned = assign_controller<FloatParam>(effects.chorus.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECDG: is_assigned = assign_controller<FloatParam>(effects.chorus.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::ECWID: is_assigned = assign_controller<FloatParam>(effects.chorus.width, (ControllerId)controller_id); break;;
+            case ParamId::ECHPF: is_assigned = assign_controller<FloatParam>(effects.chorus.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECWET: is_assigned = assign_controller<FloatParam>(effects.chorus.wet, (ControllerId)controller_id); break;;
+            case ParamId::ECDRY: is_assigned = assign_controller<FloatParam>(effects.chorus.dry, (ControllerId)controller_id); break;;
+            case ParamId::EEDEL: is_assigned = assign_controller<FloatParam>(effects.echo.delay_time, (ControllerId)controller_id); break;;
+            case ParamId::EEFB: is_assigned = assign_controller<FloatParam>(effects.echo.feedback, (ControllerId)controller_id); break;;
+            case ParamId::EEDF: is_assigned = assign_controller<FloatParam>(effects.echo.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::EEDG: is_assigned = assign_controller<FloatParam>(effects.echo.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::EEWID: is_assigned = assign_controller<FloatParam>(effects.echo.width, (ControllerId)controller_id); break;;
+            case ParamId::EEHPF: is_assigned = assign_controller<FloatParam>(effects.echo.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::EEWET: is_assigned = assign_controller<FloatParam>(effects.echo.wet, (ControllerId)controller_id); break;;
+            case ParamId::EEDRY: is_assigned = assign_controller<FloatParam>(effects.echo.dry, (ControllerId)controller_id); break;;
+            case ParamId::ERRS: is_assigned = assign_controller<FloatParam>(effects.reverb.room_size, (ControllerId)controller_id); break;;
+            case ParamId::ERDF: is_assigned = assign_controller<FloatParam>(effects.reverb.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ERDG: is_assigned = assign_controller<FloatParam>(effects.reverb.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::ERWID: is_assigned = assign_controller<FloatParam>(effects.reverb.width, (ControllerId)controller_id); break;;
+            case ParamId::ERHPF: is_assigned = assign_controller<FloatParam>(effects.reverb.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ERWET: is_assigned = assign_controller<FloatParam>(effects.reverb.wet, (ControllerId)controller_id); break;;
+            case ParamId::ERDRY: is_assigned = assign_controller<FloatParam>(effects.reverb.dry, (ControllerId)controller_id); break;;
+            default: break;
+        }
     } else {
-        is_assigned = assign_controller_to_param(param_id, (ControllerId)controller_id);
+        is_assigned = assign_controller_to_discrete_param(
+            param_id, (ControllerId)(ControllerId)controller_id
+        );
     }
 
     if (!is_assigned) {
@@ -1683,7 +2425,7 @@ void Synth::handle_clear() noexcept
 }
 
 
-bool Synth::assign_controller_to_param(
+bool Synth::assign_controller_to_discrete_param(
         ParamId const param_id,
         ControllerId const controller_id
 ) noexcept {
@@ -1771,68 +2513,67 @@ bool Synth::assign_controller_to_param(
 }
 
 
-bool Synth::assign_controller_to_float_param(
-        ParamId const param_id,
+template<class FloatParamClass>
+bool Synth::assign_controller(
+        FloatParamClass& param,
         ControllerId const controller_id
 ) noexcept {
-    FloatParam* param = float_params[param_id];
-
-    param->set_midi_controller(NULL);
-    param->set_flexible_controller(NULL);
-    param->set_envelope(NULL);
-    param->set_lfo(NULL);
+    param.set_midi_controller(NULL);
+    param.set_flexible_controller(NULL);
+    param.set_envelope(NULL);
+    param.set_lfo(NULL);
 
     switch (controller_id) {
         case NONE: return true;
 
-        case PITCH_WHEEL: param->set_midi_controller(&pitch_wheel); return true;
-        case NOTE: param->set_midi_controller(&note); return true;
-        case VELOCITY: param->set_midi_controller(&velocity); return true;
+        case PITCH_WHEEL: param.set_midi_controller(&pitch_wheel); return true;
+        case NOTE: param.set_midi_controller(&note); return true;
+        case VELOCITY: param.set_midi_controller(&velocity); return true;
 
-        case FLEXIBLE_CONTROLLER_1: param->set_flexible_controller(flexible_controllers[0]); return true;
-        case FLEXIBLE_CONTROLLER_2: param->set_flexible_controller(flexible_controllers[1]); return true;
-        case FLEXIBLE_CONTROLLER_3: param->set_flexible_controller(flexible_controllers[2]); return true;
-        case FLEXIBLE_CONTROLLER_4: param->set_flexible_controller(flexible_controllers[3]); return true;
-        case FLEXIBLE_CONTROLLER_5: param->set_flexible_controller(flexible_controllers[4]); return true;
-        case FLEXIBLE_CONTROLLER_6: param->set_flexible_controller(flexible_controllers[5]); return true;
-        case FLEXIBLE_CONTROLLER_7: param->set_flexible_controller(flexible_controllers[6]); return true;
-        case FLEXIBLE_CONTROLLER_8: param->set_flexible_controller(flexible_controllers[7]); return true;
-        case FLEXIBLE_CONTROLLER_9: param->set_flexible_controller(flexible_controllers[8]); return true;
-        case FLEXIBLE_CONTROLLER_10: param->set_flexible_controller(flexible_controllers[9]); return true;
-        case FLEXIBLE_CONTROLLER_11: param->set_flexible_controller(flexible_controllers[10]); return true;
-        case FLEXIBLE_CONTROLLER_12: param->set_flexible_controller(flexible_controllers[11]); return true;
-        case FLEXIBLE_CONTROLLER_13: param->set_flexible_controller(flexible_controllers[12]); return true;
-        case FLEXIBLE_CONTROLLER_14: param->set_flexible_controller(flexible_controllers[13]); return true;
-        case FLEXIBLE_CONTROLLER_15: param->set_flexible_controller(flexible_controllers[14]); return true;
-        case FLEXIBLE_CONTROLLER_16: param->set_flexible_controller(flexible_controllers[15]); return true;
-        case FLEXIBLE_CONTROLLER_17: param->set_flexible_controller(flexible_controllers[16]); return true;
-        case FLEXIBLE_CONTROLLER_18: param->set_flexible_controller(flexible_controllers[17]); return true;
-        case FLEXIBLE_CONTROLLER_19: param->set_flexible_controller(flexible_controllers[18]); return true;
-        case FLEXIBLE_CONTROLLER_20: param->set_flexible_controller(flexible_controllers[19]); return true;
+        case FLEXIBLE_CONTROLLER_1: param.set_flexible_controller(flexible_controllers[0]); return true;
+        case FLEXIBLE_CONTROLLER_2: param.set_flexible_controller(flexible_controllers[1]); return true;
+        case FLEXIBLE_CONTROLLER_3: param.set_flexible_controller(flexible_controllers[2]); return true;
+        case FLEXIBLE_CONTROLLER_4: param.set_flexible_controller(flexible_controllers[3]); return true;
+        case FLEXIBLE_CONTROLLER_5: param.set_flexible_controller(flexible_controllers[4]); return true;
+        case FLEXIBLE_CONTROLLER_6: param.set_flexible_controller(flexible_controllers[5]); return true;
+        case FLEXIBLE_CONTROLLER_7: param.set_flexible_controller(flexible_controllers[6]); return true;
+        case FLEXIBLE_CONTROLLER_8: param.set_flexible_controller(flexible_controllers[7]); return true;
+        case FLEXIBLE_CONTROLLER_9: param.set_flexible_controller(flexible_controllers[8]); return true;
+        case FLEXIBLE_CONTROLLER_10: param.set_flexible_controller(flexible_controllers[9]); return true;
+        case FLEXIBLE_CONTROLLER_11: param.set_flexible_controller(flexible_controllers[10]); return true;
+        case FLEXIBLE_CONTROLLER_12: param.set_flexible_controller(flexible_controllers[11]); return true;
+        case FLEXIBLE_CONTROLLER_13: param.set_flexible_controller(flexible_controllers[12]); return true;
+        case FLEXIBLE_CONTROLLER_14: param.set_flexible_controller(flexible_controllers[13]); return true;
+        case FLEXIBLE_CONTROLLER_15: param.set_flexible_controller(flexible_controllers[14]); return true;
+        case FLEXIBLE_CONTROLLER_16: param.set_flexible_controller(flexible_controllers[15]); return true;
+        case FLEXIBLE_CONTROLLER_17: param.set_flexible_controller(flexible_controllers[16]); return true;
+        case FLEXIBLE_CONTROLLER_18: param.set_flexible_controller(flexible_controllers[17]); return true;
+        case FLEXIBLE_CONTROLLER_19: param.set_flexible_controller(flexible_controllers[18]); return true;
+        case FLEXIBLE_CONTROLLER_20: param.set_flexible_controller(flexible_controllers[19]); return true;
 
-        case LFO_1: param->set_lfo(lfos_rw[0]); return true;
-        case LFO_2: param->set_lfo(lfos_rw[1]); return true;
-        case LFO_3: param->set_lfo(lfos_rw[2]); return true;
-        case LFO_4: param->set_lfo(lfos_rw[3]); return true;
-        case LFO_5: param->set_lfo(lfos_rw[4]); return true;
-        case LFO_6: param->set_lfo(lfos_rw[5]); return true;
-        case LFO_7: param->set_lfo(lfos_rw[6]); return true;
-        case LFO_8: param->set_lfo(lfos_rw[7]); return true;
+        case LFO_1: param.set_lfo(lfos_rw[0]); return true;
+        case LFO_2: param.set_lfo(lfos_rw[1]); return true;
+        case LFO_3: param.set_lfo(lfos_rw[2]); return true;
+        case LFO_4: param.set_lfo(lfos_rw[3]); return true;
+        case LFO_5: param.set_lfo(lfos_rw[4]); return true;
+        case LFO_6: param.set_lfo(lfos_rw[5]); return true;
+        case LFO_7: param.set_lfo(lfos_rw[6]); return true;
+        case LFO_8: param.set_lfo(lfos_rw[7]); return true;
 
-        case ENVELOPE_1: param->set_envelope(envelopes[0]); return true;
-        case ENVELOPE_2: param->set_envelope(envelopes[1]); return true;
-        case ENVELOPE_3: param->set_envelope(envelopes[2]); return true;
-        case ENVELOPE_4: param->set_envelope(envelopes[3]); return true;
-        case ENVELOPE_5: param->set_envelope(envelopes[4]); return true;
-        case ENVELOPE_6: param->set_envelope(envelopes[5]); return true;
+        case ENVELOPE_1: param.set_envelope(envelopes[0]); return true;
+        case ENVELOPE_2: param.set_envelope(envelopes[1]); return true;
+        case ENVELOPE_3: param.set_envelope(envelopes[2]); return true;
+        case ENVELOPE_4: param.set_envelope(envelopes[3]); return true;
+        case ENVELOPE_5: param.set_envelope(envelopes[4]); return true;
+        case ENVELOPE_6: param.set_envelope(envelopes[5]); return true;
 
-        case CHANNEL_PRESSURE: param->set_midi_controller(&channel_pressure_ctl); return true;
+        case CHANNEL_PRESSURE: param.set_midi_controller(&channel_pressure_ctl); return true;
 
         case MIDI_LEARN: return true;
 
         default: {
             if (is_supported_midi_controller(controller_id)) {
-                param->set_midi_controller(midi_controllers[controller_id]);
+                param.set_midi_controller(midi_controllers[controller_id]);
 
                 return true;
             }
@@ -1847,11 +2588,145 @@ bool Synth::assign_controller_to_float_param(
 
 Number Synth::get_param_ratio(ParamId const param_id) const noexcept
 {
-    if (param_id < FLOAT_PARAMS) {
-        return float_params[param_id]->get_ratio();
+    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
+        int const offset = (int)param_id - (int)ParamId::F1IN;
+        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_ratio();
+            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_ratio();
+            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_ratio();
+            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_ratio();
+            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_ratio();
+            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+        int const offset = (int)param_id - (int)ParamId::N1AMT;
+        int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
+        int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return envelopes_rw[envelope_idx]->amount.get_ratio();
+            case 1: return envelopes_rw[envelope_idx]->initial_value.get_ratio();
+            case 2: return envelopes_rw[envelope_idx]->delay_time.get_ratio();
+            case 3: return envelopes_rw[envelope_idx]->attack_time.get_ratio();
+            case 4: return envelopes_rw[envelope_idx]->peak_value.get_ratio();
+            case 5: return envelopes_rw[envelope_idx]->hold_time.get_ratio();
+            case 6: return envelopes_rw[envelope_idx]->decay_time.get_ratio();
+            case 7: return envelopes_rw[envelope_idx]->sustain_value.get_ratio();
+            case 8: return envelopes_rw[envelope_idx]->release_time.get_ratio();
+            case 9: return envelopes_rw[envelope_idx]->final_value.get_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
+    } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
+        int const offset = (int)param_id - (int)ParamId::L1FRQ;
+        int const lfo_idx = offset / LFO_FLOAT_PARAMS;
+        int const param_idx = offset % LFO_FLOAT_PARAMS;
+
+        switch (param_idx) {
+            case 0: return lfos_rw[lfo_idx]->frequency.get_ratio();
+            case 1: return lfos_rw[lfo_idx]->phase.get_ratio();
+            case 2: return lfos_rw[lfo_idx]->min.get_ratio();
+            case 3: return lfos_rw[lfo_idx]->max.get_ratio();
+            case 4: return lfos_rw[lfo_idx]->amount.get_ratio();
+            case 5: return lfos_rw[lfo_idx]->distortion.get_ratio();
+            case 6: return lfos_rw[lfo_idx]->randomness.get_ratio();
+            default: return 0.0; /* This should never be reached. */
+        }
     }
 
     switch (param_id) {
+        case ParamId::MIX: return modulator_add_volume.get_ratio();
+        case ParamId::PM: return phase_modulation_level.get_ratio();
+        case ParamId::FM: return frequency_modulation_level.get_ratio();
+        case ParamId::AM: return amplitude_modulation_level.get_ratio();
+        case ParamId::MAMP: return modulator_params.amplitude.get_ratio();
+        case ParamId::MVS: return modulator_params.velocity_sensitivity.get_ratio();
+        case ParamId::MFLD: return modulator_params.folding.get_ratio();
+        case ParamId::MPRT: return modulator_params.portamento_length.get_ratio();
+        case ParamId::MPRD: return modulator_params.portamento_depth.get_ratio();
+        case ParamId::MDTN: return modulator_params.detune.get_ratio();
+        case ParamId::MFIN: return modulator_params.fine_detune.get_ratio();
+        case ParamId::MWID: return modulator_params.width.get_ratio();
+        case ParamId::MPAN: return modulator_params.panning.get_ratio();
+        case ParamId::MVOL: return modulator_params.volume.get_ratio();
+        case ParamId::MC1: return modulator_params.harmonic_0.get_ratio();
+        case ParamId::MC2: return modulator_params.harmonic_1.get_ratio();
+        case ParamId::MC3: return modulator_params.harmonic_2.get_ratio();
+        case ParamId::MC4: return modulator_params.harmonic_3.get_ratio();
+        case ParamId::MC5: return modulator_params.harmonic_4.get_ratio();
+        case ParamId::MC6: return modulator_params.harmonic_5.get_ratio();
+        case ParamId::MC7: return modulator_params.harmonic_6.get_ratio();
+        case ParamId::MC8: return modulator_params.harmonic_7.get_ratio();
+        case ParamId::MC9: return modulator_params.harmonic_8.get_ratio();
+        case ParamId::MC10: return modulator_params.harmonic_9.get_ratio();
+        case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_ratio();
+        case ParamId::MF1Q: return modulator_params.filter_1_q.get_ratio();
+        case ParamId::MF1G: return modulator_params.filter_1_gain.get_ratio();
+        case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_ratio();
+        case ParamId::MF2Q: return modulator_params.filter_2_q.get_ratio();
+        case ParamId::MF2G: return modulator_params.filter_2_gain.get_ratio();
+        case ParamId::CAMP: return carrier_params.amplitude.get_ratio();
+        case ParamId::CVS: return carrier_params.velocity_sensitivity.get_ratio();
+        case ParamId::CFLD: return carrier_params.folding.get_ratio();
+        case ParamId::CPRT: return carrier_params.portamento_length.get_ratio();
+        case ParamId::CPRD: return carrier_params.portamento_depth.get_ratio();
+        case ParamId::CDTN: return carrier_params.detune.get_ratio();
+        case ParamId::CFIN: return carrier_params.fine_detune.get_ratio();
+        case ParamId::CWID: return carrier_params.width.get_ratio();
+        case ParamId::CPAN: return carrier_params.panning.get_ratio();
+        case ParamId::CVOL: return carrier_params.volume.get_ratio();
+        case ParamId::CC1: return carrier_params.harmonic_0.get_ratio();
+        case ParamId::CC2: return carrier_params.harmonic_1.get_ratio();
+        case ParamId::CC3: return carrier_params.harmonic_2.get_ratio();
+        case ParamId::CC4: return carrier_params.harmonic_3.get_ratio();
+        case ParamId::CC5: return carrier_params.harmonic_4.get_ratio();
+        case ParamId::CC6: return carrier_params.harmonic_5.get_ratio();
+        case ParamId::CC7: return carrier_params.harmonic_6.get_ratio();
+        case ParamId::CC8: return carrier_params.harmonic_7.get_ratio();
+        case ParamId::CC9: return carrier_params.harmonic_8.get_ratio();
+        case ParamId::CC10: return carrier_params.harmonic_9.get_ratio();
+        case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_ratio();
+        case ParamId::CF1Q: return carrier_params.filter_1_q.get_ratio();
+        case ParamId::CF1G: return carrier_params.filter_1_gain.get_ratio();
+        case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_ratio();
+        case ParamId::CF2Q: return carrier_params.filter_2_q.get_ratio();
+        case ParamId::CF2G: return carrier_params.filter_2_gain.get_ratio();
+        case ParamId::EOG: return effects.overdrive.level.get_ratio();
+        case ParamId::EDG: return effects.distortion.level.get_ratio();
+        case ParamId::EF1FRQ: return effects.filter_1.frequency.get_ratio();
+        case ParamId::EF1Q: return effects.filter_1.q.get_ratio();
+        case ParamId::EF1G: return effects.filter_1.gain.get_ratio();
+        case ParamId::EF2FRQ: return effects.filter_2.frequency.get_ratio();
+        case ParamId::EF2Q: return effects.filter_2.q.get_ratio();
+        case ParamId::EF2G: return effects.filter_2.gain.get_ratio();
+        case ParamId::ECDEL: return effects.chorus.delay_time.get_ratio();
+        case ParamId::ECFRQ: return effects.chorus.frequency.get_ratio();
+        case ParamId::ECDPT: return effects.chorus.depth.get_ratio();
+        case ParamId::ECFB: return effects.chorus.feedback.get_ratio();
+        case ParamId::ECDF: return effects.chorus.damping_frequency.get_ratio();
+        case ParamId::ECDG: return effects.chorus.damping_gain.get_ratio();
+        case ParamId::ECWID: return effects.chorus.width.get_ratio();
+        case ParamId::ECHPF: return effects.chorus.high_pass_frequency.get_ratio();
+        case ParamId::ECWET: return effects.chorus.wet.get_ratio();
+        case ParamId::ECDRY: return effects.chorus.dry.get_ratio();
+        case ParamId::EEDEL: return effects.echo.delay_time.get_ratio();
+        case ParamId::EEFB: return effects.echo.feedback.get_ratio();
+        case ParamId::EEDF: return effects.echo.damping_frequency.get_ratio();
+        case ParamId::EEDG: return effects.echo.damping_gain.get_ratio();
+        case ParamId::EEWID: return effects.echo.width.get_ratio();
+        case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_ratio();
+        case ParamId::EEWET: return effects.echo.wet.get_ratio();
+        case ParamId::EEDRY: return effects.echo.dry.get_ratio();
+        case ParamId::ERRS: return effects.reverb.room_size.get_ratio();
+        case ParamId::ERDF: return effects.reverb.damping_frequency.get_ratio();
+        case ParamId::ERDG: return effects.reverb.damping_gain.get_ratio();
+        case ParamId::ERWID: return effects.reverb.width.get_ratio();
+        case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_ratio();
+        case ParamId::ERWET: return effects.reverb.wet.get_ratio();
+        case ParamId::ERDRY: return effects.reverb.dry.get_ratio();
         case ParamId::MODE: return mode.get_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_ratio();

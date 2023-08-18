@@ -73,9 +73,15 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
         static constexpr Integer ENVELOPES = 6;
+        static constexpr Integer ENVELOPE_FLOAT_PARAMS = 10;
+
         static constexpr Integer MIDI_CONTROLLERS = 128;
+
         static constexpr Integer FLEXIBLE_CONTROLLERS = 20;
+        static constexpr Integer FLEXIBLE_CONTROLLER_FLOAT_PARAMS = 6;
+
         static constexpr Integer LFOS = 8;
+        static constexpr Integer LFO_FLOAT_PARAMS = 7;
 
         enum MessageType {
             SET_PARAM = 1,          ///< Set the given parameter's ratio to
@@ -1068,16 +1074,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         template<class ParamClass>
         void register_param(ParamId const param_id, ParamClass& param) noexcept;
 
-        void register_float_param_as_child(
-            ParamId const param_id,
-            FloatParam& float_param
-        ) noexcept;
-
-        void register_float_param(
-            ParamId const param_id,
-            FloatParam& float_param
-        ) noexcept;
-
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
 
@@ -1108,13 +1104,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void handle_clear() noexcept;
 
-        bool assign_controller_to_param(
+        bool assign_controller_to_discrete_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
 
-        bool assign_controller_to_float_param(
-            ParamId const param_id,
+        template<class FloatParamClass>
+        bool assign_controller(
+            FloatParamClass& param,
             ControllerId const controller_id
         ) noexcept;
 
@@ -1180,7 +1177,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         NoteStack note_stack;
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
-        FloatParam* float_params[FLOAT_PARAMS];
         BiquadFilterSharedCache* biquad_filter_shared_caches[4];
         std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
         std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];
