@@ -276,7 +276,7 @@ void render_rounds(
  *
  * \warning The two signal chains must be identical, but they must not share any
  *          \c SignalProducer instances with each other, even if it would seem
- *          rational to do so (e.g. to use the same \c FloatParam leader
+ *          rational to do so (e.g. to use the same \c FloatParamS leader
  *          instance for both chains). The reason is that the two signal chains
  *          are rendered independently from each other, so their rendering
  *          rounds are not synchronized to each other.

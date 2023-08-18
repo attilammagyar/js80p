@@ -67,9 +67,9 @@ void LFO::initialize_instance() noexcept
 
 LFO::LFO(
         std::string const name,
-        FloatParam& frequency_leader,
-        FloatParam& max_leader,
-        FloatParam& amount_leader,
+        FloatParamS& frequency_leader,
+        FloatParamS& max_leader,
+        FloatParamS& amount_leader,
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
@@ -134,12 +134,12 @@ Sample const* const* LFO::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    min_buffer = FloatParam::produce_if_not_constant(min, round, sample_count);
-    max_buffer = FloatParam::produce_if_not_constant(max, round, sample_count);
-    distortion_buffer = FloatParam::produce_if_not_constant(
+    min_buffer = FloatParamS::produce_if_not_constant(min, round, sample_count);
+    max_buffer = FloatParamS::produce_if_not_constant(max, round, sample_count);
+    distortion_buffer = FloatParamS::produce_if_not_constant(
         distortion, round, sample_count
     );
-    randomness_buffer = FloatParam::produce_if_not_constant(
+    randomness_buffer = FloatParamS::produce_if_not_constant(
         randomness, round, sample_count
     );
     oscillator_buffer = SignalProducer::produce<Oscillator_>(

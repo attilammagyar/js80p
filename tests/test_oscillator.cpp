@@ -919,8 +919,8 @@ TEST(amplitude_modulation_creates_two_sidebands, {
         -0.001
     );
 
-    FloatParam dummy_param("", 0.0, 1.0, 0.0);
-    FloatParam modulation_level("", 0.0, 1.0, 0.7);
+    FloatParamS dummy_param("", 0.0, 1.0, 0.0);
+    FloatParamS modulation_level("", 0.0, 1.0, 0.7);
 
     Modulator::WaveformParam modulator_waveform("");
     Modulator modulator(modulator_waveform);
@@ -983,8 +983,8 @@ TEST(frequency_may_be_modulated, {
 
     SumOfSines expected(1.0, 1000.0, 0.0, 0.0, 0.0, 0.0, 1, -0.000025);
 
-    FloatParam dummy_param("", 0.0, 1.0, 0.0);
-    FloatParam modulation_level("", 0.0, 1.0, 0.5);
+    FloatParamS dummy_param("", 0.0, 1.0, 0.0);
+    FloatParamS modulation_level("", 0.0, 1.0, 0.5);
 
     Modulator modulator(500.0);
 

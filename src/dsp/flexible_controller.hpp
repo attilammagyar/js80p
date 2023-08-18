@@ -31,7 +31,7 @@ namespace JS80P
 {
 
 /**
- * \brief Adjust the value of the \c input \c FloatParam, so that if that has a
+ * \brief Adjust the value of the \c input \c FloatParamB, so that if that has a
  *        \c MidiController assigned, then the \c FlexibleController can be used
  *        as an adjustable version of that controller.
  */
@@ -42,17 +42,17 @@ class FlexibleController : public MidiController
 
         void update() noexcept;
 
-        FloatParam input;
-        FloatParam min;
-        FloatParam max;
-        FloatParam amount;
-        FloatParam distortion;
-        FloatParam randomness;
+        FloatParamB input;
+        FloatParamB min;
+        FloatParamB max;
+        FloatParamB amount;
+        FloatParamB distortion;
+        FloatParamB randomness;
 
     private:
         bool update_change_indices() noexcept;
         bool update_change_index(
-            FloatParam& param, Integer& change_index
+            FloatParamB& param, Integer& change_index
         ) const noexcept;
 
         Integer input_change_index;

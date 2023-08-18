@@ -68,7 +68,7 @@ void Wavefolder<InputSignalProducerClass>::initialize_instance() noexcept
 template<class InputSignalProducerClass>
 Wavefolder<InputSignalProducerClass>::Wavefolder(
         InputSignalProducerClass& input,
-        FloatParam& folding_leader
+        FloatParamS& folding_leader
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 1),
     folding(folding_leader)
@@ -112,7 +112,7 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
-    folding_buffer = FloatParam::produce_if_not_constant(
+    folding_buffer = FloatParamS::produce_if_not_constant(
         folding, round, sample_count
     );
 

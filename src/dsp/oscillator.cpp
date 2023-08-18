@@ -30,7 +30,7 @@ namespace JS80P
 {
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
-FloatParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_param("", 0.0, 0.0, 0.0);
+FloatParamS Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_param("", 0.0, 0.0, 0.0);
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 ToggleParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_toggle("", ToggleParam::OFF);
@@ -40,7 +40,7 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::WaveformParam::WaveformParam(
         std::string const name,
         Waveform const max_value
-) noexcept : Param<Waveform>(name, SINE, max_value, SINE)
+) noexcept : Param<Waveform, ParamEvaluation::BLOCK>(name, SINE, max_value, SINE)
 {
 }
 
@@ -49,9 +49,9 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
         ModulatorSignalProducerClass* modulator,
-        FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader,
-        FloatParam& phase_modulation_level_leader,
+        FloatParamS& amplitude_modulation_level_leader,
+        FloatParamS& frequency_modulation_level_leader,
+        FloatParamS& phase_modulation_level_leader,
         ToggleParam& tempo_sync,
         ToggleParam& center
 ) noexcept
@@ -182,9 +182,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
 template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
-        FloatParam& amplitude_leader,
-        FloatParam& frequency_leader,
-        FloatParam& phase_leader,
+        FloatParamS& amplitude_leader,
+        FloatParamS& frequency_leader,
+        FloatParamS& phase_leader,
         ToggleParam& tempo_sync,
         ToggleParam& center
 ) noexcept
@@ -226,23 +226,23 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
 template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
-        FloatParam& amplitude_leader,
-        FloatParam& detune_leader,
-        FloatParam& fine_detune_leader,
-        FloatParam& harmonic_0_leader,
-        FloatParam& harmonic_1_leader,
-        FloatParam& harmonic_2_leader,
-        FloatParam& harmonic_3_leader,
-        FloatParam& harmonic_4_leader,
-        FloatParam& harmonic_5_leader,
-        FloatParam& harmonic_6_leader,
-        FloatParam& harmonic_7_leader,
-        FloatParam& harmonic_8_leader,
-        FloatParam& harmonic_9_leader,
+        FloatParamS& amplitude_leader,
+        FloatParamS& detune_leader,
+        FloatParamS& fine_detune_leader,
+        FloatParamB& harmonic_0_leader,
+        FloatParamB& harmonic_1_leader,
+        FloatParamB& harmonic_2_leader,
+        FloatParamB& harmonic_3_leader,
+        FloatParamB& harmonic_4_leader,
+        FloatParamB& harmonic_5_leader,
+        FloatParamB& harmonic_6_leader,
+        FloatParamB& harmonic_7_leader,
+        FloatParamB& harmonic_8_leader,
+        FloatParamB& harmonic_9_leader,
         ModulatorSignalProducerClass* modulator,
-        FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader,
-        FloatParam& phase_modulation_level_leader
+        FloatParamS& amplitude_modulation_level_leader,
+        FloatParamS& frequency_modulation_level_leader,
+        FloatParamS& phase_modulation_level_leader
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
@@ -452,7 +452,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
                 has_changed = true;
             }
 
-            FloatParam::produce_if_not_constant(
+            FloatParamB::produce_if_not_constant(
                 *custom_waveform_params[i], round, sample_count
             );
         }
@@ -500,12 +500,12 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         Integer const sample_count
 ) noexcept {
     Sample const* modulated_amplitude_buffer = (
-        FloatParam::produce_if_not_constant<ModulatedFloatParam>(
+        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
             modulated_amplitude, round, sample_count
         )
     );
     Sample const* amplitude_buffer = (
-        FloatParam::produce_if_not_constant(amplitude, round, sample_count)
+        FloatParamS::produce_if_not_constant(amplitude, round, sample_count)
     );
 
     if (amplitude_buffer == NULL) {
@@ -560,15 +560,15 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
     constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
 
     Sample const* const frequency_buffer = (
-        FloatParam::produce_if_not_constant<ModulatedFloatParam>(
+        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
             frequency, round, sample_count
         )
     );
     Sample const* const detune_buffer = (
-        FloatParam::produce_if_not_constant(detune, round, sample_count)
+        FloatParamS::produce_if_not_constant(detune, round, sample_count)
     );
     Sample const* const fine_detune_buffer = (
-        FloatParam::produce_if_not_constant(fine_detune, round, sample_count)
+        FloatParamS::produce_if_not_constant(fine_detune, round, sample_count)
     );
 
     Byte const_param_flags = (
@@ -729,7 +729,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Sample const* const phase_buffer = FloatParam::produce_if_not_constant<ModulatedFloatParam>(
+    Sample const* const phase_buffer = FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
         phase, round, sample_count
     );
     phase_is_constant = phase_buffer == NULL;

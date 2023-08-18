@@ -43,12 +43,12 @@ class Echo : public Effect<InputSignalProducerClass>
 
         Echo(std::string const name, InputSignalProducerClass& input);
 
-        FloatParam delay_time;
-        FloatParam feedback;
-        FloatParam damping_frequency;
-        FloatParam damping_gain;
-        FloatParam width;
-        FloatParam high_pass_frequency;
+        FloatParamS delay_time;
+        FloatParamS feedback;
+        FloatParamS damping_frequency;
+        FloatParamS damping_gain;
+        FloatParamS width;
+        FloatParamS high_pass_frequency;
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
 
@@ -67,8 +67,8 @@ class Echo : public Effect<InputSignalProducerClass>
 
     private:
         typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParam high_pass_filter_q;
-        FloatParam high_pass_filter_gain;
+        FloatParamS high_pass_filter_q;
+        FloatParamS high_pass_filter_gain;
 
         HighPassedInput high_pass_filter;
         CombFilter1 comb_filter_1;

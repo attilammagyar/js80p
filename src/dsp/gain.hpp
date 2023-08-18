@@ -34,7 +34,7 @@ class Gain : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Gain(InputSignalProducerClass& input, FloatParam& gain) noexcept;
+        Gain(InputSignalProducerClass& input, FloatParamS& gain) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -52,7 +52,7 @@ class Gain : public Filter<InputSignalProducerClass>
     private:
         Sample const* gain_buffer;
 
-        FloatParam& gain;
+        FloatParamS& gain;
 };
 
 }

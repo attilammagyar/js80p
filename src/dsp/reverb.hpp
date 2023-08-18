@@ -45,11 +45,11 @@ class Reverb : public Effect<InputSignalProducerClass>
 
         virtual ~Reverb();
 
-        FloatParam room_size;
-        FloatParam damping_frequency;
-        FloatParam damping_gain;
-        FloatParam width;
-        FloatParam high_pass_frequency;
+        FloatParamS room_size;
+        FloatParamS damping_frequency;
+        FloatParamS damping_gain;
+        FloatParamS width;
+        FloatParamS high_pass_frequency;
         ToggleParam log_scale_frequencies;
 
     protected:
@@ -75,8 +75,8 @@ class Reverb : public Effect<InputSignalProducerClass>
         Mixer<CombFilter> mixer;
 
         typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParam high_pass_filter_q;
-        FloatParam high_pass_filter_gain;
+        FloatParamS high_pass_filter_q;
+        FloatParamS high_pass_filter_gain;
 
         HighPassedInput high_pass_filter;
         CombFilter* comb_filters[COMB_FILTERS];

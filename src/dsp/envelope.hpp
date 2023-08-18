@@ -42,16 +42,16 @@ class Envelope
         Seconds get_dahd_length() const noexcept;
 
         ToggleParam dynamic;
-        FloatParam amount;
-        FloatParam initial_value;
-        FloatParam delay_time;
-        FloatParam attack_time;
-        FloatParam peak_value;
-        FloatParam hold_time;
-        FloatParam decay_time;
-        FloatParam sustain_value;
-        FloatParam release_time;
-        FloatParam final_value;
+        FloatParamB amount;
+        FloatParamB initial_value;
+        FloatParamB delay_time;
+        FloatParamB attack_time;
+        FloatParamB peak_value;
+        FloatParamB hold_time;
+        FloatParamB decay_time;
+        FloatParamB sustain_value;
+        FloatParamB release_time;
+        FloatParamB final_value;
 
     private:
         template<class ParamType>

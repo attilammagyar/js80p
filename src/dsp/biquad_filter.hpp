@@ -71,7 +71,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static constexpr Type LOW_SHELF = 5;
         static constexpr Type HIGH_SHELF = 6;
 
-        class TypeParam : public Param<Type>
+        class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
         {
             public:
                 TypeParam(std::string const name) noexcept;
@@ -94,9 +94,9 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         BiquadFilter(
             InputSignalProducerClass& input,
             TypeParam& type,
-            FloatParam& frequency_leader,
-            FloatParam& q_leader,
-            FloatParam& gain_leader,
+            FloatParamS& frequency_leader,
+            FloatParamS& q_leader,
+            FloatParamS& gain_leader,
             BiquadFilterSharedCache* shared_cache = NULL
         ) noexcept;
 
@@ -108,9 +108,9 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         virtual void reset() noexcept override;
 
-        FloatParam frequency;
-        FloatParam q;
-        FloatParam gain;
+        FloatParamS frequency;
+        FloatParamS q;
+        FloatParamS gain;
         TypeParam& type;
 
     protected:

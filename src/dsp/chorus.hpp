@@ -46,14 +46,14 @@ class Chorus : public Effect<InputSignalProducerClass>
 
         Chorus(std::string const name, InputSignalProducerClass& input);
 
-        FloatParam delay_time;
-        FloatParam frequency;
-        FloatParam depth;
-        FloatParam feedback;
-        FloatParam damping_frequency;
-        FloatParam damping_gain;
-        FloatParam width;
-        FloatParam high_pass_frequency;
+        FloatParamS delay_time;
+        FloatParamS frequency;
+        FloatParamS depth;
+        FloatParamS feedback;
+        FloatParamS damping_frequency;
+        FloatParamS damping_gain;
+        FloatParamS width;
+        FloatParamS high_pass_frequency;
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
 
@@ -79,15 +79,15 @@ class Chorus : public Effect<InputSignalProducerClass>
             1.0 / (Number)Constants::CHORUS_FEEDBACK_SCALE
         );
 
-        FloatParam biquad_filter_q;
+        FloatParamS biquad_filter_q;
 
         typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParam high_pass_filter_gain;
+        FloatParamS high_pass_filter_gain;
         HighPassedInput high_pass_filter;
 
-        FloatParam delay_time_1;
-        FloatParam delay_time_2;
-        FloatParam delay_time_3;
+        FloatParamS delay_time_1;
+        FloatParamS delay_time_2;
+        FloatParamS delay_time_3;
 
         CombFilter comb_filter_1;
         CombFilter comb_filter_2;

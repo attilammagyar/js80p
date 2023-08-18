@@ -146,13 +146,21 @@ class ToggleParam : public Param<Toggle, ParamEvaluation::BLOCK>
 };
 
 
+template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation>
+class FloatParam;
+
+
+typedef FloatParam<ParamEvaluation::SAMPLE, ParamEvaluation::SAMPLE> FloatParamS;
+typedef FloatParam<ParamEvaluation::BLOCK, ParamEvaluation::BLOCK> FloatParamB;
+
+
 /**
  * \brief Parameter with floating point values. Values can be scheduled at
  *        time offsets, or can be approached linearly over a given duration of
  *        time.
  */
 template<ParamEvaluation evaluation, ParamEvaluation leader_evaluation = ParamEvaluation::SAMPLE>
-class FloatParamTpl : public Param<Number, evaluation>
+class FloatParam : public Param<Number, evaluation>
 {
     friend class SignalProducer;
 
@@ -189,27 +197,27 @@ class FloatParamTpl : public Param<Number, evaluation>
         /**
          * \brief Render the single channel of the parameter if it has scheduled
          *        changes during this round, but if the parameter is constant
-         *        during the round, then skip this round for it and return
-         *        \c NULL. A shortcut for the following construct:
+         *        during the round, then return \c NULL. A shortcut for the
+         *        following construct:
          *
          *        \code{.cpp}
          *        if (param.is_constant_in_next_round(round, sample_count) {
          *            param.skip_round(round, sample_count);
          *        } else {
-         *            param_buffer = FloatParam::produce<FloatParam>(
+         *            param_buffer = FloatParamS::produce<FloatParamS>(
          *                param, round, sample_count
          *            )[0];
          *        }
          *        \endcode
-         */ // TODO
-        template<class FloatParamClass = FloatParamTpl<ParamEvaluation::SAMPLE> >
+         */
+        template<class FloatParamClass = FloatParam<ParamEvaluation::SAMPLE> >
         static Sample const* produce_if_not_constant(
             FloatParamClass& float_param,
             Integer const round,
             Integer const sample_count
         ) noexcept;
 
-        FloatParamTpl(
+        FloatParam(
             std::string const name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
@@ -223,9 +231,9 @@ class FloatParamTpl : public Param<Number, evaluation>
 
         /**
          * \warning When the leader needs to be rendered, it will be rendered as
-         *          a \c FloatParamTpl<leader_evaluation>.
+         *          a \c FloatParam<leader_evaluation>.
          */
-        FloatParamTpl(FloatParamTpl<leader_evaluation>& leader) noexcept;
+        FloatParam(FloatParam<leader_evaluation>& leader) noexcept;
 
         bool is_logarithmic() const noexcept;
 
@@ -366,8 +374,8 @@ class FloatParamTpl : public Param<Number, evaluation>
 
         Seconds schedule_envelope_value_if_not_reached(
             Seconds const next_event_time_offset,
-            FloatParamTpl<ParamEvaluation::SAMPLE> const& time_param, // TODO
-            FloatParamTpl<ParamEvaluation::SAMPLE> const& value_param, // TODO
+            FloatParamB const& time_param,
+            FloatParamB const& value_param,
             Number const amount
         ) noexcept;
 
@@ -384,7 +392,7 @@ class FloatParamTpl : public Param<Number, evaluation>
         Number const log_min_minus;
         Number const log_range_inv;
 
-        FloatParamTpl<leader_evaluation>* const leader;
+        FloatParam<leader_evaluation>* const leader;
 
         FlexibleController* flexible_controller;
         Integer flexible_controller_change_index;
@@ -415,15 +423,12 @@ class FloatParamTpl : public Param<Number, evaluation>
 };
 
 
-typedef FloatParamTpl<ParamEvaluation::SAMPLE, ParamEvaluation::SAMPLE> FloatParam;
-
-
 /**
  * \brief A parameter that can be modulated by the output of other
  *        \c SignalProducer objects.
  */
 template<class ModulatorSignalProducerClass>
-class ModulatableFloatParam : public FloatParam
+class ModulatableFloatParam : public FloatParamS
 {
     friend class SignalProducer;
 
@@ -432,14 +437,14 @@ class ModulatableFloatParam : public FloatParam
 
         ModulatableFloatParam(
             ModulatorSignalProducerClass* modulator,
-            FloatParam& modulation_level_leader,
+            FloatParamS& modulation_level_leader,
             std::string const name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0
         ) noexcept;
 
-        ModulatableFloatParam(FloatParam& leader) noexcept;
+        ModulatableFloatParam(FloatParamS& leader) noexcept;
 
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
@@ -466,7 +471,7 @@ class ModulatableFloatParam : public FloatParam
         ) noexcept;
 
     private:
-        FloatParam modulation_level;
+        FloatParamS modulation_level;
         ModulatorSignalProducerClass* modulator;
         Sample const* modulator_buffer;
         Sample const* modulation_level_buffer;

@@ -68,7 +68,7 @@ std::string Synth::param_names_by_id[ParamId::MAX_PARAM_ID];
 
 
 Synth::ModeParam::ModeParam(std::string const name) noexcept
-    : Param<Mode>(name, MIX_AND_MOD, SPLIT_AT_C4, MIX_AND_MOD)
+    : Param<Mode, ParamEvaluation::BLOCK>(name, MIX_AND_MOD, SPLIT_AT_C4, MIX_AND_MOD)
 {
 }
 
@@ -262,10 +262,10 @@ void Synth::register_main_params() noexcept
 
     register_param_as_child(ParamId::MODE, mode);
 
-    register_param_as_child<FloatParam>(ParamId::MIX, modulator_add_volume);
-    register_param_as_child<FloatParam>(ParamId::PM, phase_modulation_level);
-    register_param_as_child<FloatParam>(ParamId::FM, frequency_modulation_level);
-    register_param_as_child<FloatParam>(ParamId::AM, amplitude_modulation_level);
+    register_param_as_child<FloatParamS>(ParamId::MIX, modulator_add_volume);
+    register_param_as_child<FloatParamS>(ParamId::PM, phase_modulation_level);
+    register_param_as_child<FloatParamS>(ParamId::FM, frequency_modulation_level);
+    register_param_as_child<FloatParamS>(ParamId::AM, amplitude_modulation_level);
 }
 
 
@@ -274,43 +274,43 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(
         ParamId::MWAV, modulator_params.waveform
     );
-    register_param_as_child<FloatParam>(ParamId::MAMP, modulator_params.amplitude);
-    register_param_as_child<FloatParam>(ParamId::MVS, modulator_params.velocity_sensitivity);
-    register_param_as_child<FloatParam>(ParamId::MFLD, modulator_params.folding);
-    register_param_as_child<FloatParam>(ParamId::MPRT, modulator_params.portamento_length);
-    register_param_as_child<FloatParam>(ParamId::MPRD, modulator_params.portamento_depth);
-    register_param_as_child<FloatParam>(ParamId::MDTN, modulator_params.detune);
-    register_param_as_child<FloatParam>(ParamId::MFIN, modulator_params.fine_detune);
-    register_param_as_child<FloatParam>(ParamId::MWID, modulator_params.width);
-    register_param_as_child<FloatParam>(ParamId::MPAN, modulator_params.panning);
-    register_param_as_child<FloatParam>(ParamId::MVOL, modulator_params.volume);
+    register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
+    register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
+    register_param_as_child<FloatParamS>(ParamId::MFLD, modulator_params.folding);
+    register_param_as_child<FloatParamS>(ParamId::MPRT, modulator_params.portamento_length);
+    register_param_as_child<FloatParamS>(ParamId::MPRD, modulator_params.portamento_depth);
+    register_param_as_child<FloatParamS>(ParamId::MDTN, modulator_params.detune);
+    register_param_as_child<FloatParamS>(ParamId::MFIN, modulator_params.fine_detune);
+    register_param_as_child<FloatParamB>(ParamId::MWID, modulator_params.width);
+    register_param_as_child<FloatParamS>(ParamId::MPAN, modulator_params.panning);
+    register_param_as_child<FloatParamS>(ParamId::MVOL, modulator_params.volume);
 
-    register_param_as_child<FloatParam>(ParamId::MC1, modulator_params.harmonic_0);
-    register_param_as_child<FloatParam>(ParamId::MC2, modulator_params.harmonic_1);
-    register_param_as_child<FloatParam>(ParamId::MC3, modulator_params.harmonic_2);
-    register_param_as_child<FloatParam>(ParamId::MC4, modulator_params.harmonic_3);
-    register_param_as_child<FloatParam>(ParamId::MC5, modulator_params.harmonic_4);
-    register_param_as_child<FloatParam>(ParamId::MC6, modulator_params.harmonic_5);
-    register_param_as_child<FloatParam>(ParamId::MC7, modulator_params.harmonic_6);
-    register_param_as_child<FloatParam>(ParamId::MC8, modulator_params.harmonic_7);
-    register_param_as_child<FloatParam>(ParamId::MC9, modulator_params.harmonic_8);
-    register_param_as_child<FloatParam>(ParamId::MC10, modulator_params.harmonic_9);
+    register_param_as_child<FloatParamB>(ParamId::MC1, modulator_params.harmonic_0);
+    register_param_as_child<FloatParamB>(ParamId::MC2, modulator_params.harmonic_1);
+    register_param_as_child<FloatParamB>(ParamId::MC3, modulator_params.harmonic_2);
+    register_param_as_child<FloatParamB>(ParamId::MC4, modulator_params.harmonic_3);
+    register_param_as_child<FloatParamB>(ParamId::MC5, modulator_params.harmonic_4);
+    register_param_as_child<FloatParamB>(ParamId::MC6, modulator_params.harmonic_5);
+    register_param_as_child<FloatParamB>(ParamId::MC7, modulator_params.harmonic_6);
+    register_param_as_child<FloatParamB>(ParamId::MC8, modulator_params.harmonic_7);
+    register_param_as_child<FloatParamB>(ParamId::MC9, modulator_params.harmonic_8);
+    register_param_as_child<FloatParamB>(ParamId::MC10, modulator_params.harmonic_9);
 
     register_param_as_child<Modulator::Filter1::TypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_log_scale);
-    register_param_as_child<FloatParam>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
-    register_param_as_child<FloatParam>(ParamId::MF1Q, modulator_params.filter_1_q);
-    register_param_as_child<FloatParam>(ParamId::MF1G, modulator_params.filter_1_gain);
+    register_param_as_child<FloatParamS>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
+    register_param_as_child<FloatParamS>(ParamId::MF1Q, modulator_params.filter_1_q);
+    register_param_as_child<FloatParamS>(ParamId::MF1G, modulator_params.filter_1_gain);
 
     register_param_as_child<Modulator::Filter2::TypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_log_scale);
-    register_param_as_child<FloatParam>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
-    register_param_as_child<FloatParam>(ParamId::MF2Q, modulator_params.filter_2_q);
-    register_param_as_child<FloatParam>(ParamId::MF2G, modulator_params.filter_2_gain);
+    register_param_as_child<FloatParamS>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
+    register_param_as_child<FloatParamS>(ParamId::MF2Q, modulator_params.filter_2_q);
+    register_param_as_child<FloatParamS>(ParamId::MF2G, modulator_params.filter_2_gain);
 }
 
 
@@ -319,95 +319,95 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(
         ParamId::CWAV, carrier_params.waveform
     );
-    register_param_as_child<FloatParam>(ParamId::CAMP, carrier_params.amplitude);
-    register_param_as_child<FloatParam>(ParamId::CVS, carrier_params.velocity_sensitivity);
-    register_param_as_child<FloatParam>(ParamId::CFLD, carrier_params.folding);
-    register_param_as_child<FloatParam>(ParamId::CPRT, carrier_params.portamento_length);
-    register_param_as_child<FloatParam>(ParamId::CPRD, carrier_params.portamento_depth);
-    register_param_as_child<FloatParam>(ParamId::CDTN, carrier_params.detune);
-    register_param_as_child<FloatParam>(ParamId::CFIN, carrier_params.fine_detune);
-    register_param_as_child<FloatParam>(ParamId::CWID, carrier_params.width);
-    register_param_as_child<FloatParam>(ParamId::CPAN, carrier_params.panning);
-    register_param_as_child<FloatParam>(ParamId::CVOL, carrier_params.volume);
+    register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
+    register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
+    register_param_as_child<FloatParamS>(ParamId::CFLD, carrier_params.folding);
+    register_param_as_child<FloatParamS>(ParamId::CPRT, carrier_params.portamento_length);
+    register_param_as_child<FloatParamS>(ParamId::CPRD, carrier_params.portamento_depth);
+    register_param_as_child<FloatParamS>(ParamId::CDTN, carrier_params.detune);
+    register_param_as_child<FloatParamS>(ParamId::CFIN, carrier_params.fine_detune);
+    register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
+    register_param_as_child<FloatParamS>(ParamId::CPAN, carrier_params.panning);
+    register_param_as_child<FloatParamS>(ParamId::CVOL, carrier_params.volume);
 
-    register_param_as_child<FloatParam>(ParamId::CC1, carrier_params.harmonic_0);
-    register_param_as_child<FloatParam>(ParamId::CC2, carrier_params.harmonic_1);
-    register_param_as_child<FloatParam>(ParamId::CC3, carrier_params.harmonic_2);
-    register_param_as_child<FloatParam>(ParamId::CC4, carrier_params.harmonic_3);
-    register_param_as_child<FloatParam>(ParamId::CC5, carrier_params.harmonic_4);
-    register_param_as_child<FloatParam>(ParamId::CC6, carrier_params.harmonic_5);
-    register_param_as_child<FloatParam>(ParamId::CC7, carrier_params.harmonic_6);
-    register_param_as_child<FloatParam>(ParamId::CC8, carrier_params.harmonic_7);
-    register_param_as_child<FloatParam>(ParamId::CC9, carrier_params.harmonic_8);
-    register_param_as_child<FloatParam>(ParamId::CC10, carrier_params.harmonic_9);
+    register_param_as_child<FloatParamB>(ParamId::CC1, carrier_params.harmonic_0);
+    register_param_as_child<FloatParamB>(ParamId::CC2, carrier_params.harmonic_1);
+    register_param_as_child<FloatParamB>(ParamId::CC3, carrier_params.harmonic_2);
+    register_param_as_child<FloatParamB>(ParamId::CC4, carrier_params.harmonic_3);
+    register_param_as_child<FloatParamB>(ParamId::CC5, carrier_params.harmonic_4);
+    register_param_as_child<FloatParamB>(ParamId::CC6, carrier_params.harmonic_5);
+    register_param_as_child<FloatParamB>(ParamId::CC7, carrier_params.harmonic_6);
+    register_param_as_child<FloatParamB>(ParamId::CC8, carrier_params.harmonic_7);
+    register_param_as_child<FloatParamB>(ParamId::CC9, carrier_params.harmonic_8);
+    register_param_as_child<FloatParamB>(ParamId::CC10, carrier_params.harmonic_9);
 
     register_param_as_child<Carrier::Filter1::TypeParam>(
         ParamId::CF1TYP, carrier_params.filter_1_type
     );
     register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_log_scale);
-    register_param_as_child<FloatParam>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
-    register_param_as_child<FloatParam>(ParamId::CF1Q, carrier_params.filter_1_q);
-    register_param_as_child<FloatParam>(ParamId::CF1G, carrier_params.filter_1_gain);
+    register_param_as_child<FloatParamS>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
+    register_param_as_child<FloatParamS>(ParamId::CF1Q, carrier_params.filter_1_q);
+    register_param_as_child<FloatParamS>(ParamId::CF1G, carrier_params.filter_1_gain);
 
     register_param_as_child<Carrier::Filter2::TypeParam>(
         ParamId::CF2TYP, carrier_params.filter_2_type
     );
     register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_log_scale);
-    register_param_as_child<FloatParam>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
-    register_param_as_child<FloatParam>(ParamId::CF2Q, carrier_params.filter_2_q);
-    register_param_as_child<FloatParam>(ParamId::CF2G, carrier_params.filter_2_gain);
+    register_param_as_child<FloatParamS>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
+    register_param_as_child<FloatParamS>(ParamId::CF2Q, carrier_params.filter_2_q);
+    register_param_as_child<FloatParamS>(ParamId::CF2G, carrier_params.filter_2_gain);
 }
 
 
 void Synth::register_effects_params() noexcept
 {
-    register_param<FloatParam>(ParamId::EOG, effects.overdrive.level);
+    register_param<FloatParamS>(ParamId::EOG, effects.overdrive.level);
 
-    register_param<FloatParam>(ParamId::EDG, effects.distortion.level);
+    register_param<FloatParamS>(ParamId::EDG, effects.distortion.level);
 
     register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
     register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_log_scale);
-    register_param<FloatParam>(ParamId::EF1FRQ, effects.filter_1.frequency);
-    register_param<FloatParam>(ParamId::EF1Q, effects.filter_1.q);
-    register_param<FloatParam>(ParamId::EF1G, effects.filter_1.gain);
+    register_param<FloatParamS>(ParamId::EF1FRQ, effects.filter_1.frequency);
+    register_param<FloatParamS>(ParamId::EF1Q, effects.filter_1.q);
+    register_param<FloatParamS>(ParamId::EF1G, effects.filter_1.gain);
 
     register_param<Effects::Filter2<Bus>::TypeParam>(ParamId::EF2TYP, effects.filter_2_type);
     register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_log_scale);
-    register_param<FloatParam>(ParamId::EF2FRQ, effects.filter_2.frequency);
-    register_param<FloatParam>(ParamId::EF2Q, effects.filter_2.q);
-    register_param<FloatParam>(ParamId::EF2G, effects.filter_2.gain);
+    register_param<FloatParamS>(ParamId::EF2FRQ, effects.filter_2.frequency);
+    register_param<FloatParamS>(ParamId::EF2Q, effects.filter_2.q);
+    register_param<FloatParamS>(ParamId::EF2G, effects.filter_2.gain);
 
-    register_param<FloatParam>(ParamId::ECDEL, effects.chorus.delay_time);
-    register_param<FloatParam>(ParamId::ECFRQ, effects.chorus.frequency);
-    register_param<FloatParam>(ParamId::ECDPT, effects.chorus.depth);
-    register_param<FloatParam>(ParamId::ECFB, effects.chorus.feedback);
-    register_param<FloatParam>(ParamId::ECDF, effects.chorus.damping_frequency);
-    register_param<FloatParam>(ParamId::ECDG, effects.chorus.damping_gain);
-    register_param<FloatParam>(ParamId::ECWID, effects.chorus.width);
-    register_param<FloatParam>(ParamId::ECHPF, effects.chorus.high_pass_frequency);
-    register_param<FloatParam>(ParamId::ECWET, effects.chorus.wet);
-    register_param<FloatParam>(ParamId::ECDRY, effects.chorus.dry);
+    register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
+    register_param<FloatParamS>(ParamId::ECFRQ, effects.chorus.frequency);
+    register_param<FloatParamS>(ParamId::ECDPT, effects.chorus.depth);
+    register_param<FloatParamS>(ParamId::ECFB, effects.chorus.feedback);
+    register_param<FloatParamS>(ParamId::ECDF, effects.chorus.damping_frequency);
+    register_param<FloatParamS>(ParamId::ECDG, effects.chorus.damping_gain);
+    register_param<FloatParamS>(ParamId::ECWID, effects.chorus.width);
+    register_param<FloatParamS>(ParamId::ECHPF, effects.chorus.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::ECWET, effects.chorus.wet);
+    register_param<FloatParamS>(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
     register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_frequencies);
 
-    register_param<FloatParam>(ParamId::EEDEL, effects.echo.delay_time);
-    register_param<FloatParam>(ParamId::EEFB, effects.echo.feedback);
-    register_param<FloatParam>(ParamId::EEDF, effects.echo.damping_frequency);
-    register_param<FloatParam>(ParamId::EEDG, effects.echo.damping_gain);
-    register_param<FloatParam>(ParamId::EEWID, effects.echo.width);
-    register_param<FloatParam>(ParamId::EEHPF, effects.echo.high_pass_frequency);
-    register_param<FloatParam>(ParamId::EEWET, effects.echo.wet);
-    register_param<FloatParam>(ParamId::EEDRY, effects.echo.dry);
+    register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
+    register_param<FloatParamS>(ParamId::EEFB, effects.echo.feedback);
+    register_param<FloatParamS>(ParamId::EEDF, effects.echo.damping_frequency);
+    register_param<FloatParamS>(ParamId::EEDG, effects.echo.damping_gain);
+    register_param<FloatParamS>(ParamId::EEWID, effects.echo.width);
+    register_param<FloatParamS>(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::EEWET, effects.echo.wet);
+    register_param<FloatParamS>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
     register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
 
-    register_param<FloatParam>(ParamId::ERRS, effects.reverb.room_size);
-    register_param<FloatParam>(ParamId::ERDF, effects.reverb.damping_frequency);
-    register_param<FloatParam>(ParamId::ERDG, effects.reverb.damping_gain);
-    register_param<FloatParam>(ParamId::ERWID, effects.reverb.width);
-    register_param<FloatParam>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
-    register_param<FloatParam>(ParamId::ERWET, effects.reverb.wet);
-    register_param<FloatParam>(ParamId::ERDRY, effects.reverb.dry);
+    register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
+    register_param<FloatParamS>(ParamId::ERDF, effects.reverb.damping_frequency);
+    register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
+    register_param<FloatParamS>(ParamId::ERWID, effects.reverb.width);
+    register_param<FloatParamS>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
+    register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
 }
 
@@ -464,12 +464,12 @@ void Synth::create_flexible_controllers() noexcept
         );
         flexible_controllers_rw[i] = flexible_controller;
 
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->input);
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->min);
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->max);
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->amount);
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->distortion);
-        register_param_as_child<FloatParam>((ParamId)next_id++, flexible_controller->randomness);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->input);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->min);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->max);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->amount);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->distortion);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->randomness);
     }
 }
 
@@ -482,16 +482,16 @@ void Synth::create_envelopes() noexcept
         Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
         envelopes_rw[i] = envelope;
 
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->amount);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->initial_value);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->delay_time);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->attack_time);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->peak_value);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->hold_time);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->decay_time);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->sustain_value);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->release_time);
-        register_param_as_child<FloatParam>((ParamId)next_id++, envelope->final_value);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->amount);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->initial_value);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->delay_time);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->attack_time);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->peak_value);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->hold_time);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->decay_time);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->sustain_value);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->release_time);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->final_value);
     }
 
     register_param_as_child<ToggleParam>(ParamId::N1DYN, envelopes_rw[0]->dynamic);
@@ -512,13 +512,13 @@ void Synth::create_lfos() noexcept
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
-        register_param<FloatParam>((ParamId)next_id++, lfo->frequency);
-        register_param<FloatParam>((ParamId)next_id++, lfo->phase);
-        register_param<FloatParam>((ParamId)next_id++, lfo->min);
-        register_param<FloatParam>((ParamId)next_id++, lfo->max);
-        register_param<FloatParam>((ParamId)next_id++, lfo->amount);
-        register_param<FloatParam>((ParamId)next_id++, lfo->distortion);
-        register_param<FloatParam>((ParamId)next_id++, lfo->randomness);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->frequency);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->phase);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->min);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->max);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->amount);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->distortion);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->randomness);
     }
 
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L1WAV, lfos_rw[0]->waveform);
@@ -1822,95 +1822,111 @@ Sample const* const* Synth::initialize_rendering(
         effects, round, sample_count
     );
 
-    FloatParam::produce_if_not_constant(modulator_add_volume, round, sample_count);
-    FloatParam::produce_if_not_constant(phase_modulation_level, round, sample_count);
-    FloatParam::produce_if_not_constant(frequency_modulation_level, round, sample_count);
-    FloatParam::produce_if_not_constant(amplitude_modulation_level, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.amplitude, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.velocity_sensitivity, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.folding, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.portamento_length, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.portamento_depth, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.detune, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.fine_detune, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.width, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.panning, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.volume, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_0, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_1, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_2, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_3, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_4, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_5, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_6, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_7, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_8, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.harmonic_9, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_1_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_1_q, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_1_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_2_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_2_q, round, sample_count);
-    FloatParam::produce_if_not_constant(modulator_params.filter_2_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.amplitude, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.velocity_sensitivity, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.folding, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.portamento_length, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.portamento_depth, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.detune, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.fine_detune, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.width, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.panning, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.volume, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_0, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_1, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_2, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_3, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_4, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_5, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_6, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_7, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_8, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.harmonic_9, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_1_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_1_q, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_1_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_2_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_2_q, round, sample_count);
-    FloatParam::produce_if_not_constant(carrier_params.filter_2_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.overdrive.level, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.distortion.level, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_1.frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_1.q, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_1.gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_2.frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_2.q, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.filter_2.gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.delay_time, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.depth, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.feedback, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.damping_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.damping_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.width, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.high_pass_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.wet, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.chorus.dry, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.delay_time, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.feedback, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.damping_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.damping_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.width, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.high_pass_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.wet, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.echo.dry, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.room_size, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.damping_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.damping_gain, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.width, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.high_pass_frequency, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.wet, round, sample_count);
-    FloatParam::produce_if_not_constant(effects.reverb.dry, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_add_volume, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(phase_modulation_level, round, sample_count);
+    FloatParamS::produce_if_not_constant(frequency_modulation_level, round, sample_count);
+    FloatParamS::produce_if_not_constant(amplitude_modulation_level, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(modulator_params.amplitude, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.velocity_sensitivity, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.folding, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.portamento_length, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.portamento_depth, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.detune, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.fine_detune, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.width, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.panning, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.volume, round, sample_count);
+
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_0, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_1, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_2, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_3, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_4, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_5, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_6, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_7, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_8, round, sample_count);
+    FloatParamB::produce_if_not_constant(modulator_params.harmonic_9, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(modulator_params.filter_1_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.filter_1_q, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.filter_1_gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(modulator_params.filter_2_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.filter_2_q, round, sample_count);
+    FloatParamS::produce_if_not_constant(modulator_params.filter_2_gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(carrier_params.amplitude, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.velocity_sensitivity, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.folding, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.portamento_length, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.portamento_depth, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.detune, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.fine_detune, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.width, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.panning, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.volume, round, sample_count);
+
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_0, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_1, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_2, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_3, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_4, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_5, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_6, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_7, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_8, round, sample_count);
+    FloatParamB::produce_if_not_constant(carrier_params.harmonic_9, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(carrier_params.filter_1_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.filter_1_q, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.filter_1_gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(carrier_params.filter_2_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.filter_2_q, round, sample_count);
+    FloatParamS::produce_if_not_constant(carrier_params.filter_2_gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.overdrive.level, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.distortion.level, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.filter_1.frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.filter_1.q, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.filter_1.gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.filter_2.frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.filter_2.q, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.filter_2.gain, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.chorus.delay_time, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.depth, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.feedback, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.damping_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.damping_gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.width, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.high_pass_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.wet, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.chorus.dry, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.echo.delay_time, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.feedback, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.damping_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.damping_gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.width, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.high_pass_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.wet, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.dry, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.reverb.room_size, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.damping_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.damping_gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.width, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.high_pass_frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.wet, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.dry, round, sample_count);
 
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->skip_round(round, sample_count);
@@ -2248,12 +2264,12 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->input, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->min, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->max, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->amount, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->distortion, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParam>(flexible_controllers_rw[flex_ctl_idx]->randomness, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->input, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->min, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->max, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->amount, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->distortion, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->randomness, (ControllerId)controller_id); break;;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -2262,16 +2278,16 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->amount, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->initial_value, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->delay_time, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->attack_time, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->peak_value, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->hold_time, (ControllerId)controller_id); break;;
-            case 6: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->decay_time, (ControllerId)controller_id); break;;
-            case 7: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->sustain_value, (ControllerId)controller_id); break;;
-            case 8: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->release_time, (ControllerId)controller_id); break;;
-            case 9: is_assigned = assign_controller<FloatParam>(envelopes_rw[envelope_idx]->final_value, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->amount, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->initial_value, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->delay_time, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->attack_time, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->peak_value, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->hold_time, (ControllerId)controller_id); break;;
+            case 6: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->decay_time, (ControllerId)controller_id); break;;
+            case 7: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->sustain_value, (ControllerId)controller_id); break;;
+            case 8: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->release_time, (ControllerId)controller_id); break;;
+            case 9: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->final_value, (ControllerId)controller_id); break;;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -2280,106 +2296,106 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % LFO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->frequency, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->phase, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->min, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->max, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->amount, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->distortion, (ControllerId)controller_id); break;;
-            case 6: is_assigned = assign_controller<FloatParam>(lfos_rw[lfo_idx]->randomness, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->frequency, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->phase, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->min, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->max, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->amount, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->distortion, (ControllerId)controller_id); break;;
+            case 6: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->randomness, (ControllerId)controller_id); break;;
             default: break; /* This should never be reached. */
         }
     } else if (param_id < FLOAT_PARAMS) {
         switch (param_id) {
-            case ParamId::MIX: is_assigned = assign_controller<FloatParam>(modulator_add_volume, (ControllerId)controller_id); break;;
-            case ParamId::PM: is_assigned = assign_controller<FloatParam>(phase_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::FM: is_assigned = assign_controller<FloatParam>(frequency_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::AM: is_assigned = assign_controller<FloatParam>(amplitude_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::MAMP: is_assigned = assign_controller<FloatParam>(modulator_params.amplitude, (ControllerId)controller_id); break;;
-            case ParamId::MVS: is_assigned = assign_controller<FloatParam>(modulator_params.velocity_sensitivity, (ControllerId)controller_id); break;;
-            case ParamId::MFLD: is_assigned = assign_controller<FloatParam>(modulator_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::MPRT: is_assigned = assign_controller<FloatParam>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::MPRD: is_assigned = assign_controller<FloatParam>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
-            case ParamId::MDTN: is_assigned = assign_controller<FloatParam>(modulator_params.detune, (ControllerId)controller_id); break;;
-            case ParamId::MFIN: is_assigned = assign_controller<FloatParam>(modulator_params.fine_detune, (ControllerId)controller_id); break;;
-            case ParamId::MWID: is_assigned = assign_controller<FloatParam>(modulator_params.width, (ControllerId)controller_id); break;;
-            case ParamId::MPAN: is_assigned = assign_controller<FloatParam>(modulator_params.panning, (ControllerId)controller_id); break;;
-            case ParamId::MVOL: is_assigned = assign_controller<FloatParam>(modulator_params.volume, (ControllerId)controller_id); break;;
-            case ParamId::MC1: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_0, (ControllerId)controller_id); break;;
-            case ParamId::MC2: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_1, (ControllerId)controller_id); break;;
-            case ParamId::MC3: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_2, (ControllerId)controller_id); break;;
-            case ParamId::MC4: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_3, (ControllerId)controller_id); break;;
-            case ParamId::MC5: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_4, (ControllerId)controller_id); break;;
-            case ParamId::MC6: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_5, (ControllerId)controller_id); break;;
-            case ParamId::MC7: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_6, (ControllerId)controller_id); break;;
-            case ParamId::MC8: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_7, (ControllerId)controller_id); break;;
-            case ParamId::MC9: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_8, (ControllerId)controller_id); break;;
-            case ParamId::MC10: is_assigned = assign_controller<FloatParam>(modulator_params.harmonic_9, (ControllerId)controller_id); break;;
-            case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_frequency, (ControllerId)controller_id); break;;
-            case ParamId::MF1Q: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_q, (ControllerId)controller_id); break;;
-            case ParamId::MF1G: is_assigned = assign_controller<FloatParam>(modulator_params.filter_1_gain, (ControllerId)controller_id); break;;
-            case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_frequency, (ControllerId)controller_id); break;;
-            case ParamId::MF2Q: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_q, (ControllerId)controller_id); break;;
-            case ParamId::MF2G: is_assigned = assign_controller<FloatParam>(modulator_params.filter_2_gain, (ControllerId)controller_id); break;;
-            case ParamId::CAMP: is_assigned = assign_controller<FloatParam>(carrier_params.amplitude, (ControllerId)controller_id); break;;
-            case ParamId::CVS: is_assigned = assign_controller<FloatParam>(carrier_params.velocity_sensitivity, (ControllerId)controller_id); break;;
-            case ParamId::CFLD: is_assigned = assign_controller<FloatParam>(carrier_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::CPRT: is_assigned = assign_controller<FloatParam>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::CPRD: is_assigned = assign_controller<FloatParam>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
-            case ParamId::CDTN: is_assigned = assign_controller<FloatParam>(carrier_params.detune, (ControllerId)controller_id); break;;
-            case ParamId::CFIN: is_assigned = assign_controller<FloatParam>(carrier_params.fine_detune, (ControllerId)controller_id); break;;
-            case ParamId::CWID: is_assigned = assign_controller<FloatParam>(carrier_params.width, (ControllerId)controller_id); break;;
-            case ParamId::CPAN: is_assigned = assign_controller<FloatParam>(carrier_params.panning, (ControllerId)controller_id); break;;
-            case ParamId::CVOL: is_assigned = assign_controller<FloatParam>(carrier_params.volume, (ControllerId)controller_id); break;;
-            case ParamId::CC1: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_0, (ControllerId)controller_id); break;;
-            case ParamId::CC2: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_1, (ControllerId)controller_id); break;;
-            case ParamId::CC3: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_2, (ControllerId)controller_id); break;;
-            case ParamId::CC4: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_3, (ControllerId)controller_id); break;;
-            case ParamId::CC5: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_4, (ControllerId)controller_id); break;;
-            case ParamId::CC6: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_5, (ControllerId)controller_id); break;;
-            case ParamId::CC7: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_6, (ControllerId)controller_id); break;;
-            case ParamId::CC8: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_7, (ControllerId)controller_id); break;;
-            case ParamId::CC9: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_8, (ControllerId)controller_id); break;;
-            case ParamId::CC10: is_assigned = assign_controller<FloatParam>(carrier_params.harmonic_9, (ControllerId)controller_id); break;;
-            case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_frequency, (ControllerId)controller_id); break;;
-            case ParamId::CF1Q: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_q, (ControllerId)controller_id); break;;
-            case ParamId::CF1G: is_assigned = assign_controller<FloatParam>(carrier_params.filter_1_gain, (ControllerId)controller_id); break;;
-            case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_frequency, (ControllerId)controller_id); break;;
-            case ParamId::CF2Q: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_q, (ControllerId)controller_id); break;;
-            case ParamId::CF2G: is_assigned = assign_controller<FloatParam>(carrier_params.filter_2_gain, (ControllerId)controller_id); break;;
-            case ParamId::EOG: is_assigned = assign_controller<FloatParam>(effects.overdrive.level, (ControllerId)controller_id); break;;
-            case ParamId::EDG: is_assigned = assign_controller<FloatParam>(effects.distortion.level, (ControllerId)controller_id); break;;
-            case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParam>(effects.filter_1.frequency, (ControllerId)controller_id); break;;
-            case ParamId::EF1Q: is_assigned = assign_controller<FloatParam>(effects.filter_1.q, (ControllerId)controller_id); break;;
-            case ParamId::EF1G: is_assigned = assign_controller<FloatParam>(effects.filter_1.gain, (ControllerId)controller_id); break;;
-            case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParam>(effects.filter_2.frequency, (ControllerId)controller_id); break;;
-            case ParamId::EF2Q: is_assigned = assign_controller<FloatParam>(effects.filter_2.q, (ControllerId)controller_id); break;;
-            case ParamId::EF2G: is_assigned = assign_controller<FloatParam>(effects.filter_2.gain, (ControllerId)controller_id); break;;
-            case ParamId::ECDEL: is_assigned = assign_controller<FloatParam>(effects.chorus.delay_time, (ControllerId)controller_id); break;;
-            case ParamId::ECFRQ: is_assigned = assign_controller<FloatParam>(effects.chorus.frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECDPT: is_assigned = assign_controller<FloatParam>(effects.chorus.depth, (ControllerId)controller_id); break;;
-            case ParamId::ECFB: is_assigned = assign_controller<FloatParam>(effects.chorus.feedback, (ControllerId)controller_id); break;;
-            case ParamId::ECDF: is_assigned = assign_controller<FloatParam>(effects.chorus.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECDG: is_assigned = assign_controller<FloatParam>(effects.chorus.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::ECWID: is_assigned = assign_controller<FloatParam>(effects.chorus.width, (ControllerId)controller_id); break;;
-            case ParamId::ECHPF: is_assigned = assign_controller<FloatParam>(effects.chorus.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECWET: is_assigned = assign_controller<FloatParam>(effects.chorus.wet, (ControllerId)controller_id); break;;
-            case ParamId::ECDRY: is_assigned = assign_controller<FloatParam>(effects.chorus.dry, (ControllerId)controller_id); break;;
-            case ParamId::EEDEL: is_assigned = assign_controller<FloatParam>(effects.echo.delay_time, (ControllerId)controller_id); break;;
-            case ParamId::EEFB: is_assigned = assign_controller<FloatParam>(effects.echo.feedback, (ControllerId)controller_id); break;;
-            case ParamId::EEDF: is_assigned = assign_controller<FloatParam>(effects.echo.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::EEDG: is_assigned = assign_controller<FloatParam>(effects.echo.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::EEWID: is_assigned = assign_controller<FloatParam>(effects.echo.width, (ControllerId)controller_id); break;;
-            case ParamId::EEHPF: is_assigned = assign_controller<FloatParam>(effects.echo.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::EEWET: is_assigned = assign_controller<FloatParam>(effects.echo.wet, (ControllerId)controller_id); break;;
-            case ParamId::EEDRY: is_assigned = assign_controller<FloatParam>(effects.echo.dry, (ControllerId)controller_id); break;;
-            case ParamId::ERRS: is_assigned = assign_controller<FloatParam>(effects.reverb.room_size, (ControllerId)controller_id); break;;
-            case ParamId::ERDF: is_assigned = assign_controller<FloatParam>(effects.reverb.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ERDG: is_assigned = assign_controller<FloatParam>(effects.reverb.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::ERWID: is_assigned = assign_controller<FloatParam>(effects.reverb.width, (ControllerId)controller_id); break;;
-            case ParamId::ERHPF: is_assigned = assign_controller<FloatParam>(effects.reverb.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ERWET: is_assigned = assign_controller<FloatParam>(effects.reverb.wet, (ControllerId)controller_id); break;;
-            case ParamId::ERDRY: is_assigned = assign_controller<FloatParam>(effects.reverb.dry, (ControllerId)controller_id); break;;
+            case ParamId::MIX: is_assigned = assign_controller<FloatParamS>(modulator_add_volume, (ControllerId)controller_id); break;;
+            case ParamId::PM: is_assigned = assign_controller<FloatParamS>(phase_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::FM: is_assigned = assign_controller<FloatParamS>(frequency_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::AM: is_assigned = assign_controller<FloatParamS>(amplitude_modulation_level, (ControllerId)controller_id); break;;
+            case ParamId::MAMP: is_assigned = assign_controller<FloatParamS>(modulator_params.amplitude, (ControllerId)controller_id); break;;
+            case ParamId::MVS: is_assigned = assign_controller<FloatParamB>(modulator_params.velocity_sensitivity, (ControllerId)controller_id); break;;
+            case ParamId::MFLD: is_assigned = assign_controller<FloatParamS>(modulator_params.folding, (ControllerId)controller_id); break;;
+            case ParamId::MPRT: is_assigned = assign_controller<FloatParamS>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::MPRD: is_assigned = assign_controller<FloatParamS>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::MDTN: is_assigned = assign_controller<FloatParamS>(modulator_params.detune, (ControllerId)controller_id); break;;
+            case ParamId::MFIN: is_assigned = assign_controller<FloatParamS>(modulator_params.fine_detune, (ControllerId)controller_id); break;;
+            case ParamId::MWID: is_assigned = assign_controller<FloatParamB>(modulator_params.width, (ControllerId)controller_id); break;;
+            case ParamId::MPAN: is_assigned = assign_controller<FloatParamS>(modulator_params.panning, (ControllerId)controller_id); break;;
+            case ParamId::MVOL: is_assigned = assign_controller<FloatParamS>(modulator_params.volume, (ControllerId)controller_id); break;;
+            case ParamId::MC1: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_0, (ControllerId)controller_id); break;;
+            case ParamId::MC2: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_1, (ControllerId)controller_id); break;;
+            case ParamId::MC3: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_2, (ControllerId)controller_id); break;;
+            case ParamId::MC4: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_3, (ControllerId)controller_id); break;;
+            case ParamId::MC5: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_4, (ControllerId)controller_id); break;;
+            case ParamId::MC6: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_5, (ControllerId)controller_id); break;;
+            case ParamId::MC7: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_6, (ControllerId)controller_id); break;;
+            case ParamId::MC8: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_7, (ControllerId)controller_id); break;;
+            case ParamId::MC9: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_8, (ControllerId)controller_id); break;;
+            case ParamId::MC10: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_9, (ControllerId)controller_id); break;;
+            case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_frequency, (ControllerId)controller_id); break;;
+            case ParamId::MF1Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_q, (ControllerId)controller_id); break;;
+            case ParamId::MF1G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_gain, (ControllerId)controller_id); break;;
+            case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_frequency, (ControllerId)controller_id); break;;
+            case ParamId::MF2Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_q, (ControllerId)controller_id); break;;
+            case ParamId::MF2G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_gain, (ControllerId)controller_id); break;;
+            case ParamId::CAMP: is_assigned = assign_controller<FloatParamS>(carrier_params.amplitude, (ControllerId)controller_id); break;;
+            case ParamId::CVS: is_assigned = assign_controller<FloatParamB>(carrier_params.velocity_sensitivity, (ControllerId)controller_id); break;;
+            case ParamId::CFLD: is_assigned = assign_controller<FloatParamS>(carrier_params.folding, (ControllerId)controller_id); break;;
+            case ParamId::CPRT: is_assigned = assign_controller<FloatParamS>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
+            case ParamId::CPRD: is_assigned = assign_controller<FloatParamS>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
+            case ParamId::CDTN: is_assigned = assign_controller<FloatParamS>(carrier_params.detune, (ControllerId)controller_id); break;;
+            case ParamId::CFIN: is_assigned = assign_controller<FloatParamS>(carrier_params.fine_detune, (ControllerId)controller_id); break;;
+            case ParamId::CWID: is_assigned = assign_controller<FloatParamB>(carrier_params.width, (ControllerId)controller_id); break;;
+            case ParamId::CPAN: is_assigned = assign_controller<FloatParamS>(carrier_params.panning, (ControllerId)controller_id); break;;
+            case ParamId::CVOL: is_assigned = assign_controller<FloatParamS>(carrier_params.volume, (ControllerId)controller_id); break;;
+            case ParamId::CC1: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_0, (ControllerId)controller_id); break;;
+            case ParamId::CC2: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_1, (ControllerId)controller_id); break;;
+            case ParamId::CC3: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_2, (ControllerId)controller_id); break;;
+            case ParamId::CC4: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_3, (ControllerId)controller_id); break;;
+            case ParamId::CC5: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_4, (ControllerId)controller_id); break;;
+            case ParamId::CC6: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_5, (ControllerId)controller_id); break;;
+            case ParamId::CC7: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_6, (ControllerId)controller_id); break;;
+            case ParamId::CC8: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_7, (ControllerId)controller_id); break;;
+            case ParamId::CC9: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_8, (ControllerId)controller_id); break;;
+            case ParamId::CC10: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_9, (ControllerId)controller_id); break;;
+            case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_frequency, (ControllerId)controller_id); break;;
+            case ParamId::CF1Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_q, (ControllerId)controller_id); break;;
+            case ParamId::CF1G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_gain, (ControllerId)controller_id); break;;
+            case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_frequency, (ControllerId)controller_id); break;;
+            case ParamId::CF2Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_q, (ControllerId)controller_id); break;;
+            case ParamId::CF2G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_gain, (ControllerId)controller_id); break;;
+            case ParamId::EOG: is_assigned = assign_controller<FloatParamS>(effects.overdrive.level, (ControllerId)controller_id); break;;
+            case ParamId::EDG: is_assigned = assign_controller<FloatParamS>(effects.distortion.level, (ControllerId)controller_id); break;;
+            case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_1.frequency, (ControllerId)controller_id); break;;
+            case ParamId::EF1Q: is_assigned = assign_controller<FloatParamS>(effects.filter_1.q, (ControllerId)controller_id); break;;
+            case ParamId::EF1G: is_assigned = assign_controller<FloatParamS>(effects.filter_1.gain, (ControllerId)controller_id); break;;
+            case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_2.frequency, (ControllerId)controller_id); break;;
+            case ParamId::EF2Q: is_assigned = assign_controller<FloatParamS>(effects.filter_2.q, (ControllerId)controller_id); break;;
+            case ParamId::EF2G: is_assigned = assign_controller<FloatParamS>(effects.filter_2.gain, (ControllerId)controller_id); break;;
+            case ParamId::ECDEL: is_assigned = assign_controller<FloatParamS>(effects.chorus.delay_time, (ControllerId)controller_id); break;;
+            case ParamId::ECFRQ: is_assigned = assign_controller<FloatParamS>(effects.chorus.frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECDPT: is_assigned = assign_controller<FloatParamS>(effects.chorus.depth, (ControllerId)controller_id); break;;
+            case ParamId::ECFB: is_assigned = assign_controller<FloatParamS>(effects.chorus.feedback, (ControllerId)controller_id); break;;
+            case ParamId::ECDF: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECDG: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::ECWID: is_assigned = assign_controller<FloatParamS>(effects.chorus.width, (ControllerId)controller_id); break;;
+            case ParamId::ECHPF: is_assigned = assign_controller<FloatParamS>(effects.chorus.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ECWET: is_assigned = assign_controller<FloatParamS>(effects.chorus.wet, (ControllerId)controller_id); break;;
+            case ParamId::ECDRY: is_assigned = assign_controller<FloatParamS>(effects.chorus.dry, (ControllerId)controller_id); break;;
+            case ParamId::EEDEL: is_assigned = assign_controller<FloatParamS>(effects.echo.delay_time, (ControllerId)controller_id); break;;
+            case ParamId::EEFB: is_assigned = assign_controller<FloatParamS>(effects.echo.feedback, (ControllerId)controller_id); break;;
+            case ParamId::EEDF: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::EEDG: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::EEWID: is_assigned = assign_controller<FloatParamS>(effects.echo.width, (ControllerId)controller_id); break;;
+            case ParamId::EEHPF: is_assigned = assign_controller<FloatParamS>(effects.echo.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::EEWET: is_assigned = assign_controller<FloatParamS>(effects.echo.wet, (ControllerId)controller_id); break;;
+            case ParamId::EEDRY: is_assigned = assign_controller<FloatParamS>(effects.echo.dry, (ControllerId)controller_id); break;;
+            case ParamId::ERRS: is_assigned = assign_controller<FloatParamS>(effects.reverb.room_size, (ControllerId)controller_id); break;;
+            case ParamId::ERDF: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ERDG: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_gain, (ControllerId)controller_id); break;;
+            case ParamId::ERWID: is_assigned = assign_controller<FloatParamS>(effects.reverb.width, (ControllerId)controller_id); break;;
+            case ParamId::ERHPF: is_assigned = assign_controller<FloatParamS>(effects.reverb.high_pass_frequency, (ControllerId)controller_id); break;;
+            case ParamId::ERWET: is_assigned = assign_controller<FloatParamS>(effects.reverb.wet, (ControllerId)controller_id); break;;
+            case ParamId::ERDRY: is_assigned = assign_controller<FloatParamS>(effects.reverb.dry, (ControllerId)controller_id); break;;
             default: break;
         }
     } else {
@@ -2947,7 +2963,7 @@ Synth::Bus::Bus(
         Modulator* const* const modulators,
         Carrier* const* const carriers,
         Integer const polyphony,
-        FloatParam& modulator_add_volume
+        FloatParamS& modulator_add_volume
 ) noexcept
     : SignalProducer(channels, 0),
     polyphony(polyphony),
@@ -2988,7 +3004,7 @@ Sample const* const* Synth::Bus::initialize_rendering(
         return NULL;
     }
 
-    modulator_add_volume_buffer = FloatParam::produce_if_not_constant(
+    modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
         modulator_add_volume, round, sample_count
     );
 

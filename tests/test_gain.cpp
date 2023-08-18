@@ -59,7 +59,7 @@ TEST(multiplies_input_signals_by_the_value_of_the_gain_parameter, {
         (Sample const*)&input_samples[1]
     };
     FixedSignalProducer input(input_buffer);
-    FloatParam gain_param("", 0.0, 20.0, 0.12345);
+    FloatParamS gain_param("", 0.0, 20.0, 0.12345);
     Gain<FixedSignalProducer> gain(input, gain_param);
     Buffer actual_output(sample_count, CHANNELS);
 

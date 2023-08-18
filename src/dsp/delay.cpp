@@ -77,7 +77,7 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
-        FloatParam& time_leader,
+        FloatParamS& time_leader,
         ToggleParam const* tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
@@ -96,8 +96,8 @@ Delay<InputSignalProducerClass>::Delay(
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
-        FloatParam& gain_leader,
-        FloatParam& time_leader,
+        FloatParamS& gain_leader,
+        FloatParamS& time_leader,
         ToggleParam const* tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
@@ -116,7 +116,7 @@ Delay<InputSignalProducerClass>::Delay(
 template<class InputSignalProducerClass>
 Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
-        FloatParam& gain_leader,
+        FloatParamS& gain_leader,
         Seconds const time,
         ToggleParam const* tempo_sync
 ) noexcept
@@ -259,11 +259,11 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
         gain_buffer = NULL;
         need_gain = false;
     } else {
-        gain_buffer = FloatParam::produce_if_not_constant(gain, round, sample_count);
+        gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
         need_gain = gain_buffer != NULL || std::fabs(1.0 - gain.get_value()) > 0.000001;
     }
 
-    time_buffer = FloatParam::produce_if_not_constant(time, round, sample_count);
+    time_buffer = FloatParamS::produce_if_not_constant(time, round, sample_count);
 
     time_scale = (
         tempo_sync != NULL && tempo_sync->get_value() == ToggleParam::ON
@@ -466,7 +466,7 @@ template<class InputSignalProducerClass, class FilterInputClass>
 PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
-        FloatParam& delay_time_leader,
+        FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync
 ) :  Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, input.get_channels()),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
@@ -481,8 +481,8 @@ template<class InputSignalProducerClass, class FilterInputClass>
 PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
-        FloatParam& panning_leader,
-        FloatParam& delay_time_leader,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
 ) : PannedDelay<InputSignalProducerClass, FilterInputClass>(
@@ -523,8 +523,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
-        FloatParam& panning_leader,
-        FloatParam& delay_time_leader,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
@@ -545,9 +545,9 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
-        FloatParam& panning_leader,
-        FloatParam& delay_gain_leader,
-        FloatParam& delay_time_leader,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_gain_leader,
+        FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
@@ -568,8 +568,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
-        FloatParam& panning_leader,
-        FloatParam& delay_gain_leader,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_gain_leader,
         Seconds const delay_time,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
@@ -623,7 +623,7 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
-    panning_buffer = FloatParam::produce_if_not_constant(panning, round, sample_count);
+    panning_buffer = FloatParamS::produce_if_not_constant(panning, round, sample_count);
 
     if (panning_buffer == NULL) {
         panning_value = is_flipped ? -panning.get_value() : panning.get_value();
@@ -747,11 +747,11 @@ template<class InputSignalProducerClass>
 HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
-    FloatParam& panning_leader,
-    FloatParam& delay_gain_leader,
-    FloatParam& delay_time_leader,
-    FloatParam& high_shelf_filter_frequency_leader,
-    FloatParam& high_shelf_filter_gain_leader,
+    FloatParamS& panning_leader,
+    FloatParamS& delay_gain_leader,
+    FloatParamS& delay_time_leader,
+    FloatParamS& high_shelf_filter_frequency_leader,
+    FloatParamS& high_shelf_filter_gain_leader,
     ToggleParam const* tempo_sync
 ) : HighShelfPannedDelayBase<InputSignalProducerClass>(
         input,
@@ -786,11 +786,11 @@ template<class InputSignalProducerClass>
 HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
-    FloatParam& panning_leader,
-    FloatParam& delay_gain_leader,
+    FloatParamS& panning_leader,
+    FloatParamS& delay_gain_leader,
     Seconds const delay_time,
-    FloatParam& high_shelf_filter_frequency_leader,
-    FloatParam& high_shelf_filter_gain_leader,
+    FloatParamS& high_shelf_filter_frequency_leader,
+    FloatParamS& high_shelf_filter_gain_leader,
     ToggleParam const* tempo_sync
 ) : HighShelfPannedDelayBase<InputSignalProducerClass>(
         input,

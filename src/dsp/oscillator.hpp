@@ -62,7 +62,7 @@ class Oscillator : public SignalProducer
 
         static constexpr int WAVEFORMS = 10;
 
-        class WaveformParam : public Param<Waveform>
+        class WaveformParam : public Param<Waveform, ParamEvaluation::BLOCK>
         {
             public:
                 WaveformParam(
@@ -74,47 +74,47 @@ class Oscillator : public SignalProducer
         static constexpr Event::Type EVT_START = 1;
         static constexpr Event::Type EVT_STOP = 2;
 
-        static FloatParam dummy_param;
+        static FloatParamS dummy_param;
         static ToggleParam dummy_toggle;
 
         Oscillator(
             WaveformParam& waveform,
             ModulatorSignalProducerClass* modulator = NULL,
-            FloatParam& amplitude_modulation_level_leader = dummy_param,
-            FloatParam& frequency_modulation_level_leader = dummy_param,
-            FloatParam& phase_modulation_level_leader = dummy_param,
+            FloatParamS& amplitude_modulation_level_leader = dummy_param,
+            FloatParamS& frequency_modulation_level_leader = dummy_param,
+            FloatParamS& phase_modulation_level_leader = dummy_param,
             ToggleParam& tempo_sync = dummy_toggle,
             ToggleParam& center = dummy_toggle
         ) noexcept;
 
         Oscillator(
             WaveformParam& waveform,
-            FloatParam& amplitude_leader,
-            FloatParam& frequency_leader,
-            FloatParam& phase_leader,
+            FloatParamS& amplitude_leader,
+            FloatParamS& frequency_leader,
+            FloatParamS& phase_leader,
             ToggleParam& tempo_sync = dummy_toggle,
             ToggleParam& center = dummy_toggle
         ) noexcept;
 
         Oscillator(
             WaveformParam& waveform,
-            FloatParam& amplitude_leader,
-            FloatParam& detune_leader,
-            FloatParam& fine_detune_leader,
-            FloatParam& harmonic_0_leader,
-            FloatParam& harmonic_1_leader,
-            FloatParam& harmonic_2_leader,
-            FloatParam& harmonic_3_leader,
-            FloatParam& harmonic_4_leader,
-            FloatParam& harmonic_5_leader,
-            FloatParam& harmonic_6_leader,
-            FloatParam& harmonic_7_leader,
-            FloatParam& harmonic_8_leader,
-            FloatParam& harmonic_9_leader,
+            FloatParamS& amplitude_leader,
+            FloatParamS& detune_leader,
+            FloatParamS& fine_detune_leader,
+            FloatParamB& harmonic_0_leader,
+            FloatParamB& harmonic_1_leader,
+            FloatParamB& harmonic_2_leader,
+            FloatParamB& harmonic_3_leader,
+            FloatParamB& harmonic_4_leader,
+            FloatParamB& harmonic_5_leader,
+            FloatParamB& harmonic_6_leader,
+            FloatParamB& harmonic_7_leader,
+            FloatParamB& harmonic_8_leader,
+            FloatParamB& harmonic_9_leader,
             ModulatorSignalProducerClass* modulator = NULL,
-            FloatParam& amplitude_modulation_level_leader = dummy_param,
-            FloatParam& frequency_modulation_level_leader = dummy_param,
-            FloatParam& phase_modulation_level_leader = dummy_param
+            FloatParamS& amplitude_modulation_level_leader = dummy_param,
+            FloatParamS& frequency_modulation_level_leader = dummy_param,
+            FloatParamS& phase_modulation_level_leader = dummy_param
         ) noexcept;
 
         ~Oscillator() override;
@@ -131,22 +131,22 @@ class Oscillator : public SignalProducer
         WaveformParam& waveform;
 
         ModulatedFloatParam modulated_amplitude;
-        FloatParam amplitude;
+        FloatParamS amplitude;
         ModulatedFloatParam frequency;
         ModulatedFloatParam phase;
-        FloatParam detune;
-        FloatParam fine_detune;
+        FloatParamS detune;
+        FloatParamS fine_detune;
 
-        FloatParam harmonic_0;
-        FloatParam harmonic_1;
-        FloatParam harmonic_2;
-        FloatParam harmonic_3;
-        FloatParam harmonic_4;
-        FloatParam harmonic_5;
-        FloatParam harmonic_6;
-        FloatParam harmonic_7;
-        FloatParam harmonic_8;
-        FloatParam harmonic_9;
+        FloatParamB harmonic_0;
+        FloatParamB harmonic_1;
+        FloatParamB harmonic_2;
+        FloatParamB harmonic_3;
+        FloatParamB harmonic_4;
+        FloatParamB harmonic_5;
+        FloatParamB harmonic_6;
+        FloatParamB harmonic_7;
+        FloatParamB harmonic_8;
+        FloatParamB harmonic_9;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -250,7 +250,7 @@ class Oscillator : public SignalProducer
         Sample* computed_amplitude_buffer;
         Frequency* computed_frequency_buffer;
         Sample* phase_buffer;
-        FloatParam* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
+        FloatParamB* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
         Number custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS];
         Integer custom_waveform_change_indices[CUSTOM_WAVEFORM_HARMONICS];
         Number computed_amplitude_value;

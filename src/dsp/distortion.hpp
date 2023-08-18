@@ -54,7 +54,7 @@ class Distortion : public Filter<InputSignalProducerClass>
 
         virtual void reset() noexcept override;
 
-        FloatParam level;
+        FloatParamS level;
 
     protected:
         Sample const* const* initialize_rendering(

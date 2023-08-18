@@ -47,7 +47,7 @@ template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const name
 ) noexcept
-    : Param<Type>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
+    : Param<Type, ParamEvaluation::BLOCK>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
 {
 }
 
@@ -154,9 +154,9 @@ template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         InputSignalProducerClass& input,
         TypeParam& type,
-        FloatParam& frequency_leader,
-        FloatParam& q_leader,
-        FloatParam& gain_leader,
+        FloatParamS& frequency_leader,
+        FloatParamS& q_leader,
+        FloatParamS& gain_leader,
         BiquadFilterSharedCache* shared_cache
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
@@ -379,7 +379,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         && q.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -405,10 +405,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* q_buffer = (
-            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -478,7 +478,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         && q.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -503,10 +503,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* q_buffer = (
-            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -574,7 +574,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
         && q.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -597,10 +597,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* q_buffer = (
-            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -660,7 +660,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
         && q.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(gain, round, sample_count);
+    FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -683,10 +683,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* q_buffer = (
-            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -777,13 +777,13 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* q_buffer = (
-            FloatParam::produce<FloatParam>(q, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
         Sample const* gain_buffer = (
-            FloatParam::produce<FloatParam>(gain, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -865,7 +865,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         && gain.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(q, round, sample_count);
+    FloatParamS::produce_if_not_constant(q, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -890,10 +890,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* gain_buffer = (
-            FloatParam::produce<FloatParam>(gain, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {
@@ -982,7 +982,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         && gain.get_envelope() == NULL
     );
 
-    FloatParam::produce_if_not_constant(q, round, sample_count);
+    FloatParamS::produce_if_not_constant(q, round, sample_count);
 
     if (are_coefficients_constant) {
         Number const frequency_value = frequency.get_value();
@@ -1007,10 +1007,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
 
     } else {
         Sample const* frequency_buffer = (
-            FloatParam::produce<FloatParam>(frequency, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
         Sample const* gain_buffer = (
-            FloatParam::produce<FloatParam>(gain, round, sample_count)[0]
+            FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
         for (Integer i = 0; i != sample_count; ++i) {

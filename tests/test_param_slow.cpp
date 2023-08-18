@@ -46,7 +46,7 @@ TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_p
     constexpr Number resolution_inv = 1.0 / (Number)(resolution - 1);
 
     ToggleParam toggle("log", ToggleParam::OFF);
-    FloatParam param(
+    FloatParamS param(
         "freq",
         min,
         max,

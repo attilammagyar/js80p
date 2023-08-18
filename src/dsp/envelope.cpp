@@ -99,7 +99,7 @@ Seconds Envelope::get_dahd_length() const noexcept
 }
 
 
-template<class ParamType = FloatParam>
+template<class ParamType = FloatParamB>
 bool Envelope::update_change_index(ParamType const& param, Integer& change_index)
 {
     Integer const new_change_index = param.get_change_index();

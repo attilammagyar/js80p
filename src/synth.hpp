@@ -702,7 +702,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Byte byte_param;
         };
 
-        class ModeParam : public Param<Mode>
+        class ModeParam : public Param<Mode, ParamEvaluation::BLOCK>
         {
             public:
                 ModeParam(std::string const name) noexcept;
@@ -832,10 +832,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         ToggleParam polyphonic;
         ModeParam mode;
-        FloatParam modulator_add_volume;
-        FloatParam phase_modulation_level;
-        FloatParam frequency_modulation_level;
-        FloatParam amplitude_modulation_level;
+        FloatParamS modulator_add_volume;
+        FloatParamS phase_modulation_level;
+        FloatParamS frequency_modulation_level;
+        FloatParamS amplitude_modulation_level;
 
         Modulator::Params modulator_params;
         Carrier::Params carrier_params;
@@ -901,7 +901,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Modulator* const* const modulators,
                     Carrier* const* const carriers,
                     Integer const polyphony,
-                    FloatParam& modulator_add_volume
+                    FloatParamS& modulator_add_volume
                 ) noexcept;
 
             protected:
@@ -935,7 +935,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Integer const polyphony;
                 Synth::Modulator* const* const modulators;
                 Synth::Carrier* const* const carriers;
-                FloatParam& modulator_add_volume;
+                FloatParamS& modulator_add_volume;
                 Sample const* modulator_add_volume_buffer;
                 std::vector<bool> modulators_on;
                 std::vector<bool> carriers_on;

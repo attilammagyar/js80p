@@ -126,8 +126,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
         Filter2& input,
-        FloatParam& velocity,
-        FloatParam& volume
+        FloatParamS& velocity,
+        FloatParamS& volume
 ) noexcept
     : Filter<Filter2>(input),
     volume(volume),
@@ -143,7 +143,7 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initial
 ) noexcept {
     Filter<Filter2>::initialize_rendering(round, sample_count);
 
-    volume_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+    volume_buffer = FloatParamS::produce_if_not_constant<FloatParamS>(
         volume, round, sample_count
     );
 
@@ -151,7 +151,7 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initial
         volume_value = (Sample)volume.get_value();
     }
 
-    velocity_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+    velocity_buffer = FloatParamS::produce_if_not_constant<FloatParamS>(
         velocity, round, sample_count
     );
 
@@ -226,9 +226,9 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedCache* filter_1_shared_cache,
         BiquadFilterSharedCache* filter_2_shared_cache,
         ModulatorSignalProducerClass* modulator,
-        FloatParam& amplitude_modulation_level_leader,
-        FloatParam& frequency_modulation_level_leader,
-        FloatParam& phase_modulation_level_leader
+        FloatParamS& amplitude_modulation_level_leader,
+        FloatParamS& frequency_modulation_level_leader,
+        FloatParamS& phase_modulation_level_leader
 ) noexcept
     : SignalProducer(CHANNELS, 12),
     notes(notes),
@@ -682,7 +682,7 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() co
 
 template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::has_decayed(
-        FloatParam const& param
+        FloatParamS const& param
 ) const noexcept {
     constexpr Number threshold = 0.000001;
 
@@ -730,7 +730,7 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         volume_applier, round, sample_count
     )[0];
 
-    panning_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+    panning_buffer = FloatParamS::produce_if_not_constant<FloatParamS>(
         panning, round, sample_count
     );
 
@@ -738,7 +738,7 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         panning_value = panning.get_value();
     }
 
-    note_panning_buffer = FloatParam::produce_if_not_constant<FloatParam>(
+    note_panning_buffer = FloatParamS::produce_if_not_constant<FloatParamS>(
         note_panning, round, sample_count
     );
 

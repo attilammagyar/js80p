@@ -61,39 +61,39 @@ class Voice : public SignalProducer
                 Params(std::string const name) noexcept;
 
                 typename Oscillator_::WaveformParam waveform;
-                FloatParam amplitude;
-                FloatParam velocity_sensitivity;
-                FloatParam folding;
-                FloatParam portamento_length;
-                FloatParam portamento_depth;
-                FloatParam detune;
-                FloatParam fine_detune;
-                FloatParam width;
-                FloatParam panning;
-                FloatParam volume;
+                FloatParamS amplitude;
+                FloatParamB velocity_sensitivity;
+                FloatParamS folding;
+                FloatParamS portamento_length;
+                FloatParamS portamento_depth;
+                FloatParamS detune;
+                FloatParamS fine_detune;
+                FloatParamB width;
+                FloatParamS panning;
+                FloatParamS volume;
 
-                FloatParam harmonic_0;
-                FloatParam harmonic_1;
-                FloatParam harmonic_2;
-                FloatParam harmonic_3;
-                FloatParam harmonic_4;
-                FloatParam harmonic_5;
-                FloatParam harmonic_6;
-                FloatParam harmonic_7;
-                FloatParam harmonic_8;
-                FloatParam harmonic_9;
+                FloatParamB harmonic_0;
+                FloatParamB harmonic_1;
+                FloatParamB harmonic_2;
+                FloatParamB harmonic_3;
+                FloatParamB harmonic_4;
+                FloatParamB harmonic_5;
+                FloatParamB harmonic_6;
+                FloatParamB harmonic_7;
+                FloatParamB harmonic_8;
+                FloatParamB harmonic_9;
 
                 typename Filter1::TypeParam filter_1_type;
                 ToggleParam filter_1_log_scale;
-                FloatParam filter_1_frequency;
-                FloatParam filter_1_q;
-                FloatParam filter_1_gain;
+                FloatParamS filter_1_frequency;
+                FloatParamS filter_1_q;
+                FloatParamS filter_1_gain;
 
                 typename Filter2::TypeParam filter_2_type;
                 ToggleParam filter_2_log_scale;
-                FloatParam filter_2_frequency;
-                FloatParam filter_2_q;
-                FloatParam filter_2_gain;
+                FloatParamS filter_2_frequency;
+                FloatParamS filter_2_q;
+                FloatParamS filter_2_gain;
         };
 
         class VolumeApplier : public Filter<Filter2>
@@ -103,8 +103,8 @@ class Voice : public SignalProducer
             public:
                 VolumeApplier(
                     Filter2& input,
-                    FloatParam& velocity,
-                    FloatParam& volume
+                    FloatParamS& velocity,
+                    FloatParamS& volume
                 ) noexcept;
 
             protected:
@@ -121,8 +121,8 @@ class Voice : public SignalProducer
                 ) noexcept;
 
             private:
-                FloatParam& volume;
-                FloatParam& velocity;
+                FloatParamS& volume;
+                FloatParamS& velocity;
 
                 Sample const* volume_buffer;
                 Sample const* velocity_buffer;
@@ -139,9 +139,9 @@ class Voice : public SignalProducer
             BiquadFilterSharedCache* filter_1_shared_cache = NULL,
             BiquadFilterSharedCache* filter_2_shared_cache = NULL,
             ModulatorSignalProducerClass* modulator = NULL,
-            FloatParam& amplitude_modulation_level_leader = Oscillator_::dummy_param,
-            FloatParam& frequency_modulation_level_leader = Oscillator_::dummy_param,
-            FloatParam& phase_modulation_level_leader = Oscillator_::dummy_param
+            FloatParamS& amplitude_modulation_level_leader = Oscillator_::dummy_param,
+            FloatParamS& frequency_modulation_level_leader = Oscillator_::dummy_param,
+            FloatParamS& phase_modulation_level_leader = Oscillator_::dummy_param
         ) noexcept;
 
         virtual void reset() noexcept override;
@@ -227,7 +227,7 @@ class Voice : public SignalProducer
             Midi::Note const previous_note
         ) noexcept;
 
-        bool has_decayed(FloatParam const& param) const noexcept;
+        bool has_decayed(FloatParamS const& param) const noexcept;
 
         Midi::Note const notes;
 
@@ -236,13 +236,13 @@ class Voice : public SignalProducer
         Filter1 filter_1;
         Wavefolder_ wavefolder;
         Filter2 filter_2;
-        FloatParam velocity_sensitivity;
-        FloatParam note_velocity;
-        FloatParam note_panning;
-        FloatParam portamento_length;
-        FloatParam portamento_depth;
-        FloatParam panning;
-        FloatParam volume;
+        FloatParamB velocity_sensitivity;
+        FloatParamS note_velocity;
+        FloatParamS note_panning;
+        FloatParamS portamento_length;
+        FloatParamS portamento_depth;
+        FloatParamS panning;
+        FloatParamS volume;
         VolumeApplier volume_applier;
         Sample const* volume_applier_buffer;
         Sample const* panning_buffer;

@@ -48,9 +48,9 @@ class LFO : public SignalProducer
 
         LFO(
             std::string const name,
-            FloatParam& frequency_leader,
-            FloatParam& max_leader,
-            FloatParam& amount_leader,
+            FloatParamS& frequency_leader,
+            FloatParamS& max_leader,
+            FloatParamS& amount_leader,
             ToggleParam& tempo_sync_,
             Number const phase_offset
         ) noexcept;
@@ -65,13 +65,13 @@ class LFO : public SignalProducer
         ) noexcept;
 
         typename Oscillator_::WaveformParam waveform;
-        FloatParam frequency;
-        FloatParam phase;
-        FloatParam min;
-        FloatParam max;
-        FloatParam amount;
-        FloatParam distortion;
-        FloatParam randomness;
+        FloatParamS frequency;
+        FloatParamS phase;
+        FloatParamS min;
+        FloatParamS max;
+        FloatParamS amount;
+        FloatParamS distortion;
+        FloatParamS randomness;
         ToggleParam tempo_sync;
         ToggleParam center;
 

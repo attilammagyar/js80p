@@ -133,7 +133,7 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
     constexpr Frequency frequency = 30.0;
 
     LFO lfo("L1");
-    FloatParam param("F", -3.0, 7.0, 0.0);
+    FloatParamS param("F", -3.0, 7.0, 0.0);
     SumOfSines expected(1.0, frequency, 0.0, 0.0, 0.0, 0.0, 1);
     Buffer expected_output(sample_count, CHANNELS);
     Buffer actual_output(sample_count, CHANNELS);
@@ -162,7 +162,7 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
     assert_false(lfo.is_on());
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
-    render_rounds<FloatParam>(param, actual_output, rounds);
+    render_rounds<FloatParamS>(param, actual_output, rounds);
 
     assert_true(lfo.is_on());
 

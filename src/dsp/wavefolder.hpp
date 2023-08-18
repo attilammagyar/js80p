@@ -46,13 +46,13 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         Wavefolder(InputSignalProducerClass& input) noexcept;
         Wavefolder(
             InputSignalProducerClass& input,
-            FloatParam& folding_leader
+            FloatParamS& folding_leader
         ) noexcept;
         ~Wavefolder();
 
         virtual void reset() noexcept override;
 
-        FloatParam folding;
+        FloatParamS folding;
 
     protected:
         Sample const* const* initialize_rendering(

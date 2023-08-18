@@ -89,7 +89,7 @@ bool FlexibleController::update_change_indices() noexcept
 
 
 bool FlexibleController::update_change_index(
-        FloatParam& param,
+        FloatParamB& param,
         Integer& change_index
 ) const noexcept {
     Integer const new_change_index = param.get_change_index();
