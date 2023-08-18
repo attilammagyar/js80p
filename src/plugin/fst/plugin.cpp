@@ -550,6 +550,8 @@ void FstPlugin::handle_program_change() noexcept
         this->next_program = Bank::normalized_parameter_value_to_program_index(
             (Number)parameters[0].get_last_set_value()
         );
+
+        parameters[0].clear();
     }
 
     size_t const next_program = this->next_program;
