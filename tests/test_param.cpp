@@ -2346,3 +2346,17 @@ TEST(modulatable_param_rendering_is_independent_of_chunk_size, {
         param_1, param_2
     );
 })
+
+
+TEST(when_float_param_is_evaluated_once_per_rendering_block_then_still_applies_scheduled_changes, {
+    FloatParamB float_param("F", 0.0, 10.0, 1.0);
+
+    float_param.set_block_size(256);
+    float_param.set_sample_rate(100.0);
+
+    float_param.set_value(9.0);
+    float_param.schedule_value(2.0, 5.0);
+
+    assert_eq(NULL, FloatParamB::produce_if_not_constant(float_param, 1, 256));
+    assert_eq(5.0, float_param.get_value());
+})

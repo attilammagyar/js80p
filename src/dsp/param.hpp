@@ -296,11 +296,20 @@ class FloatParam : public Param<Number, evaluation>
             Integer const sample_count
         ) noexcept;
 
+        template<ParamEvaluation evaluation_ = evaluation>
         void render(
-            Integer const round,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample** buffer
+            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type round,
+            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type first_sample_index,
+            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type last_sample_index,
+            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Sample**>::type buffer
+        ) noexcept;
+
+        template<ParamEvaluation evaluation_ = evaluation>
+        void render(
+            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type round,
+            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type first_sample_index,
+            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type last_sample_index,
+            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Sample**>::type buffer
         ) noexcept;
 
         void handle_event(SignalProducer::Event const& event) noexcept;
@@ -373,6 +382,11 @@ class FloatParam : public Param<Number, evaluation>
         ) const noexcept;
 
         void process_envelope(Envelope& envelope, Seconds const time_offset = 0.0) noexcept;
+
+        void advance_envelope(
+                Integer const first_sample_index,
+                Integer const last_sample_index
+        ) noexcept;
 
         Seconds schedule_envelope_value_if_not_reached(
             Seconds const next_event_time_offset,

@@ -1300,65 +1300,41 @@ Seconds FloatParam<evaluation>::schedule_envelope_value_if_not_reached(
 }
 
 
-// TODO: enable_if
 template<ParamEvaluation evaluation>
+template<ParamEvaluation evaluation_>
 void FloatParam<evaluation>::render(
-        Integer const round,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
+        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type round,
+        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type first_sample_index,
+        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type last_sample_index,
+        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Sample**>::type buffer
 ) noexcept {
     if (lfo != NULL) {
-        if (this->get_evaluation() == ParamEvaluation::BLOCK) {
-            // if (last_sample_index != first_sample_index) {
-                // this->store_new_value(
-                    // (Number)ratio_to_value(lfo_buffer[0][last_sample_index - 1])
-                // );
-            // }
-        } else {
-            Sample sample;
+        Sample sample;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)ratio_to_value(lfo_buffer[0][i]);
-            }
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = sample = (Sample)ratio_to_value(lfo_buffer[0][i]);
+        }
 
-            if (last_sample_index != first_sample_index) {
-                this->store_new_value((Number)sample);
-            }
+        if (last_sample_index != first_sample_index) {
+            this->store_new_value((Number)sample);
         }
     } else if (latest_event_type == EVT_LINEAR_RAMP) {
         Sample sample;
 
-        if (this->get_evaluation() == ParamEvaluation::BLOCK) {
-            // if (first_sample_index != last_sample_index) {
-                // Integer const skip_samples = last_sample_index - first_sample_index - 1;
-
-                // if (linear_ramp_state.is_logarithmic) {
-                    // sample = (Sample)ratio_to_value(
-                        // linear_ramp_state.advance(skip_samples)
-                    // );
-                // } else {
-                    // sample = (Sample)linear_ramp_state.advance(skip_samples);
-                // }
-
-                // this->store_new_value((Number)sample);
-            // }
+        if (linear_ramp_state.is_logarithmic) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (
+                    (Sample)ratio_to_value(linear_ramp_state.advance())
+                );
+            }
         } else {
-            if (linear_ramp_state.is_logarithmic) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[0][i] = sample = (
-                        (Sample)ratio_to_value(linear_ramp_state.advance())
-                    );
-                }
-            } else {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
-                }
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
             }
+        }
 
-            if (last_sample_index != first_sample_index) {
-                this->store_new_value((Number)sample);
-            }
+        if (last_sample_index != first_sample_index) {
+            this->store_new_value((Number)sample);
         }
     } else {
         Param<Number, evaluation>::render(
@@ -1366,17 +1342,67 @@ void FloatParam<evaluation>::render(
         );
     }
 
-    if (envelope_stage != EnvelopeStage::NONE) {
-        Seconds const time_delta = this->sample_count_to_relative_time_offset(
-            last_sample_index - first_sample_index
-        );
+    advance_envelope(first_sample_index, last_sample_index);
+}
 
-        envelope_position += time_delta;
 
-        if (envelope_end_scheduled) {
-            envelope_end_time_offset -= time_delta;
-        }
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::advance_envelope(
+        Integer const first_sample_index,
+        Integer const last_sample_index
+) noexcept {
+    if (envelope_stage == EnvelopeStage::NONE) {
+        return;
     }
+
+    Seconds const time_delta = this->sample_count_to_relative_time_offset(
+        last_sample_index - first_sample_index
+    );
+
+    envelope_position += time_delta;
+
+    if (envelope_end_scheduled) {
+        envelope_end_time_offset -= time_delta;
+    }
+}
+
+
+template<ParamEvaluation evaluation>
+template<ParamEvaluation evaluation_>
+void FloatParam<evaluation>::render(
+        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type round,
+        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type first_sample_index,
+        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type last_sample_index,
+        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Sample**>::type buffer
+) noexcept {
+    // if (lfo != NULL) {
+        // if (last_sample_index != first_sample_index) {
+            // this->store_new_value(
+                // (Number)ratio_to_value(lfo_buffer[0][last_sample_index - 1])
+            // );
+        // }
+    // } else if (latest_event_type == EVT_LINEAR_RAMP) {
+        // if (first_sample_index != last_sample_index) {
+            // Sample sample;
+            // Integer const skip_samples = last_sample_index - first_sample_index - 1;
+
+            // if (linear_ramp_state.is_logarithmic) {
+                // sample = (Sample)ratio_to_value(
+                    // linear_ramp_state.advance(skip_samples)
+                // );
+            // } else {
+                // sample = (Sample)linear_ramp_state.advance(skip_samples);
+            // }
+
+            // this->store_new_value((Number)sample);
+        // }
+    // } else {
+        // Param<Number, evaluation>::render(
+            // round, first_sample_index, last_sample_index, buffer
+        // );
+    // }
+
+    // advance_envelope(first_sample_index, last_sample_index);
 }
 
 
