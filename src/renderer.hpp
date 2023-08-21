@@ -46,38 +46,39 @@ class Renderer
 Some hosts do use variable size buffers, and we don't want delay feedback
 buffers to run out of samples when a long batch is rendered after a shorter one.
 */
-#define _JS80P_RENDER_SPLIT_BATCH(sample_count, buffer, op)                 \
-{                                                                           \
-    if (sample_count < 0) {                                                 \
-        return;                                                             \
-    }                                                                       \
-                                                                            \
-    Integer buffer_pos = 0;                                                 \
-    Integer remaining = sample_count;                                       \
-                                                                            \
-    if (previous_round_sample_count == 0) {                                 \
-        previous_round_sample_count = sample_count;                         \
-    }                                                                       \
-                                                                            \
-    while (remaining > 0) {                                                 \
-        Integer const round_size = std::min(                                \
-            previous_round_sample_count, remaining                          \
-        );                                                                  \
-                                                                            \
-        remaining -= round_size;                                            \
-                                                                            \
-        Sample const* const* samples = render_next_round(round_size);       \
-                                                                            \
-        for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {                \
-            for (Integer i = 0; i != round_size; ++i) {                     \
-                buffer[c][buffer_pos + i] op (NumberType)samples[c][i];      \
-            }                                                               \
-        }                                                                   \
-                                                                            \
-        buffer_pos += round_size;                                           \
-    }                                                                       \
-                                                                            \
-    previous_round_sample_count = sample_count;                             \
+#define _JS80P_RENDER_SPLIT_BATCH(sample_count, buffer, op)                     \
+{                                                                               \
+    if (sample_count < 0) {                                                     \
+        return;                                                                 \
+    }                                                                           \
+                                                                                \
+    Integer buffer_pos = 0;                                                     \
+    Integer remaining = sample_count;                                           \
+    Integer previous_round_sample_count = this->previous_round_sample_count;    \
+                                                                                \
+    if (previous_round_sample_count == 0) {                                     \
+        previous_round_sample_count = sample_count;                             \
+    }                                                                           \
+                                                                                \
+    while (remaining > 0) {                                                     \
+        Integer const round_size = std::min(                                    \
+            previous_round_sample_count, remaining                              \
+        );                                                                      \
+                                                                                \
+        remaining -= round_size;                                                \
+                                                                                \
+        Sample const* const* samples = render_next_round(round_size);           \
+                                                                                \
+        for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {                    \
+            for (Integer i = 0; i != round_size; ++i) {                         \
+                buffer[c][buffer_pos + i] op (NumberType)samples[c][i];         \
+            }                                                                   \
+        }                                                                       \
+                                                                                \
+        buffer_pos += round_size;                                               \
+    }                                                                           \
+                                                                                \
+    this->previous_round_sample_count = sample_count;                           \
 }
 
         template<typename NumberType>
