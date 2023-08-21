@@ -337,7 +337,7 @@ TEST(serialization, {
     assert_true(bank[4].is_blank());
     assert_neq("to be reset name", bank[5].get_name().c_str());
 
-    assert_eq(0, (int)bank.get_current_program_index());
+    assert_eq(42, (int)bank.get_current_program_index());
 
     for (size_t i = 3; i != Bank::NUMBER_OF_PROGRAMS; ++i) {
         bank[i].import("");

@@ -126,7 +126,7 @@ class Bank
             1.0 / (Number)(NUMBER_OF_PROGRAMS - 1)
         );
 
-        void reset();
+        void generate_empty_programs(size_t const start_index);
 
         Program programs[NUMBER_OF_PROGRAMS];
         size_t current_program_index;
