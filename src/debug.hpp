@@ -34,6 +34,15 @@
 #include "js80p.hpp"
 
 
+#ifdef _WIN32
+#include <windows.h>
+#define _JS80P_GET_TID() ((unsigned int)GetCurrentThreadId())
+#else
+#include <sys/types.h>
+#define _JS80P_GET_TID() ((unsigned int)gettid())
+#endif
+
+
 #define _JS80P_DEBUG_CTX(debug_action) do {                                 \
     constexpr char const* last_slash = strrchr(__FILE__, '/');              \
     constexpr char const* basename = (                                      \
@@ -44,10 +53,11 @@
     if (_js80p_f) {                                                         \
         fprintf(                                                            \
             _js80p_f,                                                       \
-            "%s:%d/%s():\t",                                                \
+            "%s:%d/%s():\tTID=%x\t",                                        \
             basename,                                                       \
             __LINE__,                                                       \
-            __FUNCTION__                                                    \
+            __FUNCTION__,                                                   \
+            _JS80P_GET_TID()                                                \
         );                                                                  \
                                                                             \
         debug_action;                                                       \
