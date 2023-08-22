@@ -124,6 +124,7 @@ SYNTH_COMPONENTS = \
 	$(PARAM_COMPONENTS) \
 	synth \
 	note_stack \
+	spscqueue \
 	voice \
 	dsp/biquad_filter \
 	dsp/chorus \
@@ -164,6 +165,7 @@ TESTS_DSP = \
 TESTS_SYNTH = \
 	test_note_stack \
 	test_renderer \
+	test_spscqueue \
 	test_synth \
 	test_voice
 
@@ -660,6 +662,15 @@ $(BUILD_DIR)/test_signal_producer$(EXE): \
 		| $(BUILD_DIR)
 	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
+
+$(BUILD_DIR)/test_spscqueue$(EXE): \
+		tests/test_spscqueue.cpp \
+		src/spscqueue.hpp src/spscqueue.cpp \
+		src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+	$(VALGRIND) $(BUILD_DIR)/test_spscqueue$(EXE)
 
 $(BUILD_DIR)/test_synth$(EXE): \
 		tests/test_synth.cpp \

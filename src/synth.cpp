@@ -51,6 +51,7 @@
 #include "dsp/wavetable.cpp"
 
 #include "note_stack.cpp"
+#include "spscqueue.cpp"
 #include "voice.cpp"
 
 
@@ -98,6 +99,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     ),
     modulator_params("M"),
     carrier_params("C"),
+    messages(MESSAGE_QUEUE_SIZE),
     bus(
         OUT_CHANNELS,
         modulators,
@@ -2020,7 +2022,7 @@ void Synth::garbage_collect_voices() noexcept
 
 void Synth::process_messages() noexcept
 {
-    size_t const message_count = messages.size();
+    SPSCQueue<Message>::SizeType const message_count = messages.length();
 
     for (size_t i = 0; i != message_count; ++i) {
         Message message;
@@ -2887,74 +2889,6 @@ Synth::Message::Message(
     number_param(number_param),
     byte_param(byte_param)
 {
-}
-
-
-Synth::SingleProducerSingleConsumerMessageQueue::SingleProducerSingleConsumerMessageQueue() noexcept
-    : next_push(0),
-    next_pop(0)
-{
-}
-
-
-bool Synth::SingleProducerSingleConsumerMessageQueue::is_lock_free() const noexcept
-{
-    return next_push.is_lock_free() && next_pop.is_lock_free();
-}
-
-
-bool Synth::SingleProducerSingleConsumerMessageQueue::push(
-        Synth::Message const& message
-) noexcept {
-    size_t const old_next_push = next_push.load();
-    size_t const next_pop = this->next_pop.load();
-    size_t const new_next_push = advance(old_next_push);
-
-    if (next_pop == new_next_push) {
-        return false;
-    }
-
-    messages[old_next_push] = message;
-    next_push.store(new_next_push);
-
-    return true;
-}
-
-
-bool Synth::SingleProducerSingleConsumerMessageQueue::pop(Message& message) noexcept
-{
-    size_t const next_pop = this->next_pop.load();
-    size_t const next_push = this->next_push.load();
-
-    if (next_push == next_pop) {
-        return false;
-    }
-
-    message = std::move(messages[next_pop]);
-
-    this->next_pop.store(advance(next_pop));
-
-    return true;
-}
-
-
-size_t Synth::SingleProducerSingleConsumerMessageQueue::size() const noexcept
-{
-    size_t const next_pop = this->next_pop.load();
-    size_t const next_push = this->next_push.load();
-
-    if (next_push < next_pop) {
-        return SIZE + next_push - next_pop;
-    } else {
-        return next_push - next_pop;
-    }
-}
-
-
-size_t Synth::SingleProducerSingleConsumerMessageQueue::advance(
-        size_t const index
-) const noexcept {
-    return (index + 1) & SIZE_MASK;
 }
 
 

@@ -26,6 +26,7 @@
 #include "js80p.hpp"
 #include "midi.hpp"
 #include "note_stack.hpp"
+#include "spscqueue.hpp"
 #include "voice.hpp"
 
 #include "dsp/envelope.hpp"
@@ -861,36 +862,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Frequency frequencies[Midi::NOTES];
 
     private:
-        /*
-        See Timur Doumler [ACCU 2017]: Lock-free programming with modern C++
-          https://www.youtube.com/watch?v=qdrp6k4rcP4
-        */
-        class SingleProducerSingleConsumerMessageQueue
-        {
-            public:
-                SingleProducerSingleConsumerMessageQueue() noexcept;
-
-                SingleProducerSingleConsumerMessageQueue(
-                    SingleProducerSingleConsumerMessageQueue const& queue
-                ) = delete;
-
-                bool is_lock_free() const noexcept;
-                bool push(Message const& message) noexcept;
-                bool pop(Message& message) noexcept;
-                size_t size() const noexcept;
-
-            private:
-                static constexpr size_t SIZE = 0x1000; /* must be power of 2 */
-                static constexpr size_t SIZE_MASK = SIZE - 1;
-
-                size_t advance(size_t const index) const noexcept;
-
-                Message messages[SIZE];
-
-                std::atomic<size_t> next_push;
-                std::atomic<size_t> next_pop;
-        };
-
         class Bus : public SignalProducer
         {
             friend class SignalProducer;
@@ -1041,6 +1012,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Midi::Byte velocity;
         };
 
+        static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
+
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
         static constexpr Number MIDI_BYTE_SCALE = 1.0 / 127.0;
 
@@ -1171,7 +1144,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::string const to_string(Integer const) const noexcept;
 
         std::vector<DeferredNoteOff> deferred_note_offs;
-        SingleProducerSingleConsumerMessageQueue messages;
+        SPSCQueue<Message> messages;
         Bus bus;
         Effects::Effects<Bus> effects;
         NoteStack note_stack;
