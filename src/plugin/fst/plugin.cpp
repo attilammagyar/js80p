@@ -403,7 +403,7 @@ FstPlugin::FstPlugin(
         /*
         The sustain pedal was added in v1.9.0, but if it was put in the middle
         of the list of exported parameters, then it could break DAW projects
-        that have automations for parameter which come after it. In order to
+        that have automations for parameters which come after it. In order to
         avoid such backward-incompatibility, we need to put it at the end.
         */
         if (midi_controller == Midi::SUSTAIN_PEDAL) {
