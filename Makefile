@@ -453,7 +453,7 @@ $(BUILD_DIR)/test_example$(EXE): \
 	$(TEST_LIBS) \
 	| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_example$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_bank$(EXE): \
 		tests/test_bank.cpp \
@@ -465,7 +465,7 @@ $(BUILD_DIR)/test_bank$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_bank$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
@@ -476,7 +476,7 @@ $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_biquad_filter$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_delay$(EXE): \
 		tests/test_delay.cpp \
@@ -488,7 +488,7 @@ $(BUILD_DIR)/test_delay$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -Wno-maybe-uninitialized -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_delay$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_distortion$(EXE): \
 		tests/test_distortion.cpp \
@@ -499,7 +499,7 @@ $(BUILD_DIR)/test_distortion$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_distortion$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_envelope$(EXE): \
 		tests/test_envelope.cpp \
@@ -508,7 +508,7 @@ $(BUILD_DIR)/test_envelope$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_envelope$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		tests/test_flexible_controller.cpp \
@@ -517,7 +517,7 @@ $(BUILD_DIR)/test_flexible_controller$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_flexible_controller$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_gain$(EXE): \
 		tests/test_gain.cpp \
@@ -527,7 +527,7 @@ $(BUILD_DIR)/test_gain$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_gain$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_gui$(EXE): \
 		tests/test_gui.cpp \
@@ -538,7 +538,7 @@ $(BUILD_DIR)/test_gui$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_gui$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_lfo$(EXE): \
 		tests/test_lfo.cpp \
@@ -548,7 +548,7 @@ $(BUILD_DIR)/test_lfo$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_lfo$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_math$(EXE): \
 		tests/test_math.cpp \
@@ -568,7 +568,7 @@ $(BUILD_DIR)/test_midi_controller$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_midi_controller$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_mixer$(EXE): \
 		tests/test_mixer.cpp \
@@ -579,7 +579,7 @@ $(BUILD_DIR)/test_mixer$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_mixer$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_note_stack$(EXE): \
 		tests/test_note_stack.cpp \
@@ -589,7 +589,7 @@ $(BUILD_DIR)/test_note_stack$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_note_stack$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_oscillator$(EXE): \
 		tests/test_oscillator.cpp \
@@ -599,7 +599,7 @@ $(BUILD_DIR)/test_oscillator$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_oscillator$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_param$(EXE): \
 		tests/test_param.cpp \
@@ -608,7 +608,7 @@ $(BUILD_DIR)/test_param$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_param$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_param_slow$(EXE): \
 		tests/test_param_slow.cpp \
@@ -625,7 +625,7 @@ $(BUILD_DIR)/test_queue$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_queue$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_renderer$(EXE): \
 		tests/test_renderer.cpp \
@@ -636,7 +636,7 @@ $(BUILD_DIR)/test_renderer$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_renderer$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_serializer$(EXE): \
 		tests/test_serializer.cpp \
@@ -647,7 +647,7 @@ $(BUILD_DIR)/test_serializer$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_serializer$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_signal_producer$(EXE): \
 		tests/test_signal_producer.cpp \
@@ -657,7 +657,7 @@ $(BUILD_DIR)/test_signal_producer$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_signal_producer$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_spscqueue$(EXE): \
 		tests/test_spscqueue.cpp \
@@ -666,7 +666,7 @@ $(BUILD_DIR)/test_spscqueue$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_spscqueue$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_synth$(EXE): \
 		tests/test_synth.cpp \
@@ -676,7 +676,7 @@ $(BUILD_DIR)/test_synth$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_synth$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_voice$(EXE): \
 		tests/test_voice.cpp \
@@ -686,7 +686,7 @@ $(BUILD_DIR)/test_voice$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_voice$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
@@ -697,7 +697,7 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $(BUILD_DIR)/test_wavefolder$(EXE)
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/log_freq_error_tsv$(EXE): \
 		scripts/log_freq_error_tsv.cpp \
