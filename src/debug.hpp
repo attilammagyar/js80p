@@ -37,9 +37,15 @@
 #ifdef _WIN32
 #include <windows.h>
 #define _JS80P_GET_TID() ((unsigned int)GetCurrentThreadId())
+#define _JS80P_TID_FMT "\tTID=%#x"
+#elif __linux__ || __gnu_linux__
+#include <unistd.h>
+#include <sys/syscall.h>
+#define _JS80P_GET_TID() ((unsigned int)syscall(SYS_gettid))
+#define _JS80P_TID_FMT "\tTID=%#x"
 #else
-#include <sys/types.h>
-#define _JS80P_GET_TID() ((unsigned int)gettid())
+#define _JS80P_GET_TID() ("")
+#define _JS80P_TID_FMT "%s"
 #endif
 
 
@@ -53,7 +59,7 @@
     if (_js80p_f) {                                                         \
         fprintf(                                                            \
             _js80p_f,                                                       \
-            "%s:%d/%s():\tTID=%x\t",                                        \
+            "%s:%d/%s():" _JS80P_TID_FMT "\t",                              \
             basename,                                                       \
             __LINE__,                                                       \
             __FUNCTION__,                                                   \
