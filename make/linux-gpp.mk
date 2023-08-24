@@ -96,6 +96,7 @@ $(BUILD_DIR)/img_synth.o: gui/img/synth.png | $(BUILD_DIR)
 $(BUILD_DIR)/img_vst_logo.o: gui/img/vst_logo.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
+# DEBUG_LOG_FILE ?= stderr
 # DEBUG_LOG_FILE ?= /tmp/debug.txt
 
 RM = rm -f

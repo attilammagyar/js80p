@@ -1,5 +1,6 @@
 TARGET_OS = windows
 
+# DEBUG_LOG_FILE ?= stderr
 # DEBUG_LOG_FILE ?= C:\\\\debug.txt
 
 FST = $(FST_DIR)/js80p.dll

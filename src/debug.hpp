@@ -50,17 +50,24 @@
 
 
 #define _JS80P_DEBUG_CTX(debug_action) do {                                 \
-    constexpr char const* last_slash = strrchr(__FILE__, '/');              \
-    constexpr char const* basename = (                                      \
-        last_slash != NULL ? last_slash + 1 : __FILE__                      \
+    char const* const _js80p_last_slash = strrchr(__FILE__, '/');           \
+    char const* const _js80p_basename = (                                   \
+        _js80p_last_slash != NULL ? _js80p_last_slash + 1 : __FILE__        \
     );                                                                      \
-    FILE* _js80p_f = fopen(JS80P_TO_STRING(JS80P_DEBUG_LOG), "a+");         \
+    bool const _js80p_use_stderr = (                                        \
+        strncmp("stderr", JS80P_TO_STRING(JS80P_DEBUG_LOG), 7) == 0         \
+    );                                                                      \
+    FILE* _js80p_f = (                                                      \
+        _js80p_use_stderr                                                   \
+            ? stderr                                                        \
+            : fopen(JS80P_TO_STRING(JS80P_DEBUG_LOG), "a+")                 \
+    );                                                                      \
                                                                             \
     if (_js80p_f) {                                                         \
         fprintf(                                                            \
             _js80p_f,                                                       \
             "%s:%d/%s():" _JS80P_TID_FMT "\t",                              \
-            basename,                                                       \
+            _js80p_basename,                                                \
             __LINE__,                                                       \
             __FUNCTION__,                                                   \
             _JS80P_GET_TID()                                                \
@@ -69,7 +76,10 @@
         debug_action;                                                       \
                                                                             \
         fprintf(_js80p_f, "\n");                                            \
-        fclose(_js80p_f);                                                   \
+                                                                            \
+        if (!_js80p_use_stderr) {                                           \
+            fclose(_js80p_f);                                               \
+        }                                                                   \
     }                                                                       \
 } while (false)
 
