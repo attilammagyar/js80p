@@ -86,21 +86,21 @@
 #define JS80P_DEBUG_ARRAY(message, array, length, format_string)            \
     _JS80P_DEBUG_CTX(                                                       \
         if ((array) == NULL) {                                              \
-            fprintf(__f, "%s: <NULL>", (message));                          \
+            fprintf(_js80p_f, "%s: <NULL>", (message));                     \
         } else {                                                            \
             int _js80p_i;                                                   \
                                                                             \
-            fprintf(__f, "%s: [ ", (message));                              \
+            fprintf(_js80p_f, "%s: [ ", (message));                         \
                                                                             \
             for (_js80p_i = 0; _js80p_i < (length); ++_js80p_i) {           \
                 if (_js80p_i > 0) {                                         \
-                    fprintf(__f, ", ");                                     \
+                    fprintf(_js80p_f, ", ");                                \
                 }                                                           \
                                                                             \
-                fprintf(__f, (format_string), (array)[_js80p_i]);           \
+                fprintf(_js80p_f, (format_string), (array)[_js80p_i]);      \
             }                                                               \
                                                                             \
-            fprintf(__f, " ]");                                             \
+            fprintf(_js80p_f, " ]");                                        \
         }                                                                   \
     )
 
