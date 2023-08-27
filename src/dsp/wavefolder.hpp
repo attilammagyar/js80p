@@ -35,7 +35,10 @@ namespace JS80P
  *        Antialiasing (ADAA). See:
  *        <a href="https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf">
  *        Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time Convolution
- *        (Parker, J., Zavalishin, V., & Bivic, E.L. - 2016)</a>.
+ *        (Parker, J., Zavalishin, V., & Bivic, E.L. - 2016)</a>. The shaping
+ *        function is an approximation of a triangle wave which has a wavelength
+ *        of 4.0, and which is positioned so that f(0.0) = 0.0, and the
+ *        projection of the [-1.0, 1.0] interval is approximately itself.
  */
 template<class InputSignalProducerClass>
 class Wavefolder : public Filter<InputSignalProducerClass>
