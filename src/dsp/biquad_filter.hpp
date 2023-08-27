@@ -142,6 +142,11 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void allocate_buffers() noexcept;
         void free_buffers() noexcept;
 
+        Sample const* const* initialize_rendering_no_op(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
         Sample const* const* initialize_rendering_with_shared_coefficients(
             Integer const round,
             Integer const sample_count
@@ -258,7 +263,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         Number low_pass_no_op_frequency;
 
-        bool is_silent;
+        bool is_silent_;
         bool are_coefficients_constant;
         bool can_use_shared_coefficients;
 };

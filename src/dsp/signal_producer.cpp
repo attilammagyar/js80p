@@ -20,7 +20,6 @@
 #define JS80P__DSP__SIGNAL_PRODUCER_CPP
 
 #include <algorithm>
-#include <cmath>
 
 #include "dsp/signal_producer.hpp"
 
@@ -99,7 +98,9 @@ SignalProducer::SignalProducer(
     bpm(DEFAULT_BPM),
     current_time(0.0),
     cached_round(-1),
-    cached_buffer(NULL)
+    cached_silence_round(-1),
+    cached_buffer(NULL),
+    cached_silence(false)
 {
     children.reserve(number_of_children);
 
@@ -233,6 +234,36 @@ void SignalProducer::set_bpm(Number const new_bpm) noexcept
 Number SignalProducer::get_bpm() const noexcept
 {
     return bpm;
+}
+
+
+bool SignalProducer::is_silent(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    if (cached_buffer == NULL) {
+        return true;
+    }
+
+    if (round == cached_silence_round) {
+        return cached_silence;
+    }
+
+    cached_silence_round = round;
+
+    for (Integer c = 0; c != channels; ++c) {
+        for (Integer i = 0; i != sample_count; ++i) {
+            if (std::fabs(cached_buffer[c][i]) > SILENCE_THRESHOLD) {
+                cached_silence = false;
+
+                return false;
+            }
+        }
+    }
+
+    cached_silence = true;
+
+    return true;
 }
 
 

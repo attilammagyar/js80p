@@ -19,6 +19,7 @@
 #ifndef JS80P__DSP__SIGNAL_PRODUCER_HPP
 #define JS80P__DSP__SIGNAL_PRODUCER_HPP
 
+#include <cmath>
 #include <vector>
 
 #include "js80p.hpp"
@@ -64,6 +65,11 @@ class SignalProducer
 
         static constexpr Integer DEFAULT_BLOCK_SIZE = 128;
         static constexpr Frequency DEFAULT_SAMPLE_RATE = 44100.0;
+
+        static constexpr Number SILENCE_THRESHOLD_DB = -150.0;
+        static constexpr Number SILENCE_THRESHOLD = (
+            std::exp(SILENCE_THRESHOLD_DB * std::log(2) / 6.0)
+        );
 
         /*
         Default to 60, so that 1 beat = 1 second, so when no BPM info is
@@ -125,6 +131,10 @@ class SignalProducer
         void set_bpm(Number const new_bpm) noexcept;
         Number get_bpm() const noexcept;
 
+        bool is_silent(
+            Integer const round,
+            Integer const sample_count = -1
+        ) noexcept;
 
         Sample const* const* get_last_rendered_block(
             Integer& sample_count
@@ -216,7 +226,9 @@ class SignalProducer
         Number bpm;
         Seconds current_time;
         Integer cached_round;
+        Integer cached_silence_round;
         Sample const* const* cached_buffer;
+        bool cached_silence;
 
     private:
         typedef std::vector<SignalProducer*> Children;

@@ -146,3 +146,24 @@ TEST(when_folding_level_is_above_the_transition_threshold_then_the_signal_is_amp
         );
     }
 })
+
+
+TEST(when_input_is_silent_then_folding_is_no_op, {
+    SumOfSines input(1e-9, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
+    Wavefolder_ folder(input);
+    Sample const* const* input_buffer;
+    Sample const* const* folded_buffer;
+
+    folder.set_block_size(BLOCK_SIZE);
+    input.set_block_size(BLOCK_SIZE);
+
+    folder.set_sample_rate(SAMPLE_RATE);
+    input.set_sample_rate(SAMPLE_RATE);
+
+    folder.folding.set_value(Constants::FOLD_MAX);
+
+    input_buffer = SignalProducer::produce<SumOfSines>(input, 1, BLOCK_SIZE);
+    folded_buffer = SignalProducer::produce<Wavefolder_>(folder, 1, BLOCK_SIZE);
+
+    assert_eq(input_buffer, folded_buffer);
+})

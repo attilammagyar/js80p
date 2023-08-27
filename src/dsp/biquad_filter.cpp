@@ -261,6 +261,14 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 ) noexcept {
     can_use_shared_coefficients = shared_cache != NULL;
 
+    Filter<InputSignalProducerClass>::initialize_rendering(
+        round, sample_count
+    );
+
+    if (this->input.is_silent(round, sample_count)) {
+        return initialize_rendering_no_op(round, sample_count);
+    }
+
     if (can_use_shared_coefficients && shared_cache->round == round) {
         return initialize_rendering_with_shared_coefficients(
             round, sample_count
@@ -269,7 +277,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
     bool is_no_op = false;
 
-    is_silent = false;
+    is_silent_ = false;
 
     switch (type.get_value()) {
         case LOW_PASS:
@@ -305,15 +313,11 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
             break;
     }
 
-    Filter<InputSignalProducerClass>::initialize_rendering(
-        round, sample_count
-    );
-
     if (can_use_shared_coefficients) {
         shared_cache->round = round;
         shared_cache->are_coefficients_constant = are_coefficients_constant;
         shared_cache->is_no_op = is_no_op;
-        shared_cache->is_silent = is_silent;
+        shared_cache->is_silent = is_silent_;
         shared_cache->b0_buffer = b0_buffer;
         shared_cache->b1_buffer = b1_buffer;
         shared_cache->b2_buffer = b2_buffer;
@@ -322,14 +326,23 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     }
 
     if (is_no_op) {
-        frequency.skip_round(round, sample_count);
-        q.skip_round(round, sample_count);
-        gain.skip_round(round, sample_count);
-
-        return this->input_buffer;
+        return initialize_rendering_no_op(round, sample_count);
     }
 
     return NULL;
+}
+
+
+template<class InputSignalProducerClass>
+Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering_no_op(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    FloatParamS::produce_if_not_constant(frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(q, round, sample_count);
+    FloatParamS::produce_if_not_constant(gain, round, sample_count);
+
+    return this->input_buffer;
 }
 
 
@@ -338,19 +351,11 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Filter<InputSignalProducerClass>::initialize_rendering(
-        round, sample_count
-    );
-
     if (shared_cache->is_no_op) {
-        frequency.skip_round(round, sample_count);
-        q.skip_round(round, sample_count);
-        gain.skip_round(round, sample_count);
-
-        return this->input_buffer;
+        return initialize_rendering_no_op(round, sample_count);
     }
 
-    is_silent = shared_cache->is_silent;
+    is_silent_ = shared_cache->is_silent;
     are_coefficients_constant = (
         shared_cache->are_coefficients_constant
     );
@@ -394,10 +399,10 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         q.skip_round(round, sample_count);
 
         /* JS80P doesn't let the frequency go below 1.0 Hz */
-        is_silent = false;
-        // is_silent = frequency_value <= low_pass_silent_frequency;
+        is_silent_ = false;
+        // is_silent_ = frequency_value <= low_pass_silent_frequency;
 
-        // if (UNLIKELY(is_silent)) {
+        // if (UNLIKELY(is_silent_)) {
             // return false;
         // }
 
@@ -493,9 +498,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
 
-        is_silent = frequency_value >= silent_frequency;
+        is_silent_ = frequency_value >= silent_frequency;
 
-        if (UNLIKELY(is_silent)) {
+        if (UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -584,9 +589,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
             return true;
         }
 
-        is_silent = frequency_value >= band_pass_silent_frequency;
+        is_silent_ = frequency_value >= band_pass_silent_frequency;
 
-        if (UNLIKELY(is_silent)) {
+        if (UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -670,9 +675,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
             return true;
         }
 
-        is_silent = q_value < THRESHOLD;
+        is_silent_ = q_value < THRESHOLD;
 
-        if (UNLIKELY(is_silent)) {
+        if (UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -1148,7 +1153,7 @@ void BiquadFilter<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (UNLIKELY(is_silent)) {
+    if (UNLIKELY(is_silent_)) {
         this->render_silence(
             round, first_sample_index, last_sample_index, buffer
         );

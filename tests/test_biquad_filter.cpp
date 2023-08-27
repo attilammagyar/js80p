@@ -171,6 +171,35 @@ void assert_completed(
 }
 
 
+void test_silent_input_is_no_op(BiquadFilter<SumOfSines>::Type const type)
+{
+    constexpr Number low_amplitude = 1e-9;
+
+    SumOfSines input(low_amplitude, 440.0, low_amplitude, 7040.0, 0.0, 0.0, CHANNELS);
+    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilter<SumOfSines> filter("", input, filter_type);
+
+    filter.type.set_value(type);
+
+    schedule_small_param_changes(filter, 1000.0, 0.03, -6.0);
+
+    test_filter(filter, input, input, 0.0);
+
+    assert_completed(filter, 1000.0, 0.03, -6.0);
+}
+
+
+TEST(when_input_is_silent_then_biquad_filter_is_no_op, {
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::LOW_PASS);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::HIGH_PASS);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::BAND_PASS);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::NOTCH);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::PEAKING);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::LOW_SHELF);
+    test_silent_input_is_no_op(BiquadFilter<SumOfSines>::HIGH_SHELF);
+})
+
+
 TEST(when_frequency_is_at_max_value_then_low_pass_filter_is_no_op, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     BiquadFilter<SumOfSines>::TypeParam filter_type("");

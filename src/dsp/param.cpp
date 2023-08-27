@@ -286,6 +286,10 @@ Sample const* FloatParam<evaluation>::produce_if_not_constant(
         )
     );
 
+    if (rendered == NULL) {
+        return NULL;
+    }
+
     return (
         float_param.get_evaluation() == ParamEvaluation::SAMPLE
             ? rendered[0]

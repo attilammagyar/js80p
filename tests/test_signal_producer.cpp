@@ -1025,3 +1025,38 @@ TEST(event_scheduling_is_relative_to_current_time, {
 
     assert_eq(expected_samples, rendered.samples[0], sample_count);
 })
+
+
+TEST(can_tell_if_the_last_buffer_was_silent, {
+    constexpr Integer block_size = 1024;
+    constexpr Frequency sample_rate = 48000.0;
+
+    SumOfSines no_op(1e-9, 220.0, 0.0, 0.0, 0.0, 0.0, 0);
+    SumOfSines silent(1e-9, 220.0, 0.0, 0.0, 0.0, 0.0, 3);
+    SumOfSines audible(0.1, 220.0, 0.0, 0.0, 0.0, 0.0, 3);
+
+    no_op.set_block_size(block_size);
+    no_op.set_sample_rate(sample_rate);
+
+    silent.set_block_size(block_size);
+    silent.set_sample_rate(sample_rate);
+
+    audible.set_block_size(block_size);
+    audible.set_sample_rate(sample_rate);
+
+    SignalProducer::produce<SumOfSines>(no_op, 1, 1);
+    SignalProducer::produce<SumOfSines>(silent, 1, 1);
+    SignalProducer::produce<SumOfSines>(audible, 1, 1);
+
+    assert_true(no_op.is_silent(1, 1));
+    assert_true(silent.is_silent(1, 1));
+    assert_true(audible.is_silent(1, 1));
+
+    SignalProducer::produce<SumOfSines>(no_op, 2, block_size);
+    SignalProducer::produce<SumOfSines>(silent, 2, block_size);
+    SignalProducer::produce<SumOfSines>(audible, 2, block_size);
+
+    assert_true(no_op.is_silent(2, block_size));
+    assert_true(silent.is_silent(2, block_size));
+    assert_false(audible.is_silent(2, block_size));
+})

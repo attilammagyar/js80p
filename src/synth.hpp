@@ -910,7 +910,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Sample const* modulator_add_volume_buffer;
                 std::vector<bool> modulators_on;
                 std::vector<bool> carriers_on;
-                bool is_silent;
+                bool is_silent_;
         };
 
         class ParamIdHashTable

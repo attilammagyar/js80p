@@ -150,6 +150,10 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
         folding, round, sample_count
     );
 
+    if (this->input.is_silent(round, sample_count)) {
+        return this->input_buffer;
+    }
+
     if (folding_buffer == NULL)
     {
         folding_value = folding.get_value();

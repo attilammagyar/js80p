@@ -2914,13 +2914,13 @@ Sample const* const* Synth::Bus::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    is_silent = true;
+    is_silent_ = true;
 
     for (Integer v = 0; v != polyphony; ++v) {
         modulators_on[v] = modulators[v]->is_on();
 
         if (modulators_on[v]) {
-            is_silent = false;
+            is_silent_ = false;
             SignalProducer::produce<Modulator>(
                 *modulators[v], round, sample_count
             );
@@ -2929,12 +2929,12 @@ Sample const* const* Synth::Bus::initialize_rendering(
         carriers_on[v] = carriers[v]->is_on();
 
         if (carriers_on[v]) {
-            is_silent = false;
+            is_silent_ = false;
             SignalProducer::produce<Carrier>(*carriers[v], round, sample_count);
         }
     }
 
-    if (is_silent) {
+    if (is_silent_) {
         return NULL;
     }
 
@@ -2954,7 +2954,7 @@ void Synth::Bus::render(
 ) noexcept {
     render_silence(round, first_sample_index, last_sample_index, buffer);
 
-    if (is_silent) {
+    if (is_silent_) {
         return;
     }
 

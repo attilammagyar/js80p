@@ -141,3 +141,24 @@ TEST(when_distortion_level_is_high_then_the_signal_is_distorted, {
     test_distortion(3.0);
     test_distortion(10.0);
 })
+
+
+TEST(when_input_is_silent_then_distortion_is_no_op, {
+    SumOfSines input(1e-9, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
+    Distortion_ distortion("D", 10.0, input);
+    Sample const* const* input_buffer;
+    Sample const* const* distorted_buffer;
+
+    distortion.set_block_size(BLOCK_SIZE);
+    input.set_block_size(BLOCK_SIZE);
+
+    distortion.set_sample_rate(SAMPLE_RATE);
+    input.set_sample_rate(SAMPLE_RATE);
+
+    distortion.level.set_value(1.0);
+
+    input_buffer = SignalProducer::produce<SumOfSines>(input, 1, BLOCK_SIZE);
+    distorted_buffer = SignalProducer::produce<Distortion_>(distortion, 1, BLOCK_SIZE);
+
+    assert_eq(input_buffer, distorted_buffer);
+})
