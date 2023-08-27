@@ -52,6 +52,8 @@ class Filter : public SignalProducer
             Integer const sample_count
         ) noexcept;
 
+        Sample const* const* input_was_silent(Integer const round) noexcept;
+
         InputSignalProducerClass& input;
         Sample const* const* input_buffer;
 

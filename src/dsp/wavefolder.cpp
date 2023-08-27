@@ -151,7 +151,7 @@ Sample const* const* Wavefolder<InputSignalProducerClass>::initialize_rendering(
     );
 
     if (this->input.is_silent(round, sample_count)) {
-        return this->input_buffer;
+        return this->input_was_silent(round);
     }
 
     if (folding_buffer == NULL)

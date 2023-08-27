@@ -266,7 +266,9 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     );
 
     if (this->input.is_silent(round, sample_count)) {
-        return initialize_rendering_no_op(round, sample_count);
+        initialize_rendering_no_op(round, sample_count);
+
+        return this->input_was_silent(round);
     }
 
     if (can_use_shared_coefficients && shared_cache->round == round) {
