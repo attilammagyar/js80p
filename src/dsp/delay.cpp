@@ -290,7 +290,7 @@ void Delay<InputSignalProducerClass>::clear_delay_buffer(
 
             ++delay_buffer_index;
 
-            if (delay_buffer_index == delay_buffer_size) {
+            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
                 delay_buffer_index = 0;
             }
         }
@@ -312,7 +312,7 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         is_starting = false;
         write_index_feedback += sample_count;
 
-        if (write_index_feedback >= delay_buffer_size) {
+        if (UNLIKELY(write_index_feedback >= delay_buffer_size)) {
             write_index_feedback %= delay_buffer_size;
         }
 
@@ -339,7 +339,7 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
 
             ++delay_buffer_index;
 
-            if (delay_buffer_index == delay_buffer_size) {
+            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
                 delay_buffer_index = 0;
             }
         }
@@ -365,7 +365,7 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
 
             ++delay_buffer_index;
 
-            if (delay_buffer_index == delay_buffer_size) {
+            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
                 delay_buffer_index = 0;
             }
         }
