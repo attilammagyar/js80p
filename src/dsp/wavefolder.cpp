@@ -30,6 +30,38 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
+bool Wavefolder<InputSignalProducerClass>::is_initialized = false;
+
+
+// template<class InputSignalProducerClass>
+// Sample Wavefolder<InputSignalProducerClass>::f_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
+
+
+template<class InputSignalProducerClass>
+Sample Wavefolder<InputSignalProducerClass>::F0_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
+
+
+template<class InputSignalProducerClass>
+void Wavefolder<InputSignalProducerClass>::initialize_class() noexcept
+{
+    if (is_initialized) {
+        return;
+    }
+
+    is_initialized = true;
+
+    constexpr Number scale = WAVE_LENGTH * TABLE_SIZE_FLOAT_INV;
+    constexpr Number table_size_half = TABLE_SIZE_FLOAT / 2.0;
+
+    for (int i = 0; i != TABLE_SIZE; ++i) {
+        Number const x = ((Number)i - table_size_half) * scale;
+        // f_table[i] = S0 * std::sin(S1 * x) - S2 * std::sin(S3 * x) + S4 * std::sin(S5 * x);
+        F0_table[i] = -S6 * std::cos(S1 * x) + S7 * std::cos(S3 * x) - S8 * std::cos(S5 * x);
+    }
+}
+
+
+template<class InputSignalProducerClass>
 Wavefolder<InputSignalProducerClass>::Wavefolder(
         InputSignalProducerClass& input
 ) noexcept
@@ -45,6 +77,8 @@ Wavefolder<InputSignalProducerClass>::Wavefolder(
 template<class InputSignalProducerClass>
 void Wavefolder<InputSignalProducerClass>::initialize_instance() noexcept
 {
+    initialize_class();
+
     this->register_child(folding);
 
     if (this->channels > 0) {
@@ -254,25 +288,17 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
 }
 
 
-template<class InputSignalProducerClass>
-Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const noexcept
-{
-    return (
-        S0 * Math::sin(S1 * x + TRIG_OFFSET)
-        - S2 * Math::sin(S3 * x + TRIG_OFFSET)
-        + S4 * Math::sin(S5 * x + TRIG_OFFSET)
-    );
-}
+// template<class InputSignalProducerClass>
+// Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const noexcept
+// {
+    // return Math::lookup_periodic(f_table, TABLE_SIZE, TABLE_SCALE * x + TABLE_OFFSET);
+// }
 
 
 template<class InputSignalProducerClass>
 Sample Wavefolder<InputSignalProducerClass>::F0(Sample const x) const noexcept
 {
-    return (
-        -S6 * Math::cos(S1 * x + TRIG_OFFSET)
-        + S7 * Math::cos(S3 * x + TRIG_OFFSET)
-        - S8 * Math::cos(S5 * x + TRIG_OFFSET)
-    );
+    return Math::lookup_periodic(F0_table, TABLE_SIZE, TABLE_SCALE * x + TABLE_OFFSET);
 }
 
 }
