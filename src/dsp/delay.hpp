@@ -117,7 +117,11 @@ class Delay : public Filter<InputSignalProducerClass>
 
         void clear_delay_buffer(Integer const sample_count) noexcept;
         void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
-        void mix_input_into_delay_buffer(Integer const sample_count) noexcept;
+
+        void mix_input_into_delay_buffer(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
 
         void apply_gain(
             Integer const round,

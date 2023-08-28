@@ -253,7 +253,7 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
     clear_delay_buffer(sample_count);
     mix_feedback_into_delay_buffer(sample_count);
-    mix_input_into_delay_buffer(sample_count);
+    mix_input_into_delay_buffer(round, sample_count);
 
     if (is_gain_constant_1) {
         gain_buffer = NULL;
@@ -351,8 +351,15 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
 
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
+        Integer const round,
         Integer const sample_count
 ) noexcept {
+    if (this->input.is_silent(round, sample_count)) {
+        write_index_input = (write_index_input + sample_count) % delay_buffer_size;
+
+        return;
+    }
+
     Integer const channels = this->channels;
     Integer delay_buffer_index = write_index_input;
 
