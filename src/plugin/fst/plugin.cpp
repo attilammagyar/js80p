@@ -180,7 +180,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
     switch (op_code) {
         case effProcessEvents:
-            fst_plugin->process_events((VstEvents*)pointer);
+            fst_plugin->process_vst_events((VstEvents*)pointer);
             return 1;
 
         case effClose:
@@ -465,13 +465,13 @@ void FstPlugin::resume() noexcept
 }
 
 
-void FstPlugin::process_events(VstEvents const* const events) noexcept
+void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
 {
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
         VstEvent* event = events->events[i];
 
         if (event->type == kVstMidiType) {
-            process_midi_event((VstMidiEvent*)event);
+            process_vst_midi_event((VstMidiEvent*)event);
         }
     }
 
@@ -483,7 +483,7 @@ void FstPlugin::process_events(VstEvents const* const events) noexcept
 }
 
 
-void FstPlugin::process_midi_event(VstMidiEvent const* const event) noexcept
+void FstPlugin::process_vst_midi_event(VstMidiEvent const* const event) noexcept
 {
     Seconds const time_offset = (
         synth.sample_count_to_time_offset((Integer)event->deltaFrames)

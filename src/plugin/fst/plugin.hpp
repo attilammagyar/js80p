@@ -110,8 +110,8 @@ class FstPlugin : public Midi::EventHandler
         void set_block_size(VstIntPtr const new_block_size) noexcept;
         void suspend() noexcept;
         void resume() noexcept;
-        void process_events(VstEvents const* const events) noexcept;
-        void process_midi_event(VstMidiEvent const* const event) noexcept;
+        void process_vst_events(VstEvents const* const events) noexcept;
+        void process_vst_midi_event(VstMidiEvent const* const event) noexcept;
 
         template<typename NumberType>
         void generate_samples(
