@@ -473,6 +473,8 @@ constexpr Controller UNDEFINED_37                   = 117;
 constexpr Controller UNDEFINED_38                   = 118;
 constexpr Controller UNDEFINED_39                   = 119;
 
+constexpr Controller MAX_CONTROLLER_ID              = 127;
+
 constexpr Command NOTE_OFF                          = 0x80;
 constexpr Command NOTE_ON                           = 0x90;
 constexpr Command AFTERTOUCH                        = 0xa0;

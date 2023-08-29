@@ -368,6 +368,7 @@ FstPlugin::FstPlugin(
     effect(effect),
     host_callback(host_callback),
     platform_data(platform_data),
+    midi_cc_received(Midi::MAX_CONTROLLER_ID + 1, false),
     gui(NULL),
     renderer(synth),
     serialized_bank(""),
@@ -378,6 +379,8 @@ FstPlugin::FstPlugin(
     save_current_patch_before_changing_program(false),
     had_midi_cc_event(false)
 {
+    clear_received_midi_cc();
+
     window_rect.top = 0;
     window_rect.left = 0;
     window_rect.bottom = GUI::HEIGHT;
@@ -467,6 +470,8 @@ void FstPlugin::resume() noexcept
 
 void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
 {
+    clear_received_midi_cc();
+
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
         VstEvent* event = events->events[i];
 
@@ -480,6 +485,16 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
         remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
         update_host_display();
     }
+}
+
+
+void FstPlugin::clear_received_midi_cc() noexcept
+{
+    for (std::vector<bool>::iterator it = midi_cc_received.begin(); it != midi_cc_received.end(); ++it) {
+        *it = false;
+    }
+
+    received_midi_cc_cleared = true;
 }
 
 
@@ -530,6 +545,12 @@ void FstPlugin::generate_samples(
 
 void FstPlugin::prepare_rendering(Integer const sample_count) noexcept
 {
+    if (!received_midi_cc_cleared) {
+        clear_received_midi_cc();
+    }
+
+    received_midi_cc_cleared = false;
+
     handle_program_change();
     handle_parameter_changes();
     update_bpm();
@@ -594,12 +615,15 @@ void FstPlugin::handle_parameter_changes() noexcept
             changes of these parameters as if the corresponding MIDI CC message
             had been received.
             */
-            synth.control_change(
-                0.0,
-                0,
-                controller_id,
-                float_to_midi_byte(parameter.get_last_set_value())
-            );
+
+            if (!midi_cc_received[controller_id]) {
+                synth.control_change(
+                    0.0,
+                    0,
+                    controller_id,
+                    float_to_midi_byte(parameter.get_last_set_value())
+                );
+            }
         } else {
             MidiController* const midi_controller = parameter.get_midi_controller();
 
@@ -712,6 +736,10 @@ void FstPlugin::control_change(
         Midi::Byte const new_value
 ) noexcept {
     had_midi_cc_event = true;
+
+    if (synth.is_supported_midi_controller(controller)) {
+        midi_cc_received[controller] = true;
+    }
 }
 
 

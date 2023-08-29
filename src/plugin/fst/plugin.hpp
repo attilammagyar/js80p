@@ -21,6 +21,7 @@
 #define JS80P__PLUGIN__FST__PLUGIN_HPP
 
 #include <string>
+#include <vector>
 
 #include <fst/fst.h>
 
@@ -220,6 +221,8 @@ class FstPlugin : public Midi::EventHandler
             MidiController* midi_controller
         ) noexcept;
 
+        void clear_received_midi_cc() noexcept;
+
         void prepare_rendering(Integer const sample_count) noexcept;
 
         void update_bpm() noexcept;
@@ -239,6 +242,7 @@ class FstPlugin : public Midi::EventHandler
         GUI::PlatformData const platform_data;
 
         ERect window_rect;
+        std::vector<bool> midi_cc_received;
         GUI* gui;
         Renderer renderer;
         Bank bank;
@@ -249,6 +253,7 @@ class FstPlugin : public Midi::EventHandler
         VstInt32 prev_logged_op_code;
         bool save_current_patch_before_changing_program;
         bool had_midi_cc_event;
+        bool received_midi_cc_cleared;
 };
 
 }
