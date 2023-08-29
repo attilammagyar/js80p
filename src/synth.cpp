@@ -2024,7 +2024,7 @@ void Synth::process_messages() noexcept
 {
     SPSCQueue<Message>::SizeType const message_count = messages.length();
 
-    for (size_t i = 0; i != message_count; ++i) {
+    for (SPSCQueue<Message>::SizeType i = 0; i != message_count; ++i) {
         Message message;
 
         if (!messages.pop(message)) {
