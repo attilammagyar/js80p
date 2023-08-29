@@ -931,7 +931,7 @@ float FstPlugin::Parameter::get_value() noexcept
 }
 
 
-float FstPlugin::Parameter::get_last_set_value() noexcept
+float FstPlugin::Parameter::get_last_set_value() const noexcept
 {
     return this->value;
 }

@@ -201,7 +201,7 @@ class FstPlugin : public Midi::EventHandler
                 // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
 
                 float get_value() noexcept;
-                float get_last_set_value() noexcept;
+                float get_last_set_value() const noexcept;
                 void set_value(float const value) noexcept;
 
                 void clear() noexcept;
