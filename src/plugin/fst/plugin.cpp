@@ -527,6 +527,10 @@ void FstPlugin::generate_samples(
     the plugin, but since these parameters only ever change due to MIDI CC
     messages, we don't want the host to record them both as MIDI CC and as
     parameter automation.
+
+    Also, since parameter handling seems to be done in the GUI thread and
+    generate_samples() is run in the audio thread, this call would cross
+    threads, which is probably unsafe in most hosts.
     */
     // for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
         // if (UNLIKELY(parameters[i].needs_host_update())) {
