@@ -368,7 +368,6 @@ FstPlugin::FstPlugin(
     effect(effect),
     host_callback(host_callback),
     platform_data(platform_data),
-    midi_cc_received(Midi::MAX_CONTROLLER_ID + 1, false),
     gui(NULL),
     renderer(synth),
     serialized_bank(""),
@@ -490,10 +489,7 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
 
 void FstPlugin::clear_received_midi_cc() noexcept
 {
-    for (std::vector<bool>::iterator it = midi_cc_received.begin(); it != midi_cc_received.end(); ++it) {
-        *it = false;
-    }
-
+    midi_cc_received.reset();
     received_midi_cc_cleared = true;
 }
 
@@ -620,7 +616,7 @@ void FstPlugin::handle_parameter_changes() noexcept
             had been received.
             */
 
-            if (!midi_cc_received[controller_id]) {
+            if (!midi_cc_received[(size_t)controller_id]) {
                 synth.control_change(
                     0.0,
                     0,
@@ -742,7 +738,7 @@ void FstPlugin::control_change(
     had_midi_cc_event = true;
 
     if (synth.is_supported_midi_controller(controller)) {
-        midi_cc_received[controller] = true;
+        midi_cc_received[(size_t)controller] = true;
     }
 }
 

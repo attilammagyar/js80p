@@ -21,7 +21,7 @@
 #define JS80P__PLUGIN__FST__PLUGIN_HPP
 
 #include <string>
-#include <vector>
+#include <bitset>
 
 #include <fst/fst.h>
 
@@ -242,7 +242,7 @@ class FstPlugin : public Midi::EventHandler
         GUI::PlatformData const platform_data;
 
         ERect window_rect;
-        std::vector<bool> midi_cc_received;
+        std::bitset<Midi::MAX_CONTROLLER_ID + 1> midi_cc_received;
         GUI* gui;
         Renderer renderer;
         Bank bank;
