@@ -34,7 +34,8 @@ JS80P_CXXFLAGS = \
 	-Werror \
 	-m$(INSTRUCTION_SET) \
 	-ffast-math \
-	-O3
+	-O3 \
+	-std=c++17
 
 # DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 DEBUG_LOG ?=

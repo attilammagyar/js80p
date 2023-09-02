@@ -20,6 +20,7 @@
 #define JS80P__DSP__WAVETABLE_HPP
 
 #include <string>
+#include <type_traits>
 
 #include "js80p.hpp"
 
@@ -38,7 +39,6 @@ class WavetableState
         Frequency nyquist_frequency;
         Frequency interpolation_limit;
         Integer table_indices[2];
-        bool needs_table_interpolation;
 };
 
 
@@ -50,6 +50,13 @@ class Wavetable
     */
 
     public:
+        enum Interpolation
+        {
+            DYNAMIC = 0,
+            LINEAR_ONLY = 1,
+            LAGRANGE_ONLY = 2,
+        };
+
         /*
         The Nyquist limit for 48 kHz sampling rate is 24 kHz, which
         can represent up to 384 partials of a 62.5 Hz sawtooth wave.
@@ -78,6 +85,7 @@ class Wavetable
 
         ~Wavetable();
 
+        template<Interpolation interpolation = Interpolation::DYNAMIC, bool single_partial = false>
         Sample lookup(
             WavetableState& state,
             Frequency const frequency,
@@ -86,6 +94,13 @@ class Wavetable
 
         void update_coefficients(Number const coefficients[]) noexcept;
         void normalize() noexcept;
+
+        Interpolation select_interpolation(
+            Frequency const frequency,
+            Frequency const nyquist_frequency
+        ) const noexcept;
+
+        bool has_single_partial() const noexcept;
 
     private:
         /*
@@ -110,17 +125,34 @@ class Wavetable
 
         Number wrap_around(Number const index) const noexcept;
 
+        template<Interpolation interpolation, bool table_interpolation>
         Sample interpolate(
-            WavetableState const& state,
-            Frequency const frequency,
-            Number const sample_index
+            typename std::enable_if<interpolation == Interpolation::DYNAMIC, WavetableState const&>::type state,
+            typename std::enable_if<interpolation == Interpolation::DYNAMIC, Frequency const>::type frequency,
+            typename std::enable_if<interpolation == Interpolation::DYNAMIC, Number const>::type sample_index
         ) const noexcept;
 
+        template<Interpolation interpolation, bool table_interpolation>
+        Sample interpolate(
+            typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, WavetableState const&>::type state,
+            typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, Frequency const>::type frequency,
+            typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, Number const>::type sample_index
+        ) const noexcept;
+
+        template<Interpolation interpolation, bool table_interpolation>
+        Sample interpolate(
+            typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, WavetableState const&>::type state,
+            typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, Frequency const>::type frequency,
+            typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, Number const>::type sample_index
+        ) const noexcept;
+
+        template<bool table_interpolation>
         Sample interpolate_sample_linear(
             WavetableState const& state,
             Number const sample_index
         ) const noexcept;
 
+        template<bool table_interpolation>
         Sample interpolate_sample_lagrange(
             WavetableState const& state,
             Number const sample_index

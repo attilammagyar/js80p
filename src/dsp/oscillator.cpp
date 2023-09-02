@@ -760,11 +760,57 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
     }
 
     if (computed_frequency_is_constant) {
-        render_with_constant_frequency(
+        Wavetable::Interpolation const interpolation = (
+            wavetable->select_interpolation(computed_frequency_value, nyquist_frequency)
+        );
+
+        if (wavetable->has_single_partial()) {
+            switch (interpolation) {
+                case Wavetable::Interpolation::LINEAR_ONLY:
+                    render_with_constant_frequency<Wavetable::Interpolation::LINEAR_ONLY, true>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+
+                case Wavetable::Interpolation::LAGRANGE_ONLY:
+                    render_with_constant_frequency<Wavetable::Interpolation::LAGRANGE_ONLY, true>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+
+                default:
+                    render_with_constant_frequency<Wavetable::Interpolation::DYNAMIC, true>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+            }
+        } else {
+            switch (interpolation) {
+                case Wavetable::Interpolation::LINEAR_ONLY:
+                    render_with_constant_frequency<Wavetable::Interpolation::LINEAR_ONLY, false>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+
+                case Wavetable::Interpolation::LAGRANGE_ONLY:
+                    render_with_constant_frequency<Wavetable::Interpolation::LAGRANGE_ONLY, false>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+
+                default:
+                    render_with_constant_frequency<Wavetable::Interpolation::DYNAMIC, false>(
+                        round, first_sample_index, last_sample_index, buffer
+                    );
+                    break;
+            }
+        }
+    } else if (wavetable->has_single_partial()) {
+        render_with_changing_frequency<true>(
             round, first_sample_index, last_sample_index, buffer
         );
     } else {
-        render_with_changing_frequency(
+        render_with_changing_frequency<false>(
             round, first_sample_index, last_sample_index, buffer
         );
     }
@@ -772,6 +818,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
+template<Wavetable::Interpolation interpolation, bool single_partial>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_frequency(
         Integer const round,
         Integer const first_sample_index,
@@ -787,13 +834,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial, interpolation>(
                     computed_amplitude_value, computed_frequency_value, phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial, interpolation>(
                     computed_amplitude_value, computed_frequency_value, phase_buffer[i]
                 );
             }
@@ -801,13 +848,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
     } else {
         if (phase_is_constant) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial, interpolation>(
                     computed_amplitude_buffer[i], computed_frequency_value, phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial, interpolation>(
                     computed_amplitude_buffer[i], computed_frequency_value, phase_buffer[i]
                 );
             }
@@ -817,6 +864,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
 
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
+template<bool single_partial>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_frequency(
         Integer const round,
         Integer const first_sample_index,
@@ -839,13 +887,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
             Sample const phase = phase_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial>(
                     amplitude_value, computed_frequency_buffer[i], phase
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial>(
                     amplitude_value, computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
@@ -853,13 +901,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
     } else {
         if (phase_is_constant) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial>(
                     computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_value
                 );
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<is_lfo>(
+                buffer[0][i] = render_sample<is_lfo, single_partial>(
                     computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_buffer[i]
                 );
             }
@@ -869,7 +917,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
 
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
-template<bool is_lfo_>
+template<bool is_lfo_, bool single_partial, Wavetable::Interpolation interpolation>
 Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
         typename std::enable_if<is_lfo_, Sample const>::type amplitude,
         typename std::enable_if<is_lfo_, Sample const>::type frequency,
@@ -882,20 +930,22 @@ Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
     two approaches.
     */
 
-    return amplitude * sample_offset_scale + amplitude * wavetable->lookup(
+    return amplitude * sample_offset_scale + amplitude * wavetable->lookup<interpolation, single_partial>(
         wavetable_state, frequency * frequency_scale, phase
     );
 }
 
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
-template<bool is_lfo_>
+template<bool is_lfo_, bool single_partial, Wavetable::Interpolation interpolation>
 Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
         typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
         typename std::enable_if<!is_lfo_, Sample const>::type frequency,
         typename std::enable_if<!is_lfo_, Sample const>::type phase
 ) noexcept {
-    return amplitude * wavetable->lookup(wavetable_state, frequency, phase);
+    return amplitude * wavetable->lookup<interpolation, single_partial>(
+        wavetable_state, frequency, phase
+    );
 }
 
 

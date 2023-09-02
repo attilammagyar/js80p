@@ -214,12 +214,15 @@ class Oscillator : public SignalProducer
 
         void initialize_first_round(Frequency const frequency) noexcept;
 
+        template<Wavetable::Interpolation interpolation, bool single_partial>
         void render_with_constant_frequency(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
         ) noexcept;
+
+        template<bool single_partial>
         void render_with_changing_frequency(
             Integer const round,
             Integer const first_sample_index,
@@ -227,14 +230,14 @@ class Oscillator : public SignalProducer
             Sample** buffer
         ) noexcept;
 
-        template<bool is_lfo_>
+        template<bool is_lfo_, bool single_partial, Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC>
         Sample render_sample(
             typename std::enable_if<is_lfo_, Sample const>::type amplitude,
             typename std::enable_if<is_lfo_, Sample const>::type frequency,
             typename std::enable_if<is_lfo_, Sample const>::type phase
         ) noexcept;
 
-        template<bool is_lfo_>
+        template<bool is_lfo_, bool single_partial = false, Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC>
         Sample render_sample(
             typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
             typename std::enable_if<!is_lfo_, Sample const>::type frequency,
@@ -264,6 +267,7 @@ class Oscillator : public SignalProducer
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
         bool phase_is_constant;
+        bool can_use_fast_interpolation;
 };
 
 }
