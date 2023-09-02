@@ -639,21 +639,19 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
         );
 
         Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
+    } else if (is_flipped) {
+        for (Integer i = 0; i != sample_count; ++i) {
+            Number const p = -panning_buffer[i];
+            Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
+
+            Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+        }
     } else {
-        if (is_flipped) {
-            for (Integer i = 0; i != sample_count; ++i) {
-                Number const p = -panning_buffer[i];
-                Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
+        for (Integer i = 0; i != sample_count; ++i) {
+            Number const p = panning_buffer[i];
+            Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
-                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
-            }
-        } else {
-            for (Integer i = 0; i != sample_count; ++i) {
-                Number const p = panning_buffer[i];
-                Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
-
-                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
-            }
+            Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
         }
     }
 
@@ -671,53 +669,69 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::render(
     Sample const* const* const input_buffer = this->input_buffer;
 
     if (panning_buffer == NULL) {
-        if (panning_value <= 0) {
+        if (panning_value <= 0.0) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = (
                     input_buffer[0][i] + input_buffer[1][i] * stereo_gain_value[0]
                 );
+            }
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[1][i] = input_buffer[1][i] * stereo_gain_value[1];
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = input_buffer[0][i] * stereo_gain_value[0];
+            }
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[1][i] = (
                     input_buffer[1][i] + input_buffer[0][i] * stereo_gain_value[1]
                 );
             }
         }
-    } else {
-        if (is_flipped) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                if (panning_buffer[i] > 0) {
-                    buffer[0][i] = (
-                        input_buffer[0][i]
-                        + input_buffer[1][i] * stereo_gain_buffer[0][i]
-                    );
-                    buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
-                } else {
-                    buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
-                    buffer[1][i] = (
-                        input_buffer[1][i]
-                        + input_buffer[0][i] * stereo_gain_buffer[1][i]
-                    );
-                }
+    } else if (is_flipped) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if (panning_buffer[i] > 0.0) {
+                buffer[0][i] = (
+                    input_buffer[0][i]
+                    + input_buffer[1][i] * stereo_gain_buffer[0][i]
+                );
+            } else {
+                buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
             }
-        } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                if (panning_buffer[i] <= 0) {
-                    buffer[0][i] = (
-                        input_buffer[0][i]
-                        + input_buffer[1][i] * stereo_gain_buffer[0][i]
-                    );
-                    buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
-                } else {
-                    buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
-                    buffer[1][i] = (
-                        input_buffer[1][i]
-                        + input_buffer[0][i] * stereo_gain_buffer[1][i]
-                    );
-                }
+        }
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if (panning_buffer[i] > 0.0) {
+                buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
+            } else {
+                buffer[1][i] = (
+                    input_buffer[1][i]
+                    + input_buffer[0][i] * stereo_gain_buffer[1][i]
+                );
+            }
+        }
+    } else {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if (panning_buffer[i] <= 0.0) {
+                buffer[0][i] = (
+                    input_buffer[0][i]
+                    + input_buffer[1][i] * stereo_gain_buffer[0][i]
+                );
+            } else {
+                buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
+            }
+        }
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if (panning_buffer[i] <= 0.0) {
+                buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
+            } else {
+                buffer[1][i] = (
+                    input_buffer[1][i]
+                    + input_buffer[0][i] * stereo_gain_buffer[1][i]
+                );
             }
         }
     }
