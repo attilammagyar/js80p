@@ -100,6 +100,12 @@ class Math
          */
         static Number cos(Number const x) noexcept;
 
+        /**
+         * \warning Negative numbers close to multiples of PI are not handled
+         *          very well with regards to precision.
+         */
+        static void sincos(Number const x, Number& sin, Number& cos) noexcept;
+
         static Number exp(Number const x) noexcept;
         static Number pow_10(Number const x) noexcept;
         static Number pow_10_inv(Number const x) noexcept;
@@ -236,8 +242,12 @@ class Math
         void init_log_biquad_filter_freq() noexcept;
 
         Number sin_impl(Number const x) const noexcept;
+        Number cos_impl(Number const x) const noexcept;
+        Number trig(Number const* const table, Number const x) const noexcept;
+        void sincos_impl(Number const x, Number& sin, Number& cos) const noexcept;
 
         Number sines[SIN_TABLE_SIZE];
+        Number cosines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
         Number randoms_centered_lfo[RANDOMS];
         Number distortion[DISTORTION_TABLE_SIZE];

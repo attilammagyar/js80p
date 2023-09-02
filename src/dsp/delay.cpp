@@ -638,22 +638,21 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
             (panning_value <= 0.0 ? panning_value + 1.0 : panning_value) * Math::PI_HALF
         );
 
-        stereo_gain_value[0] = Math::cos(x);
-        stereo_gain_value[1] = Math::sin(x);
+        Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
     } else {
         if (is_flipped) {
             for (Integer i = 0; i != sample_count; ++i) {
                 Number const p = -panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
-                stereo_gain_buffer[0][i] = Math::cos(x);
-                stereo_gain_buffer[1][i] = Math::sin(x);
+
+                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
             }
         } else {
             for (Integer i = 0; i != sample_count; ++i) {
                 Number const p = panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
-                stereo_gain_buffer[0][i] = Math::cos(x);
-                stereo_gain_buffer[1][i] = Math::sin(x);
+
+                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
             }
         }
     }

@@ -44,7 +44,9 @@ void Math::init_sines() noexcept
     constexpr Number scale = PI_DOUBLE / (Number)SIN_TABLE_SIZE;
 
     for (int i = 0; i != SIN_TABLE_SIZE; ++i) {
-        sines[i] = std::sin((Number)i * scale);
+        Number const x = (Number)i * scale;
+        sines[i] = std::sin(x);
+        cosines[i] = std::cos(x);
     }
 }
 
@@ -144,18 +146,48 @@ Number Math::sin(Number const x) noexcept
 
 Number Math::cos(Number const x) noexcept
 {
-    return sin(x + PI_HALF);
+    return math.cos_impl(x);
 }
 
 
 Number Math::sin_impl(Number const x) const noexcept
+{
+    return math.trig(sines, x);
+}
+
+
+Number Math::cos_impl(Number const x) const noexcept
+{
+    return math.trig(cosines, x);
+}
+
+
+Number Math::trig(Number const* const table, Number const x) const noexcept
 {
     Number const index = x * SINE_SCALE;
     Number const after_weight = index - std::floor(index);
     int const before_index = ((int)index) & SIN_TABLE_MASK;
     int const after_index = (before_index + 1) & SIN_TABLE_MASK;
 
-    return combine(after_weight, sines[after_index], sines[before_index]);
+    return combine(after_weight, table[after_index], table[before_index]);
+}
+
+
+void Math::sincos(Number const x, Number& sin, Number& cos) noexcept
+{
+    math.sincos_impl(x, sin, cos);
+}
+
+
+void Math::sincos_impl(Number const x, Number& sin, Number& cos) const noexcept
+{
+    Number const index = x * SINE_SCALE;
+    Number const after_weight = index - std::floor(index);
+    int const before_index = ((int)index) & SIN_TABLE_MASK;
+    int const after_index = (before_index + 1) & SIN_TABLE_MASK;
+
+    sin = combine(after_weight, sines[after_index], sines[before_index]);
+    cos = combine(after_weight, cosines[after_index], cosines[before_index]);
 }
 
 

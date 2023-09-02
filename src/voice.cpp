@@ -768,8 +768,11 @@ void Voice<ModulatorSignalProducerClass>::render(
                 1.0, std::max(panning_value + note_panning_value, -1.0)
             );
             Number const x = (panning + 1.0) * Math::PI_QUARTER;
-            Sample const left_gain = Math::cos(x);
-            Sample const right_gain = Math::sin(x);
+
+            Sample left_gain;
+            Sample right_gain;
+
+            Math::sincos(x, right_gain, left_gain);
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = left_gain * volume_applier_buffer[i];
@@ -781,8 +784,11 @@ void Voice<ModulatorSignalProducerClass>::render(
                     1.0, std::max(panning_buffer[i] + note_panning_value, -1.0)
                 );
                 Number const x = (panning + 1.0) * Math::PI_QUARTER;
-                Sample const left_gain = Math::cos(x);
-                Sample const right_gain = Math::sin(x);
+
+                Sample left_gain;
+                Sample right_gain;
+
+                Math::sincos(x, right_gain, left_gain);
 
                 buffer[0][i] = left_gain * volume_applier_buffer[i];
                 buffer[1][i] = right_gain * volume_applier_buffer[i];
@@ -794,8 +800,11 @@ void Voice<ModulatorSignalProducerClass>::render(
                 1.0, std::max(panning_value + note_panning_buffer[i], -1.0)
             );
             Number const x = (panning + 1.0) * Math::PI_QUARTER;
-            Sample const left_gain = Math::cos(x);
-            Sample const right_gain = Math::sin(x);
+
+            Sample left_gain;
+            Sample right_gain;
+
+            Math::sincos(x, right_gain, left_gain);
 
             buffer[0][i] = left_gain * volume_applier_buffer[i];
             buffer[1][i] = right_gain * volume_applier_buffer[i];
@@ -806,8 +815,11 @@ void Voice<ModulatorSignalProducerClass>::render(
                 1.0, std::max(panning_buffer[i] + note_panning_buffer[i], -1.0)
             );
             Number const x = (panning + 1.0) * Math::PI_QUARTER;
-            Sample const left_gain = Math::cos(x);
-            Sample const right_gain = Math::sin(x);
+
+            Sample left_gain;
+            Sample right_gain;
+
+            Math::sincos(x, right_gain, left_gain);
 
             buffer[0][i] = left_gain * volume_applier_buffer[i];
             buffer[1][i] = right_gain * volume_applier_buffer[i];

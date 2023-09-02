@@ -451,12 +451,16 @@ void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
         Number const q_value
 ) noexcept {
     Sample const w0 = w0_scale * frequency_value;
+
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
     Sample const alpha_qdb = (
-        0.5 * Math::sin(w0)
-        * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
+        0.5 * sin_w0 * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
     );
 
-    Sample const cos_w0 = Math::cos(w0);
     Sample const b1 = 1.0 - cos_w0;
     Sample const b0_b2 = 0.5 * b1;
 
@@ -549,12 +553,16 @@ void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples
         Number const q_value
 ) noexcept {
     Sample const w0 = w0_scale * frequency_value;
+
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
     Sample const alpha_qdb = (
-        0.5 * Math::sin(w0)
-        * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
+        0.5 * sin_w0 * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
     );
 
-    Sample const cos_w0 = Math::cos(w0);
     Sample const b1 = -1.0 - cos_w0;
     Sample const b0_b2 = -0.5 * b1;
 
@@ -641,8 +649,13 @@ void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples
         Number const q_value
 ) noexcept {
     Sample const w0 = w0_scale * frequency_value;
-    Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
-    Sample const cos_w0 = Math::cos(w0);
+
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
+    Sample const alpha_q = 0.5 * sin_w0 / q_value;
 
     store_normalized_coefficient_samples(
         index, alpha_q, 0.0, -alpha_q, 1.0 + alpha_q, -2.0 * cos_w0, 1.0 - alpha_q
@@ -727,8 +740,13 @@ void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
         Number const q_value
 ) noexcept {
     Sample const w0 = w0_scale * frequency_value;
-    Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
-    Sample const cos_w0 = Math::cos(w0);
+
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
+    Sample const alpha_q = 0.5 * sin_w0 / q_value;
 
     Sample const b1_a1 = -2.0 * cos_w0;
 
@@ -830,16 +848,21 @@ void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
         Number const gain_value
 ) noexcept {
     Sample const w0 = w0_scale * frequency_value;
-    Sample const alpha_q = 0.5 * Math::sin(w0) / q_value;
-    Sample const cos_w0 = Math::cos(w0);
+
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
+    Sample const b1_a1 = -2.0 * cos_w0;
+
+    Sample const alpha_q = 0.5 * sin_w0 / q_value;
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
 
     Sample const alpha_q_times_a = alpha_q * a;
     Sample const alpha_q_over_a = alpha_q / a;
-
-    Sample const b1_a1 = -2.0 * cos_w0;
 
     store_normalized_coefficient_samples(
         index,
@@ -938,15 +961,19 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
+    Sample const a_p_1 = a + 1.0;
+    Sample const a_m_1 = a - 1.0;
 
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
     Sample const w0 = w0_scale * (Sample)frequency_value;
-    Sample const cos_w0 = Math::cos(w0);
 
-    Sample const a_p_1 = a + 1.0;
-    Sample const a_m_1 = a - 1.0;
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
     Sample const a_m_1_cos_w0 = a_m_1 * cos_w0;
     Sample const a_p_1_cos_w0 = a_p_1 * cos_w0;
 
@@ -954,9 +981,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     S = 1 makes sqrt((A + 1/A) * (1/S - 1) + 2) collapse to just sqrt(2). Also,
     alpha_s is always multiplied by 2, which cancels dividing the sine by 2.
     */
-    Sample const alpha_s_double_a_sqrt = (
-        Math::sin(w0) * FREQUENCY_SINE_SCALE * a_sqrt
-    );
+    Sample const alpha_s_double_a_sqrt = sin_w0 * FREQUENCY_SINE_SCALE * a_sqrt;
 
     store_normalized_coefficient_samples(
         index,
@@ -1055,15 +1080,19 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
+    Sample const a_p_1 = a + 1.0;
+    Sample const a_m_1 = a - 1.0;
 
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
     Sample const w0 = w0_scale * (Sample)frequency_value;
-    Sample const cos_w0 = Math::cos(w0);
 
-    Sample const a_p_1 = a + 1.0;
-    Sample const a_m_1 = a - 1.0;
+    Sample sin_w0;
+    Sample cos_w0;
+
+    Math::sincos(w0, sin_w0, cos_w0);
+
     Sample const a_m_1_cos_w0 = a_m_1 * cos_w0;
     Sample const a_p_1_cos_w0 = a_p_1 * cos_w0;
 
@@ -1072,7 +1101,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
     alpha_s is always multiplied by 2, which cancels dividing the sine by 2.
     */
     Sample const alpha_s_double_a_sqrt = (
-        Math::sin(w0) * FREQUENCY_SINE_SCALE * a_sqrt
+        sin_w0 * FREQUENCY_SINE_SCALE * a_sqrt
     );
 
     store_normalized_coefficient_samples(

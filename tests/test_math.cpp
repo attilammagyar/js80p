@@ -81,6 +81,19 @@ TEST(cos, {
 })
 
 
+TEST(sincos, {
+    for (Number x = 0.0, limit = PI_DOUBLE * 2.0; x < limit; x += DELTA) {
+        Number sin = 0.0;
+        Number cos = 0.0;
+
+        Math::sincos(x, sin, cos);
+
+        assert_eq(std::sin(x), sin, TOLERANCE_TRIG, "x=%f", x);
+        assert_eq(std::cos(x), cos, TOLERANCE_TRIG, "x=%f", x);
+    }
+})
+
+
 TEST(exp_limits_sanity, {
     std::vector<Number> values;
     Number min = 999999.0;
