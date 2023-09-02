@@ -337,7 +337,6 @@ class FloatParam : public Param<Number, evaluation>
                 ) noexcept;
 
                 Number advance() noexcept;
-                Number advance(Integer const skip_samples) noexcept;
                 Number get_value_at(Seconds const time_offset) const noexcept;
 
                 Seconds start_time_offset;
@@ -353,6 +352,8 @@ class FloatParam : public Param<Number, evaluation>
         };
 
         Number round_value(Number const value) const noexcept;
+        Number ratio_to_value_log(Number const ratio) const noexcept;
+        Number ratio_to_value_raw(Number const ratio) const noexcept;
 
         void handle_cancel_event(SignalProducer::Event const& event) noexcept;
         void handle_set_value_event(SignalProducer::Event const& event) noexcept;
@@ -369,6 +370,7 @@ class FloatParam : public Param<Number, evaluation>
             Integer const sample_count
         ) noexcept;
 
+        template<bool is_logarithmic_>
         Sample const* const* process_midi_controller_events() noexcept;
 
         Sample const* const* process_flexible_controller(
@@ -452,7 +454,7 @@ class ModulatableFloatParam : public FloatParamS
         static constexpr Number MODULATION_LEVEL_INSIGNIFICANT = 0.000001;
 
         ModulatableFloatParam(
-            ModulatorSignalProducerClass* modulator,
+            ModulatorSignalProducerClass* const modulator,
             FloatParamS& modulation_level_leader,
             std::string const name = "",
             Number const min_value = -1.0,
@@ -488,7 +490,7 @@ class ModulatableFloatParam : public FloatParamS
 
     private:
         FloatParamS modulation_level;
-        ModulatorSignalProducerClass* modulator;
+        ModulatorSignalProducerClass* const modulator;
         Sample const* modulator_buffer;
         Sample const* modulation_level_buffer;
         bool modulation_level_is_constant;

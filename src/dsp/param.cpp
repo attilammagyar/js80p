@@ -332,7 +332,8 @@ FloatParam<evaluation>::FloatParam(
     envelope_canceled(false),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
-        std::fabs(min_value - 0.0) < 0.000001
+        log_scale_toggle == NULL
+        && std::fabs(min_value - 0.0) < 0.000001
         && std::fabs(max_value - 1.0) < 0.000001
     ),
     round_to(round_to),
@@ -372,7 +373,8 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     envelope_canceled(false),
     should_round(false),
     is_ratio_same_as_value(
-        std::fabs(leader.get_min_value() - 0.0) < 0.000001
+        leader.get_log_scale_toggle() == NULL
+        && std::fabs(leader.get_min_value() - 0.0) < 0.000001
         && std::fabs(leader.get_max_value() - 1.0) < 0.000001
     ),
     round_to(0.0),
@@ -501,13 +503,27 @@ template<ParamEvaluation evaluation>
 Number FloatParam<evaluation>::ratio_to_value(Number const ratio) const noexcept
 {
     if (is_logarithmic()) {
-        return Math::lookup(
-            log_scale_table,
-            log_scale_table_max_index,
-            ratio * log_scale_table_scale
-        );
+        return ratio_to_value_log(ratio);
     }
 
+    return ratio_to_value_raw(ratio);
+}
+
+
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::ratio_to_value_log(Number const ratio) const noexcept
+{
+    return Math::lookup(
+        log_scale_table,
+        log_scale_table_max_index,
+        ratio * log_scale_table_scale
+    );
+}
+
+
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::ratio_to_value_raw(Number const ratio) const noexcept
+{
     return Param<Number, evaluation>::ratio_to_value(ratio);
 }
 
@@ -814,7 +830,7 @@ void FloatParam<evaluation>::handle_cancel_event(
         );
 
         if (linear_ramp_state.is_logarithmic) {
-            this->store_new_value(ratio_to_value(stop_value));
+            this->store_new_value(ratio_to_value_log(stop_value));
         } else {
             this->store_new_value(stop_value);
         }
@@ -1051,7 +1067,11 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
     if (lfo != NULL) {
         return process_lfo(round, sample_count);
     } else if (this->midi_controller != NULL) {
-        return process_midi_controller_events();
+        if (is_logarithmic()) {
+            return process_midi_controller_events<true>();
+        } else {
+            return process_midi_controller_events<false>();
+        }
     } else if (flexible_controller != NULL) {
         return process_flexible_controller(sample_count);
     } else {
@@ -1086,6 +1106,7 @@ Sample const* const* FloatParam<evaluation>::process_lfo(
 
 
 template<ParamEvaluation evaluation>
+template<bool is_logarithmic_>
 Sample const* const* FloatParam<evaluation>::process_midi_controller_events() noexcept
 {
     Queue<SignalProducer::Event>::SizeType const number_of_ctl_events = (
@@ -1103,7 +1124,11 @@ Sample const* const* FloatParam<evaluation>::process_midi_controller_events() no
             Seconds const time_offset = this->midi_controller->events[i].time_offset;
             Number const controller_value = this->midi_controller->events[i].number_param_1;
 
-            schedule_value(time_offset, ratio_to_value(controller_value));
+            if constexpr (is_logarithmic_) {
+                schedule_value(time_offset, ratio_to_value_log(controller_value));
+            } else {
+                schedule_value(time_offset, ratio_to_value_raw(controller_value));
+            }
         }
 
         return NULL;
@@ -1139,7 +1164,13 @@ Sample const* const* FloatParam<evaluation>::process_midi_controller_events() no
             time_offset - previous_time_offset
         );
         previous_ratio = controller_value;
-        schedule_linear_ramp(duration, ratio_to_value(controller_value));
+
+        if constexpr (is_logarithmic_) {
+            schedule_linear_ramp(duration, ratio_to_value_log(controller_value));
+        } else {
+            schedule_linear_ramp(duration, ratio_to_value_raw(controller_value));
+        }
+
         previous_time_offset = time_offset;
     }
 
@@ -1315,8 +1346,14 @@ void FloatParam<evaluation>::render(
     if (lfo != NULL) {
         Sample sample;
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = sample = (Sample)ratio_to_value(lfo_buffer[0][i]);
+        if (is_logarithmic()) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)ratio_to_value_log(lfo_buffer[0][i]);
+            }
+        } else {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)ratio_to_value_raw(lfo_buffer[0][i]);
+            }
         }
 
         if (last_sample_index != first_sample_index) {
@@ -1328,7 +1365,7 @@ void FloatParam<evaluation>::render(
         if (linear_ramp_state.is_logarithmic) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = sample = (
-                    (Sample)ratio_to_value(linear_ramp_state.advance())
+                    (Sample)ratio_to_value_log(linear_ramp_state.advance())
                 );
             }
         } else {
@@ -1408,23 +1445,23 @@ void FloatParam<evaluation>::LinearRampState::init(
         Seconds const duration,
         bool const is_logarithmic
 ) noexcept {
-    LinearRampState::is_logarithmic = is_logarithmic;
+    this->is_logarithmic = is_logarithmic;
 
     if (duration_in_samples > 0.0) {
         is_done = false;
 
-        LinearRampState::start_time_offset = start_time_offset;
-        LinearRampState::done_samples = done_samples;
-        LinearRampState::initial_value = initial_value;
-        LinearRampState::target_value = target_value;
-        LinearRampState::duration_in_samples = duration_in_samples;
-        LinearRampState::duration = duration;
+        this->start_time_offset = start_time_offset;
+        this->done_samples = done_samples;
+        this->initial_value = initial_value;
+        this->target_value = target_value;
+        this->duration_in_samples = duration_in_samples;
+        this->duration = duration;
 
         delta = target_value - initial_value;
         speed = 1.0 / duration_in_samples;
     } else {
         is_done = true;
-        LinearRampState::target_value = target_value;
+        this->target_value = target_value;
     }
 }
 
@@ -1434,34 +1471,6 @@ Number FloatParam<evaluation>::LinearRampState::advance() noexcept
 {
     if (is_done) {
         return target_value;
-    }
-
-    Number const next_value = initial_value + (done_samples * speed) * delta;
-
-    done_samples += 1.0;
-
-    if (done_samples >= duration_in_samples) {
-        is_done = true;
-    }
-
-    return next_value;
-}
-
-
-template<ParamEvaluation evaluation>
-Number FloatParam<evaluation>::LinearRampState::advance(
-        Integer const skip_samples
-) noexcept {
-    if (is_done) {
-        return target_value;
-    }
-
-    Number const skip_samples_float = std::min(
-        (Number)skip_samples, duration_in_samples - done_samples - 1.0
-    );
-
-    if (LIKELY(skip_samples_float > 0.0)) {
-        done_samples += skip_samples;
     }
 
     Number const next_value = initial_value + (done_samples * speed) * delta;
@@ -1490,7 +1499,7 @@ Number FloatParam<evaluation>::LinearRampState::get_value_at(
 
 template<class ModulatorSignalProducerClass>
 ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
-        ModulatorSignalProducerClass* modulator,
+        ModulatorSignalProducerClass* const modulator,
         FloatParamS& modulation_level_leader,
         std::string const name,
         Number const min_value,
@@ -1519,7 +1528,8 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
 
 template<class ModulatorSignalProducerClass>
 bool ModulatableFloatParam<ModulatorSignalProducerClass>::is_constant_in_next_round(
-        Integer const round, Integer const sample_count
+        Integer const round,
+        Integer const sample_count
 ) noexcept {
     if (modulator == NULL) {
         return FloatParamS::is_constant_in_next_round(round, sample_count);
