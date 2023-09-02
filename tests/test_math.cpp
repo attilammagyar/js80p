@@ -202,6 +202,29 @@ TEST(lookup_periodic, {
 })
 
 
+TEST(lookup_periodic_2, {
+    constexpr Integer table_size = 8;
+    constexpr Integer table_mask = 7;
+    Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+
+    assert_eq(8.0, Math::lookup_periodic_2(table, table_size, table_mask, 7.0), DOUBLE_DELTA);
+    assert_eq(7.3, Math::lookup_periodic_2(table, table_size, table_mask, 7.1), DOUBLE_DELTA);
+    assert_eq(1.0, Math::lookup_periodic_2(table, table_size, table_mask, 8.0), DOUBLE_DELTA);
+    assert_eq(1.7, Math::lookup_periodic_2(table, table_size, table_mask, 8.7), DOUBLE_DELTA);
+    assert_eq(6.0, Math::lookup_periodic_2(table, table_size, table_mask, 13.0), DOUBLE_DELTA);
+    assert_eq(6.3, Math::lookup_periodic_2(table, table_size, table_mask, 13.3), DOUBLE_DELTA);
+    assert_eq(7.99, Math::lookup_periodic_2(table, table_size, table_mask, 14.99), DOUBLE_DELTA);
+    assert_eq(7.93, Math::lookup_periodic_2(table, table_size, table_mask, 15.01), DOUBLE_DELTA);
+    assert_eq(1.7, Math::lookup_periodic_2(table, table_size, table_mask, 16.7), DOUBLE_DELTA);
+    assert_eq(5.9, Math::lookup_periodic_2(table, table_size, table_mask, -16.7), DOUBLE_DELTA);
+    assert_eq(6.8, Math::lookup_periodic_2(table, table_size, table_mask, -10.2), DOUBLE_DELTA);
+    assert_eq(8.0, Math::lookup_periodic_2(table, table_size, table_mask, -1.0), DOUBLE_DELTA);
+    assert_eq(2.7, Math::lookup_periodic_2(table, table_size, table_mask, -6.3), DOUBLE_DELTA);
+    assert_eq(1.0, Math::lookup_periodic_2(table, table_size, table_mask, -8.0), DOUBLE_DELTA);
+    assert_eq(2.0, Math::lookup_periodic_2(table, table_size, table_mask, -7.0), DOUBLE_DELTA);
+})
+
+
 TEST(statistics, {
     std::vector<Number> empty;
     std::vector<Number> one_element{1.0};

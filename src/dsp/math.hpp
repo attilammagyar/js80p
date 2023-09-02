@@ -72,6 +72,7 @@ class Math
         ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
         static constexpr int SIN_TABLE_SIZE = 0x1000;
+        static constexpr int SIN_TABLE_MASK = SIN_TABLE_SIZE - 1;
 
         static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE = 0x1000;
 
@@ -176,6 +177,17 @@ class Math
             Number const index
         ) noexcept;
 
+        /**
+         * \brief Same as \c lookup_periodic() but for tables that have a size
+         *        that is a power of 2.
+         */
+        static Number lookup_periodic_2(
+            Number const* table,
+            int const table_size,
+            int const table_mask,
+            Number const index
+        ) noexcept;
+
         class Statistics;
 
         static void compute_statistics(
@@ -201,8 +213,6 @@ class Math
         static constexpr int DISTORTION_TABLE_SIZE = 0x0800;
         static constexpr int DISTORTION_TABLE_MAX_INDEX = DISTORTION_TABLE_SIZE - 1;
         static constexpr Number DISTORTION_SCALE = (Number)DISTORTION_TABLE_SIZE;
-
-        static constexpr int SIN_TABLE_MASK = SIN_TABLE_SIZE - 1;
 
         static constexpr Number SINE_SCALE = (Number)SIN_TABLE_SIZE / PI_DOUBLE;
 

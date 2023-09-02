@@ -91,6 +91,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         [-2.0, 2.0] interval.
         */
         static constexpr int TABLE_SIZE = Math::SIN_TABLE_SIZE;
+        static constexpr int TABLE_MASK = Math::SIN_TABLE_MASK;
         static constexpr Number TABLE_SIZE_FLOAT = (Number)TABLE_SIZE;
         static constexpr Number TABLE_SIZE_FLOAT_INV = 1.0 / TABLE_SIZE_FLOAT;
         static constexpr Number WAVE_LENGTH = Math::PI_DOUBLE / S1;

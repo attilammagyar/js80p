@@ -375,8 +375,9 @@ Number Math::lookup_periodic(
         int const table_size,
         Number const index
 ) noexcept {
-    Number const after_weight = index - std::floor(index);
-    int before_index = (int)std::floor(index);
+    Number const floor_index = std::floor(index);
+    Number const after_weight = index - floor_index;
+    int before_index = (int)floor_index;
 
     if (before_index < 0) {
         before_index -= (before_index / table_size - 1) * table_size;
@@ -392,10 +393,30 @@ Number Math::lookup_periodic(
         after_index = 0;
     }
 
+    return combine(after_weight, table[after_index], table[before_index]);
+}
+
+
+Number Math::lookup_periodic_2(
+        Number const* table,
+        int const table_size,
+        int const table_mask,
+        Number const index
+) noexcept {
+    Number const floor_index = std::floor(index);
+    Number const after_weight = index - floor_index;
+    int before_index = (int)floor_index;
+
+    if (before_index < 0) {
+        before_index -= (before_index / table_size - 1) * table_size;
+    }
+
+    int const after_index = before_index + 1;
+
     return combine(
         after_weight,
-        table[after_index],
-        table[before_index]
+        table[after_index & table_mask],
+        table[before_index & table_mask]
     );
 }
 

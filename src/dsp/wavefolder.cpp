@@ -295,14 +295,14 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
 // template<class InputSignalProducerClass>
 // Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const noexcept
 // {
-    // return Math::lookup_periodic(f_table, TABLE_SIZE, TABLE_SCALE * x + TABLE_OFFSET);
+    // return Math::lookup_periodic_2(f_table, TABLE_SIZE, TABLE_MASK, TABLE_SCALE * x + TABLE_OFFSET);
 // }
 
 
 template<class InputSignalProducerClass>
 Sample Wavefolder<InputSignalProducerClass>::F0(Sample const x) const noexcept
 {
-    return Math::lookup_periodic(F0_table, TABLE_SIZE, TABLE_SCALE * x + TABLE_OFFSET);
+    return Math::lookup_periodic_2(F0_table, TABLE_SIZE, TABLE_MASK, TABLE_SCALE * x + TABLE_OFFSET);
 }
 
 }
