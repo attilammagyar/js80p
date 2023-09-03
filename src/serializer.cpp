@@ -208,7 +208,7 @@ void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
     char section_name[8];
     bool inside_js80p_section = false;
 
-    messages.reserve(600);
+    messages.reserve(800);
 
     for (Lines::const_iterator it = lines->begin(); it != lines->end(); ++it) {
         std::string line = *it;
