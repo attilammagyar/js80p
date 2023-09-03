@@ -39,6 +39,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
     char line[line_size];
     std::string serialized("");
 
+    serialized.reserve(MAX_SIZE);
     serialized += "[";
     serialized += JS80P_SECTION_NAME;
     serialized += "]";
