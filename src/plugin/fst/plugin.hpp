@@ -233,8 +233,6 @@ class FstPlugin : public Midi::EventHandler
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
 
-        void import_patch(const std::string& patch) noexcept;
-
         Parameter parameters[NUMBER_OF_PARAMETERS];
 
         AEffect* const effect;

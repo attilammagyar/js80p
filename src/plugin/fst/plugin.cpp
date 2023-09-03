@@ -589,7 +589,8 @@ void FstPlugin::handle_program_change() noexcept
     }
 
     bank.set_current_program_index(next_program);
-    import_patch(bank[next_program].serialize());
+    Serializer::import_patch_in_audio_thread(synth, bank[next_program].serialize());
+    renderer.reset();
 }
 
 
@@ -679,15 +680,6 @@ void FstPlugin::generate_and_add_samples(
 }
 
 
-void FstPlugin::import_patch(const std::string& patch) noexcept
-{
-    synth.process_messages();
-    Serializer::import(synth, patch);
-    synth.process_messages();
-    renderer.reset();
-}
-
-
 VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 {
     size_t const current_program = bank.get_current_program_index();
@@ -721,7 +713,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
         bank.import(buffer);
     }
 
-    import_patch(bank[current_program].serialize());
+    Serializer::import_patch_in_gui_thread(synth, bank[current_program].serialize());
 
     parameters[0].set_value(
         (float)Bank::program_index_to_normalized_parameter_value(current_program)

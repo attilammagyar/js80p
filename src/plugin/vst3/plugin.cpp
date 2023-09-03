@@ -242,7 +242,10 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
 
     if (bank != NULL && need_to_load_new_program) {
         need_to_load_new_program = false;
-        import_patch((*bank)[new_program].serialize());
+        Serializer::import_patch_in_audio_thread(
+            synth,
+            (*bank)[new_program].serialize()
+        );
     }
 
     if (data.numOutputs == 0 || data.numSamples < 1) {
@@ -529,17 +532,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
         return kResultFalse;
     }
 
-    import_patch(read_stream(state));
+    Serializer::import_patch_in_gui_thread(synth, read_stream(state));
 
     return kResultOk;
-}
-
-
-void Vst3Plugin::Processor::import_patch(std::string const& serialized) noexcept
-{
-    synth.process_messages();
-    Serializer::import(synth, serialized);
-    synth.process_messages();
 }
 
 

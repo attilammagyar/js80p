@@ -60,9 +60,23 @@ class Serializer
 
         static std::string serialize(Synth const& synth) noexcept;
 
-        static void import(Synth& synth, std::string const& serialized) noexcept;
+        static void import_patch_in_gui_thread(
+            Synth& synth,
+            std::string const& serialized
+        ) noexcept;
+
+        static void import_patch_in_audio_thread(
+            Synth& synth,
+            std::string const& serialized
+        ) noexcept;
 
     private:
+        enum Thread
+        {
+            AUDIO = 0,
+            GUI = 1,
+        };
+
         /*
         Using a greater number than Synth::ControllerId::MAX_CONTROLLER_ID, so
         that there is some room left for introducing more controllers.
@@ -84,9 +98,20 @@ class Serializer
             Number const controller_id
         ) noexcept;
 
-        static void reset_all_params_to_default(Synth& synth) noexcept;
+        template<Thread thread>
+        static void import_patch(
+            Synth& synth,
+            std::string const& serialized
+        ) noexcept;
 
+        template<Thread thread>
         static void process_lines(Synth& synth, Lines* lines) noexcept;
+
+        template<Thread thread>
+        static void send_message(
+            Synth& synth,
+            Synth::Message const& message
+        ) noexcept;
 
         static bool is_section_name_char(char const c) noexcept;
         static bool is_digit(char const c) noexcept;

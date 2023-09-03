@@ -87,7 +87,7 @@ void ImportPatchButton::import_patch(char const* buffer, Integer const size) con
         )
     );
 
-    Serializer::import(synth, patch);
+    Serializer::import_patch_in_gui_thread(synth, patch);
 
     synth_gui_body->stop_editing();
     synth_gui_body->refresh_param_editors();

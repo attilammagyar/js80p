@@ -94,21 +94,32 @@ Synth::ControllerId Serializer::float_to_controller_id(
 }
 
 
-void Serializer::import(Synth& synth, std::string const& serialized) noexcept
-{
-    reset_all_params_to_default(synth);
-    Lines* lines = parse_lines(serialized);
-    process_lines(synth, lines);
-
-    delete lines;
+void Serializer::import_patch_in_gui_thread(
+        Synth& synth,
+        std::string const& serialized
+) noexcept {
+    import_patch<Thread::GUI>(synth, serialized);
 }
 
 
-void Serializer::reset_all_params_to_default(Synth& synth) noexcept
-{
-    synth.push_message(
-        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
-    );
+void Serializer::import_patch_in_audio_thread(
+        Synth& synth,
+        std::string const& serialized
+) noexcept {
+    synth.process_messages();
+    import_patch<Thread::AUDIO>(synth, serialized);
+}
+
+
+template<Serializer::Thread thread>
+void Serializer::import_patch(
+        Synth& synth,
+        std::string const& serialized
+) noexcept {
+    Lines* lines = parse_lines(serialized);
+    process_lines<thread>(synth, lines);
+
+    delete lines;
 }
 
 
@@ -200,6 +211,7 @@ bool Serializer::is_section_name_char(char const c) noexcept
 }
 
 
+template<Serializer::Thread thread>
 void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
 {
     typedef std::vector<Synth::Message> Messages;
@@ -225,16 +237,36 @@ void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
         }
     }
 
+    send_message<thread>(
+        synth,
+        Synth::Message(
+            Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+        )
+    );
+
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
         if (synth.is_toggle_param(it->param_id)) {
-            synth.push_message(*it);
+            send_message<thread>(synth, *it);
         }
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
         if (!synth.is_toggle_param(it->param_id)) {
-            synth.push_message(*it);
+            send_message<thread>(synth, *it);
         }
+    }
+}
+
+
+template<Serializer::Thread thread>
+void Serializer::send_message(
+        Synth& synth,
+        Synth::Message const& message
+) noexcept {
+    if constexpr (thread == Thread::AUDIO) {
+        synth.process_message(message);
+    } else {
+        synth.push_message(message);
     }
 }
 
