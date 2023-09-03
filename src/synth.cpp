@@ -117,6 +117,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_sustaining(false),
     is_polyphonic(true),
     was_polyphonic(true),
+    is_dirty_(false),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
     envelopes((Envelope* const*)envelopes_rw),
@@ -611,6 +612,18 @@ bool Synth::is_lock_free() const noexcept
     }
 
     return is_lock_free && messages.is_lock_free();
+}
+
+
+bool Synth::is_dirty() const noexcept
+{
+    return is_dirty_;
+}
+
+
+void Synth::clear_dirty_flag() noexcept
+{
+    is_dirty_ = false;
 }
 
 
@@ -2027,30 +2040,49 @@ void Synth::process_messages() noexcept
     for (SPSCQueue<Message>::SizeType i = 0; i != message_count; ++i) {
         Message message;
 
-        if (!messages.pop(message)) {
-            continue;
+        if (messages.pop(message)) {
+            process_message(message);
         }
+    }
+}
 
-        switch (message.type) {
-            case MessageType::SET_PARAM:
-                handle_set_param(message.param_id, message.number_param);
-                break;
 
-            case MessageType::ASSIGN_CONTROLLER:
-                handle_assign_controller(message.param_id, message.byte_param);
-                break;
+void Synth::process_message(
+        MessageType const type,
+        ParamId const param_id,
+        Number const number_param,
+        Byte const byte_param
+) noexcept {
+    Message message(type, param_id, number_param, byte_param);
 
-            case MessageType::REFRESH_PARAM:
-                handle_refresh_param(message.param_id);
-                break;
+    process_message(message);
+}
 
-            case MessageType::CLEAR:
-                handle_clear();
-                break;
 
-            default:
-                break;
-        }
+void Synth::process_message(Message const& message) noexcept
+{
+    switch (message.type) {
+        case MessageType::SET_PARAM:
+            handle_set_param(message.param_id, message.number_param);
+            is_dirty_ = true;
+            break;
+
+        case MessageType::ASSIGN_CONTROLLER:
+            handle_assign_controller(message.param_id, message.byte_param);
+            is_dirty_ = true;
+            break;
+
+        case MessageType::REFRESH_PARAM:
+            handle_refresh_param(message.param_id);
+            break;
+
+        case MessageType::CLEAR:
+            handle_clear();
+            is_dirty_ = true;
+            break;
+
+        default:
+            break;
     }
 }
 

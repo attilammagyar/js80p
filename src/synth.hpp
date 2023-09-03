@@ -724,6 +724,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         bool is_lock_free() const noexcept;
 
+        bool is_dirty() const noexcept;
+        void clear_dirty_flag() noexcept;
+
         void suspend() noexcept;
         void resume() noexcept;
 
@@ -749,6 +752,21 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void push_message(Message const& message) noexcept;
 
         void process_messages() noexcept;
+
+        /**
+         * \brief Process a state changing message inside the audio thread.
+         */
+        void process_message(
+            MessageType const message,
+            ParamId const param_id,
+            Number const number_param,
+            Byte const byte_param
+        ) noexcept;
+
+        /**
+         * \brief Process a state changing message inside the audio thread.
+         */
+        void process_message(Message const& message) noexcept;
 
         std::string const& get_param_name(ParamId const param_id) const noexcept;
         ParamId get_param_id(std::string const& name) const noexcept;
@@ -1169,6 +1187,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_sustaining;
         bool is_polyphonic;
         bool was_polyphonic;
+        bool is_dirty_;
 
     public:
         MidiController* const* const midi_controllers;

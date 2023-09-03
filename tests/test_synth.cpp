@@ -895,3 +895,91 @@ TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_n
     assert_eq(expected_samples[0], rendered_samples[0], block_size, 0.001);
     assert_eq(expected_samples[1], rendered_samples[1], block_size, 0.001);
 })
+
+
+void assert_message_dirtiness(
+        Synth& synth,
+        Synth::MessageType const message_type,
+        bool const expected_dirtiness
+) {
+    assert_false(
+        synth.is_dirty(),
+        "Expected synth not to be dirty before sending message; message=%d",
+        (int)message_type
+    );
+
+    synth.push_message(
+        message_type,
+        Synth::ParamId::MVOL,
+        0.123,
+        Synth::ControllerId::FLEXIBLE_CONTROLLER_1
+    );
+    assert_false(
+        synth.is_dirty(),
+        "Expected synth not to become dirty before processing message; message=%d",
+        (int)message_type
+    );
+
+    synth.process_messages();
+
+    if (expected_dirtiness) {
+        assert_true(
+            synth.is_dirty(),
+            "Expected synth to become dirty after processing message; message=%d",
+            (int)message_type
+        );
+    } else {
+        assert_false(
+            synth.is_dirty(),
+            "Expected synth not to become dirty after processing message; message=%d",
+            (int)message_type
+        );
+    }
+
+    synth.clear_dirty_flag();
+    assert_false(
+        synth.is_dirty(),
+        "Expected synth not to remain dirty after clearing the flag; message=%d",
+        (int)message_type
+    );
+}
+
+
+TEST(when_synth_config_changes_then_synth_becomes_dirty, {
+    Synth synth;
+
+    assert_message_dirtiness(synth, SET_PARAM, true);
+    assert_message_dirtiness(synth, ASSIGN_CONTROLLER, true);
+    assert_message_dirtiness(synth, REFRESH_PARAM, false);
+    assert_message_dirtiness(synth, CLEAR, true);
+})
+
+
+TEST(can_process_messages_synchronously, {
+    Synth synth;
+    Synth::Message message(SET_PARAM, Synth::ParamId::PM, 0.123, 0);
+
+    assert_false(synth.is_dirty());
+
+    synth.process_message(message);
+    assert_true(synth.is_dirty());
+
+    synth.clear_dirty_flag();
+    assert_false(synth.is_dirty());
+
+    synth.process_message(
+        ASSIGN_CONTROLLER,
+        Synth::ParamId::FM,
+        0.0,
+        Synth::ControllerId::FLEXIBLE_CONTROLLER_1
+    );
+    assert_true(synth.is_dirty());
+
+    assert_eq(
+        0.123, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
+    );
+    assert_eq(
+        Synth::ControllerId::FLEXIBLE_CONTROLLER_1,
+        synth.get_param_controller_id_atomic(Synth::ParamId::FM)
+    );
+})
