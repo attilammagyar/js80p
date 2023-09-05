@@ -394,3 +394,63 @@ TEST(can_convert_normalized_parameter_value_to_program_index, {
         DOUBLE_DELTA
     );
 })
+
+
+TEST(bank_can_import_program_names_without_patches, {
+    std::string const serialized_bank = (
+        "[someblock]\n"
+        "MIX = 0.5\n"
+        "NAME = not a JS80P patch\n"
+        "\n"
+        "[js80p]\n"
+        "NAME = preset 1\n"
+        "MIX = 1.0\n"
+        "\n"
+        "[x]\n"
+        "MIX = 1.5\n"
+        "NAME = still not a JS80P patch\n"
+        "\n"
+        "  [js80p]\n"
+        "; default name\n"
+        "NAME =\n"
+        "MIX = 2.0\n"
+        "[js80p]\n"
+        "; a comment containing the [js80p] section header\n"
+        "NAME = preset 3\n"
+        "MIX = 3.0\n"
+    );
+    std::string const expeced_serialized = (
+        "[js80p]\r\n"
+        "NAME = preset 1\r\n"
+        "\r\n"
+        "[js80p]\r\n"
+        "NAME = Prog002\r\n"
+        "\r\n"
+        "[js80p]\r\n"
+        "NAME = preset 3\r\n"
+        "\r\n"
+        "[js80p]\r\n"
+        "NAME = Prog004\r\n"
+        "\r\n"
+        "[js80p]\r\n"
+        "NAME = Prog005\r\n"
+        "\r\n"
+        "[js80p]\r\n"
+        "NAME = Prog006\r\n"
+    );
+    Bank bank;
+
+    bank.import_names(serialized_bank);
+
+    assert_eq("preset 1", bank[0].get_name());
+    assert_eq("Prog002", bank[1].get_name());
+    assert_eq("preset 3", bank[2].get_name());
+    assert_eq("Prog004", bank[3].get_name());
+    assert_eq("Prog005", bank[4].get_name());
+    assert_eq("Prog006", bank[5].get_name());
+
+    assert_eq(
+        expeced_serialized,
+        bank.serialize().substr(0, expeced_serialized.length()).c_str()
+    );
+})

@@ -114,6 +114,7 @@ class Bank
         void set_current_program_index(size_t const new_index);
 
         void import(std::string const& serialized_bank);
+        void import_names(std::string const& serialized_bank);
         std::string serialize() const;
 
     private:

@@ -363,6 +363,29 @@ void Bank::import(std::string const& serialized_bank)
 }
 
 
+void Bank::import_names(std::string const& serialized_bank)
+{
+    Serializer::Lines* lines = Serializer::parse_lines(serialized_bank);
+    Serializer::Lines::const_iterator it = lines->begin();
+    Serializer::Lines::const_iterator end = lines->end();
+    size_t next_program_index = 0;
+    Program dummy_program;
+
+    while (it != end && next_program_index < NUMBER_OF_PROGRAMS) {
+        dummy_program.import(it, end);
+
+        programs[next_program_index].import("");
+        programs[next_program_index].set_name(dummy_program.get_name());
+
+        ++next_program_index;
+    }
+
+    generate_empty_programs(next_program_index);
+
+    delete lines;
+}
+
+
 std::string Bank::serialize() const
 {
     size_t non_blank_programs = 0;
