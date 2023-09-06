@@ -127,3 +127,30 @@ TEST(pushing_into_full_queue_fails, {
     assert_eq("a", a);
     assert_eq("b", b);
 })
+
+
+TEST(queue_can_be_filled_and_emptied_multiple_times, {
+    constexpr size_t size = 8;
+
+    SPSCQueue<std::string> q(size);
+    std::string str("a");
+
+    for (int i = 0; i != 10; ++i) {
+        char c = 'a';
+
+        for (size_t j = 0; j != size; ++j, ++c) {
+            str[0] = c;
+            q.push(str);
+        }
+
+        assert_false(q.push("x"));
+
+        c = 'a';
+
+        for (size_t j = 0; j != size; ++j, ++c) {
+            assert_true(q.pop(str));
+            assert_eq(c, str[0]);
+        }
+
+    }
+})

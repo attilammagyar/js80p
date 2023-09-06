@@ -33,9 +33,9 @@ SPSCQueue<ItemClass>::SPSCQueue(SizeType const capacity) noexcept
     next_push(0),
     next_pop(0)
 {
-    items.reserve(capacity);
+    items.reserve(this->capacity);
 
-    for (SizeType i = 0; i != capacity; ++i) {
+    for (SizeType i = 0; i != this->capacity; ++i) {
         items.push_back(ItemClass());
     }
 }
