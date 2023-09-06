@@ -107,7 +107,10 @@ bool SPSCQueue<ItemClass>::pop(ItemClass& item) noexcept
         return false;
     }
 
-    item = std::move(items[next_pop]);
+    ItemClass replacement;
+
+    std::swap(items[next_pop], replacement);
+    item = std::move(replacement);
 
     this->next_pop.store(advance(next_pop));
 
