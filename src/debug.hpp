@@ -55,7 +55,7 @@
         _js80p_last_slash != NULL ? _js80p_last_slash + 1 : __FILE__        \
     );                                                                      \
     bool const _js80p_use_stderr = (                                        \
-        strncmp("stderr", JS80P_TO_STRING(JS80P_DEBUG_LOG), 7) == 0         \
+        strncmp("STDERR", JS80P_TO_STRING(JS80P_DEBUG_LOG), 7) == 0         \
     );                                                                      \
     FILE* _js80p_f = (                                                      \
         _js80p_use_stderr                                                   \
