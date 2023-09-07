@@ -183,6 +183,11 @@ class FstPlugin : public Midi::EventHandler
             1.0 / HOST_CC_UI_UPDATE_FREQUENCY
         );
 
+        static constexpr Frequency BANK_UPDATE_FREQUENCY = 3.0;
+        static constexpr Frequency BANK_UPDATE_FREQUENCY_INV = (
+            1.0 / BANK_UPDATE_FREQUENCY
+        );
+
         enum MessageType {
             NONE = 0,
 
@@ -282,7 +287,7 @@ class FstPlugin : public Midi::EventHandler
         void clear_received_midi_cc() noexcept;
 
         void prepare_rendering(Integer const sample_count) noexcept;
-        void finalize_rendering() noexcept;
+        void finalize_rendering(Integer const sample_count) noexcept;
 
         void update_bpm() noexcept;
         void update_host_display() noexcept;
@@ -328,10 +333,13 @@ class FstPlugin : public Midi::EventHandler
         size_t current_program_index;
         Integer min_samples_before_next_cc_ui_update;
         Integer remaining_samples_before_next_cc_ui_update;
+        Integer min_samples_before_next_bank_update;
+        Integer remaining_samples_before_next_bank_update;
         VstInt32 prev_logged_op_code;
         char program_name[kVstMaxProgNameLen];
         bool had_midi_cc_event;
         bool received_midi_cc_cleared;
+        bool need_bank_update;
 };
 
 }

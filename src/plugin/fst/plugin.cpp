@@ -384,8 +384,11 @@ FstPlugin::FstPlugin(
     current_program_index(0),
     min_samples_before_next_cc_ui_update(8192),
     remaining_samples_before_next_cc_ui_update(0),
+    min_samples_before_next_bank_update(16384),
+    remaining_samples_before_next_bank_update(0),
     prev_logged_op_code(-1),
-    had_midi_cc_event(false)
+    had_midi_cc_event(false),
+    need_bank_update(false)
 {
     clear_received_midi_cc();
 
@@ -510,14 +513,7 @@ void FstPlugin::handle_change_program(size_t const new_program) noexcept
     renderer.reset();
     bank.set_current_program_index(new_program);
 
-    std::string const serialized_bank(bank.serialize());
-
-    to_gui_messages.push(
-        Message(MessageType::PROGRAM_CHANGED, new_program, new_patch)
-    );
-    to_gui_messages.push(
-        Message(MessageType::BANK_CHANGED, 0, serialized_bank)
-    );
+    need_bank_update = true;
 }
 
 
@@ -528,18 +524,7 @@ void FstPlugin::handle_rename_program(std::string const& name) noexcept
 
     current_program.set_name(name);
 
-    std::string const serialized_bank(bank.serialize());
-
-    to_gui_messages.push(
-        Message(
-            MessageType::PROGRAM_CHANGED,
-            current_program_index,
-            current_program.serialize()
-        )
-    );
-    to_gui_messages.push(
-        Message(MessageType::BANK_CHANGED, 0, bank.serialize())
-    );
+    need_bank_update = true;
 }
 
 
@@ -583,12 +568,7 @@ void FstPlugin::handle_import_patch(std::string const& patch) noexcept
 
     bank[current_program].import(serialized_patch);
 
-    std::string const& serialized_bank(bank.serialize());
-
-    to_gui_messages.push(
-        Message(MessageType::PROGRAM_CHANGED, current_program, serialized_patch)
-    );
-    to_gui_messages.push(Message(MessageType::BANK_CHANGED, 0, serialized_bank));
+    need_bank_update = true;
 }
 
 
@@ -604,15 +584,7 @@ void FstPlugin::handle_import_bank(std::string const& serialized_bank) noexcept
     synth.clear_dirty_flag();
     renderer.reset();
 
-    std::string const& serialized_patch(Serializer::serialize(synth));
-    std::string const serialized_bank_(bank.serialize());
-
-    to_gui_messages.push(
-        Message(MessageType::PROGRAM_CHANGED, current_program, serialized_patch)
-    );
-    to_gui_messages.push(
-        Message(MessageType::BANK_CHANGED, 0, serialized_bank_)
-    );
+    need_bank_update = true;
 }
 
 
@@ -690,6 +662,11 @@ void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
             new_sample_rate * HOST_CC_UI_UPDATE_FREQUENCY_INV
         );
         remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
+
+        min_samples_before_next_bank_update = 1 + (Integer)(
+            new_sample_rate * BANK_UPDATE_FREQUENCY_INV
+        );
+        remaining_samples_before_next_bank_update = min_samples_before_next_bank_update;
     }
 
     synth.set_sample_rate((Frequency)new_sample_rate);
@@ -771,7 +748,7 @@ void FstPlugin::generate_samples(
 
     prepare_rendering(sample_count);
     renderer.write_next_round<NumberType>(sample_count, samples);
-    finalize_rendering();
+    finalize_rendering(sample_count);
 
     /*
     It would be nice to notify the host about param changes that originate from
@@ -820,19 +797,32 @@ void FstPlugin::prepare_rendering(Integer const sample_count) noexcept
 }
 
 
-void FstPlugin::finalize_rendering() noexcept
+void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
 {
-    if (!synth.is_dirty()) {
+    if (remaining_samples_before_next_bank_update >= sample_count) {
+        remaining_samples_before_next_bank_update -= sample_count;
+
+        return;
+    } else if (remaining_samples_before_next_bank_update > 0) {
+        remaining_samples_before_next_bank_update = 0;
+
         return;
     }
 
+    if (LIKELY(!(synth.is_dirty() || need_bank_update))) {
+        return;
+    }
+
+    remaining_samples_before_next_bank_update = min_samples_before_next_bank_update;
+    need_bank_update = false;
+    synth.clear_dirty_flag();
+
     size_t const current_program = bank.get_current_program_index();
-    std::string const current_patch(Serializer::serialize(synth));
+    std::string const& current_patch = Serializer::serialize(synth);
 
     bank[current_program].import(current_patch);
 
     std::string const& serialized_bank(bank.serialize());
-    synth.clear_dirty_flag();
 
     to_gui_messages.push(
         Message(MessageType::PROGRAM_CHANGED, current_program, current_patch)
@@ -882,7 +872,7 @@ void FstPlugin::generate_and_add_samples(
 
     prepare_rendering(sample_count);
     renderer.add_next_round<float>(sample_count, samples);
-    finalize_rendering();
+    finalize_rendering(sample_count);
 }
 
 
