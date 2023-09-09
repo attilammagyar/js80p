@@ -111,20 +111,6 @@ class Param : public SignalProducer
         NumberType const default_value;
 
     private:
-        template<typename DummyType = NumberType>
-        NumberType ratio_to_value_for_number_type(
-            typename std::enable_if<
-                std::is_floating_point<DummyType>::value, Number const
-            >::type ratio
-        ) const noexcept;
-
-        template<typename DummyType = NumberType>
-        NumberType ratio_to_value_for_number_type(
-            typename std::enable_if<
-                !std::is_floating_point<DummyType>::value, Number const
-            >::type ratio
-        ) const noexcept;
-
         Number const range_inv;
         Integer change_index;
         NumberType value;
@@ -296,20 +282,11 @@ class FloatParam : public Param<Number, evaluation>
             Integer const sample_count
         ) noexcept;
 
-        template<ParamEvaluation evaluation_ = evaluation>
         void render(
-            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type round,
-            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type first_sample_index,
-            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type last_sample_index,
-            typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Sample**>::type buffer
-        ) noexcept;
-
-        template<ParamEvaluation evaluation_ = evaluation>
-        void render(
-            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type round,
-            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type first_sample_index,
-            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type last_sample_index,
-            typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Sample**>::type buffer
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
         ) noexcept;
 
         void handle_event(SignalProducer::Event const& event) noexcept;
@@ -384,6 +361,20 @@ class FloatParam : public Param<Number, evaluation>
         ) const noexcept;
 
         void process_envelope(Envelope& envelope, Seconds const time_offset = 0.0) noexcept;
+
+        void render_with_lfo(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+
+        void render_linear_ramp(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
 
         void advance_envelope(
                 Integer const first_sample_index,

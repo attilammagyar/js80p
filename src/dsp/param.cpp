@@ -161,31 +161,14 @@ Integer Param<NumberType, evaluation>::get_change_index() const noexcept
 
 
 template<typename NumberType, ParamEvaluation evaluation>
-NumberType Param<NumberType, evaluation>::ratio_to_value(Number const ratio) const noexcept
-{
-    return ratio_to_value_for_number_type(ratio);
-}
-
-
-template<typename NumberType, ParamEvaluation evaluation>
-template<typename DummyType>
-NumberType Param<NumberType, evaluation>::ratio_to_value_for_number_type(
-        typename std::enable_if<
-            std::is_floating_point<DummyType>::value, Number const
-        >::type ratio
+NumberType Param<NumberType, evaluation>::ratio_to_value(
+        Number const ratio
 ) const noexcept {
-    return clamp(min_value + (DummyType)((Number)range * ratio));
-}
-
-
-template<typename NumberType, ParamEvaluation evaluation>
-template<typename DummyType>
-NumberType Param<NumberType, evaluation>::ratio_to_value_for_number_type(
-        typename std::enable_if<
-            !std::is_floating_point<DummyType>::value, Number const
-        >::type ratio
-) const noexcept {
-    return clamp(min_value + (DummyType)std::round((Number)range * ratio));
+    if constexpr (std::is_floating_point<NumberType>::value) {
+        return clamp(min_value + (NumberType)((Number)range * ratio));
+    } else {
+        return clamp(min_value + (NumberType)std::round((Number)range * ratio));
+    }
 }
 
 
@@ -1336,54 +1319,77 @@ Seconds FloatParam<evaluation>::schedule_envelope_value_if_not_reached(
 
 
 template<ParamEvaluation evaluation>
-template<ParamEvaluation evaluation_>
 void FloatParam<evaluation>::render(
-        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type round,
-        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type first_sample_index,
-        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Integer const>::type last_sample_index,
-        typename std::enable_if<evaluation_ == ParamEvaluation::SAMPLE, Sample**>::type buffer
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
 ) noexcept {
-    if (lfo != NULL) {
-        Sample sample;
-
-        if (is_logarithmic()) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)ratio_to_value_log(lfo_buffer[0][i]);
-            }
+    if constexpr (evaluation == ParamEvaluation::SAMPLE) {
+        if (lfo != NULL) {
+            render_with_lfo(round, first_sample_index, last_sample_index, buffer);
+        } else if (latest_event_type == EVT_LINEAR_RAMP) {
+            render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)ratio_to_value_raw(lfo_buffer[0][i]);
-            }
+            Param<Number, evaluation>::render(
+                round, first_sample_index, last_sample_index, buffer
+            );
         }
 
-        if (last_sample_index != first_sample_index) {
-            this->store_new_value((Number)sample);
-        }
-    } else if (latest_event_type == EVT_LINEAR_RAMP) {
-        Sample sample;
+        advance_envelope(first_sample_index, last_sample_index);
+    }
+}
 
-        if (linear_ramp_state.is_logarithmic) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (
-                    (Sample)ratio_to_value_log(linear_ramp_state.advance())
-                );
-            }
-        } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
-            }
-        }
 
-        if (last_sample_index != first_sample_index) {
-            this->store_new_value((Number)sample);
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::render_with_lfo(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    Sample sample;
+
+    if (is_logarithmic()) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = sample = (Sample)ratio_to_value_log(lfo_buffer[0][i]);
         }
     } else {
-        Param<Number, evaluation>::render(
-            round, first_sample_index, last_sample_index, buffer
-        );
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = sample = (Sample)ratio_to_value_raw(lfo_buffer[0][i]);
+        }
     }
 
-    advance_envelope(first_sample_index, last_sample_index);
+    if (last_sample_index != first_sample_index) {
+        this->store_new_value((Number)sample);
+    }
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::render_linear_ramp(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    Sample sample;
+
+    if (linear_ramp_state.is_logarithmic) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = sample = (
+                (Sample)ratio_to_value_log(linear_ramp_state.advance())
+            );
+        }
+    } else {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
+        }
+    }
+
+    if (last_sample_index != first_sample_index) {
+        this->store_new_value((Number)sample);
+    }
 }
 
 
@@ -1405,17 +1411,6 @@ void FloatParam<evaluation>::advance_envelope(
     if (envelope_end_scheduled) {
         envelope_end_time_offset -= time_delta;
     }
-}
-
-
-template<ParamEvaluation evaluation>
-template<ParamEvaluation evaluation_>
-void FloatParam<evaluation>::render(
-        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type round,
-        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type first_sample_index,
-        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Integer const>::type last_sample_index,
-        typename std::enable_if<evaluation_ == ParamEvaluation::BLOCK, Sample**>::type buffer
-) noexcept {
 }
 
 

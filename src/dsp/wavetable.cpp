@@ -239,35 +239,21 @@ Number Wavetable::wrap_around(Number const index) const noexcept
 
 template<Wavetable::Interpolation interpolation, bool table_interpolation>
 Sample Wavetable::interpolate(
-        typename std::enable_if<interpolation == Interpolation::DYNAMIC, WavetableState const&>::type state,
-        typename std::enable_if<interpolation == Interpolation::DYNAMIC, Frequency const>::type frequency,
-        typename std::enable_if<interpolation == Interpolation::DYNAMIC, Number const>::type sample_index
+        WavetableState const& state,
+        Frequency const frequency,
+        Number const sample_index
 ) const noexcept {
-    if (LIKELY(frequency >= state.interpolation_limit)) {
+    if constexpr (interpolation == Interpolation::LINEAR_ONLY) {
         return interpolate_sample_linear<table_interpolation>(state, sample_index);
-    } else {
+    } else if constexpr (interpolation == Interpolation::LAGRANGE_ONLY) {
         return interpolate_sample_lagrange<table_interpolation>(state, sample_index);
+    } else {
+        if (LIKELY(frequency >= state.interpolation_limit)) {
+            return interpolate_sample_linear<table_interpolation>(state, sample_index);
+        } else {
+            return interpolate_sample_lagrange<table_interpolation>(state, sample_index);
+        }
     }
-}
-
-
-template<Wavetable::Interpolation interpolation, bool table_interpolation>
-Sample Wavetable::interpolate(
-        typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, WavetableState const&>::type state,
-        typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, Frequency const>::type frequency,
-        typename std::enable_if<interpolation == Interpolation::LINEAR_ONLY, Number const>::type sample_index
-) const noexcept {
-    return interpolate_sample_linear<table_interpolation>(state, sample_index);
-}
-
-
-template<Wavetable::Interpolation interpolation, bool table_interpolation>
-Sample Wavetable::interpolate(
-        typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, WavetableState const&>::type state,
-        typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, Frequency const>::type frequency,
-        typename std::enable_if<interpolation == Interpolation::LAGRANGE_ONLY, Number const>::type sample_index
-) const noexcept {
-    return interpolate_sample_lagrange<table_interpolation>(state, sample_index);
 }
 
 

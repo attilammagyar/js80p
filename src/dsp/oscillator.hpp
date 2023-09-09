@@ -178,15 +178,7 @@ class Oscillator : public SignalProducer
         void allocate_buffers(Integer const size) noexcept;
         void free_buffers() noexcept;
 
-        template<bool is_lfo_>
-        void apply_toggle_params(
-            typename std::enable_if<is_lfo_, Number const>::type bpm
-        ) noexcept;
-
-        template<bool is_lfo_>
-        void apply_toggle_params(
-            typename std::enable_if<!is_lfo_, Number const>::type bpm
-        ) noexcept;
+        void apply_toggle_params(Number const bpm) noexcept;
 
         void compute_amplitude_buffer(
             Integer const round,
@@ -230,18 +222,14 @@ class Oscillator : public SignalProducer
             Sample** buffer
         ) noexcept;
 
-        template<bool is_lfo_, bool single_partial, Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC>
+        template<
+            bool single_partial,
+            Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC
+        >
         Sample render_sample(
-            typename std::enable_if<is_lfo_, Sample const>::type amplitude,
-            typename std::enable_if<is_lfo_, Sample const>::type frequency,
-            typename std::enable_if<is_lfo_, Sample const>::type phase
-        ) noexcept;
-
-        template<bool is_lfo_, bool single_partial = false, Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC>
-        Sample render_sample(
-            typename std::enable_if<!is_lfo_, Sample const>::type amplitude,
-            typename std::enable_if<!is_lfo_, Sample const>::type frequency,
-            typename std::enable_if<!is_lfo_, Sample const>::type phase
+            Sample const amplitude,
+            Sample const frequency,
+            Sample const phase
         ) noexcept;
 
         ToggleParam& tempo_sync;
