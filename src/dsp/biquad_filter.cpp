@@ -331,6 +331,10 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         return initialize_rendering_no_op(round, sample_count);
     }
 
+    if (UNLIKELY(is_silent_)) {
+        update_state_for_silent_round(sample_count);
+    }
+
     return NULL;
 }
 
@@ -344,7 +348,68 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     FloatParamS::produce_if_not_constant(q, round, sample_count);
     FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
+    update_state_for_no_op_round(sample_count);
+
     return this->input_buffer;
+}
+
+
+template <class InputSignalProducerClass>
+void BiquadFilter<InputSignalProducerClass>::update_state_for_no_op_round(
+        Integer const sample_count
+) noexcept {
+    if (UNLIKELY(sample_count < 1)) {
+        return;
+    }
+
+    Integer const channels = this->channels;
+
+    if (UNLIKELY(sample_count == 1)) {
+        for (Integer c = 0; c != channels; ++c) {
+            this->x_n_m2[c] = this->x_n_m1[c];
+            this->y_n_m2[c] = this->y_n_m1[c];
+            this->x_n_m1[c] = this->input_buffer[c][0];
+            this->y_n_m1[c] = this->input_buffer[c][0];
+        }
+    } else {
+        Integer const last_sample_index = sample_count - 1;
+        Integer const penultimate_sample_index = sample_count - 2;
+
+        for (Integer c = 0; c != channels; ++c) {
+            this->x_n_m2[c] = this->input_buffer[c][penultimate_sample_index];
+            this->y_n_m2[c] = this->input_buffer[c][penultimate_sample_index];
+            this->x_n_m1[c] = this->input_buffer[c][last_sample_index];
+            this->y_n_m1[c] = this->input_buffer[c][last_sample_index];
+        }
+    }
+}
+
+
+template <class InputSignalProducerClass>
+void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
+        Integer const sample_count
+) noexcept {
+    if (UNLIKELY(sample_count < 1)) {
+        return;
+    }
+
+    Integer const channels = this->channels;
+
+    if (UNLIKELY(sample_count == 1)) {
+        for (Integer c = 0; c != channels; ++c) {
+            this->x_n_m2[c] = this->x_n_m1[c];
+            this->y_n_m2[c] = this->y_n_m1[c];
+            this->x_n_m1[c] = 0.0;
+            this->y_n_m1[c] = 0.0;
+        }
+    } else {
+        for (Integer c = 0; c != channels; ++c) {
+            this->x_n_m2[c] = 0.0;
+            this->y_n_m2[c] = 0.0;
+            this->x_n_m1[c] = 0.0;
+            this->y_n_m1[c] = 0.0;
+        }
+    }
 }
 
 
@@ -361,6 +426,10 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     are_coefficients_constant = (
         shared_cache->are_coefficients_constant
     );
+
+    if (UNLIKELY(is_silent_)) {
+        update_state_for_silent_round(sample_count);
+    }
 
     return NULL;
 }

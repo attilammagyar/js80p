@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cmath>
 
 #include "test.cpp"
@@ -665,6 +666,202 @@ TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     test_filter(filter_clone_2, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
     test_filter(filter_unique, input, expected_unique, 0.12, 1, BLOCK_SIZE);
+})
+
+
+void test_fast_path_continuity(
+        Integer const batch_size,
+        BiquadFilterSharedCache* const shared_cache,
+        BiquadFilter<FixedSignalProducer>::Type const type,
+        Number const q,
+        Sample const silent_round_input_sample
+) {
+    constexpr Integer block_size = 128;
+    constexpr Number tolerance = 0.0065;
+
+    Sample input_channel[block_size];
+    Sample* input_channels[FixedSignalProducer::CHANNELS] = {
+        input_channel, input_channel
+    };
+    Sample const* const* rendered = NULL;
+    FixedSignalProducer input(input_channels);
+    BiquadFilter<FixedSignalProducer>::TypeParam filter_type("");
+    BiquadFilter<FixedSignalProducer> filter_1("", input, filter_type, shared_cache);
+    BiquadFilter<FixedSignalProducer> filter_2("", input, filter_type, shared_cache);
+
+    input.set_sample_rate(22050.0);
+    input.set_block_size(block_size);
+    filter_type.set_sample_rate(22050.0);
+    filter_type.set_block_size(block_size);
+    filter_1.set_sample_rate(22050.0);
+    filter_1.set_block_size(block_size);
+    filter_2.set_sample_rate(22050.0);
+    filter_2.set_block_size(block_size);
+
+    filter_type.set_value(type);
+
+    filter_1.frequency.set_value(5000.0);
+    filter_1.q.set_value(1.0);
+
+    filter_2.frequency.set_value(5000.0);
+    filter_2.q.set_value(1.0);
+
+    std::fill_n(input_channel, block_size, 0.9);
+    input_channel[0] = 0.3;
+    input_channel[1] = 0.6;
+    SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_1, 1, batch_size
+    );
+    rendered = SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_2, 1, batch_size
+    );
+
+    /*
+    Too small batch will differ due to filter latency. We don't assert, but let
+    valgrind find memory handling errors.
+    */
+    if (batch_size > 8) {
+        assert_close(
+            input_channel,
+            rendered[0],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+        assert_close(
+            input_channel,
+            rendered[1],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+    }
+
+    filter_1.q.set_value(q);
+    filter_2.q.set_value(q);
+
+    std::fill_n(input_channel, block_size, silent_round_input_sample);
+    SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_1, 2, batch_size
+    );
+    rendered = SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_2, 2, batch_size
+    );
+
+    /*
+    Too small batch will differ due to filter latency. We don't assert, but let
+    valgrind find memory handling errors.
+    */
+    if (batch_size > 8) {
+        std::fill_n(input_channel, block_size, 0.0);
+        assert_close(
+            input_channel,
+            rendered[0],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+        assert_close(
+            input_channel,
+            rendered[1],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+    }
+
+    filter_1.q.set_value(1.0);
+    filter_2.q.set_value(1.0);
+
+    std::fill_n(input_channel, block_size, -0.9);
+    input_channel[0] = -0.3;
+    input_channel[1] = -0.6;
+    SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_1, 3, batch_size
+    );
+    rendered = SignalProducer::produce< BiquadFilter<FixedSignalProducer> >(
+        filter_2, 3, batch_size
+    );
+
+    /*
+    Too small batch will differ due to filter latency. We don't assert, but let
+    valgrind find memory handling errors.
+    */
+    if (batch_size > 8) {
+        assert_close(
+            input_channel,
+            rendered[0],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+        assert_close(
+            input_channel,
+            rendered[1],
+            batch_size,
+            tolerance,
+            "shared_cache=%p, type=%d",
+            (void*)shared_cache,
+            (int)type
+        );
+    }
+}
+
+
+TEST(silent_input_fast_path_keeps_continuity, {
+    BiquadFilterSharedCache shared_cache;
+
+    test_fast_path_continuity(
+        0, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+    test_fast_path_continuity(
+        0, &shared_cache, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+
+    test_fast_path_continuity(
+        0, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+    test_fast_path_continuity(
+        0, &shared_cache, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+
+    test_fast_path_continuity(
+        1, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+    test_fast_path_continuity(
+        1, &shared_cache, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+
+    test_fast_path_continuity(
+        1, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+    test_fast_path_continuity(
+        1, &shared_cache, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+
+    test_fast_path_continuity(
+        128, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+    test_fast_path_continuity(
+        128, &shared_cache, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+
+    test_fast_path_continuity(
+        128, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+    test_fast_path_continuity(
+        128, &shared_cache, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
 })
 
 

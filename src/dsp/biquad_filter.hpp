@@ -147,6 +147,9 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const sample_count
         ) noexcept;
 
+        void update_state_for_no_op_round(Integer const sample_count) noexcept;
+        void update_state_for_silent_round(Integer const sample_count) noexcept;
+
         Sample const* const* initialize_rendering_with_shared_coefficients(
             Integer const round,
             Integer const sample_count
