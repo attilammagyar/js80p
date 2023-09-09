@@ -950,6 +950,10 @@ static bool close(                                                          \
         _type const tolerance,                                              \
         _TEST_VARGS                                                         \
 ) {                                                                         \
+    if (length < 1) {                                                       \
+        _TEST_PASS();                                                       \
+        return true;                                                        \
+    }                                                                       \
     _type diff_sum = _zero;                                                 \
     _type max_mismatch = _zero;                                             \
     _type avg_diff;                                                         \
