@@ -255,7 +255,6 @@ class Oscillator : public SignalProducer
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
         bool phase_is_constant;
-        bool can_use_fast_interpolation;
 };
 
 }
