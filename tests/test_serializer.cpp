@@ -106,7 +106,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
         Synth::MessageType::ASSIGN_CONTROLLER,
         Synth::ParamId::MVOL,
         0.0,
-        Synth::ControllerId::FLEXIBLE_CONTROLLER_1
+        Synth::ControllerId::MACRO_1
     );
     synth_2.process_messages();
 

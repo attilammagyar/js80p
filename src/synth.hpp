@@ -37,10 +37,10 @@
 #include "dsp/echo.hpp"
 #include "dsp/effect.hpp"
 #include "dsp/effects.hpp"
-#include "dsp/flexible_controller.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/gain.hpp"
 #include "dsp/lfo.hpp"
+#include "dsp/macro.hpp"
 #include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/mixer.hpp"
@@ -78,8 +78,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Integer MIDI_CONTROLLERS = 128;
 
-        static constexpr Integer FLEXIBLE_CONTROLLERS = 20;
-        static constexpr Integer FLEXIBLE_CONTROLLER_FLOAT_PARAMS = 6;
+        static constexpr Integer MACROS = 20;
+        static constexpr Integer MACRO_FLOAT_PARAMS = 6;
 
         static constexpr Integer LFOS = 8;
         static constexpr Integer LFO_FLOAT_PARAMS = 7;
@@ -209,145 +209,145 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ERWET = 87,      ///< Effects Reverb Wet Volume
             ERDRY = 88,      ///< Effects Reverb Dry Volume
 
-            F1IN = 89,       ///< Flexible Controller 1 Input
-            F1MIN = 90,      ///< Flexible Controller 1 Minimum Value
-            F1MAX = 91,      ///< Flexible Controller 1 Maximum Value
-            F1AMT = 92,      ///< Flexible Controller 1 Amount
-            F1DST = 93,      ///< Flexible Controller 1 Distortion
-            F1RND = 94,      ///< Flexible Controller 1 Randomness
+            M1IN = 89,       ///< Macro 1 Input
+            M1MIN = 90,      ///< Macro 1 Minimum Value
+            M1MAX = 91,      ///< Macro 1 Maximum Value
+            M1AMT = 92,      ///< Macro 1 Amount
+            M1DST = 93,      ///< Macro 1 Distortion
+            M1RND = 94,      ///< Macro 1 Randomness
 
-            F2IN = 95,       ///< Flexible Controller 2 Input
-            F2MIN = 96,      ///< Flexible Controller 2 Minimum Value
-            F2MAX = 97,      ///< Flexible Controller 2 Maximum Value
-            F2AMT = 98,      ///< Flexible Controller 2 Amount
-            F2DST = 99,      ///< Flexible Controller 2 Distortion
-            F2RND = 100,     ///< Flexible Controller 2 Randomness
+            M2IN = 95,       ///< Macro 2 Input
+            M2MIN = 96,      ///< Macro 2 Minimum Value
+            M2MAX = 97,      ///< Macro 2 Maximum Value
+            M2AMT = 98,      ///< Macro 2 Amount
+            M2DST = 99,      ///< Macro 2 Distortion
+            M2RND = 100,     ///< Macro 2 Randomness
 
-            F3IN = 101,      ///< Flexible Controller 3 Input
-            F3MIN = 102,     ///< Flexible Controller 3 Minimum Value
-            F3MAX = 103,     ///< Flexible Controller 3 Maximum Value
-            F3AMT = 104,     ///< Flexible Controller 3 Amount
-            F3DST = 105,     ///< Flexible Controller 3 Distortion
-            F3RND = 106,     ///< Flexible Controller 3 Randomness
+            M3IN = 101,      ///< Macro 3 Input
+            M3MIN = 102,     ///< Macro 3 Minimum Value
+            M3MAX = 103,     ///< Macro 3 Maximum Value
+            M3AMT = 104,     ///< Macro 3 Amount
+            M3DST = 105,     ///< Macro 3 Distortion
+            M3RND = 106,     ///< Macro 3 Randomness
 
-            F4IN = 107,      ///< Flexible Controller 4 Input
-            F4MIN = 108,     ///< Flexible Controller 4 Minimum Value
-            F4MAX = 109,     ///< Flexible Controller 4 Maximum Value
-            F4AMT = 110,     ///< Flexible Controller 4 Amount
-            F4DST = 111,     ///< Flexible Controller 4 Distortion
-            F4RND = 112,     ///< Flexible Controller 4 Randomness
+            M4IN = 107,      ///< Macro 4 Input
+            M4MIN = 108,     ///< Macro 4 Minimum Value
+            M4MAX = 109,     ///< Macro 4 Maximum Value
+            M4AMT = 110,     ///< Macro 4 Amount
+            M4DST = 111,     ///< Macro 4 Distortion
+            M4RND = 112,     ///< Macro 4 Randomness
 
-            F5IN = 113,      ///< Flexible Controller 5 Input
-            F5MIN = 114,     ///< Flexible Controller 5 Minimum Value
-            F5MAX = 115,     ///< Flexible Controller 5 Maximum Value
-            F5AMT = 116,     ///< Flexible Controller 5 Amount
-            F5DST = 117,     ///< Flexible Controller 5 Distortion
-            F5RND = 118,     ///< Flexible Controller 5 Randomness
+            M5IN = 113,      ///< Macro 5 Input
+            M5MIN = 114,     ///< Macro 5 Minimum Value
+            M5MAX = 115,     ///< Macro 5 Maximum Value
+            M5AMT = 116,     ///< Macro 5 Amount
+            M5DST = 117,     ///< Macro 5 Distortion
+            M5RND = 118,     ///< Macro 5 Randomness
 
-            F6IN = 119,      ///< Flexible Controller 6 Input
-            F6MIN = 120,     ///< Flexible Controller 6 Minimum Value
-            F6MAX = 121,     ///< Flexible Controller 6 Maximum Value
-            F6AMT = 122,     ///< Flexible Controller 6 Amount
-            F6DST = 123,     ///< Flexible Controller 6 Distortion
-            F6RND = 124,     ///< Flexible Controller 6 Randomness
+            M6IN = 119,      ///< Macro 6 Input
+            M6MIN = 120,     ///< Macro 6 Minimum Value
+            M6MAX = 121,     ///< Macro 6 Maximum Value
+            M6AMT = 122,     ///< Macro 6 Amount
+            M6DST = 123,     ///< Macro 6 Distortion
+            M6RND = 124,     ///< Macro 6 Randomness
 
-            F7IN = 125,      ///< Flexible Controller 7 Input
-            F7MIN = 126,     ///< Flexible Controller 7 Minimum Value
-            F7MAX = 127,     ///< Flexible Controller 7 Maximum Value
-            F7AMT = 128,     ///< Flexible Controller 7 Amount
-            F7DST = 129,     ///< Flexible Controller 7 Distortion
-            F7RND = 130,     ///< Flexible Controller 7 Randomness
+            M7IN = 125,      ///< Macro 7 Input
+            M7MIN = 126,     ///< Macro 7 Minimum Value
+            M7MAX = 127,     ///< Macro 7 Maximum Value
+            M7AMT = 128,     ///< Macro 7 Amount
+            M7DST = 129,     ///< Macro 7 Distortion
+            M7RND = 130,     ///< Macro 7 Randomness
 
-            F8IN = 131,      ///< Flexible Controller 8 Input
-            F8MIN = 132,     ///< Flexible Controller 8 Minimum Value
-            F8MAX = 133,     ///< Flexible Controller 8 Maximum Value
-            F8AMT = 134,     ///< Flexible Controller 8 Amount
-            F8DST = 135,     ///< Flexible Controller 8 Distortion
-            F8RND = 136,     ///< Flexible Controller 8 Randomness
+            M8IN = 131,      ///< Macro 8 Input
+            M8MIN = 132,     ///< Macro 8 Minimum Value
+            M8MAX = 133,     ///< Macro 8 Maximum Value
+            M8AMT = 134,     ///< Macro 8 Amount
+            M8DST = 135,     ///< Macro 8 Distortion
+            M8RND = 136,     ///< Macro 8 Randomness
 
-            F9IN = 137,      ///< Flexible Controller 9 Input
-            F9MIN = 138,     ///< Flexible Controller 9 Minimum Value
-            F9MAX = 139,     ///< Flexible Controller 9 Maximum Value
-            F9AMT = 140,     ///< Flexible Controller 9 Amount
-            F9DST = 141,     ///< Flexible Controller 9 Distortion
-            F9RND = 142,     ///< Flexible Controller 9 Randomness
+            M9IN = 137,      ///< Macro 9 Input
+            M9MIN = 138,     ///< Macro 9 Minimum Value
+            M9MAX = 139,     ///< Macro 9 Maximum Value
+            M9AMT = 140,     ///< Macro 9 Amount
+            M9DST = 141,     ///< Macro 9 Distortion
+            M9RND = 142,     ///< Macro 9 Randomness
 
-            F10IN = 143,     ///< Flexible Controller 10 Input
-            F10MIN = 144,    ///< Flexible Controller 10 Minimum Value
-            F10MAX = 145,    ///< Flexible Controller 10 Maximum Value
-            F10AMT = 146,    ///< Flexible Controller 10 Amount
-            F10DST = 147,    ///< Flexible Controller 10 Distortion
-            F10RND = 148,    ///< Flexible Controller 10 Randomness
+            M10IN = 143,     ///< Macro 10 Input
+            M10MIN = 144,    ///< Macro 10 Minimum Value
+            M10MAX = 145,    ///< Macro 10 Maximum Value
+            M10AMT = 146,    ///< Macro 10 Amount
+            M10DST = 147,    ///< Macro 10 Distortion
+            M10RND = 148,    ///< Macro 10 Randomness
 
-            F11IN = 149,     ///< Flexible Controller 11 Input
-            F11MIN = 150,    ///< Flexible Controller 11 Minimum Value
-            F11MAX = 151,    ///< Flexible Controller 11 Maximum Value
-            F11AMT = 152,    ///< Flexible Controller 11 Amount
-            F11DST = 153,    ///< Flexible Controller 11 Distortion
-            F11RND = 154,    ///< Flexible Controller 11 Randomness
+            M11IN = 149,     ///< Macro 11 Input
+            M11MIN = 150,    ///< Macro 11 Minimum Value
+            M11MAX = 151,    ///< Macro 11 Maximum Value
+            M11AMT = 152,    ///< Macro 11 Amount
+            M11DST = 153,    ///< Macro 11 Distortion
+            M11RND = 154,    ///< Macro 11 Randomness
 
-            F12IN = 155,     ///< Flexible Controller 12 Input
-            F12MIN = 156,    ///< Flexible Controller 12 Minimum Value
-            F12MAX = 157,    ///< Flexible Controller 12 Maximum Value
-            F12AMT = 158,    ///< Flexible Controller 12 Amount
-            F12DST = 159,    ///< Flexible Controller 12 Distortion
-            F12RND = 160,    ///< Flexible Controller 12 Randomness
+            M12IN = 155,     ///< Macro 12 Input
+            M12MIN = 156,    ///< Macro 12 Minimum Value
+            M12MAX = 157,    ///< Macro 12 Maximum Value
+            M12AMT = 158,    ///< Macro 12 Amount
+            M12DST = 159,    ///< Macro 12 Distortion
+            M12RND = 160,    ///< Macro 12 Randomness
 
-            F13IN = 161,     ///< Flexible Controller 13 Input
-            F13MIN = 162,    ///< Flexible Controller 13 Minimum Value
-            F13MAX = 163,    ///< Flexible Controller 13 Maximum Value
-            F13AMT = 164,    ///< Flexible Controller 13 Amount
-            F13DST = 165,    ///< Flexible Controller 13 Distortion
-            F13RND = 166,    ///< Flexible Controller 13 Randomness
+            M13IN = 161,     ///< Macro 13 Input
+            M13MIN = 162,    ///< Macro 13 Minimum Value
+            M13MAX = 163,    ///< Macro 13 Maximum Value
+            M13AMT = 164,    ///< Macro 13 Amount
+            M13DST = 165,    ///< Macro 13 Distortion
+            M13RND = 166,    ///< Macro 13 Randomness
 
-            F14IN = 167,     ///< Flexible Controller 14 Input
-            F14MIN = 168,    ///< Flexible Controller 14 Minimum Value
-            F14MAX = 169,    ///< Flexible Controller 14 Maximum Value
-            F14AMT = 170,    ///< Flexible Controller 14 Amount
-            F14DST = 171,    ///< Flexible Controller 14 Distortion
-            F14RND = 172,    ///< Flexible Controller 14 Randomness
+            M14IN = 167,     ///< Macro 14 Input
+            M14MIN = 168,    ///< Macro 14 Minimum Value
+            M14MAX = 169,    ///< Macro 14 Maximum Value
+            M14AMT = 170,    ///< Macro 14 Amount
+            M14DST = 171,    ///< Macro 14 Distortion
+            M14RND = 172,    ///< Macro 14 Randomness
 
-            F15IN = 173,     ///< Flexible Controller 15 Input
-            F15MIN = 174,    ///< Flexible Controller 15 Minimum Value
-            F15MAX = 175,    ///< Flexible Controller 15 Maximum Value
-            F15AMT = 176,    ///< Flexible Controller 15 Amount
-            F15DST = 177,    ///< Flexible Controller 15 Distortion
-            F15RND = 178,    ///< Flexible Controller 15 Randomness
+            M15IN = 173,     ///< Macro 15 Input
+            M15MIN = 174,    ///< Macro 15 Minimum Value
+            M15MAX = 175,    ///< Macro 15 Maximum Value
+            M15AMT = 176,    ///< Macro 15 Amount
+            M15DST = 177,    ///< Macro 15 Distortion
+            M15RND = 178,    ///< Macro 15 Randomness
 
-            F16IN = 179,     ///< Flexible Controller 16 Input
-            F16MIN = 180,    ///< Flexible Controller 16 Minimum Value
-            F16MAX = 181,    ///< Flexible Controller 16 Maximum Value
-            F16AMT = 182,    ///< Flexible Controller 16 Amount
-            F16DST = 183,    ///< Flexible Controller 16 Distortion
-            F16RND = 184,    ///< Flexible Controller 16 Randomness
+            M16IN = 179,     ///< Macro 16 Input
+            M16MIN = 180,    ///< Macro 16 Minimum Value
+            M16MAX = 181,    ///< Macro 16 Maximum Value
+            M16AMT = 182,    ///< Macro 16 Amount
+            M16DST = 183,    ///< Macro 16 Distortion
+            M16RND = 184,    ///< Macro 16 Randomness
 
-            F17IN = 185,     ///< Flexible Controller 17 Input
-            F17MIN = 186,    ///< Flexible Controller 17 Minimum Value
-            F17MAX = 187,    ///< Flexible Controller 17 Maximum Value
-            F17AMT = 188,    ///< Flexible Controller 17 Amount
-            F17DST = 189,    ///< Flexible Controller 17 Distortion
-            F17RND = 190,    ///< Flexible Controller 17 Randomness
+            M17IN = 185,     ///< Macro 17 Input
+            M17MIN = 186,    ///< Macro 17 Minimum Value
+            M17MAX = 187,    ///< Macro 17 Maximum Value
+            M17AMT = 188,    ///< Macro 17 Amount
+            M17DST = 189,    ///< Macro 17 Distortion
+            M17RND = 190,    ///< Macro 17 Randomness
 
-            F18IN = 191,     ///< Flexible Controller 18 Input
-            F18MIN = 192,    ///< Flexible Controller 18 Minimum Value
-            F18MAX = 193,    ///< Flexible Controller 18 Maximum Value
-            F18AMT = 194,    ///< Flexible Controller 18 Amount
-            F18DST = 195,    ///< Flexible Controller 18 Distortion
-            F18RND = 196,    ///< Flexible Controller 18 Randomness
+            M18IN = 191,     ///< Macro 18 Input
+            M18MIN = 192,    ///< Macro 18 Minimum Value
+            M18MAX = 193,    ///< Macro 18 Maximum Value
+            M18AMT = 194,    ///< Macro 18 Amount
+            M18DST = 195,    ///< Macro 18 Distortion
+            M18RND = 196,    ///< Macro 18 Randomness
 
-            F19IN = 197,     ///< Flexible Controller 19 Input
-            F19MIN = 198,    ///< Flexible Controller 19 Minimum Value
-            F19MAX = 199,    ///< Flexible Controller 19 Maximum Value
-            F19AMT = 200,    ///< Flexible Controller 19 Amount
-            F19DST = 201,    ///< Flexible Controller 19 Distortion
-            F19RND = 202,    ///< Flexible Controller 19 Randomness
+            M19IN = 197,     ///< Macro 19 Input
+            M19MIN = 198,    ///< Macro 19 Minimum Value
+            M19MAX = 199,    ///< Macro 19 Maximum Value
+            M19AMT = 200,    ///< Macro 19 Amount
+            M19DST = 201,    ///< Macro 19 Distortion
+            M19RND = 202,    ///< Macro 19 Randomness
 
-            F20IN = 203,     ///< Flexible Controller 20 Input
-            F20MIN = 204,    ///< Flexible Controller 20 Minimum Value
-            F20MAX = 205,    ///< Flexible Controller 20 Maximum Value
-            F20AMT = 206,    ///< Flexible Controller 20 Amount
-            F20DST = 207,    ///< Flexible Controller 20 Distortion
-            F20RND = 208,    ///< Flexible Controller 20 Randomness
+            M20IN = 203,     ///< Macro 20 Input
+            M20MIN = 204,    ///< Macro 20 Minimum Value
+            M20MAX = 205,    ///< Macro 20 Maximum Value
+            M20AMT = 206,    ///< Macro 20 Amount
+            M20DST = 207,    ///< Macro 20 Distortion
+            M20RND = 208,    ///< Macro 20 Randomness
 
             N1AMT = 209,     ///< Envelope 1 Amount
             N1INI = 210,     ///< Envelope 1 Initial Level
@@ -621,16 +621,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             PITCH_WHEEL =               128,                        ///< Pitch Wheel
             NOTE =                      129,                        ///< Note
             VELOCITY =                  130,                        ///< Velocity
-            FLEXIBLE_CONTROLLER_1 =     131,                        ///< Flexible Controller 1
-            FLEXIBLE_CONTROLLER_2 =     132,                        ///< Flexible Controller 2
-            FLEXIBLE_CONTROLLER_3 =     133,                        ///< Flexible Controller 3
-            FLEXIBLE_CONTROLLER_4 =     134,                        ///< Flexible Controller 4
-            FLEXIBLE_CONTROLLER_5 =     135,                        ///< Flexible Controller 5
-            FLEXIBLE_CONTROLLER_6 =     136,                        ///< Flexible Controller 6
-            FLEXIBLE_CONTROLLER_7 =     137,                        ///< Flexible Controller 7
-            FLEXIBLE_CONTROLLER_8 =     138,                        ///< Flexible Controller 8
-            FLEXIBLE_CONTROLLER_9 =     139,                        ///< Flexible Controller 9
-            FLEXIBLE_CONTROLLER_10 =    140,                        ///< Flexible Controller 10
+            MACRO_1 =                   131,                        ///< Macro 1
+            MACRO_2 =                   132,                        ///< Macro 2
+            MACRO_3 =                   133,                        ///< Macro 3
+            MACRO_4 =                   134,                        ///< Macro 4
+            MACRO_5 =                   135,                        ///< Macro 5
+            MACRO_6 =                   136,                        ///< Macro 6
+            MACRO_7 =                   137,                        ///< Macro 7
+            MACRO_8 =                   138,                        ///< Macro 8
+            MACRO_9 =                   139,                        ///< Macro 9
+            MACRO_10 =                  140,                        ///< Macro 10
             LFO_1 =                     141,                        ///< LFO 1
             LFO_2 =                     142,                        ///< LFO 2
             LFO_3 =                     143,                        ///< LFO 3
@@ -647,16 +647,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ENVELOPE_6 =                154,                        ///< Envelope 6
             CHANNEL_PRESSURE =          155,                        ///< Channel Pressure
             MIDI_LEARN =                156,                        ///< MIDI Learn
-            FLEXIBLE_CONTROLLER_11 =    157,                        ///< Flexible Controller 11
-            FLEXIBLE_CONTROLLER_12 =    158,                        ///< Flexible Controller 12
-            FLEXIBLE_CONTROLLER_13 =    159,                        ///< Flexible Controller 13
-            FLEXIBLE_CONTROLLER_14 =    160,                        ///< Flexible Controller 14
-            FLEXIBLE_CONTROLLER_15 =    161,                        ///< Flexible Controller 15
-            FLEXIBLE_CONTROLLER_16 =    162,                        ///< Flexible Controller 16
-            FLEXIBLE_CONTROLLER_17 =    163,                        ///< Flexible Controller 17
-            FLEXIBLE_CONTROLLER_18 =    164,                        ///< Flexible Controller 18
-            FLEXIBLE_CONTROLLER_19 =    165,                        ///< Flexible Controller 19
-            FLEXIBLE_CONTROLLER_20 =    166,                        ///< Flexible Controller 20
+            MACRO_11 =                  157,                        ///< Macro 11
+            MACRO_12 =                  158,                        ///< Macro 12
+            MACRO_13 =                  159,                        ///< Macro 13
+            MACRO_14 =                  160,                        ///< Macro 14
+            MACRO_15 =                  161,                        ///< Macro 15
+            MACRO_16 =                  162,                        ///< Macro 16
+            MACRO_17 =                  163,                        ///< Macro 17
+            MACRO_18 =                  164,                        ///< Macro 18
+            MACRO_19 =                  165,                        ///< Macro 19
+            MACRO_20 =                  166,                        ///< Macro 20
 
             MAX_CONTROLLER_ID =         167,
         };
@@ -1052,7 +1052,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void register_effects_params() noexcept;
         void create_voices() noexcept;
         void create_midi_controllers() noexcept;
-        void create_flexible_controllers() noexcept;
+        void create_macros() noexcept;
         void create_envelopes() noexcept;
         void create_lfos() noexcept;
 
@@ -1173,7 +1173,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];
         Envelope* envelopes_rw[ENVELOPES];
         LFO* lfos_rw[LFOS];
-        FlexibleController* flexible_controllers_rw[FLEXIBLE_CONTROLLERS];
+        Macro* macros_rw[MACROS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
         Modulator* modulators[POLYPHONY];
@@ -1191,7 +1191,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
     public:
         MidiController* const* const midi_controllers;
-        FlexibleController* const* const flexible_controllers;
+        Macro* const* const macros;
         Envelope* const* const envelopes;
         LFO* const* const lfos;
 };

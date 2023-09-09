@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__FLEXIBLE_CONTROLLER_CPP
-#define JS80P__DSP__FLEXIBLE_CONTROLLER_CPP
+#ifndef JS80P__DSP__MACRO_CPP
+#define JS80P__DSP__MACRO_CPP
 
-#include "dsp/flexible_controller.hpp"
+#include "dsp/macro.hpp"
 
 
 namespace JS80P
 {
 
-FlexibleController::FlexibleController(std::string const name) noexcept
+Macro::Macro(std::string const name) noexcept
     : MidiController(),
     input(name + "IN", 0.0, 1.0, 0.5),
     min(name + "MIN", 0.0, 1.0, 0.0),
@@ -44,7 +44,7 @@ FlexibleController::FlexibleController(std::string const name) noexcept
 }
 
 
-void FlexibleController::update() noexcept
+void Macro::update() noexcept
 {
     if (is_updating) {
         return;
@@ -73,7 +73,7 @@ void FlexibleController::update() noexcept
 }
 
 
-bool FlexibleController::update_change_indices() noexcept
+bool Macro::update_change_indices() noexcept
 {
     bool is_dirty;
 
@@ -88,7 +88,7 @@ bool FlexibleController::update_change_indices() noexcept
 }
 
 
-bool FlexibleController::update_change_index(
+bool Macro::update_change_index(
         FloatParamB& param,
         Integer& change_index
 ) const noexcept {

@@ -34,7 +34,7 @@ namespace JS80P
 class Envelope;
 
 
-class FlexibleController;
+class Macro;
 
 
 class LFO;
@@ -260,11 +260,8 @@ class FloatParam : public Param<Number, evaluation>
 
         void set_midi_controller(MidiController const* midi_controller) noexcept;
 
-        void set_flexible_controller(
-            FlexibleController* flexible_controller
-        ) noexcept;
-
-        FlexibleController const* get_flexible_controller() const noexcept;
+        void set_macro(Macro* macro) noexcept;
+        Macro const* get_macro() const noexcept;
 
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;
@@ -350,9 +347,7 @@ class FloatParam : public Param<Number, evaluation>
         template<bool is_logarithmic_>
         Sample const* const* process_midi_controller_events() noexcept;
 
-        Sample const* const* process_flexible_controller(
-            Integer const sample_count
-        ) noexcept;
+        Sample const* const* process_macro(Integer const sample_count) noexcept;
 
         Seconds smooth_change_duration(
             Number const previous_value,
@@ -403,8 +398,8 @@ class FloatParam : public Param<Number, evaluation>
 
         FloatParam<evaluation>* const leader;
 
-        FlexibleController* flexible_controller;
-        Integer flexible_controller_change_index;
+        Macro* macro;
+        Integer macro_change_index;
 
         LFO* lfo;
         Sample const* const* lfo_buffer;

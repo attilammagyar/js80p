@@ -36,9 +36,9 @@
 #include "dsp/effects.cpp"
 #include "dsp/envelope.cpp"
 #include "dsp/filter.cpp"
-#include "dsp/flexible_controller.cpp"
 #include "dsp/gain.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
 #include "dsp/mixer.cpp"
@@ -81,7 +81,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + 31 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
-        + FLEXIBLE_CONTROLLERS * 6
+        + MACROS * 6
         + ENVELOPES * 10
         + LFOS
     ),
@@ -119,7 +119,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     was_polyphonic(true),
     is_dirty_(false),
     midi_controllers((MidiController* const*)midi_controllers_rw),
-    flexible_controllers((FlexibleController* const*)flexible_controllers_rw),
+    macros((Macro* const*)macros_rw),
     envelopes((Envelope* const*)envelopes_rw),
     lfos((LFO* const*)lfos_rw)
 {
@@ -158,7 +158,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     create_voices();
     create_midi_controllers();
-    create_flexible_controllers();
+    create_macros();
     create_envelopes();
     create_lfos();
 
@@ -457,22 +457,25 @@ void Synth::create_midi_controllers() noexcept
 }
 
 
-void Synth::create_flexible_controllers() noexcept
+void Synth::create_macros() noexcept
 {
-    Integer next_id = ParamId::F1IN;
+    Integer next_id = ParamId::M1IN;
 
-    for (Integer i = 0; i != FLEXIBLE_CONTROLLERS; ++i) {
-        FlexibleController* flexible_controller = (
-            new FlexibleController(std::string("F") + to_string(i + 1))
-        );
-        flexible_controllers_rw[i] = flexible_controller;
+    for (Integer i = 0; i != MACROS; ++i) {
+        /*
+        Macros used to be called Flexible Controllers, hence the F for
+        backward-compatibility.
+        */
+        Macro* macro = new Macro(std::string("F") + to_string(i + 1));
 
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->input);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->min);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->max);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->amount);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->distortion);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, flexible_controller->randomness);
+        macros_rw[i] = macro;
+
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->input);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->min);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->max);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->amount);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->distortion);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->randomness);
     }
 }
 
@@ -1189,18 +1192,18 @@ Number Synth::get_param_ratio_atomic(ParamId const param_id) const noexcept
 
 Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 {
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_default_ratio();
-            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_default_ratio();
-            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_default_ratio();
-            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_default_ratio();
-            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_default_ratio();
-            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_default_ratio();
+            case 0: return macros_rw[macro_idx]->input.get_default_ratio();
+            case 1: return macros_rw[macro_idx]->min.get_default_ratio();
+            case 2: return macros_rw[macro_idx]->max.get_default_ratio();
+            case 3: return macros_rw[macro_idx]->amount.get_default_ratio();
+            case 4: return macros_rw[macro_idx]->distortion.get_default_ratio();
+            case 5: return macros_rw[macro_idx]->randomness.get_default_ratio();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -1392,18 +1395,18 @@ bool Synth::is_toggle_param(ParamId const param_id) const noexcept
 
 Number Synth::get_param_max_value(ParamId const param_id) const noexcept
 {
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_max_value();
-            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_max_value();
-            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_max_value();
-            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_max_value();
-            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_max_value();
-            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_max_value();
+            case 0: return macros_rw[macro_idx]->input.get_max_value();
+            case 1: return macros_rw[macro_idx]->min.get_max_value();
+            case 2: return macros_rw[macro_idx]->max.get_max_value();
+            case 3: return macros_rw[macro_idx]->amount.get_max_value();
+            case 4: return macros_rw[macro_idx]->distortion.get_max_value();
+            case 5: return macros_rw[macro_idx]->randomness.get_max_value();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -1591,18 +1594,18 @@ Number Synth::float_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
 ) const noexcept {
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.ratio_to_value(ratio);
-            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.ratio_to_value(ratio);
-            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.ratio_to_value(ratio);
-            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.ratio_to_value(ratio);
-            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.ratio_to_value(ratio);
-            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.ratio_to_value(ratio);
+            case 0: return macros_rw[macro_idx]->input.ratio_to_value(ratio);
+            case 1: return macros_rw[macro_idx]->min.ratio_to_value(ratio);
+            case 2: return macros_rw[macro_idx]->max.ratio_to_value(ratio);
+            case 3: return macros_rw[macro_idx]->amount.ratio_to_value(ratio);
+            case 4: return macros_rw[macro_idx]->distortion.ratio_to_value(ratio);
+            case 5: return macros_rw[macro_idx]->randomness.ratio_to_value(ratio);
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -2089,18 +2092,18 @@ void Synth::process_message(Message const& message) noexcept
 
 void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcept
 {
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: flexible_controllers_rw[flex_ctl_idx]->input.set_ratio(ratio); break;
-            case 1: flexible_controllers_rw[flex_ctl_idx]->min.set_ratio(ratio); break;
-            case 2: flexible_controllers_rw[flex_ctl_idx]->max.set_ratio(ratio); break;
-            case 3: flexible_controllers_rw[flex_ctl_idx]->amount.set_ratio(ratio); break;
-            case 4: flexible_controllers_rw[flex_ctl_idx]->distortion.set_ratio(ratio); break;
-            case 5: flexible_controllers_rw[flex_ctl_idx]->randomness.set_ratio(ratio); break;
+            case 0: macros_rw[macro_idx]->input.set_ratio(ratio); break;
+            case 1: macros_rw[macro_idx]->min.set_ratio(ratio); break;
+            case 2: macros_rw[macro_idx]->max.set_ratio(ratio); break;
+            case 3: macros_rw[macro_idx]->amount.set_ratio(ratio); break;
+            case 4: macros_rw[macro_idx]->distortion.set_ratio(ratio); break;
+            case 5: macros_rw[macro_idx]->randomness.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -2292,18 +2295,18 @@ void Synth::handle_assign_controller(
 ) noexcept {
     bool is_assigned = false;
 
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->input, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->min, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->max, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->amount, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->distortion, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParamB>(flexible_controllers_rw[flex_ctl_idx]->randomness, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->input, (ControllerId)controller_id); break;;
+            case 1: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->min, (ControllerId)controller_id); break;;
+            case 2: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->max, (ControllerId)controller_id); break;;
+            case 3: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->amount, (ControllerId)controller_id); break;;
+            case 4: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->distortion, (ControllerId)controller_id); break;;
+            case 5: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->randomness, (ControllerId)controller_id); break;;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -2490,25 +2493,25 @@ bool Synth::assign_controller_to_discrete_param(
         case NOTE: midi_controller = &note; break;
         case VELOCITY: midi_controller = &velocity; break;
 
-        case FLEXIBLE_CONTROLLER_1:
-        case FLEXIBLE_CONTROLLER_2:
-        case FLEXIBLE_CONTROLLER_3:
-        case FLEXIBLE_CONTROLLER_4:
-        case FLEXIBLE_CONTROLLER_5:
-        case FLEXIBLE_CONTROLLER_6:
-        case FLEXIBLE_CONTROLLER_7:
-        case FLEXIBLE_CONTROLLER_8:
-        case FLEXIBLE_CONTROLLER_9:
-        case FLEXIBLE_CONTROLLER_10:
-        case FLEXIBLE_CONTROLLER_11:
-        case FLEXIBLE_CONTROLLER_12:
-        case FLEXIBLE_CONTROLLER_13:
-        case FLEXIBLE_CONTROLLER_14:
-        case FLEXIBLE_CONTROLLER_15:
-        case FLEXIBLE_CONTROLLER_16:
-        case FLEXIBLE_CONTROLLER_17:
-        case FLEXIBLE_CONTROLLER_18:
-        case FLEXIBLE_CONTROLLER_19:
+        case MACRO_1:
+        case MACRO_2:
+        case MACRO_3:
+        case MACRO_4:
+        case MACRO_5:
+        case MACRO_6:
+        case MACRO_7:
+        case MACRO_8:
+        case MACRO_9:
+        case MACRO_10:
+        case MACRO_11:
+        case MACRO_12:
+        case MACRO_13:
+        case MACRO_14:
+        case MACRO_15:
+        case MACRO_16:
+        case MACRO_17:
+        case MACRO_18:
+        case MACRO_19:
         case LFO_1:
         case LFO_2:
         case LFO_3:
@@ -2569,7 +2572,7 @@ bool Synth::assign_controller(
         ControllerId const controller_id
 ) noexcept {
     param.set_midi_controller(NULL);
-    param.set_flexible_controller(NULL);
+    param.set_macro(NULL);
     param.set_envelope(NULL);
     param.set_lfo(NULL);
 
@@ -2580,26 +2583,26 @@ bool Synth::assign_controller(
         case NOTE: param.set_midi_controller(&note); return true;
         case VELOCITY: param.set_midi_controller(&velocity); return true;
 
-        case FLEXIBLE_CONTROLLER_1: param.set_flexible_controller(flexible_controllers[0]); return true;
-        case FLEXIBLE_CONTROLLER_2: param.set_flexible_controller(flexible_controllers[1]); return true;
-        case FLEXIBLE_CONTROLLER_3: param.set_flexible_controller(flexible_controllers[2]); return true;
-        case FLEXIBLE_CONTROLLER_4: param.set_flexible_controller(flexible_controllers[3]); return true;
-        case FLEXIBLE_CONTROLLER_5: param.set_flexible_controller(flexible_controllers[4]); return true;
-        case FLEXIBLE_CONTROLLER_6: param.set_flexible_controller(flexible_controllers[5]); return true;
-        case FLEXIBLE_CONTROLLER_7: param.set_flexible_controller(flexible_controllers[6]); return true;
-        case FLEXIBLE_CONTROLLER_8: param.set_flexible_controller(flexible_controllers[7]); return true;
-        case FLEXIBLE_CONTROLLER_9: param.set_flexible_controller(flexible_controllers[8]); return true;
-        case FLEXIBLE_CONTROLLER_10: param.set_flexible_controller(flexible_controllers[9]); return true;
-        case FLEXIBLE_CONTROLLER_11: param.set_flexible_controller(flexible_controllers[10]); return true;
-        case FLEXIBLE_CONTROLLER_12: param.set_flexible_controller(flexible_controllers[11]); return true;
-        case FLEXIBLE_CONTROLLER_13: param.set_flexible_controller(flexible_controllers[12]); return true;
-        case FLEXIBLE_CONTROLLER_14: param.set_flexible_controller(flexible_controllers[13]); return true;
-        case FLEXIBLE_CONTROLLER_15: param.set_flexible_controller(flexible_controllers[14]); return true;
-        case FLEXIBLE_CONTROLLER_16: param.set_flexible_controller(flexible_controllers[15]); return true;
-        case FLEXIBLE_CONTROLLER_17: param.set_flexible_controller(flexible_controllers[16]); return true;
-        case FLEXIBLE_CONTROLLER_18: param.set_flexible_controller(flexible_controllers[17]); return true;
-        case FLEXIBLE_CONTROLLER_19: param.set_flexible_controller(flexible_controllers[18]); return true;
-        case FLEXIBLE_CONTROLLER_20: param.set_flexible_controller(flexible_controllers[19]); return true;
+        case MACRO_1: param.set_macro(macros[0]); return true;
+        case MACRO_2: param.set_macro(macros[1]); return true;
+        case MACRO_3: param.set_macro(macros[2]); return true;
+        case MACRO_4: param.set_macro(macros[3]); return true;
+        case MACRO_5: param.set_macro(macros[4]); return true;
+        case MACRO_6: param.set_macro(macros[5]); return true;
+        case MACRO_7: param.set_macro(macros[6]); return true;
+        case MACRO_8: param.set_macro(macros[7]); return true;
+        case MACRO_9: param.set_macro(macros[8]); return true;
+        case MACRO_10: param.set_macro(macros[9]); return true;
+        case MACRO_11: param.set_macro(macros[10]); return true;
+        case MACRO_12: param.set_macro(macros[11]); return true;
+        case MACRO_13: param.set_macro(macros[12]); return true;
+        case MACRO_14: param.set_macro(macros[13]); return true;
+        case MACRO_15: param.set_macro(macros[14]); return true;
+        case MACRO_16: param.set_macro(macros[15]); return true;
+        case MACRO_17: param.set_macro(macros[16]); return true;
+        case MACRO_18: param.set_macro(macros[17]); return true;
+        case MACRO_19: param.set_macro(macros[18]); return true;
+        case MACRO_20: param.set_macro(macros[19]); return true;
 
         case LFO_1: param.set_lfo(lfos_rw[0]); return true;
         case LFO_2: param.set_lfo(lfos_rw[1]); return true;
@@ -2638,18 +2641,18 @@ bool Synth::assign_controller(
 
 Number Synth::get_param_ratio(ParamId const param_id) const noexcept
 {
-    if (ParamId::F1IN <= param_id && param_id <= ParamId::F20RND) {
-        int const offset = (int)param_id - (int)ParamId::F1IN;
-        int const flex_ctl_idx = offset / FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
-        int const param_idx = offset % FLEXIBLE_CONTROLLER_FLOAT_PARAMS;
+    if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
+        int const offset = (int)param_id - (int)ParamId::M1IN;
+        int const macro_idx = offset / MACRO_FLOAT_PARAMS;
+        int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: return flexible_controllers_rw[flex_ctl_idx]->input.get_ratio();
-            case 1: return flexible_controllers_rw[flex_ctl_idx]->min.get_ratio();
-            case 2: return flexible_controllers_rw[flex_ctl_idx]->max.get_ratio();
-            case 3: return flexible_controllers_rw[flex_ctl_idx]->amount.get_ratio();
-            case 4: return flexible_controllers_rw[flex_ctl_idx]->distortion.get_ratio();
-            case 5: return flexible_controllers_rw[flex_ctl_idx]->randomness.get_ratio();
+            case 0: return macros_rw[macro_idx]->input.get_ratio();
+            case 1: return macros_rw[macro_idx]->min.get_ratio();
+            case 2: return macros_rw[macro_idx]->max.get_ratio();
+            case 3: return macros_rw[macro_idx]->amount.get_ratio();
+            case 4: return macros_rw[macro_idx]->distortion.get_ratio();
+            case 5: return macros_rw[macro_idx]->randomness.get_ratio();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {

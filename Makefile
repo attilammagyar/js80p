@@ -112,8 +112,8 @@ UPGRADE_PATCH_OBJS = \
 
 PARAM_COMPONENTS = \
 	dsp/envelope \
-	dsp/flexible_controller \
 	dsp/lfo \
+	dsp/macro \
 	dsp/math \
 	dsp/midi_controller \
 	dsp/oscillator \
@@ -148,8 +148,8 @@ TESTS_BASIC = \
 
 TESTS_PARAM = \
 	test_envelope \
-	test_flexible_controller \
 	test_lfo \
+	test_macro \
 	test_midi_controller \
 	test_oscillator \
 	test_param
@@ -511,15 +511,6 @@ $(BUILD_DIR)/test_envelope$(EXE): \
 	$(COMPILE_TEST) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_flexible_controller$(EXE): \
-		tests/test_flexible_controller.cpp \
-		$(PARAM_HEADERS) $(PARAM_SOURCES) \
-		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $@
-
 $(BUILD_DIR)/test_gain$(EXE): \
 		tests/test_gain.cpp \
 		src/dsp/gain.cpp src/dsp/gain.hpp \
@@ -544,6 +535,15 @@ $(BUILD_DIR)/test_gui$(EXE): \
 $(BUILD_DIR)/test_lfo$(EXE): \
 		tests/test_lfo.cpp \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR) \
+		$(TEST_BASIC_BINS)
+	$(COMPILE_TEST) -o $@ $<
+	$(VALGRIND) $@
+
+$(BUILD_DIR)/test_macro$(EXE): \
+		tests/test_macro.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR) \

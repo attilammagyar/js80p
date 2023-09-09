@@ -305,8 +305,8 @@ FloatParam<evaluation>::FloatParam(
             : 1.0
     ),
     leader(NULL),
-    flexible_controller(NULL),
-    flexible_controller_change_index(-1),
+    macro(NULL),
+    macro_change_index(-1),
     lfo(NULL),
     envelope(NULL),
     envelope_change_index(-1),
@@ -347,7 +347,7 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
             : 1.0
     ),
     leader(&leader),
-    flexible_controller(NULL),
+    macro(NULL),
     lfo(NULL),
     envelope(NULL),
     envelope_change_index(-1),
@@ -376,10 +376,10 @@ Number FloatParam<evaluation>::get_value() const noexcept
         return leader->get_value();
     } else if (this->midi_controller != NULL) {
         return round_value(ratio_to_value(this->midi_controller->get_value()));
-    } else if (flexible_controller != NULL) {
-        flexible_controller->update();
+    } else if (macro != NULL) {
+        macro->update();
 
-        return round_value(ratio_to_value(flexible_controller->get_value()));
+        return round_value(ratio_to_value(macro->get_value()));
     } else {
         return this->get_raw_value();
     }
@@ -435,10 +435,10 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_ratio();
-    } else if (flexible_controller != NULL) {
-        flexible_controller->update();
+    } else if (macro != NULL) {
+        macro->update();
 
-        return flexible_controller->get_value();
+        return macro->get_value();
     } else if (this->midi_controller != NULL) {
         return this->midi_controller->get_value();
     }
@@ -527,10 +527,10 @@ Integer FloatParam<evaluation>::get_change_index() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_change_index();
-    } else if (flexible_controller != NULL) {
-        flexible_controller->update();
+    } else if (macro != NULL) {
+        macro->update();
 
-        return flexible_controller->get_change_index();
+        return macro->get_change_index();
     } else {
         return Param<Number, evaluation>::get_change_index();
     }
@@ -589,10 +589,10 @@ bool FloatParam<evaluation>::is_constant_until(
         );
     }
 
-    if (flexible_controller != NULL) {
-        flexible_controller->update();
+    if (macro != NULL) {
+        macro->update();
 
-        return flexible_controller->get_change_index() == flexible_controller_change_index;
+        return macro->get_change_index() == macro_change_index;
     }
 
     return true;
@@ -840,29 +840,28 @@ void FloatParam<evaluation>::set_midi_controller(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::set_flexible_controller(
-        FlexibleController* flexible_controller
-) noexcept {
-    if (flexible_controller == NULL) {
-        if (this->flexible_controller != NULL) {
-            this->flexible_controller->update();
+void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
+{
+    if (macro == NULL) {
+        if (this->macro != NULL) {
+            this->macro->update();
 
-            set_value(ratio_to_value(this->flexible_controller->get_value()));
+            set_value(ratio_to_value(this->macro->get_value()));
         }
     } else {
-        flexible_controller->update();
-        set_value(ratio_to_value(flexible_controller->get_value()));
-        flexible_controller_change_index = flexible_controller->get_change_index();
+        macro->update();
+        set_value(ratio_to_value(macro->get_value()));
+        macro_change_index = macro->get_change_index();
     }
 
-    this->flexible_controller = flexible_controller;
+    this->macro = macro;
 }
 
 
 template<ParamEvaluation evaluation>
-FlexibleController const* FloatParam<evaluation>::get_flexible_controller() const noexcept
+Macro const* FloatParam<evaluation>::get_macro() const noexcept
 {
-    return flexible_controller;
+    return macro;
 }
 
 
@@ -1055,8 +1054,8 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
         } else {
             return process_midi_controller_events<false>();
         }
-    } else if (flexible_controller != NULL) {
-        return process_flexible_controller(sample_count);
+    } else if (macro != NULL) {
+        return process_macro(sample_count);
     } else {
         Envelope* envelope = get_envelope();
 
@@ -1162,22 +1161,22 @@ Sample const* const* FloatParam<evaluation>::process_midi_controller_events() no
 
 
 template<ParamEvaluation evaluation>
-Sample const* const* FloatParam<evaluation>::process_flexible_controller(
+Sample const* const* FloatParam<evaluation>::process_macro(
         Integer const sample_count
 ) noexcept {
-    flexible_controller->update();
+    macro->update();
 
-    Integer const new_change_index = flexible_controller->get_change_index();
+    Integer const new_change_index = macro->get_change_index();
 
-    if (new_change_index == flexible_controller_change_index) {
+    if (new_change_index == macro_change_index) {
         return NULL;
     }
 
-    flexible_controller_change_index = new_change_index;
+    macro_change_index = new_change_index;
 
     this->cancel_events_at(0.0);
 
-    Number const controller_value = flexible_controller->get_value();
+    Number const controller_value = macro->get_value();
 
     if (should_round) {
         set_value(ratio_to_value(controller_value));

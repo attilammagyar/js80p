@@ -909,10 +909,7 @@ void assert_message_dirtiness(
     );
 
     synth.push_message(
-        message_type,
-        Synth::ParamId::MVOL,
-        0.123,
-        Synth::ControllerId::FLEXIBLE_CONTROLLER_1
+        message_type, Synth::ParamId::MVOL, 0.123, Synth::ControllerId::MACRO_1
     );
     assert_false(
         synth.is_dirty(),
@@ -968,10 +965,7 @@ TEST(can_process_messages_synchronously, {
     assert_false(synth.is_dirty());
 
     synth.process_message(
-        ASSIGN_CONTROLLER,
-        Synth::ParamId::FM,
-        0.0,
-        Synth::ControllerId::FLEXIBLE_CONTROLLER_1
+        ASSIGN_CONTROLLER, Synth::ParamId::FM, 0.0, Synth::ControllerId::MACRO_1
     );
     assert_true(synth.is_dirty());
 
@@ -979,7 +973,7 @@ TEST(can_process_messages_synchronously, {
         0.123, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
     );
     assert_eq(
-        Synth::ControllerId::FLEXIBLE_CONTROLLER_1,
+        Synth::ControllerId::MACRO_1,
         synth.get_param_controller_id_atomic(Synth::ParamId::FM)
     );
 })

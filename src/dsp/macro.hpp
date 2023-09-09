@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__FLEXIBLE_CONTROLLER_HPP
-#define JS80P__DSP__FLEXIBLE_CONTROLLER_HPP
+#ifndef JS80P__DSP__MACRO_HPP
+#define JS80P__DSP__MACRO_HPP
 
 #include <string>
 
@@ -32,13 +32,13 @@ namespace JS80P
 
 /**
  * \brief Adjust the value of the \c input \c FloatParamB, so that if that has a
- *        \c MidiController assigned, then the \c FlexibleController can be used
- *        as an adjustable version of that controller.
+ *        \c MidiController assigned, then the \c Macro can be used as an
+ *        adjustable version of that controller.
  */
-class FlexibleController : public MidiController
+class Macro : public MidiController
 {
     public:
-        FlexibleController(std::string const name = "") noexcept;
+        Macro(std::string const name = "") noexcept;
 
         void update() noexcept;
 

@@ -62,7 +62,7 @@ class GUI
         enum ControllerCapability {
             NONE                = 0,
             MIDI_CONTROLLER     = 1 << 0,
-            FLEXIBLE_CONTROLLER = 1 << 1,
+            MACRO               = 1 << 1,
             LFO                 = 1 << 2,
             ENVELOPE            = 1 << 3,
             CHANNEL_PRESSURE    = 1 << 4,
@@ -136,8 +136,8 @@ class GUI
         static Color const CTL_COLOR_MIDI_LEARN_BG;
         static Color const CTL_COLOR_AFTERTOUCH_TEXT;
         static Color const CTL_COLOR_AFTERTOUCH_BG;
-        static Color const CTL_COLOR_FLEX_TEXT;
-        static Color const CTL_COLOR_FLEX_BG;
+        static Color const CTL_COLOR_MACRO_TEXT;
+        static Color const CTL_COLOR_MACRO_BG;
         static Color const CTL_COLOR_LFO_TEXT;
         static Color const CTL_COLOR_LFO_BG;
         static Color const CTL_COLOR_ENVELOPE_TEXT;

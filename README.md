@@ -536,7 +536,7 @@ Features
     * stereo reverb
  * 6 envelopes
  * 8 low-frequency oscillators (LFO)
- * configurable MIDI controllers
+ * MIDI controllers and macros
  * channel pressure (aftertouch)
  * MIDI learn
  * logarithmic and linear scale filter frequencies

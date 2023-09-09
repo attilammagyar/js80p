@@ -24,8 +24,8 @@
 #include "js80p.hpp"
 
 #include "dsp/envelope.cpp"
-#include "dsp/flexible_controller.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
 #include "dsp/oscillator.cpp"

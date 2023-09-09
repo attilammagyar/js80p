@@ -22,8 +22,8 @@
 #include "js80p.hpp"
 
 #include "dsp/envelope.cpp"
-#include "dsp/flexible_controller.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
 #include "dsp/oscillator.cpp"
@@ -1629,44 +1629,42 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
 })
 
 
-TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_flexible_controller, {
+TEST(when_a_macro_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_macro, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, 3.0, 3.0, 3.0,
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParamS float_param("float", 0.0, 10.0, 9.0, 1.0);
-    FlexibleController flexible_controller;
+    Macro macro;
     Integer change_index;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
-    flexible_controller.input.set_block_size(block_size);
-    flexible_controller.amount.set_block_size(block_size);
-    flexible_controller.min.set_block_size(block_size);
-    flexible_controller.max.set_block_size(block_size);
-    flexible_controller.distortion.set_block_size(block_size);
-    flexible_controller.randomness.set_block_size(block_size);
+    macro.input.set_block_size(block_size);
+    macro.amount.set_block_size(block_size);
+    macro.min.set_block_size(block_size);
+    macro.max.set_block_size(block_size);
+    macro.distortion.set_block_size(block_size);
+    macro.randomness.set_block_size(block_size);
 
     float_param.set_sample_rate(sample_rate);
-    flexible_controller.input.set_sample_rate(sample_rate);
-    flexible_controller.amount.set_sample_rate(sample_rate);
-    flexible_controller.min.set_sample_rate(sample_rate);
-    flexible_controller.max.set_sample_rate(sample_rate);
-    flexible_controller.distortion.set_sample_rate(sample_rate);
-    flexible_controller.randomness.set_sample_rate(sample_rate);
+    macro.input.set_sample_rate(sample_rate);
+    macro.amount.set_sample_rate(sample_rate);
+    macro.min.set_sample_rate(sample_rate);
+    macro.max.set_sample_rate(sample_rate);
+    macro.distortion.set_sample_rate(sample_rate);
+    macro.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.2);
-    flexible_controller.amount.set_value(0.5);
+    macro.input.set_value(0.2);
+    macro.amount.set_value(0.5);
 
-    float_param.set_flexible_controller(&flexible_controller);
+    float_param.set_macro(&macro);
 
-    assert_eq(
-        (void*)&flexible_controller, (void*)float_param.get_flexible_controller()
-    );
+    assert_eq((void*)&macro, (void*)float_param.get_macro());
     assert_eq(1.0, float_param.get_value());
 
-    flexible_controller.input.set_value(0.64);
+    macro.input.set_value(0.64);
 
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
@@ -1679,10 +1677,10 @@ TEST(when_a_flexible_controller_is_assigned_to_a_float_param_then_float_param_va
 
     assert_eq((int)change_index, (int)float_param.get_change_index());
 
-    flexible_controller.input.set_value(0.4);
+    macro.input.set_value(0.4);
     assert_neq((int)change_index, (int)float_param.get_change_index());
 
-    float_param.set_flexible_controller(NULL);
+    float_param.set_macro(NULL);
     assert_eq(2.0, float_param.get_value(), DOUBLE_DELTA);
 })
 
@@ -1787,7 +1785,7 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 
 
 template<class FloatParamClass>
-void test_follower_flexible_controller()
+void test_follower_macro()
 {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
@@ -1796,37 +1794,37 @@ void test_follower_flexible_controller()
     constexpr Frequency sample_rate = 1.0;
     FloatParamS leader("leader", 0.0, 10.0, 9.0, 1.0);
     FloatParamClass follower(leader);
-    FlexibleController flexible_controller;
+    Macro macro;
     Integer change_index;
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
 
     leader.set_block_size(block_size);
     follower.set_block_size(block_size);
-    flexible_controller.input.set_block_size(block_size);
-    flexible_controller.amount.set_block_size(block_size);
-    flexible_controller.min.set_block_size(block_size);
-    flexible_controller.max.set_block_size(block_size);
-    flexible_controller.distortion.set_block_size(block_size);
-    flexible_controller.randomness.set_block_size(block_size);
+    macro.input.set_block_size(block_size);
+    macro.amount.set_block_size(block_size);
+    macro.min.set_block_size(block_size);
+    macro.max.set_block_size(block_size);
+    macro.distortion.set_block_size(block_size);
+    macro.randomness.set_block_size(block_size);
 
     leader.set_sample_rate(sample_rate);
     follower.set_sample_rate(sample_rate);
-    flexible_controller.input.set_sample_rate(sample_rate);
-    flexible_controller.amount.set_sample_rate(sample_rate);
-    flexible_controller.min.set_sample_rate(sample_rate);
-    flexible_controller.max.set_sample_rate(sample_rate);
-    flexible_controller.distortion.set_sample_rate(sample_rate);
-    flexible_controller.randomness.set_sample_rate(sample_rate);
+    macro.input.set_sample_rate(sample_rate);
+    macro.amount.set_sample_rate(sample_rate);
+    macro.min.set_sample_rate(sample_rate);
+    macro.max.set_sample_rate(sample_rate);
+    macro.distortion.set_sample_rate(sample_rate);
+    macro.randomness.set_sample_rate(sample_rate);
 
-    flexible_controller.input.set_value(0.2);
-    flexible_controller.amount.set_value(0.5);
+    macro.input.set_value(0.2);
+    macro.amount.set_value(0.5);
 
-    leader.set_flexible_controller(&flexible_controller);
+    leader.set_macro(&macro);
 
     assert_eq(1.0, follower.get_value());
 
-    flexible_controller.input.set_value(0.64);
+    macro.input.set_value(0.64);
 
     assert_false(follower.is_constant_in_next_round(1, block_size));
 
@@ -1841,17 +1839,17 @@ void test_follower_flexible_controller()
 
     assert_eq((int)change_index, (int)follower.get_change_index());
 
-    flexible_controller.input.set_value(0.4);
+    macro.input.set_value(0.4);
     assert_neq((int)change_index, (int)follower.get_change_index());
 
-    leader.set_flexible_controller(NULL);
+    leader.set_macro(NULL);
     assert_eq(2.0, follower.get_value(), DOUBLE_DELTA);
 }
 
 
-TEST(when_a_flexible_controller_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_flexible_controller, {
-    test_follower_flexible_controller<FloatParamS>();
-    test_follower_flexible_controller< ModulatableFloatParam<SignalProducer> >();
+TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_macro, {
+    test_follower_macro<FloatParamS>();
+    test_follower_macro< ModulatableFloatParam<SignalProducer> >();
 })
 
 

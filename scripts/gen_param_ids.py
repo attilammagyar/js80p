@@ -11,7 +11,7 @@ def main(argv):
     param_id = print_oscillator_params(param_id, "Modulator", "M")
     param_id = print_oscillator_params(param_id, "Carrier", "C")
     param_id = print_effect_params(param_id)
-    param_id = print_flexible_controllers_params(param_id)
+    param_id = print_macros(param_id)
     param_id = print_envelopes_params(param_id)
     param_id = print_lfo_params(param_id)
     param_id = print_special_params(param_id)
@@ -114,7 +114,7 @@ def print_effect_params(param_id: int) -> int:
     return print_params(param_id, "Effects", "E", 1, params)
 
 
-def print_flexible_controllers_params(param_id: int) -> int:
+def print_macros(param_id: int) -> int:
     params = [
         ("$#IN", "  ///< $ # Input"),
         ("$#MIN", " ///< $ # Minimum Value"),
@@ -124,7 +124,7 @@ def print_flexible_controllers_params(param_id: int) -> int:
         ("$#RND", " ///< $ # Randomness"),
     ]
 
-    return print_params(param_id, "Flexible Controller", "F", 20, params)
+    return print_params(param_id, "Macro", "M", 20, params)
 
 
 def print_envelopes_params(param_id: int) -> int:

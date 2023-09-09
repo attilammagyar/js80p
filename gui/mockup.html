@@ -301,14 +301,14 @@ body.hide-objects .knob span:nth-child(4) {
 .tab {
   position: relative;
   display: inline-block;
-  font-family: Verdana, Sans-serif;
+  font-family: Arial, Sans-serif;
   font-size: 14px;
   background: #202030;
-  width: 83px;
+  width: 89px;
   height: 20px;
-  line-height: 20px;
+  line-height: 22px;
   margin: 0;
-  padding: 2px 6px;
+  padding: 2px 3px;
   border: solid 2px #5c5c60;
   border-radius: 6px 6px 0 0;
   margin-bottom: -4px;
@@ -467,8 +467,8 @@ function make_tabs(active)
     var tabs = [
             "Synth",
             "Effects",
-            "Ctls 1-10",
-            "Ctls 11-20",
+            "Macros 1-10",
+            "Macros 11-20",
             "Envelopes",
             "LFOs",
             "About"
@@ -817,7 +817,7 @@ window.onload = function ()
             k3 = document.createElement("div");
             k3.setAttribute("class", "group");
             h = document.createElement("h1");
-            h.innerHTML = "Flexible Controller " + String(o * 10 + i);
+            h.innerHTML = "Macro " + String(o * 10 + i);
             d.appendChild(h);
             k1.appendChild(k2);
             k1.appendChild(k3);
