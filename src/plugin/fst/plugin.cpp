@@ -747,7 +747,7 @@ void FstPlugin::generate_samples(
     }
 
     prepare_rendering(sample_count);
-    renderer.write_next_round<NumberType>(sample_count, samples);
+    renderer.render<NumberType>(sample_count, samples);
     finalize_rendering(sample_count);
 
     /*
@@ -871,7 +871,7 @@ void FstPlugin::generate_and_add_samples(
     }
 
     prepare_rendering(sample_count);
-    renderer.add_next_round<float>(sample_count, samples);
+    renderer.render<float, Renderer::Operation::ADD>(sample_count, samples);
     finalize_rendering(sample_count);
 }
 

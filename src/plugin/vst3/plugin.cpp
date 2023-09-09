@@ -505,12 +505,12 @@ void Vst3Plugin::Processor::update_bpm(Vst::ProcessData& data) noexcept
 void Vst3Plugin::Processor::generate_samples(Vst::ProcessData& data) noexcept
 {
     if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64) {
-        renderer.write_next_round<double>(
+        renderer.render<double>(
             (Integer)data.numSamples,
             (double**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32) {
-        renderer.write_next_round<float>(
+        renderer.render<float>(
             (Integer)data.numSamples,
             (float**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );

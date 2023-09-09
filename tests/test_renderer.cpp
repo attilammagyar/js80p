@@ -96,9 +96,9 @@ void test_varaible_size_rounds(RenderMode const mode)
         }
 
         if (mode == RenderMode::ADD) {
-            renderer.add_next_round<double>(sample_count, batch);
+            renderer.render<double, Renderer::Operation::ADD>(sample_count, batch);
         } else {
-            renderer.write_next_round<double>(sample_count, batch);
+            renderer.render<double>(sample_count, batch);
         }
 
         next_round_start += sample_count;
