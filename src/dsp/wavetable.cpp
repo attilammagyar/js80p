@@ -149,7 +149,7 @@ Wavetable::Interpolation Wavetable::select_interpolation(
         Frequency const nyquist_frequency
 ) const noexcept {
     return (
-        frequency >= nyquist_frequency * INTERPOLATION_LIMIT_SCALE
+        std::fabs(frequency) >= nyquist_frequency * INTERPOLATION_LIMIT_SCALE
             ? Interpolation::LINEAR_ONLY
             : Interpolation::LAGRANGE_ONLY
     );

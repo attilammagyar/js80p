@@ -754,7 +754,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
     if (computed_frequency_is_constant) {
         Wavetable::Interpolation const interpolation = (
-            wavetable->select_interpolation(computed_frequency_value, nyquist_frequency)
+            wavetable->select_interpolation(
+                frequency_scale * computed_frequency_value, nyquist_frequency
+            )
         );
 
         if (UNLIKELY(wavetable->has_single_partial())) {
