@@ -764,7 +764,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
             wavetable->select_interpolation(computed_frequency_value, nyquist_frequency)
         );
 
-        if (wavetable->has_single_partial()) {
+        if (UNLIKELY(wavetable->has_single_partial())) {
             switch (interpolation) {
                 case Wavetable::Interpolation::LINEAR_ONLY:
                     render_with_constant_frequency<Wavetable::Interpolation::LINEAR_ONLY, true>(
@@ -805,7 +805,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     break;
             }
         }
-    } else if (wavetable->has_single_partial()) {
+    } else if (UNLIKELY(wavetable->has_single_partial())) {
         render_with_changing_frequency<true>(
             round, first_sample_index, last_sample_index, buffer
         );
