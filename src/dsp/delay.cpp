@@ -648,7 +648,7 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
     panning_buffer = FloatParamS::produce_if_not_constant(panning, round, sample_count);
 
     if (this->input.is_silent(round, sample_count)) {
-        return this->input_buffer;
+        return this->input_was_silent(round);
     }
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
