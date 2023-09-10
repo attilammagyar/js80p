@@ -1,3 +1,12 @@
+v2.0.1 (2023-09-10)
+ * Flexible Controllers have been renamed to Macros.
+ * Reduced RAM and CPU usage, especially when the plugin is idle.
+ * Bugifx: fixed a problem in filter state handling which could lead to
+   occasional signal discontinuities and glitches.
+ * Bugfix: fixed a potential crash around GUI and audio engine communication.
+ * Bugfix: the FST plugin sometimes switched to the blank preset while loading
+   banks, saved projects, or when doing a preset change or MIDI program change.
+
 v2.0.0 (2023-08-16)
  * Implemented monophonic mode for smooth legato playing
  * New preset: Monophonic Saw
