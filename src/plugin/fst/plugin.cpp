@@ -976,6 +976,10 @@ void FstPlugin::set_program(size_t index) noexcept
     process_internal_messages_in_gui_thread();
 
     current_program_index = index;
+    parameters[0].set_value(
+        Bank::program_index_to_normalized_parameter_value(index)
+    );
+
     to_audio_messages.push(Message(MessageType::CHANGE_PROGRAM, index));
 }
 
