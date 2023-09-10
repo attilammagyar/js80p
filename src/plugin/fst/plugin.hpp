@@ -267,16 +267,12 @@ class FstPlugin : public Midi::EventHandler
                 float get_last_set_value() const noexcept;
                 void set_value(float const value) noexcept;
 
-                void clear() noexcept;
-                bool is_dirty() const noexcept;
-
             private:
                 MidiController* midi_controller;
                 char const* name;
                 Midi::Controller controller_id;
                 // Integer change_index; /* See FstPlugin::generate_samples() */
                 float value;
-                bool is_dirty_;
         };
 
         Parameter create_midi_ctl_param(

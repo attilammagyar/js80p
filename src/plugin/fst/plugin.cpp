@@ -1084,8 +1084,7 @@ FstPlugin::Parameter::Parameter()
     name("unknown"),
     controller_id(0),
     // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(0.5f),
-    is_dirty_(false)
+    value(0.5f)
 {
 }
 
@@ -1098,8 +1097,7 @@ FstPlugin::Parameter::Parameter(
     name(name),
     controller_id(controller_id),
     // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(0.5f),
-    is_dirty_(false)
+    value(0.5f)
 {
 }
 
@@ -1157,19 +1155,6 @@ float FstPlugin::Parameter::get_last_set_value() const noexcept
 void FstPlugin::Parameter::set_value(float const value) noexcept
 {
     this->value = value;
-    is_dirty_ = true;
-}
-
-
-void FstPlugin::Parameter::clear() noexcept
-{
-    is_dirty_ = false;
-}
-
-
-bool FstPlugin::Parameter::is_dirty() const noexcept
-{
-    return is_dirty_;
 }
 
 
