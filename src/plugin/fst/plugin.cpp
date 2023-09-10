@@ -1142,7 +1142,7 @@ float FstPlugin::Parameter::get_value() noexcept
     float const value = (float)midi_controller->get_value();
 
     /* See FstPlugin::generate_samples() */
-    // change_index=  midi_controller->get_change_index();
+    // change_index = midi_controller->get_change_index();
 
     return value;
 }
