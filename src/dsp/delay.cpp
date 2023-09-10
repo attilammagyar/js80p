@@ -200,6 +200,7 @@ void Delay<InputSignalProducerClass>::reset() noexcept
     write_index_feedback = 0;
     clear_index = this->block_size;
     is_starting = true;
+    previous_round = -1;
 }
 
 
@@ -236,7 +237,7 @@ void Delay<InputSignalProducerClass>::set_sample_rate(
 
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_feedback_signal_producer(
-        SignalProducer const* feedback_signal_producer
+        SignalProducer* feedback_signal_producer
 ) noexcept {
     this->feedback_signal_producer = feedback_signal_producer;
 }
@@ -270,6 +271,8 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
             ? (ONE_MINUTE / std::max(BPM_MIN, this->bpm)) * this->sample_rate
             : this->sample_rate
     );
+
+    previous_round = round;
 
     return NULL;
 }
@@ -327,6 +330,16 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         )
     );
 
+    if (feedback_signal_producer->is_silent(previous_round, feedback_sample_count)) {
+        write_index_feedback += feedback_sample_count;
+
+        if (UNLIKELY(write_index_feedback >= delay_buffer_size)) {
+            write_index_feedback %= delay_buffer_size;
+        }
+
+        return;
+    }
+
     Integer const channels = this->channels;
     Integer delay_buffer_index = write_index_feedback;
 
@@ -355,7 +368,11 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
     if (this->input.is_silent(round, sample_count)) {
-        write_index_input = (write_index_input + sample_count) % delay_buffer_size;
+        write_index_input += sample_count;
+
+        if (UNLIKELY(write_index_input >= delay_buffer_size)) {
+            write_index_input %= delay_buffer_size;
+        }
 
         return;
     }
@@ -628,9 +645,13 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 ) noexcept {
     Filter<FilterInputClass>::initialize_rendering(round, sample_count);
 
-    /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
-
     panning_buffer = FloatParamS::produce_if_not_constant(panning, round, sample_count);
+
+    if (this->input.is_silent(round, sample_count)) {
+        return this->input_buffer;
+    }
+
+    /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
     if (panning_buffer == NULL) {
         panning_value = is_flipped ? -panning.get_value() : panning.get_value();

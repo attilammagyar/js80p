@@ -87,7 +87,7 @@ class Delay : public Filter<InputSignalProducerClass>
          *          feedback object).
          */
         void set_feedback_signal_producer(
-            SignalProducer const* feedback_signal_producer
+            SignalProducer* feedback_signal_producer
         ) noexcept;
 
         ToggleParam const* const tempo_sync;
@@ -133,7 +133,7 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer const delay_buffer_oversize;
         bool const is_gain_constant_1;
 
-        SignalProducer const* feedback_signal_producer;
+        SignalProducer* feedback_signal_producer;
         Sample** delay_buffer;
         Sample const* gain_buffer;
         Sample const* time_buffer;
@@ -144,6 +144,7 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer read_index;
         Integer clear_index;
         Integer delay_buffer_size;
+        Integer previous_round;
         Number delay_buffer_size_inv;
         bool is_starting;
         bool need_gain;
