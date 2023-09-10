@@ -55,8 +55,7 @@ template<class InputSignalProducerClass>
 Sample const* const* Filter<InputSignalProducerClass>::input_was_silent(
         Integer const round
 ) noexcept {
-    cached_silence_round = round;
-    cached_silence = true;
+    mark_round_as_silent(round);
 
     return input_buffer;
 }

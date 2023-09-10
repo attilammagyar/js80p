@@ -98,8 +98,8 @@ SignalProducer::SignalProducer(
     bpm(DEFAULT_BPM),
     current_time(0.0),
     cached_round(-1),
-    cached_silence_round(-1),
     cached_buffer(NULL),
+    cached_silence_round(-1),
     cached_silence(false)
 {
     children.reserve(number_of_children);
@@ -264,6 +264,13 @@ bool SignalProducer::is_silent(
     cached_silence = true;
 
     return true;
+}
+
+
+void SignalProducer::mark_round_as_silent(Integer const round) noexcept
+{
+    cached_silence_round = round;
+    cached_silence = true;
 }
 
 

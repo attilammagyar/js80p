@@ -201,6 +201,8 @@ class SignalProducer
             Sample** buffer
         ) noexcept;
 
+        void mark_round_as_silent(Integer const round) noexcept;
+
         bool has_upcoming_events(Integer const sample_count) const noexcept;
 
         bool is_time_offset_before_sample_count(
@@ -226,9 +228,7 @@ class SignalProducer
         Number bpm;
         Seconds current_time;
         Integer cached_round;
-        Integer cached_silence_round;
         Sample const* const* cached_buffer;
-        bool cached_silence;
 
     private:
         typedef std::vector<SignalProducer*> Children;
@@ -242,6 +242,8 @@ class SignalProducer
         ) noexcept;
 
         Children children;
+        Integer cached_silence_round;
+        bool cached_silence;
 };
 
 }
