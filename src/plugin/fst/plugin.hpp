@@ -111,6 +111,9 @@ class FstPlugin : public Midi::EventHandler
         void process_internal_messages_in_audio_thread() noexcept;
         void process_internal_messages_in_gui_thread() noexcept;
 
+        void initialize() noexcept;
+        void need_idle() noexcept;
+        VstIntPtr idle() noexcept;
         void set_sample_rate(float const new_sample_rate) noexcept;
         void set_block_size(VstIntPtr const new_block_size) noexcept;
         void suspend() noexcept;

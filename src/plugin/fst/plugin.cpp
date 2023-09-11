@@ -85,7 +85,7 @@ static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
     "VendorSpecific",               /*   50 */
     "CanDo",                        /*   51 */
     "UNKNOWN-52",                   /*   52 */
-    "UNKNOWN-53",                   /*   53 */
+    "Idle",                         /*   53, https://git.iem.at/zmoelnig/FST/-/issues/24 */
     "UNKNOWN-54",                   /*   54 */
     "UNKNOWN-55",                   /*   55 */
     "UNKNOWN-56",                   /*   56 */
@@ -185,10 +185,16 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         // );
     // }
 
+    constexpr VstInt32 effIdle = 53; /* https://git.iem.at/zmoelnig/FST/-/issues/24 */
+
     switch (op_code) {
         case effProcessEvents:
             fst_plugin->process_vst_events((VstEvents*)pointer);
             return 1;
+
+        case effOpen:
+            fst_plugin->initialize();
+            return 0;
 
         case effClose:
             delete fst_plugin;
@@ -302,6 +308,9 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
                 // (char*)pointer
             // );
             return 0;
+
+        case effIdle:
+            return fst_plugin->idle();
 
         default:
             return 0;
@@ -653,6 +662,29 @@ void FstPlugin::handle_params_changed() noexcept
 }
 
 
+void FstPlugin::initialize() noexcept
+{
+    need_idle();
+}
+
+
+void FstPlugin::need_idle() noexcept
+{
+    /* https://git.iem.at/zmoelnig/FST/-/issues/24 */
+    constexpr int audioMasterNeedIdle = 14;
+
+    host_callback(effect, audioMasterNeedIdle, 0, 0, NULL, 0.0f);
+}
+
+
+VstIntPtr FstPlugin::idle() noexcept
+{
+    process_internal_messages_in_gui_thread();
+
+    return 1;
+}
+
+
 void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
 {
     process_internal_messages_in_gui_thread();
@@ -684,6 +716,7 @@ void FstPlugin::set_block_size(VstIntPtr const new_block_size) noexcept
 void FstPlugin::suspend() noexcept
 {
     process_internal_messages_in_gui_thread();
+    need_idle();
     synth.suspend();
     renderer.reset();
 }
@@ -695,6 +728,7 @@ void FstPlugin::resume() noexcept
     renderer.reset();
     host_callback(effect, audioMasterWantMidi, 0, 1, NULL, 0.0f);
     process_internal_messages_in_gui_thread();
+    need_idle();
 }
 
 
@@ -1056,12 +1090,15 @@ void FstPlugin::close_gui()
     process_internal_messages_in_gui_thread();
 
     if (gui == NULL) {
+        need_idle();
+
         return;
     }
 
     delete gui;
 
     gui = NULL;
+    need_idle();
 }
 
 
