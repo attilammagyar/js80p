@@ -333,7 +333,7 @@ clean:
 		$(VST3_OBJS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
-check: perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
+check: upgrade_patch perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(BUILD_DIR)
 check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(BUILD_DIR)
 check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(BUILD_DIR)

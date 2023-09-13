@@ -127,10 +127,9 @@ int upgrade_patch(char const* const patch_file)
     JS80P::Synth synth;
     JS80P::Serializer::Lines comments;
 
-    JS80P::Serializer::import(synth, patch);
+    JS80P::Serializer::import_patch_in_audio_thread(synth, patch);
 
     collect_comments(patch, comments);
-    synth.process_messages();
 
     if (!write_patch(patch_file, JS80P::Serializer::serialize(synth), comments)) {
         return error("Error writing patch file", patch_file);
