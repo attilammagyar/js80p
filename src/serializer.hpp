@@ -34,7 +34,7 @@ class Serializer
     public:
         static constexpr Integer MAX_SIZE = 256 * 1024;
 
-        static constexpr char const* LINE_END = "\r\n";
+        static std::string const LINE_END;
 
         typedef std::vector<std::string> Lines;
 
@@ -68,6 +68,12 @@ class Serializer
         static void import_patch_in_audio_thread(
             Synth& synth,
             std::string const& serialized
+        ) noexcept;
+
+        static void trim_excess_zeros_from_end_after_snprintf(
+            char* number,
+            int const length,
+            size_t const max_length
         ) noexcept;
 
     private:

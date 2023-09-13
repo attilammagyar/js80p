@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <string>
 
 #include "test.cpp"
@@ -447,4 +448,95 @@ TEST(can_import_patch_inside_the_gui_thread, {
     assert_eq(
         0.0, synth.get_param_ratio_atomic(Synth::ParamId::FM), DOUBLE_DELTA
     );
+})
+
+
+void assert_trimmed(char const* expected, char const* raw_number)
+{
+    constexpr size_t buffer_size = 16;
+
+    char buffer[buffer_size];
+    int const length = snprintf(buffer, buffer_size, "%s", raw_number);
+
+    Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, length, buffer_size);
+    assert_eq(expected, buffer);
+
+    if (strncmp(expected, raw_number, buffer_size) != 0) {
+        std::fill_n(buffer, buffer_size, '0');
+        int const terminating_zero = snprintf(buffer, buffer_size, "%s", expected);
+        buffer[terminating_zero] = '0';
+        buffer[buffer_size - 1] = '\x00';
+        Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, 12345, buffer_size);
+        assert_eq(expected, buffer);
+    }
+
+    snprintf(buffer, buffer_size, "000");
+    Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, -1, buffer_size);
+    assert_eq("000", buffer);
+}
+
+
+TEST(trimming_zeros_from_end_of_numbers, {
+    assert_trimmed("", "");
+    assert_trimmed("0", "0");
+    assert_trimmed("1", "1");
+    assert_trimmed("10", "10");
+    assert_trimmed("100", "100");
+    assert_trimmed("1000", "1000");
+    assert_trimmed("0.0", "0.0");
+    assert_trimmed("0.1", "0.1");
+    assert_trimmed("0.10", "0.10");
+    assert_trimmed("0.12", "0.12");
+    assert_trimmed("0.120", "0.120");
+    assert_trimmed("0.0", "0.00");
+    assert_trimmed("0.0", "0.00000");
+    assert_trimmed("0.120", "0.1200");
+    assert_trimmed("0.120", "0.120000");
+    assert_trimmed("0.120", "0.1200000000000");
+    assert_trimmed("0.1234567890123", "0.1234567890123");
+})
+
+
+TEST(trailing_zeros_and_none_controllers_and_params_with_default_values_are_omitted_from_serialized_patch, {
+    Synth synth;
+    std::string patch = "";
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += "FM = 0.50";
+    patch += Serializer::LINE_END;
+
+    synth.push_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+    );
+    synth.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::FM, 0.5, 0
+    );
+    synth.process_messages();
+
+    assert_eq(patch, Serializer::serialize(synth));
+})
+
+
+TEST(when_a_param_has_a_controller_then_its_own_value_is_omitted, {
+    Synth synth;
+    std::string patch = "";
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += "FMctl = 0.50";
+    patch += Serializer::LINE_END;
+
+    synth.push_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+    );
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::FM,
+        0.0,
+        Synth::ControllerId::PITCH_WHEEL
+    );
+    synth.process_messages();
+
+    assert_eq(patch, Serializer::serialize(synth));
 })
