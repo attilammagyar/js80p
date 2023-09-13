@@ -999,16 +999,12 @@ void FstPlugin::pitch_wheel_change(
 
 VstIntPtr FstPlugin::get_program() noexcept
 {
-    process_internal_messages_in_gui_thread();
-
     return current_program_index;
 }
 
 
 void FstPlugin::set_program(size_t index) noexcept
 {
-    process_internal_messages_in_gui_thread();
-
     current_program_index = index;
     parameters[0].set_value(
         Bank::program_index_to_normalized_parameter_value(index)
@@ -1197,16 +1193,12 @@ void FstPlugin::Parameter::set_value(float const value) noexcept
 
 float FstPlugin::get_parameter(size_t index) noexcept
 {
-    process_internal_messages_in_gui_thread();
-
     return parameters[index].get_value();
 }
 
 
 void FstPlugin::set_parameter(size_t index, float value) noexcept
 {
-    process_internal_messages_in_gui_thread();
-
     Parameter& param = parameters[index];
 
     param.set_value(value);
