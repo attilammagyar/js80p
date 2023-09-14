@@ -169,6 +169,7 @@ class FstPlugin : public Midi::EventHandler
 
         float get_parameter(size_t index) noexcept;
         void set_parameter(size_t index, float value) noexcept;
+        bool is_automatable(size_t index) noexcept;
 
         void get_param_label(size_t index, char* buffer) noexcept;
         void get_param_display(size_t index, char* buffer) noexcept;

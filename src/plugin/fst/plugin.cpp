@@ -231,7 +231,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return 0;
 
         case effCanBeAutomated:
-            return 1;
+            return fst_plugin->is_automatable((size_t)index) ? 1 : 0;
 
         case effSetSampleRate:
             fst_plugin->set_sample_rate(fvalue);
@@ -1219,6 +1219,12 @@ void FstPlugin::set_parameter(size_t index, float value) noexcept
             )
         );
     }
+}
+
+
+bool FstPlugin::is_automatable(size_t index) noexcept
+{
+    return index != 0 && index < NUMBER_OF_PARAMETERS;
 }
 
 
