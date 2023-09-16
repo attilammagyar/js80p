@@ -1227,7 +1227,7 @@ void FstPlugin::set_parameter(size_t index, float value) noexcept
 
 bool FstPlugin::is_automatable(size_t index) noexcept
 {
-    return index != 0 && index < NUMBER_OF_PARAMETERS;
+    return index < NUMBER_OF_PARAMETERS;
 }
 
 
