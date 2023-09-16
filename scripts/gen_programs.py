@@ -7,7 +7,8 @@ import sys
 
 kVstMaxProgNameLen = 24
 
-BLANK_PRESET_NAME = "blank.js80p"
+BLANK_PRESET_FILE_NAME = "blank.js80p"
+BLANK_PRESET_NAME = "Blank"
 INDENT_PROGRAM = " " * 4
 INDENT_PROGRAM_BODY = " " * 8
 INDENT_PROGRAM_BODY_CONT = " " * 12
@@ -23,7 +24,9 @@ WARNING = """\
 */"""
 
 
-Preset = collections.namedtuple("Preset", ("basename", "path", "program_name", "lines", "comments"))
+Preset = collections.namedtuple(
+    "Preset", ("basename", "path", "program_name", "lines", "comments")
+)
 
 
 def main(argv):
@@ -46,20 +49,32 @@ def main(argv):
 
     with open(os.path.join(src_dir, "bank.hpp"), "r") as f:
         src = f.read()
-        match = re.search(r"^ *static +.* +NUMBER_OF_PROGRAMS *= *([0-9]+) *;", src, re.DOTALL | re.MULTILINE)
+        matches = re.search(
+            r"^ *static +.* +NUMBER_OF_PROGRAMS *= *([0-9]+) *;",
+            src,
+            re.DOTALL | re.MULTILINE
+        )
 
-        if not match:
+        if not matches:
             print(f"Cannot find NUMBER_OF_PROGRAMS in bank.hpp", file=sys.stderr)
             return 1
 
-        number_of_programs = int(match[1])
+        number_of_programs = int(matches[1])
 
     programs = []
     presets = collect_presets(presets_dir, programs_cpp)
     readme_toc = []
     readme_presets = []
 
-    for i, (preset_file_name, preset_file_path, preset_name, preset_lines, preset_comments) in enumerate(presets):
+    for i, preset in enumerate(presets):
+        (
+            preset_file_name,
+            preset_file_path,
+            preset_name,
+            preset_lines,
+            preset_comments
+        ) = preset
+
         if i == number_of_programs:
             break
 
@@ -67,7 +82,9 @@ def main(argv):
 
         if len(preset_name) > kVstMaxProgNameLen:
             raise ValueError(
-                f"Name too long; preset_name={preset_name!r}, length={len(preset_name)}, max_length={kVstMaxProgNameLen}"
+                f"Name too long; preset_name={preset_name!r},"
+                f" length={len(preset_name)},"
+                f" max_length={kVstMaxProgNameLen}"
             )
 
         program = (
@@ -78,7 +95,7 @@ def main(argv):
                 f"{INDENT_PROGRAM_BODY}\"{default_name}\",",
                 f"{INDENT_PROGRAM_BODY}(",
             ]
-            + [f"{INDENT_PROGRAM_BODY_CONT}\"{line.strip()}\\n\"" for line in preset_lines]
+            + preset_lines_to_cpp_lines(INDENT_PROGRAM_BODY_CONT, preset_lines)
             + [
                 f"{INDENT_PROGRAM_BODY})",
                 f"{INDENT_PROGRAM}),"
@@ -87,16 +104,24 @@ def main(argv):
 
         programs.append("\n".join(program))
 
-        anchor = "preset-" + preset_file_name.replace(".js80p", "").replace("_", "-")
+        anchor = (
+            "preset-"
+            + preset_file_name.replace(".js80p", "").replace("_", "-")
+        )
         readme_toc.append(f"    * [{preset_name}](#{anchor})")
-        readme_presets.append(f"\n<a id=\"{anchor}\"></a>\n\n### {preset_name}\n")
+        readme_presets.append(
+            f"\n<a id=\"{anchor}\"></a>\n\n### {preset_name}\n"
+        )
         readme_presets.append("\n".join(preset_comments))
 
     with open(programs_cpp, "w") as f:
         print(
             (
-                template.replace("/* WARNING */", WARNING)
-                    .replace("/* NUMBER_OF_BUILT_IN_PROGRAMS */", str(len(programs)))
+                template
+                    .replace("/* WARNING */", WARNING)
+                    .replace(
+                        "/* NUMBER_OF_BUILT_IN_PROGRAMS */", str(len(programs))
+                    )
                     .replace("/* PROGRAMS */", "\n".join(programs))
             ),
             file=f
@@ -114,26 +139,33 @@ def collect_presets(presets_dir, programs_cpp):
     existing_programs_order = []
     blank_preset_file_path = None
     presets_by_program_name = {}
+    preset_files = glob.glob(os.path.join(presets_dir, "*.js80p"))
 
     for basename, path in sorted(
-        ((os.path.basename(path), path) for path in glob.glob(os.path.join(presets_dir, "*.js80p"))),
+        ((os.path.basename(path), path) for path in preset_files),
         key=lambda basename_path_pair: basename_path_pair[0]
     ):
-        if basename == BLANK_PRESET_NAME:
+        if basename == BLANK_PRESET_FILE_NAME:
             blank_preset_file_path = path
             continue
 
         program_name = preset_file_name_to_program_name(basename)
 
         if program_name in presets_by_program_name:
-            raise Exception(f"Non-unique program names: {presets_by_program_name[program_name].basename} vs {basename}")
+            raise Exception(
+                "Non-unique program names:"
+                f" {presets_by_program_name[program_name].basename}"
+                f" vs {basename}"
+            )
 
         preset = make_preset(basename, path, program_name)
         presets_by_program_name[program_name] = preset
         all_presets.append(preset)
 
     if blank_preset_file_path is None:
-        raise Exception(f"{BLANK_PRESET_NAME!r} preset not found in {presets_dir!r}", file=sys.stderr)
+        raise Exception(
+            f"{BLANK_PRESET_FILE_NAME!r} preset not found in {presets_dir!r}"
+        )
 
     try:
         with open(programs_cpp, "r") as f:
@@ -151,7 +183,11 @@ def collect_presets(presets_dir, programs_cpp):
         pass
 
     return (
-        [make_preset(BLANK_PRESET_NAME, blank_preset_file_path, "Blank")]
+        [
+            make_preset(
+                BLANK_PRESET_FILE_NAME, blank_preset_file_path, BLANK_PRESET_NAME
+            )
+        ]
         + [
             presets_by_program_name[program_name]
             for program_name in existing_programs_order
@@ -196,6 +232,9 @@ def preset_file_name_to_program_name(file_name):
     )
 
 
+def preset_lines_to_cpp_lines(indentation, lines):
+    return [f"{indentation}\"{line.strip()}\\n\"" for line in lines]
+
+
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
-
