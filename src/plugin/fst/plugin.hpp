@@ -108,9 +108,6 @@ class FstPlugin : public Midi::EventHandler
 
         ~FstPlugin();
 
-        void process_internal_messages_in_audio_thread() noexcept;
-        void process_internal_messages_in_gui_thread() noexcept;
-
         void initialize() noexcept;
         void need_idle() noexcept;
         VstIntPtr idle() noexcept;
@@ -292,6 +289,12 @@ class FstPlugin : public Midi::EventHandler
         void update_bpm() noexcept;
         void update_host_display() noexcept;
 
+        void process_internal_messages_in_audio_thread(
+            SPSCQueue<Message>& messages
+        ) noexcept;
+
+        void process_internal_messages_in_gui_thread() noexcept;
+
         void handle_change_program(size_t const new_program) noexcept;
         void handle_rename_program(std::string const& name) noexcept;
 
@@ -325,6 +328,7 @@ class FstPlugin : public Midi::EventHandler
         GUI* gui;
         Renderer renderer;
         SPSCQueue<Message> to_audio_messages;
+        SPSCQueue<Message> to_audio_string_messages;
         SPSCQueue<Message> to_gui_messages;
         Bank bank;
         Bank program_names;

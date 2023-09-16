@@ -387,6 +387,7 @@ FstPlugin::FstPlugin(
     gui(NULL),
     renderer(synth),
     to_audio_messages(1024),
+    to_audio_string_messages(256),
     to_gui_messages(1024),
     serialized_bank(""),
     current_patch(""),
@@ -458,14 +459,15 @@ FstPlugin::~FstPlugin()
 }
 
 
-void FstPlugin::process_internal_messages_in_audio_thread() noexcept
-{
-    SPSCQueue<Message>::SizeType const message_count = to_audio_messages.length();
+void FstPlugin::process_internal_messages_in_audio_thread(
+        SPSCQueue<FstPlugin::Message>& messages
+) noexcept {
+    SPSCQueue<Message>::SizeType const message_count = messages.length();
 
     for (size_t i = 0; i != message_count; ++i) {
         Message message;
 
-        if (!to_audio_messages.pop(message)) {
+        if (!messages.pop(message)) {
             continue;
         }
 
@@ -817,7 +819,8 @@ void FstPlugin::prepare_rendering(Integer const sample_count) noexcept
 
     received_midi_cc_cleared = false;
 
-    process_internal_messages_in_audio_thread();
+    process_internal_messages_in_audio_thread(to_audio_string_messages);
+    process_internal_messages_in_audio_thread(to_audio_messages);
 
     update_bpm();
 
@@ -940,7 +943,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
         program.import(current_patch);
         program_names[current_program_index].set_name(program.get_name());
 
-        to_audio_messages.push(
+        to_audio_string_messages.push(
             Message(MessageType::IMPORT_PATCH, 0, current_patch)
         );
     } else {
@@ -948,7 +951,7 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
 
         program_names.import_names(serialized_bank);
 
-        to_audio_messages.push(
+        to_audio_string_messages.push(
             Message(MessageType::IMPORT_BANK, 0, serialized_bank)
         );
     }
@@ -1050,7 +1053,7 @@ void FstPlugin::set_program_name(const char* name)
 {
     process_internal_messages_in_gui_thread();
 
-    to_audio_messages.push(Message(MessageType::RENAME_PROGRAM, 0, name));
+    to_audio_string_messages.push(Message(MessageType::RENAME_PROGRAM, 0, name));
     program_names[current_program_index].set_name(name);
 }
 
