@@ -71,6 +71,7 @@ Table of Contents
  * [Frequenctly Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
+    * [Parameters, Envelopes, and polyphony: how do they work?](#faq-params-polyphony)
     * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
@@ -589,6 +590,37 @@ would be available (at a reasonable price) for installing it in a virtual
 machine that could be used for testing, I'd consider that. But as long as it
 cannot be obtained (legally) without also buying a Mac, and I'm happy with my
 current computer, I'm not going to invest in a new one.
+
+<a id="faq-params-polyphony" href="#toc">Table of Contents</a>
+
+### Parameters, Envelopes, and polyphony: how do they work?
+
+By default, knobs and toggles act globally. This means that if you adjust a
+knob with your mouse, or if you assign a MIDI value (controller, note velocity,
+etc.), a Macro, or an LFO to it and adjust the parameter via that, or if you
+use <a href="#faq-automation">automation in your plugin host application</a>,
+then that parameter will change for all sounding notes.
+
+But if you assign an Envelope as a controller to a parameter, then each
+polyphonic note will use its own timeline for that parameter, and the
+parameter's value will change over time for each note independently according
+to the envelope's settings. By default, these settings are only evaluated once
+for each note, at the very beginning of the note, so if the parameters of the
+envelope are changed, then it will only affect the notes that start after the
+adjustment.
+
+To have polyphonic notes *sample and hold* a MIDI value or a Macro's momentary
+value for a parameter for the entire duration of the note, independently of
+other notes and subsequent changes of the value (e.g. to use lower filter
+cutoff frequency for low-velocity notes so that they sound softer), then you
+have to use an Envelope: turn up all the levels of the Envelope to 100%, assign
+the MIDI value or the Macro to the Amount parameter of the Envelope, and assign
+the Envelope to control the parameter.
+
+If an Envelope is switched to Dynamic mode, then polyphonic notes will still
+track their own independent timelines for each parameter that has that Envelope
+assigned, but the parameter's value will converge to the value that it should
+have at each moment according to the momentary settings of the Envelope.
 
 <a id="faq-custom-wave" href="#toc">Table of Contents</a>
 
