@@ -60,6 +60,8 @@ Delay<InputSignalProducerClass>::Delay(
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::initialize_instance() noexcept
 {
+    shared_buffer_owner = NULL;
+
     feedback_signal_producer = NULL;
     delay_buffer = NULL;
     gain_buffer = NULL;
@@ -153,7 +155,7 @@ void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexce
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
 {
-    if (delay_buffer == NULL) {
+    if (delay_buffer == NULL || shared_buffer_owner != NULL) {
         return;
     }
 
@@ -172,7 +174,7 @@ void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
 {
-    if (this->channels <= 0) {
+    if (this->channels <= 0 || shared_buffer_owner != NULL) {
         reset();
         return;
     }
@@ -192,8 +194,10 @@ void Delay<InputSignalProducerClass>::reset() noexcept
 {
     Filter<InputSignalProducerClass>::reset();
 
-    for (Integer c = 0; c != this->channels; ++c) {
-        std::fill_n(delay_buffer[c], delay_buffer_size, 0.0);
+    if (shared_buffer_owner == NULL) {
+        for (Integer c = 0; c != this->channels; ++c) {
+            std::fill_n(delay_buffer[c], delay_buffer_size, 0.0);
+        }
     }
 
     write_index_input = 0;
@@ -244,6 +248,16 @@ void Delay<InputSignalProducerClass>::set_feedback_signal_producer(
 
 
 template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::use_shared_delay_buffer(
+    Delay<InputSignalProducerClass> const& shared_buffer_owner
+) noexcept {
+    free_delay_buffer();
+
+    this->shared_buffer_owner = &shared_buffer_owner;
+}
+
+
+template<class InputSignalProducerClass>
 Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
@@ -252,9 +266,15 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
     read_index = write_index_input;
 
-    clear_delay_buffer(sample_count);
-    mix_feedback_into_delay_buffer(sample_count);
-    mix_input_into_delay_buffer(round, sample_count);
+    if (LIKELY(shared_buffer_owner == NULL)) {
+        clear_delay_buffer(sample_count);
+        mix_feedback_into_delay_buffer(sample_count);
+        mix_input_into_delay_buffer(round, sample_count);
+    } else {
+        write_index_input = advance_delay_buffer_index(
+            write_index_input, sample_count
+        );
+    }
 
     if (is_gain_constant_1) {
         gain_buffer = NULL;
@@ -456,6 +476,11 @@ void Delay<InputSignalProducerClass>::render(
 ) noexcept {
     Integer const channels = this->channels;
     Number const read_index_float = (Number)this->read_index;
+    Sample const* const* delay_buffer = (
+        shared_buffer_owner != NULL
+            ? shared_buffer_owner->delay_buffer
+            : this->delay_buffer
+    );
 
     if (time_buffer == NULL) {
         Number const time_value = time.get_value() * time_scale;

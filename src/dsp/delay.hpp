@@ -90,6 +90,10 @@ class Delay : public Filter<InputSignalProducerClass>
             SignalProducer* feedback_signal_producer
         ) noexcept;
 
+        void use_shared_delay_buffer(
+            Delay<InputSignalProducerClass> const& shared_buffer_owner
+        ) noexcept;
+
         ToggleParam const* const tempo_sync;
 
         FloatParamS gain;
@@ -139,6 +143,8 @@ class Delay : public Filter<InputSignalProducerClass>
 
         Integer const delay_buffer_oversize;
         bool const is_gain_constant_1;
+
+        Delay<InputSignalProducerClass> const* shared_buffer_owner;
 
         SignalProducer* feedback_signal_producer;
         Sample** delay_buffer;

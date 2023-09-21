@@ -203,6 +203,9 @@ Chorus<InputSignalProducerClass>::Chorus(
     comb_filter_2.delay.set_feedback_signal_producer(&feedback_gain);
     comb_filter_3.delay.set_feedback_signal_producer(&feedback_gain);
 
+    comb_filter_2.delay.use_shared_delay_buffer(comb_filter_1.delay);
+    comb_filter_3.delay.use_shared_delay_buffer(comb_filter_1.delay);
+
     mixer.add(comb_filter_1);
     mixer.add(comb_filter_2);
     mixer.add(comb_filter_3);

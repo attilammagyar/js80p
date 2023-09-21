@@ -427,6 +427,96 @@ TEST(when_tempo_sync_is_on_but_tempo_is_too_slow_then_the_minimum_tempo_is_used,
 })
 
 
+TEST(identical_delays_may_share_delay_buffer, {
+    constexpr Integer block_size = 3;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30},
+        {0.20, 0.40, 0.60},
+    };
+    constexpr Sample feedback_samples[CHANNELS][block_size] = {
+        {0.02, 0.04, 0.06},
+        {0.04, 0.08, 0.12},
+    };
+    /* output = gain * (input + feedback) */
+    constexpr Sample expected_output_1[CHANNELS][sample_count] = {
+        {0.00, 0.00, 0.025, 0.05, 0.075, 0.03},
+        {0.00, 0.00, 0.050, 0.10, 0.150, 0.06},
+    };
+    constexpr Sample expected_output_2[CHANNELS][sample_count] = {
+        {0.00, 0.00, 0.05, 0.10, 0.15, 0.06},
+        {0.00, 0.00, 0.10, 0.20, 0.30, 0.12},
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    Sample const* feedback_buffer[CHANNELS] = {
+        (Sample const*)&feedback_samples[0],
+        (Sample const*)&feedback_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    FixedSignalProducer feedback(feedback_buffer);
+    Buffer output_1(sample_count, CHANNELS);
+    Buffer output_2(sample_count, CHANNELS);
+    ToggleParam tempo_sync("SYN", ToggleParam::OFF);
+    Delay<FixedSignalProducer> delay_1(input, &tempo_sync);
+    Delay<FixedSignalProducer> delay_2(input, &tempo_sync);
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+
+    feedback.set_sample_rate(sample_rate);
+    feedback.set_block_size(block_size);
+
+    delay_2.use_shared_delay_buffer(delay_1);
+
+    delay_1.set_sample_rate(sample_rate);
+    delay_1.set_block_size(block_size);
+    delay_1.set_feedback_signal_producer(&feedback);
+    delay_1.gain.set_value(0.25);
+    delay_1.time.set_value(0.2);
+    delay_1.gain.schedule_value(0.7, 0.5);
+
+    delay_2.set_sample_rate(sample_rate);
+    delay_2.set_block_size(block_size);
+    delay_2.gain.set_value(0.5);
+    delay_2.time.set_value(0.2);
+    delay_2.gain.schedule_value(0.7, 1.0);
+
+    delay_2.reset();
+
+    SignalProducer::produce<FixedSignalProducer>(feedback, 12345);
+
+    render_rounds< Delay<FixedSignalProducer> >(delay_1, output_1, rounds);
+    render_rounds< Delay<FixedSignalProducer> >(delay_2, output_2, rounds);
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output_1[c],
+            output_1.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay with feedback; channel=%d",
+            (int)c
+        );
+        assert_eq(
+            expected_output_2[c],
+            output_2.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay with feedback; channel=%d",
+            (int)c
+        );
+    }
+})
+
+
 template<class PannedDelayClass>
 void test_panned_delay()
 {
