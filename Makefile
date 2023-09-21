@@ -180,6 +180,7 @@ TESTS = \
 	test_serializer
 
 PERF_TESTS = \
+	chord \
 	perf_math
 
 PARAM_HEADERS = \
@@ -441,6 +442,13 @@ $(OBJ_VST3_MAIN): \
 		$(VST3_HEADERS) \
 		| $(BUILD_DIR)
 	$(COMPILE_VST3) -c $< -o $@
+
+$(BUILD_DIR)/chord$(EXE): \
+		tests/performance/chord.cpp \
+		$(JS80P_HEADERS) \
+		$(JS80P_SOURCES) \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/perf_math$(EXE): \
 		tests/performance/perf_math.cpp \
