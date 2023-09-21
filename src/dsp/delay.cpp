@@ -368,37 +368,51 @@ template<class InputSignalProducerClass>
 template<typename Delay<InputSignalProducerClass>::DelayBufferWritingMode mode>
 Integer Delay<InputSignalProducerClass>::write_delay_buffer(
         Sample const* const* buffer,
-        Integer const delay_buffer_index,
+        Integer const delay_buffer_start_index,
         Integer const sample_count
 ) noexcept {
     Integer const channels = this->channels;
-    Integer index = delay_buffer_index;
+    Integer const delay_buffer_last_index = delay_buffer_size - 1;
+
+    Integer delay_buffer_index = delay_buffer_start_index;
 
     for (Integer c = 0; c != channels; ++c) {
-        Sample const* samples;
+        Integer samples_index;
+
+        delay_buffer_index = delay_buffer_start_index;
 
         if constexpr (mode == DelayBufferWritingMode::ADD) {
-            samples = buffer[c];
+            samples_index = 0;
         }
 
-        index = delay_buffer_index;
+        for (Integer remaining = sample_count; remaining != 0;) {
+            Sample* delay_buffer = &(this->delay_buffer[c][delay_buffer_index]);
+            Integer batch_size = delay_buffer_last_index - delay_buffer_index;
 
-        for (Integer i = 0; i != sample_count; ++i) {
-            if constexpr (mode == DelayBufferWritingMode::ADD) {
-                delay_buffer[c][index] += samples[i];
+            if (batch_size <= remaining) {
+                delay_buffer_index = 0;
             } else {
-                delay_buffer[c][index] = 0.0;
+                batch_size = remaining;
+                delay_buffer_index += remaining;
             }
 
-            ++index;
+            remaining -= batch_size;
 
-            if (UNLIKELY(index == delay_buffer_size)) {
-                index = 0;
+            if constexpr (mode == DelayBufferWritingMode::ADD) {
+                Sample const* samples = &(buffer[c][samples_index]);
+
+                samples_index += batch_size;
+
+                for (Integer i = 0; i != batch_size; ++i) {
+                    delay_buffer[i] += samples[i];
+                }
+            } else {
+                std::fill_n(delay_buffer, batch_size, 0.0);
             }
         }
     }
 
-    return index;
+    return delay_buffer_index;
 }
 
 
