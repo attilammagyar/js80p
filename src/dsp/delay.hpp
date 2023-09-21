@@ -123,6 +123,11 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const sample_count
         ) noexcept;
 
+        Integer advance_delay_buffer_index(
+            Integer const position,
+            Integer const increment
+        ) const noexcept;
+
         void apply_gain(
             Integer const round,
             Integer const first_sample_index,

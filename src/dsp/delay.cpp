@@ -279,6 +279,21 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
 
 template<class InputSignalProducerClass>
+Integer Delay<InputSignalProducerClass>::advance_delay_buffer_index(
+        Integer const position,
+        Integer const increment
+) const noexcept {
+    Integer const new_position = position + increment;
+
+    return (
+        UNLIKELY(new_position >= delay_buffer_size)
+            ? new_position % delay_buffer_size
+            : new_position
+    );
+}
+
+
+template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::clear_delay_buffer(
         Integer const sample_count
 ) noexcept {
@@ -313,11 +328,9 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
 
     if (UNLIKELY(is_starting)) {
         is_starting = false;
-        write_index_feedback += sample_count;
-
-        if (UNLIKELY(write_index_feedback >= delay_buffer_size)) {
-            write_index_feedback %= delay_buffer_size;
-        }
+        write_index_feedback = advance_delay_buffer_index(
+            write_index_feedback, sample_count
+        );
 
         return;
     }
@@ -331,11 +344,9 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
     );
 
     if (feedback_signal_producer->is_silent(previous_round, feedback_sample_count)) {
-        write_index_feedback += feedback_sample_count;
-
-        if (UNLIKELY(write_index_feedback >= delay_buffer_size)) {
-            write_index_feedback %= delay_buffer_size;
-        }
+        write_index_feedback = advance_delay_buffer_index(
+            write_index_feedback, feedback_sample_count
+        );
 
         return;
     }
@@ -368,11 +379,9 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
     if (this->input.is_silent(round, sample_count)) {
-        write_index_input += sample_count;
-
-        if (UNLIKELY(write_index_input >= delay_buffer_size)) {
-            write_index_input %= delay_buffer_size;
-        }
+        write_index_input = advance_delay_buffer_index(
+            write_index_input, sample_count
+        );
 
         return;
     }
