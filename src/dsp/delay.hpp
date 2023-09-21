@@ -113,6 +113,11 @@ class Delay : public Filter<InputSignalProducerClass>
         ) noexcept;
 
     private:
+        enum DelayBufferWritingMode {
+            CLEAR = 0,
+            ADD = 1,
+        };
+
         void initialize_instance() noexcept;
 
         void reallocate_delay_buffer_if_needed() noexcept;
@@ -121,6 +126,13 @@ class Delay : public Filter<InputSignalProducerClass>
 
         void clear_delay_buffer(Integer const sample_count) noexcept;
         void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
+
+        template<DelayBufferWritingMode mode>
+        Integer write_delay_buffer(
+            Sample const* const* buffer,
+            Integer const delay_buffer_index,
+            Integer const sample_count
+        ) noexcept;
 
         void mix_input_into_delay_buffer(
             Integer const round,

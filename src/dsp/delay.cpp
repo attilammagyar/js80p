@@ -317,24 +317,9 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::clear_delay_buffer(
         Integer const sample_count
 ) noexcept {
-    Integer const channels = this->channels;
-    Integer delay_buffer_index = clear_index;
-
-    for (Integer c = 0; c != channels; ++c) {
-        delay_buffer_index = clear_index;
-
-        for (Integer i = 0; i != sample_count; ++i) {
-            delay_buffer[c][delay_buffer_index] = 0.0;
-
-            ++delay_buffer_index;
-
-            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
-                delay_buffer_index = 0;
-            }
-        }
-    }
-
-    clear_index = delay_buffer_index;
+    clear_index = write_delay_buffer<DelayBufferWritingMode::CLEAR>(
+        NULL, clear_index, sample_count
+    );
 }
 
 
@@ -371,25 +356,49 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         return;
     }
 
+    write_index_feedback = write_delay_buffer<DelayBufferWritingMode::ADD>(
+        feedback_signal_producer_buffer,
+        write_index_feedback,
+        feedback_sample_count
+    );
+}
+
+
+template<class InputSignalProducerClass>
+template<typename Delay<InputSignalProducerClass>::DelayBufferWritingMode mode>
+Integer Delay<InputSignalProducerClass>::write_delay_buffer(
+        Sample const* const* buffer,
+        Integer const delay_buffer_index,
+        Integer const sample_count
+) noexcept {
     Integer const channels = this->channels;
-    Integer delay_buffer_index = write_index_feedback;
+    Integer index = delay_buffer_index;
 
     for (Integer c = 0; c != channels; ++c) {
-        Sample const* feedback_samples = feedback_signal_producer_buffer[c];
-        delay_buffer_index = write_index_feedback;
+        Sample const* samples;
 
-        for (Integer i = 0; i != feedback_sample_count; ++i) {
-            delay_buffer[c][delay_buffer_index] += feedback_samples[i];
+        if constexpr (mode == DelayBufferWritingMode::ADD) {
+            samples = buffer[c];
+        }
 
-            ++delay_buffer_index;
+        index = delay_buffer_index;
 
-            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
-                delay_buffer_index = 0;
+        for (Integer i = 0; i != sample_count; ++i) {
+            if constexpr (mode == DelayBufferWritingMode::ADD) {
+                delay_buffer[c][index] += samples[i];
+            } else {
+                delay_buffer[c][index] = 0.0;
+            }
+
+            ++index;
+
+            if (UNLIKELY(index == delay_buffer_size)) {
+                index = 0;
             }
         }
     }
 
-    write_index_feedback = delay_buffer_index;
+    return index;
 }
 
 
@@ -406,25 +415,9 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
         return;
     }
 
-    Integer const channels = this->channels;
-    Integer delay_buffer_index = write_index_input;
-
-    for (Integer c = 0; c != channels; ++c) {
-        Sample const* input = this->input_buffer[c];
-        delay_buffer_index = write_index_input;
-
-        for (Integer i = 0; i != sample_count; ++i) {
-            delay_buffer[c][delay_buffer_index] += input[i];
-
-            ++delay_buffer_index;
-
-            if (UNLIKELY(delay_buffer_index == delay_buffer_size)) {
-                delay_buffer_index = 0;
-            }
-        }
-    }
-
-    write_index_input = delay_buffer_index;
+    write_index_input = write_delay_buffer<DelayBufferWritingMode::ADD>(
+        this->input_buffer, write_index_input, sample_count
+    );
 }
 
 
