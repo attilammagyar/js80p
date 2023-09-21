@@ -260,6 +260,22 @@ class PannedDelay : public Filter<FilterInputClass>
 
         void initialize_instance() noexcept;
 
+        template<int channel_1, int channel_2>
+        void render_with_constant_panning(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+
+        template<int channel_1, int channel_2>
+        void render_with_changing_panning(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+
         bool const is_flipped;
 
         Sample** stereo_gain_buffer;

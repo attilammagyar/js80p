@@ -757,73 +757,86 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    Sample const* const* const input_buffer = this->input_buffer;
-
     if (panning_buffer == NULL) {
-        if (panning_value <= 0.0) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = (
-                    input_buffer[0][i] + input_buffer[1][i] * stereo_gain_value[0]
-                );
-            }
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[1][i] = input_buffer[1][i] * stereo_gain_value[1];
-            }
+        if (panning_value > 0.0) {
+            render_with_constant_panning<0, 1>(
+                round, first_sample_index, last_sample_index, buffer
+            );
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = input_buffer[0][i] * stereo_gain_value[0];
-            }
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[1][i] = (
-                    input_buffer[1][i] + input_buffer[0][i] * stereo_gain_value[1]
-                );
-            }
+            render_with_constant_panning<1, 0>(
+                round, first_sample_index, last_sample_index, buffer
+            );
         }
     } else if (is_flipped) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            if (panning_buffer[i] > 0.0) {
-                buffer[0][i] = (
-                    input_buffer[0][i]
-                    + input_buffer[1][i] * stereo_gain_buffer[0][i]
-                );
-            } else {
-                buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
-            }
-        }
-
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            if (panning_buffer[i] > 0.0) {
-                buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
-            } else {
-                buffer[1][i] = (
-                    input_buffer[1][i]
-                    + input_buffer[0][i] * stereo_gain_buffer[1][i]
-                );
-            }
-        }
+        render_with_changing_panning<1, 0>(
+            round, first_sample_index, last_sample_index, buffer
+        );
     } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            if (panning_buffer[i] <= 0.0) {
-                buffer[0][i] = (
-                    input_buffer[0][i]
-                    + input_buffer[1][i] * stereo_gain_buffer[0][i]
-                );
-            } else {
-                buffer[0][i] = input_buffer[0][i] * stereo_gain_buffer[0][i];
-            }
-        }
+        render_with_changing_panning<0, 1>(
+            round, first_sample_index, last_sample_index, buffer
+        );
+    }
+}
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            if (panning_buffer[i] <= 0.0) {
-                buffer[1][i] = input_buffer[1][i] * stereo_gain_buffer[1][i];
-            } else {
-                buffer[1][i] = (
-                    input_buffer[1][i]
-                    + input_buffer[0][i] * stereo_gain_buffer[1][i]
-                );
-            }
+
+template<class InputSignalProducerClass, class FilterInputClass>
+template<int channel_1, int channel_2>
+void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_constant_panning(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    Sample const* const* const input_buffer = this->input_buffer;
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        buffer[channel_1][i] = (
+            input_buffer[channel_1][i] * stereo_gain_value[channel_1]
+        );
+    }
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        buffer[channel_2][i] = (
+            input_buffer[channel_2][i]
+            + input_buffer[channel_1][i] * stereo_gain_value[channel_2]
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+template<int channel_1, int channel_2>
+void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_changing_panning(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer
+) noexcept {
+    Sample const* const* const input_buffer = this->input_buffer;
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        if (panning_buffer[i] > 0.0) {
+            buffer[channel_1][i] = (
+                input_buffer[channel_1][i] * stereo_gain_buffer[channel_1][i]
+            );
+        } else {
+            buffer[channel_1][i] = (
+                input_buffer[channel_1][i]
+                + input_buffer[channel_2][i] * stereo_gain_buffer[channel_1][i]
+            );
+        }
+    }
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        if (panning_buffer[i] > 0.0) {
+            buffer[channel_2][i] = (
+                input_buffer[channel_2][i]
+                + input_buffer[channel_1][i] * stereo_gain_buffer[channel_2][i]
+            );
+        } else {
+            buffer[channel_2][i] = (
+                input_buffer[channel_2][i] * stereo_gain_buffer[channel_2][i]
+            );
         }
     }
 }
