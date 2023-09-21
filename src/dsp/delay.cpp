@@ -123,7 +123,7 @@ Delay<InputSignalProducerClass>::Delay(
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
     gain(gain_leader),
-    time("", Constants::DELAY_TIME_MIN, Constants::DELAY_TIME_MAX, time),
+    time("", Constants::DELAY_TIME_MIN, time, time),
     delay_buffer_oversize(
         tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
     ),
@@ -137,7 +137,7 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexcept
 {
     Integer const new_delay_buffer_size = this->block_size * 2 + std::max(
-        (Integer)(this->sample_rate * Constants::DELAY_TIME_MAX) + 1,
+        (Integer)(this->sample_rate * time.get_max_value()) + 1,
         this->block_size
     ) * delay_buffer_oversize;
 
