@@ -415,6 +415,45 @@ void Delay<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
+    if (need_gain) {
+        if (gain_buffer == NULL) {
+            render<true, true>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                this->gain.get_value()
+            );
+        } else {
+            render<true, false>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                1.0
+            );
+        }
+    } else {
+        render<false, true>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer,
+            1.0
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<bool need_gain, bool is_gain_constant>
+void Delay<InputSignalProducerClass>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** buffer,
+        Sample const gain
+) noexcept {
     Integer const channels = this->channels;
     Number const read_index_float = (Number)this->read_index;
 
@@ -426,9 +465,21 @@ void Delay<InputSignalProducerClass>::render(
             Number read_index = read_index_float - time_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = Math::lookup_periodic(
-                    delay_channel, delay_buffer_size, read_index
-                );
+                if constexpr (need_gain) {
+                    if constexpr (is_gain_constant) {
+                        buffer[c][i] = gain * Math::lookup_periodic(
+                            delay_channel, delay_buffer_size, read_index
+                        );
+                    } else {
+                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic(
+                            delay_channel, delay_buffer_size, read_index
+                        );
+                    }
+                } else {
+                    buffer[c][i] = Math::lookup_periodic(
+                        delay_channel, delay_buffer_size, read_index
+                    );
+                }
 
                 read_index += 1.0;
             }
@@ -439,44 +490,29 @@ void Delay<InputSignalProducerClass>::render(
             Number read_index = read_index_float;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = Math::lookup_periodic(
-                    delay_channel,
-                    delay_buffer_size,
-                    read_index - time_buffer[i] * time_scale
-                );
+                if constexpr (need_gain) {
+                    if constexpr (is_gain_constant) {
+                        buffer[c][i] = gain * Math::lookup_periodic(
+                            delay_channel,
+                            delay_buffer_size,
+                            read_index - time_buffer[i] * time_scale
+                        );
+                    } else {
+                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic(
+                            delay_channel,
+                            delay_buffer_size,
+                            read_index - time_buffer[i] * time_scale
+                        );
+                    }
+                } else {
+                    buffer[c][i] = Math::lookup_periodic(
+                        delay_channel,
+                        delay_buffer_size,
+                        read_index - time_buffer[i] * time_scale
+                    );
+                }
 
                 read_index += 1.0;
-            }
-        }
-    }
-
-    if (need_gain) {
-        apply_gain(round, first_sample_index, last_sample_index, buffer);
-    }
-}
-
-
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::apply_gain(
-        Integer const round,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
-) noexcept {
-    Integer const channels = this->channels;
-
-    if (gain_buffer == NULL) {
-        Sample const gain = this->gain.get_value();
-
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] *= gain;
-            }
-        }
-    } else {
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] *= gain_buffer[i];
             }
         }
     }

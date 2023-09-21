@@ -128,11 +128,13 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const increment
         ) const noexcept;
 
-        void apply_gain(
+        template<bool need_gain, bool is_gain_constant>
+        void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** buffer,
+            Sample const gain
         ) noexcept;
 
         Integer const delay_buffer_oversize;
