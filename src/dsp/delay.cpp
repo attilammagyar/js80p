@@ -201,7 +201,13 @@ void Delay<InputSignalProducerClass>::reset() noexcept
     }
 
     write_index_input = 0;
+    silent_input_samples = delay_buffer_size;
+
     write_index_feedback = 0;
+    silent_feedback_samples = delay_buffer_size;
+
+    need_to_render_silence = false;
+
     clear_index = this->block_size;
     is_starting = true;
     previous_round = -1;
@@ -266,14 +272,14 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
     read_index = write_index_input;
 
-    if (LIKELY(shared_buffer_owner == NULL)) {
-        clear_delay_buffer(sample_count);
-        mix_feedback_into_delay_buffer(sample_count);
-        mix_input_into_delay_buffer(round, sample_count);
+    if (UNLIKELY(shared_buffer_owner != NULL)) {
+        clear_delay_buffer<true>(sample_count);
+        mix_feedback_into_delay_buffer<true>(sample_count);
+        mix_input_into_delay_buffer<true>(round, sample_count);
     } else {
-        write_index_input = advance_delay_buffer_index(
-            write_index_input, sample_count
-        );
+        clear_delay_buffer<false>(sample_count);
+        mix_feedback_into_delay_buffer<false>(sample_count);
+        mix_input_into_delay_buffer<false>(round, sample_count);
     }
 
     if (is_gain_constant_1) {
@@ -293,6 +299,19 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     );
 
     previous_round = round;
+
+    if (is_delay_buffer_silent()) {
+        if (UNLIKELY(need_to_render_silence)) {
+            need_to_render_silence = false;
+            this->render_silence(round, 0, sample_count, this->buffer);
+        }
+
+        this->mark_round_as_silent(round);
+
+        return this->buffer;
+    }
+
+    need_to_render_silence = true;
 
     return NULL;
 }
@@ -314,16 +333,20 @@ Integer Delay<InputSignalProducerClass>::advance_delay_buffer_index(
 
 
 template<class InputSignalProducerClass>
+template<bool is_delay_buffer_shared>
 void Delay<InputSignalProducerClass>::clear_delay_buffer(
         Integer const sample_count
 ) noexcept {
-    clear_index = write_delay_buffer<DelayBufferWritingMode::CLEAR>(
-        NULL, clear_index, sample_count
-    );
+    if constexpr (!is_delay_buffer_shared) {
+        clear_index = write_delay_buffer<DelayBufferWritingMode::CLEAR>(
+            NULL, clear_index, sample_count
+        );
+    }
 }
 
 
 template<class InputSignalProducerClass>
+template<bool is_delay_buffer_shared>
 void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
@@ -336,6 +359,10 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         write_index_feedback = advance_delay_buffer_index(
             write_index_feedback, sample_count
         );
+
+        if (silent_feedback_samples < delay_buffer_size) {
+            silent_feedback_samples += sample_count;
+        }
 
         return;
     }
@@ -353,14 +380,22 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
             write_index_feedback, feedback_sample_count
         );
 
+        if (silent_feedback_samples < delay_buffer_size) {
+            silent_feedback_samples += feedback_sample_count;
+        }
+
         return;
     }
 
-    write_index_feedback = write_delay_buffer<DelayBufferWritingMode::ADD>(
-        feedback_signal_producer_buffer,
-        write_index_feedback,
-        feedback_sample_count
-    );
+    silent_feedback_samples = 0;
+
+    if constexpr (!is_delay_buffer_shared) {
+        write_index_feedback = write_delay_buffer<DelayBufferWritingMode::ADD>(
+            feedback_signal_producer_buffer,
+            write_index_feedback,
+            feedback_sample_count
+        );
+    }
 }
 
 
@@ -403,6 +438,7 @@ Integer Delay<InputSignalProducerClass>::write_delay_buffer(
 
 
 template<class InputSignalProducerClass>
+template<bool is_delay_buffer_shared>
 void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
         Integer const round,
         Integer const sample_count
@@ -412,11 +448,33 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
             write_index_input, sample_count
         );
 
+        if (silent_input_samples < delay_buffer_size) {
+            silent_input_samples += sample_count;
+        }
+
         return;
     }
 
-    write_index_input = write_delay_buffer<DelayBufferWritingMode::ADD>(
-        this->input_buffer, write_index_input, sample_count
+    silent_input_samples = 0;
+
+    if constexpr (is_delay_buffer_shared) {
+        write_index_input = advance_delay_buffer_index(
+            write_index_input, sample_count
+        );
+    } else {
+        write_index_input = write_delay_buffer<DelayBufferWritingMode::ADD>(
+            this->input_buffer, write_index_input, sample_count
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass>
+bool Delay<InputSignalProducerClass>::is_delay_buffer_silent() const noexcept
+{
+    return (
+        silent_input_samples >= delay_buffer_size
+        && silent_feedback_samples >= delay_buffer_size
     );
 }
 

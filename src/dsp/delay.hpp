@@ -124,7 +124,10 @@ class Delay : public Filter<InputSignalProducerClass>
         void free_delay_buffer() noexcept;
         void allocate_delay_buffer() noexcept;
 
+        template<bool is_delay_buffer_shared>
         void clear_delay_buffer(Integer const sample_count) noexcept;
+
+        template<bool is_delay_buffer_shared>
         void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
 
         template<DelayBufferWritingMode mode>
@@ -134,6 +137,7 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const sample_count
         ) noexcept;
 
+        template<bool is_delay_buffer_shared>
         void mix_input_into_delay_buffer(
             Integer const round,
             Integer const sample_count
@@ -143,6 +147,8 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const position,
             Integer const increment
         ) const noexcept;
+
+        bool is_delay_buffer_silent() const noexcept;
 
         template<bool need_gain, bool is_gain_constant>
         void render(
@@ -165,7 +171,9 @@ class Delay : public Filter<InputSignalProducerClass>
         Sample time_scale;
         Number feedback_value;
         Integer write_index_input;
+        Integer silent_input_samples;
         Integer write_index_feedback;
+        Integer silent_feedback_samples;
         Integer read_index;
         Integer clear_index;
         Integer delay_buffer_size;
@@ -173,6 +181,7 @@ class Delay : public Filter<InputSignalProducerClass>
         Number delay_buffer_size_inv;
         bool is_starting;
         bool need_gain;
+        bool need_to_render_silence;
 };
 
 
