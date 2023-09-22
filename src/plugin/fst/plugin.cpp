@@ -918,6 +918,13 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
     process_internal_messages_in_gui_thread();
 
     if (is_preset) {
+        Bank::Program program;
+
+        program.import(current_patch);
+        program.set_name(program_names[current_program_index].get_name());
+
+        current_patch = program.serialize();
+
         *chunk = (void*)current_patch.c_str();
 
         return (VstIntPtr)current_patch.length();
@@ -936,15 +943,20 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
     std::string buffer((char const*)chunk, (std::string::size_type)size);
 
     if (is_preset) {
-        Bank::Program program;
-
         current_patch = buffer;
 
+        Bank::Program program;
         program.import(current_patch);
-        program_names[current_program_index].set_name(program.get_name());
+
+        std::string const& name(program.get_name());
+
+        program_names[current_program_index].set_name(name);
 
         to_audio_string_messages.push(
             Message(MessageType::IMPORT_PATCH, 0, current_patch)
+        );
+        to_audio_string_messages.push(
+            Message(MessageType::RENAME_PROGRAM, 0, name)
         );
     } else {
         serialized_bank = buffer;
