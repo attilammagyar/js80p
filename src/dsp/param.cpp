@@ -197,15 +197,29 @@ template<typename NumberType, ParamEvaluation evaluation>
 void Param<NumberType, evaluation>::set_midi_controller(
         MidiController const* midi_controller
 ) noexcept {
+    set_midi_controller< Param<NumberType, evaluation> >(*this, midi_controller);
+}
+
+
+template<typename NumberType, ParamEvaluation evaluation>
+template<class ParamClass>
+void Param<NumberType, evaluation>::set_midi_controller(
+        ParamClass& param,
+        MidiController const* midi_controller
+) noexcept {
     if (midi_controller == NULL) {
-        if (this->midi_controller != NULL) {
-            set_value(ratio_to_value(this->midi_controller->get_value()));
+        MidiController const* old_midi_controller = param.get_midi_controller();
+
+        if (old_midi_controller != NULL) {
+            param.set_value(
+                param.ratio_to_value(old_midi_controller->get_value())
+            );
         }
     } else {
-        set_value(ratio_to_value(midi_controller->get_value()));
+        param.set_value(param.ratio_to_value(midi_controller->get_value()));
     }
 
-    this->midi_controller = midi_controller;
+    param.midi_controller = midi_controller;
 }
 
 
@@ -219,24 +233,36 @@ MidiController const* Param<NumberType, evaluation>::get_midi_controller() const
 template<typename NumberType, ParamEvaluation evaluation>
 void Param<NumberType, evaluation>::set_macro(Macro* macro) noexcept
 {
-    if (macro == NULL) {
-        if (this->macro != NULL) {
-            this->macro->update();
-
-            set_value(ratio_to_value(this->macro->get_value()));
-        }
-    } else {
-        macro->update();
-        set_value(ratio_to_value(macro->get_value()));
-        macro_change_index = macro->get_change_index();
-    }
-
-    this->macro = macro;
+    set_macro< Param<NumberType, evaluation> >(*this, macro);
 }
 
 
 template<typename NumberType, ParamEvaluation evaluation>
-Macro const* Param<NumberType, evaluation>::get_macro() const noexcept
+template<class ParamClass>
+void Param<NumberType, evaluation>::set_macro(
+        ParamClass& param,
+        Macro* macro
+) noexcept {
+    if (macro == NULL) {
+        Macro* old_macro = param.get_macro();
+
+        if (old_macro != NULL) {
+            old_macro->update();
+
+            param.set_value(param.ratio_to_value(old_macro->get_value()));
+        }
+    } else {
+        macro->update();
+        param.set_value(param.ratio_to_value(macro->get_value()));
+        param.macro_change_index = macro->get_change_index();
+    }
+
+    param.macro = macro;
+}
+
+
+template<typename NumberType, ParamEvaluation evaluation>
+Macro* Param<NumberType, evaluation>::get_macro() const noexcept
 {
     return macro;
 }
@@ -864,15 +890,14 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_midi_controller(
         MidiController const* midi_controller
 ) noexcept {
-    if (midi_controller == NULL) {
-        if (this->midi_controller != NULL) {
-            set_value(ratio_to_value(this->midi_controller->get_value()));
-        }
-    } else {
-        set_value(ratio_to_value(midi_controller->get_value()));
-    }
+    Param<Number, evaluation>::template set_midi_controller< FloatParam<evaluation> >(*this, midi_controller);
+}
 
-    this->midi_controller = midi_controller;
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
+{
+    Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(*this, macro);
 }
 
 

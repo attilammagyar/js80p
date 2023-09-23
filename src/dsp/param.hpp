@@ -83,7 +83,7 @@ class Param : public SignalProducer
         MidiController const* get_midi_controller() const noexcept;
 
         void set_macro(Macro* macro) noexcept;
-        Macro const* get_macro() const noexcept;
+        Macro* get_macro() const noexcept;
 
         /**
          * \brief Whenever the value of the parameter changes, the change index
@@ -94,6 +94,15 @@ class Param : public SignalProducer
         Integer get_change_index() const noexcept;
 
     protected:
+        template<class ParamClass>
+        static void set_midi_controller(
+            ParamClass& param,
+            MidiController const* midi_controller
+        ) noexcept;
+
+        template<class ParamClass>
+        static void set_macro(ParamClass& param, Macro* macro) noexcept;
+
         NumberType get_raw_value() const noexcept;
 
         void render(
@@ -266,6 +275,7 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         void set_midi_controller(MidiController const* midi_controller) noexcept;
+        void set_macro(Macro* macro) noexcept;
 
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;

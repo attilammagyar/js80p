@@ -2398,3 +2398,56 @@ TEST(when_float_param_is_evaluated_once_per_rendering_block_then_still_applies_s
     assert_eq(NULL, FloatParamB::produce_if_not_constant(float_param, 1, 256));
     assert_eq(5.0, float_param.get_value());
 })
+
+
+TEST(float_param_is_constant_after_assigning_midi_controller, {
+    constexpr Integer sample_count = 10;
+    constexpr Sample expected_samples[] = {
+        1.23, 1.23, 1.23, 1.23, 1.23,
+        1.23, 1.23, 1.23, 1.23, 1.23,
+    };
+    MidiController midi_controller;
+    FloatParamS float_param("F", 0.0, 10.0, 1.0);
+    Sample const* const* samples;
+
+    float_param.set_block_size(256);
+    float_param.set_sample_rate(200.0);
+
+    float_param.schedule_linear_ramp(1.0, 5.0);
+    FloatParamS::produce(float_param, 1, 1);
+    midi_controller.change(0.0, 0.123);
+    midi_controller.clear();
+
+    float_param.set_midi_controller(&midi_controller);
+    assert_true(float_param.is_constant_in_next_round(2, sample_count));
+
+    samples = FloatParamS::produce(float_param, 2, sample_count);
+
+    assert_eq(expected_samples, samples[0], sample_count);
+})
+
+
+TEST(float_param_is_constant_after_assigning_macro, {
+    constexpr Integer sample_count = 10;
+    constexpr Sample expected_samples[] = {
+        1.23, 1.23, 1.23, 1.23, 1.23,
+        1.23, 1.23, 1.23, 1.23, 1.23,
+    };
+    Macro macro;
+    FloatParamS float_param("F", 0.0, 10.0, 1.0);
+    Sample const* const* samples;
+
+    float_param.set_block_size(256);
+    float_param.set_sample_rate(200.0);
+
+    float_param.schedule_linear_ramp(1.0, 5.0);
+    FloatParamS::produce(float_param, 1, 1);
+    macro.input.set_value(0.123);
+
+    float_param.set_macro(&macro);
+    assert_true(float_param.is_constant_in_next_round(2, sample_count));
+
+    samples = FloatParamS::produce(float_param, 2, sample_count);
+
+    assert_eq(expected_samples, samples[0], sample_count, "macro");
+})
