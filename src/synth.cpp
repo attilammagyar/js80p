@@ -2483,6 +2483,7 @@ bool Synth::assign_controller_to_discrete_param(
         ControllerId const controller_id
 ) noexcept {
     MidiController* midi_controller = NULL;
+    Macro* macro = NULL;
     bool is_assigned = false;
     bool is_special = false;
 
@@ -2493,25 +2494,27 @@ bool Synth::assign_controller_to_discrete_param(
         case NOTE: midi_controller = &note; break;
         case VELOCITY: midi_controller = &velocity; break;
 
-        case MACRO_1:
-        case MACRO_2:
-        case MACRO_3:
-        case MACRO_4:
-        case MACRO_5:
-        case MACRO_6:
-        case MACRO_7:
-        case MACRO_8:
-        case MACRO_9:
-        case MACRO_10:
-        case MACRO_11:
-        case MACRO_12:
-        case MACRO_13:
-        case MACRO_14:
-        case MACRO_15:
-        case MACRO_16:
-        case MACRO_17:
-        case MACRO_18:
-        case MACRO_19:
+        case MACRO_1: macro = macros[0]; break;
+        case MACRO_2: macro = macros[1]; break;
+        case MACRO_3: macro = macros[2]; break;
+        case MACRO_4: macro = macros[3]; break;
+        case MACRO_5: macro = macros[4]; break;
+        case MACRO_6: macro = macros[5]; break;
+        case MACRO_7: macro = macros[6]; break;
+        case MACRO_8: macro = macros[7]; break;
+        case MACRO_9: macro = macros[8]; break;
+        case MACRO_10: macro = macros[9]; break;
+        case MACRO_11: macro = macros[10]; break;
+        case MACRO_12: macro = macros[11]; break;
+        case MACRO_13: macro = macros[12]; break;
+        case MACRO_14: macro = macros[13]; break;
+        case MACRO_15: macro = macros[14]; break;
+        case MACRO_16: macro = macros[15]; break;
+        case MACRO_17: macro = macros[16]; break;
+        case MACRO_18: macro = macros[17]; break;
+        case MACRO_19: macro = macros[18]; break;
+        case MACRO_20: macro = macros[19]; break;
+
         case LFO_1:
         case LFO_2:
         case LFO_3:
@@ -2542,27 +2545,113 @@ bool Synth::assign_controller_to_discrete_param(
     }
 
     switch (param_id) {
-        case ParamId::MODE: mode.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::MWAV: modulator_params.waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::CWAV: carrier_params.waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::MF1TYP: modulator_params.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::MF2TYP: modulator_params.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::CF1TYP: carrier_params.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::CF2TYP: carrier_params.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::EF1TYP: effects.filter_1_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::EF2TYP: effects.filter_2_type.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L1WAV: lfos_rw[0]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L2WAV: lfos_rw[1]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L3WAV: lfos_rw[2]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L4WAV: lfos_rw[3]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L5WAV: lfos_rw[4]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L6WAV: lfos_rw[5]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L7WAV: lfos_rw[6]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        case ParamId::L8WAV: lfos_rw[7]->waveform.set_midi_controller(midi_controller); is_assigned = true; break;
-        default: break;
+        case ParamId::MODE:
+            mode.set_midi_controller(midi_controller);
+            mode.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::MWAV:
+            modulator_params.waveform.set_midi_controller(midi_controller);
+            modulator_params.waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::CWAV:
+            carrier_params.waveform.set_midi_controller(midi_controller);
+            carrier_params.waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::MF1TYP:
+            modulator_params.filter_1_type.set_midi_controller(midi_controller);
+            modulator_params.filter_1_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::MF2TYP:
+            modulator_params.filter_2_type.set_midi_controller(midi_controller);
+            modulator_params.filter_2_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::CF1TYP:
+            carrier_params.filter_1_type.set_midi_controller(midi_controller);
+            carrier_params.filter_1_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::CF2TYP:
+            carrier_params.filter_2_type.set_midi_controller(midi_controller);
+            carrier_params.filter_2_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::EF1TYP:
+            effects.filter_1_type.set_midi_controller(midi_controller);
+            effects.filter_1_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::EF2TYP:
+            effects.filter_2_type.set_midi_controller(midi_controller);
+            effects.filter_2_type.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L1WAV:
+            lfos_rw[0]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[0]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L2WAV:
+            lfos_rw[1]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[1]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L3WAV:
+            lfos_rw[2]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[2]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L4WAV:
+            lfos_rw[3]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[3]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L5WAV:
+            lfos_rw[4]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[4]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L6WAV:
+            lfos_rw[5]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[5]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L7WAV:
+            lfos_rw[6]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[6]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        case ParamId::L8WAV:
+            lfos_rw[7]->waveform.set_midi_controller(midi_controller);
+            lfos_rw[7]->waveform.set_macro(macro);
+            is_assigned = true;
+            break;
+
+        default:
+            break;
     }
 
-    return is_assigned && (is_special || midi_controller != NULL);
+    return is_assigned && (is_special || midi_controller != NULL || macro != NULL);
 }
 
 

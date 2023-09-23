@@ -203,7 +203,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
 
     assert_eq((void*)&midi_controller, (void*)param.get_midi_controller());
     assert_eq(2, param.get_value());
-    assert_eq(0.6, param.get_ratio());
+    assert_eq(0.6, param.get_ratio(), DOUBLE_DELTA);
 
     rendered_samples = SignalProducer::produce< Param<int> >(param, 1, block_size);
 
@@ -214,11 +214,51 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
     change_index_2 = param.get_change_index();
 
     assert_eq(-5, param.get_value());
-    assert_eq(0.2514, param.get_ratio());
+    assert_eq(0.2514, param.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
     midi_controller.change(0.0, 0.35);
+    param.set_midi_controller(NULL);
+    assert_eq(-3, param.get_value());
+})
+
+
+TEST(when_a_macro_is_assigned_to_a_param_then_the_params_value_follows_the_changes_of_the_macro, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[] = {
+        2, 2, 2, 2, 2,
+    };
+    Param<int> param("int", -10, 10, 0);
+    Macro macro;
+    Sample const* const* rendered_samples;
+    Integer change_index_1;
+    Integer change_index_2;
+
+    macro.input.set_value(0.6);
+
+    param.set_block_size(block_size);
+    param.set_sample_rate(1.0);
+    param.set_macro(&macro);
+
+    assert_eq((void*)&macro, (void*)param.get_macro());
+    assert_eq(2, param.get_value());
+    assert_eq(0.6, param.get_ratio(), DOUBLE_DELTA);
+
+    rendered_samples = SignalProducer::produce< Param<int> >(param, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+
+    change_index_1 = param.get_change_index();
+    macro.input.set_value(0.2514);
+    change_index_2 = param.get_change_index();
+
+    assert_eq(-5, param.get_value());
+    assert_eq(0.2514, param.get_ratio(), DOUBLE_DELTA);
+
+    assert_neq((int)change_index_1, (int)change_index_2);
+
+    macro.input.set_value(0.35);
     param.set_midi_controller(NULL);
     assert_eq(-3, param.get_value());
 })

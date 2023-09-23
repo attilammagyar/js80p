@@ -36,6 +36,8 @@ Param<NumberType, evaluation>::Param(
 ) noexcept
     : SignalProducer(evaluation == ParamEvaluation::SAMPLE ? 1 : 0),
     midi_controller(NULL),
+    macro(NULL),
+    macro_change_index(-1),
     name(name),
     min_value(min_value),
     max_value(max_value),
@@ -74,6 +76,10 @@ NumberType Param<NumberType, evaluation>::get_value() const noexcept
 {
     if (midi_controller != NULL) {
         return ratio_to_value(midi_controller->get_value());
+    } else if (this->macro != NULL) {
+        this->macro->update();
+
+        return ratio_to_value(this->macro->get_value());
     }
 
     return value;
@@ -129,6 +135,10 @@ Number Param<NumberType, evaluation>::get_ratio() const noexcept
 {
     if (midi_controller != NULL) {
         return midi_controller->get_value();
+    } else if (this->macro != NULL) {
+        this->macro->update();
+
+        return this->macro->get_value();
     }
 
     return std::min(1.0, std::max(0.0, value_to_ratio(value)));
@@ -154,6 +164,10 @@ Integer Param<NumberType, evaluation>::get_change_index() const noexcept
 {
     if (midi_controller != NULL) {
         return midi_controller->get_change_index();
+    } else if (this->macro != NULL) {
+        this->macro->update();
+
+        return this->macro->get_change_index();
     }
 
     return change_index;
@@ -199,6 +213,32 @@ template<typename NumberType, ParamEvaluation evaluation>
 MidiController const* Param<NumberType, evaluation>::get_midi_controller() const noexcept
 {
     return midi_controller;
+}
+
+
+template<typename NumberType, ParamEvaluation evaluation>
+void Param<NumberType, evaluation>::set_macro(Macro* macro) noexcept
+{
+    if (macro == NULL) {
+        if (this->macro != NULL) {
+            this->macro->update();
+
+            set_value(ratio_to_value(this->macro->get_value()));
+        }
+    } else {
+        macro->update();
+        set_value(ratio_to_value(macro->get_value()));
+        macro_change_index = macro->get_change_index();
+    }
+
+    this->macro = macro;
+}
+
+
+template<typename NumberType, ParamEvaluation evaluation>
+Macro const* Param<NumberType, evaluation>::get_macro() const noexcept
+{
+    return macro;
 }
 
 
@@ -305,8 +345,6 @@ FloatParam<evaluation>::FloatParam(
             : 1.0
     ),
     leader(NULL),
-    macro(NULL),
-    macro_change_index(-1),
     lfo(NULL),
     envelope(NULL),
     envelope_change_index(-1),
@@ -347,7 +385,6 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
             : 1.0
     ),
     leader(&leader),
-    macro(NULL),
     lfo(NULL),
     envelope(NULL),
     envelope_change_index(-1),
@@ -376,10 +413,10 @@ Number FloatParam<evaluation>::get_value() const noexcept
         return leader->get_value();
     } else if (this->midi_controller != NULL) {
         return round_value(ratio_to_value(this->midi_controller->get_value()));
-    } else if (macro != NULL) {
-        macro->update();
+    } else if (this->macro != NULL) {
+        this->macro->update();
 
-        return round_value(ratio_to_value(macro->get_value()));
+        return round_value(ratio_to_value(this->macro->get_value()));
     } else {
         return this->get_raw_value();
     }
@@ -435,10 +472,10 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_ratio();
-    } else if (macro != NULL) {
-        macro->update();
+    } else if (this->macro != NULL) {
+        this->macro->update();
 
-        return macro->get_value();
+        return this->macro->get_value();
     } else if (this->midi_controller != NULL) {
         return this->midi_controller->get_value();
     }
@@ -527,10 +564,10 @@ Integer FloatParam<evaluation>::get_change_index() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_change_index();
-    } else if (macro != NULL) {
-        macro->update();
+    } else if (this->macro != NULL) {
+        this->macro->update();
 
-        return macro->get_change_index();
+        return this->macro->get_change_index();
     } else {
         return Param<Number, evaluation>::get_change_index();
     }
@@ -589,10 +626,10 @@ bool FloatParam<evaluation>::is_constant_until(
         );
     }
 
-    if (macro != NULL) {
-        macro->update();
+    if (this->macro != NULL) {
+        this->macro->update();
 
-        return macro->get_change_index() == macro_change_index;
+        return this->macro->get_change_index() == this->macro_change_index;
     }
 
     return true;
@@ -840,32 +877,6 @@ void FloatParam<evaluation>::set_midi_controller(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
-{
-    if (macro == NULL) {
-        if (this->macro != NULL) {
-            this->macro->update();
-
-            set_value(ratio_to_value(this->macro->get_value()));
-        }
-    } else {
-        macro->update();
-        set_value(ratio_to_value(macro->get_value()));
-        macro_change_index = macro->get_change_index();
-    }
-
-    this->macro = macro;
-}
-
-
-template<ParamEvaluation evaluation>
-Macro const* FloatParam<evaluation>::get_macro() const noexcept
-{
-    return macro;
-}
-
-
-template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
 {
     this->envelope = envelope;
@@ -1054,7 +1065,7 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
         } else {
             return process_midi_controller_events<false>();
         }
-    } else if (macro != NULL) {
+    } else if (this->macro != NULL) {
         return process_macro(sample_count);
     } else {
         Envelope* envelope = get_envelope();
@@ -1164,29 +1175,29 @@ template<ParamEvaluation evaluation>
 Sample const* const* FloatParam<evaluation>::process_macro(
         Integer const sample_count
 ) noexcept {
-    macro->update();
+    this->macro->update();
 
-    Integer const new_change_index = macro->get_change_index();
+    Integer const new_change_index = this->macro->get_change_index();
 
-    if (new_change_index == macro_change_index) {
+    if (new_change_index == this->macro_change_index) {
         return NULL;
     }
 
-    macro_change_index = new_change_index;
+    this->macro_change_index = new_change_index;
 
     this->cancel_events_at(0.0);
 
-    Number const controller_value = macro->get_value();
+    Number const macro_value = this->macro->get_value();
 
     if (should_round) {
-        set_value(ratio_to_value(controller_value));
+        set_value(ratio_to_value(macro_value));
     } else {
         Seconds const duration = smooth_change_duration(
             value_to_ratio(this->get_raw_value()),
-            controller_value,
+            macro_value,
             (Seconds)std::max((Integer)0, sample_count - 1) * this->sampling_period
         );
-        schedule_linear_ramp(duration, ratio_to_value(controller_value));
+        schedule_linear_ramp(duration, ratio_to_value(macro_value));
     }
 
     return NULL;

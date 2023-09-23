@@ -82,6 +82,9 @@ class Param : public SignalProducer
         void set_midi_controller(MidiController const* midi_controller) noexcept;
         MidiController const* get_midi_controller() const noexcept;
 
+        void set_macro(Macro* macro) noexcept;
+        Macro const* get_macro() const noexcept;
+
         /**
          * \brief Whenever the value of the parameter changes, the change index
          *        gets incremented. You may cache the result of a slow
@@ -104,6 +107,10 @@ class Param : public SignalProducer
         void store_new_value(NumberType const new_value) noexcept;
 
         MidiController const* midi_controller;
+
+        Macro* macro;
+        Integer macro_change_index;
+
         std::string const name;
         NumberType const min_value;
         NumberType const max_value;
@@ -260,9 +267,6 @@ class FloatParam : public Param<Number, evaluation>
 
         void set_midi_controller(MidiController const* midi_controller) noexcept;
 
-        void set_macro(Macro* macro) noexcept;
-        Macro const* get_macro() const noexcept;
-
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;
         void start_envelope(Seconds const time_offset) noexcept;
@@ -397,9 +401,6 @@ class FloatParam : public Param<Number, evaluation>
         Number const log_range_inv;
 
         FloatParam<evaluation>* const leader;
-
-        Macro* macro;
-        Integer macro_change_index;
 
         LFO* lfo;
         Sample const* const* lfo_buffer;
