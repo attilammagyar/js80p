@@ -1,3 +1,11 @@
+v2.0.3 (2023-09-24)
+ * It is now possible to assign Macros to discrete parameters like Filter Types
+   and Waveforms.
+ * Memory and CPU consumption of delay based effects have been reduced, so they
+   will no longer use the CPU when the synth is idle and all sounds have
+   decayed.
+ * Bugfix: fixed a bug with program name saving and loading in the FST plugin.
+
 v2.0.2 (2023-09-16)
  * Documented how Envelopes work in the synth with regards to polyphony.
  * Reduced patch size and improved patch import and export performance by
