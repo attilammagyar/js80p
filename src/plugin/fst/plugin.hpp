@@ -344,6 +344,7 @@ class FstPlugin : public Midi::EventHandler
         bool had_midi_cc_event;
         bool received_midi_cc_cleared;
         bool need_bank_update;
+        bool need_host_update;
 };
 
 }

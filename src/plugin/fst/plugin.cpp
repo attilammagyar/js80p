@@ -398,7 +398,8 @@ FstPlugin::FstPlugin(
     remaining_samples_before_next_bank_update(0),
     prev_logged_op_code(-1),
     had_midi_cc_event(false),
-    need_bank_update(false)
+    need_bank_update(false),
+    need_host_update(false)
 {
     clear_received_midi_cc();
 
@@ -660,7 +661,7 @@ void FstPlugin::handle_bank_changed(std::string const& serialized_bank) noexcept
 
 void FstPlugin::handle_params_changed() noexcept
 {
-    update_host_display();
+    need_host_update = true;
 }
 
 
@@ -682,6 +683,7 @@ void FstPlugin::need_idle() noexcept
 VstIntPtr FstPlugin::idle() noexcept
 {
     process_internal_messages_in_gui_thread();
+    update_host_display();
 
     return 1;
 }
@@ -895,7 +897,10 @@ void FstPlugin::update_bpm() noexcept
 
 void FstPlugin::update_host_display() noexcept
 {
-    host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
+    if (need_host_update) {
+        need_host_update = false;
+        host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
+    }
 }
 
 
@@ -1083,6 +1088,7 @@ void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
 void FstPlugin::gui_idle()
 {
     process_internal_messages_in_gui_thread();
+    update_host_display();
 
     /*
     Some hosts (e.g. Ardour 5.12.0) send an effEditIdle message before sending
