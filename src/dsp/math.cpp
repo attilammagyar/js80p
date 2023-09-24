@@ -231,6 +231,12 @@ Number Math::pow_10_inv(Number const x) noexcept
 }
 
 
+Number Math::db_to_magnitude(Number const db) noexcept
+{
+    return pow_10(db * DB_TO_LINEAR_GAIN_SCALE);
+}
+
+
 Number const* Math::log_biquad_filter_freq_table() noexcept
 {
     return math.log_biquad_filter_freq;

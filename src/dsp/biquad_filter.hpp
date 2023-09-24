@@ -127,7 +127,6 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
         static constexpr Number FREQUENCY_SINE_SCALE = std::sqrt(2.0);
         static constexpr Number GAIN_SCALE_HALF = (
             Constants::BIQUAD_FILTER_GAIN_SCALE / 2.0

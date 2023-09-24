@@ -110,6 +110,8 @@ class Math
         static Number pow_10(Number const x) noexcept;
         static Number pow_10_inv(Number const x) noexcept;
 
+        static Number db_to_magnitude(Number const db) noexcept;
+
         static Number const* log_biquad_filter_freq_table() noexcept;
 
         /**
@@ -229,6 +231,8 @@ class Math
         static constexpr Number POW_10_INV_SCALE = -1.0 * POW_10_SCALE;
 
         static constexpr Number DETUNE_CENTS_TO_POWER_OF_2_SCALE = 1.0 / 1200.0;
+
+        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
 
         static Math const math;
 

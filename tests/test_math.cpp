@@ -157,6 +157,16 @@ TEST(pow_10_inv, {
 })
 
 
+TEST(db_to_magnitude, {
+    assert_eq(2.0, Math::db_to_magnitude(6.0), 0.01);
+    assert_eq(1.0, Math::db_to_magnitude(0.0), DOUBLE_DELTA);
+    assert_eq(0.5, Math::db_to_magnitude(-6.0), 0.001);
+    assert_eq(0.25, Math::db_to_magnitude(-12.0), 0.001);
+    assert_eq(0.125, Math::db_to_magnitude(-18.0), 0.001);
+    assert_eq(0.0, Math::db_to_magnitude(-120.0), DOUBLE_DELTA);
+})
+
+
 TEST(detune, {
     assert_eq(110.0, Math::detune(440.0, -2400.0), DOUBLE_DELTA);
     assert_eq(220.0, Math::detune(440.0, -1200.0), DOUBLE_DELTA);
