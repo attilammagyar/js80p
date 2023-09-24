@@ -61,13 +61,18 @@ html, body {
 }
 
 #distortion-params,
-#overdrive-params {
+#overdrive-params,
+#volume-params {
   width: 90px;
   text-align: center;
 }
 
+#overdrive, #distortion, #filter-1, #filter-2, #volume {
+  margin-top: 1px;
+}
+
 #effects .main-block {
-  padding: 2px;
+  padding: 2px 2px 1px 2px;
 }
 
 #main {
@@ -360,17 +365,12 @@ svg.icon {
 
 .effect {
   text-align: center;
-  margin: 24px 28px;
+  margin: 1.5px 12px;
   padding: 2px 6px;
 }
 
 .effect h1 {
   text-align: left;
-}
-
-#echo, #reverb {
-  margin: 24px 12px;
-  padding: 2px 6px;
 }
 
 .border > span {
@@ -585,19 +585,25 @@ function make_tabs(active)
         <h1>Distortion</h1>
         <div id="distortion-params" class="block"></div>
       </div>
-      <div id="low-shelf" class="effect main-block block">
+      <div id="filter-1" class="effect main-block block">
         <h1>
           Filter 1
           <label class="freq"><input type="text" /> LOG FREQ</label>
         </h1>
-        <div id="low-shelf-params" class="block"></div>
+        <div id="filter-1-params" class="block"></div>
       </div>
-      <div id="high-shelf" class="effect main-block block">
+      <div id="filter-2" class="effect main-block block">
         <h1>
           Filter 2
           <label class="freq"><input type="text" /> LOG FREQ</label>
         </h1>
-        <div id="high-shelf-params" class="block"></div>
+        <div id="filter-2-params" class="block"></div>
+      </div>
+      <div id="volume" class="effect main-block block">
+        <h1>
+          Volume
+        </h1>
+        <div id="volume-params" class="block"></div>
       </div>
       <div id="chorus" class="effect main-block block">
         <h1>
@@ -768,15 +774,17 @@ window.onload = function ()
 
     create_knob("distortion-params", "GAIN %", "50");
 
-    create_knob("low-shelf-params", "TYPE", "low-shelf");
-    create_knob("low-shelf-params", "FREQ Hz", "2000");
-    create_knob("low-shelf-params", "Q", "1.0");
-    create_knob("low-shelf-params", "GAIN dB", "-12.0");
+    create_knob("filter-1-params", "TYPE", "low-shelf");
+    create_knob("filter-1-params", "FREQ Hz", "2000");
+    create_knob("filter-1-params", "Q", "1.0");
+    create_knob("filter-1-params", "GAIN dB", "-12.0");
 
-    create_knob("high-shelf-params", "TYPE", "high-shelf");
-    create_knob("high-shelf-params", "FREQ Hz", "200");
-    create_knob("high-shelf-params", "Q", "1.0");
-    create_knob("high-shelf-params", "GAIN dB", "0.0");
+    create_knob("filter-2-params", "TYPE", "high-shelf");
+    create_knob("filter-2-params", "FREQ Hz", "200");
+    create_knob("filter-2-params", "Q", "1.0");
+    create_knob("filter-2-params", "GAIN dB", "0.0");
+
+    create_knob("volume-params", "VOL %", "1.0");
 
     create_knob("chorus-params", "DEL s", "0.5");
     create_knob("chorus-params", "FRQ Hz", "1.5");
@@ -795,6 +803,10 @@ window.onload = function ()
     create_knob("echo-params", "DG dB", "-6");
     create_knob("echo-params", "WID %", "-100");
     create_knob("echo-params", "HP Hz", "100");
+    create_knob("echo-params", "SCTH dB", "-30");
+    create_knob("echo-params", "SCATK s", "0.0");
+    create_knob("echo-params", "SCREL s", "0.0");
+    create_knob("echo-params", "SCG dB", "-6.0");
     create_knob("echo-params", "WET %", "50");
     create_knob("echo-params", "DRY %", "60");
 
@@ -803,6 +815,10 @@ window.onload = function ()
     create_knob("reverb-params", "DG dB", "-6");
     create_knob("reverb-params", "WID %", "-100");
     create_knob("reverb-params", "HP Hz", "100");
+    create_knob("reverb-params", "SCTH db", "-30");
+    create_knob("reverb-params", "SCATK s", "0.0");
+    create_knob("reverb-params", "SCREL s", "0.0");
+    create_knob("reverb-params", "SCG dB", "-6.0");
     create_knob("reverb-params", "WET %", "50");
     create_knob("reverb-params", "DRY %", "60");
 

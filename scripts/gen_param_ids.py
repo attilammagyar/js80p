@@ -82,6 +82,8 @@ def print_effect_params(param_id: int) -> int:
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
 
+        ("$VV", "   ///< $ Volume"),
+
         ("$CDEL", " ///< $ Chorus Delay"),
         ("$CFRQ", " ///< $ Chorus LFO Frequency"),
         ("$CDPT", " ///< $ Chorus Depth"),
@@ -99,6 +101,10 @@ def print_effect_params(param_id: int) -> int:
         ("$EDG", "  ///< $ Echo Dampening Gain"),
         ("$EWID", " ///< $ Echo Stereo Width"),
         ("$EHPF", " ///< $ Echo Highpass Frequency"),
+        ("$ESTH", " ///< $ Echo Side-Chain Compression Threshold"),
+        ("$ESAT", " ///< $ Echo Side-Chain Compression Attack Time"),
+        ("$ESRL", " ///< $ Echo Side-Chain Compression Release Time"),
+        ("$ESG", "  ///< $ Echo Side-Chain Compression Gain Reduction"),
         ("$EWET", " ///< $ Echo Wet Volume"),
         ("$EDRY", " ///< $ Echo Dry Volume"),
 
@@ -107,6 +113,10 @@ def print_effect_params(param_id: int) -> int:
         ("$RDG", "  ///< $ Reverb Dampening Gain"),
         ("$RWID", " ///< $ Reverb Stereo Width"),
         ("$RHPF", " ///< $ Reverb Highpass Frequency"),
+        ("$RSTH", " ///< $ Reverb Side-Chain Compression Threshold"),
+        ("$RSAT", " ///< $ Reverb Side-Chain Compression Attack Time"),
+        ("$RSRL", " ///< $ Reverb Side-Chain Compression Release Time"),
+        ("$RSG", "  ///< $ Reverb Side-Chain Compression Gain Reduction"),
         ("$RWET", " ///< $ Reverb Wet Volume"),
         ("$RDRY", " ///< $ Reverb Dry Volume"),
     ]

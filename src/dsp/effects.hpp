@@ -27,6 +27,8 @@
 #include "dsp/distortion.hpp"
 #include "dsp/echo.hpp"
 #include "dsp/filter.hpp"
+#include "dsp/gain.hpp"
+#include "dsp/param.hpp"
 #include "dsp/reverb.hpp"
 
 
@@ -46,7 +48,10 @@ template<class InputSignalProducerClass>
 using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Chorus = JS80P::Chorus< Filter2<InputSignalProducerClass> >;
+using GainEffect = Gain< Filter2<InputSignalProducerClass> >;
+
+template<class InputSignalProducerClass>
+using Chorus = JS80P::Chorus< GainEffect<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
@@ -61,6 +66,8 @@ class Effects : public Filter< Reverb<InputSignalProducerClass> >
     public:
         Effects(std::string const name, InputSignalProducerClass& input);
 
+        FloatParamS gain_param;
+
         Overdrive<InputSignalProducerClass> overdrive;
         Distortion<InputSignalProducerClass> distortion;
         typename Filter1<InputSignalProducerClass>::TypeParam filter_1_type;
@@ -69,6 +76,7 @@ class Effects : public Filter< Reverb<InputSignalProducerClass> >
         ToggleParam filter_2_log_scale;
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
+        GainEffect<InputSignalProducerClass> gain;
         Chorus<InputSignalProducerClass> chorus;
         Echo<InputSignalProducerClass> echo;
         Reverb<InputSignalProducerClass> reverb;

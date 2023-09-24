@@ -29,7 +29,8 @@ template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
         std::string const name,
         InputSignalProducerClass& input
-) : Filter< Reverb<InputSignalProducerClass> >(reverb, 11, input.get_channels()),
+) : Filter< Reverb<InputSignalProducerClass> >(reverb, 13, input.get_channels()),
+    gain_param(name + "GG", 0.0, 2.0, 1.0),
     overdrive(name + "O", 3.0, input),
     distortion(name + "D", 10.0, overdrive),
     filter_1_type(name + "F1TYP"),
@@ -38,10 +39,12 @@ Effects<InputSignalProducerClass>::Effects(
     filter_2_log_scale(name + "F2LOG", ToggleParam::OFF),
     filter_1(name + "F1", distortion, filter_1_type, filter_1_log_scale),
     filter_2(name + "F2", filter_1, filter_2_type, filter_2_log_scale),
-    chorus(name + "C", filter_2),
+    gain(filter_2, gain_param),
+    chorus(name + "C", gain),
     echo(name + "E", chorus),
     reverb(name + "R", echo)
 {
+    this->register_child(gain_param);
     this->register_child(overdrive);
     this->register_child(distortion);
     this->register_child(filter_1_type);
@@ -50,6 +53,7 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(filter_2_log_scale);
     this->register_child(filter_1);
     this->register_child(filter_2);
+    this->register_child(gain);
     this->register_child(chorus);
     this->register_child(echo);
     this->register_child(reverb);

@@ -489,10 +489,15 @@ Signal Chain (Simplified)
       v                                                 (x64)  |       |
       Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
                                                                        |
-    Overdrive <--------------------------------------------------------+
-    |
-    v
-    Distortion --> Filter --> Filter --> Chorus --> Echo --> Reverb --> Out
+            +----------------------------------------------------------+
+            |
+            v
+            Overdrive --> Distortion --> Filter --> Filter --> Volume --+
+                                                                        |
+            +-----------------------------------------------------------+
+            |
+            v
+            Chorus --> Echo --> Reverb --> Out
 
 <a id="features" href="#toc">Table of Contents</a>
 
@@ -532,9 +537,10 @@ Features
     * overdrive
     * distortion
     * 2 more filters
+    * volume control
     * chorus
-    * stereo echo
-    * stereo reverb
+    * stereo echo (with side-chaining)
+    * stereo reverb (with side-chaining)
  * 6 envelopes
  * 8 low-frequency oscillators (LFO)
  * MIDI controllers and macros

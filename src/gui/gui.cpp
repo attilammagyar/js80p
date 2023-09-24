@@ -172,6 +172,8 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::EF2Q] = "Filter 2 Q Factor",
     [Synth::ParamId::EF2G] = "Filter 2 Gain (dB)",
 
+    [Synth::ParamId::EVV] = "Volume (%)",
+
     [Synth::ParamId::ECDEL] = "Chorus Delay (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",
     [Synth::ParamId::ECDPT] = "Chorus Depth (%)",
@@ -189,6 +191,10 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::EEDG] = "Echo Dampening Gain (dB)",
     [Synth::ParamId::EEWID] = "Echo Stereo Width (%)",
     [Synth::ParamId::EEHPF] = "Echo Highpass Frequency (Hz)",
+    [Synth::ParamId::EESTH] = "Echo SC. Compr. Threshold (dB)",
+    [Synth::ParamId::EESAT] = "Echo SC. Compr. Attack Time (s)",
+    [Synth::ParamId::EESRL] = "Echo SC. Compr. Release Time (s)",
+    [Synth::ParamId::EESG] = "Echo SC. Compr. Gain Reduction (dB)",
     [Synth::ParamId::EEWET] = "Echo Wet Volume (%)",
     [Synth::ParamId::EEDRY] = "Echo Dry Volume (%)",
 
@@ -197,6 +203,10 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::ERDG] = "Reverb Dampening Gain (dB)",
     [Synth::ParamId::ERWID] = "Reverb Stereo Width (%)",
     [Synth::ParamId::ERHPF] = "Reverb Highpass Frequency (Hz)",
+    [Synth::ParamId::ERSTH] = "Reverb SC. Compr. Threshold (dB)",
+    [Synth::ParamId::ERSAT] = "Reverb SC. Compr. Attack Time (s)",
+    [Synth::ParamId::ERSRL] = "Reverb SC. Compr. Release Time (s)",
+    [Synth::ParamId::ERSG] = "Reverb SC. Compr. Gain Reduction (dB)",
     [Synth::ParamId::ERWET] = "Reverb Wet Volume (%)",
     [Synth::ParamId::ERDRY] = "Reverb Dry Volume (%)",
 
@@ -1393,54 +1403,64 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
-    PE(effects_body,  74 + PE_W * 0,    57, Synth::ParamId::EOG,    MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body,  56 + PE_W * 0,    35, Synth::ParamId::EOG,    MML_C,      "%.2f", 100.0, knob_states);
 
-    PE(effects_body, 237 + PE_W * 0,    57, Synth::ParamId::EDG,    MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 187 + PE_W * 0,    35, Synth::ParamId::EDG,    MML_C,      "%.2f", 100.0, knob_states);
 
-    PE(effects_body, 385 + PE_W * 0,    57, Synth::ParamId::EF1TYP, MM___,      ft, ftc, knob_states);
-    PE(effects_body, 385 + PE_W * 1,    57, Synth::ParamId::EF1FRQ, MML_C,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 385 + PE_W * 2,    57, Synth::ParamId::EF1Q,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 385 + PE_W * 3,    57, Synth::ParamId::EF1G,   MML_C,      "%.2f", 1.0, knob_states);
-    TS(effects_body, 459, 29, 90, 24, 0, Synth::ParamId::EF1LOG);
+    PE(effects_body, 303 + PE_W * 0,    35, Synth::ParamId::EF1TYP, MM___,      ft, ftc, knob_states);
+    PE(effects_body, 303 + PE_W * 1,    35, Synth::ParamId::EF1FRQ, MML_C,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 303 + PE_W * 2,    35, Synth::ParamId::EF1Q,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 303 + PE_W * 3,    35, Synth::ParamId::EF1G,   MML_C,      "%.2f", 1.0, knob_states);
+    TS(effects_body, 377, 6, 90, 24, 0, Synth::ParamId::EF1LOG);
 
-    PE(effects_body, 690 + PE_W * 0,    57, Synth::ParamId::EF2TYP, MM___,      ft, ftc, knob_states);
-    PE(effects_body, 690 + PE_W * 1,    57, Synth::ParamId::EF2FRQ, MML_C,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 690 + PE_W * 2,    57, Synth::ParamId::EF2Q,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 690 + PE_W * 3,    57, Synth::ParamId::EF2G,   MML_C,      "%.2f", 1.0, knob_states);
-    TS(effects_body, 764, 29, 90, 24, 0, Synth::ParamId::EF2LOG);
+    PE(effects_body, 577 + PE_W * 0,    35, Synth::ParamId::EF2TYP, MM___,      ft, ftc, knob_states);
+    PE(effects_body, 577 + PE_W * 1,    35, Synth::ParamId::EF2FRQ, MML_C,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 577 + PE_W * 2,    35, Synth::ParamId::EF2Q,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 577 + PE_W * 3,    35, Synth::ParamId::EF2G,   MML_C,      "%.2f", 1.0, knob_states);
+    TS(effects_body, 650, 6, 90, 24, 0, Synth::ParamId::EF2LOG);
 
-    PE(effects_body, 200 + PE_W * 0,   242, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 1,   242, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 2,   242, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
-    PE(effects_body, 200 + PE_W * 3,   242, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
-    PE(effects_body, 200 + PE_W * 4,   242, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 5,   242, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 6,   242, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 200 + PE_W * 7,   242, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 200 + PE_W * 8,   242, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 200 + PE_W * 9,   242, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TS(effects_body, 670, 215, 111, 24, 87, Synth::ParamId::ECSYN);
-    TS(effects_body, 450, 215,  96, 24,  0, Synth::ParamId::ECLOG);
+    PE(effects_body, 866 + PE_W * 0,    35, Synth::ParamId::EVV,    MML_C,      "%.2f", 100.0, knob_states);
 
-    PE(effects_body,  34 + PE_W * 0,   428, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
-    PE(effects_body,  34 + PE_W * 1,   428, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body,  34 + PE_W * 2,   428, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body,  34 + PE_W * 3,   428, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body,  34 + PE_W * 4,   428, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body,  34 + PE_W * 5,   428, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body,  34 + PE_W * 6,   428, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body,  34 + PE_W * 7,   428, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TS(effects_body, 388, 401, 111, 24, 87, Synth::ParamId::EESYN);
-    TS(effects_body, 169, 401,  96, 24,  0, Synth::ParamId::EELOG);
+    PE(effects_body, 200 + PE_W * 0,   174, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
+    PE(effects_body, 200 + PE_W * 1,   174, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 200 + PE_W * 2,   174, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
+    PE(effects_body, 200 + PE_W * 3,   174, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
+    PE(effects_body, 200 + PE_W * 4,   174, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 200 + PE_W * 5,   174, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 200 + PE_W * 6,   174, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 200 + PE_W * 7,   174, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 200 + PE_W * 8,   174, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 200 + PE_W * 9,   174, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TS(effects_body, 670, 146, 111, 24, 87, Synth::ParamId::ECSYN);
+    TS(effects_body, 450, 146,  96, 24,  0, Synth::ParamId::ECLOG);
 
-    PE(effects_body, 540 + PE_W * 0,   428, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 540 + PE_W * 1,   428, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 540 + PE_W * 2,   428, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 540 + PE_W * 3,   428, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 540 + PE_W * 4,   428, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 540 + PE_W * 5,   428, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 540 + PE_W * 6,   428, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TS(effects_body, 613, 401,  96, 24,  0, Synth::ParamId::ERLOG);
+    PE(effects_body, 142 + PE_W * 0,   314, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 1,   314, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 142 + PE_W * 2,   314, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 3,   314, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 4,   314, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 142 + PE_W * 5,   314, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 6,   314, Synth::ParamId::EESTH,  MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 7,   314, Synth::ParamId::EESAT,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 8,   314, Synth::ParamId::EESRL,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 9,   314, Synth::ParamId::EESG,   MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 10,  314, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 142 + PE_W * 11,  314, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TS(effects_body, 277, 286,  96, 24,  0, Synth::ParamId::EELOG);
+    TS(effects_body, 728, 286, 111, 24, 87, Synth::ParamId::EESYN);
+
+    PE(effects_body, 171 + PE_W * 0,   454, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 171 + PE_W * 1,   454, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 2,   454, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 3,   454, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 171 + PE_W * 4,   454, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 5,   454, Synth::ParamId::ERSTH,  MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 6,   454, Synth::ParamId::ERSAT,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 7,   454, Synth::ParamId::ERSRL,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 8,   454, Synth::ParamId::ERSG,   MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 171 + PE_W * 9,   454, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 171 + PE_W * 10,  454, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TS(effects_body, 244, 426,  96, 24,  0, Synth::ParamId::ERLOG);
 
     effects_body->hide();
 }

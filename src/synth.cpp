@@ -381,6 +381,8 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EF2Q, effects.filter_2.q);
     register_param<FloatParamS>(ParamId::EF2G, effects.filter_2.gain);
 
+    register_param<FloatParamS>(ParamId::EVV, effects.gain_param);
+
     register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
     register_param<FloatParamS>(ParamId::ECFRQ, effects.chorus.frequency);
     register_param<FloatParamS>(ParamId::ECDPT, effects.chorus.depth);
@@ -400,6 +402,10 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EEDG, effects.echo.damping_gain);
     register_param<FloatParamS>(ParamId::EEWID, effects.echo.width);
     register_param<FloatParamS>(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_param<FloatParamB>(ParamId::EESTH, effects.echo.side_chain_compression_threshold);
+    register_param<FloatParamB>(ParamId::EESAT, effects.echo.side_chain_compression_attack_time);
+    register_param<FloatParamB>(ParamId::EESRL, effects.echo.side_chain_compression_release_time);
+    register_param<FloatParamB>(ParamId::EESG, effects.echo.side_chain_compression_gain_reduction);
     register_param<FloatParamS>(ParamId::EEWET, effects.echo.wet);
     register_param<FloatParamS>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
@@ -410,6 +416,10 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
     register_param<FloatParamS>(ParamId::ERWID, effects.reverb.width);
     register_param<FloatParamS>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_param<FloatParamB>(ParamId::ERSTH, effects.reverb.side_chain_compression_threshold);
+    register_param<FloatParamB>(ParamId::ERSAT, effects.reverb.side_chain_compression_attack_time);
+    register_param<FloatParamB>(ParamId::ERSRL, effects.reverb.side_chain_compression_release_time);
+    register_param<FloatParamB>(ParamId::ERSG, effects.reverb.side_chain_compression_gain_reduction);
     register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
     register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
@@ -1307,6 +1317,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_default_ratio();
         case ParamId::EF2Q: return effects.filter_2.q.get_default_ratio();
         case ParamId::EF2G: return effects.filter_2.gain.get_default_ratio();
+        case ParamId::EVV: return effects.gain_param.get_default_ratio();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_default_ratio();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_default_ratio();
         case ParamId::ECDPT: return effects.chorus.depth.get_default_ratio();
@@ -1323,6 +1334,10 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::EEDG: return effects.echo.damping_gain.get_default_ratio();
         case ParamId::EEWID: return effects.echo.width.get_default_ratio();
         case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_default_ratio();
+        case ParamId::EESTH: return effects.echo.side_chain_compression_threshold.get_default_ratio();
+        case ParamId::EESAT: return effects.echo.side_chain_compression_attack_time.get_default_ratio();
+        case ParamId::EESRL: return effects.echo.side_chain_compression_release_time.get_default_ratio();
+        case ParamId::EESG: return effects.echo.side_chain_compression_gain_reduction.get_default_ratio();
         case ParamId::EEWET: return effects.echo.wet.get_default_ratio();
         case ParamId::EEDRY: return effects.echo.dry.get_default_ratio();
         case ParamId::ERRS: return effects.reverb.room_size.get_default_ratio();
@@ -1330,6 +1345,10 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::ERDG: return effects.reverb.damping_gain.get_default_ratio();
         case ParamId::ERWID: return effects.reverb.width.get_default_ratio();
         case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_default_ratio();
+        case ParamId::ERSTH: return effects.reverb.side_chain_compression_threshold.get_default_ratio();
+        case ParamId::ERSAT: return effects.reverb.side_chain_compression_attack_time.get_default_ratio();
+        case ParamId::ERSRL: return effects.reverb.side_chain_compression_release_time.get_default_ratio();
+        case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_default_ratio();
         case ParamId::ERWET: return effects.reverb.wet.get_default_ratio();
         case ParamId::ERDRY: return effects.reverb.dry.get_default_ratio();
         case ParamId::MODE: return mode.get_default_ratio();
@@ -1510,6 +1529,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_max_value();
         case ParamId::EF2Q: return effects.filter_2.q.get_max_value();
         case ParamId::EF2G: return effects.filter_2.gain.get_max_value();
+        case ParamId::EVV: return effects.gain_param.get_max_value();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_max_value();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_max_value();
         case ParamId::ECDPT: return effects.chorus.depth.get_max_value();
@@ -1526,6 +1546,10 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::EEDG: return effects.echo.damping_gain.get_max_value();
         case ParamId::EEWID: return effects.echo.width.get_max_value();
         case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_max_value();
+        case ParamId::EESTH: return effects.echo.side_chain_compression_threshold.get_max_value();
+        case ParamId::EESAT: return effects.echo.side_chain_compression_attack_time.get_max_value();
+        case ParamId::EESRL: return effects.echo.side_chain_compression_release_time.get_max_value();
+        case ParamId::EESG: return effects.echo.side_chain_compression_gain_reduction.get_max_value();
         case ParamId::EEWET: return effects.echo.wet.get_max_value();
         case ParamId::EEDRY: return effects.echo.dry.get_max_value();
         case ParamId::ERRS: return effects.reverb.room_size.get_max_value();
@@ -1533,6 +1557,10 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::ERDG: return effects.reverb.damping_gain.get_max_value();
         case ParamId::ERWID: return effects.reverb.width.get_max_value();
         case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_max_value();
+        case ParamId::ERSTH: return effects.reverb.side_chain_compression_threshold.get_max_value();
+        case ParamId::ERSAT: return effects.reverb.side_chain_compression_attack_time.get_max_value();
+        case ParamId::ERSRL: return effects.reverb.side_chain_compression_release_time.get_max_value();
+        case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_max_value();
         case ParamId::ERWET: return effects.reverb.wet.get_max_value();
         case ParamId::ERDRY: return effects.reverb.dry.get_max_value();
         case ParamId::MODE: return mode.get_max_value();
@@ -1709,6 +1737,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::EF2FRQ: return effects.filter_2.frequency.ratio_to_value(ratio);
         case ParamId::EF2Q: return effects.filter_2.q.ratio_to_value(ratio);
         case ParamId::EF2G: return effects.filter_2.gain.ratio_to_value(ratio);
+        case ParamId::EVV: return effects.gain_param.ratio_to_value(ratio);
         case ParamId::ECDEL: return effects.chorus.delay_time.ratio_to_value(ratio);
         case ParamId::ECFRQ: return effects.chorus.frequency.ratio_to_value(ratio);
         case ParamId::ECDPT: return effects.chorus.depth.ratio_to_value(ratio);
@@ -1725,6 +1754,10 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::EEDG: return effects.echo.damping_gain.ratio_to_value(ratio);
         case ParamId::EEWID: return effects.echo.width.ratio_to_value(ratio);
         case ParamId::EEHPF: return effects.echo.high_pass_frequency.ratio_to_value(ratio);
+        case ParamId::EESTH: return effects.echo.side_chain_compression_threshold.ratio_to_value(ratio);
+        case ParamId::EESAT: return effects.echo.side_chain_compression_attack_time.ratio_to_value(ratio);
+        case ParamId::EESRL: return effects.echo.side_chain_compression_release_time.ratio_to_value(ratio);
+        case ParamId::EESG: return effects.echo.side_chain_compression_gain_reduction.ratio_to_value(ratio);
         case ParamId::EEWET: return effects.echo.wet.ratio_to_value(ratio);
         case ParamId::EEDRY: return effects.echo.dry.ratio_to_value(ratio);
         case ParamId::ERRS: return effects.reverb.room_size.ratio_to_value(ratio);
@@ -1732,6 +1765,10 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::ERDG: return effects.reverb.damping_gain.ratio_to_value(ratio);
         case ParamId::ERWID: return effects.reverb.width.ratio_to_value(ratio);
         case ParamId::ERHPF: return effects.reverb.high_pass_frequency.ratio_to_value(ratio);
+        case ParamId::ERSTH: return effects.reverb.side_chain_compression_threshold.ratio_to_value(ratio);
+        case ParamId::ERSAT: return effects.reverb.side_chain_compression_attack_time.ratio_to_value(ratio);
+        case ParamId::ERSRL: return effects.reverb.side_chain_compression_release_time.ratio_to_value(ratio);
+        case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.ratio_to_value(ratio);
         case ParamId::ERWET: return effects.reverb.wet.ratio_to_value(ratio);
         case ParamId::ERDRY: return effects.reverb.dry.ratio_to_value(ratio);
         default: return 0.0; /* This should never be reached. */
@@ -2216,6 +2253,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::EF2FRQ: effects.filter_2.frequency.set_ratio(ratio); break;
             case ParamId::EF2Q: effects.filter_2.q.set_ratio(ratio); break;
             case ParamId::EF2G: effects.filter_2.gain.set_ratio(ratio); break;
+            case ParamId::EVV: effects.gain_param.set_ratio(ratio); break;
             case ParamId::ECDEL: effects.chorus.delay_time.set_ratio(ratio); break;
             case ParamId::ECFRQ: effects.chorus.frequency.set_ratio(ratio); break;
             case ParamId::ECDPT: effects.chorus.depth.set_ratio(ratio); break;
@@ -2232,6 +2270,10 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::EEDG: effects.echo.damping_gain.set_ratio(ratio); break;
             case ParamId::EEWID: effects.echo.width.set_ratio(ratio); break;
             case ParamId::EEHPF: effects.echo.high_pass_frequency.set_ratio(ratio); break;
+            case ParamId::EESTH: effects.echo.side_chain_compression_threshold.set_ratio(ratio); break;
+            case ParamId::EESAT: effects.echo.side_chain_compression_attack_time.set_ratio(ratio); break;
+            case ParamId::EESRL: effects.echo.side_chain_compression_release_time.set_ratio(ratio); break;
+            case ParamId::EESG: effects.echo.side_chain_compression_gain_reduction.set_ratio(ratio); break;
             case ParamId::EEWET: effects.echo.wet.set_ratio(ratio); break;
             case ParamId::EEDRY: effects.echo.dry.set_ratio(ratio); break;
             case ParamId::ERRS: effects.reverb.room_size.set_ratio(ratio); break;
@@ -2239,6 +2281,10 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::ERDG: effects.reverb.damping_gain.set_ratio(ratio); break;
             case ParamId::ERWID: effects.reverb.width.set_ratio(ratio); break;
             case ParamId::ERHPF: effects.reverb.high_pass_frequency.set_ratio(ratio); break;
+            case ParamId::ERSTH: effects.reverb.side_chain_compression_threshold.set_ratio(ratio); break;
+            case ParamId::ERSAT: effects.reverb.side_chain_compression_attack_time.set_ratio(ratio); break;
+            case ParamId::ERSRL: effects.reverb.side_chain_compression_release_time.set_ratio(ratio); break;
+            case ParamId::ERSG: effects.reverb.side_chain_compression_gain_reduction.set_ratio(ratio); break;
             case ParamId::ERWET: effects.reverb.wet.set_ratio(ratio); break;
             case ParamId::ERDRY: effects.reverb.dry.set_ratio(ratio); break;
             case ParamId::MODE: mode.set_ratio(ratio); break;
@@ -2420,6 +2466,7 @@ void Synth::handle_assign_controller(
             case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_2.frequency, ctl_id); break;
             case ParamId::EF2Q: is_assigned = assign_controller<FloatParamS>(effects.filter_2.q, ctl_id); break;
             case ParamId::EF2G: is_assigned = assign_controller<FloatParamS>(effects.filter_2.gain, ctl_id); break;
+            case ParamId::EVV: is_assigned = assign_controller<FloatParamS>(effects.gain_param, ctl_id); break;
             case ParamId::ECDEL: is_assigned = assign_controller<FloatParamS>(effects.chorus.delay_time, ctl_id); break;
             case ParamId::ECFRQ: is_assigned = assign_controller<FloatParamS>(effects.chorus.frequency, ctl_id); break;
             case ParamId::ECDPT: is_assigned = assign_controller<FloatParamS>(effects.chorus.depth, ctl_id); break;
@@ -2436,6 +2483,10 @@ void Synth::handle_assign_controller(
             case ParamId::EEDG: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_gain, ctl_id); break;
             case ParamId::EEWID: is_assigned = assign_controller<FloatParamS>(effects.echo.width, ctl_id); break;
             case ParamId::EEHPF: is_assigned = assign_controller<FloatParamS>(effects.echo.high_pass_frequency, ctl_id); break;
+            case ParamId::EESTH: is_assigned = assign_controller<FloatParamB>(effects.echo.side_chain_compression_threshold, ctl_id); break;
+            case ParamId::EESAT: is_assigned = assign_controller<FloatParamB>(effects.echo.side_chain_compression_attack_time, ctl_id); break;
+            case ParamId::EESRL: is_assigned = assign_controller<FloatParamB>(effects.echo.side_chain_compression_release_time, ctl_id); break;
+            case ParamId::EESG: is_assigned = assign_controller<FloatParamB>(effects.echo.side_chain_compression_gain_reduction, ctl_id); break;
             case ParamId::EEWET: is_assigned = assign_controller<FloatParamS>(effects.echo.wet, ctl_id); break;
             case ParamId::EEDRY: is_assigned = assign_controller<FloatParamS>(effects.echo.dry, ctl_id); break;
             case ParamId::ERRS: is_assigned = assign_controller<FloatParamS>(effects.reverb.room_size, ctl_id); break;
@@ -2443,6 +2494,10 @@ void Synth::handle_assign_controller(
             case ParamId::ERDG: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_gain, ctl_id); break;
             case ParamId::ERWID: is_assigned = assign_controller<FloatParamS>(effects.reverb.width, ctl_id); break;
             case ParamId::ERHPF: is_assigned = assign_controller<FloatParamS>(effects.reverb.high_pass_frequency, ctl_id); break;
+            case ParamId::ERSTH: is_assigned = assign_controller<FloatParamB>(effects.reverb.side_chain_compression_threshold, ctl_id); break;
+            case ParamId::ERSAT: is_assigned = assign_controller<FloatParamB>(effects.reverb.side_chain_compression_attack_time, ctl_id); break;
+            case ParamId::ERSRL: is_assigned = assign_controller<FloatParamB>(effects.reverb.side_chain_compression_release_time, ctl_id); break;
+            case ParamId::ERSG: is_assigned = assign_controller<FloatParamB>(effects.reverb.side_chain_compression_gain_reduction, ctl_id); break;
             case ParamId::ERWET: is_assigned = assign_controller<FloatParamS>(effects.reverb.wet, ctl_id); break;
             case ParamId::ERDRY: is_assigned = assign_controller<FloatParamS>(effects.reverb.dry, ctl_id); break;
             default: break;
@@ -2854,6 +2909,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_ratio();
         case ParamId::EF2Q: return effects.filter_2.q.get_ratio();
         case ParamId::EF2G: return effects.filter_2.gain.get_ratio();
+        case ParamId::EVV: return effects.gain_param.get_ratio();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_ratio();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_ratio();
         case ParamId::ECDPT: return effects.chorus.depth.get_ratio();
@@ -2870,6 +2926,10 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::EEDG: return effects.echo.damping_gain.get_ratio();
         case ParamId::EEWID: return effects.echo.width.get_ratio();
         case ParamId::EEHPF: return effects.echo.high_pass_frequency.get_ratio();
+        case ParamId::EESTH: return effects.echo.side_chain_compression_threshold.get_ratio();
+        case ParamId::EESAT: return effects.echo.side_chain_compression_attack_time.get_ratio();
+        case ParamId::EESRL: return effects.echo.side_chain_compression_release_time.get_ratio();
+        case ParamId::EESG: return effects.echo.side_chain_compression_gain_reduction.get_ratio();
         case ParamId::EEWET: return effects.echo.wet.get_ratio();
         case ParamId::EEDRY: return effects.echo.dry.get_ratio();
         case ParamId::ERRS: return effects.reverb.room_size.get_ratio();
@@ -2877,6 +2937,10 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::ERDG: return effects.reverb.damping_gain.get_ratio();
         case ParamId::ERWID: return effects.reverb.width.get_ratio();
         case ParamId::ERHPF: return effects.reverb.high_pass_frequency.get_ratio();
+        case ParamId::ERSTH: return effects.reverb.side_chain_compression_threshold.get_ratio();
+        case ParamId::ERSAT: return effects.reverb.side_chain_compression_attack_time.get_ratio();
+        case ParamId::ERSRL: return effects.reverb.side_chain_compression_release_time.get_ratio();
+        case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_ratio();
         case ParamId::ERWET: return effects.reverb.wet.get_ratio();
         case ParamId::ERDRY: return effects.reverb.dry.get_ratio();
         case ParamId::MODE: return mode.get_ratio();

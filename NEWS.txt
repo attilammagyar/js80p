@@ -1,3 +1,9 @@
+v2.1.0 (2023-09-25)
+ * New effect: volume control between the filters and the delay based effects
+ * Echo and Reverb now support side-chaining: reduce the volume of the wet
+   signal while the dry signal is loud, and gradually bring up the wet signal
+   when the dry signal goes below the threshold.
+
 v2.0.3 (2023-09-24)
  * It is now possible to assign Macros to discrete parameters like Filter Types
    and Waveforms.
