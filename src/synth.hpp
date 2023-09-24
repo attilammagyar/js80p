@@ -48,6 +48,7 @@
 #include "dsp/param.hpp"
 #include "dsp/reverb.hpp"
 #include "dsp/queue.hpp"
+#include "dsp/side_chain_compressable_effect.hpp"
 #include "dsp/signal_producer.hpp"
 
 

@@ -59,7 +59,6 @@ class Effect : public Filter<InputSignalProducerClass>
             Sample** buffer
         ) noexcept;
 
-    private:
         Sample const* wet_buffer;
         Sample const* dry_buffer;
         bool is_dry;

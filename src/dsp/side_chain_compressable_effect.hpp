@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef JS80P__DSP__ECHO_HPP
-#define JS80P__DSP__ECHO_HPP
+#ifndef JS80P__DSP__SIDE_CHAIN_COMPRESSABLE_EFFECT_HPP
+#define JS80P__DSP__SIDE_CHAIN_COMPRESSABLE_EFFECT_HPP
+
+#include <string>
 
 #include "js80p.hpp"
 
-#include "dsp/biquad_filter.hpp"
-#include "dsp/delay.hpp"
+#include "dsp/effect.hpp"
 #include "dsp/param.hpp"
-#include "dsp/side_chain_compressable_effect.hpp"
 #include "dsp/signal_producer.hpp"
 
 
@@ -32,25 +32,21 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
+class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
     friend class SignalProducer;
 
     public:
-        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
-        typedef HighShelfPannedDelay<HighPassedInput> CombFilter1;
-        typedef HighShelfPannedDelay< HighShelfDelay<HighPassedInput> > CombFilter2;
+        SideChainCompressableEffect(
+            std::string const name,
+            InputSignalProducerClass& input,
+            Integer const number_of_children = 0
+        );
 
-        Echo(std::string const name, InputSignalProducerClass& input);
-
-        FloatParamS delay_time;
-        FloatParamS feedback;
-        FloatParamS damping_frequency;
-        FloatParamS damping_gain;
-        FloatParamS width;
-        FloatParamS high_pass_frequency;
-        ToggleParam tempo_sync;
-        ToggleParam log_scale_frequencies;
+        FloatParamB side_chain_compression_threshold;
+        FloatParamB side_chain_compression_attack_time;
+        FloatParamB side_chain_compression_release_time;
+        FloatParamB side_chain_compression_gain_reduction;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -66,18 +62,21 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParamS high_pass_filter_q;
-        FloatParamS high_pass_filter_gain;
+        enum Action {
+            BYPASS = 0,
+            COMPRESS = 1,
+        };
 
-        HighPassedInput high_pass_filter;
-        CombFilter1 comb_filter_1;
-        CombFilter2 comb_filter_2;
+        Action decide_next_action(Integer const sample_count) const noexcept;
 
-        Sample const* const* comb_filter_1_buffer;
-        Sample const* const* comb_filter_2_buffer;
+        FloatParamS gain;
+
+        Sample const* gain_buffer;
+        Action previous_action;
+        bool is_bypassing;
 };
 
 }
 
 #endif
+

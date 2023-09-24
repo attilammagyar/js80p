@@ -46,6 +46,7 @@
 #include "dsp/param.cpp"
 #include "dsp/reverb.cpp"
 #include "dsp/queue.cpp"
+#include "dsp/side_chain_compressable_effect.cpp"
 #include "dsp/signal_producer.cpp"
 #include "dsp/wavefolder.cpp"
 #include "dsp/wavetable.cpp"
@@ -1918,6 +1919,8 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.filter_2.q, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.filter_2.gain, round, sample_count);
 
+    FloatParamS::produce_if_not_constant(effects.gain_param, round, sample_count);
+
     FloatParamS::produce_if_not_constant(effects.chorus.delay_time, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.chorus.frequency, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.chorus.depth, round, sample_count);
@@ -1935,6 +1938,10 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.echo.damping_gain, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.width, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.high_pass_frequency, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.echo.side_chain_compression_threshold, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.echo.side_chain_compression_attack_time, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.echo.side_chain_compression_release_time, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.echo.side_chain_compression_gain_reduction, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.wet, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.dry, round, sample_count);
 
@@ -1943,6 +1950,10 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.reverb.damping_gain, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.width, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.high_pass_frequency, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.reverb.side_chain_compression_threshold, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.reverb.side_chain_compression_attack_time, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.reverb.side_chain_compression_release_time, round, sample_count);
+    FloatParamB::produce_if_not_constant(effects.reverb.side_chain_compression_gain_reduction, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.wet, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.dry, round, sample_count);
 

@@ -35,7 +35,11 @@ template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::Reverb(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 11 + COMB_FILTERS),
+) : SideChainCompressableEffect<InputSignalProducerClass>(
+        name,
+        input,
+        11 + COMB_FILTERS
+    ),
     room_size(name + "RS", 0.0, 0.999, 0.75),
     damping_frequency(
         name + "DF",
@@ -137,7 +141,9 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Effect<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
 
     if (buffer != NULL) {

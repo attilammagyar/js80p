@@ -31,7 +31,7 @@ template<class InputSignalProducerClass>
 Echo<InputSignalProducerClass>::Echo(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 14),
+) : SideChainCompressableEffect<InputSignalProducerClass>(name, input, 14),
     delay_time(
         name + "DEL",
         Constants::DELAY_TIME_MIN,
@@ -142,7 +142,9 @@ Sample const* const* Echo<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Effect<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
 
     if (buffer != NULL) {
@@ -175,7 +177,7 @@ void Echo<InputSignalProducerClass>::render(
         }
     }
 
-    Effect<InputSignalProducerClass>::render(
+    SideChainCompressableEffect<InputSignalProducerClass>::render(
         round, first_sample_index, last_sample_index, buffer
     );
 }

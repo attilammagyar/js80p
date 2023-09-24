@@ -23,9 +23,9 @@
 
 #include "dsp/biquad_filter.hpp"
 #include "dsp/delay.hpp"
-#include "dsp/effect.hpp"
 #include "dsp/mixer.hpp"
 #include "dsp/param.hpp"
+#include "dsp/side_chain_compressable_effect.hpp"
 #include "dsp/signal_producer.hpp"
 
 
@@ -33,7 +33,7 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-class Reverb : public Effect<InputSignalProducerClass>
+class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 {
     friend class SignalProducer;
 

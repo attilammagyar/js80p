@@ -138,6 +138,7 @@ SYNTH_COMPONENTS = \
 	dsp/gain \
 	dsp/mixer \
 	dsp/reverb \
+	dsp/side_chain_compressable_effect \
 	dsp/wavefolder \
 	dsp/wavetable
 
