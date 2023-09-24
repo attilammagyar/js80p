@@ -2304,6 +2304,7 @@ void Synth::handle_assign_controller(
         ParamId const param_id,
         Byte const controller_id
 ) noexcept {
+    ControllerId const ctl_id = (ControllerId)controller_id;
     bool is_assigned = false;
 
     if (ParamId::M1IN <= param_id && param_id <= ParamId::M20RND) {
@@ -2312,12 +2313,12 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % MACRO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->input, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->min, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->max, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->amount, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->distortion, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->randomness, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->input, ctl_id); break;
+            case 1: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->min, ctl_id); break;
+            case 2: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->max, ctl_id); break;
+            case 3: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->amount, ctl_id); break;
+            case 4: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->distortion, ctl_id); break;
+            case 5: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->randomness, ctl_id); break;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
@@ -2326,16 +2327,16 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->amount, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->initial_value, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->delay_time, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->attack_time, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->peak_value, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->hold_time, (ControllerId)controller_id); break;;
-            case 6: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->decay_time, (ControllerId)controller_id); break;;
-            case 7: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->sustain_value, (ControllerId)controller_id); break;;
-            case 8: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->release_time, (ControllerId)controller_id); break;;
-            case 9: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->final_value, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->amount, ctl_id); break;
+            case 1: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->initial_value, ctl_id); break;
+            case 2: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->delay_time, ctl_id); break;
+            case 3: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->attack_time, ctl_id); break;
+            case 4: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->peak_value, ctl_id); break;
+            case 5: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->hold_time, ctl_id); break;
+            case 6: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->decay_time, ctl_id); break;
+            case 7: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->sustain_value, ctl_id); break;
+            case 8: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->release_time, ctl_id); break;
+            case 9: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->final_value, ctl_id); break;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -2344,112 +2345,110 @@ void Synth::handle_assign_controller(
         int const param_idx = offset % LFO_FLOAT_PARAMS;
 
         switch (param_idx) {
-            case 0: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->frequency, (ControllerId)controller_id); break;;
-            case 1: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->phase, (ControllerId)controller_id); break;;
-            case 2: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->min, (ControllerId)controller_id); break;;
-            case 3: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->max, (ControllerId)controller_id); break;;
-            case 4: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->amount, (ControllerId)controller_id); break;;
-            case 5: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->distortion, (ControllerId)controller_id); break;;
-            case 6: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->randomness, (ControllerId)controller_id); break;;
+            case 0: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->frequency, ctl_id); break;
+            case 1: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->phase, ctl_id); break;
+            case 2: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->min, ctl_id); break;
+            case 3: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->max, ctl_id); break;
+            case 4: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->amount, ctl_id); break;
+            case 5: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->distortion, ctl_id); break;
+            case 6: is_assigned = assign_controller<FloatParamS>(lfos_rw[lfo_idx]->randomness, ctl_id); break;
             default: break; /* This should never be reached. */
         }
     } else if (param_id < FLOAT_PARAMS) {
         switch (param_id) {
-            case ParamId::MIX: is_assigned = assign_controller<FloatParamS>(modulator_add_volume, (ControllerId)controller_id); break;;
-            case ParamId::PM: is_assigned = assign_controller<FloatParamS>(phase_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::FM: is_assigned = assign_controller<FloatParamS>(frequency_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::AM: is_assigned = assign_controller<FloatParamS>(amplitude_modulation_level, (ControllerId)controller_id); break;;
-            case ParamId::MAMP: is_assigned = assign_controller<FloatParamS>(modulator_params.amplitude, (ControllerId)controller_id); break;;
-            case ParamId::MVS: is_assigned = assign_controller<FloatParamB>(modulator_params.velocity_sensitivity, (ControllerId)controller_id); break;;
-            case ParamId::MFLD: is_assigned = assign_controller<FloatParamS>(modulator_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::MPRT: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::MPRD: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_depth, (ControllerId)controller_id); break;;
-            case ParamId::MDTN: is_assigned = assign_controller<FloatParamS>(modulator_params.detune, (ControllerId)controller_id); break;;
-            case ParamId::MFIN: is_assigned = assign_controller<FloatParamS>(modulator_params.fine_detune, (ControllerId)controller_id); break;;
-            case ParamId::MWID: is_assigned = assign_controller<FloatParamB>(modulator_params.width, (ControllerId)controller_id); break;;
-            case ParamId::MPAN: is_assigned = assign_controller<FloatParamS>(modulator_params.panning, (ControllerId)controller_id); break;;
-            case ParamId::MVOL: is_assigned = assign_controller<FloatParamS>(modulator_params.volume, (ControllerId)controller_id); break;;
-            case ParamId::MC1: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_0, (ControllerId)controller_id); break;;
-            case ParamId::MC2: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_1, (ControllerId)controller_id); break;;
-            case ParamId::MC3: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_2, (ControllerId)controller_id); break;;
-            case ParamId::MC4: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_3, (ControllerId)controller_id); break;;
-            case ParamId::MC5: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_4, (ControllerId)controller_id); break;;
-            case ParamId::MC6: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_5, (ControllerId)controller_id); break;;
-            case ParamId::MC7: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_6, (ControllerId)controller_id); break;;
-            case ParamId::MC8: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_7, (ControllerId)controller_id); break;;
-            case ParamId::MC9: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_8, (ControllerId)controller_id); break;;
-            case ParamId::MC10: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_9, (ControllerId)controller_id); break;;
-            case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_frequency, (ControllerId)controller_id); break;;
-            case ParamId::MF1Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_q, (ControllerId)controller_id); break;;
-            case ParamId::MF1G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_gain, (ControllerId)controller_id); break;;
-            case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_frequency, (ControllerId)controller_id); break;;
-            case ParamId::MF2Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_q, (ControllerId)controller_id); break;;
-            case ParamId::MF2G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_gain, (ControllerId)controller_id); break;;
-            case ParamId::CAMP: is_assigned = assign_controller<FloatParamS>(carrier_params.amplitude, (ControllerId)controller_id); break;;
-            case ParamId::CVS: is_assigned = assign_controller<FloatParamB>(carrier_params.velocity_sensitivity, (ControllerId)controller_id); break;;
-            case ParamId::CFLD: is_assigned = assign_controller<FloatParamS>(carrier_params.folding, (ControllerId)controller_id); break;;
-            case ParamId::CPRT: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_length, (ControllerId)controller_id); break;;
-            case ParamId::CPRD: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_depth, (ControllerId)controller_id); break;;
-            case ParamId::CDTN: is_assigned = assign_controller<FloatParamS>(carrier_params.detune, (ControllerId)controller_id); break;;
-            case ParamId::CFIN: is_assigned = assign_controller<FloatParamS>(carrier_params.fine_detune, (ControllerId)controller_id); break;;
-            case ParamId::CWID: is_assigned = assign_controller<FloatParamB>(carrier_params.width, (ControllerId)controller_id); break;;
-            case ParamId::CPAN: is_assigned = assign_controller<FloatParamS>(carrier_params.panning, (ControllerId)controller_id); break;;
-            case ParamId::CVOL: is_assigned = assign_controller<FloatParamS>(carrier_params.volume, (ControllerId)controller_id); break;;
-            case ParamId::CC1: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_0, (ControllerId)controller_id); break;;
-            case ParamId::CC2: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_1, (ControllerId)controller_id); break;;
-            case ParamId::CC3: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_2, (ControllerId)controller_id); break;;
-            case ParamId::CC4: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_3, (ControllerId)controller_id); break;;
-            case ParamId::CC5: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_4, (ControllerId)controller_id); break;;
-            case ParamId::CC6: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_5, (ControllerId)controller_id); break;;
-            case ParamId::CC7: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_6, (ControllerId)controller_id); break;;
-            case ParamId::CC8: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_7, (ControllerId)controller_id); break;;
-            case ParamId::CC9: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_8, (ControllerId)controller_id); break;;
-            case ParamId::CC10: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_9, (ControllerId)controller_id); break;;
-            case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_frequency, (ControllerId)controller_id); break;;
-            case ParamId::CF1Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_q, (ControllerId)controller_id); break;;
-            case ParamId::CF1G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_gain, (ControllerId)controller_id); break;;
-            case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_frequency, (ControllerId)controller_id); break;;
-            case ParamId::CF2Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_q, (ControllerId)controller_id); break;;
-            case ParamId::CF2G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_gain, (ControllerId)controller_id); break;;
-            case ParamId::EOG: is_assigned = assign_controller<FloatParamS>(effects.overdrive.level, (ControllerId)controller_id); break;;
-            case ParamId::EDG: is_assigned = assign_controller<FloatParamS>(effects.distortion.level, (ControllerId)controller_id); break;;
-            case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_1.frequency, (ControllerId)controller_id); break;;
-            case ParamId::EF1Q: is_assigned = assign_controller<FloatParamS>(effects.filter_1.q, (ControllerId)controller_id); break;;
-            case ParamId::EF1G: is_assigned = assign_controller<FloatParamS>(effects.filter_1.gain, (ControllerId)controller_id); break;;
-            case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_2.frequency, (ControllerId)controller_id); break;;
-            case ParamId::EF2Q: is_assigned = assign_controller<FloatParamS>(effects.filter_2.q, (ControllerId)controller_id); break;;
-            case ParamId::EF2G: is_assigned = assign_controller<FloatParamS>(effects.filter_2.gain, (ControllerId)controller_id); break;;
-            case ParamId::ECDEL: is_assigned = assign_controller<FloatParamS>(effects.chorus.delay_time, (ControllerId)controller_id); break;;
-            case ParamId::ECFRQ: is_assigned = assign_controller<FloatParamS>(effects.chorus.frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECDPT: is_assigned = assign_controller<FloatParamS>(effects.chorus.depth, (ControllerId)controller_id); break;;
-            case ParamId::ECFB: is_assigned = assign_controller<FloatParamS>(effects.chorus.feedback, (ControllerId)controller_id); break;;
-            case ParamId::ECDF: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECDG: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::ECWID: is_assigned = assign_controller<FloatParamS>(effects.chorus.width, (ControllerId)controller_id); break;;
-            case ParamId::ECHPF: is_assigned = assign_controller<FloatParamS>(effects.chorus.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ECWET: is_assigned = assign_controller<FloatParamS>(effects.chorus.wet, (ControllerId)controller_id); break;;
-            case ParamId::ECDRY: is_assigned = assign_controller<FloatParamS>(effects.chorus.dry, (ControllerId)controller_id); break;;
-            case ParamId::EEDEL: is_assigned = assign_controller<FloatParamS>(effects.echo.delay_time, (ControllerId)controller_id); break;;
-            case ParamId::EEFB: is_assigned = assign_controller<FloatParamS>(effects.echo.feedback, (ControllerId)controller_id); break;;
-            case ParamId::EEDF: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::EEDG: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::EEWID: is_assigned = assign_controller<FloatParamS>(effects.echo.width, (ControllerId)controller_id); break;;
-            case ParamId::EEHPF: is_assigned = assign_controller<FloatParamS>(effects.echo.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::EEWET: is_assigned = assign_controller<FloatParamS>(effects.echo.wet, (ControllerId)controller_id); break;;
-            case ParamId::EEDRY: is_assigned = assign_controller<FloatParamS>(effects.echo.dry, (ControllerId)controller_id); break;;
-            case ParamId::ERRS: is_assigned = assign_controller<FloatParamS>(effects.reverb.room_size, (ControllerId)controller_id); break;;
-            case ParamId::ERDF: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ERDG: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_gain, (ControllerId)controller_id); break;;
-            case ParamId::ERWID: is_assigned = assign_controller<FloatParamS>(effects.reverb.width, (ControllerId)controller_id); break;;
-            case ParamId::ERHPF: is_assigned = assign_controller<FloatParamS>(effects.reverb.high_pass_frequency, (ControllerId)controller_id); break;;
-            case ParamId::ERWET: is_assigned = assign_controller<FloatParamS>(effects.reverb.wet, (ControllerId)controller_id); break;;
-            case ParamId::ERDRY: is_assigned = assign_controller<FloatParamS>(effects.reverb.dry, (ControllerId)controller_id); break;;
+            case ParamId::MIX: is_assigned = assign_controller<FloatParamS>(modulator_add_volume, ctl_id); break;
+            case ParamId::PM: is_assigned = assign_controller<FloatParamS>(phase_modulation_level, ctl_id); break;
+            case ParamId::FM: is_assigned = assign_controller<FloatParamS>(frequency_modulation_level, ctl_id); break;
+            case ParamId::AM: is_assigned = assign_controller<FloatParamS>(amplitude_modulation_level, ctl_id); break;
+            case ParamId::MAMP: is_assigned = assign_controller<FloatParamS>(modulator_params.amplitude, ctl_id); break;
+            case ParamId::MVS: is_assigned = assign_controller<FloatParamB>(modulator_params.velocity_sensitivity, ctl_id); break;
+            case ParamId::MFLD: is_assigned = assign_controller<FloatParamS>(modulator_params.folding, ctl_id); break;
+            case ParamId::MPRT: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_length, ctl_id); break;
+            case ParamId::MPRD: is_assigned = assign_controller<FloatParamB>(modulator_params.portamento_depth, ctl_id); break;
+            case ParamId::MDTN: is_assigned = assign_controller<FloatParamS>(modulator_params.detune, ctl_id); break;
+            case ParamId::MFIN: is_assigned = assign_controller<FloatParamS>(modulator_params.fine_detune, ctl_id); break;
+            case ParamId::MWID: is_assigned = assign_controller<FloatParamB>(modulator_params.width, ctl_id); break;
+            case ParamId::MPAN: is_assigned = assign_controller<FloatParamS>(modulator_params.panning, ctl_id); break;
+            case ParamId::MVOL: is_assigned = assign_controller<FloatParamS>(modulator_params.volume, ctl_id); break;
+            case ParamId::MC1: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_0, ctl_id); break;
+            case ParamId::MC2: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_1, ctl_id); break;
+            case ParamId::MC3: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_2, ctl_id); break;
+            case ParamId::MC4: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_3, ctl_id); break;
+            case ParamId::MC5: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_4, ctl_id); break;
+            case ParamId::MC6: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_5, ctl_id); break;
+            case ParamId::MC7: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_6, ctl_id); break;
+            case ParamId::MC8: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_7, ctl_id); break;
+            case ParamId::MC9: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_8, ctl_id); break;
+            case ParamId::MC10: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_9, ctl_id); break;
+            case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_frequency, ctl_id); break;
+            case ParamId::MF1Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_q, ctl_id); break;
+            case ParamId::MF1G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_gain, ctl_id); break;
+            case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_frequency, ctl_id); break;
+            case ParamId::MF2Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_q, ctl_id); break;
+            case ParamId::MF2G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_gain, ctl_id); break;
+            case ParamId::CAMP: is_assigned = assign_controller<FloatParamS>(carrier_params.amplitude, ctl_id); break;
+            case ParamId::CVS: is_assigned = assign_controller<FloatParamB>(carrier_params.velocity_sensitivity, ctl_id); break;
+            case ParamId::CFLD: is_assigned = assign_controller<FloatParamS>(carrier_params.folding, ctl_id); break;
+            case ParamId::CPRT: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_length, ctl_id); break;
+            case ParamId::CPRD: is_assigned = assign_controller<FloatParamB>(carrier_params.portamento_depth, ctl_id); break;
+            case ParamId::CDTN: is_assigned = assign_controller<FloatParamS>(carrier_params.detune, ctl_id); break;
+            case ParamId::CFIN: is_assigned = assign_controller<FloatParamS>(carrier_params.fine_detune, ctl_id); break;
+            case ParamId::CWID: is_assigned = assign_controller<FloatParamB>(carrier_params.width, ctl_id); break;
+            case ParamId::CPAN: is_assigned = assign_controller<FloatParamS>(carrier_params.panning, ctl_id); break;
+            case ParamId::CVOL: is_assigned = assign_controller<FloatParamS>(carrier_params.volume, ctl_id); break;
+            case ParamId::CC1: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_0, ctl_id); break;
+            case ParamId::CC2: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_1, ctl_id); break;
+            case ParamId::CC3: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_2, ctl_id); break;
+            case ParamId::CC4: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_3, ctl_id); break;
+            case ParamId::CC5: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_4, ctl_id); break;
+            case ParamId::CC6: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_5, ctl_id); break;
+            case ParamId::CC7: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_6, ctl_id); break;
+            case ParamId::CC8: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_7, ctl_id); break;
+            case ParamId::CC9: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_8, ctl_id); break;
+            case ParamId::CC10: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_9, ctl_id); break;
+            case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_frequency, ctl_id); break;
+            case ParamId::CF1Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_q, ctl_id); break;
+            case ParamId::CF1G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_gain, ctl_id); break;
+            case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_frequency, ctl_id); break;
+            case ParamId::CF2Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_q, ctl_id); break;
+            case ParamId::CF2G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_gain, ctl_id); break;
+            case ParamId::EOG: is_assigned = assign_controller<FloatParamS>(effects.overdrive.level, ctl_id); break;
+            case ParamId::EDG: is_assigned = assign_controller<FloatParamS>(effects.distortion.level, ctl_id); break;
+            case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_1.frequency, ctl_id); break;
+            case ParamId::EF1Q: is_assigned = assign_controller<FloatParamS>(effects.filter_1.q, ctl_id); break;
+            case ParamId::EF1G: is_assigned = assign_controller<FloatParamS>(effects.filter_1.gain, ctl_id); break;
+            case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_2.frequency, ctl_id); break;
+            case ParamId::EF2Q: is_assigned = assign_controller<FloatParamS>(effects.filter_2.q, ctl_id); break;
+            case ParamId::EF2G: is_assigned = assign_controller<FloatParamS>(effects.filter_2.gain, ctl_id); break;
+            case ParamId::ECDEL: is_assigned = assign_controller<FloatParamS>(effects.chorus.delay_time, ctl_id); break;
+            case ParamId::ECFRQ: is_assigned = assign_controller<FloatParamS>(effects.chorus.frequency, ctl_id); break;
+            case ParamId::ECDPT: is_assigned = assign_controller<FloatParamS>(effects.chorus.depth, ctl_id); break;
+            case ParamId::ECFB: is_assigned = assign_controller<FloatParamS>(effects.chorus.feedback, ctl_id); break;
+            case ParamId::ECDF: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_frequency, ctl_id); break;
+            case ParamId::ECDG: is_assigned = assign_controller<FloatParamS>(effects.chorus.damping_gain, ctl_id); break;
+            case ParamId::ECWID: is_assigned = assign_controller<FloatParamS>(effects.chorus.width, ctl_id); break;
+            case ParamId::ECHPF: is_assigned = assign_controller<FloatParamS>(effects.chorus.high_pass_frequency, ctl_id); break;
+            case ParamId::ECWET: is_assigned = assign_controller<FloatParamS>(effects.chorus.wet, ctl_id); break;
+            case ParamId::ECDRY: is_assigned = assign_controller<FloatParamS>(effects.chorus.dry, ctl_id); break;
+            case ParamId::EEDEL: is_assigned = assign_controller<FloatParamS>(effects.echo.delay_time, ctl_id); break;
+            case ParamId::EEFB: is_assigned = assign_controller<FloatParamS>(effects.echo.feedback, ctl_id); break;
+            case ParamId::EEDF: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_frequency, ctl_id); break;
+            case ParamId::EEDG: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_gain, ctl_id); break;
+            case ParamId::EEWID: is_assigned = assign_controller<FloatParamS>(effects.echo.width, ctl_id); break;
+            case ParamId::EEHPF: is_assigned = assign_controller<FloatParamS>(effects.echo.high_pass_frequency, ctl_id); break;
+            case ParamId::EEWET: is_assigned = assign_controller<FloatParamS>(effects.echo.wet, ctl_id); break;
+            case ParamId::EEDRY: is_assigned = assign_controller<FloatParamS>(effects.echo.dry, ctl_id); break;
+            case ParamId::ERRS: is_assigned = assign_controller<FloatParamS>(effects.reverb.room_size, ctl_id); break;
+            case ParamId::ERDF: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_frequency, ctl_id); break;
+            case ParamId::ERDG: is_assigned = assign_controller<FloatParamS>(effects.reverb.damping_gain, ctl_id); break;
+            case ParamId::ERWID: is_assigned = assign_controller<FloatParamS>(effects.reverb.width, ctl_id); break;
+            case ParamId::ERHPF: is_assigned = assign_controller<FloatParamS>(effects.reverb.high_pass_frequency, ctl_id); break;
+            case ParamId::ERWET: is_assigned = assign_controller<FloatParamS>(effects.reverb.wet, ctl_id); break;
+            case ParamId::ERDRY: is_assigned = assign_controller<FloatParamS>(effects.reverb.dry, ctl_id); break;
             default: break;
         }
     } else {
-        is_assigned = assign_controller_to_discrete_param(
-            param_id, (ControllerId)(ControllerId)controller_id
-        );
+        is_assigned = assign_controller_to_discrete_param(param_id, ctl_id);
     }
 
     if (!is_assigned) {
