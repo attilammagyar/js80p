@@ -365,6 +365,8 @@ void Synth::register_carrier_params() noexcept
 
 void Synth::register_effects_params() noexcept
 {
+    register_param<FloatParamS>(ParamId::EV1V, effects.volume_1_gain);
+
     register_param<FloatParamS>(ParamId::EOG, effects.overdrive.level);
 
     register_param<FloatParamS>(ParamId::EDG, effects.distortion.level);
@@ -381,7 +383,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EF2Q, effects.filter_2.q);
     register_param<FloatParamS>(ParamId::EF2G, effects.filter_2.gain);
 
-    register_param<FloatParamS>(ParamId::EVV, effects.gain_param);
+    register_param<FloatParamS>(ParamId::EV2V, effects.volume_2_gain);
 
     register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
     register_param<FloatParamS>(ParamId::ECFRQ, effects.chorus.frequency);
@@ -423,6 +425,8 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
     register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
+
+    register_param<FloatParamS>(ParamId::EV3V, effects.volume_3_gain);
 }
 
 
@@ -1309,6 +1313,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_default_ratio();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_default_ratio();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_default_ratio();
+        case ParamId::EV1V: return effects.volume_1_gain.get_default_ratio();
         case ParamId::EOG: return effects.overdrive.level.get_default_ratio();
         case ParamId::EDG: return effects.distortion.level.get_default_ratio();
         case ParamId::EF1FRQ: return effects.filter_1.frequency.get_default_ratio();
@@ -1317,7 +1322,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_default_ratio();
         case ParamId::EF2Q: return effects.filter_2.q.get_default_ratio();
         case ParamId::EF2G: return effects.filter_2.gain.get_default_ratio();
-        case ParamId::EVV: return effects.gain_param.get_default_ratio();
+        case ParamId::EV2V: return effects.volume_2_gain.get_default_ratio();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_default_ratio();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_default_ratio();
         case ParamId::ECDPT: return effects.chorus.depth.get_default_ratio();
@@ -1351,6 +1356,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_default_ratio();
         case ParamId::ERWET: return effects.reverb.wet.get_default_ratio();
         case ParamId::ERDRY: return effects.reverb.dry.get_default_ratio();
+        case ParamId::EV3V: return effects.volume_3_gain.get_default_ratio();
         case ParamId::MODE: return mode.get_default_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
@@ -1521,6 +1527,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_max_value();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_max_value();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_max_value();
+        case ParamId::EV1V: return effects.volume_1_gain.get_max_value();
         case ParamId::EOG: return effects.overdrive.level.get_max_value();
         case ParamId::EDG: return effects.distortion.level.get_max_value();
         case ParamId::EF1FRQ: return effects.filter_1.frequency.get_max_value();
@@ -1529,7 +1536,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_max_value();
         case ParamId::EF2Q: return effects.filter_2.q.get_max_value();
         case ParamId::EF2G: return effects.filter_2.gain.get_max_value();
-        case ParamId::EVV: return effects.gain_param.get_max_value();
+        case ParamId::EV2V: return effects.volume_2_gain.get_max_value();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_max_value();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_max_value();
         case ParamId::ECDPT: return effects.chorus.depth.get_max_value();
@@ -1563,6 +1570,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_max_value();
         case ParamId::ERWET: return effects.reverb.wet.get_max_value();
         case ParamId::ERDRY: return effects.reverb.dry.get_max_value();
+        case ParamId::EV3V: return effects.volume_3_gain.get_max_value();
         case ParamId::MODE: return mode.get_max_value();
         case ParamId::MWAV: return modulator_params.waveform.get_max_value();
         case ParamId::CWAV: return carrier_params.waveform.get_max_value();
@@ -1729,6 +1737,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.ratio_to_value(ratio);
         case ParamId::CF2Q: return carrier_params.filter_2_q.ratio_to_value(ratio);
         case ParamId::CF2G: return carrier_params.filter_2_gain.ratio_to_value(ratio);
+        case ParamId::EV1V: return effects.volume_1_gain.ratio_to_value(ratio);
         case ParamId::EOG: return effects.overdrive.level.ratio_to_value(ratio);
         case ParamId::EDG: return effects.distortion.level.ratio_to_value(ratio);
         case ParamId::EF1FRQ: return effects.filter_1.frequency.ratio_to_value(ratio);
@@ -1737,7 +1746,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::EF2FRQ: return effects.filter_2.frequency.ratio_to_value(ratio);
         case ParamId::EF2Q: return effects.filter_2.q.ratio_to_value(ratio);
         case ParamId::EF2G: return effects.filter_2.gain.ratio_to_value(ratio);
-        case ParamId::EVV: return effects.gain_param.ratio_to_value(ratio);
+        case ParamId::EV2V: return effects.volume_2_gain.ratio_to_value(ratio);
         case ParamId::ECDEL: return effects.chorus.delay_time.ratio_to_value(ratio);
         case ParamId::ECFRQ: return effects.chorus.frequency.ratio_to_value(ratio);
         case ParamId::ECDPT: return effects.chorus.depth.ratio_to_value(ratio);
@@ -1771,6 +1780,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.ratio_to_value(ratio);
         case ParamId::ERWET: return effects.reverb.wet.ratio_to_value(ratio);
         case ParamId::ERDRY: return effects.reverb.dry.ratio_to_value(ratio);
+        case ParamId::EV3V: return effects.volume_3_gain.ratio_to_value(ratio);
         default: return 0.0; /* This should never be reached. */
     }
 
@@ -1944,6 +1954,8 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(carrier_params.filter_2_q, round, sample_count);
     FloatParamS::produce_if_not_constant(carrier_params.filter_2_gain, round, sample_count);
 
+    FloatParamS::produce_if_not_constant(effects.volume_1_gain, round, sample_count);
+
     FloatParamS::produce_if_not_constant(effects.overdrive.level, round, sample_count);
 
     FloatParamS::produce_if_not_constant(effects.distortion.level, round, sample_count);
@@ -1956,7 +1968,7 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.filter_2.q, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.filter_2.gain, round, sample_count);
 
-    FloatParamS::produce_if_not_constant(effects.gain_param, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.volume_2_gain, round, sample_count);
 
     FloatParamS::produce_if_not_constant(effects.chorus.delay_time, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.chorus.frequency, round, sample_count);
@@ -1993,6 +2005,8 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamB::produce_if_not_constant(effects.reverb.side_chain_compression_gain_reduction, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.wet, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.dry, round, sample_count);
+
+    FloatParamS::produce_if_not_constant(effects.volume_3_gain, round, sample_count);
 
     for (Integer i = 0; i != LFOS; ++i) {
         lfos_rw[i]->skip_round(round, sample_count);
@@ -2245,6 +2259,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2FRQ: carrier_params.filter_2_frequency.set_ratio(ratio); break;
             case ParamId::CF2Q: carrier_params.filter_2_q.set_ratio(ratio); break;
             case ParamId::CF2G: carrier_params.filter_2_gain.set_ratio(ratio); break;
+            case ParamId::EV1V: effects.volume_1_gain.set_ratio(ratio); break;
             case ParamId::EOG: effects.overdrive.level.set_ratio(ratio); break;
             case ParamId::EDG: effects.distortion.level.set_ratio(ratio); break;
             case ParamId::EF1FRQ: effects.filter_1.frequency.set_ratio(ratio); break;
@@ -2253,7 +2268,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::EF2FRQ: effects.filter_2.frequency.set_ratio(ratio); break;
             case ParamId::EF2Q: effects.filter_2.q.set_ratio(ratio); break;
             case ParamId::EF2G: effects.filter_2.gain.set_ratio(ratio); break;
-            case ParamId::EVV: effects.gain_param.set_ratio(ratio); break;
+            case ParamId::EV2V: effects.volume_2_gain.set_ratio(ratio); break;
             case ParamId::ECDEL: effects.chorus.delay_time.set_ratio(ratio); break;
             case ParamId::ECFRQ: effects.chorus.frequency.set_ratio(ratio); break;
             case ParamId::ECDPT: effects.chorus.depth.set_ratio(ratio); break;
@@ -2287,6 +2302,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::ERSG: effects.reverb.side_chain_compression_gain_reduction.set_ratio(ratio); break;
             case ParamId::ERWET: effects.reverb.wet.set_ratio(ratio); break;
             case ParamId::ERDRY: effects.reverb.dry.set_ratio(ratio); break;
+            case ParamId::EV3V: effects.volume_3_gain.set_ratio(ratio); break;
             case ParamId::MODE: mode.set_ratio(ratio); break;
             case ParamId::MWAV: modulator_params.waveform.set_ratio(ratio); break;
             case ParamId::CWAV: carrier_params.waveform.set_ratio(ratio); break;
@@ -2458,6 +2474,7 @@ void Synth::handle_assign_controller(
             case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_frequency, ctl_id); break;
             case ParamId::CF2Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_q, ctl_id); break;
             case ParamId::CF2G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_gain, ctl_id); break;
+            case ParamId::EV1V: is_assigned = assign_controller<FloatParamS>(effects.volume_1_gain, ctl_id); break;
             case ParamId::EOG: is_assigned = assign_controller<FloatParamS>(effects.overdrive.level, ctl_id); break;
             case ParamId::EDG: is_assigned = assign_controller<FloatParamS>(effects.distortion.level, ctl_id); break;
             case ParamId::EF1FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_1.frequency, ctl_id); break;
@@ -2466,7 +2483,7 @@ void Synth::handle_assign_controller(
             case ParamId::EF2FRQ: is_assigned = assign_controller<FloatParamS>(effects.filter_2.frequency, ctl_id); break;
             case ParamId::EF2Q: is_assigned = assign_controller<FloatParamS>(effects.filter_2.q, ctl_id); break;
             case ParamId::EF2G: is_assigned = assign_controller<FloatParamS>(effects.filter_2.gain, ctl_id); break;
-            case ParamId::EVV: is_assigned = assign_controller<FloatParamS>(effects.gain_param, ctl_id); break;
+            case ParamId::EV2V: is_assigned = assign_controller<FloatParamS>(effects.volume_2_gain, ctl_id); break;
             case ParamId::ECDEL: is_assigned = assign_controller<FloatParamS>(effects.chorus.delay_time, ctl_id); break;
             case ParamId::ECFRQ: is_assigned = assign_controller<FloatParamS>(effects.chorus.frequency, ctl_id); break;
             case ParamId::ECDPT: is_assigned = assign_controller<FloatParamS>(effects.chorus.depth, ctl_id); break;
@@ -2500,6 +2517,7 @@ void Synth::handle_assign_controller(
             case ParamId::ERSG: is_assigned = assign_controller<FloatParamB>(effects.reverb.side_chain_compression_gain_reduction, ctl_id); break;
             case ParamId::ERWET: is_assigned = assign_controller<FloatParamS>(effects.reverb.wet, ctl_id); break;
             case ParamId::ERDRY: is_assigned = assign_controller<FloatParamS>(effects.reverb.dry, ctl_id); break;
+            case ParamId::EV3V: is_assigned = assign_controller<FloatParamS>(effects.volume_3_gain, ctl_id); break;
             default: break;
         }
     } else {
@@ -2901,6 +2919,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_ratio();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_ratio();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_ratio();
+        case ParamId::EV1V: return effects.volume_1_gain.get_ratio();
         case ParamId::EOG: return effects.overdrive.level.get_ratio();
         case ParamId::EDG: return effects.distortion.level.get_ratio();
         case ParamId::EF1FRQ: return effects.filter_1.frequency.get_ratio();
@@ -2909,7 +2928,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::EF2FRQ: return effects.filter_2.frequency.get_ratio();
         case ParamId::EF2Q: return effects.filter_2.q.get_ratio();
         case ParamId::EF2G: return effects.filter_2.gain.get_ratio();
-        case ParamId::EVV: return effects.gain_param.get_ratio();
+        case ParamId::EV2V: return effects.volume_2_gain.get_ratio();
         case ParamId::ECDEL: return effects.chorus.delay_time.get_ratio();
         case ParamId::ECFRQ: return effects.chorus.frequency.get_ratio();
         case ParamId::ECDPT: return effects.chorus.depth.get_ratio();
@@ -2943,6 +2962,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::ERSG: return effects.reverb.side_chain_compression_gain_reduction.get_ratio();
         case ParamId::ERWET: return effects.reverb.wet.get_ratio();
         case ParamId::ERDRY: return effects.reverb.dry.get_ratio();
+        case ParamId::EV3V: return effects.volume_3_gain.get_ratio();
         case ParamId::MODE: return mode.get_ratio();
         case ParamId::MWAV: return modulator_params.waveform.get_ratio();
         case ParamId::CWAV: return carrier_params.waveform.get_ratio();

@@ -36,7 +36,10 @@ namespace JS80P { namespace Effects
 {
 
 template<class InputSignalProducerClass>
-using Overdrive = JS80P::Distortion<InputSignalProducerClass>;
+using Volume1 = Gain<InputSignalProducerClass>;
+
+template<class InputSignalProducerClass>
+using Overdrive = JS80P::Distortion< Volume1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Distortion = JS80P::Distortion< Overdrive<InputSignalProducerClass> >;
@@ -48,10 +51,10 @@ template<class InputSignalProducerClass>
 using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using GainEffect = Gain< Filter2<InputSignalProducerClass> >;
+using Volume2 = Gain< Filter2<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Chorus = JS80P::Chorus< GainEffect<InputSignalProducerClass> >;
+using Chorus = JS80P::Chorus< Volume2<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
@@ -59,15 +62,21 @@ using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
 template<class InputSignalProducerClass>
 using Reverb = JS80P::Reverb< Echo<InputSignalProducerClass> >;
 
+template<class InputSignalProducerClass>
+using Volume3 = Gain< Reverb<InputSignalProducerClass> >;
+
 
 template<class InputSignalProducerClass>
-class Effects : public Filter< Reverb<InputSignalProducerClass> >
+class Effects : public Filter< Volume3<InputSignalProducerClass> >
 {
     public:
         Effects(std::string const name, InputSignalProducerClass& input);
 
-        FloatParamS gain_param;
+        FloatParamS volume_1_gain;
+        FloatParamS volume_2_gain;
+        FloatParamS volume_3_gain;
 
+        Volume1<InputSignalProducerClass> volume_1;
         Overdrive<InputSignalProducerClass> overdrive;
         Distortion<InputSignalProducerClass> distortion;
         typename Filter1<InputSignalProducerClass>::TypeParam filter_1_type;
@@ -76,10 +85,11 @@ class Effects : public Filter< Reverb<InputSignalProducerClass> >
         ToggleParam filter_2_log_scale;
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
-        GainEffect<InputSignalProducerClass> gain;
+        Volume2<InputSignalProducerClass> volume_2;
         Chorus<InputSignalProducerClass> chorus;
         Echo<InputSignalProducerClass> echo;
         Reverb<InputSignalProducerClass> reverb;
+        Volume3<InputSignalProducerClass> volume_3;
 };
 
 } }

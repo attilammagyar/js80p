@@ -29,9 +29,12 @@ template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
         std::string const name,
         InputSignalProducerClass& input
-) : Filter< Reverb<InputSignalProducerClass> >(reverb, 13, input.get_channels()),
-    gain_param(name + "GG", 0.0, 2.0, 1.0),
-    overdrive(name + "O", 3.0, input),
+) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 17, input.get_channels()),
+    volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
+    volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
+    volume_3_gain(name + "V3V", 0.0, 1.0, 1.0),
+    volume_1(input, volume_1_gain),
+    overdrive(name + "O", 3.0, volume_1),
     distortion(name + "D", 10.0, overdrive),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
@@ -39,12 +42,16 @@ Effects<InputSignalProducerClass>::Effects(
     filter_2_log_scale(name + "F2LOG", ToggleParam::OFF),
     filter_1(name + "F1", distortion, filter_1_type, filter_1_log_scale),
     filter_2(name + "F2", filter_1, filter_2_type, filter_2_log_scale),
-    gain(filter_2, gain_param),
-    chorus(name + "C", gain),
+    volume_2(filter_2, volume_2_gain),
+    chorus(name + "C", volume_2),
     echo(name + "E", chorus),
-    reverb(name + "R", echo)
+    reverb(name + "R", echo),
+    volume_3(reverb, volume_3_gain)
 {
-    this->register_child(gain_param);
+    this->register_child(volume_1_gain);
+    this->register_child(volume_2_gain);
+    this->register_child(volume_3_gain);
+    this->register_child(volume_1);
     this->register_child(overdrive);
     this->register_child(distortion);
     this->register_child(filter_1_type);
@@ -53,10 +60,11 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(filter_2_log_scale);
     this->register_child(filter_1);
     this->register_child(filter_2);
-    this->register_child(gain);
+    this->register_child(volume_2);
     this->register_child(chorus);
     this->register_child(echo);
     this->register_child(reverb);
+    this->register_child(volume_3);
 }
 
 } }

@@ -70,6 +70,8 @@ def print_oscillator_params(param_id: int, group: str, prefix: str) -> int:
 
 def print_effect_params(param_id: int) -> int:
     params = [
+        ("$V1V", "  ///< $ Volume 1"),
+
         ("$OG", "   ///< $ Overdrive Gain"),
 
         ("$DG", "   ///< $ Distortion Gain"),
@@ -82,7 +84,7 @@ def print_effect_params(param_id: int) -> int:
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
 
-        ("$VV", "   ///< $ Volume"),
+        ("$V2V", "  ///< $ Volume 2"),
 
         ("$CDEL", " ///< $ Chorus Delay"),
         ("$CFRQ", " ///< $ Chorus LFO Frequency"),
@@ -119,6 +121,8 @@ def print_effect_params(param_id: int) -> int:
         ("$RSG", "  ///< $ Reverb Side-Chain Compression Gain Reduction"),
         ("$RWET", " ///< $ Reverb Wet Volume"),
         ("$RDRY", " ///< $ Reverb Dry Volume"),
+
+        ("$V3V", "  ///< $ Volume 3"),
     ]
 
     return print_params(param_id, "Effects", "E", 1, params)

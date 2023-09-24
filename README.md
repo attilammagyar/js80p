@@ -492,12 +492,12 @@ Signal Chain (Simplified)
             +----------------------------------------------------------+
             |
             v
-            Overdrive --> Distortion --> Filter --> Filter --> Volume --+
+            Volume --> Overdrive --> Distortion --> Filter --> Filter --+
                                                                         |
             +-----------------------------------------------------------+
             |
             v
-            Chorus --> Echo --> Reverb --> Out
+            Volume --> Chorus --> Echo --> Reverb --> Volume --> Out
 
 <a id="features" href="#toc">Table of Contents</a>
 

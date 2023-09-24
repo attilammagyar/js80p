@@ -62,12 +62,14 @@ html, body {
 
 #distortion-params,
 #overdrive-params,
-#volume-params {
-  width: 90px;
+#volume-1-params,
+#volume-2-params,
+#volume-3-params {
+  width: 64px;
   text-align: center;
 }
 
-#overdrive, #distortion, #filter-1, #filter-2, #volume {
+#volume-1, #overdrive, #distortion, #filter-1, #filter-2, #volume-2 {
   margin-top: 1px;
 }
 
@@ -365,7 +367,7 @@ svg.icon {
 
 .effect {
   text-align: center;
-  margin: 1.5px 12px;
+  margin: 1.5px 10px;
   padding: 2px 6px;
 }
 
@@ -577,12 +579,18 @@ function make_tabs(active)
       <script type="text/javascript">make_tabs(1);</script>
     </div>
     <div class="border" id="effects">
+      <div id="volume-1" class="effect main-block block">
+        <h1>
+          Vol 1
+        </h1>
+        <div id="volume-1-params" class="block"></div>
+      </div>
       <div id="overdrive" class="effect main-block block">
-        <h1>Overdrive</h1>
+        <h1>Odrv</h1>
         <div id="overdrive-params" class="block"></div>
       </div>
       <div id="distortion" class="effect main-block block">
-        <h1>Distortion</h1>
+        <h1>Dist</h1>
         <div id="distortion-params" class="block"></div>
       </div>
       <div id="filter-1" class="effect main-block block">
@@ -599,11 +607,11 @@ function make_tabs(active)
         </h1>
         <div id="filter-2-params" class="block"></div>
       </div>
-      <div id="volume" class="effect main-block block">
+      <div id="volume-2" class="effect main-block block">
         <h1>
-          Volume
+          Vol 2
         </h1>
-        <div id="volume-params" class="block"></div>
+        <div id="volume-2-params" class="block"></div>
       </div>
       <div id="chorus" class="effect main-block block">
         <h1>
@@ -627,6 +635,12 @@ function make_tabs(active)
           <label class="freq"><input type="text" /> LOG FREQS</label>
         </h1>
         <div id="reverb-params" class="block"></div>
+      </div>
+      <div id="volume-3" class="effect main-block block">
+        <h1>
+          Vol 3
+        </h1>
+        <div id="volume-3-params" class="block"></div>
       </div>
     </div>
   </div>
@@ -770,6 +784,8 @@ window.onload = function ()
         }
     }
 
+    create_knob("volume-1-params", "VOL %", "1.0");
+
     create_knob("overdrive-params", "GAIN %", "50");
 
     create_knob("distortion-params", "GAIN %", "50");
@@ -784,7 +800,7 @@ window.onload = function ()
     create_knob("filter-2-params", "Q", "1.0");
     create_knob("filter-2-params", "GAIN dB", "0.0");
 
-    create_knob("volume-params", "VOL %", "1.0");
+    create_knob("volume-2-params", "VOL %", "1.0");
 
     create_knob("chorus-params", "DEL s", "0.5");
     create_knob("chorus-params", "FRQ Hz", "1.5");
@@ -821,6 +837,8 @@ window.onload = function ()
     create_knob("reverb-params", "SCG dB", "-6.0");
     create_knob("reverb-params", "WET %", "50");
     create_knob("reverb-params", "DRY %", "60");
+
+    create_knob("volume-3-params", "VOL %", "1.0");
 
     for (o = 0; o <= 1; ++o) {
         for (i = 1; i <= 10; ++i) {
