@@ -307,6 +307,9 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 
     constexpr int max_top = HEIGHT - Controller::HEIGHT;
     constexpr int group_separation = 10;
+
+    GUI::ControllerCapability previous_required_capability = GUI::ControllerCapability::NONE;
+    Synth::ControllerId previous_id = Synth::ControllerId::NONE;
     int top = TITLE_HEIGHT;
     int left = 10;
 
@@ -317,15 +320,21 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
             GUI::CONTROLLERS[i].required_capability
         );
 
+        if (
+                required_capability != previous_required_capability
+                || previous_id == Synth::ControllerId::MIDI_LEARN
+        ) {
+            top += group_separation;
+            previous_required_capability = required_capability;
+        }
+
+        previous_id = id;
+
         controllers[i] = (Controller*)this->own(
             new Controller(*this, required_capability, text, left, top, id)
         );
 
         top += Controller::HEIGHT;
-
-        if (i == 0 || i == 4 || i == 5 || i == 75 || i == 95 || i == 103) {
-            top += group_separation;
-        }
 
         if (top > max_top || i == 85) {
             top = TITLE_HEIGHT;
