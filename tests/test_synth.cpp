@@ -242,7 +242,7 @@ TEST(can_look_up_param_id_by_name, {
         max_collisions, avg_collisions, avg_bucket_size
     );
 
-    assert_lte((int)max_collisions, 6);
+    assert_lte((int)max_collisions, 7);
     assert_lte(avg_bucket_size, 3.05);
     assert_lte(avg_collisions, 3.5);
 

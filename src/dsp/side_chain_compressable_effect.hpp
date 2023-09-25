@@ -46,7 +46,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         FloatParamB side_chain_compression_threshold;
         FloatParamB side_chain_compression_attack_time;
         FloatParamB side_chain_compression_release_time;
-        FloatParamB side_chain_compression_gain_reduction;
+        FloatParamB side_chain_compression_ratio;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -63,11 +63,23 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 
     private:
         enum Action {
-            BYPASS = 0,
+            BYPASS_OR_RELEASE = 0,
             COMPRESS = 1,
         };
 
-        Action decide_next_action(Integer const sample_count) const noexcept;
+        static constexpr Number NO_OP_RATIO = 1.0;
+        static constexpr Number BYPASS_GAIN = 1.0;
+
+        void fast_bypass() noexcept;
+
+        void compress(
+            Sample const peak,
+            Number const threshold_db,
+            Number const diff_db,
+            Number const ratio_value
+        ) noexcept;
+
+        void release() noexcept;
 
         FloatParamS gain;
 

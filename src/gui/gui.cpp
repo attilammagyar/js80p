@@ -193,10 +193,10 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::EEDG] = "Echo Dampening Gain (dB)",
     [Synth::ParamId::EEWID] = "Echo Stereo Width (%)",
     [Synth::ParamId::EEHPF] = "Echo Highpass Frequency (Hz)",
-    [Synth::ParamId::EESTH] = "Echo SC. Compr. Threshold (dB)",
-    [Synth::ParamId::EESAT] = "Echo SC. Compr. Attack Time (s)",
-    [Synth::ParamId::EESRL] = "Echo SC. Compr. Release Time (s)",
-    [Synth::ParamId::EESG] = "Echo SC. Compr. Gain Reduction (dB)",
+    [Synth::ParamId::EECTH] = "Echo SC. Compr. Threshold (dB)",
+    [Synth::ParamId::EECAT] = "Echo SC. Compr. Attack Time (s)",
+    [Synth::ParamId::EECRL] = "Echo SC. Compr. Release Time (s)",
+    [Synth::ParamId::EECR] = "Echo SC. Compr. Ratio (1:x)",
     [Synth::ParamId::EEWET] = "Echo Wet Volume (%)",
     [Synth::ParamId::EEDRY] = "Echo Dry Volume (%)",
 
@@ -205,10 +205,10 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::ERDG] = "Reverb Dampening Gain (dB)",
     [Synth::ParamId::ERWID] = "Reverb Stereo Width (%)",
     [Synth::ParamId::ERHPF] = "Reverb Highpass Frequency (Hz)",
-    [Synth::ParamId::ERSTH] = "Reverb SC. Compr. Threshold (dB)",
-    [Synth::ParamId::ERSAT] = "Reverb SC. Compr. Attack Time (s)",
-    [Synth::ParamId::ERSRL] = "Reverb SC. Compr. Release Time (s)",
-    [Synth::ParamId::ERSG] = "Reverb SC. Compr. Gain Reduction (dB)",
+    [Synth::ParamId::ERCTH] = "Reverb SC. Compr. Threshold (dB)",
+    [Synth::ParamId::ERCAT] = "Reverb SC. Compr. Attack Time (s)",
+    [Synth::ParamId::ERCRL] = "Reverb SC. Compr. Release Time (s)",
+    [Synth::ParamId::ERCR] = "Reverb SC. Compr. Ratio (1:x)",
     [Synth::ParamId::ERWET] = "Reverb Wet Volume (%)",
     [Synth::ParamId::ERDRY] = "Reverb Dry Volume (%)",
 
@@ -1446,10 +1446,10 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     PE(effects_body, 142 + PE_W * 3,   314, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
     PE(effects_body, 142 + PE_W * 4,   314, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
     PE(effects_body, 142 + PE_W * 5,   314, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 142 + PE_W * 6,   314, Synth::ParamId::EESTH,  MM___,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 142 + PE_W * 7,   314, Synth::ParamId::EESAT,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 142 + PE_W * 8,   314, Synth::ParamId::EESRL,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 142 + PE_W * 9,   314, Synth::ParamId::EESG,   MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 6,   314, Synth::ParamId::EECTH,  MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 7,   314, Synth::ParamId::EECAT,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 8,   314, Synth::ParamId::EECRL,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 142 + PE_W * 9,   314, Synth::ParamId::EECR,   MM___,      "%.2f", 1.0, knob_states);
     PE(effects_body, 142 + PE_W * 10,  314, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
     PE(effects_body, 142 + PE_W * 11,  314, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TS(effects_body, 277, 286,  96, 24,  0, Synth::ParamId::EELOG);
@@ -1460,10 +1460,10 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     PE(effects_body, 120 + PE_W * 2,   454, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
     PE(effects_body, 120 + PE_W * 3,   454, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
     PE(effects_body, 120 + PE_W * 4,   454, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 5,   454, Synth::ParamId::ERSTH,  MM___,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 6,   454, Synth::ParamId::ERSAT,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 7,   454, Synth::ParamId::ERSRL,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 8,   454, Synth::ParamId::ERSG,   MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 120 + PE_W * 5,   454, Synth::ParamId::ERCTH,  MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body, 120 + PE_W * 6,   454, Synth::ParamId::ERCAT,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 120 + PE_W * 7,   454, Synth::ParamId::ERCRL,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body, 120 + PE_W * 8,   454, Synth::ParamId::ERCR,   MM___,      "%.2f", 1.0, knob_states);
     PE(effects_body, 120 + PE_W * 9,   454, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
     PE(effects_body, 120 + PE_W * 10,  454, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TS(effects_body, 193, 426,  96, 24,  0, Synth::ParamId::ERLOG);

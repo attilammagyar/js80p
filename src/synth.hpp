@@ -203,10 +203,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             EEDG = 79,       ///< Effects Echo Dampening Gain
             EEWID = 80,      ///< Effects Echo Stereo Width
             EEHPF = 81,      ///< Effects Echo Highpass Frequency
-            EESTH = 82,      ///< Effects Echo Side-Chain Compression Threshold
-            EESAT = 83,      ///< Effects Echo Side-Chain Compression Attack Time
-            EESRL = 84,      ///< Effects Echo Side-Chain Compression Release Time
-            EESG = 85,       ///< Effects Echo Side-Chain Compression Gain Reduction
+            EECTH = 82,      ///< Effects Echo Side-Chain Compression Threshold
+            EECAT = 83,      ///< Effects Echo Side-Chain Compression Attack Time
+            EECRL = 84,      ///< Effects Echo Side-Chain Compression Release Time
+            EECR = 85,       ///< Effects Echo Side-Chain Compression Ratio
             EEWET = 86,      ///< Effects Echo Wet Volume
             EEDRY = 87,      ///< Effects Echo Dry Volume
 
@@ -215,10 +215,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ERDG = 90,       ///< Effects Reverb Dampening Gain
             ERWID = 91,      ///< Effects Reverb Stereo Width
             ERHPF = 92,      ///< Effects Reverb Highpass Frequency
-            ERSTH = 93,      ///< Effects Reverb Side-Chain Compression Threshold
-            ERSAT = 94,      ///< Effects Reverb Side-Chain Compression Attack Time
-            ERSRL = 95,      ///< Effects Reverb Side-Chain Compression Release Time
-            ERSG = 96,       ///< Effects Reverb Side-Chain Compression Gain Reduction
+            ERCTH = 93,      ///< Effects Reverb Side-Chain Compression Threshold
+            ERCAT = 94,      ///< Effects Reverb Side-Chain Compression Attack Time
+            ERCRL = 95,      ///< Effects Reverb Side-Chain Compression Release Time
+            ERCR = 96,       ///< Effects Reverb Side-Chain Compression Ratio
             ERWET = 97,      ///< Effects Reverb Wet Volume
             ERDRY = 98,      ///< Effects Reverb Dry Volume
 

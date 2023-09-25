@@ -38,16 +38,17 @@ SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffe
         input,
         number_of_children + 5
     ),
-    side_chain_compression_threshold(name + "STH", -120.0, 0.0, -30.0),
-    side_chain_compression_attack_time(name + "SAT", 0.001, 3.0, 0.02),
-    side_chain_compression_release_time(name + "SRL", 0.001, 3.0, 0.20),
-    side_chain_compression_gain_reduction(name + "SG", -120.0, 0.0, 0.0),
-    previous_action(Action::BYPASS)
+    side_chain_compression_threshold(name + "CTH", -120.0, 0.0, -18.0),
+    side_chain_compression_attack_time(name + "CAT", 0.001, 3.0, 0.01),
+    side_chain_compression_release_time(name + "CRL", 0.001, 3.0, 0.20),
+    side_chain_compression_ratio(name + "CR", 1.0, 120.0, NO_OP_RATIO),
+    gain(name + "G", 0.0, 1.0, BYPASS_GAIN),
+    previous_action(Action::BYPASS_OR_RELEASE)
 {
     this->register_child(side_chain_compression_threshold);
     this->register_child(side_chain_compression_attack_time);
     this->register_child(side_chain_compression_release_time);
-    this->register_child(side_chain_compression_gain_reduction);
+    this->register_child(side_chain_compression_ratio);
     this->register_child(gain);
 }
 
@@ -65,32 +66,31 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
     if (buffer != NULL) {
         FloatParamS::produce_if_not_constant(gain, round, sample_count);
+        fast_bypass();
 
         return buffer;
     }
 
-    Number const attack_time_value = side_chain_compression_attack_time.get_value();
-    Number const release_time_value = side_chain_compression_release_time.get_value();
-    Number const gain_reduction_value = side_chain_compression_gain_reduction.get_value();
+    Number const ratio_value = side_chain_compression_ratio.get_value();
 
-    is_bypassing = this->is_dry || std::fabs(gain_reduction_value) < 0.000001;
+    is_bypassing = this->is_dry || std::fabs(ratio_value - NO_OP_RATIO) < 0.000001;
 
-    if (!is_bypassing) {
-        Action const next_action = decide_next_action(sample_count);
+    if (is_bypassing) {
+        fast_bypass();
+    } else {
+        Number const threshold_db = side_chain_compression_threshold.get_value();
+        Sample const peak = SignalProducer::find_peak(
+            this->input_buffer, this->channels, sample_count
+        );
+        Number const diff_db = Math::linear_to_db(peak) - threshold_db;
 
-        if (next_action == Action::COMPRESS) {
-            if (previous_action == Action::BYPASS) {
-                gain.cancel_events_at(0.0);
-                gain.schedule_linear_ramp(
-                    attack_time_value, Math::db_to_linear(gain_reduction_value)
-                );
-            }
+        if (diff_db > 0.0) {
+            compress(peak, threshold_db, diff_db, ratio_value);
         } else if (previous_action == Action::COMPRESS) {
-            gain.cancel_events_at(0.0);
-            gain.schedule_linear_ramp(release_time_value, 1.0);
+            release();
+        } else if (std::fabs(gain.get_value() - BYPASS_GAIN) < 0.000001) {
+            fast_bypass();
         }
-
-        previous_action = next_action;
     }
 
     gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
@@ -100,26 +100,49 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
 
 template<class InputSignalProducerClass>
-typename SideChainCompressableEffect<InputSignalProducerClass>::Action SideChainCompressableEffect<InputSignalProducerClass>::decide_next_action(
-        Integer const sample_count
-) const noexcept {
-    Integer const channels = this->channels;
-    Number const threshold = Math::db_to_linear(
-        side_chain_compression_threshold.get_value()
+void SideChainCompressableEffect<InputSignalProducerClass>::fast_bypass() noexcept
+{
+    gain.cancel_events_at(0.0);
+    gain.set_value(BYPASS_GAIN);
+    previous_action = Action::BYPASS_OR_RELEASE;
+    is_bypassing = true;
+}
+
+
+template<class InputSignalProducerClass>
+void SideChainCompressableEffect<InputSignalProducerClass>::compress(
+        Sample const peak,
+        Number const threshold_db,
+        Number const diff_db,
+        Number const ratio_value
+) noexcept {
+    Number const new_peak = (
+        Math::db_to_linear(threshold_db + diff_db / ratio_value)
     );
-    Sample const* const* input_buffer = this->input_buffer;
+    Number const target_gain = (
+        peak > 0.000001 ? std::min(BYPASS_GAIN, new_peak / peak) : BYPASS_GAIN
+    );
 
-    for (Integer c = 0; c != channels; ++c) {
-        Sample const* input_channel = input_buffer[c];
+    gain.cancel_events_at(0.0);
 
-        for (Integer i = 0; i != sample_count; ++i) {
-            if (std::fabs(input_channel[i]) > threshold) {
-                return Action::COMPRESS;
-            }
-        }
+    if (std::fabs(gain.get_value() - target_gain) > 0.005) {
+        Seconds const attack_time = side_chain_compression_attack_time.get_value();
+
+        gain.schedule_linear_ramp(attack_time, target_gain);
     }
 
-    return Action::BYPASS;
+    previous_action = Action::COMPRESS;
+}
+
+
+template<class InputSignalProducerClass>
+void SideChainCompressableEffect<InputSignalProducerClass>::release() noexcept
+{
+    Seconds const release_time = side_chain_compression_release_time.get_value();
+
+    gain.cancel_events_at(0.0);
+    gain.schedule_linear_ramp(release_time, BYPASS_GAIN);
+    previous_action = Action::BYPASS_OR_RELEASE;
 }
 
 
