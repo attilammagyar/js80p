@@ -567,7 +567,7 @@ $(BUILD_DIR)/test_math$(EXE): \
 		$(TEST_LIBS) \
 		| $(BUILD_DIR)
 	$(COMPILE_TEST) -o $@ $<
-	$(BUILD_DIR)/test_math$(EXE)
+	$@
 
 $(BUILD_DIR)/test_midi_controller$(EXE): \
 		tests/test_midi_controller.cpp \
@@ -627,7 +627,7 @@ $(BUILD_DIR)/test_param_slow$(EXE): \
 		| $(BUILD_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
-	$(BUILD_DIR)/test_param_slow$(EXE)
+	$@
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \
