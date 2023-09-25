@@ -82,7 +82,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
             if (previous_action == Action::BYPASS) {
                 gain.cancel_events_at(0.0);
                 gain.schedule_linear_ramp(
-                    attack_time_value, Math::db_to_magnitude(gain_reduction_value)
+                    attack_time_value, Math::db_to_linear(gain_reduction_value)
                 );
             }
         } else if (previous_action == Action::COMPRESS) {
@@ -104,7 +104,7 @@ typename SideChainCompressableEffect<InputSignalProducerClass>::Action SideChain
         Integer const sample_count
 ) const noexcept {
     Integer const channels = this->channels;
-    Number const threshold = Math::db_to_magnitude(
+    Number const threshold = Math::db_to_linear(
         side_chain_compression_threshold.get_value()
     );
     Sample const* const* input_buffer = this->input_buffer;

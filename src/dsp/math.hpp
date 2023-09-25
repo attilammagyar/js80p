@@ -88,6 +88,10 @@ class Math
             (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
         );
 
+        static constexpr Number DB_MIN = -120.0;
+        static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
+        static constexpr Number LINEAR_TO_DB_MAX = 5.0;
+
         /**
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.
@@ -110,7 +114,8 @@ class Math
         static Number pow_10(Number const x) noexcept;
         static Number pow_10_inv(Number const x) noexcept;
 
-        static Number db_to_magnitude(Number const db) noexcept;
+        static Number db_to_linear(Number const db) noexcept;
+        static Number linear_to_db(Number const linear) noexcept;
 
         static Number const* log_biquad_filter_freq_table() noexcept;
 
@@ -232,7 +237,15 @@ class Math
 
         static constexpr Number DETUNE_CENTS_TO_POWER_OF_2_SCALE = 1.0 / 1200.0;
 
-        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / 20.0;
+        static constexpr int LINEAR_TO_DB_TABLE_SIZE = 0x0800;
+        static constexpr int LINEAR_TO_DB_TABLE_MAX_INDEX = LINEAR_TO_DB_TABLE_SIZE - 1;
+        static constexpr Number LINEAR_TO_DB_GAIN_SCALE = 20.0;
+        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / LINEAR_TO_DB_GAIN_SCALE;
+
+        /* LINEAR_TO_DB_MIN is considered to be approximately 0.0 */
+        static constexpr Number LINEAR_TO_DB_SCALE = (
+            (Number)LINEAR_TO_DB_TABLE_SIZE / LINEAR_TO_DB_MAX
+        );
 
         static Math const math;
 
@@ -244,6 +257,7 @@ class Math
         void init_randoms() noexcept;
         void init_distortion() noexcept;
         void init_log_biquad_filter_freq() noexcept;
+        void init_linear_to_db() noexcept;
 
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;
@@ -257,6 +271,7 @@ class Math
         Number distortion[DISTORTION_TABLE_SIZE];
         Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
+        Number linear_to_dbs[LINEAR_TO_DB_TABLE_SIZE];
 };
 
 }

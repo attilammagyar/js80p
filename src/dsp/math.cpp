@@ -36,6 +36,7 @@ Math::Math() noexcept
     init_randoms();
     init_distortion();
     init_log_biquad_filter_freq();
+    init_linear_to_db();
 }
 
 
@@ -138,6 +139,18 @@ Number Math::ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept
 }
 
 
+void Math::init_linear_to_db() noexcept
+{
+    constexpr Number scale = LINEAR_TO_DB_MAX / (Number)LINEAR_TO_DB_TABLE_SIZE;
+
+    for (int i = 0; i != LINEAR_TO_DB_TABLE_SIZE; ++i) {
+        Number const x = LINEAR_TO_DB_MIN + scale * (Number)i;
+
+        linear_to_dbs[i] = LINEAR_TO_DB_GAIN_SCALE * std::log10(x);
+    }
+}
+
+
 Number Math::sin(Number const x) noexcept
 {
     return math.sin_impl(x);
@@ -231,9 +244,24 @@ Number Math::pow_10_inv(Number const x) noexcept
 }
 
 
-Number Math::db_to_magnitude(Number const db) noexcept
+Number Math::db_to_linear(Number const db) noexcept
 {
     return pow_10(db * DB_TO_LINEAR_GAIN_SCALE);
+}
+
+
+Number Math::linear_to_db(Number const linear) noexcept
+{
+    /* LINEAR_TO_DB_MIN is considered to be approximately 0.0 */
+    return (
+        linear >= LINEAR_TO_DB_MIN
+            ? lookup(
+                math.linear_to_dbs,
+                LINEAR_TO_DB_TABLE_MAX_INDEX,
+                linear * LINEAR_TO_DB_SCALE
+            )
+            : DB_MIN
+    );
 }
 
 

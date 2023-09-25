@@ -1192,7 +1192,7 @@ void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
 ) noexcept {
     store_normalized_coefficient_samples(
         index,
-        (Sample)Math::db_to_magnitude(gain_value),
+        (Sample)Math::db_to_linear(gain_value),
         0.0,
         0.0,
         1.0,

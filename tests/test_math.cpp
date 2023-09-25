@@ -157,13 +157,56 @@ TEST(pow_10_inv, {
 })
 
 
-TEST(db_to_magnitude, {
-    assert_eq(2.0, Math::db_to_magnitude(6.0), 0.01);
-    assert_eq(1.0, Math::db_to_magnitude(0.0), DOUBLE_DELTA);
-    assert_eq(0.5, Math::db_to_magnitude(-6.0), 0.001);
-    assert_eq(0.25, Math::db_to_magnitude(-12.0), 0.001);
-    assert_eq(0.125, Math::db_to_magnitude(-18.0), 0.001);
-    assert_eq(0.0, Math::db_to_magnitude(-120.0), DOUBLE_DELTA);
+TEST(db_to_linear, {
+    assert_eq(2.0, Math::db_to_linear(6.0), 0.01);
+    assert_eq(1.0, Math::db_to_linear(0.0), DOUBLE_DELTA);
+    assert_eq(1.0 / 2.0, Math::db_to_linear(-6.0), 0.001);
+    assert_eq(1.0 / 4.0, Math::db_to_linear(-12.0), 0.001);
+    assert_eq(1.0 / 8.0, Math::db_to_linear(-18.0), 0.001);
+    assert_eq(1.0 / 16.0, Math::db_to_linear(-24.0), 0.001);
+    assert_eq(1.0 / 32.0, Math::db_to_linear(-30.0), 0.001);
+    assert_eq(1.0 / 64.0, Math::db_to_linear(-36.0), 0.001);
+    assert_eq(1.0 / 128.0, Math::db_to_linear(-42.0), 0.001);
+    assert_eq(1.0 / 256.0, Math::db_to_linear(-48.0), 0.001);
+    assert_eq(0.0, Math::db_to_linear(Math::DB_MIN), DOUBLE_DELTA);
+})
+
+
+TEST(linear_to_db, {
+    assert_eq(13.98, Math::linear_to_db(10.0), 0.03);
+    assert_eq(13.98, Math::linear_to_db(5.0), 0.03);
+    assert_eq(6.0, Math::linear_to_db(2.0), 0.03);
+    assert_eq(0.0, Math::linear_to_db(1.0), 0.03);
+    assert_eq(-6.0, Math::linear_to_db(1.0 / 2.0), 0.03);
+    assert_eq(-12.0, Math::linear_to_db(1.0 / 4.0), 0.05);
+    assert_eq(-18.0, Math::linear_to_db(1.0 / 8.0), 0.07);
+    assert_eq(-24.0, Math::linear_to_db(1.0 / 16.0), 0.09);
+    assert_eq(-30.0, Math::linear_to_db(1.0 / 32.0), 0.11);
+    assert_eq(-36.0, Math::linear_to_db(1.0 / 64.0), 0.15);
+    assert_eq(-42.0, Math::linear_to_db(1.0 / 128.0), 0.21);
+    assert_eq(-48.0, Math::linear_to_db(1.0 / 256.0), 0.70);
+    assert_eq(Math::DB_MIN, Math::linear_to_db(0.0), 0.05);
+    assert_eq(Math::DB_MIN, Math::linear_to_db(-0.1), 0.05);
+    assert_eq(Math::DB_MIN, Math::linear_to_db(-1.0), 0.05);
+})
+
+
+TEST(converting_back_and_forth_between_linear_and_db_reproduces_the_original_value, {
+    constexpr int resolution = 50000;
+    constexpr Number scale = Math::LINEAR_TO_DB_MAX / (Number)resolution;
+
+    /*
+    Skipping values below around -36 dB, because they tend to have larger
+    errors, but in practice, these aren't noticable.
+    */
+    for (int i = 150; i != resolution; ++i) {
+        Number const linear = Math::LINEAR_TO_DB_MIN + scale * (Number)i;
+        Number const db = Math::linear_to_db(linear);
+        Number const db_tolerance = std::max(0.001, std::fabs(db * 0.01));
+
+        assert_eq(linear, Math::db_to_linear(db), 0.03, "i=%d", i);
+        assert_eq(db, Math::linear_to_db(Math::db_to_linear(db)), db_tolerance, "i=%d", i);
+    }
 })
 
 
