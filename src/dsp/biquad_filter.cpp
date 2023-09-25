@@ -332,7 +332,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     }
 
     if (UNLIKELY(is_silent_)) {
-        update_state_for_silent_round(sample_count);
+        update_state_for_silent_round(round, sample_count);
     }
 
     return NULL;
@@ -387,8 +387,12 @@ void BiquadFilter<InputSignalProducerClass>::update_state_for_no_op_round(
 
 template <class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
+        Integer const round,
         Integer const sample_count
 ) noexcept {
+    this->render_silence(round, 0, sample_count, this->buffer);
+    this->mark_round_as_silent(round);
+
     if (UNLIKELY(sample_count < 1)) {
         return;
     }
@@ -428,7 +432,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     );
 
     if (UNLIKELY(is_silent_)) {
-        update_state_for_silent_round(sample_count);
+        update_state_for_silent_round(round, sample_count);
     }
 
     return NULL;
