@@ -1060,3 +1060,24 @@ TEST(can_tell_if_the_last_buffer_was_silent, {
     assert_true(silent.is_silent(2, block_size));
     assert_false(audible.is_silent(2, block_size));
 })
+
+
+TEST(find_peak, {
+    constexpr Integer block_size = 5;
+    constexpr Integer channels = 2;
+    constexpr Sample zeros[] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    constexpr Sample negative[] = {0.2, -0.1, 0.0, -0.2, -0.5, -0.3};
+    constexpr Sample positive[] = {-0.1, 0.05, 0.0, 0.1, 0.25, -0.15};
+
+    Sample const* buffer[channels] = {positive, negative};
+
+    assert_eq(0.0, SignalProducer::find_peak(buffer, channels, 0), DOUBLE_DELTA);
+
+    buffer[0] = zeros;
+    buffer[1] = positive;
+    assert_eq(0.25, SignalProducer::find_peak(buffer, channels, block_size), DOUBLE_DELTA);
+
+    buffer[0] = negative;
+    buffer[1] = zeros;
+    assert_eq(0.5, SignalProducer::find_peak(buffer, channels, block_size), DOUBLE_DELTA);
+})
