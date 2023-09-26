@@ -2798,7 +2798,7 @@ bool Synth::assign_controller(
 
         default: {
             if (is_supported_midi_controller(controller_id)) {
-                param.set_midi_controller(midi_controllers[controller_id]);
+                param.set_midi_controller(midi_controllers_rw[controller_id]);
 
                 return true;
             }
@@ -3027,8 +3027,8 @@ void Synth::clear_midi_controllers() noexcept
     channel_pressure_ctl.clear();
 
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
-        if (midi_controllers[i] != NULL) {
-            midi_controllers[i]->clear();
+        if (midi_controllers_rw[i] != NULL) {
+            midi_controllers_rw[i]->clear();
         }
     }
 }

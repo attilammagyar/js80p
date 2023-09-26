@@ -60,3 +60,28 @@ TEST(midi_controller_stores_midi_control_change_events, {
     midi_controller.clear();
     assert_eq(0, (int)midi_controller.events.length());
 })
+
+
+TEST(keeps_track_of_assignments, {
+    MidiController midi_controller;
+
+    assert_false(midi_controller.is_assigned());
+
+    midi_controller.assigned();
+    assert_true(midi_controller.is_assigned());
+
+    midi_controller.assigned();
+    assert_true(midi_controller.is_assigned());
+
+    midi_controller.released();
+    assert_true(midi_controller.is_assigned());
+
+    midi_controller.released();
+    assert_false(midi_controller.is_assigned());
+
+    midi_controller.released();
+    assert_false(midi_controller.is_assigned());
+
+    midi_controller.assigned();
+    assert_true(midi_controller.is_assigned());
+})

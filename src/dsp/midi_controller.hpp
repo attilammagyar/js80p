@@ -47,12 +47,17 @@ class MidiController
         Number get_value() const noexcept;
         void clear() noexcept;
 
+        void assigned() noexcept;
+        void released() noexcept;
+        Integer is_assigned() const noexcept;
+
     protected:
         void change(Number const new_value) noexcept;
 
     private:
         Queue<SignalProducer::Event> events_rw;
         Integer change_index;
+        Integer assignments;
         Number value;
 
     public:

@@ -220,6 +220,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
 
     midi_controller.change(0.0, 0.35);
     param.set_midi_controller(NULL);
+
     assert_eq(-3, param.get_value());
 })
 
@@ -2450,4 +2451,55 @@ TEST(float_param_is_constant_after_assigning_macro, {
     samples = FloatParamS::produce(float_param, 2, sample_count);
 
     assert_eq(expected_samples, samples[0], sample_count, "macro");
+})
+
+
+template<class ParamClass>
+void test_midi_controller_assignment(ParamClass& param)
+{
+    MidiController midi_controller_1;
+    MidiController midi_controller_2;
+
+    param.set_midi_controller(&midi_controller_1);
+    assert_true(midi_controller_1.is_assigned());
+
+    param.set_midi_controller(&midi_controller_2);
+    assert_false(midi_controller_1.is_assigned());
+    assert_true(midi_controller_2.is_assigned());
+
+    param.set_midi_controller(NULL);
+    assert_false(midi_controller_2.is_assigned());
+}
+
+
+template<class ParamClass>
+void test_macro_assignment(ParamClass& param)
+{
+    Macro macro_1;
+    Macro macro_2;
+
+    param.set_macro(&macro_1);
+    assert_true(macro_1.is_assigned());
+
+    param.set_macro(&macro_2);
+    assert_false(macro_1.is_assigned());
+    assert_true(macro_2.is_assigned());
+
+    param.set_macro(NULL);
+    assert_false(macro_2.is_assigned());
+}
+
+
+TEST(when_a_midi_controller_is_assigned_to_a_param_or_released_from_it_then_the_midi_controller_is_notified, {
+    Param<int> int_param("int", 0, 10, 5);
+    FloatParamS float_param_s("float_param_s", 0.0, 1.0, 0.5);
+    FloatParamB float_param_b("float_param_b", 0.0, 1.0, 0.5);
+
+    test_midi_controller_assignment< Param<int> >(int_param);
+    test_midi_controller_assignment<FloatParamS>(float_param_s);
+    test_midi_controller_assignment<FloatParamB>(float_param_b);
+
+    test_macro_assignment< Param<int> >(int_param);
+    test_macro_assignment<FloatParamS>(float_param_s);
+    test_macro_assignment<FloatParamB>(float_param_b);
 })

@@ -27,6 +27,7 @@ namespace JS80P
 
 MidiController::MidiController() noexcept
     : change_index(0),
+    assignments(0),
     value(0.5),
     events(events_rw)
 {
@@ -67,6 +68,26 @@ Number MidiController::get_value() const noexcept
 void MidiController::clear() noexcept
 {
     events_rw.drop(0);
+}
+
+
+void MidiController::assigned() noexcept
+{
+    ++assignments;
+}
+
+
+void MidiController::released() noexcept
+{
+    if (is_assigned()) {
+        --assignments;
+    }
+}
+
+
+Integer MidiController::is_assigned() const noexcept
+{
+    return assignments != 0;
 }
 
 }

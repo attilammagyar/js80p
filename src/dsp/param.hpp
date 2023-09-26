@@ -79,8 +79,8 @@ class Param : public SignalProducer
         NumberType ratio_to_value(Number const ratio) const noexcept;
         Number value_to_ratio(NumberType const value) const noexcept;
 
-        void set_midi_controller(MidiController const* midi_controller) noexcept;
-        MidiController const* get_midi_controller() const noexcept;
+        void set_midi_controller(MidiController* midi_controller) noexcept;
+        MidiController* get_midi_controller() const noexcept;
 
         void set_macro(Macro* macro) noexcept;
         Macro* get_macro() const noexcept;
@@ -97,7 +97,7 @@ class Param : public SignalProducer
         template<class ParamClass>
         static void set_midi_controller(
             ParamClass& param,
-            MidiController const* midi_controller
+            MidiController* midi_controller
         ) noexcept;
 
         template<class ParamClass>
@@ -115,7 +115,7 @@ class Param : public SignalProducer
         NumberType clamp(NumberType const value) const noexcept;
         void store_new_value(NumberType const new_value) noexcept;
 
-        MidiController const* midi_controller;
+        MidiController* midi_controller;
 
         Macro* macro;
         Integer macro_change_index;
@@ -274,7 +274,7 @@ class FloatParam : public Param<Number, evaluation>
             Number const target_value
         ) noexcept;
 
-        void set_midi_controller(MidiController const* midi_controller) noexcept;
+        void set_midi_controller(MidiController* midi_controller) noexcept;
         void set_macro(Macro* macro) noexcept;
 
         void set_envelope(Envelope* const envelope) noexcept;
