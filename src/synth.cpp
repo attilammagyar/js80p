@@ -3199,6 +3199,8 @@ Sample const* const* Synth::Bus::initialize_rendering(
     render_silence(round, 0, sample_count, buffer);
 
     if (is_silent) {
+        mark_round_as_silent(round);
+
         return buffer;
     }
 
