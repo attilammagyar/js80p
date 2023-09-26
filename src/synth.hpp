@@ -907,6 +907,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     FloatParamS& modulator_add_volume
                 ) noexcept;
 
+                virtual ~Bus();
+
+                virtual void set_block_size(
+                    Integer const new_block_size
+                ) noexcept override;
+
             protected:
                 Sample const* const* initialize_rendering(
                     Integer const round,
@@ -921,18 +927,29 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ) noexcept;
 
             private:
+                void allocate_buffers() noexcept;
+                void free_buffers() noexcept;
+                void reallocate_buffers() noexcept;
+
+                void mix_modulators(
+                    Integer const round,
+                    Integer const first_sample_index,
+                    Integer const last_sample_index
+                ) const noexcept;
+
+                template<bool is_additive_volume_constant>
                 void mix_modulators(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
-                    Sample** buffer
+                    Sample const add_volume_value,
+                    Sample const* add_volume_buffer
                 ) const noexcept;
 
                 void mix_carriers(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index,
-                    Sample** buffer
+                    Integer const last_sample_index
                 ) const noexcept;
 
                 Integer const polyphony;
@@ -940,9 +957,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Synth::Carrier* const* const carriers;
                 FloatParamS& modulator_add_volume;
                 Sample const* modulator_add_volume_buffer;
+                Sample** modulators_buffer;
+                Sample** carriers_buffer;
                 std::vector<bool> modulators_on;
                 std::vector<bool> carriers_on;
-                bool is_silent_;
         };
 
         class ParamIdHashTable

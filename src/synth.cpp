@@ -3122,9 +3122,49 @@ Synth::Bus::Bus(
     modulators(modulators),
     carriers(carriers),
     modulator_add_volume(modulator_add_volume),
+    modulators_buffer(NULL),
+    carriers_buffer(NULL),
     modulators_on(POLYPHONY),
     carriers_on(POLYPHONY)
 {
+    allocate_buffers();
+}
+
+
+Synth::Bus::~Bus()
+{
+    free_buffers();
+}
+
+
+void Synth::Bus::allocate_buffers() noexcept
+{
+    modulators_buffer = allocate_buffer();
+    carriers_buffer = allocate_buffer();
+}
+
+
+void Synth::Bus::free_buffers() noexcept
+{
+    modulators_buffer = free_buffer(modulators_buffer);
+    carriers_buffer = free_buffer(carriers_buffer);
+}
+
+
+void Synth::Bus::set_block_size(Integer const new_block_size) noexcept
+{
+    if (new_block_size != this->block_size) {
+        SignalProducer::set_block_size(new_block_size);
+
+        reallocate_buffers();
+    }
+}
+
+
+void Synth::Bus::reallocate_buffers() noexcept
+{
+    free_buffers();
+    allocate_buffers();
 }
 
 
@@ -3132,33 +3172,35 @@ Sample const* const* Synth::Bus::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    is_silent_ = true;
+    bool is_silent = true;
 
     for (Integer v = 0; v != polyphony; ++v) {
         modulators_on[v] = modulators[v]->is_on();
 
         if (modulators_on[v]) {
-            is_silent_ = false;
-            SignalProducer::produce<Modulator>(
-                *modulators[v], round, sample_count
-            );
+            is_silent = false;
+            SignalProducer::produce<Modulator>(*modulators[v], round, sample_count);
         }
 
         carriers_on[v] = carriers[v]->is_on();
 
         if (carriers_on[v]) {
-            is_silent_ = false;
+            is_silent = false;
             SignalProducer::produce<Carrier>(*carriers[v], round, sample_count);
         }
-    }
-
-    if (is_silent_) {
-        return NULL;
     }
 
     modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
         modulator_add_volume, round, sample_count
     );
+
+    render_silence(round, 0, sample_count, modulators_buffer);
+    render_silence(round, 0, sample_count, carriers_buffer);
+    render_silence(round, 0, sample_count, buffer);
+
+    if (is_silent) {
+        return buffer;
+    }
 
     return NULL;
 }
@@ -3170,22 +3212,21 @@ void Synth::Bus::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    render_silence(round, first_sample_index, last_sample_index, buffer);
+    mix_modulators(round, first_sample_index, last_sample_index);
+    mix_carriers(round, first_sample_index, last_sample_index);
 
-    if (is_silent_) {
-        return;
+    for (Integer c = 0; c != channels; ++c) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[c][i] = modulators_buffer[c][i] + carriers_buffer[c][i];
+        }
     }
-
-    mix_modulators(round, first_sample_index, last_sample_index, buffer);
-    mix_carriers(round, first_sample_index, last_sample_index, buffer);
 }
 
 
 void Synth::Bus::mix_modulators(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
+        Integer const last_sample_index
 ) const noexcept {
     Sample const* const modulator_add_volume_buffer = (
         this->modulator_add_volume_buffer
@@ -3200,39 +3241,52 @@ void Synth::Bus::mix_modulators(
             return;
         }
 
-        for (Integer v = 0; v != polyphony; ++v) {
-            if (!modulators_on[v]) {
-                continue;
-            }
+        mix_modulators<true>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            modulator_add_volume_value,
+            NULL
+        );
+    } else {
+        mix_modulators<false>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            1.0,
+            modulator_add_volume_buffer
+        );
+    }
+}
 
-            Sample const* const* const modulator_output = (
-                SignalProducer::produce<Modulator>(*modulators[v], round)
-            );
 
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] += (
-                        modulator_add_volume_value * modulator_output[c][i]
-                    );
-                }
-            }
+template<bool is_additive_volume_constant>
+void Synth::Bus::mix_modulators(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample const add_volume_value,
+        Sample const* add_volume_buffer
+) const noexcept {
+    for (Integer v = 0; v != polyphony; ++v) {
+        if (!modulators_on[v]) {
+            continue;
         }
 
-    } else {
-        for (Integer v = 0; v != polyphony; ++v) {
-            if (!modulators_on[v]) {
-                continue;
-            }
+        /*
+        Rendering was done during Synth::Bus::initialize_rendering(), we're
+        just retrieving the cached buffer now.
+        */
+        Sample const* const* const modulator_output = (
+            SignalProducer::produce<Modulator>(*modulators[v], round)
+        );
 
-            Sample const* const* const modulator_output = (
-                SignalProducer::produce<Modulator>(*modulators[v], round)
-            );
-
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] += (
-                        modulator_add_volume_buffer[i] * modulator_output[c][i]
-                    );
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                if constexpr (is_additive_volume_constant) {
+                    modulators_buffer[c][i] += add_volume_value * modulator_output[c][i];
+                } else {
+                    modulators_buffer[c][i] += add_volume_buffer[i] * modulator_output[c][i];
                 }
             }
         }
@@ -3243,21 +3297,24 @@ void Synth::Bus::mix_modulators(
 void Synth::Bus::mix_carriers(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
+        Integer const last_sample_index
 ) const noexcept {
     for (Integer v = 0; v != polyphony; ++v) {
         if (!carriers_on[v]) {
             continue;
         }
 
+        /*
+        Rendering was done during Synth::Bus::initialize_rendering(), we're
+        just retrieving the cached buffer now.
+        */
         Sample const* const* const carrier_output = (
             SignalProducer::produce<Carrier>(*carriers[v], round)
         );
 
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] += carrier_output[c][i];
+                carriers_buffer[c][i] += carrier_output[c][i];
             }
         }
     }
