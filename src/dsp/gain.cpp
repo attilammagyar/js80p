@@ -38,6 +38,21 @@ Gain<InputSignalProducerClass>::Gain(
 
 
 template<class InputSignalProducerClass>
+void Gain<InputSignalProducerClass>::find_input_peak(
+        Integer const round,
+        Integer const sample_count,
+        Sample& peak,
+        Integer& peak_index
+) const noexcept {
+    Sample const* const* const input_buffer = SignalProducer::produce<InputSignalProducerClass>(
+        this->input, round, sample_count
+    );
+
+    SignalProducer::find_peak(input_buffer, this->channels, sample_count, peak, peak_index);
+}
+
+
+template<class InputSignalProducerClass>
 Sample const* const* Gain<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count

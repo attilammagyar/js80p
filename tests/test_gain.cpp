@@ -84,3 +84,32 @@ TEST(multiplies_input_signals_by_the_value_of_the_gain_parameter, {
         expected_output[1], actual_output.samples[1], sample_count, DOUBLE_DELTA
     );
 })
+
+
+TEST(can_find_latest_peak_in_the_input_signal, {
+    constexpr Integer block_size = 5;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        { 0.70,  0.10,  0.20, -0.05,  0.10},
+        {-0.10, -0.70,  0.30,  0.90, -0.30},
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    FloatParamS gain_param("", 0.0, 1.0, 0.5);
+    Gain<FixedSignalProducer> gain(input, gain_param);
+    Sample peak;
+    Integer peak_index;
+
+    input.set_block_size(block_size);
+    gain_param.set_block_size(block_size);
+    gain.set_block_size(block_size);
+
+    SignalProducer::produce< Gain<FixedSignalProducer> >(gain, 123, 3);
+
+    gain.find_input_peak(123, 3, peak, peak_index);
+
+    assert_eq(0.70, peak, DOUBLE_DELTA);
+    assert_eq(1, peak_index);
+})

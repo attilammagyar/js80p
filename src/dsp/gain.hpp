@@ -36,6 +36,13 @@ class Gain : public Filter<InputSignalProducerClass>
     public:
         Gain(InputSignalProducerClass& input, FloatParamS& gain) noexcept;
 
+        void find_input_peak(
+            Integer const round,
+            Integer const sample_count,
+            Sample& peak,
+            Integer& peak_index
+        ) const noexcept;
+
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
