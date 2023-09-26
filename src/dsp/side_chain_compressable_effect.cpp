@@ -39,7 +39,7 @@ SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffe
         number_of_children + 5
     ),
     side_chain_compression_threshold(name + "CTH", -120.0, 0.0, -18.0),
-    side_chain_compression_attack_time(name + "CAT", 0.001, 3.0, 0.01),
+    side_chain_compression_attack_time(name + "CAT", 0.001, 3.0, 0.02),
     side_chain_compression_release_time(name + "CRL", 0.001, 3.0, 0.20),
     side_chain_compression_ratio(name + "CR", 1.0, 120.0, NO_OP_RATIO),
     gain(name + "G", 0.0, 1.0, BYPASS_GAIN),
