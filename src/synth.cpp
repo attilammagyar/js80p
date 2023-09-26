@@ -46,6 +46,7 @@
 #include "dsp/param.cpp"
 #include "dsp/reverb.cpp"
 #include "dsp/queue.cpp"
+#include "dsp/peak_tracker.cpp"
 #include "dsp/side_chain_compressable_effect.cpp"
 #include "dsp/signal_producer.cpp"
 #include "dsp/wavefolder.cpp"

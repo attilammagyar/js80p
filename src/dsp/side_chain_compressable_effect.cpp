@@ -79,9 +79,16 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
         fast_bypass();
     } else {
         Number const threshold_db = side_chain_compression_threshold.get_value();
-        Sample const peak = SignalProducer::find_peak(
-            this->input_buffer, this->channels, sample_count
+
+        Sample peak;
+        Integer peak_index;
+
+        SignalProducer::find_peak(
+            this->input_buffer, this->channels, sample_count, peak, peak_index
         );
+        peak_tracker.update(peak, peak_index, sample_count, this->sampling_period);
+        peak = peak_tracker.get_peak();
+
         Number const diff_db = Math::linear_to_db(peak) - threshold_db;
 
         if (diff_db > 0.0) {

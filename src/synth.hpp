@@ -46,6 +46,7 @@
 #include "dsp/mixer.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
+#include "dsp/peak_tracker.hpp"
 #include "dsp/reverb.hpp"
 #include "dsp/queue.hpp"
 #include "dsp/side_chain_compressable_effect.hpp"

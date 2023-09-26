@@ -111,10 +111,12 @@ class SignalProducer
             Integer const sample_count = -1
         ) noexcept;
 
-        static Sample find_peak(
+        static void find_peak(
             Sample const* const* samples,
             Integer const channels,
-            Integer const size
+            Integer const size,
+            Sample& peak,
+            Integer& peak_index
         ) noexcept;
 
         SignalProducer(

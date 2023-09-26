@@ -137,6 +137,7 @@ SYNTH_COMPONENTS = \
 	dsp/filter \
 	dsp/gain \
 	dsp/mixer \
+	dsp/peak_tracker \
 	dsp/reverb \
 	dsp/side_chain_compressable_effect \
 	dsp/wavefolder \
@@ -162,6 +163,7 @@ TESTS_DSP = \
 	test_gain \
 	test_mixer \
 	test_param_slow \
+	test_peak_tracker \
 	test_wavefolder
 
 TESTS_SYNTH = \
@@ -628,6 +630,15 @@ $(BUILD_DIR)/test_param_slow$(EXE): \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
 	$@
+
+$(BUILD_DIR)/test_peak_tracker$(EXE): \
+		tests/test_peak_tracker.cpp \
+		src/dsp/peak_tracker.cpp src/dsp/peak_tracker.hpp \
+		src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
+	$(COMPILE_TEST) -o $@ $<
+	$(VALGRIND) $@
 
 $(BUILD_DIR)/test_queue$(EXE): \
 		tests/test_queue.cpp \

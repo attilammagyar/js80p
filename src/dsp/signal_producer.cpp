@@ -84,24 +84,26 @@ Sample const* const* SignalProducer::produce(
 }
 
 
-Sample SignalProducer::find_peak(
+void SignalProducer::find_peak(
         Sample const* const* samples,
         Integer const channels,
-        Integer const size
+        Integer const size,
+        Sample& peak,
+        Integer& peak_index
 ) noexcept {
-    Sample peak = 0.0;
+    peak = 0.0;
+    peak_index = 0;
 
     for (Integer c = 0; c != channels; ++c) {
         for (Integer i = 0; i != size; ++i) {
             Sample const sample = std::fabs(samples[c][i]);
 
-            if (sample > peak) {
+            if (sample >= peak) {
                 peak = sample;
+                peak_index = i;
             }
         }
     }
-
-    return peak;
 }
 
 

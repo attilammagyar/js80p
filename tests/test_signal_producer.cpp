@@ -1062,22 +1062,30 @@ TEST(can_tell_if_the_last_buffer_was_silent, {
 })
 
 
-TEST(find_peak, {
+TEST(find_peak_finds_the_latest_peak, {
     constexpr Integer block_size = 5;
     constexpr Integer channels = 2;
     constexpr Sample zeros[] = {0.0, 0.0, 0.0, 0.0, 0.0};
-    constexpr Sample negative[] = {0.2, -0.1, 0.0, -0.2, -0.5, -0.3};
-    constexpr Sample positive[] = {-0.1, 0.05, 0.0, 0.1, 0.25, -0.15};
+    constexpr Sample negative[] = {-0.50, -0.50,  0.00, -0.20, -0.10, -0.30};
+    constexpr Sample positive[] = {-0.10,  0.25,  0.25,  0.00,  0.10, -0.15};
 
     Sample const* buffer[channels] = {positive, negative};
+    Sample peak;
+    Integer peak_index;
 
-    assert_eq(0.0, SignalProducer::find_peak(buffer, channels, 0), DOUBLE_DELTA);
+    SignalProducer::find_peak(buffer, channels, 0, peak, peak_index);
+    assert_eq(0, peak_index);
+    assert_eq(0.0, peak, DOUBLE_DELTA);
 
     buffer[0] = zeros;
     buffer[1] = positive;
-    assert_eq(0.25, SignalProducer::find_peak(buffer, channels, block_size), DOUBLE_DELTA);
+    SignalProducer::find_peak(buffer, channels, block_size, peak, peak_index);
+    assert_eq(2, peak_index);
+    assert_eq(0.25, peak, DOUBLE_DELTA);
 
     buffer[0] = negative;
     buffer[1] = zeros;
-    assert_eq(0.5, SignalProducer::find_peak(buffer, channels, block_size), DOUBLE_DELTA);
+    SignalProducer::find_peak(buffer, channels, block_size, peak, peak_index);
+    assert_eq(1, peak_index);
+    assert_eq(0.50, peak, DOUBLE_DELTA);
 })

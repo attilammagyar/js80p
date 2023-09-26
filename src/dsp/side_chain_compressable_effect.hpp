@@ -25,6 +25,7 @@
 
 #include "dsp/effect.hpp"
 #include "dsp/param.hpp"
+#include "dsp/peak_tracker.hpp"
 #include "dsp/signal_producer.hpp"
 
 
@@ -82,7 +83,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         void release() noexcept;
 
         FloatParamS gain;
-
+        PeakTracker peak_tracker;
         Sample const* gain_buffer;
         Action previous_action;
         bool is_bypassing;
