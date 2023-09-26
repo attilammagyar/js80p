@@ -302,6 +302,7 @@ class DelegatingSignalProducer : public SignalProducer
             delegate(delegate),
             initialize_rendering_calls(0),
             render_calls(0),
+            finalize_rendering_calls(0),
             value(value)
         {
         }
@@ -309,6 +310,7 @@ class DelegatingSignalProducer : public SignalProducer
         DelegatingSignalProducer* delegate;
         Integer initialize_rendering_calls;
         Integer render_calls;
+        Integer finalize_rendering_calls;
         Sample value;
 
     protected:
@@ -338,6 +340,13 @@ class DelegatingSignalProducer : public SignalProducer
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 buffer[0][i] = value;
             }
+        }
+
+        void finalize_rendering(
+                Integer const round,
+                Integer const sample_count
+        ) noexcept {
+            ++finalize_rendering_calls;
         }
 };
 
@@ -422,8 +431,12 @@ TEST(a_signal_producer_may_delegate_rendering_to_another_during_initialization, 
 
     assert_eq(1, (int)delegate.initialize_rendering_calls);
     assert_eq(1, (int)delegator.initialize_rendering_calls);
+
     assert_eq(1, (int)delegate.render_calls);
     assert_eq(0, (int)delegator.render_calls);
+
+    assert_eq(1, (int)delegate.finalize_rendering_calls);
+    assert_eq(0, (int)delegator.finalize_rendering_calls);
 })
 
 

@@ -194,6 +194,14 @@ class SignalProducer
         ) noexcept;
 
         /**
+         * \brief Implement final housekeeping after rendering in this method.
+         */
+        void finalize_rendering(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
+        /**
          * \brief Implement handling events in this method.
          */
         void handle_event(Event const& event) noexcept;

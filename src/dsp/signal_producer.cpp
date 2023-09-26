@@ -76,6 +76,8 @@ Sample const* const* SignalProducer::produce(
         );
     }
 
+    signal_producer.finalize_rendering(round, count);
+
     if (signal_producer.events.is_empty()) {
         signal_producer.current_time = 0.0;
     }
@@ -402,6 +404,13 @@ void SignalProducer::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
+) noexcept {
+}
+
+
+void SignalProducer::finalize_rendering(
+        Integer const round,
+        Integer const sample_count
 ) noexcept {
 }
 
