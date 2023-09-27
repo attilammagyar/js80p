@@ -480,16 +480,16 @@ If you find bugs, please report them at
 
 Signal Chain (Simplified)
 -------------------------
-                                                        (x64)
-    Oscillator --> Filter --> Wavefolder --> Filter ---------> Mixer --+
-                                                  |            ^       |
-        (Frequency & Amplitude Modulation)        |            |       |
-      +-------------------------------------------+            |       |
-      |                                                        |       |
-      v                                                 (x64)  |       |
-      Oscillator --> Filter --> Wavefolder --> Filter ---------+       |
-                                                                       |
-            +----------------------------------------------------------+
+                                                               (x64)
+    Oscillator --> Filter --> Wavefolder --> Filter --> Volume -----> Mixer --+
+                                                             |        ^       |
+     (Frequency, Phase, and Amplitude Modulation)            |        |       |
+     +-------------------------------------------------------+        |       |
+     |                                                                |       |
+     v                                                          (x64) |       |
+     Oscillator --> Filter --> Wavefolder --> Filter --> Volume ------+       |
+                                                                              |
+            +-----------------------------------------------------------------+
             |
             v
             Volume --> Overdrive --> Distortion --> Filter --> Filter --+
