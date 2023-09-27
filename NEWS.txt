@@ -1,4 +1,4 @@
-v2.1.0 (2023-09-??)
+v2.1.0 (2023-09-28)
  * Echo and Reverb now support side-chain compression: clean up the sound by
    reducing the volume of the wet signal while the dry signal is loud, and
    gradually bring up the wet signal once the dry signal goes below the
