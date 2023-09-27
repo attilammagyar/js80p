@@ -537,10 +537,10 @@ Features
     * overdrive
     * distortion
     * 2 more filters
-    * volume control
     * chorus
     * stereo echo (with side-chaining)
     * stereo reverb (with side-chaining)
+    * volume controls at various points of the signal chain
  * 6 envelopes
  * 8 low-frequency oscillators (LFO)
  * MIDI controllers and macros
