@@ -548,6 +548,13 @@ Features
  * MIDI learn
  * logarithmic and linear scale filter frequencies
  * LFO and effects tempo synchronization
+ * use the peak level at various points of the signal chain to control
+   parameters:
+    * oscillator 1 output
+    * oscillator 2 output
+    * volume control 1 input
+    * volume control 2 input
+    * volume control 3 input
 
 Frequenctly Asked Questions
 ---------------------------

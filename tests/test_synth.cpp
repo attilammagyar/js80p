@@ -54,6 +54,13 @@ constexpr Synth::MessageType ASSIGN_CONTROLLER = Synth::MessageType::ASSIGN_CONT
 constexpr Synth::MessageType CLEAR = Synth::MessageType::CLEAR;
 
 
+constexpr Integer PEAK_CTL_TEST_BLOCK_SIZE = 8192;
+constexpr Number PEAK_CTL_TEST_OSC_1_VOL = 0.7;
+constexpr Number PEAK_CTL_TEST_OSC_2_VOL = 0.3;
+constexpr Number PEAK_CTL_TEST_FILTER_1_GAIN = -6.0;
+constexpr Number PEAK_CTL_TEST_REVERB_DRY = 0.1;
+
+
 TEST(communication_with_the_gui_is_lock_free, {
     Synth synth;
 
@@ -976,4 +983,83 @@ TEST(can_process_messages_synchronously, {
         Synth::ControllerId::MACRO_1,
         synth.get_param_controller_id_atomic(Synth::ParamId::FM)
     );
+})
+
+
+void set_up_peak_controller_test(Synth& synth)
+{
+    synth.set_block_size(PEAK_CTL_TEST_BLOCK_SIZE);
+    synth.set_sample_rate(44100.0);
+    synth.note_on(0.0, 1, Midi::NOTE_A_4, 127);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.panning.set_value(1.0);
+    synth.modulator_params.volume.set_value(PEAK_CTL_TEST_OSC_1_VOL);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.panning.set_value(1.0);
+    synth.carrier_params.volume.set_value(PEAK_CTL_TEST_OSC_2_VOL);
+
+    synth.effects.filter_1_type.set_value(BiquadFilter<SignalProducer>::HIGH_SHELF);
+    synth.effects.filter_1.frequency.set_value(1.0);
+    synth.effects.filter_1.gain.set_value(PEAK_CTL_TEST_FILTER_1_GAIN);
+
+    synth.effects.reverb.dry.set_value(PEAK_CTL_TEST_REVERB_DRY);
+}
+
+
+TEST(peak_controllers_are_not_updated_when_they_are_not_assigned_to_any_parameter, {
+    Synth synth;
+
+    set_up_peak_controller_test(synth);
+
+    synth.generate_samples(1, PEAK_CTL_TEST_BLOCK_SIZE);
+
+    assert_eq(0.0, synth.osc_1_peak.get_value());
+    assert_eq(0.0, synth.osc_2_peak.get_value());
+    assert_eq(0.0, synth.vol_1_peak.get_value());
+    assert_eq(0.0, synth.vol_2_peak.get_value());
+    assert_eq(0.0, synth.vol_3_peak.get_value());
+})
+
+
+void test_peak_controller(
+        Synth::ControllerId const controller_id,
+        Number const expected_value
+) {
+    Synth synth;
+    MidiController const* controller = NULL;
+
+    set_up_peak_controller_test(synth);
+    assign_controller(synth, Synth::ParamId::M1IN, controller_id);
+
+    synth.generate_samples(1, PEAK_CTL_TEST_BLOCK_SIZE);
+
+    switch (controller_id) {
+        case Synth::ControllerId::OSC_1_PEAK: controller = &synth.osc_1_peak; break;
+        case Synth::ControllerId::OSC_2_PEAK: controller = &synth.osc_2_peak; break;
+        case Synth::ControllerId::VOL_1_PEAK: controller = &synth.vol_1_peak; break;
+        case Synth::ControllerId::VOL_2_PEAK: controller = &synth.vol_2_peak; break;
+        case Synth::ControllerId::VOL_3_PEAK: controller = &synth.vol_3_peak; break;
+        default: break;
+    }
+
+    assert_eq(expected_value, controller->get_value(), 0.005);
+}
+
+
+TEST(peak_controllers_are_updated_when_in_use, {
+    Number const osc_1_expected = PEAK_CTL_TEST_OSC_1_VOL;
+    Number const osc_2_expected = PEAK_CTL_TEST_OSC_2_VOL;
+    Number const vol_1_expected = osc_1_expected + osc_2_expected;
+    Number const vol_2_expected = (
+        Math::db_to_linear(PEAK_CTL_TEST_FILTER_1_GAIN) * vol_1_expected
+    );
+    Number const vol_3_expected = PEAK_CTL_TEST_REVERB_DRY * vol_2_expected;
+
+    test_peak_controller(Synth::ControllerId::OSC_1_PEAK, osc_1_expected);
+    test_peak_controller(Synth::ControllerId::OSC_2_PEAK, osc_2_expected);
+    test_peak_controller(Synth::ControllerId::VOL_1_PEAK, vol_1_expected);
+    test_peak_controller(Synth::ControllerId::VOL_2_PEAK, vol_2_expected);
+    test_peak_controller(Synth::ControllerId::VOL_3_PEAK, vol_3_expected);
 })

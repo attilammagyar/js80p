@@ -6,6 +6,8 @@ v2.1.0 (2023-09-??)
    reducing the volume of the wet signal while the dry signal is loud, and
    gradually bring up the wet signal once the dry signal goes below the
    threshold.
+ * Signal peak levels at various points of the signal chain can now be used for
+   controlling parameters and macros.
 
 v2.0.3 (2023-09-24)
  * It is now possible to assign Macros to discrete parameters like Filter Types

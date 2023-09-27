@@ -673,7 +673,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MACRO_19 =                  165,                        ///< Macro 19
             MACRO_20 =                  166,                        ///< Macro 20
 
-            MAX_CONTROLLER_ID =         167,
+            OSC_1_PEAK =                167,                        ///< Oscillator 1 Peak
+            OSC_2_PEAK =                168,                        ///< Oscillator 1 Peak
+            VOL_1_PEAK =                169,                        ///< Volume 1 Peak
+            VOL_2_PEAK =                170,                        ///< Volume 2 Peak
+            VOL_3_PEAK =                171,                        ///< Volume 3 Peak
+
+            MAX_CONTROLLER_ID =         172,
         };
 
         typedef Byte Mode;
@@ -736,6 +742,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         virtual ~Synth() override;
 
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
+        virtual void reset() noexcept override;
 
         bool is_lock_free() const noexcept;
 
@@ -878,6 +885,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         MidiController note;
         MidiController velocity;
         MidiController channel_pressure_ctl;
+        MidiController osc_1_peak;
+        MidiController osc_2_peak;
+        MidiController vol_1_peak;
+        MidiController vol_2_peak;
+        MidiController vol_3_peak;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -890,6 +902,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** buffer
+        ) noexcept;
+
+        void finalize_rendering(
+            Integer const round,
+            Integer const sample_count
         ) noexcept;
 
         Frequency frequencies[Midi::NOTES];
@@ -913,6 +930,18 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 virtual void set_block_size(
                     Integer const new_block_size
                 ) noexcept override;
+
+                void find_modulators_peak(
+                    Integer const sample_count,
+                    Sample& peak,
+                    Integer& peak_index
+                ) noexcept;
+
+                void find_carriers_peak(
+                    Integer const sample_count,
+                    Sample& peak,
+                    Integer& peak_index
+                ) noexcept;
 
             protected:
                 Sample const* const* initialize_rendering(
@@ -1197,8 +1226,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::vector<DeferredNoteOff> deferred_note_offs;
         SPSCQueue<Message> messages;
         Bus bus;
-        Effects::Effects<Bus> effects;
         NoteStack note_stack;
+        PeakTracker osc_1_peak_tracker;
+        PeakTracker osc_2_peak_tracker;
+        PeakTracker vol_1_peak_tracker;
+        PeakTracker vol_2_peak_tracker;
+        PeakTracker vol_3_peak_tracker;
+
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
         BiquadFilterSharedCache* biquad_filter_shared_caches[4];
@@ -1223,6 +1257,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_dirty_;
 
     public:
+        Effects::Effects<Bus> effects;
         MidiController* const* const midi_controllers;
         Macro* const* const macros;
         Envelope* const* const envelopes;

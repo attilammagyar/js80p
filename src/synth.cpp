@@ -109,7 +109,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         POLYPHONY,
         modulator_add_volume
     ),
-    effects("E", bus),
     samples_since_gc(0),
     samples_between_gc(samples_between_gc),
     next_voice(0),
@@ -120,6 +119,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_polyphonic(true),
     was_polyphonic(true),
     is_dirty_(false),
+    effects("E", bus),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     macros((Macro* const*)macros_rw),
     envelopes((Envelope* const*)envelopes_rw),
@@ -176,6 +176,21 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     midi_controllers_rw[Midi::SUSTAIN_PEDAL]->change(0.0, 0.0);
     midi_controllers_rw[Midi::SUSTAIN_PEDAL]->clear();
+
+    osc_1_peak.change(0.0, 0.0);
+    osc_1_peak.clear();
+
+    osc_2_peak.change(0.0, 0.0);
+    osc_2_peak.clear();
+
+    vol_1_peak.change(0.0, 0.0);
+    vol_1_peak.clear();
+
+    vol_2_peak.change(0.0, 0.0);
+    vol_2_peak.clear();
+
+    vol_3_peak.change(0.0, 0.0);
+    vol_3_peak.clear();
 
     update_param_states();
 }
@@ -616,6 +631,18 @@ void Synth::set_sample_rate(Frequency const new_sample_rate) noexcept
     SignalProducer::set_sample_rate(new_sample_rate);
 
     samples_between_gc = std::max((Integer)5000, (Integer)(new_sample_rate * 0.2));
+}
+
+
+void Synth::reset() noexcept
+{
+    SignalProducer::reset();
+
+    osc_1_peak_tracker.reset();
+    osc_2_peak_tracker.reset();
+    vol_1_peak_tracker.reset();
+    vol_2_peak_tracker.reset();
+    vol_3_peak_tracker.reset();
 }
 
 
@@ -2617,6 +2644,12 @@ bool Synth::assign_controller_to_discrete_param(
 
         case CHANNEL_PRESSURE: break;
 
+        case OSC_1_PEAK: midi_controller = &osc_1_peak; break;
+        case OSC_2_PEAK: midi_controller = &osc_2_peak; break;
+        case VOL_1_PEAK: midi_controller = &vol_1_peak; break;
+        case VOL_2_PEAK: midi_controller = &vol_2_peak; break;
+        case VOL_3_PEAK: midi_controller = &vol_3_peak; break;
+
         case MIDI_LEARN: is_special = true; break;
 
         default: {
@@ -2794,6 +2827,12 @@ bool Synth::assign_controller(
         case ENVELOPE_6: param.set_envelope(envelopes[5]); return true;
 
         case CHANNEL_PRESSURE: param.set_midi_controller(&channel_pressure_ctl); return true;
+
+        case OSC_1_PEAK: param.set_midi_controller(&osc_1_peak); return true;
+        case OSC_2_PEAK: param.set_midi_controller(&osc_2_peak); return true;
+        case VOL_1_PEAK: param.set_midi_controller(&vol_1_peak); return true;
+        case VOL_2_PEAK: param.set_midi_controller(&vol_2_peak); return true;
+        case VOL_3_PEAK: param.set_midi_controller(&vol_3_peak); return true;
 
         case MIDI_LEARN: return true;
 
@@ -3026,6 +3065,11 @@ void Synth::clear_midi_controllers() noexcept
     note.clear();
     velocity.clear();
     channel_pressure_ctl.clear();
+    osc_1_peak.clear();
+    osc_2_peak.clear();
+    vol_1_peak.clear();
+    vol_2_peak.clear();
+    vol_3_peak.clear();
 
     for (Integer i = 0; i != MIDI_CONTROLLERS; ++i) {
         if (midi_controllers_rw[i] != NULL) {
@@ -3074,6 +3118,47 @@ void Synth::render(
             */
             out[i] = std::min(2.8, std::max(-2.8, raw[i]));
         }
+    }
+}
+
+
+void Synth::finalize_rendering(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    Seconds const sampling_period = this->sampling_period;
+
+    Sample peak;
+    Integer peak_index;
+
+    if (osc_1_peak.is_assigned()) {
+        bus.find_modulators_peak(sample_count, peak, peak_index);
+        osc_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
+        osc_1_peak.change(0.0, std::min(1.0, osc_1_peak_tracker.get_peak()));
+    }
+
+    if (osc_2_peak.is_assigned()) {
+        bus.find_carriers_peak(sample_count, peak, peak_index);
+        osc_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
+        osc_2_peak.change(0.0, std::min(1.0, osc_2_peak_tracker.get_peak()));
+    }
+
+    if (vol_1_peak.is_assigned()) {
+        effects.volume_1.find_input_peak(round, sample_count, peak, peak_index);
+        vol_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
+        vol_1_peak.change(0.0, std::min(1.0, vol_1_peak_tracker.get_peak()));
+    }
+
+    if (vol_2_peak.is_assigned()) {
+        effects.volume_2.find_input_peak(round, sample_count, peak, peak_index);
+        vol_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
+        vol_2_peak.change(0.0, std::min(1.0, vol_2_peak_tracker.get_peak()));
+    }
+
+    if (vol_3_peak.is_assigned()) {
+        effects.volume_3.find_input_peak(round, sample_count, peak, peak_index);
+        vol_3_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
+        vol_3_peak.change(0.0, std::min(1.0, vol_3_peak_tracker.get_peak()));
     }
 }
 
@@ -3159,6 +3244,24 @@ void Synth::Bus::set_block_size(Integer const new_block_size) noexcept
 
         reallocate_buffers();
     }
+}
+
+
+void Synth::Bus::find_modulators_peak(
+        Integer const sample_count,
+        Sample& peak,
+        Integer& peak_index
+) noexcept {
+    SignalProducer::find_peak(modulators_buffer, this->channels, sample_count, peak, peak_index);
+}
+
+
+void Synth::Bus::find_carriers_peak(
+        Integer const sample_count,
+        Sample& peak,
+        Integer& peak_index
+) noexcept {
+    SignalProducer::find_peak(carriers_buffer, this->channels, sample_count, peak, peak_index);
 }
 
 
