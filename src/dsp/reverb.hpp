@@ -63,6 +63,10 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         static constexpr Seconds DELAY_TIME_MAX = 0.3;
 
+        /*
+        Tunings from Freeverb:
+        https://ccrma.stanford.edu/~jos/pasp/Freeverb.html
+        */
         static constexpr Seconds TUNINGS[COMB_FILTERS] = {
             1557.0 / 44100.0,
             1617.0 / 44100.0,
