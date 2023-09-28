@@ -518,24 +518,18 @@ TEST(identical_delays_may_share_delay_buffer, {
 
 
 template<class PannedDelayClass>
-void test_panned_delay(char const* class_name)
-{
-    constexpr Integer block_size = 5;
-    constexpr Integer rounds = 2;
-    constexpr Integer sample_count = rounds * block_size;
+void test_panned_delay(
+        char const* class_name,
+        Integer const block_size,
+        Integer const rounds,
+        Number const panning_scale,
+        Sample const* const* input_buffer,
+        Sample const* const* expected_output
+) {
     constexpr Frequency sample_rate = 10.0;
-    constexpr Sample input_samples[FixedSignalProducer::CHANNELS][block_size] = {
-        {0.10, 0.20, 0.30, 0.40, 0.50},
-        {0.20, 0.40, 0.60, 0.80, 1.00},
-    };
-    constexpr Sample expected_output[FixedSignalProducer::CHANNELS][sample_count] = {
-        {0.000, 0.000, 0.075, 0.150, 0.225, 0.000, 0.000, 0.000, 0.000, 0.000},
-        {0.000, 0.000, 0.150, 0.300, 0.450, 0.900, 1.125, 0.225, 0.450, 0.675},
-    };
-    Sample const* input_buffer[FixedSignalProducer::CHANNELS] = {
-        (Sample const*)&input_samples[0],
-        (Sample const*)&input_samples[1]
-    };
+
+    Integer const sample_count = rounds * block_size;
+
     FixedSignalProducer input(input_buffer);
     Buffer output(sample_count, FixedSignalProducer::CHANNELS);
     PannedDelayClass panned_delay(input, PannedDelayStereoMode::FLIPPED);
@@ -549,6 +543,7 @@ void test_panned_delay(char const* class_name)
     panned_delay.delay.time.set_value(0.2);
     panned_delay.panning.set_value(0.0);
     panned_delay.panning.schedule_value(0.45, -1.0);
+    panned_delay.set_panning_scale(panning_scale);
 
     assert_eq((int)input.get_channels(), (int)panned_delay.get_channels());
 
@@ -560,13 +555,73 @@ void test_panned_delay(char const* class_name)
             output.samples[c],
             sample_count,
             DOUBLE_DELTA,
-            "class=%s, channel=%d",
+            "class=%s, panning_scale=%f, channel=%d",
             class_name,
+            panning_scale,
             (int)c
         );
     }
 
     assert_eq(-1.0, panned_delay.panning.get_value(), DOUBLE_DELTA);
+}
+
+
+template<class PannedDelayClass>
+void test_panned_delay(char const* class_name)
+{
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = rounds * block_size;
+
+    constexpr Sample input_samples[FixedSignalProducer::CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+
+    constexpr Sample expected_output_full_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+        {0.000, 0.000, 0.075, 0.150, 0.225, 0.000, 0.000, 0.000, 0.000, 0.000},
+        {0.000, 0.000, 0.150, 0.300, 0.450, 0.900, 1.125, 0.225, 0.450, 0.675},
+    };
+
+    constexpr Sample expected_output_opposite_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+        {0.000, 0.000, 0.075, 0.150, 0.225, 0.900, 1.125, 0.225, 0.450, 0.675},
+        {0.000, 0.000, 0.150, 0.300, 0.450, 0.000, 0.000, 0.000, 0.000, 0.000},
+    };
+
+    constexpr Sample expected_output_no_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+        {0.000, 0.000, 0.075, 0.150, 0.225, 0.300, 0.375, 0.075, 0.150, 0.225},
+        {0.000, 0.000, 0.150, 0.300, 0.450, 0.600, 0.750, 0.150, 0.300, 0.450},
+    };
+
+    Sample const* input_buffer[FixedSignalProducer::CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+
+    Sample const* expected_output_full_panning[] = {
+        (Sample const*)&expected_output_full_panning_samples[0],
+        (Sample const*)&expected_output_full_panning_samples[1],
+    };
+
+    Sample const* expected_output_opposite_panning[] = {
+        (Sample const*)&expected_output_opposite_panning_samples[0],
+        (Sample const*)&expected_output_opposite_panning_samples[1],
+    };
+
+    Sample const* expected_output_no_panning[] = {
+        (Sample const*)&expected_output_no_panning_samples[0],
+        (Sample const*)&expected_output_no_panning_samples[1],
+    };
+
+    test_panned_delay<PannedDelayClass>(
+        class_name, block_size, rounds, 1.0, input_buffer, expected_output_full_panning
+    );
+    test_panned_delay<PannedDelayClass>(
+        class_name, block_size, rounds, -1.0, input_buffer, expected_output_opposite_panning
+    );
+    test_panned_delay<PannedDelayClass>(
+        class_name, block_size, rounds, 0.000001, input_buffer, expected_output_no_panning
+    );
 }
 
 

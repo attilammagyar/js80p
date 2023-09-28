@@ -616,6 +616,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         ToggleParam const* tempo_sync
 ) :  Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, input.get_channels()),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning_scale(1.0),
     panning("", -1.0, 1.0, 0.0),
     delay(input, delay_time_leader, tempo_sync)
 {
@@ -657,6 +658,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         delay_input.get_channels()
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning_scale(1.0),
     panning("", -1.0, 1.0, 0.0),
     delay(delay_input, tempo_sync)
 {
@@ -679,6 +681,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         delay_input.get_channels()
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_time_leader, tempo_sync)
 {
@@ -702,6 +705,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         delay_input.get_channels()
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_gain_leader, delay_time_leader, tempo_sync)
 {
@@ -726,6 +730,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         delay_input.get_channels()
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_gain_leader, delay_time, delay_time_max, tempo_sync)
 {
@@ -738,6 +743,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::initialize_instanc
 {
     panning_buffer = NULL;
     stereo_gain_buffer = SignalProducer::allocate_buffer();
+    panning_buffer_scaled = SignalProducer::allocate_buffer();
 
     this->register_child(panning);
     this->register_child(delay);
@@ -748,6 +754,8 @@ template<class InputSignalProducerClass, class FilterInputClass>
 PannedDelay<InputSignalProducerClass, FilterInputClass>::~PannedDelay()
 {
     SignalProducer::free_buffer(stereo_gain_buffer);
+    SignalProducer::free_buffer(panning_buffer_scaled);
+    panning_buffer = NULL;
 }
 
 
@@ -758,6 +766,16 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_block_size(
     SignalProducer::set_block_size(new_block_size);
 
     stereo_gain_buffer = SignalProducer::reallocate_buffer(stereo_gain_buffer);
+    panning_buffer_scaled = SignalProducer::reallocate_buffer(panning_buffer_scaled);
+    panning_buffer = NULL;
+}
+
+
+template<class InputSignalProducerClass, class FilterInputClass>
+void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_panning_scale(
+        Number const scale
+) noexcept {
+    panning_scale = scale;
 }
 
 
@@ -774,28 +792,43 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
         return this->input_was_silent(round);
     }
 
-    /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
-
     if (panning_buffer == NULL) {
-        panning_value = is_flipped ? -panning.get_value() : panning.get_value();
+        panning_value = (
+            is_flipped
+                ? -panning.get_value() * panning_scale
+                : (panning.get_value() * panning_scale)
+        );
+
         Number const x = (
             (panning_value <= 0.0 ? panning_value + 1.0 : panning_value) * Math::PI_HALF
         );
 
         Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
-    } else if (is_flipped) {
-        for (Integer i = 0; i != sample_count; ++i) {
-            Number const p = -panning_buffer[i];
-            Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
-
-            Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
-        }
     } else {
-        for (Integer i = 0; i != sample_count; ++i) {
-            Number const p = panning_buffer[i];
-            Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
+        if (std::fabs(panning_scale - 1.0) >= 0.000001) {
+            for (Integer i = 0; i != sample_count; ++i) {
+                panning_buffer_scaled[0][i] = panning_buffer[i] * panning_scale;
+            }
 
-            Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+            panning_buffer = panning_buffer_scaled[0];
+        }
+
+        /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
+
+        if (is_flipped) {
+            for (Integer i = 0; i != sample_count; ++i) {
+                Number p = -panning_buffer[i];
+                Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
+
+                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+            }
+        } else {
+            for (Integer i = 0; i != sample_count; ++i) {
+                Number p = panning_buffer[i];
+                Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
+
+                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+            }
         }
     }
 

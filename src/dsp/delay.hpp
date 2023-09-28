@@ -224,6 +224,8 @@ class PannedDelay : public Filter<FilterInputClass>
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
 
+        void set_panning_scale(Number const scale) noexcept;
+
     protected:
         PannedDelay(
             InputSignalProducerClass& delay_input,
@@ -302,9 +304,11 @@ class PannedDelay : public Filter<FilterInputClass>
         bool const is_flipped;
 
         Sample** stereo_gain_buffer;
+        Sample** panning_buffer_scaled;
         Sample const* panning_buffer;
         Sample stereo_gain_value[2];
         Sample panning_value;
+        Number panning_scale;
 
     public:
         FloatParamS panning;
