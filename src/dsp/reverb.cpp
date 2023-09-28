@@ -110,6 +110,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             width,
             room_size,
             TUNINGS[i],
+            DELAY_TIME_MAX,
             damping_frequency,
             damping_gain
         );

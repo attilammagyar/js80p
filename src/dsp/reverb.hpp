@@ -61,6 +61,8 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
     private:
         static constexpr Integer COMB_FILTERS = 8;
 
+        static constexpr Seconds DELAY_TIME_MAX = 0.3;
+
         static constexpr Seconds TUNINGS[COMB_FILTERS] = {
             1557.0 / 44100.0,
             1617.0 / 44100.0,

@@ -68,6 +68,7 @@ class Delay : public Filter<InputSignalProducerClass>
             InputSignalProducerClass& input,
             FloatParamS& gain_leader,
             Seconds const time,
+            Seconds const time_max,
             ToggleParam const* tempo_sync = NULL
         ) noexcept;
 
@@ -260,6 +261,7 @@ class PannedDelay : public Filter<FilterInputClass>
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
+            Seconds const delay_time_max,
             ToggleParam const* tempo_sync = NULL,
             Integer const number_of_children = 0
         );
@@ -348,6 +350,7 @@ class HighShelfPannedDelay : public HighShelfPannedDelayBase<InputSignalProducer
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
+            Seconds const delay_time_max,
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
             ToggleParam const* tempo_sync = NULL

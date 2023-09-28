@@ -120,12 +120,13 @@ Delay<InputSignalProducerClass>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& gain_leader,
         Seconds const time,
+        Seconds const time_max,
         ToggleParam const* tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
     gain(gain_leader),
-    time("", Constants::DELAY_TIME_MIN, time, time),
+    time("", Constants::DELAY_TIME_MIN, time_max, time),
     delay_buffer_oversize(
         tempo_sync != NULL ? OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC : 1
     ),
@@ -716,6 +717,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         FloatParamS& panning_leader,
         FloatParamS& delay_gain_leader,
         Seconds const delay_time,
+        Seconds const delay_time_max,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
@@ -725,7 +727,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning(panning_leader),
-    delay(delay_input, delay_gain_leader, delay_time, tempo_sync)
+    delay(delay_input, delay_gain_leader, delay_time, delay_time_max, tempo_sync)
 {
     initialize_instance();
 }
@@ -964,6 +966,7 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
     FloatParamS& panning_leader,
     FloatParamS& delay_gain_leader,
     Seconds const delay_time,
+    Seconds const delay_time_max,
     FloatParamS& high_shelf_filter_frequency_leader,
     FloatParamS& high_shelf_filter_gain_leader,
     ToggleParam const* tempo_sync
@@ -974,6 +977,7 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         panning_leader,
         delay_gain_leader,
         delay_time,
+        delay_time_max,
         tempo_sync,
         NUMBER_OF_CHILDREN
     ),
