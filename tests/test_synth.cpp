@@ -55,8 +55,8 @@ constexpr Synth::MessageType CLEAR = Synth::MessageType::CLEAR;
 
 
 constexpr Integer PEAK_CTL_TEST_BLOCK_SIZE = 8192;
-constexpr Number PEAK_CTL_TEST_OSC_1_VOL = 0.7;
-constexpr Number PEAK_CTL_TEST_OSC_2_VOL = 0.3;
+constexpr Number PEAK_CTL_TEST_OSC_1_VOL = 0.9;
+constexpr Number PEAK_CTL_TEST_OSC_2_VOL = 0.6;
 constexpr Number PEAK_CTL_TEST_FILTER_1_GAIN = -6.0;
 constexpr Number PEAK_CTL_TEST_REVERB_DRY = 0.1;
 
@@ -1051,9 +1051,10 @@ void test_peak_controller(
 TEST(peak_controllers_are_updated_when_in_use, {
     Number const osc_1_expected = PEAK_CTL_TEST_OSC_1_VOL;
     Number const osc_2_expected = PEAK_CTL_TEST_OSC_2_VOL;
-    Number const vol_1_expected = osc_1_expected + osc_2_expected;
+    Number const vol_1_expected = 1.0; /* osc_1_expected + osc_2_expected > 1.0 */
     Number const vol_2_expected = (
-        Math::db_to_linear(PEAK_CTL_TEST_FILTER_1_GAIN) * vol_1_expected
+        Math::db_to_linear(PEAK_CTL_TEST_FILTER_1_GAIN)
+        * (osc_1_expected + osc_2_expected)
     );
     Number const vol_3_expected = PEAK_CTL_TEST_REVERB_DRY * vol_2_expected;
 
