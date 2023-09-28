@@ -31,16 +31,20 @@ using namespace JS80P;
 constexpr Integer CHANNELS = 2;
 
 
-TEST(adds_input_signals_together, {
+TEST(adds_input_signals_together_with_weights, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 10.0;
     constexpr Sample input_samples_1[CHANNELS][block_size] = {
-        {0.10, 0.20, 0.30, 0.40, 0.50},
         {0.20, 0.40, 0.60, 0.80, 1.00},
+        {0.40, 0.80, 1.20, 1.60, 2.00},
     };
     constexpr Sample input_samples_2[CHANNELS][block_size] = {
         {0.01, 0.02, 0.03, 0.04, 0.05},
         {0.02, 0.04, 0.06, 0.08, 0.10},
+    };
+    constexpr Sample input_samples_3[CHANNELS][block_size] = {
+        {9.99, 9.99, 9.99, 9.99, 9.99},
+        {9.99, 9.99, 9.99, 9.99, 9.99},
     };
     constexpr Sample expected_output[CHANNELS][block_size] = {
         {0.11, 0.22, 0.33, 0.44, 0.55},
@@ -54,8 +58,13 @@ TEST(adds_input_signals_together, {
         (Sample const*)&input_samples_2[0],
         (Sample const*)&input_samples_2[1]
     };
+    Sample const* input_buffer_3[CHANNELS] = {
+        (Sample const*)&input_samples_3[0],
+        (Sample const*)&input_samples_3[1]
+    };
     FixedSignalProducer input_1(input_buffer_1);
     FixedSignalProducer input_2(input_buffer_2);
+    FixedSignalProducer input_3(input_buffer_3);
     Mixer<FixedSignalProducer> mixer(CHANNELS);
     Sample output_1[block_size] = {1.0, 1.0, 1.0, 1.0, 1.0};
     Sample output_2[block_size] = {-1.0, -1.0, -1.0, -1.0, -1.0};
@@ -63,12 +72,20 @@ TEST(adds_input_signals_together, {
 
     mixer.add(input_1);
     mixer.add(input_2);
+    mixer.add(input_3);
+
+    mixer.set_weight(0, 0.5);
+    mixer.set_weight(2, -0.1);
+    mixer.set_weight(9, 9.99);
 
     input_1.set_sample_rate(sample_rate);
     input_1.set_block_size(block_size);
 
     input_2.set_sample_rate(sample_rate);
     input_2.set_block_size(block_size);
+
+    input_3.set_sample_rate(sample_rate);
+    input_3.set_block_size(block_size);
 
     mixer.set_sample_rate(sample_rate);
     mixer.set_block_size(block_size);
