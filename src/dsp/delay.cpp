@@ -763,8 +763,8 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_block_size(
 
 template<class InputSignalProducerClass, class FilterInputClass>
 Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::initialize_rendering(
-    Integer const round,
-    Integer const sample_count
+        Integer const round,
+        Integer const sample_count
 ) noexcept {
     Filter<FilterInputClass>::initialize_rendering(round, sample_count);
 
