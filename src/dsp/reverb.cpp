@@ -106,7 +106,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     for (Integer i = 0; i != COMB_FILTERS; ++i) {
         comb_filters[i] = new CombFilter(
             high_pass_filter,
-            i & 1 ? PannedDelayStereoMode::FLIPPED : PannedDelayStereoMode::NORMAL,
+            (i & 1) == 1 ? PannedDelayStereoMode::FLIPPED : PannedDelayStereoMode::NORMAL,
             width,
             room_size,
             TUNINGS[i],
