@@ -518,7 +518,7 @@ TEST(identical_delays_may_share_delay_buffer, {
 
 
 template<class PannedDelayClass>
-void test_panned_delay()
+void test_panned_delay(char const* class_name)
 {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
@@ -560,7 +560,8 @@ void test_panned_delay()
             output.samples[c],
             sample_count,
             DOUBLE_DELTA,
-            "channel=%d",
+            "class=%s, channel=%d",
+            class_name,
             (int)c
         );
     }
@@ -570,6 +571,6 @@ void test_panned_delay()
 
 
 TEST(output_may_be_panned, {
-    test_panned_delay< HighShelfPannedDelay<FixedSignalProducer> >();
-    test_panned_delay< PannedDelay<FixedSignalProducer> >();
+    test_panned_delay< PannedDelay<FixedSignalProducer> >("PannedDelay");
+    test_panned_delay< HighShelfPannedDelay<FixedSignalProducer> >("HighShelfPannedDelay");
 })
