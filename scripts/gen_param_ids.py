@@ -234,6 +234,8 @@ def print_special_params(param_id: int) -> int:
         ("N6DYN", " ///< Envelope 6 Dynamic"),
 
         ("POLY", "  ///< Polyphonic"),
+
+        ("ERTYP", " ///< Effects Reverb Type"),
     ]
 
     return print_params(param_id, "", "", 1, params)

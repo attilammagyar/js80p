@@ -98,6 +98,7 @@ params = [
     "EECR",
     "EEWET",
     "EEDRY",
+    "ERTYP",
     "ERRS",
     "ERDF",
     "ERDG",

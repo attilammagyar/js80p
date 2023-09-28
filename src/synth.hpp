@@ -556,7 +556,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             POLY = 386,      ///< Polyphonic
 
-            MAX_PARAM_ID = 387
+            ERTYP = 387,     ///< Effects Reverb Type
+
+            MAX_PARAM_ID = 388
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

@@ -28,7 +28,16 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-constexpr Seconds Reverb<InputSignalProducerClass>::TUNINGS[COMB_FILTERS];
+constexpr typename Reverb<InputSignalProducerClass>::CombFilterTuning Reverb<InputSignalProducerClass>::TUNINGS[][COMB_FILTERS];
+
+
+template<class InputSignalProducerClass>
+Reverb<InputSignalProducerClass>::TypeParam::TypeParam(
+        std::string const name
+) noexcept
+    : Param<Type, ParamEvaluation::BLOCK>(name, FREEVERB, FREEVERB, FREEVERB)
+{
+}
 
 
 template<class InputSignalProducerClass>
@@ -38,8 +47,9 @@ Reverb<InputSignalProducerClass>::Reverb(
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
-        11 + COMB_FILTERS
+        12 + COMB_FILTERS
     ),
+    type(name+ "TYP"),
     room_size(name + "RS", 0.0, 0.999, 0.75),
     damping_frequency(
         name + "DF",
@@ -86,10 +96,12 @@ Reverb<InputSignalProducerClass>::Reverb(
         high_pass_frequency,
         high_pass_filter_q,
         high_pass_filter_gain
-    )
+    ),
+    previous_type(255)
 {
     this->register_child(mixer);
 
+    this->register_child(type);
     this->register_child(room_size);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
@@ -103,13 +115,13 @@ Reverb<InputSignalProducerClass>::Reverb(
 
     this->register_child(high_pass_filter);
 
-    for (Integer i = 0; i != COMB_FILTERS; ++i) {
+    for (size_t i = 0; i != COMB_FILTERS; ++i) {
         comb_filters[i] = new CombFilter(
             high_pass_filter,
-            (i & 1) == 1 ? PannedDelayStereoMode::FLIPPED : PannedDelayStereoMode::NORMAL,
+            PannedDelayStereoMode::NORMAL,
             width,
             room_size,
-            TUNINGS[i],
+            TUNINGS[0][i].delay_time,
             DELAY_TIME_MAX,
             damping_frequency,
             damping_gain
@@ -129,10 +141,19 @@ Reverb<InputSignalProducerClass>::Reverb(
 template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::~Reverb()
 {
-    for (Integer i = 0; i != COMB_FILTERS; ++i) {
+    for (size_t i = 0; i != COMB_FILTERS; ++i) {
         delete comb_filters[i];
         comb_filters[i] = NULL;
     }
+}
+
+
+template<class InputSignalProducerClass>
+void Reverb<InputSignalProducerClass>::reset() noexcept
+{
+    SideChainCompressableEffect<InputSignalProducerClass>::reset();
+
+    previous_type = 255;
 }
 
 
@@ -149,6 +170,18 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
 
     if (buffer != NULL) {
         return buffer;
+    }
+
+    Byte const type = this->type.get_value();
+
+    if (previous_type != type) {
+        previous_type = type;
+
+        for (size_t i = 0; i != COMB_FILTERS; ++i) {
+            comb_filters[i]->delay.time.set_value(TUNINGS[type][i].delay_time);
+            comb_filters[i]->set_panning_scale(TUNINGS[type][i].panning_scale);
+            mixer.set_weight(i, TUNINGS[type][i].weight);
+        }
     }
 
     mixer.set_output_buffer(this->buffer);

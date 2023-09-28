@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__REVERB_HPP
 #define JS80P__DSP__REVERB_HPP
 
+#include <cstddef>
+
 #include "js80p.hpp"
 
 #include "dsp/biquad_filter.hpp"
@@ -38,13 +40,26 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
+        typedef Byte Type;
+
         typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
         typedef HighShelfPannedDelay<HighPassedInput> CombFilter;
+
+        static constexpr Type FREEVERB = 0;
+
+        class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
+        {
+            public:
+                TypeParam(std::string const name) noexcept;
+        };
 
         Reverb(std::string const name, InputSignalProducerClass& input);
 
         virtual ~Reverb();
 
+        virtual void reset() noexcept override;
+
+        TypeParam type;
         FloatParamS room_size;
         FloatParamS damping_frequency;
         FloatParamS damping_gain;
@@ -59,23 +74,43 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        static constexpr Integer COMB_FILTERS = 8;
+        class CombFilterTuning
+        {
+            public:
+                constexpr CombFilterTuning(
+                        Seconds const delay_time,
+                        Number const weight,
+                        Number const panning_scale
+                ) : delay_time(delay_time),
+                    weight(weight),
+                    panning_scale(panning_scale) {}
+
+                Seconds const delay_time;
+                Number const weight;
+                Number const panning_scale;
+        };
+
+        static constexpr size_t COMB_FILTERS = 10;
 
         static constexpr Seconds DELAY_TIME_MAX = 0.3;
 
-        /*
-        Tunings from Freeverb:
-        https://ccrma.stanford.edu/~jos/pasp/Freeverb.html
-        */
-        static constexpr Seconds TUNINGS[COMB_FILTERS] = {
-            1557.0 / 44100.0,
-            1617.0 / 44100.0,
-            1491.0 / 44100.0,
-            1422.0 / 44100.0,
-            1277.0 / 44100.0,
-            1356.0 / 44100.0,
-            1188.0 / 44100.0,
-            1116.0 / 44100.0,
+        static constexpr CombFilterTuning TUNINGS[][COMB_FILTERS] = {
+            /*
+            Tunings from Freeverb:
+            https://ccrma.stanford.edu/~jos/pasp/Freeverb.html
+            */
+            {
+                {1557.0 / 44100.0, 1.00,  1.00},
+                {1617.0 / 44100.0, 1.00, -1.00},
+                {1491.0 / 44100.0, 1.00,  1.00},
+                {1422.0 / 44100.0, 1.00, -1.00},
+                {1277.0 / 44100.0, 1.00,  1.00},
+                {1356.0 / 44100.0, 1.00, -1.00},
+                {1188.0 / 44100.0, 1.00,  1.00},
+                {1116.0 / 44100.0, 1.00, -1.00},
+                {0.0,              0.00,  1.00},
+                {0.0,              0.00, -1.00},
+            },
         };
 
         Mixer<CombFilter> mixer;
@@ -86,6 +121,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         HighPassedInput high_pass_filter;
         CombFilter* comb_filters[COMB_FILTERS];
+        Type previous_type;
 };
 
 }

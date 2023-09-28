@@ -202,11 +202,15 @@ h1 {
 }
 
 #chorus h1 label.freq {
-  left: 191px;
+  left: 192px;
 }
 
 #echo h1 label.freq {
   left: 94px;
+}
+
+#reverb h1 label.freq {
+  left: 76px;
 }
 
 .block h1 label.dynamic,
@@ -826,6 +830,7 @@ window.onload = function ()
     create_knob("echo-params", "WET %", "50");
     create_knob("echo-params", "DRY %", "60");
 
+    create_knob("reverb-params", "TYPE", "0");
     create_knob("reverb-params", "ROOM %", "90");
     create_knob("reverb-params", "DF Hz", "6000");
     create_knob("reverb-params", "DG dB", "-6");

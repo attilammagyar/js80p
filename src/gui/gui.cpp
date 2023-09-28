@@ -79,6 +79,13 @@ char const* const GUI::BIQUAD_FILTER_TYPES[] = {
 int const GUI::BIQUAD_FILTER_TYPES_COUNT = 7;
 
 
+char const* const GUI::REVERB_TYPES[] = {
+    [Reverb<SignalProducer>::FREEVERB] = "1",
+};
+
+int const GUI::REVERB_TYPES_COUNT = 1;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -547,6 +554,8 @@ char const* const GUI::PARAMS[] = {
     [Synth::ParamId::N6DYN] = "Envelope 6 Dynamic",
 
     [Synth::ParamId::POLY] = "Polyphonic",
+
+    [Synth::ParamId::ERTYP] = "Reverb Type",
 };
 
 
@@ -1417,6 +1426,9 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
 
+    constexpr char const* const* rt = JS80P::GUI::REVERB_TYPES;
+    constexpr int rtc = JS80P::GUI::REVERB_TYPES_COUNT;
+
     PE(effects_body,  39 + PE_W * 0,    35, Synth::ParamId::EV1V,   MML_C,      "%.2f", 100.0, knob_states);
 
     PE(effects_body, 141 + PE_W * 0,    35, Synth::ParamId::EOG,    MML_C,      "%.2f", 100.0, knob_states);
@@ -1448,7 +1460,7 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     PE(effects_body, 200 + PE_W * 8,   174, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
     PE(effects_body, 200 + PE_W * 9,   174, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TS(effects_body, 670, 146, 111, 24, 87, Synth::ParamId::ECSYN);
-    TS(effects_body, 450, 146,  96, 24,  0, Synth::ParamId::ECLOG);
+    TS(effects_body, 451, 146,  96, 24,  0, Synth::ParamId::ECLOG);
 
     PE(effects_body, 142 + PE_W * 0,   314, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
     PE(effects_body, 142 + PE_W * 1,   314, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
@@ -1465,20 +1477,21 @@ void GUI::build_effects_body(ParamEditorKnobStates* knob_states)
     TS(effects_body, 277, 286,  96, 24,  0, Synth::ParamId::EELOG);
     TS(effects_body, 728, 286, 111, 24, 87, Synth::ParamId::EESYN);
 
-    PE(effects_body, 120 + PE_W * 0,   454, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 120 + PE_W * 1,   454, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 2,   454, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 3,   454, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 120 + PE_W * 4,   454, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 5,   454, Synth::ParamId::ERCTH,  MM___,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 6,   454, Synth::ParamId::ERCAT,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 7,   454, Synth::ParamId::ERCRL,  MM___,      "%.3f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 8,   454, Synth::ParamId::ERCR,   MM___,      "%.2f", 1.0, knob_states);
-    PE(effects_body, 120 + PE_W * 9,   454, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
-    PE(effects_body, 120 + PE_W * 10,  454, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TS(effects_body, 193, 426,  96, 24,  0, Synth::ParamId::ERLOG);
+    PE(effects_body,  91 + PE_W * 0,   454, Synth::ParamId::ERTYP,  MM___,      rt, rtc, knob_states);
+    PE(effects_body,  91 + PE_W * 1,   454, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body,  91 + PE_W * 2,   454, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 3,   454, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 4,   454, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body,  91 + PE_W * 5,   454, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 6,   454, Synth::ParamId::ERCTH,  MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 7,   454, Synth::ParamId::ERCAT,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 8,   454, Synth::ParamId::ERCRL,  MM___,      "%.3f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 9,   454, Synth::ParamId::ERCR,   MM___,      "%.2f", 1.0, knob_states);
+    PE(effects_body,  91 + PE_W * 10,  454, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body,  91 + PE_W * 11,  454, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TS(effects_body, 226, 426,  96, 24,  0, Synth::ParamId::ERLOG);
 
-    PE(effects_body, 799 + PE_W * 0,   454, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
+    PE(effects_body, 828 + PE_W * 0,   454, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
 
     effects_body->hide();
 }

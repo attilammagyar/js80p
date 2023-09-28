@@ -429,6 +429,7 @@ void Synth::register_effects_params() noexcept
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
     register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
 
+    register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
     register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
     register_param<FloatParamS>(ParamId::ERDF, effects.reverb.damping_frequency);
     register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
@@ -1436,6 +1437,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_default_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
         case ParamId::POLY: return polyphonic.get_default_ratio();
+        case ParamId::ERTYP: return effects.reverb.type.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1650,6 +1652,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_max_value();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
         case ParamId::POLY: return polyphonic.get_max_value();
+        case ParamId::ERTYP: return effects.reverb.type.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1872,6 +1875,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.ratio_to_value(ratio);
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
         case ParamId::POLY: return polyphonic.ratio_to_value(ratio);
+        case ParamId::ERTYP: return effects.reverb.type.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2382,6 +2386,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::N5DYN: envelopes_rw[4]->dynamic.set_ratio(ratio); break;
             case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
             case ParamId::POLY: polyphonic.set_ratio(ratio); break;
+            case ParamId::ERTYP: effects.reverb.type.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -2764,6 +2769,12 @@ bool Synth::assign_controller_to_discrete_param(
             is_assigned = true;
             break;
 
+        case ParamId::ERTYP:
+            effects.reverb.type.set_midi_controller(midi_controller);
+            effects.reverb.type.set_macro(macro);
+            is_assigned = true;
+            break;
+
         default:
             break;
     }
@@ -3054,6 +3065,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
         case ParamId::POLY: return polyphonic.get_ratio();
+        case ParamId::ERTYP: return effects.reverb.type.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
