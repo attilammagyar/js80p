@@ -129,6 +129,9 @@ Reverb<InputSignalProducerClass>::Reverb(
         comb_filters[i]->delay.set_feedback_signal_producer(
             &comb_filters[i]->high_shelf_filter
         );
+        comb_filters[i]->high_shelf_filter.set_shared_cache(
+            &high_shelf_filter_shared_cache
+        );
 
         mixer.add(*comb_filters[i]);
         this->register_child(*comb_filters[i]);

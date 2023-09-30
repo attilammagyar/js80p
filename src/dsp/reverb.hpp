@@ -256,6 +256,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS high_pass_filter_q;
         FloatParamS high_pass_filter_gain;
 
+        BiquadFilterSharedCache high_shelf_filter_shared_cache;
         HighPassedInput high_pass_filter;
         CombFilter* comb_filters[COMB_FILTERS];
         Type previous_type;

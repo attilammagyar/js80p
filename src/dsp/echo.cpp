@@ -133,6 +133,9 @@ Echo<InputSignalProducerClass>::Echo(
     high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 
     comb_filter_1.delay.set_feedback_signal_producer(&comb_filter_2.high_shelf_filter);
+
+    comb_filter_1.high_shelf_filter.set_shared_cache(&high_shelf_filter_shared_cache);
+    comb_filter_2.high_shelf_filter.set_shared_cache(&high_shelf_filter_shared_cache);
 }
 
 

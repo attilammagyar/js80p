@@ -70,6 +70,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS high_pass_filter_q;
         FloatParamS high_pass_filter_gain;
 
+        BiquadFilterSharedCache high_shelf_filter_shared_cache;
         HighPassedInput high_pass_filter;
         CombFilter1 comb_filter_1;
         CombFilter2 comb_filter_2;

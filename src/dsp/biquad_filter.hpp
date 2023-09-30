@@ -108,6 +108,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         virtual void reset() noexcept override;
 
+        void set_shared_cache(BiquadFilterSharedCache* shared_cache) noexcept;
+
         FloatParamS frequency;
         FloatParamS q;
         FloatParamS gain;

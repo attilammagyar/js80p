@@ -255,6 +255,14 @@ void BiquadFilter<InputSignalProducerClass>::reset() noexcept
 
 
 template<class InputSignalProducerClass>
+void BiquadFilter<InputSignalProducerClass>::set_shared_cache(
+        BiquadFilterSharedCache* shared_cache
+) noexcept {
+    this->shared_cache = shared_cache;
+}
+
+
+template<class InputSignalProducerClass>
 Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
