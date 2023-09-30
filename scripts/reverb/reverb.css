@@ -1,0 +1,98 @@
+html, body {
+  background: #000;
+  color: #b0b0b0;
+}
+
+body {
+  padding: 1vmin;
+}
+
+a {
+  color: #b0b0e0;
+}
+
+input, textarea {
+  background: #111;
+  color: #b0b0d0;
+  border: inset 2px #3060b0;
+  font-size: 14px;
+  padding: 3px;
+}
+
+input {
+  width: 100px;
+  text-align: center;
+}
+
+textarea {
+  width: 40vw;
+  height: 30vh;
+}
+
+button {
+  background: #102060;
+  color: #b0b0e0;
+  border: outset 2px #3060b0;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px;
+  min-width: 120px;
+}
+
+form {
+  max-width: 96vw;
+  float: right;
+}
+
+form > div {
+  margin: 5px;
+}
+
+label {
+  display: inline-block;
+  width: 320px;
+  text-align: right;
+  margin: 5px;
+}
+
+svg {
+  float: left;
+  border: inset 3px #808080;
+  max-width: 96vw;
+  max-height: 96vh;
+}
+
+svg .corner {
+  stroke: none;
+  fill: #b0b0b0;
+}
+
+svg .source {
+  stroke: none;
+  fill: #3080ff;
+}
+
+svg .sink {
+  stroke: none;
+  fill: #30ffa0;
+}
+
+#background {
+  stroke: none;
+  fill: #000000;
+}
+
+#walls {
+  stroke-width: 2px;
+  stroke: #b0b0b0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+#traces path {
+  stroke-width: 1.5px;
+  fill: none;
+  stroke: #4080ff;
+}

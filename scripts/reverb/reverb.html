@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Reverb</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="reverb.css" />
+</head>
+<body>
+  <a id="top" name="top"></a>
+  <noscript>
+    Your browsers does not seem to support JavaScript.
+    This application has to be run in a browser which supports JavaScript,
+    for example Firefox or Chrome.
+  </noscript>
+
+  <div>
+    Quick and dirty (and buggy and unscientific) tool
+    to come up with nice reverb tunings.
+  </div>
+
+  <form method="get" action="#">
+    <div>
+      <label for="corners">Corners:</label>
+      <input id="corners" type="number" min="3" max="36" value="9" />
+    </div>
+    <div>
+      <label for="orientation">Orientation:</label>
+      <input id="orientation" type="number" min="0" max="360" value="15" />
+      <button id="circle" type="submit">Circle!</button>
+    </div>
+    <div>
+      <label for="delays">Delays:</label>
+      <input id="delays" type="number" min="1" max="100" value="10" />
+    </div>
+    <div>
+      <label for="resolution">Angular resolution (deg):</label>
+      <input id="resolution" type="number" min="0" max="180" value="3" step="0.5" />
+    </div>
+    <div>
+      <label for="lossb">Loss per bounce (dB):</label>
+      <input id="lossb" type="number" min="0" max="120" value="0.2" step="0.1" />
+    </div>
+    <div>
+      <label for="scale">Scale (image width = x meters):</label>
+      <input id="scale" type="number" min="0" max="300" value="10" step="0.2" />
+      <button id="trace" type="submit">Trace!</button>
+    </div>
+    <div>
+      <label for="lossd">Loss over distance (dB per meter):</label>
+      <input id="lossd" type="number" min="0" max="120" value="0.05" step="0.1" />
+    </div>
+    <div>
+      <textarea id="code" rows="20" cols="80" readonly="readonly"></textarea>
+    </div>
+  </form>
+  <svg id="canvas" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <rect id="background" x="0" y="0" height="500" width="500" />
+    <path id="walls" d="" />
+    <svg id="traces"></svg>
+    <svg id="graph"></svg>
+  </svg>
+  <script type="text/javascript" src="reverb.js"></script>
+</body>
+</html>
