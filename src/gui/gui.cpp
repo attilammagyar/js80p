@@ -80,10 +80,19 @@ int const GUI::BIQUAD_FILTER_TYPES_COUNT = 7;
 
 
 char const* const GUI::REVERB_TYPES[] = {
-    [Reverb<SignalProducer>::FREEVERB] = "1",
+    [Reverb<SignalProducer>::REVERB_1] = "1",
+    [Reverb<SignalProducer>::REVERB_2] = "2",
+    [Reverb<SignalProducer>::REVERB_3] = "3",
+    [Reverb<SignalProducer>::REVERB_4] = "4",
+    [Reverb<SignalProducer>::REVERB_5] = "5",
+    [Reverb<SignalProducer>::REVERB_6] = "6",
+    [Reverb<SignalProducer>::REVERB_7] = "7",
+    [Reverb<SignalProducer>::REVERB_8] = "8",
+    [Reverb<SignalProducer>::REVERB_9] = "9",
+    [Reverb<SignalProducer>::REVERB_10] = "10",
 };
 
-int const GUI::REVERB_TYPES_COUNT = 1;
+int const GUI::REVERB_TYPES_COUNT = 10;
 
 
 GUI::Controller::Controller(
