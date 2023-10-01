@@ -691,9 +691,7 @@ void Synth::stop_lfos() noexcept
         lfos_rw[i]->stop(0.0);
     }
 
-    effects.chorus.lfo_1.stop(0.0);
-    effects.chorus.lfo_2.stop(0.0);
-    effects.chorus.lfo_3.stop(0.0);
+    effects.chorus.stop_lfos(0.0);
 }
 
 
@@ -714,9 +712,7 @@ void Synth::start_lfos() noexcept
         lfos_rw[i]->start(0.0);
     }
 
-    effects.chorus.lfo_1.start(0.0);
-    effects.chorus.lfo_2.start(0.0);
-    effects.chorus.lfo_3.start(0.0);
+    effects.chorus.start_lfos(0.0);
 }
 
 
@@ -2044,9 +2040,7 @@ Sample const* const* Synth::initialize_rendering(
         lfos_rw[i]->skip_round(round, sample_count);
     }
 
-    effects.chorus.lfo_1.skip_round(round, sample_count);
-    effects.chorus.lfo_2.skip_round(round, sample_count);
-    effects.chorus.lfo_3.skip_round(round, sample_count);
+    effects.chorus.skip_round_for_lfos(round, sample_count);
 
     clear_midi_controllers();
 

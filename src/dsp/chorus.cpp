@@ -31,7 +31,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 27),
+) : Effect<InputSignalProducerClass>(name, input, 18 + VOICES * 3),
     delay_time(
         name + "DEL",
         0.0,
@@ -72,9 +72,6 @@ Chorus<InputSignalProducerClass>::Chorus(
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
-    lfo_1(name, frequency, delay_time, depth, tempo_sync, 0.0 / 3.0),
-    lfo_2(name, frequency, delay_time, depth, tempo_sync, 1.0 / 3.0),
-    lfo_3(name, frequency, delay_time, depth, tempo_sync, 2.0 / 3.0),
     biquad_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -95,51 +92,21 @@ Chorus<InputSignalProducerClass>::Chorus(
         biquad_filter_q,
         high_pass_filter_gain
     ),
-    /*
-    The delay_time parameter controls the maximum of the centered LFOs which
-    control the actual delay time of the delay lines, but for the chorus effect,
-    we want to control the midpoint of the oscillation instead of the maximum.
-    Thus, the actual delay time range needs to be twice as large as the delay
-    time range that we present to the user.
-    */
-    delay_time_1(
-        name + "DEL1",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    delay_time_2(
-        name + "DEL2",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    delay_time_3(
-        name + "DEL3",
-        0.0,
-        Constants::CHORUS_DELAY_TIME_MAX * 2.0,
-        Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
-    ),
-    comb_filter_1(
-        high_pass_filter,
-        PannedDelayStereoMode::NORMAL,
-        width,
-        delay_time_1,
-        &tempo_sync
-    ),
-    comb_filter_2(
-        high_pass_filter,
-        PannedDelayStereoMode::FLIPPED,
-        width,
-        delay_time_2,
-        &tempo_sync
-    ),
-    comb_filter_3(
-        high_pass_filter,
-        PannedDelayStereoMode::NORMAL,
-        delay_time_3,
-        &tempo_sync
-    ),
+    lfos{
+        {name + "LFO1", frequency, delay_time, depth, tempo_sync, 0.0 / 3.0},
+        {name + "LFO2", frequency, delay_time, depth, tempo_sync, 1.0 / 3.0},
+        {name + "LFO3", frequency, delay_time, depth, tempo_sync, 2.0 / 3.0},
+    },
+    delay_times{
+        {name + "DEL1", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL2", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL3", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+    },
+    comb_filters{
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[0], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::FLIPPED, width, delay_times[1], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, delay_times[2], &tempo_sync},
+    },
     mixer(input.get_channels()),
     high_shelf_filter_type(""),
     high_shelf_filter(
@@ -162,23 +129,11 @@ Chorus<InputSignalProducerClass>::Chorus(
     this->register_child(tempo_sync);
     this->register_child(log_scale_frequencies);
 
-    this->register_child(lfo_1);
-    this->register_child(lfo_2);
-    this->register_child(lfo_3);
-
     this->register_child(biquad_filter_q);
 
     this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_gain);
     this->register_child(high_pass_filter);
-
-    this->register_child(delay_time_1);
-    this->register_child(delay_time_2);
-    this->register_child(delay_time_3);
-
-    this->register_child(comb_filter_1);
-    this->register_child(comb_filter_2);
-    this->register_child(comb_filter_3);
 
     this->register_child(mixer);
 
@@ -187,28 +142,54 @@ Chorus<InputSignalProducerClass>::Chorus(
 
     this->register_child(feedback_gain);
 
+    for (size_t i = 0; i != VOICES; ++i) {
+        lfos[i].center.set_value(ToggleParam::ON);
+        delay_times[i].set_lfo(&lfos[i]);
+        comb_filters[i].delay.set_feedback_signal_producer(&feedback_gain);
+
+        if (i > 0) {
+            comb_filters[i].delay.use_shared_delay_buffer(comb_filters[0].delay);
+        }
+
+        mixer.add(comb_filters[i]);
+
+        this->register_child(lfos[i]);
+        this->register_child(delay_times[i]);
+        this->register_child(comb_filters[i]);
+    }
+
     high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 
     high_shelf_filter_type.set_value(HighShelfFilter::HIGH_SHELF);
+}
 
-    lfo_1.center.set_value(ToggleParam::ON);
-    lfo_2.center.set_value(ToggleParam::ON);
-    lfo_3.center.set_value(ToggleParam::ON);
 
-    delay_time_1.set_lfo(&lfo_1);
-    delay_time_2.set_lfo(&lfo_2);
-    delay_time_3.set_lfo(&lfo_3);
+template<class InputSignalProducerClass>
+void Chorus<InputSignalProducerClass>::start_lfos(Seconds const time_offset) noexcept
+{
+    for (size_t i = 0; i != VOICES; ++i) {
+        lfos[i].start(time_offset);
+    }
+}
 
-    comb_filter_1.delay.set_feedback_signal_producer(&feedback_gain);
-    comb_filter_2.delay.set_feedback_signal_producer(&feedback_gain);
-    comb_filter_3.delay.set_feedback_signal_producer(&feedback_gain);
 
-    comb_filter_2.delay.use_shared_delay_buffer(comb_filter_1.delay);
-    comb_filter_3.delay.use_shared_delay_buffer(comb_filter_1.delay);
+template<class InputSignalProducerClass>
+void Chorus<InputSignalProducerClass>::stop_lfos(Seconds const time_offset) noexcept
+{
+    for (size_t i = 0; i != VOICES; ++i) {
+        lfos[i].stop(time_offset);
+    }
+}
 
-    mixer.add(comb_filter_1);
-    mixer.add(comb_filter_2);
-    mixer.add(comb_filter_3);
+
+template<class InputSignalProducerClass>
+void Chorus<InputSignalProducerClass>::skip_round_for_lfos(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    for (size_t i = 0; i != VOICES; ++i) {
+        lfos[i].skip_round(round, sample_count);
+    }
 }
 
 

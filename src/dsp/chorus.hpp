@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__CHORUS_HPP
 #define JS80P__DSP__CHORUS_HPP
 
+#include <cstddef>
+
 #include "js80p.hpp"
 
 #include "dsp/biquad_filter.hpp"
@@ -46,6 +48,14 @@ class Chorus : public Effect<InputSignalProducerClass>
 
         Chorus(std::string const name, InputSignalProducerClass& input);
 
+        void start_lfos(Seconds const time_offset) noexcept;
+        void stop_lfos(Seconds const time_offset) noexcept;
+
+        void skip_round_for_lfos(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
         FloatParamS delay_time;
         FloatParamS frequency;
         FloatParamS depth;
@@ -56,10 +66,6 @@ class Chorus : public Effect<InputSignalProducerClass>
         FloatParamS high_pass_frequency;
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
-
-        LFO lfo_1;
-        LFO lfo_2;
-        LFO lfo_3;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -79,27 +85,29 @@ class Chorus : public Effect<InputSignalProducerClass>
             1.0 / (Number)Constants::CHORUS_FEEDBACK_SCALE
         );
 
-        FloatParamS biquad_filter_q;
+        /*
+        The delay_time parameter controls the maximum of the centered LFOs
+        which control the actual delay time of the delay lines, but for the
+        chorus effect, we want to control the midpoint of the oscillation
+        instead of the maximum.  Thus, the actual delay time range needs to be
+        twice as large as the delay time range that we present to the user.
+        */
+        static constexpr Number DELAY_TIME_MAX = Constants::CHORUS_DELAY_TIME_MAX * 2.0;
+        static constexpr Number DELAY_TIME_DEFAULT = Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0;
 
+        static constexpr size_t VOICES = 3;
+
+        FloatParamS biquad_filter_q;
         typename HighPassedInput::TypeParam high_pass_filter_type;
         FloatParamS high_pass_filter_gain;
         HighPassedInput high_pass_filter;
-
-        FloatParamS delay_time_1;
-        FloatParamS delay_time_2;
-        FloatParamS delay_time_3;
-
-        CombFilter comb_filter_1;
-        CombFilter comb_filter_2;
-        CombFilter comb_filter_3;
-
+        LFO lfos[VOICES];
+        FloatParamS delay_times[VOICES];
+        CombFilter comb_filters[VOICES];
         Mixer<CombFilter> mixer;
-
         typename HighShelfFilter::TypeParam high_shelf_filter_type;
         HighShelfFilter high_shelf_filter;
-
         Gain<HighShelfFilter> feedback_gain;
-
         Sample const* const* chorused;
 };
 
