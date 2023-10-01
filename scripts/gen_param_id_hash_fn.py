@@ -76,6 +76,7 @@ params = [
     "EF2Q",
     "EF2G",
     "EV2V",
+    "ECTYP",
     "ECDEL",
     "ECFRQ",
     "ECDPT",

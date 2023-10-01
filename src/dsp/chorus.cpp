@@ -28,10 +28,23 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
+constexpr typename Chorus<InputSignalProducerClass>::Tuning Chorus<InputSignalProducerClass>::TUNINGS[][VOICES];
+
+
+template<class InputSignalProducerClass>
+Chorus<InputSignalProducerClass>::TypeParam::TypeParam(
+        std::string const name
+) noexcept
+    : Param<Type, ParamEvaluation::BLOCK>(name, CHORUS_1, CHORUS_15, CHORUS_1)
+{
+}
+
+template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
 ) : Effect<InputSignalProducerClass>(name, input, 18 + VOICES * 3),
+    type(name+ "TYP"),
     delay_time(
         name + "DEL",
         0.0,
@@ -93,19 +106,31 @@ Chorus<InputSignalProducerClass>::Chorus(
         high_pass_filter_gain
     ),
     lfos{
-        {name + "LFO1", frequency, delay_time, depth, tempo_sync, 0.0 / 3.0},
-        {name + "LFO2", frequency, delay_time, depth, tempo_sync, 1.0 / 3.0},
-        {name + "LFO3", frequency, delay_time, depth, tempo_sync, 2.0 / 3.0},
+        {name + "LFO1", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO2", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO3", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO4", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO5", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO6", frequency, delay_time, depth, tempo_sync, 0.0},
+        {name + "LFO7", frequency, delay_time, depth, tempo_sync, 0.0},
     },
     delay_times{
         {name + "DEL1", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
         {name + "DEL2", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
         {name + "DEL3", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL4", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL5", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL6", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
+        {name + "DEL7", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT},
     },
     comb_filters{
         {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[0], &tempo_sync},
-        {high_pass_filter, PannedDelayStereoMode::FLIPPED, width, delay_times[1], &tempo_sync},
-        {high_pass_filter, PannedDelayStereoMode::NORMAL, delay_times[2], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[1], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[2], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[3], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[4], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[5], &tempo_sync},
+        {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[6], &tempo_sync},
     },
     mixer(input.get_channels()),
     high_shelf_filter_type(""),
@@ -116,7 +141,9 @@ Chorus<InputSignalProducerClass>::Chorus(
         biquad_filter_q,
         damping_gain
     ),
-    feedback_gain(high_shelf_filter, feedback)
+    feedback_gain(high_shelf_filter, feedback),
+    previous_type(255),
+    should_start_lfos(true)
 {
     this->register_child(delay_time);
     this->register_child(frequency);
@@ -167,6 +194,8 @@ Chorus<InputSignalProducerClass>::Chorus(
 template<class InputSignalProducerClass>
 void Chorus<InputSignalProducerClass>::start_lfos(Seconds const time_offset) noexcept
 {
+    should_start_lfos = true;
+
     for (size_t i = 0; i != VOICES; ++i) {
         lfos[i].start(time_offset);
     }
@@ -176,6 +205,8 @@ void Chorus<InputSignalProducerClass>::start_lfos(Seconds const time_offset) noe
 template<class InputSignalProducerClass>
 void Chorus<InputSignalProducerClass>::stop_lfos(Seconds const time_offset) noexcept
 {
+    should_start_lfos = false;
+
     for (size_t i = 0; i != VOICES; ++i) {
         lfos[i].stop(time_offset);
     }
@@ -206,10 +237,48 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
         return buffer;
     }
 
+    Byte const type = this->type.get_value();
+
+    if (previous_type != type) {
+        previous_type = type;
+
+        update_tunings(type);
+    }
+
     chorused = SignalProducer::produce<HighShelfFilter>(high_shelf_filter, round, sample_count);
     SignalProducer::produce< Gain<HighShelfFilter> >(feedback_gain, round, sample_count);
 
     return NULL;
+}
+
+
+template<class InputSignalProducerClass>
+void Chorus<InputSignalProducerClass>::update_tunings(Byte const type) noexcept
+{
+    Tuning const* const tunings = TUNINGS[type];
+
+    mixer.reset();
+
+    for (size_t i = 0; i != VOICES; ++i) {
+        Tuning const& tuning = tunings[i];
+
+        CombFilter& comb_filter = comb_filters[i];
+        LFO& lfo = lfos[i];
+
+        comb_filter.reset();
+        comb_filter.set_panning_scale(tuning.panning_scale);
+
+        lfo.reset();
+        lfo.phase.set_value(tuning.lfo_phase);
+
+        mixer.set_weight(i, tuning.weight);
+    }
+
+    if (should_start_lfos) {
+        for (size_t i = 0; i != VOICES; ++i) {
+            lfos[i].start(0.0);
+        }
+    }
 }
 
 

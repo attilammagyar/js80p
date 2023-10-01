@@ -401,6 +401,7 @@ void Synth::register_effects_params() noexcept
 
     register_param<FloatParamS>(ParamId::EV2V, effects.volume_2_gain);
 
+    register_param<Effects::Chorus<Bus>::TypeParam>(ParamId::ECTYP, effects.chorus.type);
     register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
     register_param<FloatParamS>(ParamId::ECFRQ, effects.chorus.frequency);
     register_param<FloatParamS>(ParamId::ECDPT, effects.chorus.depth);
@@ -1434,6 +1435,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
         case ParamId::POLY: return polyphonic.get_default_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_default_ratio();
+        case ParamId::ECTYP: return effects.chorus.type.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1649,6 +1651,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
         case ParamId::POLY: return polyphonic.get_max_value();
         case ParamId::ERTYP: return effects.reverb.type.get_max_value();
+        case ParamId::ECTYP: return effects.chorus.type.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1872,6 +1875,7 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
         case ParamId::POLY: return polyphonic.ratio_to_value(ratio);
         case ParamId::ERTYP: return effects.reverb.type.ratio_to_value(ratio);
+        case ParamId::ECTYP: return effects.chorus.type.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2381,6 +2385,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
             case ParamId::POLY: polyphonic.set_ratio(ratio); break;
             case ParamId::ERTYP: effects.reverb.type.set_ratio(ratio); break;
+            case ParamId::ECTYP: effects.chorus.type.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -2769,6 +2774,12 @@ bool Synth::assign_controller_to_discrete_param(
             is_assigned = true;
             break;
 
+        case ParamId::ECTYP:
+            effects.chorus.type.set_midi_controller(midi_controller);
+            effects.chorus.type.set_macro(macro);
+            is_assigned = true;
+            break;
+
         default:
             break;
     }
@@ -3060,6 +3071,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
         case ParamId::POLY: return polyphonic.get_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_ratio();
+        case ParamId::ECTYP: return effects.chorus.type.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }

@@ -236,6 +236,8 @@ def print_special_params(param_id: int) -> int:
         ("POLY", "  ///< Polyphonic"),
 
         ("ERTYP", " ///< Effects Reverb Type"),
+
+        ("ECTYP", " ///< Effects Chorus Type"),
     ]
 
     return print_params(param_id, "", "", 1, params)

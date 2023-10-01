@@ -103,6 +103,9 @@ class GUI
         static char const* const BIQUAD_FILTER_TYPES[];
         static int const BIQUAD_FILTER_TYPES_COUNT;
 
+        static char const* const CHORUS_TYPES[];
+        static int const CHORUS_TYPES_COUNT;
+
         static char const* const REVERB_TYPES[];
         static int const REVERB_TYPES_COUNT;
 
