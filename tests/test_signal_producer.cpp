@@ -84,6 +84,11 @@ class CompositeSignalProducer : public SignalProducer
                     set_bpm(cache_test_bpm);
                 }
 
+                Integer get_cached_round() const noexcept
+                {
+                    return this->cached_round;
+                }
+
                 bool is_clean;
         };
 
@@ -97,6 +102,16 @@ class CompositeSignalProducer : public SignalProducer
         ChildSignalProducer child;
 
     protected:
+        Sample const* const* initialize_rendering(
+                Integer const round,
+                Integer const sample_count
+        ) noexcept
+        {
+            SignalProducer::produce<ChildSignalProducer>(child, round, sample_count);
+
+            return NULL;
+        }
+
         void render(
                 Integer const round,
                 Integer const first_sample_index,
@@ -114,6 +129,7 @@ class CompositeSignalProducer : public SignalProducer
 
 TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
     constexpr Integer block_size = 5;
+    constexpr Integer round = 1;
     constexpr Frequency sample_rate = 48000.0;
     constexpr Number bpm = 144;
     constexpr Number cache_test_bpm = 0.123;
@@ -127,7 +143,9 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
     composite_signal_producer.child.schedule(
         CompositeSignalProducer::ChildSignalProducer::EVT_TEST, 0.0
     );
-    SignalProducer::produce<CompositeSignalProducer>(composite_signal_producer, 1);
+    SignalProducer::produce<CompositeSignalProducer>(
+        composite_signal_producer, round
+    );
     composite_signal_producer.reset();
 
     assert_eq((int)block_size, (int)composite_signal_producer.child.get_block_size());
@@ -144,6 +162,7 @@ TEST(changes_of_basic_properties_and_reset_are_propagated_to_children, {
         DOUBLE_DELTA,
         "channel=0"
     );
+    assert_neq((int)round, (int)composite_signal_producer.child.get_cached_round());
 
     composite_signal_producer.child.set_cache_test_bpm(cache_test_bpm);
     composite_signal_producer.set_bpm(bpm);

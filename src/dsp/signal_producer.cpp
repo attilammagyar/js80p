@@ -237,6 +237,8 @@ void SignalProducer::reset() noexcept
     for (Children::iterator it = children.begin(); it != children.end(); ++it) {
         (*it)->reset();
     }
+
+    cached_round = -1;
 }
 
 
