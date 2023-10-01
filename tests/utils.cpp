@@ -139,6 +139,11 @@ class FixedSignalProducer : public SignalProducer
         {
         }
 
+        Integer get_cached_round() const noexcept
+        {
+            return this->cached_round;
+        }
+
     protected:
         Sample const* const* initialize_rendering(
                 Integer const round,

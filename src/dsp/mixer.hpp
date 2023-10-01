@@ -70,6 +70,8 @@ class Mixer : public SignalProducer
                 Number weight;
         };
 
+        static constexpr Number SILENCE_WEIGHT = 0.000001;
+
         template<bool has_weights>
         void render(
             Integer const round,

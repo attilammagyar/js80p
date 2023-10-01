@@ -68,9 +68,14 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
     has_weights = false;
 
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        it->buffer = SignalProducer::produce<InputSignalProducerClass>(*it->input, round, sample_count);
+        Number const weight = it->weight;
 
-        has_weights = has_weights || std::fabs(it->weight - 1.0) >= 0.000001;
+        if (weight > SILENCE_WEIGHT) {
+            it->buffer = SignalProducer::produce<InputSignalProducerClass>(
+                *it->input, round, sample_count
+            );
+            has_weights = has_weights || std::fabs(weight - 1.0) >= 0.000001;
+        }
     }
 
     return NULL;
@@ -106,10 +111,8 @@ void Mixer<InputSignalProducerClass>::render(
     render_silence(round, first_sample_index, last_sample_index, output);
 
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        if constexpr (has_weights) {
-            if (it->weight < 0.000001) {
-                continue;
-            }
+        if (UNLIKELY(it->weight < SILENCE_WEIGHT)) {
+            continue;
         }
 
         for (Integer c = 0; c != channels; ++c) {

@@ -31,7 +31,7 @@ using namespace JS80P;
 constexpr Integer CHANNELS = 2;
 
 
-TEST(adds_input_signals_together_with_weights, {
+TEST(renders_and_sums_positive_weight_input_signals, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 10.0;
     constexpr Sample input_samples_1[CHANNELS][block_size] = {
@@ -43,8 +43,8 @@ TEST(adds_input_signals_together_with_weights, {
         {0.02, 0.04, 0.06, 0.08, 0.10},
     };
     constexpr Sample input_samples_3[CHANNELS][block_size] = {
-        {9.99, 9.99, 9.99, 9.99, 9.99},
-        {9.99, 9.99, 9.99, 9.99, 9.99},
+        {9.09, 9.09, 9.09, 9.09, 9.09},
+        {9.90, 9.90, 9.90, 9.90, 9.90},
     };
     constexpr Sample expected_output[CHANNELS][block_size] = {
         {0.11, 0.22, 0.33, 0.44, 0.55},
@@ -103,4 +103,6 @@ TEST(adds_input_signals_together_with_weights, {
             (int)c
         );
     }
+
+    assert_neq(1, (int)input_3.get_cached_round());
 })

@@ -181,13 +181,13 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
         CombFilterTuning const* const tunings = TUNINGS[type];
 
         previous_type = type;
+        mixer.reset();
 
         for (size_t i = 0; i != COMB_FILTERS; ++i) {
             CombFilter& comb_filter = *comb_filters[i];
 
-            comb_filter.delay.time.cancel_events_at(0.0);
-            comb_filter.delay.time.schedule_linear_ramp(0.1, tunings[i].delay_time);
-
+            comb_filter.reset();
+            comb_filter.delay.time.set_value(tunings[i].delay_time);
             comb_filter.set_panning_scale(tunings[i].panning_scale);
 
             mixer.set_weight(i, tunings[i].weight);
