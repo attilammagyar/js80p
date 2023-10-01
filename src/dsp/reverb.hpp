@@ -81,10 +81,10 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        class CombFilterTuning
+        class Tuning
         {
             public:
-                constexpr CombFilterTuning(
+                constexpr Tuning(
                         Seconds const delay_time,
                         Number const weight,
                         Number const panning_scale
@@ -101,7 +101,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         static constexpr Seconds DELAY_TIME_MAX = 0.150;
 
-        static constexpr CombFilterTuning TUNINGS[][COMB_FILTERS] = {
+        static constexpr Tuning TUNINGS[][COMB_FILTERS] = {
             /*
             REVERB_1
 

@@ -28,7 +28,7 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-constexpr typename Reverb<InputSignalProducerClass>::CombFilterTuning Reverb<InputSignalProducerClass>::TUNINGS[][COMB_FILTERS];
+constexpr typename Reverb<InputSignalProducerClass>::Tuning Reverb<InputSignalProducerClass>::TUNINGS[][COMB_FILTERS];
 
 
 template<class InputSignalProducerClass>
@@ -275,7 +275,7 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
 template<class InputSignalProducerClass>
 void Reverb<InputSignalProducerClass>::update_tunings(Byte const type) noexcept
 {
-    CombFilterTuning const* const tunings = TUNINGS[type];
+    Tuning const* const tunings = TUNINGS[type];
 
     mixer.reset();
 
