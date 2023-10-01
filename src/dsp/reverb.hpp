@@ -64,8 +64,6 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         Reverb(std::string const name, InputSignalProducerClass& input);
 
-        virtual ~Reverb();
-
         virtual void reset() noexcept override;
 
         TypeParam type;
@@ -250,6 +248,8 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
             },
         };
 
+        void update_tunings(Byte const type) noexcept;
+
         Mixer<CombFilter> mixer;
 
         typename HighPassedInput::TypeParam high_pass_filter_type;
@@ -258,7 +258,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         BiquadFilterSharedCache high_shelf_filter_shared_cache;
         HighPassedInput high_pass_filter;
-        CombFilter* comb_filters[COMB_FILTERS];
+        CombFilter comb_filters[COMB_FILTERS];
         Type previous_type;
 };
 

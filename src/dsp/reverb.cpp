@@ -97,6 +97,108 @@ Reverb<InputSignalProducerClass>::Reverb(
         high_pass_filter_q,
         high_pass_filter_gain
     ),
+    comb_filters{
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][0].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][1].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][2].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][3].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][4].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][5].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][6].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][7].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][8].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+        {
+            high_pass_filter,
+            PannedDelayStereoMode::NORMAL,
+            width,
+            room_size,
+            TUNINGS[0][9].delay_time,
+            DELAY_TIME_MAX,
+            damping_frequency,
+            damping_gain
+        },
+    },
     previous_type(255)
 {
     this->register_child(mixer);
@@ -116,38 +218,18 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(high_pass_filter);
 
     for (size_t i = 0; i != COMB_FILTERS; ++i) {
-        comb_filters[i] = new CombFilter(
-            high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
-            width,
-            room_size,
-            TUNINGS[0][i].delay_time,
-            DELAY_TIME_MAX,
-            damping_frequency,
-            damping_gain
+        comb_filters[i].delay.set_feedback_signal_producer(
+            &comb_filters[i].high_shelf_filter
         );
-        comb_filters[i]->delay.set_feedback_signal_producer(
-            &comb_filters[i]->high_shelf_filter
-        );
-        comb_filters[i]->high_shelf_filter.set_shared_cache(
+        comb_filters[i].high_shelf_filter.set_shared_cache(
             &high_shelf_filter_shared_cache
         );
 
-        mixer.add(*comb_filters[i]);
-        this->register_child(*comb_filters[i]);
+        mixer.add(comb_filters[i]);
+        this->register_child(comb_filters[i]);
     }
 
     high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
-}
-
-
-template<class InputSignalProducerClass>
-Reverb<InputSignalProducerClass>::~Reverb()
-{
-    for (size_t i = 0; i != COMB_FILTERS; ++i) {
-        delete comb_filters[i];
-        comb_filters[i] = NULL;
-    }
 }
 
 
@@ -178,26 +260,34 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
     Byte const type = this->type.get_value();
 
     if (previous_type != type) {
-        CombFilterTuning const* const tunings = TUNINGS[type];
-
         previous_type = type;
-        mixer.reset();
 
-        for (size_t i = 0; i != COMB_FILTERS; ++i) {
-            CombFilter& comb_filter = *comb_filters[i];
-
-            comb_filter.reset();
-            comb_filter.delay.time.set_value(tunings[i].delay_time);
-            comb_filter.set_panning_scale(tunings[i].panning_scale);
-
-            mixer.set_weight(i, tunings[i].weight);
-        }
+        update_tunings(type);
     }
 
     mixer.set_output_buffer(this->buffer);
     SignalProducer::produce< Mixer<CombFilter> >(mixer, round, sample_count);
 
     return NULL;
+}
+
+
+template<class InputSignalProducerClass>
+void Reverb<InputSignalProducerClass>::update_tunings(Byte const type) noexcept
+{
+    CombFilterTuning const* const tunings = TUNINGS[type];
+
+    mixer.reset();
+
+    for (size_t i = 0; i != COMB_FILTERS; ++i) {
+        CombFilter& comb_filter = comb_filters[i];
+
+        comb_filter.reset();
+        comb_filter.delay.time.set_value(tunings[i].delay_time);
+        comb_filter.set_panning_scale(tunings[i].panning_scale);
+
+        mixer.set_weight(i, tunings[i].weight);
+    }
 }
 
 }
