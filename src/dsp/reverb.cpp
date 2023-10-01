@@ -280,13 +280,14 @@ void Reverb<InputSignalProducerClass>::update_tunings(Byte const type) noexcept
     mixer.reset();
 
     for (size_t i = 0; i != COMB_FILTERS; ++i) {
+        Tuning const& tuning = tunings[i];
         CombFilter& comb_filter = comb_filters[i];
 
         comb_filter.reset();
-        comb_filter.delay.time.set_value(tunings[i].delay_time);
-        comb_filter.set_panning_scale(tunings[i].panning_scale);
+        comb_filter.delay.time.set_value(tuning.delay_time);
+        comb_filter.set_panning_scale(tuning.panning_scale);
 
-        mixer.set_weight(i, tunings[i].weight);
+        mixer.set_weight(i, tuning.weight);
     }
 }
 
