@@ -214,8 +214,10 @@ void render_sound(
     out_file.write(buffer.get_buffer(), buffer.get_buffer_pos());
     buffer.clear();
 
+    synth.suspend();
     synth.set_block_size(BLOCK_SIZE);
     synth.set_sample_rate(SAMPLE_RATE);
+    synth.resume();
     synth.process_messages();
 
     for (std::vector<Midi::Note>::const_iterator it = notes.begin(); it != notes.end(); ++it) {
