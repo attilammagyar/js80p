@@ -811,16 +811,16 @@ JS80P and want to compile it themselves.
 
 #### Linux
 
- * [GNU Make 4.2.1+](https://www.gnu.org/software/make/)
- * [G++ 9.3+](https://gcc.gnu.org/)
- * [MinGW-w64 7.0.0+](https://www.mingw-w64.org/)
- * [Valgrind 3.15.0+](https://valgrind.org/)
- * [Doxygen 1.8.17+](https://www.doxygen.nl/)
+ * [GNU Make 4.3+](https://www.gnu.org/software/make/)
+ * [G++ 11.4.0+](https://gcc.gnu.org/)
+ * [MinGW-w64 10+](https://www.mingw-w64.org/)
+ * [Valgrind 3.18.1+](https://valgrind.org/)
+ * [Doxygen 1.9.1+](https://www.doxygen.nl/)
 
 #### Windows
 
- * [WinLibs MinGW-w64 7.0.0+ (MSVCRT)](https://winlibs.com/)
- * [Doxygen 1.8.17+](https://www.doxygen.nl/)
+ * [WinLibs MinGW-w64 13.1.0+ (MSVCRT)](https://winlibs.com/)
+ * [Doxygen 1.9.6+](https://www.doxygen.nl/)
 
 <a id="dev-dep"></a>
 
