@@ -1,3 +1,8 @@
+v2.2.0 (2023-10-03)
+ * New parameter for the Chorus effect: switch between 15 different
+   configurations, with up to 7 voices.
+ * New parameter for the Reverb effect: switch between 10 different tunings.
+
 v2.1.0 (2023-09-28)
  * Echo and Reverb now support side-chain compression: clean up the sound by
    reducing the volume of the wet signal while the dry signal is loud, and
