@@ -28,8 +28,43 @@
 #include "dsp/signal_producer.hpp"
 
 
-namespace JS80P
+namespace JS80P { namespace Distortion
 {
+
+enum Type {
+    SOFT = 0,
+    HEAVY = 1,
+
+    NUMBER_OF_TYPES = 2,
+};
+
+
+typedef Sample Table[0x2000];
+
+
+class Tables
+{
+    public:
+        static constexpr int SIZE = 0x2000;
+        static constexpr int MAX_INDEX = SIZE - 1;
+
+        static constexpr Sample INPUT_MAX = 3.0;
+        static constexpr Sample INPUT_MIN = - INPUT_MAX;
+
+        Tables();
+
+        Table const& get_f_table(Type const type) const noexcept;
+        Table const& get_F0_table(Type const type) const noexcept;
+
+    private:
+        static constexpr Sample SIZE_INV = 1.0 / (Sample)SIZE;
+
+        void fill_tables(Type const type, Number const steepness) noexcept;
+
+        Table f_tables[Type::NUMBER_OF_TYPES];
+        Table F0_tables[Type::NUMBER_OF_TYPES];
+};
+
 
 /**
  * \brief Antialiased waveshaper based distortion, using Antiderivative
@@ -41,12 +76,12 @@ namespace JS80P
 template<class InputSignalProducerClass>
 class Distortion : public Filter<InputSignalProducerClass>
 {
-    friend class SignalProducer;
+    friend class JS80P::SignalProducer;
 
     public:
         Distortion(
             std::string const name,
-            Number const steepness,
+            Type const type,
             InputSignalProducerClass& input
         ) noexcept;
 
@@ -70,13 +105,12 @@ class Distortion : public Filter<InputSignalProducerClass>
         ) noexcept;
 
     private:
-        static constexpr int TABLE_SIZE = 0x2000;
-        static constexpr int MAX_INDEX = TABLE_SIZE - 1;
+        static constexpr int MAX_INDEX = Tables::MAX_INDEX;
 
-        static constexpr Sample INPUT_MAX = 3.0;
-        static constexpr Sample INPUT_MIN = -3.0;
+        static constexpr Sample INPUT_MAX = Tables::INPUT_MAX;
+        static constexpr Sample INPUT_MIN = Tables::INPUT_MIN;
         static constexpr Sample INPUT_MAX_INV = 1.0 / INPUT_MAX;
-        static constexpr Sample TABLE_SIZE_FLOAT = (Sample)TABLE_SIZE;
+        static constexpr Sample TABLE_SIZE_FLOAT = (Sample)Tables::SIZE;
         static constexpr Sample SCALE = TABLE_SIZE_FLOAT * INPUT_MAX_INV;
 
         Sample distort(
@@ -88,10 +122,10 @@ class Distortion : public Filter<InputSignalProducerClass>
         Sample f(Sample const x) const noexcept;
         Sample F0(Sample const x) const noexcept;
 
-        Sample lookup(Sample const* const table, Sample const x) const noexcept;
+        Sample lookup(Table const& table, Sample const x) const noexcept;
 
-        Sample f_table[TABLE_SIZE];
-        Sample F0_table[TABLE_SIZE];
+        Table const& f_table;
+        Table const& F0_table;
 
         Sample const* level_buffer;
         Sample* previous_input_sample;
@@ -99,7 +133,7 @@ class Distortion : public Filter<InputSignalProducerClass>
         Number level_value;
 };
 
-}
+} }
 
 #endif
 

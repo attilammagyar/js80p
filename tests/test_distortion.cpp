@@ -38,7 +38,7 @@
 using namespace JS80P;
 
 
-typedef Distortion<SumOfSines> Distortion_;
+typedef Distortion::Distortion<SumOfSines> Distortion_;
 
 
 constexpr Frequency SAMPLE_RATE = 44100.0;
@@ -52,7 +52,7 @@ constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
 TEST(while_distortion_level_is_close_to_zero_the_original_signal_is_barely_affected, {
     SumOfSines input(1.0, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", 10.0, input);
+    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
@@ -101,7 +101,7 @@ void naive_distort(Number const level, Buffer &buffer)
 void test_distortion(Number const original_signal_level)
 {
     SumOfSines input(original_signal_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", 10.0, input);
+    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
@@ -129,8 +129,9 @@ void test_distortion(Number const original_signal_level)
             actual_output.samples[c],
             SAMPLE_COUNT,
             0.06,
-            "channel=%d",
-            (int)c
+            "channel=%d, original_signal_level=%f",
+            (int)c,
+            original_signal_level
         );
     }
 }
@@ -145,7 +146,7 @@ TEST(when_distortion_level_is_high_then_the_signal_is_distorted, {
 
 TEST(when_input_is_silent_then_distortion_is_no_op, {
     SumOfSines input(1e-9, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", 10.0, input);
+    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
     Sample const* const* input_buffer;
     Sample const* const* distorted_buffer;
 

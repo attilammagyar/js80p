@@ -39,13 +39,13 @@ template<class InputSignalProducerClass>
 using Volume1 = Gain<InputSignalProducerClass>;
 
 template<class InputSignalProducerClass>
-using Overdrive = JS80P::Distortion< Volume1<InputSignalProducerClass> >;
+using Overdrive = JS80P::Distortion::Distortion< Volume1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Distortion = JS80P::Distortion< Overdrive<InputSignalProducerClass> >;
+using Distortion_ = JS80P::Distortion::Distortion< Overdrive<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Filter1 = BiquadFilter< Distortion<InputSignalProducerClass> >;
+using Filter1 = BiquadFilter< Distortion_<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Filter2 = BiquadFilter< Filter1<InputSignalProducerClass> >;
@@ -78,7 +78,7 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
 
         Volume1<InputSignalProducerClass> volume_1;
         Overdrive<InputSignalProducerClass> overdrive;
-        Distortion<InputSignalProducerClass> distortion;
+        Distortion_<InputSignalProducerClass> distortion;
         typename Filter1<InputSignalProducerClass>::TypeParam filter_1_type;
         typename Filter2<InputSignalProducerClass>::TypeParam filter_2_type;
         ToggleParam filter_1_log_scale;

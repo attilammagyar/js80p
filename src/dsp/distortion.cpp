@@ -26,30 +26,60 @@
 #include "dsp/math.hpp"
 
 
-namespace JS80P
+namespace JS80P { namespace Distortion
 {
 
-template<class InputSignalProducerClass>
-Distortion<InputSignalProducerClass>::Distortion(
-        std::string const name,
-        Number const steepness,
-        InputSignalProducerClass& input
-) noexcept
-    : Filter<InputSignalProducerClass>(input, 1),
-    level(name + "G", 0.0, 1.0, 0.0)
-{
-    this->register_child(level);
+Tables tables;
 
-    Sample const table_size_inv = 1.0 / (Sample)TABLE_SIZE;
+
+Tables::Tables()
+{
+    fill_tables(Type::SOFT, 3.0);
+    fill_tables(Type::HEAVY, 10.0);
+}
+
+
+void Tables::fill_tables(Type const type, Number const steepness) noexcept
+{
     Sample const steepness_inv_double = 2.0 / steepness;
 
-    for (Integer i = 0; i != TABLE_SIZE; ++i) {
-        Number const x = INPUT_MAX * ((Sample)i * table_size_inv);
+    Table& f_table = f_tables[(int)type];
+    Table& F0_table = F0_tables[(int)type];
+
+    for (Integer i = 0; i != SIZE; ++i) {
+        Number const x = INPUT_MAX * ((Sample)i * SIZE_INV);
         f_table[i] = std::tanh(steepness * x * 0.5);
         F0_table[i] = (
             x + steepness_inv_double * std::log(std::exp(-steepness * x) + 1.0)
         );
     }
+}
+
+
+Table const& Tables::get_f_table(Type const type) const noexcept
+{
+    return f_tables[type];
+}
+
+
+Table const& Tables::get_F0_table(Type const type) const noexcept
+{
+    return F0_tables[type];
+}
+
+
+template<class InputSignalProducerClass>
+Distortion<InputSignalProducerClass>::Distortion(
+        std::string const name,
+        Type const type,
+        InputSignalProducerClass& input
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 1),
+    level(name + "G", 0.0, 1.0, 0.0),
+    f_table(tables.get_f_table(type)),
+    F0_table(tables.get_F0_table(type))
+{
+    this->register_child(level);
 
     if (this->channels > 0) {
         previous_input_sample = new Sample[this->channels];
@@ -230,12 +260,12 @@ Sample Distortion<InputSignalProducerClass>::F0(Sample const x) const noexcept
 
 template<class InputSignalProducerClass>
 Sample Distortion<InputSignalProducerClass>::lookup(
-        Sample const* const table,
+        Table const& table,
         Sample const x
 ) const noexcept {
-    return Math::lookup(table, MAX_INDEX, x * SCALE);
+    return Math::lookup(&(table[0]), MAX_INDEX, x * SCALE);
 }
 
-}
+} }
 
 #endif
