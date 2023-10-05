@@ -1106,18 +1106,18 @@ TEST(find_peak_finds_the_latest_peak, {
     Integer peak_index;
 
     SignalProducer::find_peak(buffer, channels, 0, peak, peak_index);
-    assert_eq(0, peak_index);
+    assert_eq(0, (int)peak_index);
     assert_eq(0.0, peak, DOUBLE_DELTA);
 
     buffer[0] = zeros;
     buffer[1] = positive;
     SignalProducer::find_peak(buffer, channels, block_size, peak, peak_index);
-    assert_eq(2, peak_index);
+    assert_eq(2, (int)peak_index);
     assert_eq(0.25, peak, DOUBLE_DELTA);
 
     buffer[0] = negative;
     buffer[1] = zeros;
     SignalProducer::find_peak(buffer, channels, block_size, peak, peak_index);
-    assert_eq(1, peak_index);
+    assert_eq(1, (int)peak_index);
     assert_eq(0.50, peak, DOUBLE_DELTA);
 })

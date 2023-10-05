@@ -111,5 +111,5 @@ TEST(can_find_latest_peak_in_the_input_signal, {
     gain.find_input_peak(123, 3, peak, peak_index);
 
     assert_eq(0.70, peak, DOUBLE_DELTA);
-    assert_eq(1, peak_index);
+    assert_eq(1, (int)peak_index);
 })
