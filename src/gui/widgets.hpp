@@ -196,13 +196,13 @@ class ControllerSelector : public Widget
 
         ControllerSelector(Background& background, Synth& synth);
 
-        void show(
+        void select_controller(
             Synth::ParamId const param_id,
             int const controller_choices,
             ParamEditor* param_editor
         );
 
-        virtual void hide();
+        virtual void hide() override;
 
         void handle_selection_change(Synth::ControllerId const new_controller_id);
 

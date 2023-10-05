@@ -344,7 +344,7 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 }
 
 
-void ControllerSelector::show(
+void ControllerSelector::select_controller(
         Synth::ParamId const param_id,
         int const controller_choices,
         ParamEditor* param_editor
@@ -863,7 +863,7 @@ bool ParamEditor::mouse_up(int const x, int const y)
     TransparentWidget::mouse_up(x, y);
 
     if (is_clicking && controller_choices > 0) {
-        controller_selector.show(param_id, controller_choices, this);
+        controller_selector.select_controller(param_id, controller_choices, this);
     }
 
     return false;
