@@ -403,7 +403,7 @@ void Voice<ModulatorSignalProducerClass>::reset() noexcept
 {
     SignalProducer::reset();
 
-    state = OFF;
+    state = State::OFF;
     note_id = 0;
     note = 0;
     channel = 0;
@@ -428,7 +428,7 @@ bool Voice<ModulatorSignalProducerClass>::is_off_after(
 template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::is_released() const noexcept
 {
-    return state == OFF;
+    return state == State::OFF;
 }
 
 
@@ -441,11 +441,11 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
-    if (state == ON || note >= notes) {
+    if (state == State::ON || note >= notes) {
         return;
     }
 
-    state = ON;
+    state = State::ON;
 
     save_note_info(note_id, note, channel);
 
@@ -657,7 +657,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
         Midi::Note const note,
         Number const velocity
 ) noexcept {
-    if (state != ON || note_id != this->note_id || note != this->note) {
+    if (state != State::ON || note_id != this->note_id || note != this->note) {
         return;
     }
 
@@ -677,7 +677,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     oscillator.cancel_events_at(off_after);
     oscillator.stop(off_after);
 
-    state = OFF;
+    state = State::OFF;
 
     wavefolder.folding.end_envelope(time_offset);
 
@@ -698,7 +698,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
 {
-    if (state != ON) {
+    if (state != State::ON) {
         return;
     }
 
@@ -706,7 +706,7 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
     note = 0;
     channel = 0;
 
-    state = OFF;
+    state = State::OFF;
 
     oscillator.amplitude.cancel_events();
     volume.cancel_events();
@@ -737,7 +737,7 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
         Seconds const time_offset
 ) noexcept {
-    state = OFF;
+    state = State::OFF;
 
     wavefolder.folding.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
@@ -771,7 +771,7 @@ template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() const noexcept
 {
     return (
-        state == ON
+        state == State::ON
         && (has_decayed(volume) || has_decayed(oscillator.amplitude))
     );
 }
