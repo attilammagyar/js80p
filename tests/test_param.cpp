@@ -923,19 +923,17 @@ TEST(auto_skipping_a_follower_float_param_advances_the_clock_of_the_leader, {
 })
 
 
-template<class FloatParamClass>
-void test_follower_signal()
-{
+TEST(when_a_float_param_is_following_another_then_it_does_not_render_its_own_signal, {
     constexpr Integer block_size = 10;
     FloatParamS leader("float", -1.0, 1.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
     Integer const follower_change_index_before = follower.get_change_index();
     Integer const leader_change_index_before = leader.get_change_index();
 
     leader_samples = FloatParamS::produce<FloatParamS>(leader, 1, block_size);
-    follower_samples = FloatParamS::produce<FloatParamClass>(follower, 1, block_size);
+    follower_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
 
     Integer const follower_change_index_after = follower.get_change_index();
     Integer const leader_change_index_after = leader.get_change_index();
@@ -944,40 +942,24 @@ void test_follower_signal()
     assert_eq((int)leader_change_index_before, (int)follower_change_index_before);
     assert_eq((int)leader_change_index_after, (int)follower_change_index_after);
     assert_eq((int)leader_change_index_before, (int)leader_change_index_after);
-}
-
-
-TEST(when_a_float_param_is_following_another_then_it_does_not_render_its_own_signal, {
-    test_follower_signal<FloatParamS>();
-    test_follower_signal< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_value()
-{
+TEST(when_a_float_param_is_following_another_then_it_has_the_same_value, {
     FloatParamS leader("float", -1.0, 1.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
 
     leader.set_value(0.5);
 
     assert_eq(0.5, leader.get_value(), DOUBLE_DELTA);
     assert_eq(0.5, follower.get_value(), DOUBLE_DELTA);
-}
-
-
-TEST(when_a_float_param_is_following_another_then_it_has_the_same_value, {
-    test_follower_value<FloatParamS>();
-    test_follower_value< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_constantness()
-{
+TEST(when_a_float_param_is_following_another_then_it_is_constant_if_the_leader_is_constant, {
     constexpr Integer block_size = 5;
     FloatParamS leader("float", -1.0, 1.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(10.0);
@@ -1012,12 +994,6 @@ void test_follower_constantness()
     assert_eq((int)leader_change_index_before, (int)follower_change_index_before);
     assert_eq((int)leader_change_index_after, (int)follower_change_index_after);
     assert_neq((int)leader_change_index_before, (int)leader_change_index_after);
-}
-
-
-TEST(when_a_float_param_is_following_another_then_it_is_constant_if_the_leader_is_constant, {
-    test_follower_constantness<FloatParamS>();
-    test_follower_constantness< ModulatableFloatParam<SignalProducer> >();
 })
 
 
@@ -1241,16 +1217,14 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
 })
 
 
-template<class FloatParamClass>
-void test_follower_envelope()
-{
+TEST(follower_float_param_follows_the_leaders_envelope, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_samples[block_size] = {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Envelope envelope("env");
     Sample const* const* rendered_samples;
 
@@ -1284,27 +1258,19 @@ void test_follower_envelope()
     assert_true(follower.is_constant_until(1));
     assert_false(follower.is_constant_until(2));
 
-    rendered_samples = FloatParamS::produce<FloatParamClass>(follower, 1, block_size);
+    rendered_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
-}
-
-
-TEST(follower_float_param_follows_the_leaders_envelope, {
-    test_follower_envelope<FloatParamS>();
-    test_follower_envelope< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_envelope_cancellation()
-{
+TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_time, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_samples[block_size] = {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Envelope envelope("env");
     Sample const* const* rendered_samples;
 
@@ -1340,20 +1306,12 @@ void test_follower_envelope_cancellation()
     assert_true(follower.is_constant_until(1));
     assert_false(follower.is_constant_until(2));
 
-    rendered_samples = FloatParamS::produce<FloatParamClass>(follower, 1, block_size);
+    rendered_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     assert_eq(expected_samples, rendered_samples[0], block_size, 0.001);
-}
-
-
-TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_time, {
-    test_follower_envelope_cancellation<FloatParamS>();
-    test_follower_envelope_cancellation< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_dynamic_envelope()
-{
+TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_dahds, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {
         0.0, 1.0, 2.0, 3.0, 3.0,
@@ -1364,7 +1322,7 @@ void test_follower_dynamic_envelope()
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Envelope envelope("env");
     Sample const* rendered_samples;
 
@@ -1396,7 +1354,7 @@ void test_follower_dynamic_envelope()
 
     assert_eq(2.0, follower.end_envelope(29.0), DOUBLE_DELTA);
 
-    FloatParamS::produce<FloatParamClass>(follower, 1, 6);
+    FloatParamS::produce<FloatParamS>(follower, 1, 6);
 
     envelope.amount.set_value(0.8);
     envelope.initial_value.set_value(0.625);
@@ -1410,33 +1368,25 @@ void test_follower_dynamic_envelope()
 
     assert_false(follower.is_constant_until(2));
 
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 2, block_size
     );
     assert_eq(expected_dahd_samples, rendered_samples, block_size, DOUBLE_DELTA);
 
     assert_true(follower.is_constant_until(block_size));
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 3, block_size
     );
     assert_eq(NULL, rendered_samples, block_size, DOUBLE_DELTA);
 
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 4, block_size
     );
     assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
-}
-
-
-TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_dahds, {
-    test_follower_dynamic_envelope<FloatParamS>();
-    test_follower_dynamic_envelope< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_update_envelope()
-{
+TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {
         0.0, 1.0, 2.0, 3.0, 3.0,
@@ -1447,7 +1397,7 @@ void test_follower_update_envelope()
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Envelope envelope("env");
     Sample const* rendered_samples;
 
@@ -1474,14 +1424,14 @@ void test_follower_update_envelope()
     envelope.final_value.set_value(0.625);
 
     follower.start_envelope(0.3);
-    FloatParamS::produce<FloatParamClass>(follower, 0, 2);
+    FloatParamS::produce<FloatParamS>(follower, 0, 2);
 
     envelope.release_time.set_value(2.0);
     follower.update_envelope(1.0);
 
     assert_eq(2.0, follower.end_envelope(28.0), DOUBLE_DELTA);
 
-    FloatParamS::produce<FloatParamClass>(follower, 1, 4);
+    FloatParamS::produce<FloatParamS>(follower, 1, 4);
 
     envelope.amount.set_value(0.8);
     envelope.initial_value.set_value(0.625);
@@ -1496,27 +1446,21 @@ void test_follower_update_envelope()
 
     assert_false(follower.is_constant_until(2));
 
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 2, block_size
     );
     assert_eq(expected_dahd_samples, rendered_samples, block_size, DOUBLE_DELTA);
 
     assert_true(follower.is_constant_until(block_size));
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 3, block_size
     );
     assert_eq(NULL, rendered_samples, block_size, DOUBLE_DELTA);
 
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 4, block_size
     );
     assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
-}
-
-
-TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
-    test_follower_update_envelope<FloatParamS>();
-    test_follower_update_envelope< ModulatableFloatParam<SignalProducer> >();
 })
 
 
@@ -1614,15 +1558,13 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
 })
 
 
-template<class FloatParamClass>
-void test_follower_midi_controller()
-{
+TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, -2.5, -2.5, -2.5,
     };
     FloatParamS leader("float", -5.0, 5.0, 3.0, 0.5);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     MidiController midi_controller;
     Integer change_index_1;
     Integer change_index_2;
@@ -1652,7 +1594,7 @@ void test_follower_midi_controller()
 
     assert_false(follower.is_constant_in_next_round(1, block_size));
     leader_samples = FloatParamS::produce<FloatParamS>(leader, 1, block_size);
-    follower_samples = FloatParamS::produce<FloatParamClass>(follower, 1, block_size);
+    follower_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     assert_false(follower.is_constant_in_next_round(1, block_size));
 
     assert_eq(expected_samples, follower_samples[0], block_size, 0.01);
@@ -1661,12 +1603,6 @@ void test_follower_midi_controller()
     midi_controller.change(0.0, 0.35);
     leader.set_midi_controller(NULL);
     assert_eq(-1.5, follower.get_value(), DOUBLE_DELTA);
-}
-
-
-TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
-    test_follower_midi_controller<FloatParamS>();
-    test_follower_midi_controller< ModulatableFloatParam<SignalProducer> >();
 })
 
 
@@ -1777,14 +1713,12 @@ TEST(when_an_lfo_is_assigned_to_a_float_param_then_float_param_value_follows_the
 })
 
 
-template<class FloatParamClass>
-void test_follower_lfo()
-{
+TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_lfo, {
     constexpr Integer block_size = 1024;
     constexpr Frequency sample_rate = 11025.0;
     constexpr Frequency frequency = 20.0;
     FloatParamS leader("leader", -3.0, 7.0, 2.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     LFO lfo("lfo");
     Sample const* rendered_samples;
     SumOfSines expected(5.0, frequency, 0.0, 0.0, 0.0, 0.0, 1, 0.0, 2.0);
@@ -1811,30 +1745,22 @@ void test_follower_lfo()
     assert_false(follower.is_constant_in_next_round(1, block_size));
 
     render_rounds<SumOfSines>(expected, expected_output, 1);
-    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamClass>(
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 1, block_size
     );
 
     assert_eq(expected_output.samples[0], rendered_samples, block_size, 0.001);
-}
-
-
-TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_lfo, {
-    test_follower_lfo<FloatParamS>();
-    test_follower_lfo< ModulatableFloatParam<SignalProducer> >();
 })
 
 
-template<class FloatParamClass>
-void test_follower_macro()
-{
+TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_macro, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, 3.0, 3.0, 3.0,
     };
     constexpr Frequency sample_rate = 1.0;
     FloatParamS leader("leader", 0.0, 10.0, 9.0, 1.0);
-    FloatParamClass follower(leader);
+    FloatParamS follower(leader);
     Macro macro;
     Integer change_index;
     Sample const* const* leader_samples;
@@ -1873,7 +1799,7 @@ void test_follower_macro()
     assert_eq(3.0, follower.get_value(), DOUBLE_DELTA);
     assert_eq(0.32, follower.get_ratio(), DOUBLE_DELTA);
 
-    follower_samples = FloatParamS::produce<FloatParamClass>(follower, 1, block_size);
+    follower_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     leader_samples = FloatParamS::produce<FloatParamS>(leader, 1, block_size);
     assert_eq(expected_samples, follower_samples[0], block_size, DOUBLE_DELTA);
     assert_eq((void*)leader_samples, (void*)follower_samples);
@@ -1885,12 +1811,6 @@ void test_follower_macro()
 
     leader.set_macro(NULL);
     assert_eq(2.0, follower.get_value(), DOUBLE_DELTA);
-}
-
-
-TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_macro, {
-    test_follower_macro<FloatParamS>();
-    test_follower_macro< ModulatableFloatParam<SignalProducer> >();
 })
 
 
@@ -2001,47 +1921,6 @@ class Modulator : public SignalProducer
 };
 
 
-TEST(when_no_modulator_is_set_then_modulated_float_param_is_constant, {
-    constexpr Integer block_size = 3;
-    constexpr Frequency sample_rate = 1.0;
-    constexpr Sample expected_samples[][block_size] = {
-        {6.0, 6.0, 6.0},
-        {6.0, 3.0, 3.0},
-    };
-
-    FloatParamS modulation_level_leader("MOD", 0.0, 1.0, 1.0);
-    ModulatableFloatParam<Modulator> modulatable_float_param(
-        NULL, modulation_level_leader, "", 0.0, 10.0, 0.0
-    );
-    Sample const* const* rendered_samples;
-
-    modulation_level_leader.set_block_size(block_size);
-    modulation_level_leader.set_sample_rate(sample_rate);
-
-    modulatable_float_param.set_block_size(block_size);
-    modulatable_float_param.set_sample_rate(sample_rate);
-
-    modulatable_float_param.set_value(6.0);
-    modulation_level_leader.set_value(0.5);
-    modulation_level_leader.schedule_linear_ramp(2.0, 1.0);
-
-    assert_true(modulatable_float_param.is_constant_in_next_round(1, block_size));
-    rendered_samples = FloatParamS::produce< ModulatableFloatParam<Modulator> >(
-        modulatable_float_param, 1
-    );
-    assert_true(modulatable_float_param.is_constant_in_next_round(1, block_size));
-    assert_eq(expected_samples[0], rendered_samples[0], block_size, DOUBLE_DELTA);
-
-    modulatable_float_param.schedule_value(1.0, 3.0);
-    assert_false(modulatable_float_param.is_constant_in_next_round(2, block_size));
-    rendered_samples = FloatParamS::produce< ModulatableFloatParam<Modulator> >(
-        modulatable_float_param, 2
-    );
-    assert_eq(expected_samples[1], rendered_samples[0], block_size, DOUBLE_DELTA);
-
-})
-
-
 TEST(when_modulation_level_is_zero_then_modulated_float_param_is_constant_and_does_not_invoke_modulator, {
     constexpr Integer block_size = 3;
     constexpr Frequency sample_rate = 1.0;
@@ -2050,7 +1929,7 @@ TEST(when_modulation_level_is_zero_then_modulated_float_param_is_constant_and_do
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 1.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2082,7 +1961,7 @@ TEST(when_modulation_level_is_zero_but_the_modulatable_float_param_is_scheduled_
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 1.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2121,7 +2000,7 @@ TEST(when_modulation_level_is_positive_then_modulated_float_param_is_not_constan
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 3.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2161,7 +2040,7 @@ TEST(when_modulation_level_is_changing_then_modulated_float_param_is_not_constan
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2202,7 +2081,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2273,7 +2152,7 @@ TEST(modulated_values_are_not_clamped, {
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 2.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 2.0, 0.0
     );
     Sample const* const* rendered_samples;
 
@@ -2310,7 +2189,7 @@ TEST(modulated_param_might_have_a_midi_controller_assigned, {
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        &modulator, modulation_level_leader, "", 0.0, 2.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 2.0, 0.0
     );
     MidiController midi_controller;
     Sample const* const* rendered_samples;
@@ -2368,10 +2247,10 @@ TEST(modulatable_param_rendering_is_independent_of_chunk_size, {
     FloatParamS modulation_level_1("MOD", 0.0, 1.0, 0.0);
     FloatParamS modulation_level_2("MOD", 0.0, 1.0, 0.0);
     ModulatableFloatParam<Modulator> param_1(
-        &modulator_1, modulation_level_1, "", 0.0, 1.0, 0.0
+        modulator_1, modulation_level_1, "", 0.0, 1.0, 0.0
     );
     ModulatableFloatParam<Modulator> param_2(
-        &modulator_2, modulation_level_2, "", 0.0, 1.0, 0.0
+        modulator_2, modulation_level_2, "", 0.0, 1.0, 0.0
     );
 
     set_up_chunk_size_independent_test(

@@ -1538,7 +1538,7 @@ Number FloatParam<evaluation>::LinearRampState::get_value_at(
 
 template<class ModulatorSignalProducerClass>
 ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
-        ModulatorSignalProducerClass* const modulator,
+        ModulatorSignalProducerClass& modulator,
         FloatParamS& modulation_level_leader,
         std::string const name,
         Number const min_value,
@@ -1554,26 +1554,10 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
 
 
 template<class ModulatorSignalProducerClass>
-ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
-        FloatParamS& leader
-) noexcept
-    : FloatParamS(leader),
-    modulation_level("", 0.0, 0.0, 0.0),
-    modulator(NULL)
-{
-    register_child(modulation_level);
-}
-
-
-template<class ModulatorSignalProducerClass>
 bool ModulatableFloatParam<ModulatorSignalProducerClass>::is_constant_in_next_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (modulator == NULL) {
-        return FloatParamS::is_constant_in_next_round(round, sample_count);
-    }
-
     return (
         modulation_level.is_constant_in_next_round(round, sample_count)
         && FloatParamS::is_constant_in_next_round(round, sample_count)
@@ -1591,12 +1575,6 @@ Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initia
         round, sample_count
     );
 
-    if (modulator == NULL) {
-        is_no_op = true;
-
-        return buffer;
-    }
-
     modulation_level_buffer = FloatParamS::produce_if_not_constant(
         modulation_level, round, sample_count
     );
@@ -1604,20 +1582,18 @@ Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initia
     if (modulation_level_buffer == NULL) {
         is_no_op = modulation_level.get_value() <= MODULATION_LEVEL_INSIGNIFICANT;
 
-        if (!is_no_op) {
+        if (is_no_op) {
+            return buffer;
+        } else {
             modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-                *modulator, round, sample_count
+                modulator, round, sample_count
             )[0];
         }
     } else {
         is_no_op = false;
         modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-            *modulator, round, sample_count
+            modulator, round, sample_count
         )[0];
-    }
-
-    if (is_no_op) {
-        return buffer;
     }
 
     return NULL;
@@ -1660,9 +1636,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
 ) noexcept {
     FloatParamS::start_envelope(time_offset);
 
-    if (modulator != NULL) {
-        modulation_level.start_envelope(time_offset);
-    }
+    modulation_level.start_envelope(time_offset);
 }
 
 
@@ -1671,10 +1645,6 @@ Seconds ModulatableFloatParam<ModulatorSignalProducerClass>::end_envelope(
         Seconds const time_offset
 ) noexcept {
     Seconds const envelope_end = FloatParamS::end_envelope(time_offset);
-
-    if (modulator == NULL) {
-        return envelope_end;
-    }
 
     Seconds const modulation_level_envelope_end = (
         modulation_level.end_envelope(time_offset)
@@ -1691,9 +1661,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::cancel_envelope(
 ) noexcept {
     FloatParamS::cancel_envelope(time_offset, duration);
 
-    if (modulator != NULL) {
-        modulation_level.cancel_envelope(time_offset, duration);
-    }
+    modulation_level.cancel_envelope(time_offset, duration);
 }
 
 
@@ -1703,9 +1671,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::update_envelope(
 ) noexcept {
     FloatParamS::update_envelope(time_offset);
 
-    if (modulator != NULL) {
-        modulation_level.update_envelope(time_offset);
-    }
+    modulation_level.update_envelope(time_offset);
 }
 
 
@@ -1716,9 +1682,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::skip_round(
 ) noexcept {
     FloatParamS::skip_round(round, sample_count);
 
-    if (modulator != NULL) {
-        modulation_level.skip_round(round, sample_count);
-    }
+    modulation_level.skip_round(round, sample_count);
 }
 
 }

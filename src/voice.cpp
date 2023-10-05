@@ -324,7 +324,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_7,
         param_leaders.harmonic_8,
         param_leaders.harmonic_9,
-        &modulator,
+        modulator,
         amplitude_modulation_level_leader,
         frequency_modulation_level_leader,
         phase_modulation_level_leader

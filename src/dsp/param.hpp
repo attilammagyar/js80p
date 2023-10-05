@@ -451,15 +451,13 @@ class ModulatableFloatParam : public FloatParamS
         static constexpr Number MODULATION_LEVEL_INSIGNIFICANT = 0.000001;
 
         ModulatableFloatParam(
-            ModulatorSignalProducerClass* const modulator,
+            ModulatorSignalProducerClass& modulator,
             FloatParamS& modulation_level_leader,
             std::string const name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0
         ) noexcept;
-
-        ModulatableFloatParam(FloatParamS& leader) noexcept;
 
         bool is_constant_in_next_round(
             Integer const round, Integer const sample_count
@@ -487,7 +485,7 @@ class ModulatableFloatParam : public FloatParamS
 
     private:
         FloatParamS modulation_level;
-        ModulatorSignalProducerClass* const modulator;
+        ModulatorSignalProducerClass& modulator;
         Sample const* modulator_buffer;
         Sample const* modulation_level_buffer;
         bool modulation_level_is_constant;

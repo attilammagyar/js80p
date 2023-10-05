@@ -47,19 +47,11 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::WaveformParam::WaveformParam(
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
-        WaveformParam& waveform,
-        ModulatorSignalProducerClass* modulator,
-        FloatParamS& amplitude_modulation_level_leader,
-        FloatParamS& frequency_modulation_level_leader,
-        FloatParamS& phase_modulation_level_leader,
-        ToggleParam& tempo_sync,
-        ToggleParam& center
+        WaveformParam& waveform
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
     modulated_amplitude(
-        modulator,
-        amplitude_modulation_level_leader,
         "MA",
         0.0,
         1.0,
@@ -67,16 +59,12 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     ),
     amplitude("", 0.0, 1.0, 1.0),
     frequency(
-        modulator,
-        frequency_modulation_level_leader,
         "MF",
         FREQUENCY_MIN,
         FREQUENCY_MAX,
         FREQUENCY_DEFAULT
     ),
     phase(
-        modulator,
-        phase_modulation_level_leader,
         "MP",
         0.0,
         1.0,
@@ -104,8 +92,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     harmonic_7("", -1.0, 1.0, 0.0),
     harmonic_8("", -1.0, 1.0, 0.0),
     harmonic_9("", -1.0, 1.0, 0.0),
-    tempo_sync(tempo_sync),
-    center(center)
+    tempo_sync(dummy_toggle),
+    center(dummy_toggle)
 {
     initialize_instance();
 }
@@ -182,6 +170,63 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
 template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
+        ModulatorSignalProducerClass& modulator,
+        FloatParamS& amplitude_modulation_level_leader,
+        FloatParamS& frequency_modulation_level_leader,
+        FloatParamS& phase_modulation_level_leader
+) noexcept
+    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    waveform(waveform),
+    modulated_amplitude(
+        modulator,
+        amplitude_modulation_level_leader,
+        "MA",
+        0.0,
+        1.0,
+        1.0
+    ),
+    amplitude("", 0.0, 1.0, 1.0),
+    frequency(
+        modulator,
+        frequency_modulation_level_leader,
+        "MF",
+        FREQUENCY_MIN,
+        FREQUENCY_MAX,
+        FREQUENCY_DEFAULT
+    ),
+    phase(modulator, phase_modulation_level_leader, "MP", 0.0, 1.0, 0.0),
+    detune(
+        "",
+        Constants::DETUNE_MIN,
+        Constants::DETUNE_MAX,
+        Constants::DETUNE_DEFAULT
+    ),
+    fine_detune(
+        "",
+        Constants::FINE_DETUNE_MIN,
+        Constants::FINE_DETUNE_MAX,
+        Constants::FINE_DETUNE_DEFAULT
+    ),
+    harmonic_0("", -1.0, 1.0, 0.0),
+    harmonic_1("", -1.0, 1.0, 0.0),
+    harmonic_2("", -1.0, 1.0, 0.0),
+    harmonic_3("", -1.0, 1.0, 0.0),
+    harmonic_4("", -1.0, 1.0, 0.0),
+    harmonic_5("", -1.0, 1.0, 0.0),
+    harmonic_6("", -1.0, 1.0, 0.0),
+    harmonic_7("", -1.0, 1.0, 0.0),
+    harmonic_8("", -1.0, 1.0, 0.0),
+    harmonic_9("", -1.0, 1.0, 0.0),
+    tempo_sync(dummy_toggle),
+    center(dummy_toggle)
+{
+    initialize_instance();
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
+        WaveformParam& waveform,
         FloatParamS& amplitude_leader,
         FloatParamS& frequency_leader,
         FloatParamS& phase_leader,
@@ -190,7 +235,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN),
     waveform(waveform),
-    modulated_amplitude(NULL, dummy_param, "X", 0.0, 1.0, 1.0),
+    modulated_amplitude("X", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
     frequency(frequency_leader),
     phase(phase_leader),
@@ -238,8 +283,50 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamB& harmonic_6_leader,
         FloatParamB& harmonic_7_leader,
         FloatParamB& harmonic_8_leader,
+        FloatParamB& harmonic_9_leader
+) noexcept
+    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    waveform(waveform),
+    modulated_amplitude("XX", 0.0, 1.0, 1.0),
+    amplitude(amplitude_leader),
+    frequency("MF2", FREQUENCY_MIN, FREQUENCY_MAX, FREQUENCY_DEFAULT),
+    phase("MP2", 0.0, 1.0, 0.0),
+    detune(detune_leader),
+    fine_detune(fine_detune_leader),
+    harmonic_0(harmonic_0_leader),
+    harmonic_1(harmonic_1_leader),
+    harmonic_2(harmonic_2_leader),
+    harmonic_3(harmonic_3_leader),
+    harmonic_4(harmonic_4_leader),
+    harmonic_5(harmonic_5_leader),
+    harmonic_6(harmonic_6_leader),
+    harmonic_7(harmonic_7_leader),
+    harmonic_8(harmonic_8_leader),
+    harmonic_9(harmonic_9_leader),
+    tempo_sync(dummy_toggle),
+    center(dummy_toggle)
+{
+    initialize_instance();
+}
+
+
+template<class ModulatorSignalProducerClass, bool is_lfo>
+Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
+        WaveformParam& waveform,
+        FloatParamS& amplitude_leader,
+        FloatParamS& detune_leader,
+        FloatParamS& fine_detune_leader,
+        FloatParamB& harmonic_0_leader,
+        FloatParamB& harmonic_1_leader,
+        FloatParamB& harmonic_2_leader,
+        FloatParamB& harmonic_3_leader,
+        FloatParamB& harmonic_4_leader,
+        FloatParamB& harmonic_5_leader,
+        FloatParamB& harmonic_6_leader,
+        FloatParamB& harmonic_7_leader,
+        FloatParamB& harmonic_8_leader,
         FloatParamB& harmonic_9_leader,
-        ModulatorSignalProducerClass* modulator,
+        ModulatorSignalProducerClass& modulator,
         FloatParamS& amplitude_modulation_level_leader,
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader
@@ -249,7 +336,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     modulated_amplitude(
         modulator,
         amplitude_modulation_level_leader,
-        modulator == NULL ? "XX" : "MA2",
+        "MA2",
         0.0,
         1.0,
         1.0

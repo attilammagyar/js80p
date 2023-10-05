@@ -928,8 +928,9 @@ TEST(amplitude_modulation_creates_two_sidebands, {
     Carrier::WaveformParam carrier_waveform("");
     Carrier carrier(
         carrier_waveform,
-        &modulator,
+        modulator,
         modulation_level,
+        dummy_param,
         dummy_param
     );
 
@@ -991,9 +992,10 @@ TEST(frequency_may_be_modulated, {
     Carrier::WaveformParam carrier_waveform("");
     Carrier carrier(
         carrier_waveform,
-        &modulator,
+        modulator,
         dummy_param,
-        modulation_level
+        modulation_level,
+        dummy_param
     );
 
     Buffer carrier_output(sample_count);
@@ -1183,20 +1185,22 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     ReferenceSine reference(expeced_frequency, 0.0, 0.0, 1.0);
     SimpleLFO::WaveformParam waveform_param("");
     ToggleParam tempo_sync("SYN", ToggleParam::ON);
+    FloatParamS amplitude_leader("AMP", 0.0, 1.0, 1.0);
+    FloatParamS frequency_leader("FREQ", 0.01, 10000.0, 500.0);
     SimpleLFO oscillator(
         waveform_param,
-        NULL,
+        amplitude_leader,
+        frequency_leader,
         SimpleOscillator::dummy_param,
-        SimpleOscillator::dummy_param,
-        SimpleOscillator::dummy_param,
-        tempo_sync
+        tempo_sync,
+        SimpleOscillator::dummy_toggle
     );
 
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(SAMPLE_RATE);
     oscillator.set_bpm(bpm);
     oscillator.waveform.set_value(SimpleLFO::SINE);
-    oscillator.frequency.set_value(frequency);
+    frequency_leader.set_value(frequency);
 
     assert_oscillator_output_is_close_to_reference<SimpleLFO>(
         reference, oscillator, SAMPLE_RATE, block_size, 5, 0.000001, SimpleOscillator::SINE

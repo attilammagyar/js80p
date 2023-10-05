@@ -44,8 +44,17 @@ class Oscillator : public SignalProducer
 {
     friend class SignalProducer;
 
+    private:
+        static constexpr bool IS_MODULATED = (
+            !std::is_same<ModulatorSignalProducerClass, SignalProducer>::value
+        );
+
     public:
-        typedef ModulatableFloatParam<ModulatorSignalProducerClass> ModulatedFloatParam;
+        typedef typename std::conditional<
+            IS_MODULATED,
+            ModulatableFloatParam<ModulatorSignalProducerClass>,
+            FloatParamS
+        >::type ModulatedFloatParam;
 
         typedef Byte Waveform;
 
@@ -62,6 +71,10 @@ class Oscillator : public SignalProducer
 
         static constexpr int WAVEFORMS = 10;
 
+        static constexpr Number FREQUENCY_MIN = 0.001;
+        static constexpr Number FREQUENCY_MAX = 24000.0;
+        static constexpr Number FREQUENCY_DEFAULT = 440.0;
+
         class WaveformParam : public Param<Waveform, ParamEvaluation::BLOCK>
         {
             public:
@@ -77,14 +90,14 @@ class Oscillator : public SignalProducer
         static FloatParamS dummy_param;
         static ToggleParam dummy_toggle;
 
+        Oscillator(WaveformParam& waveform) noexcept;
+
         Oscillator(
             WaveformParam& waveform,
-            ModulatorSignalProducerClass* modulator = NULL,
-            FloatParamS& amplitude_modulation_level_leader = dummy_param,
-            FloatParamS& frequency_modulation_level_leader = dummy_param,
-            FloatParamS& phase_modulation_level_leader = dummy_param,
-            ToggleParam& tempo_sync = dummy_toggle,
-            ToggleParam& center = dummy_toggle
+            ModulatorSignalProducerClass& modulator,
+            FloatParamS& amplitude_modulation_level_leader,
+            FloatParamS& frequency_modulation_level_leader,
+            FloatParamS& phase_modulation_level_leader
         ) noexcept;
 
         Oscillator(
@@ -92,8 +105,25 @@ class Oscillator : public SignalProducer
             FloatParamS& amplitude_leader,
             FloatParamS& frequency_leader,
             FloatParamS& phase_leader,
-            ToggleParam& tempo_sync = dummy_toggle,
-            ToggleParam& center = dummy_toggle
+            ToggleParam& tempo_sync,
+            ToggleParam& center
+        ) noexcept;
+
+        Oscillator(
+            WaveformParam& waveform,
+            FloatParamS& amplitude_leader,
+            FloatParamS& detune_leader,
+            FloatParamS& fine_detune_leader,
+            FloatParamB& harmonic_0_leader,
+            FloatParamB& harmonic_1_leader,
+            FloatParamB& harmonic_2_leader,
+            FloatParamB& harmonic_3_leader,
+            FloatParamB& harmonic_4_leader,
+            FloatParamB& harmonic_5_leader,
+            FloatParamB& harmonic_6_leader,
+            FloatParamB& harmonic_7_leader,
+            FloatParamB& harmonic_8_leader,
+            FloatParamB& harmonic_9_leader
         ) noexcept;
 
         Oscillator(
@@ -111,10 +141,10 @@ class Oscillator : public SignalProducer
             FloatParamB& harmonic_7_leader,
             FloatParamB& harmonic_8_leader,
             FloatParamB& harmonic_9_leader,
-            ModulatorSignalProducerClass* modulator = NULL,
-            FloatParamS& amplitude_modulation_level_leader = dummy_param,
-            FloatParamS& frequency_modulation_level_leader = dummy_param,
-            FloatParamS& phase_modulation_level_leader = dummy_param
+            ModulatorSignalProducerClass& modulator,
+            FloatParamS& amplitude_modulation_level_leader,
+            FloatParamS& frequency_modulation_level_leader,
+            FloatParamS& phase_modulation_level_leader
         ) noexcept;
 
         ~Oscillator() override;
@@ -164,10 +194,6 @@ class Oscillator : public SignalProducer
         void handle_event(Event const& event) noexcept;
 
     private:
-        static constexpr Number FREQUENCY_MIN = 0.001;
-        static constexpr Number FREQUENCY_MAX = 24000.0;
-        static constexpr Number FREQUENCY_DEFAULT = 440.0;
-
         static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
 
         static constexpr Integer NUMBER_OF_CHILDREN = 17;
