@@ -20,11 +20,13 @@
 #define JS80P__VOICE_HPP
 
 #include <string>
+#include <type_traits>
 
 #include "js80p.hpp"
 #include "midi.hpp"
 
 #include "dsp/biquad_filter.hpp"
+#include "dsp/distortion.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
@@ -40,6 +42,13 @@ class Voice : public SignalProducer
 {
     friend class SignalProducer;
 
+    private:
+        static constexpr bool IS_MODULATOR = (
+            std::is_same<ModulatorSignalProducerClass, SignalProducer>::value
+        );
+
+        static constexpr bool IS_CARRIER = !IS_MODULATOR;
+
     public:
         enum State {
             OFF = 0,
@@ -49,11 +58,28 @@ class Voice : public SignalProducer
         typedef Oscillator<ModulatorSignalProducerClass> Oscillator_;
         typedef BiquadFilter<Oscillator_> Filter1;
         typedef Wavefolder<Filter1> Wavefolder_;
-        typedef BiquadFilter<Wavefolder_> Filter2;
+        typedef Distortion::Distortion<Wavefolder_> Distortion_;
+
+        typedef typename std::conditional<IS_CARRIER, Distortion_, Wavefolder_>::type Filter2Input;
+
+        typedef BiquadFilter<Filter2Input> Filter2;
 
         class VolumeApplier;
 
         typedef VolumeApplier ModulationOut;
+
+        class Dummy
+        {
+            public:
+                Dummy();
+
+                Dummy(
+                    std::string const a,
+                    Number const b,
+                    Number const c,
+                    Number const d
+                );
+        };
 
         class Params
         {
@@ -94,6 +120,8 @@ class Voice : public SignalProducer
                 FloatParamS filter_2_frequency;
                 FloatParamS filter_2_q;
                 FloatParamS filter_2_gain;
+
+                typename std::conditional<IS_CARRIER, FloatParamS, Dummy>::type distortion;
         };
 
         class VolumeApplier : public Filter<Filter2>
@@ -137,11 +165,19 @@ class Voice : public SignalProducer
             Midi::Note const notes,
             Params& param_leaders,
             BiquadFilterSharedCache* filter_1_shared_cache = NULL,
-            BiquadFilterSharedCache* filter_2_shared_cache = NULL,
-            ModulatorSignalProducerClass* modulator = NULL,
-            FloatParamS& amplitude_modulation_level_leader = Oscillator_::dummy_param,
-            FloatParamS& frequency_modulation_level_leader = Oscillator_::dummy_param,
-            FloatParamS& phase_modulation_level_leader = Oscillator_::dummy_param
+            BiquadFilterSharedCache* filter_2_shared_cache = NULL
+        ) noexcept;
+
+        Voice(
+            Frequency const* frequencies,
+            Midi::Note const notes,
+            Params& param_leaders,
+            ModulatorSignalProducerClass& modulator,
+            FloatParamS& amplitude_modulation_level_leader,
+            FloatParamS& frequency_modulation_level_leader,
+            FloatParamS& phase_modulation_level_leader,
+            BiquadFilterSharedCache* filter_1_shared_cache = NULL,
+            BiquadFilterSharedCache* filter_2_shared_cache = NULL
         ) noexcept;
 
         virtual void reset() noexcept override;
@@ -208,9 +244,13 @@ class Voice : public SignalProducer
         ) noexcept;
 
     private:
+        typedef typename std::conditional<IS_CARRIER, Distortion_, Dummy>::type DistortionInstance;
+
         static constexpr Number NOTE_PANNING_SCALE = 2.0 / (Number)Midi::NOTE_MAX;
 
         static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
+
+        void initialize_instance(Frequency const* frequencies) noexcept;
 
         void save_note_info(
             Integer const note_id,
@@ -235,6 +275,7 @@ class Voice : public SignalProducer
         Oscillator_ oscillator;
         Filter1 filter_1;
         Wavefolder_ wavefolder;
+        DistortionInstance distortion;
         Filter2 filter_2;
         FloatParamB velocity_sensitivity;
         FloatParamS note_velocity;
@@ -258,6 +299,10 @@ class Voice : public SignalProducer
     public:
         ModulationOut& modulation_out;
 };
+
+
+typedef Voice<SignalProducer> Modulator;
+typedef Voice<Modulator::ModulationOut> Carrier;
 
 }
 

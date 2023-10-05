@@ -35,6 +35,7 @@ Tables tables;
 Tables::Tables()
 {
     fill_tables(Type::SOFT, 3.0);
+    fill_tables(Type::MEDIUM, 6.0);
     fill_tables(Type::HEAVY, 10.0);
 }
 
@@ -78,6 +79,29 @@ Distortion<InputSignalProducerClass>::Distortion(
     level(name + "G", 0.0, 1.0, 0.0),
     f_table(tables.get_f_table(type)),
     F0_table(tables.get_F0_table(type))
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+Distortion<InputSignalProducerClass>::Distortion(
+        std::string const name,
+        Type const type,
+        InputSignalProducerClass& input,
+        FloatParamS& level_leader
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 1),
+    level(level_leader),
+    f_table(tables.get_f_table(type)),
+    F0_table(tables.get_F0_table(type))
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
+void Distortion<InputSignalProducerClass>::initialize_instance() noexcept
 {
     this->register_child(level);
 

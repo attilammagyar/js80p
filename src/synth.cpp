@@ -464,12 +464,12 @@ void Synth::create_voices() noexcept
             frequencies,
             Midi::NOTES,
             carrier_params,
-            biquad_filter_shared_caches[2],
-            biquad_filter_shared_caches[3],
-            &modulators[i]->modulation_out,
+            modulators[i]->modulation_out,
             amplitude_modulation_level,
             frequency_modulation_level,
-            phase_modulation_level
+            phase_modulation_level,
+            biquad_filter_shared_caches[2],
+            biquad_filter_shared_caches[3]
         );
         register_child(*carriers[i]);
     }

@@ -26,6 +26,7 @@
 
 #include "dsp/biquad_filter.cpp"
 #include "dsp/delay.cpp"
+#include "dsp/distortion.cpp"
 #include "dsp/envelope.cpp"
 #include "dsp/filter.cpp"
 #include "dsp/lfo.cpp"

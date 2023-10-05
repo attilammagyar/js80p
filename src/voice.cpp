@@ -28,6 +28,22 @@ namespace JS80P
 {
 
 template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::Dummy::Dummy()
+{
+}
+
+
+template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
+        std::string const a,
+        Number const b,
+        Number const c,
+        Number const d
+) {
+}
+
+
+template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
     : waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75),
@@ -118,7 +134,9 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
-    )
+    ),
+
+    distortion(name + "DG", 0.0, 1.0, 0.0)
 {
 }
 
@@ -224,11 +242,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Midi::Note const notes,
         Params& param_leaders,
         BiquadFilterSharedCache* filter_1_shared_cache,
-        BiquadFilterSharedCache* filter_2_shared_cache,
-        ModulatorSignalProducerClass* modulator,
-        FloatParamS& amplitude_modulation_level_leader,
-        FloatParamS& frequency_modulation_level_leader,
-        FloatParamS& phase_modulation_level_leader
+        BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
     : SignalProducer(CHANNELS, 12),
     notes(notes),
@@ -247,11 +261,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_6,
         param_leaders.harmonic_7,
         param_leaders.harmonic_8,
-        param_leaders.harmonic_9,
-        modulator,
-        amplitude_modulation_level_leader,
-        frequency_modulation_level_leader,
-        phase_modulation_level_leader
+        param_leaders.harmonic_9
     ),
     filter_1(
         oscillator,
@@ -278,13 +288,95 @@ Voice<ModulatorSignalProducerClass>::Voice(
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, note_velocity, volume),
-    frequencies(frequencies),
-    state(OFF),
-    note_id(0),
-    note(0),
-    channel(0),
     modulation_out((ModulationOut&)volume_applier)
 {
+    initialize_instance(frequencies);
+}
+
+
+template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::Voice(
+        Frequency const* frequencies,
+        Midi::Note const notes,
+        Params& param_leaders,
+        ModulatorSignalProducerClass& modulator,
+        FloatParamS& amplitude_modulation_level_leader,
+        FloatParamS& frequency_modulation_level_leader,
+        FloatParamS& phase_modulation_level_leader,
+        BiquadFilterSharedCache* filter_1_shared_cache,
+        BiquadFilterSharedCache* filter_2_shared_cache
+) noexcept
+    : SignalProducer(CHANNELS, 12),
+    notes(notes),
+    param_leaders(param_leaders),
+    oscillator(
+        param_leaders.waveform,
+        param_leaders.amplitude,
+        param_leaders.detune,
+        param_leaders.fine_detune,
+        param_leaders.harmonic_0,
+        param_leaders.harmonic_1,
+        param_leaders.harmonic_2,
+        param_leaders.harmonic_3,
+        param_leaders.harmonic_4,
+        param_leaders.harmonic_5,
+        param_leaders.harmonic_6,
+        param_leaders.harmonic_7,
+        param_leaders.harmonic_8,
+        param_leaders.harmonic_9,
+        &modulator,
+        amplitude_modulation_level_leader,
+        frequency_modulation_level_leader,
+        phase_modulation_level_leader
+    ),
+    filter_1(
+        oscillator,
+        param_leaders.filter_1_type,
+        param_leaders.filter_1_frequency,
+        param_leaders.filter_1_q,
+        param_leaders.filter_1_gain,
+        filter_1_shared_cache
+    ),
+    wavefolder(filter_1, param_leaders.folding),
+    distortion(
+        "DIST",
+        Distortion::Type::MEDIUM,
+        wavefolder,
+        param_leaders.distortion
+    ),
+    filter_2(
+        distortion,
+        param_leaders.filter_2_type,
+        param_leaders.filter_2_frequency,
+        param_leaders.filter_2_q,
+        param_leaders.filter_2_gain,
+        filter_2_shared_cache
+    ),
+    velocity_sensitivity(param_leaders.velocity_sensitivity),
+    note_velocity("NV", 0.0, 1.0, 1.0),
+    note_panning("NP", -1.0, 1.0, 0.0),
+    portamento_length(param_leaders.portamento_length),
+    portamento_depth(param_leaders.portamento_depth),
+    panning(param_leaders.panning),
+    volume(param_leaders.volume),
+    volume_applier(filter_2, note_velocity, volume),
+    modulation_out((ModulationOut&)volume_applier)
+{
+    initialize_instance(frequencies);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::initialize_instance(
+        Frequency const* frequencies
+) noexcept {
+    this->frequencies = frequencies;
+
+    state = State::OFF;
+    note_id = 0;
+    note = 0;
+    channel = 0;
+
     register_child(velocity_sensitivity);
     register_child(note_velocity);
     register_child(note_panning);
@@ -296,6 +388,11 @@ Voice<ModulatorSignalProducerClass>::Voice(
     register_child(oscillator);
     register_child(filter_1);
     register_child(wavefolder);
+
+    if constexpr (IS_CARRIER) {
+        register_child(distortion);
+    }
+
     register_child(filter_2);
     register_child(volume_applier);
 }

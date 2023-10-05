@@ -33,9 +33,10 @@ namespace JS80P { namespace Distortion
 
 enum Type {
     SOFT = 0,
-    HEAVY = 1,
+    MEDIUM = 1,
+    HEAVY = 2,
 
-    NUMBER_OF_TYPES = 2,
+    NUMBER_OF_TYPES = 3,
 };
 
 
@@ -85,6 +86,13 @@ class Distortion : public Filter<InputSignalProducerClass>
             InputSignalProducerClass& input
         ) noexcept;
 
+        Distortion(
+            std::string const name,
+            Type const type,
+            InputSignalProducerClass& input,
+            FloatParamS& level_leader
+        ) noexcept;
+
         ~Distortion();
 
         virtual void reset() noexcept override;
@@ -112,6 +120,8 @@ class Distortion : public Filter<InputSignalProducerClass>
         static constexpr Sample INPUT_MAX_INV = 1.0 / INPUT_MAX;
         static constexpr Sample TABLE_SIZE_FLOAT = (Sample)Tables::SIZE;
         static constexpr Sample SCALE = TABLE_SIZE_FLOAT * INPUT_MAX_INV;
+
+        void initialize_instance() noexcept;
 
         Sample distort(
             Sample const input_sample,

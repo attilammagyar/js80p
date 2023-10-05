@@ -68,9 +68,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer NEXT_VOICE_MASK = 0x3f;
 
     public:
-        typedef Voice<SignalProducer> Modulator;
-        typedef Voice<Modulator::ModulationOut> Carrier;
-
         static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
 
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
@@ -987,8 +984,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ) const noexcept;
 
                 Integer const polyphony;
-                Synth::Modulator* const* const modulators;
-                Synth::Carrier* const* const carriers;
+                Modulator* const* const modulators;
+                Carrier* const* const carriers;
                 FloatParamS& modulator_add_volume;
                 Sample const* modulator_add_volume_buffer;
                 Sample** modulators_buffer;
