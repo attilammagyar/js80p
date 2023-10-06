@@ -87,12 +87,15 @@ class Wavetable
 
         template<
             Interpolation interpolation = Interpolation::DYNAMIC,
-            bool single_partial = false
+            bool single_partial = false,
+            bool with_subharmonic = false
         >
-        Sample lookup(
+        void lookup(
             WavetableState& state,
             Frequency const frequency,
-            Number const phase_offset
+            Number const phase_offset,
+            Sample& sample,
+            Sample& subharmonic_sample
         ) const noexcept;
 
         void update_coefficients(Number const coefficients[]) noexcept;
@@ -112,39 +115,59 @@ class Wavetable
         good enough for most of the audible spectrum.
 
         Better interpolation is needed though when frequency is
-        significantly lower than sample_rate / SIZE.
+        significantly lower than sample_rate / PERIOD_SIZE.
+
+        In order to be able to interpolate both the fundamental and the first
+        subharmonic (when needed) in a single step, the table size is doubled
+        so it holds 2 periods of the fundamental.
         */
-        static constexpr Integer SIZE = 0x0800;
-        static constexpr Integer MASK = 0x07ff;
+        static constexpr Integer PERIOD_SIZE = 0x0800;
+        static constexpr Integer SIZE = PERIOD_SIZE * 2;
+        static constexpr Integer MASK = SIZE - 1;
+
+        static constexpr Number PERIOD_SIZE_FLOAT = (Number)PERIOD_SIZE;
+        static constexpr Number PERIOD_SIZE_INV = 1.0 / PERIOD_SIZE_FLOAT;
 
         static constexpr Number SIZE_FLOAT = (Number)SIZE;
         static constexpr Number SIZE_INV = 1.0 / SIZE_FLOAT;
+
         static constexpr Frequency INTERPOLATION_LIMIT_SCALE = (
-            1.0 / (2.0 * (Frequency)SIZE_FLOAT)
+            1.0 / (2.0 * (Frequency)PERIOD_SIZE_FLOAT)
         );
 
+        static Number subharmonic[SIZE];
         static Number sines[SIZE];
         static bool is_initialized;
 
         Number wrap_around(Number const index) const noexcept;
 
-        template<Interpolation interpolation, bool table_interpolation>
-        Sample interpolate(
+        template<
+            Interpolation interpolation,
+            bool table_interpolation,
+            bool with_subharmonic
+        >
+        void interpolate(
             WavetableState const& state,
             Frequency const frequency,
-            Number const sample_index
+            Number const sample_index,
+            Sample& sample,
+            Sample& subharmonic_sample
         ) const noexcept;
 
-        template<bool table_interpolation>
-        Sample interpolate_sample_linear(
+        template<bool table_interpolation, bool with_subharmonic>
+        void interpolate_sample_linear(
             WavetableState const& state,
-            Number const sample_index
+            Number const sample_index,
+            Sample& sample,
+            Sample& subharmonic_sample
         ) const noexcept;
 
-        template<bool table_interpolation>
-        Sample interpolate_sample_lagrange(
+        template<bool table_interpolation, bool with_subharmonic>
+        void interpolate_sample_lagrange(
             WavetableState const& state,
-            Number const sample_index
+            Number const sample_index,
+            Sample& sample,
+            Sample& subharmonic_sample
         ) const noexcept;
 
         Integer const partials;

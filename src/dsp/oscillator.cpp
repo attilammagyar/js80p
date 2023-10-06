@@ -58,6 +58,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         1.0
     ),
     amplitude("", 0.0, 1.0, 1.0),
+    subharmonic_amplitude("", 0.0, 1.0, 0.0),
     frequency(
         "MF",
         FREQUENCY_MIN,
@@ -113,10 +114,14 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
     frequency_scale = 1.0;
     is_on_ = false;
     is_starting = false;
+    subharmonic_amplitude_is_constant = true;
+    subharmonic_amplitude_buffer = NULL;
+    subharmonic_amplitude_value = 0.0;
 
     register_child(waveform);
     register_child(modulated_amplitude);
     register_child(amplitude);
+    register_child(subharmonic_amplitude);
     register_child(frequency);
     register_child(phase);
     register_child(detune);
@@ -186,6 +191,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         1.0
     ),
     amplitude("", 0.0, 1.0, 1.0),
+    subharmonic_amplitude("", 0.0, 1.0, 0.0),
     frequency(
         modulator,
         frequency_modulation_level_leader,
@@ -237,6 +243,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     waveform(waveform),
     modulated_amplitude("X", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
+    subharmonic_amplitude("", 0.0, 1.0, 0.0),
     frequency(frequency_leader),
     phase(phase_leader),
     detune(
@@ -272,6 +279,7 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform,
         FloatParamS& amplitude_leader,
+        FloatParamS& subharmonic_leader,
         FloatParamS& detune_leader,
         FloatParamS& fine_detune_leader,
         FloatParamB& harmonic_0_leader,
@@ -289,6 +297,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     waveform(waveform),
     modulated_amplitude("XX", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
+    subharmonic_amplitude(subharmonic_leader),
     frequency("MF2", FREQUENCY_MIN, FREQUENCY_MAX, FREQUENCY_DEFAULT),
     phase("MP2", 0.0, 1.0, 0.0),
     detune(detune_leader),
@@ -342,6 +351,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         1.0
     ),
     amplitude(amplitude_leader),
+    subharmonic_amplitude("", 0.0, 1.0, 0.0),
     frequency(
         modulator,
         frequency_modulation_level_leader,
@@ -473,6 +483,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::skip_round(
 
     modulated_amplitude.skip_round(round, sample_count);
     amplitude.skip_round(round, sample_count);
+    subharmonic_amplitude.skip_round(round, sample_count);
     frequency.skip_round(round, sample_count);
     phase.skip_round(round, sample_count);
     detune.skip_round(round, sample_count);
@@ -638,6 +649,18 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
     constexpr Byte DETUNE = 2;
     constexpr Byte FINE_DETUNE = 4;
     constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
+
+    if constexpr (HAS_SUBHARMONIC) {
+        subharmonic_amplitude_buffer = FloatParamS::produce_if_not_constant(
+            subharmonic_amplitude, round, sample_count
+        );
+
+        subharmonic_amplitude_is_constant = subharmonic_amplitude_buffer == NULL;
+
+        if (subharmonic_amplitude_is_constant) {
+            subharmonic_amplitude_value = subharmonic_amplitude.get_value();
+        }
+    }
 
     Sample const* const frequency_buffer = (
         FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
@@ -911,34 +934,148 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
         initialize_first_round(computed_frequency_value);
     }
 
-    if (computed_amplitude_is_constant) {
-        if (phase_is_constant) {
-            Sample const phase = phase_value;
+    if constexpr (HAS_SUBHARMONIC) {
+        if (computed_amplitude_is_constant) {
+            if (phase_is_constant) {
+                Sample const phase = phase_value;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial, interpolation>(
-                    computed_amplitude_value, computed_frequency_value, phase
-                );
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_value,
+                            computed_frequency_value,
+                            phase,
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_value,
+                            computed_frequency_value,
+                            phase,
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
+            } else {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_value,
+                            computed_frequency_value,
+                            phase_buffer[i],
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_value,
+                            computed_frequency_value,
+                            phase_buffer[i],
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial, interpolation>(
-                    computed_amplitude_value, computed_frequency_value, phase_buffer[i]
-                );
+            if (phase_is_constant) {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_value,
+                            phase_value,
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_value,
+                            phase_value,
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
+            } else {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_value,
+                            phase_buffer[i],
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial, interpolation>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_value,
+                            phase_buffer[i],
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
             }
         }
     } else {
-        if (phase_is_constant) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial, interpolation>(
-                    computed_amplitude_buffer[i], computed_frequency_value, phase_value
-                );
+        if (computed_amplitude_is_constant) {
+            if (phase_is_constant) {
+                Sample const phase = phase_value;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial, interpolation>(
+                        computed_amplitude_value,
+                        computed_frequency_value,
+                        phase
+                    );
+                }
+            } else {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial, interpolation>(
+                        computed_amplitude_value,
+                        computed_frequency_value,
+                        phase_buffer[i]
+                    );
+                }
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial, interpolation>(
-                    computed_amplitude_buffer[i], computed_frequency_value, phase_buffer[i]
-                );
+            if (phase_is_constant) {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial, interpolation>(
+                        computed_amplitude_buffer[i],
+                        computed_frequency_value,
+                        phase_value
+                    );
+                }
+            } else {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial, interpolation>(
+                        computed_amplitude_buffer[i],
+                        computed_frequency_value,
+                        phase_buffer[i]
+                    );
+                }
             }
         }
     }
@@ -962,36 +1099,152 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
     );
     Sample const* const phase_buffer = this->phase_buffer;
 
-    if (computed_amplitude_is_constant) {
-        Sample const amplitude_value = computed_amplitude_value;
+    if constexpr (HAS_SUBHARMONIC) {
+        if (computed_amplitude_is_constant) {
+            Sample const amplitude_value = computed_amplitude_value;
 
-        if (phase_is_constant) {
-            Sample const phase = phase_value;
+            if (phase_is_constant) {
+                Sample const phase = phase_value;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial>(
-                    amplitude_value, computed_frequency_buffer[i], phase
-                );
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            amplitude_value,
+                            computed_frequency_buffer[i],
+                            phase,
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            amplitude_value,
+                            computed_frequency_buffer[i],
+                            phase,
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
+            } else {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            amplitude_value,
+                            computed_frequency_buffer[i],
+                            phase_buffer[i],
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            amplitude_value,
+                            computed_frequency_buffer[i],
+                            phase_buffer[i],
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial>(
-                    amplitude_value, computed_frequency_buffer[i], phase_buffer[i]
-                );
+            if (phase_is_constant) {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_buffer[i],
+                            phase_value,
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_buffer[i],
+                            phase_value,
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
+            } else {
+                if (subharmonic_amplitude_is_constant) {
+                    Sample const subharmonic_amplitude = subharmonic_amplitude_value;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_buffer[i],
+                            phase_buffer[i],
+                            subharmonic_amplitude
+                        );
+                    }
+                } else {
+                    Sample const* const subharmonic_amplitude_buffer = this->subharmonic_amplitude_buffer;
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        buffer[0][i] = render_sample<single_partial>(
+                            computed_amplitude_buffer[i],
+                            computed_frequency_buffer[i],
+                            phase_buffer[i],
+                            subharmonic_amplitude_buffer[i]
+                        );
+                    }
+                }
             }
         }
     } else {
-        if (phase_is_constant) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial>(
-                    computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_value
-                );
+        if (computed_amplitude_is_constant) {
+            Sample const amplitude_value = computed_amplitude_value;
+
+            if (phase_is_constant) {
+                Sample const phase = phase_value;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial>(
+                        amplitude_value,
+                        computed_frequency_buffer[i],
+                        phase
+                    );
+                }
+            } else {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial>(
+                        amplitude_value,
+                        computed_frequency_buffer[i],
+                        phase_buffer[i]
+                    );
+                }
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = render_sample<single_partial>(
-                    computed_amplitude_buffer[i], computed_frequency_buffer[i], phase_buffer[i]
-                );
+            if (phase_is_constant) {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial>(
+                        computed_amplitude_buffer[i],
+                        computed_frequency_buffer[i],
+                        phase_value
+                    );
+                }
+            } else {
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    buffer[0][i] = render_sample<single_partial>(
+                        computed_amplitude_buffer[i],
+                        computed_frequency_buffer[i],
+                        phase_buffer[i]
+                    );
+                }
             }
         }
     }
@@ -1003,29 +1256,30 @@ template<bool single_partial, Wavetable::Interpolation interpolation>
 Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
         Sample const amplitude,
         Sample const frequency,
-        Sample const phase
+        Sample const phase,
+        Sample const subharmonic_amplitude
 ) noexcept {
+    Sample sample;
+    Sample subharmonic_sample;
+
     if constexpr (is_lfo) {
-        /*
-        We could set a bool flag in apply_toggle_params() to indicate if the
-        offset has to be added, so no multiplication would be necessary, but in
-        practice, there doesn't seem to be a significant performance difference
-        between the two approaches.
-
-        Also, doing the addition first and then multiplying the sum by the
-        amplitude doesn't seem to make a difference either.
-        */
-
-        return (
-            amplitude * sample_offset_scale
-            + amplitude * wavetable->lookup<interpolation, single_partial>(
-                wavetable_state, frequency * frequency_scale, phase
-            )
+        wavetable->lookup<interpolation, single_partial, false>(
+            wavetable_state, frequency * frequency_scale, phase, sample, subharmonic_sample
         );
+
+        return amplitude * (sample_offset_scale + sample);
+    } else if constexpr (HAS_SUBHARMONIC) {
+        wavetable->lookup<interpolation, single_partial, true>(
+            wavetable_state, frequency, phase, sample, subharmonic_sample
+        );
+
+        return amplitude * sample + subharmonic_amplitude * subharmonic_sample;
     } else {
-        return amplitude * wavetable->lookup<interpolation, single_partial>(
-            wavetable_state, frequency, phase
+        wavetable->lookup<interpolation, single_partial, false>(
+            wavetable_state, frequency, phase, sample, subharmonic_sample
         );
+
+        return amplitude * sample;
     }
 }
 

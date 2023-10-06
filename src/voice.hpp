@@ -121,6 +121,7 @@ class Voice : public SignalProducer
                 FloatParamS filter_2_q;
                 FloatParamS filter_2_gain;
 
+                typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type subharmonic_amplitude;
                 typename std::conditional<IS_CARRIER, FloatParamS, Dummy>::type distortion;
         };
 

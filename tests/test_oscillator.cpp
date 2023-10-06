@@ -1206,3 +1206,43 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
         reference, oscillator, SAMPLE_RATE, block_size, 5, 0.000001, SimpleOscillator::SINE
     );
 });
+
+
+TEST(amplitude_of_subharmonic_is_independent_from_main_amplitude, {
+    constexpr Frequency sample_rate = 22050.0;
+    constexpr Integer block_size = 2048;
+    constexpr Integer rounds = 3;
+    constexpr Integer buffer_size = rounds * block_size;
+
+    SumOfSines expected(0.7, 220.0, 0.3, 440.0, 0.0, 0.0, 1, 0.0);
+
+    SimpleOscillator::WaveformParam waveform_param("");
+    SimpleOscillator oscillator(waveform_param);
+
+    Buffer actual_output(buffer_size);
+    Buffer expected_output(buffer_size);
+
+    expected.set_sample_rate(sample_rate);
+    expected.set_block_size(block_size);
+
+    waveform_param.set_sample_rate(sample_rate);
+    waveform_param.set_block_size(block_size);
+    waveform_param.set_value(SimpleOscillator::SINE);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(sample_rate);
+    oscillator.amplitude.set_value(0.7);
+    oscillator.subharmonic_amplitude.set_value(0.3);
+    oscillator.frequency.set_value(440.0);
+    oscillator.start(0.0);
+
+    oscillator.amplitude.schedule_value(0.0001, 0.3);
+    oscillator.subharmonic_amplitude.schedule_value(0.0001, 0.7);
+
+    render_rounds<SimpleOscillator>(oscillator, actual_output, rounds, block_size);
+    render_rounds<SumOfSines>(expected, expected_output, rounds, block_size);
+
+    assert_close(
+        expected_output.samples[0], actual_output.samples[0], buffer_size, 0.0001
+    );
+})

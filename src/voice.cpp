@@ -136,6 +136,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
 
+    subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0),
     distortion(name + "DG", 0.0, 1.0, 0.0)
 {
 }
@@ -250,6 +251,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
+        param_leaders.subharmonic_amplitude,
         param_leaders.detune,
         param_leaders.fine_detune,
         param_leaders.harmonic_0,

@@ -49,12 +49,20 @@ class Oscillator : public SignalProducer
             !std::is_same<ModulatorSignalProducerClass, SignalProducer>::value
         );
 
+        static constexpr bool HAS_SUBHARMONIC = !(IS_MODULATED || is_lfo);
+
     public:
         typedef typename std::conditional<
             IS_MODULATED,
             ModulatableFloatParam<ModulatorSignalProducerClass>,
             FloatParamS
         >::type ModulatedFloatParam;
+
+        typedef typename std::conditional<
+            HAS_SUBHARMONIC,
+            FloatParamS,
+            FloatParamB
+        >::type SubharmonicAmplitude;
 
         typedef Byte Waveform;
 
@@ -112,6 +120,7 @@ class Oscillator : public SignalProducer
         Oscillator(
             WaveformParam& waveform,
             FloatParamS& amplitude_leader,
+            FloatParamS& subharmonic_leader,
             FloatParamS& detune_leader,
             FloatParamS& fine_detune_leader,
             FloatParamB& harmonic_0_leader,
@@ -162,6 +171,7 @@ class Oscillator : public SignalProducer
 
         ModulatedFloatParam modulated_amplitude;
         FloatParamS amplitude;
+        SubharmonicAmplitude subharmonic_amplitude;
         ModulatedFloatParam frequency;
         ModulatedFloatParam phase;
         FloatParamS detune;
@@ -196,7 +206,7 @@ class Oscillator : public SignalProducer
     private:
         static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 17;
+        static constexpr Integer NUMBER_OF_CHILDREN = 18;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
 
@@ -255,7 +265,8 @@ class Oscillator : public SignalProducer
         Sample render_sample(
             Sample const amplitude,
             Sample const frequency,
-            Sample const phase
+            Sample const phase,
+            Sample const subharmonic_amplitude = 0.0
         ) noexcept;
 
         ToggleParam& tempo_sync;
@@ -267,10 +278,12 @@ class Oscillator : public SignalProducer
         Sample* computed_amplitude_buffer;
         Frequency* computed_frequency_buffer;
         Sample* phase_buffer;
+        Sample const* subharmonic_amplitude_buffer;
         FloatParamB* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
         Number custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS];
         Integer custom_waveform_change_indices[CUSTOM_WAVEFORM_HARMONICS];
         Number computed_amplitude_value;
+        Sample subharmonic_amplitude_value;
         Frequency computed_frequency_value;
         Number phase_value;
         Seconds start_time_offset;
@@ -281,6 +294,7 @@ class Oscillator : public SignalProducer
         bool computed_frequency_is_constant;
         bool computed_amplitude_is_constant;
         bool phase_is_constant;
+        bool subharmonic_amplitude_is_constant;
 };
 
 }
