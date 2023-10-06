@@ -147,7 +147,7 @@ h1 {
 #osc-1-main > div.knob:nth-child(7),
 #osc-1-main > div.knob:nth-child(8),
 #osc-1-main > div.knob:nth-child(10),
-#osc-2-main > div.knob:nth-child(7),
+#osc-2-main > div.knob:nth-child(6),
 #osc-2-main > div.knob:nth-child(8) {
   border-left: solid 1px #445;
   width: 57px;
@@ -430,7 +430,7 @@ svg.icon {
 .sc21 {
   position: absolute;
   top: 337px;
-  left: 435px;
+  left: 377px;
   display: block;
 }
 
@@ -547,7 +547,7 @@ function make_tabs(active)
           </h1>
         </div>
         <div id="osc-1-wave" class="osc-main block">
-          <h1>Custom waveform harmonics</h1>
+          <h1>Waveform &amp; harmonics for the Custom waveform</h1>
         </div>
         <div id="osc-1-filter-2" class="block osc-filter">
           <h1>
@@ -566,7 +566,7 @@ function make_tabs(active)
           </h1>
         </div>
         <div id="osc-2-wave" class="osc-main block">
-          <h1>Custom waveform harmonics</h1>
+          <h1>Waveform &amp; harmonics for the Custom waveform</h1>
         </div>
         <div id="osc-2-filter-2" class="block">
           <h1>
@@ -751,13 +751,22 @@ window.onload = function ()
     create_knob("main", "AM %", "100");
 
     for (o = 1; o <= 2; ++o) {
-        create_knob("osc-" + String(o) + "-main", "WAV", "triangle");
         create_knob("osc-" + String(o) + "-main", "PRT s", "0.01");
         create_knob("osc-" + String(o) + "-main", "PRD c", "2400");
         create_knob("osc-" + String(o) + "-main", "DTN st", "-48");
         create_knob("osc-" + String(o) + "-main", "FIN c", "-1200");
         create_knob("osc-" + String(o) + "-main", "AMP %", "50", "E7");
+
+        if (o === 1) {
+          create_knob("osc-" + String(o) + "-main", "SUB %", "10", "E8");
+        }
+
         create_knob("osc-" + String(o) + "-main", "FOLD %", "10", "E8");
+
+        if (o === 2) {
+          create_knob("osc-" + String(o) + "-main", "DIST %", "10", "E8");
+        }
+
         create_knob("osc-" + String(o) + "-main", "VEL S %", "50");
         create_knob("osc-" + String(o) + "-main", "VOL %", "50", "C12");
         create_knob("osc-" + String(o) + "-main", "WID %", "-100");
@@ -772,6 +781,8 @@ window.onload = function ()
         create_knob("osc-" + String(o) + "-filter-2", "FREQ Hz", "11025");
         create_knob("osc-" + String(o) + "-filter-2", "Q", "5.5");
         create_knob("osc-" + String(o) + "-filter-2", "GAIN dB", "0.0");
+
+        create_knob("osc-" + String(o) + "-wave", "WAV", "triangle");
 
         for (i = 1; i <= 10; ++i) {
             s = "th";
