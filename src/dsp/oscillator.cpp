@@ -855,9 +855,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Sample** buffer
 ) noexcept {
     if (!is_on_) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = 0.0;
-        }
+        render_silence(round, first_sample_index, last_sample_index, buffer);
 
         return;
     }
