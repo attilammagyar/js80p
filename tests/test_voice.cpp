@@ -278,6 +278,7 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
     params.volume.set_value(1.0);
 
     params.amplitude.set_envelope(&envelope);
+    params.subharmonic_amplitude.set_envelope(&envelope);
 
     envelope.dynamic.set_value(ToggleParam::OFF);
     envelope.amount.set_value(1.0);

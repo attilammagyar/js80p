@@ -342,7 +342,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     wavefolder(filter_1, param_leaders.folding),
     distortion(
         "DIST",
-        Distortion::Type::MEDIUM,
+        Distortion::Type::HEAVY,
         wavefolder,
         param_leaders.distortion
     ),
@@ -461,6 +461,10 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     wavefolder.folding.start_envelope(time_offset);
 
+    if constexpr (IS_CARRIER) {
+        distortion.level.start_envelope(time_offset);
+    }
+
     panning.start_envelope(time_offset);
     volume.start_envelope(time_offset);
 
@@ -472,6 +476,11 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     */
     oscillator.modulated_amplitude.start_envelope(time_offset);
     oscillator.amplitude.start_envelope(time_offset);
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.start_envelope(time_offset);
+    }
+
     oscillator.frequency.start_envelope(time_offset);
     oscillator.phase.start_envelope(time_offset);
 
@@ -619,6 +628,10 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     wavefolder.folding.update_envelope(time_offset);
 
+    if constexpr (IS_CARRIER) {
+        distortion.level.update_envelope(time_offset);
+    }
+
     panning.update_envelope(time_offset);
     volume.update_envelope(time_offset);
 
@@ -628,6 +641,11 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     */
     oscillator.modulated_amplitude.update_envelope(time_offset);
     oscillator.amplitude.update_envelope(time_offset);
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.update_envelope(time_offset);
+    }
+
     oscillator.frequency.update_envelope(time_offset);
     oscillator.phase.update_envelope(time_offset);
 
@@ -671,10 +689,22 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     oscillator.frequency.end_envelope(time_offset);
     oscillator.phase.end_envelope(time_offset);
 
-    Seconds off_after = time_offset + std::max(
-        oscillator.amplitude.end_envelope(time_offset),
-        volume.end_envelope(time_offset)
-    );
+    Seconds off_after;
+
+    if constexpr (IS_MODULATOR) {
+        off_after = time_offset + std::max(
+            {
+                oscillator.amplitude.end_envelope(time_offset),
+                oscillator.subharmonic_amplitude.end_envelope(time_offset),
+                volume.end_envelope(time_offset),
+            }
+        );
+    } else {
+        off_after = time_offset + std::max(
+            oscillator.amplitude.end_envelope(time_offset),
+            volume.end_envelope(time_offset)
+        );
+    }
 
     oscillator.cancel_events_at(off_after);
     oscillator.stop(off_after);
@@ -682,6 +712,10 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     state = State::OFF;
 
     wavefolder.folding.end_envelope(time_offset);
+
+    if constexpr (IS_CARRIER) {
+        distortion.level.end_envelope(time_offset);
+    }
 
     panning.end_envelope(time_offset);
 
@@ -711,12 +745,21 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
     state = State::OFF;
 
     oscillator.amplitude.cancel_events();
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.cancel_events();
+    }
+
     volume.cancel_events();
 
     oscillator.cancel_events();
     oscillator.stop(0.0);
 
     wavefolder.folding.cancel_events();
+
+    if constexpr (IS_CARRIER) {
+        distortion.level.cancel_events();
+    }
 
     panning.cancel_events();
 
@@ -743,6 +786,10 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 
     wavefolder.folding.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
+    if constexpr (IS_CARRIER) {
+        distortion.level.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    }
+
     panning.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     volume.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
@@ -752,6 +799,11 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     */
     oscillator.modulated_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     oscillator.amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    }
+
     oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
     oscillator.phase.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
 
@@ -772,10 +824,23 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() const noexcept
 {
-    return (
-        state == State::ON
-        && (has_decayed(volume) || has_decayed(oscillator.amplitude))
-    );
+    if constexpr (IS_MODULATOR) {
+        return (
+            state == State::ON
+            && (
+                has_decayed(volume)
+                || (
+                    has_decayed(oscillator.amplitude)
+                    && has_decayed(oscillator.subharmonic_amplitude)
+                )
+            )
+        );
+    } else {
+        return (
+            state == State::ON
+            && (has_decayed(volume) || has_decayed(oscillator.amplitude))
+        );
+    }
 }
 
 
