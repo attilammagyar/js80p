@@ -242,7 +242,19 @@ class Oscillator : public SignalProducer
 
         void initialize_first_round(Frequency const frequency) noexcept;
 
-        template<Wavetable::Interpolation interpolation, bool single_partial>
+        template<bool has_subharmonic>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
+        ) noexcept;
+
+        template<
+            Wavetable::Interpolation interpolation,
+            bool single_partial,
+            bool has_subharmonic
+        >
         void render_with_constant_frequency(
             Integer const round,
             Integer const first_sample_index,
@@ -250,7 +262,7 @@ class Oscillator : public SignalProducer
             Sample** buffer
         ) noexcept;
 
-        template<bool single_partial>
+        template<bool single_partial, bool has_subharmonic>
         void render_with_changing_frequency(
             Integer const round,
             Integer const first_sample_index,
@@ -260,6 +272,7 @@ class Oscillator : public SignalProducer
 
         template<
             bool single_partial,
+            bool has_subharmonic,
             Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC
         >
         Sample render_sample(
