@@ -304,6 +304,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::MWID, modulator_params.width);
     register_param_as_child<FloatParamS>(ParamId::MPAN, modulator_params.panning);
     register_param_as_child<FloatParamS>(ParamId::MVOL, modulator_params.volume);
+    register_param_as_child<FloatParamS>(ParamId::MSUB, modulator_params.subharmonic_amplitude);
 
     register_param_as_child<FloatParamB>(ParamId::MC1, modulator_params.harmonic_0);
     register_param_as_child<FloatParamB>(ParamId::MC2, modulator_params.harmonic_1);
@@ -349,6 +350,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
     register_param_as_child<FloatParamS>(ParamId::CPAN, carrier_params.panning);
     register_param_as_child<FloatParamS>(ParamId::CVOL, carrier_params.volume);
+    register_param_as_child<FloatParamS>(ParamId::CDG, carrier_params.distortion);
 
     register_param_as_child<FloatParamB>(ParamId::CC1, carrier_params.harmonic_0);
     register_param_as_child<FloatParamB>(ParamId::CC2, carrier_params.harmonic_1);
@@ -1297,6 +1299,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::MWID: return modulator_params.width.get_default_ratio();
         case ParamId::MPAN: return modulator_params.panning.get_default_ratio();
         case ParamId::MVOL: return modulator_params.volume.get_default_ratio();
+        case ParamId::MSUB: return modulator_params.subharmonic_amplitude.get_default_ratio();
         case ParamId::MC1: return modulator_params.harmonic_0.get_default_ratio();
         case ParamId::MC2: return modulator_params.harmonic_1.get_default_ratio();
         case ParamId::MC3: return modulator_params.harmonic_2.get_default_ratio();
@@ -1323,6 +1326,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CWID: return carrier_params.width.get_default_ratio();
         case ParamId::CPAN: return carrier_params.panning.get_default_ratio();
         case ParamId::CVOL: return carrier_params.volume.get_default_ratio();
+        case ParamId::CDG: return carrier_params.distortion.get_default_ratio();
         case ParamId::CC1: return carrier_params.harmonic_0.get_default_ratio();
         case ParamId::CC2: return carrier_params.harmonic_1.get_default_ratio();
         case ParamId::CC3: return carrier_params.harmonic_2.get_default_ratio();
@@ -1513,6 +1517,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::MWID: return modulator_params.width.get_max_value();
         case ParamId::MPAN: return modulator_params.panning.get_max_value();
         case ParamId::MVOL: return modulator_params.volume.get_max_value();
+        case ParamId::MSUB: return modulator_params.subharmonic_amplitude.get_max_value();
         case ParamId::MC1: return modulator_params.harmonic_0.get_max_value();
         case ParamId::MC2: return modulator_params.harmonic_1.get_max_value();
         case ParamId::MC3: return modulator_params.harmonic_2.get_max_value();
@@ -1539,6 +1544,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CWID: return carrier_params.width.get_max_value();
         case ParamId::CPAN: return carrier_params.panning.get_max_value();
         case ParamId::CVOL: return carrier_params.volume.get_max_value();
+        case ParamId::CDG: return carrier_params.distortion.get_max_value();
         case ParamId::CC1: return carrier_params.harmonic_0.get_max_value();
         case ParamId::CC2: return carrier_params.harmonic_1.get_max_value();
         case ParamId::CC3: return carrier_params.harmonic_2.get_max_value();
@@ -1725,6 +1731,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::MWID: return modulator_params.width.ratio_to_value(ratio);
         case ParamId::MPAN: return modulator_params.panning.ratio_to_value(ratio);
         case ParamId::MVOL: return modulator_params.volume.ratio_to_value(ratio);
+        case ParamId::MSUB: return modulator_params.subharmonic_amplitude.ratio_to_value(ratio);
         case ParamId::MC1: return modulator_params.harmonic_0.ratio_to_value(ratio);
         case ParamId::MC2: return modulator_params.harmonic_1.ratio_to_value(ratio);
         case ParamId::MC3: return modulator_params.harmonic_2.ratio_to_value(ratio);
@@ -1751,6 +1758,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::CWID: return carrier_params.width.ratio_to_value(ratio);
         case ParamId::CPAN: return carrier_params.panning.ratio_to_value(ratio);
         case ParamId::CVOL: return carrier_params.volume.ratio_to_value(ratio);
+        case ParamId::CDG: return carrier_params.distortion.ratio_to_value(ratio);
         case ParamId::CC1: return carrier_params.harmonic_0.ratio_to_value(ratio);
         case ParamId::CC2: return carrier_params.harmonic_1.ratio_to_value(ratio);
         case ParamId::CC3: return carrier_params.harmonic_2.ratio_to_value(ratio);
@@ -2247,6 +2255,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::MWID: modulator_params.width.set_ratio(ratio); break;
             case ParamId::MPAN: modulator_params.panning.set_ratio(ratio); break;
             case ParamId::MVOL: modulator_params.volume.set_ratio(ratio); break;
+            case ParamId::MSUB: modulator_params.subharmonic_amplitude.set_ratio(ratio); break;
             case ParamId::MC1: modulator_params.harmonic_0.set_ratio(ratio); break;
             case ParamId::MC2: modulator_params.harmonic_1.set_ratio(ratio); break;
             case ParamId::MC3: modulator_params.harmonic_2.set_ratio(ratio); break;
@@ -2273,6 +2282,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CWID: carrier_params.width.set_ratio(ratio); break;
             case ParamId::CPAN: carrier_params.panning.set_ratio(ratio); break;
             case ParamId::CVOL: carrier_params.volume.set_ratio(ratio); break;
+            case ParamId::CDG: carrier_params.distortion.set_ratio(ratio); break;
             case ParamId::CC1: carrier_params.harmonic_0.set_ratio(ratio); break;
             case ParamId::CC2: carrier_params.harmonic_1.set_ratio(ratio); break;
             case ParamId::CC3: carrier_params.harmonic_2.set_ratio(ratio); break;
@@ -2464,6 +2474,7 @@ void Synth::handle_assign_controller(
             case ParamId::MWID: is_assigned = assign_controller<FloatParamB>(modulator_params.width, ctl_id); break;
             case ParamId::MPAN: is_assigned = assign_controller<FloatParamS>(modulator_params.panning, ctl_id); break;
             case ParamId::MVOL: is_assigned = assign_controller<FloatParamS>(modulator_params.volume, ctl_id); break;
+            case ParamId::MSUB: is_assigned = assign_controller<FloatParamS>(modulator_params.subharmonic_amplitude, ctl_id); break;
             case ParamId::MC1: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_0, ctl_id); break;
             case ParamId::MC2: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_1, ctl_id); break;
             case ParamId::MC3: is_assigned = assign_controller<FloatParamB>(modulator_params.harmonic_2, ctl_id); break;
@@ -2490,6 +2501,7 @@ void Synth::handle_assign_controller(
             case ParamId::CWID: is_assigned = assign_controller<FloatParamB>(carrier_params.width, ctl_id); break;
             case ParamId::CPAN: is_assigned = assign_controller<FloatParamS>(carrier_params.panning, ctl_id); break;
             case ParamId::CVOL: is_assigned = assign_controller<FloatParamS>(carrier_params.volume, ctl_id); break;
+            case ParamId::CDG: is_assigned = assign_controller<FloatParamS>(carrier_params.distortion, ctl_id); break;
             case ParamId::CC1: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_0, ctl_id); break;
             case ParamId::CC2: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_1, ctl_id); break;
             case ParamId::CC3: is_assigned = assign_controller<FloatParamB>(carrier_params.harmonic_2, ctl_id); break;
@@ -2933,6 +2945,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::MWID: return modulator_params.width.get_ratio();
         case ParamId::MPAN: return modulator_params.panning.get_ratio();
         case ParamId::MVOL: return modulator_params.volume.get_ratio();
+        case ParamId::MSUB: return modulator_params.subharmonic_amplitude.get_ratio();
         case ParamId::MC1: return modulator_params.harmonic_0.get_ratio();
         case ParamId::MC2: return modulator_params.harmonic_1.get_ratio();
         case ParamId::MC3: return modulator_params.harmonic_2.get_ratio();
@@ -2959,6 +2972,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CWID: return carrier_params.width.get_ratio();
         case ParamId::CPAN: return carrier_params.panning.get_ratio();
         case ParamId::CVOL: return carrier_params.volume.get_ratio();
+        case ParamId::CDG: return carrier_params.distortion.get_ratio();
         case ParamId::CC1: return carrier_params.harmonic_0.get_ratio();
         case ParamId::CC2: return carrier_params.harmonic_1.get_ratio();
         case ParamId::CC3: return carrier_params.harmonic_2.get_ratio();

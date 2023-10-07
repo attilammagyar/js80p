@@ -44,7 +44,18 @@ def print_oscillator_params(param_id: int, group: str, prefix: str) -> int:
         ("$WID", "  ///< $ Width"),
         ("$PAN", "  ///< $ Pan"),
         ("$VOL", "  ///< $ Volume"),
+    ]
 
+    if prefix == "M":
+        params += [
+            ("$SUB", "  ///< $ Subharmonic Amplitude"),
+        ]
+    elif prefix == "C":
+        params += [
+            ("$DG", "   ///< $ Distortion Gain"),
+        ]
+
+    params += [
         ("$C1", "   ///< $ Custom Waveform 1st Harmonic"),
         ("$C2", "   ///< $ Custom Waveform 2nd Harmonic"),
         ("$C3", "   ///< $ Custom Waveform 3rd Harmonic"),
