@@ -356,39 +356,25 @@ small {
 
         <h3>What's New in v2.0.3</h3>
         <ul>
-          <li><p>It is now possible to assign Macros to discrete parameters like Filter Types
-          and Waveforms.</p></li>
-          <li><p>Memory and CPU consumption of delay based effects have been reduced, so they
-          will no longer use the CPU when the synth is idle and all sounds have
-          decayed.</p></li>
-          <li><p>Bugfix: fixed a bug with program name saving and loading in the FST plugin.</p></li>
-        </ul>
-
-        <h3>What's New in v2.0.2</h3>
-        <ul>
+          <li><p>Implemented monophonic mode for smooth legato playing</p></li>
+          <li><p>New preset: Monophonic Saw</p></li>
+          <li><p>Flexible Controllers have been renamed to Macros.</p></li>
+          <li><p>Reduced RAM and CPU usage, especially when the plugin is idle.</p></li>
           <li><p>Documented how Envelopes work in the synth with regards to polyphony.</p></li>
           <li><p>Reduced patch size and improved patch import and export performance by
           omitting redundant information from patches.</p></li>
           <li><p>Improved responsivity of the FST plugin to host events (by requesting the
           "effIdle" message from the host) when the plugin's own window is closed or
           hidden.</p></li>
+          <li><p>It is now possible to assign Macros to discrete parameters like Filter Types
+          and Waveforms.</p></li>
+          <li><p>Bugfix: fixed a bug with program name saving and loading in the FST plugin.</p></li>
           <li><p>Bugfix: fixed possible crashes in the FST plugin when using automation.</p></li>
-        </ul>
-
-        <h3>What's New in v2.0.1</h3>
-        <ul>
-          <li><p>Flexible Controllers have been renamed to Macros.</p></li>
-          <li><p>Reduced RAM and CPU usage, especially when the plugin is idle.</p></li>
           <li><p>Bugfix: fixed a problem in filter state handling which could lead to
                  occasional signal discontinuities and glitches.</p></li>
           <li><p>Bugfix: fixed a potential crash around GUI and audio engine communication.</p></li>
           <li><p>Bugfix: the FST plugin sometimes switched to the blank preset while loading
                  banks, saved projects, or when doing a preset change or MIDI program change.</p></li>
-        </ul>
-        <h3>What's New in v2.0.0</h3>
-        <ul>
-          <li><p>Implemented monophonic mode for smooth legato playing</p></li>
-          <li><p>New preset: Monophonic Saw</p></li>
         </ul>
       </div>
 
