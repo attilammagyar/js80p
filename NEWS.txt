@@ -1,3 +1,8 @@
+v2.3.0 (2023-10-08)
+ * New preset: Dystopian Cathedral.
+ * New parameter for the Modulator: subharmonic sine wave amplitude.
+ * New parameter for the Carrier: Distortion
+
 v2.2.0 (2023-10-03)
  * New parameter for the Chorus effect: switch between 15 different
    configurations, with up to 7 voices.
