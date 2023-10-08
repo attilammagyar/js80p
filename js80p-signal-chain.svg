@@ -1,6 +1,6 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 700 290"
+  viewBox="0 0 700 340"
   stroke="#c0c0c0"
   stroke-width="3"
   style="background: #0b0b0b"
@@ -76,7 +76,15 @@
       </svg>
     </svg>
 
-    <svg x="30" y="90" width="520" height="24">
+    <svg x="20" y="60" width="80" height="24">
+      <rect x="0" y="0" width="100%" height="100%" rx="5" />
+      <text x="50%" y="50%">Sub-oscillator</text>
+    </svg>
+
+    <path d="M100,72 L140,72 L140,54"/>
+    <polygon points="135,54 145,54 140,44"/>
+
+    <svg x="30" y="140" width="630" height="24">
       <svg x="0" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Oscillator</text>
@@ -103,13 +111,21 @@
 
       <svg x="330" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
-        <text x="50%" y="50%">Filter</text>
+        <text x="50%" y="50%">Distortion</text>
       </svg>
 
       <path d="M410,12 L430,12"/>
       <polygon points="430,7 430,17 440,12"/>
 
       <svg x="440" y="0" width="80" height="24">
+        <rect x="0" y="0" width="100%" height="100%" rx="5" />
+        <text x="50%" y="50%">Filter</text>
+      </svg>
+
+      <path d="M520,12 L540,12"/>
+      <polygon points="540,7 540,17 550,12"/>
+
+      <svg x="550" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Volume</text>
       </svg>
@@ -127,22 +143,22 @@
       <text x="50%" y="50%">Mixer</text>
     </svg>
 
-    <path d="M550,102 L630,102 L630,54"/>
-    <polygon points="625,54 635,54 630,44"/>
+    <path d="M620,140 L620,54"/>
+    <polygon points="615,54 625,54 620,44"/>
 
-    <svg x="540" y="80" width="80" height="24">
+    <svg x="597" y="110" width="80" height="24">
       <text x="50%" y="50%">(x64)</text>
     </svg>
 
-    <path d="M490,44 L490,70 L70,70 L70,80"/>
-    <polygon points="65,80 75,80 70,90"/>
+    <path d="M490,44 L490,120 L70,120 L70,130"/>
+    <polygon points="65,130 75,130 70,140"/>
 
-    <text x="75" y="64">(Frequency, Phase, and Amplitude Modulation)</text>
+    <text x="75" y="114">(Frequency, Phase, and Amplitude Modulation)</text>
 
-    <path d="M670,32 L690,32 L690,160 L90,160 L90,170"/>
-    <polygon points="85,170 95,170 90,180"/>
+    <path d="M670,32 L690,32 L690,210 L90,210 L90,220"/>
+    <polygon points="85,220 95,220 90,230"/>
 
-    <svg x="50" y="180" width="520" height="24">
+    <svg x="50" y="230" width="520" height="24">
       <svg x="0" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Volume</text>
@@ -181,10 +197,10 @@
       </svg>
     </svg>
 
-    <path d="M570,192 L590,192 L590,230 L95,230 L95,240"/>
-    <polygon points="90,240 100,240 95,250"/>
+    <path d="M570,242 L590,242 L590,280 L95,280 L95,290"/>
+    <polygon points="90,290 100,290 95,300"/>
 
-    <svg x="50" y="250" width="740" height="24">
+    <svg x="50" y="300" width="740" height="24">
       <svg x="0" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Volume</text>

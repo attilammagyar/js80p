@@ -35,6 +35,10 @@ a {
   color: #80d0f8;
 }
 
+a.img {
+  text-decoration: none;
+}
+
 h1 {
   font-size: 36px;
   font-weight: bold;
@@ -456,7 +460,7 @@ small {
               <li>separate packages are available for AVX capable 64 bit processors</li>
             </ul>
           </li>
-          <li>RAM: 150-300 MB per instance, depending on buffer sizes, etc.</li>
+          <li>RAM: 200-500 MB per instance, depending on buffer sizes, etc.</li>
         </ul>
 
         <div class="indent">
@@ -866,7 +870,9 @@ small {
       <div class="section">
         <h3>Signal Chain (Simplified)</h3>
         <p class="center">
-          <img id="signal-chain-img" src="js80p-signal-chain.svg" alt="Signal Chain" />
+          <a class="img" href="js80p-signal-chain.svg" target="_blank">
+            <img id="signal-chain-img" src="js80p-signal-chain.svg" alt="Signal Chain" />
+          </a>
         </p>
       </div>
 
@@ -908,6 +914,7 @@ small {
               <li>high-shelf</li>
             </ul>
           </li>
+          <li>subharmonic sine wave for oscillator 1, distortion for oscillator 2</li>
           <li>portamento</li>
           <li>wavefolder</li>
           <li>split keyboard</li>
