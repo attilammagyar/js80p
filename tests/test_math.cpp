@@ -173,6 +173,7 @@ TEST(db_to_linear, {
 
 
 TEST(linear_to_db, {
+    assert_eq(13.98, Math::linear_to_db(10e10), 0.03);
     assert_eq(13.98, Math::linear_to_db(10.0), 0.03);
     assert_eq(13.98, Math::linear_to_db(5.0), 0.03);
     assert_eq(6.0, Math::linear_to_db(2.0), 0.03);

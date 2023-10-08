@@ -106,6 +106,10 @@ void SignalProducer::find_peak(
             }
         }
     }
+
+    if (peak > 1000.0) {
+        peak = 1000.0;
+    }
 }
 
 
