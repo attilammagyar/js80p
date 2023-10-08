@@ -65,6 +65,7 @@ Table of Contents
     * [Nightmare Lead](#preset-nightmare-lead)
     * [Tremolo Lead](#preset-tremolo-lead)
     * [Monophonic Saw](#preset-monophonic-saw)
+    * [Dystopian Cathedral](#preset-dystopian-cathedral)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -467,6 +468,14 @@ A sawtooth wave based monophonic, sustained sound with smooth legato glides.
 The harder you play, the brighter and richer the timbre, and the harder the
 note attack. Mod wheel controls the vibrato, and aftertouch controls the
 filtering and the wavefolder. The sustain pedal lengthens note decay.
+
+<a id="preset-dystopian-cathedral"></a>
+
+### Dystopian Cathedral
+
+Play softly and this futuristic organ-like patch will sound smooth as butter,
+but when you start playing with more force, the sound will become angry, fat,
+and in-your-face. The mod wheel increases the level of madness.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
