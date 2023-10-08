@@ -562,7 +562,7 @@ Features
  * MIDI controllers and macros
  * channel pressure (aftertouch)
  * MIDI learn
- * logarithmic and linear scale filter frequencies
+ * logarithmic or linear scale filter frequencies
  * LFO and effects tempo synchronization
  * use the peak level at various points of the signal chain to control
    parameters:
