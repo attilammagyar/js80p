@@ -93,7 +93,7 @@ System Requirements
  * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04)
  * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
     * separate packages are available for AVX capable 64 bit processors
- * RAM: 150-300 MB per instance, depending on buffer sizes, etc.
+ * RAM: 200-500 MB per instance, depending on buffer sizes, etc.
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
@@ -481,13 +481,19 @@ If you find bugs, please report them at
 Signal Chain (Simplified)
 -------------------------
                                                                (x64)
-    Oscillator --> Filter --> Wavefolder --> Filter --> Volume -----> Mixer --+
-                                                             |        ^       |
-     (Frequency, Phase, and Amplitude Modulation)            |        |       |
-     +-------------------------------------------------------+        |       |
-     |                                                                |       |
-     v                                                          (x64) |       |
-     Oscillator --> Filter --> Wavefolder --> Filter --> Volume ------+       |
+    Oscillator --> Filter --> Wavefolder --> Filter --> Volume ---------> Mixer
+                     ^                                       |            ^   |
+                     |                                       |            |   |
+    Sub-oscillator --+                                       |            |   |
+                                                             |            |   |
+     (Frequency, Phase, and Amplitude Modulation)            |            |   |
+     +-------------------------------------------------------+            |   |
+     |                                                                    |   |
+     v                                                                    |   |
+     Oscillator                                                           |   |
+     |                                                                    |   |
+     v                                                          (x64)     |   |
+     Filter --> Wavefolder --> Distortion --> Filter --> Volume ----------+   |
                                                                               |
             +-----------------------------------------------------------------+
             |
@@ -527,6 +533,7 @@ Features
     * bell (peaking)
     * low-shelf
     * high-shelf
+ * subharmonic sine wave for oscillator 1, distortion for oscillator 2
  * portamento
  * wavefolder
  * split keyboard
@@ -836,7 +843,7 @@ contains what's required for compiling JS80P.
 
 #### Linux
 
-To compile JS80P on e.g. Ubuntu Linux 20.04 for all supported platforms, the
+To compile JS80P on e.g. Ubuntu Linux 22.04 for all supported platforms, the
 following packages need to be installed:
 
     apt-get install \
