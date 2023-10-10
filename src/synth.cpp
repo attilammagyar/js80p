@@ -3241,9 +3241,7 @@ Synth::Bus::Bus(
     carriers(carriers),
     modulator_add_volume(modulator_add_volume),
     modulators_buffer(NULL),
-    carriers_buffer(NULL),
-    modulators_on(POLYPHONY),
-    carriers_on(POLYPHONY)
+    carriers_buffer(NULL)
 {
     allocate_buffers();
 }
@@ -3308,21 +3306,18 @@ Sample const* const* Synth::Bus::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    bool is_silent = true;
+    active_modulators_count = 0;
+    active_carriers_count = 0;
 
     for (Integer v = 0; v != polyphony; ++v) {
-        modulators_on[v] = modulators[v]->is_on();
-
-        if (modulators_on[v]) {
-            is_silent = false;
-            SignalProducer::produce<Modulator>(*modulators[v], round, sample_count);
+        if (modulators[v]->is_on()) {
+            active_modulators[active_modulators_count] = modulators[v];
+            ++active_modulators_count;
         }
 
-        carriers_on[v] = carriers[v]->is_on();
-
-        if (carriers_on[v]) {
-            is_silent = false;
-            SignalProducer::produce<Carrier>(*carriers[v], round, sample_count);
+        if (carriers[v]->is_on()) {
+            active_carriers[active_carriers_count] = carriers[v];
+            ++active_carriers_count;
         }
     }
 
@@ -3334,13 +3329,42 @@ Sample const* const* Synth::Bus::initialize_rendering(
     render_silence(round, 0, sample_count, carriers_buffer);
     render_silence(round, 0, sample_count, buffer);
 
-    if (is_silent) {
+    render_voices<Modulator>(active_modulators, active_modulators_count, round, sample_count);
+    render_voices<Carrier>(active_carriers, active_carriers_count, round, sample_count);
+
+    if (active_modulators_count == 0 && active_carriers_count == 0) {
         mark_round_as_silent(round);
 
         return buffer;
     }
 
     return NULL;
+}
+
+
+template<class VoiceClass>
+void Synth::Bus::render_voices(
+        VoiceClass* (&voices)[POLYPHONY],
+        size_t const voices_count,
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    if (voices_count > 0) {
+        /*
+        Rendering oscillators together seems to be more cache-friendly. Cannot group
+        modulators and carriers though, because when there is actual modulation,
+        then rendering carrier oscillators would trigger rendering the whole signal
+        chain of the corresponding modulator.
+        */
+
+        for (size_t v = 0; v != voices_count; ++v) {
+            voices[v]->render_oscillator(round, sample_count);
+        }
+
+        for (size_t v = 0; v != voices_count; ++v) {
+            SignalProducer::produce<VoiceClass>(*voices[v], round, sample_count);
+        }
+    }
 }
 
 
@@ -3365,7 +3389,7 @@ void Synth::Bus::mix_modulators(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index
-) const noexcept {
+) noexcept {
     Sample const* const modulator_add_volume_buffer = (
         this->modulator_add_volume_buffer
     );
@@ -3405,18 +3429,14 @@ void Synth::Bus::mix_modulators(
         Integer const last_sample_index,
         Sample const add_volume_value,
         Sample const* add_volume_buffer
-) const noexcept {
-    for (Integer v = 0; v != polyphony; ++v) {
-        if (!modulators_on[v]) {
-            continue;
-        }
-
+) noexcept {
+    for (size_t v = 0; v != active_modulators_count; ++v) {
         /*
         Rendering was done during Synth::Bus::initialize_rendering(), we're
         just retrieving the cached buffer now.
         */
         Sample const* const* const modulator_output = (
-            SignalProducer::produce<Modulator>(*modulators[v], round)
+            SignalProducer::produce<Modulator>(*active_modulators[v], round)
         );
 
         for (Integer c = 0; c != channels; ++c) {
@@ -3436,18 +3456,14 @@ void Synth::Bus::mix_carriers(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index
-) const noexcept {
-    for (Integer v = 0; v != polyphony; ++v) {
-        if (!carriers_on[v]) {
-            continue;
-        }
-
+) noexcept {
+    for (size_t v = 0; v != active_carriers_count; ++v) {
         /*
         Rendering was done during Synth::Bus::initialize_rendering(), we're
         just retrieving the cached buffer now.
         */
         Sample const* const* const carrier_output = (
-            SignalProducer::produce<Carrier>(*carriers[v], round)
+            SignalProducer::produce<Carrier>(*active_carriers[v], round)
         );
 
         for (Integer c = 0; c != channels; ++c) {

@@ -886,6 +886,15 @@ Midi::Note Voice<ModulatorSignalProducerClass>::get_channel() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::render_oscillator(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    SignalProducer::produce<Oscillator_>(oscillator, round, sample_count);
+}
+
+
+template<class ModulatorSignalProducerClass>
 Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count

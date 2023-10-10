@@ -20,6 +20,7 @@
 #define JS80P__SYNTH_HPP
 
 #include <atomic>
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -963,11 +964,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 void free_buffers() noexcept;
                 void reallocate_buffers() noexcept;
 
+                template<class VoiceClass>
+                void render_voices(
+                    VoiceClass* (&voices)[POLYPHONY],
+                    size_t const voices_count,
+                    Integer const round,
+                    Integer const sample_count
+                ) noexcept;
+
                 void mix_modulators(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index
-                ) const noexcept;
+                ) noexcept;
 
                 template<bool is_additive_volume_constant>
                 void mix_modulators(
@@ -976,23 +985,25 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const last_sample_index,
                     Sample const add_volume_value,
                     Sample const* add_volume_buffer
-                ) const noexcept;
+                ) noexcept;
 
                 void mix_carriers(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index
-                ) const noexcept;
+                ) noexcept;
 
                 Integer const polyphony;
                 Modulator* const* const modulators;
                 Carrier* const* const carriers;
+                Modulator* active_modulators[POLYPHONY];
+                Carrier* active_carriers[POLYPHONY];
+                size_t active_modulators_count;
+                size_t active_carriers_count;
                 FloatParamS& modulator_add_volume;
                 Sample const* modulator_add_volume_buffer;
                 Sample** modulators_buffer;
                 Sample** carriers_buffer;
-                std::vector<bool> modulators_on;
-                std::vector<bool> carriers_on;
         };
 
         class ParamIdHashTable

@@ -231,6 +231,8 @@ class Voice : public SignalProducer
         Midi::Note get_note() const noexcept;
         Midi::Channel get_channel() const noexcept;
 
+        void render_oscillator(Integer const round, Integer const sample_count) noexcept;
+
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
