@@ -139,6 +139,7 @@ class Wavetable
         static Number sines[SIZE];
         static bool is_initialized;
 
+        template<bool with_subharmonic>
         Number wrap_around(Number const index) const noexcept;
 
         template<

@@ -201,7 +201,7 @@ void Wavetable::lookup(
 
     Number const sample_index = state.sample_index;
 
-    state.sample_index = wrap_around(
+    state.sample_index = wrap_around<with_subharmonic>(
         sample_index + state.scale * (Number)frequency
     );
 
@@ -242,9 +242,24 @@ void Wavetable::lookup(
 }
 
 
+template<bool with_subharmonic>
 Number Wavetable::wrap_around(Number const index) const noexcept
 {
-    return index - std::floor(index * SIZE_INV) * SIZE_FLOAT;
+    if constexpr (with_subharmonic) {
+        return index - std::floor(index * SIZE_INV) * SIZE_FLOAT;
+    } else {
+        /*
+        The lookup table for the fundamental contains 2 periods of the wave, and
+        we have another table with the same size holding a single period of the
+        subharmonic. This way we can calculate both waves in a single
+        interpolation step.
+
+        However, here we don't need the subharmonic, so we can restrict our
+        lookup to only the first half of the table for the fundamental, leaving
+        more room in the CPU caches for other data.
+        */
+        return index - std::floor(index * PERIOD_SIZE_INV) * PERIOD_SIZE_FLOAT;
+    }
 }
 
 
