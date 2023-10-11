@@ -1044,7 +1044,7 @@ void test_peak_controller(
         default: break;
     }
 
-    assert_eq(expected_value, controller->get_value(), 0.005);
+    assert_eq(expected_value, controller->get_value(), 0.006);
 }
 
 

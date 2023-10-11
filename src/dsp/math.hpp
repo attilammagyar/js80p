@@ -71,9 +71,6 @@ class Math
             std::max(LN_OF_10 * POW_10_MAX, -1.0 * LN_OF_10 * POW_10_INV_MIN)
         ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
-        static constexpr int SIN_TABLE_SIZE = 0x1000;
-        static constexpr int SIN_TABLE_MASK = SIN_TABLE_SIZE - 1;
-
         static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE = 0x1000;
 
         static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX = (
@@ -219,6 +216,9 @@ class Math
         };
 
     private:
+        static constexpr int SIN_TABLE_SIZE = 0x0800;
+        static constexpr int SIN_TABLE_MASK = SIN_TABLE_SIZE - 1;
+
         static constexpr int RANDOMS = 0x0200;
         static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
         static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
