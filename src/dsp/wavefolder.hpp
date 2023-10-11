@@ -87,25 +87,26 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         static constexpr Sample S8 = TRIANGLE_SCALE / (125.0 * Math::PI);
 
         /*
-        The table contains a whole period of the triangle wave function for the
-        [-2.0, 2.0] interval.
+        The table contains a whole period of the triangle wave function's
+        antiderivative for the [-2.0, 2.0] interval. Folding occurs because the
+        input (which is supposed to go from -1.0 to 1.0) is scaled up by
+        1 + folding_level, so when the periodic-triangle-wave shaping function
+        is applied, the scaled up input spans multiple wave periods.
+
+        The triangle wave is aligned so that it projects the [-1.0, 1.0]
+        interval onto itself. Since the wave is bandlimited, this projection is
+        imperfect, so the first 10% of the folding level parameter is used for
+        smoothly transitioning from the "bypass" state to the "no folding yet
+        but the triangle wave already has some small influence" state.
         */
-        static constexpr int TABLE_SIZE = Math::SIN_TABLE_SIZE;
-        static constexpr int TABLE_MASK = Math::SIN_TABLE_MASK;
+        static constexpr int TABLE_SIZE = 0x1000;
+        static constexpr int TABLE_MASK = TABLE_SIZE - 1;
         static constexpr Number TABLE_SIZE_FLOAT = (Number)TABLE_SIZE;
         static constexpr Number TABLE_SIZE_FLOAT_INV = 1.0 / TABLE_SIZE_FLOAT;
         static constexpr Number WAVE_LENGTH = Math::PI_DOUBLE / S1;
         static constexpr Number WAVE_LENGTH_HALF = WAVE_LENGTH / 2.0;
         static constexpr Number TABLE_SCALE = TABLE_SIZE_FLOAT / WAVE_LENGTH;
         static constexpr Number TABLE_OFFSET = TABLE_SIZE_FLOAT / WAVE_LENGTH_HALF;
-
-        /*
-        The trigonometric functions in the Math class handle positive numbers
-        better, so we shift everything by a few periods.
-        */
-        static constexpr Sample TRIG_OFFSET = (
-            Math::PI_DOUBLE * std::ceil(Constants::FOLD_MAX * S5)
-        );
 
         // static Sample f_table[TABLE_SIZE];
         static Sample F0_table[TABLE_SIZE];
