@@ -121,7 +121,27 @@ html, body {
 }
 
 #osc-2 {
-  margin-top: -2px;
+  margin-top: -4px;
+}
+
+#osc-2 > h1 {
+  margin-bottom: 2px;
+}
+
+#osc-1-tuning, #osc-2-tuning {
+  text-align: center;
+  color: #00ffff;
+  font-size: 13px;
+  background: #000000;
+  border: inset 2px #9090b0;
+  width: 130px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 2px;
+  left: 150px;
+  border-radius: 3px;
 }
 
 h1 {
@@ -301,7 +321,9 @@ h1 {
 
 body.hide-objects .knob select,
 body.hide-objects .knob div,
-body.hide-objects .knob span:nth-child(4) {
+body.hide-objects .knob span:nth-child(4),
+body.hide-objects #osc-1-tuning span,
+body.hide-objects #osc-2-tuning span {
   opacity: 0.0;
 }
 
@@ -538,7 +560,8 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">
-        <h1>Oscillator 1 (modulator)</h1>
+        <h1>Osc 1 (modulator)</h1>
+        <div id="osc-1-tuning"><span>440 12TET-INAC</span></div>
         <div id="osc-1-main" class="osc-main block"></div>
         <div id="osc-1-filter-1" class="block osc-filter">
           <h1>
@@ -557,7 +580,8 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-2" class="osc main-block block">
-        <h1>Oscillator 2 (carrier)</h1>
+        <h1>Osc 2 (carrier)</h1>
+        <div id="osc-2-tuning"><span>MTS-ESP (ERR)</span></div>
         <div id="osc-2-main" class="osc-main block"></div>
         <div id="osc-2-filter-1" class="block">
           <h1>
