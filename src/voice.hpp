@@ -68,6 +68,14 @@ class Voice : public SignalProducer
 
         typedef VolumeApplier ModulationOut;
 
+        typedef Byte Tuning;
+
+        class TuningParam : public Param<Tuning, ParamEvaluation::BLOCK>
+        {
+            public:
+                TuningParam(std::string const name) noexcept;
+        };
+
         class Dummy
         {
             public:
@@ -85,6 +93,8 @@ class Voice : public SignalProducer
         {
             public:
                 Params(std::string const name) noexcept;
+
+                TuningParam tuning;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;
@@ -160,6 +170,17 @@ class Voice : public SignalProducer
         };
 
         static constexpr Integer CHANNELS = 2;
+
+        static constexpr Tuning TUNING_440HZ_12TET = 0;
+        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY = 1;
+        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY = 2;
+        static constexpr Tuning TUNING_432HZ_12TET = 3;
+        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY = 4;
+        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY = 5;
+        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 6;
+        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 7;
+
+        static constexpr int TUNINGS = 8;
 
         Voice(
             Frequency const* frequencies,

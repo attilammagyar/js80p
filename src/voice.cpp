@@ -28,6 +28,17 @@ namespace JS80P
 {
 
 template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
+        std::string const name
+) noexcept
+    : Param<Tuning, ParamEvaluation::BLOCK>(
+        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_REALTIME, TUNING_440HZ_12TET
+    )
+{
+}
+
+
+template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Dummy::Dummy()
 {
 }
@@ -45,7 +56,8 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
-    : waveform(name + "WAV"),
+    : tuning(name + "TUN"),
+    waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
     folding(

@@ -559,7 +559,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ERTYP = 389,     ///< Effects Reverb Type
             ECTYP = 390,     ///< Effects Chorus Type
 
-            MAX_PARAM_ID = 391
+            MTUN = 391,      ///< Modulator Tuning
+            CTUN = 392,      ///< Carrier Tuning
+
+            MAX_PARAM_ID = 393
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;

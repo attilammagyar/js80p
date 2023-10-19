@@ -291,9 +291,8 @@ void Synth::register_main_params() noexcept
 
 void Synth::register_modulator_params() noexcept
 {
-    register_param_as_child<Modulator::Oscillator_::WaveformParam>(
-        ParamId::MWAV, modulator_params.waveform
-    );
+    register_param_as_child<Modulator::TuningParam>(ParamId::MTUN, modulator_params.tuning);
+    register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::MFLD, modulator_params.folding);
@@ -337,9 +336,8 @@ void Synth::register_modulator_params() noexcept
 
 void Synth::register_carrier_params() noexcept
 {
-    register_param_as_child<Carrier::Oscillator_::WaveformParam>(
-        ParamId::CWAV, carrier_params.waveform
-    );
+    register_param_as_child<Carrier::TuningParam>(ParamId::CTUN, carrier_params.tuning);
+    register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::CFLD, carrier_params.folding);
@@ -1440,6 +1438,8 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::POLY: return polyphonic.get_default_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_default_ratio();
         case ParamId::ECTYP: return effects.chorus.type.get_default_ratio();
+        case ParamId::MTUN: return modulator_params.tuning.get_default_ratio();
+        case ParamId::CTUN: return carrier_params.tuning.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1658,6 +1658,8 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::POLY: return polyphonic.get_max_value();
         case ParamId::ERTYP: return effects.reverb.type.get_max_value();
         case ParamId::ECTYP: return effects.chorus.type.get_max_value();
+        case ParamId::MTUN: return modulator_params.tuning.get_max_value();
+        case ParamId::CTUN: return carrier_params.tuning.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1884,6 +1886,8 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::POLY: return polyphonic.ratio_to_value(ratio);
         case ParamId::ERTYP: return effects.reverb.type.ratio_to_value(ratio);
         case ParamId::ECTYP: return effects.chorus.type.ratio_to_value(ratio);
+        case ParamId::MTUN: return modulator_params.tuning.ratio_to_value(ratio);
+        case ParamId::CTUN: return carrier_params.tuning.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2396,6 +2400,8 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::POLY: polyphonic.set_ratio(ratio); break;
             case ParamId::ERTYP: effects.reverb.type.set_ratio(ratio); break;
             case ParamId::ECTYP: effects.chorus.type.set_ratio(ratio); break;
+            case ParamId::MTUN: modulator_params.tuning.set_ratio(ratio); break;
+            case ParamId::CTUN: carrier_params.tuning.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -3086,6 +3092,8 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::POLY: return polyphonic.get_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_ratio();
         case ParamId::ECTYP: return effects.chorus.type.get_ratio();
+        case ParamId::MTUN: return modulator_params.tuning.get_ratio();
+        case ParamId::CTUN: return carrier_params.tuning.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
