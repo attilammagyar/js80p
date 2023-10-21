@@ -109,9 +109,6 @@ class ExportPatchButton : public TransparentWidget
 };
 
 
-class ParamEditor;
-
-
 class TabBody : public TransparentWidget
 {
     public:
