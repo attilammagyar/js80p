@@ -127,8 +127,7 @@ class TabBody : public TransparentWidget
         void stop_editing();
 
         void refresh_controlled_param_editors();
-        void refresh_param_editors();
-        void refresh_toggle_switches();
+        void refresh_all_params();
 
     private:
         GUI::ParamEditors param_editors;

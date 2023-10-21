@@ -90,8 +90,7 @@ void ImportPatchButton::import_patch(char const* buffer, Integer const size) con
     Serializer::import_patch_in_gui_thread(synth, patch);
 
     synth_gui_body->stop_editing();
-    synth_gui_body->refresh_param_editors();
-    synth_gui_body->refresh_toggle_switches();
+    synth_gui_body->refresh_all_params();
 }
 
 
@@ -191,16 +190,12 @@ void TabBody::refresh_controlled_param_editors()
 }
 
 
-void TabBody::refresh_param_editors()
+void TabBody::refresh_all_params()
 {
     for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
         (*it)->refresh();
     }
-}
 
-
-void TabBody::refresh_toggle_switches()
-{
     for (GUI::ToggleSwitches::iterator it = toggle_switches.begin(); it != toggle_switches.end(); ++it) {
         (*it)->refresh();
     }
@@ -257,8 +252,7 @@ void Background::refresh()
 
     if (next_full_refresh == 0) {
         next_full_refresh = FULL_REFRESH_TICKS;
-        body->refresh_param_editors();
-        body->refresh_toggle_switches();
+        body->refresh_all_params();
     } else {
         body->refresh_controlled_param_editors();
     }
