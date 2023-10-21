@@ -150,13 +150,13 @@ TabBody::TabBody(char const* const text)
 }
 
 
-ParamEditor* TabBody::own(ParamEditor* param_editor)
+KnobParamEditor* TabBody::own(KnobParamEditor* knob_param_editor)
 {
-    Widget::own(param_editor);
+    Widget::own(knob_param_editor);
 
-    param_editors.push_back(param_editor);
+    knob_param_editors.push_back(knob_param_editor);
 
-    return param_editor;
+    return knob_param_editor;
 }
 
 
@@ -172,16 +172,16 @@ ToggleSwitch* TabBody::own(ToggleSwitch* toggle_switch)
 
 void TabBody::stop_editing()
 {
-    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+    for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
         (*it)->stop_editing();
     }
 }
 
 
-void TabBody::refresh_controlled_param_editors()
+void TabBody::refresh_controlled_knob_param_editors()
 {
-    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
-        ParamEditor* editor = *it;
+    for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
+        KnobParamEditor* editor = *it;
 
         if (editor->has_controller()) {
             editor->refresh();
@@ -192,7 +192,7 @@ void TabBody::refresh_controlled_param_editors()
 
 void TabBody::refresh_all_params()
 {
-    for (GUI::ParamEditors::iterator it = param_editors.begin(); it != param_editors.end(); ++it) {
+    for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
         (*it)->refresh();
     }
 
@@ -254,7 +254,7 @@ void Background::refresh()
         next_full_refresh = FULL_REFRESH_TICKS;
         body->refresh_all_params();
     } else {
-        body->refresh_controlled_param_editors();
+        body->refresh_controlled_knob_param_editors();
     }
 }
 
@@ -288,7 +288,7 @@ ControllerSelector::ControllerSelector(
 ) : Widget("Select controller", LEFT, TOP, WIDTH, HEIGHT, Type::CONTROLLER_SELECTOR),
     background(background),
     synth(synth),
-    param_editor(NULL),
+    knob_param_editor(NULL),
     param_id(Synth::ParamId::MAX_PARAM_ID),
     selected_controller_id(Synth::ControllerId::MAX_CONTROLLER_ID)
 {
@@ -341,7 +341,7 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 void ControllerSelector::select_controller(
         Synth::ParamId const param_id,
         int const controller_choices,
-        ParamEditor* param_editor
+        KnobParamEditor* knob_param_editor
 ) {
     Synth::ControllerId const selected_controller_id = (
         synth.get_param_controller_id_atomic(param_id)
@@ -367,7 +367,7 @@ void ControllerSelector::select_controller(
     );
 
     this->param_id = param_id;
-    this->param_editor = param_editor;
+    this->knob_param_editor = knob_param_editor;
     this->selected_controller_id = selected_controller_id;
 
     controllers[controller->index]->select();
@@ -402,11 +402,11 @@ void ControllerSelector::handle_selection_change(
 ) {
     hide();
 
-    if (param_editor == NULL || param_id >= Synth::Synth::ParamId::MAX_PARAM_ID) {
+    if (knob_param_editor == NULL || param_id >= Synth::Synth::ParamId::MAX_PARAM_ID) {
         return;
     }
 
-    param_editor->handle_controller_change(new_controller_id);
+    knob_param_editor->handle_controller_change(new_controller_id);
 }
 
 
@@ -543,7 +543,7 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 }
 
 
-ParamEditorKnobStates::ParamEditorKnobStates(
+KnobStates::KnobStates(
         WidgetBase* widget,
         GUI::Image free_image,
         GUI::Image controlled_image,
@@ -554,19 +554,19 @@ ParamEditorKnobStates::ParamEditorKnobStates(
     none_image(none_image)
 {
     for (int i = 0; i != COUNT; ++i) {
-        int const top = i * ParamEditor::KNOB_HEIGHT;
+        int const top = i * KnobParamEditor::KNOB_HEIGHT;
 
         free_images[i] = widget->copy_image_region(
-            free_image, 0, top, ParamEditor::KNOB_WIDTH, ParamEditor::KNOB_HEIGHT
+            free_image, 0, top, KnobParamEditor::KNOB_WIDTH, KnobParamEditor::KNOB_HEIGHT
         );
         controlled_images[i] = widget->copy_image_region(
-            controlled_image, 0, top, ParamEditor::KNOB_WIDTH, ParamEditor::KNOB_HEIGHT
+            controlled_image, 0, top, KnobParamEditor::KNOB_WIDTH, KnobParamEditor::KNOB_HEIGHT
         );
     }
 }
 
 
-ParamEditorKnobStates::~ParamEditorKnobStates()
+KnobStates::~KnobStates()
 {
     widget->delete_image(free_image);
     widget->delete_image(controlled_image);
@@ -586,7 +586,7 @@ ParamEditorKnobStates::~ParamEditorKnobStates()
 }
 
 
-ParamEditor::ParamEditor(
+KnobParamEditor::KnobParamEditor(
         GUI& gui,
         char const* const text,
         int const left,
@@ -597,7 +597,7 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* format,
         double const scale,
-        ParamEditorKnobStates* knob_states
+        KnobStates* knob_states
 ) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(format),
@@ -617,7 +617,7 @@ ParamEditor::ParamEditor(
 }
 
 
-ParamEditor::ParamEditor(
+KnobParamEditor::KnobParamEditor(
         GUI& gui,
         char const* const text,
         int const left,
@@ -628,7 +628,7 @@ ParamEditor::ParamEditor(
         int const controller_choices,
         char const* const* const options,
         int const number_of_options,
-        ParamEditorKnobStates* knob_states
+        KnobStates* knob_states
 ) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
     param_id(param_id),
     format(NULL),
@@ -649,7 +649,7 @@ ParamEditor::ParamEditor(
 }
 
 
-void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+void KnobParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     TransparentWidget::set_up(platform_data, parent);
 
@@ -657,7 +657,7 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
         *this,
         *gui,
         text,
-        (WIDTH - ParamEditor::KNOB_WIDTH) / 2,
+        (WIDTH - KnobParamEditor::KNOB_WIDTH) / 2,
         16,
         number_of_options > 1 ? (Number)(number_of_options - 1) : 0.0,
         knob_states
@@ -671,13 +671,13 @@ void ParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 }
 
 
-bool ParamEditor::has_controller() const
+bool KnobParamEditor::has_controller() const
 {
     return has_controller_;
 }
 
 
-void ParamEditor::refresh()
+void KnobParamEditor::refresh()
 {
     if (knob->is_editing()) {
         return;
@@ -700,7 +700,7 @@ void ParamEditor::refresh()
 }
 
 
-void ParamEditor::update_editor(
+void KnobParamEditor::update_editor(
         Number const new_ratio,
         Synth::ControllerId const new_controller_id
 ) {
@@ -709,21 +709,21 @@ void ParamEditor::update_editor(
 }
 
 
-void ParamEditor::update_editor(Number const new_ratio)
+void KnobParamEditor::update_editor(Number const new_ratio)
 {
     ratio = GUI::clamp_ratio(new_ratio);
     update_editor();
 }
 
 
-void ParamEditor::update_editor(Synth::ControllerId const new_controller_id)
+void KnobParamEditor::update_editor(Synth::ControllerId const new_controller_id)
 {
     controller_id = new_controller_id;
     update_editor();
 }
 
 
-void ParamEditor::update_editor()
+void KnobParamEditor::update_editor()
 {
     has_controller_ = controller_id > Synth::ControllerId::NONE;
 
@@ -741,7 +741,7 @@ void ParamEditor::update_editor()
 }
 
 
-void ParamEditor::adjust_ratio(Number const delta)
+void KnobParamEditor::adjust_ratio(Number const delta)
 {
     if (param_id < Synth::FLOAT_PARAMS) {
         handle_ratio_change(ratio + delta);
@@ -754,7 +754,7 @@ void ParamEditor::adjust_ratio(Number const delta)
 }
 
 
-void ParamEditor::handle_ratio_change(Number const new_ratio)
+void KnobParamEditor::handle_ratio_change(Number const new_ratio)
 {
     Number const ratio = GUI::clamp_ratio(new_ratio);
 
@@ -765,7 +765,7 @@ void ParamEditor::handle_ratio_change(Number const new_ratio)
 }
 
 
-void ParamEditor::handle_controller_change(Synth::ControllerId const new_controller_id)
+void KnobParamEditor::handle_controller_change(Synth::ControllerId const new_controller_id)
 {
     synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
@@ -778,7 +778,7 @@ void ParamEditor::handle_controller_change(Synth::ControllerId const new_control
 }
 
 
-void ParamEditor::update_value_str()
+void KnobParamEditor::update_value_str()
 {
     GUI::param_ratio_to_str(
         synth,
@@ -794,7 +794,7 @@ void ParamEditor::update_value_str()
 }
 
 
-void ParamEditor::update_controller_str()
+void KnobParamEditor::update_controller_str()
 {
     constexpr size_t last_index = TEXT_MAX_LENGTH - 1;
 
@@ -805,19 +805,19 @@ void ParamEditor::update_controller_str()
 }
 
 
-void ParamEditor::reset_default()
+void KnobParamEditor::reset_default()
 {
     handle_ratio_change(synth.get_param_default_ratio(param_id));
 }
 
 
-void ParamEditor::stop_editing()
+void KnobParamEditor::stop_editing()
 {
     knob->stop_editing();
 }
 
 
-bool ParamEditor::paint()
+bool KnobParamEditor::paint()
 {
     TransparentWidget::paint();
 
@@ -852,7 +852,7 @@ bool ParamEditor::paint()
 }
 
 
-bool ParamEditor::mouse_up(int const x, int const y)
+bool KnobParamEditor::mouse_up(int const x, int const y)
 {
     TransparentWidget::mouse_up(x, y);
 
@@ -864,7 +864,7 @@ bool ParamEditor::mouse_up(int const x, int const y)
 }
 
 
-bool ParamEditor::mouse_move(int const x, int const y, bool const modifier)
+bool KnobParamEditor::mouse_move(int const x, int const y, bool const modifier)
 {
     TransparentWidget::mouse_move(x, y, modifier);
     gui->set_status_line(text);
@@ -873,7 +873,7 @@ bool ParamEditor::mouse_move(int const x, int const y, bool const modifier)
 }
 
 
-bool ParamEditor::mouse_leave(int const x, int const y)
+bool KnobParamEditor::mouse_leave(int const x, int const y)
 {
     TransparentWidget::mouse_leave(x, y);
     gui->set_status_line("");
@@ -882,14 +882,14 @@ bool ParamEditor::mouse_leave(int const x, int const y)
 }
 
 
-ParamEditor::Knob::Knob(
-        ParamEditor& editor,
+KnobParamEditor::Knob::Knob(
+        KnobParamEditor& editor,
         GUI& gui,
         char const* const text,
         int const left,
         int const top,
         Number const steps,
-        ParamEditorKnobStates* knob_states
+        KnobStates* knob_states
 ) : Widget(text, left, top, WIDTH, HEIGHT, Type::KNOB),
     steps(steps),
     editor(editor),
@@ -905,12 +905,12 @@ ParamEditor::Knob::Knob(
 }
 
 
-ParamEditor::Knob::~Knob()
+KnobParamEditor::Knob::~Knob()
 {
 }
 
 
-void ParamEditor::Knob::set_up(
+void KnobParamEditor::Knob::set_up(
         GUI::PlatformData platform_data,
         WidgetBase* parent
 ) {
@@ -920,7 +920,7 @@ void ParamEditor::Knob::set_up(
 }
 
 
-void ParamEditor::Knob::update(Number const ratio)
+void KnobParamEditor::Knob::update(Number const ratio)
 {
     this->ratio = (
         steps > 0.0 ? std::round(ratio * steps) / steps : ratio
@@ -930,7 +930,7 @@ void ParamEditor::Knob::update(Number const ratio)
 }
 
 
-void ParamEditor::Knob::update()
+void KnobParamEditor::Knob::update()
 {
     if (is_controller_polyphonic) {
         set_image(knob_states->none_image);
@@ -948,7 +948,7 @@ void ParamEditor::Knob::update()
 }
 
 
-void ParamEditor::Knob::make_free()
+void KnobParamEditor::Knob::make_free()
 {
     is_controlled = false;
     is_controller_polyphonic = false;
@@ -956,7 +956,7 @@ void ParamEditor::Knob::make_free()
 }
 
 
-void ParamEditor::Knob::make_controlled(Synth::ControllerId const controller_id)
+void KnobParamEditor::Knob::make_controlled(Synth::ControllerId const controller_id)
 {
     is_controlled = true;
     is_controller_polyphonic = Synth::is_controller_polyphonic(controller_id);
@@ -964,25 +964,25 @@ void ParamEditor::Knob::make_controlled(Synth::ControllerId const controller_id)
 }
 
 
-bool ParamEditor::Knob::is_editing() const
+bool KnobParamEditor::Knob::is_editing() const
 {
     return is_editing_ && !is_controlled;
 }
 
 
-void ParamEditor::Knob::start_editing()
+void KnobParamEditor::Knob::start_editing()
 {
     is_editing_ = true;
 }
 
 
-void ParamEditor::Knob::stop_editing()
+void KnobParamEditor::Knob::stop_editing()
 {
     is_editing_ = false;
 }
 
 
-bool ParamEditor::Knob::double_click()
+bool KnobParamEditor::Knob::double_click()
 {
     Widget::double_click();
 
@@ -998,7 +998,7 @@ bool ParamEditor::Knob::double_click()
 }
 
 
-bool ParamEditor::Knob::mouse_down(int const x, int const y)
+bool KnobParamEditor::Knob::mouse_down(int const x, int const y)
 {
     Widget::mouse_down(x, y);
 
@@ -1014,7 +1014,7 @@ bool ParamEditor::Knob::mouse_down(int const x, int const y)
 }
 
 
-bool ParamEditor::Knob::mouse_up(int const x, int const y)
+bool KnobParamEditor::Knob::mouse_up(int const x, int const y)
 {
     Widget::mouse_up(x, y);
 
@@ -1028,7 +1028,7 @@ bool ParamEditor::Knob::mouse_up(int const x, int const y)
 }
 
 
-bool ParamEditor::Knob::mouse_move(
+bool KnobParamEditor::Knob::mouse_move(
         int const x,
         int const y,
         bool const modifier
@@ -1075,7 +1075,7 @@ bool ParamEditor::Knob::mouse_move(
 }
 
 
-bool ParamEditor::Knob::mouse_leave(int const x, int const y)
+bool KnobParamEditor::Knob::mouse_leave(int const x, int const y)
 {
     Widget::mouse_leave(x, y);
     stop_editing();
@@ -1085,7 +1085,7 @@ bool ParamEditor::Knob::mouse_leave(int const x, int const y)
 }
 
 
-bool ParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
+bool KnobParamEditor::Knob::mouse_wheel(Number const delta, bool const modifier)
 {
     Widget::mouse_wheel(delta, modifier);
 

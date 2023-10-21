@@ -34,8 +34,8 @@ class ControllerSelector;
 class ExportPatchButton;
 class ExternallyCreatedWindow;
 class ImportPatchButton;
-class ParamEditorKnobStates;
-class ParamEditor;
+class KnobStates;
+class KnobParamEditor;
 class StatusLine;
 class TabBody;
 class TabSelector;
@@ -53,7 +53,7 @@ class GUI
 
         typedef std::vector<WidgetBase*> Widgets;
 
-        typedef std::vector<ParamEditor*> ParamEditors;
+        typedef std::vector<KnobParamEditor*> KnobParamEditors;
         typedef std::vector<ToggleSwitch*> ToggleSwitches;
 
         typedef unsigned int Color;
@@ -213,12 +213,12 @@ class GUI
         void destroy();
 
         void build_about_body(char const* sdk_version);
-        void build_controllers_1_body(ParamEditorKnobStates* knob_states);
-        void build_controllers_2_body(ParamEditorKnobStates* knob_states);
-        void build_effects_body(ParamEditorKnobStates* knob_states);
-        void build_envelopes_body(ParamEditorKnobStates* knob_states);
-        void build_lfos_body(ParamEditorKnobStates* knob_states);
-        void build_synth_body(ParamEditorKnobStates* knob_states);
+        void build_controllers_1_body(KnobStates* knob_states);
+        void build_controllers_2_body(KnobStates* knob_states);
+        void build_effects_body(KnobStates* knob_states);
+        void build_envelopes_body(KnobStates* knob_states);
+        void build_lfos_body(KnobStates* knob_states);
+        void build_synth_body(KnobStates* knob_states);
 
         bool const show_vst_logo;
 
@@ -233,7 +233,7 @@ class GUI
         Image synth_image;
         Image vst_logo_image;
 
-        ParamEditorKnobStates* knob_states;
+        KnobStates* knob_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;

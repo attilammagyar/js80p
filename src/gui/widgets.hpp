@@ -121,16 +121,16 @@ class TabBody : public TransparentWidget
 
         using TransparentWidget::own;
 
-        ParamEditor* own(ParamEditor* param_editor);
-        ToggleSwitch* own(ToggleSwitch* param_editor);
+        KnobParamEditor* own(KnobParamEditor* knob_param_editor);
+        ToggleSwitch* own(ToggleSwitch* toggle_switch);
 
         void stop_editing();
 
-        void refresh_controlled_param_editors();
+        void refresh_controlled_knob_param_editors();
         void refresh_all_params();
 
     private:
-        GUI::ParamEditors param_editors;
+        GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitches toggle_switches;
 };
 
@@ -195,7 +195,7 @@ class ControllerSelector : public Widget
         void select_controller(
             Synth::ParamId const param_id,
             int const controller_choices,
-            ParamEditor* param_editor
+            KnobParamEditor* knob_param_editor
         );
 
         virtual void hide() override;
@@ -250,26 +250,26 @@ class ControllerSelector : public Widget
         char title[TITLE_SIZE];
         Background& background;
         Synth& synth;
-        ParamEditor* param_editor;
+        KnobParamEditor* knob_param_editor;
         Controller* controllers[GUI::CONTROLLERS_COUNT];
         Synth::ParamId param_id;
         Synth::ControllerId selected_controller_id;
 };
 
 
-class ParamEditorKnobStates
+class KnobStates
 {
     public:
         static constexpr int COUNT = 128;
 
-        ParamEditorKnobStates(
+        KnobStates(
             WidgetBase* widget,
             GUI::Image free_image,
             GUI::Image controlled_image,
             GUI::Image none_image
         );
 
-        ~ParamEditorKnobStates();
+        ~KnobStates();
 
         WidgetBase* widget;
 
@@ -282,7 +282,7 @@ class ParamEditorKnobStates
 };
 
 
-class ParamEditor : public TransparentWidget
+class KnobParamEditor : public TransparentWidget
 {
     public:
         static constexpr int WIDTH = 58;
@@ -290,7 +290,7 @@ class ParamEditor : public TransparentWidget
         static constexpr int KNOB_WIDTH = 48;
         static constexpr int KNOB_HEIGHT = 48;
 
-        ParamEditor(
+        KnobParamEditor(
             GUI& gui,
             char const* const text,
             int const left,
@@ -301,10 +301,10 @@ class ParamEditor : public TransparentWidget
             int const controller_choices,
             char const* format,
             double const scale,
-            ParamEditorKnobStates* knob_states
+            KnobStates* knob_states
         );
 
-        ParamEditor(
+        KnobParamEditor(
             GUI& gui,
             char const* const text,
             int const left,
@@ -315,7 +315,7 @@ class ParamEditor : public TransparentWidget
             int const controller_choices,
             char const* const* const options,
             int const number_of_options,
-            ParamEditorKnobStates* knob_states
+            KnobStates* knob_states
         );
 
         bool has_controller() const;
@@ -352,7 +352,7 @@ class ParamEditor : public TransparentWidget
 
     private:
         static constexpr Number KNOB_STATES_LAST_INDEX = (
-            (Number)(ParamEditorKnobStates::COUNT - 1)
+            (Number)(KnobStates::COUNT - 1)
         );
         static constexpr int TEXT_MAX_LENGTH = 16;
 
@@ -376,13 +376,13 @@ class ParamEditor : public TransparentWidget
                 );
 
                 Knob(
-                    ParamEditor& editor,
+                    KnobParamEditor& editor,
                     GUI& gui,
                     char const* const text,
                     int const left,
                     int const top,
                     Number const steps,
-                    ParamEditorKnobStates* knob_states
+                    KnobStates* knob_states
                 );
                 virtual ~Knob();
 
@@ -411,8 +411,8 @@ class ParamEditor : public TransparentWidget
             private:
                 Number const steps;
 
-                ParamEditor& editor;
-                ParamEditorKnobStates* knob_states;
+                KnobParamEditor& editor;
+                KnobStates* knob_states;
                 GUI::Image knob_state;
                 Number prev_x;
                 Number prev_y;
@@ -435,7 +435,7 @@ class ParamEditor : public TransparentWidget
         int const controller_choices;
 
         ControllerSelector& controller_selector;
-        ParamEditorKnobStates* knob_states;
+        KnobStates* knob_states;
         Synth& synth;
         Number ratio;
         Knob* knob;
