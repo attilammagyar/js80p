@@ -319,11 +319,6 @@ class ParamEditor : public TransparentWidget
             ParamEditorKnobStates* knob_states
         );
 
-        virtual void set_up(
-            GUI::PlatformData platform_data,
-            WidgetBase* parent
-        ) override;
-
         bool has_controller() const;
 
         void adjust_ratio(Number const ratio);
@@ -346,6 +341,11 @@ class ParamEditor : public TransparentWidget
         Synth::ParamId const param_id;
 
     protected:
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
+
         virtual bool paint() override;
         virtual bool mouse_up(int const x, int const y) override;
         virtual bool mouse_move(int const x, int const y, bool const modifier) override;
@@ -387,11 +387,6 @@ class ParamEditor : public TransparentWidget
                 );
                 virtual ~Knob();
 
-                virtual void set_up(
-                    GUI::PlatformData platform_data,
-                    WidgetBase* parent
-                ) override;
-
                 void update(Number const ratio);
                 void update();
                 void make_free();
@@ -402,6 +397,11 @@ class ParamEditor : public TransparentWidget
                 void stop_editing();
 
             protected:
+                virtual void set_up(
+                    GUI::PlatformData platform_data,
+                    WidgetBase* parent
+                ) override;
+
                 virtual bool double_click() override;
                 virtual bool mouse_down(int const x, int const y) override;
                 virtual bool mouse_up(int const x, int const y) override;
@@ -541,16 +541,16 @@ class ToggleSwitch : public TransparentWidget
             Synth::ParamId const param_id
         );
 
-        virtual void set_up(
-            GUI::PlatformData platform_data,
-            WidgetBase* parent
-        ) override;
-
         void refresh();
 
         Synth::ParamId const param_id;
 
     protected:
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
+
         virtual bool paint() override;
         virtual bool mouse_up(int const x, int const y) override;
         virtual bool mouse_move(int const x, int const y, bool const modifier) override;
