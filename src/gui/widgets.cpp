@@ -772,9 +772,7 @@ void KnobParamEditor::handle_ratio_change(Number const new_ratio)
 {
     Number const ratio = GUI::clamp_ratio(new_ratio);
 
-    synth.push_message(
-        Synth::MessageType::SET_PARAM, param_id, ratio, 0
-    );
+    synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
     update_editor(ratio);
 }
 
@@ -1305,9 +1303,7 @@ bool ToggleSwitch::paint()
 bool ToggleSwitch::mouse_up(int const x, int const y)
 {
     ratio = ratio < 0.5 ? 1.0 : 0.0;
-    synth.push_message(
-        Synth::MessageType::SET_PARAM, param_id, ratio, 0
-    );
+    synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
     redraw();
 
     return true;
