@@ -172,15 +172,19 @@ class Voice : public SignalProducer
         static constexpr Integer CHANNELS = 2;
 
         static constexpr Tuning TUNING_440HZ_12TET = 0;
-        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY = 1;
-        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY = 2;
-        static constexpr Tuning TUNING_432HZ_12TET = 3;
-        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY = 4;
-        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY = 5;
-        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 6;
-        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 7;
+        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_1 = 1;
+        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_2 = 2;
+        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_1 = 3;
+        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_2 = 4;
+        static constexpr Tuning TUNING_432HZ_12TET = 5;
+        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_1 = 6;
+        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_2 = 7;
+        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_1 = 8;
+        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_2 = 9;
+        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 10;
+        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 11;
 
-        static constexpr int TUNINGS = 8;
+        static constexpr int TUNINGS = 12;
 
         Voice(
             Frequency const* frequencies,
