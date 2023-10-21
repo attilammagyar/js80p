@@ -50,6 +50,20 @@ char const* const GUI::MODES[] = {
 int const GUI::MODES_COUNT = Synth::MODES;
 
 
+char const* const GUI::TUNINGS[] = {
+    [Modulator::TUNING_440HZ_12TET] = "440 12TET",
+    [Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY] = "440 12TET ina",
+    [Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY] = "440 12TET INA",
+    [Modulator::TUNING_432HZ_12TET] = "432 12TET",
+    [Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY] = "432 12TET ina",
+    [Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY] = "432 12TET INA",
+    [Modulator::TUNING_MTS_ESP_NOTE_ON] = "MTS-ESP NO",
+    [Modulator::TUNING_MTS_ESP_REALTIME] = "MTS-ESP RT",
+};
+
+int const GUI::TUNINGS_COUNT = Modulator::TUNINGS;
+
+
 char const* const GUI::WAVEFORMS[] = {
     [SimpleOscillator::SINE] = "Sine",
     [SimpleOscillator::SAWTOOTH] = "Saw",
@@ -589,6 +603,9 @@ char const* const GUI::PARAMS[] = {
 
     [Synth::ParamId::ERTYP] = "Reverb Type",
     [Synth::ParamId::ECTYP] = "Chorus Type",
+
+    [Synth::ParamId::MTUN] = "Modulator Tuning",
+    [Synth::ParamId::CTUN] = "Carrier Tuning",
 };
 
 
@@ -1123,7 +1140,8 @@ GUI::GUI(
     synth_body(NULL),
     status_line(NULL),
     synth(synth),
-    platform_data(platform_data)
+    platform_data(platform_data),
+    is_mts_esp_connected_(false)
 {
     initialize();
 
@@ -1749,6 +1767,9 @@ void GUI::build_synth_body(KnobStates* knob_states)
     ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
+    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 232,   8, synth, Synth::ParamId::MTUN));
+    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 232, 288, synth, Synth::ParamId::CTUN));
+
     TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
 
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 0, Synth::ParamId::MODE,   MM___,      md, mdc, knob_states);
@@ -1865,6 +1886,24 @@ void GUI::show()
 void GUI::set_status_line(char const* text)
 {
     status_line->set_text(text);
+}
+
+
+void GUI::mts_esp_connected()
+{
+    is_mts_esp_connected_ = true;
+}
+
+
+void GUI::mts_esp_disconnected()
+{
+    is_mts_esp_connected_ = false;
+}
+
+
+bool GUI::is_mts_esp_connected() const
+{
+    return is_mts_esp_connected_;
 }
 
 

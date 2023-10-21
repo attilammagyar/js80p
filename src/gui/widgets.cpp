@@ -170,6 +170,16 @@ ToggleSwitch* TabBody::own(ToggleSwitch* toggle_switch)
 }
 
 
+TuningSelector* TabBody::own(TuningSelector* tuning_selector)
+{
+    Widget::own(tuning_selector);
+
+    tuning_selectors.push_back(tuning_selector);
+
+    return tuning_selector;
+}
+
+
 void TabBody::stop_editing()
 {
     for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
@@ -197,6 +207,10 @@ void TabBody::refresh_all_params()
     }
 
     for (GUI::ToggleSwitches::iterator it = toggle_switches.begin(); it != toggle_switches.end(); ++it) {
+        (*it)->refresh();
+    }
+
+    for (GUI::TuningSelectors::iterator it = tuning_selectors.begin(); it != tuning_selectors.end(); ++it) {
         (*it)->refresh();
     }
 }
@@ -1337,6 +1351,153 @@ void ToggleSwitch::start_editing()
 void ToggleSwitch::stop_editing()
 {
     is_editing_ = false;
+}
+
+
+TuningSelector::TuningSelector(
+        GUI& gui,
+        char const* const text,
+        int const left,
+        int const top,
+        Synth& synth,
+        Synth::ParamId const param_id
+) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::TUNING_SELECTOR),
+    param_id(param_id),
+    synth(synth),
+    ratio(0.0),
+    is_editing_(false)
+{
+    set_gui(gui);
+    update_value_str();
+}
+
+
+void TuningSelector::refresh()
+{
+    if (is_editing()) {
+        return;
+    }
+
+    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
+
+    if (new_ratio != ratio) {
+        ratio = GUI::clamp_ratio(new_ratio);
+        update_value_str();
+        redraw();
+    } else {
+        synth.push_message(
+            Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
+        );
+    }
+}
+
+
+void TuningSelector::update_value_str()
+{
+    Byte const tuning = synth.int_param_ratio_to_display_value(param_id, ratio);
+
+    if (tuning < Modulator::TUNING_MTS_ESP_NOTE_ON) {
+        GUI::param_ratio_to_str(
+            synth,
+            param_id,
+            ratio,
+            1.0,
+            NULL,
+            GUI::TUNINGS,
+            GUI::TUNINGS_COUNT,
+            value_str,
+            TEXT_MAX_LENGTH
+        );
+
+        return;
+    }
+
+    snprintf(
+        value_str,
+        TEXT_MAX_LENGTH,
+        "%s %s",
+        tuning < GUI::TUNINGS_COUNT ? GUI::TUNINGS[tuning] : "???",
+        gui->is_mts_esp_connected() ? "(OK)" : "(ERR)"
+    );
+}
+
+
+bool TuningSelector::is_editing() const
+{
+    return is_editing_;
+}
+
+
+void TuningSelector::start_editing()
+{
+    is_editing_ = true;
+}
+
+
+void TuningSelector::stop_editing()
+{
+    is_editing_ = false;
+}
+
+
+void TuningSelector::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+{
+    TransparentWidget::set_up(platform_data, parent);
+}
+
+
+bool TuningSelector::paint()
+{
+    TransparentWidget::paint();
+
+    draw_text(
+        value_str, 10, 0, 0, WIDTH, HEIGHT, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+    );
+
+    return true;
+}
+
+
+bool TuningSelector::mouse_up(int const x, int const y)
+{
+    TransparentWidget::mouse_up(x, y);
+
+    if (ratio > 0.99999) {
+        ratio = 0.0;
+    } else {
+        Number const delta = 1.001 / synth.get_param_max_value(param_id);
+
+        ratio = GUI::clamp_ratio(ratio + delta);
+    }
+
+    synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
+    update_value_str();
+    redraw();
+
+    return false;
+}
+
+
+
+bool TuningSelector::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+
+    gui->set_status_line(text);
+    start_editing();
+
+    return true;
+}
+
+
+bool TuningSelector::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+
+    gui->set_status_line("");
+    stop_editing();
+
+    return true;
 }
 
 }

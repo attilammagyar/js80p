@@ -20,6 +20,7 @@
 #define JS80P__GUI__WIDGETS_HPP
 
 #include <cmath>
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -123,6 +124,7 @@ class TabBody : public TransparentWidget
 
         KnobParamEditor* own(KnobParamEditor* knob_param_editor);
         ToggleSwitch* own(ToggleSwitch* toggle_switch);
+        TuningSelector* own(TuningSelector* tuning_selector);
 
         void stop_editing();
 
@@ -132,6 +134,7 @@ class TabBody : public TransparentWidget
     private:
         GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitches toggle_switches;
+        GUI::TuningSelectors tuning_selectors;
 };
 
 
@@ -565,6 +568,52 @@ class ToggleSwitch : public TransparentWidget
         Synth& synth;
 
         Number default_ratio;
+        Number ratio;
+        bool is_editing_;
+};
+
+
+class TuningSelector : public TransparentWidget
+{
+    public:
+        static constexpr int WIDTH = 130;
+        static constexpr int HEIGHT = 20;
+
+        TuningSelector(
+            GUI& gui,
+            char const* const text,
+            int const left,
+            int const top,
+            Synth& synth,
+            Synth::ParamId const param_id
+        );
+
+        void refresh();
+
+        Synth::ParamId const param_id;
+
+    protected:
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* parent
+        ) override;
+
+        virtual bool paint() override;
+        virtual bool mouse_up(int const x, int const y) override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
+
+    private:
+        static constexpr size_t TEXT_MAX_LENGTH = 24;
+
+        void update_value_str();
+
+        bool is_editing() const;
+        void start_editing();
+        void stop_editing();
+
+        Synth& synth;
+        char value_str[TEXT_MAX_LENGTH];
         Number ratio;
         bool is_editing_;
 };

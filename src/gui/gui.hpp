@@ -40,6 +40,7 @@ class StatusLine;
 class TabBody;
 class TabSelector;
 class ToggleSwitch;
+class TuningSelector;
 class Widget;
 class WidgetBase;
 
@@ -55,6 +56,7 @@ class GUI
 
         typedef std::vector<KnobParamEditor*> KnobParamEditors;
         typedef std::vector<ToggleSwitch*> ToggleSwitches;
+        typedef std::vector<TuningSelector*> TuningSelectors;
 
         typedef unsigned int Color;
         typedef unsigned char ColorComponent;
@@ -96,6 +98,9 @@ class GUI
 
         static char const* const MODES[];
         static int const MODES_COUNT;
+
+        static char const* const TUNINGS[];
+        static int const TUNINGS_COUNT;
 
         static char const* const WAVEFORMS[];
         static int const WAVEFORMS_COUNT;
@@ -182,6 +187,10 @@ class GUI
 
         void set_status_line(char const* text);
 
+        void mts_esp_connected();
+        void mts_esp_disconnected();
+        bool is_mts_esp_connected() const;
+
         PlatformData get_platform_data() const;
 
     private:
@@ -248,6 +257,7 @@ class GUI
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
+        bool is_mts_esp_connected_;
 };
 
 
@@ -271,6 +281,7 @@ class WidgetBase
             ABOUT_TEXT = 1 << 10,
             STATUS_LINE = 1 << 11,
             TOGGLE_SWITCH = 1 << 12,
+            TUNING_SELECTOR = 1 << 13,
         };
 
         enum TextAlignment {
