@@ -114,7 +114,7 @@ class GUI
         static char const* const REVERB_TYPES[];
         static int const REVERB_TYPES_COUNT;
 
-        static char const* const PARAMS[];
+        static char const* const PARAMS[Synth::ParamId::MAX_PARAM_ID];
 
         static Controller const CONTROLLERS[];
 

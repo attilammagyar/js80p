@@ -145,7 +145,7 @@ GUI::Controller::Controller(
 }
 
 
-char const* const GUI::PARAMS[] = {
+char const* const GUI::PARAMS[Synth::ParamId::MAX_PARAM_ID] = {
     [Synth::ParamId::MIX] = "Modulator Additive Volume (%)",
     [Synth::ParamId::PM] = "Phase Modulation (%)",
     [Synth::ParamId::FM] = "Frequency Modulation (%)",
