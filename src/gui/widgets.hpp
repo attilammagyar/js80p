@@ -357,7 +357,7 @@ class KnobParamEditor : public TransparentWidget
         static constexpr Number KNOB_STATES_LAST_INDEX = (
             (Number)(KnobStates::COUNT - 1)
         );
-        static constexpr int TEXT_MAX_LENGTH = 16;
+        static constexpr size_t TEXT_MAX_LENGTH = 16;
 
         class Knob : public Widget
         {
