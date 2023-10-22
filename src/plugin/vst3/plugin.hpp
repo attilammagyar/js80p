@@ -80,6 +80,7 @@ class Vst3Plugin
                     Type const type,
                     Seconds const time_offset,
                     Midi::Byte const note_or_ctl,
+                    Midi::Channel const channel,
                     Number const velocity_or_value
                 );
                 Event(Event const& event) = default;
@@ -93,6 +94,7 @@ class Vst3Plugin
                 Number velocity_or_value;
                 Type type;
                 Midi::Byte note_or_ctl;
+                Midi::Channel channel;
         };
 
         class Processor : public Vst::AudioEffect

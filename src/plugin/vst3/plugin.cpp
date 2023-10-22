@@ -62,7 +62,8 @@ Vst3Plugin::Event::Event()
     : time_offset(0.0),
     velocity_or_value(0.0),
     type(Type::UNDEFINED),
-    note_or_ctl(0)
+    note_or_ctl(0),
+    channel(0)
 {
 }
 
@@ -71,11 +72,13 @@ Vst3Plugin::Event::Event(
         Type const type,
         Seconds const time_offset,
         Midi::Byte const note_or_ctl,
+        Midi::Channel const channel,
         Number const velocity_or_value
 ) : time_offset(time_offset),
     velocity_or_value(velocity_or_value),
     type(type),
-    note_or_ctl(note_or_ctl)
+    note_or_ctl(note_or_ctl),
+    channel(channel & 0x0f)
 {
 }
 
@@ -157,7 +160,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::notify(Vst::IMessage* message)
 
         if (message->getAttributes()->getFloat(MSG_PROGRAM_CHANGE_PROGRAM, program) == kResultOk) {
             events.push_back(
-                Event(Event::Type::PROGRAM_CHANGE, 0.0, 0, (Number)program)
+                Event(Event::Type::PROGRAM_CHANGE, 0.0, 0, 0, (Number)program)
             );
         }
     } else if (FIDStringsEqual(message->getMessageID(), MSG_CTL_READY)) {
@@ -330,6 +333,7 @@ void Vst3Plugin::Processor::collect_param_change_events_as(
                 event_type,
                 synth.sample_count_to_time_offset(sample_offset),
                 midi_controller,
+                0,
                 (Number)value
             )
         );
@@ -360,6 +364,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
                         Event::Type::NOTE_ON,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.noteOn.pitch,
+                        (Midi::Channel)(event.noteOn.channel & 0xff),
                         (Number)event.noteOn.velocity
                     )
                 );
@@ -371,6 +376,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
                         Event::Type::NOTE_OFF,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.noteOff.pitch,
+                        (Midi::Channel)(event.noteOn.channel & 0xff),
                         (Number)event.noteOff.velocity
                     )
                 );
@@ -382,6 +388,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
                         Event::Type::NOTE_PRESSURE,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.polyPressure.pitch,
+                        (Midi::Channel)(event.noteOn.channel & 0xff),
                         (Number)event.polyPressure.pressure
                     )
                 );
@@ -408,7 +415,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
         case Event::Type::NOTE_ON:
             synth.note_on(
                 event.time_offset,
-                0,
+                event.channel,
                 event.note_or_ctl,
                 float_to_midi_byte(event.velocity_or_value)
             );
@@ -417,7 +424,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
         case Event::Type::NOTE_PRESSURE:
             synth.aftertouch(
                 event.time_offset,
-                0,
+                event.channel,
                 event.note_or_ctl,
                 float_to_midi_byte(event.velocity_or_value)
             );
@@ -426,7 +433,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
         case Event::Type::NOTE_OFF:
             synth.note_off(
                 event.time_offset,
-                0,
+                event.channel,
                 event.note_or_ctl,
                 float_to_midi_byte(event.velocity_or_value)
             );
