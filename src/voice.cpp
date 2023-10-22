@@ -294,11 +294,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_gain,
         filter_2_shared_cache
     ),
-    velocity_sensitivity(param_leaders.velocity_sensitivity),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
-    portamento_length(param_leaders.portamento_length),
-    portamento_depth(param_leaders.portamento_depth),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, note_velocity, volume),
@@ -366,11 +363,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_gain,
         filter_2_shared_cache
     ),
-    velocity_sensitivity(param_leaders.velocity_sensitivity),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
-    portamento_length(param_leaders.portamento_length),
-    portamento_depth(param_leaders.portamento_depth),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, note_velocity, volume),
@@ -391,11 +385,8 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
     note = 0;
     channel = 0;
 
-    register_child(velocity_sensitivity);
     register_child(note_velocity);
     register_child(note_panning);
-    register_child(portamento_length);
-    register_child(portamento_depth);
     register_child(panning);
     register_child(volume);
 
@@ -526,7 +517,7 @@ template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::calculate_note_velocity(
         Number const raw_velocity
 ) const noexcept {
-    Number const sensitivity = velocity_sensitivity.get_value();
+    Number const sensitivity = param_leaders.velocity_sensitivity.get_value();
 
     if (sensitivity <= 1.0) {
         return 1.0 - sensitivity + sensitivity * raw_velocity;
@@ -566,7 +557,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Midi::Note const note,
         Midi::Note const previous_note
 ) noexcept {
-    Number const portamento_length = this->portamento_length.get_value();
+    Number const portamento_length = param_leaders.portamento_length.get_value();
     Frequency const note_frequency = frequencies[note];
 
     oscillator.frequency.cancel_events_at(time_offset);
@@ -576,7 +567,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         return;
     }
 
-    Number const portamento_depth = this->portamento_depth.get_value();
+    Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
         std::fabs(portamento_depth) < 0.01
             ? frequencies[previous_note]
@@ -628,7 +619,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         return;
     }
 
-    Number const portamento_length = this->portamento_length.get_value();
+    Number const portamento_length = param_leaders.portamento_length.get_value();
 
     if (portamento_length <= 0.000001) {
         retrigger(time_offset, note_id, note, channel, velocity, previous_note);

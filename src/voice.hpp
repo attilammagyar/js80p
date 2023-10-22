@@ -305,11 +305,8 @@ class Voice : public SignalProducer
         Wavefolder_ wavefolder;
         DistortionInstance distortion;
         Filter2 filter_2;
-        FloatParamB velocity_sensitivity;
         FloatParamS note_velocity;
         FloatParamS note_panning;
-        FloatParamB portamento_length;
-        FloatParamB portamento_depth;
         FloatParamS panning;
         FloatParamS volume;
         VolumeApplier volume_applier;
