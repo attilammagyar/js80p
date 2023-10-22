@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <vector>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -75,9 +76,9 @@ class FrequenciesTestSynth : public Synth
         {
         }
 
-        Frequency get_frequency(Midi::Note const note) const
+        Frequency get_frequency(Modulator::Tuning const tuning, Midi::Note const note) const
         {
-            return frequencies[note];
+            return frequencies[tuning][note];
         }
 };
 
@@ -85,13 +86,17 @@ class FrequenciesTestSynth : public Synth
 TEST(twelve_tone_equal_temperament_440_hz, {
     FrequenciesTestSynth synth;
 
-    assert_eq(880.0, synth.get_frequency(Midi::NOTE_A_5), DOUBLE_DELTA);
-    assert_eq(440.0, synth.get_frequency(Midi::NOTE_A_4), DOUBLE_DELTA);
-    assert_eq(220.0, synth.get_frequency(Midi::NOTE_A_3), DOUBLE_DELTA);
+    assert_eq(880.0, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_A_5), DOUBLE_DELTA);
+    assert_eq(440.0, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_A_4), DOUBLE_DELTA);
+    assert_eq(220.0, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_A_3), DOUBLE_DELTA);
 
-    assert_eq(12543.85, synth.get_frequency(Midi::NOTE_G_9), 0.01);
-    assert_eq(261.63, synth.get_frequency(Midi::NOTE_C_4), 0.01);
-    assert_eq(8.18, synth.get_frequency(Midi::NOTE_0), 0.01);
+    assert_eq(864.0, synth.get_frequency(Modulator::TUNING_432HZ_12TET, Midi::NOTE_A_5), DOUBLE_DELTA);
+    assert_eq(432.0, synth.get_frequency(Modulator::TUNING_432HZ_12TET, Midi::NOTE_A_4), DOUBLE_DELTA);
+    assert_eq(216.0, synth.get_frequency(Modulator::TUNING_432HZ_12TET, Midi::NOTE_A_3), DOUBLE_DELTA);
+
+    assert_eq(12543.85, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_G_9), 0.01);
+    assert_eq(261.63, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_C_4), 0.01);
+    assert_eq(8.18, synth.get_frequency(Modulator::TUNING_440HZ_12TET, Midi::NOTE_0), 0.01);
 })
 
 
@@ -1063,4 +1068,80 @@ TEST(peak_controllers_are_updated_when_in_use, {
     test_peak_controller(Synth::ControllerId::VOL_1_PEAK, vol_1_expected);
     test_peak_controller(Synth::ControllerId::VOL_2_PEAK, vol_2_expected);
     test_peak_controller(Synth::ControllerId::VOL_3_PEAK, vol_3_expected);
+})
+
+
+void play_notes(Synth& synth)
+{
+    synth.note_on(0.00, 1, Midi::NOTE_A_2, 100);
+    synth.note_off(0.21, 1, Midi::NOTE_A_2, 100);
+
+    synth.note_on(0.20, 1, Midi::NOTE_A_3, 100);
+    synth.note_off(0.41, 1, Midi::NOTE_A_3, 100);
+
+    synth.note_on(0.40, 1, Midi::NOTE_A_4, 100);
+    synth.note_off(0.61, 1, Midi::NOTE_A_4, 100);
+
+    synth.note_on(0.60, 1, Midi::NOTE_A_5, 100);
+    synth.note_off(0.81, 1, Midi::NOTE_A_5, 100);
+
+    synth.note_on(0.80, 1, Midi::NOTE_A_6, 100);
+    synth.note_off(0.99, 1, Midi::NOTE_A_6, 100);
+}
+
+
+TEST(voice_inaccuracy_is_deterministic_random, {
+    constexpr Frequency sample_rate = 10000.0;
+    constexpr Integer block_size = 10000;
+    constexpr Integer rounds = 1;
+    constexpr Integer buffer_size = rounds * block_size;
+
+    Synth synth;
+    Buffer buffer_precise(buffer_size, synth.get_channels());
+    Buffer buffer_inaccurate_a(buffer_size, synth.get_channels());
+    Buffer buffer_inaccurate_b(buffer_size, synth.get_channels());
+    std::vector<Number> diff(buffer_size);
+    Math::Statistics statistics;
+
+    Number const tuning = (
+        synth.modulator_params.tuning.value_to_ratio(
+            Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3
+        )
+    );
+
+    synth.set_sample_rate(sample_rate);
+    synth.set_block_size(block_size);
+    synth.resume();
+
+    set_param(synth, Synth::ParamId::MVOL, 1.0);
+    set_param(synth, Synth::ParamId::CVOL, 0.0);
+    synth.process_messages();
+
+    play_notes(synth);
+    render_rounds<Synth>(synth, buffer_precise, rounds, block_size);
+
+    set_param(synth, Synth::ParamId::MTUN, tuning);
+    set_param(synth, Synth::ParamId::CTUN, tuning);
+    synth.process_messages();
+
+    synth.reset();
+    play_notes(synth);
+    render_rounds<Synth>(synth, buffer_inaccurate_a, rounds, block_size);
+
+    synth.reset();
+    play_notes(synth);
+    render_rounds<Synth>(synth, buffer_inaccurate_b, rounds, block_size);
+
+    for (Integer i = 0; i != buffer_size; ++i) {
+        diff[i] = std::fabs(buffer_precise.samples[0][i] - buffer_inaccurate_a.samples[0][i]);
+    }
+
+    Math::compute_statistics(diff, statistics);
+    assert_true(statistics.is_valid);
+    assert_lt(statistics.min, 0.01);
+    assert_gt(statistics.max, 0.70);
+    assert_gt(statistics.standard_deviation, 0.2);
+
+    assert_eq(buffer_inaccurate_a.samples[0], buffer_inaccurate_b.samples[0], buffer_size, DOUBLE_DELTA);
+    assert_eq(buffer_inaccurate_a.samples[1], buffer_inaccurate_b.samples[1], buffer_size, DOUBLE_DELTA);
 })

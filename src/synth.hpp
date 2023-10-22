@@ -744,6 +744,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ControllerId const controller_id
         ) noexcept;
 
+        static Number calculate_initial_inaccuracy(Integer const voice) noexcept;
+
         Synth(Integer const samples_between_gc = 8000) noexcept;
         virtual ~Synth() override;
 
@@ -915,7 +917,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Integer const sample_count
         ) noexcept;
 
-        Frequency frequencies[Midi::NOTES];
+        FrequencyTable frequencies;
 
     private:
         class Bus : public SignalProducer
@@ -1124,6 +1126,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
         void initialize_supported_midi_controllers() noexcept;
+
+        void build_frequency_table() noexcept;
         void register_main_params() noexcept;
         void register_modulator_params() noexcept;
         void register_carrier_params() noexcept;

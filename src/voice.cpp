@@ -250,16 +250,25 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
 
 
 template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::calculate_new_inaccuracy(
+        Number const seed
+) noexcept {
+    return 0.1 + 0.9 * Math::randomize(1.0, seed);
+}
+
+
+template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
-        Frequency const* frequencies,
-        Midi::Note const notes,
+        FrequencyTable const& frequencies,
+        Number const inaccuracy,
         Params& param_leaders,
         BiquadFilterSharedCache* filter_1_shared_cache,
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
     : SignalProducer(CHANNELS, 12),
-    notes(notes),
+    initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
+    frequencies(frequencies),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -301,14 +310,14 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, note_velocity, volume),
     modulation_out((ModulationOut&)volume_applier)
 {
-    initialize_instance(frequencies);
+    initialize_instance(inaccuracy);
 }
 
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
-        Frequency const* frequencies,
-        Midi::Note const notes,
+        FrequencyTable const& frequencies,
+        Number const inaccuracy,
         Params& param_leaders,
         ModulatorSignalProducerClass& modulator,
         FloatParamS& amplitude_modulation_level_leader,
@@ -318,8 +327,9 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
     : SignalProducer(CHANNELS, 12),
-    notes(notes),
+    initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
+    frequencies(frequencies),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -370,15 +380,15 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, note_velocity, volume),
     modulation_out((ModulationOut&)volume_applier)
 {
-    initialize_instance(frequencies);
+    initialize_instance(inaccuracy);
 }
 
 
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::initialize_instance(
-        Frequency const* frequencies
+        Number const inaccuracy
 ) noexcept {
-    this->frequencies = frequencies;
+    this->inaccuracy = inaccuracy;
 
     state = State::OFF;
     note_id = 0;
@@ -408,6 +418,7 @@ void Voice<ModulatorSignalProducerClass>::reset() noexcept
 {
     SignalProducer::reset();
 
+    inaccuracy = initial_inaccuracy;
     state = State::OFF;
     note_id = 0;
     note = 0;
@@ -446,13 +457,14 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
-    if (state == State::ON || note >= notes) {
+    if (state == State::ON || note >= Midi::NOTES) {
         return;
     }
 
     state = State::ON;
 
     save_note_info(note_id, note, channel);
+    update_inaccuracy();
 
     note_velocity.cancel_events_at(time_offset);
     note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
@@ -514,6 +526,13 @@ void Voice<ModulatorSignalProducerClass>::save_note_info(
 
 
 template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::update_inaccuracy() noexcept
+{
+    inaccuracy = calculate_new_inaccuracy(inaccuracy);
+}
+
+
+template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::calculate_note_velocity(
         Number const raw_velocity
 ) const noexcept {
@@ -558,7 +577,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Midi::Note const previous_note
 ) noexcept {
     Number const portamento_length = param_leaders.portamento_length.get_value();
-    Frequency const note_frequency = frequencies[note];
+    Frequency const note_frequency = calculate_note_frequency(note);
 
     oscillator.frequency.cancel_events_at(time_offset);
 
@@ -570,7 +589,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
         std::fabs(portamento_depth) < 0.01
-            ? frequencies[previous_note]
+            ? calculate_note_frequency(previous_note)
             : Math::detune(note_frequency, portamento_depth)
     );
 
@@ -578,6 +597,42 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     oscillator.frequency.schedule_linear_ramp(
         portamento_length, (Number)note_frequency
     );
+}
+
+
+template<class ModulatorSignalProducerClass>
+Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
+        Midi::Note const note
+) const noexcept {
+    Tuning const tuning = param_leaders.tuning.get_value();
+    Frequency const frequency = frequencies[tuning][note];
+
+    switch (tuning) {
+        case TUNING_440HZ_12TET_SMALL_INACCURACY_1:
+        case TUNING_432HZ_12TET_SMALL_INACCURACY_1:
+            return Math::detune(frequency, 2.0 * inaccuracy - 0.6);
+
+        case TUNING_440HZ_12TET_SMALL_INACCURACY_3:
+        case TUNING_432HZ_12TET_SMALL_INACCURACY_3:
+            return Math::detune(frequency, 5.0 * inaccuracy - 2.0);
+
+        case TUNING_440HZ_12TET_LARGE_INACCURACY_1:
+        case TUNING_432HZ_12TET_LARGE_INACCURACY_1:
+            return Math::detune(frequency, 20.0 * inaccuracy - 6.0);
+
+        case TUNING_440HZ_12TET_LARGE_INACCURACY_3:
+        case TUNING_432HZ_12TET_LARGE_INACCURACY_3:
+            return Math::detune(frequency, 60.0 * inaccuracy - 24.0);
+
+        case TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED:
+        case TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED:
+        case TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED:
+        case TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED:
+        default:
+            break;
+    }
+
+    return frequency;
 }
 
 
@@ -590,7 +645,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
-    if (note >= notes) {
+    if (note >= Midi::NOTES) {
         return;
     }
 
@@ -615,7 +670,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Number const velocity,
         Midi::Note const previous_note
 ) noexcept {
-    if (note >= notes) {
+    if (note >= Midi::NOTES) {
         return;
     }
 
@@ -628,6 +683,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     }
 
     save_note_info(note_id, note, channel);
+    update_inaccuracy();
 
     wavefolder.folding.update_envelope(time_offset);
 
@@ -669,7 +725,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
     note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
-    oscillator.frequency.schedule_linear_ramp(portamento_length, frequencies[note]);
+    oscillator.frequency.schedule_linear_ramp(portamento_length, calculate_note_frequency(note));
 }
 
 
@@ -885,6 +941,13 @@ template<class ModulatorSignalProducerClass>
 Midi::Note Voice<ModulatorSignalProducerClass>::get_channel() const noexcept
 {
     return channel;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
+{
+    return inaccuracy;
 }
 
 

@@ -139,18 +139,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         param_names_by_id[i] = "";
     }
 
-    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-        /*
-         * Not using Math::exp() and friends here, for 2 reasons:
-         *  1. We go out of their domain here.
-         *  2. Since this loop runs only once, we can afford favoring accuracy
-         *     over speed.
-         */
-        frequencies[note] = (
-            (Frequency)std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
-        );
-    }
-
+    build_frequency_table();
     register_main_params();
     register_child(bus);
     register_modulator_params();
@@ -275,6 +264,75 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
 }
 
+
+void Synth::build_frequency_table() noexcept
+{
+    constexpr Number note_scale = 1.0 / (Number)Midi::NOTES;
+
+    for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+        /*
+         * Not using Math::exp() and friends here, for 2 reasons:
+         *  1. We go out of their domain here.
+         *  2. Since this loop runs only once, we can afford favoring accuracy
+         *     over speed.
+         */
+
+        Frequency const f_440hz_12tet = (Frequency)(
+            std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 440.0
+        );
+        Frequency const f_432hz_12tet = (Frequency)(
+            std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 432.0
+        );
+        Number const note_float = (Number)note * note_scale;
+        Number const scale = 0.3 + 0.7 * note_float;
+
+        Number const random_1 = scale * Math::randomize(1.0, note_float);
+        Number const random_2 = scale * Math::randomize(1.0, 1.0 - note_float);
+        Number const random_3 = scale * Math::randomize(1.0, random_1);
+        Number const random_4 = scale * Math::randomize(1.0, random_2);
+        Number const random_5 = scale * Math::randomize(1.0, 1.0 - random_1);
+        Number const random_6 = scale * Math::randomize(1.0, 1.0 - random_2);
+        Number const random_7 = scale * Math::randomize(1.0, random_3);
+        Number const random_8 = scale * Math::randomize(1.0, random_4);
+        Number const random_9 = scale * Math::randomize(1.0, 1.0 - random_3);
+        Number const random_10 = scale * Math::randomize(1.0, 1.0 - random_4);
+        Number const random_11 = scale * Math::randomize(1.0, random_5);
+        Number const random_12 = scale * Math::randomize(1.0, random_6);
+
+        Number const detune_440_small_1 = 3.0 * random_1 - 1.0;
+        Number const detune_440_small_2 = 7.0 * random_2 - 3.0;
+        Number const detune_440_small_3 = 7.0 * random_3 - 3.0;
+        Number const detune_440_large_1 = 10.0 * random_4 - 3.0;
+        Number const detune_440_large_2 = 30.0 * random_5 - 12.0;
+        Number const detune_440_large_3 = 30.0 * random_6 - 12.0;
+
+        Number const detune_432_small_1 = 3.0 * random_7 - 1.0;
+        Number const detune_432_small_2 = 7.0 * random_8 - 3.0;
+        Number const detune_432_small_3 = 7.0 * random_9 - 3.0;
+        Number const detune_432_large_1 = 10.0 * random_10 - 3.0;
+        Number const detune_432_large_2 = 30.0 * random_11 - 12.0;
+        Number const detune_432_large_3 = 30.0 * random_12 - 12.0;
+
+        frequencies[Modulator::TUNING_440HZ_12TET][note] = f_440hz_12tet;
+        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_small_1);
+        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED][note] = Math::detune(f_440hz_12tet, detune_440_small_2);
+        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_small_3);
+        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_large_1);
+        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED][note] = Math::detune(f_440hz_12tet, detune_440_large_2);
+        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_large_3);
+
+        frequencies[Modulator::TUNING_432HZ_12TET][note] = f_432hz_12tet;
+        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_small_1);
+        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED][note] = Math::detune(f_432hz_12tet, detune_432_small_2);
+        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_small_3);
+        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_large_1);
+        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED][note] = Math::detune(f_432hz_12tet, detune_432_large_2);
+        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_large_3);
+
+        frequencies[Modulator::TUNING_MTS_ESP_NOTE_ON][note] = f_440hz_12tet;
+        frequencies[Modulator::TUNING_MTS_ESP_REALTIME][note] = f_440hz_12tet;
+    }
+}
 
 void Synth::register_main_params() noexcept
 {
@@ -453,7 +511,7 @@ void Synth::create_voices() noexcept
     for (Integer i = 0; i != POLYPHONY; ++i) {
         modulators[i] = new Modulator(
             frequencies,
-            Midi::NOTES,
+            calculate_initial_inaccuracy(i),
             modulator_params,
             biquad_filter_shared_caches[0],
             biquad_filter_shared_caches[1]
@@ -462,7 +520,7 @@ void Synth::create_voices() noexcept
 
         carriers[i] = new Carrier(
             frequencies,
-            Midi::NOTES,
+            calculate_initial_inaccuracy(POLYPHONY - i),
             carrier_params,
             modulators[i]->modulation_out,
             amplitude_modulation_level,
@@ -640,6 +698,8 @@ void Synth::reset() noexcept
 {
     SignalProducer::reset();
 
+    next_voice = 0;
+
     osc_1_peak_tracker.reset();
     osc_2_peak_tracker.reset();
     vol_1_peak_tracker.reset();
@@ -747,6 +807,8 @@ void Synth::note_on_polyphonic(
     if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
         return;
     }
+
+    next_voice = (next_voice + 1) & NEXT_VOICE_MASK;
 
     for (Integer v = 0; v != POLYPHONY; ++v) {
         if (!(
@@ -1114,6 +1176,14 @@ bool Synth::is_supported_midi_controller(
 bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
 {
     return controller_id >= ControllerId::ENVELOPE_1 && controller_id <= ControllerId::ENVELOPE_6;
+}
+
+
+Number Synth::calculate_initial_inaccuracy(Integer const voice) noexcept
+{
+    constexpr Number scale = 1.0 / (Number)POLYPHONY;
+
+    return Modulator::calculate_new_inaccuracy(scale * (Number)voice);
 }
 
 
