@@ -123,10 +123,7 @@ class Math
          */
         static Number ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept;
 
-        static Frequency detune(
-            Frequency const frequency,
-            Number const cents
-        ) noexcept;
+        static Frequency detune(Frequency const frequency, Number const cents) noexcept;
 
         /**
          * \brief Compute a_weight * a + (1.0 - a_weight) * b
