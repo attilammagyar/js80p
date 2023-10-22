@@ -313,6 +313,8 @@ void Synth::build_frequency_table() noexcept
         Number const detune_432_large_2 = 30.0 * random_11 - 12.0;
         Number const detune_432_large_3 = 30.0 * random_12 - 12.0;
 
+        per_channel_frequencies[0][note] = f_440hz_12tet;
+
         frequencies[Modulator::TUNING_440HZ_12TET][note] = f_440hz_12tet;
         frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_small_1);
         frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED][note] = Math::detune(f_440hz_12tet, detune_440_small_2);
@@ -328,9 +330,12 @@ void Synth::build_frequency_table() noexcept
         frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_large_1);
         frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED][note] = Math::detune(f_432hz_12tet, detune_432_large_2);
         frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_large_3);
+    }
 
-        frequencies[Modulator::TUNING_MTS_ESP_NOTE_ON][note] = f_440hz_12tet;
-        frequencies[Modulator::TUNING_MTS_ESP_REALTIME][note] = f_440hz_12tet;
+    for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
+        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+            per_channel_frequencies[channel][note] = per_channel_frequencies[0][note];
+        }
     }
 }
 
@@ -511,6 +516,7 @@ void Synth::create_voices() noexcept
     for (Integer i = 0; i != POLYPHONY; ++i) {
         modulators[i] = new Modulator(
             frequencies,
+            per_channel_frequencies,
             calculate_initial_inaccuracy(i),
             modulator_params,
             biquad_filter_shared_caches[0],
@@ -520,6 +526,7 @@ void Synth::create_voices() noexcept
 
         carriers[i] = new Carrier(
             frequencies,
+            per_channel_frequencies,
             calculate_initial_inaccuracy(POLYPHONY - i),
             carrier_params,
             modulators[i]->modulation_out,

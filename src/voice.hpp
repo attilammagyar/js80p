@@ -40,7 +40,8 @@ namespace JS80P
 
 constexpr int VOICE_TUNINGS = 16;
 
-typedef Frequency FrequencyTable[VOICE_TUNINGS][Midi::NOTES];
+typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
+typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 
 
 template<class ModulatorSignalProducerClass>
@@ -198,6 +199,7 @@ class Voice : public SignalProducer
 
         Voice(
             FrequencyTable const& frequencies,
+            PerChannelFrequencyTable const& per_channel_frequencies,
             Number const inaccuracy,
             Params& param_leaders,
             BiquadFilterSharedCache* filter_1_shared_cache = NULL,
@@ -206,6 +208,7 @@ class Voice : public SignalProducer
 
         Voice(
             FrequencyTable const& frequencies,
+            PerChannelFrequencyTable const& per_channel_frequencies,
             Number const inaccuracy,
             Params& param_leaders,
             ModulatorSignalProducerClass& modulator,
@@ -299,13 +302,18 @@ class Voice : public SignalProducer
 
         void update_inaccuracy() noexcept;
 
-        Frequency calculate_note_frequency(Midi::Note const note) const noexcept;
+        Frequency calculate_note_frequency(
+            Midi::Note const note,
+            Midi::Channel const channel
+        ) const noexcept;
+
         Number calculate_note_velocity(Number const raw_velocity) const noexcept;
         Number calculate_note_panning(Midi::Note const note) const noexcept;
 
         void set_up_oscillator_frequency(
             Seconds const time_offset,
             Midi::Note const note,
+            Midi::Channel const channel,
             Midi::Note const previous_note
         ) noexcept;
 
@@ -315,6 +323,7 @@ class Voice : public SignalProducer
 
         Params& param_leaders;
         FrequencyTable const& frequencies;
+        PerChannelFrequencyTable const& per_channel_frequencies;
         Oscillator_ oscillator;
         Filter1 filter_1;
         Wavefolder_ wavefolder;

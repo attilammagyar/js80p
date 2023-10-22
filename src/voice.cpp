@@ -260,6 +260,7 @@ Number Voice<ModulatorSignalProducerClass>::calculate_new_inaccuracy(
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         FrequencyTable const& frequencies,
+        PerChannelFrequencyTable const& per_channel_frequencies,
         Number const inaccuracy,
         Params& param_leaders,
         BiquadFilterSharedCache* filter_1_shared_cache,
@@ -269,6 +270,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
     frequencies(frequencies),
+    per_channel_frequencies(per_channel_frequencies),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -317,6 +319,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         FrequencyTable const& frequencies,
+        PerChannelFrequencyTable const& per_channel_frequencies,
         Number const inaccuracy,
         Params& param_leaders,
         ModulatorSignalProducerClass& modulator,
@@ -330,6 +333,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
     frequencies(frequencies),
+    per_channel_frequencies(per_channel_frequencies),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -483,7 +487,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     panning.start_envelope(time_offset);
     volume.start_envelope(time_offset);
 
-    set_up_oscillator_frequency(time_offset, note, previous_note);
+    set_up_oscillator_frequency(time_offset, note, channel, previous_note);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
@@ -574,10 +578,11 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Seconds const time_offset,
         Midi::Note const note,
+        Midi::Channel const channel,
         Midi::Note const previous_note
 ) noexcept {
     Number const portamento_length = param_leaders.portamento_length.get_value();
-    Frequency const note_frequency = calculate_note_frequency(note);
+    Frequency const note_frequency = calculate_note_frequency(note, channel);
 
     oscillator.frequency.cancel_events_at(time_offset);
 
@@ -589,7 +594,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
         std::fabs(portamento_depth) < 0.01
-            ? calculate_note_frequency(previous_note)
+            ? calculate_note_frequency(previous_note, channel)
             : Math::detune(note_frequency, portamento_depth)
     );
 
@@ -602,9 +607,15 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
 template<class ModulatorSignalProducerClass>
 Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
-        Midi::Note const note
+        Midi::Note const note,
+        Midi::Channel const channel
 ) const noexcept {
     Tuning const tuning = param_leaders.tuning.get_value();
+
+    if (tuning == TUNING_MTS_ESP_NOTE_ON || tuning == TUNING_MTS_ESP_REALTIME) {
+        return per_channel_frequencies[channel][note];
+    }
+
     Frequency const frequency = frequencies[tuning][note];
 
     switch (tuning) {
@@ -725,7 +736,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
     note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
-    oscillator.frequency.schedule_linear_ramp(portamento_length, calculate_note_frequency(note));
+    oscillator.frequency.schedule_linear_ramp(portamento_length, calculate_note_frequency(note, channel));
 }
 
 

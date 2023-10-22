@@ -54,10 +54,16 @@ constexpr FrequencyTable FREQUENCIES = {
     {300.0, 600.0, 1200.0, 2400.0, 4800.0},
 };
 
+constexpr PerChannelFrequencyTable PER_CHANNEL_FREQUENCIES = {
+    {100.0, 200.0, 400.0, 800.0, 1600.0},
+    {100.0, 200.0, 400.0, 800.0, 1600.0},
+    {75.0, 150.0, 300.0, 600.0, 1200.0},
+};
+
 
 TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, 0.0, params);
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     voice.note_on(0.12, 42, 1, 0, 0.5, 1);
 
@@ -76,8 +82,8 @@ TEST(rendering_is_independent_of_chunk_size, {
     constexpr Frequency sample_rate = 44100.0;
 
     SimpleVoice::Params params("");
-    SimpleVoice voice_1(FREQUENCIES, 0.0, params);
-    SimpleVoice voice_2(FREQUENCIES, 0.0, params);
+    SimpleVoice voice_1(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice_2(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     params.waveform.set_value(SimpleOscillator::SINE);
     params.amplitude.set_value(1.0);
@@ -175,7 +181,7 @@ TEST(portamento, {
     );
     SimpleVoice::Params params("");
     Envelope envelope("");
-    SimpleVoice voice(FREQUENCIES, 0.0, params);
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -219,7 +225,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
     Constant expected(0.0, SimpleVoice::CHANNELS);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, 0.0, params);
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -265,8 +271,8 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
 
     Envelope envelope("E");
     SimpleVoice::Params params("V");
-    SimpleVoice decaying_voice(FREQUENCIES, 0.0, params);
-    SimpleVoice non_decaying_voice(FREQUENCIES, 0.0, params);
+    SimpleVoice decaying_voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice non_decaying_voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
     Integer rendered_samples = 0;
     Integer round = 0;
 
@@ -347,8 +353,8 @@ TEST(can_glide_smoothly_to_a_new_note, {
     SimpleVoice::Params params_ref("R");
     SimpleVoice::Params params("P");
     Envelope envelope("E");
-    SimpleVoice reference(FREQUENCIES, 0.0, params_ref);
-    SimpleVoice voice(FREQUENCIES, 0.0, params);
+    SimpleVoice reference(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params_ref);
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     set_up_voice(voice, params, block_size, sample_rate);
     set_up_voice(reference, params_ref, block_size, sample_rate);
@@ -412,7 +418,7 @@ TEST(tuning_can_be_changed, {
         SimpleVoice::CHANNELS
     );
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, 0.0, params);
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -421,6 +427,43 @@ TEST(tuning_can_be_changed, {
 
     params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED);
     voice.note_on(0.0, 123, 2, 0, 1.0, 2);
+
+    render_rounds<SumOfSines>(expected, expected_output, rounds);
+    render_rounds<SimpleVoice>(voice, actual_output, rounds);
+
+    assert_close(
+        expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
+    );
+})
+
+
+TEST(when_using_channel_based_tuning_then_note_frequency_is_selected_based_on_the_channel, {
+    constexpr Frequency sample_rate = 44100.0;
+    constexpr Integer block_size = 8192;
+    constexpr Integer rounds = 1;
+    constexpr Integer sample_count = block_size * rounds;
+
+    Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
+    Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
+    SumOfSines expected(
+        std::sin(Math::PI / 4.0),
+        150.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        SimpleVoice::CHANNELS
+    );
+    SimpleVoice::Params params("");
+    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+
+    expected.set_sample_rate(sample_rate);
+    expected.set_block_size(block_size);
+
+    set_up_voice(voice, params, block_size, sample_rate);
+
+    params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_NOTE_ON);
+    voice.note_on(0.0, 123, 1, 2, 1.0, 1);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);

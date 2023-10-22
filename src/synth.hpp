@@ -918,6 +918,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
 
         FrequencyTable frequencies;
+        PerChannelFrequencyTable per_channel_frequencies;
 
     private:
         class Bus : public SignalProducer

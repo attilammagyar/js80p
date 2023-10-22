@@ -51,6 +51,8 @@ typedef Voice<SignalProducer> SimpleVoice;
 
 constexpr FrequencyTable FREQUENCIES{};
 
+constexpr PerChannelFrequencyTable PER_CHANNEL_FREQUENCIES{};
+
 
 TEST(inaccuracy_keeps_changing_for_each_note, {
     constexpr Integer probes = 100000;
@@ -60,7 +62,7 @@ TEST(inaccuracy_keeps_changing_for_each_note, {
     for (Integer i = 0; i != Synth::POLYPHONY; ++i) {
         Number const inaccuracy = Synth::calculate_initial_inaccuracy(i);
 
-        SimpleVoice voice(FREQUENCIES, inaccuracy, params);
+        SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, inaccuracy, params);
         std::vector<Number> inaccuracies(probes);
         Math::Statistics statistics;
 
