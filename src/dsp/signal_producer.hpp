@@ -68,7 +68,7 @@ class SignalProducer
 
         static constexpr Number SILENCE_THRESHOLD_DB = -150.0;
         static constexpr Number SILENCE_THRESHOLD = (
-            std::exp(SILENCE_THRESHOLD_DB * std::log(2) / 6.0)
+            std::exp(SILENCE_THRESHOLD_DB * std::log(2.0) / 6.0)
         );
 
         /*
