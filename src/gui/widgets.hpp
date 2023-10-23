@@ -19,7 +19,6 @@
 #ifndef JS80P__GUI__WIDGETS_HPP
 #define JS80P__GUI__WIDGETS_HPP
 
-#include <cmath>
 #include <cstddef>
 #include <string>
 #include <vector>

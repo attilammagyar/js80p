@@ -89,6 +89,14 @@ class Math
         static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
         static constexpr Number LINEAR_TO_DB_MAX = 5.0;
 
+        static bool is_abs_small(Number const x, Number const threshold = 0.000001) noexcept;
+
+        static bool is_close(
+            Number const a,
+            Number const b,
+            Number const threshold = 0.000001
+        ) noexcept;
+
         /**
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.

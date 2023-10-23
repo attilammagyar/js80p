@@ -250,7 +250,7 @@ void SignalProducer::set_bpm(Number const new_bpm) noexcept
 {
     constexpr Number threshold = 0.000001;
 
-    if (new_bpm < threshold || std::fabs(bpm - new_bpm) < threshold) {
+    if (new_bpm < threshold || Math::is_close(bpm, new_bpm, threshold)) {
         return;
     }
 
@@ -284,7 +284,7 @@ bool SignalProducer::is_silent(
 
     for (Integer c = 0; c != channels; ++c) {
         for (Integer i = 0; i != sample_count; ++i) {
-            if (std::fabs(cached_buffer[c][i]) > SILENCE_THRESHOLD) {
+            if (!Math::is_abs_small(cached_buffer[c][i], SILENCE_THRESHOLD)) {
                 cached_silence = false;
 
                 return false;

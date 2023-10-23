@@ -19,6 +19,8 @@
 #ifndef JS80P__GUI__WIDGETS_CPP
 #define JS80P__GUI__WIDGETS_CPP
 
+#include <algorithm>
+#include <cmath>
 #include <cstring>
 
 #include "gui/widgets.hpp"

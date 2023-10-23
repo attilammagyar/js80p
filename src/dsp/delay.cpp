@@ -20,7 +20,6 @@
 #define JS80P__DSP__DELAY_CPP
 
 #include <algorithm>
-#include <cmath>
 
 #include "dsp/delay.hpp"
 #include "dsp/math.hpp"
@@ -288,7 +287,7 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
         need_gain = false;
     } else {
         gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
-        need_gain = gain_buffer != NULL || std::fabs(1.0 - gain.get_value()) > 0.000001;
+        need_gain = gain_buffer != NULL || !Math::is_close(gain.get_value(), 1.0);
     }
 
     time_buffer = FloatParamS::produce_if_not_constant(time, round, sample_count);
@@ -805,7 +804,7 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 
         Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
     } else {
-        if (std::fabs(panning_scale - 1.0) >= 0.000001) {
+        if (!Math::is_close(panning_scale, 1.0)) {
             for (Integer i = 0; i != sample_count; ++i) {
                 panning_buffer_scaled[0][i] = panning_buffer[i] * panning_scale;
             }

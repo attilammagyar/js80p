@@ -595,7 +595,7 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
     Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
-        std::fabs(portamento_depth) < 0.01
+        Math::is_abs_small(portamento_depth, 0.01)
             ? calculate_note_frequency(previous_note, channel)
             : Math::detune(note_frequency, portamento_depth)
     );
@@ -974,7 +974,7 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency() noexcept
     Frequency const new_frequency = calculate_note_frequency(note, channel);
     Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
 
-    if (remaining < 0.000001 && std::fabs(new_frequency - oscillator.frequency.get_value()) < 0.000001) {
+    if (remaining < 0.000001 && Math::is_close(new_frequency, oscillator.frequency.get_value())) {
         return;
     }
 

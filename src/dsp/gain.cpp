@@ -21,6 +21,8 @@
 
 #include "dsp/gain.hpp"
 
+#include "dsp/math.hpp"
+
 
 namespace JS80P
 {
@@ -62,7 +64,7 @@ Sample const* const* Gain<InputSignalProducerClass>::initialize_rendering(
     );
     gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
-    if (gain_buffer == NULL && std::fabs(1.0 - gain.get_value()) < 0.000001) {
+    if (gain_buffer == NULL && Math::is_close(gain.get_value(), 1.0)) {
         return input_buffer;
     }
 

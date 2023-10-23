@@ -19,7 +19,7 @@
 #ifndef JS80P__DSP__SIDE_CHAIN_COMPRESSABLE_EFFECT_CPP
 #define JS80P__DSP__SIDE_CHAIN_COMPRESSABLE_EFFECT_CPP
 
-#include <cmath>
+#include <algorithm>
 
 #include "dsp/math.hpp"
 #include "dsp/side_chain_compressable_effect.hpp"
@@ -73,7 +73,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
     Number const ratio_value = side_chain_compression_ratio.get_value();
 
-    is_bypassing = this->is_dry || std::fabs(ratio_value - NO_OP_RATIO) < 0.000001;
+    is_bypassing = this->is_dry || Math::is_close(ratio_value, NO_OP_RATIO);
 
     if (is_bypassing) {
         fast_bypass();
@@ -95,7 +95,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
             compress(peak, threshold_db, diff_db, ratio_value);
         } else if (previous_action == Action::COMPRESS) {
             release();
-        } else if (std::fabs(gain.get_value() - BYPASS_GAIN) < 0.000001) {
+        } else if (Math::is_close(gain.get_value(), BYPASS_GAIN)) {
             fast_bypass();
         }
     }
@@ -132,7 +132,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::compress(
 
     gain.cancel_events_at(0.0);
 
-    if (std::fabs(gain.get_value() - target_gain) > 0.005) {
+    if (!Math::is_close(gain.get_value(), target_gain, 0.005)) {
         Seconds const attack_time = side_chain_compression_attack_time.get_value();
 
         gain.schedule_linear_ramp(attack_time, target_gain);

@@ -20,8 +20,11 @@
 #define JS80P__DSP__PARAM_CPP
 
 #include <algorithm>
+#include <cmath>
 
 #include "dsp/param.hpp"
+
+#include "dsp/math.hpp"
 
 
 namespace JS80P
@@ -389,8 +392,8 @@ FloatParam<evaluation>::FloatParam(
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         log_scale_toggle == NULL
-        && std::fabs(min_value - 0.0) < 0.000001
-        && std::fabs(max_value - 1.0) < 0.000001
+        && Math::is_close(min_value, 0.0)
+        && Math::is_close(max_value, 1.0)
     ),
     round_to(round_to),
     round_to_inv(should_round ? 1.0 / round_to : 0.0),
@@ -429,8 +432,8 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     should_round(false),
     is_ratio_same_as_value(
         leader.get_log_scale_toggle() == NULL
-        && std::fabs(leader.get_min_value() - 0.0) < 0.000001
-        && std::fabs(leader.get_max_value() - 1.0) < 0.000001
+        && Math::is_close(leader.get_min_value(), 0.0)
+        && Math::is_close(leader.get_max_value(), 1.0)
     ),
     round_to(0.0),
     round_to_inv(0.0),
@@ -1296,7 +1299,7 @@ void FloatParam<evaluation>::process_envelope(
                 amount * envelope.sustain_value.get_value()
             );
 
-            if (std::fabs(this->get_raw_value() - sustain_value) > 0.000001) {
+            if (!Math::is_close(this->get_raw_value(), sustain_value)) {
                 schedule_linear_ramp(0.1, sustain_value);
             }
         } else {

@@ -432,3 +432,19 @@ TEST(ratio_to_exact_log_biquad_filter_frequency, {
         DOUBLE_DELTA
     );
 })
+
+
+TEST(is_abs_small, {
+    assert_true(Math::is_abs_small(0.01, 0.1));
+    assert_true(Math::is_abs_small(-0.01, 0.1));
+    assert_false(Math::is_abs_small(0.2, 0.1));
+    assert_false(Math::is_abs_small(-0.2, 0.1));
+})
+
+
+TEST(is_close, {
+    assert_true(Math::is_close(1.0, 1.05, 0.1));
+    assert_true(Math::is_close(-1.0, -1.05, 0.1));
+    assert_false(Math::is_close(1.0, 1.2, 0.1));
+    assert_false(Math::is_close(-1.0, -1.2, 0.1));
+})

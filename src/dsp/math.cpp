@@ -151,6 +151,18 @@ void Math::init_linear_to_db() noexcept
 }
 
 
+bool Math::is_abs_small(Number const x, Number const threshold) noexcept
+{
+    return std::fabs(x) < threshold;
+}
+
+
+bool Math::is_close(Number const a, Number const b, Number const threshold) noexcept
+{
+    return is_abs_small(a - b, threshold);
+}
+
+
 Number Math::sin(Number const x) noexcept
 {
     return math.sin_impl(x);

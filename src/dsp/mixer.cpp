@@ -19,9 +19,9 @@
 #ifndef JS80P__DSP__MIXER_CPP
 #define JS80P__DSP__MIXER_CPP
 
-#include <cmath>
-
 #include "dsp/mixer.hpp"
+
+#include "dsp/math.hpp"
 
 
 namespace JS80P
@@ -74,7 +74,7 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
             it->buffer = SignalProducer::produce<InputSignalProducerClass>(
                 *it->input, round, sample_count
             );
-            has_weights = has_weights || std::fabs(weight - 1.0) >= 0.000001;
+            has_weights = has_weights || !Math::is_close(weight, 1.0);
         }
     }
 

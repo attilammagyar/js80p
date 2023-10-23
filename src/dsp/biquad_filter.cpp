@@ -19,7 +19,7 @@
 #ifndef JS80P__DSP__BIQUAD_FILTER_CPP
 #define JS80P__DSP__BIQUAD_FILTER_CPP
 
-#include <cmath>
+#include <algorithm>
 
 #include "dsp/biquad_filter.hpp"
 
@@ -861,7 +861,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
         Number const gain_value = gain.get_value();
 
         if (
-                std::fabs(gain_value) < THRESHOLD
+                Math::is_abs_small(gain_value, THRESHOLD)
                 || frequency_value >= peaking_no_op_frequency
         ) {
             return true;
@@ -897,7 +897,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
             Number const gain_value = (Number)gain_buffer[i];
 
             if (
-                    std::fabs(gain_value) < THRESHOLD
+                    Math::is_abs_small(gain_value, THRESHOLD)
                     || frequency_value >= peaking_no_op_frequency
             ) {
                 store_no_op_coefficient_samples(i);

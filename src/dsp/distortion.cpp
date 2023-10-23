@@ -228,7 +228,7 @@ Sample Distortion<InputSignalProducerClass>::distort(
 ) noexcept {
     Sample const delta = input_sample - previous_input_sample;
 
-    if (UNLIKELY(std::fabs(delta) < 0.00000001)) {
+    if (UNLIKELY(Math::is_abs_small(delta, 0.00000001))) {
         previous_input_sample = input_sample;
         F0_previous_input_sample = F0(input_sample);
 
