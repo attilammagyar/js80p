@@ -274,6 +274,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const target_value
         ) noexcept;
 
+        Seconds get_remaining_time_from_linear_ramp() const noexcept;
+
         void set_midi_controller(MidiController* midi_controller) noexcept;
         void set_macro(Macro* macro) noexcept;
 
@@ -326,6 +328,7 @@ class FloatParam : public Param<Number, evaluation>
 
                 Number advance() noexcept;
                 Number get_value_at(Seconds const time_offset) const noexcept;
+                Number get_remaining_samples() const noexcept;
 
                 Seconds start_time_offset;
                 Number done_samples;

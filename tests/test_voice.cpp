@@ -437,7 +437,7 @@ TEST(tuning_can_be_changed, {
 })
 
 
-TEST(when_using_channel_based_tuning_then_note_frequency_is_selected_based_on_the_channel, {
+TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_channel, {
     constexpr Frequency sample_rate = 44100.0;
     constexpr Integer block_size = 8192;
     constexpr Integer rounds = 1;
@@ -470,5 +470,94 @@ TEST(when_using_channel_based_tuning_then_note_frequency_is_selected_based_on_th
 
     assert_close(
         expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
+    );
+})
+
+
+TEST(when_using_realtime_mts_esp_tuning_then_frequency_is_updated_before_each_round, {
+    constexpr Frequency sample_rate = 30000.0;
+    constexpr Integer block_size = 3000;
+    constexpr Seconds portamento_length = 2.0 * ((Seconds)block_size / sample_rate);
+    constexpr Number portamento_depth = -1200.0;
+    constexpr Number tolerance = 0.001;
+    constexpr Frequency orig_freq = 300.0;
+    constexpr Frequency new_freq = 500.0;
+
+    PerChannelFrequencyTable per_channel_frequencies = {
+        {100.0, 200.0, 400.0, 800.0, 1600.0},
+        {100.0, 200.0, 400.0, 800.0, 1600.0},
+        {75.0, 150.0, orig_freq, 600.0, 1200.0},
+    };
+
+    Sample const* const* expected_output;
+    Sample const* const* actual_output;
+    SimpleOscillator::WaveformParam expected_waveform("WF");
+    SimpleOscillator expected(expected_waveform);
+    SimpleVoice::Params params("");
+    SimpleVoice voice(FREQUENCIES, per_channel_frequencies, 0.0, params);
+
+    expected.set_sample_rate(sample_rate);
+    expected.set_block_size(block_size);
+    expected.start(0.0);
+
+    expected_waveform.set_sample_rate(sample_rate);
+    expected_waveform.set_block_size(block_size);
+    expected_waveform.set_value(SimpleOscillator::SINE);
+
+    expected.amplitude.set_value(std::sin(Math::PI / 4.0));
+    expected.frequency.set_value(Math::detune(orig_freq, portamento_depth));
+    expected.frequency.schedule_linear_ramp(
+        portamento_length / 2.0,
+        (orig_freq + Math::detune(orig_freq, portamento_depth)) / 2.0
+    );
+    expected.frequency.schedule_linear_ramp(portamento_length / 2.0, new_freq);
+
+    set_up_voice(voice, params, block_size, sample_rate);
+
+    params.portamento_length.set_value(portamento_length);
+    params.portamento_depth.set_value(portamento_depth);
+
+    params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_REALTIME);
+    voice.note_on(0.0, 123, 2, 2, 1.0, 2);
+    voice.update_note_frequency();
+
+    expected_output = SignalProducer::produce<SimpleOscillator>(expected, 1);
+    actual_output = SignalProducer::produce<SimpleVoice>(voice, 1);
+
+    assert_close(
+        expected_output[0],
+        actual_output[0],
+        block_size,
+        tolerance,
+        "round=1, channel=0"
+    );
+    assert_close(
+        expected_output[0],
+        actual_output[1],
+        block_size,
+        tolerance,
+        "round=1, channel=1"
+    );
+
+    per_channel_frequencies[2][2] = new_freq;
+
+    voice.update_note_frequency();
+
+    expected_output = SignalProducer::produce<SimpleOscillator>(expected, 2);
+    actual_output = SignalProducer::produce<SimpleVoice>(voice, 2);
+
+    assert_close(
+        expected_output[0],
+        actual_output[0],
+        block_size,
+        tolerance,
+        "round=2, channel=0"
+    );
+    assert_close(
+        expected_output[0],
+        actual_output[1],
+        block_size,
+        tolerance,
+        "round=2, channel=1"
     );
 })

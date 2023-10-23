@@ -728,6 +728,17 @@ void FloatParam<evaluation>::schedule_linear_ramp(
 
 
 template<ParamEvaluation evaluation>
+Seconds FloatParam<evaluation>::get_remaining_time_from_linear_ramp() const noexcept
+{
+    if (latest_event_type == EVT_LINEAR_RAMP) {
+        return linear_ramp_state.get_remaining_samples() * this->sampling_period;
+    }
+
+    return 0.0;
+}
+
+
+template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_event(
         SignalProducer::Event const& event
 ) noexcept {
@@ -1500,7 +1511,9 @@ void FloatParam<evaluation>::LinearRampState::init(
         speed = 1.0 / duration_in_samples;
     } else {
         is_done = true;
+        this->done_samples = 0.0;
         this->target_value = target_value;
+        this->duration_in_samples = 0.0;
     }
 }
 
@@ -1517,6 +1530,7 @@ Number FloatParam<evaluation>::LinearRampState::advance() noexcept
     done_samples += 1.0;
 
     if (done_samples >= duration_in_samples) {
+        done_samples = duration_in_samples;
         is_done = true;
     }
 
@@ -1533,6 +1547,13 @@ Number FloatParam<evaluation>::LinearRampState::get_value_at(
     } else {
         return target_value;
     }
+}
+
+
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::LinearRampState::get_remaining_samples() const noexcept
+{
+    return is_done ? 0.0 : (duration_in_samples - done_samples);
 }
 
 

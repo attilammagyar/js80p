@@ -272,6 +272,8 @@ class Voice : public SignalProducer
         Midi::Channel get_channel() const noexcept;
         Number get_inaccuracy() const noexcept;
 
+        void update_note_frequency() noexcept;
+
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
 
     protected:

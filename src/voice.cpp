@@ -19,6 +19,8 @@
 #ifndef JS80P__VOICE_CPP
 #define JS80P__VOICE_CPP
 
+#include <algorithm>
+
 #include "dsp/math.hpp"
 
 #include "voice.hpp"
@@ -959,6 +961,27 @@ template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 {
     return inaccuracy;
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::update_note_frequency() noexcept
+{
+    if (!oscillator.is_on()) {
+        return;
+    }
+
+    Frequency const new_frequency = calculate_note_frequency(note, channel);
+    Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
+
+    if (remaining < 0.000001 && std::fabs(new_frequency - oscillator.frequency.get_value()) < 0.000001) {
+        return;
+    }
+
+    Seconds const ramp_duration = std::max(0.003, remaining);
+
+    oscillator.frequency.cancel_events_at(0.0);
+    oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);
 }
 
 

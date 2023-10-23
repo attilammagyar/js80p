@@ -508,6 +508,35 @@ TEST(float_param_can_schedule_linear_ramping_clamped_to_min_value, {
 })
 
 
+TEST(float_param_can_tell_remaining_time_from_linear_ramp, {
+    constexpr Integer block_size = 10;
+
+    FloatParamS float_param("float", 0.0, 10.0, 0.0);
+
+    float_param.set_sample_rate(1.0);
+    float_param.set_block_size(block_size);
+    float_param.set_value(5.0);
+
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    float_param.schedule_value(7.0, 0.0);
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    float_param.schedule_linear_ramp(10.0, 10.0);
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
+    assert_eq(7.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    FloatParamS::produce<FloatParamS>(float_param, 2, block_size);
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    float_param.schedule_linear_ramp(0.5, 5.0);
+    FloatParamS::produce<FloatParamS>(float_param, 3, 1);
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+})
+
+
 TEST(when_float_param_linear_ramping_is_canceled_then_last_calculated_value_is_held, {
     constexpr Integer block_size = 20;
     constexpr Sample expected_samples[] = {
