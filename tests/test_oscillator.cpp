@@ -336,11 +336,52 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     SumOfSines expected_1(0.5, 440.0, -0.5, 440.0 * 2.0, 0.0, 440.0 * 9.0, 1, 0.0);
     SumOfSines expected_2(0.5, 440.0, 0.3, 440.0 * 2.0, 0.2, 440.0 * 9.0, 1, (Number)block_size / sample_rate);
 
+    FloatParamS amplitude("", 0.0, 1.0, 1.0);
+    FloatParamS dummy_param("", 0.0, 1.0, 0.0);
+    FloatParamB harmonic_0("", -1.0, 1.0, 0.0);
+    FloatParamB harmonic_1("", -1.0, 1.0, 0.0);
+    FloatParamB harmonic_8("", -1.0, 1.0, 0.0);
+    FloatParamB harmonic_rest("", -1.0, 1.0, 0.0);
+
     SimpleOscillator::WaveformParam waveform_param("");
-    SimpleOscillator oscillator(waveform_param);
+    SimpleOscillator oscillator(
+        waveform_param,
+        amplitude,
+        dummy_param,
+        dummy_param,
+        dummy_param,
+        harmonic_0,
+        harmonic_1,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_8,
+        harmonic_rest
+    );
 
     Buffer actual_output(block_size);
     Buffer expected_output(block_size);
+
+    amplitude.set_sample_rate(sample_rate);
+    amplitude.set_block_size(block_size);
+
+    dummy_param.set_sample_rate(sample_rate);
+    dummy_param.set_block_size(block_size);
+
+    harmonic_0.set_sample_rate(sample_rate);
+    harmonic_0.set_block_size(block_size);
+
+    harmonic_1.set_sample_rate(sample_rate);
+    harmonic_1.set_block_size(block_size);
+
+    harmonic_8.set_sample_rate(sample_rate);
+    harmonic_8.set_block_size(block_size);
+
+    harmonic_rest.set_sample_rate(sample_rate);
+    harmonic_rest.set_block_size(block_size);
 
     expected_1.set_sample_rate(sample_rate);
     expected_1.set_block_size(block_size);
@@ -354,21 +395,15 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
 
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(sample_rate);
-    oscillator.harmonic_0.set_value(0.5);
-    oscillator.harmonic_1.set_value(-0.5);
-    oscillator.harmonic_2.set_value(0.0);
-    oscillator.harmonic_3.set_value(0.0);
-    oscillator.harmonic_4.set_value(0.0);
-    oscillator.harmonic_5.set_value(0.0);
-    oscillator.harmonic_6.set_value(0.0);
-    oscillator.harmonic_7.set_value(0.0);
-    oscillator.harmonic_8.set_value(0.0);
-    oscillator.harmonic_9.set_value(0.0);
+
+    harmonic_0.set_value(0.5);
+    harmonic_1.set_value(-0.5);
+
     oscillator.frequency.set_value(440.0);
     oscillator.start(0.0);
 
-    oscillator.harmonic_1.schedule_value(0.001, 0.3);
-    oscillator.harmonic_8.schedule_value(0.001, 0.2);
+    harmonic_1.schedule_value(0.001, 0.3);
+    harmonic_8.schedule_value(0.001, 0.2);
 
     render_rounds<SimpleOscillator>(oscillator, actual_output, 1, block_size, 1);
     render_rounds<SumOfSines>(expected_1, expected_output, 1, block_size, 1);
@@ -1187,13 +1222,15 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     ToggleParam tempo_sync("SYN", ToggleParam::ON);
     FloatParamS amplitude_leader("AMP", 0.0, 1.0, 1.0);
     FloatParamS frequency_leader("FREQ", 0.01, 10000.0, 500.0);
+    FloatParamS dummy_param("", 0.0, 1.0, 0.0);
+    ToggleParam dummy_toggle("", ToggleParam::OFF);
     SimpleLFO oscillator(
         waveform_param,
         amplitude_leader,
         frequency_leader,
-        SimpleOscillator::dummy_param,
+        dummy_param,
         tempo_sync,
-        SimpleOscillator::dummy_toggle
+        dummy_toggle
     );
 
     oscillator.set_block_size(block_size);

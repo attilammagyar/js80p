@@ -30,7 +30,7 @@ namespace JS80P
 {
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
-FloatParamS Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_param("", 0.0, 0.0, 0.0);
+FloatParamB Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_param("", 0.0, 1.0, 0.0);
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 ToggleParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_toggle("", ToggleParam::OFF);
@@ -83,16 +83,16 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
-    harmonic_0("", -1.0, 1.0, 0.0),
-    harmonic_1("", -1.0, 1.0, 0.0),
-    harmonic_2("", -1.0, 1.0, 0.0),
-    harmonic_3("", -1.0, 1.0, 0.0),
-    harmonic_4("", -1.0, 1.0, 0.0),
-    harmonic_5("", -1.0, 1.0, 0.0),
-    harmonic_6("", -1.0, 1.0, 0.0),
-    harmonic_7("", -1.0, 1.0, 0.0),
-    harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0),
+    harmonic_0(dummy_param),
+    harmonic_1(dummy_param),
+    harmonic_2(dummy_param),
+    harmonic_3(dummy_param),
+    harmonic_4(dummy_param),
+    harmonic_5(dummy_param),
+    harmonic_6(dummy_param),
+    harmonic_7(dummy_param),
+    harmonic_8(dummy_param),
+    harmonic_9(dummy_param),
     tempo_sync(dummy_toggle),
     center(dummy_toggle)
 {
@@ -126,17 +126,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
     register_child(phase);
     register_child(detune);
     register_child(fine_detune);
-
-    register_child(harmonic_0);
-    register_child(harmonic_1);
-    register_child(harmonic_2);
-    register_child(harmonic_3);
-    register_child(harmonic_4);
-    register_child(harmonic_5);
-    register_child(harmonic_6);
-    register_child(harmonic_7);
-    register_child(harmonic_8);
-    register_child(harmonic_9);
 
     custom_waveform_params[0] = &harmonic_0;
     custom_waveform_params[1] = &harmonic_1;
@@ -213,16 +202,16 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
-    harmonic_0("", -1.0, 1.0, 0.0),
-    harmonic_1("", -1.0, 1.0, 0.0),
-    harmonic_2("", -1.0, 1.0, 0.0),
-    harmonic_3("", -1.0, 1.0, 0.0),
-    harmonic_4("", -1.0, 1.0, 0.0),
-    harmonic_5("", -1.0, 1.0, 0.0),
-    harmonic_6("", -1.0, 1.0, 0.0),
-    harmonic_7("", -1.0, 1.0, 0.0),
-    harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0),
+    harmonic_0(dummy_param),
+    harmonic_1(dummy_param),
+    harmonic_2(dummy_param),
+    harmonic_3(dummy_param),
+    harmonic_4(dummy_param),
+    harmonic_5(dummy_param),
+    harmonic_6(dummy_param),
+    harmonic_7(dummy_param),
+    harmonic_8(dummy_param),
+    harmonic_9(dummy_param),
     tempo_sync(dummy_toggle),
     center(dummy_toggle)
 {
@@ -258,16 +247,16 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
-    harmonic_0("", -1.0, 1.0, 0.0),
-    harmonic_1("", -1.0, 1.0, 0.0),
-    harmonic_2("", -1.0, 1.0, 0.0),
-    harmonic_3("", -1.0, 1.0, 0.0),
-    harmonic_4("", -1.0, 1.0, 0.0),
-    harmonic_5("", -1.0, 1.0, 0.0),
-    harmonic_6("", -1.0, 1.0, 0.0),
-    harmonic_7("", -1.0, 1.0, 0.0),
-    harmonic_8("", -1.0, 1.0, 0.0),
-    harmonic_9("", -1.0, 1.0, 0.0),
+    harmonic_0(dummy_param),
+    harmonic_1(dummy_param),
+    harmonic_2(dummy_param),
+    harmonic_3(dummy_param),
+    harmonic_4(dummy_param),
+    harmonic_5(dummy_param),
+    harmonic_6(dummy_param),
+    harmonic_7(dummy_param),
+    harmonic_8(dummy_param),
+    harmonic_9(dummy_param),
     tempo_sync(tempo_sync),
     center(center)
 {

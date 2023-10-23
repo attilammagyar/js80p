@@ -51,6 +51,9 @@ class Oscillator : public SignalProducer
 
         static constexpr bool HAS_SUBHARMONIC = !(IS_MODULATED || is_lfo);
 
+        static FloatParamB dummy_param;
+        static ToggleParam dummy_toggle;
+
     public:
         typedef typename std::conditional<
             IS_MODULATED,
@@ -94,9 +97,6 @@ class Oscillator : public SignalProducer
 
         static constexpr Event::Type EVT_START = 1;
         static constexpr Event::Type EVT_STOP = 2;
-
-        static FloatParamS dummy_param;
-        static ToggleParam dummy_toggle;
 
         Oscillator(WaveformParam& waveform) noexcept;
 
@@ -177,16 +177,16 @@ class Oscillator : public SignalProducer
         FloatParamS detune;
         FloatParamS fine_detune;
 
-        FloatParamB harmonic_0;
-        FloatParamB harmonic_1;
-        FloatParamB harmonic_2;
-        FloatParamB harmonic_3;
-        FloatParamB harmonic_4;
-        FloatParamB harmonic_5;
-        FloatParamB harmonic_6;
-        FloatParamB harmonic_7;
-        FloatParamB harmonic_8;
-        FloatParamB harmonic_9;
+        FloatParamB& harmonic_0;
+        FloatParamB& harmonic_1;
+        FloatParamB& harmonic_2;
+        FloatParamB& harmonic_3;
+        FloatParamB& harmonic_4;
+        FloatParamB& harmonic_5;
+        FloatParamB& harmonic_6;
+        FloatParamB& harmonic_7;
+        FloatParamB& harmonic_8;
+        FloatParamB& harmonic_9;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -206,7 +206,7 @@ class Oscillator : public SignalProducer
     private:
         static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 18;
+        static constexpr Integer NUMBER_OF_CHILDREN = 8;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
 
