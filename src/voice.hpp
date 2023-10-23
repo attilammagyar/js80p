@@ -56,6 +56,8 @@ class Voice : public SignalProducer
 
         static constexpr bool IS_CARRIER = !IS_MODULATOR;
 
+        static constexpr Integer NUMBER_OF_CHILDREN = 10;
+
     public:
         enum State {
             OFF = 0,

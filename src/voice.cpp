@@ -266,7 +266,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedCache* filter_1_shared_cache,
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
-    : SignalProducer(CHANNELS, 12),
+    : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
     frequencies(frequencies),
@@ -329,7 +329,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedCache* filter_1_shared_cache,
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
-    : SignalProducer(CHANNELS, 12),
+    : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     initial_inaccuracy(inaccuracy),
     param_leaders(param_leaders),
     frequencies(frequencies),
