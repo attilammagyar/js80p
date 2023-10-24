@@ -274,6 +274,7 @@ class FloatParam : public Param<Number, evaluation>
             Number const target_value
         ) noexcept;
 
+        bool is_ramping() const noexcept;
         Seconds get_remaining_time_from_linear_ramp() const noexcept;
 
         void set_midi_controller(MidiController* midi_controller) noexcept;

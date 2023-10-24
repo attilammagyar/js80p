@@ -768,7 +768,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
     note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
-    oscillator.frequency.schedule_linear_ramp(portamento_length, calculate_note_frequency(note, channel));
+
+    Frequency const f = calculate_note_frequency(note, channel);
+    oscillator.frequency.schedule_linear_ramp(portamento_length, f);
 }
 
 
@@ -959,7 +961,7 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed(
     }
 
     return (
-        !param.has_events_after(0.0)
+        !param.has_events()
         && param.get_value() < threshold
         && envelope->final_value.get_value() < threshold
     );
@@ -997,7 +999,7 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp() noexcept
 {
-    if (UNLIKELY(!oscillator.is_on())) {
+    if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
 
@@ -1021,15 +1023,29 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts
 
 
 template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept
+{
+    return (
+        !oscillator.is_on()
+        || oscillator.has_events()
+        || (
+            oscillator.frequency.has_events()
+            && !oscillator.frequency.is_ramping()
+        )
+    );
+}
+
+
+template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency() noexcept
 {
-    if (UNLIKELY(!oscillator.is_on())) {
+    if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
 
     Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
 
-    if (LIKELY(remaining > 0.02)) {
+    if (LIKELY(remaining > 0.0)) {
         return;
     }
 

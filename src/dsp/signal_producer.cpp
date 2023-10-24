@@ -385,9 +385,15 @@ void SignalProducer::cancel_events_after(Seconds const time_offset) noexcept
 }
 
 
+bool SignalProducer::has_events() const noexcept
+{
+    return !events.is_empty();
+}
+
+
 bool SignalProducer::has_events_after(Seconds const time_offset) const noexcept
 {
-    return !events.is_empty() && events.back().time_offset > time_offset;
+    return has_events() && events.back().time_offset > time_offset;
 }
 
 

@@ -330,6 +330,8 @@ class Voice : public SignalProducer
             Midi::Note const previous_note
         ) noexcept;
 
+        bool is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept;
+
         bool has_decayed(FloatParamS const& param) const noexcept;
 
         Number const initial_inaccuracy;

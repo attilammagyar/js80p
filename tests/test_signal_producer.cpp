@@ -699,6 +699,8 @@ TEST(resetting_a_signal_producer_drops_all_events, {
         signal_producer, 1, block_size
     );
 
+    assert_false(signal_producer.has_events());
+
     assert_eq(expected_samples, rendered[0], block_size);
 })
 
@@ -740,10 +742,12 @@ void test_event_handling(
 
     signal_producer.set_block_size(block_size);
 
+    assert_false(signal_producer.has_events());
     assert_false(signal_producer.has_events_after(0.0));
 
     for (Integer i = 0; i != events_length; ++i) {
         signal_producer.schedule(events[i].time_offset, events[i].param);
+        assert_true(signal_producer.has_events());
         assert_false(signal_producer.has_events_after(events[i].time_offset));
         assert_true(
             signal_producer.has_events_after(events[i].time_offset - DOUBLE_DELTA)
@@ -762,6 +766,7 @@ void test_event_handling(
             signal_producer.cancel_events_after(cancellations[i].time_offset);
         }
 
+        assert_true(signal_producer.has_events());
         assert_false(signal_producer.has_events_after(cancellations[i].time_offset));
         assert_true(signal_producer.has_events_after(0.0));
         assert_true(

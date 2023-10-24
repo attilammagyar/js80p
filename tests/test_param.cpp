@@ -517,22 +517,32 @@ TEST(float_param_can_tell_remaining_time_from_linear_ramp, {
     float_param.set_block_size(block_size);
     float_param.set_value(5.0);
 
+    assert_false(float_param.is_ramping());
     assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 
     float_param.schedule_value(7.0, 0.0);
+    assert_false(float_param.is_ramping());
     assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 
     float_param.schedule_linear_ramp(10.0, 10.0);
+    assert_false(float_param.is_ramping());
     assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 
     FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
+    assert_true(float_param.is_ramping());
     assert_eq(7.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 
     FloatParamS::produce<FloatParamS>(float_param, 2, block_size);
+    assert_false(float_param.is_ramping());
     assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 
     float_param.schedule_linear_ramp(0.5, 5.0);
     FloatParamS::produce<FloatParamS>(float_param, 3, 1);
+    assert_true(float_param.is_ramping());
+    assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
+
+    FloatParamS::produce<FloatParamS>(float_param, 4, 1);
+    assert_false(float_param.is_ramping());
     assert_eq(0.0, float_param.get_remaining_time_from_linear_ramp(), DOUBLE_DELTA);
 })
 

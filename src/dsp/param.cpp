@@ -641,7 +641,7 @@ bool FloatParam<evaluation>::is_constant_until(
 
     Integer const last_sample_idx = sample_count - 1;
 
-    if (latest_event_type == EVT_LINEAR_RAMP || this->has_upcoming_events(last_sample_idx)) {
+    if (is_ramping() || this->has_upcoming_events(last_sample_idx)) {
         return false;
     }
 
@@ -731,9 +731,16 @@ void FloatParam<evaluation>::schedule_linear_ramp(
 
 
 template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_ramping() const noexcept
+{
+    return latest_event_type == EVT_LINEAR_RAMP;
+}
+
+
+template<ParamEvaluation evaluation>
 Seconds FloatParam<evaluation>::get_remaining_time_from_linear_ramp() const noexcept
 {
-    if (latest_event_type == EVT_LINEAR_RAMP) {
+    if (is_ramping()) {
         return linear_ramp_state.get_remaining_samples() * this->sampling_period;
     }
 
@@ -893,7 +900,7 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_cancel_event(
         SignalProducer::Event const& event
 ) noexcept {
-    if (latest_event_type == EVT_LINEAR_RAMP) {
+    if (is_ramping()) {
         Number const stop_value = linear_ramp_state.get_value_at(
             event.time_offset - linear_ramp_state.start_time_offset
         );
@@ -1386,7 +1393,7 @@ void FloatParam<evaluation>::render(
     if constexpr (evaluation == ParamEvaluation::SAMPLE) {
         if (lfo != NULL) {
             render_with_lfo(round, first_sample_index, last_sample_index, buffer);
-        } else if (latest_event_type == EVT_LINEAR_RAMP) {
+        } else if (is_ramping()) {
             render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
         } else {
             Param<Number, evaluation>::render(
