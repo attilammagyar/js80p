@@ -623,19 +623,19 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
     switch (tuning) {
         case TUNING_440HZ_12TET_SMALL_INACCURACY_1:
         case TUNING_432HZ_12TET_SMALL_INACCURACY_1:
-            return Math::detune(frequency, 2.0 * inaccuracy - 0.6);
+            return Math::detune(frequency, 1.0 * inaccuracy - 0.4);
 
         case TUNING_440HZ_12TET_SMALL_INACCURACY_3:
         case TUNING_432HZ_12TET_SMALL_INACCURACY_3:
-            return Math::detune(frequency, 5.0 * inaccuracy - 2.0);
+            return Math::detune(frequency, 2.0 * inaccuracy - 0.8);
 
         case TUNING_440HZ_12TET_LARGE_INACCURACY_1:
         case TUNING_432HZ_12TET_LARGE_INACCURACY_1:
-            return Math::detune(frequency, 20.0 * inaccuracy - 6.0);
+            return Math::detune(frequency, 12.0 * inaccuracy - 5.0);
 
         case TUNING_440HZ_12TET_LARGE_INACCURACY_3:
         case TUNING_432HZ_12TET_LARGE_INACCURACY_3:
-            return Math::detune(frequency, 60.0 * inaccuracy - 24.0);
+            return Math::detune(frequency, 30.0 * inaccuracy - 14.0);
 
         case TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED:
         case TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED:
