@@ -1145,3 +1145,38 @@ TEST(voice_inaccuracy_is_deterministic_random, {
     assert_eq(buffer_inaccurate_a.samples[0], buffer_inaccurate_b.samples[0], buffer_size, DOUBLE_DELTA);
     assert_eq(buffer_inaccurate_a.samples[1], buffer_inaccurate_b.samples[1], buffer_size, DOUBLE_DELTA);
 })
+
+
+TEST(can_collect_notes_which_are_on_and_not_released, {
+    Synth synth(0);
+
+    synth.set_sample_rate(44100.0);
+    synth.set_block_size(4096);
+
+    set_param(synth, Synth::ParamId::MAMP, 0.5);
+    set_param(synth, Synth::ParamId::CAMP, 0.5);
+
+    set_param(synth, Synth::ParamId::N1REL, 1.0);
+    assign_controller(synth, Synth::ParamId::MVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_1);
+    synth.process_messages();
+
+    synth.note_on(0.000001, 1, Midi::NOTE_A_2, 100);
+    synth.note_on(0.000002, 1, Midi::NOTE_A_3, 100);
+    synth.note_on(0.000003, 1, Midi::NOTE_A_4, 100);
+    synth.note_on(0.000004, 1, Midi::NOTE_A_5, 100);
+
+    synth.note_off(0.000005, 1, Midi::NOTE_A_3, 100);
+    synth.note_off(0.000006, 1, Midi::NOTE_A_4, 100);
+    synth.note_off(0.000007, 1, Midi::NOTE_A_5, 100);
+
+    SignalProducer::produce<Synth>(synth, 1);
+
+    Integer active_notes_count = 0;
+    Synth::NoteTunings const& active_notes = synth.collect_active_notes(active_notes_count);
+
+    assert_eq(1, (int)active_notes_count);
+    assert_true(active_notes[0].is_valid());
+    assert_eq((int)Midi::NOTE_A_2, (int)active_notes[0].note);
+    assert_eq(1, (int)active_notes[0].channel);
+})

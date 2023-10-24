@@ -965,16 +965,21 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::update_note_frequency() noexcept
+void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp() noexcept
 {
-    if (!oscillator.is_on()) {
+    if (UNLIKELY(!oscillator.is_on())) {
         return;
     }
 
-    Frequency const new_frequency = calculate_note_frequency(note, channel);
+    Frequency const new_frequency = per_channel_frequencies[channel][note];
     Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
 
-    if (remaining < 0.000001 && Math::is_close(new_frequency, oscillator.frequency.get_value())) {
+    if (
+            LIKELY(
+                remaining < 0.000001
+                && Math::is_close(new_frequency, oscillator.frequency.get_value())
+            )
+    ) {
         return;
     }
 

@@ -474,7 +474,7 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
 })
 
 
-TEST(when_using_realtime_mts_esp_tuning_then_frequency_is_updated_before_each_round, {
+TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_each_round, {
     constexpr Frequency sample_rate = 30000.0;
     constexpr Integer block_size = 3000;
     constexpr Seconds portamento_length = 2.0 * ((Seconds)block_size / sample_rate);
@@ -519,7 +519,7 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_is_updated_before_each_ro
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_REALTIME);
     voice.note_on(0.0, 123, 2, 2, 1.0, 2);
-    voice.update_note_frequency();
+    voice.update_note_frequency_for_realtime_mts_esp();
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 1);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 1);
@@ -541,7 +541,7 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_is_updated_before_each_ro
 
     per_channel_frequencies[2][2] = new_freq;
 
-    voice.update_note_frequency();
+    voice.update_note_frequency_for_realtime_mts_esp();
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 2);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 2);

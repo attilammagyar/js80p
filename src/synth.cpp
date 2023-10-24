@@ -105,7 +105,9 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     bus(
         OUT_CHANNELS,
         modulators,
+        modulator_params,
         carriers,
+        carrier_params,
         POLYPHONY,
         modulator_add_volume
     ),
@@ -771,6 +773,14 @@ void Synth::resume() noexcept
     start_lfos();
     clear_sustain();
     note_stack.clear();
+}
+
+
+Synth::NoteTunings const& Synth::collect_active_notes(Integer& active_notes_count) noexcept
+{
+    bus.collect_active_notes(active_note_tunings, active_notes_count);
+
+    return active_note_tunings;
 }
 
 
@@ -3316,7 +3326,9 @@ Synth::Message::Message(
 Synth::Bus::Bus(
         Integer const channels,
         Modulator* const* const modulators,
+        Modulator::Params const& modulator_params,
         Carrier* const* const carriers,
+        Carrier::Params const& carrier_params,
         Integer const polyphony,
         FloatParamS& modulator_add_volume
 ) noexcept
@@ -3324,6 +3336,8 @@ Synth::Bus::Bus(
     polyphony(polyphony),
     modulators(modulators),
     carriers(carriers),
+    modulator_params(modulator_params),
+    carrier_params(carrier_params),
     modulator_add_volume(modulator_add_volume),
     modulators_buffer(NULL),
     carriers_buffer(NULL)
@@ -3380,6 +3394,30 @@ void Synth::Bus::find_carriers_peak(
 }
 
 
+void Synth::Bus::collect_active_notes(
+        NoteTunings& note_tunings,
+        Integer& note_tunings_count
+) noexcept {
+    Integer i = 0;
+
+    for (Integer v = 0; v != polyphony; ++v) {
+        if (!modulators[v]->is_released() && modulators[v]->is_on()) {
+            note_tunings[i] = NoteTuning(
+                modulators[v]->get_note(), modulators[v]->get_channel()
+            );
+            ++i;
+        } else if (!carriers[v]->is_released() && carriers[v]->is_on()) {
+            note_tunings[i] = NoteTuning(
+                carriers[v]->get_note(), carriers[v]->get_channel()
+            );
+            ++i;
+        }
+    }
+
+    note_tunings_count = i;
+}
+
+
 void Synth::Bus::reallocate_buffers() noexcept
 {
     free_buffers();
@@ -3391,6 +3429,31 @@ Sample const* const* Synth::Bus::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    collect_active_voices();
+
+    modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
+        modulator_add_volume, round, sample_count
+    );
+
+    render_silence(round, 0, sample_count, modulators_buffer);
+    render_silence(round, 0, sample_count, carriers_buffer);
+    render_silence(round, 0, sample_count, buffer);
+
+    render_voices<Modulator>(active_modulators, active_modulators_count, modulator_params.tuning.get_value(), round, sample_count);
+    render_voices<Carrier>(active_carriers, active_carriers_count, carrier_params.tuning.get_value(), round, sample_count);
+
+    if (active_modulators_count == 0 && active_carriers_count == 0) {
+        mark_round_as_silent(round);
+
+        return buffer;
+    }
+
+    return NULL;
+}
+
+
+void Synth::Bus::collect_active_voices() noexcept
+{
     active_modulators_count = 0;
     active_carriers_count = 0;
 
@@ -3405,25 +3468,6 @@ Sample const* const* Synth::Bus::initialize_rendering(
             ++active_carriers_count;
         }
     }
-
-    modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
-        modulator_add_volume, round, sample_count
-    );
-
-    render_silence(round, 0, sample_count, modulators_buffer);
-    render_silence(round, 0, sample_count, carriers_buffer);
-    render_silence(round, 0, sample_count, buffer);
-
-    render_voices<Modulator>(active_modulators, active_modulators_count, round, sample_count);
-    render_voices<Carrier>(active_carriers, active_carriers_count, round, sample_count);
-
-    if (active_modulators_count == 0 && active_carriers_count == 0) {
-        mark_round_as_silent(round);
-
-        return buffer;
-    }
-
-    return NULL;
 }
 
 
@@ -3431,6 +3475,7 @@ template<class VoiceClass>
 void Synth::Bus::render_voices(
         VoiceClass* (&voices)[POLYPHONY],
         size_t const voices_count,
+        typename VoiceClass::Tuning const tuning,
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -3441,6 +3486,12 @@ void Synth::Bus::render_voices(
         then rendering carrier oscillators would trigger rendering the whole signal
         chain of the corresponding modulator.
         */
+
+        if (tuning == VoiceClass::TUNING_MTS_ESP_REALTIME) {
+            for (size_t v = 0; v != voices_count; ++v) {
+                voices[v]->update_note_frequency_for_realtime_mts_esp();
+            }
+        }
 
         for (size_t v = 0; v != voices_count; ++v) {
             voices[v]->render_oscillator(round, sample_count);

@@ -736,6 +736,45 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ModeParam(std::string const name) noexcept;
         };
 
+        class NoteTuning
+        {
+            public:
+                NoteTuning() noexcept
+                    : frequency(0.0),
+                    note(Midi::INVALID_NOTE),
+                    channel(Midi::INVALID_CHANNEL)
+                {
+                }
+
+                NoteTuning(NoteTuning const& note_tuning) noexcept = default;
+                NoteTuning(NoteTuning&& note_tuning) noexcept = default;
+
+                NoteTuning(
+                    Midi::Note const note,
+                    Midi::Channel const channel,
+                    Frequency const frequency = 0.0
+                ) noexcept
+                    : frequency(frequency),
+                    note(note),
+                    channel(channel)
+                {
+                }
+
+                NoteTuning& operator=(NoteTuning const& note_tuning) noexcept = default;
+                NoteTuning& operator=(NoteTuning&& note_tuning) noexcept = default;
+
+                bool is_valid() const noexcept
+                {
+                    return channel <= Midi::CHANNEL_MAX && note <= Midi::NOTE_MAX;
+                }
+
+                Frequency frequency;
+                Midi::Note note;
+                Midi::Channel channel;
+        };
+
+        typedef NoteTuning NoteTunings[POLYPHONY];
+
         static bool is_supported_midi_controller(
             Midi::Controller const controller
         ) noexcept;
@@ -759,6 +798,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void suspend() noexcept;
         void resume() noexcept;
+
+        NoteTunings const& collect_active_notes(Integer& active_notes_count) noexcept;
 
         Sample const* const* generate_samples(
             Integer const round, Integer const sample_count
@@ -929,7 +970,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Bus(
                     Integer const channels,
                     Modulator* const* const modulators,
+                    Modulator::Params const& modulator_params,
                     Carrier* const* const carriers,
+                    Carrier::Params const& carrier_params,
                     Integer const polyphony,
                     FloatParamS& modulator_add_volume
                 ) noexcept;
@@ -952,6 +995,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer& peak_index
                 ) noexcept;
 
+                void collect_active_notes(
+                    NoteTunings& note_tunings,
+                    Integer& note_tunings_count
+                ) noexcept;
+
             protected:
                 Sample const* const* initialize_rendering(
                     Integer const round,
@@ -970,10 +1018,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 void free_buffers() noexcept;
                 void reallocate_buffers() noexcept;
 
+                void collect_active_voices() noexcept;
+
                 template<class VoiceClass>
                 void render_voices(
                     VoiceClass* (&voices)[POLYPHONY],
                     size_t const voices_count,
+                    typename VoiceClass::Tuning const tuning,
                     Integer const round,
                     Integer const sample_count
                 ) noexcept;
@@ -1002,6 +1053,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Integer const polyphony;
                 Modulator* const* const modulators;
                 Carrier* const* const carriers;
+                Modulator::Params const& modulator_params;
+                Carrier::Params const& carrier_params;
                 Modulator* active_modulators[POLYPHONY];
                 Carrier* active_carriers[POLYPHONY];
                 size_t active_modulators_count;
@@ -1266,6 +1319,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
+        NoteTunings active_note_tunings;
         Integer samples_since_gc;
         Integer samples_between_gc;
         Integer next_voice;
