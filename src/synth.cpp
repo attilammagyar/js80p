@@ -3491,6 +3491,10 @@ void Synth::Bus::render_voices(
             for (size_t v = 0; v != voices_count; ++v) {
                 voices[v]->update_note_frequency_for_realtime_mts_esp();
             }
+        } else if (VoiceClass::is_tuning_unstable(tuning)) {
+            for (size_t v = 0; v != voices_count; ++v) {
+                voices[v]->update_unstable_note_frequency();
+            }
         }
 
         for (size_t v = 0; v != voices_count; ++v) {

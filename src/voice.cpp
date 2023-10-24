@@ -260,6 +260,26 @@ Number Voice<ModulatorSignalProducerClass>::calculate_new_inaccuracy(
 
 
 template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::is_tuning_unstable(
+        Tuning const tuning
+) noexcept {
+    constexpr int mask = (
+        0
+        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_1
+        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_3
+        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_1
+        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_3
+        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_1
+        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_3
+        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_1
+        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_3
+    );
+
+    return 0 != (mask & (1 << tuning));
+}
+
+
+template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         FrequencyTable const& frequencies,
         PerChannelFrequencyTable const& per_channel_frequencies,
@@ -618,6 +638,16 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
         return per_channel_frequencies[channel][note];
     }
 
+    return calculate_inaccurate_note_frequency(tuning, note, channel);
+}
+
+
+template<class ModulatorSignalProducerClass>
+Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequency(
+        Tuning const tuning,
+        Midi::Note const note,
+        Midi::Channel const channel
+) const noexcept {
     Frequency const frequency = frequencies[tuning][note];
 
     switch (tuning) {
@@ -984,6 +1014,41 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts
     }
 
     Seconds const ramp_duration = std::max(0.003, remaining);
+
+    oscillator.frequency.cancel_events_at(0.0);
+    oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency() noexcept
+{
+    if (UNLIKELY(!oscillator.is_on())) {
+        return;
+    }
+
+    Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
+
+    if (LIKELY(remaining > 0.02)) {
+        return;
+    }
+
+    update_inaccuracy();
+
+    Frequency const new_frequency = calculate_inaccurate_note_frequency(
+        param_leaders.tuning.get_value(), note, channel
+    );
+
+    if (
+            UNLIKELY(
+                remaining < 0.000001
+                && Math::is_close(new_frequency, oscillator.frequency.get_value())
+            )
+    ) {
+        return;
+    }
+
+    Seconds const ramp_duration = 0.3 + 1.7 * inaccuracy;
 
     oscillator.frequency.cancel_events_at(0.0);
     oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);

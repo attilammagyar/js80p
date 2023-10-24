@@ -199,6 +199,8 @@ class Voice : public SignalProducer
 
         static Number calculate_new_inaccuracy(Number const seed) noexcept;
 
+        static bool is_tuning_unstable(Tuning const tuning) noexcept;
+
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
@@ -273,6 +275,7 @@ class Voice : public SignalProducer
         Number get_inaccuracy() const noexcept;
 
         void update_note_frequency_for_realtime_mts_esp() noexcept;
+        void update_unstable_note_frequency() noexcept;
 
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
 
@@ -307,6 +310,12 @@ class Voice : public SignalProducer
         void update_inaccuracy() noexcept;
 
         Frequency calculate_note_frequency(
+            Midi::Note const note,
+            Midi::Channel const channel
+        ) const noexcept;
+
+        Frequency calculate_inaccurate_note_frequency(
+            Tuning const tuning,
             Midi::Note const note,
             Midi::Channel const channel
         ) const noexcept;

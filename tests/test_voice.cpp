@@ -561,3 +561,23 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
         "round=2, channel=1"
     );
 })
+
+
+TEST(can_tell_if_tuning_is_unstable, {
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_1));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_3));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_1));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_1));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_3));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_1));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_NOTE_ON));
+    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_REALTIME));
+})
