@@ -614,7 +614,7 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
 ) const noexcept {
     Tuning const tuning = param_leaders.tuning.get_value();
 
-    if (tuning == TUNING_MTS_ESP_NOTE_ON || tuning == TUNING_MTS_ESP_REALTIME) {
+    if (tuning >= TUNING_MTS_ESP_NOTE_ON) {
         return per_channel_frequencies[channel][note];
     }
 
