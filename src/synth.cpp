@@ -319,18 +319,18 @@ void Synth::build_frequency_table() noexcept
 
         frequencies[Modulator::TUNING_440HZ_12TET][note] = f_440hz_12tet;
         frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_small_1);
-        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED][note] = Math::detune(f_440hz_12tet, detune_440_small_2);
+        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_small_2);
         frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_small_3);
         frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_large_1);
-        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED][note] = Math::detune(f_440hz_12tet, detune_440_large_2);
+        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_large_2);
         frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_large_3);
 
         frequencies[Modulator::TUNING_432HZ_12TET][note] = f_432hz_12tet;
         frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_small_1);
-        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED][note] = Math::detune(f_432hz_12tet, detune_432_small_2);
+        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_small_2);
         frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_small_3);
         frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_large_1);
-        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED][note] = Math::detune(f_432hz_12tet, detune_432_large_2);
+        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_large_2);
         frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_large_3);
     }
 
@@ -516,10 +516,15 @@ void Synth::register_effects_params() noexcept
 void Synth::create_voices() noexcept
 {
     for (Integer i = 0; i != POLYPHONY; ++i) {
+        synced_inaccuracies[i] = new Inaccuracy(
+            calculate_inaccuracy_seed((i + 31) % POLYPHONY)
+        );
+
         modulators[i] = new Modulator(
             frequencies,
             per_channel_frequencies,
-            calculate_initial_inaccuracy(i),
+            *synced_inaccuracies[i],
+            calculate_inaccuracy_seed(i),
             modulator_params,
             biquad_filter_shared_caches[0],
             biquad_filter_shared_caches[1]
@@ -529,7 +534,8 @@ void Synth::create_voices() noexcept
         carriers[i] = new Carrier(
             frequencies,
             per_channel_frequencies,
-            calculate_initial_inaccuracy(POLYPHONY - i),
+            *synced_inaccuracies[i],
+            calculate_inaccuracy_seed(POLYPHONY - i),
             carrier_params,
             modulators[i]->modulation_out,
             amplitude_modulation_level,
@@ -681,6 +687,7 @@ Synth::~Synth()
     for (Integer i = 0; i != POLYPHONY; ++i) {
         delete carriers[i];
         delete modulators[i];
+        delete synced_inaccuracies[i];
     }
 
     for (Integer i = 0; i != ENVELOPES; ++i) {
@@ -1196,11 +1203,11 @@ bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
 }
 
 
-Number Synth::calculate_initial_inaccuracy(Integer const voice) noexcept
+Number Synth::calculate_inaccuracy_seed(Integer const voice) noexcept
 {
     constexpr Number scale = 1.0 / (Number)POLYPHONY;
 
-    return Modulator::calculate_new_inaccuracy(scale * (Number)voice);
+    return Inaccuracy::calculate_new_inaccuracy(scale * (Number)voice);
 }
 
 
@@ -3492,8 +3499,14 @@ void Synth::Bus::render_voices(
                 voices[v]->update_note_frequency_for_realtime_mts_esp();
             }
         } else if (VoiceClass::is_tuning_unstable(tuning)) {
-            for (size_t v = 0; v != voices_count; ++v) {
-                voices[v]->update_unstable_note_frequency();
+            if (VoiceClass::is_tuning_synced_unstable(tuning)) {
+                for (size_t v = 0; v != voices_count; ++v) {
+                    voices[v]->template update_unstable_note_frequency<true>(round);
+                }
+            } else {
+                for (size_t v = 0; v != voices_count; ++v) {
+                    voices[v]->template update_unstable_note_frequency<false>(round);
+                }
             }
         }
 

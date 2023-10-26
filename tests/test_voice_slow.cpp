@@ -60,9 +60,16 @@ TEST(inaccuracy_keeps_changing_for_each_note, {
     SimpleVoice::Params params("V");
 
     for (Integer i = 0; i != Synth::POLYPHONY; ++i) {
-        Number const inaccuracy = Synth::calculate_initial_inaccuracy(i);
+        Inaccuracy synced_inaccuracy(0.5);
+        Number const inaccuracy = Synth::calculate_inaccuracy_seed(i);
 
-        SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, inaccuracy, params);
+        SimpleVoice voice(
+            FREQUENCIES,
+            PER_CHANNEL_FREQUENCIES,
+            synced_inaccuracy,
+            inaccuracy,
+            params
+        );
         std::vector<Number> inaccuracies(probes);
         Math::Statistics statistics;
 

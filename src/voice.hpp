@@ -44,6 +44,26 @@ typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
 typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 
 
+class Inaccuracy
+{
+    public:
+        static Number calculate_new_inaccuracy(Number const seed) noexcept;
+
+        Inaccuracy(Number const seed);
+
+        Number get_inaccuracy() const noexcept;
+
+        void update(Integer const round) noexcept;
+        void reset() noexcept;
+
+    private:
+        Number const seed;
+
+        Number inaccuracy;
+        Integer last_update_round;
+};
+
+
 template<class ModulatorSignalProducerClass>
 class Voice : public SignalProducer
 {
@@ -182,29 +202,30 @@ class Voice : public SignalProducer
 
         static constexpr Tuning TUNING_440HZ_12TET = 0;
         static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_1 = 1;
-        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED = 2;
+        static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED = 2;
         static constexpr Tuning TUNING_440HZ_12TET_SMALL_INACCURACY_3 = 3;
         static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_1 = 4;
-        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED = 5;
+        static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED = 5;
         static constexpr Tuning TUNING_440HZ_12TET_LARGE_INACCURACY_3 = 6;
         static constexpr Tuning TUNING_432HZ_12TET = 7;
         static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_1 = 8;
-        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED = 9;
+        static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED = 9;
         static constexpr Tuning TUNING_432HZ_12TET_SMALL_INACCURACY_3 = 10;
         static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_1 = 11;
-        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED = 12;
+        static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED = 12;
         static constexpr Tuning TUNING_432HZ_12TET_LARGE_INACCURACY_3 = 13;
         static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 14;
         static constexpr Tuning TUNING_MTS_ESP_REALTIME = 15;
 
-        static Number calculate_new_inaccuracy(Number const seed) noexcept;
-
         static bool is_tuning_unstable(Tuning const tuning) noexcept;
+
+        static bool is_tuning_synced_unstable(Tuning const tuning) noexcept;
 
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
-            Number const inaccuracy,
+            Inaccuracy& synced_inaccuracy,
+            Number const inaccuracy_seed,
             Params& param_leaders,
             BiquadFilterSharedCache* filter_1_shared_cache = NULL,
             BiquadFilterSharedCache* filter_2_shared_cache = NULL
@@ -213,7 +234,8 @@ class Voice : public SignalProducer
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
-            Number const inaccuracy,
+            Inaccuracy& synced_inaccuracy,
+            Number const inaccuracy_seed,
             Params& param_leaders,
             ModulatorSignalProducerClass& modulator,
             FloatParamS& amplitude_modulation_level_leader,
@@ -275,7 +297,9 @@ class Voice : public SignalProducer
         Number get_inaccuracy() const noexcept;
 
         void update_note_frequency_for_realtime_mts_esp() noexcept;
-        void update_unstable_note_frequency() noexcept;
+
+        template<bool is_synced>
+        void update_unstable_note_frequency(Integer const round) noexcept;
 
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
 
@@ -299,7 +323,7 @@ class Voice : public SignalProducer
 
         static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
 
-        void initialize_instance(Number const inaccuracy) noexcept;
+        void initialize_instance(Number const inaccuracy_seed) noexcept;
 
         void save_note_info(
             Integer const note_id,
@@ -334,11 +358,12 @@ class Voice : public SignalProducer
 
         bool has_decayed(FloatParamS const& param) const noexcept;
 
-        Number const initial_inaccuracy;
+        Number const inaccuracy_seed;
 
         Params& param_leaders;
         FrequencyTable const& frequencies;
         PerChannelFrequencyTable const& per_channel_frequencies;
+        Inaccuracy& synced_inaccuracy;
         Oscillator_ oscillator;
         Filter1 filter_1;
         Wavefolder_ wavefolder;

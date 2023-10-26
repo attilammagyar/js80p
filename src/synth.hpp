@@ -783,7 +783,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ControllerId const controller_id
         ) noexcept;
 
-        static Number calculate_initial_inaccuracy(Integer const voice) noexcept;
+        static Number calculate_inaccuracy_seed(Integer const voice) noexcept;
 
         Synth(Integer const samples_between_gc = 8000) noexcept;
         virtual ~Synth() override;
@@ -1317,6 +1317,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Macro* macros_rw[MACROS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
+        Inaccuracy* synced_inaccuracies[POLYPHONY];
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
         NoteTunings active_note_tunings;

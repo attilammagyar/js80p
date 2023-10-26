@@ -29,6 +29,41 @@
 namespace JS80P
 {
 
+Number Inaccuracy::calculate_new_inaccuracy(Number const seed) noexcept
+{
+    return 0.1 + 0.9 * Math::randomize(1.0, seed);
+}
+
+
+Inaccuracy::Inaccuracy(Number const seed)
+    : seed(seed),
+    inaccuracy(seed),
+    last_update_round(-1)
+{
+}
+
+
+Number Inaccuracy::get_inaccuracy() const noexcept
+{
+    return inaccuracy;
+}
+
+
+void Inaccuracy::update(Integer const round) noexcept
+{
+    if (last_update_round != round) {
+        last_update_round = round;
+        inaccuracy = calculate_new_inaccuracy(inaccuracy);
+    }
+}
+
+
+void Inaccuracy::reset() noexcept
+{
+    inaccuracy = seed;
+}
+
+
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
         std::string const name
@@ -252,27 +287,39 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
 
 
 template<class ModulatorSignalProducerClass>
-Number Voice<ModulatorSignalProducerClass>::calculate_new_inaccuracy(
-        Number const seed
-) noexcept {
-    return 0.1 + 0.9 * Math::randomize(1.0, seed);
-}
-
-
-template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::is_tuning_unstable(
         Tuning const tuning
 ) noexcept {
     constexpr int mask = (
         0
         | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_1
+        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED
         | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_3
         | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_1
+        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED
         | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_3
         | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_1
+        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED
         | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_3
         | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_1
+        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED
         | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_3
+    );
+
+    return 0 != (mask & (1 << tuning));
+}
+
+
+template<class ModulatorSignalProducerClass>
+bool Voice<ModulatorSignalProducerClass>::is_tuning_synced_unstable(
+        Tuning const tuning
+) noexcept {
+    constexpr int mask = (
+        0
+        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED
+        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED
+        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED
+        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED
     );
 
     return 0 != (mask & (1 << tuning));
@@ -283,16 +330,18 @@ template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         FrequencyTable const& frequencies,
         PerChannelFrequencyTable const& per_channel_frequencies,
-        Number const inaccuracy,
+        Inaccuracy& synced_inaccuracy,
+        Number const inaccuracy_seed,
         Params& param_leaders,
         BiquadFilterSharedCache* filter_1_shared_cache,
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
-    initial_inaccuracy(inaccuracy),
+    inaccuracy_seed(inaccuracy_seed),
     param_leaders(param_leaders),
     frequencies(frequencies),
     per_channel_frequencies(per_channel_frequencies),
+    synced_inaccuracy(synced_inaccuracy),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -334,7 +383,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, note_velocity, volume),
     modulation_out((ModulationOut&)volume_applier)
 {
-    initialize_instance(inaccuracy);
+    initialize_instance(inaccuracy_seed);
 }
 
 
@@ -342,7 +391,8 @@ template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
         FrequencyTable const& frequencies,
         PerChannelFrequencyTable const& per_channel_frequencies,
-        Number const inaccuracy,
+        Inaccuracy& synced_inaccuracy,
+        Number const inaccuracy_seed,
         Params& param_leaders,
         ModulatorSignalProducerClass& modulator,
         FloatParamS& amplitude_modulation_level_leader,
@@ -352,10 +402,11 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedCache* filter_2_shared_cache
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
-    initial_inaccuracy(inaccuracy),
+    inaccuracy_seed(inaccuracy_seed),
     param_leaders(param_leaders),
     frequencies(frequencies),
     per_channel_frequencies(per_channel_frequencies),
+    synced_inaccuracy(synced_inaccuracy),
     oscillator(
         param_leaders.waveform,
         param_leaders.amplitude,
@@ -406,15 +457,15 @@ Voice<ModulatorSignalProducerClass>::Voice(
     volume_applier(filter_2, note_velocity, volume),
     modulation_out((ModulationOut&)volume_applier)
 {
-    initialize_instance(inaccuracy);
+    initialize_instance(inaccuracy_seed);
 }
 
 
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::initialize_instance(
-        Number const inaccuracy
+        Number const inaccuracy_seed
 ) noexcept {
-    this->inaccuracy = inaccuracy;
+    this->inaccuracy = inaccuracy_seed;
 
     state = State::OFF;
     note_id = 0;
@@ -444,7 +495,8 @@ void Voice<ModulatorSignalProducerClass>::reset() noexcept
 {
     SignalProducer::reset();
 
-    inaccuracy = initial_inaccuracy;
+    synced_inaccuracy.reset();
+    inaccuracy = inaccuracy_seed;
     state = State::OFF;
     note_id = 0;
     note = 0;
@@ -554,7 +606,7 @@ void Voice<ModulatorSignalProducerClass>::save_note_info(
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::update_inaccuracy() noexcept
 {
-    inaccuracy = calculate_new_inaccuracy(inaccuracy);
+    inaccuracy = Inaccuracy::calculate_new_inaccuracy(inaccuracy);
 }
 
 
@@ -655,6 +707,10 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequen
         case TUNING_432HZ_12TET_SMALL_INACCURACY_1:
             return Math::detune(frequency, 1.5 * inaccuracy - 0.3);
 
+        case TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED:
+        case TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED:
+            return Math::detune(frequency, 3.0 * synced_inaccuracy.get_inaccuracy() - 0.6);
+
         case TUNING_440HZ_12TET_SMALL_INACCURACY_3:
         case TUNING_432HZ_12TET_SMALL_INACCURACY_3:
             return Math::detune(frequency, 9.0 * inaccuracy - 3.5);
@@ -663,14 +719,14 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequen
         case TUNING_432HZ_12TET_LARGE_INACCURACY_1:
             return Math::detune(frequency, 3.0 * inaccuracy - 0.6);
 
+        case TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED:
+        case TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED:
+            return Math::detune(frequency, 20 * synced_inaccuracy.get_inaccuracy() - 8.0);
+
         case TUNING_440HZ_12TET_LARGE_INACCURACY_3:
         case TUNING_432HZ_12TET_LARGE_INACCURACY_3:
             return Math::detune(frequency, 30.0 * inaccuracy - 14.0);
 
-        case TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED:
-        case TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED:
-        case TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED:
-        case TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED:
         default:
             break;
     }
@@ -1037,8 +1093,10 @@ bool Voice<ModulatorSignalProducerClass>::is_oscillator_starting_or_stopping_or_
 
 
 template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency() noexcept
-{
+template<bool is_synced>
+void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
+        Integer const round
+) noexcept {
     if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
@@ -1049,10 +1107,16 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency() noexc
         return;
     }
 
-    update_inaccuracy();
+    if constexpr (is_synced) {
+        synced_inaccuracy.update(round);
+    } else {
+        update_inaccuracy();
+    }
+
+    Tuning const tuning = param_leaders.tuning.get_value();
 
     Frequency const new_frequency = calculate_inaccurate_note_frequency(
-        param_leaders.tuning.get_value(), note, channel
+        tuning, note, channel
     );
 
     if (
@@ -1064,7 +1128,13 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency() noexc
         return;
     }
 
-    Seconds const ramp_duration = 0.3 + 1.7 * inaccuracy;
+    Number ramp_duration;
+
+    if constexpr (is_synced) {
+        ramp_duration = 0.3 + 1.7 * synced_inaccuracy.get_inaccuracy();
+    } else {
+        ramp_duration = 0.3 + 1.7 * inaccuracy;
+    }
 
     oscillator.frequency.cancel_events_at(0.0);
     oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);

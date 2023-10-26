@@ -62,8 +62,11 @@ constexpr PerChannelFrequencyTable PER_CHANNEL_FREQUENCIES = {
 
 
 TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     voice.note_on(0.12, 42, 1, 0, 0.5, 1);
 
@@ -81,9 +84,14 @@ TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
 TEST(rendering_is_independent_of_chunk_size, {
     constexpr Frequency sample_rate = 44100.0;
 
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
-    SimpleVoice voice_1(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
-    SimpleVoice voice_2(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice_1(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
+    SimpleVoice voice_2(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     params.waveform.set_value(SimpleOscillator::SINE);
     params.amplitude.set_value(1.0);
@@ -179,9 +187,12 @@ TEST(portamento, {
         SimpleVoice::CHANNELS,
         0.00009
     );
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
     Envelope envelope("");
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -224,8 +235,11 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
     Constant expected(0.0, SimpleVoice::CHANNELS);
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -270,9 +284,14 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
     constexpr Seconds sustain_start = note_start + short_time * 4.0;
 
     Envelope envelope("E");
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("V");
-    SimpleVoice decaying_voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
-    SimpleVoice non_decaying_voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice decaying_voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
+    SimpleVoice non_decaying_voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
     Integer rendered_samples = 0;
     Integer round = 0;
 
@@ -350,11 +369,16 @@ TEST(can_glide_smoothly_to_a_new_note, {
 
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params_ref("R");
     SimpleVoice::Params params("P");
     Envelope envelope("E");
-    SimpleVoice reference(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params_ref);
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice reference(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params_ref
+    );
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     set_up_voice(voice, params, block_size, sample_rate);
     set_up_voice(reference, params_ref, block_size, sample_rate);
@@ -417,22 +441,25 @@ TEST(tuning_can_be_changed, {
         0.0,
         SimpleVoice::CHANNELS
     );
+    Inaccuracy synced_inaccuracy(0.2);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
 
     set_up_voice(voice, params, block_size, sample_rate);
 
-    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED);
+    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED);
     voice.note_on(0.0, 123, 2, 0, 1.0, 2);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
+        expected_output.samples[0], actual_output.samples[0], sample_count, 0.02
     );
 })
 
@@ -454,8 +481,11 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
         0.0,
         SimpleVoice::CHANNELS
     );
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, PER_CHANNEL_FREQUENCIES, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -493,8 +523,11 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
     Sample const* const* actual_output;
     SimpleOscillator::WaveformParam expected_waveform("WF");
     SimpleOscillator expected(expected_waveform);
+    Inaccuracy synced_inaccuracy(0.5);
     SimpleVoice::Params params("");
-    SimpleVoice voice(FREQUENCIES, per_channel_frequencies, 0.0, params);
+    SimpleVoice voice(
+        FREQUENCIES, per_channel_frequencies, synced_inaccuracy, 0.0, params
+    );
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -566,18 +599,89 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
 TEST(can_tell_if_tuning_is_unstable, {
     assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_1));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_3));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_1));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_3));
     assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_1));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_3));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_1));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_2_FIXED));
+    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED));
     assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_3));
     assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_NOTE_ON));
     assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_REALTIME));
+})
+
+
+TEST(can_tell_if_tuning_is_unstable_and_synced, {
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_1));
+    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_1));
+    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_LARGE_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_1));
+    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_SMALL_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_1));
+    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_LARGE_INACCURACY_3));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_MTS_ESP_NOTE_ON));
+    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_MTS_ESP_REALTIME));
+})
+
+
+TEST(synced_inaccuracy_is_updated_once_per_round, {
+    Inaccuracy synced_inaccuracy(0.123);
+    SimpleVoice::Params params("");
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
+
+    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED);
+    voice.note_on(0.0, 42, 1, 0, 0.5, 1);
+
+    voice.update_unstable_note_frequency<true>(1);
+    SignalProducer::produce<SimpleVoice>(voice, 1);
+    Number const inaccuracy_in_round_1 = synced_inaccuracy.get_inaccuracy();
+
+    voice.update_unstable_note_frequency<true>(2);
+    SignalProducer::produce<SimpleVoice>(voice, 2);
+    Number const inaccuracy_in_round_2 = synced_inaccuracy.get_inaccuracy();
+
+    synced_inaccuracy.update(2);
+    assert_lt(0.01, std::fabs(inaccuracy_in_round_1 - inaccuracy_in_round_2));
+    assert_eq(inaccuracy_in_round_2, synced_inaccuracy.get_inaccuracy());
+
+    synced_inaccuracy.update(2);
+    assert_eq(inaccuracy_in_round_2, synced_inaccuracy.get_inaccuracy());
+})
+
+
+TEST(when_vocie_is_reset_then_synced_inaccuracy_is_also_reset, {
+    constexpr Number seed = 0.123;
+
+    Inaccuracy synced_inaccuracy(seed);
+    SimpleVoice::Params params("");
+    SimpleVoice voice(
+        FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
+    );
+
+    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED);
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1);
+
+    voice.update_unstable_note_frequency<true>(1);
+    SignalProducer::produce<SimpleVoice>(voice, 1);
+
+    voice.update_unstable_note_frequency<true>(2);
+    SignalProducer::produce<SimpleVoice>(voice, 2);
+
+    voice.reset();
+
+    assert_eq(seed, synced_inaccuracy.get_inaccuracy(), DOUBLE_DELTA);
 })
