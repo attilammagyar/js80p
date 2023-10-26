@@ -1105,7 +1105,7 @@ TEST(voice_inaccuracy_is_deterministic_random, {
 
     Number const tuning = (
         synth.modulator_params.tuning.value_to_ratio(
-            Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3
+            Modulator::TUNING_432HZ_12TET_INACCURATE_6
         )
     );
 

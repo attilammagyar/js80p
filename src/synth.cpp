@@ -301,37 +301,37 @@ void Synth::build_frequency_table() noexcept
         Number const random_11 = scale * Math::randomize(1.0, random_5);
         Number const random_12 = scale * Math::randomize(1.0, random_6);
 
-        Number const detune_440_small_1 = 2.0 * random_1 - 0.3;
-        Number const detune_440_small_2 = 5.0 * random_2 - 1.0;
-        Number const detune_440_small_3 = 15.0 * random_3 - 5.0;
-        Number const detune_440_large_1 = 30.0 * random_4 - 10.0;
-        Number const detune_440_large_2 = 50.0 * random_5 - 15.0;
-        Number const detune_440_large_3 = 50.0 * random_6 - 17.0;
+        Number const detune_440_1 = 2.0 * random_1 - 0.3;
+        Number const detune_440_2 = 5.0 * random_2 - 1.0;
+        Number const detune_440_3 = 15.0 * random_3 - 5.0;
+        Number const detune_440_4 = 30.0 * random_4 - 10.0;
+        Number const detune_440_5 = 50.0 * random_5 - 15.0;
+        Number const detune_440_6 = 50.0 * random_6 - 17.0;
 
-        Number const detune_432_small_1 = 2.0 * random_7 - 0.3;
-        Number const detune_432_small_2 = 5.0 * random_8 - 1.0;
-        Number const detune_432_small_3 = 15.0 * random_9 - 5.0;
-        Number const detune_432_large_1 = 30.0 * random_10 - 10.0;
-        Number const detune_432_large_2 = 50.0 * random_11 - 15.0;
-        Number const detune_432_large_3 = 50.0 * random_12 - 17.0;
+        Number const detune_432_1 = 2.0 * random_7 - 0.3;
+        Number const detune_432_2 = 5.0 * random_8 - 1.0;
+        Number const detune_432_3 = 15.0 * random_9 - 5.0;
+        Number const detune_432_4 = 30.0 * random_10 - 10.0;
+        Number const detune_432_5 = 50.0 * random_11 - 15.0;
+        Number const detune_432_6 = 50.0 * random_12 - 17.0;
 
         per_channel_frequencies[0][note] = f_440hz_12tet;
 
         frequencies[Modulator::TUNING_440HZ_12TET][note] = f_440hz_12tet;
-        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_small_1);
-        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_small_2);
-        frequencies[Modulator::TUNING_440HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_small_3);
-        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_440hz_12tet, detune_440_large_1);
-        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_large_2);
-        frequencies[Modulator::TUNING_440HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_440hz_12tet, detune_440_large_3);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_1][note] = Math::detune(f_440hz_12tet, detune_440_1);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_2);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_3][note] = Math::detune(f_440hz_12tet, detune_440_3);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_4][note] = Math::detune(f_440hz_12tet, detune_440_4);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_5_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_5);
+        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_6][note] = Math::detune(f_440hz_12tet, detune_440_6);
 
         frequencies[Modulator::TUNING_432HZ_12TET][note] = f_432hz_12tet;
-        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_small_1);
-        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_small_2);
-        frequencies[Modulator::TUNING_432HZ_12TET_SMALL_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_small_3);
-        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_1][note] = Math::detune(f_432hz_12tet, detune_432_large_1);
-        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_large_2);
-        frequencies[Modulator::TUNING_432HZ_12TET_LARGE_INACCURACY_3][note] = Math::detune(f_432hz_12tet, detune_432_large_3);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_1][note] = Math::detune(f_432hz_12tet, detune_432_1);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_2);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_3][note] = Math::detune(f_432hz_12tet, detune_432_3);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_4][note] = Math::detune(f_432hz_12tet, detune_432_4);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_5_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_5);
+        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_6][note] = Math::detune(f_432hz_12tet, detune_432_6);
     }
 
     for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {

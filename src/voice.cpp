@@ -292,18 +292,18 @@ bool Voice<ModulatorSignalProducerClass>::is_tuning_unstable(
 ) noexcept {
     constexpr int mask = (
         0
-        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_1
-        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED
-        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_3
-        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_1
-        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED
-        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_3
-        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_1
-        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_3
-        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_1
-        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_3
+        | 1 << TUNING_440HZ_12TET_INACCURATE_1
+        | 1 << TUNING_440HZ_12TET_INACCURATE_2_SYNCED
+        | 1 << TUNING_440HZ_12TET_INACCURATE_3
+        | 1 << TUNING_440HZ_12TET_INACCURATE_4
+        | 1 << TUNING_440HZ_12TET_INACCURATE_5_SYNCED
+        | 1 << TUNING_440HZ_12TET_INACCURATE_6
+        | 1 << TUNING_432HZ_12TET_INACCURATE_1
+        | 1 << TUNING_432HZ_12TET_INACCURATE_2_SYNCED
+        | 1 << TUNING_432HZ_12TET_INACCURATE_3
+        | 1 << TUNING_432HZ_12TET_INACCURATE_4
+        | 1 << TUNING_432HZ_12TET_INACCURATE_5_SYNCED
+        | 1 << TUNING_432HZ_12TET_INACCURATE_6
     );
 
     return 0 != (mask & (1 << tuning));
@@ -316,10 +316,10 @@ bool Voice<ModulatorSignalProducerClass>::is_tuning_synced_unstable(
 ) noexcept {
     constexpr int mask = (
         0
-        | 1 << TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED
-        | 1 << TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED
+        | 1 << TUNING_440HZ_12TET_INACCURATE_2_SYNCED
+        | 1 << TUNING_440HZ_12TET_INACCURATE_5_SYNCED
+        | 1 << TUNING_432HZ_12TET_INACCURATE_2_SYNCED
+        | 1 << TUNING_432HZ_12TET_INACCURATE_5_SYNCED
     );
 
     return 0 != (mask & (1 << tuning));
@@ -703,28 +703,28 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequen
     Frequency const frequency = frequencies[tuning][note];
 
     switch (tuning) {
-        case TUNING_440HZ_12TET_SMALL_INACCURACY_1:
-        case TUNING_432HZ_12TET_SMALL_INACCURACY_1:
+        case TUNING_440HZ_12TET_INACCURATE_1:
+        case TUNING_432HZ_12TET_INACCURATE_1:
             return Math::detune(frequency, 1.5 * inaccuracy - 0.3);
 
-        case TUNING_440HZ_12TET_SMALL_INACCURACY_2_SYNCED:
-        case TUNING_432HZ_12TET_SMALL_INACCURACY_2_SYNCED:
+        case TUNING_440HZ_12TET_INACCURATE_2_SYNCED:
+        case TUNING_432HZ_12TET_INACCURATE_2_SYNCED:
             return Math::detune(frequency, 3.0 * synced_inaccuracy.get_inaccuracy() - 0.6);
 
-        case TUNING_440HZ_12TET_SMALL_INACCURACY_3:
-        case TUNING_432HZ_12TET_SMALL_INACCURACY_3:
+        case TUNING_440HZ_12TET_INACCURATE_3:
+        case TUNING_432HZ_12TET_INACCURATE_3:
             return Math::detune(frequency, 9.0 * inaccuracy - 3.5);
 
-        case TUNING_440HZ_12TET_LARGE_INACCURACY_1:
-        case TUNING_432HZ_12TET_LARGE_INACCURACY_1:
+        case TUNING_440HZ_12TET_INACCURATE_4:
+        case TUNING_432HZ_12TET_INACCURATE_4:
             return Math::detune(frequency, 3.0 * inaccuracy - 0.6);
 
-        case TUNING_440HZ_12TET_LARGE_INACCURACY_2_SYNCED:
-        case TUNING_432HZ_12TET_LARGE_INACCURACY_2_SYNCED:
+        case TUNING_440HZ_12TET_INACCURATE_5_SYNCED:
+        case TUNING_432HZ_12TET_INACCURATE_5_SYNCED:
             return Math::detune(frequency, 20 * synced_inaccuracy.get_inaccuracy() - 8.0);
 
-        case TUNING_440HZ_12TET_LARGE_INACCURACY_3:
-        case TUNING_432HZ_12TET_LARGE_INACCURACY_3:
+        case TUNING_440HZ_12TET_INACCURATE_6:
+        case TUNING_432HZ_12TET_INACCURATE_6:
             return Math::detune(frequency, 30.0 * inaccuracy - 14.0);
 
         default:
