@@ -1415,7 +1415,7 @@ void TuningSelector::update_value_str()
         TEXT_MAX_LENGTH,
         "%s %s",
         tuning < GUI::TUNINGS_COUNT ? GUI::TUNINGS[tuning] : "???",
-        gui->is_mts_esp_connected() ? "(OK)" : "(ERR)"
+        gui->is_mts_esp_connected() ? "(on)" : "(off)"
     );
 }
 
