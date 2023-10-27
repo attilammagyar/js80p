@@ -1180,3 +1180,69 @@ TEST(can_collect_notes_which_are_on_and_not_released, {
     assert_eq((int)Midi::NOTE_A_2, (int)active_notes[0].note);
     assert_eq(1, (int)active_notes[0].channel);
 })
+
+
+TEST(tuning_can_be_updated_on_the_fly, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+    constexpr Frequency a2_freq = 110.0;
+    constexpr Frequency a3_freq_original = 220.0;
+    constexpr Frequency a3_freq_modified = 880.0;
+    constexpr Midi::Channel channel = 12;
+
+    Synth synth;
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL, a2_freq,
+        OUT_VOLUME_PER_CHANNEL * 0.5, a3_freq_original,
+        OUT_VOLUME_PER_CHANNEL * 0.5, a3_freq_modified,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+    Synth::NoteTunings note_tunings = {
+        Synth::NoteTuning(Midi::NOTE_A_2, channel, -1.0),
+        Synth::NoteTuning(Midi::NOTE_A_3, channel, a3_freq_modified),
+    };
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(0.5);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.volume.set_value(0.5);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+
+    assert_false(synth.has_mts_esp_tuning());
+    assert_false(synth.has_realtime_mts_esp_tuning());
+
+    synth.modulator_params.tuning.set_value(Modulator::TUNING_MTS_ESP_NOTE_ON);
+    assert_true(synth.has_mts_esp_tuning());
+    assert_false(synth.has_realtime_mts_esp_tuning());
+
+    synth.modulator_params.tuning.set_value(Carrier::TUNING_MTS_ESP_REALTIME);
+    assert_true(synth.has_mts_esp_tuning());
+    assert_true(synth.has_realtime_mts_esp_tuning());
+
+    synth.note_on(0.0, channel, Midi::NOTE_A_2, 127);
+    synth.note_on(0.0, channel, Midi::NOTE_A_3, 127);
+
+    synth.update_note_tuning(Synth::NoteTuning(Midi::NOTES, Midi::CHANNELS, 1760.0));
+    synth.update_note_tunings(note_tunings, 2);
+
+    SignalProducer::produce<SumOfSines>(expected, 1, 1);
+    SignalProducer::produce<Synth>(synth, 1, 1);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 2);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 2);
+
+    assert_close(expected_samples[0], rendered_samples[0], block_size, 0.06, "channel=0");
+    assert_close(expected_samples[1], rendered_samples[1], block_size, 0.06, "channel=1");
+})

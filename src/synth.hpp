@@ -799,7 +799,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void suspend() noexcept;
         void resume() noexcept;
 
+        bool has_mts_esp_tuning() const noexcept;
+        bool has_realtime_mts_esp_tuning() const noexcept;
         NoteTunings const& collect_active_notes(Integer& active_notes_count) noexcept;
+        void update_note_tuning(NoteTuning const& note_tuning) noexcept;
+        void update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept;
 
         Sample const* const* generate_samples(
             Integer const round, Integer const sample_count

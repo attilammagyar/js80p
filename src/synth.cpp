@@ -783,11 +783,46 @@ void Synth::resume() noexcept
 }
 
 
+bool Synth::has_mts_esp_tuning() const noexcept
+{
+    return (
+        modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_NOTE_ON
+        || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_NOTE_ON
+        || has_realtime_mts_esp_tuning()
+    );
+}
+
+
+bool Synth::has_realtime_mts_esp_tuning() const noexcept
+{
+    return (
+        modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_REALTIME
+        || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_REALTIME
+    );
+}
+
+
 Synth::NoteTunings const& Synth::collect_active_notes(Integer& active_notes_count) noexcept
 {
     bus.collect_active_notes(active_note_tunings, active_notes_count);
 
     return active_note_tunings;
+}
+
+
+void Synth::update_note_tuning(NoteTuning const& note_tuning) noexcept
+{
+    if (note_tuning.is_valid() && note_tuning.frequency > 0.0) {
+        per_channel_frequencies[note_tuning.channel][note_tuning.note] = note_tuning.frequency;
+    }
+}
+
+
+void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept
+{
+    for (Integer i = 0; i != count; ++i) {
+        update_note_tuning(note_tunings[i]);
+    }
 }
 
 
