@@ -516,15 +516,13 @@ void Synth::register_effects_params() noexcept
 void Synth::create_voices() noexcept
 {
     for (Integer i = 0; i != POLYPHONY; ++i) {
-        synced_inaccuracies[i] = new Inaccuracy(
-            calculate_inaccuracy_seed((i + 31) % POLYPHONY)
-        );
+        synced_inaccuracies[i] = new Inaccuracy(calculate_inaccuracy_seed(i));
 
         modulators[i] = new Modulator(
             frequencies,
             per_channel_frequencies,
             *synced_inaccuracies[i],
-            calculate_inaccuracy_seed(i),
+            calculate_inaccuracy_seed((i + 23) % POLYPHONY),
             modulator_params,
             biquad_filter_shared_caches[0],
             biquad_filter_shared_caches[1]
@@ -535,7 +533,7 @@ void Synth::create_voices() noexcept
             frequencies,
             per_channel_frequencies,
             *synced_inaccuracies[i],
-            calculate_inaccuracy_seed(POLYPHONY - i),
+            calculate_inaccuracy_seed((POLYPHONY - i + 41) % POLYPHONY),
             carrier_params,
             modulators[i]->modulation_out,
             amplitude_modulation_level,
