@@ -1119,12 +1119,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         tuning, note, channel
     );
 
-    if (
-            UNLIKELY(
-                remaining < 0.000001
-                && Math::is_close(new_frequency, oscillator.frequency.get_value())
-            )
-    ) {
+    if (UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
         return;
     }
 
