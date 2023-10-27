@@ -656,7 +656,8 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Midi::Note const previous_note
 ) noexcept {
     Number const portamento_length = param_leaders.portamento_length.get_value();
-    Frequency const note_frequency = calculate_note_frequency(note, channel);
+
+    note_frequency = calculate_note_frequency(note, channel);
 
     oscillator.frequency.cancel_events_at(time_offset);
 
@@ -690,19 +691,13 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
         return per_channel_frequencies[channel][note];
     }
 
-    return calculate_inaccurate_note_frequency(tuning, note, channel);
-}
-
-
-template<class ModulatorSignalProducerClass>
-Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequency(
-        Tuning const tuning,
-        Midi::Note const note,
-        Midi::Channel const channel
-) const noexcept {
     Frequency const frequency = frequencies[tuning][note];
 
     switch (tuning) {
+        case TUNING_440HZ_12TET:
+        case TUNING_432HZ_12TET:
+            return frequency;
+
         case TUNING_440HZ_12TET_INACCURATE_1:
         case TUNING_432HZ_12TET_INACCURATE_1:
             return Math::detune(frequency, 1.5 * inaccuracy - 0.3);
@@ -713,25 +708,62 @@ Frequency Voice<ModulatorSignalProducerClass>::calculate_inaccurate_note_frequen
 
         case TUNING_440HZ_12TET_INACCURATE_3:
         case TUNING_432HZ_12TET_INACCURATE_3:
-            return Math::detune(frequency, 9.0 * inaccuracy - 3.5);
+            return Math::detune(frequency, 15.0 * inaccuracy - 6.0);
 
         case TUNING_440HZ_12TET_INACCURATE_4:
         case TUNING_432HZ_12TET_INACCURATE_4:
-            return Math::detune(frequency, 3.0 * inaccuracy - 0.6);
+            return Math::detune(frequency, 20.0 * inaccuracy - 8.0);
 
         case TUNING_440HZ_12TET_INACCURATE_5_SYNCED:
         case TUNING_432HZ_12TET_INACCURATE_5_SYNCED:
-            return Math::detune(frequency, 20 * synced_inaccuracy.get_inaccuracy() - 8.0);
+            return Math::detune(frequency, 35.0 * synced_inaccuracy.get_inaccuracy() - 16.0);
 
         case TUNING_440HZ_12TET_INACCURATE_6:
         case TUNING_432HZ_12TET_INACCURATE_6:
-            return Math::detune(frequency, 30.0 * inaccuracy - 14.0);
+            return Math::detune(frequency, 50.0 * inaccuracy - 23.0);
 
         default:
             break;
     }
 
     return frequency;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency_drift_target(
+        Tuning const tuning
+) const noexcept {
+    switch (tuning) {
+        case TUNING_440HZ_12TET_INACCURATE_1:
+        case TUNING_432HZ_12TET_INACCURATE_1:
+            return Math::detune(note_frequency, 0.7 * inaccuracy - 0.2);
+
+        case TUNING_440HZ_12TET_INACCURATE_2_SYNCED:
+        case TUNING_432HZ_12TET_INACCURATE_2_SYNCED:
+            return Math::detune(note_frequency, 1.0 * synced_inaccuracy.get_inaccuracy() - 0.3);
+
+        case TUNING_440HZ_12TET_INACCURATE_3:
+        case TUNING_432HZ_12TET_INACCURATE_3:
+            return Math::detune(note_frequency, 3.0 * inaccuracy - 1.0);
+
+        case TUNING_440HZ_12TET_INACCURATE_4:
+        case TUNING_432HZ_12TET_INACCURATE_4:
+            return Math::detune(note_frequency, 5.0 * inaccuracy - 2.0);
+
+        case TUNING_440HZ_12TET_INACCURATE_5_SYNCED:
+        case TUNING_432HZ_12TET_INACCURATE_5_SYNCED:
+            return Math::detune(note_frequency, 7.0 * synced_inaccuracy.get_inaccuracy() - 3.0);
+
+        case TUNING_440HZ_12TET_INACCURATE_6:
+        case TUNING_432HZ_12TET_INACCURATE_6:
+            return Math::detune(note_frequency, 25.0 * inaccuracy - 11.0);
+
+        default:
+            break;
+    }
+
+    return note_frequency;
 }
 
 
@@ -825,8 +857,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
     note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
 
-    Frequency const f = calculate_note_frequency(note, channel);
-    oscillator.frequency.schedule_linear_ramp(portamento_length, f);
+    note_frequency = calculate_note_frequency(note, channel);
+
+    oscillator.frequency.schedule_linear_ramp(portamento_length, note_frequency);
 }
 
 
@@ -1115,9 +1148,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
 
     Tuning const tuning = param_leaders.tuning.get_value();
 
-    Frequency const new_frequency = calculate_inaccurate_note_frequency(
-        tuning, note, channel
-    );
+    Frequency const new_frequency = calculate_note_frequency_drift_target(tuning);
 
     if (UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
         return;

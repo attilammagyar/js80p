@@ -303,17 +303,17 @@ void Synth::build_frequency_table() noexcept
 
         Number const detune_440_1 = 2.0 * random_1 - 0.3;
         Number const detune_440_2 = 5.0 * random_2 - 1.0;
-        Number const detune_440_3 = 15.0 * random_3 - 5.0;
-        Number const detune_440_4 = 30.0 * random_4 - 10.0;
-        Number const detune_440_5 = 50.0 * random_5 - 15.0;
-        Number const detune_440_6 = 50.0 * random_6 - 17.0;
+        Number const detune_440_3 = 10.0 * random_3 - 2.0;
+        Number const detune_440_4 = 15.0 * random_4 - 5.0;
+        Number const detune_440_5 = 20.0 * random_5 - 6.0;
+        Number const detune_440_6 = 25.0 * random_6 - 8.0;
 
         Number const detune_432_1 = 2.0 * random_7 - 0.3;
         Number const detune_432_2 = 5.0 * random_8 - 1.0;
-        Number const detune_432_3 = 15.0 * random_9 - 5.0;
-        Number const detune_432_4 = 30.0 * random_10 - 10.0;
-        Number const detune_432_5 = 50.0 * random_11 - 15.0;
-        Number const detune_432_6 = 50.0 * random_12 - 17.0;
+        Number const detune_432_3 = 10.0 * random_9 - 2.0;
+        Number const detune_432_4 = 15.0 * random_10 - 5.0;
+        Number const detune_432_5 = 20.0 * random_11 - 6.0;
+        Number const detune_432_6 = 25.0 * random_12 - 8.0;
 
         per_channel_frequencies[0][note] = f_440hz_12tet;
 

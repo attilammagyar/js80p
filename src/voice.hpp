@@ -338,11 +338,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel
         ) const noexcept;
 
-        Frequency calculate_inaccurate_note_frequency(
-            Tuning const tuning,
-            Midi::Note const note,
-            Midi::Channel const channel
-        ) const noexcept;
+        Frequency calculate_note_frequency_drift_target(Tuning const tuning) const noexcept;
 
         Number calculate_note_velocity(Number const raw_velocity) const noexcept;
         Number calculate_note_panning(Midi::Note const note) const noexcept;
@@ -380,6 +376,7 @@ class Voice : public SignalProducer
         Number inaccuracy;
         Number panning_value;
         Number note_panning_value;
+        Frequency note_frequency;
         State state;
         Integer note_id;
         Midi::Note note;
