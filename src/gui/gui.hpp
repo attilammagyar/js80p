@@ -275,7 +275,7 @@ class WidgetBase
             EXTERNALLY_CREATED_WINDOW = 1 << 4,
             IMPORT_PATCH_BUTTON = 1 << 5,
             KNOB = 1 << 6,
-            PARAM_EDITOR = 1 << 7,
+            KNOB_PARAM_EDITOR = 1 << 7,
             TAB_BODY = 1 << 8,
             TAB_SELECTOR = 1 << 9,
             ABOUT_TEXT = 1 << 10,

@@ -614,7 +614,7 @@ KnobParamEditor::KnobParamEditor(
         char const* format,
         double const scale,
         KnobStates* knob_states
-) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     format(format),
     scale(scale),
@@ -645,7 +645,7 @@ KnobParamEditor::KnobParamEditor(
         char const* const* const options,
         int const number_of_options,
         KnobStates* knob_states
-) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     format(NULL),
     scale(1.0),
@@ -1247,7 +1247,7 @@ ToggleSwitch::ToggleSwitch(
         int const box_left,
         Synth& synth,
         Synth::ParamId const param_id
-) : TransparentWidget(text, left, top, width, height, Type::PARAM_EDITOR),
+) : TransparentWidget(text, left, top, width, height, Type::TOGGLE_SWITCH),
     param_id(param_id),
     box_left(box_left),
     synth(synth),

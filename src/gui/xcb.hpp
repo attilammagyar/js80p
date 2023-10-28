@@ -252,7 +252,7 @@ class Widget : public WidgetBase
             0
             | Type::EXPORT_PATCH_BUTTON
             | Type::IMPORT_PATCH_BUTTON
-            | Type::PARAM_EDITOR
+            | Type::KNOB_PARAM_EDITOR
             | Type::TAB_BODY
             | Type::TAB_SELECTOR
             | Type::STATUS_LINE
