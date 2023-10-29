@@ -305,8 +305,8 @@ ControllerSelector::ControllerSelector(
     background(background),
     synth(synth),
     knob_param_editor(NULL),
-    param_id(Synth::ParamId::MAX_PARAM_ID),
-    selected_controller_id(Synth::ControllerId::MAX_CONTROLLER_ID)
+    param_id(Synth::ParamId::INVALID_PARAM_ID),
+    selected_controller_id(Synth::ControllerId::INVALID_CONTROLLER_ID)
 {
 }
 
@@ -371,7 +371,7 @@ void ControllerSelector::select_controller(
         return;
     }
 
-    if (this->selected_controller_id < Synth::ControllerId::MAX_CONTROLLER_ID) {
+    if (this->selected_controller_id < Synth::ControllerId::CONTROLLER_ID_COUNT) {
         GUI::Controller const* const old_controller = GUI::get_controller(
             this->selected_controller_id
         );
@@ -418,7 +418,7 @@ void ControllerSelector::handle_selection_change(
 ) {
     hide();
 
-    if (knob_param_editor == NULL || param_id >= Synth::Synth::ParamId::MAX_PARAM_ID) {
+    if (knob_param_editor == NULL || param_id >= Synth::Synth::ParamId::INVALID_PARAM_ID) {
         return;
     }
 

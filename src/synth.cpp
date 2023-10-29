@@ -67,7 +67,7 @@ bool Synth::supported_midi_controllers_initialized = false;
 
 Synth::ParamIdHashTable Synth::param_id_hash_table;
 
-std::string Synth::param_names_by_id[ParamId::MAX_PARAM_ID];
+std::string Synth::param_names_by_id[ParamId::PARAM_ID_COUNT];
 
 
 Synth::ModeParam::ModeParam(std::string const name) noexcept
@@ -135,7 +135,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
     }
 
-    for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
         param_ratios[i].store(0.0);
         controller_assignments[i].store(ControllerId::NONE);
         param_names_by_id[i] = "";
@@ -688,7 +688,7 @@ bool Synth::is_lock_free() const noexcept
 {
     bool is_lock_free = true;
 
-    for (int i = 0; is_lock_free && i != ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; is_lock_free && i != ParamId::PARAM_ID_COUNT; ++i) {
         is_lock_free = (
             param_ratios[i].is_lock_free()
             && controller_assignments[i].is_lock_free()
@@ -1128,7 +1128,7 @@ void Synth::control_change(
     }
 
     if (is_learning) {
-        for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
+        for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
             if (controller_assignments[i].load() == ControllerId::MIDI_LEARN) {
                 handle_assign_controller((ParamId)i, controller);
             }
@@ -1557,7 +1557,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 
 bool Synth::is_toggle_param(ParamId const param_id) const noexcept
 {
-    return param_id >= ParamId::L1SYN && param_id < ParamId::MAX_PARAM_ID;
+    return param_id >= ParamId::L1SYN && param_id < ParamId::PARAM_ID_COUNT;
 }
 
 
@@ -2020,7 +2020,7 @@ Synth::ControllerId Synth::get_param_controller_id_atomic(
 
 void Synth::update_param_states() noexcept
 {
-    for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
         handle_refresh_param((ParamId)i);
     }
 }
@@ -2724,7 +2724,7 @@ void Synth::handle_clear() noexcept
     clear_midi_note_to_voice_assignments();
     clear_sustain();
 
-    for (int i = 0; i != ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
         ParamId const param_id = (ParamId)i;
 
         handle_assign_controller(param_id, no_controller);
@@ -3341,7 +3341,7 @@ std::string const Synth::to_string(Integer const n) const noexcept
 
 Synth::Message::Message() noexcept
     : type(INVALID),
-    param_id(ParamId::MAX_PARAM_ID),
+    param_id(ParamId::INVALID_PARAM_ID),
     number_param(0.0),
     byte_param(0)
 {
@@ -3705,7 +3705,7 @@ void Synth::ParamIdHashTable::lookup(
 
     *parent = NULL;
 
-    if ((*root)->param_id == MAX_PARAM_ID) {
+    if ((*root)->param_id == ParamId::INVALID_PARAM_ID) {
         *entry = NULL;
 
         return;
@@ -3732,7 +3732,7 @@ Synth::ParamId Synth::ParamIdHashTable::lookup(std::string const& name) noexcept
 
     lookup(name, &root, &parent, &entry);
 
-    return entry == NULL ? ParamId::MAX_PARAM_ID : entry->param_id;
+    return entry == NULL ? ParamId::INVALID_PARAM_ID : entry->param_id;
 }
 
 
@@ -3751,7 +3751,7 @@ void Synth::ParamIdHashTable::get_statistics(
     for (Integer i = 0; i != ENTRIES; ++i) {
         Entry const* entry = &entries[i];
 
-        if (entry->param_id == ParamId::MAX_PARAM_ID) {
+        if (entry->param_id == ParamId::INVALID_PARAM_ID) {
             continue;
         }
 
@@ -3833,7 +3833,7 @@ Integer Synth::ParamIdHashTable::hash(std::string const& name) noexcept
 
 Synth::ParamIdHashTable::Entry::Entry() noexcept : next(NULL)
 {
-    set("", MAX_PARAM_ID);
+    set("", ParamId::INVALID_PARAM_ID);
 }
 
 

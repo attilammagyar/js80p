@@ -258,11 +258,11 @@ TEST(can_look_up_param_id_by_name, {
     assert_lte(avg_bucket_size, 3.15);
     assert_lte(avg_collisions, 3.45);
 
-    assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(""));
-    assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(" \n"));
-    assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id("NO_SUCH_PARAM"));
+    assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(""));
+    assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(" \n"));
+    assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id("NO_SUCH_PARAM"));
 
-    for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; i != Synth::ParamId::PARAM_ID_COUNT; ++i) {
         std::string const name = synth.get_param_name((Synth::ParamId)i);
         Synth::ParamId const param_id = synth.get_param_id(name);
         assert_eq((Synth::ParamId)i, param_id, "i=%d, name=\"%s\"", i, name);
@@ -549,7 +549,7 @@ TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
     SignalProducer::produce<Synth>(synth, 1);
     assert_true(synth.lfos[0]->is_on());
 
-    synth.push_message(CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0);
+    synth.push_message(CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0);
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
     SignalProducer::produce<Synth>(synth, 2);
 

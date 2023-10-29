@@ -16,7 +16,8 @@ def main(argv):
     param_id = print_lfo_params(param_id)
     param_id = print_special_params(param_id)
 
-    print(f"{INDENTATION}MAX_PARAM_ID = {param_id}")
+    print(f"{INDENTATION}PARAM_ID_COUNT = {param_id},")
+    print(f"{INDENTATION}INVALID_PARAM_ID = PARAM_ID_COUNT,")
 
     return 0
 

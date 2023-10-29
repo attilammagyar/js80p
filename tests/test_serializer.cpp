@@ -507,7 +507,7 @@ TEST(trailing_zeros_and_none_controllers_and_params_with_default_values_are_omit
     patch += Serializer::LINE_END;
 
     synth.push_message(
-        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+        Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
     );
     synth.push_message(
         Synth::MessageType::SET_PARAM, Synth::ParamId::FM, 0.5, 0
@@ -528,7 +528,7 @@ TEST(when_a_param_has_a_controller_then_its_own_value_is_omitted, {
     patch += Serializer::LINE_END;
 
     synth.push_message(
-        Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+        Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
     );
     synth.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,

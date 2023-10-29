@@ -117,7 +117,7 @@ class GUI
         static char const* const REVERB_TYPES[];
         static int const REVERB_TYPES_COUNT;
 
-        static char const* const PARAMS[Synth::ParamId::MAX_PARAM_ID];
+        static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];
 
@@ -219,7 +219,7 @@ class GUI
             size_t const buffer_size
         );
 
-        static Controller const* controllers_by_id[Synth::ControllerId::MAX_CONTROLLER_ID];
+        static Controller const* controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT];
         static bool controllers_by_id_initialized;
 
         void initialize();

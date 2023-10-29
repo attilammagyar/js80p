@@ -208,7 +208,7 @@ GUI::Controller::Controller(
 }
 
 
-char const* const GUI::PARAMS[Synth::ParamId::MAX_PARAM_ID] = {
+char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::MIX] = "Modulator Additive Volume (%)",
     [Synth::ParamId::PM] = "Phase Modulation (%)",
     [Synth::ParamId::FM] = "Frequency Modulation (%)",
@@ -803,7 +803,7 @@ GUI::Controller const GUI::CONTROLLERS[] = {
 };
 
 
-GUI::Controller const* GUI::controllers_by_id[Synth::ControllerId::MAX_CONTROLLER_ID];
+GUI::Controller const* GUI::controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT];
 
 
 GUI::Controller const* GUI::get_controller(Synth::ControllerId const controller_id)
@@ -824,7 +824,7 @@ void GUI::initialize_controllers_by_id()
 
     int i;
 
-    for (i = 0; i != Synth::ControllerId::MAX_CONTROLLER_ID; ++i) {
+    for (i = 0; i != Synth::ControllerId::CONTROLLER_ID_COUNT; ++i) {
         controllers_by_id[i] = NULL;
     }
 

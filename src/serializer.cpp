@@ -47,7 +47,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
     serialized += "]";
     serialized += LINE_END;
 
-    for (int i = 0; i != Synth::ParamId::MAX_PARAM_ID; ++i) {
+    for (int i = 0; i != Synth::ParamId::PARAM_ID_COUNT; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
         std::string const param_name = synth.get_param_name(param_id);
 
@@ -297,7 +297,7 @@ void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
     send_message<thread>(
         synth,
         Synth::Message(
-            Synth::MessageType::CLEAR, Synth::ParamId::MAX_PARAM_ID, 0.0, 0
+            Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
         )
     );
 
@@ -420,7 +420,7 @@ void Serializer::process_line(
     is_controller_assignment = CONTROLLER_SUFFIX == suffix;
 
     if (
-            param_id == Synth::ParamId::MAX_PARAM_ID
+            param_id == Synth::ParamId::INVALID_PARAM_ID
             || (suffix[0] != '\x00' && !is_controller_assignment)
     ) {
         return;

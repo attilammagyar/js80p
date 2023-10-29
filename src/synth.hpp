@@ -568,7 +568,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CINA = 395,      ///< Carrier Inaccuracy
             CDRF = 396,      ///< Carrier Drift
 
-            MAX_PARAM_ID = 397
+            PARAM_ID_COUNT = 397,
+            INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
@@ -691,7 +692,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             VOL_2_PEAK =                170,                        ///< Volume 2 Peak
             VOL_3_PEAK =                171,                        ///< Volume 3 Peak
 
-            MAX_CONTROLLER_ID =         172,
+            CONTROLLER_ID_COUNT =       172,
+            INVALID_CONTROLLER_ID =     CONTROLLER_ID_COUNT,
         };
 
         typedef Byte Mode;
@@ -1187,7 +1189,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static bool supported_midi_controllers_initialized;
 
         static ParamIdHashTable param_id_hash_table;
-        static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
+        static std::string param_names_by_id[ParamId::PARAM_ID_COUNT];
 
         static bool should_sync_inaccuracy(
             Modulator::Params const& modulator_params,
@@ -1326,10 +1328,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
         PeakTracker vol_3_peak_tracker;
 
         Sample const* const* raw_output;
-        MidiControllerMessage previous_controller_message[ControllerId::MAX_CONTROLLER_ID];
+        MidiControllerMessage previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];
         BiquadFilterSharedCache* biquad_filter_shared_caches[4];
-        std::atomic<Number> param_ratios[ParamId::MAX_PARAM_ID];
-        std::atomic<Byte> controller_assignments[ParamId::MAX_PARAM_ID];
+        std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
+        std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
         Envelope* envelopes_rw[ENVELOPES];
         LFO* lfos_rw[LFOS];
         Macro* macros_rw[MACROS];

@@ -84,7 +84,7 @@ class Serializer
         };
 
         /*
-        Using a greater number than Synth::ControllerId::MAX_CONTROLLER_ID, so
+        Using a greater number than Synth::ControllerId::CONTROLLER_ID_COUNT, so
         that there is some room left for introducing more controllers.
         */
         static constexpr Number FLOAT_TO_CONTROLLER_ID_SCALE = 256.0;
