@@ -128,9 +128,8 @@ html, body {
   margin-bottom: 2px;
 }
 
-#osc-1-tuning, #osc-2-tuning {
-  text-align: center;
-  color: #00ffff;
+#osc-1-tuning,
+#osc-2-tuning {
   font-size: 13px;
   background: #000000;
   border: inset 2px #9090b0;
@@ -142,6 +141,11 @@ html, body {
   top: 2px;
   left: 150px;
   border-radius: 3px;
+}
+
+#osc-1-tuning span,
+#osc-2-tuning span {
+  padding-left: 10px;
 }
 
 h1 {
@@ -561,7 +565,7 @@ function make_tabs(active)
       </div>
       <div id="osc-1" class="osc main-block block">
         <h1>Osc 1 (modulator)</h1>
-        <div id="osc-1-tuning"><span>440 12TET-INAC</span></div>
+        <div id="osc-1-tuning"><span>440 12TET</span></div>
         <div id="osc-1-main" class="osc-main block"></div>
         <div id="osc-1-filter-1" class="block osc-filter">
           <h1>
@@ -916,7 +920,7 @@ window.onload = function ()
         h.innerHTML = "Envelope " + String(i);
 
         l = document.createElement("label");
-        l.innerHTML = "DYNANMIC ";
+        l.innerHTML = "DYNAMIC ";
         l.setAttribute("class", "dynamic");
         n = document.createElement("input");
         n.setAttribute("type", "text");
