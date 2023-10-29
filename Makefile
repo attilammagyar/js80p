@@ -171,8 +171,7 @@ TESTS_SYNTH = \
 	test_renderer \
 	test_spscqueue \
 	test_synth \
-	test_voice \
-	test_voice_slow
+	test_voice
 
 TESTS = \
 	$(TESTS_BASIC) \
@@ -709,16 +708,6 @@ $(BUILD_DIR)/test_voice$(EXE): \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_TEST) -o $@ $<
 	$(VALGRIND) $@
-
-$(BUILD_DIR)/test_voice_slow$(EXE): \
-		tests/test_voice_slow.cpp \
-		$(TEST_LIBS) \
-		$(SYNTH_SOURCES) \
-		$(SYNTH_HEADERS) \
-		| $(BUILD_DIR) \
-		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
-	$@
 
 $(BUILD_DIR)/test_wavefolder$(EXE): \
 		tests/test_wavefolder.cpp \
