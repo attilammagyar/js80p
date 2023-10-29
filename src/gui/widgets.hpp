@@ -262,16 +262,23 @@ class ControllerSelector : public Widget
 class KnobStates
 {
     public:
-        static constexpr int COUNT = 128;
-
         KnobStates(
             WidgetBase* widget,
             GUI::Image free_image,
             GUI::Image controlled_image,
-            GUI::Image none_image
+            GUI::Image none_image,
+            size_t const count,
+            int const width,
+            int const height
         );
 
         ~KnobStates();
+
+        size_t const count;
+        int const width;
+        int const height;
+
+        Number const last_index;
 
         WidgetBase* widget;
 
@@ -279,24 +286,22 @@ class KnobStates
         GUI::Image controlled_image;
         GUI::Image none_image;
 
-        GUI::Image free_images[COUNT];
-        GUI::Image controlled_images[COUNT];
+        GUI::Image* free_images;
+        GUI::Image* controlled_images;
 };
 
 
 class KnobParamEditor : public TransparentWidget
 {
     public:
-        static constexpr int WIDTH = 58;
-        static constexpr int HEIGHT = 100;
-        static constexpr int KNOB_WIDTH = 48;
-        static constexpr int KNOB_HEIGHT = 48;
-
         KnobParamEditor(
             GUI& gui,
             char const* const text,
             int const left,
             int const top,
+            int const width,
+            int const height,
+            int const knob_top,
             ControllerSelector& controller_selector,
             Synth& synth,
             Synth::ParamId const param_id,
@@ -311,6 +316,9 @@ class KnobParamEditor : public TransparentWidget
             char const* const text,
             int const left,
             int const top,
+            int const width,
+            int const height,
+            int const knob_top,
             ControllerSelector& controller_selector,
             Synth& synth,
             Synth::ParamId const param_id,
@@ -353,26 +361,24 @@ class KnobParamEditor : public TransparentWidget
         virtual bool mouse_leave(int const x, int const y) override;
 
     private:
-        static constexpr Number KNOB_STATES_LAST_INDEX = (
-            (Number)(KnobStates::COUNT - 1)
-        );
         static constexpr size_t TEXT_MAX_LENGTH = 16;
+        static constexpr size_t TITLE_MAX_LENGTH = 64;
+
+        static constexpr int VALUE_TEXT_HEIGHT = 20;
+        static constexpr int CONTROLLER_TEXT_HEIGHT = 16;
+        static constexpr int TEXTS_HEIGHT = VALUE_TEXT_HEIGHT + CONTROLLER_TEXT_HEIGHT;
 
         class Knob : public Widget
         {
             public:
-                static constexpr int WIDTH = KNOB_WIDTH;
-                static constexpr int HEIGHT = KNOB_HEIGHT;
-
                 static constexpr Number MOUSE_WHEEL_COARSE_SCALE = 1.0 / 200.0;
 
                 static constexpr Number MOUSE_WHEEL_FINE_SCALE = (
                     MOUSE_WHEEL_COARSE_SCALE / 50.0
                 );
 
-                static constexpr Number MOUSE_MOVE_COARSE_SCALE = (
-                    1.0 / ((Number)HEIGHT * 5.0)
-                );
+                static constexpr Number MOUSE_MOVE_COARSE_SCALE = 1.0 / 240.0;
+
                 static constexpr Number MOUSE_MOVE_FINE_SCALE = (
                     MOUSE_MOVE_COARSE_SCALE / 50.0
                 );
@@ -428,6 +434,9 @@ class KnobParamEditor : public TransparentWidget
         void update_value_str();
         void update_controller_str();
 
+        int const knob_top;
+        bool const has_room_for_texts;
+
         char const* const format;
         double const scale;
 
@@ -443,6 +452,7 @@ class KnobParamEditor : public TransparentWidget
         Knob* knob;
         char value_str[TEXT_MAX_LENGTH];
         char controller_str[TEXT_MAX_LENGTH];
+        char title[TITLE_MAX_LENGTH];
         Synth::ControllerId controller_id;
         bool has_controller_;
 };
@@ -575,7 +585,7 @@ class ToggleSwitch : public TransparentWidget
 class TuningSelector : public TransparentWidget
 {
     public:
-        static constexpr int WIDTH = 130;
+        static constexpr int WIDTH = 90;
         static constexpr int HEIGHT = 20;
 
         TuningSelector(

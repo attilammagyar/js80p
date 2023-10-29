@@ -50,7 +50,6 @@ typedef Voice<SignalProducer> SimpleVoice;
 
 constexpr FrequencyTable FREQUENCIES = {
     {100.0, 200.0, 400.0, 800.0, 1600.0},
-    {},
     {300.0, 600.0, 1200.0, 2400.0, 4800.0},
 };
 
@@ -68,7 +67,7 @@ TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
         FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
     );
 
-    voice.note_on(0.12, 42, 1, 0, 0.5, 1);
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true);
 
     voice.note_off(0.12 + 1.0, 123, 1, 0.5);
     assert_false(voice.is_off_after(2.0));
@@ -101,10 +100,10 @@ TEST(rendering_is_independent_of_chunk_size, {
     voice_1.set_sample_rate(sample_rate);
     voice_2.set_sample_rate(sample_rate);
 
-    voice_1.note_on(0.12, 42, 1, 0, 0.5, 1);
+    voice_1.note_on(0.12, 42, 1, 0, 0.5, 1, true);
     voice_1.note_off(0.12 + 1.0, 42, 1, 0.5);
 
-    voice_2.note_on(0.12, 123, 1, 0, 0.5, 1);
+    voice_2.note_on(0.12, 123, 1, 0, 0.5, 1, true);
     voice_2.note_off(0.12 + 1.0, 123, 1, 0.5);
 
     assert_rendering_is_independent_from_chunk_size<SimpleVoice>(
@@ -212,7 +211,7 @@ TEST(portamento, {
     params.portamento_length.set_value(portamento_length);
     params.portamento_depth.set_value(portamento_depth);
 
-    voice.note_on(note_start, 123, 1, 0, 1.0, 1);
+    voice.note_on(note_start, 123, 1, 0, 1.0, 1, true);
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -251,7 +250,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(0.0, 123, 2, 3, 1.0, 1);
+    voice.note_on(0.0, 123, 2, 3, 1.0, 1, true);
 
     assert_eq(123, (int)voice.get_note_id());
     assert_eq(2, (int)voice.get_note());
@@ -318,10 +317,10 @@ TEST(can_tell_if_note_decayed_during_envelope_dahds, {
     envelope.release_time.set_value(envelope.release_time.get_max_value());
     envelope.final_value.set_value(0.0);
 
-    decaying_voice.note_on(note_start, 42, 1, 0, 1.0, 1);
+    decaying_voice.note_on(note_start, 42, 1, 0, 1.0, 1, true);
 
     envelope.sustain_value.set_value(0.5);
-    non_decaying_voice.note_on(note_start, 123, 1, 0, 1.0, 1);
+    non_decaying_voice.note_on(note_start, 123, 1, 0, 1.0, 1, true);
 
     while (rendered_samples < sustain_start_samples) {
         assert_false(
@@ -403,17 +402,17 @@ TEST(can_glide_smoothly_to_a_new_note, {
     params.portamento_length.set_value(glide_duration);
     params_ref.portamento_length.set_value(glide_duration);
 
-    reference.note_on(note_start, 123, 0, 0, 1.0, 0);
+    reference.note_on(note_start, 123, 0, 0, 1.0, 0, true);
     reference.note_off(glide_start, 123, 0, 1.0);
 
     envelope.peak_value.set_value(1.0);
     envelope.sustain_value.set_value(1.0);
     envelope.final_value.set_value(1.0);
 
-    reference.note_on(glide_start, 42, 1, 0, 1.0, 0);
+    reference.note_on(glide_start, 42, 1, 0, 1.0, 0, true);
 
-    voice.note_on(note_start, 123, 0, 0, 0.5, 0);
-    voice.glide_to(glide_start, 42, 1, 0, 1.0, 123);
+    voice.note_on(note_start, 123, 0, 0, 0.5, 0, true);
+    voice.glide_to(glide_start, 42, 1, 0, 1.0, 123, true);
 
     render_rounds<SimpleVoice>(reference, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -452,8 +451,10 @@ TEST(tuning_can_be_changed, {
 
     set_up_voice(voice, params, block_size, sample_rate);
 
-    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_2_SYNCED);
-    voice.note_on(0.0, 123, 2, 0, 1.0, 2);
+    params.tuning.set_value(SimpleVoice::TUNING_432HZ_12TET);
+    params.inaccuracy.set_value(1);
+    params.drift.set_value(1);
+    voice.note_on(0.0, 123, 2, 0, 1.0, 2, true);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -493,7 +494,7 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
     set_up_voice(voice, params, block_size, sample_rate);
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_NOTE_ON);
-    voice.note_on(0.0, 123, 1, 2, 1.0, 1);
+    voice.note_on(0.0, 123, 1, 2, 1.0, 1, true);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -551,8 +552,8 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
     params.portamento_depth.set_value(portamento_depth);
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_REALTIME);
-    voice.note_on(0.0, 123, 2, 2, 1.0, 2);
-    voice.update_note_frequency_for_realtime_mts_esp();
+    voice.note_on(0.0, 123, 2, 2, 1.0, 2, true);
+    voice.update_note_frequency_for_realtime_mts_esp<true>();
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 1);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 1);
@@ -574,7 +575,7 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
 
     per_channel_frequencies[2][2] = new_freq;
 
-    voice.update_note_frequency_for_realtime_mts_esp();
+    voice.update_note_frequency_for_realtime_mts_esp<true>();
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 2);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 2);
@@ -596,55 +597,16 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
 })
 
 
-TEST(can_tell_if_tuning_is_unstable, {
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_1));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_2_SYNCED));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_3));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_4));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_5_SYNCED));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_6));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_1));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_2_SYNCED));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_3));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_4));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_5_SYNCED));
-    assert_true(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_6));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_NOTE_ON));
-    assert_false(SimpleVoice::is_tuning_unstable(SimpleVoice::TUNING_MTS_ESP_REALTIME));
-})
-
-
-TEST(can_tell_if_tuning_is_unstable_and_synced, {
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_1));
-    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_2_SYNCED));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_3));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_4));
-    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_5_SYNCED));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_6));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_1));
-    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_2_SYNCED));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_3));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_4));
-    assert_true(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_5_SYNCED));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_432HZ_12TET_INACCURATE_6));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_MTS_ESP_NOTE_ON));
-    assert_false(SimpleVoice::is_tuning_synced_unstable(SimpleVoice::TUNING_MTS_ESP_REALTIME));
-})
-
-
-TEST(synced_inaccuracy_is_updated_once_per_round, {
+TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, {
     Inaccuracy synced_inaccuracy(0.123);
     SimpleVoice::Params params("");
     SimpleVoice voice(
         FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
     );
 
-    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_2_SYNCED);
-    voice.note_on(0.0, 42, 1, 0, 0.5, 1);
+    params.inaccuracy.set_value(1);
+    params.drift.set_value(1);
+    voice.note_on(0.0, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);
     SignalProducer::produce<SimpleVoice>(voice, 1);
@@ -672,8 +634,9 @@ TEST(when_vocie_is_reset_then_synced_inaccuracy_is_also_reset, {
         FREQUENCIES, PER_CHANNEL_FREQUENCIES, synced_inaccuracy, 0.0, params
     );
 
-    params.tuning.set_value(SimpleVoice::TUNING_440HZ_12TET_INACCURATE_2_SYNCED);
-    voice.note_on(0.12, 42, 1, 0, 0.5, 1);
+    params.inaccuracy.set_value(1);
+    params.drift.set_value(1);
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);
     SignalProducer::produce<SimpleVoice>(voice, 1);

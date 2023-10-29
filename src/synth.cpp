@@ -80,7 +80,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         7                           /* POLY + MODE + MIX + PM + FM + AM + bus   */
-        + 31 * 2                    /* Modulator::Params + Carrier::Params      */
+        + 35 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * 6
@@ -269,8 +269,6 @@ void Synth::initialize_supported_midi_controllers() noexcept
 
 void Synth::build_frequency_table() noexcept
 {
-    constexpr Number note_scale = 1.0 / (Number)Midi::NOTES;
-
     for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
         /*
          * Not using Math::exp() and friends here, for 2 reasons:
@@ -285,53 +283,11 @@ void Synth::build_frequency_table() noexcept
         Frequency const f_432hz_12tet = (Frequency)(
             std::pow(2.0, ((Frequency)note - 69.0) / 12.0) * 432.0
         );
-        Number const note_float = (Number)note * note_scale;
-        Number const scale = 0.3 + 0.7 * note_float;
-
-        Number const random_1 = scale * Math::randomize(1.0, note_float);
-        Number const random_2 = scale * Math::randomize(1.0, 1.0 - note_float);
-        Number const random_3 = scale * Math::randomize(1.0, random_1);
-        Number const random_4 = scale * Math::randomize(1.0, random_2);
-        Number const random_5 = scale * Math::randomize(1.0, 1.0 - random_1);
-        Number const random_6 = scale * Math::randomize(1.0, 1.0 - random_2);
-        Number const random_7 = scale * Math::randomize(1.0, random_3);
-        Number const random_8 = scale * Math::randomize(1.0, random_4);
-        Number const random_9 = scale * Math::randomize(1.0, 1.0 - random_3);
-        Number const random_10 = scale * Math::randomize(1.0, 1.0 - random_4);
-        Number const random_11 = scale * Math::randomize(1.0, random_5);
-        Number const random_12 = scale * Math::randomize(1.0, random_6);
-
-        Number const detune_440_1 = 2.0 * random_1 - 0.3;
-        Number const detune_440_2 = 5.0 * random_2 - 1.0;
-        Number const detune_440_3 = 10.0 * random_3 - 2.0;
-        Number const detune_440_4 = 15.0 * random_4 - 5.0;
-        Number const detune_440_5 = 20.0 * random_5 - 6.0;
-        Number const detune_440_6 = 25.0 * random_6 - 8.0;
-
-        Number const detune_432_1 = 2.0 * random_7 - 0.3;
-        Number const detune_432_2 = 5.0 * random_8 - 1.0;
-        Number const detune_432_3 = 10.0 * random_9 - 2.0;
-        Number const detune_432_4 = 15.0 * random_10 - 5.0;
-        Number const detune_432_5 = 20.0 * random_11 - 6.0;
-        Number const detune_432_6 = 25.0 * random_12 - 8.0;
 
         per_channel_frequencies[0][note] = f_440hz_12tet;
 
         frequencies[Modulator::TUNING_440HZ_12TET][note] = f_440hz_12tet;
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_1][note] = Math::detune(f_440hz_12tet, detune_440_1);
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_2_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_2);
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_3][note] = Math::detune(f_440hz_12tet, detune_440_3);
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_4][note] = Math::detune(f_440hz_12tet, detune_440_4);
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_5_SYNCED][note] = Math::detune(f_440hz_12tet, detune_440_5);
-        frequencies[Modulator::TUNING_440HZ_12TET_INACCURATE_6][note] = Math::detune(f_440hz_12tet, detune_440_6);
-
         frequencies[Modulator::TUNING_432HZ_12TET][note] = f_432hz_12tet;
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_1][note] = Math::detune(f_432hz_12tet, detune_432_1);
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_2_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_2);
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_3][note] = Math::detune(f_432hz_12tet, detune_432_3);
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_4][note] = Math::detune(f_432hz_12tet, detune_432_4);
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_5_SYNCED][note] = Math::detune(f_432hz_12tet, detune_432_5);
-        frequencies[Modulator::TUNING_432HZ_12TET_INACCURATE_6][note] = Math::detune(f_432hz_12tet, detune_432_6);
     }
 
     for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
@@ -357,6 +313,9 @@ void Synth::register_main_params() noexcept
 void Synth::register_modulator_params() noexcept
 {
     register_param_as_child<Modulator::TuningParam>(ParamId::MTUN, modulator_params.tuning);
+    register_param_as_child<Modulator::InaccuracyParam>(ParamId::MINA, modulator_params.inaccuracy);
+    register_param_as_child<Modulator::InaccuracyParam>(ParamId::MDRF, modulator_params.drift);
+
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
@@ -402,6 +361,9 @@ void Synth::register_modulator_params() noexcept
 void Synth::register_carrier_params() noexcept
 {
     register_param_as_child<Carrier::TuningParam>(ParamId::CTUN, carrier_params.tuning);
+    register_param_as_child<Carrier::InaccuracyParam>(ParamId::CINA, carrier_params.inaccuracy);
+    register_param_as_child<Carrier::InaccuracyParam>(ParamId::CDRF, carrier_params.drift);
+
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
@@ -855,6 +817,20 @@ void Synth::note_on(
 }
 
 
+bool Synth::should_sync_inaccuracy() const noexcept
+{
+    return should_sync_inaccuracy(modulator_params, carrier_params);
+}
+
+
+bool Synth::should_sync_inaccuracy(
+        Modulator::Params const& modulator_params,
+        Carrier::Params const& carrier_params
+) noexcept {
+    return modulator_params.inaccuracy.get_value() == carrier_params.inaccuracy.get_value();
+}
+
+
 void Synth::note_on_polyphonic(
         Seconds const time_offset,
         Midi::Channel const channel,
@@ -893,15 +869,16 @@ void Synth::trigger_note_on_voice(
     assign_voice_and_note_id(voice, channel, note);
 
     Mode const mode = this->mode.get_value();
+    bool const should_sync_inaccuracy = this->should_sync_inaccuracy();
 
     if (mode == MIX_AND_MOD) {
-        modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
-        carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+        modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
+        carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
     } else {
         if (note < mode + Midi::NOTE_B_2) {
-            modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+            modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
         } else {
-            carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+            carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
         }
     }
 
@@ -950,24 +927,25 @@ void Synth::note_on_monophonic(
     assign_voice_and_note_id(0, channel, note);
 
     Mode const mode = this->mode.get_value();
+    bool const should_sync_inaccuracy = this->should_sync_inaccuracy();
 
     if (mode == MIX_AND_MOD) {
         trigger_note_on_voice_monophonic<Modulator>(
-            *modulator, modulator_off, time_offset, channel, note, velocity
+            *modulator, modulator_off, time_offset, channel, note, velocity, should_sync_inaccuracy
         );
         trigger_note_on_voice_monophonic<Carrier>(
-            *carrier, carrier_off, time_offset, channel, note, velocity
+            *carrier, carrier_off, time_offset, channel, note, velocity, should_sync_inaccuracy
         );
     } else {
         if (note < mode + Midi::NOTE_B_2) {
             trigger_note_on_voice_monophonic<Modulator>(
-                *modulator, modulator_off, time_offset, channel, note, velocity
+                *modulator, modulator_off, time_offset, channel, note, velocity, should_sync_inaccuracy
             );
             carrier->cancel_note_smoothly(time_offset);
         } else {
             modulator->cancel_note_smoothly(time_offset);
             trigger_note_on_voice_monophonic<Carrier>(
-                *carrier, carrier_off, time_offset, channel, note, velocity
+                *carrier, carrier_off, time_offset, channel, note, velocity, should_sync_inaccuracy
             );
         }
     }
@@ -983,14 +961,15 @@ void Synth::trigger_note_on_voice_monophonic(
         Seconds const time_offset,
         Midi::Channel const channel,
         Midi::Note const note,
-        Number const velocity
+        Number const velocity,
+        bool const should_sync_inaccuracy
 ) noexcept {
     if (is_off) {
-        voice.note_on(time_offset, next_note_id, note, channel, velocity, previous_note);
+        voice.note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
     } else if (voice.is_released()) {
-        voice.retrigger(time_offset, next_note_id, note, channel, velocity, previous_note);
+        voice.retrigger(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
     } else {
-        voice.glide_to(time_offset, next_note_id, note, channel, velocity, previous_note);
+        voice.glide_to(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_inaccuracy);
     }
 }
 
@@ -1567,6 +1546,10 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::ECTYP: return effects.chorus.type.get_default_ratio();
         case ParamId::MTUN: return modulator_params.tuning.get_default_ratio();
         case ParamId::CTUN: return carrier_params.tuning.get_default_ratio();
+        case ParamId::MINA: return modulator_params.inaccuracy.get_default_ratio();
+        case ParamId::MDRF: return modulator_params.drift.get_default_ratio();
+        case ParamId::CINA: return carrier_params.inaccuracy.get_default_ratio();
+        case ParamId::CDRF: return carrier_params.drift.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1787,6 +1770,10 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::ECTYP: return effects.chorus.type.get_max_value();
         case ParamId::MTUN: return modulator_params.tuning.get_max_value();
         case ParamId::CTUN: return carrier_params.tuning.get_max_value();
+        case ParamId::MINA: return modulator_params.inaccuracy.get_max_value();
+        case ParamId::MDRF: return modulator_params.drift.get_max_value();
+        case ParamId::CINA: return carrier_params.inaccuracy.get_max_value();
+        case ParamId::CDRF: return carrier_params.drift.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -2015,6 +2002,10 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::ECTYP: return effects.chorus.type.ratio_to_value(ratio);
         case ParamId::MTUN: return modulator_params.tuning.ratio_to_value(ratio);
         case ParamId::CTUN: return carrier_params.tuning.ratio_to_value(ratio);
+        case ParamId::MINA: return modulator_params.inaccuracy.ratio_to_value(ratio);
+        case ParamId::MDRF: return modulator_params.drift.ratio_to_value(ratio);
+        case ParamId::CINA: return carrier_params.inaccuracy.ratio_to_value(ratio);
+        case ParamId::CDRF: return carrier_params.drift.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2529,6 +2520,10 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::ECTYP: effects.chorus.type.set_ratio(ratio); break;
             case ParamId::MTUN: modulator_params.tuning.set_ratio(ratio); break;
             case ParamId::CTUN: carrier_params.tuning.set_ratio(ratio); break;
+            case ParamId::MINA: modulator_params.inaccuracy.set_ratio(ratio); break;
+            case ParamId::MDRF: modulator_params.drift.set_ratio(ratio); break;
+            case ParamId::CINA: carrier_params.inaccuracy.set_ratio(ratio); break;
+            case ParamId::CDRF: carrier_params.drift.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -3221,6 +3216,10 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::ECTYP: return effects.chorus.type.get_ratio();
         case ParamId::MTUN: return modulator_params.tuning.get_ratio();
         case ParamId::CTUN: return carrier_params.tuning.get_ratio();
+        case ParamId::MINA: return modulator_params.inaccuracy.get_ratio();
+        case ParamId::MDRF: return modulator_params.drift.get_ratio();
+        case ParamId::CINA: return carrier_params.inaccuracy.get_ratio();
+        case ParamId::CDRF: return carrier_params.drift.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -3479,8 +3478,13 @@ Sample const* const* Synth::Bus::initialize_rendering(
     render_silence(round, 0, sample_count, carriers_buffer);
     render_silence(round, 0, sample_count, buffer);
 
-    render_voices<Modulator>(active_modulators, active_modulators_count, modulator_params.tuning.get_value(), round, sample_count);
-    render_voices<Carrier>(active_carriers, active_carriers_count, carrier_params.tuning.get_value(), round, sample_count);
+    if (Synth::should_sync_inaccuracy(modulator_params, carrier_params)) {
+        render_voices<Modulator, true>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
+        render_voices<Carrier, true>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+    } else {
+        render_voices<Modulator, false>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
+        render_voices<Carrier, false>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+    }
 
     if (active_modulators_count == 0 && active_carriers_count == 0) {
         mark_round_as_silent(round);
@@ -3511,11 +3515,11 @@ void Synth::Bus::collect_active_voices() noexcept
 }
 
 
-template<class VoiceClass>
+template<class VoiceClass, bool should_sync_inaccuracy>
 void Synth::Bus::render_voices(
         VoiceClass* (&voices)[POLYPHONY],
         size_t const voices_count,
-        typename VoiceClass::Tuning const tuning,
+        typename VoiceClass::Params const& params,
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -3527,19 +3531,15 @@ void Synth::Bus::render_voices(
         chain of the corresponding modulator.
         */
 
-        if (tuning == VoiceClass::TUNING_MTS_ESP_REALTIME) {
+        if (params.tuning.get_value() == VoiceClass::TUNING_MTS_ESP_REALTIME) {
             for (size_t v = 0; v != voices_count; ++v) {
-                voices[v]->update_note_frequency_for_realtime_mts_esp();
+                voices[v]->template update_note_frequency_for_realtime_mts_esp<should_sync_inaccuracy>();
             }
-        } else if (VoiceClass::is_tuning_unstable(tuning)) {
-            if (VoiceClass::is_tuning_synced_unstable(tuning)) {
-                for (size_t v = 0; v != voices_count; ++v) {
-                    voices[v]->template update_unstable_note_frequency<true>(round);
-                }
-            } else {
-                for (size_t v = 0; v != voices_count; ++v) {
-                    voices[v]->template update_unstable_note_frequency<false>(round);
-                }
+        }
+
+        if (params.drift.get_value() != 0) {
+            for (size_t v = 0; v != voices_count; ++v) {
+                voices[v]->template update_unstable_note_frequency<should_sync_inaccuracy>(round);
             }
         }
 

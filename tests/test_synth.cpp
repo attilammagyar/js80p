@@ -254,9 +254,9 @@ TEST(can_look_up_param_id_by_name, {
         max_collisions, avg_collisions, avg_bucket_size
     );
 
-    assert_lte((int)max_collisions, 6);
-    assert_lte(avg_bucket_size, 3.1);
-    assert_lte(avg_collisions, 3.41);
+    assert_lte((int)max_collisions, 7);
+    assert_lte(avg_bucket_size, 3.15);
+    assert_lte(avg_collisions, 3.45);
 
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(""));
     assert_eq(Synth::ParamId::MAX_PARAM_ID, synth.get_param_id(" \n"));
@@ -1104,9 +1104,7 @@ TEST(voice_inaccuracy_is_deterministic_random, {
     Math::Statistics statistics;
 
     Number const tuning = (
-        synth.modulator_params.tuning.value_to_ratio(
-            Modulator::TUNING_432HZ_12TET_INACCURATE_6
-        )
+        synth.modulator_params.tuning.value_to_ratio(Modulator::TUNING_432HZ_12TET)
     );
 
     synth.set_sample_rate(sample_rate);
@@ -1121,7 +1119,9 @@ TEST(voice_inaccuracy_is_deterministic_random, {
     render_rounds<Synth>(synth, buffer_precise, rounds, block_size);
 
     set_param(synth, Synth::ParamId::MTUN, tuning);
+    set_param(synth, Synth::ParamId::MINA, 1.0);
     set_param(synth, Synth::ParamId::CTUN, tuning);
+    set_param(synth, Synth::ParamId::CINA, 1.0);
     synth.process_messages();
 
     synth.reset();

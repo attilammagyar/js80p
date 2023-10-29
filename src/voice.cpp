@@ -20,6 +20,7 @@
 #define JS80P__VOICE_CPP
 
 #include <algorithm>
+#include <cmath>
 
 #include "dsp/math.hpp"
 
@@ -29,16 +30,109 @@
 namespace JS80P
 {
 
+constexpr Number Inaccuracy::interval_width(Integer const level)
+{
+    return MAX_WIDTH * std::pow((Number)level / (Number)MAX_LEVEL, 2.25);
+}
+
+
+constexpr Number Inaccuracy::interval_min(Integer const level)
+{
+    return (MAX_WIDTH / 2.0) * std::pow((Number)level / (Number)MAX_LEVEL, 2.7);
+}
+
+
+Number const Inaccuracy::CENTS[Inaccuracy::MAX_LEVEL + 1][2] = {
+    {0.0, 0.0},
+    {interval_width(1), interval_min(1)},
+    {interval_width(2), interval_min(2)},
+    {interval_width(3), interval_min(3)},
+    {interval_width(4), interval_min(4)},
+    {interval_width(5), interval_min(5)},
+    {interval_width(6), interval_min(6)},
+    {interval_width(7), interval_min(7)},
+    {interval_width(8), interval_min(8)},
+    {interval_width(9), interval_min(9)},
+    {interval_width(10), interval_min(10)},
+    {interval_width(11), interval_min(11)},
+    {interval_width(12), interval_min(12)},
+    {interval_width(13), interval_min(13)},
+    {interval_width(14), interval_min(14)},
+    {interval_width(15), interval_min(15)},
+    {interval_width(16), interval_min(16)},
+    {interval_width(17), interval_min(17)},
+    {interval_width(18), interval_min(18)},
+    {interval_width(19), interval_min(19)},
+    {interval_width(20), interval_min(20)},
+    {interval_width(21), interval_min(21)},
+    {interval_width(22), interval_min(22)},
+    {interval_width(23), interval_min(23)},
+    {interval_width(24), interval_min(24)},
+    {interval_width(25), interval_min(25)},
+    {interval_width(26), interval_min(26)},
+    {interval_width(27), interval_min(27)},
+    {interval_width(28), interval_min(28)},
+    {interval_width(29), interval_min(29)},
+    {interval_width(30), interval_min(30)},
+    {interval_width(31), interval_min(31)},
+    {interval_width(32), interval_min(32)},
+    {interval_width(33), interval_min(33)},
+    {interval_width(34), interval_min(34)},
+    {interval_width(35), interval_min(35)},
+    {interval_width(36), interval_min(36)},
+    {interval_width(37), interval_min(37)},
+    {interval_width(38), interval_min(38)},
+    {interval_width(39), interval_min(39)},
+    {interval_width(40), interval_min(40)},
+    {interval_width(41), interval_min(41)},
+    {interval_width(42), interval_min(42)},
+    {interval_width(43), interval_min(43)},
+    {interval_width(44), interval_min(44)},
+    {interval_width(45), interval_min(45)},
+    {interval_width(46), interval_min(46)},
+    {interval_width(47), interval_min(47)},
+    {interval_width(48), interval_min(48)},
+    {interval_width(49), interval_min(49)},
+    {interval_width(50), interval_min(50)},
+    {interval_width(51), interval_min(51)},
+    {interval_width(52), interval_min(52)},
+    {interval_width(53), interval_min(53)},
+    {interval_width(54), interval_min(54)},
+    {interval_width(55), interval_min(55)},
+    {interval_width(56), interval_min(56)},
+    {interval_width(57), interval_min(57)},
+    {interval_width(58), interval_min(58)},
+    {interval_width(59), interval_min(59)},
+    {interval_width(60), interval_min(60)},
+};
+
+
+Frequency Inaccuracy::detune(
+        Frequency const frequency,
+        Integer const level,
+        Number const inaccuracy
+) noexcept {
+    if (level < 1) {
+        return frequency;
+    }
+
+    Number const width = CENTS[level][0];
+    Number const min = CENTS[level][1];
+
+    return Math::detune(frequency, width * inaccuracy - min);
+}
+
+
 Number Inaccuracy::calculate_new_inaccuracy(Number const seed) noexcept
 {
-    return 0.1 + 0.9 * Math::randomize(1.0, seed);
+    return MIN + DELTA * Math::randomize(1.0, seed);
 }
 
 
 Inaccuracy::Inaccuracy(Number const seed)
     : seed(seed),
     inaccuracy(seed),
-    last_update_round(-1)
+    last_update_round(-2)
 {
 }
 
@@ -61,6 +155,15 @@ void Inaccuracy::update(Integer const round) noexcept
 void Inaccuracy::reset() noexcept
 {
     inaccuracy = seed;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::InaccuracyParam::InaccuracyParam(
+        std::string const name
+) noexcept
+    : Param<InaccuracyLevel, ParamEvaluation::BLOCK>(name, 0, Inaccuracy::MAX_LEVEL, 0)
+{
 }
 
 
@@ -94,6 +197,8 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
     : tuning(name + "TUN"),
+    inaccuracy(name + "INA"),
+    drift(name + "DRF"),
     waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
@@ -283,46 +388,6 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
             }
         }
     }
-}
-
-
-template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::is_tuning_unstable(
-        Tuning const tuning
-) noexcept {
-    constexpr int mask = (
-        0
-        | 1 << TUNING_440HZ_12TET_INACCURATE_1
-        | 1 << TUNING_440HZ_12TET_INACCURATE_2_SYNCED
-        | 1 << TUNING_440HZ_12TET_INACCURATE_3
-        | 1 << TUNING_440HZ_12TET_INACCURATE_4
-        | 1 << TUNING_440HZ_12TET_INACCURATE_5_SYNCED
-        | 1 << TUNING_440HZ_12TET_INACCURATE_6
-        | 1 << TUNING_432HZ_12TET_INACCURATE_1
-        | 1 << TUNING_432HZ_12TET_INACCURATE_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_INACCURATE_3
-        | 1 << TUNING_432HZ_12TET_INACCURATE_4
-        | 1 << TUNING_432HZ_12TET_INACCURATE_5_SYNCED
-        | 1 << TUNING_432HZ_12TET_INACCURATE_6
-    );
-
-    return 0 != (mask & (1 << tuning));
-}
-
-
-template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::is_tuning_synced_unstable(
-        Tuning const tuning
-) noexcept {
-    constexpr int mask = (
-        0
-        | 1 << TUNING_440HZ_12TET_INACCURATE_2_SYNCED
-        | 1 << TUNING_440HZ_12TET_INACCURATE_5_SYNCED
-        | 1 << TUNING_432HZ_12TET_INACCURATE_2_SYNCED
-        | 1 << TUNING_432HZ_12TET_INACCURATE_5_SYNCED
-    );
-
-    return 0 != (mask & (1 << tuning));
 }
 
 
@@ -533,7 +598,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Midi::Note const note,
         Midi::Channel const channel,
         Number const velocity,
-        Midi::Note const previous_note
+        Midi::Note const previous_note,
+        bool const should_sync_inaccuracy
 ) noexcept {
     if (state == State::ON || note >= Midi::NOTES) {
         return;
@@ -561,7 +627,15 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     panning.start_envelope(time_offset);
     volume.start_envelope(time_offset);
 
-    set_up_oscillator_frequency(time_offset, note, channel, previous_note);
+    if (should_sync_inaccuracy) {
+        set_up_oscillator_frequency<true>(
+            time_offset, note, channel, previous_note
+        );
+    } else {
+        set_up_oscillator_frequency<false>(
+            time_offset, note, channel, previous_note
+        );
+    }
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
@@ -604,9 +678,10 @@ void Voice<ModulatorSignalProducerClass>::save_note_info(
 
 
 template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::update_inaccuracy() noexcept
+void Voice<ModulatorSignalProducerClass>::update_inaccuracy(Integer const round) noexcept
 {
     inaccuracy = Inaccuracy::calculate_new_inaccuracy(inaccuracy);
+    synced_inaccuracy.update(round);
 }
 
 
@@ -649,6 +724,7 @@ Number Voice<ModulatorSignalProducerClass>::calculate_note_panning(
 
 
 template<class ModulatorSignalProducerClass>
+template<bool should_sync_inaccuracy>
 void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Seconds const time_offset,
         Midi::Note const note,
@@ -657,7 +733,9 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 ) noexcept {
     Number const portamento_length = param_leaders.portamento_length.get_value();
 
-    note_frequency = calculate_note_frequency(note, channel);
+    note_frequency = calculate_note_frequency<should_sync_inaccuracy>(
+        note, channel
+    );
 
     oscillator.frequency.cancel_events_at(time_offset);
 
@@ -669,7 +747,9 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
         Math::is_abs_small(portamento_depth, 0.01)
-            ? calculate_note_frequency(previous_note, channel)
+            ? calculate_note_frequency<should_sync_inaccuracy>(
+                previous_note, channel
+            )
             : Math::detune(note_frequency, portamento_depth)
     );
 
@@ -681,89 +761,43 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
 
 template<class ModulatorSignalProducerClass>
+template<bool should_sync_inaccuracy>
 Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
         Midi::Note const note,
         Midi::Channel const channel
 ) const noexcept {
     Tuning const tuning = param_leaders.tuning.get_value();
+    Frequency const frequency = (
+        tuning >= TUNING_MTS_ESP_NOTE_ON
+            ? per_channel_frequencies[channel][note]
+            : frequencies[tuning][note]
+    );
 
-    if (tuning >= TUNING_MTS_ESP_NOTE_ON) {
-        return per_channel_frequencies[channel][note];
-    }
-
-    Frequency const frequency = frequencies[tuning][note];
-
-    switch (tuning) {
-        case TUNING_440HZ_12TET:
-        case TUNING_432HZ_12TET:
-            return frequency;
-
-        case TUNING_440HZ_12TET_INACCURATE_1:
-        case TUNING_432HZ_12TET_INACCURATE_1:
-            return Math::detune(frequency, 1.5 * inaccuracy - 0.3);
-
-        case TUNING_440HZ_12TET_INACCURATE_2_SYNCED:
-        case TUNING_432HZ_12TET_INACCURATE_2_SYNCED:
-            return Math::detune(frequency, 3.0 * synced_inaccuracy.get_inaccuracy() - 0.6);
-
-        case TUNING_440HZ_12TET_INACCURATE_3:
-        case TUNING_432HZ_12TET_INACCURATE_3:
-            return Math::detune(frequency, 15.0 * inaccuracy - 6.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_4:
-        case TUNING_432HZ_12TET_INACCURATE_4:
-            return Math::detune(frequency, 20.0 * inaccuracy - 8.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_5_SYNCED:
-        case TUNING_432HZ_12TET_INACCURATE_5_SYNCED:
-            return Math::detune(frequency, 35.0 * synced_inaccuracy.get_inaccuracy() - 16.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_6:
-        case TUNING_432HZ_12TET_INACCURATE_6:
-            return Math::detune(frequency, 50.0 * inaccuracy - 23.0);
-
-        default:
-            break;
-    }
-
-    return frequency;
+    return detune<should_sync_inaccuracy>(frequency, param_leaders.inaccuracy);
 }
 
 
 template<class ModulatorSignalProducerClass>
-Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency_drift_target(
-        Tuning const tuning
+template<bool should_sync_inaccuracy>
+Frequency Voice<ModulatorSignalProducerClass>::detune(
+        Frequency const frequency,
+        InaccuracyParam const& level_param
 ) const noexcept {
-    switch (tuning) {
-        case TUNING_440HZ_12TET_INACCURATE_1:
-        case TUNING_432HZ_12TET_INACCURATE_1:
-            return Math::detune(note_frequency, 0.7 * inaccuracy - 0.2);
-
-        case TUNING_440HZ_12TET_INACCURATE_2_SYNCED:
-        case TUNING_432HZ_12TET_INACCURATE_2_SYNCED:
-            return Math::detune(note_frequency, 1.0 * synced_inaccuracy.get_inaccuracy() - 0.3);
-
-        case TUNING_440HZ_12TET_INACCURATE_3:
-        case TUNING_432HZ_12TET_INACCURATE_3:
-            return Math::detune(note_frequency, 3.0 * inaccuracy - 1.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_4:
-        case TUNING_432HZ_12TET_INACCURATE_4:
-            return Math::detune(note_frequency, 5.0 * inaccuracy - 2.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_5_SYNCED:
-        case TUNING_432HZ_12TET_INACCURATE_5_SYNCED:
-            return Math::detune(note_frequency, 7.0 * synced_inaccuracy.get_inaccuracy() - 3.0);
-
-        case TUNING_440HZ_12TET_INACCURATE_6:
-        case TUNING_432HZ_12TET_INACCURATE_6:
-            return Math::detune(note_frequency, 25.0 * inaccuracy - 11.0);
-
-        default:
-            break;
+    if constexpr (should_sync_inaccuracy) {
+        return Inaccuracy::detune(
+            frequency, level_param.get_value(), synced_inaccuracy.get_inaccuracy()
+        );
+    } else {
+        return Inaccuracy::detune(frequency, level_param.get_value(), inaccuracy);
     }
+}
 
-    return note_frequency;
+
+template<class ModulatorSignalProducerClass>
+template<bool should_sync_inaccuracy>
+Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency_drift_target() const noexcept
+{
+    return detune<should_sync_inaccuracy>(note_frequency, param_leaders.drift);
 }
 
 
@@ -774,7 +808,8 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Midi::Note const note,
         Midi::Channel const channel,
         Number const velocity,
-        Midi::Note const previous_note
+        Midi::Note const previous_note,
+        bool const should_sync_inaccuracy
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -787,7 +822,8 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         note,
         channel,
         velocity,
-        previous_note
+        previous_note,
+        should_sync_inaccuracy
     );
 }
 
@@ -799,7 +835,8 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Midi::Note const note,
         Midi::Channel const channel,
         Number const velocity,
-        Midi::Note const previous_note
+        Midi::Note const previous_note,
+        bool const should_sync_inaccuracy
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -808,7 +845,15 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     Number const portamento_length = param_leaders.portamento_length.get_value();
 
     if (portamento_length <= 0.000001) {
-        retrigger(time_offset, note_id, note, channel, velocity, previous_note);
+        retrigger(
+            time_offset,
+            note_id,
+            note,
+            channel,
+            velocity,
+            previous_note,
+            should_sync_inaccuracy
+        );
 
         return;
     }
@@ -854,10 +899,18 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     oscillator.frequency.cancel_events_at(time_offset);
 
-    note_velocity.schedule_linear_ramp(portamento_length, calculate_note_velocity(velocity));
-    note_panning.schedule_linear_ramp(portamento_length, calculate_note_panning(note));
+    note_velocity.schedule_linear_ramp(
+        portamento_length, calculate_note_velocity(velocity)
+    );
+    note_panning.schedule_linear_ramp(
+        portamento_length, calculate_note_panning(note)
+    );
 
-    note_frequency = calculate_note_frequency(note, channel);
+    if (should_sync_inaccuracy) {
+        note_frequency = calculate_note_frequency<true>(note, channel);
+    } else {
+        note_frequency = calculate_note_frequency<false>(note, channel);
+    }
 
     oscillator.frequency.schedule_linear_ramp(portamento_length, note_frequency);
 }
@@ -1086,28 +1139,33 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
+template<bool should_sync_inaccuracy>
 void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp() noexcept
 {
     if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
 
-    Frequency const new_frequency = per_channel_frequencies[channel][note];
-    Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
+    Seconds const remaining = (
+        oscillator.frequency.get_remaining_time_from_linear_ramp()
+    );
+    Frequency const new_frequency = detune<should_sync_inaccuracy>(
+        per_channel_frequencies[channel][note], param_leaders.inaccuracy
+    );
 
-    if (
-            LIKELY(
-                remaining < 0.000001
-                && Math::is_close(new_frequency, oscillator.frequency.get_value())
-            )
-    ) {
+    if (LIKELY(remaining < 0.000001 && Math::is_close(new_frequency, note_frequency))) {
         return;
     }
+
+    note_frequency = new_frequency;
 
     Seconds const ramp_duration = std::max(0.003, remaining);
 
     oscillator.frequency.cancel_events_at(0.0);
-    oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);
+    oscillator.frequency.schedule_linear_ramp(
+        ramp_duration,
+        calculate_note_frequency_drift_target<should_sync_inaccuracy>()
+    );
 }
 
 
@@ -1126,7 +1184,7 @@ bool Voice<ModulatorSignalProducerClass>::is_oscillator_starting_or_stopping_or_
 
 
 template<class ModulatorSignalProducerClass>
-template<bool is_synced>
+template<bool should_sync_inaccuracy>
 void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         Integer const round
 ) noexcept {
@@ -1134,21 +1192,19 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         return;
     }
 
-    Seconds const remaining = oscillator.frequency.get_remaining_time_from_linear_ramp();
+    Seconds const remaining = (
+        oscillator.frequency.get_remaining_time_from_linear_ramp()
+    );
 
     if (LIKELY(remaining > 0.0)) {
         return;
     }
 
-    if constexpr (is_synced) {
-        synced_inaccuracy.update(round);
-    } else {
-        update_inaccuracy();
-    }
+    update_inaccuracy(round);
 
-    Tuning const tuning = param_leaders.tuning.get_value();
-
-    Frequency const new_frequency = calculate_note_frequency_drift_target(tuning);
+    Frequency const new_frequency = (
+        calculate_note_frequency_drift_target<should_sync_inaccuracy>()
+    );
 
     if (UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
         return;
@@ -1156,7 +1212,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
 
     Number ramp_duration;
 
-    if constexpr (is_synced) {
+    if constexpr (should_sync_inaccuracy) {
         ramp_duration = 0.3 + 1.7 * synced_inaccuracy.get_inaccuracy();
     } else {
         ramp_duration = 0.3 + 1.7 * inaccuracy;

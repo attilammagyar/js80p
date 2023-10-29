@@ -562,7 +562,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MTUN = 391,      ///< Modulator Tuning
             CTUN = 392,      ///< Carrier Tuning
 
-            MAX_PARAM_ID = 393
+            MINA = 393,      ///< Modulator Inaccuracy
+            MDRF = 394,      ///< Modulator Drift
+
+            CINA = 395,      ///< Carrier Inaccuracy
+            CDRF = 396,      ///< Carrier Drift
+
+            MAX_PARAM_ID = 397
         };
 
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
@@ -1024,11 +1030,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 void collect_active_voices() noexcept;
 
-                template<class VoiceClass>
+                template<class VoiceClass, bool is_synced>
                 void render_voices(
                     VoiceClass* (&voices)[POLYPHONY],
                     size_t const voices_count,
-                    typename VoiceClass::Tuning const tuning,
+                    typename VoiceClass::Params const& params,
                     Integer const round,
                     Integer const sample_count
                 ) noexcept;
@@ -1183,6 +1189,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::MAX_PARAM_ID];
 
+        static bool should_sync_inaccuracy(
+            Modulator::Params const& modulator_params,
+            Carrier::Params const& carrier_params
+        ) noexcept;
+
         void initialize_supported_midi_controllers() noexcept;
 
         void build_frequency_table() noexcept;
@@ -1254,6 +1265,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void clear_sustain() noexcept;
 
+        bool should_sync_inaccuracy() const noexcept;
+
         void note_on_polyphonic(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -1284,7 +1297,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
-            Number const velocity
+            Number const velocity,
+            bool const should_sync_inaccuracy
         ) noexcept;
 
         void assign_voice_and_note_id(

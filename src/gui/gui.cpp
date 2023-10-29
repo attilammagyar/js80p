@@ -52,24 +52,79 @@ int const GUI::MODES_COUNT = Synth::MODES;
 
 char const* const GUI::TUNINGS[] = {
     [Modulator::TUNING_440HZ_12TET] = "440 12TET",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_1] = "440 12TET ina 1",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_2_SYNCED] = "440 12TET ina 2=",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_3] = "440 12TET ina 3",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_4] = "440 12TET ina 4",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_5_SYNCED] = "440 12TET ina 5=",
-    [Modulator::TUNING_440HZ_12TET_INACCURATE_6] = "440 12TET ina 6",
     [Modulator::TUNING_432HZ_12TET] = "432 12TET",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_1] = "432 12TET ina 1",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_2_SYNCED] = "432 12TET ina 2=",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_3] = "432 12TET ina 3",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_4] = "432 12TET ina 4",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_5_SYNCED] = "432 12TET ina 5=",
-    [Modulator::TUNING_432HZ_12TET_INACCURATE_6] = "432 12TET ina 6",
-    [Modulator::TUNING_MTS_ESP_NOTE_ON] = "MTS-ESP NO",
-    [Modulator::TUNING_MTS_ESP_REALTIME] = "MTS-ESP RT",
+    [Modulator::TUNING_MTS_ESP_NOTE_ON] = "MTS-ESP1",
+    [Modulator::TUNING_MTS_ESP_REALTIME] = "MTS-ESP2",
 };
 
 int const GUI::TUNINGS_COUNT = VOICE_TUNINGS;
+
+
+char const* const GUI::INACCURACY_LEVELS[] = {
+    "0.00%",
+    "0.01%",
+    "0.05%",
+    "0.12%",
+    "0.23%",
+    "0.37%",
+    "0.56%",
+    "0.80%",
+    "1.07%",
+    "1.40%",
+    "1.77%",
+    "2.20%",
+    "2.67%",
+    "3.20%",
+    "3.78%",
+    "4.42%",
+    "5.11%",
+    "5.86%",
+    "6.66%",
+    "7.52%",
+    "8.44%",
+    "9.42%",
+    "10.46%",
+    "11.56%",
+    "12.72%",
+    "13.95%",
+    "15.24%",
+    "16.59%",
+    "18.00%",
+    "19.48%",
+    "21.02%",
+    "22.63%",
+    "24.31%",
+    "26.05%",
+    "27.86%",
+    "29.74%",
+    "31.68%",
+    "33.70%",
+    "35.78%",
+    "37.94%",
+    "40.16%",
+    "42.45%",
+    "44.82%",
+    "47.26%",
+    "49.77%",
+    "52.35%",
+    "55.00%",
+    "57.73%",
+    "60.53%",
+    "63.40%",
+    "66.35%",
+    "69.37%",
+    "72.47%",
+    "75.65%",
+    "78.89%",
+    "82.22%",
+    "85.62%",
+    "89.10%",
+    "92.66%",
+    "96.29%",
+    "100.00%",
+};
+
+int const GUI::INACCURACY_LEVELS_COUNT = Inaccuracy::MAX_LEVEL + 1;
 
 
 char const* const GUI::WAVEFORMS[] = {
@@ -614,6 +669,12 @@ char const* const GUI::PARAMS[Synth::ParamId::MAX_PARAM_ID] = {
 
     [Synth::ParamId::MTUN] = "Modulator Tuning",
     [Synth::ParamId::CTUN] = "Carrier Tuning",
+
+    [Synth::ParamId::MINA] = "Modulator Inaccuracy",
+    [Synth::ParamId::MDRF] = "Modulator Drift",
+
+    [Synth::ParamId::CINA] = "Carrier Inaccuracy",
+    [Synth::ParamId::CDRF] = "Carrier Drift",
 };
 
 
@@ -1054,6 +1115,13 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
 }
 
 
+#define KNOB_W 58
+#define KNOB_H 100
+#define KNOB_TOP 16
+
+#define SCREW_W 20
+#define SCREW_H 20
+
 #define KNOB(owner, left, top, param_id, ctls, varg1, varg2, ks)    \
     owner->own(                                                     \
         new KnobParamEditor(                                        \
@@ -1061,6 +1129,9 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
             GUI::PARAMS[param_id],                                  \
             left,                                                   \
             top,                                                    \
+            KNOB_W,                                                 \
+            KNOB_H,                                                 \
+            KNOB_TOP,                                               \
             *controller_selector,                                   \
             synth,                                                  \
             param_id,                                               \
@@ -1071,8 +1142,25 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         )                                                           \
     )
 
-#define KNOB_W KnobParamEditor::WIDTH
-#define KNOB_H KnobParamEditor::HEIGHT
+#define SCREW(owner, left, top, param_id, ctls, varg1, varg2, ks)   \
+    owner->own(                                                     \
+        new KnobParamEditor(                                        \
+            *this,                                                  \
+            GUI::PARAMS[param_id],                                  \
+            left,                                                   \
+            top,                                                    \
+            SCREW_W,                                                \
+            SCREW_H,                                                \
+            0,                                                      \
+            *controller_selector,                                   \
+            synth,                                                  \
+            param_id,                                               \
+            ctls,                                                   \
+            varg1,                                                  \
+            varg2,                                                  \
+            ks                                                      \
+        )                                                           \
+    )
 
 #define TOGG(owner, left, top, width, height, box_left, param_id)   \
     owner->own(                                                     \
@@ -1159,7 +1247,20 @@ GUI::GUI(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESFREE"),
         dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED"),
-        dummy_widget->load_image(this->platform_data, "KNOBSTATESNONE")
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESNONE"),
+        128,
+        48,
+        48
+    );
+
+    screw_states = new KnobStates(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "SCREWSTATES"),
+        NULL,
+        NULL,
+        61,
+        SCREW_W,
+        SCREW_H
     );
 
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
@@ -1189,7 +1290,7 @@ GUI::GUI(
     build_effects_body(knob_states);
     build_envelopes_body(knob_states);
     build_lfos_body(knob_states);
-    build_synth_body(knob_states);
+    build_synth_body(knob_states, screw_states);
 
     background->own(
         new TabSelector(
@@ -1759,7 +1860,7 @@ void GUI::build_lfos_body(KnobStates* knob_states)
 }
 
 
-void GUI::build_synth_body(KnobStates* knob_states)
+void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
 {
     synth_body = new TabBody("Synth");
 
@@ -1767,6 +1868,8 @@ void GUI::build_synth_body(KnobStates* knob_states)
 
     constexpr char const* const* md = JS80P::GUI::MODES;
     constexpr int mdc = JS80P::GUI::MODES_COUNT;
+    constexpr char const* const* ia = JS80P::GUI::INACCURACY_LEVELS;
+    constexpr int iac = JS80P::GUI::INACCURACY_LEVELS_COUNT;
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
@@ -1776,7 +1879,12 @@ void GUI::build_synth_body(KnobStates* knob_states)
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 232,   8, synth, Synth::ParamId::MTUN));
+    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, 0, ia, iac, screw_states);
+    SCREW(synth_body, 342, 8, Synth::ParamId::MDRF, 0, ia, iac, screw_states);
+
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 232, 288, synth, Synth::ParamId::CTUN));
+    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, 0, ia, iac, screw_states);
+    SCREW(synth_body, 342, 288, Synth::ParamId::CDRF, 0, ia, iac, screw_states);
 
     TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
 
@@ -1867,6 +1975,7 @@ GUI::~GUI()
     delete parent_window;
 
     delete knob_states;
+    delete screw_states;
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(controllers_1_image);
@@ -1894,6 +2003,12 @@ void GUI::show()
 void GUI::set_status_line(char const* text)
 {
     status_line->set_text(text);
+}
+
+
+void GUI::redraw_status_line()
+{
+    status_line->redraw();
 }
 
 

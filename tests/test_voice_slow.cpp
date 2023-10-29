@@ -77,7 +77,7 @@ TEST(inaccuracy_keeps_changing_for_each_note, {
         voice.set_sample_rate(1000.0);
 
         for (Integer j = 0; j != probes; ++j) {
-            voice.note_on(0.001, j, Midi::NOTE_A_3, 0, 1.0, 0);
+            voice.note_on(0.001, j, Midi::NOTE_A_3, 0, 1.0, 0, true);
             voice.note_off(0.002, j, Midi::NOTE_A_3, 1.0);
             SignalProducer::produce<SimpleVoice>(voice, j);
 
@@ -86,6 +86,17 @@ TEST(inaccuracy_keeps_changing_for_each_note, {
 
         Math::compute_statistics(inaccuracies, statistics);
 
-        assert_statistics(true, 0.1, 0.55, 1.0, 0.55, 0.225, statistics, 0.02);
+        Number const mean = (Inaccuracy::MIN + Inaccuracy::MAX) / 2.0;
+
+        assert_statistics(
+            true,
+            Inaccuracy::MIN,
+            mean,
+            Inaccuracy::MAX,
+            mean,
+            (Inaccuracy::MAX - mean) / 2.0,
+            statistics,
+            0.02
+        );
     }
 })

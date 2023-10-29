@@ -252,6 +252,12 @@ def print_special_params(param_id: int) -> int:
 
         ("MTUN", "  ///< Modulator Tuning"),
         ("CTUN", "  ///< Carrier Tuning"),
+
+        ("MINA", "  ///< Modulator Inaccuracy"),
+        ("MDRF", "  ///< Modulator Drift"),
+
+        ("CINA", "  ///< Carrier Inaccuracy"),
+        ("CDRF", "  ///< Carrier Drift"),
     ]
 
     return print_params(param_id, "", "", 1, params)

@@ -38,7 +38,7 @@
 namespace JS80P
 {
 
-constexpr int VOICE_TUNINGS = 16;
+constexpr int VOICE_TUNINGS = 4;
 
 typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
 typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
@@ -47,6 +47,17 @@ typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 class Inaccuracy
 {
     public:
+        static constexpr Integer MAX_LEVEL = 60;
+
+        static constexpr Number MIN = 0.1;
+        static constexpr Number MAX = 1.0;
+
+        static Frequency detune(
+            Frequency const frequency,
+            Integer const level,
+            Number const inaccuracy
+        ) noexcept;
+
         static Number calculate_new_inaccuracy(Number const seed) noexcept;
 
         Inaccuracy(Number const seed);
@@ -57,6 +68,15 @@ class Inaccuracy
         void reset() noexcept;
 
     private:
+        static constexpr Number MAX_WIDTH = 110.0;
+
+        static constexpr Number DELTA = MAX - MIN;
+
+        static constexpr Number interval_width(Integer const level);
+        static constexpr Number interval_min(Integer const level);
+
+        static Number const CENTS[MAX_LEVEL + 1][2];
+
         Number const seed;
 
         Number inaccuracy;
@@ -97,6 +117,14 @@ class Voice : public SignalProducer
 
         typedef VolumeApplier ModulationOut;
 
+        typedef Byte InaccuracyLevel;
+
+        class InaccuracyParam : public Param<InaccuracyLevel, ParamEvaluation::BLOCK>
+        {
+            public:
+                InaccuracyParam(std::string const name) noexcept;
+        };
+
         typedef Byte Tuning;
 
         class TuningParam : public Param<Tuning, ParamEvaluation::BLOCK>
@@ -124,6 +152,8 @@ class Voice : public SignalProducer
                 Params(std::string const name) noexcept;
 
                 TuningParam tuning;
+                InaccuracyParam inaccuracy;
+                InaccuracyParam drift;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;
@@ -201,25 +231,9 @@ class Voice : public SignalProducer
         static constexpr Integer CHANNELS = 2;
 
         static constexpr Tuning TUNING_440HZ_12TET = 0;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_1 = 1;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_2_SYNCED = 2;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_3 = 3;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_4 = 4;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_5_SYNCED = 5;
-        static constexpr Tuning TUNING_440HZ_12TET_INACCURATE_6 = 6;
-        static constexpr Tuning TUNING_432HZ_12TET = 7;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_1 = 8;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_2_SYNCED = 9;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_3 = 10;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_4 = 11;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_5_SYNCED = 12;
-        static constexpr Tuning TUNING_432HZ_12TET_INACCURATE_6 = 13;
-        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 14;
-        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 15;
-
-        static bool is_tuning_unstable(Tuning const tuning) noexcept;
-
-        static bool is_tuning_synced_unstable(Tuning const tuning) noexcept;
+        static constexpr Tuning TUNING_432HZ_12TET = 1;
+        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 2;
+        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 3;
 
         Voice(
             FrequencyTable const& frequencies,
@@ -257,7 +271,8 @@ class Voice : public SignalProducer
             Midi::Note const note,
             Midi::Channel const channel,
             Number const velocity,
-            Midi::Note const previous_note
+            Midi::Note const previous_note,
+            bool const should_sync_inaccuracy
         ) noexcept;
 
         void retrigger(
@@ -266,7 +281,8 @@ class Voice : public SignalProducer
             Midi::Note const note,
             Midi::Channel const channel,
             Number const velocity,
-            Midi::Note const previous_note
+            Midi::Note const previous_note,
+            bool const should_sync_inaccuracy
         ) noexcept;
 
         void glide_to(
@@ -275,7 +291,8 @@ class Voice : public SignalProducer
             Midi::Note const note,
             Midi::Channel const channel,
             Number const velocity,
-            Midi::Note const previous_note
+            Midi::Note const previous_note,
+            bool const should_sync_inaccuracy
         ) noexcept;
 
         void note_off(
@@ -296,9 +313,10 @@ class Voice : public SignalProducer
         Midi::Channel get_channel() const noexcept;
         Number get_inaccuracy() const noexcept;
 
+        template<bool should_sync_inaccuracy>
         void update_note_frequency_for_realtime_mts_esp() noexcept;
 
-        template<bool is_synced>
+        template<bool should_sync_inaccuracy>
         void update_unstable_note_frequency(Integer const round) noexcept;
 
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
@@ -331,18 +349,27 @@ class Voice : public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
-        void update_inaccuracy() noexcept;
+        void update_inaccuracy(Integer const round = -1) noexcept;
 
+        template<bool should_sync_inaccuracy>
         Frequency calculate_note_frequency(
             Midi::Note const note,
             Midi::Channel const channel
         ) const noexcept;
 
-        Frequency calculate_note_frequency_drift_target(Tuning const tuning) const noexcept;
+        template<bool should_sync_inaccuracy>
+        Frequency detune(
+            Frequency const frequency,
+            InaccuracyParam const& level_param
+        ) const noexcept;
+
+        template<bool should_sync_inaccuracy>
+        Frequency calculate_note_frequency_drift_target() const noexcept;
 
         Number calculate_note_velocity(Number const raw_velocity) const noexcept;
         Number calculate_note_panning(Midi::Note const note) const noexcept;
 
+        template<bool should_sync_inaccuracy>
         void set_up_oscillator_frequency(
             Seconds const time_offset,
             Midi::Note const note,
@@ -381,6 +408,7 @@ class Voice : public SignalProducer
         Integer note_id;
         Midi::Note note;
         Midi::Channel channel;
+        bool started_drifting;
 
     public:
         ModulationOut& modulation_out;

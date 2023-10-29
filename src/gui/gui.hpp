@@ -102,6 +102,9 @@ class GUI
         static char const* const TUNINGS[];
         static int const TUNINGS_COUNT;
 
+        static char const* const INACCURACY_LEVELS[Inaccuracy::MAX_LEVEL + 1];
+        static int const INACCURACY_LEVELS_COUNT;
+
         static char const* const WAVEFORMS[];
         static int const WAVEFORMS_COUNT;
 
@@ -186,6 +189,7 @@ class GUI
         void idle();
 
         void set_status_line(char const* text);
+        void redraw_status_line();
 
         void mts_esp_connected();
         void mts_esp_disconnected();
@@ -227,7 +231,7 @@ class GUI
         void build_effects_body(KnobStates* knob_states);
         void build_envelopes_body(KnobStates* knob_states);
         void build_lfos_body(KnobStates* knob_states);
-        void build_synth_body(KnobStates* knob_states);
+        void build_synth_body(KnobStates* knob_states, KnobStates* screw_states);
 
         bool const show_vst_logo;
 
@@ -243,6 +247,7 @@ class GUI
         Image vst_logo_image;
 
         KnobStates* knob_states;
+        KnobStates* screw_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
@@ -309,6 +314,7 @@ class WidgetBase
             GUI::PlatformData platform_data,
             char const* name
         );
+
         virtual GUI::Image copy_image_region(
             GUI::Image source,
             int const left,
@@ -316,6 +322,7 @@ class WidgetBase
             int const width,
             int const height
         );
+
         virtual void delete_image(GUI::Image image);
 
         virtual void show();
@@ -341,6 +348,7 @@ class WidgetBase
             int const height,
             Type const type
         );
+
         WidgetBase(
             GUI::PlatformData platform_data,
             GUI::PlatformWidget platform_widget,

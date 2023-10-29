@@ -563,42 +563,71 @@ KnobStates::KnobStates(
         WidgetBase* widget,
         GUI::Image free_image,
         GUI::Image controlled_image,
-        GUI::Image none_image
-) : widget(widget),
+        GUI::Image none_image,
+        size_t const count,
+        int const width,
+        int const height
+) : count(count),
+    width(width),
+    height(height),
+    last_index((Number)(count - 1)),
+    widget(widget),
     free_image(free_image),
     controlled_image(controlled_image),
     none_image(none_image)
 {
-    for (int i = 0; i != COUNT; ++i) {
-        int const top = i * KnobParamEditor::KNOB_HEIGHT;
+    free_images = new GUI::Image[count];
 
-        free_images[i] = widget->copy_image_region(
-            free_image, 0, top, KnobParamEditor::KNOB_WIDTH, KnobParamEditor::KNOB_HEIGHT
-        );
-        controlled_images[i] = widget->copy_image_region(
-            controlled_image, 0, top, KnobParamEditor::KNOB_WIDTH, KnobParamEditor::KNOB_HEIGHT
-        );
+    for (size_t i = 0; i != count; ++i) {
+        int const top = (int)i * height;
+
+        free_images[i] = widget->copy_image_region(free_image, 0, top, width, height);
+    }
+
+    if (controlled_image == NULL) {
+        controlled_images = NULL;
+    } else {
+        controlled_images = new GUI::Image[count];
+
+        for (size_t i = 0; i != count; ++i) {
+            int const top = (int)i * height;
+
+            controlled_images[i] = widget->copy_image_region(controlled_image, 0, top, width, height);
+        }
     }
 }
 
 
 KnobStates::~KnobStates()
 {
-    widget->delete_image(free_image);
-    widget->delete_image(controlled_image);
-    widget->delete_image(none_image);
-
-    for (int i = 0; i != COUNT; ++i) {
+    for (size_t i = 0; i != count; ++i) {
         widget->delete_image(free_images[i]);
-        widget->delete_image(controlled_images[i]);
-
         free_images[i] = NULL;
-        controlled_images[i] = NULL;
     }
 
+    delete[] free_images;
+    free_images = NULL;
+
+    widget->delete_image(free_image);
     free_image = NULL;
-    controlled_image = NULL;
-    none_image = NULL;
+
+    if (controlled_image != NULL) {
+        for (size_t i = 0; i != count; ++i) {
+            widget->delete_image(controlled_images[i]);
+            controlled_images[i] = NULL;
+        }
+
+        delete[] controlled_images;
+        controlled_images = NULL;
+
+        widget->delete_image(controlled_image);
+        controlled_image = NULL;
+    }
+
+    if (none_image != NULL) {
+        widget->delete_image(none_image);
+        none_image = NULL;
+    }
 }
 
 
@@ -607,6 +636,9 @@ KnobParamEditor::KnobParamEditor(
         char const* const text,
         int const left,
         int const top,
+        int const width,
+        int const height,
+        int const knob_top,
         ControllerSelector& controller_selector,
         Synth& synth,
         Synth::ParamId const param_id,
@@ -614,8 +646,10 @@ KnobParamEditor::KnobParamEditor(
         char const* format,
         double const scale,
         KnobStates* knob_states
-) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::KNOB_PARAM_EDITOR),
+) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
+    knob_top(knob_top),
+    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     format(format),
     scale(scale),
     options(NULL),
@@ -638,6 +672,9 @@ KnobParamEditor::KnobParamEditor(
         char const* const text,
         int const left,
         int const top,
+        int const width,
+        int const height,
+        int const knob_top,
         ControllerSelector& controller_selector,
         Synth& synth,
         Synth::ParamId const param_id,
@@ -645,8 +682,10 @@ KnobParamEditor::KnobParamEditor(
         char const* const* const options,
         int const number_of_options,
         KnobStates* knob_states
-) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::KNOB_PARAM_EDITOR),
+) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
+    knob_top(knob_top),
+    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     format(NULL),
     scale(1.0),
     options(options),
@@ -673,8 +712,8 @@ void KnobParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent
         *this,
         *gui,
         text,
-        (WIDTH - KnobParamEditor::KNOB_WIDTH) / 2,
-        16,
+        (width - knob_states->width) / 2,
+        knob_top,
         number_of_options > 1 ? (Number)(number_of_options - 1) : 0.0,
         knob_states
     );
@@ -805,6 +844,18 @@ void KnobParamEditor::update_value_str()
         value_str,
         TEXT_MAX_LENGTH
     );
+
+    if (not has_room_for_texts) {
+        snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, value_str);
+        title[TITLE_MAX_LENGTH - 1] = '\x00';
+
+        knob->set_text(title);
+
+        if (knob->is_editing()) {
+            gui->set_status_line(title);
+            gui->redraw_status_line();
+        }
+    }
 }
 
 
@@ -835,31 +886,33 @@ bool KnobParamEditor::paint()
 {
     TransparentWidget::paint();
 
-    draw_text(
-        Synth::is_controller_polyphonic(controller_id) ? "" : value_str,
-        value_font_size,
-        1,
-        HEIGHT - 20,
-        WIDTH - 2,
-        20,
-        GUI::controller_id_to_text_color(controller_id),
-        GUI::TEXT_BACKGROUND
-    );
-
-    if (controller_choices > 0) {
+    if (has_room_for_texts) {
         draw_text(
-            controller_str,
-            10,
+            Synth::is_controller_polyphonic(controller_id) ? "" : value_str,
+            value_font_size,
             1,
-            HEIGHT - 36,
-            WIDTH - 2,
-            16,
-            has_controller_ ? GUI::TEXT_BACKGROUND : GUI::TEXT_COLOR,
-            has_controller_
-                ? GUI::controller_id_to_bg_color(controller_id)
-                : GUI::TEXT_BACKGROUND,
-            has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
+            height - VALUE_TEXT_HEIGHT,
+            width - 2,
+            VALUE_TEXT_HEIGHT,
+            GUI::controller_id_to_text_color(controller_id),
+            GUI::TEXT_BACKGROUND
         );
+
+        if (controller_choices > 0) {
+            draw_text(
+                controller_str,
+                10,
+                1,
+                height - TEXTS_HEIGHT,
+                width - 2,
+                CONTROLLER_TEXT_HEIGHT,
+                has_controller_ ? GUI::TEXT_BACKGROUND : GUI::TEXT_COLOR,
+                has_controller_
+                    ? GUI::controller_id_to_bg_color(controller_id)
+                    : GUI::TEXT_BACKGROUND,
+                has_controller_ ? FontWeight::BOLD : FontWeight::NORMAL
+            );
+        }
     }
 
     return true;
@@ -904,7 +957,7 @@ KnobParamEditor::Knob::Knob(
         int const top,
         Number const steps,
         KnobStates* knob_states
-) : Widget(text, left, top, WIDTH, HEIGHT, Type::KNOB),
+) : Widget(text, left, top, knob_states->width, knob_states->height, Type::KNOB),
     steps(steps),
     editor(editor),
     knob_states(knob_states),
@@ -952,7 +1005,7 @@ void KnobParamEditor::Knob::update()
         return;
     }
 
-    int const index = (int)(KNOB_STATES_LAST_INDEX * this->ratio);
+    size_t const index = (size_t)(knob_states->last_index * this->ratio);
 
     if (is_controlled) {
         set_image(knob_states->controlled_images[index]);
@@ -1415,7 +1468,7 @@ void TuningSelector::update_value_str()
         TEXT_MAX_LENGTH,
         "%s %s",
         tuning < GUI::TUNINGS_COUNT ? GUI::TUNINGS[tuning] : "???",
-        gui->is_mts_esp_connected() ? "(on)" : "(off)"
+        gui->is_mts_esp_connected() ? "on" : "off"
     );
 }
 
@@ -1449,7 +1502,7 @@ bool TuningSelector::paint()
     TransparentWidget::paint();
 
     draw_text(
-        value_str, 10, 0, 0, WIDTH, HEIGHT, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+        value_str, 9, 0, 0, WIDTH, HEIGHT, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
     );
 
     return true;
