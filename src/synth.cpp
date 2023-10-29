@@ -84,7 +84,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * 6
-        + ENVELOPES * 10
+        + ENVELOPES * 11
         + LFOS
     ),
     polyphonic("POLY", ToggleParam::ON),
