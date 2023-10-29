@@ -404,9 +404,9 @@ params = [
     "MTUN",
     "CTUN",
     "MINA",
-    "MDRF",
+    "MNST",
     "CINA",
-    "CDRF",
+    "CNST",
 ]
 
 

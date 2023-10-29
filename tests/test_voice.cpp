@@ -453,7 +453,7 @@ TEST(tuning_can_be_changed, {
 
     params.tuning.set_value(SimpleVoice::TUNING_432HZ_12TET);
     params.inaccuracy.set_value(1);
-    params.drift.set_value(1);
+    params.instability.set_value(1);
     voice.note_on(0.0, 123, 2, 0, 1.0, 2, true);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
@@ -553,7 +553,7 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_REALTIME);
     voice.note_on(0.0, 123, 2, 2, 1.0, 2, true);
-    voice.update_note_frequency_for_realtime_mts_esp<true>();
+    voice.update_note_frequency_for_realtime_mts_esp<true, true>(1);
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 1);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 1);
@@ -575,7 +575,7 @@ TEST(when_using_realtime_mts_esp_tuning_then_frequency_can_be_updated_before_eac
 
     per_channel_frequencies[2][2] = new_freq;
 
-    voice.update_note_frequency_for_realtime_mts_esp<true>();
+    voice.update_note_frequency_for_realtime_mts_esp<true, true>(2);
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 2);
     actual_output = SignalProducer::produce<SimpleVoice>(voice, 2);
@@ -605,7 +605,7 @@ TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, 
     );
 
     params.inaccuracy.set_value(1);
-    params.drift.set_value(1);
+    params.instability.set_value(1);
     voice.note_on(0.0, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);
@@ -635,7 +635,7 @@ TEST(when_vocie_is_reset_then_synced_inaccuracy_is_also_reset, {
     );
 
     params.inaccuracy.set_value(1);
-    params.drift.set_value(1);
+    params.instability.set_value(1);
     voice.note_on(0.12, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);

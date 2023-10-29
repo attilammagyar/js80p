@@ -25,8 +25,13 @@ def main(argv):
 
     screw_line_color = (32, 32, 36)
     screw_line_border_color = (198, 198, 211)
-    screw_pointer_color = (218, 218, 232)
-    screw_pointer_border_color = (80, 200, 232)
+    screw_pointer_color = (212, 217, 231)
+    screw_pointer_border_color = (200, 218, 231)
+
+    screw_line_color_synced = (81, 141, 183)
+    screw_line_border_color_synced = (128, 232, 243)
+    screw_pointer_color_synced = (210, 229, 243)
+    screw_pointer_border_color_synced = (84, 210, 243)
 
     generate_knob_states(
         knob_bg=knob_bg,
@@ -61,9 +66,21 @@ def main(argv):
         screw_bg=screw_bg,
         line_color=screw_line_color,
         line_border_color=screw_line_border_color,
+        line_width=15,
+        line_border_width=5,
         pointer_color=screw_pointer_color,
         pointer_border_color=screw_pointer_border_color,
         out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states.png")
+    )
+    generate_screw_states(
+        screw_bg=screw_bg,
+        line_color=screw_line_color_synced,
+        line_border_color=screw_line_border_color_synced,
+        line_width=9,
+        line_border_width=9,
+        pointer_color=screw_pointer_color_synced,
+        pointer_border_color=screw_pointer_border_color_synced,
+        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states_synced.png")
     )
 
 
@@ -173,6 +190,8 @@ def generate_screw_states(
         screw_bg,
         line_color,
         line_border_color,
+        line_width,
+        line_border_width,
         pointer_color,
         pointer_border_color,
         out_file,
@@ -181,15 +200,13 @@ def generate_screw_states(
 
     width, height = screw_bg.size
     edge_distance = float(width) / 7.5
-    border_width = 5
-    line_width = 15
 
     center = (int(round(width / 2)), int(round(height / 2)))
     angle_diff = 30.0
 
     # in PIL, 3 o'clock is 0 degrees
     start_angle = 0.0
-    end_angle_delta = 170
+    end_angle_delta = 160
 
     screw_states = Image.new("RGB", (width, height * stages), (0, 0, 0))
     screw_states_canvas = ImageDraw.Draw(screw_states)
@@ -198,20 +215,22 @@ def generate_screw_states(
         progress = float(i) / float(stages - 1) if stages > 1 else 0
         angle_delta = end_angle_delta * progress
         angle = end_angle_delta * progress
-        l1 = rotate((edge_distance + border_width, center[0]), center, angle)
-        l2 = rotate((width - edge_distance - border_width, center[0]), center, angle)
+        l1 = rotate((edge_distance + line_border_width, center[0]), center, angle)
+        l2 = rotate((width - edge_distance - line_border_width, center[0]), center, angle)
         b1 = rotate((edge_distance, center[0]), center, angle)
         b2 = rotate((width - edge_distance, center[0]), center, angle)
-        t1 = rotate((0.0, center[0]), center, angle)
-        t2 = rotate((edge_distance * 2.4, center[0] - edge_distance * 1.2), center, angle)
-        t3 = rotate((edge_distance * 2.4, center[0] + edge_distance * 1.2), center, angle)
 
         overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         canvas = ImageDraw.Draw(overlay)
 
-        canvas.line((b2, b1), line_border_color, line_width + border_width * 2)
+        canvas.line((b2, b1), line_border_color, line_width + line_border_width * 2)
         canvas.line((l2, l1), line_color, line_width)
-        canvas.polygon((t1, t2, t3), pointer_color, pointer_border_color, 3)
+
+        if i > 0:
+            t1 = rotate((0.0, center[0]), center, angle)
+            t2 = rotate((edge_distance * 2.3, center[0] - edge_distance * 1.15), center, angle)
+            t3 = rotate((edge_distance * 2.3, center[0] + edge_distance * 1.15), center, angle)
+            canvas.polygon((t1, t2, t3), pointer_color, pointer_border_color, 4)
 
         screw = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         screw.paste(screw_bg, (0, 0, width, height))

@@ -198,7 +198,7 @@ template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
     : tuning(name + "TUN"),
     inaccuracy(name + "INA"),
-    drift(name + "DRF"),
+    instability(name + "NST"),
     waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
@@ -608,7 +608,6 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     state = State::ON;
 
     save_note_info(note_id, note, channel);
-    update_inaccuracy();
 
     note_velocity.cancel_events_at(time_offset);
     note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
@@ -681,6 +680,7 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::update_inaccuracy(Integer const round) noexcept
 {
     inaccuracy = Inaccuracy::calculate_new_inaccuracy(inaccuracy);
+
     synced_inaccuracy.update(round);
 }
 
@@ -733,9 +733,8 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 ) noexcept {
     Number const portamento_length = param_leaders.portamento_length.get_value();
 
-    note_frequency = calculate_note_frequency<should_sync_inaccuracy>(
-        note, channel
-    );
+    nominal_frequency = get_note_frequency(note, channel);
+    note_frequency = detune<should_sync_inaccuracy>(nominal_frequency, param_leaders.inaccuracy);
 
     oscillator.frequency.cancel_events_at(time_offset);
 
@@ -747,8 +746,8 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     Number const portamento_depth = param_leaders.portamento_depth.get_value();
     Frequency const start_frequency = (
         Math::is_abs_small(portamento_depth, 0.01)
-            ? calculate_note_frequency<should_sync_inaccuracy>(
-                previous_note, channel
+            ? detune<should_sync_inaccuracy>(
+                get_note_frequency(previous_note, channel), param_leaders.inaccuracy
             )
             : Math::detune(note_frequency, portamento_depth)
     );
@@ -761,29 +760,26 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_inaccuracy>
-Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency(
+Frequency Voice<ModulatorSignalProducerClass>::get_note_frequency(
         Midi::Note const note,
         Midi::Channel const channel
 ) const noexcept {
     Tuning const tuning = param_leaders.tuning.get_value();
-    Frequency const frequency = (
+    return (
         tuning >= TUNING_MTS_ESP_NOTE_ON
             ? per_channel_frequencies[channel][note]
             : frequencies[tuning][note]
     );
-
-    return detune<should_sync_inaccuracy>(frequency, param_leaders.inaccuracy);
 }
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_inaccuracy>
+template<bool should_sync>
 Frequency Voice<ModulatorSignalProducerClass>::detune(
         Frequency const frequency,
         InaccuracyParam const& level_param
 ) const noexcept {
-    if constexpr (should_sync_inaccuracy) {
+    if constexpr (should_sync) {
         return Inaccuracy::detune(
             frequency, level_param.get_value(), synced_inaccuracy.get_inaccuracy()
         );
@@ -794,10 +790,10 @@ Frequency Voice<ModulatorSignalProducerClass>::detune(
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_inaccuracy>
+template<bool should_sync_instability>
 Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency_drift_target() const noexcept
 {
-    return detune<should_sync_inaccuracy>(note_frequency, param_leaders.drift);
+    return detune<should_sync_instability>(note_frequency, param_leaders.instability);
 }
 
 
@@ -859,7 +855,6 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     }
 
     save_note_info(note_id, note, channel);
-    update_inaccuracy();
 
     wavefolder.folding.update_envelope(time_offset);
 
@@ -906,10 +901,12 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         portamento_length, calculate_note_panning(note)
     );
 
+    nominal_frequency = get_note_frequency(note, channel);
+
     if (should_sync_inaccuracy) {
-        note_frequency = calculate_note_frequency<true>(note, channel);
+        note_frequency = detune<true>(nominal_frequency, param_leaders.inaccuracy);
     } else {
-        note_frequency = calculate_note_frequency<false>(note, channel);
+        note_frequency = detune<false>(nominal_frequency, param_leaders.inaccuracy);
     }
 
     oscillator.frequency.schedule_linear_ramp(portamento_length, note_frequency);
@@ -1139,8 +1136,8 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_inaccuracy>
-void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp() noexcept
+template<bool should_sync_inaccuracy, bool should_sync_instability>
+void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept
 {
     if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
@@ -1149,22 +1146,25 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts
     Seconds const remaining = (
         oscillator.frequency.get_remaining_time_from_linear_ramp()
     );
-    Frequency const new_frequency = detune<should_sync_inaccuracy>(
-        per_channel_frequencies[channel][note], param_leaders.inaccuracy
-    );
+    Frequency const new_nominal_frequency = per_channel_frequencies[channel][note];
 
-    if (LIKELY(remaining < 0.000001 && Math::is_close(new_frequency, note_frequency))) {
+    if (LIKELY(remaining < 0.000001 && Math::is_close(new_nominal_frequency, nominal_frequency))) {
         return;
     }
 
-    note_frequency = new_frequency;
+    if (remaining > MIN_DRIFT_DURATION) {
+        update_inaccuracy(round);
+    }
+
+    nominal_frequency = new_nominal_frequency;
+    note_frequency = detune<should_sync_inaccuracy>(nominal_frequency, param_leaders.inaccuracy);
 
     Seconds const ramp_duration = std::max(0.003, remaining);
 
     oscillator.frequency.cancel_events_at(0.0);
     oscillator.frequency.schedule_linear_ramp(
         ramp_duration,
-        calculate_note_frequency_drift_target<should_sync_inaccuracy>()
+        calculate_note_frequency_drift_target<should_sync_instability>()
     );
 }
 
@@ -1184,7 +1184,7 @@ bool Voice<ModulatorSignalProducerClass>::is_oscillator_starting_or_stopping_or_
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_inaccuracy>
+template<bool should_sync_instability>
 void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         Integer const round
 ) noexcept {
@@ -1203,7 +1203,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
     update_inaccuracy(round);
 
     Frequency const new_frequency = (
-        calculate_note_frequency_drift_target<should_sync_inaccuracy>()
+        calculate_note_frequency_drift_target<should_sync_instability>()
     );
 
     if (UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
@@ -1212,10 +1212,10 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
 
     Number ramp_duration;
 
-    if constexpr (should_sync_inaccuracy) {
-        ramp_duration = 0.3 + 1.7 * synced_inaccuracy.get_inaccuracy();
+    if constexpr (should_sync_instability) {
+        ramp_duration = MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * synced_inaccuracy.get_inaccuracy();
     } else {
-        ramp_duration = 0.3 + 1.7 * inaccuracy;
+        ramp_duration = MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * inaccuracy;
     }
 
     oscillator.frequency.cancel_events_at(0.0);

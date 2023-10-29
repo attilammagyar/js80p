@@ -54,7 +54,7 @@ constexpr FrequencyTable FREQUENCIES{};
 constexpr PerChannelFrequencyTable PER_CHANNEL_FREQUENCIES{};
 
 
-TEST(inaccuracy_keeps_changing_for_each_note, {
+TEST(updating_the_inaccuracy_many_times_yields_uniform_distribution, {
     constexpr Integer probes = 100000;
 
     SimpleVoice::Params params("V");
@@ -77,6 +77,10 @@ TEST(inaccuracy_keeps_changing_for_each_note, {
         voice.set_sample_rate(1000.0);
 
         for (Integer j = 0; j != probes; ++j) {
+            if (j > 0) {
+                voice.update_inaccuracy(j - 1);
+            }
+
             voice.note_on(0.001, j, Midi::NOTE_A_3, 0, 1.0, 0, true);
             voice.note_off(0.002, j, Midi::NOTE_A_3, 1.0);
             SignalProducer::produce<SimpleVoice>(voice, j);

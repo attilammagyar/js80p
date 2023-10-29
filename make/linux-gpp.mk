@@ -46,6 +46,7 @@ OBJ_GUI_EXTRA = \
 	$(BUILD_DIR)/img_knob_states-none.o \
 	$(BUILD_DIR)/img_lfos.o \
 	$(BUILD_DIR)/img_screw_states.o \
+	$(BUILD_DIR)/img_screw_states_synced.o \
 	$(BUILD_DIR)/img_synth.o \
 	$(BUILD_DIR)/img_vst_logo.o
 
@@ -91,6 +92,9 @@ $(BUILD_DIR)/img_lfos.o: gui/img/lfos.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
 $(BUILD_DIR)/img_screw_states.o: gui/img/screw_states.png | $(BUILD_DIR)
+	$(OBJCOPY) $< $@
+
+$(BUILD_DIR)/img_screw_states_synced.o: gui/img/screw_states_synced.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
 $(BUILD_DIR)/img_synth.o: gui/img/synth.png | $(BUILD_DIR)

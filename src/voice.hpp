@@ -153,7 +153,7 @@ class Voice : public SignalProducer
 
                 TuningParam tuning;
                 InaccuracyParam inaccuracy;
-                InaccuracyParam drift;
+                InaccuracyParam instability;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;
@@ -265,6 +265,8 @@ class Voice : public SignalProducer
         bool is_off_after(Seconds const time_offset) const noexcept;
         bool is_released() const noexcept;
 
+        void update_inaccuracy(Integer const round) noexcept;
+
         void note_on(
             Seconds const time_offset,
             Integer const note_id,
@@ -313,8 +315,8 @@ class Voice : public SignalProducer
         Midi::Channel get_channel() const noexcept;
         Number get_inaccuracy() const noexcept;
 
-        template<bool should_sync_inaccuracy>
-        void update_note_frequency_for_realtime_mts_esp() noexcept;
+        template<bool should_sync_inaccuracy, bool should_sync_instability>
+        void update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept;
 
         template<bool should_sync_inaccuracy>
         void update_unstable_note_frequency(Integer const round) noexcept;
@@ -341,6 +343,9 @@ class Voice : public SignalProducer
 
         static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
 
+        static constexpr Seconds MIN_DRIFT_DURATION = 0.3;
+        static constexpr Seconds DRIFT_DURATION_DELTA = 3.2;
+
         void initialize_instance(Number const inaccuracy_seed) noexcept;
 
         void save_note_info(
@@ -349,15 +354,12 @@ class Voice : public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
-        void update_inaccuracy(Integer const round = -1) noexcept;
-
-        template<bool should_sync_inaccuracy>
-        Frequency calculate_note_frequency(
+        Frequency get_note_frequency(
             Midi::Note const note,
             Midi::Channel const channel
         ) const noexcept;
 
-        template<bool should_sync_inaccuracy>
+        template<bool should_sync>
         Frequency detune(
             Frequency const frequency,
             InaccuracyParam const& level_param
@@ -403,12 +405,12 @@ class Voice : public SignalProducer
         Number inaccuracy;
         Number panning_value;
         Number note_panning_value;
+        Frequency nominal_frequency;
         Frequency note_frequency;
         State state;
         Integer note_id;
         Midi::Note note;
         Midi::Channel channel;
-        bool started_drifting;
 
     public:
         ModulationOut& modulation_out;

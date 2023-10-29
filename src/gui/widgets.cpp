@@ -563,6 +563,7 @@ KnobStates::KnobStates(
         WidgetBase* widget,
         GUI::Image free_image,
         GUI::Image controlled_image,
+        GUI::Image synced_image,
         GUI::Image none_image,
         size_t const count,
         int const width,
@@ -574,60 +575,77 @@ KnobStates::KnobStates(
     widget(widget),
     free_image(free_image),
     controlled_image(controlled_image),
+    synced_image(synced_image),
     none_image(none_image)
 {
-    free_images = new GUI::Image[count];
+    free_images = split_image(free_image);
+    controlled_images = split_image(controlled_image);
+    synced_images = split_image(synced_image);
+}
+
+
+GUI::Image* KnobStates::split_image(GUI::Image image) const
+{
+    if (image == NULL) {
+        return NULL;
+    }
+
+    GUI::Image* images = new GUI::Image[count];
 
     for (size_t i = 0; i != count; ++i) {
         int const top = (int)i * height;
 
-        free_images[i] = widget->copy_image_region(free_image, 0, top, width, height);
+        images[i] = widget->copy_image_region(image, 0, top, width, height);
     }
 
-    if (controlled_image == NULL) {
-        controlled_images = NULL;
-    } else {
-        controlled_images = new GUI::Image[count];
-
-        for (size_t i = 0; i != count; ++i) {
-            int const top = (int)i * height;
-
-            controlled_images[i] = widget->copy_image_region(controlled_image, 0, top, width, height);
-        }
-    }
+    return images;
 }
 
 
 KnobStates::~KnobStates()
 {
-    for (size_t i = 0; i != count; ++i) {
-        widget->delete_image(free_images[i]);
-        free_images[i] = NULL;
+    if (free_image != NULL) {
+        free_images = free_images_(free_images);
+
+        widget->delete_image(free_image);
+        free_image = NULL;
     }
 
-    delete[] free_images;
-    free_images = NULL;
-
-    widget->delete_image(free_image);
-    free_image = NULL;
-
     if (controlled_image != NULL) {
-        for (size_t i = 0; i != count; ++i) {
-            widget->delete_image(controlled_images[i]);
-            controlled_images[i] = NULL;
-        }
-
-        delete[] controlled_images;
-        controlled_images = NULL;
+        controlled_images = free_images_(controlled_images);
 
         widget->delete_image(controlled_image);
         controlled_image = NULL;
+    }
+
+    if (synced_image != NULL) {
+        synced_images = free_images_(synced_images);
+
+        widget->delete_image(synced_image);
+        synced_image = NULL;
     }
 
     if (none_image != NULL) {
         widget->delete_image(none_image);
         none_image = NULL;
     }
+}
+
+
+GUI::Image* KnobStates::free_images_(GUI::Image* images) const
+{
+    if (images == NULL) {
+        return NULL;
+    }
+
+    for (size_t i = 0; i != count; ++i) {
+        widget->delete_image(images[i]);
+        images[i] = NULL;
+    }
+
+    delete[] images;
+
+    return NULL;
 }
 
 
@@ -726,6 +744,12 @@ void KnobParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent
 }
 
 
+void KnobParamEditor::set_sync_param_id(Synth::ParamId const param_id)
+{
+    knob->set_sync_param_id(param_id);
+}
+
+
 bool KnobParamEditor::has_controller() const
 {
     return has_controller_;
@@ -745,7 +769,7 @@ void KnobParamEditor::refresh()
 
     has_controller_ = new_controller_id > Synth::Synth::ControllerId::NONE;
 
-    if (new_ratio != ratio || new_controller_id != controller_id) {
+    if (knob->update_sync_status() || new_ratio != ratio || new_controller_id != controller_id) {
         update_editor(new_ratio, new_controller_id);
     } else {
         synth.push_message(
@@ -964,9 +988,11 @@ KnobParamEditor::Knob::Knob(
     knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
+    sync_param_id(Synth::ParamId::INVALID_PARAM_ID),
     is_controlled(false),
     is_controller_polyphonic(false),
-    is_editing_(false)
+    is_editing_(false),
+    is_synced(false)
 {
     set_gui(gui);
 }
@@ -987,12 +1013,19 @@ void KnobParamEditor::Knob::set_up(
 }
 
 
+void KnobParamEditor::Knob::set_sync_param_id(Synth::ParamId const param_id)
+{
+    sync_param_id = param_id;
+}
+
+
 void KnobParamEditor::Knob::update(Number const ratio)
 {
     this->ratio = (
         steps > 0.0 ? std::round(ratio * steps) / steps : ratio
     );
 
+    update_sync_status();
     update();
 }
 
@@ -1009,9 +1042,25 @@ void KnobParamEditor::Knob::update()
 
     if (is_controlled) {
         set_image(knob_states->controlled_images[index]);
+    } else if (is_synced) {
+        set_image(knob_states->synced_images[index]);
     } else {
         set_image(knob_states->free_images[index]);
     }
+}
+
+
+bool KnobParamEditor::Knob::update_sync_status()
+{
+    bool const was_synced = is_synced;
+
+    is_synced = (
+        sync_param_id != Synth::ParamId::INVALID_PARAM_ID
+        && ratio > 0.0
+        && std::fabs(ratio - editor.synth.get_param_ratio_atomic(sync_param_id)) < 0.000001
+    );
+
+    return was_synced != is_synced;
 }
 
 

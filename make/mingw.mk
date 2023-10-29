@@ -33,6 +33,7 @@ GUI_IMAGES = \
 	gui/img/knob_states-none.bmp \
 	gui/img/lfos.bmp \
 	gui/img/screw_states.bmp \
+	gui/img/screw_states_synced.bmp \
 	gui/img/synth.bmp \
 	gui/img/vst_logo.bmp
 

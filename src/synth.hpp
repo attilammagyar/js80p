@@ -563,10 +563,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CTUN = 392,      ///< Carrier Tuning
 
             MINA = 393,      ///< Modulator Inaccuracy
-            MDRF = 394,      ///< Modulator Drift
+            MNST = 394,      ///< Modulator Instability
 
             CINA = 395,      ///< Carrier Inaccuracy
-            CDRF = 396,      ///< Carrier Drift
+            CNST = 396,      ///< Carrier Instability
 
             PARAM_ID_COUNT = 397,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
@@ -1032,7 +1032,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 void collect_active_voices() noexcept;
 
-                template<class VoiceClass, bool is_synced>
+                template<class VoiceClass, bool should_sync_inaccuracy, bool should_sync_instability>
                 void render_voices(
                     VoiceClass* (&voices)[POLYPHONY],
                     size_t const voices_count,
@@ -1196,6 +1196,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Carrier::Params const& carrier_params
         ) noexcept;
 
+        static bool should_sync_instability(
+            Modulator::Params const& modulator_params,
+            Carrier::Params const& carrier_params
+        ) noexcept;
+
         void initialize_supported_midi_controllers() noexcept;
 
         void build_frequency_table() noexcept;
@@ -1268,6 +1273,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void clear_sustain() noexcept;
 
         bool should_sync_inaccuracy() const noexcept;
+        bool should_sync_instability() const noexcept;
 
         void note_on_polyphonic(
             Seconds const time_offset,

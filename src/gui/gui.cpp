@@ -671,10 +671,10 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CTUN] = "Carrier Tuning",
 
     [Synth::ParamId::MINA] = "Modulator Inaccuracy",
-    [Synth::ParamId::MDRF] = "Modulator Drift",
+    [Synth::ParamId::MNST] = "Modulator Instability",
 
     [Synth::ParamId::CINA] = "Carrier Inaccuracy",
-    [Synth::ParamId::CDRF] = "Carrier Drift",
+    [Synth::ParamId::CNST] = "Carrier Instability",
 };
 
 
@@ -1247,6 +1247,7 @@ GUI::GUI(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESFREE"),
         dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED"),
+        NULL,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESNONE"),
         128,
         48,
@@ -1257,6 +1258,7 @@ GUI::GUI(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "SCREWSTATES"),
         NULL,
+        dummy_widget->load_image(this->platform_data, "SCREWSTATESSYNCED"),
         NULL,
         61,
         SCREW_W,
@@ -1879,12 +1881,12 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 232,   8, synth, Synth::ParamId::MTUN));
-    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, 0, ia, iac, screw_states);
-    SCREW(synth_body, 342, 8, Synth::ParamId::MDRF, 0, ia, iac, screw_states);
+    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CINA);
+    SCREW(synth_body, 342, 8, Synth::ParamId::MNST, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CNST);
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 232, 288, synth, Synth::ParamId::CTUN));
-    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, 0, ia, iac, screw_states);
-    SCREW(synth_body, 342, 288, Synth::ParamId::CDRF, 0, ia, iac, screw_states);
+    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MINA);
+    SCREW(synth_body, 342, 288, Synth::ParamId::CNST, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MNST);
 
     TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
 

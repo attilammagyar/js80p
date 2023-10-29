@@ -266,6 +266,7 @@ class KnobStates
             WidgetBase* widget,
             GUI::Image free_image,
             GUI::Image controlled_image,
+            GUI::Image synced_image,
             GUI::Image none_image,
             size_t const count,
             int const width,
@@ -284,10 +285,16 @@ class KnobStates
 
         GUI::Image free_image;
         GUI::Image controlled_image;
+        GUI::Image synced_image;
         GUI::Image none_image;
 
         GUI::Image* free_images;
         GUI::Image* controlled_images;
+        GUI::Image* synced_images;
+
+    private:
+        GUI::Image* split_image(GUI::Image image) const;
+        GUI::Image* free_images_(GUI::Image* images) const;
 };
 
 
@@ -327,6 +334,8 @@ class KnobParamEditor : public TransparentWidget
             int const number_of_options,
             KnobStates* knob_states
         );
+
+        void set_sync_param_id(Synth::ParamId const param_id);
 
         bool has_controller() const;
 
@@ -392,10 +401,14 @@ class KnobParamEditor : public TransparentWidget
                     Number const steps,
                     KnobStates* knob_states
                 );
+
                 virtual ~Knob();
+
+                void set_sync_param_id(Synth::ParamId const param_id);
 
                 void update(Number const ratio);
                 void update();
+                bool update_sync_status();
                 void make_free();
                 void make_controlled(Synth::ControllerId const controller_id);
 
@@ -426,9 +439,11 @@ class KnobParamEditor : public TransparentWidget
                 Number prev_y;
                 Number ratio;
                 Number mouse_move_delta;
+                Synth::ParamId sync_param_id;
                 bool is_controlled;
                 bool is_controller_polyphonic;
                 bool is_editing_;
+                bool is_synced;
         };
 
         void update_value_str();
