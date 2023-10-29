@@ -640,6 +640,7 @@ class TuningSelector : public TransparentWidget
         char value_str[TEXT_MAX_LENGTH];
         Number ratio;
         bool is_editing_;
+        bool is_mts_esp_connected;
 };
 
 }

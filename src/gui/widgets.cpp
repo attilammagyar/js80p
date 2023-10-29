@@ -1465,7 +1465,8 @@ TuningSelector::TuningSelector(
     param_id(param_id),
     synth(synth),
     ratio(0.0),
-    is_editing_(false)
+    is_editing_(false),
+    is_mts_esp_connected(false)
 {
     set_gui(gui);
     update_value_str();
@@ -1479,9 +1480,16 @@ void TuningSelector::refresh()
     }
 
     Number const new_ratio = synth.get_param_ratio_atomic(param_id);
+    bool const new_is_mts_esp_connected = gui->is_mts_esp_connected();
 
-    if (new_ratio != ratio) {
+    bool const is_changed = (
+        std::fabs(new_ratio - ratio) > 0.000001
+        || new_is_mts_esp_connected != is_mts_esp_connected
+    );
+
+    if (is_changed) {
         ratio = GUI::clamp_ratio(new_ratio);
+        is_mts_esp_connected = new_is_mts_esp_connected;
         update_value_str();
         redraw();
     } else {
@@ -1517,7 +1525,7 @@ void TuningSelector::update_value_str()
         TEXT_MAX_LENGTH,
         "%s %s",
         tuning < GUI::TUNINGS_COUNT ? GUI::TUNINGS[tuning] : "???",
-        gui->is_mts_esp_connected() ? "on" : "off"
+        is_mts_esp_connected ? "on" : "off"
     );
 }
 
