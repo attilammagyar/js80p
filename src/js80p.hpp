@@ -27,11 +27,11 @@
 
 
 #if defined(__GNUC__) || defined(__clang__)
-  #define LIKELY(condition) __builtin_expect((condition), 1)
-  #define UNLIKELY(condition) __builtin_expect((condition), 0)
+  #define JS80P_LIKELY(condition) __builtin_expect((condition), 1)
+  #define JS80P_UNLIKELY(condition) __builtin_expect((condition), 0)
 #else
-  #define LIKELY(condition) (condition)
-  #define UNLIKELY(condition) (condition)
+  #define JS80P_LIKELY(condition) (condition)
+  #define JS80P_UNLIKELY(condition) (condition)
 #endif
 
 

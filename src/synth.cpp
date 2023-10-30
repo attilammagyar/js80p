@@ -908,7 +908,7 @@ void Synth::assign_voice_and_note_id(
         Midi::Channel const channel,
         Midi::Note const note
 ) noexcept {
-    if (UNLIKELY(previous_note > Midi::NOTE_MAX)) {
+    if (JS80P_UNLIKELY(previous_note > Midi::NOTE_MAX)) {
         previous_note = note;
     }
 
@@ -1185,7 +1185,7 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const voice = deferred_note_off.get_voice();
 
-            if (UNLIKELY(voice == INVALID_VOICE)) {
+            if (JS80P_UNLIKELY(voice == INVALID_VOICE)) {
                 /* This should never happen, but safety first! */
                 continue;
             }

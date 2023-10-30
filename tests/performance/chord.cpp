@@ -94,7 +94,7 @@ class WavBuffer
 
         bool append8(char const byte)
         {
-            if (UNLIKELY(buffer_pos >= BUFFER_SIZE)) {
+            if (JS80P_UNLIKELY(buffer_pos >= BUFFER_SIZE)) {
                 return false;
             }
 
@@ -148,9 +148,9 @@ void usage(char const* name)
 
 uint32_t sample_to_wav(Sample const sample)
 {
-    if (UNLIKELY(sample > 1.0)) {
+    if (JS80P_UNLIKELY(sample > 1.0)) {
         return (uint32_t)SIGNED_24BIT_MAX;
-    } else if (UNLIKELY(sample < -1.0)) {
+    } else if (JS80P_UNLIKELY(sample < -1.0)) {
         return (uint32_t)-SIGNED_24BIT_MAX;
     }
 
@@ -232,7 +232,7 @@ void render_sound(
     }
 
     for (Integer r = 0; r != ROUNDS; ++r) {
-        if (UNLIKELY((r & 7) == 0)) {
+        if (JS80P_UNLIKELY((r & 7) == 0)) {
             if (mod_wheel < 127) {
                 ++mod_wheel;
                 synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, mod_wheel);

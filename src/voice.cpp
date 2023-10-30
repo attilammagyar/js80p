@@ -350,7 +350,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
     if (volume_buffer == NULL) {
         Sample const volume_value = this->volume_value;
 
-        if (LIKELY(velocity_buffer == NULL)) {
+        if (JS80P_LIKELY(velocity_buffer == NULL)) {
             Sample const velocity_value = this->velocity_value;
 
             for (Integer c = 0; c != channels; ++c) {
@@ -369,7 +369,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
                 }
             }
         }
-    } else if (LIKELY(velocity_buffer == NULL)) {
+    } else if (JS80P_LIKELY(velocity_buffer == NULL)) {
         Sample const velocity_value = this->velocity_value;
 
         for (Integer c = 0; c != channels; ++c) {
@@ -1143,13 +1143,13 @@ template<class ModulatorSignalProducerClass>
 template<bool should_sync_inaccuracy, bool should_sync_instability>
 void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept
 {
-    if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
+    if (JS80P_UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
 
     Frequency const new_nominal_frequency = per_channel_frequencies[channel][note];
 
-    if (LIKELY(Math::is_close(new_nominal_frequency, nominal_frequency))) {
+    if (JS80P_LIKELY(Math::is_close(new_nominal_frequency, nominal_frequency))) {
         return;
     }
 
@@ -1204,7 +1204,7 @@ template<bool should_sync_instability>
 void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         Integer const round
 ) noexcept {
-    if (UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
+    if (JS80P_UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;
     }
 
@@ -1212,7 +1212,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         oscillator.frequency.get_remaining_time_from_linear_ramp()
     );
 
-    if (LIKELY(remaining > 0.0)) {
+    if (JS80P_LIKELY(remaining > 0.0)) {
         return;
     }
 
@@ -1222,7 +1222,7 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         calculate_note_frequency_drift_target<should_sync_instability>()
     );
 
-    if (UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
+    if (JS80P_UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
         return;
     }
 
@@ -1291,7 +1291,7 @@ void Voice<ModulatorSignalProducerClass>::render(
     Sample const* const panning_buffer = this->panning_buffer;
     Sample const* const note_panning_buffer = this->note_panning_buffer;
 
-    if (LIKELY(note_panning_buffer == NULL)) {
+    if (JS80P_LIKELY(note_panning_buffer == NULL)) {
         if (panning_buffer == NULL) {
             Number const panning = std::min(
                 1.0, std::max(panning_value + note_panning_value, -1.0)

@@ -85,7 +85,7 @@ void NoteStack::push(
         Midi::Note const note,
         Number const velocity
 ) noexcept {
-    if (UNLIKELY(is_invalid(channel, note))) {
+    if (JS80P_UNLIKELY(is_invalid(channel, note))) {
         return;
     }
 
@@ -145,7 +145,7 @@ void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
 
 void NoteStack::remove(Midi::Channel const channel, Midi::Note const note) noexcept
 {
-    if (UNLIKELY(is_invalid(channel, note))) {
+    if (JS80P_UNLIKELY(is_invalid(channel, note))) {
         return;
     }
 

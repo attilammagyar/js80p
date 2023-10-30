@@ -267,7 +267,7 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
     Sample const folding_times_input_sample = folding * input_sample;
     Sample const delta = folding_times_input_sample - previous_input_sample;
 
-    if (UNLIKELY(Math::is_abs_small(delta))) {
+    if (JS80P_UNLIKELY(Math::is_abs_small(delta))) {
         /*
         We're supposed to calculate f for the average of the two samples here,
         but the numerical approximation of our f(x) via its antiderivative

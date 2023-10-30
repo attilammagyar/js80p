@@ -52,12 +52,12 @@ class Renderer
         template<typename NumberType, Operation operation = Operation::OVERWRITE>
         void render(Integer const sample_count, NumberType** buffer)
         {
-            if (UNLIKELY(sample_count <= 0)) {
+            if (JS80P_UNLIKELY(sample_count <= 0)) {
                 return;
             }
 
             Integer const previous_round_sample_count = (
-                LIKELY(this->previous_round_sample_count != 0)
+                JS80P_LIKELY(this->previous_round_sample_count != 0)
                     ? this->previous_round_sample_count
                     : sample_count
             );

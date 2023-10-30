@@ -272,7 +272,7 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
     read_index = write_index_input;
 
-    if (UNLIKELY(shared_buffer_owner != NULL)) {
+    if (JS80P_UNLIKELY(shared_buffer_owner != NULL)) {
         clear_delay_buffer<true>(sample_count);
         mix_feedback_into_delay_buffer<true>(sample_count);
         mix_input_into_delay_buffer<true>(round, sample_count);
@@ -301,7 +301,7 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     previous_round = round;
 
     if (is_delay_buffer_silent()) {
-        if (UNLIKELY(need_to_render_silence)) {
+        if (JS80P_UNLIKELY(need_to_render_silence)) {
             need_to_render_silence = false;
             this->render_silence(round, 0, sample_count, this->buffer);
         }
@@ -325,7 +325,7 @@ Integer Delay<InputSignalProducerClass>::advance_delay_buffer_index(
     Integer const new_position = position + increment;
 
     return (
-        UNLIKELY(new_position >= delay_buffer_size)
+        JS80P_UNLIKELY(new_position >= delay_buffer_size)
             ? new_position % delay_buffer_size
             : new_position
     );
@@ -350,11 +350,11 @@ template<bool is_delay_buffer_shared>
 void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
-    if (UNLIKELY(feedback_signal_producer == NULL)) {
+    if (JS80P_UNLIKELY(feedback_signal_producer == NULL)) {
         return;
     }
 
-    if (UNLIKELY(is_starting)) {
+    if (JS80P_UNLIKELY(is_starting)) {
         is_starting = false;
         write_index_feedback = advance_delay_buffer_index(
             write_index_feedback, sample_count
@@ -427,7 +427,7 @@ Integer Delay<InputSignalProducerClass>::write_delay_buffer(
 
             ++index;
 
-            if (UNLIKELY(index == delay_buffer_size)) {
+            if (JS80P_UNLIKELY(index == delay_buffer_size)) {
                 index = 0;
             }
         }

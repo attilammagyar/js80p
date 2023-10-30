@@ -111,7 +111,7 @@ void Mixer<InputSignalProducerClass>::render(
     render_silence(round, first_sample_index, last_sample_index, output);
 
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        if (UNLIKELY(it->weight < SILENCE_WEIGHT)) {
+        if (JS80P_UNLIKELY(it->weight < SILENCE_WEIGHT)) {
             continue;
         }
 

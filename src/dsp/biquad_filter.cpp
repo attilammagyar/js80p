@@ -339,7 +339,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         return initialize_rendering_no_op(round, sample_count);
     }
 
-    if (UNLIKELY(is_silent_)) {
+    if (JS80P_UNLIKELY(is_silent_)) {
         update_state_for_silent_round(round, sample_count);
     }
 
@@ -366,13 +366,13 @@ template <class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::update_state_for_no_op_round(
         Integer const sample_count
 ) noexcept {
-    if (UNLIKELY(sample_count < 1)) {
+    if (JS80P_UNLIKELY(sample_count < 1)) {
         return;
     }
 
     Integer const channels = this->channels;
 
-    if (UNLIKELY(sample_count == 1)) {
+    if (JS80P_UNLIKELY(sample_count == 1)) {
         for (Integer c = 0; c != channels; ++c) {
             this->x_n_m2[c] = this->x_n_m1[c];
             this->y_n_m2[c] = this->y_n_m1[c];
@@ -401,13 +401,13 @@ void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
     this->render_silence(round, 0, sample_count, this->buffer);
     this->mark_round_as_silent(round);
 
-    if (UNLIKELY(sample_count < 1)) {
+    if (JS80P_UNLIKELY(sample_count < 1)) {
         return;
     }
 
     Integer const channels = this->channels;
 
-    if (UNLIKELY(sample_count == 1)) {
+    if (JS80P_UNLIKELY(sample_count == 1)) {
         for (Integer c = 0; c != channels; ++c) {
             this->x_n_m2[c] = this->x_n_m1[c];
             this->y_n_m2[c] = this->y_n_m1[c];
@@ -439,7 +439,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         shared_cache->are_coefficients_constant
     );
 
-    if (UNLIKELY(is_silent_)) {
+    if (JS80P_UNLIKELY(is_silent_)) {
         update_state_for_silent_round(round, sample_count);
     }
 
@@ -485,7 +485,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         is_silent_ = false;
         // is_silent_ = frequency_value <= low_pass_silent_frequency;
 
-        // if (UNLIKELY(is_silent_)) {
+        // if (JS80P_UNLIKELY(is_silent_)) {
             // return false;
         // }
 
@@ -509,7 +509,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
             }
 
             /* JS80P doesn't let the frequency go below 1.0 Hz */
-            // if (UNLIKELY(frequency_value <= low_pass_silent_frequency)) {
+            // if (JS80P_UNLIKELY(frequency_value <= low_pass_silent_frequency)) {
                 // store_silent_coefficient_samples(i);
 
                 // continue;
@@ -587,7 +587,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
 
         is_silent_ = frequency_value >= silent_frequency;
 
-        if (UNLIKELY(is_silent_)) {
+        if (JS80P_UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -611,7 +611,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
                 // continue;
             // }
 
-            if (UNLIKELY(frequency_value >= silent_frequency)) {
+            if (JS80P_UNLIKELY(frequency_value >= silent_frequency)) {
                 store_silent_coefficient_samples(i);
 
                 continue;
@@ -682,7 +682,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
 
         is_silent_ = frequency_value >= band_pass_silent_frequency;
 
-        if (UNLIKELY(is_silent_)) {
+        if (JS80P_UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -773,7 +773,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
 
         is_silent_ = q_value < THRESHOLD;
 
-        if (UNLIKELY(is_silent_)) {
+        if (JS80P_UNLIKELY(is_silent_)) {
             return false;
         }
 
@@ -991,7 +991,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         frequency.skip_round(round, sample_count);
         gain.skip_round(round, sample_count);
 
-        if (UNLIKELY(frequency_value >= becomes_gain_frequency)) {
+        if (JS80P_UNLIKELY(frequency_value >= becomes_gain_frequency)) {
             store_gain_coefficient_samples(0, gain_value);
 
             return false;
@@ -1019,7 +1019,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
 
             Number const gain_value = (Number)gain_buffer[i];
 
-            if (UNLIKELY(frequency_value >= becomes_gain_frequency)) {
+            if (JS80P_UNLIKELY(frequency_value >= becomes_gain_frequency)) {
                 store_gain_coefficient_samples(i, gain_value);
 
                 continue;
@@ -1110,7 +1110,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         gain.skip_round(round, sample_count);
 
         /* JS80P doesn't let the frequency go below 1.0 Hz */
-        // if (UNLIKELY(frequency_value <= becomes_gain_frequency)) {
+        // if (JS80P_UNLIKELY(frequency_value <= becomes_gain_frequency)) {
             // store_gain_coefficient_samples(0, gain_value);
 
             // return false;
@@ -1138,7 +1138,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
             Number const gain_value = gain_buffer[i];
 
             /* JS80P doesn't let the frequency go below 1.0 Hz */
-            // if (UNLIKELY(frequency_value <= becomes_gain_frequency)) {
+            // if (JS80P_UNLIKELY(frequency_value <= becomes_gain_frequency)) {
                 // store_gain_coefficient_samples(i, gain_value);
 
                 // continue;
@@ -1265,7 +1265,7 @@ void BiquadFilter<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (UNLIKELY(is_silent_)) {
+    if (JS80P_UNLIKELY(is_silent_)) {
         this->render_silence(
             round, first_sample_index, last_sample_index, buffer
         );

@@ -187,13 +187,13 @@ void Wavetable::lookup(
 ) const noexcept {
     Frequency const abs_frequency = std::fabs(frequency);
 
-    if (UNLIKELY(abs_frequency < 0.0000001)) {
+    if (JS80P_UNLIKELY(abs_frequency < 0.0000001)) {
         sample = 1.0;
 
         return;
     }
 
-    if (UNLIKELY(abs_frequency > state.nyquist_frequency)) {
+    if (JS80P_UNLIKELY(abs_frequency > state.nyquist_frequency)) {
         sample = 0.0;
 
         return;
@@ -280,7 +280,7 @@ void Wavetable::interpolate(
             state, sample_index, sample, subharmonic_sample
         );
     } else {
-        if (LIKELY(frequency >= state.interpolation_limit)) {
+        if (JS80P_LIKELY(frequency >= state.interpolation_limit)) {
             interpolate_sample_linear<table_interpolation, with_subharmonic>(
                 state, sample_index, sample, subharmonic_sample
             );

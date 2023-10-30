@@ -493,7 +493,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::skip_round(
         buffer[0][i] = 0.0;
     }
 
-    if (UNLIKELY(is_starting)) {
+    if (JS80P_UNLIKELY(is_starting)) {
         initialize_first_round(frequency.get_value());
     }
 }
@@ -876,7 +876,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
             )
         );
 
-        if (UNLIKELY(wavetable->has_single_partial())) {
+        if (JS80P_UNLIKELY(wavetable->has_single_partial())) {
             switch (interpolation) {
                 case Wavetable::Interpolation::LINEAR_ONLY:
                     render_with_constant_frequency<Wavetable::Interpolation::LINEAR_ONLY, true, has_subharmonic>(
@@ -917,7 +917,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     break;
             }
         }
-    } else if (UNLIKELY(wavetable->has_single_partial())) {
+    } else if (JS80P_UNLIKELY(wavetable->has_single_partial())) {
         render_with_changing_frequency<true, has_subharmonic>(
             round, first_sample_index, last_sample_index, buffer
         );
@@ -937,7 +937,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (UNLIKELY(is_starting)) {
+    if (JS80P_UNLIKELY(is_starting)) {
         initialize_first_round(computed_frequency_value);
     }
 
@@ -1097,7 +1097,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (UNLIKELY(is_starting)) {
+    if (JS80P_UNLIKELY(is_starting)) {
         initialize_first_round(computed_frequency_buffer[first_sample_index]);
     }
 

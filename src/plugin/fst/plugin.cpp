@@ -563,7 +563,7 @@ void FstPlugin::handle_change_param(
         synth.control_change(
             0.0, 0, controller_id, float_to_midi_byte(new_value)
         );
-    } else if (LIKELY(midi_controller != NULL)) {
+    } else if (JS80P_LIKELY(midi_controller != NULL)) {
         midi_controller->change(0.0, new_value);
     }
 }
@@ -818,7 +818,7 @@ void FstPlugin::generate_samples(
     threads, which is probably unsafe in most hosts.
     */
     // for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
-        // if (UNLIKELY(parameters[i].needs_host_update())) {
+        // if (JS80P_UNLIKELY(parameters[i].needs_host_update())) {
             // host_callback(
                 // effect,
                 // audioMasterAutomate,
@@ -873,7 +873,7 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
         Message(MessageType::MTS_ESP_STATUS, mts_esp.is_connected() ? 1 : 0)
     );
 
-    if (LIKELY(!(synth.is_dirty() || need_bank_update))) {
+    if (JS80P_LIKELY(!(synth.is_dirty() || need_bank_update))) {
         return;
     }
 
@@ -1212,7 +1212,7 @@ Midi::Controller FstPlugin::Parameter::get_controller_id() const noexcept
 /* See FstPlugin::generate_samples() */
 // bool FstPlugin::Parameter::needs_host_update() const noexcept
 // {
-    // if (UNLIKELY(midi_controller == NULL)) {
+    // if (JS80P_UNLIKELY(midi_controller == NULL)) {
         // return false;
     // }
 
@@ -1222,7 +1222,7 @@ Midi::Controller FstPlugin::Parameter::get_controller_id() const noexcept
 
 float FstPlugin::Parameter::get_value() noexcept
 {
-    if (UNLIKELY(midi_controller == NULL)) {
+    if (JS80P_UNLIKELY(midi_controller == NULL)) {
         return get_last_set_value();
     }
 

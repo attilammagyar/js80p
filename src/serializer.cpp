@@ -97,7 +97,7 @@ void Serializer::trim_excess_zeros_from_end_after_snprintf(
         int const length,
         size_t const max_length
 ) noexcept {
-    if (UNLIKELY(length < 1 || max_length < 1)) {
+    if (JS80P_UNLIKELY(length < 1 || max_length < 1)) {
         return;
     }
 
@@ -111,7 +111,7 @@ void Serializer::trim_excess_zeros_from_end_after_snprintf(
         }
     }
 
-    if (UNLIKELY(dot_index == max_length)) {
+    if (JS80P_UNLIKELY(dot_index == max_length)) {
         return;
     }
 
