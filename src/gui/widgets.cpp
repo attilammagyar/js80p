@@ -869,7 +869,7 @@ void KnobParamEditor::update_value_str()
         TEXT_MAX_LENGTH
     );
 
-    if (not has_room_for_texts) {
+    if (!has_room_for_texts) {
         snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, value_str);
         title[TITLE_MAX_LENGTH - 1] = '\x00';
 
