@@ -1142,7 +1142,7 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         )                                                           \
     )
 
-#define SCREW(owner, left, top, param_id, ctls, varg1, varg2, ks)   \
+#define SCREW(owner, left, top, param_id, varg1, varg2, ks)         \
     owner->own(                                                     \
         new KnobParamEditor(                                        \
             *this,                                                  \
@@ -1155,7 +1155,7 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
             *controller_selector,                                   \
             synth,                                                  \
             param_id,                                               \
-            ctls,                                                   \
+            0,                                                      \
             varg1,                                                  \
             varg2,                                                  \
             ks                                                      \
@@ -1881,12 +1881,12 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 232,   8, synth, Synth::ParamId::MTUN));
-    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CINA);
-    SCREW(synth_body, 342, 8, Synth::ParamId::MNST, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CNST);
+    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CINA);
+    SCREW(synth_body, 342, 8, Synth::ParamId::MNST, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CNST);
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 232, 288, synth, Synth::ParamId::CTUN));
-    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MINA);
-    SCREW(synth_body, 342, 288, Synth::ParamId::CNST, 0, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MNST);
+    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MINA);
+    SCREW(synth_body, 342, 288, Synth::ParamId::CNST, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MNST);
 
     TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
 
