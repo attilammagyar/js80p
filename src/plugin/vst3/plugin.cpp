@@ -47,6 +47,23 @@
 using namespace Steinberg;
 
 
+#define JS80P_VST3_SEND_MSG(msg_id, attr_setter, attr_name, attr_value)     \
+    do {                                                                    \
+        IPtr<Vst::IMessage> message = owned(allocateMessage());             \
+                                                                            \
+        if (message) {                                                      \
+            message->setMessageID(msg_id);                                  \
+                                                                            \
+            Vst::IAttributeList* attributes = message->getAttributes();     \
+                                                                            \
+            if (attributes) {                                               \
+                attributes->attr_setter((attr_name), (attr_value));         \
+                sendMessage(message);                                       \
+            }                                                               \
+        }                                                                   \
+    } while (false)
+
+
 namespace JS80P
 {
 
@@ -218,20 +235,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::setActive(TBool state)
 
 void Vst3Plugin::Processor::share_synth() noexcept
 {
-    IPtr<Vst::IMessage> message = owned(allocateMessage());
-
-    if (!message) {
-        return;
-    }
-
-    message->setMessageID(MSG_SHARE_SYNTH);
-
-    Vst::IAttributeList* attributes = message->getAttributes();
-
-    if (attributes) {
-        attributes->setInt(MSG_SHARE_SYNTH_SYNTH, (int64)&synth);
-        sendMessage(message);
-    }
+    JS80P_VST3_SEND_MSG(
+        MSG_SHARE_SYNTH, setInt, MSG_SHARE_SYNTH_SYNTH, (int64)&synth
+    );
 }
 
 
@@ -763,20 +769,9 @@ tresult PLUGIN_API Vst3Plugin::Controller::setParamNormalized(
     tresult result = EditControllerEx1::setParamNormalized(tag, value);
 
     if (result == kResultOk && tag == PROGRAM_LIST_ID) {
-        IPtr<Vst::IMessage> message = owned(allocateMessage());
-
-        if (!message) {
-            return result;
-        }
-
-        message->setMessageID(MSG_PROGRAM_CHANGE);
-
-        Vst::IAttributeList* attributes = message->getAttributes();
-
-        if (attributes) {
-            attributes->setFloat(MSG_PROGRAM_CHANGE_PROGRAM, (double)value);
-            sendMessage(message);
-        }
+        JS80P_VST3_SEND_MSG(
+            MSG_PROGRAM_CHANGE, setFloat, MSG_PROGRAM_CHANGE_PROGRAM, (double)value
+        );
     }
 
     return result;
@@ -832,20 +827,7 @@ tresult PLUGIN_API Vst3Plugin::Controller::connect(IConnectionPoint* other)
 {
     tresult result = EditControllerEx1::connect(other);
 
-    IPtr<Vst::IMessage> message = owned(allocateMessage());
-
-    if (!message) {
-        return result;
-    }
-
-    message->setMessageID(MSG_CTL_READY);
-
-    Vst::IAttributeList* attributes = message->getAttributes();
-
-    if (attributes) {
-        attributes->setInt(MSG_CTL_READY_BANK, (int64)&bank);
-        sendMessage(message);
-    }
+    JS80P_VST3_SEND_MSG(MSG_CTL_READY, setInt, MSG_CTL_READY_BANK, (int64)&bank);
 
     return result;
 }
