@@ -630,7 +630,7 @@ Vst3Plugin::GUI::~GUI()
 
 tresult PLUGIN_API Vst3Plugin::GUI::isPlatformTypeSupported(FIDString type)
 {
-    if (type && strcmp(type, JS80P_VST3_GUI_PLATFORM) == 0) {
+    if (FIDStringsEqual(type, JS80P_VST3_GUI_PLATFORM)) {
         return kResultTrue;
     }
 
@@ -855,7 +855,7 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
 
 IPlugView* PLUGIN_API Vst3Plugin::Controller::createView(FIDString name)
 {
-    if (name && strcmp(name, Vst::ViewType::kEditor) == 0) {
+    if (FIDStringsEqual(name, Vst::ViewType::kEditor)) {
         if (synth == NULL) {
             return NULL;
         }
