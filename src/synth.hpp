@@ -749,8 +749,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             public:
                 NoteTuning() noexcept
                     : frequency(0.0),
-                    note(Midi::INVALID_NOTE),
-                    channel(Midi::INVALID_CHANNEL)
+                    channel(Midi::INVALID_CHANNEL),
+                    note(Midi::INVALID_NOTE)
                 {
                 }
 
@@ -758,13 +758,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 NoteTuning(NoteTuning&& note_tuning) noexcept = default;
 
                 NoteTuning(
-                    Midi::Note const note,
                     Midi::Channel const channel,
+                    Midi::Note const note,
                     Frequency const frequency = 0.0
                 ) noexcept
                     : frequency(frequency),
-                    note(note),
-                    channel(channel)
+                    channel(channel),
+                    note(note)
                 {
                 }
 
@@ -777,8 +777,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 }
 
                 Frequency frequency;
-                Midi::Note note;
                 Midi::Channel channel;
+                Midi::Note note;
         };
 
         typedef NoteTuning NoteTunings[POLYPHONY];
@@ -809,7 +809,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         bool has_mts_esp_tuning() const noexcept;
         bool has_realtime_mts_esp_tuning() const noexcept;
-        NoteTunings const& collect_active_notes(Integer& active_notes_count) noexcept;
+        NoteTunings& collect_active_notes(Integer& active_notes_count) noexcept;
         void update_note_tuning(NoteTuning const& note_tuning) noexcept;
         void update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept;
 

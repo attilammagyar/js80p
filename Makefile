@@ -79,6 +79,7 @@ OBJ_BANK = $(BUILD_DIR)/bank-$(SUFFIX).o
 OBJ_SERIALIZER = $(BUILD_DIR)/serializer-$(SUFFIX).o
 OBJ_SYNTH = $(BUILD_DIR)/synth-$(SUFFIX).o
 OBJ_GUI = $(BUILD_DIR)/gui-$(SUFFIX).o
+OBJ_MTS_ESP = $(BUILD_DIR)/mts-esp-$(SUFFIX).o
 
 FST_OBJS = \
 	$(OBJ_GUI_EXTRA) \
@@ -87,7 +88,8 @@ FST_OBJS = \
 	$(OBJ_GUI) \
 	$(OBJ_BANK) \
 	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH)
+	$(OBJ_SYNTH) \
+	$(OBJ_MTS_ESP)
 
 VST3_OBJS = \
 	$(OBJ_GUI_EXTRA) \
@@ -96,7 +98,8 @@ VST3_OBJS = \
 	$(OBJ_GUI) \
 	$(OBJ_BANK) \
 	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH)
+	$(OBJ_SYNTH) \
+	$(OBJ_MTS_ESP)
 
 GUI_PLAYGROUND_OBJS = \
 	$(OBJ_GUI_EXTRA) \
@@ -206,6 +209,7 @@ JS80P_HEADERS = \
 	src/gui/gui.hpp \
 	src/gui/widgets.hpp \
 	src/bank.hpp \
+	src/mtsesp.hpp \
 	src/renderer.hpp \
 	src/serializer.hpp \
 	$(SYNTH_HEADERS)
@@ -264,6 +268,9 @@ TEST_CXXFLAGS = \
 	-D JS80P_ASSERTIONS=1 \
 	-I./tests \
 	-g
+
+MTS_ESP_CXXFLAGS = \
+	-Wno-char-subscripts
 
 FST_CXXFLAGS = \
 	-DFST_DONT_DEPRECATE_UNKNOWN \
@@ -421,6 +428,11 @@ $(OBJ_GUI) : \
 		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
 	$(COMPILE_OBJ) -c $< -o $@
+
+$(OBJ_MTS_ESP) : \
+		lib/mtsesp/Client/libMTSClient.cpp lib/mtsesp/Client/libMTSClient.h \
+		| $(BUILD_DIR)
+	$(COMPILE_OBJ) $(MTS_ESP_CXXFLAGS) -c $< -o $@
 
 $(OBJ_FST_PLUGIN): \
 		src/plugin/fst/plugin.cpp \

@@ -762,7 +762,7 @@ bool Synth::has_realtime_mts_esp_tuning() const noexcept
 }
 
 
-Synth::NoteTunings const& Synth::collect_active_notes(Integer& active_notes_count) noexcept
+Synth::NoteTunings& Synth::collect_active_notes(Integer& active_notes_count) noexcept
 {
     bus.collect_active_notes(active_note_tunings, active_notes_count);
 
@@ -3462,12 +3462,12 @@ void Synth::Bus::collect_active_notes(
     for (Integer v = 0; v != polyphony; ++v) {
         if (!modulators[v]->is_released() && modulators[v]->is_on()) {
             note_tunings[i] = NoteTuning(
-                modulators[v]->get_note(), modulators[v]->get_channel()
+                modulators[v]->get_channel(), modulators[v]->get_note()
             );
             ++i;
         } else if (!carriers[v]->is_released() && carriers[v]->is_on()) {
             note_tunings[i] = NoteTuning(
-                carriers[v]->get_note(), carriers[v]->get_channel()
+                carriers[v]->get_channel(), carriers[v]->get_note()
             );
             ++i;
         }

@@ -30,6 +30,7 @@
 #include "bank.hpp"
 #include "js80p.hpp"
 #include "midi.hpp"
+#include "mtsesp.hpp"
 #include "renderer.hpp"
 #include "spscqueue.hpp"
 #include "synth.hpp"
@@ -132,6 +133,13 @@ class FstPlugin : public Midi::EventHandler
         VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;
         void set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept;
 
+        void note_on(
+            Seconds const time_offset,
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Midi::Byte const velocity
+        ) noexcept;
+
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
@@ -180,12 +188,12 @@ class FstPlugin : public Midi::EventHandler
 
     private:
         static constexpr Frequency HOST_CC_UI_UPDATE_FREQUENCY = 6.0;
-        static constexpr Frequency HOST_CC_UI_UPDATE_FREQUENCY_INV = (
+        static constexpr Seconds HOST_CC_UI_UPDATE_FREQUENCY_INV = (
             1.0 / HOST_CC_UI_UPDATE_FREQUENCY
         );
 
         static constexpr Frequency BANK_UPDATE_FREQUENCY = 3.0;
-        static constexpr Frequency BANK_UPDATE_FREQUENCY_INV = (
+        static constexpr Seconds BANK_UPDATE_FREQUENCY_INV = (
             1.0 / BANK_UPDATE_FREQUENCY
         );
 
@@ -203,6 +211,7 @@ class FstPlugin : public Midi::EventHandler
             PROGRAM_CHANGED = 6,
             BANK_CHANGED = 7,
             PARAMS_CHANGED = 8,
+            MTS_ESP_STATUS = 9,
         };
 
         class Message
@@ -287,6 +296,7 @@ class FstPlugin : public Midi::EventHandler
         void finalize_rendering(Integer const sample_count) noexcept;
 
         void update_bpm() noexcept;
+
         void update_host_display() noexcept;
 
         void process_internal_messages_in_audio_thread(
@@ -315,6 +325,8 @@ class FstPlugin : public Midi::EventHandler
         void handle_bank_changed(std::string const& serialized_bank) noexcept;
         void handle_params_changed() noexcept;
 
+        void handle_mts_esp_status(size_t const index) noexcept;
+
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
 
         Parameter parameters[NUMBER_OF_PARAMETERS];
@@ -332,6 +344,7 @@ class FstPlugin : public Midi::EventHandler
         SPSCQueue<Message> to_gui_messages;
         Bank bank;
         Bank program_names;
+        MtsEsp mts_esp;
         std::string serialized_bank;
         std::string current_patch;
         size_t current_program_index;

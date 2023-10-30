@@ -1200,8 +1200,8 @@ TEST(tuning_can_be_updated_on_the_fly, {
     Sample const* const* rendered_samples;
     Sample const* const* expected_samples;
     Synth::NoteTunings note_tunings = {
-        Synth::NoteTuning(Midi::NOTE_A_2, channel, -1.0),
-        Synth::NoteTuning(Midi::NOTE_A_3, channel, a3_freq_modified),
+        Synth::NoteTuning(channel, Midi::NOTE_A_2, -1.0),
+        Synth::NoteTuning(channel, Midi::NOTE_A_3, a3_freq_modified),
     };
 
     synth.set_block_size(block_size);
@@ -1234,7 +1234,7 @@ TEST(tuning_can_be_updated_on_the_fly, {
     synth.note_on(0.0, channel, Midi::NOTE_A_2, 127);
     synth.note_on(0.0, channel, Midi::NOTE_A_3, 127);
 
-    synth.update_note_tuning(Synth::NoteTuning(Midi::NOTES, Midi::CHANNELS, 1760.0));
+    synth.update_note_tuning(Synth::NoteTuning(Midi::CHANNELS, Midi::NOTES, 1760.0));
     synth.update_note_tunings(note_tunings, 2);
 
     SignalProducer::produce<SumOfSines>(expected, 1, 1);

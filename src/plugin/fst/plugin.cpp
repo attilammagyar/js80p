@@ -389,6 +389,7 @@ FstPlugin::FstPlugin(
     to_audio_messages(1024),
     to_audio_string_messages(256),
     to_gui_messages(1024),
+    mts_esp(synth),
     serialized_bank(""),
     current_patch(""),
     current_program_index(0),
@@ -626,6 +627,10 @@ void FstPlugin::process_internal_messages_in_gui_thread() noexcept
                 handle_params_changed();
                 break;
 
+            case MessageType::MTS_ESP_STATUS:
+                handle_mts_esp_status(message.get_index());
+                break;
+
             default:
                 break;
         }
@@ -662,6 +667,20 @@ void FstPlugin::handle_bank_changed(std::string const& serialized_bank) noexcept
 void FstPlugin::handle_params_changed() noexcept
 {
     need_host_update = true;
+}
+
+
+void FstPlugin::handle_mts_esp_status(size_t const index) noexcept
+{
+    if (gui == NULL) {
+        return;
+    }
+
+    if (index == 0) {
+        gui->mts_esp_disconnected();
+    } else {
+        gui->mts_esp_connected();
+    }
 }
 
 
@@ -833,6 +852,8 @@ void FstPlugin::prepare_rendering(Integer const sample_count) noexcept
             remaining_samples_before_next_cc_ui_update = 0;
         }
     }
+
+    mts_esp.update_active_notes_tuning();
 }
 
 
@@ -847,6 +868,10 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
 
         return;
     }
+
+    to_gui_messages.push(
+        Message(MessageType::MTS_ESP_STATUS, mts_esp.is_connected() ? 1 : 0)
+    );
 
     if (LIKELY(!(synth.is_dirty() || need_bank_update))) {
         return;
@@ -972,6 +997,16 @@ void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_prese
             Message(MessageType::IMPORT_BANK, 0, serialized_bank)
         );
     }
+}
+
+
+void FstPlugin::note_on(
+        Seconds const time_offset,
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Midi::Byte const velocity
+) noexcept {
+    mts_esp.update_note_tuning(channel, note);
 }
 
 
