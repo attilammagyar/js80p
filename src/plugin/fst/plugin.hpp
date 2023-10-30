@@ -211,7 +211,6 @@ class FstPlugin : public Midi::EventHandler
             PROGRAM_CHANGED = 6,
             BANK_CHANGED = 7,
             PARAMS_CHANGED = 8,
-            MTS_ESP_STATUS = 9,
         };
 
         class Message

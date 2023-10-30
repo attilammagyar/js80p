@@ -809,6 +809,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         bool has_mts_esp_tuning() const noexcept;
         bool has_realtime_mts_esp_tuning() const noexcept;
+        bool is_mts_esp_connected() const noexcept;
+        void mts_esp_connected() noexcept;
+        void mts_esp_disconnected() noexcept;
         NoteTunings& collect_active_notes(Integer& active_notes_count) noexcept;
         void update_note_tuning(NoteTuning const& note_tuning) noexcept;
         void update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept;
@@ -1357,6 +1360,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_polyphonic;
         bool was_polyphonic;
         bool is_dirty_;
+        std::atomic<bool> is_mts_esp_connected_;
 
     public:
         Effects::Effects<Bus> effects;

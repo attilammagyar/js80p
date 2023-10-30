@@ -191,8 +191,6 @@ class GUI
         void set_status_line(char const* text);
         void redraw_status_line();
 
-        void mts_esp_connected();
-        void mts_esp_disconnected();
         bool is_mts_esp_connected() const;
 
         PlatformData get_platform_data() const;
@@ -262,7 +260,6 @@ class GUI
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
-        bool is_mts_esp_connected_;
 };
 
 

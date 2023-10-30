@@ -1236,8 +1236,7 @@ GUI::GUI(
     synth_body(NULL),
     status_line(NULL),
     synth(synth),
-    platform_data(platform_data),
-    is_mts_esp_connected_(false)
+    platform_data(platform_data)
 {
     initialize();
 
@@ -2014,21 +2013,9 @@ void GUI::redraw_status_line()
 }
 
 
-void GUI::mts_esp_connected()
-{
-    is_mts_esp_connected_ = true;
-}
-
-
-void GUI::mts_esp_disconnected()
-{
-    is_mts_esp_connected_ = false;
-}
-
-
 bool GUI::is_mts_esp_connected() const
 {
-    return is_mts_esp_connected_;
+    return synth.is_mts_esp_connected();
 }
 
 

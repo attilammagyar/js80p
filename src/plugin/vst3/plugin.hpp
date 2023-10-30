@@ -35,6 +35,7 @@
 
 #include "bank.hpp"
 #include "js80p.hpp"
+#include "mtsesp.hpp"
 #include "renderer.hpp"
 #include "synth.hpp"
 
@@ -154,6 +155,7 @@ class Vst3Plugin
 
                 Synth synth;
                 Renderer renderer;
+                MtsEsp mts_esp;
                 Bank const* bank;
                 std::vector<Event> events;
                 size_t new_program;

@@ -1246,3 +1246,16 @@ TEST(tuning_can_be_updated_on_the_fly, {
     assert_close(expected_samples[0], rendered_samples[0], block_size, 0.06, "channel=0");
     assert_close(expected_samples[1], rendered_samples[1], block_size, 0.06, "channel=1");
 })
+
+
+TEST(stores_mts_esp_connection_flag, {
+    Synth synth;
+
+    assert_false(synth.is_mts_esp_connected());
+
+    synth.mts_esp_connected();
+    assert_true(synth.is_mts_esp_connected());
+
+    synth.mts_esp_disconnected();
+    assert_false(synth.is_mts_esp_connected());
+})

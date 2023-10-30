@@ -42,9 +42,17 @@ class MtsEsp
             MTS_DeregisterClient(client);
         }
 
-        bool is_connected()
+        void update_connection_status()
         {
-            return MTS_HasMaster(client);
+            if (!synth.has_mts_esp_tuning()) {
+                return;
+            }
+
+            if (MTS_HasMaster(client)) {
+                synth.mts_esp_connected();
+            } else {
+                synth.mts_esp_disconnected();
+            }
         }
 
         void update_note_tuning(Midi::Note const note, Midi::Channel const channel)

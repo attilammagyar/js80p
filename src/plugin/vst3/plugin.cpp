@@ -115,6 +115,7 @@ FUnknown* Vst3Plugin::Processor::createInstance(void* unused)
 Vst3Plugin::Processor::Processor()
     : synth(),
     renderer(synth),
+    mts_esp(synth),
     bank(NULL),
     events(4096),
     new_program(0),
@@ -262,7 +263,11 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
     }
 
     update_bpm(data);
+    mts_esp.update_active_notes_tuning();
+
     generate_samples(data);
+
+    mts_esp.update_connection_status();
 
     return kResultOk;
 }
@@ -419,6 +424,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
 {
     switch (event.type) {
         case Event::Type::NOTE_ON:
+            mts_esp.update_note_tuning(event.channel, event.note_or_ctl);
             synth.note_on(
                 event.time_offset,
                 event.channel,

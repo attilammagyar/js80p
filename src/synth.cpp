@@ -127,6 +127,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     envelopes((Envelope* const*)envelopes_rw),
     lfos((LFO* const*)lfos_rw)
 {
+    is_mts_esp_connected_.store(false);
+
     deferred_note_offs.reserve(2 * POLYPHONY);
 
     initialize_supported_midi_controllers();
@@ -695,7 +697,11 @@ bool Synth::is_lock_free() const noexcept
         );
     }
 
-    return is_lock_free && messages.is_lock_free();
+    return (
+        is_lock_free
+        && messages.is_lock_free()
+        && is_mts_esp_connected_.is_lock_free()
+    );
 }
 
 
@@ -759,6 +765,24 @@ bool Synth::has_realtime_mts_esp_tuning() const noexcept
         modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_REALTIME
         || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_REALTIME
     );
+}
+
+
+bool Synth::is_mts_esp_connected() const noexcept
+{
+    return is_mts_esp_connected_.load();
+}
+
+
+void Synth::mts_esp_connected() noexcept
+{
+    is_mts_esp_connected_.store(true);
+}
+
+
+void Synth::mts_esp_disconnected() noexcept
+{
+    is_mts_esp_connected_.store(false);
 }
 
 

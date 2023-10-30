@@ -627,10 +627,6 @@ void FstPlugin::process_internal_messages_in_gui_thread() noexcept
                 handle_params_changed();
                 break;
 
-            case MessageType::MTS_ESP_STATUS:
-                handle_mts_esp_status(message.get_index());
-                break;
-
             default:
                 break;
         }
@@ -667,20 +663,6 @@ void FstPlugin::handle_bank_changed(std::string const& serialized_bank) noexcept
 void FstPlugin::handle_params_changed() noexcept
 {
     need_host_update = true;
-}
-
-
-void FstPlugin::handle_mts_esp_status(size_t const index) noexcept
-{
-    if (gui == NULL) {
-        return;
-    }
-
-    if (index == 0) {
-        gui->mts_esp_disconnected();
-    } else {
-        gui->mts_esp_connected();
-    }
 }
 
 
@@ -869,9 +851,7 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
         return;
     }
 
-    to_gui_messages.push(
-        Message(MessageType::MTS_ESP_STATUS, mts_esp.is_connected() ? 1 : 0)
-    );
+    mts_esp.update_connection_status();
 
     if (JS80P_LIKELY(!(synth.is_dirty() || need_bank_update))) {
         return;
