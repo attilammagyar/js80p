@@ -270,6 +270,7 @@ TEST_CXXFLAGS = \
 	-g
 
 MTS_ESP_CXXFLAGS = \
+	-Wno-array-bounds \
 	-Wno-char-subscripts
 
 FST_CXXFLAGS = \
