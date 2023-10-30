@@ -83,8 +83,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + 35 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
-        + MACROS * 6
-        + ENVELOPES * 11
+        + MACROS * MACRO_FLOAT_PARAMS
+        + ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_TOGGLE_PARAMS)
         + LFOS
     ),
     polyphonic("POLY", ToggleParam::ON),

@@ -75,6 +75,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Integer ENVELOPES = 6;
         static constexpr Integer ENVELOPE_FLOAT_PARAMS = 10;
+        static constexpr Integer ENVELOPE_TOGGLE_PARAMS = 1;
 
         static constexpr Integer MIDI_CONTROLLERS = 128;
 
