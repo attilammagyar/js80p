@@ -130,7 +130,6 @@ class Vst3Plugin
 
             private:
                 void share_synth() noexcept;
-                void block_rendered() noexcept;
 
                 void collect_param_change_events(Vst::ProcessData& data) noexcept;
 
