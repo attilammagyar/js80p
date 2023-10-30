@@ -446,6 +446,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, note_velocity, volume),
+    is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
 {
     initialize_instance(inaccuracy_seed);
@@ -520,6 +521,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     panning(param_leaders.panning),
     volume(param_leaders.volume),
     volume_applier(filter_2, note_velocity, volume),
+    is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
 {
     initialize_instance(inaccuracy_seed);
@@ -673,6 +675,8 @@ void Voice<ModulatorSignalProducerClass>::save_note_info(
     this->note_id = note_id;
     this->note = note;
     this->channel = channel;
+
+    is_drifting = false;
 }
 
 
@@ -1143,14 +1147,15 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts
         return;
     }
 
+    Frequency const new_nominal_frequency = per_channel_frequencies[channel][note];
+
+    if (LIKELY(Math::is_close(new_nominal_frequency, nominal_frequency))) {
+        return;
+    }
+
     Seconds const remaining = (
         oscillator.frequency.get_remaining_time_from_linear_ramp()
     );
-    Frequency const new_nominal_frequency = per_channel_frequencies[channel][note];
-
-    if (LIKELY(remaining < 0.000001 && Math::is_close(new_nominal_frequency, nominal_frequency))) {
-        return;
-    }
 
     if (remaining > MIN_DRIFT_DURATION) {
         update_inaccuracy(round);
@@ -1159,13 +1164,24 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts
     nominal_frequency = new_nominal_frequency;
     note_frequency = detune<should_sync_inaccuracy>(nominal_frequency, param_leaders.inaccuracy);
 
-    Seconds const ramp_duration = std::max(0.003, remaining);
-
     oscillator.frequency.cancel_events_at(0.0);
-    oscillator.frequency.schedule_linear_ramp(
-        ramp_duration,
-        calculate_note_frequency_drift_target<should_sync_instability>()
-    );
+
+    if (is_drifting) {
+        oscillator.frequency.schedule_linear_ramp(
+            MTS_ESP_CORRECTION_DURATION, note_frequency
+        );
+        oscillator.frequency.schedule_linear_ramp(
+            std::max(MIN_DRIFT_DURATION, remaining),
+            calculate_note_frequency_drift_target<should_sync_instability>()
+        );
+    } else {
+        Seconds const ramp_duration = std::max(MTS_ESP_CORRECTION_DURATION, remaining);
+
+        oscillator.frequency.schedule_linear_ramp(
+            ramp_duration,
+            calculate_note_frequency_drift_target<should_sync_instability>()
+        );
+    }
 }
 
 
@@ -1220,6 +1236,8 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
 
     oscillator.frequency.cancel_events_at(0.0);
     oscillator.frequency.schedule_linear_ramp(ramp_duration, new_frequency);
+
+    is_drifting = true;
 }
 
 

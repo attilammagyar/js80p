@@ -343,6 +343,8 @@ class Voice : public SignalProducer
 
         static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
 
+        static constexpr Seconds MTS_ESP_CORRECTION_DURATION = 0.003;
+
         static constexpr Seconds MIN_DRIFT_DURATION = 0.3;
         static constexpr Seconds DRIFT_DURATION_DELTA = 3.2;
 
@@ -411,6 +413,7 @@ class Voice : public SignalProducer
         Integer note_id;
         Midi::Note note;
         Midi::Channel channel;
+        bool is_drifting;
 
     public:
         ModulationOut& modulation_out;
