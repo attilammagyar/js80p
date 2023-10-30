@@ -63,7 +63,7 @@ class MtsEsp
 
             Synth::NoteTuning tuning(channel, note);
 
-            tuning.frequency = query_note_frequency(channel, note);
+            update_frequency(tuning);
             synth.update_note_tuning(tuning);
         }
 
@@ -77,20 +77,18 @@ class MtsEsp
             Synth::NoteTunings& tunings = synth.collect_active_notes(count);
 
             for (Integer i = 0; i != count; ++i) {
-                tunings[i].frequency = query_note_frequency(
-                    tunings[i].channel, tunings[i].note
-                );
+                update_frequency(tunings[i]);
             }
 
             synth.update_note_tunings(tunings, count);
         }
 
     private:
-        Frequency query_note_frequency(
-                Midi::Channel const channel,
-                Midi::Note const note
-        ) noexcept {
-            return MTS_NoteToFrequency(client, (char)note, (char)channel);
+        Frequency update_frequency(Synth::NoteTunings& tuning) noexcept
+        {
+            tuning.frequency = MTS_NoteToFrequency(
+                client, (char)tuning.note, (char)tuning.channel
+            );
         }
 
         Synth& synth;
