@@ -1348,6 +1348,12 @@ void FloatParam<evaluation>::process_envelope(
             envelope_end_time_offset = 0.0;
         }
 
+        /*
+        If the envelope is already releasing, we cannot increase the release
+        time, because there might be events in other parameters scheduled to the
+        original release time, e.g. oscillator stopping after the end of a
+        volume envelope.
+        */
         envelope_release_time = std::min(
             envelope_release_time, (Seconds)envelope.release_time.get_value()
         );
