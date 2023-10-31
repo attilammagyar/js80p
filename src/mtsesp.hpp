@@ -84,7 +84,7 @@ class MtsEsp
         }
 
     private:
-        Frequency update_frequency(Synth::NoteTunings& tuning) noexcept
+        void update_frequency(Synth::NoteTuning& tuning) noexcept
         {
             tuning.frequency = MTS_NoteToFrequency(
                 client, (char)tuning.note, (char)tuning.channel
