@@ -165,6 +165,8 @@ def print_envelopes_params(param_id: int) -> int:
         ("$#SUS", " ///< $ # Sustain Level"),
         ("$#REL", " ///< $ # Release Time"),
         ("$#FIN", " ///< $ # Final Level"),
+        ("$#TIN", " ///< $ # Time Inaccuracy"),
+        ("$#VIN", " ///< $ # Level Inaccuracy"),
     ]
 
     return print_params(param_id, "Envelope", "N", 6, params)

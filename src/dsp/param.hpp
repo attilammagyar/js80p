@@ -156,6 +156,28 @@ typedef FloatParam<ParamEvaluation::SAMPLE> FloatParamS;
 typedef FloatParam<ParamEvaluation::BLOCK> FloatParamB;
 
 
+constexpr size_t ENVELOPE_RANDOMS_COUNT = 9;
+
+
+typedef Number EnvelopeRandoms[ENVELOPE_RANDOMS_COUNT];
+
+
+class EnvelopeSnapshot
+{
+    public:
+        Number initial_value;
+        Number peak_value;
+        Number sustain_value;
+        Number final_value;
+
+        Seconds delay_time;
+        Seconds attack_time;
+        Seconds hold_time;
+        Seconds decay_time;
+        Seconds release_time;
+};
+
+
 /**
  * \brief Parameter with floating point values. Values can be scheduled at
  *        time offsets, or can be approached linearly over a given duration of
@@ -280,9 +302,17 @@ class FloatParam : public Param<Number, evaluation>
         void set_midi_controller(MidiController* midi_controller) noexcept;
         void set_macro(Macro* macro) noexcept;
 
+
+        void set_random_seed(Number const seed) noexcept;
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;
-        void start_envelope(Seconds const time_offset) noexcept;
+
+        void start_envelope(
+            Seconds const time_offset,
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
+
         Seconds end_envelope(Seconds const time_offset) noexcept;
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
         void update_envelope(Seconds const time_offset) noexcept;
@@ -343,6 +373,8 @@ class FloatParam : public Param<Number, evaluation>
                 bool is_done;
         };
 
+        void initialize_instance() noexcept;
+
         Number round_value(Number const value) const noexcept;
         Number ratio_to_value_log(Number const ratio) const noexcept;
         Number ratio_to_value_raw(Number const ratio) const noexcept;
@@ -373,6 +405,11 @@ class FloatParam : public Param<Number, evaluation>
             Seconds const duration
         ) const noexcept;
 
+        void update_envelope_randoms(
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
+
         void process_envelope(Envelope& envelope, Seconds const time_offset = 0.0) noexcept;
 
         void render_with_lfo(
@@ -396,9 +433,8 @@ class FloatParam : public Param<Number, evaluation>
 
         Seconds schedule_envelope_value_if_not_reached(
             Seconds const next_event_time_offset,
-            FloatParamB const& time_param,
-            FloatParamB const& value_param,
-            Number const amount
+            Seconds const duration,
+            Number const value
         ) noexcept;
 
         template<SignalProducer::Event::Type event>
@@ -419,13 +455,15 @@ class FloatParam : public Param<Number, evaluation>
         LFO* lfo;
         Sample const* const* lfo_buffer;
 
+        Number random_seed;
+
         Envelope* envelope;
+        EnvelopeRandoms envelope_randoms;
+        EnvelopeSnapshot envelope_snapshot;
         Integer envelope_change_index;
         Seconds envelope_end_time_offset;
         Seconds envelope_position;
-        Seconds envelope_release_time;
         Seconds envelope_cancel_duration;
-        Number envelope_final_value;
         EnvelopeStage envelope_stage;
         bool envelope_end_scheduled;
         bool envelope_canceled;
@@ -469,7 +507,14 @@ class ModulatableFloatParam : public FloatParamS
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
-        void start_envelope(Seconds const time_offset) noexcept;
+        void set_random_seed(Number const seed) noexcept;
+
+        void start_envelope(
+            Seconds const time_offset,
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
+
         Seconds end_envelope(Seconds const time_offset) noexcept;
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
         void update_envelope(Seconds const time_offset) noexcept;

@@ -350,6 +350,8 @@ class Voice : public SignalProducer
 
         void initialize_instance(Number const inaccuracy_seed) noexcept;
 
+        Number make_param_random_seed(Number const random) const noexcept;
+
         void save_note_info(
             Integer const note_id,
             Midi::Note const note,

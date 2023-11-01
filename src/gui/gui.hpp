@@ -227,7 +227,7 @@ class GUI
         void build_controllers_1_body(KnobStates* knob_states);
         void build_controllers_2_body(KnobStates* knob_states);
         void build_effects_body(KnobStates* knob_states);
-        void build_envelopes_body(KnobStates* knob_states);
+        void build_envelopes_body(KnobStates* knob_states, KnobStates* screw_states);
         void build_lfos_body(KnobStates* knob_states);
         void build_synth_body(KnobStates* knob_states, KnobStates* screw_states);
 

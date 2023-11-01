@@ -19,6 +19,7 @@
 #ifndef JS80P__DSP__ENVELOPE_HPP
 #define JS80P__DSP__ENVELOPE_HPP
 
+#include <cstddef>
 #include <string>
 
 #include "js80p.hpp"
@@ -35,11 +36,24 @@ namespace JS80P
 class Envelope
 {
     public:
+        static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
+
         Envelope(std::string const name) noexcept;
 
         void update() noexcept;
         Integer get_change_index() const noexcept;
-        Seconds get_dahd_length() const noexcept;
+
+        bool is_dynamic() const noexcept;
+
+        void make_snapshot(
+            EnvelopeRandoms const& randoms,
+            EnvelopeSnapshot& snapshot
+        ) const noexcept;
+
+        void make_end_snapshot(
+            EnvelopeRandoms const& randoms,
+            EnvelopeSnapshot& snapshot
+        ) const noexcept;
 
         ToggleParam dynamic;
         FloatParamB amount;
@@ -52,10 +66,22 @@ class Envelope
         FloatParamB sustain_value;
         FloatParamB release_time;
         FloatParamB final_value;
+        FloatParamB time_inaccuracy;
+        FloatParamB value_inaccuracy;
 
     private:
         template<class ParamType>
         bool update_change_index(ParamType const& param, Integer& change_index);
+
+        Number randomize_value(
+            FloatParamB const& param,
+            Number const random
+        ) const noexcept;
+
+        Seconds randomize_time(
+            FloatParamB const& param,
+            Number const random
+        ) const noexcept;
 
         Integer dynamic_change_index;
         Integer amount_change_index;
@@ -68,9 +94,9 @@ class Envelope
         Integer sustain_value_change_index;
         Integer release_time_change_index;
         Integer final_value_change_index;
+        Integer time_inaccuracy_change_index;
+        Integer value_inaccuracy_change_index;
         Integer change_index;
-
-        Seconds dahd_length;
 };
 
 }

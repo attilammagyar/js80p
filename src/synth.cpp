@@ -566,6 +566,8 @@ void Synth::create_envelopes() noexcept
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->sustain_value);
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->release_time);
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->final_value);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->time_inaccuracy);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->value_inaccuracy);
     }
 
     register_param_as_child<ToggleParam>(ParamId::N1DYN, envelopes_rw[0]->dynamic);
@@ -1397,7 +1399,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_default_ratio();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -1413,6 +1415,8 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
             case 7: return envelopes_rw[envelope_idx]->sustain_value.get_default_ratio();
             case 8: return envelopes_rw[envelope_idx]->release_time.get_default_ratio();
             case 9: return envelopes_rw[envelope_idx]->final_value.get_default_ratio();
+            case 10: return envelopes_rw[envelope_idx]->time_inaccuracy.get_default_ratio();
+            case 11: return envelopes_rw[envelope_idx]->value_inaccuracy.get_default_ratio();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -1621,7 +1625,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_max_value();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -1637,6 +1641,8 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
             case 7: return envelopes_rw[envelope_idx]->sustain_value.get_max_value();
             case 8: return envelopes_rw[envelope_idx]->release_time.get_max_value();
             case 9: return envelopes_rw[envelope_idx]->final_value.get_max_value();
+            case 10: return envelopes_rw[envelope_idx]->time_inaccuracy.get_max_value();
+            case 11: return envelopes_rw[envelope_idx]->value_inaccuracy.get_max_value();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -1841,7 +1847,7 @@ Number Synth::float_param_ratio_to_display_value(
             case 5: return macros_rw[macro_idx]->randomness.ratio_to_value(ratio);
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -1857,6 +1863,8 @@ Number Synth::float_param_ratio_to_display_value(
             case 7: return envelopes_rw[envelope_idx]->sustain_value.ratio_to_value(ratio);
             case 8: return envelopes_rw[envelope_idx]->release_time.ratio_to_value(ratio);
             case 9: return envelopes_rw[envelope_idx]->final_value.ratio_to_value(ratio);
+            case 10: return envelopes_rw[envelope_idx]->time_inaccuracy.ratio_to_value(ratio);
+            case 11: return envelopes_rw[envelope_idx]->value_inaccuracy.ratio_to_value(ratio);
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -2372,7 +2380,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case 5: macros_rw[macro_idx]->randomness.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -2388,6 +2396,8 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case 7: envelopes_rw[envelope_idx]->sustain_value.set_ratio(ratio); break;
             case 8: envelopes_rw[envelope_idx]->release_time.set_ratio(ratio); break;
             case 9: envelopes_rw[envelope_idx]->final_value.set_ratio(ratio); break;
+            case 10: envelopes_rw[envelope_idx]->time_inaccuracy.set_ratio(ratio); break;
+            case 11: envelopes_rw[envelope_idx]->value_inaccuracy.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
@@ -2597,7 +2607,7 @@ void Synth::handle_assign_controller(
             case 5: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->randomness, ctl_id); break;
             default: break; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -2613,7 +2623,10 @@ void Synth::handle_assign_controller(
             case 7: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->sustain_value, ctl_id); break;
             case 8: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->release_time, ctl_id); break;
             case 9: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->final_value, ctl_id); break;
-            default: break; /* This should never be reached. */
+            /* Controlling these is not supported yet. */
+            // case 10: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->time_inaccuracy, ctl_id); break;
+            // case 11: is_assigned = assign_controller<FloatParamB>(envelopes_rw[envelope_idx]->value_inaccuracy, ctl_id); break;
+            default: break;
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {
         int const offset = (int)param_id - (int)ParamId::L1FRQ;
@@ -3067,7 +3080,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_ratio();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6FIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -3083,6 +3096,8 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
             case 7: return envelopes_rw[envelope_idx]->sustain_value.get_ratio();
             case 8: return envelopes_rw[envelope_idx]->release_time.get_ratio();
             case 9: return envelopes_rw[envelope_idx]->final_value.get_ratio();
+            case 10: return envelopes_rw[envelope_idx]->time_inaccuracy.get_ratio();
+            case 11: return envelopes_rw[envelope_idx]->value_inaccuracy.get_ratio();
             default: return 0.0; /* This should never be reached. */
         }
     } else if (ParamId::L1FRQ <= param_id && param_id <= L8RND) {

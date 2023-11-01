@@ -534,6 +534,34 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 ) noexcept {
     this->inaccuracy = inaccuracy_seed;
 
+    wavefolder.folding.set_random_seed(make_param_random_seed(0.583));
+
+    if constexpr (IS_CARRIER) {
+        distortion.level.set_random_seed(make_param_random_seed(0.257));
+    }
+
+    panning.set_random_seed(make_param_random_seed(0.081));
+    volume.set_random_seed(make_param_random_seed(0.814));
+
+    oscillator.modulated_amplitude.set_random_seed(make_param_random_seed(0.617));
+    oscillator.amplitude.set_random_seed(make_param_random_seed(0.347));
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.set_random_seed(make_param_random_seed(0.388));
+    }
+
+    oscillator.frequency.set_random_seed(make_param_random_seed(0.348));
+    oscillator.phase.set_random_seed(make_param_random_seed(0.623));
+    oscillator.fine_detune.set_random_seed(make_param_random_seed(0.457));
+
+    filter_1.frequency.set_random_seed(make_param_random_seed(0.661));
+    filter_1.q.set_random_seed(make_param_random_seed(0.230));
+    filter_1.gain.set_random_seed(make_param_random_seed(0.146));
+
+    filter_2.frequency.set_random_seed(make_param_random_seed(0.096));
+    filter_2.q.set_random_seed(make_param_random_seed(0.674));
+    filter_2.gain.set_random_seed(make_param_random_seed(0.968));
+
     state = State::OFF;
     note_id = 0;
     note = 0;
@@ -554,6 +582,14 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 
     register_child(filter_2);
     register_child(volume_applier);
+}
+
+
+template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::make_param_random_seed(
+        Number const random
+) const noexcept {
+    return Math::randomize(1.0, 0.5 * (random + inaccuracy_seed));
 }
 
 
@@ -607,6 +643,12 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         return;
     }
 
+    Number const random_1 = inaccuracy;
+    Number const random_2 = Math::randomize(
+        1.0,
+        (synced_inaccuracy.get_inaccuracy() + inaccuracy + inaccuracy_seed) * 0.333
+    );
+
     state = State::ON;
 
     save_note_info(note_id, note, channel);
@@ -619,14 +661,14 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     oscillator.cancel_events_at(time_offset);
 
-    wavefolder.folding.start_envelope(time_offset);
+    wavefolder.folding.start_envelope(time_offset, random_1, random_2);
 
     if constexpr (IS_CARRIER) {
-        distortion.level.start_envelope(time_offset);
+        distortion.level.start_envelope(time_offset, random_1, random_2);
     }
 
-    panning.start_envelope(time_offset);
-    volume.start_envelope(time_offset);
+    panning.start_envelope(time_offset, random_1, random_2);
+    volume.start_envelope(time_offset, random_1, random_2);
 
     if (should_sync_inaccuracy) {
         set_up_oscillator_frequency<true>(
@@ -642,25 +684,25 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.start_envelope(time_offset);
-    oscillator.amplitude.start_envelope(time_offset);
+    oscillator.modulated_amplitude.start_envelope(time_offset, random_1, random_2);
+    oscillator.amplitude.start_envelope(time_offset, random_1, random_2);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.start_envelope(time_offset);
+        oscillator.subharmonic_amplitude.start_envelope(time_offset, random_1, random_2);
     }
 
-    oscillator.frequency.start_envelope(time_offset);
-    oscillator.phase.start_envelope(time_offset);
+    oscillator.frequency.start_envelope(time_offset, random_1, random_2);
+    oscillator.phase.start_envelope(time_offset, random_1, random_2);
 
-    oscillator.fine_detune.start_envelope(time_offset);
+    oscillator.fine_detune.start_envelope(time_offset, random_1, random_2);
 
-    filter_1.frequency.start_envelope(time_offset);
-    filter_1.q.start_envelope(time_offset);
-    filter_1.gain.start_envelope(time_offset);
+    filter_1.frequency.start_envelope(time_offset, random_1, random_2);
+    filter_1.q.start_envelope(time_offset, random_1, random_2);
+    filter_1.gain.start_envelope(time_offset, random_1, random_2);
 
-    filter_2.frequency.start_envelope(time_offset);
-    filter_2.q.start_envelope(time_offset);
-    filter_2.gain.start_envelope(time_offset);
+    filter_2.frequency.start_envelope(time_offset, random_1, random_2);
+    filter_2.q.start_envelope(time_offset, random_1, random_2);
+    filter_2.gain.start_envelope(time_offset, random_1, random_2);
 
     oscillator.start(time_offset);
 }

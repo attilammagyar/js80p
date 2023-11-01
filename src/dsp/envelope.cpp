@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__ENVELOPE_CPP
 #define JS80P__DSP__ENVELOPE_CPP
 
+#include <algorithm>
+
 #include "dsp/envelope.hpp"
 
 
@@ -37,6 +39,8 @@ Envelope::Envelope(std::string const name) noexcept
     sustain_value(name + "SUS",     0.0,    1.0,  0.7),
     release_time(name + "REL",      0.0,    6.0,  0.1),
     final_value(name + "FIN",       0.0,    1.0,  0.0),
+    time_inaccuracy(name + "TIN",   0.0,    1.0,  0.0),
+    value_inaccuracy(name + "VIN",  0.0,    1.0,  0.0),
     dynamic_change_index(-1),
     amount_change_index(-1),
     initial_value_change_index(-1),
@@ -48,6 +52,8 @@ Envelope::Envelope(std::string const name) noexcept
     sustain_value_change_index(-1),
     release_time_change_index(-1),
     final_value_change_index(-1),
+    time_inaccuracy_change_index(-1),
+    value_inaccuracy_change_index(-1),
     change_index(-1)
 {
     update();
@@ -63,22 +69,17 @@ void Envelope::update() noexcept
     is_dirty |= update_change_index(hold_time, hold_time_change_index);
     is_dirty |= update_change_index(decay_time, decay_time_change_index);
 
-    if (is_dirty) {
-        dahd_length = (
-            delay_time.get_value()
-            + attack_time.get_value()
-            + hold_time.get_value()
-            + decay_time.get_value()
-        );
-    }
-
     is_dirty |= update_change_index<ToggleParam>(dynamic, dynamic_change_index);
+
     is_dirty |= update_change_index(amount, amount_change_index);
     is_dirty |= update_change_index(initial_value, initial_value_change_index);
     is_dirty |= update_change_index(peak_value, peak_value_change_index);
     is_dirty |= update_change_index(sustain_value, sustain_value_change_index);
     is_dirty |= update_change_index(release_time, release_time_change_index);
     is_dirty |= update_change_index(final_value, final_value_change_index);
+
+    is_dirty |= update_change_index(time_inaccuracy, time_inaccuracy_change_index);
+    is_dirty |= update_change_index(value_inaccuracy, value_inaccuracy_change_index);
 
     if (is_dirty) {
         ++change_index;
@@ -93,9 +94,9 @@ Integer Envelope::get_change_index() const noexcept
 }
 
 
-Seconds Envelope::get_dahd_length() const noexcept
+bool Envelope::is_dynamic() const noexcept
 {
-    return dahd_length;
+    return dynamic.get_value() == ToggleParam::ON;
 }
 
 
@@ -111,6 +112,80 @@ bool Envelope::update_change_index(ParamType const& param, Integer& change_index
     }
 
     return false;
+}
+
+
+void Envelope::make_snapshot(
+        EnvelopeRandoms const& randoms,
+        EnvelopeSnapshot& snapshot
+) const noexcept {
+    if (value_inaccuracy.get_value() > 0.000001) {
+        snapshot.initial_value = randomize_value(initial_value, randoms[0]);
+        snapshot.peak_value = randomize_value(peak_value, randoms[1]);
+        snapshot.sustain_value = randomize_value(sustain_value, randoms[2]);
+        snapshot.final_value = randomize_value(final_value, randoms[3]);
+    } else {
+        Number const amount = this->amount.get_value();
+
+        snapshot.initial_value = initial_value.get_value() * amount;
+        snapshot.peak_value = peak_value.get_value() * amount;
+        snapshot.sustain_value = sustain_value.get_value() * amount;
+        snapshot.final_value = final_value.get_value() * amount;
+    }
+
+    if (time_inaccuracy.get_value() > 0.000001) {
+        snapshot.delay_time = randomize_time(delay_time, randoms[4]);
+        snapshot.attack_time = randomize_time(attack_time, randoms[5]);
+        snapshot.hold_time = randomize_time(hold_time, randoms[6]);
+        snapshot.decay_time = randomize_time(decay_time, randoms[7]);
+        snapshot.release_time = randomize_time(release_time, randoms[8]);
+    } else {
+        snapshot.delay_time = delay_time.get_value();
+        snapshot.attack_time = attack_time.get_value();
+        snapshot.hold_time = hold_time.get_value();
+        snapshot.decay_time = decay_time.get_value();
+        snapshot.release_time = release_time.get_value();
+    }
+}
+
+
+void Envelope::make_end_snapshot(
+        EnvelopeRandoms const& randoms,
+        EnvelopeSnapshot& snapshot
+) const noexcept {
+    if (value_inaccuracy.get_value() > 0.000001) {
+        snapshot.final_value = randomize_value(final_value, randoms[3]);
+    } else {
+        snapshot.final_value = final_value.get_value() * amount.get_value();
+    }
+
+    if (time_inaccuracy.get_value() > 0.000001) {
+        snapshot.release_time = randomize_time(release_time, randoms[8]);
+    } else {
+        snapshot.release_time = release_time.get_value();
+    }
+}
+
+
+Number Envelope::randomize_value(
+        FloatParamB const& param,
+        Number const random
+) const noexcept {
+    Number const scale = ((random - 0.5) * value_inaccuracy.get_value() + 1.0);
+
+    return std::min(1.0, scale * amount.get_value() * param.get_value());
+}
+
+
+Seconds Envelope::randomize_time(
+        FloatParamB const& param,
+        Number const random
+) const noexcept {
+    Seconds const inaccuracy = (
+        random * time_inaccuracy.get_value() * TIME_INACCURACY_MAX
+    );
+
+    return std::min(param.get_max_value(), inaccuracy + param.get_value());
 }
 
 }

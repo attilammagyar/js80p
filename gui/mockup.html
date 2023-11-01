@@ -43,9 +43,13 @@ html, body {
 }
 
 #controllers-1 .main-block,
-#controllers-2 .main-block,
-#envelopes .main-block {
+#controllers-2 .main-block {
   margin: 12px 2px;
+  padding: 1px 2px;
+}
+
+#envelopes .main-block {
+  margin: 11px 2px;
   padding: 1px 2px;
 }
 
@@ -238,11 +242,24 @@ h1 {
 }
 
 .block h1 label.dynamic,
+.block h1 label.inaccuracy,
 .block h1 label.poly,
 .block h1 label.sync {
   margin-right: 3px;
   float: right;
   margin-top: 2px;
+}
+
+.block h1 label.inaccuracy {
+  margin-left: 30px;
+  margin-top: -2px;
+  height: 24px;
+}
+
+.block h1 label.inaccuracy input {
+  margin-top: 1px;
+  height: 20px;
+  width: 46px;
 }
 
 .block h1 label.center {
@@ -925,6 +942,13 @@ window.onload = function ()
         n = document.createElement("input");
         n.setAttribute("type", "text");
         l.appendChild(n);
+        l2 = document.createElement("label");
+        l2.innerHTML = "";
+        l2.setAttribute("class", "inaccuracy");
+        n2 = document.createElement("input");
+        n2.setAttribute("type", "text");
+        l2.appendChild(n2);
+        h.appendChild(l2);
         h.appendChild(l);
 
         d.appendChild(h);

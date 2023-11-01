@@ -312,7 +312,7 @@ Sample const* const* FloatParam<evaluation>::produce(
 ) noexcept {
     Envelope* envelope = float_param.get_envelope();
 
-    if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+    if (envelope != NULL && envelope->is_dynamic()) {
         envelope->update();
     }
 
@@ -383,12 +383,6 @@ FloatParam<evaluation>::FloatParam(
             : 1.0
     ),
     leader(NULL),
-    lfo(NULL),
-    envelope(NULL),
-    envelope_change_index(-1),
-    envelope_stage(EnvelopeStage::NONE),
-    envelope_end_scheduled(false),
-    envelope_canceled(false),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         log_scale_toggle == NULL
@@ -396,11 +390,31 @@ FloatParam<evaluation>::FloatParam(
         && Math::is_close(max_value, 1.0)
     ),
     round_to(round_to),
-    round_to_inv(should_round ? 1.0 / round_to : 0.0),
-    constantness_round(-1),
-    constantness(false),
-    latest_event_type(EVT_SET_VALUE)
+    round_to_inv(should_round ? 1.0 / round_to : 0.0)
 {
+    initialize_instance();
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::initialize_instance() noexcept
+{
+    lfo = NULL;
+
+    random_seed = 0.5;
+
+    envelope = NULL;
+    envelope_change_index = -1;
+    envelope_stage = EnvelopeStage::NONE;
+    envelope_end_scheduled = false;
+    envelope_canceled = false;
+
+    std::fill_n(envelope_randoms, ENVELOPE_RANDOMS_COUNT, 0.0);
+
+    constantness_round = -1;
+    constantness = false;
+
+    latest_event_type = EVT_SET_VALUE;
 }
 
 
@@ -423,12 +437,6 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
             : 1.0
     ),
     leader(&leader),
-    lfo(NULL),
-    envelope(NULL),
-    envelope_change_index(-1),
-    envelope_stage(EnvelopeStage::NONE),
-    envelope_end_scheduled(false),
-    envelope_canceled(false),
     should_round(false),
     is_ratio_same_as_value(
         leader.get_log_scale_toggle() == NULL
@@ -436,11 +444,9 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
         && Math::is_close(leader.get_max_value(), 1.0)
     ),
     round_to(0.0),
-    round_to_inv(0.0),
-    constantness_round(-1),
-    constantness(false),
-    latest_event_type(EVT_SET_VALUE)
+    round_to_inv(0.0)
 {
+    initialize_instance();
 }
 
 
@@ -647,7 +653,7 @@ bool FloatParam<evaluation>::is_constant_until(
 
     Envelope* envelope = get_envelope();
 
-    if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+    if (envelope != NULL && envelope->is_dynamic()) {
         envelope->update();
 
         return envelope_change_index == envelope->get_change_index();
@@ -930,6 +936,12 @@ void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
     Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(*this, macro);
 }
 
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::set_random_seed(Number const seed) noexcept
+{
+    random_seed = seed;
+}
+
 
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
@@ -957,8 +969,11 @@ Envelope* FloatParam<evaluation>::get_envelope() const noexcept
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::start_envelope(Seconds const time_offset) noexcept
-{
+void FloatParam<evaluation>::start_envelope(
+        Seconds const time_offset,
+        Number const random_1,
+        Number const random_2
+) noexcept {
     Seconds next_event_time_offset;
     Number next_value;
     Envelope* const envelope = get_envelope();
@@ -973,8 +988,12 @@ void FloatParam<evaluation>::start_envelope(Seconds const time_offset) noexcept
     envelope_position = 0.0;
     envelope_end_time_offset = 0.0;
 
+    update_envelope_randoms(random_1, random_2);
+
     envelope->update();
     envelope_change_index = envelope->get_change_index();
+
+    envelope->make_snapshot(envelope_randoms, envelope_snapshot);
 
     /*
     initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
@@ -984,29 +1003,49 @@ void FloatParam<evaluation>::start_envelope(Seconds const time_offset) noexcept
 
     this->schedule(EVT_ENVELOPE_START, time_offset);
 
-    Number const amount = envelope->amount.get_value();
-    next_value = ratio_to_value(amount * envelope->initial_value.get_value());
+    next_value = ratio_to_value(envelope_snapshot.initial_value);
 
     schedule_value(time_offset, next_value);
-    next_event_time_offset = (
-        time_offset + (Seconds)envelope->delay_time.get_value()
-    );
+    next_event_time_offset = time_offset + envelope_snapshot.delay_time;
     schedule_value(next_event_time_offset, next_value);
 
-    Seconds const attack = (Seconds)envelope->attack_time.get_value();
-    next_value = ratio_to_value(amount * envelope->peak_value.get_value());
-    schedule_linear_ramp(attack, next_value);
+    next_value = ratio_to_value(envelope_snapshot.peak_value);
+    schedule_linear_ramp(envelope_snapshot.attack_time, next_value);
 
-    next_event_time_offset += attack + (Seconds)envelope->hold_time.get_value();
+    next_event_time_offset += (
+        envelope_snapshot.attack_time + envelope_snapshot.hold_time
+    );
     schedule_value(next_event_time_offset, next_value);
 
     schedule_linear_ramp(
-        (Seconds)envelope->decay_time.get_value(),
-        ratio_to_value(amount * envelope->sustain_value.get_value())
+        envelope_snapshot.decay_time,
+        ratio_to_value(envelope_snapshot.sustain_value)
+    );
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::update_envelope_randoms(
+        Number const random_1,
+        Number const random_2
+) noexcept {
+    Number const random_avg = (random_1 + random_2 + random_seed) * 0.333;
+    Number const random_1_with_seed = (
+        Math::randomize(1.0, 0.5 * (random_1 + random_seed))
+    );
+    Number const random_2_with_seed = (
+        Math::randomize(1.0, 0.5 * (random_2 + random_seed))
     );
 
-    envelope_final_value = amount * envelope->final_value.get_value();
-    envelope_release_time = (Seconds)envelope->release_time.get_value();
+    envelope_randoms[0] = random_1_with_seed;
+    envelope_randoms[1] = random_2_with_seed;
+    envelope_randoms[2] = Math::randomize(1.0, random_avg);
+    envelope_randoms[3] = Math::randomize(1.0, random_1_with_seed);
+    envelope_randoms[4] = Math::randomize(1.0, random_2_with_seed);
+    envelope_randoms[5] = Math::randomize(1.0, 1.0 - random_avg);
+    envelope_randoms[6] = Math::randomize(1.0, 1.0 - random_1_with_seed);
+    envelope_randoms[7] = Math::randomize(1.0, 1.0 - random_2_with_seed);
+    envelope_randoms[8] = Math::randomize(1.0, 0.3 + 0.7 * random_1_with_seed);
 }
 
 
@@ -1033,19 +1072,15 @@ Seconds FloatParam<evaluation>::end_envelope(
         return 0.0;
     }
 
-    if (envelope->dynamic.get_value() == ToggleParam::ON) {
+    if (envelope->is_dynamic()) {
         envelope->update();
         envelope_change_index = envelope->get_change_index();
 
-        envelope_final_value = (
-            envelope->amount.get_value() * envelope->final_value.get_value()
-        );
-
-        envelope_release_time = (Seconds)envelope->release_time.get_value();
+        envelope->make_end_snapshot(envelope_randoms, envelope_snapshot);
     }
 
     if (event == EVT_ENVELOPE_CANCEL) {
-        envelope_release_time = duration;
+        envelope_snapshot.release_time = duration;
     }
 
     envelope_end_scheduled = true;
@@ -1055,9 +1090,12 @@ Seconds FloatParam<evaluation>::end_envelope(
 
     this->cancel_events_after(time_offset);
     this->schedule(event, time_offset);
-    schedule_linear_ramp(envelope_release_time, ratio_to_value(envelope_final_value));
+    schedule_linear_ramp(
+        envelope_snapshot.release_time,
+        ratio_to_value(envelope_snapshot.final_value)
+    );
 
-    return envelope_release_time;
+    return envelope_snapshot.release_time;
 }
 
 
@@ -1080,13 +1118,6 @@ void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
     if (envelope != NULL) {
         envelope->update();
         process_envelope(*envelope, time_offset);
-
-        if (envelope_end_scheduled) {
-            return;
-        }
-
-        envelope_final_value = envelope->amount.get_value() * envelope->final_value.get_value();
-        envelope_release_time = (Seconds)envelope->release_time.get_value();
     }
 }
 
@@ -1125,7 +1156,7 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
     } else {
         Envelope* envelope = get_envelope();
 
-        if (envelope != NULL && envelope->dynamic.get_value() == ToggleParam::ON) {
+        if (envelope != NULL && envelope->is_dynamic()) {
             process_envelope(*envelope);
         }
     }
@@ -1296,14 +1327,23 @@ void FloatParam<evaluation>::process_envelope(
 
     envelope_change_index = new_change_index;
 
-    Number const amount = envelope.amount.get_value();
+    Seconds const old_release_time = envelope_snapshot.release_time;
+
+    envelope.make_snapshot(envelope_randoms, envelope_snapshot);
 
     if (envelope_stage == EnvelopeStage::DAHDS) {
+        Seconds const dahd_duration = (
+            envelope_snapshot.delay_time
+            + envelope_snapshot.attack_time
+            + envelope_snapshot.hold_time
+            + envelope_snapshot.decay_time
+        );
+
         this->cancel_events_at(time_offset);
 
-        if (envelope_position > envelope.get_dahd_length()) {
+        if (envelope_position > dahd_duration) {
             Number const sustain_value = ratio_to_value(
-                amount * envelope.sustain_value.get_value()
+                envelope_snapshot.sustain_value
             );
 
             if (!Math::is_close(this->get_raw_value(), sustain_value)) {
@@ -1314,27 +1354,23 @@ void FloatParam<evaluation>::process_envelope(
 
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope.delay_time,
-                envelope.initial_value,
-                amount
+                envelope_snapshot.delay_time,
+                envelope_snapshot.initial_value
             );
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope.attack_time,
-                envelope.peak_value,
-                amount
+                envelope_snapshot.attack_time,
+                envelope_snapshot.peak_value
             );
             next_event_time_offset = schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope.hold_time,
-                envelope.peak_value,
-                amount
+                envelope_snapshot.hold_time,
+                envelope_snapshot.peak_value
             );
-            next_event_time_offset = schedule_envelope_value_if_not_reached(
+            schedule_envelope_value_if_not_reached(
                 next_event_time_offset,
-                envelope.decay_time,
-                envelope.sustain_value,
-                amount
+                envelope_snapshot.decay_time,
+                envelope_snapshot.sustain_value
             );
         }
     }
@@ -1354,15 +1390,15 @@ void FloatParam<evaluation>::process_envelope(
         original release time, e.g. oscillator stopping after the end of a
         volume envelope.
         */
-        envelope_release_time = std::min(
-            envelope_release_time, (Seconds)envelope.release_time.get_value()
+        envelope_snapshot.release_time = std::min(
+            old_release_time, envelope_snapshot.release_time
         );
 
         this->cancel_events_at(envelope_end_time_offset);
         this->schedule(EVT_ENVELOPE_END, envelope_end_time_offset);
         schedule_linear_ramp(
-            envelope_release_time,
-            ratio_to_value(amount * envelope.final_value.get_value())
+            envelope_snapshot.release_time,
+            ratio_to_value(envelope_snapshot.final_value)
         );
     }
 }
@@ -1371,21 +1407,18 @@ void FloatParam<evaluation>::process_envelope(
 template<ParamEvaluation evaluation>
 Seconds FloatParam<evaluation>::schedule_envelope_value_if_not_reached(
         Seconds const next_event_time_offset,
-        FloatParamB const& time_param,
-        FloatParamB const& value_param,
-        Number const amount
+        Seconds const duration,
+        Number const value
 ) noexcept {
-    Seconds const duration = next_event_time_offset + time_param.get_value();
+    Seconds const new_next_event_time_offset = next_event_time_offset + duration;
 
-    if (duration >= 0.0) {
-        schedule_linear_ramp(
-            duration, ratio_to_value(amount * value_param.get_value())
-        );
+    if (new_next_event_time_offset >= 0.0) {
+        schedule_linear_ramp(new_next_event_time_offset, ratio_to_value(value));
 
         return 0.0;
     }
 
-    return duration;
+    return new_next_event_time_offset;
 }
 
 
@@ -1668,12 +1701,24 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
 
 
 template<class ModulatorSignalProducerClass>
-void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
-        Seconds const time_offset
+void ModulatableFloatParam<ModulatorSignalProducerClass>::set_random_seed(
+        Number const seed
 ) noexcept {
-    FloatParamS::start_envelope(time_offset);
+    FloatParamS::set_random_seed(seed);
 
-    modulation_level.start_envelope(time_offset);
+    modulation_level.set_random_seed(Math::randomize(1.0, 1.0 - seed));
+}
+
+
+template<class ModulatorSignalProducerClass>
+void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
+        Seconds const time_offset,
+        Number const random_1,
+        Number const random_2
+) noexcept {
+    FloatParamS::start_envelope(time_offset, random_1, random_2);
+
+    modulation_level.start_envelope(time_offset, random_2, random_1);
 }
 
 

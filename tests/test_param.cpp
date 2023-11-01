@@ -1049,7 +1049,7 @@ TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_o
 
     float_param.set_sample_rate(1.0);
     float_param.set_value(1.0);
-    float_param.start_envelope(3.0);
+    float_param.start_envelope(3.0, 0.0, 0.0);
     assert_eq(0.0, float_param.end_envelope(6.0), DOUBLE_DELTA);
     assert_eq(NULL, float_param.get_envelope());
 
@@ -1088,7 +1088,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    float_param.start_envelope(0.3);
+    float_param.start_envelope(0.3, 0.0, 0.0);
 
     assert_true(float_param.is_constant_until(1));
     assert_false(float_param.is_constant_until(2));
@@ -1126,7 +1126,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3);
+    float_param.start_envelope(0.3, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1165,7 +1165,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.375);
 
-    float_param.start_envelope(1.0);
+    float_param.start_envelope(1.0, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(1.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1202,7 +1202,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3);
+    float_param.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
     envelope.amount.set_value(1.0);
@@ -1248,7 +1248,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
 
     envelope.release_time.set_value(0.01);
 
-    float_param.start_envelope(0.3);
+    float_param.start_envelope(0.3, 0.0, 0.0);
     float_param.cancel_envelope(4.0, 2.0);
 
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
@@ -1288,7 +1288,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
 
@@ -1334,7 +1334,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     envelope.release_time.set_value(6.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
 
@@ -1387,7 +1387,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     envelope.release_time.set_value(0.123);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(2.0);
 
@@ -1462,7 +1462,7 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3);
+    follower.start_envelope(0.3, 0.0, 0.0);
     FloatParamS::produce<FloatParamS>(follower, 0, 2);
 
     envelope.release_time.set_value(2.0);
@@ -1916,7 +1916,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     );
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
-    follower.start_envelope(0.0);
+    follower.start_envelope(0.0, 0.0, 0.0);
     follower.cancel_events_at(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
@@ -2158,7 +2158,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     modulatable_float_param.set_sample_rate(sample_rate);
 
     modulatable_float_param.set_value(param_value);
-    modulatable_float_param.start_envelope(6.0);
+    modulatable_float_param.start_envelope(6.0, 0.0, 0.0);
     assert_eq(3.0, modulatable_float_param.end_envelope(12.0), DOUBLE_DELTA);
 
     assert_eq(
