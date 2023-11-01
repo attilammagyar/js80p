@@ -288,9 +288,12 @@ Frequency Math::detune(Frequency const frequency, Number const cents) noexcept
     /*
     The approximation errors in exp() would keep piling up in oscillators (even
     with more iterations) until the oscillators go so much out of phase that it
-    may produce noticable, even audible problems, so we're using cmath here.
+    may produce noticable, audible problems, so we're using cmath here. Also,
+    detuning with cmath doesn't seem to introduce any noticable performance
+    difference compared to detuning with iterate_exp(), even with fewer
+    iterations.
 
-    Also, std::pow(2.0, c1 * x) seems to be almost twice as fast as
+    Note that std::pow(2.0, c1 * x) seems to be almost twice as fast as
     std::exp(c2 * x), for constants c1 and c2 (where c2 = c1 * LN_OF_2).
     */
     return (
