@@ -183,12 +183,16 @@ class Voice : public SignalProducer
                 FloatParamS filter_1_frequency;
                 FloatParamS filter_1_q;
                 FloatParamS filter_1_gain;
+                FloatParamB filter_1_freq_inaccuracy;
+                FloatParamB filter_1_q_inaccuracy;
 
                 typename Filter2::TypeParam filter_2_type;
                 ToggleParam filter_2_log_scale;
                 FloatParamS filter_2_frequency;
                 FloatParamS filter_2_q;
                 FloatParamS filter_2_gain;
+                FloatParamB filter_2_freq_inaccuracy;
+                FloatParamB filter_2_q_inaccuracy;
 
                 typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type subharmonic_amplitude;
                 typename std::conditional<IS_CARRIER, FloatParamS, Dummy>::type distortion;
@@ -350,7 +354,7 @@ class Voice : public SignalProducer
 
         void initialize_instance(Number const oscillator_inaccuracy_seed) noexcept;
 
-        Number make_param_random_seed(Number const random) const noexcept;
+        Number make_random_seed(Number const random) const noexcept;
 
         void save_note_info(
             Integer const note_id,

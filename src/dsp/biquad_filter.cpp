@@ -57,7 +57,10 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        BiquadFilterSharedCache* shared_cache
+        BiquadFilterSharedCache* shared_cache,
+        Number const inaccuracy_seed,
+        FloatParamB const* freq_inaccuracy_param,
+        FloatParamB const* q_inaccuracy_param
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(
@@ -79,6 +82,9 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
+    inaccuracy_seed(inaccuracy_seed),
+    freq_inaccuracy_param(freq_inaccuracy_param),
+    q_inaccuracy_param(q_inaccuracy_param),
     shared_cache(shared_cache)
 {
     initialize_instance();
@@ -144,6 +150,9 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     type(type),
+    inaccuracy_seed(0.0),
+    freq_inaccuracy_param(NULL),
+    q_inaccuracy_param(NULL),
     shared_cache(NULL)
 {
     initialize_instance();
@@ -157,13 +166,19 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
-        BiquadFilterSharedCache* shared_cache
+        BiquadFilterSharedCache* shared_cache,
+        Number const inaccuracy_seed,
+        FloatParamB const* freq_inaccuracy_param,
+        FloatParamB const* q_inaccuracy_param
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
     type(type),
+    inaccuracy_seed(inaccuracy_seed),
+    freq_inaccuracy_param(freq_inaccuracy_param),
+    q_inaccuracy_param(q_inaccuracy_param),
     shared_cache(shared_cache)
 {
     initialize_instance();
@@ -263,11 +278,61 @@ void BiquadFilter<InputSignalProducerClass>::set_shared_cache(
 
 
 template<class InputSignalProducerClass>
+void BiquadFilter<InputSignalProducerClass>::update_inaccuracy(
+        Number const random_1,
+        Number const random_2
+) noexcept {
+    freq_inaccuracy = Math::randomize(1.0, 0.5 * (inaccuracy_seed + random_1));
+    q_inaccuracy = Math::randomize(1.0, 0.5 * (inaccuracy_seed + random_2));
+}
+
+
+#define JS80P_BF_CALL_INIT_FQ(func)                                     \
+    do {                                                                \
+        if (is_freq_inaccurate) {                                       \
+            if (is_q_inaccurate) {                                      \
+                is_no_op = func<true, true>(round, sample_count);       \
+            } else {                                                    \
+                is_no_op = func<true, false>(round, sample_count);      \
+            }                                                           \
+        } else {                                                        \
+            if (is_q_inaccurate) {                                      \
+                is_no_op = func<false, true>(round, sample_count);      \
+            } else {                                                    \
+                is_no_op = func<false, false>(round, sample_count);     \
+            }                                                           \
+        }                                                               \
+    } while (false)
+
+
+#define JS80P_BF_CALL_INIT_F(func)                                      \
+    do {                                                                \
+        if (is_freq_inaccurate) {                                       \
+            is_no_op = func<true>(round, sample_count);                 \
+        } else {                                                        \
+            is_no_op = func<false>(round, sample_count);                \
+        }                                                               \
+    } while (false)
+
+
+template<class InputSignalProducerClass>
 Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    can_use_shared_coefficients = shared_cache != NULL;
+    freq_inaccuracy_param_value = (
+        freq_inaccuracy_param != NULL ? freq_inaccuracy_param->get_value() : 0.0
+    );
+    q_inaccuracy_param_value = (
+        q_inaccuracy_param != NULL ? q_inaccuracy_param->get_value() : 0.0
+    );
+
+    bool const is_freq_inaccurate = freq_inaccuracy_param_value > 0.000001;
+    bool const is_q_inaccurate = q_inaccuracy_param_value > 0.000001;
+
+    can_use_shared_coefficients = (
+        shared_cache != NULL && !is_freq_inaccurate && !is_q_inaccurate
+    );
 
     Filter<InputSignalProducerClass>::initialize_rendering(
         round, sample_count
@@ -291,31 +356,31 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
     switch (type.get_value()) {
         case LOW_PASS:
-            is_no_op = initialize_low_pass_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_FQ(initialize_low_pass_rendering);
             break;
 
         case HIGH_PASS:
-            is_no_op = initialize_high_pass_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_FQ(initialize_high_pass_rendering);
             break;
 
         case BAND_PASS:
-            is_no_op = initialize_band_pass_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_FQ(initialize_band_pass_rendering);
             break;
 
         case NOTCH:
-            is_no_op = initialize_notch_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_FQ(initialize_notch_rendering);
             break;
 
         case PEAKING:
-            is_no_op = initialize_peaking_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_FQ(initialize_peaking_rendering);
             break;
 
         case LOW_SHELF:
-            is_no_op = initialize_low_shelf_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_F(initialize_low_shelf_rendering);
             break;
 
         case HIGH_SHELF:
-            is_no_op = initialize_high_shelf_rendering(round, sample_count);
+            JS80P_BF_CALL_INIT_F(initialize_high_shelf_rendering);
             break;
 
         default:
@@ -448,6 +513,36 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate>
+Number BiquadFilter<InputSignalProducerClass>::apply_freq_inaccuracy(
+        Number const frequency_value
+) const noexcept {
+    if constexpr (is_freq_inaccurate) {
+        return Math::detune(
+            frequency_value,
+            (freq_inaccuracy * 2400.0 - 1200.0) * freq_inaccuracy_param_value
+        );
+    } else {
+        return frequency_value;
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<bool is_q_inaccurate>
+Number BiquadFilter<InputSignalProducerClass>::apply_q_inaccuracy(
+        Number const q_value
+) const noexcept {
+    if constexpr (is_q_inaccurate) {
+        return q_value * ((q_inaccuracy - 0.2) * q_inaccuracy_param_value + 1.0);
+    } else {
+        return q_value;
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         Integer const round,
         Integer const sample_count
@@ -489,7 +584,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
             // return false;
         // }
 
-        store_low_pass_coefficient_samples(0, frequency_value, q_value);
+        store_low_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+            0, frequency_value, q_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -515,7 +612,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
                 // continue;
             // }
 
-            store_low_pass_coefficient_samples(
+            store_low_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
                 i, frequency_value, (Number)q_buffer[i]
             );
         }
@@ -526,12 +623,13 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
 ) noexcept {
-    Sample const w0 = w0_scale * frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
@@ -539,7 +637,9 @@ void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
     Math::sincos(w0, sin_w0, cos_w0);
 
     Sample const alpha_qdb = (
-        0.5 * sin_w0 * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
+        0.5 * sin_w0 * Math::pow_10_inv(
+            apply_q_inaccuracy<is_q_inaccurate>(q_value) * Constants::BIQUAD_FILTER_Q_SCALE
+        )
     );
 
     Sample const b1 = 1.0 - cos_w0;
@@ -552,6 +652,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
         Integer const round,
         Integer const sample_count
@@ -591,7 +692,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
             return false;
         }
 
-        store_high_pass_coefficient_samples(0, frequency_value, q_value);
+        store_high_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+            0, frequency_value, q_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -617,7 +720,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
                 continue;
             }
 
-            store_high_pass_coefficient_samples(
+            store_high_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
                 i, frequency_value, (Number)q_buffer[i]
             );
         }
@@ -628,12 +731,13 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
 ) noexcept {
-    Sample const w0 = w0_scale * frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
@@ -641,7 +745,9 @@ void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples
     Math::sincos(w0, sin_w0, cos_w0);
 
     Sample const alpha_qdb = (
-        0.5 * sin_w0 * Math::pow_10_inv(q_value * Constants::BIQUAD_FILTER_Q_SCALE)
+        0.5 * sin_w0 * Math::pow_10_inv(
+            apply_q_inaccuracy<is_q_inaccurate>(q_value) * Constants::BIQUAD_FILTER_Q_SCALE
+        )
     );
 
     Sample const b1 = -1.0 - cos_w0;
@@ -654,6 +760,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
         Integer const round,
         Integer const sample_count
@@ -689,7 +796,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
 
-        store_band_pass_coefficient_samples(0, frequency_value, q_value);
+        store_band_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+            0, frequency_value, q_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -715,7 +824,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
                 continue;
             }
 
-            store_band_pass_coefficient_samples(i, frequency_value, q_value);
+            store_band_pass_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+                i, frequency_value, q_value
+            );
         }
     }
 
@@ -724,19 +835,28 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
 ) noexcept {
-    Sample const w0 = w0_scale * frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
 
     Math::sincos(w0, sin_w0, cos_w0);
 
-    Sample const alpha_q = 0.5 * sin_w0 / q_value;
+    Sample q;
+
+    if constexpr (is_q_inaccurate) {
+        q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
+    } else {
+        q = q_value;
+    }
+
+    Sample const alpha_q = 0.5 * sin_w0 / q;
 
     store_normalized_coefficient_samples(
         index, alpha_q, 0.0, -alpha_q, 1.0 + alpha_q, -2.0 * cos_w0, 1.0 - alpha_q
@@ -745,6 +865,7 @@ void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
         Integer const round,
         Integer const sample_count
@@ -780,7 +901,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
         frequency.skip_round(round, sample_count);
         q.skip_round(round, sample_count);
 
-        store_notch_coefficient_samples(0, frequency_value, q_value);
+        store_notch_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+            0, frequency_value, q_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -806,7 +929,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
                 continue;
             }
 
-            store_notch_coefficient_samples(i, frequency_value, q_value);
+            store_notch_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
+                i, frequency_value, q_value
+            );
         }
     }
 
@@ -815,19 +940,28 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
 ) noexcept {
-    Sample const w0 = w0_scale * frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
 
     Math::sincos(w0, sin_w0, cos_w0);
 
-    Sample const alpha_q = 0.5 * sin_w0 / q_value;
+    Sample q;
+
+    if constexpr (is_q_inaccurate) {
+        q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
+    } else {
+        q = q_value;
+    }
+
+    Sample const alpha_q = 0.5 * sin_w0 / q;
 
     Sample const b1_a1 = -2.0 * cos_w0;
 
@@ -838,6 +972,7 @@ void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
         Integer const round,
         Integer const sample_count
@@ -874,7 +1009,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
         gain.skip_round(round, sample_count);
 
         if (q_value >= THRESHOLD) {
-            store_peaking_coefficient_samples(
+            store_peaking_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
                 0, frequency_value, q_value, gain_value
             );
         } else {
@@ -908,7 +1043,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
             Number const q_value = (Number)q_buffer[i];
 
             if (q_value >= THRESHOLD) {
-                store_peaking_coefficient_samples(
+                store_peaking_coefficient_samples<is_freq_inaccurate, is_q_inaccurate>(
                     i, frequency_value, q_value, gain_value
                 );
             } else {
@@ -922,13 +1057,14 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate, bool is_q_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value,
         Number const gain_value
 ) noexcept {
-    Sample const w0 = w0_scale * frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
@@ -937,7 +1073,16 @@ void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
 
     Sample const b1_a1 = -2.0 * cos_w0;
 
-    Sample const alpha_q = 0.5 * sin_w0 / q_value;
+    Sample q;
+
+    if constexpr (is_q_inaccurate) {
+        q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
+    } else {
+        q = q_value;
+    }
+
+    Sample const alpha_q = 0.5 * sin_w0 / q;
+
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
@@ -958,6 +1103,7 @@ void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
         Integer const round,
         Integer const sample_count
@@ -997,7 +1143,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
             return false;
         }
 
-        store_low_shelf_coefficient_samples(0, frequency_value, gain_value);
+        store_low_shelf_coefficient_samples<is_freq_inaccurate>(
+            0, frequency_value, gain_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -1025,7 +1173,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
                 continue;
             }
 
-            store_low_shelf_coefficient_samples(i, frequency_value, gain_value);
+            store_low_shelf_coefficient_samples<is_freq_inaccurate>(
+                i, frequency_value, gain_value
+            );
         }
     }
 
@@ -1034,6 +1184,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples(
         Integer const index,
         Number const frequency_value,
@@ -1048,7 +1199,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
-    Sample const w0 = w0_scale * (Sample)frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;
@@ -1077,6 +1228,7 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate>
 bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
         Integer const round,
         Integer const sample_count
@@ -1116,7 +1268,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
             // return false;
         // }
 
-        store_high_shelf_coefficient_samples(0, frequency_value, gain_value);
+        store_high_shelf_coefficient_samples<is_freq_inaccurate>(
+            0, frequency_value, gain_value
+        );
 
     } else {
         Sample const* frequency_buffer = (
@@ -1144,7 +1298,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
                 // continue;
             // }
 
-            store_high_shelf_coefficient_samples(i, frequency_value, gain_value);
+            store_high_shelf_coefficient_samples<is_freq_inaccurate>(
+                i, frequency_value, gain_value
+            );
         }
     }
 
@@ -1153,6 +1309,7 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
 
 
 template<class InputSignalProducerClass>
+template<bool is_freq_inaccurate>
 void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_samples(
         Integer const index,
         Number const frequency_value,
@@ -1167,7 +1324,7 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
     /* Recalculating the power seems to be slightly faster than std::sqrt(a). */
     Sample const a_sqrt = Math::pow_10((Sample)gain_value * GAIN_SCALE_HALF);
 
-    Sample const w0 = w0_scale * (Sample)frequency_value;
+    Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
     Sample cos_w0;

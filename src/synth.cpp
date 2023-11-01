@@ -80,7 +80,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         7                           /* POLY + MODE + MIX + PM + FM + AM + bus   */
-        + 35 * 2                    /* Modulator::Params + Carrier::Params      */
+        + 39 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_FLOAT_PARAMS
@@ -349,6 +349,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
     register_param_as_child<FloatParamS>(ParamId::MF1Q, modulator_params.filter_1_q);
     register_param_as_child<FloatParamS>(ParamId::MF1G, modulator_params.filter_1_gain);
+    register_param_as_child<FloatParamB>(ParamId::MF1FIA, modulator_params.filter_1_freq_inaccuracy);
+    register_param_as_child<FloatParamB>(ParamId::MF1QIA, modulator_params.filter_1_q_inaccuracy);
 
     register_param_as_child<Modulator::Filter2::TypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
@@ -357,6 +359,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
     register_param_as_child<FloatParamS>(ParamId::MF2Q, modulator_params.filter_2_q);
     register_param_as_child<FloatParamS>(ParamId::MF2G, modulator_params.filter_2_gain);
+    register_param_as_child<FloatParamB>(ParamId::MF2FIA, modulator_params.filter_2_freq_inaccuracy);
+    register_param_as_child<FloatParamB>(ParamId::MF2QIA, modulator_params.filter_2_q_inaccuracy);
 }
 
 
@@ -397,6 +401,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
     register_param_as_child<FloatParamS>(ParamId::CF1Q, carrier_params.filter_1_q);
     register_param_as_child<FloatParamS>(ParamId::CF1G, carrier_params.filter_1_gain);
+    register_param_as_child<FloatParamB>(ParamId::CF1FIA, carrier_params.filter_1_freq_inaccuracy);
+    register_param_as_child<FloatParamB>(ParamId::CF1QIA, carrier_params.filter_1_q_inaccuracy);
 
     register_param_as_child<Carrier::Filter2::TypeParam>(
         ParamId::CF2TYP, carrier_params.filter_2_type
@@ -405,6 +411,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
     register_param_as_child<FloatParamS>(ParamId::CF2Q, carrier_params.filter_2_q);
     register_param_as_child<FloatParamS>(ParamId::CF2G, carrier_params.filter_2_gain);
+    register_param_as_child<FloatParamB>(ParamId::CF2FIA, carrier_params.filter_2_freq_inaccuracy);
+    register_param_as_child<FloatParamB>(ParamId::CF2QIA, carrier_params.filter_2_q_inaccuracy);
 }
 
 
@@ -1467,9 +1475,13 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_default_ratio();
         case ParamId::MF1Q: return modulator_params.filter_1_q.get_default_ratio();
         case ParamId::MF1G: return modulator_params.filter_1_gain.get_default_ratio();
+        case ParamId::MF1FIA: return modulator_params.filter_1_freq_inaccuracy.get_default_ratio();
+        case ParamId::MF1QIA: return modulator_params.filter_1_q_inaccuracy.get_default_ratio();
         case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_default_ratio();
         case ParamId::MF2Q: return modulator_params.filter_2_q.get_default_ratio();
         case ParamId::MF2G: return modulator_params.filter_2_gain.get_default_ratio();
+        case ParamId::MF2FIA: return modulator_params.filter_2_freq_inaccuracy.get_default_ratio();
+        case ParamId::MF2QIA: return modulator_params.filter_2_q_inaccuracy.get_default_ratio();
         case ParamId::CAMP: return carrier_params.amplitude.get_default_ratio();
         case ParamId::CVS: return carrier_params.velocity_sensitivity.get_default_ratio();
         case ParamId::CFLD: return carrier_params.folding.get_default_ratio();
@@ -1494,9 +1506,13 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_default_ratio();
         case ParamId::CF1Q: return carrier_params.filter_1_q.get_default_ratio();
         case ParamId::CF1G: return carrier_params.filter_1_gain.get_default_ratio();
+        case ParamId::CF1FIA: return carrier_params.filter_1_freq_inaccuracy.get_default_ratio();
+        case ParamId::CF1QIA: return carrier_params.filter_1_q_inaccuracy.get_default_ratio();
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_default_ratio();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_default_ratio();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_default_ratio();
+        case ParamId::CF2FIA: return carrier_params.filter_2_freq_inaccuracy.get_default_ratio();
+        case ParamId::CF2QIA: return carrier_params.filter_2_q_inaccuracy.get_default_ratio();
         case ParamId::EV1V: return effects.volume_1_gain.get_default_ratio();
         case ParamId::EOG: return effects.overdrive.level.get_default_ratio();
         case ParamId::EDG: return effects.distortion.level.get_default_ratio();
@@ -1693,9 +1709,13 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_max_value();
         case ParamId::MF1Q: return modulator_params.filter_1_q.get_max_value();
         case ParamId::MF1G: return modulator_params.filter_1_gain.get_max_value();
+        case ParamId::MF1FIA: return modulator_params.filter_1_freq_inaccuracy.get_max_value();
+        case ParamId::MF1QIA: return modulator_params.filter_1_q_inaccuracy.get_max_value();
         case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_max_value();
         case ParamId::MF2Q: return modulator_params.filter_2_q.get_max_value();
         case ParamId::MF2G: return modulator_params.filter_2_gain.get_max_value();
+        case ParamId::MF2FIA: return modulator_params.filter_2_freq_inaccuracy.get_max_value();
+        case ParamId::MF2QIA: return modulator_params.filter_2_q_inaccuracy.get_max_value();
         case ParamId::CAMP: return carrier_params.amplitude.get_max_value();
         case ParamId::CVS: return carrier_params.velocity_sensitivity.get_max_value();
         case ParamId::CFLD: return carrier_params.folding.get_max_value();
@@ -1720,9 +1740,13 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_max_value();
         case ParamId::CF1Q: return carrier_params.filter_1_q.get_max_value();
         case ParamId::CF1G: return carrier_params.filter_1_gain.get_max_value();
+        case ParamId::CF1FIA: return carrier_params.filter_1_freq_inaccuracy.get_max_value();
+        case ParamId::CF1QIA: return carrier_params.filter_1_q_inaccuracy.get_max_value();
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_max_value();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_max_value();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_max_value();
+        case ParamId::CF2FIA: return carrier_params.filter_2_freq_inaccuracy.get_max_value();
+        case ParamId::CF2QIA: return carrier_params.filter_2_q_inaccuracy.get_max_value();
         case ParamId::EV1V: return effects.volume_1_gain.get_max_value();
         case ParamId::EOG: return effects.overdrive.level.get_max_value();
         case ParamId::EDG: return effects.distortion.level.get_max_value();
@@ -1915,9 +1939,13 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.ratio_to_value(ratio);
         case ParamId::MF1Q: return modulator_params.filter_1_q.ratio_to_value(ratio);
         case ParamId::MF1G: return modulator_params.filter_1_gain.ratio_to_value(ratio);
+        case ParamId::MF1FIA: return modulator_params.filter_1_freq_inaccuracy.ratio_to_value(ratio);
+        case ParamId::MF1QIA: return modulator_params.filter_1_q_inaccuracy.ratio_to_value(ratio);
         case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.ratio_to_value(ratio);
         case ParamId::MF2Q: return modulator_params.filter_2_q.ratio_to_value(ratio);
         case ParamId::MF2G: return modulator_params.filter_2_gain.ratio_to_value(ratio);
+        case ParamId::MF2FIA: return modulator_params.filter_2_freq_inaccuracy.ratio_to_value(ratio);
+        case ParamId::MF2QIA: return modulator_params.filter_2_q_inaccuracy.ratio_to_value(ratio);
         case ParamId::CAMP: return carrier_params.amplitude.ratio_to_value(ratio);
         case ParamId::CVS: return carrier_params.velocity_sensitivity.ratio_to_value(ratio);
         case ParamId::CFLD: return carrier_params.folding.ratio_to_value(ratio);
@@ -1942,9 +1970,13 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.ratio_to_value(ratio);
         case ParamId::CF1Q: return carrier_params.filter_1_q.ratio_to_value(ratio);
         case ParamId::CF1G: return carrier_params.filter_1_gain.ratio_to_value(ratio);
+        case ParamId::CF1FIA: return carrier_params.filter_1_freq_inaccuracy.ratio_to_value(ratio);
+        case ParamId::CF1QIA: return carrier_params.filter_1_q_inaccuracy.ratio_to_value(ratio);
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.ratio_to_value(ratio);
         case ParamId::CF2Q: return carrier_params.filter_2_q.ratio_to_value(ratio);
         case ParamId::CF2G: return carrier_params.filter_2_gain.ratio_to_value(ratio);
+        case ParamId::CF2FIA: return carrier_params.filter_2_freq_inaccuracy.ratio_to_value(ratio);
+        case ParamId::CF2QIA: return carrier_params.filter_2_q_inaccuracy.ratio_to_value(ratio);
         case ParamId::EV1V: return effects.volume_1_gain.ratio_to_value(ratio);
         case ParamId::EOG: return effects.overdrive.level.ratio_to_value(ratio);
         case ParamId::EDG: return effects.distortion.level.ratio_to_value(ratio);
@@ -2447,9 +2479,13 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::MF1FRQ: modulator_params.filter_1_frequency.set_ratio(ratio); break;
             case ParamId::MF1Q: modulator_params.filter_1_q.set_ratio(ratio); break;
             case ParamId::MF1G: modulator_params.filter_1_gain.set_ratio(ratio); break;
+            case ParamId::MF1FIA: modulator_params.filter_1_freq_inaccuracy.set_ratio(ratio); break;
+            case ParamId::MF1QIA: modulator_params.filter_1_q_inaccuracy.set_ratio(ratio); break;
             case ParamId::MF2FRQ: modulator_params.filter_2_frequency.set_ratio(ratio); break;
             case ParamId::MF2Q: modulator_params.filter_2_q.set_ratio(ratio); break;
             case ParamId::MF2G: modulator_params.filter_2_gain.set_ratio(ratio); break;
+            case ParamId::MF2FIA: modulator_params.filter_2_freq_inaccuracy.set_ratio(ratio); break;
+            case ParamId::MF2QIA: modulator_params.filter_2_q_inaccuracy.set_ratio(ratio); break;
             case ParamId::CAMP: carrier_params.amplitude.set_ratio(ratio); break;
             case ParamId::CVS: carrier_params.velocity_sensitivity.set_ratio(ratio); break;
             case ParamId::CFLD: carrier_params.folding.set_ratio(ratio); break;
@@ -2474,9 +2510,13 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF1FRQ: carrier_params.filter_1_frequency.set_ratio(ratio); break;
             case ParamId::CF1Q: carrier_params.filter_1_q.set_ratio(ratio); break;
             case ParamId::CF1G: carrier_params.filter_1_gain.set_ratio(ratio); break;
+            case ParamId::CF1FIA: carrier_params.filter_1_freq_inaccuracy.set_ratio(ratio); break;
+            case ParamId::CF1QIA: carrier_params.filter_1_q_inaccuracy.set_ratio(ratio); break;
             case ParamId::CF2FRQ: carrier_params.filter_2_frequency.set_ratio(ratio); break;
             case ParamId::CF2Q: carrier_params.filter_2_q.set_ratio(ratio); break;
             case ParamId::CF2G: carrier_params.filter_2_gain.set_ratio(ratio); break;
+            case ParamId::CF2FIA: carrier_params.filter_2_freq_inaccuracy.set_ratio(ratio); break;
+            case ParamId::CF2QIA: carrier_params.filter_2_q_inaccuracy.set_ratio(ratio); break;
             case ParamId::EV1V: effects.volume_1_gain.set_ratio(ratio); break;
             case ParamId::EOG: effects.overdrive.level.set_ratio(ratio); break;
             case ParamId::EDG: effects.distortion.level.set_ratio(ratio); break;
@@ -2675,9 +2715,15 @@ void Synth::handle_assign_controller(
             case ParamId::MF1FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_frequency, ctl_id); break;
             case ParamId::MF1Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_q, ctl_id); break;
             case ParamId::MF1G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_1_gain, ctl_id); break;
+            /* Controlling these is not supported yet. */
+            // case ParamId::MF1FIA: is_assigned = assign_controller<FloatParamB>(modulator_params.filter_1_freq_inaccuracy, ctl_id); break;
+            // case ParamId::MF1QIA: is_assigned = assign_controller<FloatParamB>(modulator_params.filter_1_q_inaccuracy, ctl_id); break;
             case ParamId::MF2FRQ: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_frequency, ctl_id); break;
             case ParamId::MF2Q: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_q, ctl_id); break;
             case ParamId::MF2G: is_assigned = assign_controller<FloatParamS>(modulator_params.filter_2_gain, ctl_id); break;
+            /* Controlling these is not supported yet. */
+            // case ParamId::MF2FIA: is_assigned = assign_controller<FloatParamB>(modulator_params.filter_2_freq_inaccuracy, ctl_id); break;
+            // case ParamId::MF2QIA: is_assigned = assign_controller<FloatParamB>(modulator_params.filter_2_q_inaccuracy, ctl_id); break;
             case ParamId::CAMP: is_assigned = assign_controller<FloatParamS>(carrier_params.amplitude, ctl_id); break;
             case ParamId::CVS: is_assigned = assign_controller<FloatParamB>(carrier_params.velocity_sensitivity, ctl_id); break;
             case ParamId::CFLD: is_assigned = assign_controller<FloatParamS>(carrier_params.folding, ctl_id); break;
@@ -2702,9 +2748,15 @@ void Synth::handle_assign_controller(
             case ParamId::CF1FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_frequency, ctl_id); break;
             case ParamId::CF1Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_q, ctl_id); break;
             case ParamId::CF1G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_1_gain, ctl_id); break;
+            /* Controlling these is not supported yet. */
+            // case ParamId::CF1FIA: is_assigned = assign_controller<FloatParamB>(carrier_params.filter_1_freq_inaccuracy, ctl_id); break;
+            // case ParamId::CF1QIA: is_assigned = assign_controller<FloatParamB>(carrier_params.filter_1_q_inaccuracy, ctl_id); break;
             case ParamId::CF2FRQ: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_frequency, ctl_id); break;
             case ParamId::CF2Q: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_q, ctl_id); break;
             case ParamId::CF2G: is_assigned = assign_controller<FloatParamS>(carrier_params.filter_2_gain, ctl_id); break;
+            /* Controlling these is not supported yet. */
+            // case ParamId::CF2FIA: is_assigned = assign_controller<FloatParamB>(carrier_params.filter_2_freq_inaccuracy, ctl_id); break;
+            // case ParamId::CF2QIA: is_assigned = assign_controller<FloatParamB>(carrier_params.filter_2_q_inaccuracy, ctl_id); break;
             case ParamId::EV1V: is_assigned = assign_controller<FloatParamS>(effects.volume_1_gain, ctl_id); break;
             case ParamId::EOG: is_assigned = assign_controller<FloatParamS>(effects.overdrive.level, ctl_id); break;
             case ParamId::EDG: is_assigned = assign_controller<FloatParamS>(effects.distortion.level, ctl_id); break;
@@ -3148,9 +3200,13 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::MF1FRQ: return modulator_params.filter_1_frequency.get_ratio();
         case ParamId::MF1Q: return modulator_params.filter_1_q.get_ratio();
         case ParamId::MF1G: return modulator_params.filter_1_gain.get_ratio();
+        case ParamId::MF1FIA: return modulator_params.filter_1_freq_inaccuracy.get_ratio();
+        case ParamId::MF1QIA: return modulator_params.filter_1_q_inaccuracy.get_ratio();
         case ParamId::MF2FRQ: return modulator_params.filter_2_frequency.get_ratio();
         case ParamId::MF2Q: return modulator_params.filter_2_q.get_ratio();
         case ParamId::MF2G: return modulator_params.filter_2_gain.get_ratio();
+        case ParamId::MF2FIA: return modulator_params.filter_2_freq_inaccuracy.get_ratio();
+        case ParamId::MF2QIA: return modulator_params.filter_2_q_inaccuracy.get_ratio();
         case ParamId::CAMP: return carrier_params.amplitude.get_ratio();
         case ParamId::CVS: return carrier_params.velocity_sensitivity.get_ratio();
         case ParamId::CFLD: return carrier_params.folding.get_ratio();
@@ -3175,9 +3231,13 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF1FRQ: return carrier_params.filter_1_frequency.get_ratio();
         case ParamId::CF1Q: return carrier_params.filter_1_q.get_ratio();
         case ParamId::CF1G: return carrier_params.filter_1_gain.get_ratio();
+        case ParamId::CF1FIA: return carrier_params.filter_1_freq_inaccuracy.get_ratio();
+        case ParamId::CF1QIA: return carrier_params.filter_1_q_inaccuracy.get_ratio();
         case ParamId::CF2FRQ: return carrier_params.filter_2_frequency.get_ratio();
         case ParamId::CF2Q: return carrier_params.filter_2_q.get_ratio();
         case ParamId::CF2G: return carrier_params.filter_2_gain.get_ratio();
+        case ParamId::CF2FIA: return carrier_params.filter_2_freq_inaccuracy.get_ratio();
+        case ParamId::CF2QIA: return carrier_params.filter_2_q_inaccuracy.get_ratio();
         case ParamId::EV1V: return effects.volume_1_gain.get_ratio();
         case ParamId::EOG: return effects.overdrive.level.get_ratio();
         case ParamId::EDG: return effects.distortion.level.get_ratio();

@@ -265,6 +265,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_MAX,
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
+    filter_1_freq_inaccuracy(name + "F1FIA", 0.0, 1.0, 0.0),
+    filter_1_q_inaccuracy(name + "F1QIA", 0.0, 1.0, 0.0),
 
     filter_2_type(name + "F2TYP"),
     filter_2_log_scale(name + "F2LOG", ToggleParam::OFF),
@@ -291,6 +293,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_MAX,
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
+    filter_2_freq_inaccuracy(name + "F2FIA", 0.0, 1.0, 0.0),
+    filter_2_q_inaccuracy(name + "F2QIA", 0.0, 1.0, 0.0),
 
     subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0),
     distortion(name + "DG", 0.0, 1.0, 0.0)
@@ -432,7 +436,10 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
-        filter_1_shared_cache
+        filter_1_shared_cache,
+        make_random_seed(0.289),
+        &param_leaders.filter_1_freq_inaccuracy,
+        &param_leaders.filter_1_q_inaccuracy
     ),
     wavefolder(filter_1, param_leaders.folding),
     filter_2(
@@ -441,7 +448,10 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
-        filter_2_shared_cache
+        filter_2_shared_cache,
+        make_random_seed(0.629),
+        &param_leaders.filter_2_freq_inaccuracy,
+        &param_leaders.filter_2_q_inaccuracy
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
@@ -501,7 +511,10 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
-        filter_1_shared_cache
+        filter_1_shared_cache,
+        make_random_seed(0.327),
+        &param_leaders.filter_1_freq_inaccuracy,
+        &param_leaders.filter_1_q_inaccuracy
     ),
     wavefolder(filter_1, param_leaders.folding),
     distortion(
@@ -516,7 +529,10 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
-        filter_2_shared_cache
+        filter_2_shared_cache,
+        make_random_seed(0.796),
+        &param_leaders.filter_2_freq_inaccuracy,
+        &param_leaders.filter_2_q_inaccuracy
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
@@ -526,43 +542,43 @@ Voice<ModulatorSignalProducerClass>::Voice(
     is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
 {
-    initialize_instance(inaccuracy_seed);
+    initialize_instance(oscillator_inaccuracy_seed);
 }
 
 
 template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::initialize_instance(
-        Number const inaccuracy_seed
+        Number const oscillator_inaccuracy_seed
 ) noexcept {
-    this->oscillator_inaccuracy = inaccuracy_seed;
+    this->oscillator_inaccuracy = oscillator_inaccuracy_seed;
 
-    wavefolder.folding.set_random_seed(make_param_random_seed(0.583));
+    wavefolder.folding.set_random_seed(make_random_seed(0.583));
 
     if constexpr (IS_CARRIER) {
-        distortion.level.set_random_seed(make_param_random_seed(0.257));
+        distortion.level.set_random_seed(make_random_seed(0.257));
     }
 
-    panning.set_random_seed(make_param_random_seed(0.081));
-    volume.set_random_seed(make_param_random_seed(0.814));
+    panning.set_random_seed(make_random_seed(0.081));
+    volume.set_random_seed(make_random_seed(0.814));
 
-    oscillator.modulated_amplitude.set_random_seed(make_param_random_seed(0.617));
-    oscillator.amplitude.set_random_seed(make_param_random_seed(0.347));
+    oscillator.modulated_amplitude.set_random_seed(make_random_seed(0.617));
+    oscillator.amplitude.set_random_seed(make_random_seed(0.347));
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.set_random_seed(make_param_random_seed(0.388));
+        oscillator.subharmonic_amplitude.set_random_seed(make_random_seed(0.388));
     }
 
-    oscillator.frequency.set_random_seed(make_param_random_seed(0.348));
-    oscillator.phase.set_random_seed(make_param_random_seed(0.623));
-    oscillator.fine_detune.set_random_seed(make_param_random_seed(0.457));
+    oscillator.frequency.set_random_seed(make_random_seed(0.348));
+    oscillator.phase.set_random_seed(make_random_seed(0.623));
+    oscillator.fine_detune.set_random_seed(make_random_seed(0.457));
 
-    filter_1.frequency.set_random_seed(make_param_random_seed(0.661));
-    filter_1.q.set_random_seed(make_param_random_seed(0.230));
-    filter_1.gain.set_random_seed(make_param_random_seed(0.146));
+    filter_1.frequency.set_random_seed(make_random_seed(0.661));
+    filter_1.q.set_random_seed(make_random_seed(0.230));
+    filter_1.gain.set_random_seed(make_random_seed(0.146));
 
-    filter_2.frequency.set_random_seed(make_param_random_seed(0.096));
-    filter_2.q.set_random_seed(make_param_random_seed(0.674));
-    filter_2.gain.set_random_seed(make_param_random_seed(0.968));
+    filter_2.frequency.set_random_seed(make_random_seed(0.096));
+    filter_2.q.set_random_seed(make_random_seed(0.674));
+    filter_2.gain.set_random_seed(make_random_seed(0.968));
 
     state = State::OFF;
     note_id = 0;
@@ -588,7 +604,7 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 
 
 template<class ModulatorSignalProducerClass>
-Number Voice<ModulatorSignalProducerClass>::make_param_random_seed(
+Number Voice<ModulatorSignalProducerClass>::make_random_seed(
         Number const random
 ) const noexcept {
     return Math::randomize(1.0, 0.5 * (random + oscillator_inaccuracy_seed));
@@ -658,6 +674,9 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     state = State::ON;
 
     save_note_info(note_id, note, channel);
+
+    filter_1.update_inaccuracy(1.0 - random_1, random_2);
+    filter_2.update_inaccuracy(1.0 - random_2, random_1);
 
     note_velocity.cancel_events_at(time_offset);
     note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));

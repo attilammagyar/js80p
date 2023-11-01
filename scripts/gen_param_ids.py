@@ -71,10 +71,14 @@ def print_oscillator_params(param_id: int, group: str, prefix: str) -> int:
         ("$F1FRQ", "///< $ Filter 1 Frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor"),
         ("$F1G", "  ///< $ Filter 1 Gain"),
+        ("$F1FIA", "///< $ Filter 1 Frequency Inaccuracy"),
+        ("$F1QIA", "///< $ Filter 1 Q Factor Inaccuracy"),
 
         ("$F2FRQ", "///< $ Filter 2 Frequency"),
         ("$F2Q", "  ///< $ Filter 2 Q Factor"),
         ("$F2G", "  ///< $ Filter 2 Gain"),
+        ("$F2FIA", "///< $ Filter 2 Frequency Inaccuracy"),
+        ("$F2QIA", "///< $ Filter 2 Q Factor Inaccuracy"),
     ]
 
     return print_params(param_id, group, prefix, 1, params)

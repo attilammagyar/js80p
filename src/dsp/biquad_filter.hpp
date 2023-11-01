@@ -81,7 +81,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            BiquadFilterSharedCache* shared_cache = NULL
+            BiquadFilterSharedCache* shared_cache = NULL,
+            Number const inaccuracy_seed = 0.0,
+            FloatParamB const* freq_inaccuracy_param = NULL,
+            FloatParamB const* q_inaccuracy_param = NULL
         ) noexcept;
 
         BiquadFilter(
@@ -97,7 +100,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParamS& frequency_leader,
             FloatParamS& q_leader,
             FloatParamS& gain_leader,
-            BiquadFilterSharedCache* shared_cache = NULL
+            BiquadFilterSharedCache* shared_cache = NULL,
+            Number const inaccuracy_seed = 0.0,
+            FloatParamB const* freq_inaccuracy_param = NULL,
+            FloatParamB const* q_inaccuracy_param = NULL
         ) noexcept;
 
         virtual ~BiquadFilter();
@@ -109,6 +115,11 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         virtual void reset() noexcept override;
 
         void set_shared_cache(BiquadFilterSharedCache* shared_cache) noexcept;
+
+        void update_inaccuracy(
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
 
         FloatParamS frequency;
         FloatParamS q;
@@ -159,70 +170,97 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const sample_count
         ) noexcept;
 
+        template<bool is_freq_inaccurate>
+        Number apply_freq_inaccuracy(Number const frequency_value) const noexcept;
+
+        template<bool is_q_inaccurate>
+        Number apply_q_inaccuracy(Number const q_value) const noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_low_pass_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         void store_low_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_high_pass_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         void store_high_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate>
         bool initialize_low_shelf_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate>
         void store_low_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const gain_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate>
         bool initialize_high_shelf_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate>
         void store_high_shelf_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const gain_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_band_pass_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         void store_band_pass_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_notch_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         void store_notch_coefficient_samples(
             Integer const index,
             Number const frequency_value,
             Number const q_value
         ) noexcept;
 
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_peaking_rendering(
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<bool is_freq_inaccurate, bool is_q_inaccurate>
         void store_peaking_coefficient_samples(
             Integer const index,
             Number const frequency_value,
@@ -248,6 +286,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index) noexcept;
         void store_silent_coefficient_samples(Integer const index) noexcept;
 
+        Number const inaccuracy_seed;
+        FloatParamB const* const freq_inaccuracy_param;
+        FloatParamB const* const q_inaccuracy_param;
+
         BiquadFilterSharedCache* shared_cache;
 
         /*
@@ -269,6 +311,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         Sample w0_scale;
 
         Number low_pass_no_op_frequency;
+        Number freq_inaccuracy;
+        Number q_inaccuracy;
+        Number freq_inaccuracy_param_value;
+        Number q_inaccuracy_param_value;
 
         bool is_silent_;
         bool are_coefficients_constant;
