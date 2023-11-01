@@ -1038,7 +1038,11 @@ void KnobParamEditor::Knob::update()
         return;
     }
 
-    size_t const index = (size_t)(knob_states->last_index * this->ratio);
+    size_t index = (size_t)(knob_states->last_index * this->ratio);
+
+    if (index == 0 && this->ratio > 0.000001) {
+        index = 1;
+    }
 
     if (is_controlled) {
         set_image(knob_states->controlled_images[index]);
