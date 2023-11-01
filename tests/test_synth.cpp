@@ -1119,9 +1119,9 @@ TEST(voice_inaccuracy_is_deterministic_random, {
     render_rounds<Synth>(synth, buffer_precise, rounds, block_size);
 
     set_param(synth, Synth::ParamId::MTUN, tuning);
-    set_param(synth, Synth::ParamId::MINA, 1.0);
+    set_param(synth, Synth::ParamId::MOIA, 1.0);
     set_param(synth, Synth::ParamId::CTUN, tuning);
-    set_param(synth, Synth::ParamId::CINA, 1.0);
+    set_param(synth, Synth::ParamId::COIA, 1.0);
     synth.process_messages();
 
     synth.reset();

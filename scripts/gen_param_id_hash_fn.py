@@ -415,10 +415,10 @@ params = [
     "POLY",
     "MTUN",
     "CTUN",
-    "MINA",
-    "MNST",
-    "CINA",
-    "CNST",
+    "MOIA",
+    "MOIS",
+    "COIA",
+    "COIS",
 ]
 
 

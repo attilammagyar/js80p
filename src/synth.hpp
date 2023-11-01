@@ -578,11 +578,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             MTUN = 403,      ///< Modulator Tuning
             CTUN = 404,      ///< Carrier Tuning
 
-            MINA = 405,      ///< Modulator Inaccuracy
-            MNST = 406,      ///< Modulator Instability
+            MOIA = 405,      ///< Modulator Oscillator Inaccuracy
+            MOIS = 406,      ///< Modulator Oscillator Instability
 
-            CINA = 407,      ///< Carrier Inaccuracy
-            CNST = 408,      ///< Carrier Instability
+            COIA = 407,      ///< Carrier Oscillator Inaccuracy
+            COIS = 408,      ///< Carrier Oscillator Instability
 
             PARAM_ID_COUNT = 409,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
@@ -1051,7 +1051,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 void collect_active_voices() noexcept;
 
-                template<class VoiceClass, bool should_sync_inaccuracy, bool should_sync_instability>
+                template<class VoiceClass, bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
                 void render_voices(
                     VoiceClass* (&voices)[POLYPHONY],
                     size_t const voices_count,
@@ -1210,12 +1210,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::PARAM_ID_COUNT];
 
-        static bool should_sync_inaccuracy(
+        static bool should_sync_oscillator_inaccuracy(
             Modulator::Params const& modulator_params,
             Carrier::Params const& carrier_params
         ) noexcept;
 
-        static bool should_sync_instability(
+        static bool should_sync_oscillator_instability(
             Modulator::Params const& modulator_params,
             Carrier::Params const& carrier_params
         ) noexcept;
@@ -1291,8 +1291,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void clear_sustain() noexcept;
 
-        bool should_sync_inaccuracy() const noexcept;
-        bool should_sync_instability() const noexcept;
+        bool should_sync_oscillator_inaccuracy() const noexcept;
+        bool should_sync_oscillator_instability() const noexcept;
 
         void note_on_polyphonic(
             Seconds const time_offset,
@@ -1325,7 +1325,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel,
             Midi::Note const note,
             Number const velocity,
-            bool const should_sync_inaccuracy
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void assign_voice_and_note_id(
@@ -1362,7 +1362,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Macro* macros_rw[MACROS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];
-        Inaccuracy* synced_inaccuracies[POLYPHONY];
+        OscillatorInaccuracy* synced_oscillator_inaccuracies[POLYPHONY];
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
         NoteTunings active_note_tunings;

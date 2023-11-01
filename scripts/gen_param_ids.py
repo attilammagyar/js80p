@@ -256,11 +256,11 @@ def print_special_params(param_id: int) -> int:
         ("MTUN", "  ///< Modulator Tuning"),
         ("CTUN", "  ///< Carrier Tuning"),
 
-        ("MINA", "  ///< Modulator Inaccuracy"),
-        ("MNST", "  ///< Modulator Instability"),
+        ("MOIA", "  ///< Modulator Oscillator Inaccuracy"),
+        ("MOIS", "  ///< Modulator Oscillator Instability"),
 
-        ("CINA", "  ///< Carrier Inaccuracy"),
-        ("CNST", "  ///< Carrier Instability"),
+        ("COIA", "  ///< Carrier Oscillator Inaccuracy"),
+        ("COIS", "  ///< Carrier Oscillator Instability"),
     ]
 
     return print_params(param_id, "", "", 1, params)

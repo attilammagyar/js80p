@@ -102,8 +102,8 @@ class GUI
         static char const* const TUNINGS[];
         static int const TUNINGS_COUNT;
 
-        static char const* const INACCURACY_LEVELS[Inaccuracy::MAX_LEVEL + 1];
-        static int const INACCURACY_LEVELS_COUNT;
+        static char const* const OSCILLATOR_INACCURACY_LEVELS[OscillatorInaccuracy::MAX_LEVEL + 1];
+        static int const OSCILLATOR_INACCURACY_LEVELS_COUNT;
 
         static char const* const WAVEFORMS[];
         static int const WAVEFORMS_COUNT;

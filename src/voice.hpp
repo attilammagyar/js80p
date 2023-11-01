@@ -44,7 +44,7 @@ typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
 typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 
 
-class Inaccuracy
+class OscillatorInaccuracy
 {
     public:
         static constexpr Integer MAX_LEVEL = 60;
@@ -60,7 +60,7 @@ class Inaccuracy
 
         static Number calculate_new_inaccuracy(Number const seed) noexcept;
 
-        Inaccuracy(Number const seed);
+        OscillatorInaccuracy(Number const seed);
 
         Number get_inaccuracy() const noexcept;
 
@@ -117,12 +117,12 @@ class Voice : public SignalProducer
 
         typedef VolumeApplier ModulationOut;
 
-        typedef Byte InaccuracyLevel;
+        typedef Byte OscillatorInaccuracyLevel;
 
-        class InaccuracyParam : public Param<InaccuracyLevel, ParamEvaluation::BLOCK>
+        class OscillatorInaccuracyParam : public Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>
         {
             public:
-                InaccuracyParam(std::string const name) noexcept;
+                OscillatorInaccuracyParam(std::string const name) noexcept;
         };
 
         typedef Byte Tuning;
@@ -152,8 +152,8 @@ class Voice : public SignalProducer
                 Params(std::string const name) noexcept;
 
                 TuningParam tuning;
-                InaccuracyParam inaccuracy;
-                InaccuracyParam instability;
+                OscillatorInaccuracyParam oscillator_inaccuracy;
+                OscillatorInaccuracyParam oscillator_instability;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;
@@ -238,8 +238,8 @@ class Voice : public SignalProducer
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
-            Inaccuracy& synced_inaccuracy,
-            Number const inaccuracy_seed,
+            OscillatorInaccuracy& synced_oscillator_inaccuracy,
+            Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
             BiquadFilterSharedCache* filter_1_shared_cache = NULL,
             BiquadFilterSharedCache* filter_2_shared_cache = NULL
@@ -248,8 +248,8 @@ class Voice : public SignalProducer
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
-            Inaccuracy& synced_inaccuracy,
-            Number const inaccuracy_seed,
+            OscillatorInaccuracy& synced_oscillator_inaccuracy,
+            Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
             ModulatorSignalProducerClass& modulator,
             FloatParamS& amplitude_modulation_level_leader,
@@ -274,7 +274,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_inaccuracy
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void retrigger(
@@ -284,7 +284,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_inaccuracy
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void glide_to(
@@ -294,7 +294,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_inaccuracy
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void note_off(
@@ -315,10 +315,10 @@ class Voice : public SignalProducer
         Midi::Channel get_channel() const noexcept;
         Number get_inaccuracy() const noexcept;
 
-        template<bool should_sync_inaccuracy, bool should_sync_instability>
+        template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
         void update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept;
 
-        template<bool should_sync_inaccuracy>
+        template<bool should_sync_oscillator_inaccuracy>
         void update_unstable_note_frequency(Integer const round) noexcept;
 
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
@@ -348,7 +348,7 @@ class Voice : public SignalProducer
         static constexpr Seconds MIN_DRIFT_DURATION = 0.3;
         static constexpr Seconds DRIFT_DURATION_DELTA = 3.2;
 
-        void initialize_instance(Number const inaccuracy_seed) noexcept;
+        void initialize_instance(Number const oscillator_inaccuracy_seed) noexcept;
 
         Number make_param_random_seed(Number const random) const noexcept;
 
@@ -366,16 +366,16 @@ class Voice : public SignalProducer
         template<bool should_sync>
         Frequency detune(
             Frequency const frequency,
-            InaccuracyParam const& level_param
+            OscillatorInaccuracyParam const& level_param
         ) const noexcept;
 
-        template<bool should_sync_inaccuracy>
+        template<bool should_sync_oscillator_inaccuracy>
         Frequency calculate_note_frequency_drift_target() const noexcept;
 
         Number calculate_note_velocity(Number const raw_velocity) const noexcept;
         Number calculate_note_panning(Midi::Note const note) const noexcept;
 
-        template<bool should_sync_inaccuracy>
+        template<bool should_sync_oscillator_inaccuracy>
         void set_up_oscillator_frequency(
             Seconds const time_offset,
             Midi::Note const note,
@@ -387,12 +387,12 @@ class Voice : public SignalProducer
 
         bool has_decayed(FloatParamS const& param) const noexcept;
 
-        Number const inaccuracy_seed;
+        Number const oscillator_inaccuracy_seed;
 
         Params& param_leaders;
         FrequencyTable const& frequencies;
         PerChannelFrequencyTable const& per_channel_frequencies;
-        Inaccuracy& synced_inaccuracy;
+        OscillatorInaccuracy& synced_oscillator_inaccuracy;
         Oscillator_ oscillator;
         Filter1 filter_1;
         Wavefolder_ wavefolder;
@@ -406,7 +406,7 @@ class Voice : public SignalProducer
         Sample const* volume_applier_buffer;
         Sample const* panning_buffer;
         Sample const* note_panning_buffer;
-        Number inaccuracy;
+        Number oscillator_inaccuracy;
         Number panning_value;
         Number note_panning_value;
         Frequency nominal_frequency;

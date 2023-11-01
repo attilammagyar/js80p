@@ -60,7 +60,7 @@ char const* const GUI::TUNINGS[] = {
 int const GUI::TUNINGS_COUNT = VOICE_TUNINGS;
 
 
-char const* const GUI::INACCURACY_LEVELS[] = {
+char const* const GUI::OSCILLATOR_INACCURACY_LEVELS[] = {
     "0.00%",
     "0.01%",
     "0.05%",
@@ -124,7 +124,7 @@ char const* const GUI::INACCURACY_LEVELS[] = {
     "100.00%",
 };
 
-int const GUI::INACCURACY_LEVELS_COUNT = Inaccuracy::MAX_LEVEL + 1;
+int const GUI::OSCILLATOR_INACCURACY_LEVELS_COUNT = OscillatorInaccuracy::MAX_LEVEL + 1;
 
 
 char const* const GUI::WAVEFORMS[] = {
@@ -682,11 +682,11 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::MTUN] = "Modulator Tuning",
     [Synth::ParamId::CTUN] = "Carrier Tuning",
 
-    [Synth::ParamId::MINA] = "Modulator Inaccuracy",
-    [Synth::ParamId::MNST] = "Modulator Instability",
+    [Synth::ParamId::MOIA] = "Modulator Oscillator Inaccuracy",
+    [Synth::ParamId::MOIS] = "Modulator Oscillator Instability",
 
-    [Synth::ParamId::CINA] = "Carrier Inaccuracy",
-    [Synth::ParamId::CNST] = "Carrier Instability",
+    [Synth::ParamId::COIA] = "Carrier Oscillator Inaccuracy",
+    [Synth::ParamId::COIS] = "Carrier Oscillator Instability",
 };
 
 
@@ -1900,8 +1900,8 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
 
     constexpr char const* const* md = JS80P::GUI::MODES;
     constexpr int mdc = JS80P::GUI::MODES_COUNT;
-    constexpr char const* const* ia = JS80P::GUI::INACCURACY_LEVELS;
-    constexpr int iac = JS80P::GUI::INACCURACY_LEVELS_COUNT;
+    constexpr char const* const* oia = JS80P::GUI::OSCILLATOR_INACCURACY_LEVELS;
+    constexpr int oiac = JS80P::GUI::OSCILLATOR_INACCURACY_LEVELS_COUNT;
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
@@ -1911,12 +1911,12 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 232,   8, synth, Synth::ParamId::MTUN));
-    SCREW(synth_body, 322, 8, Synth::ParamId::MINA, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CINA);
-    SCREW(synth_body, 342, 8, Synth::ParamId::MNST, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::CNST);
+    SCREW(synth_body, 322, 8, Synth::ParamId::MOIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIA);
+    SCREW(synth_body, 342, 8, Synth::ParamId::MOIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIS);
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 232, 288, synth, Synth::ParamId::CTUN));
-    SCREW(synth_body, 322, 288, Synth::ParamId::CINA, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MINA);
-    SCREW(synth_body, 342, 288, Synth::ParamId::CNST, ia, iac, screw_states)->set_sync_param_id(Synth::ParamId::MNST);
+    SCREW(synth_body, 322, 288, Synth::ParamId::COIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIA);
+    SCREW(synth_body, 342, 288, Synth::ParamId::COIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIS);
 
     TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
 
