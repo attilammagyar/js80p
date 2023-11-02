@@ -266,7 +266,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     filter_1_freq_inaccuracy(name + "F1FIA", 0.0, 1.0, 0.0),
-    filter_1_q_inaccuracy(name + "F1QIA", 0.0, 1.0, 0.0),
+    filter_1_q_inaccuracy(name + "F1QIA", 0.0, 0.4, 0.0),
 
     filter_2_type(name + "F2TYP"),
     filter_2_log_scale(name + "F2LOG", ToggleParam::OFF),
@@ -294,7 +294,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         Constants::BIQUAD_FILTER_GAIN_DEFAULT
     ),
     filter_2_freq_inaccuracy(name + "F2FIA", 0.0, 1.0, 0.0),
-    filter_2_q_inaccuracy(name + "F2QIA", 0.0, 1.0, 0.0),
+    filter_2_q_inaccuracy(name + "F2QIA", 0.0, 0.4, 0.0),
 
     subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0),
     distortion(name + "DG", 0.0, 1.0, 0.0)

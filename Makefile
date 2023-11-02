@@ -161,6 +161,7 @@ TESTS_PARAM = \
 
 TESTS_DSP = \
 	test_biquad_filter \
+	test_biquad_filter_slow \
 	test_delay \
 	test_distortion \
 	test_gain \
@@ -494,6 +495,17 @@ $(BUILD_DIR)/test_bank$(EXE): \
 
 $(BUILD_DIR)/test_biquad_filter$(EXE): \
 		tests/test_biquad_filter.cpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(BUILD_DIR) \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
+	$(COMPILE_TEST) -o $@ $<
+	$(VALGRIND) $@
+
+$(BUILD_DIR)/test_biquad_filter_slow$(EXE): \
+		tests/test_biquad_filter_slow.cpp \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \

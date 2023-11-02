@@ -518,9 +518,12 @@ Number BiquadFilter<InputSignalProducerClass>::apply_freq_inaccuracy(
         Number const frequency_value
 ) const noexcept {
     if constexpr (is_freq_inaccurate) {
-        return Math::detune(
-            frequency_value,
-            (freq_inaccuracy * 2400.0 - 1200.0) * freq_inaccuracy_param_value
+        return std::min(
+            this->low_pass_no_op_frequency,
+            Math::detune(
+                frequency_value,
+                (freq_inaccuracy * 2400.0 - 1200.0) * freq_inaccuracy_param_value
+            )
         );
     } else {
         return frequency_value;
@@ -534,7 +537,7 @@ Number BiquadFilter<InputSignalProducerClass>::apply_q_inaccuracy(
         Number const q_value
 ) const noexcept {
     if constexpr (is_q_inaccurate) {
-        return q_value * ((q_inaccuracy - 0.2) * q_inaccuracy_param_value + 1.0);
+        return q_value * ((q_inaccuracy - 0.5) * q_inaccuracy_param_value + 1.0);
     } else {
         return q_value;
     }
