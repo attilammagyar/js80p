@@ -31,10 +31,14 @@ main()
     fi
 
     version_tag="$(git tag --points-at HEAD | grep -E "^v[0-9]+\\.[0-9]\\.[0-9]$" || true)"
+    version_str="${version_tag:1}"
+    version_int="$(version_str_to_int "$version_str")"
 
     if [[ "$version_tag" = "" ]]
     then
         version_tag="v999.0.0"
+        version_str="${version_tag:1}-$(git log -1 --pretty=%h)"
+        version_int="$(version_str_to_int "999.0.0")"
         log "WARNING: No version tag (format: \"v123.4.5\") found on git HEAD, creating a development release."
     fi
 
@@ -53,9 +57,8 @@ main()
             || error "Cannot find '$version_tag ($date)' in NEWS.txt"
     fi
 
-    version_str="${version_tag:1}"
-    version_int="$(version_str_to_int "$version_str")"
     version_as_file_name="$(version_str_to_file_name "$version_str")"
+
     source_dir="js80p-$version_as_file_name-src"
     source_archive="$source_dir.zip"
 
@@ -102,7 +105,7 @@ main()
 
     log "Running unit tests"
 
-    call_make "x86_64-w64-mingw32" "avx" "$version_str" check
+    call_make "x86_64-w64-mingw32" "avx" "$version_str" "$version_int" "$version_as_file_name" check
 
     for target_platform in $TARGET_PLATFORMS
     do
@@ -111,11 +114,23 @@ main()
         instruction_set="$(printf "%s\n" "$target_platform" | cut -d ":" -f 2)"
         target_platform="$(printf "%s\n" "$target_platform" | cut -d ":" -f 1)"
 
-        call_make "$target_platform" "$instruction_set" "$version_str" clean
-        call_make "$target_platform" "$instruction_set" "$version_str" all
+        call_make \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name" \
+            clean
 
-        package_fst "$target_platform" "$instruction_set" "$version_str"
-        package_vst3_single_file "$target_platform" "$instruction_set" "$version_str"
+        call_make \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name" \
+            all
+
+        package_fst \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name"
+
+        package_vst3_single_file \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name"
     done
 
     package_vst3_bundle "$version_as_file_name" "sse2"
@@ -178,7 +193,7 @@ version_str_to_file_name()
 {
     local version_str="$1"
 
-    printf "%s\n" "$version_str" | sed "s/[^0-9]/_/g"
+    printf "%s\n" "$version_str" | sed "s/[^0-9a-f-]/_/g"
 }
 
 call_make()
@@ -186,15 +201,14 @@ call_make()
     local target_platform="$1"
     local instruction_set="$2"
     local version_str="$3"
-    local version_int
-    local version_as_file_name
+    local version_int="$4"
+    local version_as_file_name="$5"
 
     shift
     shift
     shift
-
-    version_int="$(version_str_to_int "$version_str")"
-    version_as_file_name="$(version_str_to_file_name "$version_str")"
+    shift
+    shift
 
     TARGET_PLATFORM="$target_platform" \
         INSTRUCTION_SET="$instruction_set" \
@@ -209,9 +223,16 @@ package_fst()
     local target_platform="$1"
     local instruction_set="$2"
     local version_str="$3"
+    local version_int="$4"
+    local version_as_file_name="$5"
     local dist_dir
 
-    dist_dir=$(get_dist_dir "$target_platform" "$instruction_set" "$version_str" "show_fst_dir")
+    dist_dir=$(
+        get_dist_dir \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name" \
+            "show_fst_dir"
+    )
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
@@ -226,9 +247,11 @@ get_dist_dir()
     local target_platform="$1"
     local instruction_set="$2"
     local version_str="$3"
-    local make_target="$4"
+    local version_int="$4"
+    local version_as_file_name="$5"
+    local make_target="$6"
 
-    basename "$(call_make "$target_platform" "$instruction_set" "$version_str" "$make_target")"
+    basename "$(call_make "$target_platform" "$instruction_set" "$version_str" "$version_int" "$version_as_file_name" "$make_target")"
 }
 
 finalize_package()
@@ -278,9 +301,16 @@ package_vst3_single_file()
     local target_platform="$1"
     local instruction_set="$2"
     local version_str="$3"
+    local version_int="$4"
+    local version_as_file_name="$5"
     local dist_dir
 
-    dist_dir=$(get_dist_dir "$target_platform" "$instruction_set" "$version_str" "show_vst3_dir")
+    dist_dir=$(
+        get_dist_dir \
+            "$target_platform" "$instruction_set" \
+            "$version_str" "$version_int" "$version_as_file_name" \
+            "show_vst3_dir"
+    )
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
