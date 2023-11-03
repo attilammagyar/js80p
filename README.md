@@ -66,6 +66,9 @@ Table of Contents
     * [Tremolo Lead](#preset-tremolo-lead)
     * [Monophonic Saw](#preset-monophonic-saw)
     * [Dystopian Cathedral](#preset-dystopian-cathedral)
+    * [Gloomy Brass](#preset-gloomy-brass)
+    * [Gloomy Brass Raindrops](#preset-gloomy-brass-raindrops)
+    * [Sawyer-Bass](#preset-sawyer-bass)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -476,6 +479,27 @@ filtering and the wavefolder. The sustain pedal lengthens note decay.
 Play softly and this futuristic organ-like patch will sound smooth as butter,
 but when you start playing with more force, the sound will become angry, fat,
 and in-your-face. The mod wheel increases the level of madness.
+
+<a id="preset-gloomy-brass"></a>
+
+### Gloomy Brass
+
+Turn the mod wheel down for a soft, warm, and fat sound, turn it up for
+brassy swells, distortion, and reverb. Aftertouch adds some harshness and
+vibrato.
+
+<a id="preset-gloomy-brass-raindrops"></a>
+
+### Gloomy Brass Raindrops
+
+A version of Gloomy Brass where each note is followed by a raindrop after a
+random amount of time.
+
+<a id="preset-sawyer-bass"></a>
+
+### Sawyer-Bass
+
+A recreation of the iconic resonant bass sweep from Tom Sawyer by Rush.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
