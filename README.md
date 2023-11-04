@@ -503,11 +503,11 @@ Recreation of the iconic bass and lead sound from Tom Sawyer by Rush. Notes
 below middle C will do the well-known resonance sweep and then turn into a
 dark growl (which you can spice up with the mod wheel and some aftertouch),
 and notes above middle C will be bright, but will lose much of their
-brightness while doing a huge vibrato when you turn up the mod wheel.
-(Note that this is not a split-keyboard patch, because both oscillators are
-required to make this sound good in stereo - instead, the effect is achieved
-through trickery with the Note controller and the Distortion knob of Macro 12
-and 13.)
+brightness while doing a huge vibrato when you turn up the mod wheel or apply
+aftertouch. (Note that this is not a split-keyboard patch, because both
+oscillators are required to make this sound good in stereo - instead, the
+effect is achieved through trickery with the Note controller and the
+Distortion knob of Macro 12 and 13.)
 
 <a id="bugs" href="#toc">Table of Contents</a>
 

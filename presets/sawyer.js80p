@@ -2,11 +2,11 @@
 ; below middle C will do the well-known resonance sweep and then turn into a
 ; dark growl (which you can spice up with the mod wheel and some aftertouch),
 ; and notes above middle C will be bright, but will lose much of their
-; brightness while doing a huge vibrato when you turn up the mod wheel.
-; (Note that this is not a split-keyboard patch, because both oscillators are
-; required to make this sound good in stereo - instead, the effect is achieved
-; through trickery with the Note controller and the Distortion knob of Macro 12
-; and 13.)
+; brightness while doing a huge vibrato when you turn up the mod wheel or apply
+; aftertouch. (Note that this is not a split-keyboard patch, because both
+; oscillators are required to make this sound good in stereo - instead, the
+; effect is achieved through trickery with the Note controller and the
+; Distortion knob of Macro 12 and 13.)
 [js80p]
 MAMP = 1.0
 MFLDctl = 0.531250
@@ -72,7 +72,7 @@ F2INctl = 0.503906250
 F2MINctl = 0.535156250
 F2MAXctl = 0.636718750
 F2DSTctl = 0.6406250
-F3INctl = 0.003906250
+F3INctl = 0.644531250
 F3MIN = 0.030
 F3AMTctl = 0.621093750
 F4INctl = 0.50
@@ -91,12 +91,12 @@ F8INctl = 0.621093750
 F8MIN = 0.230
 F8MAX = 0.50
 F9INctl = 0.003906250
-F9MINctl = 0.644531250
+F9MIN = 0.060
 F9MAX = 0.159999999999999
 F10INctl = 0.621093750
 F10MIN = 0.770000000000001
 F10MAX = 0.50
-F11INctl = 0.003906250
+F11INctl = 0.644531250
 F11MIN = 0.955000000000001
 F11MAX = 0.790
 F11AMTctl = 0.621093750
@@ -124,9 +124,8 @@ F17DST = 0.150
 F18INctl = 0.621093750
 F18MIN = 0.150
 F18DST = 0.50
-F19INctl = 0.621093750
-F19MIN = 0.070
-F19MAX = 0.120
+F19INctl = 0.003906250
+F19MINctl = 0.605468750
 F20INctl = 0.621093750
 F20MIN = 0.0010
 F20MAX = 0.0050
