@@ -1508,7 +1508,7 @@ void TuningSelector::update_value_str()
 {
     Byte const tuning = synth.int_param_ratio_to_display_value(param_id, ratio);
 
-    if (tuning < Modulator::TUNING_MTS_ESP_NOTE_ON) {
+    if (tuning < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
         GUI::param_ratio_to_str(
             synth,
             param_id,

@@ -174,7 +174,7 @@ Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
         std::string const name
 ) noexcept
     : Param<Tuning, ParamEvaluation::BLOCK>(
-        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_CONTINUOUS, TUNING_440HZ_12TET
+        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_NOTE_ON, TUNING_MTS_ESP_CONTINUOUS
     )
 {
 }
@@ -840,7 +840,7 @@ Frequency Voice<ModulatorSignalProducerClass>::get_note_frequency(
 ) const noexcept {
     Tuning const tuning = param_leaders.tuning.get_value();
     return (
-        tuning >= TUNING_MTS_ESP_NOTE_ON
+        tuning >= TUNING_MTS_ESP_CONTINUOUS
             ? per_channel_frequencies[channel][note]
             : frequencies[tuning][note]
     );

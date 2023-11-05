@@ -223,10 +223,13 @@ Tuning
 Each oscillator can be tuned separately by clicking on the tuning selector in
 the title bar of the oscillator. The following options are available:
 
- * `440 12TET`: the usual [12 tone equal temperament](https://en.wikipedia.org/wiki/Equal_temperament)
-   tuning, where the `A4` MIDI note is 440 Hz.
-
- * `432 12TET`: 12 tone equal temperament with `A4` set to 432 Hz.
+ * `MTS-ESP C`: continuously query information from an MTS-ESP tuning provider
+   (usually another plugin) when at least one note is playing, and update the
+   frequency of all sounding notes that haven't reached the Release portion of
+   their volume envelopes yet, on the fly. The tuning selector displays "`on`"
+   when a tuning provider is available, and "`off`" when no tuning provider is
+   found.  In the latter case, notes will fall back to 440 Hz 12 tone equal
+   temperament.
 
  * `MTS-ESP N`: query tuning information from an MTS-ESP tuning provider
    (usually another plugin) for evey `NOTE ON` MIDI event. Already sounding
@@ -234,13 +237,10 @@ the title bar of the oscillator. The following options are available:
    provider is available, and "`off`" when no tuning provider is found. In the
    latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
 
- * `MTS-ESP C`: continuously query information from an MTS-ESP tuning provider
-   (usually another plugin) when at least one note is being played, and update
-   the frequency of sounding notes that haven't reached the Release part of
-   their volume envelopes, in real-time, on the fly. The tuning selector
-   displays "`on`" when a tuning provider is available, and "`off`" when no
-   tuning provider is found. In the latter case, notes will fall back to
-   440 Hz 12 tone equal temperament.
+ * `440 12TET`: the usual [12 tone equal temperament](https://en.wikipedia.org/wiki/Equal_temperament)
+   tuning, where the `A4` MIDI note is 440 Hz.
+
+ * `432 12TET`: 12 tone equal temperament with `A4` set to 432 Hz.
 
 <a id="mts-esp-windows"></a>
 

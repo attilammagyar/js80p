@@ -236,8 +236,8 @@ class Voice : public SignalProducer
 
         static constexpr Tuning TUNING_440HZ_12TET = 0;
         static constexpr Tuning TUNING_432HZ_12TET = 1;
-        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 2;
-        static constexpr Tuning TUNING_MTS_ESP_REALTIME = 3;
+        static constexpr Tuning TUNING_MTS_ESP_CONTINUOUS = 2;
+        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 3;
 
         Voice(
             FrequencyTable const& frequencies,
