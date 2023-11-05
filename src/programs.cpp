@@ -3607,8 +3607,9 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "EF2LOG = 1.0\n"
             "ERTYP = 0.888888888888889\n"
             "ECTYP = 0.50\n"
-            "MOIA = 0.166666666666667\n"
-            "MOIS = 0.133333333333333\n"
+            "MOIA = 0.133333333333333\n"
+            "MOIS = 0.233333333333333\n"
+            "COIA = 0.150\n"
         )
     ),
 
@@ -3782,8 +3783,8 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "EF2LOG = 1.0\n"
             "ERTYP = 0.888888888888889\n"
             "ECTYP = 0.50\n"
-            "MOIA = 0.166666666666667\n"
-            "MOIS = 0.133333333333333\n"
+            "MOIA = 0.133333333333333\n"
+            "MOIS = 0.233333333333333\n"
             "COIA = 0.150\n"
         )
     ),
