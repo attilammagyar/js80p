@@ -1,6 +1,6 @@
-v2.4.0 (2023-11-05)
- * One-click switch between 440 Hz and 432 Hz equal temperament tunings,
-   support for microtonal and any other tunings via the MTS-ESP protocol.
+v2.4.0 (2023-11-06)
+ * Support for microtonal and any other tunings via MTS-ESP, one-click switch
+   between 440 Hz and 432 Hz equal temperament tunings.
  * Analog inaccuracy and instability emulation for oscillator pitch, and
    inaccuracy settings for filter frequency and Q factor, and envelope time and
    level.
