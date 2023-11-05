@@ -17,6 +17,8 @@
  */
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdio>
 #include <string>
 
 #include "test.cpp"
@@ -539,4 +541,33 @@ TEST(when_a_param_has_a_controller_then_its_own_value_is_omitted, {
     synth.process_messages();
 
     assert_eq(patch, Serializer::serialize(synth));
+})
+
+
+TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_current_tuning_is_kept, {
+    constexpr size_t serialized_modulator_tuning_length = 64;
+
+    Synth synth;
+    char serialized_modulator_tuning[serialized_modulator_tuning_length];
+    std::string patch = "";
+
+    snprintf(
+        serialized_modulator_tuning,
+        serialized_modulator_tuning_length,
+        "MTUN = %f",
+        (double)synth.modulator_params.tuning.value_to_ratio(Modulator::TUNING_432HZ_12TET)
+    );
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += serialized_modulator_tuning;
+    patch += Serializer::LINE_END;
+
+    synth.modulator_params.tuning.set_value(Modulator::TUNING_MTS_ESP_NOTE_ON);
+    synth.carrier_params.tuning.set_value(Carrier::TUNING_MTS_ESP_NOTE_ON);
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
+
+    assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.modulator_params.tuning.get_value());
+    assert_eq((int)Carrier::TUNING_MTS_ESP_NOTE_ON, (int)synth.carrier_params.tuning.get_value());
 })

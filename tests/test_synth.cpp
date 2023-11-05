@@ -557,6 +557,23 @@ TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
 })
 
 
+TEST(when_synth_state_is_cleared_then_tuning_is_restored, {
+    Synth synth;
+
+    synth.resume();
+
+    synth.modulator_params.tuning.set_value(Modulator::TUNING_432HZ_12TET);
+    synth.carrier_params.tuning.set_value(Carrier::TUNING_432HZ_12TET);
+
+    synth.push_message(CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0);
+
+    SignalProducer::produce<Synth>(synth, 1, 1);
+
+    assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.modulator_params.tuning.get_value());
+    assert_eq((int)Carrier::TUNING_432HZ_12TET, (int)synth.carrier_params.tuning.get_value());
+})
+
+
 TEST(effects, {
     constexpr Frequency sample_rate = 22050.0;
     constexpr Integer block_size = 2048;
@@ -1214,11 +1231,13 @@ TEST(tuning_can_be_updated_on_the_fly, {
     synth.modulator_params.volume.set_value(0.5);
     synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
     synth.modulator_params.width.set_value(0.0);
+    synth.modulator_params.tuning.set_value(Modulator::TUNING_440HZ_12TET);
 
     synth.carrier_params.amplitude.set_value(1.0);
     synth.carrier_params.volume.set_value(0.5);
     synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
     synth.carrier_params.width.set_value(0.0);
+    synth.carrier_params.tuning.set_value(Carrier::TUNING_440HZ_12TET);
 
     assert_false(synth.has_mts_esp_tuning());
     assert_false(synth.has_continuous_mts_esp_tuning());

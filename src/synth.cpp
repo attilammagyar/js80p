@@ -2839,7 +2839,10 @@ void Synth::handle_clear() noexcept
         ParamId const param_id = (ParamId)i;
 
         handle_assign_controller(param_id, no_controller);
-        handle_set_param(param_id, get_param_default_ratio(param_id));
+
+        if (param_id != ParamId::MTUN && param_id != ParamId::CTUN) {
+            handle_set_param(param_id, get_param_default_ratio(param_id));
+        }
     }
 }
 
