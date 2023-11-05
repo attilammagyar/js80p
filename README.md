@@ -228,13 +228,13 @@ the title bar of the oscillator. The following options are available:
 
  * `432 12TET`: 12 tone equal temperament with `A4` set to 432 Hz.
 
- * `MTS-ESP1`: query tuning information from an MTS-ESP tuning provider
+ * `MTS-ESP N`: query tuning information from an MTS-ESP tuning provider
    (usually another plugin) for evey `NOTE ON` MIDI event. Already sounding
    notes are kept unchanged. The tuning selector displays "`on`" when a tuning
    provider is available, and "`off`" when no tuning provider is found. In the
    latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
 
- * `MTS-ESP2`: continuously query information from an MTS-ESP tuning provider
+ * `MTS-ESP C`: continuously query information from an MTS-ESP tuning provider
    (usually another plugin) when at least one note is being played, and update
    the frequency of sounding notes that haven't reached the Release part of
    their volume envelopes, in real-time, on the fly. The tuning selector
