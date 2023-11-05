@@ -424,11 +424,7 @@ cairo_font_face_t* XcbPlatform::find_narrowest_font(
     returned font anyways.
     */
 
-    if (narrowest_font_face != NULL) {
-        return narrowest_font_face;
-    }
-
-    return NULL;
+    return narrowest_font_face;
 }
 
 
