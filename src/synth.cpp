@@ -766,16 +766,16 @@ bool Synth::has_mts_esp_tuning() const noexcept
     return (
         modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_NOTE_ON
         || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_NOTE_ON
-        || has_realtime_mts_esp_tuning()
+        || has_continuous_mts_esp_tuning()
     );
 }
 
 
-bool Synth::has_realtime_mts_esp_tuning() const noexcept
+bool Synth::has_continuous_mts_esp_tuning() const noexcept
 {
     return (
-        modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_REALTIME
-        || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_REALTIME
+        modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_CONTINUOUS
+        || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_CONTINUOUS
     );
 }
 
@@ -3662,9 +3662,9 @@ void Synth::Bus::render_voices(
         chain of the corresponding modulator.
         */
 
-        if (params.tuning.get_value() == VoiceClass::TUNING_MTS_ESP_REALTIME) {
+        if (params.tuning.get_value() == VoiceClass::TUNING_MTS_ESP_CONTINUOUS) {
             for (size_t v = 0; v != voices_count; ++v) {
-                voices[v]->template update_note_frequency_for_realtime_mts_esp<should_sync_oscillator_inaccuracy, should_sync_oscillator_instability>(round);
+                voices[v]->template update_note_frequency_for_continuous_mts_esp<should_sync_oscillator_inaccuracy, should_sync_oscillator_instability>(round);
             }
         }
 

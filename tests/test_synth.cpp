@@ -1221,15 +1221,15 @@ TEST(tuning_can_be_updated_on_the_fly, {
     synth.carrier_params.width.set_value(0.0);
 
     assert_false(synth.has_mts_esp_tuning());
-    assert_false(synth.has_realtime_mts_esp_tuning());
+    assert_false(synth.has_continuous_mts_esp_tuning());
 
     synth.modulator_params.tuning.set_value(Modulator::TUNING_MTS_ESP_NOTE_ON);
     assert_true(synth.has_mts_esp_tuning());
-    assert_false(synth.has_realtime_mts_esp_tuning());
+    assert_false(synth.has_continuous_mts_esp_tuning());
 
-    synth.modulator_params.tuning.set_value(Carrier::TUNING_MTS_ESP_REALTIME);
+    synth.modulator_params.tuning.set_value(Carrier::TUNING_MTS_ESP_CONTINUOUS);
     assert_true(synth.has_mts_esp_tuning());
-    assert_true(synth.has_realtime_mts_esp_tuning());
+    assert_true(synth.has_continuous_mts_esp_tuning());
 
     synth.note_on(0.0, channel, Midi::NOTE_A_2, 127);
     synth.note_on(0.0, channel, Midi::NOTE_A_3, 127);

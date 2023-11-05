@@ -69,7 +69,7 @@ class MtsEsp
 
         void update_active_notes_tuning()
         {
-            if (!synth.has_realtime_mts_esp_tuning()) {
+            if (!synth.has_continuous_mts_esp_tuning()) {
                 return;
             }
 

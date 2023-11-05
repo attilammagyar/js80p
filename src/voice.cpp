@@ -174,7 +174,7 @@ Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
         std::string const name
 ) noexcept
     : Param<Tuning, ParamEvaluation::BLOCK>(
-        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_REALTIME, TUNING_440HZ_12TET
+        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_CONTINUOUS, TUNING_440HZ_12TET
     )
 {
 }
@@ -1217,7 +1217,7 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 
 template<class ModulatorSignalProducerClass>
 template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
-void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept
+void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_continuous_mts_esp(Integer const round) noexcept
 {
     if (JS80P_UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
         return;

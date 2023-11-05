@@ -829,7 +829,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void resume() noexcept;
 
         bool has_mts_esp_tuning() const noexcept;
-        bool has_realtime_mts_esp_tuning() const noexcept;
+        bool has_continuous_mts_esp_tuning() const noexcept;
         bool is_mts_esp_connected() const noexcept;
         void mts_esp_connected() noexcept;
         void mts_esp_disconnected() noexcept;

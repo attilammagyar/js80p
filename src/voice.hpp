@@ -320,7 +320,7 @@ class Voice : public SignalProducer
         Number get_inaccuracy() const noexcept;
 
         template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
-        void update_note_frequency_for_realtime_mts_esp(Integer const round) noexcept;
+        void update_note_frequency_for_continuous_mts_esp(Integer const round) noexcept;
 
         template<bool should_sync_oscillator_inaccuracy>
         void update_unstable_note_frequency(Integer const round) noexcept;
