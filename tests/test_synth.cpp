@@ -546,12 +546,12 @@ TEST(when_synth_state_is_cleared_then_lfos_are_started_again, {
     synth.resume();
 
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
-    SignalProducer::produce<Synth>(synth, 1);
+    SignalProducer::produce<Synth>(synth, 1, 1);
     assert_true(synth.lfos[0]->is_on());
 
     synth.push_message(CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0);
     assign_controller(synth, Synth::ParamId::EEDRY, Synth::ControllerId::LFO_1);
-    SignalProducer::produce<Synth>(synth, 2);
+    SignalProducer::produce<Synth>(synth, 2, 1);
 
     assert_true(synth.lfos[0]->is_on());
 })
