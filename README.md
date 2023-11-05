@@ -643,6 +643,8 @@ Features
  * subharmonic sine wave for oscillator 1, distortion for oscillator 2
  * adjustable oscillator pitch inaccuracy and instability, for analog-like
    liveliness and warmth
+    * set the same inaccuracy or instability level for the two oscillators to
+      synchronize them within a single polyphonic voice
  * portamento
  * wavefolder
  * split keyboard
