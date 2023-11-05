@@ -118,6 +118,68 @@ Usage
  * It is recommended to use a small buffer size for lower latency, for example,
    3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
 
+Tuning
+------
+
+Each oscillator can be tuned separately by clicking on the tuning selector in
+the title bar of the oscillator. The following options are available:
+
+ * "440 12TET": the usual 12 tone equal temperament tuning where the "A4" MIDI
+   note is 440 Hz.
+
+ * "432 12TET": 12 tone equal temperament with "A4" set to 432 Hz.
+
+ * "MTS-ESP1": query tuning information from an MTS-ESP tuning provider
+   (usually another plugin) for evey "NOTE ON" MIDI event. Already sounding
+   notes are kept unchanged. The tuning selector displays "on" when a tuning
+   provider is available, and "off" when no tuning provider is found. In the
+   latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
+
+ * "MTS-ESP2": continuously query information from an MTS-ESP tuning provider
+   (usually another plugin) when at least one note is being played, and update
+   the frequency of sounding notes that haven't reached the Release part of
+   their volume envelopes, in real-time, on the fly. The tuning selector
+   displays "on" when a tuning provider is available, and "off" when no
+   tuning provider is found. In the latter case, notes will fall back to
+   440 Hz 12 tone equal temperament.
+
+Setting up MTS-ESP on Windows
+-----------------------------
+
+Download and install either the free MTS-ESP MINI plugin from
+https://oddsound.com/mtsespmini.php or the paid MTS-ESP SUITE plugin from
+https://oddsound.com/mtsespsuite.php by ODDSOUND. Follow the instuctions on
+the website, where you can also find the User Guide documentation for each
+product.
+
+Note: it is possible to use a different tuning provider without installing any
+of the above plugins, but you may have to manually download the "LIBMTS.dll"
+library from the ODDSound/MTS-ESP GitHub repository at
+https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win
+
+Put the downloaded "LIBMTS.dll" in a folder where Windows can find it:
+
+ * On 64 bit Windows:
+    * put the 64 bit DLL into the "Program Files\Common Files\MTS-ESP" folder,
+    * put the 32 bit DLL into the "Program Files (x86)\Common Files\MTS-ESP"
+      folder.
+ * On 32 bit Windows, put the 32 bit version of "LIBMTS.dll" into the
+   "Program Files\Common Files\MTS-ESP" folder.
+
+Setting up MTS-ESP on Linux
+---------------------------
+
+As of November, 2023, there is no official distribution of the MTS-ESP tuning
+provider plugins by ODDSOUND (https://oddsound.com/) for Linux, however, there
+are plugins which can act as a tuning provider, for example, Surge XT:
+https://surge-synthesizer.github.io/
+
+To use MTS-ESP, you may have to download the "libMTS.so" library from the
+ODDSound/MTS-ESP GitHub repository at
+https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux and put it in the
+"/usr/local/lib" directory, if it is not already installed on your system.
+As of November, 2023, "libMTS.so" is only available for "x86_64" Linux systems.
+
 Presets
 -------
 
