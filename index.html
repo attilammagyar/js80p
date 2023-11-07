@@ -223,10 +223,19 @@ small {
     <div id="home" class="main-section">
       <h1 class="center">JS80P</h1>
       <div class="center" id="tagline">
-        A MIDI driven, performance oriented, versatile synthesizer
+        A MIDI driven, performance oriented, versatile, free and open source
+        synthesizer VST plugin for Linux and Windows
       </div>
       <div class="center">
         <img src="js80p.png" alt="JS80P screenshot" />
+      </div>
+
+      <div class="center">
+        JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
+        effects, envelopes, LFOs, and powerful macros to shape your sound with
+        subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
+        monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
+        imperfection emulation.
       </div>
     </div>
 
@@ -341,7 +350,7 @@ small {
         <h3>What's New in v2.3.2</h3>
         <ul>
           <li><p>New preset: Dystopian Cathedral.</p></li>
-          <li><p>New parameter for the Modulator: subharmonic sine wave amplitude.</p></li>
+          <li><p>New parameter for the Modulator: sub-harmonic sine wave amplitude.</p></li>
           <li><p>New parameter for the Carrier: Distortion.</p></li>
           <li><p>Bugfix: fixed a crash when side chaining was turned on for the Reverb or
           Echo effects, and the Chorus effect got overloaded by too much feedback</p></li>
@@ -497,11 +506,11 @@ small {
         VST 2.4, then you have to download and install the FST version of JS80P.
         Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
 
-        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
+        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions" target="_blank">AVX instructions</a>
         and you use a 64 bit plugin host application, then you should download a JS80P
         package that is optimized for AVX compatible processors. If you have an older
         computer, or if you experience crashes, then you should go with one of the
-        <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
+        <a href="https://en.wikipedia.org/wiki/SSE2" target="_blank">SSE2</a> compatible JS80P packages.</p>
 
         <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
         then you have to download and install the VST 3 Single File version that
@@ -518,7 +527,7 @@ small {
           <li>
             <h4 id="install-vst3-bundle-windows">VST 3 Bundle on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
               usually <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
@@ -527,7 +536,7 @@ small {
           <li>
             <h4 id="install-vst3-bundle-linux">VST 3 Bundle on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
               usually <code>~/.vst3</code>.</li>
@@ -536,7 +545,7 @@ small {
           <li>
             <h4 id="install-vst3-single-file-windows">VST 3 Single File on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
               <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
@@ -545,7 +554,7 @@ small {
           <li>
             <h4 id="install-vst3-single-file-linux">VST 3 Single File on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
               <code>~/.vst3</code>.</li>
@@ -554,7 +563,7 @@ small {
           <li>
             <h4 id="install-fst-windows">FST (VST 2.4) on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.dll</code> file to the directory where you keep your VST 2.4
               plugins.</li>
@@ -563,7 +572,7 @@ small {
           <li>
             <h4 id="install-fst-linux">FST (VST 2.4) on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.so</code> file to the directory where you keep your VST 2.4
               plugins.</li>
@@ -627,7 +636,8 @@ small {
           </li>
           <li>
             <p>
-              <code>440 12TET</code>: the usual <a href="https://en.wikipedia.org/wiki/Equal_temperament">12 tone equal temperament</a>
+              <code>440 12TET</code>: the usual
+              <a href="https://en.wikipedia.org/wiki/Equal_temperament" target="_blank">12 tone equal temperament</a>
               tuning, where the <code>A4</code> MIDI note is 440 Hz.
             </p>
           </li>
@@ -639,15 +649,17 @@ small {
         </ul>
         <h4>Setting up MTS-ESP on Windows</h4>
         <p>
-          Download and install either the free <a href="https://oddsound.com/mtsespmini.php">MTS-ESP MINI</a>
-          plugin or the paid <a href="https://oddsound.com/mtsespsuite.php">MTS-ESP SUITE</a> plugin
-          by <a href="https://oddsound.com/">ODDSOUND</a>. Follow the instuctions on the website,
-          where you can also find the User Guide documentation for each product.
+          Download and install either the free
+          <a href="https://oddsound.com/mtsespmini.php" target="_blank">MTS-ESP Mini</a>
+          plugin or the paid <a href="https://oddsound.com/mtsespsuite.php" target="_blank">MTS-ESP Suite</a>
+          plugin by <a href="https://oddsound.com/" target="_blank">ODDSound</a>.
+          Follow the instuctions on the website, where you can also find the
+          User Guide documentation for each product.
         </p>
         <p>
           Note: it is possible to use a different tuning provider without installing any
           of the above plugins, but you may have to manually download the <code>LIBMTS.dll</code>
-          library from the <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win">ODDSound/MTS-ESP GitHub repository</a>,
+          library from the <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win" target="_blank">ODDSound/MTS-ESP GitHub repository</a>,
           and put it in a folder where Windows can find it:
         </p>
         <ul>
@@ -677,13 +689,13 @@ small {
         <h4>Setting up MTS-ESP on Linux</h4>
         <p>
           As of November, 2023, there is no official distribution of the MTS-ESP tuning
-          provider plugins by <a href="https://oddsound.com/">ODDSOUND</a> for Linux, however, there
+          provider plugins by <a href="https://oddsound.com/" target="_blank">ODDSound</a> for Linux, however, there
           are plugins which can act as a tuning provider, for example,
-          <a href="https://surge-synthesizer.github.io/">Surge XT</a>.
+          <a href="https://surge-synthesizer.github.io/" target="_blank">Surge XT</a>.
         </p>
         <p>
           To use MTS-ESP, you may have to download the <code>libMTS.so</code> library from the
-          <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux">ODDSound/MTS-ESP GitHub repository</a>,
+          <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux" target="_blank">ODDSound/MTS-ESP GitHub repository</a>,
           and put it in the <code>/usr/local/lib</code> directory, if it is not already installed on
           your system. As of November, 2023, <code>libMTS.so</code> is only available for <code>x86_64</code>
           Linux systems.
@@ -1016,87 +1028,92 @@ small {
       <div class="section">
         <h3>Features</h3>
         <ul>
-          <li>64 notes polyphony</li>
+          <li>64 notes polyphony.</li>
           <li>
-            last-note priority monophonic mode
+            Last-note priority monophonic mode.
             <ul>
-              <li>legato playing will either retrigger or smoothly glide to the next note,
-              depending on the portamento length setting</li>
+              <li>Legato playing will either retrigger or smoothly glide to the next note,
+              depending on the portamento length setting.</li>
             </ul>
           </li>
           <li>
             2 oscillators with 10 waveforms:
             <ul>
-              <li>sine</li>
-              <li>sawtooth</li>
-              <li>soft sawtooth</li>
-              <li>inverse sawtooth</li>
-              <li>soft inverse sawtooth</li>
-              <li>triangle</li>
-              <li>soft triangle</li>
-              <li>square</li>
-              <li>soft square</li>
-              <li>custom</li>
+              <li>sine,</li>
+              <li>sawtooth,</li>
+              <li>soft sawtooth,</li>
+              <li>inverse sawtooth,</li>
+              <li>soft inverse sawtooth,</li>
+              <li>triangle,</li>
+              <li>soft triangle,</li>
+              <li>square,</li>
+              <li>soft square,</li>
+              <li>custom.</li>
             </ul>
           </li>
           <li>
             2 filters for each oscillator, 7 filter types:
             <ul>
-              <li>low-pass</li>
-              <li>high-pass</li>
-              <li>band-pass</li>
-              <li>notch</li>
-              <li>bell (peaking)</li>
-              <li>low-shelf</li>
-              <li>high-shelf</li>
+              <li>low-pass,</li>
+              <li>high-pass,</li>
+              <li>band-pass,</li>
+              <li>notch,</li>
+              <li>bell (peaking),</li>
+              <li>low-shelf,</li>
+              <li>high-shelfa.</li>
             </ul>
           </li>
-          <li>subharmonic sine wave for oscillator 1, distortion for oscillator 2</li>
+          <li>Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.</li>
           <li>
-            adjustable oscillator pitch inaccuracy and instability, for analog-like
-            liveliness and warmth
+            Adjustable oscillator pitch inaccuracy and instability, for analog-like
+            liveliness and warmth.
             <ul>
-              <li>
-                set the same inaccuracy or instability level for the two oscillators to
-                synchronize them within a single polyphonic voice
-              </li>
+              <li>Set the same inaccuracy or instability level for the two
+              oscillators to synchronize their imperfections within a single
+              polyphonic voice, so that the effect will only occur between
+              multiple voices, but not between the oscillators within a single
+              voice.</li>
             </ul>
           </li>
-          <li>portamento</li>
-          <li>wavefolder</li>
-          <li>split keyboard</li>
-          <li>amplitude modulation</li>
-          <li>frequency modulation</li>
-          <li>phase modulation</li>
           <li>
-            built-in effects:
+            Microtuning support via the MTS-ESP tuning protocol by
+            <a href="https://oddsound.com/" target="_blank">ODDSound</a>.
+          </li>
+          <li>Portamento.</li>
+          <li>Wavefolder.</li>
+          <li>Split keyboard.</li>
+          <li>Amplitude modulation.</li>
+          <li>Frequency modulation.</li>
+          <li>Phase modulation.</li>
+          <li>
+            Built-in effects:
             <ul>
-              <li>overdrive</li>
-              <li>distortion</li>
-              <li>2 more filters</li>
-              <li>chorus</li>
-              <li>stereo echo (with side-chaining)</li>
-              <li>stereo reverb (with side-chaining)</li>
-              <li>volume controls at various points of the signal chain</li>
+              <li>overdrive,</li>
+              <li>distortion,</li>
+              <li>2 more filters,</li>
+              <li>chorus,</li>
+              <li>stereo echo (with side-chaining),</li>
+              <li>stereo reverb (with side-chaining),</li>
+              <li>volume controls at various points of the signal chain.</li>
             </ul>
           </li>
-          <li>6 envelopes</li>
-          <li>8 low-frequency oscillators (LFO)</li>
-          <li>filter and envelope imperfection settings for analog-like feel</li>
-          <li>MIDI controllers and macros</li>
-          <li>channel pressure (aftertouch)</li>
-          <li>MIDI learn</li>
-          <li>logarithmic or linear scale filter frequencies</li>
-          <li>LFO and effects tempo synchronization</li>
+          <li>6 envelopes.</li>
+          <li>8 low-frequency oscillators (LFO).</li>
+          <li>Filter and envelope imperfection settings for analog-like feel.</li>
+          <li>MIDI controllers and macros.</li>
+          <li>Channel pressure (aftertouch).</li>
+          <li>MIDI learn.</li>
+          <li>Logarithmic or linear scale filter frequencies.</li>
+          <li>Tempo synchronization for LFOs and effects.</li>
           <li>
-            use the peak level at various points of the signal chain to control
+            Use the peak level at various points of the signal chain to control
             parameters:
             <ul>
-              <li>oscillator 1 output</li>
-              <li>oscillator 2 output</li>
-              <li>volume control 1 input</li>
-              <li>volume control 2 input</li>
-              <li>volume control 3 input</li>
+              <li>oscillator 1 output,</li>
+              <li>oscillator 2 output,</li>
+              <li>volume control 1 input,</li>
+              <li>volume control 2 input,</li>
+              <li>volume control 3 input.</li>
             </ul>
           </li>
         </ul>
@@ -1135,11 +1152,11 @@ small {
         VST 2.4, then you have to download and install the FST version of JS80P.
         Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
 
-        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
+        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions" target="_blank">AVX instructions</a>
         and you use a 64 bit plugin host application, then you should download a JS80P
         package that is optimized for AVX compatible processors. If you have an older
         computer, or if you experience crashes, then you should go with one of the
-        <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
+        <a href="https://en.wikipedia.org/wiki/SSE2" target="_blank">SSE2</a> compatible JS80P packages.</p>
 
         <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
         then you have to download and install the VST 3 Single File version that
@@ -1220,9 +1237,10 @@ small {
         <h3>How can parameters be automated? What parameters does the plugin export?</h3>
 
         <p>The intended way of automating JS80P's parameters is to assign a
-        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2">MIDI Control Change</a> (MIDI CC) message to a parameter (or use <em>MIDI
-        Learn</em>), and turn the corresponding knob on your MIDI keyboard while playing,
-        or edit the MIDI CC events in your host application's MIDI editor.</p>
+        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change</a>
+        (MIDI CC) message to a parameter (or use <em>MIDI Learn</em>), and turn
+        the corresponding knob on your MIDI keyboard while playing, or edit the
+        MIDI CC events in your host application's MIDI editor.</p>
 
         <p>However, the VST 3 plugin format requires plugins to export a proxy parameter
         for each MIDI CC message that they want to receive, and as a side-effect, these
@@ -1253,9 +1271,9 @@ small {
         <h3>Where does the name come from?</h3>
         <p>
           In 2022, I started developing a browser-based synthesizer using the
-          <a href="https://www.w3.org/TR/webaudio/">Web Audio API</a>, mostly being
-          inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80">Yamaha CS-80</a>.
-          I named that project <a href="https://attilammagyar.github.io/toys/js-80/">JS-80</a>.
+          <a href="https://www.w3.org/TR/webaudio/" target="_blank">Web Audio API</a>, mostly being
+          inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80" target="_blank">Yamaha CS-80</a>.
+          I named that project <a href="https://attilammagyar.github.io/toys/js-80/" target="_blank">JS-80</a>.
           Then I started adding one little feature and customization option after the
           other, then it got out of hand, and I also started finding limitations of
           doing audio in the browser. So I decided to implement a cleaned up version
@@ -1267,10 +1285,10 @@ small {
       <div class="section" id="faq-flstudio-midicc">
         <h3>FL Studio: How to assign a MIDI CC to a JS80P parameter?</h3>
 
-        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/">Reaper</a>),
-        <a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI events that
+        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/" target="_blank">Reaper</a>),
+        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a> does not send all MIDI events that
         come out of your MIDI keyboard to plugins, and unfortunately,
-        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2">MIDI Control Change (MIDI CC)</a>
+        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a>
         messages are among the kinds of MIDI data that it swallows. To make
         everything work, you have to assign the MIDI CC events to a plugin
         parameter.</p>
@@ -1300,8 +1318,8 @@ small {
       <div class="section" id="faq-flstudio-aftertouch">
         <h3>FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?</h3>
 
-        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/">Reaper</a>),
-        <a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI events that
+        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/" target="_blank">Reaper</a>),
+        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a> does not send all MIDI events that
         come out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
         known as Channel Aftertouch)  messages are among the kinds MIDI data that it
         swallows.</p>
@@ -1329,12 +1347,25 @@ small {
         <h3>FL Studio: How to use the Sustain Pedal?</h3>
 
         <p>Unlike decent audio software (like for example
-        <a href="https://www.reaper.fm/">REAPER</a>), <a href="https://www.image-line.com/fl-studio/">FL Studio</a>
+        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
+        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
         does not send all MIDI events that come out of your MIDI keyboard to plugins,
-        and unfortunately, the <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2">MIDI Control Change (MIDI CC)</a> message which
-        contains information about the sustain pedal's state is among the kinds of MIDI
-        data that it swallows. To make everything work, you have to assign the sustain
-        pedal's MIDI CC events to the plugin parameter where JS80P expects them.</p>
+        and unfortunately, the
+        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a>
+        message which contains information about the sustain pedal's state is
+        among the kinds of MIDI data that it swallows.</p>
+
+        <p>To add insult to injury, it pretends that it notifies the plugin
+        about the pedal's state, but in reality, it just defers sending
+        <code>NOTE OFF</code> events until the pedal is released. This might
+        give the desired effect in some cases, but it breaks patches that
+        assign additional functionality to the pedal besides sustaining
+        notes.</p>
+
+        <p>To make everything work, you have to assign the sustain pedal's MIDI
+        CC events to the plugin parameter where JS80P expects them, and you
+        have to turn off FL Studio's default behavior of handling the pedal on
+        behalf of plugins.</p>
 
         <ol>
           <li><p>Open "<em>Options / MIDI settings</em>" from the main menu.</p></li>
