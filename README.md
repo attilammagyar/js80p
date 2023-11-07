@@ -82,7 +82,7 @@ Table of Contents
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
- * [Frequenctly Asked Questions](#faq)
+ * [Frequently Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
     * [Parameters, Envelopes, and polyphony: how do they work?](#faq-params-polyphony)
@@ -690,8 +690,10 @@ Features
     * volume control 2 input,
     * volume control 3 input.
 
-Frequenctly Asked Questions
----------------------------
+<a id="faq" href="#toc">Table of Contents</a>
+
+Frequently Asked Questions
+--------------------------
 
 <a id="faq-which"></a>
 
