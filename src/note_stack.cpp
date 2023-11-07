@@ -31,7 +31,7 @@ Midi::Word NoteStack::encode(
     Midi::Channel const channel,
     Midi::Note const note
 ) noexcept {
-    return ((channel & 0x0f) << 8) | note;
+    return ((channel & 0x0f) << 8) | (note & 0xff);
 }
 
 

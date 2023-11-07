@@ -119,9 +119,9 @@ TEST(note_stack_is_created_empty, {
 TEST(when_a_note_is_pushed_on_the_stack_then_stack_is_no_longer_empty_and_the_note_is_on_the_top, {
     NoteStack note_stack;
 
-    note_stack.push(5, Midi::NOTE_A_3, 0.5);
+    note_stack.push(15, Midi::NOTE_A_3, 0.5);
 
-    assert_pop(5, Midi::NOTE_A_3, 0.5, 0, Midi::INVALID_NOTE, 0.0, note_stack);
+    assert_pop(15, Midi::NOTE_A_3, 0.5, 0, Midi::INVALID_NOTE, 0.0, note_stack);
     assert_empty(note_stack);
 })
 

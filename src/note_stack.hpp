@@ -56,7 +56,7 @@ class NoteStack
     private:
         static constexpr Midi::Word INVALID_ITEM = Midi::INVALID_NOTE;
 
-        static constexpr size_t ITEMS = Midi::CHANNELS * Midi::NOTES;
+        static constexpr size_t ITEMS = Midi::CHANNELS << 8;
 
         static Midi::Word encode(
             Midi::Channel const channel,
