@@ -1,3 +1,8 @@
+v2.4.1 (2023-11-07)
+ * Bugfix: fixed a potential crash or memory corruption when MIDI channel
+   number is greater than 8.
+ * Bugfix: fixed several typos in the documentation.
+
 v2.4.0 (2023-11-06)
  * Support for microtonal and any other tunings via MTS-ESP, one-click switch
    between 440 Hz and 432 Hz equal temperament tunings.
