@@ -1,14 +1,21 @@
 JS80P
 =====
 
-A MIDI driven, performance oriented, versatile [synthesizer VST plugin][plugin].
+JS80P is a MIDI driven, performance oriented, versatile, free and open source
+[synthesizer VST plugin][plugin] for Linux and Windows.
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
+<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
+
+JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
+effects, envelopes, LFOs, and powerful macros to shape your sound with
+subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
+monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
+imperfection emulation.
+
 To download JS80P, visit its website at
 [https://attilammagyar.github.io/js80p/](https://attilammagyar.github.io/js80p/).
-
-<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
 
 The source code is available at
 [https://github.com/attilammagyar/js80p](https://github.com/attilammagyar/js80p)
@@ -147,7 +154,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Bundle on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
@@ -156,7 +163,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Bundle on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `~/.vst3`.
@@ -165,7 +172,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Single File on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
@@ -174,7 +181,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Single File on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
@@ -183,7 +190,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### FST (VST 2.4) on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
    plugins.
@@ -192,7 +199,7 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### FST (VST 2.4) on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/).
+1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
    plugins.
@@ -221,7 +228,11 @@ Tuning
 ------
 
 Each oscillator can be tuned separately by clicking on the tuning selector in
-the title bar of the oscillator. The following options are available:
+the title bar of the oscillator, allowing maximum flexibility; for example, you
+can have continuously updated tuning for one oscillator, and have the other
+update its frequency tables only for `NOTE ON` events.
+
+The following tuning options are available:
 
  * `MTS-ESP C`: continuously query information from an MTS-ESP tuning provider
    (usually another plugin) when at least one note is playing, and update the
@@ -246,9 +257,9 @@ the title bar of the oscillator. The following options are available:
 
 ### Setting up MTS-ESP on Windows
 
-Download and install either the free [MTS-ESP MINI](https://oddsound.com/mtsespmini.php)
-plugin or the paid [MTS-ESP SUITE](https://oddsound.com/mtsespsuite.php) plugin
-by [ODDSOUND](https://oddsound.com/). Follow the instuctions on the website,
+Download and install either the free [MTS-ESP Mini](https://oddsound.com/mtsespmini.php)
+plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
+by [ODDSound](https://oddsound.com/). Follow the instuctions on the website,
 where you can also find the User Guide documentation for each product.
 
 Note: it is possible to use a different tuning provider without installing any
@@ -268,7 +279,7 @@ and put it in a folder where Windows can find it:
 ### Setting up MTS-ESP on Linux
 
 As of November, 2023, there is no official distribution of the MTS-ESP tuning
-provider plugins by [ODDSOUND](https://oddsound.com/) for Linux, however, there
+provider plugins by [ODDSound](https://oddsound.com/) for Linux, however, there
 are plugins which can act as a tuning provider, for example,
 [Surge XT](https://surge-synthesizer.github.io/).
 
@@ -617,63 +628,67 @@ Signal Chain (Simplified)
 Features
 --------
 
- * 64 notes polyphony
- * last-note priority monophonic mode
-    * legato playing will either retrigger or smoothly glide to the next note,
-      depending on the portamento length setting
+ * 64 notes polyphony.
+ * Last-note priority monophonic mode.
+    * Legato playing will either retrigger or smoothly glide to the next note,
+      depending on the portamento length setting.
  * 2 oscillators with 10 waveforms:
-    * sine
-    * sawtooth
-    * soft sawtooth
-    * inverse sawtooth
-    * soft inverse sawtooth
-    * triangle
-    * soft triangle
-    * square
-    * soft square
-    * custom
+    * sine,
+    * sawtooth,
+    * soft sawtooth,
+    * inverse sawtooth,
+    * soft inverse sawtooth,
+    * triangle,
+    * soft triangle,
+    * square,
+    * soft square,
+    * custom.
  * 2 filters for each oscillator, 7 filter types:
-    * low-pass
-    * high-pass
-    * band-pass
-    * notch
-    * bell (peaking)
-    * low-shelf
-    * high-shelf
- * subharmonic sine wave for oscillator 1, distortion for oscillator 2
- * adjustable oscillator pitch inaccuracy and instability, for analog-like
-   liveliness and warmth
-    * set the same inaccuracy or instability level for the two oscillators to
-      synchronize them within a single polyphonic voice
- * portamento
- * wavefolder
- * split keyboard
- * amplitude modulation
- * frequency modulation
- * phase modulation
- * built-in effects:
-    * overdrive
-    * distortion
-    * 2 more filters
-    * chorus
-    * stereo echo (with side-chaining)
-    * stereo reverb (with side-chaining)
-    * volume controls at various points of the signal chain
- * 6 envelopes
- * 8 low-frequency oscillators (LFO)
- * filter and envelope imperfection settings for analog-like feel
- * MIDI controllers and macros
- * channel pressure (aftertouch)
- * MIDI learn
- * logarithmic or linear scale filter frequencies
- * LFO and effects tempo synchronization
- * use the peak level at various points of the signal chain to control
+    * low-pass,
+    * high-pass,
+    * band-pass,
+    * notch,
+    * bell (peaking),
+    * low-shelf,
+    * high-shelfa.
+ * Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.
+ * Adjustable oscillator pitch inaccuracy and instability, for analog-like
+   liveliness and warmth.
+    * Set the same inaccuracy or instability level for the two oscillators to
+      synchronize their imperfections within a single polyphonic voice, so that
+      the effect will only occur between multiple voices, but not between the
+      oscillators within a single voice.
+ * Microtuning support via the MTS-ESP tuning protocol by
+   [ODDSound](https://oddsound.com/).
+ * Portamento.
+ * Wavefolder.
+ * Split keyboard.
+ * Amplitude modulation.
+ * Frequency modulation.
+ * Phase modulation.
+ * Built-in effects:
+    * overdrive,
+    * distortion,
+    * 2 more filters,
+    * chorus,
+    * stereo echo (with side-chaining),
+    * stereo reverb (with side-chaining),
+    * volume controls at various points of the signal chain.
+ * 6 envelopes.
+ * 8 low-frequency oscillators (LFO).
+ * Filter and envelope imperfection settings for analog-like feel.
+ * MIDI controllers and macros.
+ * Channel pressure (aftertouch).
+ * MIDI learn.
+ * Logarithmic or linear scale filter frequencies.
+ * Tempo synchronization for LFOs and effects.
+ * Use the peak level at various points of the signal chain to control
    parameters:
-    * oscillator 1 output
-    * oscillator 2 output
-    * volume control 1 input
-    * volume control 2 input
-    * volume control 3 input
+    * oscillator 1 output,
+    * oscillator 2 output,
+    * volume control 1 input,
+    * volume control 2 input,
+    * volume control 3 input.
 
 Frequenctly Asked Questions
 ---------------------------
@@ -895,8 +910,17 @@ Unlike decent audio software (like for example
 does not send all MIDI events that come out of your MIDI keyboard to plugins,
 and unfortunately, the [MIDI Control Change (MIDI CC)][midicc2] message which
 contains information about the sustain pedal's state is among the kinds of MIDI
-data that it swallows. To make everything work, you have to assign the sustain
-pedal's MIDI CC events to the plugin parameter where JS80P expects them.
+data that it swallows.
+
+To add insult to injury, it pretends that it notifies the plugin about the
+pedal's state, but in reality, it just defers sending `NOTE OFF` events until
+the pedal is released. This might give the desired effect in some cases, but it
+breaks patches that assign additional functionality to the pedal besides
+sustaining notes.
+
+To make everything work, you have to assign the sustain pedal's MIDI CC events
+to the plugin parameter where JS80P expects them, and you have to turn off
+FL Studio's default behavior of handling the pedal on behalf of plugins.
 
   [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
 
