@@ -650,7 +650,7 @@ Features
     * notch,
     * bell (peaking),
     * low-shelf,
-    * high-shelfa.
+    * high-shelf.
  * Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.
  * Adjustable oscillator pitch inaccuracy and instability, for analog-like
    liveliness and warmth.
