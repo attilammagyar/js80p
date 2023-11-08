@@ -37,8 +37,8 @@ OBJ_GUI_EXTRA = \
 	$(LIB_PATH)/libxcb.so \
 	$(LIB_PATH)/libxcb-render.so \
 	$(BUILD_DIR)/img_about.o \
-	$(BUILD_DIR)/img_controllers1.o \
-	$(BUILD_DIR)/img_controllers2.o \
+	$(BUILD_DIR)/img_macros1.o \
+	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_effects.o \
 	$(BUILD_DIR)/img_envelopes.o \
 	$(BUILD_DIR)/img_knob_states-controlled.o \
@@ -67,10 +67,10 @@ $(LIB_PATH)/libxcb-render.so: $(SYS_LIB_PATH)/libxcb-render.so.0 | $(LIB_PATH)
 $(BUILD_DIR)/img_about.o: gui/img/about.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
-$(BUILD_DIR)/img_controllers1.o: gui/img/controllers1.png | $(BUILD_DIR)
+$(BUILD_DIR)/img_macros1.o: gui/img/macros1.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
-$(BUILD_DIR)/img_controllers2.o: gui/img/controllers2.png | $(BUILD_DIR)
+$(BUILD_DIR)/img_macros2.o: gui/img/macros2.png | $(BUILD_DIR)
 	$(OBJCOPY) $< $@
 
 $(BUILD_DIR)/img_effects.o: gui/img/effects.png | $(BUILD_DIR)

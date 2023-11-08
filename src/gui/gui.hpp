@@ -224,8 +224,8 @@ class GUI
         void destroy();
 
         void build_about_body(char const* sdk_version);
-        void build_controllers_1_body(KnobStates* knob_states);
-        void build_controllers_2_body(KnobStates* knob_states);
+        void build_macros_1_body(KnobStates* knob_states);
+        void build_macros_2_body(KnobStates* knob_states);
         void build_effects_body(KnobStates* knob_states);
         void build_envelopes_body(KnobStates* knob_states, KnobStates* screw_states);
         void build_lfos_body(KnobStates* knob_states);
@@ -236,8 +236,8 @@ class GUI
         Widget* dummy_widget;
 
         Image about_image;
-        Image controllers_1_image;
-        Image controllers_2_image;
+        Image macros_1_image;
+        Image macros_2_image;
         Image effects_image;
         Image envelopes_image;
         Image lfos_image;
@@ -249,8 +249,8 @@ class GUI
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
-        TabBody* controllers_1_body;
-        TabBody* controllers_2_body;
+        TabBody* macros_1_body;
+        TabBody* macros_2_body;
         TabBody* effects_body;
         TabBody* envelopes_body;
         TabBody* lfos_body;

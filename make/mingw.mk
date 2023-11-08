@@ -24,8 +24,8 @@ GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
 
 GUI_IMAGES = \
 	gui/img/about.bmp \
-	gui/img/controllers1.bmp \
-	gui/img/controllers2.bmp \
+	gui/img/macros1.bmp \
+	gui/img/macros2.bmp \
 	gui/img/effects.bmp \
 	gui/img/envelopes.bmp \
 	gui/img/knob_states-controlled.bmp \
