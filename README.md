@@ -697,7 +697,7 @@ Features
     * stereo echo (with side-chaining),
     * stereo reverb (with side-chaining),
     * volume controls at various points of the signal chain.
- * 6 envelopes.
+ * 12 envelopes.
  * 8 low-frequency oscillators (LFO).
  * Filter and envelope imperfection settings for analog-like feel.
  * MIDI controllers and macros.

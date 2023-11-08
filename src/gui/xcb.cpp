@@ -45,8 +45,10 @@ extern unsigned char _binary_gui_img_macros2_png_start;
 extern unsigned char _binary_gui_img_macros2_png_end;
 extern unsigned char _binary_gui_img_effects_png_start;
 extern unsigned char _binary_gui_img_effects_png_end;
-extern unsigned char _binary_gui_img_envelopes_png_start;
-extern unsigned char _binary_gui_img_envelopes_png_end;
+extern unsigned char _binary_gui_img_envelopes1_png_start;
+extern unsigned char _binary_gui_img_envelopes1_png_end;
+extern unsigned char _binary_gui_img_envelopes2_png_start;
+extern unsigned char _binary_gui_img_envelopes2_png_end;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_start;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_end;
 extern unsigned char _binary_gui_img_knob_states_free_png_start;
@@ -101,10 +103,17 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         )
     },
     {
-        "ENVELOPES",
+        "ENVELOPES1",
         Widget::Resource(
-            &_binary_gui_img_envelopes_png_start,
-            &_binary_gui_img_envelopes_png_end
+            &_binary_gui_img_envelopes1_png_start,
+            &_binary_gui_img_envelopes1_png_end
+        )
+    },
+    {
+        "ENVELOPES2",
+        Widget::Resource(
+            &_binary_gui_img_envelopes2_png_start,
+            &_binary_gui_img_envelopes2_png_end
         )
     },
     {

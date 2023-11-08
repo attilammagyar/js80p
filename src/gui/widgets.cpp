@@ -346,7 +346,7 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
 
         top += Controller::HEIGHT;
 
-        if (top > max_top) {
+        if (top > max_top || id == Synth::ControllerId::MACRO_10) {
             top = TITLE_HEIGHT;
             left += Controller::WIDTH;
         }

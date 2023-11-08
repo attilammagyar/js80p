@@ -599,6 +599,12 @@ void Synth::create_envelopes() noexcept
     register_param_as_child<ToggleParam>(ParamId::N4DYN, envelopes_rw[3]->dynamic);
     register_param_as_child<ToggleParam>(ParamId::N5DYN, envelopes_rw[4]->dynamic);
     register_param_as_child<ToggleParam>(ParamId::N6DYN, envelopes_rw[5]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N7DYN, envelopes_rw[6]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N8DYN, envelopes_rw[7]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N9DYN, envelopes_rw[8]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N10DYN, envelopes_rw[9]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N11DYN, envelopes_rw[10]->dynamic);
+    register_param_as_child<ToggleParam>(ParamId::N12DYN, envelopes_rw[11]->dynamic);
 }
 
 
@@ -1344,7 +1350,10 @@ bool Synth::is_supported_midi_controller(
 
 bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
 {
-    return controller_id >= ControllerId::ENVELOPE_1 && controller_id <= ControllerId::ENVELOPE_6;
+    return (
+        (controller_id >= ControllerId::ENVELOPE_1 && controller_id <= ControllerId::ENVELOPE_6)
+        || (controller_id >= ControllerId::ENVELOPE_7 && controller_id <= ControllerId::ENVELOPE_12)
+    );
 }
 
 
@@ -1506,7 +1515,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_default_ratio();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -1704,6 +1713,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_default_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_default_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_default_ratio();
+        case ParamId::N7DYN: return envelopes_rw[6]->dynamic.get_default_ratio();
+        case ParamId::N8DYN: return envelopes_rw[7]->dynamic.get_default_ratio();
+        case ParamId::N9DYN: return envelopes_rw[8]->dynamic.get_default_ratio();
+        case ParamId::N10DYN: return envelopes_rw[9]->dynamic.get_default_ratio();
+        case ParamId::N11DYN: return envelopes_rw[10]->dynamic.get_default_ratio();
+        case ParamId::N12DYN: return envelopes_rw[11]->dynamic.get_default_ratio();
         case ParamId::POLY: return polyphonic.get_default_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_default_ratio();
         case ParamId::ECTYP: return effects.chorus.type.get_default_ratio();
@@ -1746,7 +1761,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_max_value();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -1944,6 +1959,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_max_value();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_max_value();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_max_value();
+        case ParamId::N7DYN: return envelopes_rw[6]->dynamic.get_max_value();
+        case ParamId::N8DYN: return envelopes_rw[7]->dynamic.get_max_value();
+        case ParamId::N9DYN: return envelopes_rw[8]->dynamic.get_max_value();
+        case ParamId::N10DYN: return envelopes_rw[9]->dynamic.get_max_value();
+        case ParamId::N11DYN: return envelopes_rw[10]->dynamic.get_max_value();
+        case ParamId::N12DYN: return envelopes_rw[11]->dynamic.get_max_value();
         case ParamId::POLY: return polyphonic.get_max_value();
         case ParamId::ERTYP: return effects.reverb.type.get_max_value();
         case ParamId::ECTYP: return effects.chorus.type.get_max_value();
@@ -1982,7 +2003,7 @@ Number Synth::float_param_ratio_to_display_value(
             case 5: return macros_rw[macro_idx]->randomness.ratio_to_value(ratio);
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -2192,6 +2213,12 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.ratio_to_value(ratio);
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.ratio_to_value(ratio);
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.ratio_to_value(ratio);
+        case ParamId::N7DYN: return envelopes_rw[6]->dynamic.ratio_to_value(ratio);
+        case ParamId::N8DYN: return envelopes_rw[7]->dynamic.ratio_to_value(ratio);
+        case ParamId::N9DYN: return envelopes_rw[8]->dynamic.ratio_to_value(ratio);
+        case ParamId::N10DYN: return envelopes_rw[9]->dynamic.ratio_to_value(ratio);
+        case ParamId::N11DYN: return envelopes_rw[10]->dynamic.ratio_to_value(ratio);
+        case ParamId::N12DYN: return envelopes_rw[11]->dynamic.ratio_to_value(ratio);
         case ParamId::POLY: return polyphonic.ratio_to_value(ratio);
         case ParamId::ERTYP: return effects.reverb.type.ratio_to_value(ratio);
         case ParamId::ECTYP: return effects.chorus.type.ratio_to_value(ratio);
@@ -2529,7 +2556,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case 5: macros_rw[macro_idx]->randomness.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -2726,6 +2753,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::N4DYN: envelopes_rw[3]->dynamic.set_ratio(ratio); break;
             case ParamId::N5DYN: envelopes_rw[4]->dynamic.set_ratio(ratio); break;
             case ParamId::N6DYN: envelopes_rw[5]->dynamic.set_ratio(ratio); break;
+            case ParamId::N7DYN: envelopes_rw[6]->dynamic.set_ratio(ratio); break;
+            case ParamId::N8DYN: envelopes_rw[7]->dynamic.set_ratio(ratio); break;
+            case ParamId::N9DYN: envelopes_rw[8]->dynamic.set_ratio(ratio); break;
+            case ParamId::N10DYN: envelopes_rw[9]->dynamic.set_ratio(ratio); break;
+            case ParamId::N11DYN: envelopes_rw[10]->dynamic.set_ratio(ratio); break;
+            case ParamId::N12DYN: envelopes_rw[11]->dynamic.set_ratio(ratio); break;
             case ParamId::POLY: polyphonic.set_ratio(ratio); break;
             case ParamId::ERTYP: effects.reverb.type.set_ratio(ratio); break;
             case ParamId::ECTYP: effects.chorus.type.set_ratio(ratio); break;
@@ -2770,7 +2803,7 @@ void Synth::handle_assign_controller(
             case 5: is_assigned = assign_controller<FloatParamB>(macros_rw[macro_idx]->randomness, ctl_id); break;
             default: break; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -3019,6 +3052,12 @@ bool Synth::assign_controller_to_discrete_param(
         case ENVELOPE_4:
         case ENVELOPE_5:
         case ENVELOPE_6:
+        case ENVELOPE_7:
+        case ENVELOPE_8:
+        case ENVELOPE_9:
+        case ENVELOPE_10:
+        case ENVELOPE_11:
+        case ENVELOPE_12:
             break;
 
         case CHANNEL_PRESSURE: break;
@@ -3216,6 +3255,12 @@ bool Synth::assign_controller(
         case ENVELOPE_4: param.set_envelope(envelopes[3]); return true;
         case ENVELOPE_5: param.set_envelope(envelopes[4]); return true;
         case ENVELOPE_6: param.set_envelope(envelopes[5]); return true;
+        case ENVELOPE_7: param.set_envelope(envelopes[6]); return true;
+        case ENVELOPE_8: param.set_envelope(envelopes[7]); return true;
+        case ENVELOPE_9: param.set_envelope(envelopes[8]); return true;
+        case ENVELOPE_10: param.set_envelope(envelopes[9]); return true;
+        case ENVELOPE_11: param.set_envelope(envelopes[10]); return true;
+        case ENVELOPE_12: param.set_envelope(envelopes[11]); return true;
 
         case CHANNEL_PRESSURE: param.set_midi_controller(&channel_pressure_ctl); return true;
 
@@ -3258,7 +3303,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
             case 5: return macros_rw[macro_idx]->randomness.get_ratio();
             default: return 0.0; /* This should never be reached. */
         }
-    } else if (ParamId::N1AMT <= param_id && param_id <= N6VIN) {
+    } else if (ParamId::N1AMT <= param_id && param_id <= N12VIN) {
         int const offset = (int)param_id - (int)ParamId::N1AMT;
         int const envelope_idx = offset / ENVELOPE_FLOAT_PARAMS;
         int const param_idx = offset % ENVELOPE_FLOAT_PARAMS;
@@ -3456,6 +3501,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::N4DYN: return envelopes_rw[3]->dynamic.get_ratio();
         case ParamId::N5DYN: return envelopes_rw[4]->dynamic.get_ratio();
         case ParamId::N6DYN: return envelopes_rw[5]->dynamic.get_ratio();
+        case ParamId::N7DYN: return envelopes_rw[6]->dynamic.get_ratio();
+        case ParamId::N8DYN: return envelopes_rw[7]->dynamic.get_ratio();
+        case ParamId::N9DYN: return envelopes_rw[8]->dynamic.get_ratio();
+        case ParamId::N10DYN: return envelopes_rw[9]->dynamic.get_ratio();
+        case ParamId::N11DYN: return envelopes_rw[10]->dynamic.get_ratio();
+        case ParamId::N12DYN: return envelopes_rw[11]->dynamic.get_ratio();
         case ParamId::POLY: return polyphonic.get_ratio();
         case ParamId::ERTYP: return effects.reverb.type.get_ratio();
         case ParamId::ECTYP: return effects.chorus.type.get_ratio();

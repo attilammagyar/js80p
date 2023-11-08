@@ -95,7 +95,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int CONTROLLERS_COUNT = 115;
+        static constexpr int CONTROLLERS_COUNT = 121;
 
         static char const* const MODES[];
         static int const MODES_COUNT;
@@ -228,7 +228,8 @@ class GUI
         void build_macros_1_body(KnobStates* knob_states);
         void build_macros_2_body(KnobStates* knob_states);
         void build_effects_body(KnobStates* knob_states);
-        void build_envelopes_body(KnobStates* knob_states, KnobStates* screw_states);
+        void build_envelopes_1_body(KnobStates* knob_states, KnobStates* screw_states);
+        void build_envelopes_2_body(KnobStates* knob_states, KnobStates* screw_states);
         void build_lfos_body(KnobStates* knob_states);
         void build_synth_body(KnobStates* knob_states, KnobStates* screw_states);
 
@@ -240,7 +241,8 @@ class GUI
         Image macros_1_image;
         Image macros_2_image;
         Image effects_image;
-        Image envelopes_image;
+        Image envelopes_1_image;
+        Image envelopes_2_image;
         Image lfos_image;
         Image synth_image;
         Image vst_logo_image;
@@ -253,7 +255,8 @@ class GUI
         TabBody* macros_1_body;
         TabBody* macros_2_body;
         TabBody* effects_body;
-        TabBody* envelopes_body;
+        TabBody* envelopes_1_body;
+        TabBody* envelopes_2_body;
         TabBody* lfos_body;
         TabBody* synth_body;
         StatusLine* status_line;
