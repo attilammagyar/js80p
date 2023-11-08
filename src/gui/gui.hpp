@@ -39,6 +39,7 @@ class KnobParamEditor;
 class StatusLine;
 class TabBody;
 class TabSelector;
+class TextBoxParamEditor;
 class ToggleSwitch;
 class TuningSelector;
 class Widget;
@@ -56,7 +57,7 @@ class GUI
 
         typedef std::vector<KnobParamEditor*> KnobParamEditors;
         typedef std::vector<ToggleSwitch*> ToggleSwitches;
-        typedef std::vector<TuningSelector*> TuningSelectors;
+        typedef std::vector<TextBoxParamEditor*> TextBoxParamEditors;
 
         typedef unsigned int Color;
         typedef unsigned char ColorComponent;
@@ -283,7 +284,7 @@ class WidgetBase
             ABOUT_TEXT = 1 << 10,
             STATUS_LINE = 1 << 11,
             TOGGLE_SWITCH = 1 << 12,
-            TUNING_SELECTOR = 1 << 13,
+            TEXT_BOX_PARAM_EDITOR = 1 << 13,
         };
 
         enum TextAlignment {

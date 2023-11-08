@@ -123,7 +123,7 @@ class TabBody : public TransparentWidget
 
         KnobParamEditor* own(KnobParamEditor* knob_param_editor);
         ToggleSwitch* own(ToggleSwitch* toggle_switch);
-        TuningSelector* own(TuningSelector* tuning_selector);
+        TextBoxParamEditor* own(TextBoxParamEditor* text_box_param_editor);
 
         void stop_editing();
 
@@ -133,7 +133,7 @@ class TabBody : public TransparentWidget
     private:
         GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitches toggle_switches;
-        GUI::TuningSelectors tuning_selectors;
+        GUI::TextBoxParamEditors text_box_param_editors;
 };
 
 
@@ -597,7 +597,55 @@ class ToggleSwitch : public TransparentWidget
 };
 
 
-class TuningSelector : public TransparentWidget
+class TextBoxParamEditor : public TransparentWidget
+{
+    public:
+        TextBoxParamEditor(
+            GUI& gui,
+            char const* const text,
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth,
+            Synth::ParamId const param_id,
+            char const* const* const options,
+            int const options_count
+        );
+
+        virtual void refresh();
+
+        Synth::ParamId const param_id;
+
+    protected:
+        static constexpr size_t TEXT_MAX_LENGTH = 24;
+
+        virtual bool paint() override;
+        virtual bool mouse_up(int const x, int const y) override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+        virtual bool mouse_leave(int const x, int const y) override;
+
+        virtual void update_value_str();
+        void update_value_str(Byte const value);
+
+        bool is_editing() const;
+
+        Synth& synth;
+        char value_str[TEXT_MAX_LENGTH];
+        Number ratio;
+
+    private:
+        void start_editing();
+        void stop_editing();
+
+        char const* const* const options;
+        int const options_count;
+
+        bool is_editing_;
+};
+
+
+class TuningSelector : public TextBoxParamEditor
 {
     public:
         static constexpr int WIDTH = 90;
@@ -612,34 +660,12 @@ class TuningSelector : public TransparentWidget
             Synth::ParamId const param_id
         );
 
-        void refresh();
-
-        Synth::ParamId const param_id;
+        virtual void refresh() override;
 
     protected:
-        virtual void set_up(
-            GUI::PlatformData platform_data,
-            WidgetBase* parent
-        ) override;
-
-        virtual bool paint() override;
-        virtual bool mouse_up(int const x, int const y) override;
-        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
-        virtual bool mouse_leave(int const x, int const y) override;
+        virtual void update_value_str() override;
 
     private:
-        static constexpr size_t TEXT_MAX_LENGTH = 24;
-
-        void update_value_str();
-
-        bool is_editing() const;
-        void start_editing();
-        void stop_editing();
-
-        Synth& synth;
-        char value_str[TEXT_MAX_LENGTH];
-        Number ratio;
-        bool is_editing_;
         bool is_mts_esp_connected;
 };
 

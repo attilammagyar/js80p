@@ -172,13 +172,13 @@ ToggleSwitch* TabBody::own(ToggleSwitch* toggle_switch)
 }
 
 
-TuningSelector* TabBody::own(TuningSelector* tuning_selector)
+TextBoxParamEditor* TabBody::own(TextBoxParamEditor* text_box_param_editor)
 {
-    Widget::own(tuning_selector);
+    Widget::own(text_box_param_editor);
 
-    tuning_selectors.push_back(tuning_selector);
+    text_box_param_editors.push_back(text_box_param_editor);
 
-    return tuning_selector;
+    return text_box_param_editor;
 }
 
 
@@ -212,7 +212,7 @@ void TabBody::refresh_all_params()
         (*it)->refresh();
     }
 
-    for (GUI::TuningSelectors::iterator it = tuning_selectors.begin(); it != tuning_selectors.end(); ++it) {
+    for (GUI::TextBoxParamEditors::iterator it = text_box_param_editors.begin(); it != text_box_param_editors.end(); ++it) {
         (*it)->refresh();
     }
 }
@@ -1458,6 +1458,146 @@ void ToggleSwitch::stop_editing()
 }
 
 
+TextBoxParamEditor::TextBoxParamEditor(
+        GUI& gui,
+        char const* const text,
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        Synth& synth,
+        Synth::ParamId const param_id,
+        char const* const* const options,
+        int const options_count
+) : TransparentWidget(text, left, top, width, height, Type::TEXT_BOX_PARAM_EDITOR),
+    param_id(param_id),
+    synth(synth),
+    ratio(0.0),
+    options(options),
+    options_count(options_count),
+    is_editing_(false)
+{
+    set_gui(gui);
+    update_value_str();
+}
+
+
+void TextBoxParamEditor::refresh()
+{
+    if (is_editing()) {
+        return;
+    }
+
+    Number const new_ratio = synth.get_param_ratio_atomic(param_id);
+    bool const is_changed = std::fabs(new_ratio - ratio) > 0.000001;
+
+    if (is_changed) {
+        ratio = GUI::clamp_ratio(new_ratio);
+        update_value_str();
+        redraw();
+    } else {
+        synth.push_message(
+            Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
+        );
+    }
+}
+
+
+void TextBoxParamEditor::update_value_str()
+{
+    update_value_str(synth.int_param_ratio_to_display_value(param_id, ratio));
+}
+
+
+void TextBoxParamEditor::update_value_str(Byte const value)
+{
+    GUI::param_ratio_to_str(
+        synth,
+        param_id,
+        ratio,
+        1.0,
+        NULL,
+        options,
+        options_count,
+        value_str,
+        TEXT_MAX_LENGTH
+    );
+}
+
+
+bool TextBoxParamEditor::is_editing() const
+{
+    return is_editing_;
+}
+
+
+void TextBoxParamEditor::start_editing()
+{
+    is_editing_ = true;
+}
+
+
+void TextBoxParamEditor::stop_editing()
+{
+    is_editing_ = false;
+}
+
+
+bool TextBoxParamEditor::paint()
+{
+    TransparentWidget::paint();
+
+    draw_text(
+        value_str, 9, 0, 0, width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+    );
+
+    return true;
+}
+
+
+bool TextBoxParamEditor::mouse_up(int const x, int const y)
+{
+    TransparentWidget::mouse_up(x, y);
+
+    if (ratio > 0.99999) {
+        ratio = 0.0;
+    } else {
+        Number const delta = 1.001 / synth.get_param_max_value(param_id);
+
+        ratio = GUI::clamp_ratio(ratio + delta);
+    }
+
+    synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
+    update_value_str();
+    redraw();
+
+    return false;
+}
+
+
+
+bool TextBoxParamEditor::mouse_move(int const x, int const y, bool const modifier)
+{
+    TransparentWidget::mouse_move(x, y, modifier);
+
+    gui->set_status_line(text);
+    start_editing();
+
+    return true;
+}
+
+
+bool TextBoxParamEditor::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+
+    gui->set_status_line("");
+    stop_editing();
+
+    return true;
+}
+
+
 TuningSelector::TuningSelector(
         GUI& gui,
         char const* const text,
@@ -1465,15 +1605,20 @@ TuningSelector::TuningSelector(
         int const top,
         Synth& synth,
         Synth::ParamId const param_id
-) : TransparentWidget(text, left, top, WIDTH, HEIGHT, Type::TUNING_SELECTOR),
-    param_id(param_id),
-    synth(synth),
-    ratio(0.0),
-    is_editing_(false),
+) : TextBoxParamEditor(
+        gui,
+        text,
+        left,
+        top,
+        WIDTH,
+        HEIGHT,
+        synth,
+        param_id,
+        GUI::TUNINGS,
+        GUI::TUNINGS_COUNT
+    ),
     is_mts_esp_connected(false)
 {
-    set_gui(gui);
-    update_value_str();
 }
 
 
@@ -1506,20 +1651,10 @@ void TuningSelector::refresh()
 
 void TuningSelector::update_value_str()
 {
-    Byte const tuning = synth.int_param_ratio_to_display_value(param_id, ratio);
+    Byte const value = synth.int_param_ratio_to_display_value(param_id, ratio);
 
-    if (tuning < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
-        GUI::param_ratio_to_str(
-            synth,
-            param_id,
-            ratio,
-            1.0,
-            NULL,
-            GUI::TUNINGS,
-            GUI::TUNINGS_COUNT,
-            value_str,
-            TEXT_MAX_LENGTH
-        );
+    if ((Modulator::Tuning)value < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
+        TextBoxParamEditor::update_value_str(value);
 
         return;
     }
@@ -1528,88 +1663,9 @@ void TuningSelector::update_value_str()
         value_str,
         TEXT_MAX_LENGTH,
         "%s %s",
-        tuning < GUI::TUNINGS_COUNT ? GUI::TUNINGS[tuning] : "???",
+        (int)value < GUI::TUNINGS_COUNT ? GUI::TUNINGS[value] : "???",
         is_mts_esp_connected ? "on" : "off"
     );
-}
-
-
-bool TuningSelector::is_editing() const
-{
-    return is_editing_;
-}
-
-
-void TuningSelector::start_editing()
-{
-    is_editing_ = true;
-}
-
-
-void TuningSelector::stop_editing()
-{
-    is_editing_ = false;
-}
-
-
-void TuningSelector::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
-{
-    TransparentWidget::set_up(platform_data, parent);
-}
-
-
-bool TuningSelector::paint()
-{
-    TransparentWidget::paint();
-
-    draw_text(
-        value_str, 9, 0, 0, WIDTH, HEIGHT, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
-    );
-
-    return true;
-}
-
-
-bool TuningSelector::mouse_up(int const x, int const y)
-{
-    TransparentWidget::mouse_up(x, y);
-
-    if (ratio > 0.99999) {
-        ratio = 0.0;
-    } else {
-        Number const delta = 1.001 / synth.get_param_max_value(param_id);
-
-        ratio = GUI::clamp_ratio(ratio + delta);
-    }
-
-    synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
-    update_value_str();
-    redraw();
-
-    return false;
-}
-
-
-
-bool TuningSelector::mouse_move(int const x, int const y, bool const modifier)
-{
-    TransparentWidget::mouse_move(x, y, modifier);
-
-    gui->set_status_line(text);
-    start_editing();
-
-    return true;
-}
-
-
-bool TuningSelector::mouse_leave(int const x, int const y)
-{
-    TransparentWidget::mouse_leave(x, y);
-
-    gui->set_status_line("");
-    stop_editing();
-
-    return true;
 }
 
 }

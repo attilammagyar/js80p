@@ -1522,7 +1522,7 @@ void Widget::draw_text(
         (double)(top + height) - font_extents.height * 0.5 + font_extents.descent
     );
 
-    if (type == Type::STATUS_LINE || type == Type::TUNING_SELECTOR) {
+    if (type == Type::STATUS_LINE || type == Type::TEXT_BOX_PARAM_EDITOR) {
         text_top -= 3.0;
     }
 
