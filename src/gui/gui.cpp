@@ -1184,7 +1184,7 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
 
 #define TOGG(owner, left, top, width, height, box_left, param_id)   \
     owner->own(                                                     \
-        new ToggleSwitch(                                           \
+        new ToggleSwitchParamEditor(                                \
             *this,                                                  \
             GUI::PARAMS[param_id],                                  \
             left,                                                   \

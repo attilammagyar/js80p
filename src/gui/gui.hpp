@@ -40,7 +40,7 @@ class StatusLine;
 class TabBody;
 class TabSelector;
 class TextBoxParamEditor;
-class ToggleSwitch;
+class ToggleSwitchParamEditor;
 class TuningSelector;
 class Widget;
 class WidgetBase;
@@ -56,7 +56,7 @@ class GUI
         typedef std::vector<WidgetBase*> Widgets;
 
         typedef std::vector<KnobParamEditor*> KnobParamEditors;
-        typedef std::vector<ToggleSwitch*> ToggleSwitches;
+        typedef std::vector<ToggleSwitchParamEditor*> ToggleSwitchParamEditors;
         typedef std::vector<TextBoxParamEditor*> TextBoxParamEditors;
 
         typedef unsigned int Color;

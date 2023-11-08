@@ -122,7 +122,7 @@ class TabBody : public TransparentWidget
         using TransparentWidget::own;
 
         KnobParamEditor* own(KnobParamEditor* knob_param_editor);
-        ToggleSwitch* own(ToggleSwitch* toggle_switch);
+        ToggleSwitchParamEditor* own(ToggleSwitchParamEditor* toggle_switch_param_editor);
         TextBoxParamEditor* own(TextBoxParamEditor* text_box_param_editor);
 
         void stop_editing();
@@ -132,7 +132,7 @@ class TabBody : public TransparentWidget
 
     private:
         GUI::KnobParamEditors knob_param_editors;
-        GUI::ToggleSwitches toggle_switches;
+        GUI::ToggleSwitchParamEditors toggle_switch_param_editors;
         GUI::TextBoxParamEditors text_box_param_editors;
 };
 
@@ -552,10 +552,10 @@ class StatusLine : public TransparentWidget
 };
 
 
-class ToggleSwitch : public TransparentWidget
+class ToggleSwitchParamEditor: public TransparentWidget
 {
     public:
-        ToggleSwitch(
+        ToggleSwitchParamEditor(
             GUI& gui,
             char const* const text,
             int const left,

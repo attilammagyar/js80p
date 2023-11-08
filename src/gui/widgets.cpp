@@ -162,13 +162,13 @@ KnobParamEditor* TabBody::own(KnobParamEditor* knob_param_editor)
 }
 
 
-ToggleSwitch* TabBody::own(ToggleSwitch* toggle_switch)
+ToggleSwitchParamEditor* TabBody::own(ToggleSwitchParamEditor* toggle_switch_param_editor)
 {
-    Widget::own(toggle_switch);
+    Widget::own(toggle_switch_param_editor);
 
-    toggle_switches.push_back(toggle_switch);
+    toggle_switch_param_editors.push_back(toggle_switch_param_editor);
 
-    return toggle_switch;
+    return toggle_switch_param_editor;
 }
 
 
@@ -208,7 +208,7 @@ void TabBody::refresh_all_params()
         (*it)->refresh();
     }
 
-    for (GUI::ToggleSwitches::iterator it = toggle_switches.begin(); it != toggle_switches.end(); ++it) {
+    for (GUI::ToggleSwitchParamEditors::iterator it = toggle_switch_param_editors.begin(); it != toggle_switch_param_editors.end(); ++it) {
         (*it)->refresh();
     }
 
@@ -1343,7 +1343,7 @@ bool StatusLine::paint()
 }
 
 
-ToggleSwitch::ToggleSwitch(
+ToggleSwitchParamEditor::ToggleSwitchParamEditor(
         GUI& gui,
         char const* const text,
         int const left,
@@ -1363,7 +1363,7 @@ ToggleSwitch::ToggleSwitch(
 }
 
 
-void ToggleSwitch::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
+void ToggleSwitchParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 {
     TransparentWidget::set_up(platform_data, parent);
 
@@ -1374,7 +1374,7 @@ void ToggleSwitch::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
 }
 
 
-void ToggleSwitch::refresh()
+void ToggleSwitchParamEditor::refresh()
 {
     if (is_editing()) {
         return;
@@ -1393,7 +1393,7 @@ void ToggleSwitch::refresh()
 }
 
 
-bool ToggleSwitch::paint()
+bool ToggleSwitchParamEditor::paint()
 {
     TransparentWidget::paint();
 
@@ -1408,7 +1408,7 @@ bool ToggleSwitch::paint()
 }
 
 
-bool ToggleSwitch::mouse_up(int const x, int const y)
+bool ToggleSwitchParamEditor::mouse_up(int const x, int const y)
 {
     ratio = ratio < 0.5 ? 1.0 : 0.0;
     synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
@@ -1418,7 +1418,7 @@ bool ToggleSwitch::mouse_up(int const x, int const y)
 }
 
 
-bool ToggleSwitch::mouse_move(int const x, int const y, bool const modifier)
+bool ToggleSwitchParamEditor::mouse_move(int const x, int const y, bool const modifier)
 {
     TransparentWidget::mouse_move(x, y, modifier);
 
@@ -1429,7 +1429,7 @@ bool ToggleSwitch::mouse_move(int const x, int const y, bool const modifier)
 }
 
 
-bool ToggleSwitch::mouse_leave(int const x, int const y)
+bool ToggleSwitchParamEditor::mouse_leave(int const x, int const y)
 {
     TransparentWidget::mouse_leave(x, y);
 
@@ -1440,19 +1440,19 @@ bool ToggleSwitch::mouse_leave(int const x, int const y)
 }
 
 
-bool ToggleSwitch::is_editing() const
+bool ToggleSwitchParamEditor::is_editing() const
 {
     return is_editing_;
 }
 
 
-void ToggleSwitch::start_editing()
+void ToggleSwitchParamEditor::start_editing()
 {
     is_editing_ = true;
 }
 
 
-void ToggleSwitch::stop_editing()
+void ToggleSwitchParamEditor::stop_editing()
 {
     is_editing_ = false;
 }
