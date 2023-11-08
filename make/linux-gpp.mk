@@ -59,7 +59,8 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(BUILD_DIR)/img_macros1.o \
 	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_effects.o \
-	$(BUILD_DIR)/img_envelopes.o \
+	$(BUILD_DIR)/img_envelopes1.o \
+	$(BUILD_DIR)/img_envelopes2.o \
 	$(BUILD_DIR)/img_knob_states-controlled.o \
 	$(BUILD_DIR)/img_knob_states-free.o \
 	$(BUILD_DIR)/img_knob_states-none.o \

@@ -191,7 +191,7 @@ def print_envelopes_params(param_id: int) -> int:
         ("$#VIN", " ///< $ # Level Inaccuracy"),
     ]
 
-    return print_params(param_id, "Envelope", "N", 6, params)
+    return print_params(param_id, "Envelope", "N", 12, params)
 
 
 def print_lfo_params(param_id: int) -> int:
@@ -268,6 +268,12 @@ def print_special_params(param_id: int) -> int:
         ("N4DYN", " ///< Envelope 4 Dynamic"),
         ("N5DYN", " ///< Envelope 5 Dynamic"),
         ("N6DYN", " ///< Envelope 6 Dynamic"),
+        ("N7DYN", " ///< Envelope 7 Dynamic"),
+        ("N8DYN", " ///< Envelope 8 Dynamic"),
+        ("N9DYN", " ///< Envelope 9 Dynamic"),
+        ("N10DYN", " ///< Envelope 10 Dynamic"),
+        ("N11DYN", " ///< Envelope 11 Dynamic"),
+        ("N12DYN", " ///< Envelope 12 Dynamic"),
 
         ("POLY", "  ///< Polyphonic"),
 

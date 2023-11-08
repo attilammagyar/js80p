@@ -65,7 +65,8 @@ html, body {
   padding: 1px 2px;
 }
 
-#envelopes .main-block {
+#envelopes-1 .main-block,
+#envelopes-2 .main-block {
   margin: 11px 2px;
   padding: 1px 2px;
 }
@@ -77,7 +78,8 @@ html, body {
 
 #controllers-1 .block .group:nth-child(2),
 #controllers-2 .block .group:nth-child(2),
-#envelopes .block .group:nth-child(2) {
+#envelopes-1 .block .group:nth-child(2),
+#envelopes-2 .block .group:nth-child(2) {
   margin-top: 20px;
 }
 
@@ -380,7 +382,7 @@ body.hide-objects #osc-2-tuning span {
   font-family: Arial, Sans-serif;
   font-size: 14px;
   background: #202030;
-  width: 89px;
+  width: 72px;
   height: 20px;
   line-height: 22px;
   margin: 0;
@@ -538,9 +540,10 @@ function make_tabs(active)
     var tabs = [
             "Synth",
             "Effects",
-            "Macros 1-10",
-            "Macros 11-20",
-            "Envelopes",
+            "MCR 1-10",
+            "MCR 11-20",
+            "ENV 1-6",
+            "ENV 7-12",
             "LFOs",
             "About"
         ],
@@ -742,7 +745,7 @@ function make_tabs(active)
     <div class="tabs">
       <script type="text/javascript">make_tabs(4);</script>
     </div>
-    <div class="border" id="envelopes">
+    <div class="border" id="envelopes-1">
     </div>
   </div>
 
@@ -750,13 +753,21 @@ function make_tabs(active)
     <div class="tabs">
       <script type="text/javascript">make_tabs(5);</script>
     </div>
-    <div class="border" id="lfos">
+    <div class="border" id="envelopes-2">
     </div>
   </div>
 
   <div class="background">
     <div class="tabs">
       <script type="text/javascript">make_tabs(6);</script>
+    </div>
+    <div class="border" id="lfos">
+    </div>
+  </div>
+
+  <div class="background">
+    <div class="tabs">
+      <script type="text/javascript">make_tabs(7);</script>
     </div>
     <div class="border" id="about">
     </div>
@@ -958,55 +969,57 @@ window.onload = function ()
         }
     }
 
-    for (i = 1; i <= 6; ++i) {
-        d = document.createElement("div");
-        d.setAttribute("class", "block main-block");
-        h = document.createElement("h1");
-        h.innerHTML = "Envelope " + String(i);
+    for (o = 0; o <= 1; ++o) {
+      for (i = o * 6 + 1; i <= (o * 6 + 6); ++i) {
+          d = document.createElement("div");
+          d.setAttribute("class", "block main-block");
+          h = document.createElement("h1");
+          h.innerHTML = "Envelope " + String(i);
 
-        l = document.createElement("label");
-        l.innerHTML = "DYNAMIC ";
-        l.setAttribute("class", "dynamic");
-        n = document.createElement("input");
-        n.setAttribute("type", "text");
-        l.appendChild(n);
-        l2 = document.createElement("label");
-        l2.innerHTML = "";
-        l2.setAttribute("class", "inaccuracy");
-        n2 = document.createElement("input");
-        n2.setAttribute("type", "text");
-        l2.appendChild(n2);
-        h.appendChild(l2);
-        h.appendChild(l);
+          l = document.createElement("label");
+          l.innerHTML = "DYNAMIC ";
+          l.setAttribute("class", "dynamic");
+          n = document.createElement("input");
+          n.setAttribute("type", "text");
+          l.appendChild(n);
+          l2 = document.createElement("label");
+          l2.innerHTML = "";
+          l2.setAttribute("class", "inaccuracy");
+          n2 = document.createElement("input");
+          n2.setAttribute("type", "text");
+          l2.appendChild(n2);
+          h.appendChild(l2);
+          h.appendChild(l);
 
-        d.appendChild(h);
+          d.appendChild(h);
 
-        k3 = document.createElement("div");
-        k3.setAttribute("class", "block");
+          k3 = document.createElement("div");
+          k3.setAttribute("class", "block");
 
-        k1 = document.createElement("div");
-        k1.setAttribute("class", "group");
-        k2 = document.createElement("div");
-        k2.setAttribute("class", "group");
+          k1 = document.createElement("div");
+          k1.setAttribute("class", "group");
+          k2 = document.createElement("div");
+          k2.setAttribute("class", "group");
 
-        k3.appendChild(k1);
-        k3.appendChild(k2);
+          k3.appendChild(k1);
+          k3.appendChild(k2);
 
-        d.appendChild(k3);
+          d.appendChild(k3);
 
-        create_knob(k1, "AMT %", "75");
-        create_knob(k1, "INI %", "0");
-        create_knob(k1, "PEAK %", "100");
-        create_knob(k1, "SUS %", "50");
-        create_knob(k1, "FIN %", "0");
+          create_knob(k1, "AMT %", "75");
+          create_knob(k1, "INI %", "0");
+          create_knob(k1, "PEAK %", "100");
+          create_knob(k1, "SUS %", "50");
+          create_knob(k1, "FIN %", "0");
 
-        create_knob(k2, "DEL s", "0.0");
-        create_knob(k2, "ATK s", "0.001");
-        create_knob(k2, "HOLD s", "0.3");
-        create_knob(k2, "DEC s", "1.0");
-        create_knob(k2, "REL s", "0.2");
+          create_knob(k2, "DEL s", "0.0");
+          create_knob(k2, "ATK s", "0.001");
+          create_knob(k2, "HOLD s", "0.3");
+          create_knob(k2, "DEC s", "1.0");
+          create_knob(k2, "REL s", "0.2");
 
-        $("envelopes").appendChild(d);
+          $("envelopes-" + String(o + 1)).appendChild(d);
+      }
     }
 
     for (i = 1; i <= 8; ++i) {

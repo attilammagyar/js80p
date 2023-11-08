@@ -44,7 +44,8 @@ GUI_IMAGES = \
 	gui/img/macros1.bmp \
 	gui/img/macros2.bmp \
 	gui/img/effects.bmp \
-	gui/img/envelopes.bmp \
+	gui/img/envelopes1.bmp \
+	gui/img/envelopes2.bmp \
 	gui/img/knob_states-controlled.bmp \
 	gui/img/knob_states-free.bmp \
 	gui/img/knob_states-none.bmp \
