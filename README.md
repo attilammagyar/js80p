@@ -234,7 +234,7 @@ update its frequency tables only for `NOTE ON` events.
 
 The following tuning options are available:
 
- * `MTS-ESP C`: continuously query information from an MTS-ESP tuning provider
+ * `C MTS-ESP`: continuously query information from an MTS-ESP tuning provider
    (usually another plugin) when at least one note is playing, and update the
    frequency of all sounding notes that haven't reached the Release portion of
    their volume envelopes yet, on the fly. The tuning selector displays "`on`"
@@ -242,7 +242,7 @@ The following tuning options are available:
    found.  In the latter case, notes will fall back to 440 Hz 12 tone equal
    temperament.
 
- * `MTS-ESP N`: query tuning information from an MTS-ESP tuning provider
+ * `N MTS-ESP`: query tuning information from an MTS-ESP tuning provider
    (usually another plugin) for evey `NOTE ON` MIDI event. Already sounding
    notes are kept unchanged. The tuning selector displays "`on`" when a tuning
    provider is available, and "`off`" when no tuning provider is found. In the

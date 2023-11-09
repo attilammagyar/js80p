@@ -53,8 +53,8 @@ int const GUI::MODES_COUNT = Synth::MODES;
 char const* const GUI::TUNINGS[] = {
     [Modulator::TUNING_440HZ_12TET] = "440 12TET",
     [Modulator::TUNING_432HZ_12TET] = "432 12TET",
-    [Modulator::TUNING_MTS_ESP_CONTINUOUS] = "MTS-ESP C",
-    [Modulator::TUNING_MTS_ESP_NOTE_ON] = "MTS-ESP N",
+    [Modulator::TUNING_MTS_ESP_CONTINUOUS] = "C MTS-ESP",
+    [Modulator::TUNING_MTS_ESP_NOTE_ON] = "N MTS-ESP",
 };
 
 int const GUI::TUNINGS_COUNT = VOICE_TUNINGS;
