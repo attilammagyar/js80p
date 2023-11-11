@@ -84,7 +84,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_FLOAT_PARAMS
-        + ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_TOGGLE_PARAMS)
+        + Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_TOGGLE_PARAMS)
         + LFOS
     ),
     polyphonic("POLY", ToggleParam::ON),
@@ -575,7 +575,7 @@ void Synth::create_envelopes() noexcept
 {
     Integer next_id = ParamId::N1AMT;
 
-    for (Integer i = 0; i != ENVELOPES; ++i) {
+    for (Integer i = 0; i != Constants::ENVELOPES; ++i) {
         Envelope* envelope = new Envelope(std::string("N") + to_string(i + 1));
         envelopes_rw[i] = envelope;
 
@@ -724,7 +724,7 @@ Synth::~Synth()
         delete synced_oscillator_inaccuracies[i];
     }
 
-    for (Integer i = 0; i != ENVELOPES; ++i) {
+    for (Integer i = 0; i != Constants::ENVELOPES; ++i) {
         delete envelopes[i];
     }
 

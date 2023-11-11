@@ -73,7 +73,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
-        static constexpr Integer ENVELOPES = 12;
         static constexpr Integer ENVELOPE_FLOAT_PARAMS = 12;
         static constexpr Integer ENVELOPE_TOGGLE_PARAMS = 1;
 
@@ -1493,7 +1492,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         BiquadFilterSharedBuffers biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
         std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
         std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
-        Envelope* envelopes_rw[ENVELOPES];
+        Envelope* envelopes_rw[Constants::ENVELOPES];
         LFO* lfos_rw[LFOS];
         Macro* macros_rw[MACROS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
