@@ -3465,7 +3465,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "CF2LOG = 1.0\n"
             "EF1LOG = 1.0\n"
             "EF2LOG = 1.0\n"
-            "N3DYN = 1.0\n"
             "ERTYP = 0.666666666666667\n"
             "ECTYP = 0.50\n"
         )
@@ -3609,7 +3608,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "ECTYP = 0.50\n"
             "MOIA = 0.133333333333333\n"
             "MOIS = 0.233333333333333\n"
-            "COIA = 0.150\n"
         )
     ),
 
@@ -3761,7 +3759,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "N4HLD = 0.0050\n"
             "N4DEC = 0.104935995733049\n"
             "N4SUS = 0.0\n"
-            "N4REL = 0.091666666666667\n"
+            "N4REL = 0.196666666666667\n"
             "N5AMTctl = 0.644531250\n"
             "N5INI = 1.0\n"
             "N5SUS = 1.0\n"
