@@ -122,33 +122,37 @@ Tuning
 ------
 
 Each oscillator can be tuned separately by clicking on the tuning selector in
-the title bar of the oscillator. The following options are available:
+the title bar of the oscillator, allowing maximum flexibility; for example, you
+can have continuously updated tuning for one oscillator, and have the other
+update its frequency tables only for "NOTE ON" events.
 
- * "440 12TET": the usual 12 tone equal temperament tuning, where the "A4" MIDI
-   note is 440 Hz.
+The following tuning options are available:
 
- * "432 12TET": 12 tone equal temperament with "A4" set to 432 Hz.
+ * "C MTS-ESP": continuously query information from an MTS-ESP tuning provider
+   (usually another plugin) when at least one note is playing, and update the
+   frequency of all sounding notes that haven't reached the Release portion of
+   their volume envelopes yet, on the fly. The tuning selector displays "on"
+   when a tuning provider is available, and "off" when no tuning provider is
+   found.  In the latter case, notes will fall back to 440 Hz 12 tone equal
+   temperament.
 
- * "MTS-ESP1": query tuning information from an MTS-ESP tuning provider
+ * "N MTS-ESP": query tuning information from an MTS-ESP tuning provider
    (usually another plugin) for evey "NOTE ON" MIDI event. Already sounding
    notes are kept unchanged. The tuning selector displays "on" when a tuning
    provider is available, and "off" when no tuning provider is found. In the
    latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
 
- * "MTS-ESP2": continuously query information from an MTS-ESP tuning provider
-   (usually another plugin) when at least one note is being played, and update
-   the frequency of sounding notes that haven't reached the Release part of
-   their volume envelopes, in real-time, on the fly. The tuning selector
-   displays "on" when a tuning provider is available, and "off" when no
-   tuning provider is found. In the latter case, notes will fall back to
-   440 Hz 12 tone equal temperament.
+ * "440 12TET": the usual 12 tone equal temperament tuning, where the "A4"
+   MIDI note is 440 Hz.
+
+ * "432 12TET": 12 tone equal temperament with "A4" set to 432 Hz.
 
 Setting up MTS-ESP on Windows
 -----------------------------
 
 Download and install either the free MTS-ESP MINI plugin from
 https://oddsound.com/mtsespmini.php or the paid MTS-ESP SUITE plugin from
-https://oddsound.com/mtsespsuite.php by ODDSOUND. Follow the instuctions on
+https://oddsound.com/mtsespsuite.php by ODDSound. Follow the instuctions on
 the website, where you can also find the User Guide documentation for each
 product.
 
@@ -170,7 +174,7 @@ Setting up MTS-ESP on Linux
 ---------------------------
 
 As of November, 2023, there is no official distribution of the MTS-ESP tuning
-provider plugins by ODDSOUND (https://oddsound.com/) for Linux, however, there
+provider plugins by ODDSound (https://oddsound.com/) for Linux, however, there
 are plugins which can act as a tuning provider, for example, Surge XT:
 https://surge-synthesizer.github.io/
 
