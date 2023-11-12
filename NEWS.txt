@@ -1,3 +1,15 @@
+v2.4.2 (2023-11-12)
+ * The MTS-ESP mode (continuous or note-on) is now shown at the beginning of
+   the tuning selector for better readability.
+ * Bugfix: Envelope 3 of the Dystopian Cathedral preset was accidentally
+   configured to be dynamic.
+ * Bugfix: inaccuracy has been turned off for the unused oscillator in the
+   Gloomy Brass preset.
+ * Bugfix: the release time of Envelope 4 in the Gloomy Brass Raindrops preset
+   has been increased so that when a Note Off event occurs right after the
+   "raindrop" sound kicks in, its decay is more natural.
+ * Bugfix: MTS-ESP related information has been corrected in README.txt.
+
 v2.4.1 (2023-11-07)
  * Bugfix: fixed a potential crash or memory corruption when MIDI channel
    number is greater than 8.
