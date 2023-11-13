@@ -191,8 +191,8 @@ Number Math::trig(Number const* const table, Number const x) const noexcept
 {
     Number const index = x * SINE_SCALE;
     Number const after_weight = index - std::floor(index);
-    int const before_index = ((int)index) & SIN_TABLE_MASK;
-    int const after_index = (before_index + 1) & SIN_TABLE_MASK;
+    int const before_index = ((int)index) & SIN_TABLE_INDEX_MASK;
+    int const after_index = (before_index + 1) & SIN_TABLE_INDEX_MASK;
 
     return combine(after_weight, table[after_index], table[before_index]);
 }
@@ -208,8 +208,8 @@ void Math::sincos_impl(Number const x, Number& sin, Number& cos) const noexcept
 {
     Number const index = x * SINE_SCALE;
     Number const after_weight = index - std::floor(index);
-    int const before_index = ((int)index) & SIN_TABLE_MASK;
-    int const after_index = (before_index + 1) & SIN_TABLE_MASK;
+    int const before_index = ((int)index) & SIN_TABLE_INDEX_MASK;
+    int const after_index = (before_index + 1) & SIN_TABLE_INDEX_MASK;
 
     sin = combine(after_weight, sines[after_index], sines[before_index]);
     cos = combine(after_weight, cosines[after_index], cosines[before_index]);
@@ -481,7 +481,7 @@ Number Math::lookup_periodic(
 Number Math::lookup_periodic_2(
         Number const* table,
         int const table_size,
-        int const table_mask,
+        int const table_index_mask,
         Number const index
 ) noexcept {
     Number const floor_index = std::floor(index);
@@ -491,8 +491,8 @@ Number Math::lookup_periodic_2(
 
     return combine(
         after_weight,
-        table[after_index & table_mask],
-        table[before_index & table_mask]
+        table[after_index & table_index_mask],
+        table[before_index & table_index_mask]
     );
 }
 

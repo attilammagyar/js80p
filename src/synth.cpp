@@ -891,14 +891,14 @@ void Synth::note_on_polyphonic(
         return;
     }
 
-    next_voice = (next_voice + 1) & NEXT_VOICE_MASK;
+    next_voice = (next_voice + 1) & VOICE_INDEX_MASK;
 
     for (Integer v = 0; v != POLYPHONY; ++v) {
         if (!(
                 modulators[next_voice]->is_off_after(time_offset)
                 && carriers[next_voice]->is_off_after(time_offset)
         )) {
-            next_voice = (next_voice + 1) & NEXT_VOICE_MASK;
+            next_voice = (next_voice + 1) & VOICE_INDEX_MASK;
             continue;
         }
 

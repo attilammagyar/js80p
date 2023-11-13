@@ -100,7 +100,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         but the triangle wave already has some small influence" state.
         */
         static constexpr int TABLE_SIZE = 0x1000;
-        static constexpr int TABLE_MASK = TABLE_SIZE - 1;
+        static constexpr int TABLE_INDEX_MASK = TABLE_SIZE - 1;
         static constexpr Number TABLE_SIZE_FLOAT = (Number)TABLE_SIZE;
         static constexpr Number TABLE_SIZE_FLOAT_INV = 1.0 / TABLE_SIZE_FLOAT;
         static constexpr Number WAVE_LENGTH = Math::PI_DOUBLE / S1;

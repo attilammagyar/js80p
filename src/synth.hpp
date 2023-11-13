@@ -66,10 +66,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
     friend class SignalProducer;
 
     private:
-        static constexpr Integer NEXT_VOICE_MASK = 0x3f;
+        static constexpr Integer VOICE_INDEX_MASK = 0x3f;
 
     public:
-        static constexpr Integer POLYPHONY = NEXT_VOICE_MASK + 1;
+        static constexpr Integer POLYPHONY = VOICE_INDEX_MASK + 1;
 
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
@@ -1134,7 +1134,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 };
 
                 static constexpr Integer ENTRIES = 0x80;
-                static constexpr Integer MASK = 0x7f;
+                static constexpr Integer MASK = ENTRIES - 1;
                 static constexpr Integer MULTIPLIER = 16565;
                 static constexpr Integer SHIFT = 16;
 

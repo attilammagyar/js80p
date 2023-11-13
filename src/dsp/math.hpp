@@ -199,7 +199,7 @@ class Math
         static Number lookup_periodic_2(
             Number const* table,
             int const table_size,
-            int const table_mask,
+            int const table_index_mask,
             Number const index
         ) noexcept;
 
@@ -222,7 +222,7 @@ class Math
 
     private:
         static constexpr int SIN_TABLE_SIZE = 0x0800;
-        static constexpr int SIN_TABLE_MASK = SIN_TABLE_SIZE - 1;
+        static constexpr int SIN_TABLE_INDEX_MASK = SIN_TABLE_SIZE - 1;
 
         static constexpr int RANDOMS = 0x0200;
         static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
