@@ -486,12 +486,7 @@ Number Math::lookup_periodic_2(
 ) noexcept {
     Number const floor_index = std::floor(index);
     Number const after_weight = index - floor_index;
-    int before_index = (int)floor_index;
-
-    if (before_index < 0) {
-        before_index -= (before_index / table_size - 1) * table_size;
-    }
-
+    int const before_index = (int)floor_index;
     int const after_index = before_index + 1;
 
     return combine(

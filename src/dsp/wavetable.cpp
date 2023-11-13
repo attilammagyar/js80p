@@ -108,7 +108,7 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
 
     for (Integer j = 0; j != SIZE; ++j) {
         samples[0][j] = (
-            (Sample)(coefficients[0] * sines[(j * frequency) & MASK])
+            (Sample)(coefficients[0] * sines[(j * frequency) & TABLE_INDEX_MASK])
         );
     }
 
@@ -118,7 +118,7 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
         for (Integer j = 0; j != SIZE; ++j) {
             samples[i][j] = (
                 samples[prev_i][j]
-                + (Sample)(coefficients[i] * sines[(j * frequency) & MASK])
+                + (Sample)(coefficients[i] * sines[(j * frequency) & TABLE_INDEX_MASK])
             );
         }
     }
@@ -201,9 +201,7 @@ void Wavetable::lookup(
 
     Number const sample_index = state.sample_index;
 
-    state.sample_index = wrap_around<with_subharmonic>(
-        sample_index + state.scale * (Number)frequency
-    );
+    state.sample_index += state.scale * (Number)frequency;
 
     if constexpr (single_partial) {
         state.table_indices[0] = 0;
@@ -238,27 +236,6 @@ void Wavetable::lookup(
         interpolate<interpolation, true, with_subharmonic>(
             state, abs_frequency, sample_index + phase_offset, sample, subharmonic_sample
         );
-    }
-}
-
-
-template<bool with_subharmonic>
-Number Wavetable::wrap_around(Number const index) const noexcept
-{
-    if constexpr (with_subharmonic) {
-        return index - std::floor(index * SIZE_INV) * SIZE_FLOAT;
-    } else {
-        /*
-        The lookup table for the fundamental contains 2 periods of the wave, and
-        we have another table with the same size holding a single period of the
-        subharmonic. This way we can calculate both waves in a single
-        interpolation step.
-
-        However, here we don't need the subharmonic, so we can restrict our
-        lookup to only the first half of the table for the fundamental, leaving
-        more room in the CPU caches for other data.
-        */
-        return index - std::floor(index * PERIOD_SIZE_INV) * PERIOD_SIZE_FLOAT;
     }
 }
 
@@ -308,8 +285,9 @@ void Wavetable::interpolate_sample_linear(
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
     );
-    Integer const sample_1_index = (Integer)sample_index & MASK;
-    Integer const sample_2_index = (sample_1_index + 1) & MASK;
+    Integer const mask = get_index_mask<with_subharmonic>();
+    Integer const sample_1_index = (Integer)sample_index & mask;
+    Integer const sample_2_index = (sample_1_index + 1) & mask;
 
     Sample const* const table_1 = samples[state.table_indices[0]];
 
@@ -346,9 +324,10 @@ void Wavetable::interpolate_sample_lagrange(
         Sample& sample,
         Sample& subharmonic_sample
 ) const noexcept {
-    Integer const sample_1_index = (Integer)sample_index & MASK;
-    Integer const sample_2_index = (sample_1_index + 1) & MASK;
-    Integer const sample_3_index = (sample_1_index + 2) & MASK;
+    Integer const mask = get_index_mask<with_subharmonic>();
+    Integer const sample_1_index = (Integer)sample_index & mask;
+    Integer const sample_2_index = (sample_1_index + 1) & mask;
+    Integer const sample_3_index = (sample_1_index + 2) & mask;
 
     Sample const* const table_1 = samples[state.table_indices[0]];
 
@@ -387,6 +366,27 @@ void Wavetable::interpolate_sample_lagrange(
         Sample const sh_f_1_3 = subharmonic[sample_3_index];
 
         subharmonic_sample = a_1 * sh_f_1_1 + a_2 * sh_f_1_2 + a_3 * sh_f_1_3;
+    }
+}
+
+
+template<bool with_subharmonic>
+constexpr Integer Wavetable::get_index_mask() noexcept
+{
+    if constexpr (with_subharmonic) {
+        return TABLE_INDEX_MASK;
+    } else {
+        /*
+        The lookup table for the fundamental contains 2 periods of the wave, and
+        we have another table with the same size holding a single period of the
+        subharmonic. This way we can calculate both waves in a single
+        interpolation step.
+
+        However, when we don't need the subharmonic, we can restrict our lookup
+        to only the first half of the table for the fundamental, leaving more
+        room in CPU caches for other data.
+        */
+        return PERIOD_INDEX_MASK;
     }
 }
 

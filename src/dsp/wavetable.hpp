@@ -122,8 +122,9 @@ class Wavetable
         so it holds 2 periods of the fundamental.
         */
         static constexpr Integer PERIOD_SIZE = 0x0800;
+        static constexpr Integer PERIOD_INDEX_MASK = PERIOD_SIZE - 1;
         static constexpr Integer SIZE = PERIOD_SIZE * 2;
-        static constexpr Integer MASK = SIZE - 1;
+        static constexpr Integer TABLE_INDEX_MASK = SIZE - 1;
 
         static constexpr Number PERIOD_SIZE_FLOAT = (Number)PERIOD_SIZE;
         static constexpr Number PERIOD_SIZE_INV = 1.0 / PERIOD_SIZE_FLOAT;
@@ -140,7 +141,7 @@ class Wavetable
         static bool is_initialized;
 
         template<bool with_subharmonic>
-        Number wrap_around(Number const index) const noexcept;
+        static constexpr Integer get_index_mask() noexcept;
 
         template<
             Interpolation interpolation,
