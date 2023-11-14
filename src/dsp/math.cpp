@@ -451,6 +451,7 @@ Number Math::lookup(
 }
 
 
+template<bool is_index_positive>
 Number Math::lookup_periodic(
         Number const* table,
         int const table_size,
@@ -460,8 +461,10 @@ Number Math::lookup_periodic(
     Number const after_weight = index - floor_index;
     int before_index = (int)floor_index;
 
-    if (before_index < 0) {
-        before_index -= (before_index / table_size - 1) * table_size;
+    if constexpr (!is_index_positive) {
+        if (before_index < 0) {
+            before_index -= (before_index / table_size - 1) * table_size;
+        }
     }
 
     if (before_index >= table_size) {

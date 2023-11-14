@@ -251,21 +251,21 @@ TEST(lookup_periodic, {
     constexpr Integer table_size = 7;
     Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
 
-    assert_eq(7.0, Math::lookup_periodic(table, table_size, 6.0), DOUBLE_DELTA);
-    assert_eq(6.4, Math::lookup_periodic(table, table_size, 6.1), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic(table, table_size, 7.0), DOUBLE_DELTA);
-    assert_eq(1.7, Math::lookup_periodic(table, table_size, 7.7), DOUBLE_DELTA);
-    assert_eq(6.0, Math::lookup_periodic(table, table_size, 12.0), DOUBLE_DELTA);
-    assert_eq(6.3, Math::lookup_periodic(table, table_size, 12.3), DOUBLE_DELTA);
-    assert_eq(6.99, Math::lookup_periodic(table, table_size, 12.99), DOUBLE_DELTA);
-    assert_eq(6.94, Math::lookup_periodic(table, table_size, 13.01), DOUBLE_DELTA);
-    assert_eq(2.7, Math::lookup_periodic(table, table_size, 15.7), DOUBLE_DELTA);
-    assert_eq(6.3, Math::lookup_periodic(table, table_size, -15.7), DOUBLE_DELTA);
-    assert_eq(3.8, Math::lookup_periodic(table, table_size, -11.2), DOUBLE_DELTA);
-    assert_eq(7.0, Math::lookup_periodic(table, table_size, -8.0), DOUBLE_DELTA);
-    assert_eq(2.8, Math::lookup_periodic(table, table_size, -7.3), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic(table, table_size, -7.0), DOUBLE_DELTA);
-    assert_eq(2.0, Math::lookup_periodic(table, table_size, -6.0), DOUBLE_DELTA);
+    assert_eq(7.0, Math::lookup_periodic<true>(table, table_size, 6.0), DOUBLE_DELTA);
+    assert_eq(6.4, Math::lookup_periodic<true>(table, table_size, 6.1), DOUBLE_DELTA);
+    assert_eq(1.0, Math::lookup_periodic<true>(table, table_size, 7.0), DOUBLE_DELTA);
+    assert_eq(1.7, Math::lookup_periodic<true>(table, table_size, 7.7), DOUBLE_DELTA);
+    assert_eq(6.0, Math::lookup_periodic<true>(table, table_size, 12.0), DOUBLE_DELTA);
+    assert_eq(6.3, Math::lookup_periodic<true>(table, table_size, 12.3), DOUBLE_DELTA);
+    assert_eq(6.99, Math::lookup_periodic<true>(table, table_size, 12.99), DOUBLE_DELTA);
+    assert_eq(6.94, Math::lookup_periodic<true>(table, table_size, 13.01), DOUBLE_DELTA);
+    assert_eq(2.7, Math::lookup_periodic<true>(table, table_size, 15.7), DOUBLE_DELTA);
+    assert_eq(6.3, Math::lookup_periodic<false>(table, table_size, -15.7), DOUBLE_DELTA);
+    assert_eq(3.8, Math::lookup_periodic<false>(table, table_size, -11.2), DOUBLE_DELTA);
+    assert_eq(7.0, Math::lookup_periodic<false>(table, table_size, -8.0), DOUBLE_DELTA);
+    assert_eq(2.8, Math::lookup_periodic<false>(table, table_size, -7.3), DOUBLE_DELTA);
+    assert_eq(1.0, Math::lookup_periodic<false>(table, table_size, -7.0), DOUBLE_DELTA);
+    assert_eq(2.0, Math::lookup_periodic<false>(table, table_size, -6.0), DOUBLE_DELTA);
 })
 
 

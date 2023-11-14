@@ -186,6 +186,7 @@ class Math
          *        is greater than or equal to the specified \c table_size, then
          *        it wraps around.
          */
+        template<bool is_index_positive = false>
         static Number lookup_periodic(
             Number const* table,
             int const table_size,

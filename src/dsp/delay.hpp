@@ -133,7 +133,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         template<DelayBufferWritingMode mode>
         Integer write_delay_buffer(
-            Sample const* const* buffer,
+            Sample const* const* source_buffer,
             Integer const delay_buffer_index,
             Integer const sample_count
         ) noexcept;
@@ -179,7 +179,7 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer clear_index;
         Integer delay_buffer_size;
         Integer previous_round;
-        Number delay_buffer_size_inv;
+        Number delay_buffer_size_float;
         bool is_starting;
         bool need_gain;
         bool need_to_render_silence;

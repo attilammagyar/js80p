@@ -66,6 +66,7 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
     gain_buffer = NULL;
     time_buffer = NULL;
     delay_buffer_size = 0;
+    delay_buffer_size_float = 0.0;
 
     reallocate_delay_buffer_if_needed();
     reset();
@@ -146,6 +147,7 @@ void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexce
     if (new_delay_buffer_size != delay_buffer_size) {
         free_delay_buffer();
         delay_buffer_size = new_delay_buffer_size;
+        delay_buffer_size_float = (Number)delay_buffer_size;
         clear_index = this->block_size;
         allocate_delay_buffer();
     }
@@ -402,7 +404,7 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
 template<class InputSignalProducerClass>
 template<typename Delay<InputSignalProducerClass>::DelayBufferWritingMode mode>
 Integer Delay<InputSignalProducerClass>::write_delay_buffer(
-        Sample const* const* buffer,
+        Sample const* const* source_buffer,
         Integer const delay_buffer_index,
         Integer const sample_count
 ) noexcept {
@@ -410,25 +412,33 @@ Integer Delay<InputSignalProducerClass>::write_delay_buffer(
     Integer index = delay_buffer_index;
 
     for (Integer c = 0; c != channels; ++c) {
-        Sample const* samples;
+        Sample const* source_channel;
 
         if constexpr (mode == DelayBufferWritingMode::ADD) {
-            samples = buffer[c];
+            source_channel = source_buffer[c];
         }
 
         index = delay_buffer_index;
 
-        for (Integer i = 0; i != sample_count; ++i) {
-            if constexpr (mode == DelayBufferWritingMode::ADD) {
-                delay_buffer[c][index] += samples[i];
-            } else {
-                delay_buffer[c][index] = 0.0;
-            }
+        for (Integer i = 0; i != sample_count;) {
+            Integer const batch_size = std::min(sample_count - i, delay_buffer_size - index);
+            Integer const batch_end = index + batch_size;
 
-            ++index;
+            for (; index != batch_end; ++index) {
+                if constexpr (mode == DelayBufferWritingMode::ADD) {
+                    delay_buffer[c][index] += source_channel[i];
+                    ++i;
+                } else {
+                    delay_buffer[c][index] = 0.0;
+                }
+            }
 
             if (JS80P_UNLIKELY(index == delay_buffer_size)) {
                 index = 0;
+            }
+
+            if constexpr (mode != DelayBufferWritingMode::ADD) {
+                i += batch_size;
             }
         }
     }
@@ -540,19 +550,23 @@ void Delay<InputSignalProducerClass>::render(
             Sample const* const delay_channel = delay_buffer[c];
             Number read_index = read_index_float - time_value;
 
+            if (read_index < 0.0) {
+                read_index += delay_buffer_size_float;
+            }
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (need_gain) {
                     if constexpr (is_gain_constant) {
-                        buffer[c][i] = gain * Math::lookup_periodic(
+                        buffer[c][i] = gain * Math::lookup_periodic<true>(
                             delay_channel, delay_buffer_size, read_index
                         );
                     } else {
-                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic(
+                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic<true>(
                             delay_channel, delay_buffer_size, read_index
                         );
                     }
                 } else {
-                    buffer[c][i] = Math::lookup_periodic(
+                    buffer[c][i] = Math::lookup_periodic<true>(
                         delay_channel, delay_buffer_size, read_index
                     );
                 }
@@ -568,20 +582,20 @@ void Delay<InputSignalProducerClass>::render(
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (need_gain) {
                     if constexpr (is_gain_constant) {
-                        buffer[c][i] = gain * Math::lookup_periodic(
+                        buffer[c][i] = gain * Math::lookup_periodic<false>(
                             delay_channel,
                             delay_buffer_size,
                             read_index - time_buffer[i] * time_scale
                         );
                     } else {
-                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic(
+                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic<false>(
                             delay_channel,
                             delay_buffer_size,
                             read_index - time_buffer[i] * time_scale
                         );
                     }
                 } else {
-                    buffer[c][i] = Math::lookup_periodic(
+                    buffer[c][i] = Math::lookup_periodic<false>(
                         delay_channel,
                         delay_buffer_size,
                         read_index - time_buffer[i] * time_scale
@@ -816,14 +830,14 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 
         if (is_flipped) {
             for (Integer i = 0; i != sample_count; ++i) {
-                Number p = -panning_buffer[i];
+                Number const p = -panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
                 Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
             }
         } else {
             for (Integer i = 0; i != sample_count; ++i) {
-                Number p = panning_buffer[i];
+                Number const p = panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
                 Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
