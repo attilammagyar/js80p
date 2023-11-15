@@ -53,30 +53,30 @@ NoteStack::NoteStack() noexcept
 
 void NoteStack::clear() noexcept
 {
-    std::fill_n(linked_list, ITEMS, INVALID_ITEM);
-    std::fill_n(index, ITEMS, INVALID_ITEM);
+    std::fill_n(next, ITEMS, INVALID_ITEM);
+    std::fill_n(previous, ITEMS, INVALID_ITEM);
     std::fill_n(velocities, ITEMS, 0.0);
 
-    top_ = INVALID_ITEM;
+    head = INVALID_ITEM;
 }
 
 
 bool NoteStack::is_empty() const noexcept
 {
-    return top_ == INVALID_ITEM;
+    return head == INVALID_ITEM;
 }
 
 
 bool NoteStack::is_top(Midi::Channel const channel, Midi::Note const note) const noexcept
 {
-    return top_ == encode(channel, note);
+    return head == encode(channel, note);
 }
 
 
 void NoteStack::top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept
 {
-    decode(top_, channel, note);
-    velocity = is_empty() ? 0.0 : velocities[top_];
+    decode(head, channel, note);
+    velocity = is_empty() ? 0.0 : velocities[head];
 }
 
 
@@ -95,12 +95,12 @@ void NoteStack::push(
         remove(item);
     }
 
-    if (top_ != INVALID_ITEM) {
-        index[top_] = item;
+    if (head != INVALID_ITEM) {
+        previous[head] = item;
     }
 
-    linked_list[item] = top_;
-    top_ = item;
+    next[item] = head;
+    head = item;
     velocities[item] = velocity;
 }
 
@@ -115,7 +115,7 @@ bool NoteStack::is_invalid(
 
 bool NoteStack::is_already_pushed(Midi::Word const item) const noexcept
 {
-    return top_ == item || index[item] != INVALID_ITEM;
+    return head == item || previous[item] != INVALID_ITEM;
 }
 
 
@@ -128,15 +128,15 @@ void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
         return;
     }
 
-    Midi::Word const item = top_;
+    Midi::Word const item = head;
 
-    top_ = linked_list[item];
+    head = next[item];
 
-    if (top_ != INVALID_ITEM) {
-        index[top_] = INVALID_ITEM;
+    if (head != INVALID_ITEM) {
+        previous[head] = INVALID_ITEM;
     }
 
-    linked_list[item] = INVALID_ITEM;
+    next[item] = INVALID_ITEM;
 
     decode(item, channel, note);
     velocity = velocities[item];
@@ -154,22 +154,22 @@ void NoteStack::remove(Midi::Channel const channel, Midi::Note const note) noexc
 
 void NoteStack::remove(Midi::Word const item) noexcept
 {
-    Midi::Word const next_item = linked_list[item];
-    Midi::Word const key = index[item];
+    Midi::Word const next_item = next[item];
+    Midi::Word const previous_item = previous[item];
 
     if (next_item != INVALID_ITEM) {
-        index[next_item] = key;
+        previous[next_item] = previous_item;
     }
 
-    if (item == top_) {
-        top_ = next_item;
+    if (item == head) {
+        head = next_item;
     } else {
-        if (key != INVALID_ITEM) {
-            linked_list[key] = next_item;
+        if (previous_item != INVALID_ITEM) {
+            next[previous_item] = next_item;
         }
 
-        linked_list[item] = INVALID_ITEM;
-        index[item] = INVALID_ITEM;
+        next[item] = INVALID_ITEM;
+        previous[item] = INVALID_ITEM;
     }
 }
 
@@ -179,20 +179,20 @@ void NoteStack::remove(Midi::Word const item) noexcept
     // Midi::Channel channel;
     // Midi::Note note;
 
-    // fprintf(stderr, "  top:\t%hhx\n  lst:\t[", top_);
+    // fprintf(stderr, "  top:\t%hhx\n  nxt:\t[", head);
 
     // for (Midi::Word i = 0; i != ITEMS; ++i) {
-        // if (linked_list[i] != INVALID_ITEM) {
-            // decode(linked_list[i], channel, note);
+        // if (next[i] != INVALID_ITEM) {
+            // decode(next[i], channel, note);
             // fprintf(stderr, "%hhx:(%hhx,%hhx), ", i, channel, note);
         // }
     // }
 
-    // fprintf(stderr, "]\n  idx:\t[");
+    // fprintf(stderr, "]\n  prev:\t[");
 
     // for (Midi::Word i = 0; i != ITEMS; ++i) {
-        // if (index[i] != INVALID_ITEM) {
-            // decode(index[i], channel, note);
+        // if (previous[i] != INVALID_ITEM) {
+            // decode(previous[i], channel, note);
             // fprintf(stderr, "%hhx:(%hhx,%hhx), ", i, channel, note);
         // }
     // }

@@ -29,8 +29,9 @@ namespace JS80P
 {
 
 /**
- * \brief A stack (LIFO) for unique \c Midi::Note values where all operations
- *        cost O(1), including removing an element by value from the middle.
+ * \brief A stack (LIFO) for unique \c Midi::Channel and \c Midi::Note pairs
+ *        where all operations cost O(1), including removing an element by value
+ *        from the middle.
  */
 class NoteStack
 {
@@ -77,15 +78,25 @@ class NoteStack
 
         bool is_already_pushed(Midi::Word const word) const noexcept;
 
-        /* linked_list[X] = Y if and only if Y is the next element after X */
-        Midi::Word linked_list[ITEMS];
-
-        /* index[X] = Y if and only if linked_list[Y] = X */
-        Midi::Word index[ITEMS];
-
         Number velocities[ITEMS];
 
-        Midi::Word top_;
+        /*
+        Since we have a small, finite number of possible elements, and they are
+        unique, we can represent the LIFO container as a pair of arrays which
+        contain respectively the next and previous pointers of a finite sized
+        doubly linked list, and we can use the values themselves as indices
+        within the arrays. This way we can both add, remove, and look up
+        elements at any position of the container in constant time.
+
+        In other words:
+
+            next[X] = Y if and only if Y is the next element after X
+            previous[Y] = X if and only if next[X] = Y
+        */
+        Midi::Word next[ITEMS];
+        Midi::Word previous[ITEMS];
+
+        Midi::Word head;
 };
 
 }
