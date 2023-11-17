@@ -38,16 +38,18 @@ class Renderer
 
         Renderer(Synth& synth)
             : synth(synth),
-            round(0),
-            previous_round_sample_count(0)
+            rendered(NULL),
+            block_size(synth.get_block_size()),
+            next_rendered_sample_index(block_size),
+            round(0)
         {
         }
 
         /*
         Some hosts do use variable size buffers, and we don't want delay
         feedback buffers to run out of samples when a long batch is rendered
-        after a shorter one, so we split up rendering batches into chunks that
-        are smaller than the previously rendered batch.
+        after a shorter one, so we split up rendering batches into equal sized
+        chunks.
         */
         template<typename NumberType, Operation operation = Operation::OVERWRITE>
         void render(Integer const sample_count, NumberType** buffer)
@@ -56,59 +58,59 @@ class Renderer
                 return;
             }
 
-            Integer const previous_round_sample_count = (
-                JS80P_LIKELY(this->previous_round_sample_count != 0)
-                    ? this->previous_round_sample_count
-                    : sample_count
-            );
+            Integer const block_size = this->block_size;
 
-            Integer buffer_pos = 0;
-            Integer remaining = sample_count;
+            Integer next_rendered_sample_index = this->next_rendered_sample_index;
+            Integer next_output_sample_index = 0;
 
-            while (remaining > 0) {
-                round = (round + 1) & ROUND_MASK;
+            while (next_output_sample_index != sample_count) {
+                if (next_rendered_sample_index == block_size) {
+                    round = (round + 1) & ROUND_MASK;
+                    rendered = synth.generate_samples(round, block_size);
+                    next_rendered_sample_index = 0;
+                }
 
-                Integer const round_size = std::min(
-                    previous_round_sample_count, remaining
+                Integer const batch_size = std::min(
+                    sample_count - next_output_sample_index,
+                    block_size - next_rendered_sample_index
                 );
 
-                remaining -= round_size;
-
-                Sample const* const* samples = synth.generate_samples(
-                    round, round_size
-                );
-
-                if constexpr (operation == Operation::OVERWRITE) {
-                    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
-                        for (Integer i = 0; i != round_size; ++i) {
-                            buffer[c][buffer_pos + i] = (NumberType)samples[c][i];
-                        }
-                    }
-                } else {
-                    for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
-                        for (Integer i = 0; i != round_size; ++i) {
-                            buffer[c][buffer_pos + i] += (NumberType)samples[c][i];
+                for (Integer c = 0; c != Synth::OUT_CHANNELS; ++c) {
+                    for (Integer i = 0; i != batch_size; ++i) {
+                        if constexpr (operation == Operation::OVERWRITE) {
+                            buffer[c][next_output_sample_index + i] = (
+                                (NumberType)rendered[c][next_rendered_sample_index + i]
+                            );
+                        } else {
+                            buffer[c][next_output_sample_index + i] += (
+                                (NumberType)rendered[c][next_rendered_sample_index + i]
+                            );
                         }
                     }
                 }
 
-                buffer_pos += round_size;
+                next_rendered_sample_index += batch_size;
+                next_output_sample_index += batch_size;
             }
 
-            this->previous_round_sample_count = sample_count;
+            this->next_rendered_sample_index = next_rendered_sample_index;
         }
 
         void reset()
         {
-            previous_round_sample_count = 0;
+            rendered = NULL;
+            block_size = synth.get_block_size();
+            next_rendered_sample_index = block_size;
         }
 
     private:
         static constexpr Integer ROUND_MASK = 0x7fffff;
 
         Synth& synth;
+        Sample const* const* rendered;
+        Integer block_size;
+        Integer next_rendered_sample_index;
         Integer round;
-        Integer previous_round_sample_count;
 };
 
 }

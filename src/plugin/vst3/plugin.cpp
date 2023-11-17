@@ -209,7 +209,6 @@ tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(int32 symbolic_sa
 
 tresult PLUGIN_API Vst3Plugin::Processor::setupProcessing(Vst::ProcessSetup& setup)
 {
-    synth.set_block_size((Integer)setup.maxSamplesPerBlock);
     synth.set_sample_rate((Frequency)setup.sampleRate);
     renderer.reset();
 

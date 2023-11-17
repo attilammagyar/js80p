@@ -219,8 +219,8 @@ Usage
 
  * Click on the area below a knob to assign a controller to it.
 
- * It is recommended to use a small buffer size for lower latency, for example,
-   3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
+ * A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
+   gives good performance and low latency.
 
 <a id="tuning" href="#toc">Table of Contents</a>
 

@@ -63,7 +63,7 @@ class SignalProducer
                 Type type;
         };
 
-        static constexpr Integer DEFAULT_BLOCK_SIZE = 128;
+        static constexpr Integer DEFAULT_BLOCK_SIZE = 256;
         static constexpr Frequency DEFAULT_SAMPLE_RATE = 44100.0;
 
         static constexpr Number SILENCE_THRESHOLD_DB = -150.0;

@@ -519,9 +519,8 @@ class AboutText : public Widget
             "\n"
             "Click on the area below a knob to assign a controller to it.\n"
             "\n"
-            "It is recommended to use a small buffer size for lower latency,\n"
-            "for example, 3-6 milliseconds, or 128 or 256 samples\n"
-            "at 44.1 kHz sample rate.\n"
+            "A buffer size of around 6 ms (256 samples at 44.1 kHz sample\n"
+            "rate) usually gives good performance and low latency.\n"
         );
 
         AboutText(char const* sdk_version, GUI::Image logo);

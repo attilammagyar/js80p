@@ -707,13 +707,13 @@ void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
     }
 
     synth.set_sample_rate((Frequency)new_sample_rate);
+    renderer.reset();
 }
 
 
 void FstPlugin::set_block_size(VstIntPtr const new_block_size) noexcept
 {
     process_internal_messages_in_gui_thread();
-    synth.set_block_size((Integer)new_block_size);
     renderer.reset();
 }
 
