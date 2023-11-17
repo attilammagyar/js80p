@@ -27,6 +27,7 @@
 
 #include "js80p.hpp"
 #include "midi.hpp"
+#include "renderer.hpp"
 
 #include "bank.cpp"
 #include "serializer.cpp"
@@ -189,6 +190,8 @@ void render_sound(
     Synth synth;
     Bank bank;
     WavBuffer buffer;
+    Renderer renderer(synth);
+    Sample* samples[Synth::OUT_CHANNELS];
     std::vector<Midi::Note> notes = {
         Midi::NOTE_C_2,
         Midi::NOTE_C_3,
@@ -207,6 +210,10 @@ void render_sound(
     Midi::Byte mod_wheel = 0;
     Midi::Byte channel_pressure = 0;
     Midi::Byte velocity = initial_velocity;
+
+    for (Integer i = 0; i != Synth::OUT_CHANNELS; ++i) {
+        samples[i] = new Sample[BLOCK_SIZE];
+    }
 
     Serializer::import_patch_in_audio_thread(synth, bank[program_index].serialize());
 
@@ -244,7 +251,7 @@ void render_sound(
             }
         }
 
-        Sample const* const* samples = synth.generate_samples(r, BLOCK_SIZE);
+        renderer.render<Sample>((Integer)BLOCK_SIZE, samples);
 
         for (size_t i = 0; i != BLOCK_SIZE; ++i) {
             buffer.append24(sample_to_wav(samples[0][i]));
@@ -253,6 +260,11 @@ void render_sound(
 
         out_file.write(buffer.get_buffer(), buffer.get_buffer_pos());
         buffer.clear();
+    }
+
+    for (Integer i = 0; i != Synth::OUT_CHANNELS; ++i) {
+        delete[] samples[i];
+        samples[i] = NULL;
     }
 }
 
