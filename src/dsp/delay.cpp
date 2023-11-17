@@ -305,7 +305,7 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     if (is_delay_buffer_silent()) {
         if (JS80P_UNLIKELY(need_to_render_silence)) {
             need_to_render_silence = false;
-            this->render_silence(round, 0, sample_count, this->buffer);
+            this->render_silence(round, 0, this->block_size, this->buffer);
         }
 
         this->mark_round_as_silent(round);
