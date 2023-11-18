@@ -40,7 +40,7 @@ enum RenderMode {
 
 void test_varaible_size_rounds(RenderMode const mode)
 {
-    constexpr Integer buffer_size = 1024;
+    constexpr Integer buffer_size = 2048;
     constexpr Frequency sample_rate = 11025.0;
     constexpr Number volume_per_channel = std::sin(Math::PI / 4.0);
     constexpr Integer round_sizes[] = {
@@ -48,6 +48,9 @@ void test_varaible_size_rounds(RenderMode const mode)
         20, 20, 20, 10, 10,
         10, 90, 150, 160, 0,
         9, 0, 0, 15, 10,
+        100, 99, 100, 99, 101,
+        8, 1, 1, 6, 1, 101, 6,
+        100, 101, 99, 20, 81,
         -1,
     };
 
