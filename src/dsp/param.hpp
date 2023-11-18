@@ -395,9 +395,9 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         template<bool is_logarithmic_>
-        Sample const* const* process_midi_controller_events() noexcept;
+        void process_midi_controller_events() noexcept;
 
-        Sample const* const* process_macro(Integer const sample_count) noexcept;
+        void process_macro(Integer const sample_count) noexcept;
 
         Seconds smooth_change_duration(
             Number const previous_value,

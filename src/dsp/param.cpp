@@ -1147,12 +1147,12 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
         return process_lfo(round, sample_count);
     } else if (this->midi_controller != NULL) {
         if (is_logarithmic()) {
-            return process_midi_controller_events<true>();
+            process_midi_controller_events<true>();
         } else {
-            return process_midi_controller_events<false>();
+            process_midi_controller_events<false>();
         }
     } else if (this->macro != NULL) {
-        return process_macro(sample_count);
+        process_macro(sample_count);
     } else {
         Envelope* envelope = get_envelope();
 
@@ -1186,14 +1186,14 @@ Sample const* const* FloatParam<evaluation>::process_lfo(
 
 template<ParamEvaluation evaluation>
 template<bool is_logarithmic_>
-Sample const* const* FloatParam<evaluation>::process_midi_controller_events() noexcept
+void FloatParam<evaluation>::process_midi_controller_events() noexcept
 {
     Queue<SignalProducer::Event>::SizeType const number_of_ctl_events = (
         this->midi_controller->events.length()
     );
 
     if (number_of_ctl_events == 0) {
-        return NULL;
+        return;
     }
 
     this->cancel_events_at(0.0);
@@ -1210,7 +1210,7 @@ Sample const* const* FloatParam<evaluation>::process_midi_controller_events() no
             }
         }
 
-        return NULL;
+        return;
     }
 
     Queue<SignalProducer::SignalProducer::Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
@@ -1252,21 +1252,18 @@ Sample const* const* FloatParam<evaluation>::process_midi_controller_events() no
 
         previous_time_offset = time_offset;
     }
-
-    return NULL;
 }
 
 
 template<ParamEvaluation evaluation>
-Sample const* const* FloatParam<evaluation>::process_macro(
-        Integer const sample_count
-) noexcept {
+void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
+{
     this->macro->update();
 
     Integer const new_change_index = this->macro->get_change_index();
 
     if (new_change_index == this->macro_change_index) {
-        return NULL;
+        return;
     }
 
     this->macro_change_index = new_change_index;
@@ -1285,8 +1282,6 @@ Sample const* const* FloatParam<evaluation>::process_macro(
         );
         schedule_linear_ramp(duration, ratio_to_value(macro_value));
     }
-
-    return NULL;
 }
 
 
