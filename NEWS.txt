@@ -1,3 +1,12 @@
+v2.4.3 (2023-11-18)
+ * Reduced RAM usage.
+ * Bugfix: despite the efforts in v1.5.1, in some circumstances, short delay
+   times (lower than 3-5 milliseconds) could still make the feedback lines
+   noisy in delay based effects in hosts which use variable rendering block
+   size (e.g. FL Studio). The rendering logic has been adjusted to prevent
+   delay feedback lines from falling behind and becoming discontinuous when the
+   host requests a large rendering batch after a sequence of short ones.
+
 v2.4.2 (2023-11-12)
  * The MTS-ESP mode (continuous or note-on) is now shown at the beginning of
    the tuning selector for better readability.
