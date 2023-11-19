@@ -1533,7 +1533,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
-    assert_true(float_param.is_constant_until(2));
+    assert_false(float_param.is_constant_until(2));
     assert_false(float_param.is_constant_until(3));
 
     /* Sample-exact param usage. */
@@ -1585,6 +1585,7 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
     reference_float_param.set_sample_rate(sample_rate);
 
     reference_float_param.set_value(0.0);
+    reference_float_param.schedule_value(0.01, 0.0);
 
     reference_float_param.schedule_linear_ramp(small_change_duration, 0.1);
     reference_float_param.schedule_linear_ramp(0.3, 3.3);
@@ -1628,7 +1629,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
-    assert_true(follower.is_constant_until(2));
+    assert_false(follower.is_constant_until(2));
     assert_false(follower.is_constant_until(3));
 
     assert_false(follower.is_constant_in_next_round(1, block_size));

@@ -660,14 +660,7 @@ bool FloatParam<evaluation>::is_constant_until(
     }
 
     if (this->midi_controller != NULL) {
-        return (
-            this->midi_controller->events.is_empty()
-            || !(
-                this->is_time_offset_before_sample_count(
-                    this->midi_controller->events.front().time_offset, last_sample_idx
-                )
-            )
-        );
+        return this->midi_controller->events.is_empty();
     }
 
     if (this->macro != NULL) {
@@ -1196,7 +1189,7 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
         return;
     }
 
-    this->cancel_events_at(0.0);
+    this->cancel_events_at(this->midi_controller->events[0].time_offset);
 
     if (should_round) {
         for (Queue<SignalProducer::SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
