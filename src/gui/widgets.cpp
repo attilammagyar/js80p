@@ -1465,6 +1465,8 @@ TextBoxParamEditor::TextBoxParamEditor(
         int const top,
         int const width,
         int const height,
+        int const text_left,
+        int const text_width,
         Synth& synth,
         Synth::ParamId const param_id,
         char const* const* const options,
@@ -1475,6 +1477,8 @@ TextBoxParamEditor::TextBoxParamEditor(
     ratio(0.0),
     options(options),
     options_count(options_count),
+    text_left(text_left),
+    text_width(text_width),
     is_editing_(false)
 {
     set_gui(gui);
@@ -1548,7 +1552,7 @@ bool TextBoxParamEditor::paint()
     TransparentWidget::paint();
 
     draw_text(
-        value_str, 9, 0, 0, width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+        value_str, 9, text_left, 0, text_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
     );
 
     return true;
@@ -1612,6 +1616,8 @@ TuningSelector::TuningSelector(
         top,
         WIDTH,
         HEIGHT,
+        0,
+        WIDTH,
         synth,
         param_id,
         GUI::TUNINGS,

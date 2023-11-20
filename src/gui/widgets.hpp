@@ -606,6 +606,8 @@ class TextBoxParamEditor : public TransparentWidget
             int const top,
             int const width,
             int const height,
+            int const text_left,
+            int const text_width,
             Synth& synth,
             Synth::ParamId const param_id,
             char const* const* const options,
@@ -640,6 +642,8 @@ class TextBoxParamEditor : public TransparentWidget
         char const* const* const options;
         int const options_count;
 
+        int const text_left;
+        int const text_width;
         bool is_editing_;
 };
 
