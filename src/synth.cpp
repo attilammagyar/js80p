@@ -635,6 +635,15 @@ void Synth::create_lfos() noexcept
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
 
+    register_param<ToggleParam>(ParamId::L1SYN, lfos_rw[0]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L2SYN, lfos_rw[1]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L3SYN, lfos_rw[2]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L4SYN, lfos_rw[3]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L5SYN, lfos_rw[4]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L6SYN, lfos_rw[5]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L7SYN, lfos_rw[6]->tempo_sync);
+    register_param<ToggleParam>(ParamId::L8SYN, lfos_rw[7]->tempo_sync);
+
     register_param<ToggleParam>(ParamId::L1CEN, lfos_rw[0]->center);
     register_param<ToggleParam>(ParamId::L2CEN, lfos_rw[1]->center);
     register_param<ToggleParam>(ParamId::L3CEN, lfos_rw[2]->center);
@@ -644,14 +653,14 @@ void Synth::create_lfos() noexcept
     register_param<ToggleParam>(ParamId::L7CEN, lfos_rw[6]->center);
     register_param<ToggleParam>(ParamId::L8CEN, lfos_rw[7]->center);
 
-    register_param<ToggleParam>(ParamId::L1SYN, lfos_rw[0]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L2SYN, lfos_rw[1]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L3SYN, lfos_rw[2]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L4SYN, lfos_rw[3]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L5SYN, lfos_rw[4]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L6SYN, lfos_rw[5]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L7SYN, lfos_rw[6]->tempo_sync);
-    register_param<ToggleParam>(ParamId::L8SYN, lfos_rw[7]->tempo_sync);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L1AEN, lfos_rw[0]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L2AEN, lfos_rw[1]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L3AEN, lfos_rw[2]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L4AEN, lfos_rw[3]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L5AEN, lfos_rw[4]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L6AEN, lfos_rw[5]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L7AEN, lfos_rw[6]->amount_envelope);
+    register_param<LFO::AmountEnvelopeParam>(ParamId::L8AEN, lfos_rw[7]->amount_envelope);
 }
 
 
@@ -1734,6 +1743,14 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_default_ratio();
         case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_default_ratio();
         case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_default_ratio();
+        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_default_ratio();
+        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_default_ratio();
+        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_default_ratio();
+        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_default_ratio();
+        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_default_ratio();
+        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_default_ratio();
+        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_default_ratio();
+        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1980,6 +1997,14 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_max_value();
         case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_max_value();
         case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_max_value();
+        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_max_value();
+        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_max_value();
+        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_max_value();
+        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_max_value();
+        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_max_value();
+        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_max_value();
+        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_max_value();
+        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -2234,6 +2259,14 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.ratio_to_value(ratio);
         case ParamId::EF1QLG: return effects.filter_1_q_log_scale.ratio_to_value(ratio);
         case ParamId::EF2QLG: return effects.filter_2_q_log_scale.ratio_to_value(ratio);
+        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2720,14 +2753,6 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6WAV: lfos_rw[5]->waveform.set_ratio(ratio); break;
             case ParamId::L7WAV: lfos_rw[6]->waveform.set_ratio(ratio); break;
             case ParamId::L8WAV: lfos_rw[7]->waveform.set_ratio(ratio); break;
-            case ParamId::L1SYN: lfos_rw[0]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L2SYN: lfos_rw[1]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L3SYN: lfos_rw[2]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L4SYN: lfos_rw[3]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L5SYN: lfos_rw[4]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L6SYN: lfos_rw[5]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L7SYN: lfos_rw[6]->tempo_sync.set_ratio(ratio); break;
-            case ParamId::L8SYN: lfos_rw[7]->tempo_sync.set_ratio(ratio); break;
             case ParamId::L1CEN: lfos_rw[0]->center.set_ratio(ratio); break;
             case ParamId::L2CEN: lfos_rw[1]->center.set_ratio(ratio); break;
             case ParamId::L3CEN: lfos_rw[2]->center.set_ratio(ratio); break;
@@ -2736,6 +2761,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6CEN: lfos_rw[5]->center.set_ratio(ratio); break;
             case ParamId::L7CEN: lfos_rw[6]->center.set_ratio(ratio); break;
             case ParamId::L8CEN: lfos_rw[7]->center.set_ratio(ratio); break;
+            case ParamId::L1SYN: lfos_rw[0]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L2SYN: lfos_rw[1]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L3SYN: lfos_rw[2]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L4SYN: lfos_rw[3]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L5SYN: lfos_rw[4]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L6SYN: lfos_rw[5]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L7SYN: lfos_rw[6]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::L8SYN: lfos_rw[7]->tempo_sync.set_ratio(ratio); break;
             case ParamId::ECSYN: effects.chorus.tempo_sync.set_ratio(ratio); break;
             case ParamId::EESYN: effects.echo.tempo_sync.set_ratio(ratio); break;
             case ParamId::MF1LOG: modulator_params.filter_1_freq_log_scale.set_ratio(ratio); break;
@@ -2774,6 +2807,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2QLG: carrier_params.filter_2_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF1QLG: effects.filter_1_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF2QLG: effects.filter_2_q_log_scale.set_ratio(ratio); break;
+            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -3522,6 +3563,14 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_ratio();
         case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_ratio();
         case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_ratio();
+        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_ratio();
+        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_ratio();
+        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_ratio();
+        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_ratio();
+        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_ratio();
+        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_ratio();
+        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_ratio();
+        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }

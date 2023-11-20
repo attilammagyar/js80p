@@ -44,6 +44,8 @@ class LFO : public SignalProducer
     public:
         typedef Oscillator<SignalProducer, true> Oscillator_;
 
+        typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
+
         explicit LFO(std::string const& name) noexcept;
 
         /* No, this is not a macro. */
@@ -76,6 +78,7 @@ class LFO : public SignalProducer
         FloatParamS randomness;
         ToggleParam tempo_sync;
         ToggleParam center;
+        AmountEnvelopeParam amount_envelope;
 
     protected:
         Sample const* const* initialize_rendering(

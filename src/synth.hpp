@@ -679,7 +679,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             EF1QLG = 499,    ///< Effects Filter 1 Logarithmic Q Factor
             EF2QLG = 500,    ///< Effects Filter 2 Logarithmic Q Factor
 
-            PARAM_ID_COUNT = 501,
+            L1AEN = 501,     ///< LFO 1 Amount Envelope
+            L2AEN = 502,     ///< LFO 2 Amount Envelope
+            L3AEN = 503,     ///< LFO 3 Amount Envelope
+            L4AEN = 504,     ///< LFO 4 Amount Envelope
+            L5AEN = 505,     ///< LFO 5 Amount Envelope
+            L6AEN = 506,     ///< LFO 6 Amount Envelope
+            L7AEN = 507,     ///< LFO 7 Amount Envelope
+            L8AEN = 508,     ///< LFO 8 Amount Envelope
+
+            PARAM_ID_COUNT = 509,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 

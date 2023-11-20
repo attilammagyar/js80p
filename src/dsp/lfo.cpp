@@ -28,7 +28,7 @@ namespace JS80P
 {
 
 LFO::LFO(std::string const& name) noexcept
-    : SignalProducer(1, 11, 0, &oscillator),
+    : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(name + "FRQ", 0.01, 30.0, 1.0),
     phase(name + "PHS", 0.0, 1.0, 0.0),
@@ -39,6 +39,7 @@ LFO::LFO(std::string const& name) noexcept
     randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
+    amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
     oscillator(waveform, amount, frequency, phase, tempo_sync, center)
 {
     initialize_instance();
@@ -57,6 +58,7 @@ void LFO::initialize_instance() noexcept
     register_child(randomness);
     register_child(tempo_sync);
     register_child(center);
+    register_child(amount_envelope);
     register_child(oscillator);
 }
 
@@ -69,7 +71,7 @@ LFO::LFO(
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
-    : SignalProducer(1, 11, 0, &oscillator),
+    : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(frequency_leader),
     phase(name + "PHS", 0.0, 1.0, phase_offset),
@@ -80,6 +82,7 @@ LFO::LFO(
     randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
+    amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
     oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
 {
     initialize_instance();
