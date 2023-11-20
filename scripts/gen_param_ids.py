@@ -296,6 +296,15 @@ def print_special_params(param_id: int) -> int:
         ("CF2QLG", "///< Carrier Filter 2 Logarithmic Q Factor"),
         ("EF1QLG", "///< Effects Filter 1 Logarithmic Q Factor"),
         ("EF2QLG", "///< Effects Filter 2 Logarithmic Q Factor"),
+
+        ("L1AEN", " ///< LFO 1 Amount Envelope"),
+        ("L2AEN", " ///< LFO 2 Amount Envelope"),
+        ("L3AEN", " ///< LFO 3 Amount Envelope"),
+        ("L4AEN", " ///< LFO 4 Amount Envelope"),
+        ("L5AEN", " ///< LFO 5 Amount Envelope"),
+        ("L6AEN", " ///< LFO 6 Amount Envelope"),
+        ("L7AEN", " ///< LFO 7 Amount Envelope"),
+        ("L8AEN", " ///< LFO 8 Amount Envelope"),
     ]
 
     return print_params(param_id, "", "", 1, params)

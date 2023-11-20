@@ -287,8 +287,22 @@ h1 {
 }
 
 .block h1 label.center {
-  margin-left: 125px;
+  margin-left: 55px;
   margin-top: 2px;
+}
+
+.block h1 label.envelope {
+  margin-left: 35px;
+  margin-bottom: -3px;
+  line-height: 12px;
+  height: 20px;
+  overflow: visible;
+}
+
+.block h1 label.envelope input {
+  width: 25px;
+  height: 19px;
+  margin-top: -2px;
 }
 
 #main div input,
@@ -822,7 +836,7 @@ function create_knob(container, label_text, value_text, controller_text, without
 
 window.onload = function ()
 {
-    var i, o, s, d, h, k1, k2, k3, l, l2, n2;
+    var i, o, s, d, h, k1, k2, k3, l, l2, n2, l3, n3;
 
     if (String(window.location).match(/#hide/)) {
         document.getElementsByTagName("body")[0].setAttribute("class", "hide-objects");
@@ -1034,11 +1048,21 @@ window.onload = function ()
         l.setAttribute("class", "sync");
         n = document.createElement("input");
         n.setAttribute("type", "text");
+
+        l3 = document.createElement("label");
+        l3.innerHTML = "ENVELOPE ";
+        l3.setAttribute("class", "envelope");
+        n3 = document.createElement("input");
+        n3.setAttribute("type", "text");
+
         l2 = document.createElement("label");
         l2.innerHTML = "CENTER ";
         l2.setAttribute("class", "center");
         n2 = document.createElement("input");
         n2.setAttribute("type", "text");
+
+        l3.appendChild(n3);
+        h.appendChild(l3);
         l2.appendChild(n2);
         h.appendChild(l2);
         l.appendChild(n);

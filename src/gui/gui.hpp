@@ -118,6 +118,9 @@ class GUI
         static char const* const REVERB_TYPES[];
         static int const REVERB_TYPES_COUNT;
 
+        static char const* const LFO_AMOUNT_ENVELOPES[];
+        static int const LFO_AMOUNT_ENVELOPES_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];

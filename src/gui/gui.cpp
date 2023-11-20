@@ -193,6 +193,25 @@ char const* const GUI::REVERB_TYPES[] = {
 int const GUI::REVERB_TYPES_COUNT = 10;
 
 
+char const* const GUI::LFO_AMOUNT_ENVELOPES[] = {
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "",
+};
+
+int const GUI::LFO_AMOUNT_ENVELOPES_COUNT = 13;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -786,6 +805,15 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CF2QLG] = "Carrier Filter 2 Logarithmic Q Factor",
     [Synth::ParamId::EF1QLG] = "Filter 1 Logarithmic Q Factor",
     [Synth::ParamId::EF2QLG] = "Filter 2 Logarithmic Q Factor",
+
+    [Synth::ParamId::L1AEN] = "LFO 1 Amount Envelope",
+    [Synth::ParamId::L2AEN] = "LFO 2 Amount Envelope",
+    [Synth::ParamId::L3AEN] = "LFO 3 Amount Envelope",
+    [Synth::ParamId::L4AEN] = "LFO 4 Amount Envelope",
+    [Synth::ParamId::L5AEN] = "LFO 5 Amount Envelope",
+    [Synth::ParamId::L6AEN] = "LFO 6 Amount Envelope",
+    [Synth::ParamId::L7AEN] = "LFO 7 Amount Envelope",
+    [Synth::ParamId::L8AEN] = "LFO 8 Amount Envelope",
 };
 
 
@@ -2049,6 +2077,13 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
 
+    constexpr int aew = 93;
+    constexpr int aeh = 19;
+    constexpr int aetw = 21;
+    constexpr int aetl = 70;
+    constexpr char const* const* ae = JS80P::GUI::LFO_AMOUNT_ENVELOPES;
+    constexpr int aec = JS80P::GUI::LFO_AMOUNT_ENVELOPES_COUNT;
+
     KNOB(lfos_body,  16 + KNOB_W * 0,  32, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 1,  32, Synth::ParamId::L1FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 2,  32, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2058,7 +2093,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body,  16 + KNOB_W * 6,  32, Synth::ParamId::L1DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 7,  32, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 372,   6, 111, 24, 87, Synth::ParamId::L1SYN);
-    TOGG(lfos_body, 188,   6,  75, 24, 51, Synth::ParamId::L1CEN);
+    TOGG(lfos_body, 250,   6,  75, 24, 51, Synth::ParamId::L1CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L1AEN], 98, 8, aew, aeh, aetl, aetw, synth, Synth::ParamId::L1AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body, 496 + KNOB_W * 0,  32, Synth::ParamId::L2WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 1,  32, Synth::ParamId::L2FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2069,7 +2109,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body, 496 + KNOB_W * 6,  32, Synth::ParamId::L2DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 7,  32, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 852,   6, 111, 24, 87, Synth::ParamId::L2SYN);
-    TOGG(lfos_body, 668,   6,  75, 24, 51, Synth::ParamId::L2CEN);
+    TOGG(lfos_body, 730,   6,  75, 24, 51, Synth::ParamId::L2CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L2AEN], 578, 8, aew, aeh, aetl, aetw, synth, Synth::ParamId::L2AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body,  16 + KNOB_W * 0, 172, Synth::ParamId::L3WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 1, 172, Synth::ParamId::L3FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2080,7 +2125,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body,  16 + KNOB_W * 6, 172, Synth::ParamId::L3DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 7, 172, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 372, 146, 111, 24, 87, Synth::ParamId::L3SYN);
-    TOGG(lfos_body, 188, 146,  75, 24, 51, Synth::ParamId::L3CEN);
+    TOGG(lfos_body, 250, 146,  75, 24, 51, Synth::ParamId::L3CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L3AEN], 98, 148, aew, aeh, aetl, aetw, synth, Synth::ParamId::L3AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body, 496 + KNOB_W * 0, 172, Synth::ParamId::L4WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 1, 172, Synth::ParamId::L4FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2091,7 +2141,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body, 496 + KNOB_W * 6, 172, Synth::ParamId::L4DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 7, 172, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 852, 146, 111, 24, 87, Synth::ParamId::L4SYN);
-    TOGG(lfos_body, 668, 146,  75, 24, 51, Synth::ParamId::L4CEN);
+    TOGG(lfos_body, 730, 146,  75, 24, 51, Synth::ParamId::L4CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L4AEN], 578, 148, aew, aeh, aetl, aetw, synth, Synth::ParamId::L4AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body,  16 + KNOB_W * 0, 312, Synth::ParamId::L5WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 1, 312, Synth::ParamId::L5FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2102,7 +2157,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body,  16 + KNOB_W * 6, 312, Synth::ParamId::L5DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 7, 312, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 372, 286, 111, 24, 87, Synth::ParamId::L5SYN);
-    TOGG(lfos_body, 188, 286,  75, 24, 51, Synth::ParamId::L5CEN);
+    TOGG(lfos_body, 250, 286,  75, 24, 51, Synth::ParamId::L5CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L5AEN], 98, 288, aew, aeh, aetl, aetw, synth, Synth::ParamId::L5AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body, 496 + KNOB_W * 0, 312, Synth::ParamId::L6WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 1, 312, Synth::ParamId::L6FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2113,7 +2173,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body, 496 + KNOB_W * 6, 312, Synth::ParamId::L6DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 7, 312, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 852, 286, 111, 24, 87, Synth::ParamId::L6SYN);
-    TOGG(lfos_body, 668, 286,  75, 24, 51, Synth::ParamId::L6CEN);
+    TOGG(lfos_body, 730, 286,  75, 24, 51, Synth::ParamId::L6CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L6AEN], 578, 288, aew, aeh, aetl, aetw, synth, Synth::ParamId::L6AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body,  16 + KNOB_W * 0, 452, Synth::ParamId::L7WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 1, 452, Synth::ParamId::L7FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2124,7 +2189,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body,  16 + KNOB_W * 6, 452, Synth::ParamId::L7DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,  16 + KNOB_W * 7, 452, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 372, 426, 111, 24, 87, Synth::ParamId::L7SYN);
-    TOGG(lfos_body, 188, 426,  75, 24, 51, Synth::ParamId::L7CEN);
+    TOGG(lfos_body, 250, 426,  75, 24, 51, Synth::ParamId::L7CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L7AEN], 98, 428, aew, aeh, aetl, aetw, synth, Synth::ParamId::L7AEN, ae, aec
+        )
+    );
 
     KNOB(lfos_body, 496 + KNOB_W * 0, 452, Synth::ParamId::L8WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 1, 452, Synth::ParamId::L8FRQ,  MML_C,    "%.2f", 1.0, knob_states);
@@ -2135,7 +2205,12 @@ void GUI::build_lfos_body(KnobStates* knob_states)
     KNOB(lfos_body, 496 + KNOB_W * 6, 452, Synth::ParamId::L8DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body, 496 + KNOB_W * 7, 452, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 852, 426, 111, 24, 87, Synth::ParamId::L8SYN);
-    TOGG(lfos_body, 668, 426,  75, 24, 51, Synth::ParamId::L8CEN);
+    TOGG(lfos_body, 730, 426,  75, 24, 51, Synth::ParamId::L8CEN);
+    lfos_body->own(
+        new TextBoxParamEditor(
+            *this, GUI::PARAMS[Synth::ParamId::L8AEN], 578, 428, aew, aeh, aetl, aetw, synth, Synth::ParamId::L8AEN, ae, aec
+        )
+    );
 
     lfos_body->hide();
 }
