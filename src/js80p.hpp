@@ -76,6 +76,7 @@ namespace Constants {
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
 
     constexpr Integer ENVELOPES = 12;
+    constexpr Integer LFOS = 8;
 
     constexpr Number AM_DEFAULT = 0.0;
     constexpr Number AM_MAX = 3.0;

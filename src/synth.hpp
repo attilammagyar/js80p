@@ -81,7 +81,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer MACROS = 20;
         static constexpr Integer MACRO_FLOAT_PARAMS = 6;
 
-        static constexpr Integer LFOS = 8;
         static constexpr Integer LFO_FLOAT_PARAMS = 7;
 
         enum MessageType {
@@ -1502,7 +1501,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
         std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
         Envelope* envelopes_rw[Constants::ENVELOPES];
-        LFO* lfos_rw[LFOS];
+        LFO* lfos_rw[Constants::LFOS];
         Macro* macros_rw[MACROS];
         MidiController* midi_controllers_rw[MIDI_CONTROLLERS];
         Integer midi_note_to_voice_assignments[Midi::CHANNELS][Midi::NOTES];

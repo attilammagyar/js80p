@@ -85,7 +85,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + 1                         /* effects                                  */
         + MACROS * MACRO_FLOAT_PARAMS
         + Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_TOGGLE_PARAMS)
-        + LFOS
+        + Constants::LFOS
     ),
     polyphonic("POLY", ToggleParam::ON),
     mode("MODE"),
@@ -612,7 +612,7 @@ void Synth::create_lfos() noexcept
 {
     Integer next_id = ParamId::L1FRQ;
 
-    for (Integer i = 0; i != LFOS; ++i) {
+    for (Integer i = 0; i != Constants::LFOS; ++i) {
         LFO* lfo = new LFO(std::string("L") + to_string(i + 1));
         lfos_rw[i] = lfo;
 
@@ -743,7 +743,7 @@ Synth::~Synth()
         }
     }
 
-    for (Integer i = 0; i != LFOS; ++i) {
+    for (Integer i = 0; i != Constants::LFOS; ++i) {
         delete lfos_rw[i];
     }
 
@@ -834,7 +834,7 @@ void Synth::suspend() noexcept
 
 void Synth::stop_lfos() noexcept
 {
-    for (Integer i = 0; i != LFOS; ++i) {
+    for (Integer i = 0; i != Constants::LFOS; ++i) {
         lfos_rw[i]->stop(0.0);
     }
 
@@ -916,7 +916,7 @@ void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const c
 
 void Synth::start_lfos() noexcept
 {
-    for (Integer i = 0; i != LFOS; ++i) {
+    for (Integer i = 0; i != Constants::LFOS; ++i) {
         lfos_rw[i]->start(0.0);
     }
 
@@ -2431,7 +2431,7 @@ Sample const* const* Synth::initialize_rendering(
 
     FloatParamS::produce_if_not_constant(effects.volume_3_gain, round, sample_count);
 
-    for (Integer i = 0; i != LFOS; ++i) {
+    for (Integer i = 0; i != Constants::LFOS; ++i) {
         lfos_rw[i]->skip_round(round, sample_count);
     }
 
