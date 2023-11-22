@@ -89,18 +89,47 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     ),
     polyphonic("POLY", ToggleParam::ON),
     mode("MODE"),
-    modulator_add_volume("MIX", 0.0, 1.0, 1.0),
+    modulator_add_volume(
+        "MIX",
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        (Envelope* const*)&envelopes_rw,
+        (LFO* const*)&lfos_rw
+    ),
     phase_modulation_level(
-        "PM", Constants::PM_MIN, Constants::PM_MAX, Constants::PM_DEFAULT
+        "PM",
+        Constants::PM_MIN,
+        Constants::PM_MAX,
+        Constants::PM_DEFAULT,
+        0.0,
+        (Envelope* const*)&envelopes_rw,
+        (LFO* const*)&lfos_rw
+
     ),
     frequency_modulation_level(
-        "FM", Constants::FM_MIN, Constants::FM_MAX, Constants::FM_DEFAULT
+        "FM",
+        Constants::FM_MIN,
+        Constants::FM_MAX,
+        Constants::FM_DEFAULT,
+        0.0,
+        (Envelope* const*)&envelopes_rw,
+        (LFO* const*)&lfos_rw
+
     ),
     amplitude_modulation_level(
-        "AM", Constants::AM_MIN, Constants::AM_MAX, Constants::AM_DEFAULT
+        "AM",
+        Constants::AM_MIN,
+        Constants::AM_MAX,
+        Constants::AM_DEFAULT,
+        0.0,
+        (Envelope* const*)&envelopes_rw,
+        (LFO* const*)&lfos_rw
+
     ),
-    modulator_params("M"),
-    carrier_params("C"),
+    modulator_params("M", (Envelope* const*)&envelopes_rw, (LFO* const*)&lfos_rw),
+    carrier_params("C", (Envelope* const*)&envelopes_rw, (LFO* const*)&lfos_rw),
     messages(MESSAGE_QUEUE_SIZE),
     bus(
         OUT_CHANNELS,
@@ -154,11 +183,11 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     register_child(effects);
     register_effects_params();
 
+    create_envelopes();
+    create_lfos();
     create_voices();
     create_midi_controllers();
     create_macros();
-    create_envelopes();
-    create_lfos();
 
     modulator_params.filter_1_freq_log_scale.set_value(ToggleParam::ON);
     modulator_params.filter_2_freq_log_scale.set_value(ToggleParam::ON);
@@ -512,7 +541,9 @@ void Synth::create_voices() noexcept
             calculate_inaccuracy_seed((i + 23) % POLYPHONY),
             modulator_params,
             &biquad_filter_shared_buffers[0],
-            &biquad_filter_shared_buffers[1]
+            &biquad_filter_shared_buffers[1],
+            envelopes,
+            lfos
         );
         register_child(*modulators[i]);
 
@@ -527,7 +558,9 @@ void Synth::create_voices() noexcept
             frequency_modulation_level,
             phase_modulation_level,
             &biquad_filter_shared_buffers[2],
-            &biquad_filter_shared_buffers[3]
+            &biquad_filter_shared_buffers[3],
+            envelopes,
+            lfos
         );
         register_child(*carriers[i]);
     }
@@ -613,7 +646,7 @@ void Synth::create_lfos() noexcept
     Integer next_id = ParamId::L1FRQ;
 
     for (Integer i = 0; i != Constants::LFOS; ++i) {
-        LFO* lfo = new LFO(std::string("L") + to_string(i + 1));
+        LFO* lfo = new LFO(std::string("L") + to_string(i + 1), i);
         lfos_rw[i] = lfo;
 
         register_child(*lfo);

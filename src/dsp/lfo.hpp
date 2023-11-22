@@ -46,7 +46,7 @@ class LFO : public SignalProducer
 
         typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
 
-        explicit LFO(std::string const& name) noexcept;
+        explicit LFO(std::string const& name, Integer const index = -1) noexcept;
 
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro
@@ -127,6 +127,8 @@ class LFO : public SignalProducer
             Sample const* source_buffer,
             Sample* target_buffer
         );
+
+        Integer const index;
 
         Oscillator_ oscillator;
 

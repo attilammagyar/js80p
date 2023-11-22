@@ -190,24 +190,34 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
         std::string const& a,
         Number const b,
         Number const c,
-        Number const d
+        Number const d,
+        Number const e,
+        Envelope* const* envelopes,
+        LFO* const* lfos
 ) {
 }
 
 
 template<class ModulatorSignalProducerClass>
-Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noexcept
+Voice<ModulatorSignalProducerClass>::Params::Params(
+        std::string const& name,
+        Envelope* const* envelopes,
+        LFO* const* lfos
+) noexcept
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
     waveform(name + "WAV"),
-    amplitude(name + "AMP", 0.0, 1.0, 0.75),
+    amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes, lfos),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
     folding(
         name + "FLD",
         Constants::FOLD_MIN,
         Constants::FOLD_MAX,
-        Constants::FOLD_DEFAULT
+        Constants::FOLD_DEFAULT,
+        0.0,
+        envelopes,
+        lfos
     ),
     portamento_length(name + "PRT", 0.0, 3.0, 0.0),
     portamento_depth(name + "PRD", -2400.0, 2400.0, 0.0),
@@ -222,11 +232,14 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         name + "FIN",
         Constants::FINE_DETUNE_MIN,
         Constants::FINE_DETUNE_MAX,
-        Constants::FINE_DETUNE_DEFAULT
+        Constants::FINE_DETUNE_DEFAULT,
+        0.0,
+        envelopes,
+        lfos
     ),
     width(name + "WID", -1.0, 1.0, 0.0),
-    panning(name + "PAN", -1.0, 1.0, 0.0),
-    volume(name + "VOL", 0.0, 1.0, 0.33),
+    panning(name + "PAN", -1.0, 1.0, 0.0, 0.0, envelopes, lfos),
+    volume(name + "VOL", 0.0, 1.0, 0.33, 0.0, envelopes, lfos),
 
     harmonic_0(name + "C1", -1.0, 1.0, 0.0),
     harmonic_1(name + "C2", -1.0, 1.0, 0.0),
@@ -248,6 +261,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
+        envelopes,
+        lfos,
         &filter_1_freq_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
@@ -259,6 +274,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT,
         0.0,
+        envelopes,
+        lfos,
         &filter_1_q_log_scale,
         Math::log_biquad_filter_q_table(),
         Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
@@ -269,7 +286,10 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         name + "F1G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
-        Constants::BIQUAD_FILTER_GAIN_DEFAULT
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT,
+        0.0,
+        envelopes,
+        lfos
     ),
     filter_1_freq_inaccuracy(name + "F1FIA", 0.0, 1.0, 0.0),
     filter_1_q_inaccuracy(name + "F1QIA", 0.0, 0.4, 0.0),
@@ -283,6 +303,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
+        envelopes,
+        lfos,
         &filter_2_freq_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
@@ -294,6 +316,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT,
         0.0,
+        envelopes,
+        lfos,
         &filter_2_q_log_scale,
         Math::log_biquad_filter_q_table(),
         Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
@@ -304,13 +328,16 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noe
         name + "F2G",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
-        Constants::BIQUAD_FILTER_GAIN_DEFAULT
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT,
+        0.0,
+        envelopes,
+        lfos
     ),
     filter_2_freq_inaccuracy(name + "F2FIA", 0.0, 1.0, 0.0),
     filter_2_q_inaccuracy(name + "F2QIA", 0.0, 0.4, 0.0),
 
-    subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0),
-    distortion(name + "DG", 0.0, 1.0, 0.0)
+    subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0, 0.0, envelopes, lfos),
+    distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes, lfos)
 {
 }
 
@@ -419,7 +446,9 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Number const oscillator_inaccuracy_seed,
         Params& param_leaders,
         BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers
+        BiquadFilterSharedBuffers* filter_2_shared_buffers,
+        Envelope* const* envelopes,
+        LFO* const* lfos
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
@@ -493,7 +522,9 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader,
         BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers
+        BiquadFilterSharedBuffers* filter_2_shared_buffers,
+        Envelope* const* envelopes,
+        LFO* const* lfos
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),

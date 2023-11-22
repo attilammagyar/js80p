@@ -27,7 +27,9 @@
 
 #include "dsp/biquad_filter.hpp"
 #include "dsp/distortion.hpp"
+#include "dsp/envelope.hpp"
 #include "dsp/filter.hpp"
+#include "dsp/lfo.hpp"
 #include "dsp/math.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
@@ -148,14 +150,21 @@ class Voice : public SignalProducer
                     std::string const& a,
                     Number const b,
                     Number const c,
-                    Number const d
+                    Number const d,
+                    Number const e,
+                    Envelope* const* envelopes,
+                    LFO* const* lfos
                 );
         };
 
         class Params
         {
             public:
-                explicit Params(std::string const& name) noexcept;
+                explicit Params(
+                    std::string const& name,
+                    Envelope* const* envelopes = NULL,
+                    LFO* const* lfos = NULL
+                ) noexcept;
 
                 TuningParam tuning;
                 OscillatorInaccuracyParam oscillator_inaccuracy;
@@ -255,7 +264,9 @@ class Voice : public SignalProducer
             Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
             BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL,
+            Envelope* const* envelopes = NULL,
+            LFO* const* lfos = NULL
         ) noexcept;
 
         Voice(
@@ -269,7 +280,9 @@ class Voice : public SignalProducer
             FloatParamS& frequency_modulation_level_leader,
             FloatParamS& phase_modulation_level_leader,
             BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL,
+            Envelope* const* envelopes = NULL,
+            LFO* const* lfos = NULL
         ) noexcept;
 
         virtual void reset() noexcept override;
