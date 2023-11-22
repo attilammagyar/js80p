@@ -28,6 +28,7 @@
 #include "dsp/midi_controller.hpp"
 #include "dsp/signal_producer.hpp"
 #include "dsp/queue.hpp"
+#include "dsp/wavetable.hpp"
 
 
 namespace JS80P
@@ -278,6 +279,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const max_value = 1.0,
             Number const default_value = 0.0,
             Number const round_to = 0.0,
+            Envelope* const* envelopes = NULL,
+            LFO* const* lfos = NULL,
             ToggleParam const* log_scale_toggle = NULL,
             Number const* log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
@@ -292,6 +295,8 @@ class FloatParam : public Param<Number, evaluation>
          *          be leaders.
          */
         FloatParam(FloatParam<evaluation>& leader) noexcept;
+
+        ~FloatParam() override;
 
         bool is_logarithmic() const noexcept;
 
@@ -341,6 +346,7 @@ class FloatParam : public Param<Number, evaluation>
         void set_random_seed(Number const seed) noexcept;
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;
+        Envelope* const* get_envelopes() const noexcept;
 
         void start_envelope(
             Seconds const time_offset,
@@ -354,6 +360,7 @@ class FloatParam : public Param<Number, evaluation>
 
         void set_lfo(LFO* lfo) noexcept;
         LFO const* get_lfo() const noexcept;
+        LFO* const* get_lfos() const noexcept;
 
         virtual void reset() noexcept override;
 
@@ -481,6 +488,9 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         FloatParam<evaluation>* const leader;
+        Envelope* const* const envelopes;
+        LFO* const* const lfos;
+        WavetableState* const lfo_states;
         Number const round_to;
         Number const round_to_inv;
         ToggleParam const* const log_scale_toggle;
@@ -532,7 +542,9 @@ class ModulatableFloatParam : public FloatParamS
             std::string const& name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
-            Number const default_value = 0.0
+            Number const default_value = 0.0,
+            Envelope* const* envelopes = NULL,
+            LFO* const* lfos = NULL
         ) noexcept;
 
         bool is_constant_in_next_round(

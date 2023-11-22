@@ -374,6 +374,8 @@ FloatParam<evaluation>::FloatParam(
         Number const max_value,
         Number const default_value,
         Number const round_to,
+        Envelope* const* envelopes,
+        LFO* const* lfos,
         ToggleParam const* log_scale_toggle,
         Number const* log_scale_table,
         int const log_scale_table_max_index,
@@ -384,6 +386,9 @@ FloatParam<evaluation>::FloatParam(
         name, min_value, max_value, default_value, NUMBER_OF_EVENTS
     ),
     leader(NULL),
+    envelopes(envelopes),
+    lfos(lfos),
+    lfo_states(envelopes != NULL ? new WavetableState[Constants::LFOS] : NULL),
     round_to(round_to),
     round_to_inv(round_to > 0.0 ? 1.0 / round_to : 0.0),
     log_scale_toggle(log_scale_toggle),
@@ -415,7 +420,12 @@ FloatParam<evaluation>::FloatParam(
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::initialize_instance() noexcept
 {
-    if (evaluation == ParamEvaluation::SAMPLE) {
+    JS80P_ASSERT(
+        (envelopes == NULL && lfos == NULL)
+        || (envelopes != NULL && lfos != NULL)
+    );
+
+    if (envelopes != NULL) {
         envelope_snapshots.reserve(2);
         unused_envelope_snapshots.reserve(2);
     }
@@ -447,6 +457,9 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
         (SignalProducer*)&leader
     ),
     leader(&leader),
+    envelopes(leader.get_envelopes()),
+    lfos(leader.get_lfos()),
+    lfo_states(envelopes != NULL ? new WavetableState[Constants::LFOS] : NULL),
     round_to(0.0),
     round_to_inv(0.0),
     log_scale_toggle(leader.get_log_scale_toggle()),
@@ -475,6 +488,15 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     )
 {
     initialize_instance();
+}
+
+
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::~FloatParam()
+{
+    if (lfo_states != NULL) {
+        delete[] lfo_states;
+    }
 }
 
 
@@ -1166,6 +1188,13 @@ Envelope* FloatParam<evaluation>::get_envelope() const noexcept
 
 
 template<ParamEvaluation evaluation>
+Envelope* const* FloatParam<evaluation>::get_envelopes() const noexcept
+{
+    return envelopes;
+}
+
+
+template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::start_envelope(
         Seconds const time_offset,
         Number const random_1,
@@ -1331,6 +1360,13 @@ template<ParamEvaluation evaluation>
 LFO const* FloatParam<evaluation>::get_lfo() const noexcept
 {
     return leader == NULL ? lfo : leader->get_lfo();
+}
+
+
+template<ParamEvaluation evaluation>
+LFO* const* FloatParam<evaluation>::get_lfos() const noexcept
+{
+    return lfos;
 }
 
 
@@ -1788,9 +1824,11 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         std::string const& name,
         Number const min_value,
         Number const max_value,
-        Number const default_value
+        Number const default_value,
+        Envelope* const* envelopes,
+        LFO* const* lfos
 ) noexcept
-    : FloatParamS(name, min_value, max_value, default_value),
+    : FloatParamS(name, min_value, max_value, default_value, 0.0, envelopes, lfos),
     modulation_level(modulation_level_leader),
     modulator(modulator)
 {

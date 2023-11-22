@@ -27,19 +27,23 @@
 namespace JS80P
 {
 
-LFO::LFO(std::string const& name) noexcept
+LFO::LFO(
+        std::string const& name,
+        Integer const index
+) noexcept
     : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
-    frequency(name + "FRQ", 0.01, 30.0, 1.0),
-    phase(name + "PHS", 0.0, 1.0, 0.0),
-    min(name + "MIN", 0.0, 1.0, 0.0),
-    max(name + "MAX", 0.0, 1.0, 1.0),
-    amount(name + "AMT", 0.0, 0.5, 0.5),
-    distortion(name + "DST", 0.0, 1.0, 0.0),
-    randomness(name + "RND", 0.0, 1.0, 0.0),
+    frequency(name + "FRQ", 0.01, 30.0, 1.0, 0.0),
+    phase(name + "PHS", 0.0, 1.0, 0.0, 0.0),
+    min(name + "MIN", 0.0, 1.0, 0.0, 0.0),
+    max(name + "MAX", 0.0, 1.0, 1.0, 0.0),
+    amount(name + "AMT", 0.0, 0.5, 0.5, 0.0),
+    distortion(name + "DST", 0.0, 1.0, 0.0, 0.0),
+    randomness(name + "RND", 0.0, 1.0, 0.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
+    index(index),
     oscillator(waveform, amount, frequency, phase, tempo_sync, center)
 {
     initialize_instance();
@@ -83,6 +87,7 @@ LFO::LFO(
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
+    index(-1),
     oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
 {
     initialize_instance();
