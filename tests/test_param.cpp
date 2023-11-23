@@ -1719,7 +1719,7 @@ TEST(when_an_lfo_is_assigned_to_a_float_param_then_float_param_value_follows_the
 
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
-    lfo.frequency.set_value(20.0);
+    lfo.frequency.set_value(frequency);
     lfo.waveform.set_value(LFO::Oscillator_::SINE);
     lfo.start(0.0);
 
@@ -1769,7 +1769,7 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
-    lfo.frequency.set_value(20.0);
+    lfo.frequency.set_value(frequency);
     lfo.waveform.set_value(LFO::Oscillator_::SINE);
     lfo.start(0.0);
 
