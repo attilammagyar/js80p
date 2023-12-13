@@ -36,6 +36,7 @@ Math::Math() noexcept
     init_randoms();
     init_distortion();
     init_log_biquad_filter_freq();
+    init_log_biquad_filter_q();
     init_linear_to_db();
 }
 
@@ -136,6 +137,47 @@ Number Math::ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept
     constexpr Number range = max / min;
 
     return min * std::pow(range, ratio);
+}
+
+
+void Math::init_log_biquad_filter_q() noexcept
+{
+    Number prev_idx = 0.0;
+    Number prev = Constants::BIQUAD_FILTER_Q_MIN;
+
+    log_biquad_filter_q[0] = prev;
+
+    for (int i = 1; i != LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX; ++i) {
+        Number const current_idx = (Number)i;
+        Number const ratio = current_idx * LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX_INV;
+        Number const current = ratio_to_exact_log_biquad_filter_q(ratio);
+
+        /* See init_log_biquad_filter_freq().  */
+        Number const correction = -0.66898329211 * (
+            (current + prev) * 0.5
+            - ratio_to_exact_log_biquad_filter_q(
+                (prev_idx + 0.5) * LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX_INV
+            )
+        );
+
+        log_biquad_filter_q[i] = current + correction;
+        prev = current;
+        prev_idx = current_idx;
+    }
+
+    log_biquad_filter_q[LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX] = (
+        Constants::BIQUAD_FILTER_Q_MAX
+    );
+}
+
+
+Number Math::ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept
+{
+    constexpr Number min = Constants::BIQUAD_FILTER_Q_MIN + 1.0;
+    constexpr Number max = Constants::BIQUAD_FILTER_Q_MAX + 1.0;
+    constexpr Number range = max / min;
+
+    return min * std::pow(range, ratio) - 1.0;
 }
 
 
@@ -280,6 +322,12 @@ Number Math::linear_to_db(Number const linear) noexcept
 Number const* Math::log_biquad_filter_freq_table() noexcept
 {
     return math.log_biquad_filter_freq;
+}
+
+
+Number const* Math::log_biquad_filter_q_table() noexcept
+{
+    return math.log_biquad_filter_q;
 }
 
 

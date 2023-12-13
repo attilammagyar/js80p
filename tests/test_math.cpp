@@ -434,6 +434,22 @@ TEST(ratio_to_exact_log_biquad_filter_frequency, {
 })
 
 
+TEST(ratio_to_exact_log_biquad_filter_q, {
+    constexpr Number min = Constants::BIQUAD_FILTER_Q_MIN;
+    constexpr Number max = Constants::BIQUAD_FILTER_Q_MAX;
+    constexpr Number min_p1 = min + 1.0;
+    constexpr Number max_p1 = max + 1.0;
+
+    assert_eq(min, Math::ratio_to_exact_log_biquad_filter_q(0.0), DOUBLE_DELTA);
+    assert_eq(max, Math::ratio_to_exact_log_biquad_filter_q(1.0), DOUBLE_DELTA);
+    assert_eq(
+        std::sqrt(min_p1 * (max_p1 / min_p1)) - 1.0,
+        Math::ratio_to_exact_log_biquad_filter_q(0.5),
+        DOUBLE_DELTA
+    );
+})
+
+
 TEST(is_abs_small, {
     assert_true(Math::is_abs_small(0.01, 0.1));
     assert_true(Math::is_abs_small(-0.01, 0.1));

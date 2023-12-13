@@ -85,6 +85,20 @@ class Math
             (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
         );
 
+        static constexpr int LOG_BIQUAD_FILTER_Q_TABLE_SIZE = 0x400;
+
+        static constexpr int LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX = (
+            LOG_BIQUAD_FILTER_Q_TABLE_SIZE - 1
+        );
+
+        static constexpr Number LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX_INV = (
+            1.0 / (Number)LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX
+        );
+
+        static constexpr Number LOG_BIQUAD_FILTER_Q_SCALE = (
+            (Number)LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX
+        );
+
         static constexpr Number DB_MIN = -120.0;
         static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
         static constexpr Number LINEAR_TO_DB_MAX = 5.0;
@@ -123,6 +137,7 @@ class Math
         static Number linear_to_db(Number const linear) noexcept;
 
         static Number const* log_biquad_filter_freq_table() noexcept;
+        static Number const* log_biquad_filter_q_table() noexcept;
 
         /**
          * \brief Calcualte the exact biquad filter frequency value using a
@@ -130,6 +145,13 @@ class Math
          *        Intended for testing purposes.
          */
         static Number ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept;
+
+        /**
+         * \brief Calcualte the exact biquad filter Q value using a
+         *        logarithmic scale for a given ratio between 0.0 and 1.0.
+         *        Intended for testing purposes.
+         */
+        static Number ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept;
 
         static Frequency detune(Frequency const frequency, Number const cents) noexcept;
 
@@ -263,6 +285,7 @@ class Math
         void init_randoms() noexcept;
         void init_distortion() noexcept;
         void init_log_biquad_filter_freq() noexcept;
+        void init_log_biquad_filter_q() noexcept;
         void init_linear_to_db() noexcept;
 
         Number sin_impl(Number const x) const noexcept;
@@ -277,6 +300,7 @@ class Math
         Number distortion[DISTORTION_TABLE_SIZE];
         Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
+        Number log_biquad_filter_q[LOG_BIQUAD_FILTER_Q_TABLE_SIZE];
         Number linear_to_dbs[LINEAR_TO_DB_TABLE_SIZE];
 };
 

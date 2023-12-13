@@ -80,7 +80,7 @@ OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
 	fst \
 	gui_playground \
 	perf \
-	log_freq_error_tsv \
+	log_tables_error_tsv \
 	show_fst_dir \
 	show_vst3_dir \
 	upgrade_patch \
@@ -375,7 +375,7 @@ test_example: $(BUILD_DIR)/test_example$(EXE) | $(BUILD_DIR)
 
 perf: $(BUILD_DIR) $(PERF_TEST_BINS)
 
-log_freq_error_tsv: $(BUILD_DIR)/log_freq_error_tsv$(EXE)
+log_tables_error_tsv: $(BUILD_DIR)/log_tables_error_tsv$(EXE)
 
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
@@ -764,8 +764,8 @@ $(BUILD_DIR)/test_wavefolder$(EXE): \
 	$(COMPILE_TEST) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/log_freq_error_tsv$(EXE): \
-		scripts/log_freq_error_tsv.cpp \
+$(BUILD_DIR)/log_tables_error_tsv$(EXE): \
+		scripts/log_tables_error_tsv.cpp \
 		src/dsp/math.cpp src/dsp/math.hpp \
 		src/js80p.hpp \
 		| $(BUILD_DIR)
