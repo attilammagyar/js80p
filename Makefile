@@ -32,10 +32,13 @@ JS80P_CXXFLAGS = \
 	-D JS80P_INSTRUCTION_SET=$(INSTRUCTION_SET) \
 	-Wall \
 	-Werror \
-	-m$(INSTRUCTION_SET) \
 	-ffast-math \
 	-O3 \
 	-std=c++17
+
+ifneq ($(INSTRUCTION_SET),none)
+JS80P_CXXINCS += -m$(INSTRUCTION_SET)
+endif
 
 # DEBUG_LOG ?= -D JS80P_DEBUG_LOG=$(DEBUG_LOG_FILE)
 DEBUG_LOG ?=
