@@ -79,17 +79,21 @@ int main(int argc, char* argv[])
     fprintf(
         stdout,
         "ratio"
-        "\tfreq-error-without-correction\tfreq-error-with-correction"
-        "\tq-error-without-correction\tq-error-with-correction"
+        "\tfreq-error-without-correction\tfreq-error-with-correction\tfreq-abs-error-with-correction"
+        "\tq-error-without-correction\tq-error-with-correction\tq-abs-error-with-correction"
         "\n"
     );
 
     Number const* freq_with_correction = Math::log_biquad_filter_freq_table();
     Number const* q_with_correction = Math::log_biquad_filter_q_table();
+
     Number sum_freq_error_with_correction = 0.0;
     Number sum_freq_error_without_correction = 0.0;
+    Number sum_freq_abs_error_with_correction = 0.0;
+
     Number sum_q_error_without_correction = 0.0;
     Number sum_q_error_with_correction = 0.0;
+    Number sum_q_abs_error_with_correction = 0.0;
 
     Number* freq_without_correction = build_log_freq_lookup_table_without_correction();
     Number* q_without_correction = build_log_q_lookup_table_without_correction();
@@ -105,6 +109,9 @@ int main(int argc, char* argv[])
         Number const freq_error_with_correction = (
             Math::lookup(freq_with_correction, freq_max_index, freq_index) - freq_exact
         );
+        Number const freq_abs_error_with_correction = (
+            std::abs(freq_error_with_correction)
+        );
 
         Number const q_index = ratio * Math::LOG_BIQUAD_FILTER_Q_SCALE;
         Number const q_exact = Math::ratio_to_exact_log_biquad_filter_q(ratio);
@@ -114,30 +121,40 @@ int main(int argc, char* argv[])
         Number const q_error_with_correction = (
             Math::lookup(q_with_correction, q_max_index, q_index) - q_exact
         );
+        Number const q_abs_error_with_correction = (
+            std::abs(q_error_with_correction)
+        );
 
         fprintf(
             stdout,
-            "%.15f\t%.15f\t%.15f\t%.15f\t%.15f\n",
+            "%.15f\t%.15f\t%.15f\t%.15f\t%.15f\t%.15f\t%.15f\n",
             ratio,
             freq_error_without_correction,
             freq_error_with_correction,
+            freq_abs_error_with_correction,
             q_error_without_correction,
-            q_error_with_correction
+            q_error_with_correction,
+            q_abs_error_with_correction
         );
 
         sum_freq_error_without_correction += freq_error_without_correction;
         sum_freq_error_with_correction += freq_error_with_correction;
+        sum_freq_abs_error_with_correction += freq_abs_error_with_correction;
+
         sum_q_error_without_correction += q_error_without_correction;
         sum_q_error_with_correction += q_error_with_correction;
+        sum_q_abs_error_with_correction += q_abs_error_with_correction;
     }
 
     fprintf(
         stdout,
-        "sum:\t%.15f\t%.15f\t%.15f\t%.15f\n",
+        "sum:\t%.15f\t%.15f\t%.15f\t%.15f\t%.15f\t%.15f\n",
         sum_freq_error_without_correction,
         sum_freq_error_with_correction,
+        sum_freq_abs_error_with_correction,
         sum_q_error_without_correction,
-        sum_q_error_with_correction
+        sum_q_error_with_correction,
+        sum_q_abs_error_with_correction
     );
 
     delete[] freq_without_correction;
