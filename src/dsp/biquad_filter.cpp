@@ -135,7 +135,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         &log_scale_toggle,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
     q(
         name + "Q",

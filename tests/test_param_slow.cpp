@@ -55,7 +55,7 @@ TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_p
         &toggle,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     );
 
     toggle.set_value(ToggleParam::ON);

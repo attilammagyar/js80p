@@ -251,7 +251,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         &filter_1_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
     filter_1_q(
         name + "F1Q",
@@ -279,7 +279,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noex
         &filter_2_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
     filter_2_q(
         name + "F2Q",

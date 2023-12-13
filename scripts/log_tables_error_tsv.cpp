@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i != resolution; ++i) {
         Number const ratio = scale * (Number)i;
 
-        Number const freq_index = ratio * Math::LOG_BIQUAD_FILTER_FREQ_SCALE;
+        Number const freq_index = ratio * Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE;
         Number const freq_exact = Math::ratio_to_exact_log_biquad_filter_frequency(ratio);
         Number const freq_error_without_correction = (
             Math::lookup(freq_without_correction, freq_max_index, freq_index) - freq_exact
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
             std::abs(freq_error_with_correction)
         );
 
-        Number const q_index = ratio * Math::LOG_BIQUAD_FILTER_Q_SCALE;
+        Number const q_index = ratio * Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE;
         Number const q_exact = Math::ratio_to_exact_log_biquad_filter_q(ratio);
         Number const q_error_without_correction = (
             Math::lookup(q_without_correction, q_max_index, q_index) - q_exact

@@ -230,7 +230,7 @@ DEFINE_FUNC(
     Math::lookup(
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        x * Math::LOG_BIQUAD_FILTER_FREQ_SCALE
+        x * Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
     0.0,
     1.0

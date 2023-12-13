@@ -250,7 +250,7 @@ class FloatParam : public Param<Number, evaluation>
             ToggleParam const* log_scale_toggle = NULL,
             Number const* log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
-            Number const log_scale_table_scale = 0.0
+            Number const log_scale_table_index_scale = 0.0
         ) noexcept;
 
         /**
@@ -271,7 +271,7 @@ class FloatParam : public Param<Number, evaluation>
         ToggleParam const* get_log_scale_toggle() const noexcept;
         Number const* get_log_scale_table() const noexcept;
         int get_log_scale_table_max_index() const noexcept;
-        Number get_log_scale_table_scale() const noexcept;
+        Number get_log_scale_table_index_scale() const noexcept;
 
         Number ratio_to_value(Number const ratio) const noexcept;
         Number value_to_ratio(Number const value) const noexcept;
@@ -446,7 +446,7 @@ class FloatParam : public Param<Number, evaluation>
         ToggleParam const* const log_scale_toggle;
         Number const* const log_scale_table;
         int const log_scale_table_max_index;
-        Number const log_scale_table_scale;
+        Number const log_scale_table_index_scale;
         Number const log_min_minus;
         Number const log_range_inv;
 

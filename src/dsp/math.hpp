@@ -81,7 +81,7 @@ class Math
             1.0 / (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
         );
 
-        static constexpr Number LOG_BIQUAD_FILTER_FREQ_SCALE = (
+        static constexpr Number LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE = (
             (Number)LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX
         );
 
@@ -95,7 +95,7 @@ class Math
             1.0 / (Number)LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX
         );
 
-        static constexpr Number LOG_BIQUAD_FILTER_Q_SCALE = (
+        static constexpr Number LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE = (
             (Number)LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX
         );
 
