@@ -153,6 +153,32 @@ class Math
          */
         static Number ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept;
 
+        /**
+         * \brief Initialize a lookup table for a logarithmic scale param.
+         *        Intended for testing purposes.
+         *
+         * The error of the piece-wise linear interpolation of the exponential
+         * curve is positive on the whole domain (assuming that the base is
+         * greater than 1). By slightly shifting the line segments downward,
+         * parts of them go below the exact curve, introducing negative errors
+         * which should balance out the positive ones, reducing the overall,
+         * integrated error.
+         *
+         * The correction term is based on the error at the midpoint of the line
+         * segment, ie. the difference between the linearly interpolated value
+         * and the exact value. The scaler constant should be chosen so that the
+         * integrated error is sufficiently close to 0.
+         */
+        static void init_log_table(
+            Number* const table,
+            int const max_index,
+            Number const max_index_inv,
+            Number const min,
+            Number const max,
+            Number const correction_scale,
+            Number(*ratio_to_exact_value)(Number const ratio)
+        ) noexcept;
+
         static Frequency detune(Frequency const frequency, Number const cents) noexcept;
 
         /**

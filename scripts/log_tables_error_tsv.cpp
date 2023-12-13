@@ -28,18 +28,16 @@ Number* build_log_freq_lookup_table_without_correction()
 {
     Number* table = new Number[Math::LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
 
-    table[0] = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
-
-    for (int i = 1; i != Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX; ++i) {
-        Number const idx = (Number)i;
-
-        table[i] = Math::ratio_to_exact_log_biquad_filter_frequency(
-            idx * Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV
-        );
-    }
-
-    table[Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX] = (
-        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+    Math::init_log_table(
+        table,
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV,
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX,
+        0.0,
+        [](Number const ratio) -> Number {
+            return Math::ratio_to_exact_log_biquad_filter_frequency(ratio);
+        }
     );
 
     return table;
@@ -50,18 +48,16 @@ Number* build_log_q_lookup_table_without_correction()
 {
     Number* table = new Number[Math::LOG_BIQUAD_FILTER_Q_TABLE_SIZE];
 
-    table[0] = Constants::BIQUAD_FILTER_Q_MIN;
-
-    for (int i = 1; i != Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX; ++i) {
-        Number const idx = (Number)i;
-
-        table[i] = Math::ratio_to_exact_log_biquad_filter_q(
-            idx * Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX_INV
-        );
-    }
-
-    table[Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX] = (
-        Constants::BIQUAD_FILTER_Q_MAX
+    Math::init_log_table(
+        table,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX_INV,
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        0.0,
+        [](Number const ratio) -> Number {
+            return Math::ratio_to_exact_log_biquad_filter_q(ratio);
+        }
     );
 
     return table;
