@@ -130,6 +130,7 @@
  *  FAIL (tests/test_example.cpp:29 doubles): failed to assert that a == b
  *   a=1.000000000 (1.000000000000e+00) // 1.0
  *   b=1.200000000 (1.200000000000e+00) // 1.0 + 0.2
+ *   diff=-0.200000000 (-2.000000000000e-01)
  *   tolerance=0.100000000 (1.000000000000e-01)
  *   message=Custom parametric message
  *
@@ -779,38 +780,42 @@ static bool _name(                                                          \
         _ASSERT_A_OP_B_METHOD(gte, >=, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
 
-#define _ASSERT_A_OP_B_WITH_DELTA_METHOD(_name, _cmp, _op, _type, _zero)    \
-static bool _name(                                                          \
-        _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
-        _type const a,                                                      \
-        _type const b,                                                      \
-        _type const tolerance = _zero,                                      \
-        _TEST_VARGS                                                         \
-) {                                                                         \
-    if (std::fabs(a - b) _cmp tolerance) {                                  \
-        _TEST_PASS();                                                       \
-        return true;                                                        \
-    } else {                                                                \
-        _TEST_FAIL(                                                         \
-            file,                                                           \
-            line,                                                           \
-            "a " #_op " b\n  a=" _TEST_DBL_F " // %s\n"                     \
-                "  b=" _TEST_DBL_F " // %s\n  tolerance=" _TEST_DBL_F,      \
-            a, a, a_src,                                                    \
-            b, b, b_src,                                                    \
-            tolerance, tolerance                                            \
-        );                                                                  \
-        return false;                                                       \
-    }                                                                       \
+#define _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(_name, _cmp, _op, _type, _zero)  \
+static bool _name(                                                            \
+        _TEST_ARGS,                                                           \
+        char const* a_src,                                                    \
+        char const* b_src,                                                    \
+        _type const a,                                                        \
+        _type const b,                                                        \
+        _type const tolerance = _zero,                                        \
+        _TEST_VARGS                                                           \
+) {                                                                           \
+    _type const diff = a - b;                                                 \
+    if (std::fabs(diff) _cmp tolerance) {                                     \
+        _TEST_PASS();                                                         \
+        return true;                                                          \
+    } else {                                                                  \
+        _TEST_FAIL(                                                           \
+            file,                                                             \
+            line,                                                             \
+            "a " #_op " b\n  a=" _TEST_DBL_F " // %s\n"                       \
+                "  b=" _TEST_DBL_F " // %s\n"                                 \
+                "  diff=" _TEST_DBL_F "\n"                                    \
+                "  tolerance=" _TEST_DBL_F,                                   \
+            a, a, a_src,                                                      \
+            b, b, b_src,                                                      \
+            diff, diff,                                                       \
+            tolerance, tolerance                                              \
+        );                                                                    \
+        return false;                                                         \
+    }                                                                         \
 }
 
-        _ASSERT_A_OP_B_WITH_DELTA_METHOD(eq, <=, ==, float, 0.0f)
-        _ASSERT_A_OP_B_WITH_DELTA_METHOD(eq, <=, ==, double, 0.0)
+        _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(eq, <=, ==, float, 0.0f)
+        _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(eq, <=, ==, double, 0.0)
 
-        _ASSERT_A_OP_B_WITH_DELTA_METHOD(neq, >, !=, float, 0.0f)
-        _ASSERT_A_OP_B_WITH_DELTA_METHOD(neq, >, !=, double, 0.0)
+        _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(neq, >, !=, float, 0.0f)
+        _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(neq, >, !=, double, 0.0)
 
 
 #define _ASSERT_ARRAY_OP_METHOD(_name, _op, _type, _type_f, _abs_fn)        \
