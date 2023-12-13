@@ -111,7 +111,7 @@ void Math::init_log_biquad_filter_freq() noexcept
         the exact value. The constant scaler is picked so that the integrated
         error is sufficiently close to 0.
         */
-        Number const correction = -0.6683106 * (
+        Number const correction = -0.6683103012188 * (
             (current + prev) * 0.5
             - ratio_to_exact_log_biquad_filter_frequency(
                 (prev_idx + 0.5) * LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX_INV
