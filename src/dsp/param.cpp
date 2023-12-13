@@ -369,17 +369,23 @@ FloatParam<evaluation>::FloatParam(
         ToggleParam const* log_scale_toggle,
         Number const* log_scale_table,
         int const log_scale_table_max_index,
-        Number const log_scale_table_index_scale
+        Number const log_scale_table_index_scale,
+        Number const log_scale_value_offset
 ) noexcept
     : Param<Number, evaluation>(name, min_value, max_value, default_value),
     log_scale_toggle(log_scale_toggle),
     log_scale_table(log_scale_table),
     log_scale_table_max_index(log_scale_table_max_index),
     log_scale_table_index_scale(log_scale_table_index_scale),
-    log_min_minus(log_scale_toggle != NULL ? -std::log2(min_value) : 0.0),
+    log_scale_value_offset(log_scale_value_offset),
+    log_min_minus(
+        log_scale_toggle != NULL
+            ? -std::log2(min_value + log_scale_value_offset)
+            : 0.0
+    ),
     log_range_inv(
         log_scale_toggle != NULL
-            ? 1.0 / (std::log2(max_value) + log_min_minus)
+            ? 1.0 / (std::log2(max_value + log_scale_value_offset) + log_min_minus)
             : 1.0
     ),
     leader(NULL),
@@ -430,10 +436,15 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     log_scale_table(leader.get_log_scale_table()),
     log_scale_table_max_index(leader.get_log_scale_table_max_index()),
     log_scale_table_index_scale(leader.get_log_scale_table_index_scale()),
-    log_min_minus(log_scale_toggle != NULL ? -std::log2(leader.get_min_value()) : 0.0),
+    log_scale_value_offset(leader.get_log_scale_value_offset()),
+    log_min_minus(
+        log_scale_toggle != NULL
+            ? -std::log2(leader.get_min_value() + log_scale_value_offset)
+            : 0.0
+    ),
     log_range_inv(
         log_scale_toggle != NULL
-            ? 1.0 / (std::log2(leader.get_max_value()) + log_min_minus)
+            ? 1.0 / (std::log2(leader.get_max_value() + log_scale_value_offset) + log_min_minus)
             : 1.0
     ),
     leader(&leader),
@@ -564,6 +575,13 @@ Number FloatParam<evaluation>::get_log_scale_table_index_scale() const noexcept
 
 
 template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::get_log_scale_value_offset() const noexcept
+{
+    return log_scale_value_offset;
+}
+
+
+template<ParamEvaluation evaluation>
 Number FloatParam<evaluation>::ratio_to_value(Number const ratio) const noexcept
 {
     if (is_logarithmic()) {
@@ -596,7 +614,9 @@ template<ParamEvaluation evaluation>
 Number FloatParam<evaluation>::value_to_ratio(Number const value) const noexcept
 {
     if (is_logarithmic()) {
-        return (std::log2(value) + log_min_minus) * log_range_inv;
+        return (
+            (std::log2(value + log_scale_value_offset) + log_min_minus) * log_range_inv
+        );
     }
 
     return Param<Number, evaluation>::value_to_ratio(value);

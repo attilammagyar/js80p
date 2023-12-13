@@ -36,26 +36,35 @@
 using namespace JS80P;
 
 
-TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_param_is_small_and_stable, {
+void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+        Number const* table,
+        int const max_index,
+        Number const index_scale,
+        Number const min,
+        Number const max,
+        Number const default_value,
+        Number const value_offset,
+        Number const tolerance_percent,
+        Number const min_tolerance
+) {
     constexpr int resolution = 20000;
     constexpr int iterations = 50000;
-    constexpr Number tolerance_percent = 0.0021; /* 0.21% */
-    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
-    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
-    constexpr Number range = max - min;
     constexpr Number resolution_inv = 1.0 / (Number)(resolution - 1);
+
+    Number const range = max - min;
 
     ToggleParam toggle("log", ToggleParam::OFF);
     FloatParamS param(
-        "freq",
+        "p",
         min,
         max,
-        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        default_value,
         0.0,
         &toggle,
-        Math::log_biquad_filter_freq_table(),
-        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
-        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
+        table,
+        max_index,
+        index_scale,
+        value_offset
     );
 
     toggle.set_value(ToggleParam::ON);
@@ -71,7 +80,7 @@ TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_p
             assert_eq(
                 value,
                 param.get_value(),
-                value * tolerance_percent,
+                std::max(min_tolerance, value * tolerance_percent),
                 "i=%d (%d), j=%d (%d)",
                 i,
                 resolution,
@@ -80,4 +89,30 @@ TEST(error_of_repeated_ratio_to_value_back_and_forth_conversion_of_logarithmic_p
             );
         }
     }
+}
+
+
+TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable, {
+    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+        Math::log_biquad_filter_freq_table(),
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE,
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        0.0021, /* 0.21% */
+        0.0
+    );
+    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+        Math::log_biquad_filter_q_table(),
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE,
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT,
+        1.0,
+        0.0029,
+        0.0054
+    );
 })
