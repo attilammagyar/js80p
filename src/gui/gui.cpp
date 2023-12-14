@@ -695,6 +695,13 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::COIA] = "Carrier Oscillator Inaccuracy",
     [Synth::ParamId::COIS] = "Carrier Oscillator Instability",
+
+    [Synth::ParamId::MF1QLG] = "Modulator Filter 1 Logarithmic Q Factor",
+    [Synth::ParamId::MF2QLG] = "Modulator Filter 2 Logarithmic Q Factor",
+    [Synth::ParamId::CF1QLG] = "Carrier Filter 1 Logarithmic Q Factor",
+    [Synth::ParamId::CF2QLG] = "Carrier Filter 2 Logarithmic Q Factor",
+    [Synth::ParamId::EF1QLG] = "Filter 1 Logarithmic Q Factor",
+    [Synth::ParamId::EF2QLG] = "Filter 2 Logarithmic Q Factor",
 };
 
 
@@ -1622,13 +1629,15 @@ void GUI::build_effects_body(KnobStates* knob_states)
     KNOB(effects_body, 341 + KNOB_W * 1,    35, Synth::ParamId::EF1FRQ, MML_C,      "%.1f", 1.0, knob_states);
     KNOB(effects_body, 341 + KNOB_W * 2,    35, Synth::ParamId::EF1Q,   MML_C,      "%.2f", 1.0, knob_states);
     KNOB(effects_body, 341 + KNOB_W * 3,    35, Synth::ParamId::EF1G,   MML_C,      "%.2f", 1.0, knob_states);
-    TOGG(effects_body, 415, 6, 90, 24, 0, Synth::ParamId::EF1LOG);
+    TOGG(effects_body, 403, 6, 53, 24, 0, Synth::ParamId::EF1LOG);
+    TOGG(effects_body, 460, 6, 53, 24, 0, Synth::ParamId::EF1QLG);
 
     KNOB(effects_body, 610 + KNOB_W * 0,    35, Synth::ParamId::EF2TYP, MM___,      ft, ftc, knob_states);
     KNOB(effects_body, 610 + KNOB_W * 1,    35, Synth::ParamId::EF2FRQ, MML_C,      "%.1f", 1.0, knob_states);
     KNOB(effects_body, 610 + KNOB_W * 2,    35, Synth::ParamId::EF2Q,   MML_C,      "%.2f", 1.0, knob_states);
     KNOB(effects_body, 610 + KNOB_W * 3,    35, Synth::ParamId::EF2G,   MML_C,      "%.2f", 1.0, knob_states);
-    TOGG(effects_body, 684, 6, 90, 24, 0, Synth::ParamId::EF2LOG);
+    TOGG(effects_body, 672, 6, 53, 24, 0, Synth::ParamId::EF2LOG);
+    TOGG(effects_body, 729, 6, 53, 24, 0, Synth::ParamId::EF2QLG);
 
     KNOB(effects_body, 883 + KNOB_W * 0,    35, Synth::ParamId::EV2V,   MML_C,      "%.2f", 100.0, knob_states);
 
@@ -1950,9 +1959,10 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     KNOB(synth_body, 735 + KNOB_W * 1,      36, Synth::ParamId::MF1FRQ, MMLEC,      "%.1f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 2,      36, Synth::ParamId::MF1Q,   MMLEC,      "%.2f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 3,      36, Synth::ParamId::MF1G,   MMLEC,      "%.2f", 1.0, knob_states);
-    TOGG(synth_body, 811, 13, 90, 24, 0, Synth::ParamId::MF1LOG);
-    SCREW(synth_body, 909, 13, Synth::ParamId::MF1FIA, "%.2f%%", 100.0, screw_states);
-    SCREW(synth_body, 929, 13, Synth::ParamId::MF1QIA, "%.2f%%", 250.0, screw_states);
+    TOGG(synth_body, 799, 13, 53, 24, 0, Synth::ParamId::MF1LOG);
+    TOGG(synth_body, 856, 13, 53, 24, 0, Synth::ParamId::MF1QLG);
+    SCREW(synth_body, 915, 13, Synth::ParamId::MF1FIA, "%.2f%%", 100.0, screw_states);
+    SCREW(synth_body, 935, 13, Synth::ParamId::MF1QIA, "%.2f%%", 250.0, screw_states);
 
     KNOB(synth_body,  87 + KNOB_W * 0,     168, Synth::ParamId::MWAV,   MM___,      wf, wfc, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 1,     168, Synth::ParamId::MC1,    MM___,      "%.2f", 100.0, knob_states);
@@ -1970,9 +1980,10 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     KNOB(synth_body, 735 + KNOB_W * 1,     168, Synth::ParamId::MF2FRQ, MMLEC,      "%.1f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 2,     168, Synth::ParamId::MF2Q,   MMLEC,      "%.2f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 3,     168, Synth::ParamId::MF2G,   MMLEC,      "%.2f", 1.0, knob_states);
-    TOGG(synth_body, 811, 145, 90, 24, 0, Synth::ParamId::MF2LOG);
-    SCREW(synth_body, 909, 145, Synth::ParamId::MF2FIA, "%.2f%%", 100.0, screw_states);
-    SCREW(synth_body, 929, 145, Synth::ParamId::MF2QIA, "%.2f%%", 250.0, screw_states);
+    TOGG(synth_body, 799, 145, 53, 24, 0, Synth::ParamId::MF2LOG);
+    TOGG(synth_body, 856, 145, 53, 24, 0, Synth::ParamId::MF2QLG);
+    SCREW(synth_body, 915, 145, Synth::ParamId::MF2FIA, "%.2f%%", 100.0, screw_states);
+    SCREW(synth_body, 935, 145, Synth::ParamId::MF2QIA, "%.2f%%", 250.0, screw_states);
 
     KNOB(synth_body,  87 + KNOB_W * 0,     316, Synth::ParamId::CPRT,   MM___,      "%.3f", 1.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 1,     316, Synth::ParamId::CPRD,   MM___,      "%.2f", 1.0, knob_states);
@@ -1990,9 +2001,10 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     KNOB(synth_body, 735 + KNOB_W * 1,     316, Synth::ParamId::CF1FRQ, MMLEC,      "%.1f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 2,     316, Synth::ParamId::CF1Q,   MMLEC,      "%.2f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 3,     316, Synth::ParamId::CF1G,   MMLEC,      "%.2f", 1.0, knob_states);
-    TOGG(synth_body, 811, 293, 90, 24, 0, Synth::ParamId::CF1LOG);
-    SCREW(synth_body, 909, 293, Synth::ParamId::CF1FIA, "%.2f%%", 100.0, screw_states);
-    SCREW(synth_body, 929, 293, Synth::ParamId::CF1QIA, "%.2f%%", 250.0, screw_states);
+    TOGG(synth_body, 799, 293, 53, 24, 0, Synth::ParamId::CF1LOG);
+    TOGG(synth_body, 856, 293, 53, 24, 0, Synth::ParamId::CF1QLG);
+    SCREW(synth_body, 915, 293, Synth::ParamId::CF1FIA, "%.2f%%", 100.0, screw_states);
+    SCREW(synth_body, 935, 293, Synth::ParamId::CF1QIA, "%.2f%%", 250.0, screw_states);
 
     KNOB(synth_body,  87 + KNOB_W * 0,     448, Synth::ParamId::CWAV,   MM___,      wf, wfc, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 1,     448, Synth::ParamId::CC1,    MM___,      "%.2f", 100.0, knob_states);
@@ -2010,9 +2022,10 @@ void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
     KNOB(synth_body, 735 + KNOB_W * 1,     448, Synth::ParamId::CF2FRQ, MMLEC,      "%.1f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 2,     448, Synth::ParamId::CF2Q,   MMLEC,      "%.2f", 1.0, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 3,     448, Synth::ParamId::CF2G,   MMLEC,      "%.2f", 1.0, knob_states);
-    TOGG(synth_body, 811, 425, 90, 24, 0, Synth::ParamId::CF2LOG);
-    SCREW(synth_body, 909, 425, Synth::ParamId::CF2FIA, "%.2f%%", 100.0, screw_states);
-    SCREW(synth_body, 929, 425, Synth::ParamId::CF2QIA, "%.2f%%", 250.0, screw_states);
+    TOGG(synth_body, 799, 425, 53, 24, 0, Synth::ParamId::CF2LOG);
+    TOGG(synth_body, 856, 425, 53, 24, 0, Synth::ParamId::CF2QLG);
+    SCREW(synth_body, 915, 425, Synth::ParamId::CF2FIA, "%.2f%%", 100.0, screw_states);
+    SCREW(synth_body, 935, 425, Synth::ParamId::CF2QIA, "%.2f%%", 250.0, screw_states);
 
     synth_body->show();
 }

@@ -589,7 +589,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
             COIA = 415,      ///< Carrier Oscillator Inaccuracy
             COIS = 416,      ///< Carrier Oscillator Instability
 
-            PARAM_ID_COUNT = 417,
+            MF1QLG = 417,    ///< Modulator Filter 1 Logarithmic Q Factor
+            MF2QLG = 418,    ///< Modulator Filter 2 Logarithmic Q Factor
+            CF1QLG = 419,    ///< Carrier Filter 1 Logarithmic Q Factor
+            CF2QLG = 420,    ///< Carrier Filter 2 Logarithmic Q Factor
+            EF1QLG = 421,    ///< Effects Filter 1 Logarithmic Q Factor
+            EF2QLG = 422,    ///< Effects Filter 2 Logarithmic Q Factor
+
+            PARAM_ID_COUNT = 423,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 

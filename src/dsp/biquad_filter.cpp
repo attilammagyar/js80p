@@ -123,7 +123,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        ToggleParam const& log_scale_toggle
+        ToggleParam const& freq_log_scale_toggle,
+        ToggleParam const& q_log_scale_toggle
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3),
     frequency(
@@ -132,7 +133,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         Constants::BIQUAD_FILTER_FREQUENCY_MAX,
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
-        &log_scale_toggle,
+        &freq_log_scale_toggle,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
@@ -141,7 +142,13 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         name + "Q",
         Constants::BIQUAD_FILTER_Q_MIN,
         Constants::BIQUAD_FILTER_Q_MAX,
-        Constants::BIQUAD_FILTER_Q_DEFAULT
+        Constants::BIQUAD_FILTER_Q_DEFAULT,
+        0.0,
+        &q_log_scale_toggle,
+        Math::log_biquad_filter_q_table(),
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE,
+        Math::LOG_BIQUAD_FILTER_Q_VALUE_OFFSET
     ),
     gain(
         name + "G",

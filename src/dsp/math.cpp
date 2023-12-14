@@ -165,11 +165,11 @@ void Math::init_log_biquad_filter_q() noexcept
 
 Number Math::ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept
 {
-    constexpr Number min = Constants::BIQUAD_FILTER_Q_MIN + 1.0;
-    constexpr Number max = Constants::BIQUAD_FILTER_Q_MAX + 1.0;
+    constexpr Number min = Constants::BIQUAD_FILTER_Q_MIN + LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
+    constexpr Number max = Constants::BIQUAD_FILTER_Q_MAX + LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
     constexpr Number range = max / min;
 
-    return min * std::pow(range, ratio) - 1.0;
+    return min * std::pow(range, ratio) - LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
 }
 
 

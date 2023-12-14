@@ -80,7 +80,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         7                           /* POLY + MODE + MIX + PM + FM + AM + bus   */
-        + 39 * 2                    /* Modulator::Params + Carrier::Params      */
+        + 41 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_FLOAT_PARAMS
@@ -157,12 +157,12 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     create_envelopes();
     create_lfos();
 
-    modulator_params.filter_1_log_scale.set_value(ToggleParam::ON);
-    modulator_params.filter_2_log_scale.set_value(ToggleParam::ON);
-    carrier_params.filter_1_log_scale.set_value(ToggleParam::ON);
-    carrier_params.filter_2_log_scale.set_value(ToggleParam::ON);
-    effects.filter_1_log_scale.set_value(ToggleParam::ON);
-    effects.filter_2_log_scale.set_value(ToggleParam::ON);
+    modulator_params.filter_1_freq_log_scale.set_value(ToggleParam::ON);
+    modulator_params.filter_2_freq_log_scale.set_value(ToggleParam::ON);
+    carrier_params.filter_1_freq_log_scale.set_value(ToggleParam::ON);
+    carrier_params.filter_2_freq_log_scale.set_value(ToggleParam::ON);
+    effects.filter_1_freq_log_scale.set_value(ToggleParam::ON);
+    effects.filter_2_freq_log_scale.set_value(ToggleParam::ON);
 
     channel_pressure_ctl.change(0.0, 0.0);
     channel_pressure_ctl.clear();
@@ -345,7 +345,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Filter1::TypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
-    register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_freq_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::MF1QLG, modulator_params.filter_1_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
     register_param_as_child<FloatParamS>(ParamId::MF1Q, modulator_params.filter_1_q);
     register_param_as_child<FloatParamS>(ParamId::MF1G, modulator_params.filter_1_gain);
@@ -355,7 +356,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<Modulator::Filter2::TypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
-    register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_freq_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::MF2QLG, modulator_params.filter_2_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
     register_param_as_child<FloatParamS>(ParamId::MF2Q, modulator_params.filter_2_q);
     register_param_as_child<FloatParamS>(ParamId::MF2G, modulator_params.filter_2_gain);
@@ -397,7 +399,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Filter1::TypeParam>(
         ParamId::CF1TYP, carrier_params.filter_1_type
     );
-    register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_freq_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::CF1QLG, carrier_params.filter_1_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
     register_param_as_child<FloatParamS>(ParamId::CF1Q, carrier_params.filter_1_q);
     register_param_as_child<FloatParamS>(ParamId::CF1G, carrier_params.filter_1_gain);
@@ -407,7 +410,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::Filter2::TypeParam>(
         ParamId::CF2TYP, carrier_params.filter_2_type
     );
-    register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_freq_log_scale);
+    register_param_as_child<ToggleParam>(ParamId::CF2QLG, carrier_params.filter_2_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
     register_param_as_child<FloatParamS>(ParamId::CF2Q, carrier_params.filter_2_q);
     register_param_as_child<FloatParamS>(ParamId::CF2G, carrier_params.filter_2_gain);
@@ -425,13 +429,15 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EDG, effects.distortion.level);
 
     register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
-    register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_log_scale);
+    register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_freq_log_scale);
+    register_param<ToggleParam>(ParamId::EF1QLG, effects.filter_1_q_log_scale);
     register_param<FloatParamS>(ParamId::EF1FRQ, effects.filter_1.frequency);
     register_param<FloatParamS>(ParamId::EF1Q, effects.filter_1.q);
     register_param<FloatParamS>(ParamId::EF1G, effects.filter_1.gain);
 
     register_param<Effects::Filter2<Bus>::TypeParam>(ParamId::EF2TYP, effects.filter_2_type);
-    register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_log_scale);
+    register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_freq_log_scale);
+    register_param<ToggleParam>(ParamId::EF2QLG, effects.filter_2_q_log_scale);
     register_param<FloatParamS>(ParamId::EF2FRQ, effects.filter_2.frequency);
     register_param<FloatParamS>(ParamId::EF2Q, effects.filter_2.q);
     register_param<FloatParamS>(ParamId::EF2G, effects.filter_2.gain);
@@ -1592,12 +1598,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_default_ratio();
         case ParamId::ECSYN: return effects.chorus.tempo_sync.get_default_ratio();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_default_ratio();
-        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_default_ratio();
-        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_default_ratio();
-        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_default_ratio();
-        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_default_ratio();
-        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_default_ratio();
-        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_default_ratio();
+        case ParamId::MF1LOG: return modulator_params.filter_1_freq_log_scale.get_default_ratio();
+        case ParamId::MF2LOG: return modulator_params.filter_2_freq_log_scale.get_default_ratio();
+        case ParamId::CF1LOG: return carrier_params.filter_1_freq_log_scale.get_default_ratio();
+        case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_default_ratio();
+        case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_default_ratio();
+        case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_default_ratio();
         case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_default_ratio();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_default_ratio();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_default_ratio();
@@ -1616,6 +1622,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::MOIS: return modulator_params.oscillator_instability.get_default_ratio();
         case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_default_ratio();
         case ParamId::COIS: return carrier_params.oscillator_instability.get_default_ratio();
+        case ParamId::MF1QLG: return modulator_params.filter_1_q_log_scale.get_default_ratio();
+        case ParamId::MF2QLG: return modulator_params.filter_2_q_log_scale.get_default_ratio();
+        case ParamId::CF1QLG: return carrier_params.filter_1_q_log_scale.get_default_ratio();
+        case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_default_ratio();
+        case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_default_ratio();
+        case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -1826,12 +1838,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_max_value();
         case ParamId::ECSYN: return effects.chorus.tempo_sync.get_max_value();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_max_value();
-        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_max_value();
-        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_max_value();
-        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_max_value();
-        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_max_value();
-        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_max_value();
-        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_max_value();
+        case ParamId::MF1LOG: return modulator_params.filter_1_freq_log_scale.get_max_value();
+        case ParamId::MF2LOG: return modulator_params.filter_2_freq_log_scale.get_max_value();
+        case ParamId::CF1LOG: return carrier_params.filter_1_freq_log_scale.get_max_value();
+        case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_max_value();
+        case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_max_value();
+        case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_max_value();
         case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_max_value();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_max_value();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_max_value();
@@ -1850,6 +1862,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::MOIS: return modulator_params.oscillator_instability.get_max_value();
         case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_max_value();
         case ParamId::COIS: return carrier_params.oscillator_instability.get_max_value();
+        case ParamId::MF1QLG: return modulator_params.filter_1_q_log_scale.get_max_value();
+        case ParamId::MF2QLG: return modulator_params.filter_2_q_log_scale.get_max_value();
+        case ParamId::CF1QLG: return carrier_params.filter_1_q_log_scale.get_max_value();
+        case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_max_value();
+        case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_max_value();
+        case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -2068,12 +2086,12 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.ratio_to_value(ratio);
         case ParamId::ECSYN: return effects.chorus.tempo_sync.ratio_to_value(ratio);
         case ParamId::EESYN: return effects.echo.tempo_sync.ratio_to_value(ratio);
-        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.ratio_to_value(ratio);
-        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.ratio_to_value(ratio);
-        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.ratio_to_value(ratio);
-        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.ratio_to_value(ratio);
-        case ParamId::EF1LOG: return effects.filter_1_log_scale.ratio_to_value(ratio);
-        case ParamId::EF2LOG: return effects.filter_2_log_scale.ratio_to_value(ratio);
+        case ParamId::MF1LOG: return modulator_params.filter_1_freq_log_scale.ratio_to_value(ratio);
+        case ParamId::MF2LOG: return modulator_params.filter_2_freq_log_scale.ratio_to_value(ratio);
+        case ParamId::CF1LOG: return carrier_params.filter_1_freq_log_scale.ratio_to_value(ratio);
+        case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.ratio_to_value(ratio);
+        case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.ratio_to_value(ratio);
+        case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.ratio_to_value(ratio);
         case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.ratio_to_value(ratio);
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.ratio_to_value(ratio);
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.ratio_to_value(ratio);
@@ -2092,6 +2110,12 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::MOIS: return modulator_params.oscillator_instability.ratio_to_value(ratio);
         case ParamId::COIA: return carrier_params.oscillator_inaccuracy.ratio_to_value(ratio);
         case ParamId::COIS: return carrier_params.oscillator_instability.ratio_to_value(ratio);
+        case ParamId::MF1QLG: return modulator_params.filter_1_q_log_scale.ratio_to_value(ratio);
+        case ParamId::MF2QLG: return modulator_params.filter_2_q_log_scale.ratio_to_value(ratio);
+        case ParamId::CF1QLG: return carrier_params.filter_1_q_log_scale.ratio_to_value(ratio);
+        case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.ratio_to_value(ratio);
+        case ParamId::EF1QLG: return effects.filter_1_q_log_scale.ratio_to_value(ratio);
+        case ParamId::EF2QLG: return effects.filter_2_q_log_scale.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2596,12 +2620,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L8CEN: lfos_rw[7]->center.set_ratio(ratio); break;
             case ParamId::ECSYN: effects.chorus.tempo_sync.set_ratio(ratio); break;
             case ParamId::EESYN: effects.echo.tempo_sync.set_ratio(ratio); break;
-            case ParamId::MF1LOG: modulator_params.filter_1_log_scale.set_ratio(ratio); break;
-            case ParamId::MF2LOG: modulator_params.filter_2_log_scale.set_ratio(ratio); break;
-            case ParamId::CF1LOG: carrier_params.filter_1_log_scale.set_ratio(ratio); break;
-            case ParamId::CF2LOG: carrier_params.filter_2_log_scale.set_ratio(ratio); break;
-            case ParamId::EF1LOG: effects.filter_1_log_scale.set_ratio(ratio); break;
-            case ParamId::EF2LOG: effects.filter_2_log_scale.set_ratio(ratio); break;
+            case ParamId::MF1LOG: modulator_params.filter_1_freq_log_scale.set_ratio(ratio); break;
+            case ParamId::MF2LOG: modulator_params.filter_2_freq_log_scale.set_ratio(ratio); break;
+            case ParamId::CF1LOG: carrier_params.filter_1_freq_log_scale.set_ratio(ratio); break;
+            case ParamId::CF2LOG: carrier_params.filter_2_freq_log_scale.set_ratio(ratio); break;
+            case ParamId::EF1LOG: effects.filter_1_freq_log_scale.set_ratio(ratio); break;
+            case ParamId::EF2LOG: effects.filter_2_freq_log_scale.set_ratio(ratio); break;
             case ParamId::ECLOG: effects.chorus.log_scale_frequencies.set_ratio(ratio); break;
             case ParamId::EELOG: effects.echo.log_scale_frequencies.set_ratio(ratio); break;
             case ParamId::ERLOG: effects.reverb.log_scale_frequencies.set_ratio(ratio); break;
@@ -2620,6 +2644,12 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::MOIS: modulator_params.oscillator_instability.set_ratio(ratio); break;
             case ParamId::COIA: carrier_params.oscillator_inaccuracy.set_ratio(ratio); break;
             case ParamId::COIS: carrier_params.oscillator_instability.set_ratio(ratio); break;
+            case ParamId::MF1QLG: modulator_params.filter_1_q_log_scale.set_ratio(ratio); break;
+            case ParamId::MF2QLG: modulator_params.filter_2_q_log_scale.set_ratio(ratio); break;
+            case ParamId::CF1QLG: carrier_params.filter_1_q_log_scale.set_ratio(ratio); break;
+            case ParamId::CF2QLG: carrier_params.filter_2_q_log_scale.set_ratio(ratio); break;
+            case ParamId::EF1QLG: effects.filter_1_q_log_scale.set_ratio(ratio); break;
+            case ParamId::EF2QLG: effects.filter_2_q_log_scale.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -3320,12 +3350,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L8SYN: return lfos_rw[7]->tempo_sync.get_ratio();
         case ParamId::ECSYN: return effects.chorus.tempo_sync.get_ratio();
         case ParamId::EESYN: return effects.echo.tempo_sync.get_ratio();
-        case ParamId::MF1LOG: return modulator_params.filter_1_log_scale.get_ratio();
-        case ParamId::MF2LOG: return modulator_params.filter_2_log_scale.get_ratio();
-        case ParamId::CF1LOG: return carrier_params.filter_1_log_scale.get_ratio();
-        case ParamId::CF2LOG: return carrier_params.filter_2_log_scale.get_ratio();
-        case ParamId::EF1LOG: return effects.filter_1_log_scale.get_ratio();
-        case ParamId::EF2LOG: return effects.filter_2_log_scale.get_ratio();
+        case ParamId::MF1LOG: return modulator_params.filter_1_freq_log_scale.get_ratio();
+        case ParamId::MF2LOG: return modulator_params.filter_2_freq_log_scale.get_ratio();
+        case ParamId::CF1LOG: return carrier_params.filter_1_freq_log_scale.get_ratio();
+        case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_ratio();
+        case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_ratio();
+        case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_ratio();
         case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_ratio();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_ratio();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_ratio();
@@ -3344,6 +3374,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::MOIS: return modulator_params.oscillator_instability.get_ratio();
         case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_ratio();
         case ParamId::COIS: return carrier_params.oscillator_instability.get_ratio();
+        case ParamId::MF1QLG: return modulator_params.filter_1_q_log_scale.get_ratio();
+        case ParamId::MF2QLG: return modulator_params.filter_2_q_log_scale.get_ratio();
+        case ParamId::CF1QLG: return carrier_params.filter_1_q_log_scale.get_ratio();
+        case ParamId::CF2QLG: return carrier_params.filter_2_q_log_scale.get_ratio();
+        case ParamId::EF1QLG: return effects.filter_1_q_log_scale.get_ratio();
+        case ParamId::EF2QLG: return effects.filter_2_q_log_scale.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }

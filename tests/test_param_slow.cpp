@@ -111,7 +111,7 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         Constants::BIQUAD_FILTER_Q_MIN,
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT,
-        1.0,
+        Math::LOG_BIQUAD_FILTER_Q_VALUE_OFFSET,
         0.0029,
         0.0054
     );

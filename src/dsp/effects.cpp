@@ -29,7 +29,7 @@ template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
         std::string const name,
         InputSignalProducerClass& input
-) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 17, input.get_channels()),
+) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 19, input.get_channels()),
     volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
     volume_3_gain(name + "V3V", 0.0, 1.0, 1.0),
@@ -38,10 +38,24 @@ Effects<InputSignalProducerClass>::Effects(
     distortion(name + "D", Distortion::Type::HEAVY, overdrive),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
-    filter_1_log_scale(name + "F1LOG", ToggleParam::OFF),
-    filter_2_log_scale(name + "F2LOG", ToggleParam::OFF),
-    filter_1(name + "F1", distortion, filter_1_type, filter_1_log_scale),
-    filter_2(name + "F2", filter_1, filter_2_type, filter_2_log_scale),
+    filter_1_freq_log_scale(name + "F1LOG", ToggleParam::OFF),
+    filter_1_q_log_scale(name + "F1QLG", ToggleParam::OFF),
+    filter_2_freq_log_scale(name + "F2LOG", ToggleParam::OFF),
+    filter_2_q_log_scale(name + "F2QLG", ToggleParam::OFF),
+    filter_1(
+        name + "F1",
+        distortion,
+        filter_1_type,
+        filter_1_freq_log_scale,
+        filter_1_q_log_scale
+    ),
+    filter_2(
+        name + "F2",
+        filter_1,
+        filter_2_type,
+        filter_2_freq_log_scale,
+        filter_2_q_log_scale
+    ),
     volume_2(filter_2, volume_2_gain),
     chorus(name + "C", volume_2),
     echo(name + "E", chorus),
@@ -56,8 +70,10 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(distortion);
     this->register_child(filter_1_type);
     this->register_child(filter_2_type);
-    this->register_child(filter_1_log_scale);
-    this->register_child(filter_2_log_scale);
+    this->register_child(filter_1_freq_log_scale);
+    this->register_child(filter_1_q_log_scale);
+    this->register_child(filter_2_freq_log_scale);
+    this->register_child(filter_2_q_log_scale);
     this->register_child(filter_1);
     this->register_child(filter_2);
     this->register_child(volume_2);

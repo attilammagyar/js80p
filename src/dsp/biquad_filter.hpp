@@ -91,7 +91,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            ToggleParam const& log_scale_toggle
+            ToggleParam const& freq_log_scale_toggle,
+            ToggleParam const& q_log_scale_toggle
         ) noexcept;
 
         BiquadFilter(

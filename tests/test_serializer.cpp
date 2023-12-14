@@ -316,13 +316,13 @@ TEST(toggle_params_are_loaded_before_other_params, {
     Serializer::import_patch_in_audio_thread(synth, patch);
 
     assert_eq(
-        ToggleParam::ON, synth.modulator_params.filter_1_log_scale.get_value(), DOUBLE_DELTA
+        ToggleParam::ON, synth.modulator_params.filter_1_freq_log_scale.get_value()
     );
     assert_eq(
         1928.2, synth.modulator_params.filter_1_frequency.get_value(), 19.282
     );
     assert_eq(
-        ToggleParam::OFF, synth.modulator_params.filter_2_log_scale.get_value(), DOUBLE_DELTA
+        ToggleParam::OFF, synth.modulator_params.filter_2_freq_log_scale.get_value()
     );
     assert_eq(
         18000.0, synth.modulator_params.filter_2_frequency.get_value(), 1.0

@@ -243,7 +243,12 @@ h1 {
 
 .block h1 label.freq {
   position: relative;
-  left: 14px;
+  left: 2px;
+}
+
+.block h1 label.q {
+  position: relative;
+  left: 2px;
 }
 
 #chorus h1 label.freq {
@@ -604,7 +609,8 @@ function make_tabs(active)
         <div id="osc-1-filter-1" class="block osc-filter">
           <h1>
             Filter 1
-            <label class="freq"><input type="text" /> LOG FREQ</label>
+            <label class="freq"><input type="text" /> LG F</label>
+            <label class="q"><input type="text" /> LG Q</label>
           </h1>
         </div>
         <div id="osc-1-wave" class="osc-main block">
@@ -613,7 +619,8 @@ function make_tabs(active)
         <div id="osc-1-filter-2" class="block osc-filter">
           <h1>
             Filter 2
-            <label class="freq"><input type="text" /> LOG FREQ</label>
+            <label class="freq"><input type="text" /> LG F</label>
+            <label class="q"><input type="text" /> LG Q</label>
           </h1>
         </div>
       </div>
@@ -624,7 +631,8 @@ function make_tabs(active)
         <div id="osc-2-filter-1" class="block">
           <h1>
             Filter 1
-            <label class="freq"><input type="text" /> LOG FREQ</label>
+            <label class="freq"><input type="text" /> LG F</label>
+            <label class="q"><input type="text" /> LG Q</label>
           </h1>
         </div>
         <div id="osc-2-wave" class="osc-main block">
@@ -633,7 +641,8 @@ function make_tabs(active)
         <div id="osc-2-filter-2" class="block">
           <h1>
             Filter 2
-            <label class="freq"><input type="text" /> LOG FREQ</label>
+            <label class="freq"><input type="text" /> LG F</label>
+            <label class="q"><input type="text" /> LG Q</label>
           </h1>
         </div>
       </div>
@@ -662,14 +671,16 @@ function make_tabs(active)
       <div id="filter-1" class="effect main-block block">
         <h1>
           Filter 1
-          <label class="freq"><input type="text" /> LOG FREQ</label>
+          <label class="freq"><input type="text" /> LG F</label>
+          <label class="q"><input type="text" /> LG Q</label>
         </h1>
         <div id="filter-1-params" class="block"></div>
       </div>
       <div id="filter-2" class="effect main-block block">
         <h1>
           Filter 2
-          <label class="freq"><input type="text" /> LOG FREQ</label>
+          <label class="freq"><input type="text" /> LG F</label>
+          <label class="q"><input type="text" /> LG Q</label>
         </h1>
         <div id="filter-2-params" class="block"></div>
       </div>

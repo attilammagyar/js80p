@@ -283,6 +283,13 @@ def print_special_params(param_id: int) -> int:
 
         ("COIA", "  ///< Carrier Oscillator Inaccuracy"),
         ("COIS", "  ///< Carrier Oscillator Instability"),
+
+        ("MF1QLG", "///< Modulator Filter 1 Logarithmic Q Factor"),
+        ("MF2QLG", "///< Modulator Filter 2 Logarithmic Q Factor"),
+        ("CF1QLG", "///< Carrier Filter 1 Logarithmic Q Factor"),
+        ("CF2QLG", "///< Carrier Filter 2 Logarithmic Q Factor"),
+        ("EF1QLG", "///< Effects Filter 1 Logarithmic Q Factor"),
+        ("EF2QLG", "///< Effects Filter 2 Logarithmic Q Factor"),
     ]
 
     return print_params(param_id, "", "", 1, params)

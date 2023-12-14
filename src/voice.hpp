@@ -179,7 +179,8 @@ class Voice : public SignalProducer
                 FloatParamB harmonic_9;
 
                 typename Filter1::TypeParam filter_1_type;
-                ToggleParam filter_1_log_scale;
+                ToggleParam filter_1_freq_log_scale;
+                ToggleParam filter_1_q_log_scale;
                 FloatParamS filter_1_frequency;
                 FloatParamS filter_1_q;
                 FloatParamS filter_1_gain;
@@ -187,7 +188,8 @@ class Voice : public SignalProducer
                 FloatParamB filter_1_q_inaccuracy;
 
                 typename Filter2::TypeParam filter_2_type;
-                ToggleParam filter_2_log_scale;
+                ToggleParam filter_2_freq_log_scale;
+                ToggleParam filter_2_q_log_scale;
                 FloatParamS filter_2_frequency;
                 FloatParamS filter_2_q;
                 FloatParamS filter_2_gain;
