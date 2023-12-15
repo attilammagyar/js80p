@@ -1,3 +1,3 @@
-SUFFIX = 32bit
+SUFFIX = x86
 
 include make/windows-mingw.mk
