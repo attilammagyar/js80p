@@ -5,7 +5,7 @@ set -e
 set -u
 set -o pipefail
 
-TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2"
+TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2 riscv64-gpp:none"
 PLUGIN_TYPES="fst vst3"
 TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
 DIST_DIR_BASE="dist"
@@ -135,6 +135,7 @@ main()
 
     package_vst3_bundle "$version_as_file_name" "sse2"
     package_vst3_bundle "$version_as_file_name" "avx"
+    package_vst3_bundle "$version_as_file_name" "none"
 
     log "Done"
 }
@@ -339,15 +340,26 @@ package_vst3_bundle()
 
     cp --verbose "$README_HTML" "$doc_dir/README.html"
 
-    if [[ "$instruction_set" = "sse2" ]]
-    then
-        copy_vst3 "$version_as_file_name" "linux-32bit-sse2" "$vst3_base_dir" "i386-linux" "js80p.so"
-        copy_vst3 "$version_as_file_name" "linux-32bit-sse2" "$vst3_base_dir" "i686-linux" "js80p.so"
-        copy_vst3 "$version_as_file_name" "windows-32bit-sse2" "$vst3_base_dir" "x86-win" "js80p.vst3"
-    fi
+    case "$instruction_set" in
+        "sse2")
+            copy_vst3 "$version_as_file_name" "linux-x86-sse2" "$vst3_base_dir" "i386-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "linux-x86-sse2" "$vst3_base_dir" "i686-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "windows-x86-sse2" "$vst3_base_dir" "x86-win" "js80p.vst3"
+            copy_vst3 "$version_as_file_name" "linux-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "windows-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+            ;;
+        "avx")
+            copy_vst3 "$version_as_file_name" "linux-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "windows-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+            ;;
+        "none")
+            copy_vst3 "$version_as_file_name" "linux-riscv64-$instruction_set" "$vst3_base_dir" "riscv64-linux" "js80p.so"
+            ;;
+        *)
+            error "Unknown instruction_set: $instruction_set."
+            ;;
+    esac
 
-    copy_vst3 "$version_as_file_name" "linux-64bit-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
-    copy_vst3 "$version_as_file_name" "windows-64bit-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
 
     for src_file in $TEXT_FILES
     do

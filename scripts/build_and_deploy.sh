@@ -30,7 +30,7 @@ main()
 
     if [[ "$plugin_type$target_os$arch" = "" ]]
     then
-        echo "Usage: $0 fst|vst3 linux|windows 64bit|32bit [avx|sse2]" >&2
+        echo "Usage: $0 fst|vst3 linux|windows x86|x86_64|riscv64 [avx|sse2|none]" >&2
         return 1
     fi
 
@@ -42,10 +42,10 @@ main()
     if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
 
     case "$arch" in
-        "32bit") target_platform="i686" ;;
-        "64bit") target_platform="x86_64" ;;
+        "x86") target_platform="i686" ;;
+        "x86_64|riscv64") target_platform="$arch" ;;
         *)
-            echo "Unknown architecture: \"$arch\" - should be either \"32bit\" or \"64bit\"" >&2
+            echo "Unknown architecture: \"$arch\" - should be either \"x86\" or \"x86_64\" or \"riscv64\"" >&2
             return 1
             ;;
     esac
@@ -76,14 +76,16 @@ main()
     TARGET_PLATFORM="$target_platform" INSTRUCTION_SET="$instruction_set" make
 
     case "$target_os-$plugin_type-$arch" in
-        "linux-fst-64bit")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
-        "linux-vst3-64bit")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
-        "windows-fst-64bit")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_64 ;;
-        "windows-vst3-64bit")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_64 ;;
-        "linux-fst-32bit")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_32 ;;
-        "linux-vst3-32bit")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_32 ;;
-        "windows-fst-32bit")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_32 ;;
-        "windows-vst3-32bit")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_32 ;;
+        "linux-fst-x86_64")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
+        "linux-vst3-x86_64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "linux-fst-riscv64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "linux-vst3-riscv64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "windows-fst-x86_64")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_64 ;;
+        "windows-vst3-x86_64")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_64 ;;
+        "linux-fst-x86")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_32 ;;
+        "linux-vst3-x86")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_32 ;;
+        "windows-fst-x86")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_32 ;;
+        "windows-vst3-x86")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_32 ;;
     esac
 
     echo "SUCCESS" >&2
