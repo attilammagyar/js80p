@@ -111,6 +111,9 @@ System Requirements
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
+Note: a RISC-V 64 port is available as a separate project by
+[@aimixsaka](https://github.com/aimixsaka/js80p).
+
 <a id="linux-deps"></a>
 
 ### Dependencies on Linux
