@@ -155,17 +155,26 @@ main()
 
     if [[ "$target_platforms" =~ :sse2 ]]
     then
+        log "Bulding VST 3 bundle for SSE 2"
         package_vst3_bundle "$version_as_file_name" "sse2"
+    else
+        log "Skipping VST 3 bundle for SSE 2"
     fi
 
     if [[ "$target_platforms" =~ :avx ]]
     then
+        log "Bulding VST 3 bundle for AVX"
         package_vst3_bundle "$version_as_file_name" "avx"
+    else
+        log "Skipping VST 3 bundle for AVX"
     fi
 
     if [[ "$target_platforms" =~ riscv64-gpp:none ]]
     then
+        log "Bulding VST 3 bundle for RISC-V 64"
         package_vst3_bundle "$version_as_file_name" "none"
+    else
+        log "Skipping VST 3 bundle for RISC-V 64"
     fi
 
     log "Done"
