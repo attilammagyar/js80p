@@ -1,3 +1,5 @@
+INSTRUCTION_SET ?= sse2
+
 LIB_PATH ?= $(BUILD_DIR)/lib32
 SYS_LIB_PATH ?= /usr/lib/i386-linux-gnu
 SUFFIX = x86

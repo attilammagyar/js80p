@@ -1,3 +1,5 @@
+INSTRUCTION_SET = none
+
 LIB_PATH ?= $(BUILD_DIR)/lib64
 SYS_LIB_PATH ?= /usr/lib/riscv64-linux-gnu
 SUFFIX = riscv64

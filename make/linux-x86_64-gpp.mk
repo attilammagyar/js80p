@@ -1,3 +1,5 @@
+INSTRUCTION_SET ?= avx
+
 LIB_PATH ?= $(BUILD_DIR)/lib64
 SYS_LIB_PATH ?= /usr/lib/x86_64-linux-gnu
 SUFFIX = x86_64
