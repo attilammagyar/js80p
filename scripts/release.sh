@@ -345,15 +345,15 @@ package_vst3_bundle()
             copy_vst3 "$version_as_file_name" "linux-x86-sse2" "$vst3_base_dir" "i386-linux" "js80p.so"
             copy_vst3 "$version_as_file_name" "linux-x86-sse2" "$vst3_base_dir" "i686-linux" "js80p.so"
             copy_vst3 "$version_as_file_name" "windows-x86-sse2" "$vst3_base_dir" "x86-win" "js80p.vst3"
-            copy_vst3 "$version_as_file_name" "linux-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
-            copy_vst3 "$version_as_file_name" "windows-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+            copy_vst3 "$version_as_file_name" "linux-x86_64-sse2" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "windows-x86_64-sse2" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
             ;;
         "avx")
-            copy_vst3 "$version_as_file_name" "linux-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-linux" "js80p.so"
-            copy_vst3 "$version_as_file_name" "windows-x86_64-$instruction_set" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
+            copy_vst3 "$version_as_file_name" "linux-x86_64-avx" "$vst3_base_dir" "x86_64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "windows-x86_64-avx" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
             ;;
         "none")
-            copy_vst3 "$version_as_file_name" "linux-riscv64-$instruction_set" "$vst3_base_dir" "riscv64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "linux-riscv64-none" "$vst3_base_dir" "riscv64-linux" "js80p.so"
             ;;
         *)
             error "Unknown instruction_set: $instruction_set."
