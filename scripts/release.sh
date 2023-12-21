@@ -22,6 +22,7 @@ main()
     local source_archive
     local uncommitted
     local date
+    local build_platform
     local target_platforms="${@:-$TARGET_PLATFORMS}"
 
     log "Verifying repository"
@@ -104,9 +105,27 @@ main()
     zip --recurse-paths -9 "$source_archive" "$source_dir"
     cd ..
 
-    log "Running unit tests"
+    build_platform="$(uname -m)"
 
-    call_make "x86_64-w64-mingw32" "avx" "$version_str" "$version_int" "$version_as_file_name" check
+    log "Running unit tests ($build_platform)"
+
+    case "$build_platform" in
+        "x86_64")
+            call_make \
+                "x86_64-w64-mingw32" "avx" \
+                "$version_str" "$version_int" "$version_as_file_name" \
+                check
+            ;;
+        "riscv64")
+            call_make \
+                "riscv64-gpp" "none" \
+                "$version_str" "$version_int" "$version_as_file_name" \
+                check
+            ;;
+        *)
+            error "Unsupported build platform: $uname"
+            ;;
+    esac
 
     for target_platform in $target_platforms
     do
