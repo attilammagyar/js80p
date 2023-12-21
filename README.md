@@ -111,8 +111,9 @@ System Requirements
 
 Tested with [REAPER](https://www.reaper.fm/) 6.79.
 
-Note: a RISC-V 64 port is available as a separate project by
-[@aimixsaka](https://github.com/aimixsaka/js80p).
+Note: a RISC-V 64 port is available as a
+[separate project](https://github.com/aimixsaka/js80p/) by
+[@aimixsaka](https://github.com/aimixsaka/).
 
 <a id="linux-deps"></a>
 
