@@ -22,6 +22,7 @@ main()
     local source_archive
     local uncommitted
     local date
+    local target_platforms="${@:-$TARGET_PLATFORMS}"
 
     log "Verifying repository"
 
@@ -107,7 +108,7 @@ main()
 
     call_make "x86_64-w64-mingw32" "avx" "$version_str" "$version_int" "$version_as_file_name" check
 
-    for target_platform in $TARGET_PLATFORMS
+    for target_platform in $target_platforms
     do
         log "Building for target: $target_platform"
 
@@ -133,9 +134,20 @@ main()
             "$version_str" "$version_int" "$version_as_file_name"
     done
 
-    package_vst3_bundle "$version_as_file_name" "sse2"
-    package_vst3_bundle "$version_as_file_name" "avx"
-    package_vst3_bundle "$version_as_file_name" "none"
+    if [[ "$target_platforms" =~ :sse2 ]]
+    then
+        package_vst3_bundle "$version_as_file_name" "sse2"
+    fi
+
+    if [[ "$target_platforms" =~ :avx ]]
+    then
+        package_vst3_bundle "$version_as_file_name" "avx"
+    fi
+
+    if [[ "$target_platforms" =~ riscv64-gpp:none ]]
+    then
+        package_vst3_bundle "$version_as_file_name" "none"
+    fi
 
     log "Done"
 }
