@@ -76,16 +76,16 @@ main()
     TARGET_PLATFORM="$target_platform" INSTRUCTION_SET="$instruction_set" make
 
     case "$target_os-$plugin_type-$arch" in
-        "linux-fst-x86_64")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
-        "linux-vst3-x86_64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
-        "linux-fst-riscv64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
-        "linux-vst3-riscv64")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
-        "windows-fst-x86_64")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_64 ;;
-        "windows-vst3-x86_64")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_64 ;;
-        "linux-fst-x86")      replace_in_dir "$built_plugin" $FST_DIRS_LINUX_32 ;;
-        "linux-vst3-x86")     replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_32 ;;
-        "windows-fst-x86")    replace_in_dir "$built_plugin" $FST_DIRS_WINE_32 ;;
-        "windows-vst3-x86")   replace_in_dir "$built_plugin" $VST3_DIRS_WINE_32 ;;
+        "linux-fst-x86_64")     replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
+        "linux-vst3-x86_64")    replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "linux-fst-riscv64")    replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "linux-vst3-riscv64")   replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_64 ;;
+        "windows-fst-x86_64")   replace_in_dir "$built_plugin" $FST_DIRS_WINE_64 ;;
+        "windows-vst3-x86_64")  replace_in_dir "$built_plugin" $VST3_DIRS_WINE_64 ;;
+        "linux-fst-x86")        replace_in_dir "$built_plugin" $FST_DIRS_LINUX_32 ;;
+        "linux-vst3-x86")       replace_in_dir "$built_plugin" $VST3_DIRS_LINUX_32 ;;
+        "windows-fst-x86")      replace_in_dir "$built_plugin" $FST_DIRS_WINE_32 ;;
+        "windows-vst3-x86")     replace_in_dir "$built_plugin" $VST3_DIRS_WINE_32 ;;
     esac
 
     echo "SUCCESS" >&2
