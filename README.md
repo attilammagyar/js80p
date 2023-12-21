@@ -1025,12 +1025,14 @@ following commands to run tests and compile JS80P for Windows:
 Run `make check` for running tests.
 
 The following commands (on a 64 bit Linux environment) will compile JS80P for
-64 bit Windows, 32 bit Windows, 64 bit Linux, and 32 bit Linux respectively:
+64 bit Windows, 32 bit Windows, `x86_64` Linux, `x86` Linux, and
+`RISC-V 64` Linux respectively:
 
     TARGET_PLATFORM=x86_64-w64-mingw32 make all
     TARGET_PLATFORM=i686-w64-mingw32 make all
     TARGET_PLATFORM=x86_64-gpp make all
     TARGET_PLATFORM=i686-gpp make all
+    TARGET_PLATFORM=riscv64-gpp make all
 
 <a id="dev-theory" href="#toc">Table of Contents</a>
 
