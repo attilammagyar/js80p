@@ -577,6 +577,18 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    if constexpr (HAS_SUBHARMONIC) {
+        subharmonic_amplitude_buffer = FloatParamS::produce_if_not_constant(
+            subharmonic_amplitude, round, sample_count
+        );
+
+        subharmonic_amplitude_is_constant = subharmonic_amplitude_buffer == NULL;
+
+        if (subharmonic_amplitude_is_constant) {
+            subharmonic_amplitude_value = subharmonic_amplitude.get_value();
+        }
+    }
+
     Sample const* modulated_amplitude_buffer = (
         FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
             modulated_amplitude, round, sample_count
@@ -636,18 +648,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
     constexpr Byte DETUNE = 2;
     constexpr Byte FINE_DETUNE = 4;
     constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
-
-    if constexpr (HAS_SUBHARMONIC) {
-        subharmonic_amplitude_buffer = FloatParamS::produce_if_not_constant(
-            subharmonic_amplitude, round, sample_count
-        );
-
-        subharmonic_amplitude_is_constant = subharmonic_amplitude_buffer == NULL;
-
-        if (subharmonic_amplitude_is_constant) {
-            subharmonic_amplitude_value = subharmonic_amplitude.get_value();
-        }
-    }
 
     Sample const* const frequency_buffer = (
         FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
