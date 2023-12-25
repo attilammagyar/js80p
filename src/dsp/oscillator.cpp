@@ -519,13 +519,11 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if constexpr (is_lfo) {
-        apply_toggle_params(bpm);
-    }
-
     Waveform const waveform = this->waveform.get_value();
 
-    if (waveform == CUSTOM) {
+    if constexpr (is_lfo) {
+        apply_toggle_params(bpm);
+    } else if (waveform == CUSTOM) {
         bool has_changed = false;
 
         for (Integer i = 0; i != CUSTOM_WAVEFORM_HARMONICS; ++i) {
