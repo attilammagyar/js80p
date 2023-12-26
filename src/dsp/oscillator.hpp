@@ -218,11 +218,13 @@ class Oscillator : public SignalProducer
         void apply_toggle_params(Number const bpm) noexcept;
 
         void compute_amplitude_buffer(
+            Sample const* const amplitude_buffer,
             Integer const round,
             Integer const sample_count
         ) noexcept;
 
         void compute_frequency_buffer(
+            Sample const* const frequency_buffer,
             Integer const round,
             Integer const sample_count
         ) noexcept;
@@ -234,6 +236,7 @@ class Oscillator : public SignalProducer
         ) const noexcept;
 
         void compute_phase_buffer(
+            Sample const* const phase_buffer,
             Integer const round,
             Integer const sample_count
         ) noexcept;

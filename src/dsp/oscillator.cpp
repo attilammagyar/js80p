@@ -550,9 +550,24 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
     }
 
     wavetable = wavetables[waveform];
-    compute_amplitude_buffer(round, sample_count);
-    compute_frequency_buffer(round, sample_count);
-    compute_phase_buffer(round, sample_count);
+
+    Sample const* const amplitude_buffer = (
+        FloatParamS::produce_if_not_constant(amplitude, round, sample_count)
+    );
+    Sample const* const frequency_buffer = (
+        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
+            frequency, round, sample_count
+        )
+    );
+    Sample const* const phase_buffer = (
+        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
+            phase, round, sample_count
+        )
+    );
+
+    compute_amplitude_buffer(amplitude_buffer, round, sample_count);
+    compute_frequency_buffer(frequency_buffer, round, sample_count);
+    compute_phase_buffer(phase_buffer, round, sample_count);
 
     return NULL;
 }
@@ -574,6 +589,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::apply_toggle_params(
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
+        Sample const* const amplitude_buffer,
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -589,13 +605,10 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         }
     }
 
-    Sample const* modulated_amplitude_buffer = (
+    Sample const* const modulated_amplitude_buffer = (
         FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
             modulated_amplitude, round, sample_count
         )
-    );
-    Sample const* amplitude_buffer = (
-        FloatParamS::produce_if_not_constant(amplitude, round, sample_count)
     );
 
     if (amplitude_buffer == NULL) {
@@ -640,6 +653,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
+        Sample const* const frequency_buffer,
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -649,11 +663,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
     constexpr Byte FINE_DETUNE = 4;
     constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
 
-    Sample const* const frequency_buffer = (
-        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
-            frequency, round, sample_count
-        )
-    );
     Sample const* const detune_buffer = (
         FloatParamS::produce_if_not_constant(detune, round, sample_count)
     );
@@ -816,12 +825,10 @@ Frequency Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency(
 
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
+        Sample const* const phase_buffer,
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Sample const* const phase_buffer = FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
-        phase, round, sample_count
-    );
     phase_is_constant = phase_buffer == NULL;
 
     if (phase_is_constant) {
