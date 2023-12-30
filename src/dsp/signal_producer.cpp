@@ -115,9 +115,11 @@ void SignalProducer::find_peak(
 
 SignalProducer::SignalProducer(
         Integer const channels,
-        Integer const number_of_children
+        Integer const number_of_children,
+        Integer const number_of_events
 ) noexcept
     : channels(0 <= channels ? channels : 0),
+    events((Queue<Event>::SizeType)number_of_events),
     buffer(NULL),
     last_sample_count(0),
     block_size(DEFAULT_BLOCK_SIZE),
@@ -131,7 +133,9 @@ SignalProducer::SignalProducer(
     cached_silence_round(-1),
     cached_silence(false)
 {
-    children.reserve(number_of_children);
+    if (number_of_children > 0) {
+        children.reserve((Children::size_type)number_of_children);
+    }
 
     buffer = allocate_buffer();
 }
@@ -350,6 +354,10 @@ void SignalProducer::schedule(
 
 void SignalProducer::cancel_events() noexcept
 {
+    if (events.is_empty()) {
+        return;
+    }
+
     events.drop(0);
     schedule(EVT_CANCEL, 0.0);
 }

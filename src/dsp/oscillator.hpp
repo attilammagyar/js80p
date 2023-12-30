@@ -207,6 +207,7 @@ class Oscillator : public SignalProducer
         static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
 
         static constexpr Integer NUMBER_OF_CHILDREN = 8;
+        static constexpr Integer NUMBER_OF_EVENTS = 4;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
 

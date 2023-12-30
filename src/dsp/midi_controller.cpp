@@ -26,7 +26,8 @@ namespace JS80P
 {
 
 MidiController::MidiController() noexcept
-    : change_index(0),
+    : events_rw(32),
+    change_index(0),
     assignments(0),
     value(0.5),
     events(events_rw)

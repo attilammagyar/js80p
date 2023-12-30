@@ -35,9 +35,14 @@ Param<NumberType, evaluation>::Param(
         std::string const name,
         NumberType const min_value,
         NumberType const max_value,
-        NumberType const default_value
+        NumberType const default_value,
+        Integer const number_of_events
 ) noexcept
-    : SignalProducer(evaluation == ParamEvaluation::SAMPLE ? 1 : 0),
+    : SignalProducer(
+        evaluation == ParamEvaluation::SAMPLE ? 1 : 0,
+        0,
+        number_of_events
+    ),
     midi_controller(NULL),
     macro(NULL),
     macro_change_index(-1),
@@ -372,7 +377,9 @@ FloatParam<evaluation>::FloatParam(
         Number const log_scale_table_index_scale,
         Number const log_scale_value_offset
 ) noexcept
-    : Param<Number, evaluation>(name, min_value, max_value, default_value),
+    : Param<Number, evaluation>(
+        name, min_value, max_value, default_value, NUMBER_OF_EVENTS
+    ),
     log_scale_toggle(log_scale_toggle),
     log_scale_table(log_scale_table),
     log_scale_table_max_index(log_scale_table_max_index),
@@ -430,7 +437,8 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
         leader.get_name(),
         leader.get_min_value(),
         leader.get_max_value(),
-        leader.get_default_value()
+        leader.get_default_value(),
+        NUMBER_OF_EVENTS
     ),
     log_scale_toggle(leader.get_log_scale_toggle()),
     log_scale_table(leader.get_log_scale_table()),

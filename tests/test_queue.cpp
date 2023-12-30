@@ -42,6 +42,11 @@ class TestObj
 class TestObjQueue : public Queue<TestObj>
 {
     public:
+        TestObjQueue(Queue<TestObj>::SizeType const capacity = DEFAULT_CAPACITY)
+            : Queue<TestObj>(capacity)
+        {
+        }
+
         Queue<TestObj>::SizeType capacity() const
         {
             return items.capacity();
@@ -49,12 +54,13 @@ class TestObjQueue : public Queue<TestObj>
 };
 
 
-TEST(empty_queue_allocates_a_few_items, {
-    TestObjQueue q;
+TEST(newly_created_queue_can_allocate_memory_for_the_given_number_of_items, {
+    constexpr Queue<TestObj>::SizeType capacity = 128;
+    TestObjQueue q(capacity);
 
     assert_true(q.is_empty());
     assert_eq(0, q.length());
-    assert_eq((int)Queue<TestObj>::RESERVED, (int)q.capacity());
+    assert_eq((int)capacity, (int)q.capacity());
 })
 
 
@@ -119,35 +125,8 @@ TEST(fifo, {
 })
 
 
-TEST(when_becomes_empty_then_resets, {
-    constexpr int count = Queue<TestObj>::RESERVED;
-    TestObjQueue q;
-
-    for (int i = 0; i != count; ++i) {
-        TestObj item(i);
-        q.push(item);
-    }
-
-    assert_eq(count, q.length());
-
-    for (int i = 0; i != count; ++i) {
-        assert_eq(i, q.pop().value);
-    }
-
-    assert_eq(0, q.length());
-
-    for (int i = 0; i != count; ++i) {
-        TestObj item(i + count);
-        q.push(item);
-    }
-
-    assert_eq(count, q.length());
-    assert_eq(count, (int)q.capacity());
-})
-
-
 TEST(increases_capacity_when_necessary, {
-    constexpr int count = Queue<TestObj>::RESERVED * 2;
+    constexpr int count = 16;
     TestObjQueue q;
 
     for (int i = 0; i != count; ++i) {
@@ -156,6 +135,7 @@ TEST(increases_capacity_when_necessary, {
     }
 
     assert_eq(count, q.length());
+    assert_gte((int)q.capacity(), count);
 
     for (int i = 0; i != count; ++i) {
         assert_eq(i, q.pop().value);
@@ -164,6 +144,42 @@ TEST(increases_capacity_when_necessary, {
     assert_eq(0, q.length());
     assert_gte((int)q.capacity(), count);
 })
+
+
+TEST(when_becomes_empty_then_resets, {
+    constexpr int count = 16;
+    TestObjQueue q;
+
+    for (int i = 0; i != count; ++i) {
+        TestObj item(i);
+        q.push(item);
+    }
+
+    for (int i = 0; i != count; ++i) {
+        assert_eq(i, q.pop().value);
+    }
+
+    assert_eq(0, q.length());
+    assert_eq(count, (int)q.capacity());
+
+    for (int i = 0; i != count; ++i) {
+        TestObj item(i + count);
+        q.push(item);
+    }
+
+    assert_eq(count, q.length());
+    assert_eq(count, (int)q.capacity());
+
+    for (int i = 0; i != count; ++i) {
+        assert_eq(i + count, q.pop().value);
+    }
+
+    assert_eq(0, q.length());
+    assert_eq(count, (int)q.capacity());
+})
+
+
+
 
 
 TEST(elements_may_be_accessed_randomly, {

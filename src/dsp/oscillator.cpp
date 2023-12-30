@@ -49,7 +49,7 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         WaveformParam& waveform
 ) noexcept
-    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
     modulated_amplitude(
         "MA",
@@ -169,7 +169,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
     modulated_amplitude(
         modulator,
@@ -228,7 +228,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         ToggleParam& tempo_sync,
         ToggleParam& center
 ) noexcept
-    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
     modulated_amplitude("X", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
@@ -282,7 +282,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamB& harmonic_8_leader,
         FloatParamB& harmonic_9_leader
 ) noexcept
-    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
     modulated_amplitude("XX", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
@@ -329,7 +329,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader
 ) noexcept
-    : SignalProducer(1, NUMBER_OF_CHILDREN),
+    : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
     modulated_amplitude(
         modulator,

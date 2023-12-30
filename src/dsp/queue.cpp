@@ -26,12 +26,14 @@ namespace JS80P
 {
 
 template<class Item>
-Queue<Item>::Queue() noexcept
+Queue<Item>::Queue(SizeType const capacity) noexcept
     : next_push(0),
     next_pop(0),
     size(0)
 {
-    items.reserve(RESERVED);
+    if (capacity > 0) {
+        items.reserve(capacity);
+    }
 }
 
 

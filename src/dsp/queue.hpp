@@ -41,9 +41,9 @@ class Queue
         dynamically growing std::vector here is cheating, but it should
         settle after a while.
         */
-        static constexpr SizeType RESERVED = 32;
+        static constexpr SizeType DEFAULT_CAPACITY = 0;
 
-        Queue() noexcept;
+        Queue(SizeType const capacity = DEFAULT_CAPACITY) noexcept;
 
         bool is_empty() const noexcept;
         void push(Item const& item) noexcept;

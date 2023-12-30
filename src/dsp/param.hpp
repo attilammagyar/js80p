@@ -61,7 +61,8 @@ class Param : public SignalProducer
             std::string const name,
             NumberType const min_value,
             NumberType const max_value,
-            NumberType const default_value
+            NumberType const default_value,
+            Integer const number_of_events = 0
         ) noexcept;
 
         ParamEvaluation get_evaluation() const noexcept;
@@ -187,6 +188,11 @@ template<ParamEvaluation evaluation>
 class FloatParam : public Param<Number, evaluation>
 {
     friend class SignalProducer;
+
+    private:
+        static constexpr Integer NUMBER_OF_EVENTS = (
+            evaluation == ParamEvaluation::SAMPLE ? 32 : 0
+        );
 
     public:
         static constexpr SignalProducer::Event::Type EVT_SET_VALUE = 1;

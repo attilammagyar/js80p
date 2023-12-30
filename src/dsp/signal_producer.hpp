@@ -121,7 +121,8 @@ class SignalProducer
 
         SignalProducer(
             Integer const channels,
-            Integer const number_of_children = 0
+            Integer const number_of_children = 0,
+            Integer const number_of_events = 0
         ) noexcept;
 
         virtual ~SignalProducer() noexcept;
