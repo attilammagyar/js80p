@@ -179,9 +179,6 @@ TEST(when_becomes_empty_then_resets, {
 })
 
 
-
-
-
 TEST(elements_may_be_accessed_randomly, {
     TestObjQueue q;
 
