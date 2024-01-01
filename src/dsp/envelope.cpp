@@ -42,6 +42,12 @@ EnvelopeSnapshot::EnvelopeSnapshot() noexcept
 }
 
 
+Seconds EnvelopeSnapshot::get_dahd_duration() const noexcept
+{
+    return delay_time + attack_time + hold_time + decay_time;
+}
+
+
 Envelope::Envelope(std::string const name) noexcept
     : dynamic(name + "DYN", ToggleParam::OFF),
     amount(name + "AMT",            0.0,    1.0,  1.0),

@@ -168,6 +168,8 @@ class EnvelopeSnapshot
     public:
         EnvelopeSnapshot() noexcept;
 
+        Seconds get_dahd_duration() const noexcept;
+
         Number initial_value;
         Number peak_value;
         Number sustain_value;

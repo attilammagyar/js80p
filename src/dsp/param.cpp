@@ -1340,12 +1340,7 @@ void FloatParam<evaluation>::process_envelope(
     envelope.make_snapshot(envelope_randoms, envelope_snapshot);
 
     if (envelope_stage == EnvelopeStage::DAHDS) {
-        Seconds const dahd_duration = (
-            envelope_snapshot.delay_time
-            + envelope_snapshot.attack_time
-            + envelope_snapshot.hold_time
-            + envelope_snapshot.decay_time
-        );
+        Seconds const dahd_duration = envelope_snapshot.get_dahd_duration();
 
         this->cancel_events_at(time_offset);
 
