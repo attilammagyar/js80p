@@ -27,6 +27,11 @@
 namespace JS80P
 {
 
+EnvelopeSnapshot::EnvelopeSnapshot() noexcept : change_index(-1)
+{
+}
+
+
 Envelope::Envelope(std::string const name) noexcept
     : dynamic(name + "DYN", ToggleParam::OFF),
     amount(name + "AMT",            0.0,    1.0,  1.0),
@@ -119,6 +124,8 @@ void Envelope::make_snapshot(
         EnvelopeRandoms const& randoms,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
+    snapshot.change_index = get_change_index();
+
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.initial_value = randomize_value(initial_value, randoms[0]);
         snapshot.peak_value = randomize_value(peak_value, randoms[1]);
@@ -153,6 +160,8 @@ void Envelope::make_end_snapshot(
         EnvelopeRandoms const& randoms,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
+    snapshot.change_index = get_change_index();
+
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.final_value = randomize_value(final_value, randoms[3]);
     } else {

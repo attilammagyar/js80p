@@ -417,7 +417,6 @@ void FloatParam<evaluation>::initialize_instance() noexcept
     random_seed = 0.5;
 
     envelope = NULL;
-    envelope_change_index = -1;
     envelope_stage = EnvelopeStage::NONE;
     envelope_end_scheduled = false;
     envelope_canceled = false;
@@ -684,7 +683,7 @@ bool FloatParam<evaluation>::is_constant_until(
     if (envelope != NULL && envelope->is_dynamic()) {
         envelope->update();
 
-        return envelope_change_index == envelope->get_change_index();
+        return envelope_snapshot.change_index == envelope->get_change_index();
     }
 
     if (this->midi_controller != NULL) {
@@ -971,7 +970,7 @@ void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
 
     if (envelope != NULL) {
         envelope->update();
-        envelope_change_index = envelope->get_change_index();
+        envelope_snapshot.change_index = envelope->get_change_index();
     }
 
     envelope_stage = EnvelopeStage::NONE;
@@ -1012,8 +1011,6 @@ void FloatParam<evaluation>::start_envelope(
     update_envelope_randoms(random_1, random_2);
 
     envelope->update();
-    envelope_change_index = envelope->get_change_index();
-
     envelope->make_snapshot(envelope_randoms, envelope_snapshot);
 
     /*
@@ -1095,8 +1092,6 @@ Seconds FloatParam<evaluation>::end_envelope(
 
     if (envelope->is_dynamic()) {
         envelope->update();
-        envelope_change_index = envelope->get_change_index();
-
         envelope->make_end_snapshot(envelope_randoms, envelope_snapshot);
     }
 
@@ -1339,10 +1334,7 @@ void FloatParam<evaluation>::process_envelope(
     }
 
     Integer const new_change_index = envelope.get_change_index();
-    bool const has_changed = new_change_index != envelope_change_index;
-
-    envelope_change_index = new_change_index;
-
+    bool const has_changed = new_change_index != envelope_snapshot.change_index;
     Seconds const old_release_time = envelope_snapshot.release_time;
 
     envelope.make_snapshot(envelope_randoms, envelope_snapshot);

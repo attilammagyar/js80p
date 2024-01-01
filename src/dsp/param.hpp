@@ -166,6 +166,8 @@ typedef Number EnvelopeRandoms[ENVELOPE_RANDOMS_COUNT];
 class EnvelopeSnapshot
 {
     public:
+        EnvelopeSnapshot() noexcept;
+
         Number initial_value;
         Number peak_value;
         Number sustain_value;
@@ -176,6 +178,8 @@ class EnvelopeSnapshot
         Seconds hold_time;
         Seconds decay_time;
         Seconds release_time;
+
+        Integer change_index;
 };
 
 
@@ -469,7 +473,6 @@ class FloatParam : public Param<Number, evaluation>
         Envelope* envelope;
         EnvelopeRandoms envelope_randoms;
         EnvelopeSnapshot envelope_snapshot;
-        Integer envelope_change_index;
         Seconds envelope_end_time_offset;
         Seconds envelope_position;
         Seconds envelope_cancel_duration;
