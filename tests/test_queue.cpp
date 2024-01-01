@@ -232,3 +232,13 @@ TEST(the_entire_queue_may_be_dropped, {
     assert_eq(0, q.length());
     assert_true(q.is_empty());
 })
+
+
+TEST(capacity_can_be_increased_on_demand, {
+    TestObjQueue q(2);
+
+    assert_eq(2, (int)q.capacity());
+
+    q.reserve(16);
+    assert_eq(16, (int)q.capacity());
+})

@@ -46,6 +46,7 @@ class Queue
         Queue(SizeType const capacity = DEFAULT_CAPACITY) noexcept;
 
         bool is_empty() const noexcept;
+        void reserve(SizeType const capacity) noexcept;
         void push(Item const& item) noexcept;
         Item const& pop() noexcept;
         Item const& front() const noexcept;

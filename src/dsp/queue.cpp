@@ -32,7 +32,7 @@ Queue<Item>::Queue(SizeType const capacity) noexcept
     size(0)
 {
     if (capacity > 0) {
-        items.reserve(capacity);
+        reserve(capacity);
     }
 }
 
@@ -41,6 +41,13 @@ template<class Item>
 bool Queue<Item>::is_empty() const noexcept
 {
     return next_push == next_pop;
+}
+
+
+template<class Item>
+void Queue<Item>::reserve(SizeType const capacity) noexcept
+{
+    items.reserve(capacity);
 }
 
 
