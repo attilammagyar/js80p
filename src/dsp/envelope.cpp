@@ -27,7 +27,17 @@
 namespace JS80P
 {
 
-EnvelopeSnapshot::EnvelopeSnapshot() noexcept : change_index(-1)
+EnvelopeSnapshot::EnvelopeSnapshot() noexcept
+    : initial_value(0.0),
+    peak_value(1.0),
+    sustain_value(0.7),
+    final_value(0.0),
+    delay_time(0.0),
+    attack_time(0.02),
+    hold_time(0.3),
+    decay_time(0.6),
+    release_time(0.1),
+    change_index(-1)
 {
 }
 
