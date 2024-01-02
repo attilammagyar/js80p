@@ -48,10 +48,10 @@ class Queue
         bool is_empty() const noexcept;
         void reserve(SizeType const capacity) noexcept;
         void push(Item const& item) noexcept;
-        Item const& pop() noexcept;
+        Item& pop() noexcept;
         Item const& front() const noexcept;
         Item const& back() const noexcept;
-        SizeType const length() const noexcept;
+        SizeType length() const noexcept;
         Item const& operator[](SizeType const index) const noexcept;
         void drop(SizeType const index) noexcept;
 

@@ -65,9 +65,9 @@ void Queue<Item>::push(Item const& item) noexcept
 
 
 template<class Item>
-Item const& Queue<Item>::pop() noexcept
+Item& Queue<Item>::pop() noexcept
 {
-    Item const& item = items[next_pop++];
+    Item& item = items[next_pop++];
 
     reset_if_empty();
 
@@ -100,7 +100,7 @@ Item const& Queue<Item>::back() const noexcept
 
 
 template<class Item>
-typename Queue<Item>::SizeType const Queue<Item>::length() const noexcept
+typename Queue<Item>::SizeType Queue<Item>::length() const noexcept
 {
     return next_push - next_pop;
 }
