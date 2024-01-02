@@ -50,9 +50,12 @@ class Queue
         void push(Item const& item) noexcept;
         Item& pop() noexcept;
         Item const& front() const noexcept;
+        Item& front() noexcept;
         Item const& back() const noexcept;
+        Item& back() noexcept;
         SizeType length() const noexcept;
         Item const& operator[](SizeType const index) const noexcept;
+        Item& operator[](SizeType const index) noexcept;
         void drop(SizeType const index) noexcept;
 
     protected:

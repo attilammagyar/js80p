@@ -33,7 +33,9 @@ class TestObj
         }
 
         TestObj(TestObj const& o) = default;
+        TestObj(TestObj&& o) = default;
         TestObj& operator=(TestObj const& o) = default;
+        TestObj& operator=(TestObj&& o) = default;
 
         int value;
 };
@@ -241,4 +243,22 @@ TEST(capacity_can_be_increased_on_demand, {
 
     q.reserve(16);
     assert_eq(16, (int)q.capacity());
+})
+
+
+TEST(items_may_be_modified_in_place, {
+    TestObjQueue q(3);
+    TestObj const i(42);
+
+    q.push(10);
+    q.push(20);
+    q.push(30);
+
+    q.front().value += 1;
+    q[1].value += 1;
+    q.back().value += 1;
+
+    assert_eq(12, q.pop().value += 1);
+    assert_eq(21, q[0].value);
+    assert_eq(31, q[1].value);
 })

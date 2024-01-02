@@ -93,7 +93,21 @@ Item const& Queue<Item>::front() const noexcept
 
 
 template<class Item>
+Item& Queue<Item>::front() noexcept
+{
+    return items[next_pop];
+}
+
+
+template<class Item>
 Item const& Queue<Item>::back() const noexcept
+{
+    return items[next_push - 1];
+}
+
+
+template<class Item>
+Item& Queue<Item>::back() noexcept
 {
     return items[next_push - 1];
 }
@@ -110,6 +124,14 @@ template<class Item>
 Item const& Queue<Item>::operator[](
         typename Queue<Item>::SizeType const index
 ) const noexcept {
+    return items[next_pop + index];
+}
+
+
+template<class Item>
+Item& Queue<Item>::operator[](
+        typename Queue<Item>::SizeType const index
+) noexcept {
     return items[next_pop + index];
 }
 
