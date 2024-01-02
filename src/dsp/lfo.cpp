@@ -19,10 +19,6 @@
 #ifndef JS80P__DSP__LFO_CPP
 #define JS80P__DSP__LFO_CPP
 
-#ifdef JS80P_ASSERTIONS
-#include <cassert>
-#endif
-
 #include "dsp/lfo.hpp"
 
 #include "dsp/math.hpp"
@@ -232,13 +228,6 @@ void LFO::apply_distortions(
 }
 
 
-#ifdef JS80P_ASSERTIONS
-#define JS80P_LFO_ASSERT(condition) assert(condition)
-#else
-#define JS80P_LFO_ASSERT(condition)
-#endif
-
-
 void LFO::apply_range(
         Integer const round,
         Integer const first_sample_index,
@@ -258,8 +247,8 @@ void LFO::apply_range(
                     min_value + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -269,8 +258,8 @@ void LFO::apply_range(
                     min_value + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_buffer[i]);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_buffer[i]);
             }
         }
     } else {
@@ -284,8 +273,8 @@ void LFO::apply_range(
                     min_buffer[i] + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_buffer[i]);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_buffer[i]);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -295,8 +284,8 @@ void LFO::apply_range(
                     min_buffer[i] + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_buffer[i]);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_buffer[i]);
+                JS80P_ASSERT(target_buffer[i] >= min_buffer[i]);
+                JS80P_ASSERT(target_buffer[i] <= max_buffer[i]);
             }
         }
     }
@@ -380,8 +369,8 @@ void LFO::apply_range_centered(
                     center + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -393,8 +382,8 @@ void LFO::apply_range_centered(
                     center + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         }
     } else {
@@ -410,8 +399,8 @@ void LFO::apply_range_centered(
                     center + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -424,8 +413,8 @@ void LFO::apply_range_centered(
                     center + range * (source_buffer[i])
                 );
 
-                JS80P_LFO_ASSERT(target_buffer[i] >= min_value);
-                JS80P_LFO_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT(target_buffer[i] >= min_value);
+                JS80P_ASSERT(target_buffer[i] <= max_value);
             }
         }
     }

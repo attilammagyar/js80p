@@ -21,6 +21,18 @@
 
 #include <cstdint>
 
+#ifdef JS80P_ASSERTIONS
+#include <cassert>
+#endif
+
+
+#ifdef JS80P_ASSERTIONS
+#define JS80P_ASSERT(condition) assert(condition)
+#else
+#define JS80P_ASSERT(condition)
+#endif
+
+
 
 #define JS80P_TO_STRING(x) _JS80P_EXPAND(x)
 #define _JS80P_EXPAND(x) #x
