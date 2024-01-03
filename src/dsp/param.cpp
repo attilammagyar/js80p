@@ -36,12 +36,14 @@ Param<NumberType, evaluation>::Param(
         NumberType const min_value,
         NumberType const max_value,
         NumberType const default_value,
-        Integer const number_of_events
+        Integer const number_of_events,
+        SignalProducer* const buffer_owner
 ) noexcept
     : SignalProducer(
         evaluation == ParamEvaluation::SAMPLE ? 1 : 0,
         0,
-        number_of_events
+        number_of_events,
+        buffer_owner
     ),
     midi_controller(NULL),
     macro(NULL),
@@ -437,7 +439,8 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
         leader.get_min_value(),
         leader.get_max_value(),
         leader.get_default_value(),
-        NUMBER_OF_EVENTS
+        NUMBER_OF_EVENTS,
+        (SignalProducer*)&leader
     ),
     log_scale_toggle(leader.get_log_scale_toggle()),
     log_scale_table(leader.get_log_scale_table()),

@@ -62,7 +62,8 @@ class Param : public SignalProducer
             NumberType const min_value,
             NumberType const max_value,
             NumberType const default_value,
-            Integer const number_of_events = 0
+            Integer const number_of_events = 0,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
         ParamEvaluation get_evaluation() const noexcept;

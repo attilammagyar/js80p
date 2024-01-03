@@ -48,7 +48,12 @@ Sample const* const* SignalProducer::produce(
         return signal_producer.cached_buffer;
     }
 
-    Sample** buffer = signal_producer.buffer;
+    Sample** buffer = (
+        signal_producer.buffer_owner == NULL
+            ? signal_producer.buffer
+            : signal_producer.buffer_owner->buffer
+    );
+
 
     signal_producer.cached_buffer = buffer;
 
@@ -116,7 +121,8 @@ void SignalProducer::find_peak(
 SignalProducer::SignalProducer(
         Integer const channels,
         Integer const number_of_children,
-        Integer const number_of_events
+        Integer const number_of_events,
+        SignalProducer* const buffer_owner
 ) noexcept
     : channels(0 <= channels ? channels : 0),
     events((Queue<Event>::SizeType)number_of_events),
@@ -130,6 +136,7 @@ SignalProducer::SignalProducer(
     current_time(0.0),
     cached_round(-1),
     cached_buffer(NULL),
+    buffer_owner(buffer_owner),
     cached_silence_round(-1),
     cached_silence(false)
 {
@@ -167,7 +174,7 @@ Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const noexcept
 
 Sample** SignalProducer::allocate_buffer() const noexcept
 {
-    if (channels <= 0) {
+    if (channels <= 0 || buffer_owner != NULL) {
         return NULL;
     }
 
@@ -240,7 +247,9 @@ void SignalProducer::reset() noexcept
 {
     cancel_events();
 
-    render_silence(-1, 0, block_size, buffer);
+    if (buffer_owner == NULL) {
+        render_silence(-1, 0, block_size, buffer);
+    }
 
     for (Children::iterator it = children.begin(); it != children.end(); ++it) {
         (*it)->reset();

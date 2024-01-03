@@ -122,7 +122,8 @@ class SignalProducer
         SignalProducer(
             Integer const channels,
             Integer const number_of_children = 0,
-            Integer const number_of_events = 0
+            Integer const number_of_events = 0,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
         virtual ~SignalProducer() noexcept;
@@ -258,6 +259,8 @@ class SignalProducer
             Integer const sample_count,
             Integer& next_stop
         ) noexcept;
+
+        SignalProducer* const buffer_owner;
 
         Children children;
         Integer cached_silence_round;
