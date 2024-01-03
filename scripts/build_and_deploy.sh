@@ -91,7 +91,7 @@ main()
 
     echo "Building; plugin_type=\"$plugin_type\", target_os=\"$target_os\", arch=\"$arch\", instruction_set=\"$instruction_set\"" >&2
 
-    TARGET_PLATFORM="$target_platform" INSTRUCTION_SET="$instruction_set" make
+    TARGET_PLATFORM="$target_platform" INSTRUCTION_SET="$instruction_set" make "$plugin_type"
 
     case "$target_os-$plugin_type-$arch" in
         "linux-fst-x86_64")     replace_in_dir "$built_plugin" $FST_DIRS_LINUX_64 ;;
