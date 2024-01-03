@@ -133,7 +133,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     initialize_supported_midi_controllers();
 
-    for (int i = 0; i != 4; ++i) {
+    for (int i = 0; i != BIQUAD_FILTER_SHARED_CACHES; ++i) {
         biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
     }
 
@@ -678,6 +678,18 @@ Synth::~Synth()
         if (midi_controllers_rw[i] != NULL) {
             delete midi_controllers_rw[i];
         }
+    }
+
+    for (Integer i = 0; i != LFOS; ++i) {
+        delete lfos_rw[i];
+    }
+
+    for (Integer i = 0; i != MACROS; ++i) {
+        delete macros_rw[i];
+    }
+
+    for (Integer i = 0; i != BIQUAD_FILTER_SHARED_CACHES; ++i) {
+        delete biquad_filter_shared_caches[i];
     }
 }
 
