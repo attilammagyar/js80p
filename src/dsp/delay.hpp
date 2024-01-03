@@ -343,6 +343,7 @@ class HighShelfPannedDelay : public HighShelfPannedDelayBase<InputSignalProducer
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             FloatParamS& delay_time_leader,
+            BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
             ToggleParam const* tempo_sync = NULL
@@ -355,6 +356,7 @@ class HighShelfPannedDelay : public HighShelfPannedDelayBase<InputSignalProducer
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
             Seconds const delay_time_max,
+            BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
             ToggleParam const* tempo_sync = NULL

@@ -121,7 +121,12 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_polyphonic(true),
     was_polyphonic(true),
     is_dirty_(false),
-    effects("E", bus),
+    effects(
+        "E",
+        bus,
+        biquad_filter_shared_buffers[4],
+        biquad_filter_shared_buffers[5]
+    ),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     macros((Macro* const*)macros_rw),
     envelopes((Envelope* const*)envelopes_rw),
@@ -133,9 +138,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     initialize_supported_midi_controllers();
 
-    for (int i = 0; i != BIQUAD_FILTER_SHARED_CACHES; ++i) {
-        biquad_filter_shared_caches[i] = new BiquadFilterSharedCache();
-    }
+    allocate_buffers();
 
     for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
         param_ratios[i].store(0.0);
@@ -504,8 +507,8 @@ void Synth::create_voices() noexcept
             *synced_oscillator_inaccuracies[i],
             calculate_inaccuracy_seed((i + 23) % POLYPHONY),
             modulator_params,
-            biquad_filter_shared_caches[0],
-            biquad_filter_shared_caches[1]
+            &biquad_filter_shared_buffers[0],
+            &biquad_filter_shared_buffers[1]
         );
         register_child(*modulators[i]);
 
@@ -519,8 +522,8 @@ void Synth::create_voices() noexcept
             amplitude_modulation_level,
             frequency_modulation_level,
             phase_modulation_level,
-            biquad_filter_shared_caches[2],
-            biquad_filter_shared_caches[3]
+            &biquad_filter_shared_buffers[2],
+            &biquad_filter_shared_buffers[3]
         );
         register_child(*carriers[i]);
     }
@@ -642,6 +645,47 @@ void Synth::create_lfos() noexcept
 }
 
 
+void Synth::allocate_buffers() noexcept
+{
+    for (Integer i = 0; i != BIQUAD_FILTER_SHARED_BUFFERS; ++i) {
+        BiquadFilterSharedBuffers& shared_buffers = biquad_filter_shared_buffers[i];
+
+        shared_buffers.b0_buffer = new Sample[block_size];
+        shared_buffers.b1_buffer = new Sample[block_size];
+        shared_buffers.b2_buffer = new Sample[block_size];
+        shared_buffers.a1_buffer = new Sample[block_size];
+        shared_buffers.a2_buffer = new Sample[block_size];
+    }
+}
+
+
+void Synth::free_buffers() noexcept
+{
+    for (Integer i = 0; i != BIQUAD_FILTER_SHARED_BUFFERS; ++i) {
+        BiquadFilterSharedBuffers& shared_buffers = biquad_filter_shared_buffers[i];
+
+        delete[] shared_buffers.b0_buffer;
+        delete[] shared_buffers.b1_buffer;
+        delete[] shared_buffers.b2_buffer;
+        delete[] shared_buffers.a1_buffer;
+        delete[] shared_buffers.a2_buffer;
+
+        shared_buffers.b0_buffer = NULL;
+        shared_buffers.b1_buffer = NULL;
+        shared_buffers.b2_buffer = NULL;
+        shared_buffers.a1_buffer = NULL;
+        shared_buffers.a2_buffer = NULL;
+    }
+}
+
+
+void Synth::reallocate_buffers() noexcept
+{
+    free_buffers();
+    allocate_buffers();
+}
+
+
 template<class ParamClass>
 void Synth::register_param_as_child(
         ParamId const param_id,
@@ -688,9 +732,7 @@ Synth::~Synth()
         delete macros_rw[i];
     }
 
-    for (Integer i = 0; i != BIQUAD_FILTER_SHARED_CACHES; ++i) {
-        delete biquad_filter_shared_caches[i];
-    }
+    free_buffers();
 }
 
 
@@ -700,6 +742,19 @@ void Synth::set_sample_rate(Frequency const new_sample_rate) noexcept
 
     samples_between_gc = std::max((Integer)5000, (Integer)(new_sample_rate * 0.2));
 }
+
+
+void Synth::set_block_size(Integer const new_block_size) noexcept
+{
+    if (new_block_size == this->block_size) {
+        return;
+    }
+
+    SignalProducer::set_block_size(new_block_size);
+
+    reallocate_buffers();
+}
+
 
 
 void Synth::reset() noexcept

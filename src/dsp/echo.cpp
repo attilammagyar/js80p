@@ -30,7 +30,8 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Echo<InputSignalProducerClass>::Echo(
         std::string const name,
-        InputSignalProducerClass& input
+        InputSignalProducerClass& input,
+        BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(name, input, 14),
     delay_time(
         name + "DEL",
@@ -96,6 +97,7 @@ Echo<InputSignalProducerClass>::Echo(
         width,
         feedback,
         delay_time,
+        high_shelf_filter_shared_buffers,
         damping_frequency,
         damping_gain,
         &tempo_sync
@@ -106,6 +108,7 @@ Echo<InputSignalProducerClass>::Echo(
         width,
         feedback,
         delay_time,
+        high_shelf_filter_shared_buffers,
         damping_frequency,
         damping_gain,
         &tempo_sync
@@ -133,9 +136,6 @@ Echo<InputSignalProducerClass>::Echo(
     high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 
     comb_filter_1.delay.set_feedback_signal_producer(&comb_filter_2.high_shelf_filter);
-
-    comb_filter_1.high_shelf_filter.set_shared_cache(&high_shelf_filter_shared_cache);
-    comb_filter_2.high_shelf_filter.set_shared_cache(&high_shelf_filter_shared_cache);
 }
 
 

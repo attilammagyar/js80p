@@ -38,17 +38,17 @@ class BiquadFilter;
 typedef BiquadFilter<SignalProducer> SimpleBiquadFilter;
 
 
-class BiquadFilterSharedCache
+class BiquadFilterSharedBuffers
 {
     public:
-        BiquadFilterSharedCache();
+        BiquadFilterSharedBuffers();
 
         Integer round;
-        Sample const* b0_buffer;
-        Sample const* b1_buffer;
-        Sample const* b2_buffer;
-        Sample const* a1_buffer;
-        Sample const* a2_buffer;
+        Sample* b0_buffer;
+        Sample* b1_buffer;
+        Sample* b2_buffer;
+        Sample* a1_buffer;
+        Sample* a2_buffer;
         bool are_coefficients_constant;
         bool is_silent;
         bool is_no_op;
@@ -81,7 +81,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             std::string const name,
             InputSignalProducerClass& input,
             TypeParam& type,
-            BiquadFilterSharedCache* shared_cache = NULL,
+            BiquadFilterSharedBuffers* shared_buffers = NULL,
             Number const inaccuracy_seed = 0.0,
             FloatParamB const* freq_inaccuracy_param = NULL,
             FloatParamB const* q_inaccuracy_param = NULL
@@ -101,7 +101,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             FloatParamS& frequency_leader,
             FloatParamS& q_leader,
             FloatParamS& gain_leader,
-            BiquadFilterSharedCache* shared_cache = NULL,
+            BiquadFilterSharedBuffers* shared_buffers = NULL,
             Number const inaccuracy_seed = 0.0,
             FloatParamB const* freq_inaccuracy_param = NULL,
             FloatParamB const* q_inaccuracy_param = NULL
@@ -114,8 +114,6 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         virtual void set_block_size(Integer const new_block_size) noexcept override;
 
         virtual void reset() noexcept override;
-
-        void set_shared_cache(BiquadFilterSharedCache* shared_cache) noexcept;
 
         void update_inaccuracy(
             Number const random_1,
@@ -291,7 +289,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         FloatParamB const* const freq_inaccuracy_param;
         FloatParamB const* const q_inaccuracy_param;
 
-        BiquadFilterSharedCache* shared_cache;
+        BiquadFilterSharedBuffers* const shared_buffers;
 
         /*
         Notation:

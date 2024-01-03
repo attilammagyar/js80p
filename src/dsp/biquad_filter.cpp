@@ -29,7 +29,7 @@
 namespace JS80P
 {
 
-BiquadFilterSharedCache::BiquadFilterSharedCache()
+BiquadFilterSharedBuffers::BiquadFilterSharedBuffers()
     : round(-1),
     b0_buffer(NULL),
     b1_buffer(NULL),
@@ -57,7 +57,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         std::string const name,
         InputSignalProducerClass& input,
         TypeParam& type,
-        BiquadFilterSharedCache* shared_cache,
+        BiquadFilterSharedBuffers* shared_buffers,
         Number const inaccuracy_seed,
         FloatParamB const* freq_inaccuracy_param,
         FloatParamB const* q_inaccuracy_param
@@ -85,7 +85,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
     inaccuracy_seed(inaccuracy_seed),
     freq_inaccuracy_param(freq_inaccuracy_param),
     q_inaccuracy_param(q_inaccuracy_param),
-    shared_cache(shared_cache)
+    shared_buffers(shared_buffers)
 {
     initialize_instance();
 }
@@ -160,7 +160,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
     inaccuracy_seed(0.0),
     freq_inaccuracy_param(NULL),
     q_inaccuracy_param(NULL),
-    shared_cache(NULL)
+    shared_buffers(NULL)
 {
     initialize_instance();
 }
@@ -173,7 +173,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
-        BiquadFilterSharedCache* shared_cache,
+        BiquadFilterSharedBuffers* shared_buffers,
         Number const inaccuracy_seed,
         FloatParamB const* freq_inaccuracy_param,
         FloatParamB const* q_inaccuracy_param
@@ -186,7 +186,7 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
     inaccuracy_seed(inaccuracy_seed),
     freq_inaccuracy_param(freq_inaccuracy_param),
     q_inaccuracy_param(q_inaccuracy_param),
-    shared_cache(shared_cache)
+    shared_buffers(shared_buffers)
 {
     initialize_instance();
 }
@@ -215,17 +215,31 @@ void BiquadFilter<InputSignalProducerClass>::reallocate_buffers() noexcept
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::free_buffers() noexcept
 {
+    if (shared_buffers != NULL) {
+        return;
+    }
+
     delete[] b0_buffer;
     delete[] b1_buffer;
     delete[] b2_buffer;
     delete[] a1_buffer;
     delete[] a2_buffer;
+
+    b0_buffer = NULL;
+    b1_buffer = NULL;
+    b2_buffer = NULL;
+    a1_buffer = NULL;
+    a2_buffer = NULL;
 }
 
 
 template<class InputSignalProducerClass>
 void BiquadFilter<InputSignalProducerClass>::allocate_buffers() noexcept
 {
+    if (shared_buffers != NULL) {
+        return;
+    }
+
     b0_buffer = new Sample[this->block_size];
     b1_buffer = new Sample[this->block_size];
     b2_buffer = new Sample[this->block_size];
@@ -273,14 +287,6 @@ void BiquadFilter<InputSignalProducerClass>::reset() noexcept
     for (Integer c = 0; c != this->channels; ++c) {
         x_n_m1[c] = x_n_m2[c] = y_n_m1[c] = y_n_m2[c] = 0.0;
     }
-}
-
-
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::set_shared_cache(
-        BiquadFilterSharedCache* shared_cache
-) noexcept {
-    this->shared_cache = shared_cache;
 }
 
 
@@ -337,9 +343,16 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     bool const is_freq_inaccurate = freq_inaccuracy_param_value > 0.000001;
     bool const is_q_inaccurate = q_inaccuracy_param_value > 0.000001;
 
-    can_use_shared_coefficients = (
-        shared_cache != NULL && !is_freq_inaccurate && !is_q_inaccurate
-    );
+    if (shared_buffers == NULL) {
+        can_use_shared_coefficients = false;
+    } else {
+        can_use_shared_coefficients = !is_freq_inaccurate && !is_q_inaccurate;
+        b0_buffer = shared_buffers->b0_buffer;
+        b1_buffer = shared_buffers->b1_buffer;
+        b2_buffer = shared_buffers->b2_buffer;
+        a1_buffer = shared_buffers->a1_buffer;
+        a2_buffer = shared_buffers->a2_buffer;
+    }
 
     Filter<InputSignalProducerClass>::initialize_rendering(
         round, sample_count
@@ -351,7 +364,7 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         return this->input_was_silent(round);
     }
 
-    if (can_use_shared_coefficients && shared_cache->round == round) {
+    if (can_use_shared_coefficients && shared_buffers->round == round) {
         return initialize_rendering_with_shared_coefficients(
             round, sample_count
         );
@@ -396,15 +409,12 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
     }
 
     if (can_use_shared_coefficients) {
-        shared_cache->round = round;
-        shared_cache->are_coefficients_constant = are_coefficients_constant;
-        shared_cache->is_no_op = is_no_op;
-        shared_cache->is_silent = is_silent_;
-        shared_cache->b0_buffer = b0_buffer;
-        shared_cache->b1_buffer = b1_buffer;
-        shared_cache->b2_buffer = b2_buffer;
-        shared_cache->a1_buffer = a1_buffer;
-        shared_cache->a2_buffer = a2_buffer;
+        shared_buffers->round = round;
+        shared_buffers->are_coefficients_constant = are_coefficients_constant;
+        shared_buffers->is_no_op = is_no_op;
+        shared_buffers->is_silent = is_silent_;
+    } else if (shared_buffers != NULL) {
+        shared_buffers->round = -1;
     }
 
     if (is_no_op) {
@@ -502,13 +512,13 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (shared_cache->is_no_op) {
+    if (shared_buffers->is_no_op) {
         return initialize_rendering_no_op(round, sample_count);
     }
 
-    is_silent_ = shared_cache->is_silent;
+    is_silent_ = shared_buffers->is_silent;
     are_coefficients_constant = (
-        shared_cache->are_coefficients_constant
+        shared_buffers->are_coefficients_constant
     );
 
     if (JS80P_UNLIKELY(is_silent_)) {
@@ -1447,11 +1457,11 @@ void BiquadFilter<InputSignalProducerClass>::render(
         Sample b0, b1, b2, a1, a2;
 
         if (can_use_shared_coefficients) {
-            b0 = shared_cache->b0_buffer[0];
-            b1 = shared_cache->b1_buffer[0];
-            b2 = shared_cache->b2_buffer[0];
-            a1 = shared_cache->a1_buffer[0];
-            a2 = shared_cache->a2_buffer[0];
+            b0 = shared_buffers->b0_buffer[0];
+            b1 = shared_buffers->b1_buffer[0];
+            b2 = shared_buffers->b2_buffer[0];
+            a1 = shared_buffers->a1_buffer[0];
+            a2 = shared_buffers->a2_buffer[0];
         } else {
             b0 = b0_buffer[0];
             b1 = b1_buffer[0];
@@ -1497,11 +1507,11 @@ void BiquadFilter<InputSignalProducerClass>::render(
     Sample const* a2;
 
     if (can_use_shared_coefficients) {
-        b0 = shared_cache->b0_buffer;
-        b1 = shared_cache->b1_buffer;
-        b2 = shared_cache->b2_buffer;
-        a1 = shared_cache->a1_buffer;
-        a2 = shared_cache->a2_buffer;
+        b0 = shared_buffers->b0_buffer;
+        b1 = shared_buffers->b1_buffer;
+        b2 = shared_buffers->b2_buffer;
+        a1 = shared_buffers->a1_buffer;
+        a2 = shared_buffers->a2_buffer;
     } else {
         b0 = b0_buffer;
         b1 = b1_buffer;

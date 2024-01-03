@@ -28,7 +28,9 @@ namespace JS80P { namespace Effects
 template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
         std::string const name,
-        InputSignalProducerClass& input
+        InputSignalProducerClass& input,
+        BiquadFilterSharedBuffers& echo_filter_shared_buffers,
+        BiquadFilterSharedBuffers& reverb_filter_shared_buffers
 ) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 19, input.get_channels()),
     volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
@@ -58,8 +60,8 @@ Effects<InputSignalProducerClass>::Effects(
     ),
     volume_2(filter_2, volume_2_gain),
     chorus(name + "C", volume_2),
-    echo(name + "E", chorus),
-    reverb(name + "R", echo),
+    echo(name + "E", chorus, echo_filter_shared_buffers),
+    reverb(name + "R", echo, reverb_filter_shared_buffers),
     volume_3(reverb, volume_3_gain)
 {
     this->register_child(volume_1_gain);

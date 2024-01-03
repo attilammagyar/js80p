@@ -70,7 +70,12 @@ template<class InputSignalProducerClass>
 class Effects : public Filter< Volume3<InputSignalProducerClass> >
 {
     public:
-        Effects(std::string const name, InputSignalProducerClass& input);
+        Effects(
+            std::string const name,
+            InputSignalProducerClass& input,
+            BiquadFilterSharedBuffers& echo_filter_shared_buffers,
+            BiquadFilterSharedBuffers& reverb_filter_shared_buffers
+        );
 
         FloatParamS volume_1_gain;
         FloatParamS volume_2_gain;

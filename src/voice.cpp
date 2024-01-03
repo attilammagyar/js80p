@@ -418,8 +418,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         OscillatorInaccuracy& synced_oscillator_inaccuracy,
         Number const oscillator_inaccuracy_seed,
         Params& param_leaders,
-        BiquadFilterSharedCache* filter_1_shared_cache,
-        BiquadFilterSharedCache* filter_2_shared_cache
+        BiquadFilterSharedBuffers* filter_1_shared_buffers,
+        BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
@@ -450,7 +450,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
-        filter_1_shared_cache,
+        filter_1_shared_buffers,
         make_random_seed(0.289),
         &param_leaders.filter_1_freq_inaccuracy,
         &param_leaders.filter_1_q_inaccuracy
@@ -462,7 +462,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
-        filter_2_shared_cache,
+        filter_2_shared_buffers,
         make_random_seed(0.629),
         &param_leaders.filter_2_freq_inaccuracy,
         &param_leaders.filter_2_q_inaccuracy
@@ -490,8 +490,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParamS& amplitude_modulation_level_leader,
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader,
-        BiquadFilterSharedCache* filter_1_shared_cache,
-        BiquadFilterSharedCache* filter_2_shared_cache
+        BiquadFilterSharedBuffers* filter_1_shared_buffers,
+        BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
@@ -525,7 +525,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
-        filter_1_shared_cache,
+        filter_1_shared_buffers,
         make_random_seed(0.327),
         &param_leaders.filter_1_freq_inaccuracy,
         &param_leaders.filter_1_q_inaccuracy
@@ -543,7 +543,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
-        filter_2_shared_cache,
+        filter_2_shared_buffers,
         make_random_seed(0.796),
         &param_leaders.filter_2_freq_inaccuracy,
         &param_leaders.filter_2_q_inaccuracy

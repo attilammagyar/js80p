@@ -150,16 +150,18 @@ SignalProducer::SignalProducer(
 
 void SignalProducer::set_block_size(Integer const new_block_size) noexcept
 {
-    if (new_block_size != block_size) {
-        block_size = new_block_size;
-        buffer = reallocate_buffer(buffer);
-        last_sample_count = 0;
-        cached_round = -1;
-        cached_buffer = NULL;
+    if (new_block_size == block_size) {
+        return;
+    }
 
-        for (Children::iterator it = children.begin(); it != children.end(); ++it) {
-            (*it)->set_block_size(new_block_size);
-        }
+    block_size = new_block_size;
+    buffer = reallocate_buffer(buffer);
+    last_sample_count = 0;
+    cached_round = -1;
+    cached_buffer = NULL;
+
+    for (Children::iterator it = children.begin(); it != children.end(); ++it) {
+        (*it)->set_block_size(new_block_size);
     }
 }
 

@@ -247,8 +247,8 @@ class Voice : public SignalProducer
             OscillatorInaccuracy& synced_oscillator_inaccuracy,
             Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
-            BiquadFilterSharedCache* filter_1_shared_cache = NULL,
-            BiquadFilterSharedCache* filter_2_shared_cache = NULL
+            BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
         ) noexcept;
 
         Voice(
@@ -261,8 +261,8 @@ class Voice : public SignalProducer
             FloatParamS& amplitude_modulation_level_leader,
             FloatParamS& frequency_modulation_level_leader,
             FloatParamS& phase_modulation_level_leader,
-            BiquadFilterSharedCache* filter_1_shared_cache = NULL,
-            BiquadFilterSharedCache* filter_2_shared_cache = NULL
+            BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
         ) noexcept;
 
         virtual void reset() noexcept override;

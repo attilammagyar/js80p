@@ -825,6 +825,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         virtual ~Synth() override;
 
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
+        virtual void set_block_size(Integer const new_block_size) noexcept override;
         virtual void reset() noexcept override;
 
         bool is_lock_free() const noexcept;
@@ -1216,7 +1217,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr Integer NOTE_ID_MASK = 0x7fffffff;
 
-        static constexpr Integer BIQUAD_FILTER_SHARED_CACHES = 4;
+        static constexpr Integer BIQUAD_FILTER_SHARED_BUFFERS = 6;
 
         static std::vector<bool> supported_midi_controllers;
         static bool supported_midi_controllers_initialized;
@@ -1246,6 +1247,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void create_macros() noexcept;
         void create_envelopes() noexcept;
         void create_lfos() noexcept;
+
+        void allocate_buffers() noexcept;
+        void free_buffers() noexcept;
+        void reallocate_buffers() noexcept;
 
         template<class ParamClass>
         void register_param_as_child(
@@ -1368,7 +1373,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];
-        BiquadFilterSharedCache* biquad_filter_shared_caches[BIQUAD_FILTER_SHARED_CACHES];
+        BiquadFilterSharedBuffers biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
         std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
         std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
         Envelope* envelopes_rw[ENVELOPES];

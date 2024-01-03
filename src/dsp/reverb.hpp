@@ -62,7 +62,11 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         static constexpr Type REVERB_9  = 8;
         static constexpr Type REVERB_10 = 9;
 
-        Reverb(std::string const name, InputSignalProducerClass& input);
+        Reverb(
+            std::string const name,
+            InputSignalProducerClass& input,
+            BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
+        );
 
         virtual void reset() noexcept override;
 
@@ -256,7 +260,6 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS high_pass_filter_q;
         FloatParamS high_pass_filter_gain;
 
-        BiquadFilterSharedCache high_shelf_filter_shared_cache;
         HighPassedInput high_pass_filter;
         CombFilter comb_filters[COMB_FILTERS];
         Type previous_type;

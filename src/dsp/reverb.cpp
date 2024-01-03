@@ -43,7 +43,8 @@ Reverb<InputSignalProducerClass>::TypeParam::TypeParam(
 template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::Reverb(
         std::string const name,
-        InputSignalProducerClass& input
+        InputSignalProducerClass& input,
+        BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
@@ -105,6 +106,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][0].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -115,6 +117,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][1].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -125,6 +128,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][2].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -135,6 +139,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][3].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -145,6 +150,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][4].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -155,6 +161,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][5].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -165,6 +172,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][6].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -175,6 +183,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][7].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -185,6 +194,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][8].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -195,6 +205,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             room_size,
             TUNINGS[0][9].delay_time,
             DELAY_TIME_MAX,
+            high_shelf_filter_shared_buffers,
             damping_frequency,
             damping_gain
         },
@@ -220,9 +231,6 @@ Reverb<InputSignalProducerClass>::Reverb(
     for (size_t i = 0; i != COMB_FILTERS; ++i) {
         comb_filters[i].delay.set_feedback_signal_producer(
             &comb_filters[i].high_shelf_filter
-        );
-        comb_filters[i].high_shelf_filter.set_shared_cache(
-            &high_shelf_filter_shared_cache
         );
 
         mixer.add(comb_filters[i]);

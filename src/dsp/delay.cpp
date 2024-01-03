@@ -973,6 +973,7 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
     FloatParamS& panning_leader,
     FloatParamS& delay_gain_leader,
     FloatParamS& delay_time_leader,
+    BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
     FloatParamS& high_shelf_filter_frequency_leader,
     FloatParamS& high_shelf_filter_gain_leader,
     ToggleParam const* tempo_sync
@@ -998,7 +999,8 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         high_shelf_filter_type,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
-        high_shelf_filter_gain_leader
+        high_shelf_filter_gain_leader,
+        &high_shelf_filter_shared_buffers
     )
 {
     initialize_instance();
@@ -1013,6 +1015,7 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
     FloatParamS& delay_gain_leader,
     Seconds const delay_time,
     Seconds const delay_time_max,
+    BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
     FloatParamS& high_shelf_filter_frequency_leader,
     FloatParamS& high_shelf_filter_gain_leader,
     ToggleParam const* tempo_sync
@@ -1039,7 +1042,8 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         high_shelf_filter_type,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
-        high_shelf_filter_gain_leader
+        high_shelf_filter_gain_leader,
+        &high_shelf_filter_shared_buffers
     )
 {
     initialize_instance();
