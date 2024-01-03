@@ -134,6 +134,53 @@ void set_up_voice(
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
+    params.tuning.set_block_size(block_size);
+    params.oscillator_inaccuracy.set_block_size(block_size);
+    params.oscillator_instability.set_block_size(block_size);
+
+    params.waveform.set_block_size(block_size);
+    params.amplitude.set_block_size(block_size);
+    params.velocity_sensitivity.set_block_size(block_size);
+    params.folding.set_block_size(block_size);
+    params.portamento_length.set_block_size(block_size);
+    params.portamento_depth.set_block_size(block_size);
+    params.detune.set_block_size(block_size);
+    params.fine_detune.set_block_size(block_size);
+    params.width.set_block_size(block_size);
+    params.panning.set_block_size(block_size);
+    params.volume.set_block_size(block_size);
+
+    params.harmonic_0.set_block_size(block_size);
+    params.harmonic_1.set_block_size(block_size);
+    params.harmonic_2.set_block_size(block_size);
+    params.harmonic_3.set_block_size(block_size);
+    params.harmonic_4.set_block_size(block_size);
+    params.harmonic_5.set_block_size(block_size);
+    params.harmonic_6.set_block_size(block_size);
+    params.harmonic_7.set_block_size(block_size);
+    params.harmonic_8.set_block_size(block_size);
+    params.harmonic_9.set_block_size(block_size);
+
+    params.filter_1_type.set_block_size(block_size);
+    params.filter_1_freq_log_scale.set_block_size(block_size);
+    params.filter_1_q_log_scale.set_block_size(block_size);
+    params.filter_1_frequency.set_block_size(block_size);
+    params.filter_1_q.set_block_size(block_size);
+    params.filter_1_gain.set_block_size(block_size);
+    params.filter_1_freq_inaccuracy.set_block_size(block_size);
+    params.filter_1_q_inaccuracy.set_block_size(block_size);
+
+    params.filter_2_type.set_block_size(block_size);
+    params.filter_2_freq_log_scale.set_block_size(block_size);
+    params.filter_2_q_log_scale.set_block_size(block_size);
+    params.filter_2_frequency.set_block_size(block_size);
+    params.filter_2_q.set_block_size(block_size);
+    params.filter_2_gain.set_block_size(block_size);
+    params.filter_2_freq_inaccuracy.set_block_size(block_size);
+    params.filter_2_q_inaccuracy.set_block_size(block_size);
+
+    params.subharmonic_amplitude.set_block_size(block_size);
+
     params.amplitude.set_value(1.0);
     params.volume.set_value(1.0);
     params.width.set_value(0.0);
