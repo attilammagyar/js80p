@@ -1216,7 +1216,7 @@ Midi::Note Voice<ModulatorSignalProducerClass>::get_note() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
-Midi::Note Voice<ModulatorSignalProducerClass>::get_channel() const noexcept
+Midi::Channel Voice<ModulatorSignalProducerClass>::get_channel() const noexcept
 {
     return channel;
 }
