@@ -36,8 +36,8 @@ Effects<InputSignalProducerClass>::Effects(
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
     volume_3_gain(name + "V3V", 0.0, 1.0, 1.0),
     volume_1(input, volume_1_gain),
-    overdrive(name + "O", Distortion::Type::SOFT, volume_1),
-    distortion(name + "D", Distortion::Type::HEAVY, overdrive),
+    overdrive(name + "O", Distortion::Type::SOFT, volume_1, &volume_1),
+    distortion(name + "D", Distortion::Type::HEAVY, overdrive, &volume_1),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
     filter_1_freq_log_scale(name + "F1LOG", ToggleParam::OFF),
@@ -49,14 +49,16 @@ Effects<InputSignalProducerClass>::Effects(
         distortion,
         filter_1_type,
         filter_1_freq_log_scale,
-        filter_1_q_log_scale
+        filter_1_q_log_scale,
+        &volume_1
     ),
     filter_2(
         name + "F2",
         filter_1,
         filter_2_type,
         filter_2_freq_log_scale,
-        filter_2_q_log_scale
+        filter_2_q_log_scale,
+        &volume_1
     ),
     volume_2(filter_2, volume_2_gain),
     chorus(name + "C", volume_2),

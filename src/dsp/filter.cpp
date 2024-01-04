@@ -29,9 +29,15 @@ template<class InputSignalProducerClass>
 Filter<InputSignalProducerClass>::Filter(
         InputSignalProducerClass& input,
         Integer const number_of_children,
-        Integer const channels
+        Integer const channels,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : SignalProducer(channels > 0 ? channels : input.get_channels(), number_of_children),
+    : SignalProducer(
+        channels > 0 ? channels : input.get_channels(),
+        number_of_children,
+        0,
+        buffer_owner
+    ),
     input(input),
     input_buffer(NULL)
 {

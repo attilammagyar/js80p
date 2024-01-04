@@ -48,12 +48,7 @@ Sample const* const* SignalProducer::produce(
         return signal_producer.cached_buffer;
     }
 
-    Sample** buffer = (
-        signal_producer.buffer_owner == NULL
-            ? signal_producer.buffer
-            : signal_producer.buffer_owner->buffer
-    );
-
+    Sample** buffer = signal_producer.buffer_owner->buffer;
 
     signal_producer.cached_buffer = buffer;
 
@@ -136,7 +131,8 @@ SignalProducer::SignalProducer(
     current_time(0.0),
     cached_round(-1),
     cached_buffer(NULL),
-    buffer_owner(buffer_owner),
+    has_external_buffer(buffer_owner != NULL),
+    buffer_owner(has_external_buffer ? buffer_owner : this),
     cached_silence_round(-1),
     cached_silence(false)
 {
@@ -176,7 +172,7 @@ Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const noexcept
 
 Sample** SignalProducer::allocate_buffer() const noexcept
 {
-    if (channels <= 0 || buffer_owner != NULL) {
+    if (channels <= 0 || has_external_buffer) {
         return NULL;
     }
 
@@ -245,11 +241,17 @@ Integer SignalProducer::get_block_size() const noexcept
 }
 
 
+SignalProducer* SignalProducer::get_buffer_owner() noexcept
+{
+    return buffer_owner;
+}
+
+
 void SignalProducer::reset() noexcept
 {
     cancel_events();
 
-    if (buffer_owner == NULL) {
+    if (!has_external_buffer) {
         render_silence(-1, 0, block_size, buffer);
     }
 

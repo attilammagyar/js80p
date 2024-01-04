@@ -72,9 +72,10 @@ template<class InputSignalProducerClass>
 Distortion<InputSignalProducerClass>::Distortion(
         std::string const name,
         Type const type,
-        InputSignalProducerClass& input
+        InputSignalProducerClass& input,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 1),
+    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
     level(name + "G", 0.0, 1.0, 0.0),
     f_table(tables.get_f_table(type)),
     F0_table(tables.get_F0_table(type))
@@ -88,9 +89,10 @@ Distortion<InputSignalProducerClass>::Distortion(
         std::string const name,
         Type const type,
         InputSignalProducerClass& input,
-        FloatParamS& level_leader
+        FloatParamS& level_leader,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 1),
+    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
     level(level_leader),
     f_table(tables.get_f_table(type)),
     F0_table(tables.get_F0_table(type))

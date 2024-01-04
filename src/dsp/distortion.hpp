@@ -82,14 +82,16 @@ class Distortion : public Filter<InputSignalProducerClass>
         Distortion(
             std::string const name,
             Type const type,
-            InputSignalProducerClass& input
+            InputSignalProducerClass& input,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
         Distortion(
             std::string const name,
             Type const type,
             InputSignalProducerClass& input,
-            FloatParamS& level_leader
+            FloatParamS& level_leader,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
         ~Distortion();

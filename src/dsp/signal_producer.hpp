@@ -136,6 +136,8 @@ class SignalProducer
         virtual void set_block_size(Integer const new_block_size) noexcept;
         Integer get_block_size() const noexcept;
 
+        SignalProducer* get_buffer_owner() noexcept;
+
         virtual void reset() noexcept;
 
         void set_bpm(Number const new_bpm) noexcept;
@@ -260,6 +262,7 @@ class SignalProducer
             Integer& next_stop
         ) noexcept;
 
+        bool const has_external_buffer;
         SignalProducer* const buffer_owner;
 
         Children children;

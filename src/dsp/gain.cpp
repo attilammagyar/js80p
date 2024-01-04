@@ -30,9 +30,10 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Gain<InputSignalProducerClass>::Gain(
         InputSignalProducerClass& input,
-        FloatParamS& gain
+        FloatParamS& gain,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : Filter<InputSignalProducerClass>(input),
+    : Filter<InputSignalProducerClass>(input, 0, 0, buffer_owner),
     gain_buffer(NULL),
     gain(gain)
 {

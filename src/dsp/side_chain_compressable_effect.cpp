@@ -32,11 +32,13 @@ template<class InputSignalProducerClass>
 SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffect(
         std::string const name,
         InputSignalProducerClass& input,
-        Integer const number_of_children
+        Integer const number_of_children,
+        SignalProducer* const buffer_owner
 ) : Effect<InputSignalProducerClass>(
         name,
         input,
-        number_of_children + 5
+        number_of_children + 5,
+        buffer_owner
     ),
     side_chain_compression_threshold(name + "CTH", -120.0, 0.0, -18.0),
     side_chain_compression_attack_time(name + "CAT", 0.001, 3.0, 0.02),

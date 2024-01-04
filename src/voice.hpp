@@ -208,7 +208,8 @@ class Voice : public SignalProducer
                 VolumeApplier(
                     Filter2& input,
                     FloatParamS& velocity,
-                    FloatParamS& volume
+                    FloatParamS& volume,
+                    SignalProducer* const buffer_owner = NULL
                 ) noexcept;
 
             protected:

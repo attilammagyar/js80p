@@ -43,7 +43,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 18 + VOICES * 3),
+) : Effect<InputSignalProducerClass>(name, input, 18 + VOICES * 3, &mixer),
     type(name+ "TYP"),
     delay_time(
         name + "DEL",
@@ -139,7 +139,12 @@ Chorus<InputSignalProducerClass>::Chorus(
         high_shelf_filter_type,
         damping_frequency,
         biquad_filter_q,
-        damping_gain
+        damping_gain,
+        NULL,
+        0.0,
+        NULL,
+        NULL,
+        &mixer
     ),
     feedback_gain(high_shelf_filter, feedback),
     previous_type(255),

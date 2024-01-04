@@ -29,11 +29,13 @@ template<class InputSignalProducerClass>
 Effect<InputSignalProducerClass>::Effect(
         std::string const name,
         InputSignalProducerClass& input,
-        Integer const number_of_children
+        Integer const number_of_children,
+        SignalProducer* const buffer_owner
 ) : Filter<InputSignalProducerClass>(
         input,
         number_of_children + 2,
-        input.get_channels()
+        input.get_channels(),
+        buffer_owner
     ),
     dry(name + "DRY", 0.0, 1.0, 1.0),
     wet(name + "WET", 0.0, 1.0, 0.0)

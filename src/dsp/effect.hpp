@@ -40,7 +40,8 @@ class Effect : public Filter<InputSignalProducerClass>
         Effect(
             std::string const name,
             InputSignalProducerClass& input,
-            Integer const number_of_children = 0
+            Integer const number_of_children = 0,
+            SignalProducer* const buffer_owner = NULL
         );
 
         FloatParamS dry;

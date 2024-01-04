@@ -956,7 +956,16 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
-    high_shelf_filter("", this->delay, high_shelf_filter_type)
+    high_shelf_filter(
+        "",
+        this->delay,
+        high_shelf_filter_type,
+        NULL,
+        0.0,
+        NULL,
+        NULL,
+        &this->delay
+    )
 {
     initialize_instance();
 
@@ -1000,7 +1009,11 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,
-        &high_shelf_filter_shared_buffers
+        &high_shelf_filter_shared_buffers,
+        0.0,
+        NULL,
+        NULL,
+        &this->delay
     )
 {
     initialize_instance();
@@ -1043,7 +1056,11 @@ HighShelfPannedDelay<InputSignalProducerClass>::HighShelfPannedDelay(
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,
-        &high_shelf_filter_shared_buffers
+        &high_shelf_filter_shared_buffers,
+        0.0,
+        NULL,
+        NULL,
+        &this->delay
     )
 {
     initialize_instance();

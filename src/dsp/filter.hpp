@@ -43,7 +43,8 @@ class Filter : public SignalProducer
         Filter(
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
-            Integer const channels = 0
+            Integer const channels = 0,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
     protected:

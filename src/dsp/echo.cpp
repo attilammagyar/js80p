@@ -32,7 +32,9 @@ Echo<InputSignalProducerClass>::Echo(
         std::string const name,
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
-) : SideChainCompressableEffect<InputSignalProducerClass>(name, input, 14),
+) : SideChainCompressableEffect<InputSignalProducerClass>(
+        name, input, 14, &comb_filter_2
+    ),
     delay_time(
         name + "DEL",
         Constants::DELAY_TIME_MIN,

@@ -48,7 +48,8 @@ Reverb<InputSignalProducerClass>::Reverb(
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
-        12 + COMB_FILTERS
+        12 + COMB_FILTERS,
+        &mixer
     ),
     type(name+ "TYP"),
     room_size(name + "RS", 0.0, 0.999, 0.75),

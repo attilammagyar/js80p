@@ -320,9 +320,10 @@ template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
         Filter2& input,
         FloatParamS& velocity,
-        FloatParamS& volume
+        FloatParamS& volume,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : Filter<Filter2>(input),
+    : Filter<Filter2>(input, 0, 0, buffer_owner),
     volume(volume),
     velocity(velocity)
 {
@@ -453,9 +454,10 @@ Voice<ModulatorSignalProducerClass>::Voice(
         filter_1_shared_buffers,
         make_random_seed(0.289),
         &param_leaders.filter_1_freq_inaccuracy,
-        &param_leaders.filter_1_q_inaccuracy
+        &param_leaders.filter_1_q_inaccuracy,
+        &oscillator
     ),
-    wavefolder(filter_1, param_leaders.folding),
+    wavefolder(filter_1, param_leaders.folding, &oscillator),
     filter_2(
         wavefolder,
         param_leaders.filter_2_type,
@@ -465,13 +467,14 @@ Voice<ModulatorSignalProducerClass>::Voice(
         filter_2_shared_buffers,
         make_random_seed(0.629),
         &param_leaders.filter_2_freq_inaccuracy,
-        &param_leaders.filter_2_q_inaccuracy
+        &param_leaders.filter_2_q_inaccuracy,
+        &oscillator
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
-    volume_applier(filter_2, note_velocity, volume),
+    volume_applier(filter_2, note_velocity, volume, &oscillator),
     is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
 {
@@ -528,14 +531,16 @@ Voice<ModulatorSignalProducerClass>::Voice(
         filter_1_shared_buffers,
         make_random_seed(0.327),
         &param_leaders.filter_1_freq_inaccuracy,
-        &param_leaders.filter_1_q_inaccuracy
+        &param_leaders.filter_1_q_inaccuracy,
+        &oscillator
     ),
-    wavefolder(filter_1, param_leaders.folding),
+    wavefolder(filter_1, param_leaders.folding, &oscillator),
     distortion(
         "DIST",
         Distortion::Type::HEAVY,
         wavefolder,
-        param_leaders.distortion
+        param_leaders.distortion,
+        &oscillator
     ),
     filter_2(
         distortion,
@@ -546,13 +551,14 @@ Voice<ModulatorSignalProducerClass>::Voice(
         filter_2_shared_buffers,
         make_random_seed(0.796),
         &param_leaders.filter_2_freq_inaccuracy,
-        &param_leaders.filter_2_q_inaccuracy
+        &param_leaders.filter_2_q_inaccuracy,
+        &oscillator
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
     panning(param_leaders.panning),
     volume(param_leaders.volume),
-    volume_applier(filter_2, note_velocity, volume),
+    volume_applier(filter_2, note_velocity, volume, &oscillator),
     is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
 {

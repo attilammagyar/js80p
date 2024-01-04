@@ -102,9 +102,10 @@ void Wavefolder<InputSignalProducerClass>::initialize_instance() noexcept
 template<class InputSignalProducerClass>
 Wavefolder<InputSignalProducerClass>::Wavefolder(
         InputSignalProducerClass& input,
-        FloatParamS& folding_leader
+        FloatParamS& folding_leader,
+        SignalProducer* const buffer_owner
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 1),
+    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
     folding(folding_leader)
 {
     initialize_instance();

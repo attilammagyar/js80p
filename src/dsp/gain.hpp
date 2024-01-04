@@ -34,7 +34,11 @@ class Gain : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Gain(InputSignalProducerClass& input, FloatParamS& gain) noexcept;
+        Gain(
+            InputSignalProducerClass& input,
+            FloatParamS& gain,
+            SignalProducer* const buffer_owner = NULL
+        ) noexcept;
 
         void find_input_peak(
             Integer const round,
