@@ -28,7 +28,7 @@ namespace JS80P
 {
 
 LFO::LFO(std::string const name) noexcept
-    : SignalProducer(1, 11),
+    : SignalProducer(1, 11, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(name + "FRQ", 0.01, 30.0, 1.0),
     phase(name + "PHS", 0.0, 1.0, 0.0),
@@ -69,7 +69,7 @@ LFO::LFO(
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
-    : SignalProducer(1, 11),
+    : SignalProducer(1, 11, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(frequency_leader),
     phase(name + "PHS", 0.0, 1.0, phase_offset),
