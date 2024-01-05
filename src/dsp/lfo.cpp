@@ -69,7 +69,7 @@ LFO::LFO(
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
-    : SignalProducer(1, 10),
+    : SignalProducer(1, 11),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(frequency_leader),
     phase(name + "PHS", 0.0, 1.0, phase_offset),
