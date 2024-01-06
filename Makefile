@@ -271,6 +271,9 @@ GUI_SOURCES = \
 
 UPGRADE_PATCH_SOURCES = src/upgrade_patch.cpp
 
+MTS_ESP_SOURCES = lib/mtsesp/Client/libMTSClient.cpp
+MTS_ESP_HEADERS = lib/mtsesp/Client/libMTSClient.h
+
 TEST_LIBS = \
 	tests/test.cpp \
 	tests/utils.cpp
@@ -451,7 +454,8 @@ $(OBJ_GUI) : \
 	$(COMPILE_OBJ) -c $< -o $@
 
 $(OBJ_MTS_ESP) : \
-		lib/mtsesp/Client/libMTSClient.cpp lib/mtsesp/Client/libMTSClient.h \
+		$(MTS_ESP_SOURCES) \
+		$(MTS_ESP_HEADERS) \
 		| $(BUILD_DIR)
 	$(COMPILE_OBJ) $(MTS_ESP_CXXFLAGS) -c $< -o $@
 
