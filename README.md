@@ -158,16 +158,16 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Bundle on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
-3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
+3. Copy the entire `js80p.vst3` folder to your VST 3 folder which is
    usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
 <a id="vst3-bundle-linux"></a>
 
 ### VST 3 Bundle on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `~/.vst3`.
@@ -176,16 +176,16 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### VST 3 Single File on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
-3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
+3. Copy the `js80p.vst3` file to your VST 3 folder which is usually
    `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
 
 <a id="vst3-single-linux"></a>
 
 ### VST 3 Single File on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
@@ -194,19 +194,23 @@ have to download the 32 bit VST 3 Single File JS80P package.)
 
 ### FST (VST 2.4) on Windows
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
-3. Copy the `js80p.dll` file to the directory where you keep your VST 2.4
-   plugins.
+3. Copy the `js80p.dll` file to the folder where you keep your VST 2.4 plugins.
+
+Note: VST 2.4 plugins are usually put in the `C:\Program Files\VstPlugins`
+folder.
 
 <a id="fst-linux"></a>
 
 ### FST (VST 2.4) on Linux
 
-1. [Download the plugin](https://attilammagyar.github.io/js80p/index.html#download).
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.so` file to the directory where you keep your VST 2.4
    plugins.
+
+Note: VST 2.4 plugins are usually put in the `~/.vst` directory.
 
 <a id="usage" href="#toc">Table of Contents</a>
 
