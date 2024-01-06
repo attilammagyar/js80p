@@ -135,7 +135,7 @@ AEffect* FstPlugin::create_instance(
     effect->numInputs = 0;
     effect->numOutputs = (VstInt32)FstPlugin::OUT_CHANNELS;
     effect->numPrograms = (VstInt32)Bank::NUMBER_OF_PROGRAMS;
-    effect->numParams = NUMBER_OF_PARAMETERS;
+    effect->numParams = (VstInt32)NUMBER_OF_PARAMETERS;
     effect->object = (void*)fst_plugin;
     effect->process = &process_accumulating;
     effect->processReplacing = &process_replacing;
