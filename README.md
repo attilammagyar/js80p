@@ -86,7 +86,7 @@ Table of Contents
     * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
     * [Parameters, Envelopes, and polyphony: how do they work?](#faq-params-polyphony)
-    * [The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?](#faq-custom-wave)
+    * [The knobs in the waveform harmonics section don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
@@ -781,10 +781,10 @@ have at each moment according to the momentary settings of the Envelope.
 
 <a id="faq-custom-wave" href="#toc">Table of Contents</a>
 
-### The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?
+### The knobs in the waveform harmonics section don't do anything, is this a bug?
 
 To hear the effect of those knobs, you have to select the _Custom_ waveworm
-using the `WAV` knob in the top left corner of the Oscillator sections.
+using the `WAV` knob in the Waveform section of the oscillators.
 
 (Note that these parameters are CPU-intensive to process, so they are not
 sample accurate, they are not smoothed, and they are processed only once for
@@ -890,7 +890,9 @@ and unfortunately, Channel Pressure (also known as Channel Aftertouch)
 messages are among the kinds MIDI data that it swallows.
 
 Getting the Channel Pressure to work in FL Studio is a similar, but slightly
-more complicated procedure than setting up MIDI CC:
+more complicated procedure than setting up MIDI CC. For example, to make
+Channel Pressure control the _Phase Modulation (PM)_ virtual knob in JS80P, you
+have to do the following steps:
 
 1. Click on the small triangle in the top left corner of the plugin window of
    JS80P, and select the "_Browse parameters_" menu item.
