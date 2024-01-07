@@ -570,16 +570,16 @@ small {
           <li>
             <h4 id="install-vst3-bundle-windows">VST 3 Bundle on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
-              <li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
+              <li>Copy the entire <code>js80p.vst3</code> folder to your VST 3 folder which is
               usually <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
             </ol>
           </li>
           <li>
             <h4 id="install-vst3-bundle-linux">VST 3 Bundle on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
               usually <code>~/.vst3</code>.</li>
@@ -588,16 +588,16 @@ small {
           <li>
             <h4 id="install-vst3-single-file-windows">VST 3 Single File on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
+              <li>Copy the <code>js80p.vst3</code> file to your VST 3 folder which is usually
               <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
             </ol>
           </li>
           <li>
             <h4 id="install-vst3-single-file-linux">VST 3 Single File on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
               <code>~/.vst3</code>.</li>
@@ -606,20 +606,24 @@ small {
           <li>
             <h4 id="install-fst-windows">FST (VST 2.4) on Windows</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.dll</code> file to the directory where you keep your VST 2.4
-              plugins.</li>
+              <li>Copy the <code>js80p.dll</code> file to the folder where you keep your VST 2.4 plugins.</li>
             </ol>
+
+            <p>Note: VST 2.4 plugins are usually put in the <code>C:\Program Files\VstPlugins</code>
+            folder.</p>
           </li>
           <li>
             <h4 id="install-fst-linux">FST (VST 2.4) on Linux</h4>
             <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download the plugin</a>.</li>
+              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
               <li>Extract the ZIP archive.</li>
               <li>Copy the <code>js80p.so</code> file to the directory where you keep your VST 2.4
               plugins.</li>
             </ol>
+
+            <p>Note: VST 2.4 plugins are usually put in the <code>~/.vst</code> directory.</p>
           </li>
         </ul>
       </div>
@@ -1181,7 +1185,7 @@ small {
           <li><a href="#faq-which">Which distribution should I download?</a></li>
           <li><a href="#faq-mac">Mac version?</a></li>
           <li><a href="#faq-params-polyphony">Parameters, Envelopes, and polyphony: how do they work?</a></li>
-          <li><a href="#faq-custom-wave">The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?</a></li>
+          <li><a href="#faq-custom-wave">The knobs in the waveform harmonics section don't do anything, is this a bug?</a></li>
           <li><a href="#faq-automation">How can parameters be automated? What parameters does the plugin export?</a></li>
           <li><a href="#faq-pm-fm">Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</a></li>
           <li><a href="#faq-name">Where does the name come from?</a></li>
@@ -1268,10 +1272,10 @@ small {
       </div>
 
       <div class="section" id="faq-custom-wave">
-        <h3>The knobs in the Custom Waveform harmonics secion don't do anything, is this a bug?</h3>
+        <h3>The knobs in the waveform harmonics section don't do anything, is this a bug?</h3>
 
         <p>To hear the effect of those knobs, you have to select the <em>Custom</em> waveworm
-        using the <code>WAV</code> knob in the top left corner of the Oscillator sections.</p>
+        using the <code>WAV</code> knob in the Waveform section of the oscillators.</p>
 
         <p>(Note that these parameters are CPU-intensive to process, so they are not
         sample accurate, they are not smoothed, and they are processed only once for
@@ -1304,40 +1308,39 @@ small {
 
       <div class="section" id="faq-pm-fm">
         <h3>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</h3>
-        <p>
-          The reason for JS80P having both kinds of modulation is that they are not
-          always equivalent. They are only identical when the modulator signal is a
-          sinusoid, but with each added harmonic, PM and FM start to differ more and
-          more. A detailed mathematical explanation of this is shown
-          <a href="https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md">here</a>.
-        </p>
+
+        <p>The reason for JS80P having both kinds of modulation is that they are not
+        always equivalent. They are only identical when the modulator signal is a
+        sinusoid, but with each added harmonic, PM and FM start to differ more and
+        more. A detailed mathematical explanation of this is shown in
+        <a href="https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.md" target="_blank">here</a>.</p>
       </div>
 
       <div class="section" id="faq-name">
         <h3>Where does the name come from?</h3>
-        <p>
-          In 2022, I started developing a browser-based synthesizer using the
-          <a href="https://www.w3.org/TR/webaudio/" target="_blank">Web Audio API</a>, mostly being
-          inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80" target="_blank">Yamaha CS-80</a>.
-          I named that project <a href="https://attilammagyar.github.io/toys/js-80/" target="_blank">JS-80</a>.
-          Then I started adding one little feature and customization option after the
-          other, then it got out of hand, and I also started finding limitations of
-          doing audio in the browser. So I decided to implement a cleaned up version
-          of this synth in C++ as a DAW plugin (with a better waveshaper antialiasing
-          method than what's available in the browser), and so JS80P was born.
-        </p>
+
+        <p>In 2022, I started developing a browser-based synthesizer using the
+        <a href="https://www.w3.org/TR/webaudio/" target="_blank">Web Audio API</a>,
+        mostly being inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80" target="_blank">Yamaha CS-80</a>.
+        I named that project <a href="https://attilammagyar.github.io/toys/js-80/" target="_blank">JS-80</a>.
+        Then I started adding one little feature and customization option after
+        the other, then it got out of hand, and I also started finding
+        limitations of doing audio in the browser. So I decided to implement a
+        cleaned up version of this synth in C++ as a DAW plugin (with a better
+        waveshaper antialiasing method than what's available in the browser),
+        and so JS80P was born.</p>
       </div>
 
       <div class="section" id="faq-flstudio-midicc">
         <h3>FL Studio: How to assign a MIDI CC to a JS80P parameter?</h3>
 
-        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/" target="_blank">Reaper</a>),
-        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a> does not send all MIDI events that
-        come out of your MIDI keyboard to plugins, and unfortunately,
-        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a>
-        messages are among the kinds of MIDI data that it swallows. To make
-        everything work, you have to assign the MIDI CC events to a plugin
-        parameter.</p>
+        <p>Unlike decent audio software (like for example
+        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
+        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
+        does not send all MIDI events that come out of your MIDI keyboard to plugins,
+        and unfortunately, <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a> messages are among
+        the kinds of MIDI data that it swallows. To make everything work, you have to
+        assign the MIDI CC events to a plugin parameter.</p>
 
         <p>JS80P does not directly export its parameters (in order to avoid conflict
         between the host's automations and JS80P's internal control assignments), but
@@ -1348,44 +1351,47 @@ small {
         Modulation (PM)</em> virtual knob in JS80P, you have to do the following steps:</p>
 
         <ol>
-        <li><p>Click on the small triangle in the top left corner of the plugin window of
-        JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-        <li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST 3) in
-        the browser. Click on it with the right mouse button.</p></li>
-        <li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
-        <li><p>Turn the knob on your MIDI keyboard until FL Studio recognizes it.</p></li>
-        <li><p>Now click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
-        JS80P's interface.</p></li>
-        <li><p>Select either the "<em>MIDI CC 7 (Volume)</em>" option, or the "<em>MIDI Learn</em>"
-        option, and turn the physical knob on your MIDI keyboard again.</p></li>
+          <li><p>Click on the small triangle in the top left corner of the plugin window of
+          JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
+          <li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST 3) in
+          the browser. Click on it with the right mouse button.</p></li>
+          <li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
+          <li><p>Turn the knob on your MIDI keyboard until FL Studio recognizes it.</p></li>
+          <li><p>Now click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
+          JS80P's interface.</p></li>
+          <li><p>Select either the "<em>MIDI CC 7 (Volume)</em>" option, or the "<em>MIDI Learn</em>"
+          option, and turn the physical knob on your MIDI keyboard again.</p></li>
         </ol>
       </div>
 
       <div class="section" id="faq-flstudio-aftertouch">
         <h3>FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?</h3>
 
-        <p>Unlike decent audio software (like for example <a href="https://www.reaper.fm/" target="_blank">Reaper</a>),
-        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a> does not send all MIDI events that
-        come out of your MIDI keyboard to plugins, and unfortunately, Channel Pressure (also
-        known as Channel Aftertouch)  messages are among the kinds MIDI data that it
-        swallows.</p>
+        <p>Unlike decent audio software (like for example
+        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
+        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
+        does not send all MIDI events that come out of your MIDI keyboard to plugins,
+        and unfortunately, Channel Pressure (also known as Channel Aftertouch)
+        messages are among the kinds MIDI data that it swallows.</p>
 
-        <p>Getting the Channel Pressure to work in FL Studio is a similar, but
-        slightly more complicated procedure than setting up MIDI CC:</p>
+        <p>Getting the Channel Pressure to work in FL Studio is a similar, but slightly
+        more complicated procedure than setting up MIDI CC. For example, to make
+        Channel Pressure control the <em>Phase Modulation (PM)</em> virtual knob in JS80P, you
+        have to do the following steps:</p>
 
         <ol>
-        <li><p>Click on the small triangle in the top left corner of the plugin window of
-        JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-        <li><p>Press a piano key on your MIDI keyboard, and hold it down without triggering
-        aftertouch.</p></li>
-        <li><p>While holding the piano key down, find the parameter named "<em>Ch AT</em>" (FST)
-        or "<em>Channel Aftertouch</em>" (VST 3) in FL Studio's browser. Click on it with
-        the right mouse button.</p></li>
-        <li><p>Select the "<em>Link to controller...</em>" menu item (keep holding the piano key).</p></li>
-        <li><p>Now push the piano key harder to trigger aftertouch.</p></li>
-        <li><p>Click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
-        JS80P's interface.</p></li>
-        <li><p>Select the "<em>Channel Aftertouch</em>" option.</p></li>
+          <li><p>Click on the small triangle in the top left corner of the plugin window of
+          JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
+          <li><p>Press a piano key on your MIDI keyboard, and hold it down without triggering
+          aftertouch.</p></li>
+          <li><p>While holding the piano key down, find the parameter named "<em>Ch AT</em>" (FST)
+          or "<em>Channel Aftertouch</em>" (VST 3) in FL Studio's browser. Click on it with
+          the right mouse button.</p></li>
+          <li><p>Select the "<em>Link to controller...</em>" menu item (keep holding the piano key).</p></li>
+          <li><p>Now push the piano key harder to trigger aftertouch.</p></li>
+          <li><p>Click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
+          JS80P's interface.</p></li>
+          <li><p>Select the "<em>Channel Aftertouch</em>" option.</p></li>
         </ol>
       </div>
 
@@ -1396,22 +1402,19 @@ small {
         <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
         <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
         does not send all MIDI events that come out of your MIDI keyboard to plugins,
-        and unfortunately, the
-        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a>
-        message which contains information about the sustain pedal's state is
-        among the kinds of MIDI data that it swallows.</p>
+        and unfortunately, the <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a> message which
+        contains information about the sustain pedal's state is among the kinds of MIDI
+        data that it swallows.</p>
 
-        <p>To add insult to injury, it pretends that it notifies the plugin
-        about the pedal's state, but in reality, it just defers sending
-        <code>NOTE OFF</code> events until the pedal is released. This might
-        give the desired effect in some cases, but it breaks patches that
-        assign additional functionality to the pedal besides sustaining
-        notes.</p>
+        <p>To add insult to injury, it pretends that it notifies the plugin about the
+        pedal's state, but in reality, it just defers sending <code>NOTE OFF</code> events until
+        the pedal is released. This might give the desired effect in some cases, but it
+        breaks patches that assign additional functionality to the pedal besides
+        sustaining notes.</p>
 
-        <p>To make everything work, you have to assign the sustain pedal's MIDI
-        CC events to the plugin parameter where JS80P expects them, and you
-        have to turn off FL Studio's default behavior of handling the pedal on
-        behalf of plugins.</p>
+        <p>To make everything work, you have to assign the sustain pedal's MIDI CC events
+        to the plugin parameter where JS80P expects them, and you have to turn off
+        FL Studio's default behavior of handling the pedal on behalf of plugins.</p>
 
         <ol>
           <li><p>Open "<em>Options / MIDI settings</em>" from the main menu.</p></li>
