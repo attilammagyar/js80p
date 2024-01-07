@@ -55,9 +55,14 @@ GUI_IMAGES = \
 	gui/img/synth.bmp \
 	gui/img/vst_logo.bmp
 
-OBJ_GUI_EXTRA = $(BUILD_DIR)/js80p-$(SUFFIX).res
+OBJ_GUI_EXTRA = $(BUILD_DIR)/gui-$(SUFFIX).res
 
 $(OBJ_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
+	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
+
+OBJ_FST_EXTRA = $(BUILD_DIR)/fst-$(SUFFIX).res
+
+$(OBJ_FST_EXTRA): src/plugin/fst/dll.rc $(VSTXML) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).exe

@@ -68,6 +68,8 @@ OBJ_GUI_EXTRA = \
 	$(BUILD_DIR)/img_synth.o \
 	$(BUILD_DIR)/img_vst_logo.o
 
+OBJ_FST_EXTRA =
+
 UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX)
 
 $(LIB_PATH): | $(BUILD_DIR)

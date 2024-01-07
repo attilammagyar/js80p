@@ -375,6 +375,70 @@ void VSTCALLBACK FstPlugin::set_parameter(
 }
 
 
+void FstPlugin::populate_parameters(
+        Synth& synth,
+        Parameters& parameters
+) noexcept {
+    parameters[0] = Parameter("Program", NULL, Synth::ControllerId::NONE);
+    parameters[1] = create_midi_ctl_param(
+        Synth::ControllerId::PITCH_WHEEL, &synth.pitch_wheel, synth
+    );
+    parameters[2] = create_midi_ctl_param(
+        Synth::ControllerId::CHANNEL_PRESSURE,
+        &synth.channel_pressure_ctl,
+        synth
+    );
+
+    size_t index = 3;
+
+    for (Integer cc = 0; cc != Synth::MIDI_CONTROLLERS; ++cc) {
+        Midi::Controller const midi_controller = (Midi::Controller)cc;
+
+        if (!Synth::is_supported_midi_controller(midi_controller)) {
+            continue;
+        }
+
+        /*
+        The sustain pedal was added in v1.9.0, but if it was put in the middle
+        of the list of exported parameters, then it could break DAW projects
+        that have automations for parameters which come after it. In order to
+        avoid such backward-incompatibility, we need to put it at the end.
+        */
+        if (midi_controller == Midi::SUSTAIN_PEDAL) {
+            continue;
+        }
+
+        parameters[index] = create_midi_ctl_param(
+            (Synth::ControllerId)cc,
+            synth.midi_controllers[cc],
+            synth
+        );
+        ++index;
+    }
+
+    parameters[index++] = create_midi_ctl_param(
+        Synth::ControllerId::SUSTAIN_PEDAL,
+        synth.midi_controllers[Synth::ControllerId::SUSTAIN_PEDAL],
+        synth
+    );
+}
+
+
+FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
+        Synth::ControllerId const controller_id,
+        MidiController* midi_controller,
+        Synth& synth
+) noexcept {
+    return Parameter(
+        GUI::get_controller(controller_id)->short_name,
+        midi_controller != NULL
+            ? midi_controller
+            : synth.midi_controllers[controller_id],
+        (Midi::Controller)controller_id
+    );
+}
+
+
 FstPlugin::FstPlugin(
         AEffect* const effect,
         audioMasterCallback const host_callback,
@@ -409,44 +473,7 @@ FstPlugin::FstPlugin(
     window_rect.bottom = GUI::HEIGHT;
     window_rect.right = GUI::WIDTH;
 
-    parameters[0] = Parameter("Program", NULL, Synth::ControllerId::NONE);
-    parameters[1] = create_midi_ctl_param(
-        Synth::ControllerId::PITCH_WHEEL, &synth.pitch_wheel
-    );
-    parameters[2] = create_midi_ctl_param(
-        Synth::ControllerId::CHANNEL_PRESSURE, &synth.channel_pressure_ctl
-    );
-
-    size_t index = 3;
-
-    for (Integer cc = 0; cc != Synth::MIDI_CONTROLLERS; ++cc) {
-        Midi::Controller const midi_controller = (Midi::Controller)cc;
-
-        if (!Synth::is_supported_midi_controller(midi_controller)) {
-            continue;
-        }
-
-        /*
-        The sustain pedal was added in v1.9.0, but if it was put in the middle
-        of the list of exported parameters, then it could break DAW projects
-        that have automations for parameters which come after it. In order to
-        avoid such backward-incompatibility, we need to put it at the end.
-        */
-        if (midi_controller == Midi::SUSTAIN_PEDAL) {
-            continue;
-        }
-
-        parameters[index] = create_midi_ctl_param(
-            (Synth::ControllerId)cc,
-            synth.midi_controllers[cc]
-        );
-        ++index;
-    }
-
-    parameters[index++] = create_midi_ctl_param(
-        Synth::ControllerId::SUSTAIN_PEDAL,
-        synth.midi_controllers[Synth::ControllerId::SUSTAIN_PEDAL]
-    );
+    populate_parameters(synth, parameters);
 
     serialized_bank = bank.serialize();
     current_patch = bank[current_program_index].serialize();
@@ -1131,20 +1158,6 @@ void FstPlugin::close_gui()
 
     gui = NULL;
     need_idle();
-}
-
-
-FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
-        Synth::ControllerId const controller_id,
-        MidiController* midi_controller
-) noexcept {
-    return Parameter(
-        GUI::get_controller(controller_id)->short_name,
-        midi_controller != NULL
-            ? midi_controller
-            : synth.midi_controllers[controller_id],
-        (Midi::Controller)controller_id
-    );
 }
 
 

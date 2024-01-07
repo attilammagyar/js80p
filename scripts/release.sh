@@ -126,25 +126,19 @@ main()
 
     build_platform="$(uname -m)"
 
+    log "Generating js80p.vstxml ($build_platform)"
+
+    call_make_for_build_platform \
+        "$build_platform" \
+        "$version_str" "$version_int" "$version_as_file_name" \
+        vstxml
+
     log "Running unit tests ($build_platform)"
 
-    case "$build_platform" in
-        "x86_64")
-            call_make \
-                "x86_64-w64-mingw32" "avx" \
-                "$version_str" "$version_int" "$version_as_file_name" \
-                check
-            ;;
-        "riscv64")
-            call_make \
-                "riscv64-gpp" "none" \
-                "$version_str" "$version_int" "$version_as_file_name" \
-                check
-            ;;
-        *)
-            error "Unsupported build platform: $uname"
-            ;;
-    esac
+    call_make_for_build_platform \
+        "$build_platform" \
+        "$version_str" "$version_int" "$version_as_file_name" \
+        check
 
     for target_platform in $target_platforms
     do
@@ -256,6 +250,19 @@ version_str_to_file_name()
     printf "%s\n" "$version_str" | sed "s/[^0-9a-f-]/_/g"
 }
 
+call_make_for_build_platform()
+{
+    local build_platform="$1"
+
+    shift
+
+    case "$build_platform" in
+        "x86_64")   call_make "x86_64-w64-mingw32" "avx" "$@" ;;
+        "riscv64")  call_make "riscv64-gpp" "none" "$@" ;;
+        *) error "Unsupported build platform: $uname" ;;
+    esac
+}
+
 call_make()
 {
     local target_platform="$1"
@@ -296,9 +303,9 @@ package_fst()
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
-        finalize_package "$dist_dir" "convert"
+        finalize_package "$dist_dir" "convert" "$DIST_DIR_BASE/js80p.vstxml"
     else
-        finalize_package "$dist_dir" ""
+        finalize_package "$dist_dir" "" "$DIST_DIR_BASE/js80p.vstxml"
     fi
 }
 
@@ -318,6 +325,7 @@ finalize_package()
 {
     local dist_dir="$1"
     local convert_newlines="$2"
+    local extra_file="$3"
     local dist_archive
     local src_file
     local dst_file
@@ -326,6 +334,11 @@ finalize_package()
 
     cp --verbose "$README_HTML" "$DIST_DIR_BASE/$dist_dir/"
     cp --verbose --recursive presets "$DIST_DIR_BASE/$dist_dir/"
+
+    if [[ ! -z "$extra_file" ]]
+    then
+        cp --verbose "$extra_file" "$DIST_DIR_BASE/$dist_dir/"
+    fi
 
     if [[ "$convert_newlines" = "convert" ]]
     then
@@ -374,9 +387,9 @@ package_vst3_single_file()
 
     if [[ "$target_platform" =~ "-mingw32" ]]
     then
-        finalize_package "$dist_dir" "convert"
+        finalize_package "$dist_dir" "convert" ""
     else
-        finalize_package "$dist_dir" ""
+        finalize_package "$dist_dir" "" ""
     fi
 }
 
@@ -426,7 +439,7 @@ package_vst3_bundle()
         convert_text_file "$src_file" "$dst_file"
     done
 
-    finalize_package "$dist_dir" "convert"
+    finalize_package "$dist_dir" "convert" ""
 }
 
 get_vst3_snapshot_id()

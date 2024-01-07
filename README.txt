@@ -96,6 +96,9 @@ Installing the FST (VST 2.4) Version on Windows
 2. Extract the ZIP archive.
 3. Copy the "js80p.dll" file to the folder where you keep your VST 2.4
    plugins.
+4. Optionally, if your host application can load ".vstxml" files, it is
+   recommended to copy the "js80p.vstxml" file as well to the folder where
+   you keep your VST 2.4 plugins.
 
 Note: VST 2.4 plugins are usually put in the "C:\Program Files\VstPlugins"
 folder.
@@ -107,6 +110,9 @@ Installing the FST (VST 2.4) Version on Linux
 2. Extract the ZIP archive.
 3. Copy the "js80p.so" file to the directory where you keep your VST 2.4
    plugins.
+4. Optionally, if your host application can load ".vstxml" files, it is
+   recommended to copy the "js80p.vstxml" file as well to the directory where
+   you keep your VST 2.4 plugins.
 
 Note: VST 2.4 plugins are usually put in the "~/.vst" directory.
 

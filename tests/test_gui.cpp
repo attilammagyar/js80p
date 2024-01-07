@@ -26,7 +26,7 @@
 #include "serializer.cpp"
 #include "synth.cpp"
 
-#include "gui_stubs.cpp"
+#include "gui/stub.cpp"
 
 #include "gui/widgets.cpp"
 #include "gui/gui.cpp"

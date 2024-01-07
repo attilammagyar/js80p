@@ -62,6 +62,8 @@ DEBUG_LOG ?=
 FST_DIR = $(DIST_DIR_PREFIX)-fst
 VST3_DIR = $(DIST_DIR_PREFIX)-vst3_single_file
 
+VSTXML = $(BUILD_DIR_BASE)/js80p.vstxml
+
 OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
 
 OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
@@ -101,6 +103,7 @@ OBJ_GUI = $(BUILD_DIR)/gui-$(SUFFIX).o
 OBJ_MTS_ESP = $(BUILD_DIR)/mts-esp-$(SUFFIX).o
 
 FST_OBJS = \
+	$(OBJ_FST_EXTRA) \
 	$(OBJ_GUI_EXTRA) \
 	$(OBJ_FST_MAIN) \
 	$(OBJ_FST_PLUGIN) \
@@ -340,6 +343,8 @@ fst: $(FST)
 
 vst3: $(VST3)
 
+vstxml: $(VSTXML)
+
 dirs: $(BUILD_DIR) $(DOC_DIR) $(FST_DIR) $(VST3_DIR)
 
 $(BUILD_DIR): | $(BUILD_DIR_BASE)
@@ -359,6 +364,7 @@ clean:
 		$(DEV_PLATFORM_CLEAN) \
 		$(FST) \
 		$(FST_OBJS) \
+		$(VSTXML) \
 		$(GUI_PLAYGROUND) \
 		$(GUI_PLAYGROUND_OBJS) \
 		$(PERF_TEST_BINS) \
@@ -483,6 +489,18 @@ $(OBJ_VST3_MAIN): \
 		| $(BUILD_DIR)
 	$(COMPILE_VST3) -c $< -o $@
 
+$(VSTXML): $(BUILD_DIR)/vstxmlgen$(EXE) | $(DIST_DIR_BASE)
+	$(BUILD_DIR)/vstxmlgen$(EXE) $(VSTXML)
+
+$(BUILD_DIR)/vstxmlgen$(EXE): \
+		src/plugin/fst/vstxmlgen.cpp \
+		src/plugin/fst/plugin.hpp src/plugin/fst/plugin.cpp \
+		src/gui/gui.hpp src/gui/gui.cpp \
+		src/synth.hpp src/synth.cpp \
+		src/midi.hpp \
+		| $(BUILD_DIR)
+	$(CPP_DEV_PLATFORM) $(FST_CXXINCS) $(FST_CXXFLAGS) $(MTS_ESP_CXXFLAGS) -o $@ $<
+
 $(BUILD_DIR)/chord$(EXE): \
 		tests/performance/chord.cpp \
 		$(JS80P_HEADERS) \
@@ -582,7 +600,7 @@ $(BUILD_DIR)/test_gain$(EXE): \
 
 $(BUILD_DIR)/test_gui$(EXE): \
 		tests/test_gui.cpp \
-		tests/gui_stubs.cpp \
+		src/gui/stub.cpp \
 		$(TEST_LIBS) \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \

@@ -42,7 +42,42 @@ namespace JS80P
 class FstPlugin : public Midi::EventHandler
 {
     public:
+        class Parameter
+        {
+            public:
+                Parameter();
+                Parameter(
+                    char const* name,
+                    MidiController* midi_controller,
+                    Midi::Controller const controller_id
+                );
+                Parameter(Parameter const& parameter) = default;
+                Parameter(Parameter&& parameter) = default;
+
+                Parameter& operator=(Parameter const& parameter) noexcept = default;
+                Parameter& operator=(Parameter&& parameter) noexcept = default;
+
+                char const* get_name() const noexcept;
+                MidiController* get_midi_controller() const noexcept;
+                Midi::Controller get_controller_id() const noexcept;
+
+                // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
+
+                float get_value() noexcept;
+                float get_last_set_value() const noexcept;
+                void set_value(float const value) noexcept;
+
+            private:
+                MidiController* midi_controller;
+                char const* name;
+                Midi::Controller controller_id;
+                // Integer change_index; /* See FstPlugin::generate_samples() */
+                float value;
+        };
+
         static constexpr size_t NUMBER_OF_PARAMETERS = 72;
+
+        typedef Parameter Parameters[NUMBER_OF_PARAMETERS];
 
         static constexpr VstInt32 OUT_CHANNELS = (VstInt32)Synth::OUT_CHANNELS;
         static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
@@ -101,6 +136,11 @@ class FstPlugin : public Midi::EventHandler
             VstInt32 index,
             float fvalue
         );
+
+        static void populate_parameters(
+            Synth& synth,
+            Parameters& parameters
+        ) noexcept;
 
         FstPlugin(
             AEffect* const effect,
@@ -252,42 +292,10 @@ class FstPlugin : public Midi::EventHandler
                 Midi::Controller controller_id;
         };
 
-        class Parameter
-        {
-            public:
-                Parameter();
-                Parameter(
-                    char const* name,
-                    MidiController* midi_controller,
-                    Midi::Controller const controller_id
-                );
-                Parameter(Parameter const& parameter) = default;
-                Parameter(Parameter&& parameter) = default;
-
-                Parameter& operator=(Parameter const& parameter) noexcept = default;
-                Parameter& operator=(Parameter&& parameter) noexcept = default;
-
-                char const* get_name() const noexcept;
-                MidiController* get_midi_controller() const noexcept;
-                Midi::Controller get_controller_id() const noexcept;
-
-                // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
-
-                float get_value() noexcept;
-                float get_last_set_value() const noexcept;
-                void set_value(float const value) noexcept;
-
-            private:
-                MidiController* midi_controller;
-                char const* name;
-                Midi::Controller controller_id;
-                // Integer change_index; /* See FstPlugin::generate_samples() */
-                float value;
-        };
-
-        Parameter create_midi_ctl_param(
+        static Parameter create_midi_ctl_param(
             Synth::ControllerId const controller_id,
-            MidiController* midi_controller
+            MidiController* midi_controller,
+            Synth& synth
         ) noexcept;
 
         void clear_received_midi_cc() noexcept;
@@ -329,7 +337,7 @@ class FstPlugin : public Midi::EventHandler
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
 
-        Parameter parameters[NUMBER_OF_PARAMETERS];
+        Parameters parameters;
 
         AEffect* const effect;
         audioMasterCallback const host_callback;
