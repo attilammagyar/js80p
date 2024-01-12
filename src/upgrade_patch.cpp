@@ -88,7 +88,7 @@ bool write_patch(
 
     for (JS80P::Serializer::Lines::const_iterator it = comments.begin(); it != comments.end(); ++it) {
         std::string const& comment = *it;
-        fprintf(stderr, "c: %s\n", comment.c_str());
+        std::cout << "c: " << comment << std::endl;
 
         patch_file.write(comment.c_str(), comment.length());
         patch_file.write(line_end.c_str(), line_end.length());
@@ -116,7 +116,7 @@ int error(char const* message, char const* file_path)
 
 int upgrade_patch(char const* const patch_file)
 {
-    std::cerr << "Upgrading " << patch_file << std::endl;
+    std::cout << "Upgrading " << patch_file << std::endl;
 
     std::string patch;
 
