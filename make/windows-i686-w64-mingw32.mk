@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023  Attila M. Magyar
+# Copyright (C) 2023, 2024  Attila M. Magyar
 # Copyright (C) 2023  Patrik Ehringer
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 #
