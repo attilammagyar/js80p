@@ -27,14 +27,14 @@ main()
 
     if [[ "$platform" = "" ]]
     then
-        platform="x86_64-gpp-avx"
+        platform="dev-linux-x86_64-avx"
     fi
 
     executable=./build/"$platform"/chord
 
     if [[ ! -x "$executable" ]]
     then
-        echo "Unable to find $executable, run \"make perf\" first" >&2
+        echo "Unable to find $executable, run \"make perf\" first." >&2
         echo "or pass a platform name in the first argument." >&2
         return 1
     fi

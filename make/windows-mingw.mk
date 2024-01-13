@@ -32,10 +32,13 @@ RM = del /q
 MKDIR = mkdir
 
 EXE = .exe
+DEV_EXE = .exe
 
 CPP_DEV_PLATFORM = $(ROOT_DIR)/bin/g++.exe
 CPP_TARGET_PLATFORM = $(CPP_DEV_PLATFORM)
 DOXYGEN = "C:/Program Files/doxygen/bin/doxygen.exe"
 WINDRES = $(ROOT_DIR)/bin/windres.exe
+
+LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall -static
 
 include make/mingw.mk

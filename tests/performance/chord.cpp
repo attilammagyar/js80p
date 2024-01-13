@@ -26,12 +26,12 @@
 #include <vector>
 
 #include "js80p.hpp"
+
+#include "bank.hpp"
 #include "midi.hpp"
 #include "renderer.hpp"
-
-#include "bank.cpp"
-#include "serializer.cpp"
-#include "synth.cpp"
+#include "serializer.hpp"
+#include "synth.hpp"
 
 
 using namespace JS80P;

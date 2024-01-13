@@ -24,7 +24,8 @@ VERSION_INT ?= 999000
 VERSION_AS_FILE_NAME ?= dev
 
 BUILD_DIR_BASE ?= build
-BUILD_DIR = $(BUILD_DIR_BASE)$(DIR_SEP)$(TARGET_PLATFORM)-$(INSTRUCTION_SET)
+BUILD_DIR = $(BUILD_DIR_BASE)$(DIR_SEP)$(TARGET_PLATFORM)-$(SUFFIX)-$(INSTRUCTION_SET)
+DEV_DIR = $(BUILD_DIR_BASE)$(DIR_SEP)dev-$(DEV_OS)-$(SUFFIX)-$(INSTRUCTION_SET)
 DIST_DIR_BASE ?= dist
 DIST_DIR_PREFIX ?= $(DIST_DIR_BASE)$(DIR_SEP)js80p-$(VERSION_AS_FILE_NAME)-$(TARGET_OS)-$(SUFFIX)-$(INSTRUCTION_SET)
 DOC_DIR ?= doc
@@ -62,11 +63,10 @@ DEBUG_LOG ?=
 FST_DIR = $(DIST_DIR_PREFIX)-fst
 VST3_DIR = $(DIST_DIR_PREFIX)-vst3_single_file
 
-VSTXML = $(BUILD_DIR_BASE)/js80p.vstxml
+VSTXML = $(DIST_DIR_BASE)/js80p.vstxml
+VSTXMLGEN = $(DEV_DIR)/vstxmlgen$(DEV_EXE)
 
-OBJ_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).o
-
-OBJ_UPGRADE_PATCH = $(BUILD_DIR)/upgrade-patch-$(SUFFIX).o
+UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch$(DEV_EXE)
 
 .PHONY: \
 	all \
@@ -92,48 +92,70 @@ all: dirs fst vst3
 
 include make/$(DEV_OS)-$(TARGET_PLATFORM).mk
 
-OBJ_FST_MAIN = $(BUILD_DIR)/fst-main-$(SUFFIX).o
-OBJ_FST_PLUGIN = $(BUILD_DIR)/fst-plugin-$(SUFFIX).o
-OBJ_VST3_MAIN = $(BUILD_DIR)/vst3-main-$(SUFFIX).o
-OBJ_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin-$(SUFFIX).o
-OBJ_BANK = $(BUILD_DIR)/bank-$(SUFFIX).o
-OBJ_SERIALIZER = $(BUILD_DIR)/serializer-$(SUFFIX).o
-OBJ_SYNTH = $(BUILD_DIR)/synth-$(SUFFIX).o
-OBJ_GUI = $(BUILD_DIR)/gui-$(SUFFIX).o
-OBJ_MTS_ESP = $(BUILD_DIR)/mts-esp-$(SUFFIX).o
+OBJ_TARGET_FST_MAIN = $(BUILD_DIR)/fst-main.o
+OBJ_TARGET_FST_PLUGIN = $(BUILD_DIR)/fst-plugin.o
+OBJ_TARGET_VST3_MAIN = $(BUILD_DIR)/vst3-main.o
+OBJ_TARGET_VST3_PLUGIN = $(BUILD_DIR)/vst3-plugin.o
+OBJ_TARGET_BANK = $(BUILD_DIR)/bank.o
+OBJ_TARGET_SERIALIZER = $(BUILD_DIR)/serializer.o
+OBJ_TARGET_SYNTH = $(BUILD_DIR)/synth.o
+OBJ_TARGET_GUI = $(BUILD_DIR)/gui.o
+OBJ_TARGET_MTS_ESP = $(BUILD_DIR)/mts-esp.o
+
+OBJ_TARGET_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground.o
+
+OBJ_DEV_FST_PLUGIN = $(DEV_DIR)/fst-plugin.o
+OBJ_DEV_BANK = $(DEV_DIR)/bank.o
+OBJ_DEV_SERIALIZER = $(DEV_DIR)/serializer.o
+OBJ_DEV_SYNTH = $(DEV_DIR)/synth.o
+OBJ_DEV_GUI_STUB = $(DEV_DIR)/gui-stub.o
+OBJ_DEV_MTS_ESP = $(DEV_DIR)/mts-esp.o
+
+OBJ_DEV_UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch.o
+
+OBJ_DEV_VSTXMLGEN = $(DEV_DIR)/vstxmlgen.o
+
 
 FST_OBJS = \
-	$(OBJ_FST_EXTRA) \
-	$(OBJ_GUI_EXTRA) \
-	$(OBJ_FST_MAIN) \
-	$(OBJ_FST_PLUGIN) \
-	$(OBJ_GUI) \
-	$(OBJ_BANK) \
-	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH) \
-	$(OBJ_MTS_ESP)
+	$(OBJ_TARGET_GUI_EXTRA) \
+	$(OBJ_TARGET_FST_MAIN) \
+	$(OBJ_TARGET_FST_PLUGIN) \
+	$(OBJ_TARGET_GUI) \
+	$(OBJ_TARGET_BANK) \
+	$(OBJ_TARGET_SERIALIZER) \
+	$(OBJ_TARGET_SYNTH) \
+	$(OBJ_TARGET_MTS_ESP)
 
 VST3_OBJS = \
-	$(OBJ_GUI_EXTRA) \
-	$(OBJ_VST3_MAIN) \
-	$(OBJ_VST3_PLUGIN) \
-	$(OBJ_GUI) \
-	$(OBJ_BANK) \
-	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH) \
-	$(OBJ_MTS_ESP)
+	$(OBJ_TARGET_GUI_EXTRA) \
+	$(OBJ_TARGET_VST3_MAIN) \
+	$(OBJ_TARGET_VST3_PLUGIN) \
+	$(OBJ_TARGET_GUI) \
+	$(OBJ_TARGET_BANK) \
+	$(OBJ_TARGET_SERIALIZER) \
+	$(OBJ_TARGET_SYNTH) \
+	$(OBJ_TARGET_MTS_ESP)
 
 GUI_PLAYGROUND_OBJS = \
-	$(OBJ_GUI_EXTRA) \
-	$(OBJ_GUI) \
-	$(OBJ_GUI_PLAYGROUND) \
-	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH)
+	$(OBJ_TARGET_GUI_EXTRA) \
+	$(OBJ_TARGET_GUI) \
+	$(OBJ_TARGET_GUI_PLAYGROUND) \
+	$(OBJ_TARGET_SERIALIZER) \
+	$(OBJ_TARGET_SYNTH)
 
 UPGRADE_PATCH_OBJS = \
-	$(OBJ_SERIALIZER) \
-	$(OBJ_SYNTH) \
-	$(OBJ_UPGRADE_PATCH)
+	$(OBJ_DEV_UPGRADE_PATCH) \
+	$(OBJ_DEV_SYNTH) \
+	$(OBJ_DEV_SERIALIZER)
+
+VSTXMLGEN_OBJS = \
+	$(OBJ_DEV_SYNTH) \
+	$(OBJ_DEV_SERIALIZER) \
+	$(OBJ_DEV_BANK) \
+	$(OBJ_DEV_GUI_STUB) \
+	$(OBJ_DEV_MTS_ESP) \
+	$(OBJ_DEV_FST_PLUGIN) \
+	$(OBJ_DEV_VSTXMLGEN)
 
 PARAM_COMPONENTS = \
 	dsp/envelope \
@@ -147,11 +169,11 @@ PARAM_COMPONENTS = \
 	dsp/signal_producer
 
 SYNTH_COMPONENTS = \
-	$(PARAM_COMPONENTS) \
 	synth \
 	note_stack \
 	spscqueue \
 	voice \
+	$(PARAM_COMPONENTS) \
 	dsp/biquad_filter \
 	dsp/chorus \
 	dsp/delay \
@@ -228,13 +250,24 @@ SYNTH_HEADERS = \
 SYNTH_SOURCES = \
 	$(foreach COMPONENT,$(SYNTH_COMPONENTS),src/$(COMPONENT).cpp)
 
+SERIALIZER_HEADERS = src/serializer.hpp
+
+SERIALIZER_SOURCES = src/serializer.cpp
+
+BANK_HEADERS = \
+	src/bank.hpp \
+	$(SERIALIZER_HEADERS)
+
+BANK_SOURCES = \
+	src/bank.cpp \
+	src/programs.cpp
+
 JS80P_HEADERS = \
 	src/gui/gui.hpp \
 	src/gui/widgets.hpp \
-	src/bank.hpp \
 	src/mtsesp.hpp \
 	src/renderer.hpp \
-	src/serializer.hpp \
+	$(BANK_HEADERS) \
 	$(SYNTH_HEADERS)
 
 JS80P_SOURCES = \
@@ -263,14 +296,26 @@ VST3_SOURCES = \
 	$(VST3_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
+GUI_COMMON_HEADERS = $(JS80P_HEADERS)
+
+GUI_COMMON_SOURCES = \
+	src/gui/widgets.cpp \
+	src/gui/gui.cpp
+
 GUI_HEADERS = \
 	$(GUI_TARGET_PLATFORM_HEADERS) \
 	$(JS80P_HEADERS)
 
 GUI_SOURCES = \
 	$(GUI_TARGET_PLATFORM_SOURCES) \
-	src/gui/widgets.cpp \
-	src/gui/gui.cpp
+	$(GUI_COMMON_SOURCES)
+
+GUI_STUB_HEADERS = \
+	$(GUI_COMMON_HEADERS)
+
+GUI_STUB_SOURCES = \
+	src/gui/stub.cpp \
+	$(GUI_COMMON_SOURCES)
 
 UPGRADE_PATCH_SOURCES = src/upgrade_patch.cpp
 
@@ -282,12 +327,12 @@ TEST_LIBS = \
 	tests/utils.cpp
 
 TEST_CPPS = $(foreach TEST,$(TESTS),tests/$(TEST).cpp)
-TEST_BINS = $(foreach TEST,$(TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
-TEST_BASIC_BINS = $(foreach TEST,$(TESTS_BASIC),$(BUILD_DIR)/$(TEST)$(EXE))
-TEST_DSP_BINS = $(foreach TEST,$(TESTS_DSP),$(BUILD_DIR)/$(TEST)$(EXE))
-TEST_PARAM_BINS = $(foreach TEST,$(TESTS_PARAM),$(BUILD_DIR)/$(TEST)$(EXE))
-TEST_SYNTH_BINS = $(foreach TEST,$(TESTS_SYNTH),$(BUILD_DIR)/$(TEST)$(EXE))
-PERF_TEST_BINS = $(foreach TEST,$(PERF_TESTS),$(BUILD_DIR)/$(TEST)$(EXE))
+TEST_BINS = $(foreach TEST,$(TESTS),$(DEV_DIR)/$(TEST)$(DEV_EXE))
+TEST_BASIC_BINS = $(foreach TEST,$(TESTS_BASIC),$(DEV_DIR)/$(TEST)$(DEV_EXE))
+TEST_DSP_BINS = $(foreach TEST,$(TESTS_DSP),$(DEV_DIR)/$(TEST)$(DEV_EXE))
+TEST_PARAM_BINS = $(foreach TEST,$(TESTS_PARAM),$(DEV_DIR)/$(TEST)$(DEV_EXE))
+TEST_SYNTH_BINS = $(foreach TEST,$(TESTS_SYNTH),$(DEV_DIR)/$(TEST)$(DEV_EXE))
+PERF_TEST_BINS = $(foreach TEST,$(PERF_TESTS),$(DEV_DIR)/$(TEST)$(DEV_EXE))
 
 TEST_CXXFLAGS = \
 	-D TEST_MAX_ARRAY_PRINT=$(TEST_MAX_ARRAY_PRINT) \
@@ -314,23 +359,31 @@ VST3_CXXFLAGS = \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas
 
-COMPILE_OBJ = \
+COMPILE_TARGET = \
 	$(CPP_TARGET_PLATFORM) \
-		$(TARGET_PLATFORM_CXXINCS) $(JS80P_CXXINCS) $(JS80P_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXINCS) \
+		$(JS80P_CXXINCS) $(JS80P_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG)
 
 COMPILE_FST = \
 	$(CPP_TARGET_PLATFORM) \
-		$(TARGET_PLATFORM_CXXINCS) $(FST_CXXINCS) $(FST_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXINCS) \
+		$(FST_CXXINCS) $(FST_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG)
 
 COMPILE_VST3 = \
 	$(CPP_TARGET_PLATFORM) \
-		$(TARGET_PLATFORM_CXXINCS) $(VST3_CXXINCS) $(VST3_CXXFLAGS) $(TARGET_PLATFORM_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXINCS) \
+		$(VST3_CXXINCS) $(VST3_CXXFLAGS) \
+		$(TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG)
 
-COMPILE_TEST = \
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) \
+COMPILE_DEV = \
+	$(CPP_DEV_PLATFORM) \
+		$(JS80P_CXXINCS) $(JS80P_CXXFLAGS) \
+		$(TEST_CXXFLAGS) \
 		$(DEBUG_LOG)
 
 show_fst_dir:
@@ -339,52 +392,50 @@ show_fst_dir:
 show_vst3_dir:
 	@echo $(VST3_DIR)
 
-fst: $(FST)
+fst: $(FST) $(VSTXML)
 
 vst3: $(VST3)
 
 vstxml: $(VSTXML)
 
-dirs: $(BUILD_DIR) $(DOC_DIR) $(FST_DIR) $(VST3_DIR)
+dirs: $(BUILD_DIR) $(DEV_DIR) $(DOC_DIR) $(FST_DIR) $(VST3_DIR)
 
-$(BUILD_DIR): | $(BUILD_DIR_BASE)
+$(BUILD_DIR) $(DEV_DIR): | $(BUILD_DIR_BASE)
 	$(MKDIR) $@
 
-$(BUILD_DIR_BASE):
-	$(MKDIR) $@
-
-$(DIST_DIR_BASE):
-	$(MKDIR) $@
-
-$(DOC_DIR):
+$(BUILD_DIR_BASE) $(DIST_DIR_BASE) $(DOC_DIR):
 	$(MKDIR) $@
 
 clean:
 	$(RM) \
+		$(DEV_DIR)/chord.o \
 		$(DEV_PLATFORM_CLEAN) \
 		$(FST) \
 		$(FST_OBJS) \
-		$(VSTXML) \
 		$(GUI_PLAYGROUND) \
 		$(GUI_PLAYGROUND_OBJS) \
 		$(PERF_TEST_BINS) \
 		$(TEST_BINS) \
 		$(UPGRADE_PATCH) \
+		$(UPGRADE_PATCH_OBJS) \
 		$(VST3) \
-		$(VST3_OBJS)
+		$(VST3_OBJS) \
+		$(VSTXML) \
+		$(VSTXMLGEN) \
+		$(VSTXMLGEN_OBJS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
-check: upgrade_patch perf $(TEST_LIBS) $(TEST_BINS) | $(BUILD_DIR)
-check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(BUILD_DIR)
-check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(BUILD_DIR)
-check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(BUILD_DIR)
-check_synth: perf $(TEST_LIBS) $(TEST_SYNTH_BINS) | $(BUILD_DIR)
+check: upgrade_patch perf $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
+check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(DEV_DIR)
+check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(DEV_DIR)
+check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(DEV_DIR)
+check_synth: perf $(TEST_LIBS) $(TEST_SYNTH_BINS) | $(DEV_DIR)
 
-test_example: $(BUILD_DIR)/test_example$(EXE) | $(BUILD_DIR)
+test_example: $(DEV_DIR)/test_example$(DEV_EXE) | $(DEV_DIR)
 
-perf: $(BUILD_DIR) $(PERF_TEST_BINS)
+perf: $(DEV_DIR) $(PERF_TEST_BINS)
 
-log_tables_error_tsv: $(BUILD_DIR)/log_tables_error_tsv$(EXE)
+log_tables_error_tsv: $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE)
 
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
@@ -406,389 +457,379 @@ $(DOC_DIR)/html/index.html: \
 		| $(DOC_DIR)
 	$(DOXYGEN)
 
-$(FST): $(FST_PLATFORM_OBJS) $(FST_OBJS) | $(FST_DIR)
-	$(LINK_FST) \
-		$(FST_PLATFORM_OBJS) $(FST_OBJS) \
-		-o $@ $(TARGET_PLATFORM_LFLAGS)
+$(FST): $(FST_EXTRA) $(FST_OBJS) | $(FST_DIR)
+	$(LINK_FST) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(FST_DIR): | $(DIST_DIR_BASE)
-	$(MKDIR) $@
+$(VST3): $(VST3_EXTRA) $(VST3_OBJS) | $(VST3_DIR)
+	$(LINK_VST3) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(VST3): $(VST3_PLATFORM_OBJS) $(VST3_OBJS) | $(VST3_DIR)
-	$(LINK_VST3) \
-		$(VST3_PLATFORM_OBJS) $(VST3_OBJS) \
-		-o $@ $(TARGET_PLATFORM_LFLAGS)
-
-$(VST3_DIR): | $(DIST_DIR_BASE)
+$(FST_DIR) $(VST3_DIR): | $(DIST_DIR_BASE)
 	$(MKDIR) $@
 
 $(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
-	$(LINK_GUI_PLAYGROUND) $(GUI_PLAYGROUND_OBJS) -o $@ $(TARGET_PLATFORM_LFLAGS)
+	$(LINK_TARGET_EXE) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(OBJ_GUI_PLAYGROUND): \
+$(OBJ_TARGET_GUI_PLAYGROUND): \
 		$(GUI_PLAYGROUND_SOURCES) \
 		$(GUI_SOURCES) $(GUI_HEADERS) \
 		| $(BUILD_DIR)
-	$(COMPILE_OBJ) -c $< -o $@
+	$(COMPILE_TARGET) -c -o $@ $<
 
-$(UPGRADE_PATCH): $(UPGRADE_PATCH_OBJS) | $(BUILD_DIR)
-	$(LINK_UPGRADE_PATCH) $(UPGRADE_PATCH_OBJS) $(TARGET_PLATFORM_LFLAGS) -o $@
+$(UPGRADE_PATCH): $(UPGRADE_PATCH_OBJS) | $(DEV_DIR)
+	$(LINK_DEV_EXE) $^ -o $@
 
-$(OBJ_UPGRADE_PATCH): $(UPGRADE_PATCH_SOURCES) | $(BUILD_DIR)
-	$(COMPILE_OBJ) -c $< -o $@
+$(OBJ_DEV_UPGRADE_PATCH): $(UPGRADE_PATCH_SOURCES) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
-$(OBJ_SYNTH): $(SYNTH_HEADERS) $(SYNTH_SOURCES) | $(BUILD_DIR)
-	$(COMPILE_OBJ) -c src/synth.cpp -o $@
+$(OBJ_TARGET_SYNTH): $(SYNTH_SOURCES) $(SYNTH_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_TARGET) -c -o $@ $<
 
-$(OBJ_BANK): \
-		src/bank.cpp src/bank.hpp \
-		src/programs.cpp \
-		src/serializer.cpp src/serializer.hpp \
-		$(SYNTH_HEADERS) \
+$(OBJ_DEV_SYNTH): $(SYNTH_SOURCES) $(SYNTH_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
+
+$(OBJ_TARGET_BANK): \
+		$(BANK_SOURCES) $(BANK_HEADERS) $(SYNTH_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_TARGET) -c -o $@ $<
+
+$(OBJ_DEV_BANK): $(BANK_SOURCES) $(BANK_HEADERS) $(SYNTH_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
+
+$(OBJ_TARGET_SERIALIZER): \
+		$(SERIALIZER_SOURCES) $(SERIALIZER_HEADERS) $(SYNTH_HEADERS) \
 		| $(BUILD_DIR)
-	$(COMPILE_OBJ) -c $< -o $@
+	$(COMPILE_TARGET) -c -o $@ $<
 
-$(OBJ_SERIALIZER): \
-		src/serializer.cpp src/serializer.hpp \
-		$(SYNTH_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_OBJ) -c $< -o $@
+$(OBJ_DEV_SERIALIZER): \
+		$(SERIALIZER_SOURCES) $(SERIALIZER_HEADERS) $(SYNTH_HEADERS) \
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
-$(OBJ_GUI) : \
-		$(GUI_SOURCES) $(GUI_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_OBJ) -c $< -o $@
+$(OBJ_TARGET_GUI): $(GUI_SOURCES) $(GUI_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_TARGET) -c -o $@ $<
 
-$(OBJ_MTS_ESP) : \
-		$(MTS_ESP_SOURCES) \
-		$(MTS_ESP_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_OBJ) $(MTS_ESP_CXXFLAGS) -c $< -o $@
+$(OBJ_DEV_GUI_STUB): $(GUI_STUB_SOURCES) $(GUI_STUB_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
-$(OBJ_FST_PLUGIN): \
-		src/plugin/fst/plugin.cpp \
-		$(FST_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_FST) -c $< -o $@
+$(OBJ_TARGET_MTS_ESP) : $(MTS_ESP_SOURCES) $(MTS_ESP_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_TARGET) $(MTS_ESP_CXXFLAGS) -c -o $@ $<
 
-$(OBJ_FST_MAIN): \
-		$(FST_MAIN_SOURCES) \
-		$(FST_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_FST) -c $< -o $@
+$(OBJ_DEV_MTS_ESP) : $(MTS_ESP_SOURCES) $(MTS_ESP_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) $(MTS_ESP_CXXFLAGS) -c -o $@ $<
 
-$(OBJ_VST3_PLUGIN): \
-		$(VST3_PLUGIN_SOURCES) \
-		$(VST3_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_VST3) -c $< -o $@
+$(OBJ_TARGET_FST_PLUGIN): src/plugin/fst/plugin.cpp $(FST_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_FST) -c -o $@ $<
 
-$(OBJ_VST3_MAIN): \
-		$(VST3_MAIN_SOURCES) \
-		$(VST3_HEADERS) \
-		| $(BUILD_DIR)
-	$(COMPILE_VST3) -c $< -o $@
+$(OBJ_DEV_FST_PLUGIN): src/plugin/fst/plugin.cpp $(FST_HEADERS) | $(DEV_DIR)
+	$(CPP_DEV_PLATFORM) $(FST_CXXINCS) $(FST_CXXFLAGS) $(DEBUG_LOG) -c -o $@ $<
 
-$(VSTXML): $(BUILD_DIR)/vstxmlgen$(EXE) | $(DIST_DIR_BASE)
-	$(BUILD_DIR)/vstxmlgen$(EXE) $(VSTXML)
+$(OBJ_TARGET_FST_MAIN): $(FST_MAIN_SOURCES) $(FST_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_FST) -c -o $@ $<
 
-$(BUILD_DIR)/vstxmlgen$(EXE): \
-		src/plugin/fst/vstxmlgen.cpp \
-		src/plugin/fst/plugin.hpp src/plugin/fst/plugin.cpp \
-		src/gui/gui.hpp src/gui/gui.cpp \
-		src/synth.hpp src/synth.cpp \
-		src/midi.hpp \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(FST_CXXINCS) $(FST_CXXFLAGS) $(MTS_ESP_CXXFLAGS) -o $@ $<
+$(OBJ_TARGET_VST3_PLUGIN): $(VST3_PLUGIN_SOURCES) $(VST3_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_VST3) -c -o $@ $<
 
-$(BUILD_DIR)/chord$(EXE): \
-		tests/performance/chord.cpp \
-		$(JS80P_HEADERS) \
-		$(JS80P_SOURCES) \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+$(OBJ_TARGET_VST3_MAIN): $(VST3_MAIN_SOURCES) $(VST3_HEADERS) | $(BUILD_DIR)
+	$(COMPILE_VST3) -c -o $@ $<
 
-$(BUILD_DIR)/perf_math$(EXE): \
+$(VSTXML): $(VSTXMLGEN) | $(DIST_DIR_BASE)
+	$(VSTXMLGEN) $(VSTXML)
+
+$(VSTXMLGEN): $(VSTXMLGEN_OBJS) | $(DEV_DIR)
+	$(LINK_DEV_EXE) $^ -o $@
+
+$(OBJ_DEV_VSTXMLGEN): src/plugin/fst/vstxmlgen.cpp $(FST_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) \
+		$(FST_CXXINCS) $(FST_CXXFLAGS) $(MTS_ESP_CXXFLAGS) \
+		-c -o $@ $<
+
+$(DEV_DIR)/chord$(DEV_EXE): \
+		$(DEV_DIR)/chord.o \
+		$(OBJ_DEV_SYNTH) $(OBJ_DEV_SERIALIZER) $(OBJ_DEV_BANK) | $(DEV_DIR)
+	$(LINK_DEV_EXE) $^ -o $@
+
+$(DEV_DIR)/chord.o: \
+		tests/performance/chord.cpp $(JS80P_HEADERS) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
+
+$(DEV_DIR)/perf_math$(DEV_EXE): \
 		tests/performance/perf_math.cpp \
 		src/dsp/math.hpp src/dsp/math.cpp \
 		src/js80p.hpp \
-		| $(BUILD_DIR)
-	$(CPP_DEV_PLATFORM) $(JS80P_CXXINCS) $(TEST_CXXFLAGS) $(JS80P_CXXFLAGS) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 
-$(BUILD_DIR)/test_example$(EXE): \
-	tests/test_example.cpp \
-	$(TEST_LIBS) \
-	| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+$(DEV_DIR)/log_tables_error_tsv$(DEV_EXE): \
+		scripts/log_tables_error_tsv.cpp \
+		src/dsp/math.cpp src/dsp/math.hpp \
+		src/js80p.hpp \
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
+
+$(DEV_DIR)/test_example$(DEV_EXE): \
+		tests/test_example.cpp $(TEST_LIBS) | $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_bank$(EXE): \
+$(DEV_DIR)/test_bank$(DEV_EXE): \
 		tests/test_bank.cpp \
 		src/bank.cpp src/bank.hpp \
 		src/serializer.cpp src/serializer.hpp \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_biquad_filter$(EXE): \
+$(DEV_DIR)/test_biquad_filter$(DEV_EXE): \
 		tests/test_biquad_filter.cpp \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_biquad_filter_slow$(EXE): \
+$(DEV_DIR)/test_biquad_filter_slow$(DEV_EXE): \
 		tests/test_biquad_filter_slow.cpp \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
-	$(VALGRIND) $@
+	$(COMPILE_DEV) -o $@ $<
+	$@
 
-$(BUILD_DIR)/test_delay$(EXE): \
+$(DEV_DIR)/test_delay$(DEV_EXE): \
 		tests/test_delay.cpp \
 		src/dsp/delay.cpp src/dsp/delay.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -Wno-maybe-uninitialized -o $@ $<
+	$(COMPILE_DEV) -Wno-maybe-uninitialized -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_distortion$(EXE): \
+$(DEV_DIR)/test_distortion$(DEV_EXE): \
 		tests/test_distortion.cpp \
 		src/dsp/distortion.cpp src/dsp/distortion.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_envelope$(EXE): \
+$(DEV_DIR)/test_envelope$(DEV_EXE): \
 		tests/test_envelope.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_gain$(EXE): \
+$(DEV_DIR)/test_gain$(DEV_EXE): \
 		tests/test_gain.cpp \
 		src/dsp/gain.cpp src/dsp/gain.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_gui$(EXE): \
+$(DEV_DIR)/test_gui$(DEV_EXE): \
 		tests/test_gui.cpp \
 		src/gui/stub.cpp \
 		$(TEST_LIBS) \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_lfo$(EXE): \
+$(DEV_DIR)/test_lfo$(DEV_EXE): \
 		tests/test_lfo.cpp \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_macro$(EXE): \
+$(DEV_DIR)/test_macro$(DEV_EXE): \
 		tests/test_macro.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_math$(EXE): \
+$(DEV_DIR)/test_math$(DEV_EXE): \
 		tests/test_math.cpp \
 		src/dsp/math.cpp src/dsp/math.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$@
 
-$(BUILD_DIR)/test_midi_controller$(EXE): \
+$(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		tests/test_midi_controller.cpp \
 		src/dsp/midi_controller.cpp src/dsp/midi_controller.hpp \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_mixer$(EXE): \
+$(DEV_DIR)/test_mixer$(DEV_EXE): \
 		tests/test_mixer.cpp \
 		src/dsp/mixer.cpp src/dsp/mixer.hpp \
 		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_note_stack$(EXE): \
+$(DEV_DIR)/test_note_stack$(DEV_EXE): \
 		tests/test_note_stack.cpp \
 		src/note_stack.hpp src/note_stack.cpp \
 		src/js80p.hpp \
 		src/midi.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_oscillator$(EXE): \
+$(DEV_DIR)/test_oscillator$(DEV_EXE): \
 		tests/test_oscillator.cpp \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_param$(EXE): \
+$(DEV_DIR)/test_param$(DEV_EXE): \
 		tests/test_param.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_param_slow$(EXE): \
+$(DEV_DIR)/test_param_slow$(DEV_EXE): \
 		tests/test_param_slow.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$@
 
-$(BUILD_DIR)/test_peak_tracker$(EXE): \
+$(DEV_DIR)/test_peak_tracker$(DEV_EXE): \
 		tests/test_peak_tracker.cpp \
 		src/dsp/peak_tracker.cpp src/dsp/peak_tracker.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_queue$(EXE): \
+$(DEV_DIR)/test_queue$(DEV_EXE): \
 		tests/test_queue.cpp \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_renderer$(EXE): \
+$(DEV_DIR)/test_renderer$(DEV_EXE): \
 		tests/test_renderer.cpp \
 		src/renderer.hpp \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_serializer$(EXE): \
+$(DEV_DIR)/test_serializer$(DEV_EXE): \
 		tests/test_serializer.cpp \
 		src/serializer.cpp src/serializer.hpp \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_signal_producer$(EXE): \
+$(DEV_DIR)/test_signal_producer$(DEV_EXE): \
 		tests/test_signal_producer.cpp \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_spscqueue$(EXE): \
+$(DEV_DIR)/test_spscqueue$(DEV_EXE): \
 		tests/test_spscqueue.cpp \
 		src/spscqueue.hpp src/spscqueue.cpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_synth$(EXE): \
+$(DEV_DIR)/test_synth$(DEV_EXE): \
 		tests/test_synth.cpp \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_voice$(EXE): \
+$(DEV_DIR)/test_voice$(DEV_EXE): \
 		tests/test_voice.cpp \
 		$(TEST_LIBS) \
 		$(SYNTH_SOURCES) \
 		$(SYNTH_HEADERS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
 
-$(BUILD_DIR)/test_wavefolder$(EXE): \
+$(DEV_DIR)/test_wavefolder$(DEV_EXE): \
 		tests/test_wavefolder.cpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR) \
+		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
-	$(COMPILE_TEST) -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(VALGRIND) $@
-
-$(BUILD_DIR)/log_tables_error_tsv$(EXE): \
-		scripts/log_tables_error_tsv.cpp \
-		src/dsp/math.cpp src/dsp/math.hpp \
-		src/js80p.hpp \
-		| $(BUILD_DIR)
-	$(COMPILE_TEST) -o $@ $<

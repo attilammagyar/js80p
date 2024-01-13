@@ -105,10 +105,10 @@ class Widget : public WidgetBase
 
 
 #include "gui/widgets.hpp"
+#include "gui/gui.cpp"
 
 
-namespace JS80P
-{
+namespace JS80P {
 
 void ImportPatchButton::click()
 {
@@ -120,5 +120,8 @@ void ExportPatchButton::click()
 }
 
 }
+
+
+#include "gui/widgets.cpp"
 
 #endif

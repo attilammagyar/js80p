@@ -24,23 +24,13 @@
 #include <string>
 #include <vector>
 
-#include <mtsesp/Client/libMTSClient.cpp>
-
 #include "js80p.hpp"
 #include "midi.hpp"
-#include "renderer.hpp"
+#include "synth.hpp"
 
-#include "bank.cpp"
-#include "serializer.cpp"
-#include "synth.cpp"
-#include "mtsesp.hpp"
+#include "gui/gui.hpp"
 
-#include "gui/stub.cpp"
-
-#include "gui/widgets.cpp"
-#include "gui/gui.cpp"
-
-#include "plugin/fst/plugin.cpp"
+#include "plugin/fst/plugin.hpp"
 
 
 /*

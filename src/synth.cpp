@@ -200,6 +200,10 @@ void Synth::initialize_supported_midi_controllers() noexcept
 
     supported_midi_controllers_initialized = true;
 
+    supported_midi_controllers.reserve(
+        (std::vector<bool>::size_type)MIDI_CONTROLLERS
+    );
+
     supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
     supported_midi_controllers[ControllerId::BREATH] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_1] = true;
