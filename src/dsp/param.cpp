@@ -1218,7 +1218,7 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
     this->cancel_events_at(this->midi_controller->events[0].time_offset);
 
     if (should_round) {
-        for (Queue<SignalProducer::SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+        for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
             Seconds const time_offset = this->midi_controller->events[i].time_offset;
             Number const controller_value = this->midi_controller->events[i].number_param_1;
 
@@ -1232,12 +1232,12 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
         return;
     }
 
-    Queue<SignalProducer::SignalProducer::Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
+    Queue<SignalProducer::Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
 
     Seconds previous_time_offset = 0.0;
     Number previous_ratio = value_to_ratio(this->get_raw_value());
 
-    for (Queue<SignalProducer::SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+    for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
         Seconds time_offset = this->midi_controller->events[i].time_offset;
 
         while (i != last_ctl_event_index) {
