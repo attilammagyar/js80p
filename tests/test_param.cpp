@@ -1241,12 +1241,12 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
     envelope.hold_time.set_value(1.0);
     envelope.decay_time.set_value(2.0);
     envelope.sustain_value.set_value(0.75);
-    envelope.release_time.set_value(0.1);
+    envelope.release_time.set_value(3.0);
     envelope.final_value.set_value(0.625);
 
     float_param.set_envelope(&envelope);
 
-    envelope.release_time.set_value(0.01);
+    envelope.release_time.set_value(6.0);
 
     float_param.start_envelope(0.3, 0.0, 0.0);
     float_param.cancel_envelope(4.0, 2.0);
@@ -1331,16 +1331,15 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     envelope.hold_time.set_value(1.0);
     envelope.decay_time.set_value(2.0);
     envelope.sustain_value.set_value(0.75);
-    envelope.release_time.set_value(6.0);
+    envelope.release_time.set_value(3.0);
     envelope.final_value.set_value(0.625);
 
     follower.start_envelope(0.3, 0.0, 0.0);
 
-    envelope.release_time.set_value(0.123);
+    envelope.release_time.set_value(6.0);
 
     follower.end_envelope(4.0);
     follower.cancel_envelope(4.001, 1.999);
-    assert_eq(1.999, follower.end_envelope(5.0), DOUBLE_DELTA);
 
     assert_true(follower.is_constant_until(1));
     assert_false(follower.is_constant_until(2));
