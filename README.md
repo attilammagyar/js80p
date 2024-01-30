@@ -79,6 +79,7 @@ Table of Contents
     * [Gloomy Brass](#preset-gloomy-brass)
     * [Gloomy Brass Raindrops](#preset-gloomy-brass-raindrops)
     * [Sawyer](#preset-sawyer)
+    * [Analog Brass](#preset-analog-brass)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -599,6 +600,14 @@ aftertouch. (Note that this is not a split-keyboard patch, because both
 oscillators are required to make this sound good in stereo - instead, the
 effect is achieved through trickery with the Note controller and the
 Distortion knob of Macro 12 and 13.)
+
+<a id="preset-analog-brass"></a>
+
+### Analog Brass
+
+Turn the mod wheel down and play with low velocity for a soft, smooth, warm,
+and fat analog brass sound. Turn it up and play fortissimo for big bright
+swells. Aftertouch adds a slow vibrato.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
