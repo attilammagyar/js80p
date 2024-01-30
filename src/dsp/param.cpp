@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 #include "dsp/param.hpp"
 
@@ -317,7 +318,7 @@ Sample const* const* FloatParam<evaluation>::produce(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Envelope* envelope = float_param.get_envelope();
+    Envelope* const envelope = float_param.get_envelope();
 
     if (envelope != NULL && envelope->is_dynamic()) {
         envelope->update();
@@ -419,9 +420,12 @@ void FloatParam<evaluation>::initialize_instance() noexcept
     random_seed = 0.5;
 
     envelope = NULL;
-    envelope_stage = EnvelopeStage::NONE;
-    envelope_end_scheduled = false;
+    active_envelope_snapshot_id = -1;
+    scheduled_envelope_snapshot_id = -1;
+    envelope_stage = EnvelopeStage::ENV_STG_NONE;
+    envelope_time = 0.0;
     envelope_canceled = false;
+    envelope_is_constant = true;
 
     std::fill_n(envelope_randoms, ENVELOPE_RANDOMS_COUNT, 0.0);
 
@@ -659,7 +663,9 @@ bool FloatParam<evaluation>::is_constant_in_next_round(
 
     constantness_round = round;
 
-    return constantness = is_constant_until(sample_count);
+    constantness = is_constant_until(sample_count);
+
+    return constantness;
 }
 
 
@@ -681,12 +687,28 @@ bool FloatParam<evaluation>::is_constant_until(
         return false;
     }
 
-    Envelope* envelope = get_envelope();
+    Envelope* const envelope = get_envelope();
 
-    if (envelope != NULL && envelope->is_dynamic()) {
-        envelope->update();
+    if (envelope != NULL) {
+        if (
+                envelope->is_dynamic()
+                && active_envelope_snapshot_id >= 0
+                && (
+                    envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
+                    || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
+                )
+        ) {
+            envelope->update();
 
-        return envelope_snapshot.change_index == envelope->get_change_index();
+            Integer const envelope_change_index = envelope->get_change_index();
+            Integer const snapshot_change_index = (
+                envelope_snapshots[active_envelope_snapshot_id].change_index
+            );
+
+            return snapshot_change_index == envelope_change_index && envelope_is_constant;
+        }
+
+        return envelope_stage == EnvelopeStage::ENV_STG_NONE || envelope_is_constant;
     }
 
     if (this->midi_controller != NULL) {
@@ -714,14 +736,10 @@ void FloatParam<evaluation>::skip_round(
         this->current_time += (Seconds)sample_count * this->sampling_period;
         this->cached_round = round;
 
-        if (envelope_stage != EnvelopeStage::NONE) {
+        if (envelope_stage != EnvelopeStage::ENV_STG_NONE) {
             Seconds const offset = this->sample_count_to_relative_time_offset(sample_count);
 
-            envelope_position += offset;
-
-            if (envelope_end_scheduled) {
-                envelope_end_time_offset -= offset;
-            }
+            envelope_time += offset;
         }
     }
 }
@@ -804,12 +822,16 @@ void FloatParam<evaluation>::handle_event(
             handle_envelope_start_event(event);
             break;
 
+        case EVT_ENVELOPE_UPDATE:
+            handle_envelope_update_event(event);
+            break;
+
         case EVT_ENVELOPE_END:
-            handle_envelope_end_event();
+            handle_envelope_end_event(event);
             break;
 
         case EVT_ENVELOPE_CANCEL:
-            handle_envelope_cancel_event();
+            handle_envelope_cancel_event(event);
             break;
 
         default:
@@ -906,22 +928,111 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_envelope_start_event(
         SignalProducer::Event const& event
 ) noexcept {
-    envelope_stage = EnvelopeStage::DAHDS;
-    envelope_position = this->current_time - event.time_offset;
+    Envelope* const envelope = get_envelope();
+
+    if (envelope == NULL) {
+        return;
+    }
+
+    active_envelope_snapshot_id = event.int_param;
+    EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+    if (envelope->is_dynamic()) {
+        envelope->update();
+        envelope->make_snapshot(envelope_randoms, snapshot);
+    }
+
+    Seconds const latency = this->current_time - event.time_offset;
+
+    envelope_stage = EnvelopeStage::ENV_STG_DAHD;
+    envelope_time = latency;
+
+    this->store_new_value(ratio_to_value(snapshot.initial_value));
 }
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_envelope_end_event() noexcept
-{
-    envelope_stage = EnvelopeStage::R;
+void FloatParam<evaluation>::handle_envelope_update_event(
+        SignalProducer::Event const& event
+) noexcept {
+    Envelope* const envelope = get_envelope();
+
+    if (envelope == NULL || active_envelope_snapshot_id < 0) {
+        return;
+    }
+
+    unused_envelope_snapshots.push(active_envelope_snapshot_id);
+
+    active_envelope_snapshot_id = event.int_param;
+    EnvelopeSnapshot& new_snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+    envelope->update();
+    envelope->make_snapshot(envelope_randoms, new_snapshot);
+
+    if (
+            envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
+            || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
+    ) {
+        envelope_time = 0.0;
+    }
 }
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_envelope_cancel_event() noexcept
-{
-    envelope_stage = EnvelopeStage::R;
+void FloatParam<evaluation>::handle_envelope_end_event(
+        SignalProducer::Event const& event
+) noexcept {
+    if (
+            JS80P_UNLIKELY(
+                envelope_stage == EnvelopeStage::ENV_STG_RELEASED
+                || envelope_stage == EnvelopeStage::ENV_STG_NONE
+            )
+    ) {
+        return;
+    }
+
+    Seconds const latency = this->current_time - event.time_offset;
+
+    store_envelope_value_at_event(latency);
+
+    envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
+    envelope_time = latency;
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::store_envelope_value_at_event(
+        Seconds const latency
+) noexcept {
+    if (active_envelope_snapshot_id < 0) {
+        return;
+    }
+
+    EnvelopeSnapshot const& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+    Number const ratio_at_time_of_event = Envelope::get_value_at_time(
+        snapshot,
+        envelope_time - latency,
+        envelope_stage,
+        value_to_ratio(this->get_raw_value()),
+        this->sampling_period
+    );
+
+    this->store_new_value(ratio_to_value(ratio_at_time_of_event));
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_envelope_cancel_event(
+        SignalProducer::Event const& event
+) noexcept {
+    if (active_envelope_snapshot_id >= 0) {
+        EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+        snapshot.release_time = std::min((Seconds)event.number_param_1, snapshot.release_time);
+    }
+
+    handle_envelope_end_event(event);
 }
 
 
@@ -938,6 +1049,14 @@ void FloatParam<evaluation>::handle_cancel_event(
             this->store_new_value(ratio_to_value_log(stop_value));
         } else {
             this->store_new_value(stop_value);
+        }
+    } else {
+        Envelope* const envelope = get_envelope();
+
+        if (envelope != NULL) {
+            Seconds const latency = this->current_time - event.time_offset;
+
+            store_envelope_value_at_event(latency);
         }
     }
 
@@ -972,15 +1091,21 @@ void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
     this->envelope = envelope;
 
     if (envelope != NULL) {
+        envelope_snapshots.reserve(2);
+        unused_envelope_snapshots.reserve(2);
         envelope->update();
-        envelope_snapshot.change_index = envelope->get_change_index();
     }
 
-    envelope_stage = EnvelopeStage::NONE;
-    envelope_end_scheduled = false;
+    this->cancel_events();
+
+    envelope_snapshots.clear();
+    unused_envelope_snapshots.drop(0);
+
+    envelope_stage = EnvelopeStage::ENV_STG_NONE;
+    envelope_time = 0.0;
+    active_envelope_snapshot_id = -1;
+    scheduled_envelope_snapshot_id = -1;
     envelope_canceled = false;
-    envelope_position = 0.0;
-    envelope_end_time_offset = 0.0;
 }
 
 
@@ -997,51 +1122,47 @@ void FloatParam<evaluation>::start_envelope(
         Number const random_1,
         Number const random_2
 ) noexcept {
-    Seconds next_event_time_offset;
-    Number next_value;
     Envelope* const envelope = get_envelope();
 
     if (envelope == NULL) {
         return;
     }
 
-    envelope_stage = EnvelopeStage::NONE;
-    envelope_end_scheduled = false;
-    envelope_canceled = false;
-    envelope_position = 0.0;
-    envelope_end_time_offset = 0.0;
+    EnvelopeSnapshot envelope_snapshot;
 
     update_envelope_randoms(random_1, random_2);
 
     envelope->update();
-    envelope->make_snapshot(envelope_randoms, envelope_snapshot);
+    Integer const snapshot_id = make_envelope_snapshot(envelope);
 
-    /*
-    initial-v ==delay-t==> initial-v ==attack-t==> peak-v ==hold-t==> peak-v ==decay-t==> sustain-v
-    */
+    scheduled_envelope_snapshot_id = snapshot_id;
+    envelope_canceled = false;
 
     this->cancel_events_after(time_offset);
+    this->schedule(EVT_ENVELOPE_START, time_offset, snapshot_id);
+}
 
-    this->schedule(EVT_ENVELOPE_START, time_offset);
 
-    next_value = ratio_to_value(envelope_snapshot.initial_value);
+template<ParamEvaluation evaluation>
+Integer FloatParam<evaluation>::make_envelope_snapshot(Envelope* const envelope) noexcept
+{
+    EnvelopeSnapshot snapshot;
 
-    schedule_value(time_offset, next_value);
-    next_event_time_offset = time_offset + envelope_snapshot.delay_time;
-    schedule_value(next_event_time_offset, next_value);
+    envelope->make_snapshot(envelope_randoms, snapshot);
 
-    next_value = ratio_to_value(envelope_snapshot.peak_value);
-    schedule_linear_ramp(envelope_snapshot.attack_time, next_value);
+    std::vector<EnvelopeSnapshot>::size_type snapshot_id;
 
-    next_event_time_offset += (
-        envelope_snapshot.attack_time + envelope_snapshot.hold_time
-    );
-    schedule_value(next_event_time_offset, next_value);
+    if (unused_envelope_snapshots.is_empty()) {
+        snapshot_id = envelope_snapshots.size();
+        envelope_snapshots.push_back(std::move(snapshot));
+    } else {
+        snapshot_id = (
+            (std::vector<EnvelopeSnapshot>::size_type)unused_envelope_snapshots.pop()
+        );
+        envelope_snapshots[snapshot_id] = std::move(snapshot);
+    }
 
-    schedule_linear_ramp(
-        envelope_snapshot.decay_time,
-        ratio_to_value(envelope_snapshot.sustain_value)
-    );
+    return (Integer)snapshot_id;
 }
 
 
@@ -1089,32 +1210,24 @@ Seconds FloatParam<evaluation>::end_envelope(
 ) noexcept {
     Envelope* const envelope = get_envelope();
 
-    if (envelope == NULL) {
+    if (envelope == NULL || scheduled_envelope_snapshot_id < 0) {
         return 0.0;
     }
 
+    EnvelopeSnapshot& snapshot = envelope_snapshots[scheduled_envelope_snapshot_id];
+
     if (envelope->is_dynamic()) {
         envelope->update();
-        envelope->make_end_snapshot(envelope_randoms, envelope_snapshot);
+        envelope->make_end_snapshot(envelope_randoms, snapshot);
     }
 
-    if (event == EVT_ENVELOPE_CANCEL) {
-        envelope_snapshot.release_time = duration;
+    if constexpr (event == EVT_ENVELOPE_CANCEL) {
+        this->schedule(event, time_offset, 0, std::min(snapshot.release_time, duration));
+    } else {
+        this->schedule(event, time_offset);
     }
 
-    envelope_end_scheduled = true;
-    envelope_end_time_offset = time_offset;
-
-    /* current-v ==release-t==> release-v */
-
-    this->cancel_events_after(time_offset);
-    this->schedule(event, time_offset);
-    schedule_linear_ramp(
-        envelope_snapshot.release_time,
-        ratio_to_value(envelope_snapshot.final_value)
-    );
-
-    return envelope_snapshot.release_time;
+    return snapshot.release_time;
 }
 
 
@@ -1124,20 +1237,25 @@ void FloatParam<evaluation>::cancel_envelope(
         Seconds const duration
 ) noexcept {
     envelope_canceled = true;
-    envelope_cancel_duration = duration;
-    end_envelope<EVT_ENVELOPE_CANCEL>(time_offset, duration);
+    envelope_cancel_duration = end_envelope<EVT_ENVELOPE_CANCEL>(time_offset, duration);
 }
 
 
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
 {
-    Envelope* envelope = get_envelope();
+    Envelope* const envelope = get_envelope();
 
-    if (envelope != NULL) {
-        envelope->update();
-        process_envelope(*envelope, time_offset);
+    if (envelope == NULL) {
+        return;
     }
+
+    envelope->update();
+    Integer const snapshot_id = make_envelope_snapshot(envelope);
+
+    scheduled_envelope_snapshot_id = snapshot_id;
+
+    this->schedule(EVT_ENVELOPE_UPDATE, time_offset, snapshot_id);
 }
 
 
@@ -1152,6 +1270,23 @@ template<ParamEvaluation evaluation>
 LFO const* FloatParam<evaluation>::get_lfo() const noexcept
 {
     return lfo;
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::reset() noexcept
+{
+    SignalProducer::reset();
+
+    active_envelope_snapshot_id = -1;
+    scheduled_envelope_snapshot_id = -1;
+    envelope_stage = EnvelopeStage::ENV_STG_NONE;
+    envelope_time = 0.0;
+    envelope_canceled = false;
+    envelope_is_constant = true;
+
+    envelope_snapshots.clear();
+    unused_envelope_snapshots.drop(0);
 }
 
 
@@ -1173,9 +1308,9 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
     } else if (this->macro != NULL) {
         process_macro(sample_count);
     } else {
-        Envelope* envelope = get_envelope();
+        Envelope* const envelope = get_envelope();
 
-        if (envelope != NULL && envelope->is_dynamic()) {
+        if (envelope != NULL) {
             process_envelope(*envelope);
         }
     }
@@ -1305,6 +1440,41 @@ void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
 
 
 template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::process_envelope(Envelope& envelope) noexcept
+{
+    if (!envelope.is_dynamic() || active_envelope_snapshot_id < 0) {
+        return;
+    }
+
+    EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+    envelope.update();
+
+    if (snapshot.change_index == envelope.get_change_index()) {
+        return;
+    }
+
+    Seconds const old_release_time = snapshot.release_time;
+
+    if (
+            envelope_stage == EnvelopeStage::ENV_STG_RELEASE
+            || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
+    ) {
+        envelope_time = 0.0;
+        envelope.make_end_snapshot(envelope_randoms, snapshot);
+    } else {
+        envelope.make_snapshot(envelope_randoms, snapshot);
+
+        if (envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN) {
+            envelope_time = 0.0;
+        }
+    }
+
+    snapshot.release_time = std::min(old_release_time, snapshot.release_time);
+}
+
+
+template<ParamEvaluation evaluation>
 Seconds FloatParam<evaluation>::smooth_change_duration(
         Number const previous_value,
         Number const controller_value,
@@ -1328,107 +1498,6 @@ Seconds FloatParam<evaluation>::smooth_change_duration(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::process_envelope(
-        Envelope& envelope,
-        Seconds const time_offset
-) noexcept {
-    if (envelope_stage == EnvelopeStage::NONE) {
-        return;
-    }
-
-    Integer const new_change_index = envelope.get_change_index();
-    bool const has_changed = new_change_index != envelope_snapshot.change_index;
-    Seconds const old_release_time = envelope_snapshot.release_time;
-
-    envelope.make_snapshot(envelope_randoms, envelope_snapshot);
-
-    if (envelope_stage == EnvelopeStage::DAHDS) {
-        Seconds const dahd_duration = envelope_snapshot.get_dahd_duration();
-
-        this->cancel_events_at(time_offset);
-
-        if (envelope_position > dahd_duration) {
-            Number const sustain_value = ratio_to_value(
-                envelope_snapshot.sustain_value
-            );
-
-            if (!Math::is_close(this->get_raw_value(), sustain_value)) {
-                schedule_linear_ramp(0.1, sustain_value);
-            }
-        } else {
-            Seconds next_event_time_offset = -envelope_position;
-
-            next_event_time_offset = schedule_envelope_value_if_not_reached(
-                next_event_time_offset,
-                envelope_snapshot.delay_time,
-                envelope_snapshot.initial_value
-            );
-            next_event_time_offset = schedule_envelope_value_if_not_reached(
-                next_event_time_offset,
-                envelope_snapshot.attack_time,
-                envelope_snapshot.peak_value
-            );
-            next_event_time_offset = schedule_envelope_value_if_not_reached(
-                next_event_time_offset,
-                envelope_snapshot.hold_time,
-                envelope_snapshot.peak_value
-            );
-            schedule_envelope_value_if_not_reached(
-                next_event_time_offset,
-                envelope_snapshot.decay_time,
-                envelope_snapshot.sustain_value
-            );
-        }
-    }
-
-    if (
-            envelope_end_scheduled
-            && !envelope_canceled
-            && (has_changed || envelope_stage == EnvelopeStage::DAHDS)
-    ) {
-        if (envelope_end_time_offset < 0.0) {
-            envelope_end_time_offset = 0.0;
-        }
-
-        /*
-        If the envelope is already releasing, we cannot increase the release
-        time, because there might be events in other SignalProducers scheduled
-        to the original release time, e.g. oscillator stopping after the end of
-        a volume envelope.
-        */
-        envelope_snapshot.release_time = std::min(
-            old_release_time, envelope_snapshot.release_time
-        );
-
-        this->cancel_events_at(envelope_end_time_offset);
-        this->schedule(EVT_ENVELOPE_END, envelope_end_time_offset);
-        schedule_linear_ramp(
-            envelope_snapshot.release_time,
-            ratio_to_value(envelope_snapshot.final_value)
-        );
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-Seconds FloatParam<evaluation>::schedule_envelope_value_if_not_reached(
-        Seconds const next_event_time_offset,
-        Seconds const duration,
-        Number const value
-) noexcept {
-    Seconds const new_next_event_time_offset = next_event_time_offset + duration;
-
-    if (new_next_event_time_offset >= 0.0) {
-        schedule_linear_ramp(new_next_event_time_offset, ratio_to_value(value));
-
-        return 0.0;
-    }
-
-    return new_next_event_time_offset;
-}
-
-
-template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::render(
         Integer const round,
         Integer const first_sample_index,
@@ -1440,13 +1509,13 @@ void FloatParam<evaluation>::render(
             render_with_lfo(round, first_sample_index, last_sample_index, buffer);
         } else if (is_ramping()) {
             render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
+        } else if (get_envelope() != NULL) {
+            render_with_envelope(round, first_sample_index, last_sample_index, buffer);
         } else {
             Param<Number, evaluation>::render(
                 round, first_sample_index, last_sample_index, buffer
             );
         }
-
-        advance_envelope(first_sample_index, last_sample_index);
     }
 }
 
@@ -1504,22 +1573,57 @@ void FloatParam<evaluation>::render_linear_ramp(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::advance_envelope(
+void FloatParam<evaluation>::render_with_envelope(
+        Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const last_sample_index,
+        Sample** buffer
 ) noexcept {
-    if (envelope_stage == EnvelopeStage::NONE) {
+    if (active_envelope_snapshot_id < 0) {
+        Param<Number, evaluation>::render(
+            round, first_sample_index, last_sample_index, buffer
+        );
+
         return;
     }
 
-    Seconds const time_delta = this->sample_count_to_relative_time_offset(
-        last_sample_index - first_sample_index
+    EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+    Sample* buffer_ = buffer[0];
+    Sample ratio = value_to_ratio(this->get_raw_value());
+
+    Envelope::render(
+        snapshot,
+        envelope_time,
+        envelope_stage,
+        envelope_is_constant,
+        ratio,
+        this->sample_rate,
+        this->sampling_period,
+        first_sample_index,
+        last_sample_index,
+        buffer_
     );
 
-    envelope_position += time_delta;
+    if (is_ratio_same_as_value) {
+        this->store_new_value(ratio);
+    } else if (is_logarithmic()) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer_[i] = (Sample)ratio_to_value_log(buffer_[i]);
+        }
 
-    if (envelope_end_scheduled) {
-        envelope_end_time_offset -= time_delta;
+        this->store_new_value(ratio_to_value_log(ratio));
+    } else {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer_[i] = (Sample)ratio_to_value_raw(buffer_[i]);
+        }
+
+        this->store_new_value(ratio_to_value_raw(ratio));
+    }
+
+    if (envelope_stage == EnvelopeStage::ENV_STG_RELEASED) {
+        unused_envelope_snapshots.push(active_envelope_snapshot_id);
+        active_envelope_snapshot_id = -1;
+        envelope_is_constant = true;
     }
 }
 

@@ -21,11 +21,13 @@
 
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "js80p.hpp"
 
 #include "dsp/midi_controller.hpp"
 #include "dsp/signal_producer.hpp"
+#include "dsp/queue.hpp"
 
 
 namespace JS80P
@@ -164,12 +166,26 @@ constexpr size_t ENVELOPE_RANDOMS_COUNT = 9;
 typedef Number EnvelopeRandoms[ENVELOPE_RANDOMS_COUNT];
 
 
+/* The VST 3 SDK uses a macro named "RELEASE", hence the prefix. */
+enum EnvelopeStage {
+    ENV_STG_NONE = 0,
+    ENV_STG_DAHD = 1,
+    ENV_STG_SUSTAIN = 2,
+    ENV_STG_RELEASE = 3,
+    ENV_STG_RELEASED = 4,
+};
+
+
 class EnvelopeSnapshot
 {
     public:
         EnvelopeSnapshot() noexcept;
 
-        Seconds get_dahd_duration() const noexcept;
+        EnvelopeSnapshot(EnvelopeSnapshot const& snapshot) noexcept = default;
+        EnvelopeSnapshot(EnvelopeSnapshot&& snapshot) noexcept = default;
+
+        EnvelopeSnapshot& operator=(EnvelopeSnapshot const& snapshot) noexcept = default;
+        EnvelopeSnapshot& operator=(EnvelopeSnapshot&& snapshot) noexcept = default;
 
         Number initial_value;
         Number peak_value;
@@ -206,8 +222,9 @@ class FloatParam : public Param<Number, evaluation>
         static constexpr SignalProducer::Event::Type EVT_LINEAR_RAMP = 2;
         static constexpr SignalProducer::Event::Type EVT_LOG_RAMP = 3;
         static constexpr SignalProducer::Event::Type EVT_ENVELOPE_START = 4;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_END = 5;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_CANCEL = 6;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_UPDATE = 5;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_END = 6;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_CANCEL = 7;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -317,7 +334,6 @@ class FloatParam : public Param<Number, evaluation>
         void set_midi_controller(MidiController* midi_controller) noexcept;
         void set_macro(Macro* macro) noexcept;
 
-
         void set_random_seed(Number const seed) noexcept;
         void set_envelope(Envelope* const envelope) noexcept;
         Envelope* get_envelope() const noexcept;
@@ -335,6 +351,8 @@ class FloatParam : public Param<Number, evaluation>
         void set_lfo(LFO* lfo) noexcept;
         LFO const* get_lfo() const noexcept;
 
+        virtual void reset() noexcept override;
+
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
@@ -351,12 +369,6 @@ class FloatParam : public Param<Number, evaluation>
         void handle_event(SignalProducer::Event const& event) noexcept;
 
     private:
-        enum EnvelopeStage {
-            NONE = 0,
-            DAHDS = 1,
-            R = 2,
-        };
-
         class LinearRampState
         {
             public:
@@ -399,8 +411,11 @@ class FloatParam : public Param<Number, evaluation>
         void handle_linear_ramp_event(SignalProducer::Event const& event) noexcept;
         void handle_log_ramp_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_start_event(SignalProducer::Event const& event) noexcept;
-        void handle_envelope_end_event() noexcept;
-        void handle_envelope_cancel_event() noexcept;
+        void handle_envelope_update_event(SignalProducer::Event const& event) noexcept;
+        void handle_envelope_end_event(SignalProducer::Event const& event) noexcept;
+        void handle_envelope_cancel_event(SignalProducer::Event const& event) noexcept;
+
+        void store_envelope_value_at_event(Seconds const latency) noexcept;
 
         bool is_following_leader() const noexcept;
 
@@ -414,6 +429,8 @@ class FloatParam : public Param<Number, evaluation>
 
         void process_macro(Integer const sample_count) noexcept;
 
+        void process_envelope(Envelope& envelope) noexcept;
+
         Seconds smooth_change_duration(
             Number const previous_value,
             Number const controller_value,
@@ -425,7 +442,7 @@ class FloatParam : public Param<Number, evaluation>
             Number const random_2
         ) noexcept;
 
-        void process_envelope(Envelope& envelope, Seconds const time_offset = 0.0) noexcept;
+        Integer make_envelope_snapshot(Envelope* const envelope) noexcept;
 
         void render_with_lfo(
             Integer const round,
@@ -441,15 +458,11 @@ class FloatParam : public Param<Number, evaluation>
             Sample** buffer
         ) noexcept;
 
-        void advance_envelope(
-                Integer const first_sample_index,
-                Integer const last_sample_index
-        ) noexcept;
-
-        Seconds schedule_envelope_value_if_not_reached(
-            Seconds const next_event_time_offset,
-            Seconds const duration,
-            Number const value
+        void render_with_envelope(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** buffer
         ) noexcept;
 
         template<SignalProducer::Event::Type event>
@@ -475,13 +488,15 @@ class FloatParam : public Param<Number, evaluation>
 
         Envelope* envelope;
         EnvelopeRandoms envelope_randoms;
-        EnvelopeSnapshot envelope_snapshot;
-        Seconds envelope_end_time_offset;
-        Seconds envelope_position;
+        std::vector<EnvelopeSnapshot> envelope_snapshots;
+        Queue<std::vector<EnvelopeSnapshot>::size_type> unused_envelope_snapshots;
+        Integer active_envelope_snapshot_id;
+        Integer scheduled_envelope_snapshot_id;
+        Seconds envelope_time;
         Seconds envelope_cancel_duration;
         EnvelopeStage envelope_stage;
-        bool envelope_end_scheduled;
         bool envelope_canceled;
+        bool envelope_is_constant;
 
         bool const should_round;
         bool const is_ratio_same_as_value;

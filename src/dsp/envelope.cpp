@@ -19,9 +19,12 @@
 #ifndef JS80P__DSP__ENVELOPE_CPP
 #define JS80P__DSP__ENVELOPE_CPP
 
+#include <cmath>
 #include <algorithm>
 
 #include "dsp/envelope.hpp"
+
+#include "dsp/math.hpp"
 
 
 namespace JS80P
@@ -42,9 +45,437 @@ EnvelopeSnapshot::EnvelopeSnapshot() noexcept
 }
 
 
-Seconds EnvelopeSnapshot::get_dahd_duration() const noexcept
-{
-    return delay_time + attack_time + hold_time + decay_time;
+Number Envelope::get_value_at_time(
+        EnvelopeSnapshot const& snapshot,
+        Seconds const time,
+        EnvelopeStage const stage,
+        Number const last_rendered_value,
+        Seconds const sampling_period
+) noexcept {
+    if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
+        return last_rendered_value;
+    }
+
+    Seconds time_ = time;
+    EnvelopeStage stage_ = stage;
+    Number initial_value;
+    Number target_value;
+    Seconds time_until_target;
+    Seconds duration;
+    bool becomes_constant;
+
+    set_up_next_target(
+        snapshot,
+        last_rendered_value,
+        time_,
+        stage_,
+        initial_value,
+        target_value,
+        time_until_target,
+        duration,
+        becomes_constant,
+        sampling_period
+    );
+
+    if (
+            becomes_constant
+            || JS80P_UNLIKELY(duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO)
+    ) {
+        return target_value;
+    }
+
+    Number delta;
+    Number ratio;
+
+    set_up_interpolation<true>(
+        initial_value,
+        delta,
+        ratio,
+        last_rendered_value,
+        target_value,
+        stage_,
+        duration,
+        time_until_target,
+        sampling_period,
+        1.0 / duration
+    );
+
+    return initial_value + ratio * delta;
+}
+
+
+template<bool adjust_initial_value_during_dahds>
+void Envelope::set_up_interpolation(
+        Number& initial_value,
+        Number& delta,
+        Number& initial_ratio,
+        Number const last_rendered_value,
+        Number const target_value,
+        EnvelopeStage const stage,
+        Seconds const duration,
+        Seconds const time_until_target,
+        Seconds const sampling_period,
+        Number const duration_inv
+) noexcept {
+    Seconds const elapsed_time = duration - time_until_target;
+
+    if (
+            stage != EnvelopeStage::ENV_STG_DAHD
+            || (adjust_initial_value_during_dahds && elapsed_time >= sampling_period)
+    ) {
+        Number const old_ratio = (
+            std::max(0.0, elapsed_time - sampling_period) * duration_inv
+        );
+        Number const old_initial_value = (
+            (last_rendered_value - old_ratio * target_value)
+            / std::max(ALMOST_ZERO, 1.0 - old_ratio)
+        );
+
+        if (JS80P_UNLIKELY(!Math::is_close(old_initial_value, initial_value))) {
+            initial_value = old_initial_value;
+        }
+    }
+
+    initial_ratio = elapsed_time * duration_inv;
+    delta = target_value - initial_value;
+}
+
+
+void Envelope::render(
+        EnvelopeSnapshot const& snapshot,
+        Seconds& time,
+        EnvelopeStage& stage,
+        bool& becomes_constant,
+        Number& last_rendered_value,
+        Frequency const sample_rate,
+        Seconds const sampling_period,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample* buffer
+) noexcept {
+    if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
+        becomes_constant = true;
+        render_constant(
+            time,
+            last_rendered_value,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
+
+        return;
+    }
+
+    Integer i = first_sample_index;
+
+    while (i != last_sample_index) {
+        Number initial_value;
+        Number target_value;
+        Seconds time_until_target;
+        Seconds duration;
+
+        set_up_next_target(
+            snapshot,
+            last_rendered_value,
+            time,
+            stage,
+            initial_value,
+            target_value,
+            time_until_target,
+            duration,
+            becomes_constant,
+            sampling_period
+        );
+
+        if (becomes_constant) {
+            last_rendered_value = target_value;
+            render_constant(time, target_value, i, last_sample_index, buffer);
+
+            return;
+        }
+
+        if (JS80P_UNLIKELY(duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO)) {
+            time += ALMOST_ZERO;
+            last_rendered_value = target_value;
+
+            continue;
+        }
+
+        Number const duration_inv = 1.0 / duration;
+        Number const scale = sampling_period * duration_inv;
+        Integer const end_index = std::min(
+            last_sample_index,
+            i + std::max((Integer)1, (Integer)(time_until_target * sample_rate))
+        );
+
+        Number done_samples = 0.0;
+        Number initial_ratio;
+        Number delta;
+
+        if (i == first_sample_index) {
+            set_up_interpolation<true>(
+                initial_value,
+                delta,
+                initial_ratio,
+                last_rendered_value,
+                target_value,
+                stage,
+                duration,
+                time_until_target,
+                sampling_period,
+                duration_inv
+            );
+        } else {
+            set_up_interpolation<false>(
+                initial_value,
+                delta,
+                initial_ratio,
+                last_rendered_value,
+                target_value,
+                stage,
+                duration,
+                time_until_target,
+                sampling_period,
+                duration_inv
+            );
+        }
+
+        for (; i != end_index; ++i, done_samples += 1.0) {
+            Number const ratio = initial_ratio + done_samples * scale;
+
+            buffer[i] = initial_value + ratio * delta;
+        }
+
+        time += done_samples * sampling_period;
+        last_rendered_value = buffer[i - 1];
+    }
+}
+
+
+void Envelope::render_constant(
+        Seconds& time,
+        Number& value,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample* buffer
+) noexcept {
+    time = 0.0;
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        buffer[i] = value;
+    }
+}
+
+
+void Envelope::set_up_next_target(
+        EnvelopeSnapshot const& snapshot,
+        Number const last_rendered_value,
+        Seconds& time,
+        EnvelopeStage& stage,
+        Number& initial_value,
+        Number& target_value,
+        Seconds& time_until_target,
+        Seconds& duration,
+        bool& becomes_constant,
+        Seconds const sampling_period
+) noexcept {
+    switch (stage) {
+        case EnvelopeStage::ENV_STG_DAHD:
+            set_up_next_dahds_target(
+                snapshot,
+                last_rendered_value,
+                time,
+                stage,
+                initial_value,
+                target_value,
+                time_until_target,
+                duration,
+                becomes_constant,
+                sampling_period
+            );
+
+            break;
+
+        case EnvelopeStage::ENV_STG_SUSTAIN:
+            target_value = snapshot.sustain_value;
+
+            set_up_next_sustain_target(
+                snapshot,
+                last_rendered_value,
+                time,
+                initial_value,
+                target_value,
+                time_until_target,
+                duration,
+                becomes_constant
+            );
+
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASE:
+            set_up_next_release_target(
+                snapshot,
+                time,
+                stage,
+                initial_value,
+                target_value,
+                time_until_target,
+                duration,
+                becomes_constant
+            );
+
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASED:
+            target_value = snapshot.final_value;
+
+            set_up_next_sustain_target(
+                snapshot,
+                last_rendered_value,
+                time,
+                initial_value,
+                target_value,
+                time_until_target,
+                duration,
+                becomes_constant
+            );
+
+            break;
+
+        default:
+            becomes_constant = true;
+            time_until_target = 0.0;
+            duration = 0.0;
+            initial_value = last_rendered_value;
+            target_value = last_rendered_value;
+
+            break;
+    }
+}
+
+
+void Envelope::set_up_next_dahds_target(
+        EnvelopeSnapshot const& snapshot,
+        Number const last_rendered_value,
+        Seconds& time,
+        EnvelopeStage& stage,
+        Number& initial_value,
+        Number& target_value,
+        Seconds& time_until_target,
+        Seconds& duration,
+        bool& becomes_constant,
+        Seconds const sampling_period
+) noexcept {
+    /*
+    init-v =del-t=> init-v =atk-t=> peak-v =hold-t=> peak-v =dec-t=> sust-v
+    */
+
+    time_until_target = snapshot.delay_time - time;
+
+    if (time_until_target > 0.0) {
+        duration = snapshot.delay_time;
+        initial_value = snapshot.initial_value;
+        target_value = snapshot.initial_value;
+        becomes_constant = false;
+
+        return;
+    }
+
+    time_until_target += snapshot.attack_time;
+
+    if (time_until_target > 0.0) {
+        duration = snapshot.attack_time;
+        initial_value = snapshot.initial_value;
+        target_value = snapshot.peak_value;
+        becomes_constant = false;
+
+        return;
+    }
+
+    time_until_target += snapshot.hold_time;
+
+    if (time_until_target > 0.0) {
+        duration = snapshot.hold_time;
+        initial_value = snapshot.peak_value;
+        target_value = snapshot.peak_value;
+        becomes_constant = false;
+
+        return;
+    }
+
+    time_until_target += snapshot.decay_time;
+    target_value = snapshot.sustain_value;
+
+    if (time_until_target > 0.0) {
+        duration = snapshot.decay_time;
+        initial_value = snapshot.peak_value;
+        becomes_constant = false;
+
+        return;
+    }
+
+    initial_value = snapshot.sustain_value;
+    stage = EnvelopeStage::ENV_STG_SUSTAIN;
+    time = 0.0;
+    becomes_constant = std::fabs(time_until_target) < sampling_period;
+
+    if (JS80P_LIKELY(becomes_constant)) {
+        time_until_target = 0.0;
+        duration = 0.0;
+    } else {
+        duration = DYNAMIC_ENVELOPE_RAMP_TIME;
+        time_until_target = duration;
+    }
+}
+
+
+void Envelope::set_up_next_sustain_target(
+        EnvelopeSnapshot const& snapshot,
+        Number const last_rendered_value,
+        Seconds const time,
+        Number& initial_value,
+        Number const target_value,
+        Seconds& time_until_target,
+        Seconds& duration,
+        bool& becomes_constant
+) noexcept {
+    initial_value = snapshot.sustain_value;
+    becomes_constant = Math::is_close(last_rendered_value, target_value);
+
+    if (JS80P_LIKELY(becomes_constant)) {
+        duration = 0.0;
+        time_until_target = 0.0;
+    } else {
+        duration = DYNAMIC_ENVELOPE_RAMP_TIME;
+        time_until_target = std::max(0.0, duration - time);
+    }
+}
+
+
+void Envelope::set_up_next_release_target(
+        EnvelopeSnapshot const& snapshot,
+        Seconds& time,
+        EnvelopeStage& stage,
+        Number& initial_value,
+        Number& target_value,
+        Seconds& time_until_target,
+        Seconds& duration,
+        bool& becomes_constant
+) noexcept {
+    /* current-v ==release-t==> release-v */
+
+    initial_value = snapshot.sustain_value;
+    target_value = snapshot.final_value;
+    duration = snapshot.release_time;
+    time_until_target = duration - time;
+    becomes_constant = time_until_target < ALMOST_ZERO;
+
+    if (JS80P_UNLIKELY(becomes_constant)) {
+        stage = EnvelopeStage::ENV_STG_RELEASED;
+        time_until_target = 0.0;
+        duration = 0.0;
+        time = 0.0;
+    }
 }
 
 

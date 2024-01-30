@@ -1390,9 +1390,9 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
 
     envelope.release_time.set_value(2.0);
 
-    assert_eq(2.0, follower.end_envelope(29.0), DOUBLE_DELTA);
+    assert_eq(2.0, follower.end_envelope(30.0), DOUBLE_DELTA);
 
-    FloatParamS::produce<FloatParamS>(follower, 1, 6);
+    FloatParamS::produce<FloatParamS>(follower, 1, 5);
 
     envelope.amount.set_value(0.8);
     envelope.initial_value.set_value(0.625);
@@ -1404,21 +1404,23 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     envelope.sustain_value.set_value(0.75);
     envelope.release_time.set_value(6.0);
 
+    FloatParamS::produce<FloatParamS>(follower, 2, 1);
+
     assert_false(follower.is_constant_until(2));
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 2, block_size
+        follower, 3, block_size
     );
     assert_eq(expected_dahd_samples, rendered_samples, block_size, DOUBLE_DELTA);
 
     assert_true(follower.is_constant_until(block_size));
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 3, block_size
+        follower, 4, block_size
     );
     assert_eq(NULL, rendered_samples, block_size, DOUBLE_DELTA);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 4, block_size
+        follower, 5, block_size
     );
     assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
 })
@@ -1468,8 +1470,9 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
     follower.update_envelope(1.0);
 
     assert_eq(2.0, follower.end_envelope(28.0), DOUBLE_DELTA);
+    follower.cancel_events();
 
-    FloatParamS::produce<FloatParamS>(follower, 1, 4);
+    FloatParamS::produce<FloatParamS>(follower, 1, 2);
 
     envelope.amount.set_value(0.8);
     envelope.initial_value.set_value(0.625);
@@ -1479,26 +1482,77 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
     envelope.hold_time.set_value(2.0);
     envelope.decay_time.set_value(4.0);
     envelope.sustain_value.set_value(0.75);
-    envelope.release_time.set_value(6.0);
     follower.update_envelope(0.0);
+
+    FloatParamS::produce<FloatParamS>(follower, 2, 2);
 
     assert_false(follower.is_constant_until(2));
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 2, block_size
+        follower, 3, block_size
     );
     assert_eq(expected_dahd_samples, rendered_samples, block_size, DOUBLE_DELTA);
 
+    assert_eq(2.0, follower.end_envelope(14.0), DOUBLE_DELTA);
+
     assert_true(follower.is_constant_until(block_size));
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 3, block_size
+        follower, 4, block_size
     );
     assert_eq(NULL, rendered_samples, block_size, DOUBLE_DELTA);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 4, block_size
+        follower, 5, block_size
     );
     assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
+})
+
+
+TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_by_a_dynamic_envelope_then_all_events_have_effect, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    constexpr Sample expected_samples_1[] = {
+        0.0, 5.0, 10.0, 7.5, 5.0
+    };
+    constexpr Sample expected_samples_2[] = {
+        5.0, 5.0, 3.0, 1.0, 1.0,
+        0.0, 5.0, 10.0, 7.5, 5.0,
+        5.0, 5.0, 3.0, 1.0, 1.0,
+    };
+    FloatParamS float_param("float", 0.0, 10.0, 0.0);
+    Envelope envelope("envelope");
+    Sample const* rendered_samples;
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(1.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(1.0);
+    envelope.sustain_value.set_value(0.5);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.1);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_envelope(&envelope);
+    float_param.start_envelope(0.0, 0.0, 0.0);
+    float_param.end_envelope(3.0);
+    float_param.start_envelope(5.0, 0.0, 0.0);
+    float_param.end_envelope(8.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, 5
+    );
+    assert_eq(expected_samples_1, rendered_samples, 5, DOUBLE_DELTA);
+
+    envelope.release_time.set_value(1.0);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, 15
+    );
+    assert_eq(expected_samples_2, rendered_samples, 15, DOUBLE_DELTA);
 })
 
 
@@ -1861,7 +1915,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     constexpr Integer block_size = 15;
     constexpr Frequency sample_rate = 14.0;
     constexpr Sample expected_samples_log[] = {
-        0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.0, 12.0,
+        0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 6.0, 0.0,
     };
     ToggleParam log_scale("log", ToggleParam::OFF);
     FloatParamS leader(
@@ -1892,6 +1946,8 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(1.0);
     envelope.peak_value.set_value(std::log2(16384.0) / (log2_max - log2_min));
+    envelope.release_time.set_value(2.0 / sample_rate);
+    envelope.final_value.set_value(0.0);
 
     assert_eq(min, follower.ratio_to_value(0.0), DOUBLE_DELTA);
     assert_eq((min + max) / 2.0, follower.ratio_to_value(0.5), DOUBLE_DELTA);
@@ -1917,7 +1973,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
     follower.start_envelope(0.0, 0.0, 0.0);
-    follower.cancel_events_at(12.0 / sample_rate);
+    follower.end_envelope(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
         follower, 1, block_size, &rendered_samples

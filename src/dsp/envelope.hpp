@@ -32,11 +32,60 @@ namespace JS80P
 
 /**
  * \brief A collection of parameters specifying an envelope.
+ *
+ * \code
+ *                      /--o---o---o--\  Peak
+ *                     o|  :   :   : | o Value
+ *                    /:|  :   :   : | :\
+ *                   / :|  :   :   : | : \
+ *                  /  :|  :   :   : | :  \
+ *                 o   :|  :   :   : | :   o   Sustain
+ *                /:   :|  :   :   : | :   :\  Value
+ *               / :   :|  :   :   : | :   : \-o---o- ~ ~ ~ -o-\
+ *              /  :   :|  :   :   : | :   : | :   :         :| \    Final
+ *  Initial    o   :   :|  :   :   : | :   : | :   :         :|  o   Value
+ *  Value     /:   :   :|  :   :   : | :   : | :   :         :|  :\--o---o-
+ * o---o---o-/-+---+---+---+---+---+---+---+---+---+- ~ ~ ~ -+---+---+---+-->
+ * 0   1   2|  3   4   5|  6   7   8 | 9  10 |11  12          |   |         time
+ *          |           |            |       |                |   |
+ *          |           |            |       |                |   |
+ *          |           |            |       |                |   |
+ * Delay    | Attack    | Hold       | Decay | Sustain        | Release
+ *
+ *
+ * param.envelope_time  how much time will have elapsed since the last event
+ *                      (envelope start, release start, sustain level change,
+ *                      etc.), at the next sample to be rendered
+ *
+ * param.value          last rendered value
+ * \endcode
+ *
  */
 class Envelope
 {
     public:
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
+
+        static Number get_value_at_time(
+                EnvelopeSnapshot const& snapshot,
+                Seconds const time,
+                EnvelopeStage const stage,
+                Number const last_rendered_value,
+                Seconds const sampling_period
+        ) noexcept;
+
+        static void render(
+            EnvelopeSnapshot const& snapshot,
+            Seconds& time,
+            EnvelopeStage& stage,
+            bool& becomes_constant,
+            Number& last_rendered_value,
+            Frequency const sample_rate,
+            Seconds const sampling_period,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample* buffer
+        ) noexcept;
 
         Envelope(std::string const name) noexcept;
 
@@ -70,6 +119,79 @@ class Envelope
         FloatParamB value_inaccuracy;
 
     private:
+        static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
+        static constexpr Number ALMOST_ZERO = 0.0000001;
+
+        static void set_up_next_target(
+            EnvelopeSnapshot const& snapshot,
+            Number const last_rendered_value,
+            Seconds& time,
+            EnvelopeStage& stage,
+            Number& initial_value,
+            Number& target_value,
+            Seconds& time_until_target,
+            Seconds& duration,
+            bool& becomes_constant,
+            Seconds const sampling_period
+        ) noexcept;
+
+        static void set_up_next_dahds_target(
+            EnvelopeSnapshot const& snapshot,
+            Number const last_rendered_value,
+            Seconds& time,
+            EnvelopeStage& stage,
+            Number& initial_value,
+            Number& target_value,
+            Seconds& time_until_target,
+            Seconds& duration,
+            bool& becomes_constant,
+            Seconds const sampling_period
+        ) noexcept;
+
+        static void set_up_next_sustain_target(
+            EnvelopeSnapshot const& snapshot,
+            Number const last_rendered_value,
+            Seconds const time,
+            Number& initial_value,
+            Number const target_value,
+            Seconds& time_until_target,
+            Seconds& duration,
+            bool& becomes_constant
+        ) noexcept;
+
+        static void set_up_next_release_target(
+            EnvelopeSnapshot const& snapshot,
+            Seconds& time,
+            EnvelopeStage& stage,
+            Number& initial_value,
+            Number& target_value,
+            Seconds& time_until_target,
+            Seconds& duration,
+            bool& becomes_constant
+        ) noexcept;
+
+        template<bool adjust_initial_value_during_dahds>
+        static void set_up_interpolation(
+            Number& initial_value,
+            Number& delta,
+            Number& initial_ratio,
+            Number const last_rendered_value,
+            Number const target_value,
+            EnvelopeStage const stage,
+            Seconds const duration,
+            Seconds const time_until_target,
+            Seconds const sampling_period,
+            Number const duration_inv
+        ) noexcept;
+
+        static void render_constant(
+            Seconds& time,
+            Number& value,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample* buffer
+        ) noexcept;
+
         template<class ParamType>
         bool update_change_index(ParamType const& param, Integer& change_index);
 
