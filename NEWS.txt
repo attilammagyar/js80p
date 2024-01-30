@@ -1,3 +1,19 @@
+v?.?.? (2024-??-??)
+ * Filter Q parameter can also use logarithmic scale.
+ * Various performance and RAM usage improvements.
+ * The source distribution can now be compiled for RISC-V 64 systems thanks to
+   @aimixsaka.
+ * New preset: Analog Brass
+ * FST: hosts which support VSTXML files can now show full length parameter
+   names instead of abbreviations.
+ * Bugfix: dynamic envelope parameter changes could produce glitches, sudden
+   jumps, and some sections of the envelope could get lost, especially in
+   monophonic mode.
+ * Bugfix: decayed notes were not garbage collected when envelopes were
+   assigned only to the amplitude parameter of the oscillators, but not to
+   the first oscillator's subharmonic amplitude which was left at the default 0
+   setting. (E.g. the Bells 1 and 2 presets while holding the sustain pedal.)
+
 v2.4.4 (2023-11-19)
  * Reduced RAM usage.
  * Bugfix: hosts that use variable length rendering blocks could cause JS80P in
