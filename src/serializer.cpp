@@ -20,8 +20,9 @@
 #define JS80P__SERIALIZER_CPP
 
 #include <algorithm>
-#include <cstring>
+#include <cmath>
 #include <cctype>
+#include <cstring>
 #include <sstream>
 
 #include "serializer.hpp"
