@@ -530,6 +530,8 @@ class _Test
                     _test_line,
                     _TEST_STR_OR(_test_name, "UNKNOWN")
                 );
+            } else {
+                ++_test_failed;
             }
 
             _test_name = NULL;
@@ -584,11 +586,12 @@ int main(int argc, char const* argv[])
 
     fprintf(
         stderr,
-        "\nSummary for %s: %d passed, %d failed, %d assertions\n\n",
+        "\nSummary for %s: %d passed, %d failed, %d assertion%s\n\n",
         _TEST_STR_OR(_test_file, argv[0]),
         _test_started - _test_failed,
         _test_failed,
-        _test_assertions
+        _test_assertions,
+        _test_assertions == 1 ? "" : "s"
     );
 
     return _test_result;
@@ -624,7 +627,6 @@ int main(int argc, char const* argv[])
     }                                                                       \
     _test_result = 1;                                                       \
     _test_current_test_passed = false;                                      \
-    ++_test_failed;                                                         \
     ++_test_assertions;                                                     \
 } while (false)
 
