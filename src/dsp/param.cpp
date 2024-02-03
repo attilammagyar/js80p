@@ -1155,8 +1155,6 @@ void FloatParam<evaluation>::start_envelope(
         return;
     }
 
-    EnvelopeSnapshot envelope_snapshot;
-
     update_envelope_randoms(random_1, random_2);
 
     envelope->update();
