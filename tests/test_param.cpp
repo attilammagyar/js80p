@@ -1036,6 +1036,28 @@ TEST(when_a_float_param_is_following_another_then_it_is_constant_if_the_leader_i
 })
 
 
+TEST(when_a_float_param_is_following_another_then_their_controllers_are_the_same, {
+    MidiController midi_controller;
+    Macro macro("M");
+    LFO lfo("L");
+
+    FloatParamS leader("float", -1.0, 1.0, 0.0);
+    FloatParamS follower(leader);
+
+    leader.set_midi_controller(&midi_controller);
+    assert_eq((void*)&midi_controller, (void*)follower.get_midi_controller());
+    leader.set_midi_controller(NULL);
+
+    leader.set_macro(&macro);
+    assert_eq((void*)&macro, (void*)follower.get_macro());
+    leader.set_macro(NULL);
+
+    leader.set_lfo(&lfo);
+    assert_eq((void*)&lfo, (void*)follower.get_lfo());
+    leader.set_lfo(NULL);
+})
+
+
 TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_op, {
     constexpr Integer block_size = 10;
     constexpr Integer rounds = 1;

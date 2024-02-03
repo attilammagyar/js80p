@@ -345,90 +345,264 @@ TEST(voice_can_be_turned_off_immediately, {
 })
 
 
-TEST(can_tell_if_note_decayed_during_envelope_dahds, {
-    constexpr Seconds note_start = 0.002;
-    constexpr Seconds short_time = 0.001;
-    constexpr Seconds sustain_start = note_start + short_time * 4.0;
+enum NoteDecay {
+    NEVER = 0,
+    AT_BEGINNING_OF_SUSTAIN = 1,
+    BEFORE_SUSTAIN = 2,
+};
 
-    Envelope envelope("E");
-    OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
-    SimpleVoice::Params params("V");
-    SimpleVoice decaying_voice(
-        FREQUENCIES,
-        PER_CHANNEL_FREQUENCIES,
-        synced_oscillator_inaccuracy,
-        0.0,
-        params
+
+void test_decay_before_note_off(
+        SimpleVoice& voice,
+        Envelope* const envelope,
+        NoteDecay const expected_decay,
+        char const* const test_name
+) {
+    constexpr Seconds delay_time = 0.01;
+    constexpr Seconds attack_time = 0.01;
+    constexpr Seconds hold_time = 0.1;
+    constexpr Seconds decay_time = 0.01;
+
+    Seconds const note_start = (
+        (Number)(voice.get_block_size() * 2) / voice.get_sample_rate()
     );
-    SimpleVoice non_decaying_voice(
-        FREQUENCIES,
-        PER_CHANNEL_FREQUENCIES,
-        synced_oscillator_inaccuracy,
-        0.0,
-        params
+    Seconds const sustain_start = (
+        note_start + delay_time + attack_time + hold_time + decay_time
     );
+
     Integer rendered_samples = 0;
     Integer round = 0;
 
     Integer const sustain_start_samples = (
-        (Integer)std::ceil(sustain_start * decaying_voice.get_sample_rate())
+        (Integer)std::ceil(sustain_start * voice.get_sample_rate())
     );
 
-    params.waveform.set_value(SimpleOscillator::SINE);
-    params.amplitude.set_value(1.0);
-    params.volume.set_value(1.0);
+    if (envelope != NULL) {
+        envelope->dynamic.set_value(ToggleParam::OFF);
+        envelope->amount.set_value(1.0);
+        envelope->initial_value.set_value(0.0);
+        envelope->delay_time.set_value(delay_time);
+        envelope->attack_time.set_value(attack_time);
+        envelope->hold_time.set_value(hold_time);
+        envelope->decay_time.set_value(decay_time);
+        envelope->release_time.set_value(envelope->release_time.get_max_value());
+        envelope->final_value.set_value(0.0);
+    }
 
-    params.amplitude.set_envelope(&envelope);
-    params.subharmonic_amplitude.set_envelope(&envelope);
-
-    envelope.dynamic.set_value(ToggleParam::OFF);
-    envelope.amount.set_value(1.0);
-    envelope.initial_value.set_value(0.0);
-    envelope.delay_time.set_value(0.001);
-    envelope.attack_time.set_value(0.001);
-    envelope.peak_value.set_value(1.0);
-    envelope.hold_time.set_value(0.001);
-    envelope.decay_time.set_value(0.001);
-    envelope.sustain_value.set_value(0.0);
-    envelope.release_time.set_value(envelope.release_time.get_max_value());
-    envelope.final_value.set_value(0.0);
-
-    decaying_voice.note_on(note_start, 42, 1, 0, 1.0, 1, true);
-
-    envelope.sustain_value.set_value(0.5);
-    non_decaying_voice.note_on(note_start, 123, 1, 0, 1.0, 1, true);
+    voice.reset();
+    voice.note_on(note_start, 42, 1, 0, 1.0, 1, true);
 
     while (rendered_samples < sustain_start_samples) {
-        assert_false(
-            decaying_voice.has_decayed_during_envelope_dahds(),
-            "rendered_samples=%d, round=%d",
+        assert_eq(
+            expected_decay == NoteDecay::BEFORE_SUSTAIN,
+            voice.has_decayed_before_note_off(),
+            "test=\"%s\", rendered_samples=%d, round=%d",
+            test_name,
             (int)rendered_samples,
             (int)round
         );
-        assert_false(
-            non_decaying_voice.has_decayed_during_envelope_dahds(),
-            "rendered_samples=%d, round=%d",
-            (int)rendered_samples,
-            (int)round
-        );
-        SignalProducer::produce<SimpleVoice>(decaying_voice, round);
-        SignalProducer::produce<SimpleVoice>(non_decaying_voice, round);
-        rendered_samples += decaying_voice.get_block_size();
+
+        SignalProducer::produce<SimpleVoice>(voice, round);
+
+        rendered_samples += voice.get_block_size();
         ++round;
     }
 
-    assert_true(decaying_voice.has_decayed_during_envelope_dahds());
-    assert_false(non_decaying_voice.has_decayed_during_envelope_dahds());
-
-    envelope.final_value.set_value(0.5);
-
-    assert_false(
-        decaying_voice.has_decayed_during_envelope_dahds(),
-        "after envelope final value modification"
+    assert_eq(
+        expected_decay != NoteDecay::NEVER,
+        voice.has_decayed_before_note_off(),
+        "test=\"%s\"",
+        test_name
     );
-    assert_false(
-        non_decaying_voice.has_decayed_during_envelope_dahds(),
-        "after envelope final value modification"
+
+    if (envelope != NULL) {
+        envelope->final_value.set_value(0.5);
+        assert_eq(
+            expected_decay == NoteDecay::BEFORE_SUSTAIN,
+            voice.has_decayed_before_note_off(),
+            "test=\"%s (after envelope final value modification)\"",
+            test_name
+        );
+    }
+}
+
+
+TEST(can_tell_if_note_decayed_before_note_off, {
+    Envelope envelope("E");
+    OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
+    MidiController midi_controller;
+    Macro macro("M");
+    LFO lfo("L");
+
+    SimpleVoice::Params params_with_envelope("VE");
+    SimpleVoice::Params params_with_zero_amplitudes("VAS");
+    SimpleVoice::Params params_with_zero_volume("VV");
+    SimpleVoice::Params params_with_zero_subharmonic_amplitude("VS");
+    SimpleVoice::Params params_with_zero_amplitude("VA");
+    SimpleVoice::Params params_with_midi_controller("VMI");
+    SimpleVoice::Params params_with_macro("VMA");
+    SimpleVoice::Params params_with_lfo("VL");
+
+    SimpleVoice voice_with_envelope(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_envelope
+    );
+
+    SimpleVoice voice_with_zero_amplitudes(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_zero_amplitudes
+    );
+
+    SimpleVoice voice_with_zero_volume(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_zero_volume
+    );
+
+    SimpleVoice voice_with_zero_amplitude(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_zero_amplitude
+    );
+
+    SimpleVoice voice_with_zero_subharmonic_amplitude(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_zero_subharmonic_amplitude
+    );
+
+    SimpleVoice voice_with_midi_controller(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_midi_controller
+    );
+
+    SimpleVoice voice_with_macro(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_macro
+    );
+
+    SimpleVoice voice_with_lfo(
+        FREQUENCIES,
+        PER_CHANNEL_FREQUENCIES,
+        synced_oscillator_inaccuracy,
+        0.0,
+        params_with_lfo
+    );
+
+    params_with_envelope.amplitude.set_value(1.0);
+    params_with_envelope.volume.set_value(1.0);
+
+    params_with_envelope.amplitude.set_envelope(&envelope);
+    params_with_envelope.subharmonic_amplitude.set_envelope(&envelope);
+
+    params_with_zero_amplitudes.amplitude.set_value(0.0);
+    params_with_zero_amplitudes.subharmonic_amplitude.set_value(0.0);
+    params_with_zero_amplitudes.volume.set_value(1.0);
+
+    params_with_zero_volume.amplitude.set_value(1.0);
+    params_with_zero_volume.subharmonic_amplitude.set_value(1.0);
+    params_with_zero_volume.volume.set_value(0.0);
+
+    params_with_zero_subharmonic_amplitude.amplitude.set_value(1.0);
+    params_with_zero_subharmonic_amplitude.subharmonic_amplitude.set_value(0.0);
+    params_with_zero_subharmonic_amplitude.volume.set_value(1.0);
+
+    params_with_zero_amplitude.amplitude.set_value(0.0);
+    params_with_zero_amplitude.subharmonic_amplitude.set_value(1.0);
+    params_with_zero_amplitude.volume.set_value(1.0);
+
+    midi_controller.change(0.0, 0.0);
+    params_with_midi_controller.volume.set_midi_controller(&midi_controller);
+
+    macro.input.set_value(0.0);
+    params_with_macro.volume.set_macro(&macro);
+
+    params_with_lfo.volume.set_lfo(&lfo);
+
+    envelope.peak_value.set_value(1.0);
+    envelope.sustain_value.set_value(0.0);
+    test_decay_before_note_off(
+        voice_with_envelope,
+        &envelope,
+        NoteDecay::AT_BEGINNING_OF_SUSTAIN,
+        "when sustain value is 0.0, then the note should decay when starting sustaining"
+    );
+
+    envelope.peak_value.set_value(0.0);
+    envelope.sustain_value.set_value(0.5);
+    test_decay_before_note_off(
+        voice_with_envelope,
+        &envelope,
+        NoteDecay::NEVER,
+        "when sustain value is greater than 0.0, then the note should never decay"
+    );
+
+    test_decay_before_note_off(
+        voice_with_zero_amplitudes,
+        NULL,
+        NoteDecay::BEFORE_SUSTAIN,
+        "when amplitudes are constant 0.0, then the note should decay instantly"
+    );
+
+    test_decay_before_note_off(
+        voice_with_zero_volume,
+        NULL,
+        NoteDecay::BEFORE_SUSTAIN,
+        "when volume is constant 0.0, then the note should decay instantly"
+    );
+
+    test_decay_before_note_off(
+        voice_with_zero_amplitude,
+        NULL,
+        NoteDecay::NEVER,
+        "when only the amplitude is 0.0, then the note should never decay"
+
+    );
+
+    test_decay_before_note_off(
+        voice_with_zero_subharmonic_amplitude,
+        NULL,
+        NoteDecay::NEVER,
+        "when only the subharmonic amplitude is 0.0, then the note should never decay"
+    );
+
+    test_decay_before_note_off(
+        voice_with_midi_controller,
+        NULL,
+        NoteDecay::NEVER,
+        "when a voice is controlled by MIDI CC then it should never decay"
+    );
+
+    test_decay_before_note_off(
+        voice_with_macro,
+        NULL,
+        NoteDecay::NEVER,
+        "when a voice is controlled by a macro then it should never decay"
+    );
+
+    test_decay_before_note_off(
+        voice_with_lfo,
+        NULL,
+        NoteDecay::NEVER,
+        "when a voice is controlled by an LFO then it should never decay"
     );
 })
 

@@ -315,7 +315,7 @@ class Voice : public SignalProducer
 
         void cancel_note_smoothly(Seconds const time_offset) noexcept;
 
-        bool has_decayed_during_envelope_dahds() const noexcept;
+        bool has_decayed_before_note_off() const noexcept;
 
         Integer get_note_id() const noexcept;
         Midi::Note get_note() const noexcept;

@@ -218,7 +218,7 @@ void Param<NumberType, evaluation>::set_midi_controller(
         ParamClass& param,
         MidiController* midi_controller
 ) noexcept {
-    MidiController* old_midi_controller = param.get_midi_controller();
+    MidiController* const old_midi_controller = param.midi_controller;
 
     if (old_midi_controller != NULL) {
         old_midi_controller->released();
@@ -259,7 +259,7 @@ void Param<NumberType, evaluation>::set_macro(
         ParamClass& param,
         Macro* macro
 ) noexcept {
-    Macro* old_macro = param.get_macro();
+    Macro* const old_macro = param.macro;
 
     if (old_macro != NULL) {
         if (macro == NULL) {
@@ -698,6 +698,10 @@ bool FloatParam<evaluation>::is_constant_until(
                     || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
                 )
         ) {
+            if (envelope_is_constant) {
+                return true;
+            }
+
             envelope->update();
 
             Integer const envelope_change_index = envelope->get_change_index();
@@ -705,10 +709,10 @@ bool FloatParam<evaluation>::is_constant_until(
                 envelope_snapshots[active_envelope_snapshot_id].change_index
             );
 
-            return snapshot_change_index == envelope_change_index && envelope_is_constant;
+            return snapshot_change_index == envelope_change_index;
         }
 
-        return envelope_stage == EnvelopeStage::ENV_STG_NONE || envelope_is_constant;
+        return envelope_is_constant || envelope_stage == EnvelopeStage::ENV_STG_NONE;
     }
 
     if (this->midi_controller != NULL) {
@@ -1073,10 +1077,33 @@ void FloatParam<evaluation>::set_midi_controller(
 
 
 template<ParamEvaluation evaluation>
+MidiController* FloatParam<evaluation>::get_midi_controller() const noexcept
+{
+    return (
+        leader == NULL
+            ? Param<Number, evaluation>::get_midi_controller()
+            : leader->get_midi_controller()
+    );
+}
+
+
+template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
 {
     Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(*this, macro);
 }
+
+
+template<ParamEvaluation evaluation>
+Macro* FloatParam<evaluation>::get_macro() const noexcept
+{
+    return (
+        leader == NULL
+            ? Param<Number, evaluation>::get_macro()
+            : leader->get_macro()
+    );
+}
+
 
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_random_seed(Number const seed) noexcept
@@ -1269,7 +1296,7 @@ void FloatParam<evaluation>::set_lfo(LFO* lfo) noexcept
 template<ParamEvaluation evaluation>
 LFO const* FloatParam<evaluation>::get_lfo() const noexcept
 {
-    return lfo;
+    return leader == NULL ? lfo : leader->get_lfo();
 }
 
 

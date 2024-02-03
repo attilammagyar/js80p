@@ -2404,7 +2404,7 @@ void Synth::garbage_collect_voices() noexcept
         Midi::Note note;
 
         Modulator* const modulator = modulators[voice];
-        bool const modulator_decayed = modulator->has_decayed_during_envelope_dahds();
+        bool const modulator_decayed = modulator->has_decayed_before_note_off();
 
         if (modulator_decayed) {
             note = modulator->get_note();
@@ -2413,7 +2413,7 @@ void Synth::garbage_collect_voices() noexcept
         }
 
         Carrier* const carrier = carriers[voice];
-        bool const carrier_decayed = carrier->has_decayed_during_envelope_dahds();
+        bool const carrier_decayed = carrier->has_decayed_before_note_off();
 
         if (carrier_decayed) {
             note = carrier->get_note();

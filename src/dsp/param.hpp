@@ -332,7 +332,10 @@ class FloatParam : public Param<Number, evaluation>
         Seconds get_remaining_time_from_linear_ramp() const noexcept;
 
         void set_midi_controller(MidiController* midi_controller) noexcept;
+        MidiController* get_midi_controller() const noexcept;
+
         void set_macro(Macro* macro) noexcept;
+        Macro* get_macro() const noexcept;
 
         void set_random_seed(Number const seed) noexcept;
         void set_envelope(Envelope* const envelope) noexcept;

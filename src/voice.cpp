@@ -1165,7 +1165,7 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 
 
 template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::has_decayed_during_envelope_dahds() const noexcept
+bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const noexcept
 {
     if constexpr (IS_MODULATOR) {
         return (
@@ -1193,16 +1193,23 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed(
 ) const noexcept {
     constexpr Number threshold = 0.000001;
 
-    Envelope* envelope = param.get_envelope();
-
-    if (envelope == NULL) {
+    if (param.has_events() || param.get_value() >= threshold) {
         return false;
     }
 
+    Envelope* const envelope = param.get_envelope();
+
+    if (envelope != NULL) {
+        return (
+            envelope->final_value.get_value() < threshold
+            && param.is_constant_until(2)
+        );
+    }
+
     return (
-        !param.has_events()
-        && param.get_value() < threshold
-        && envelope->final_value.get_value() < threshold
+        param.get_midi_controller() == NULL
+        && param.get_macro() == NULL
+        && param.get_lfo() == NULL
     );
 }
 
