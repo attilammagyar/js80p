@@ -139,7 +139,11 @@ class WavBuffer
 
 void usage(char const* name)
 {
-    fprintf(stderr, "Usage: valgrind --tool=callgrind %s program velocity out.wav\n", name);
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  valgrind --tool=callgrind %s program velocity out.wav\n", name);
+    fprintf(stderr, "\n");
+    fprintf(stderr, "  valgrind --tool=cachegrind --cache-sim=yes --branch-sim=yes %s program velocity out.wav\n", name);
     fprintf(stderr, "\n");
     fprintf(stderr, "    program    preset number (0-%d)\n", (int)Bank::NUMBER_OF_PROGRAMS - 1);
     fprintf(stderr, "    velocity   first note's velocity (0-127)\n");
