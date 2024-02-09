@@ -139,6 +139,62 @@ class LFO : public SignalProducer
         Sample const* const* oscillator_buffer;
 };
 
+
+class LFOEnvelopeMapping
+{
+    private:
+        class EnvelopeIndex
+        {
+            public:
+                static constexpr Byte to_byte(
+                    Integer const mapping,
+                    Byte const offset
+                ) noexcept;
+
+                EnvelopeIndex(Integer& mapping, Byte const lfo_index);
+                EnvelopeIndex(EnvelopeIndex const& envelope_index) = delete;
+                EnvelopeIndex(EnvelopeIndex&& envelope_index) = delete;
+
+                operator Byte() const noexcept;
+
+                EnvelopeIndex& operator=(EnvelopeIndex const& envelope_index) = delete;
+                EnvelopeIndex& operator=(EnvelopeIndex&& envelope_index) = delete;
+                EnvelopeIndex& operator=(Byte const envelope_index);
+
+            private:
+                Byte const offset;
+
+                Integer& mapping;
+        };
+
+    public:
+        LFOEnvelopeMapping();
+
+        LFOEnvelopeMapping(
+            LFOEnvelopeMapping const& lfo_envelope_mapping
+        ) noexcept = default;
+
+        LFOEnvelopeMapping(
+            LFOEnvelopeMapping&& lfo_envelope_mapping
+        ) noexcept = default;
+
+        LFOEnvelopeMapping& operator=(
+            LFOEnvelopeMapping const& lfo_envelope_mapping
+        ) noexcept = default;
+
+        LFOEnvelopeMapping& operator=(
+            LFOEnvelopeMapping&& lfo_envelope_mapping
+        ) noexcept = default;
+
+        void clear() noexcept;
+
+        Byte operator[](Byte const lfo_index) const noexcept;
+        EnvelopeIndex operator[](Byte const lfo_index) noexcept;
+
+    private:
+        Integer mapping;
+};
+
 }
 
 #endif
