@@ -29,7 +29,7 @@ namespace JS80P
 
 LFO::LFO(
         std::string const& name,
-        Integer const index
+        Byte const index
 ) noexcept
     : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
@@ -87,7 +87,7 @@ LFO::LFO(
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
-    index(-1),
+    index(Constants::INVALID_LFO_INDEX),
     oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
 {
     initialize_instance();
