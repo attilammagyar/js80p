@@ -76,6 +76,8 @@ namespace Constants {
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
 
     constexpr Byte ENVELOPES = 12;
+    constexpr Byte ENVELOPE_INDEX_MASK = 0x0f;
+    constexpr Byte ENVELOPE_INDEX_BITS = 4;
     constexpr Byte INVALID_ENVELOPE_INDEX = ENVELOPES;
 
     constexpr Byte LFOS = 8;
