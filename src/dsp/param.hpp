@@ -279,8 +279,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const max_value = 1.0,
             Number const default_value = 0.0,
             Number const round_to = 0.0,
-            Envelope* const* envelopes = NULL,
-            LFO* const* lfos = NULL,
+            Envelope* const* const envelopes = NULL,
+            LFO* const* const lfos = NULL,
             ToggleParam const* log_scale_toggle = NULL,
             Number const* log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
@@ -543,8 +543,8 @@ class ModulatableFloatParam : public FloatParamS
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0,
-            Envelope* const* envelopes = NULL,
-            LFO* const* lfos = NULL
+            Envelope* const* const envelopes = NULL,
+            LFO* const* const lfos = NULL
         ) noexcept;
 
         bool is_constant_in_next_round(
