@@ -152,7 +152,6 @@ void LFO::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-
     if (center.get_value() == ToggleParam::OFF) {
         apply_distortions(
             round, first_sample_index, last_sample_index, oscillator_buffer[0], buffer[0]
