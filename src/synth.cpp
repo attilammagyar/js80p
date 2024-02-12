@@ -1453,6 +1453,7 @@ Synth::ParamId Synth::get_param_id(std::string const& name) const noexcept
 }
 
 
+#ifdef JS80P_ASSERTIONS
 void Synth::get_param_id_hash_table_statistics(
         Integer& max_collisions,
         Number& avg_collisions,
@@ -1462,6 +1463,7 @@ void Synth::get_param_id_hash_table_statistics(
         max_collisions, avg_collisions, avg_bucket_size
     );
 }
+#endif
 
 
 Number Synth::get_param_ratio_atomic(ParamId const param_id) const noexcept
@@ -3977,6 +3979,7 @@ Synth::ParamId Synth::ParamIdHashTable::lookup(std::string const& name) noexcept
 }
 
 
+#ifdef JS80P_ASSERTIONS
 void Synth::ParamIdHashTable::get_statistics(
         Integer& max_collisions,
         Number& avg_collisions,
@@ -4020,6 +4023,7 @@ void Synth::ParamIdHashTable::get_statistics(
     avg_collisions = (double)collisions_sum / (double)collisions_count;
     avg_bucket_size = (double)bucket_size_sum / (double)bucket_count;
 }
+#endif
 
 
 /*

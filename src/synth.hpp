@@ -886,11 +886,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
         std::string const& get_param_name(ParamId const param_id) const noexcept;
         ParamId get_param_id(std::string const& name) const noexcept;
 
+#ifdef JS80P_ASSERTIONS
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
             Number& avg_collisions,
             Number& avg_bucket_size
         ) const noexcept;
+#endif
 
         Number float_param_ratio_to_display_value(
             ParamId const param_id,
@@ -1117,11 +1119,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 void add(std::string const& name, ParamId const param_id) noexcept;
                 ParamId lookup(std::string const& name) noexcept;
+
+#ifdef JS80P_ASSERTIONS
                 void get_statistics(
                     Integer& max_collisions,
                     Number& avg_collisions,
                     Number& avg_bucket_size
                 ) const noexcept;
+#endif
 
             private:
                 class Entry
