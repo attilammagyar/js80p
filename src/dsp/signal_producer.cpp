@@ -356,11 +356,21 @@ void SignalProducer::schedule(
         Seconds const time_offset,
         Integer const int_param,
         Number const number_param_1,
-        Number const number_param_2
+        Number const number_param_2,
+        Byte const byte_param_1,
+        Byte const byte_param_2
 ) noexcept {
     Seconds const time = time_offset + current_time;
 
-    Event event(type, time, int_param, number_param_1, number_param_2);
+    Event event(
+        type,
+        time,
+        int_param,
+        number_param_1,
+        number_param_2,
+        byte_param_1,
+        byte_param_2
+    );
     events.push(event);
 }
 
@@ -505,6 +515,8 @@ SignalProducer::Event::Event(Type const type) noexcept
     int_param(0),
     number_param_1(0.0),
     number_param_2(0.0),
+    byte_param_1(0),
+    byte_param_2(0),
     type(type)
 {
 }
@@ -515,12 +527,16 @@ SignalProducer::Event::Event(
         Seconds const time_offset,
         Integer const int_param,
         Number const number_param_1,
-        Number const number_param_2
+        Number const number_param_2,
+        Byte const byte_param_1,
+        Byte const byte_param_2
 ) noexcept
     : time_offset(time_offset),
     int_param(int_param),
     number_param_1(number_param_1),
     number_param_2(number_param_2),
+    byte_param_1(byte_param_1),
+    byte_param_2(byte_param_2),
     type(type)
 {
 }
