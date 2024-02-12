@@ -150,6 +150,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_polyphonic(true),
     was_polyphonic(true),
     is_dirty_(false),
+    need_lfo_envelope_mapping_update(false),
     effects(
         "E",
         bus,
@@ -1532,6 +1533,12 @@ void Synth::get_param_id_hash_table_statistics(
         max_collisions, avg_collisions, avg_bucket_size
     );
 }
+
+
+LFOEnvelopeMapping const& Synth::get_lfo_envelope_mapping() const noexcept
+{
+    return lfo_envelope_mapping;
+}
 #endif
 
 
@@ -2563,6 +2570,8 @@ void Synth::process_messages() noexcept
             process_message(message);
         }
     }
+
+    update_lfo_envelope_mapping();
 }
 
 
@@ -2840,19 +2849,35 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2QLG: carrier_params.filter_2_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF1QLG: effects.filter_1_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF2QLG: effects.filter_2_q_log_scale.set_ratio(ratio); break;
-            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
             default: break; /* This should never be reached. */
         }
     }
 
     handle_refresh_param(param_id);
+}
+
+
+void Synth::update_lfo_envelope_mapping() noexcept
+{
+    if (JS80P_LIKELY(!need_lfo_envelope_mapping_update)) {
+        return;
+    }
+
+    need_lfo_envelope_mapping_update = false;
+
+    lfo_envelope_mapping.clear();
+
+    for (Byte i = 0; i != Constants::LFOS; ++i) {
+        lfo_envelope_mapping[i] = lfos_rw[i]->amount_envelope.get_value();
+    }
 }
 
 
@@ -3072,6 +3097,8 @@ void Synth::handle_clear() noexcept
             handle_set_param(param_id, get_param_default_ratio(param_id));
         }
     }
+
+    update_lfo_envelope_mapping();
 }
 
 

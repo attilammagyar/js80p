@@ -998,6 +998,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number& avg_collisions,
             Number& avg_bucket_size
         ) const noexcept;
+
+        LFOEnvelopeMapping const& get_lfo_envelope_mapping() const noexcept;
 #endif
 
         Number float_param_ratio_to_display_value(
@@ -1483,6 +1485,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void garbage_collect_voices() noexcept;
 
+        void update_lfo_envelope_mapping() noexcept;
+
         std::string const to_string(Integer const) const noexcept;
 
         std::vector<DeferredNoteOff> deferred_note_offs;
@@ -1509,6 +1513,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
         NoteTunings active_note_tunings;
+        LFOEnvelopeMapping lfo_envelope_mapping;
         Integer samples_since_gc;
         Integer samples_between_gc;
         Integer next_voice;
@@ -1519,6 +1524,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_polyphonic;
         bool was_polyphonic;
         bool is_dirty_;
+        bool need_lfo_envelope_mapping_update;
         std::atomic<bool> is_mts_esp_connected_;
 
     public:
