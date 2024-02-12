@@ -1311,3 +1311,23 @@ TEST(updating_voice_inaccuracy_many_times_yields_uniform_distribution, {
         );
     }
 })
+
+
+TEST(when_lfo_amount_envelopes_are_changed_then_lfo_envelope_mapping_is_updated, {
+    Synth synth;
+
+    set_param(synth, Synth::ParamId::L3AEN, synth.lfos[2]->amount_envelope.value_to_ratio(7));
+    set_param(synth, Synth::ParamId::L6AEN, synth.lfos[5]->amount_envelope.value_to_ratio(1));
+    synth.process_messages();
+
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, synth.get_lfo_envelope_mapping()[0]);
+    assert_eq(7, synth.get_lfo_envelope_mapping()[2]);
+    assert_eq(1, synth.get_lfo_envelope_mapping()[5]);
+
+    synth.push_message(CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0);
+    synth.process_messages();
+
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, synth.get_lfo_envelope_mapping()[0]);
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, synth.get_lfo_envelope_mapping()[2]);
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, synth.get_lfo_envelope_mapping()[5]);
+})
