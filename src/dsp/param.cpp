@@ -1198,7 +1198,8 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::start_envelope(
         Seconds const time_offset,
         Number const random_1,
-        Number const random_2
+        Number const random_2,
+        LFOEnvelopeMapping const& lfo_envelope_mapping
 ) noexcept {
     Envelope* const envelope = get_envelope();
 
@@ -1927,11 +1928,12 @@ template<class ModulatorSignalProducerClass>
 void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
         Seconds const time_offset,
         Number const random_1,
-        Number const random_2
+        Number const random_2,
+        LFOEnvelopeMapping const& lfo_envelope_mapping
 ) noexcept {
-    FloatParamS::start_envelope(time_offset, random_1, random_2);
+    FloatParamS::start_envelope(time_offset, random_1, random_2, lfo_envelope_mapping);
 
-    modulation_level.start_envelope(time_offset, random_2, random_1);
+    modulation_level.start_envelope(time_offset, random_2, random_1, lfo_envelope_mapping);
 }
 
 

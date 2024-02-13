@@ -705,7 +705,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy
+        bool const should_sync_oscillator_inaccuracy,
+        LFOEnvelopeMapping const& lfo_envelope_mapping
 ) noexcept {
     if (state == State::ON || note >= Midi::NOTES) {
         return;
@@ -736,14 +737,22 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     oscillator.cancel_events_at(time_offset);
 
-    wavefolder.folding.start_envelope(time_offset, random_1, random_2);
+    wavefolder.folding.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
     if constexpr (IS_CARRIER) {
-        distortion.level.start_envelope(time_offset, random_1, random_2);
+        distortion.level.start_envelope(
+            time_offset, random_1, random_2, lfo_envelope_mapping
+        );
     }
 
-    panning.start_envelope(time_offset, random_1, random_2);
-    volume.start_envelope(time_offset, random_1, random_2);
+    panning.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    volume.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
     if (should_sync_oscillator_inaccuracy) {
         set_up_oscillator_frequency<true>(
@@ -759,25 +768,49 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.start_envelope(time_offset, random_1, random_2);
-    oscillator.amplitude.start_envelope(time_offset, random_1, random_2);
+    oscillator.modulated_amplitude.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    oscillator.amplitude.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.start_envelope(time_offset, random_1, random_2);
+        oscillator.subharmonic_amplitude.start_envelope(
+            time_offset, random_1, random_2, lfo_envelope_mapping
+        );
     }
 
-    oscillator.frequency.start_envelope(time_offset, random_1, random_2);
-    oscillator.phase.start_envelope(time_offset, random_1, random_2);
+    oscillator.frequency.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    oscillator.phase.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
-    oscillator.fine_detune.start_envelope(time_offset, random_1, random_2);
+    oscillator.fine_detune.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
-    filter_1.frequency.start_envelope(time_offset, random_1, random_2);
-    filter_1.q.start_envelope(time_offset, random_1, random_2);
-    filter_1.gain.start_envelope(time_offset, random_1, random_2);
+    filter_1.frequency.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    filter_1.q.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    filter_1.gain.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
-    filter_2.frequency.start_envelope(time_offset, random_1, random_2);
-    filter_2.q.start_envelope(time_offset, random_1, random_2);
-    filter_2.gain.start_envelope(time_offset, random_1, random_2);
+    filter_2.frequency.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    filter_2.q.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
+    filter_2.gain.start_envelope(
+        time_offset, random_1, random_2, lfo_envelope_mapping
+    );
 
     oscillator.start(time_offset);
 }
@@ -931,7 +964,8 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy
+        bool const should_sync_oscillator_inaccuracy,
+        LFOEnvelopeMapping const& lfo_envelope_mapping
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -945,7 +979,8 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         channel,
         velocity,
         previous_note,
-        should_sync_oscillator_inaccuracy
+        should_sync_oscillator_inaccuracy,
+        lfo_envelope_mapping
     );
 }
 
@@ -958,7 +993,8 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy
+        bool const should_sync_oscillator_inaccuracy,
+        LFOEnvelopeMapping const& lfo_envelope_mapping
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -974,7 +1010,8 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
             channel,
             velocity,
             previous_note,
-            should_sync_oscillator_inaccuracy
+            should_sync_oscillator_inaccuracy,
+            lfo_envelope_mapping
         );
 
         return;

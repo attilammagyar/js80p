@@ -43,6 +43,9 @@ class Macro;
 class LFO;
 
 
+class LFOEnvelopeMapping;
+
+
 enum ParamEvaluation
 {
     BLOCK = 0,  ///< The parameter is evaluated once at the beginning of each rendering block
@@ -351,7 +354,8 @@ class FloatParam : public Param<Number, evaluation>
         void start_envelope(
             Seconds const time_offset,
             Number const random_1,
-            Number const random_2
+            Number const random_2,
+            LFOEnvelopeMapping const& lfo_envelope_mapping
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;
@@ -558,7 +562,8 @@ class ModulatableFloatParam : public FloatParamS
         void start_envelope(
             Seconds const time_offset,
             Number const random_1,
-            Number const random_2
+            Number const random_2,
+            LFOEnvelopeMapping const& lfo_envelope_mapping
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;

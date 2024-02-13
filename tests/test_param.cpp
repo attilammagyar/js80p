@@ -1069,11 +1069,12 @@ TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_o
         1.0, 1.0, 1.0, 1.0, 1.0,
     };
     FloatParamS float_param("float", -1.0, 1.0, 0.0);
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_sample_rate(1.0);
     float_param.set_value(1.0);
-    float_param.start_envelope(3.0, 0.0, 0.0);
+    float_param.start_envelope(3.0, 0.0, 0.0, lfo_envelope_mapping);
     assert_eq(0.0, float_param.end_envelope(6.0), DOUBLE_DELTA);
     assert_eq(NULL, float_param.get_envelope());
 
@@ -1093,6 +1094,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
     };
     FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1112,7 +1114,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
 
     assert_true(float_param.is_constant_until(1));
     assert_false(float_param.is_constant_until(2));
@@ -1133,6 +1135,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     };
     FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1150,7 +1153,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1170,6 +1173,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     };
     FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1189,7 +1193,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.375);
 
-    float_param.start_envelope(1.0, 0.0, 0.0);
+    float_param.start_envelope(1.0, 0.0, 0.0, lfo_envelope_mapping);
     assert_eq(2.0, float_param.end_envelope(1.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1209,6 +1213,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     };
     FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1226,7 +1231,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
 
     envelope.release_time.set_value(0.123);
     envelope.amount.set_value(1.0);
@@ -1251,6 +1256,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
     };
     FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1272,7 +1278,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
 
     envelope.release_time.set_value(6.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
     float_param.cancel_envelope(4.0, 2.0);
 
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
@@ -1289,6 +1295,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1312,7 +1319,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
 
     envelope.release_time.set_value(0.123);
 
@@ -1335,6 +1342,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1358,7 +1366,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     envelope.release_time.set_value(3.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
 
     envelope.release_time.set_value(6.0);
 
@@ -1381,6 +1389,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
     };
     FloatParamS param("P", 0.0, 10.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     param.set_block_size(block_size);
@@ -1398,7 +1407,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0);
+    param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
     param.end_envelope(5.0);
     param.cancel_envelope(7.0, 2.0);
 
@@ -1417,6 +1426,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     };
     FloatParamS param("P", 0.0, 10.0, 0.0);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* const* rendered_samples;
 
     param.set_block_size(block_size);
@@ -1435,7 +1445,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0);
+    param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
     FloatParamS::produce<FloatParamS>(param, 1, block_size);
 
     param.end_envelope(0.0);
@@ -1464,6 +1474,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1488,7 +1499,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     envelope.release_time.set_value(0.123);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
 
     envelope.release_time.set_value(2.0);
 
@@ -1545,6 +1556,7 @@ void test_envelope_manual_update_dahds(
     FloatParamS leader("follow", -5.0, 5.0, 0.0);
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1569,7 +1581,7 @@ void test_envelope_manual_update_dahds(
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
     FloatParamS::produce<FloatParamS>(follower, 0, 2);
 
     envelope.release_time.set_value(2.0);
@@ -1640,6 +1652,7 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
     };
     FloatParamS float_param("float", 0.0, 10.0, 0.0);
     Envelope envelope("envelope");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
 
     envelope.dynamic.set_value(ToggleParam::ON);
@@ -1657,9 +1670,9 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(sample_rate);
     float_param.set_envelope(&envelope);
-    float_param.start_envelope(0.0, 0.0, 0.0);
+    float_param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
     float_param.end_envelope(3.0);
-    float_param.start_envelope(5.0, 0.0, 0.0);
+    float_param.start_envelope(5.0, 0.0, 0.0, lfo_envelope_mapping);
     float_param.end_envelope(8.0);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -1689,6 +1702,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     FloatParamS leader("follow", 0.0, 10.0, 0.0);
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size_max);
@@ -1711,7 +1725,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    follower.start_envelope(0.0, 0.0, 0.0);
+    follower.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
 
     FloatParamS::produce<FloatParamS>(follower, 1, block_size_1);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -2116,6 +2130,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     );
     FloatParamS follower(leader);
     Envelope envelope("env");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
     Sample rendered_samples_log[block_size];
 
@@ -2157,7 +2172,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     );
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
-    follower.start_envelope(0.0, 0.0, 0.0);
+    follower.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
     follower.end_envelope(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
@@ -2357,6 +2372,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
         (Sample)(param_value + Modulator::VALUE * 3.0),
     };
     Envelope envelope("ENV");
+    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     Modulator modulator;
     FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
@@ -2399,7 +2415,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     modulatable_float_param.set_sample_rate(sample_rate);
 
     modulatable_float_param.set_value(param_value);
-    modulatable_float_param.start_envelope(6.0, 0.0, 0.0);
+    modulatable_float_param.start_envelope(6.0, 0.0, 0.0, lfo_envelope_mapping);
     assert_eq(3.0, modulatable_float_param.end_envelope(12.0), DOUBLE_DELTA);
 
     assert_eq(

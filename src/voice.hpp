@@ -300,7 +300,8 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy
+            bool const should_sync_oscillator_inaccuracy,
+            LFOEnvelopeMapping const& lfo_envelope_mapping
         ) noexcept;
 
         void retrigger(
@@ -310,7 +311,8 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy
+            bool const should_sync_oscillator_inaccuracy,
+            LFOEnvelopeMapping const& lfo_envelope_mapping
         ) noexcept;
 
         void glide_to(
@@ -320,7 +322,8 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy
+            bool const should_sync_oscillator_inaccuracy,
+            LFOEnvelopeMapping const& lfo_envelope_mapping
         ) noexcept;
 
         void note_off(
