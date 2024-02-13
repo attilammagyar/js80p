@@ -1051,13 +1051,21 @@ void Synth::trigger_note_on_voice(
     carriers[voice]->update_inaccuracy(cached_round);
 
     if (mode == MIX_AND_MOD) {
-        modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
-        carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+        modulators[voice]->note_on(
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+        );
+        carriers[voice]->note_on(
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+        );
     } else {
         if (note < mode + Midi::NOTE_B_2) {
-            modulators[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+            modulators[voice]->note_on(
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            );
         } else {
-            carriers[voice]->note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+            carriers[voice]->note_on(
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            );
         }
     }
 
@@ -1147,11 +1155,17 @@ void Synth::trigger_note_on_voice_monophonic(
         bool const should_sync_oscillator_inaccuracy
 ) noexcept {
     if (is_off) {
-        voice.note_on(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+        voice.note_on(
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+        );
     } else if (voice.is_released()) {
-        voice.retrigger(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+        voice.retrigger(
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+        );
     } else {
-        voice.glide_to(time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy);
+        voice.glide_to(
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+        );
     }
 }
 
