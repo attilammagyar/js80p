@@ -58,12 +58,12 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     std::string serialized;
     Number const inv_saw_as_ratio = (
         synth_1.modulator_params.waveform.value_to_ratio(
-            SimpleOscillator::INVERSE_SAWTOOTH
+            Modulator::Oscillator_::INVERSE_SAWTOOTH
         )
     );
     Number const triangle_as_ratio = (
         synth_1.modulator_params.waveform.value_to_ratio(
-            SimpleOscillator::TRIANGLE
+            Modulator::Oscillator_::TRIANGLE
         )
     );
 
