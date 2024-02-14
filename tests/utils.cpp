@@ -19,6 +19,8 @@
 #ifndef JS80P__TESTS__UTILS_CPP
 #define JS80P__TESTS__UTILS_CPP
 
+#include "utils.hpp"
+
 #include "js80p.hpp"
 
 #include "dsp/math.cpp"
@@ -28,10 +30,6 @@
 
 namespace JS80P
 {
-
-constexpr float FLOAT_DELTA = 0.000001f;
-constexpr double DOUBLE_DELTA = 0.000001;
-
 
 class Buffer
 {

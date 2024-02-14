@@ -21,13 +21,13 @@
 #include <utility>
 
 #include "test.cpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include "js80p.hpp"
 
-#include "bank.cpp"
-#include "serializer.cpp"
-#include "synth.cpp"
+#include "bank.hpp"
+#include "serializer.hpp"
+#include "synth.hpp"
 
 
 using namespace JS80P;

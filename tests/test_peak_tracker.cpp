@@ -17,7 +17,7 @@
  */
 
 #include "test.cpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include "js80p.hpp"
 

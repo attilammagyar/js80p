@@ -106,15 +106,23 @@ OBJ_TARGET_GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground.o
 
 OBJ_DEV_FST_PLUGIN = $(DEV_DIR)/fst-plugin.o
 OBJ_DEV_BANK = $(DEV_DIR)/bank.o
-OBJ_DEV_SERIALIZER = $(DEV_DIR)/serializer.o
-OBJ_DEV_SYNTH = $(DEV_DIR)/synth.o
 OBJ_DEV_GUI_STUB = $(DEV_DIR)/gui-stub.o
 OBJ_DEV_MTS_ESP = $(DEV_DIR)/mts-esp.o
-
+OBJ_DEV_SERIALIZER = $(DEV_DIR)/serializer.o
+OBJ_DEV_SYNTH = $(DEV_DIR)/synth.o
 OBJ_DEV_UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch.o
-
 OBJ_DEV_VSTXMLGEN = $(DEV_DIR)/vstxmlgen.o
 
+OBJ_DEV_TEST_BANK = $(DEV_DIR)/test_bank.o
+OBJ_DEV_TEST_GUI = $(DEV_DIR)/test_gui.o
+
+TEST_OBJS = \
+	$(OBJ_DEV_BANK) \
+	$(OBJ_DEV_GUI_STUB) \
+	$(OBJ_DEV_SERIALIZER) \
+	$(OBJ_DEV_SYNTH) \
+	$(OBJ_DEV_TEST_BANK) \
+	$(OBJ_DEV_TEST_GUI)
 
 FST_OBJS = \
 	$(OBJ_TARGET_GUI_EXTRA) \
@@ -324,6 +332,7 @@ MTS_ESP_HEADERS = lib/mtsesp/Client/libMTSClient.h
 
 TEST_LIBS = \
 	tests/test.cpp \
+	tests/utils.hpp \
 	tests/utils.cpp
 
 TEST_CPPS = $(foreach TEST,$(TESTS),tests/$(TEST).cpp)
@@ -416,6 +425,7 @@ clean:
 		$(GUI_PLAYGROUND_OBJS) \
 		$(PERF_TEST_BINS) \
 		$(TEST_BINS) \
+		$(TEST_OBJS) \
 		$(UPGRADE_PATCH) \
 		$(UPGRADE_PATCH_OBJS) \
 		$(VST3) \
@@ -571,16 +581,21 @@ $(DEV_DIR)/test_example$(DEV_EXE): \
 	$(VALGRIND) $@
 
 $(DEV_DIR)/test_bank$(DEV_EXE): \
-		tests/test_bank.cpp \
-		src/bank.cpp src/bank.hpp \
-		src/serializer.cpp src/serializer.hpp \
-		$(TEST_LIBS) \
-		$(SYNTH_HEADERS) \
-		$(SYNTH_SOURCES) \
+		$(OBJ_DEV_BANK) \
+		$(OBJ_DEV_SERIALIZER) \
+		$(OBJ_DEV_SYNTH) \
+		$(OBJ_DEV_TEST_BANK) \
 		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_DEV) -o $@ $<
+	$(LINK_DEV_EXE) $^ -o $@
 	$(VALGRIND) $@
+
+$(OBJ_DEV_TEST_BANK): \
+		tests/test_bank.cpp \
+		$(BANK_HEADERS) $(SYNTH_HEADERS) \
+		$(TEST_LIBS) \
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
 $(DEV_DIR)/test_biquad_filter$(DEV_EXE): \
 		tests/test_biquad_filter.cpp \
@@ -647,15 +662,18 @@ $(DEV_DIR)/test_gain$(DEV_EXE): \
 	$(VALGRIND) $@
 
 $(DEV_DIR)/test_gui$(DEV_EXE): \
-		tests/test_gui.cpp \
-		src/gui/stub.cpp \
-		$(TEST_LIBS) \
-		$(JS80P_HEADERS) \
-		$(JS80P_SOURCES) \
+		$(OBJ_DEV_GUI_STUB) \
+		$(OBJ_DEV_SERIALIZER) \
+		$(OBJ_DEV_SYNTH) \
+		$(OBJ_DEV_TEST_GUI) \
 		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_DEV) -o $@ $<
+	$(LINK_DEV_EXE) $^ -o $@
 	$(VALGRIND) $@
+
+$(OBJ_DEV_TEST_GUI): \
+		tests/test_gui.cpp $(GUI_COMMON_HEADERS) $(TEST_LIBS) | $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
 $(DEV_DIR)/test_lfo$(DEV_EXE): \
 		tests/test_lfo.cpp \

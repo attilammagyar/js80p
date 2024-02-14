@@ -19,7 +19,7 @@
 #include <string>
 
 #include "test.cpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include "spscqueue.cpp"
 

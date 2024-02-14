@@ -17,19 +17,16 @@
  */
 
 #include "test.cpp"
-#include "utils.cpp"
+#include "utils.hpp"
 
 #include <cstddef>
 
 #include "js80p.hpp"
 
-#include "serializer.cpp"
-#include "synth.cpp"
+#include "serializer.hpp"
+#include "synth.hpp"
 
-#include "gui/stub.cpp"
-
-#include "gui/widgets.cpp"
-#include "gui/gui.cpp"
+#include "gui/gui.hpp"
 
 
 using namespace JS80P;
