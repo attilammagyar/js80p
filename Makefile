@@ -833,9 +833,14 @@ $(DEV_DIR)/test_synth$(DEV_EXE): \
 
 $(DEV_DIR)/test_voice$(DEV_EXE): \
 		tests/test_voice.cpp \
+		src/voice.cpp src/voice.hpp \
+		src/midi.hpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
+		src/dsp/distortion.cpp src/dsp/distortion.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		$(SYNTH_SOURCES) \
-		$(SYNTH_HEADERS) \
 		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<

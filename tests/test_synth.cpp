@@ -1278,3 +1278,36 @@ TEST(stores_mts_esp_connection_flag, {
     synth.mts_esp_disconnected();
     assert_false(synth.is_mts_esp_connected());
 })
+
+
+TEST(updating_voice_inaccuracy_many_times_yields_uniform_distribution, {
+    constexpr Integer probes = 100000;
+
+    for (Integer i = 0; i != Synth::POLYPHONY; ++i) {
+        std::vector<Number> inaccuracies(probes);
+        Math::Statistics statistics;
+        Number inaccuracy = Synth::calculate_inaccuracy_seed(i);
+
+        for (Integer j = 0; j != probes; ++j) {
+            inaccuracy = OscillatorInaccuracy::calculate_new_inaccuracy(inaccuracy);
+            inaccuracies[j] = inaccuracy;
+        }
+
+        Math::compute_statistics(inaccuracies, statistics);
+
+        Number const mean = (
+            (OscillatorInaccuracy::MIN + OscillatorInaccuracy::MAX) / 2.0
+        );
+
+        assert_statistics(
+            true,
+            OscillatorInaccuracy::MIN,
+            mean,
+            OscillatorInaccuracy::MAX,
+            mean,
+            (OscillatorInaccuracy::MAX - mean) / 2.0,
+            statistics,
+            0.02
+        );
+    }
+})

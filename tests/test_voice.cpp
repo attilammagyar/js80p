@@ -40,7 +40,6 @@
 #include "dsp/wavefolder.cpp"
 #include "dsp/wavetable.cpp"
 
-#include "synth.cpp"
 #include "voice.cpp"
 
 
@@ -925,37 +924,4 @@ TEST(when_vocie_is_reset_then_synced_inaccuracy_is_also_reset, {
     voice.reset();
 
     assert_eq(seed, synced_oscillator_inaccuracy.get_inaccuracy(), DOUBLE_DELTA);
-})
-
-
-TEST(updating_the_inaccuracy_many_times_yields_uniform_distribution, {
-    constexpr Integer probes = 100000;
-
-    for (Integer i = 0; i != Synth::POLYPHONY; ++i) {
-        std::vector<Number> inaccuracies(probes);
-        Math::Statistics statistics;
-        Number inaccuracy = Synth::calculate_inaccuracy_seed(i);
-
-        for (Integer j = 0; j != probes; ++j) {
-            inaccuracy = OscillatorInaccuracy::calculate_new_inaccuracy(inaccuracy);
-            inaccuracies[j] = inaccuracy;
-        }
-
-        Math::compute_statistics(inaccuracies, statistics);
-
-        Number const mean = (
-            (OscillatorInaccuracy::MIN + OscillatorInaccuracy::MAX) / 2.0
-        );
-
-        assert_statistics(
-            true,
-            OscillatorInaccuracy::MIN,
-            mean,
-            OscillatorInaccuracy::MAX,
-            mean,
-            (OscillatorInaccuracy::MAX - mean) / 2.0,
-            statistics,
-            0.02
-        );
-    }
 })
