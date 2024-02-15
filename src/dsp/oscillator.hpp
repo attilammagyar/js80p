@@ -311,6 +311,9 @@ class Oscillator : public SignalProducer
         bool subharmonic_amplitude_is_constant;
 };
 
+
+template class Param<SimpleOscillator::Waveform, ParamEvaluation::BLOCK>;
+
 }
 
 #endif

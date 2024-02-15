@@ -27,15 +27,16 @@
 #include "js80p.hpp"
 #include "midi.hpp"
 
-#include "serializer.cpp"
-#include "synth.cpp"
+#include "dsp/lfo.hpp"
+
+#include "serializer.hpp"
+#include "synth.hpp"
 
 
 using namespace JS80P;
 
 
-SimpleOscillator::WaveformParam wavetable_cache_waveform("WAV");
-SimpleOscillator wavetable_cache(wavetable_cache_waveform);
+LFO wavetable_cache("CACHE");
 
 
 void assert_in(std::string const& needle, std::string const& haystack)

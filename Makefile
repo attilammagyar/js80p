@@ -115,6 +115,7 @@ OBJ_DEV_VSTXMLGEN = $(DEV_DIR)/vstxmlgen.o
 
 OBJ_DEV_TEST_BANK = $(DEV_DIR)/test_bank.o
 OBJ_DEV_TEST_GUI = $(DEV_DIR)/test_gui.o
+OBJ_DEV_TEST_SERIALIZER = $(DEV_DIR)/test_serializer.o
 
 TEST_OBJS = \
 	$(OBJ_DEV_BANK) \
@@ -122,7 +123,8 @@ TEST_OBJS = \
 	$(OBJ_DEV_SERIALIZER) \
 	$(OBJ_DEV_SYNTH) \
 	$(OBJ_DEV_TEST_BANK) \
-	$(OBJ_DEV_TEST_GUI)
+	$(OBJ_DEV_TEST_GUI) \
+	$(OBJ_DEV_TEST_SERIALIZER)
 
 FST_OBJS = \
 	$(OBJ_TARGET_GUI_EXTRA) \
@@ -792,15 +794,20 @@ $(DEV_DIR)/test_renderer$(DEV_EXE): \
 	$(VALGRIND) $@
 
 $(DEV_DIR)/test_serializer$(DEV_EXE): \
-		tests/test_serializer.cpp \
-		src/serializer.cpp src/serializer.hpp \
-		$(TEST_LIBS) \
-		$(SYNTH_HEADERS) \
-		$(SYNTH_SOURCES) \
+		$(OBJ_DEV_SERIALIZER) \
+		$(OBJ_DEV_SYNTH) \
+		$(OBJ_DEV_TEST_SERIALIZER) \
 		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
-	$(COMPILE_DEV) -o $@ $<
+	$(LINK_DEV_EXE) $^ -o $@
 	$(VALGRIND) $@
+
+$(OBJ_DEV_TEST_SERIALIZER): \
+		tests/test_serializer.cpp \
+		$(SERIALIZER_HEADERS) \
+		$(TEST_LIBS) \
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -c -o $@ $<
 
 $(DEV_DIR)/test_signal_producer$(DEV_EXE): \
 		tests/test_signal_producer.cpp \
