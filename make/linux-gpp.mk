@@ -88,8 +88,9 @@ $(LIB_PATH)/libxcb.so: $(SYS_LIB_PATH)/libxcb.so.1 | $(LIB_PATH)
 $(LIB_PATH)/libxcb-render.so: $(SYS_LIB_PATH)/libxcb-render.so.0 | $(LIB_PATH)
 	ln -s $< $@
 
-# DEBUG_LOG_FILE ?= STDERR
-# DEBUG_LOG_FILE ?= /tmp/debug.txt
+# DEBUG_LOG ?= STDERR
+# DEBUG_LOG ?= /tmp/debug.txt
+DEBUG_LOG ?=
 
 RM = rm -f
 MKDIR = mkdir

@@ -18,8 +18,9 @@
 
 TARGET_OS = windows
 
-# DEBUG_LOG_FILE ?= STDERR
-# DEBUG_LOG_FILE ?= C:\\\\debug.txt
+# DEBUG_LOG ?= STDERR
+# DEBUG_LOG ?= C:\\\\debug.txt
+DEBUG_LOG ?=
 
 FST = $(FST_DIR)/js80p.dll
 FST_MAIN_SOURCES = src/plugin/fst/dll.cpp
