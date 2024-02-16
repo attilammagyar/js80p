@@ -46,14 +46,14 @@ Param<NumberType, evaluation>::Param(
         number_of_events,
         buffer_owner
     ),
-    midi_controller(NULL),
-    macro(NULL),
-    macro_change_index(-1),
     name(name),
     min_value(min_value),
     max_value(max_value),
     range((NumberType)(max_value - min_value)),
     default_value(default_value),
+    midi_controller(NULL),
+    macro(NULL),
+    macro_change_index(-1),
     range_inv(1.0 / (Number)range),
     change_index(0),
     value(default_value)
@@ -383,9 +383,11 @@ FloatParam<evaluation>::FloatParam(
     : Param<Number, evaluation>(
         name, min_value, max_value, default_value, NUMBER_OF_EVENTS
     ),
+    leader(NULL),
+    round_to(round_to),
+    round_to_inv(round_to > 0.0 ? 1.0 / round_to : 0.0),
     log_scale_toggle(log_scale_toggle),
     log_scale_table(log_scale_table),
-    log_scale_table_max_index(log_scale_table_max_index),
     log_scale_table_index_scale(log_scale_table_index_scale),
     log_scale_value_offset(log_scale_value_offset),
     log_min_minus(
@@ -398,15 +400,13 @@ FloatParam<evaluation>::FloatParam(
             ? 1.0 / (std::log2(max_value + log_scale_value_offset) + log_min_minus)
             : 1.0
     ),
-    leader(NULL),
+    log_scale_table_max_index(log_scale_table_max_index),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         log_scale_toggle == NULL
         && Math::is_close(min_value, 0.0)
         && Math::is_close(max_value, 1.0)
-    ),
-    round_to(round_to),
-    round_to_inv(should_round ? 1.0 / round_to : 0.0)
+    )
 {
     initialize_instance();
 }
@@ -446,9 +446,11 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
         NUMBER_OF_EVENTS,
         (SignalProducer*)&leader
     ),
+    leader(&leader),
+    round_to(0.0),
+    round_to_inv(0.0),
     log_scale_toggle(leader.get_log_scale_toggle()),
     log_scale_table(leader.get_log_scale_table()),
-    log_scale_table_max_index(leader.get_log_scale_table_max_index()),
     log_scale_table_index_scale(leader.get_log_scale_table_index_scale()),
     log_scale_value_offset(leader.get_log_scale_value_offset()),
     log_min_minus(
@@ -461,15 +463,13 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
             ? 1.0 / (std::log2(leader.get_max_value() + log_scale_value_offset) + log_min_minus)
             : 1.0
     ),
-    leader(&leader),
+    log_scale_table_max_index(leader.get_log_scale_table_max_index()),
     should_round(false),
     is_ratio_same_as_value(
         leader.get_log_scale_toggle() == NULL
         && Math::is_close(leader.get_min_value(), 0.0)
         && Math::is_close(leader.get_max_value(), 1.0)
-    ),
-    round_to(0.0),
-    round_to_inv(0.0)
+    )
 {
     initialize_instance();
 }

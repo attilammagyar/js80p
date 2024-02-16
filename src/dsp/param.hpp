@@ -119,19 +119,20 @@ class Param : public SignalProducer
         NumberType clamp(NumberType const value) const noexcept;
         void store_new_value(NumberType const new_value) noexcept;
 
-        MidiController* midi_controller;
-
-        Macro* macro;
-        Integer macro_change_index;
-
         std::string const name;
         NumberType const min_value;
         NumberType const max_value;
         NumberType const range;
         NumberType const default_value;
 
+        MidiController* midi_controller;
+
+        Macro* macro;
+        Integer macro_change_index;
+
     private:
         Number const range_inv;
+
         Integer change_index;
         NumberType value;
 };
@@ -474,42 +475,37 @@ class FloatParam : public Param<Number, evaluation>
             Seconds const duration = 0.0
         ) noexcept;
 
+        FloatParam<evaluation>* const leader;
+        Number const round_to;
+        Number const round_to_inv;
         ToggleParam const* const log_scale_toggle;
         Number const* const log_scale_table;
-        int const log_scale_table_max_index;
         Number const log_scale_table_index_scale;
         Number const log_scale_value_offset;
         Number const log_min_minus;
         Number const log_range_inv;
-
-        FloatParam<evaluation>* const leader;
-
-        LFO* lfo;
-        Sample const* const* lfo_buffer;
-
-        Number random_seed;
-
-        Envelope* envelope;
-        EnvelopeRandoms envelope_randoms;
-        std::vector<EnvelopeSnapshot> envelope_snapshots;
-        Queue<std::vector<EnvelopeSnapshot>::size_type> unused_envelope_snapshots;
-        Integer active_envelope_snapshot_id;
-        Integer scheduled_envelope_snapshot_id;
-        Seconds envelope_time;
-        Seconds envelope_cancel_duration;
-        EnvelopeStage envelope_stage;
-        bool envelope_canceled;
-        bool envelope_is_constant;
-
+        int const log_scale_table_max_index;
         bool const should_round;
         bool const is_ratio_same_as_value;
-        Number const round_to;
-        Number const round_to_inv;
 
+        std::vector<EnvelopeSnapshot> envelope_snapshots;
+        Queue<std::vector<EnvelopeSnapshot>::size_type> unused_envelope_snapshots;
         LinearRampState linear_ramp_state;
+        EnvelopeRandoms envelope_randoms;
+        LFO* lfo;
+        Sample const* const* lfo_buffer;
+        Envelope* envelope;
+        Number random_seed;
+        Seconds envelope_time;
+        Seconds envelope_cancel_duration;
+        Integer active_envelope_snapshot_id;
+        Integer scheduled_envelope_snapshot_id;
         Integer constantness_round;
-        bool constantness;
+        EnvelopeStage envelope_stage;
         SignalProducer::Event::Type latest_event_type;
+        bool envelope_canceled;
+        bool envelope_is_constant;
+        bool constantness;
 };
 
 
