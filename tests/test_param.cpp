@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "test.cpp"
 #include "utils.cpp"
 
@@ -1575,6 +1577,71 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
         float_param, 2, 15
     );
     assert_eq(expected_samples_2, rendered_samples, 15, DOUBLE_DELTA);
+})
+
+
+TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_sustaining, {
+    constexpr Integer block_size_1 = 5;
+    constexpr Integer block_size_2 = 10;
+    constexpr Integer block_size_max = std::max(block_size_1, block_size_2);
+    constexpr Sample expected_samples_1[block_size_1] = {
+        9.00, 8.50, 8.00, 7.50, 7.00,
+    };
+    constexpr Sample expected_samples_2[block_size_2] = {
+        7.00, 6.75, 6.50, 6.25, 6.00,
+        5.75, 5.50, 5.50, 5.50, 5.50,
+    };
+    FloatParamS leader("follow", 0.0, 10.0, 0.0);
+    FloatParamS follower(leader);
+    Envelope envelope("env");
+    Sample const* rendered_samples;
+
+    leader.set_block_size(block_size_max);
+    leader.set_sample_rate(1.0);
+    leader.set_envelope(&envelope);
+    leader.set_value(0.2);
+
+    follower.set_block_size(block_size_max);
+    follower.set_sample_rate(6.0 / Envelope::DYNAMIC_ENVELOPE_RAMP_TIME);
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(envelope.decay_time.get_min_value());
+    envelope.sustain_value.set_value(0.9);
+    envelope.release_time.set_value(0.0);
+    envelope.final_value.set_value(0.0);
+
+    follower.start_envelope(0.0, 0.0, 0.0);
+
+    FloatParamS::produce<FloatParamS>(follower, 1, block_size_1);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 2, block_size_1
+    );
+    assert_eq(NULL, rendered_samples);
+
+    envelope.sustain_value.set_value(0.6);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 3, block_size_1
+    );
+    assert_eq(expected_samples_1, rendered_samples, block_size_1, DOUBLE_DELTA);
+    assert_false(follower.is_constant_until(block_size_1));
+
+    envelope.sustain_value.set_value(0.55);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 4, block_size_2
+    );
+    assert_eq(expected_samples_2, rendered_samples, block_size_2, DOUBLE_DELTA);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 5, block_size_2
+    );
+    assert_eq(NULL, rendered_samples);
+    assert_eq(5.5, follower.get_value(), DOUBLE_DELTA);
 })
 
 

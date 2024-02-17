@@ -65,6 +65,7 @@ class Envelope
 {
     public:
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
+        static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
 
         static Number get_value_at_time(
                 EnvelopeSnapshot const& snapshot,
@@ -119,7 +120,6 @@ class Envelope
         FloatParamB value_inaccuracy;
 
     private:
-        static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
         static constexpr Number ALMOST_ZERO = 0.0000001;
 
         static void set_up_next_target(

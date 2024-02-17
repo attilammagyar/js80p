@@ -698,8 +698,8 @@ bool FloatParam<evaluation>::is_constant_until(
                     || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
                 )
         ) {
-            if (envelope_is_constant) {
-                return true;
+            if (!envelope_is_constant) {
+                return false;
             }
 
             envelope->update();
