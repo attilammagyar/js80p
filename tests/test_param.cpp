@@ -1921,7 +1921,6 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 
     follower.set_block_size(block_size);
     follower.set_sample_rate(sample_rate);
-    follower.set_lfo(&lfo);
 
     assert_eq((void*)&lfo, (void*)follower.get_lfo());
     assert_false(follower.is_constant_in_next_round(1, block_size));
