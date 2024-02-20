@@ -441,6 +441,8 @@ class FloatParam : public Param<Number, evaluation>
             Seconds const duration
         ) const noexcept;
 
+        void clear_envelope_state() noexcept;
+
         void update_envelope_randoms(
             Number const random_1,
             Number const random_2

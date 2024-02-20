@@ -420,12 +420,7 @@ void FloatParam<evaluation>::initialize_instance() noexcept
     random_seed = 0.5;
 
     envelope = NULL;
-    active_envelope_snapshot_id = -1;
-    scheduled_envelope_snapshot_id = -1;
-    envelope_stage = EnvelopeStage::ENV_STG_NONE;
-    envelope_time = 0.0;
-    envelope_canceled = false;
-    envelope_is_constant = true;
+    clear_envelope_state();
 
     std::fill_n(envelope_randoms, ENVELOPE_RANDOMS_COUNT, 0.0);
 
@@ -1124,15 +1119,23 @@ void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
     }
 
     this->cancel_events();
+    clear_envelope_state();
+}
 
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::clear_envelope_state() noexcept
+{
     envelope_snapshots.clear();
     unused_envelope_snapshots.drop(0);
 
-    envelope_stage = EnvelopeStage::ENV_STG_NONE;
     envelope_time = 0.0;
+    envelope_cancel_duration = 0.0;
     active_envelope_snapshot_id = -1;
     scheduled_envelope_snapshot_id = -1;
+    envelope_stage = EnvelopeStage::ENV_STG_NONE;
     envelope_canceled = false;
+    envelope_is_constant = true;
 }
 
 
@@ -1302,16 +1305,7 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::reset() noexcept
 {
     SignalProducer::reset();
-
-    active_envelope_snapshot_id = -1;
-    scheduled_envelope_snapshot_id = -1;
-    envelope_stage = EnvelopeStage::ENV_STG_NONE;
-    envelope_time = 0.0;
-    envelope_canceled = false;
-    envelope_is_constant = true;
-
-    envelope_snapshots.clear();
-    unused_envelope_snapshots.drop(0);
+    clear_envelope_state();
 }
 
 
