@@ -25,6 +25,7 @@
 
 #include "js80p.hpp"
 
+#include "dsp/lfo_envelope_mapping.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/signal_producer.hpp"
 #include "dsp/queue.hpp"
@@ -41,9 +42,6 @@ class Macro;
 
 
 class LFO;
-
-
-class LFOEnvelopeMapping;
 
 
 enum ParamEvaluation
