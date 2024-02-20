@@ -808,7 +808,7 @@ $(DEV_DIR)/test_serializer$(DEV_EXE): \
 
 $(OBJ_DEV_TEST_SERIALIZER): \
 		tests/test_serializer.cpp \
-		$(SERIALIZER_HEADERS) \
+		$(SERIALIZER_HEADERS) $(SYNTH_HEADERS) \
 		$(TEST_LIBS) \
 		| $(DEV_DIR)
 	$(COMPILE_DEV) -c -o $@ $<
