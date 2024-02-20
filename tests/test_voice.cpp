@@ -898,7 +898,7 @@ TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, 
 })
 
 
-TEST(when_vocie_is_reset_then_synced_inaccuracy_is_also_reset, {
+TEST(when_voice_is_reset_then_synced_inaccuracy_is_also_reset, {
     constexpr Number seed = 0.123;
 
     OscillatorInaccuracy synced_oscillator_inaccuracy(seed);
