@@ -29,7 +29,7 @@
 #include "dsp/distortion.hpp"
 #include "dsp/envelope.hpp"
 #include "dsp/filter.hpp"
-#include "dsp/lfo.hpp"
+#include "dsp/lfo_envelope_mapping.hpp"
 #include "dsp/math.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
