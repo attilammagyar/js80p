@@ -1373,6 +1373,40 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
 })
 
 
+TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_time, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 5.0, 10.0, 10.0, 10.0,
+        10.0, 8.0, 6.0, 3.0, 0.0,
+    };
+    FloatParamS param("P", 0.0, 10.0, 0.0);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    param.set_block_size(block_size);
+    param.set_sample_rate(1.0);
+    param.set_envelope(&envelope);
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(2.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(10.0);
+    envelope.decay_time.set_value(15.0);
+    envelope.sustain_value.set_value(1.0);
+    envelope.release_time.set_value(5.0);
+    envelope.final_value.set_value(0.0);
+
+    param.start_envelope(0.0, 0.0, 0.0);
+    param.end_envelope(5.0);
+    param.cancel_envelope(7.0, 2.0);
+
+    rendered_samples = FloatParamS::produce<FloatParamS>(param, 1, block_size);
+    assert_eq(expected_samples, rendered_samples[0], block_size, 0.001);
+})
+
+
 TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_dahds, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {

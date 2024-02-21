@@ -992,7 +992,9 @@ void FloatParam<evaluation>::handle_envelope_end_event(
 
     Seconds const latency = this->current_time - event.time_offset;
 
-    store_envelope_value_at_event(latency);
+    if (active_envelope_snapshot_id >= 0) {
+        store_envelope_value_at_event(latency);
+    }
 
     envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
     envelope_time = latency;
@@ -1003,10 +1005,6 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::store_envelope_value_at_event(
         Seconds const latency
 ) noexcept {
-    if (active_envelope_snapshot_id < 0) {
-        return;
-    }
-
     EnvelopeSnapshot const& snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
     Number const ratio_at_time_of_event = Envelope::get_value_at_time(
@@ -1025,13 +1023,27 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_envelope_cancel_event(
         SignalProducer::Event const& event
 ) noexcept {
+    if (
+            JS80P_UNLIKELY(
+                envelope_stage == EnvelopeStage::ENV_STG_RELEASED
+                || envelope_stage == EnvelopeStage::ENV_STG_NONE
+            )
+    ) {
+        return;
+    }
+
+    Seconds const latency = this->current_time - event.time_offset;
+
     if (active_envelope_snapshot_id >= 0) {
+        store_envelope_value_at_event(latency);
+
         EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
         snapshot.release_time = std::min((Seconds)event.number_param_1, snapshot.release_time);
     }
 
-    handle_envelope_end_event(event);
+    envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
+    envelope_time = latency;
 }
 
 
@@ -1055,7 +1067,9 @@ void FloatParam<evaluation>::handle_cancel_event(
         if (envelope != NULL) {
             Seconds const latency = this->current_time - event.time_offset;
 
-            store_envelope_value_at_event(latency);
+            if (active_envelope_snapshot_id >= 0) {
+                store_envelope_value_at_event(latency);
+            }
         }
     }
 
