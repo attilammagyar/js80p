@@ -978,6 +978,7 @@ JS80P and want to compile it themselves.
 The `lib/` directory contains code from the following projects:
 
  * [FST](https://git.iem.at/zmoelnig/FST)
+ * [MTS-ESP](https://github.com/ODDSound/MTS-ESP)
  * [VST 3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
 Note that the `lib/` directory does not include the whole SDK packages, it only
