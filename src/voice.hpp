@@ -43,6 +43,15 @@ constexpr int VOICE_TUNINGS = 4;
 typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
 typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 
+typedef Byte OscillatorInaccuracyLevel;
+
+
+class OscillatorInaccuracyParam : public Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>
+{
+    public:
+        explicit OscillatorInaccuracyParam(std::string const& name) noexcept;
+};
+
 
 class OscillatorInaccuracy
 {
@@ -54,13 +63,13 @@ class OscillatorInaccuracy
 
         static Frequency detune(
             Frequency const frequency,
-            Integer const level,
+            OscillatorInaccuracyParam const& level_param,
             Number const inaccuracy
         ) noexcept;
 
         static Number calculate_new_inaccuracy(Number const seed) noexcept;
 
-        OscillatorInaccuracy(Number const seed);
+        explicit OscillatorInaccuracy(Number const seed);
 
         Number get_inaccuracy() const noexcept;
 
@@ -72,7 +81,12 @@ class OscillatorInaccuracy
 
         static constexpr Number DELTA = MAX - MIN;
 
+        /* False-positive, it is used in voice.cpp for initializing CENTS. */
+        // cppcheck-suppress unusedPrivateFunction
         static constexpr Number interval_width(Integer const level);
+
+        /* False-positive, it is used in voice.cpp for initializing CENTS. */
+        // cppcheck-suppress unusedPrivateFunction
         static constexpr Number interval_min(Integer const level);
 
         static Number const CENTS[MAX_LEVEL + 1][2];
@@ -117,20 +131,12 @@ class Voice : public SignalProducer
 
         typedef VolumeApplier ModulationOut;
 
-        typedef Byte OscillatorInaccuracyLevel;
-
-        class OscillatorInaccuracyParam : public Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>
-        {
-            public:
-                OscillatorInaccuracyParam(std::string const name) noexcept;
-        };
-
         typedef Byte Tuning;
 
         class TuningParam : public Param<Tuning, ParamEvaluation::BLOCK>
         {
             public:
-                TuningParam(std::string const name) noexcept;
+                explicit TuningParam(std::string const& name) noexcept;
         };
 
         class Dummy
@@ -139,7 +145,7 @@ class Voice : public SignalProducer
                 Dummy();
 
                 Dummy(
-                    std::string const a,
+                    std::string const& a,
                     Number const b,
                     Number const c,
                     Number const d
@@ -149,7 +155,7 @@ class Voice : public SignalProducer
         class Params
         {
             public:
-                Params(std::string const name) noexcept;
+                explicit Params(std::string const& name) noexcept;
 
                 TuningParam tuning;
                 OscillatorInaccuracyParam oscillator_inaccuracy;

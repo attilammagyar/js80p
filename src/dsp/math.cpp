@@ -59,11 +59,11 @@ void Math::init_randoms() noexcept
     https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
     */
 
-    constexpr Integer seed = 0x1705;
+    constexpr unsigned int seed = 0x1705;
     constexpr Number scale = 1.0 / 65536.0;
 
-    Integer x = seed;
-    Integer c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
+    unsigned int x = seed;
+    unsigned int c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
 
     for (int i = 0; i != RANDOMS; ++i) {
         x = 32718 * x + c;

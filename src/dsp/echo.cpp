@@ -29,7 +29,7 @@ namespace JS80P
 
 template<class InputSignalProducerClass>
 Echo<InputSignalProducerClass>::Echo(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(

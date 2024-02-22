@@ -48,7 +48,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
         {
             public:
-                TypeParam(std::string const name) noexcept;
+                explicit TypeParam(std::string const& name) noexcept;
         };
 
         static constexpr Type REVERB_1  = 0;
@@ -63,7 +63,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         static constexpr Type REVERB_10 = 9;
 
         Reverb(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
         );

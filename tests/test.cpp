@@ -714,9 +714,10 @@ class _TestAssert
         }
 
 
-#define _CONV_ID(x) (x)
-#define _CONV_REPEAT(x) (x), (x)
-#define _CONV_STR_TO_CSTR(x) (x).c_str()
+#define _CONV_ID(x, _type) (x)
+#define _CONV_REPEAT(x, _type) (x), (x)
+#define _CONV_REPEAT_AS_UNSIGNED(x, _type) (x), ((unsigned _type)(x))
+#define _CONV_STR_TO_CSTR(x, _type) (x).c_str()
 
 
 #define _ASSERT_A_OP_B_METHOD(_name, _op, _type, _type_f, _conv)            \
@@ -736,46 +737,46 @@ static bool _name(                                                          \
             file,                                                           \
             line,                                                           \
             "a " #_op " b\n  a=" _type_f " // %s\n  b=" _type_f " // %s",   \
-            _conv(a), a_src,                                                \
-            _conv(b), b_src                                                 \
+            _conv(a, _type), a_src,                                         \
+            _conv(b, _type), b_src                                          \
         );                                                                  \
         return false;                                                       \
     }                                                                       \
 }
 
-        _ASSERT_A_OP_B_METHOD(eq, ==, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(eq, ==, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(eq, ==, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(eq, ==, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(eq, ==, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(eq, ==, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
-        _ASSERT_A_OP_B_METHOD(neq, !=, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(neq, !=, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(neq, !=, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(neq, !=, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(neq, !=, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(neq, !=, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
-        _ASSERT_A_OP_B_METHOD(lt, <, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(lt, <, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(lt, <, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(lt, <, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(lt, <, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(lt, <, float, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(lt, <, double, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(lt, <, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
-        _ASSERT_A_OP_B_METHOD(lte, <=, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(lte, <=, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(lte, <=, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(lte, <=, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(lte, <=, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(lte, <=, float, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(lte, <=, double, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(lte, <=, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
-        _ASSERT_A_OP_B_METHOD(gt, >, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(gt, >, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(gt, >, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(gt, >, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(gt, >, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(gt, >, float, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(gt, >, double, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(gt, >, std::string, _TEST_CSTR_F, _CONV_STR_TO_CSTR)
 
-        _ASSERT_A_OP_B_METHOD(gte, >=, int, _TEST_INT_F, _CONV_REPEAT)
-        _ASSERT_A_OP_B_METHOD(gte, >=, long long int, _TEST_LLINT_F, _CONV_REPEAT)
+        _ASSERT_A_OP_B_METHOD(gte, >=, int, _TEST_INT_F, _CONV_REPEAT_AS_UNSIGNED)
+        _ASSERT_A_OP_B_METHOD(gte, >=, long long int, _TEST_LLINT_F, _CONV_REPEAT_AS_UNSIGNED)
         _ASSERT_A_OP_B_METHOD(gte, >=, void const*, _TEST_PTR_F, _CONV_ID)
         _ASSERT_A_OP_B_METHOD(gte, >=, float, _TEST_DBL_F, _CONV_REPEAT)
         _ASSERT_A_OP_B_METHOD(gte, >=, double, _TEST_DBL_F, _CONV_REPEAT)

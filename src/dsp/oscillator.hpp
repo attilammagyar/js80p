@@ -89,8 +89,8 @@ class Oscillator : public SignalProducer
         class WaveformParam : public Param<Waveform, ParamEvaluation::BLOCK>
         {
             public:
-                WaveformParam(
-                    std::string const name,
+                explicit WaveformParam(
+                    std::string const& name,
                     Waveform const max_value = CUSTOM
                 ) noexcept;
         };
@@ -98,7 +98,7 @@ class Oscillator : public SignalProducer
         static constexpr Event::Type EVT_START = 1;
         static constexpr Event::Type EVT_STOP = 2;
 
-        Oscillator(WaveformParam& waveform) noexcept;
+        explicit Oscillator(WaveformParam& waveform) noexcept;
 
         Oscillator(
             WaveformParam& waveform,

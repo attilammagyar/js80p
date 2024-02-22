@@ -38,7 +38,7 @@ namespace JS80P
 class Macro : public MidiController
 {
     public:
-        Macro(std::string const name = "") noexcept;
+        explicit Macro(std::string const& name = "") noexcept;
 
         void update() noexcept;
 

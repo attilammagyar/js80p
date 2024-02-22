@@ -60,7 +60,7 @@ class Param : public SignalProducer
 
     public:
         Param(
-            std::string const name,
+            std::string const& name,
             NumberType const min_value,
             NumberType const max_value,
             NumberType const default_value,
@@ -149,7 +149,7 @@ class ToggleParam : public Param<Toggle, ParamEvaluation::BLOCK>
         static constexpr Toggle OFF = 0;
         static constexpr Toggle ON = 1;
 
-        ToggleParam(std::string const name, Toggle const default_value);
+        ToggleParam(std::string const& name, Toggle const default_value);
 };
 
 
@@ -272,8 +272,8 @@ class FloatParam : public Param<Number, evaluation>
             Integer const sample_count
         ) noexcept;
 
-        FloatParam(
-            std::string const name = "",
+        explicit FloatParam(
+            std::string const& name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0,
@@ -526,7 +526,7 @@ class ModulatableFloatParam : public FloatParamS
         ModulatableFloatParam(
             ModulatorSignalProducerClass& modulator,
             FloatParamS& modulation_level_leader,
-            std::string const name = "",
+            std::string const& name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0

@@ -42,7 +42,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         typedef HighShelfPannedDelay< HighShelfDelay<HighPassedInput> > CombFilter2;
 
         Echo(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
         );

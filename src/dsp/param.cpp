@@ -33,7 +33,7 @@ namespace JS80P
 
 template<typename NumberType, ParamEvaluation evaluation>
 Param<NumberType, evaluation>::Param(
-        std::string const name,
+        std::string const& name,
         NumberType const min_value,
         NumberType const max_value,
         NumberType const default_value,
@@ -305,7 +305,7 @@ void Param<NumberType, evaluation>::render(
 }
 
 
-ToggleParam::ToggleParam(std::string const name, Toggle const default_value)
+ToggleParam::ToggleParam(std::string const& name, Toggle const default_value)
     : Param<Toggle, ParamEvaluation::BLOCK>(name, OFF, ON, default_value)
 {
 }
@@ -369,7 +369,7 @@ Sample const* FloatParam<evaluation>::produce_if_not_constant(
 
 template<ParamEvaluation evaluation>
 FloatParam<evaluation>::FloatParam(
-        std::string const name,
+        std::string const& name,
         Number const min_value,
         Number const max_value,
         Number const default_value,
@@ -1753,7 +1753,7 @@ template<class ModulatorSignalProducerClass>
 ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         ModulatorSignalProducerClass& modulator,
         FloatParamS& modulation_level_leader,
-        std::string const name,
+        std::string const& name,
         Number const min_value,
         Number const max_value,
         Number const default_value

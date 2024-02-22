@@ -27,7 +27,7 @@ namespace JS80P { namespace Effects
 
 template<class InputSignalProducerClass>
 Effects<InputSignalProducerClass>::Effects(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& echo_filter_shared_buffers,
         BiquadFilterSharedBuffers& reverb_filter_shared_buffers

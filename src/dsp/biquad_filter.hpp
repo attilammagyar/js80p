@@ -74,11 +74,11 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
         {
             public:
-                TypeParam(std::string const name) noexcept;
+                explicit TypeParam(std::string const& name) noexcept;
         };
 
         BiquadFilter(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             TypeParam& type,
             BiquadFilterSharedBuffers* shared_buffers = NULL,
@@ -89,7 +89,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         ) noexcept;
 
         BiquadFilter(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             TypeParam& type,
             ToggleParam const& freq_log_scale_toggle,

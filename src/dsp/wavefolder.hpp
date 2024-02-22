@@ -46,7 +46,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Wavefolder(InputSignalProducerClass& input) noexcept;
+        explicit Wavefolder(InputSignalProducerClass& input) noexcept;
 
         Wavefolder(
             InputSignalProducerClass& input,

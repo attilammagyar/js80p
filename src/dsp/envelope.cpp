@@ -254,7 +254,7 @@ void Envelope::render(
 
 void Envelope::render_constant(
         Seconds& time,
-        Number& value,
+        Number const value,
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample* buffer
@@ -479,7 +479,7 @@ void Envelope::set_up_next_release_target(
 }
 
 
-Envelope::Envelope(std::string const name) noexcept
+Envelope::Envelope(std::string const& name) noexcept
     : dynamic(name + "DYN", ToggleParam::OFF),
     amount(name + "AMT",            0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),

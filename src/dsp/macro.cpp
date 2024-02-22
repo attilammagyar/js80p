@@ -25,7 +25,7 @@
 namespace JS80P
 {
 
-Macro::Macro(std::string const name) noexcept
+Macro::Macro(std::string const& name) noexcept
     : MidiController(),
     input(name + "IN", 0.0, 1.0, 0.5),
     min(name + "MIN", 0.0, 1.0, 0.0),

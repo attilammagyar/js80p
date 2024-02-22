@@ -27,7 +27,7 @@
 namespace JS80P
 {
 
-LFO::LFO(std::string const name) noexcept
+LFO::LFO(std::string const& name) noexcept
     : SignalProducer(1, 11, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     frequency(name + "FRQ", 0.01, 30.0, 1.0),
@@ -62,7 +62,7 @@ void LFO::initialize_instance() noexcept
 
 
 LFO::LFO(
-        std::string const name,
+        std::string const& name,
         FloatParamS& frequency_leader,
         FloatParamS& max_leader,
         FloatParamS& amount_leader,

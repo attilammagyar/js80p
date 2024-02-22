@@ -40,7 +40,7 @@ char const* func_names[MAX_FUNCTIONS] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
-char const** next_func_name = &func_names[0];
+char const** g_next_func_name = &func_names[0];
 
 
 typedef bool (*RunIfRequestedFunc)(char const* const func_name, int const n);
@@ -52,7 +52,7 @@ RunIfRequestedFunc run_if_requested_functions[MAX_FUNCTIONS] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
-RunIfRequestedFunc* next_func = &run_if_requested_functions[0];
+RunIfRequestedFunc* g_next_func = &run_if_requested_functions[0];
 
 
 class Function
@@ -121,7 +121,7 @@ class NewGroup_ ## line                                                     \
 {                                                                           \
     public:                                                                 \
         NewGroup_ ## line () {                                              \
-            *(next_func_name++) = "";                                       \
+            *(g_next_func_name++) = "";                                     \
         }                                                                   \
 };                                                                          \
                                                                             \
@@ -141,8 +141,8 @@ class class_name : public Function                                          \
                                                                             \
         class_name() : Function(min, max)                                   \
         {                                                                   \
-            *(next_func_name++) = (name);                                   \
-            *(next_func++) = &run_if_requested<class_name>;                 \
+            *(g_next_func_name++) = (name);                                 \
+            *(g_next_func++) = &run_if_requested<class_name>;               \
         }                                                                   \
                                                                             \
         Number operator()(Number const x, Number const y) const             \

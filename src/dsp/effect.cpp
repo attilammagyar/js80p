@@ -27,7 +27,7 @@ namespace JS80P
 
 template<class InputSignalProducerClass>
 Effect<InputSignalProducerClass>::Effect(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         Integer const number_of_children,
         SignalProducer* const buffer_owner

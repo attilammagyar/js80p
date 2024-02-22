@@ -30,7 +30,8 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Mixer<InputSignalProducerClass>::Mixer(Integer const channels) noexcept
     : SignalProducer(channels, 0),
-    output(NULL)
+    output(NULL),
+    has_weights(false)
 {
 }
 

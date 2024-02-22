@@ -400,23 +400,41 @@ TEST(distort, {
 TEST(randomize, {
     constexpr Integer last_probe = 500;
     std::vector<Number> numbers(last_probe + 1);
-    std::vector<Number> numbers_centered_lfo(last_probe + 1);
     Math::Statistics statistics;
 
     for (Integer i = 0; i != last_probe; ++i) {
         Number const number = (Number)i / (Number)last_probe;
         numbers[i] = Math::randomize(1.0, number);
-        numbers_centered_lfo[i] = Math::randomize_centered_lfo(1.0, number);
         assert_eq(number, Math::randomize(0.2, number), 0.21);
     }
 
     numbers[last_probe] = Math::randomize(1.0, 1.0);
 
     Math::compute_statistics(numbers, statistics);
-
     assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.02);
-
     assert_eq(Math::randomize(1.0, 1.0), Math::randomize(1.0, 99999.0));
+})
+
+
+TEST(randomize_centered_lfo, {
+    constexpr Integer last_probe = 500;
+    std::vector<Number> numbers(last_probe + 1);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != last_probe; ++i) {
+        Number const number = (Number)i / (Number)last_probe - 0.5;
+        numbers[i] = Math::randomize_centered_lfo(1.0, number);
+        assert_eq(number, Math::randomize_centered_lfo(0.2, number), 0.21);
+    }
+
+    numbers[last_probe] = Math::randomize_centered_lfo(1.0, 0.5);
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(true, -0.5, 0.0, 0.5, 0.0, 0.25, statistics, 0.02);
+    assert_eq(
+        Math::randomize_centered_lfo(1.0, 0.5),
+        Math::randomize_centered_lfo(1.0, 99999.0)
+    );
 })
 
 

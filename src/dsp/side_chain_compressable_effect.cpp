@@ -30,7 +30,7 @@ namespace JS80P
 
 template<class InputSignalProducerClass>
 SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffect(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         Integer const number_of_children,
         SignalProducer* const buffer_owner

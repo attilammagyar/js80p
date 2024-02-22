@@ -46,7 +46,7 @@ class Delay : public Filter<InputSignalProducerClass>
             ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
         );
 
-        Delay(
+        explicit Delay(
             InputSignalProducerClass& input,
             ToggleParam const* tempo_sync = NULL
         ) noexcept;

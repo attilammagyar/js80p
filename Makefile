@@ -88,6 +88,7 @@ UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch$(DEV_EXE)
 	log_tables_error_tsv \
 	show_fst_dir \
 	show_vst3_dir \
+	static_analysis \
 	upgrade_patch \
 	vst3
 
@@ -442,7 +443,7 @@ clean:
 		$(VSTXMLGEN_OBJS)
 	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
 
-check: upgrade_patch perf $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
+check: perf static_analysis upgrade_patch $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(DEV_DIR)
 check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(DEV_DIR)
 check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(DEV_DIR)
@@ -457,6 +458,9 @@ log_tables_error_tsv: $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE)
 docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
 
 gui_playground: $(GUI_PLAYGROUND)
+
+static_analysis:
+	$(CPPCHECK) $(CPPCHECK_FLAGS) src/ tests/
 
 upgrade_patch: $(UPGRADE_PATCH)
 

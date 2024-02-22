@@ -85,6 +85,12 @@ class Wavetable
 
         ~Wavetable();
 
+        Wavetable(Wavetable const& wavetable) = delete;
+        Wavetable(Wavetable&& wavetable) = delete;
+
+        Wavetable& operator=(Wavetable const& wavetable) = delete;
+        Wavetable& operator=(Wavetable&& wavetable) = delete;
+
         template<
             Interpolation interpolation = Interpolation::DYNAMIC,
             bool single_partial = false,
@@ -193,6 +199,22 @@ class StandardWaveforms
 
         StandardWaveforms() noexcept;
         ~StandardWaveforms();
+
+        StandardWaveforms(
+            StandardWaveforms const& standard_waveforms
+        ) = delete;
+
+        StandardWaveforms(
+            StandardWaveforms&& standard_waveforms
+        ) = delete;
+
+        StandardWaveforms& operator=(
+            StandardWaveforms const& standard_waveforms
+        ) = delete;
+
+        StandardWaveforms& operator=(
+            StandardWaveforms&& standard_waveforms
+        ) = delete;
 
     private:
         static StandardWaveforms const standard_waveforms;

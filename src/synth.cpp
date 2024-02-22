@@ -322,8 +322,8 @@ void Synth::register_main_params() noexcept
 void Synth::register_modulator_params() noexcept
 {
     register_param_as_child<Modulator::TuningParam>(ParamId::MTUN, modulator_params.tuning);
-    register_param_as_child<Modulator::OscillatorInaccuracyParam>(ParamId::MOIA, modulator_params.oscillator_inaccuracy);
-    register_param_as_child<Modulator::OscillatorInaccuracyParam>(ParamId::MOIS, modulator_params.oscillator_instability);
+    register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIA, modulator_params.oscillator_inaccuracy);
+    register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIS, modulator_params.oscillator_instability);
 
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
@@ -376,8 +376,8 @@ void Synth::register_modulator_params() noexcept
 void Synth::register_carrier_params() noexcept
 {
     register_param_as_child<Carrier::TuningParam>(ParamId::CTUN, carrier_params.tuning);
-    register_param_as_child<Carrier::OscillatorInaccuracyParam>(ParamId::COIA, carrier_params.oscillator_inaccuracy);
-    register_param_as_child<Carrier::OscillatorInaccuracyParam>(ParamId::COIS, carrier_params.oscillator_instability);
+    register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIA, carrier_params.oscillator_inaccuracy);
+    register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIS, carrier_params.oscillator_instability);
 
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);

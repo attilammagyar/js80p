@@ -41,7 +41,8 @@ class SignalProducer
             public:
                 typedef Byte Type;
 
-                Event(Type const type) noexcept;
+                explicit Event(Type const type) noexcept;
+
                 Event(Event const& event) noexcept = default;
                 Event(Event&& event) noexcept = default;
 
@@ -119,7 +120,7 @@ class SignalProducer
             Integer& peak_index
         ) noexcept;
 
-        SignalProducer(
+        explicit SignalProducer(
             Integer const channels,
             Integer const number_of_children = 0,
             Integer const number_of_events = 0,

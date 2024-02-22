@@ -109,9 +109,11 @@ Number const OscillatorInaccuracy::CENTS[OscillatorInaccuracy::MAX_LEVEL + 1][2]
 
 Frequency OscillatorInaccuracy::detune(
         Frequency const frequency,
-        Integer const level,
+        OscillatorInaccuracyParam const& level_param,
         Number const inaccuracy
 ) noexcept {
+    Integer const level = level_param.get_value();
+
     if (level < 1) {
         return frequency;
     }
@@ -158,10 +160,7 @@ void OscillatorInaccuracy::reset() noexcept
 }
 
 
-template<class ModulatorSignalProducerClass>
-Voice<ModulatorSignalProducerClass>::OscillatorInaccuracyParam::OscillatorInaccuracyParam(
-        std::string const name
-) noexcept
+OscillatorInaccuracyParam::OscillatorInaccuracyParam(std::string const& name) noexcept
     : Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>(
         name, 0, OscillatorInaccuracy::MAX_LEVEL, 0
     )
@@ -171,7 +170,7 @@ Voice<ModulatorSignalProducerClass>::OscillatorInaccuracyParam::OscillatorInaccu
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
-        std::string const name
+        std::string const& name
 ) noexcept
     : Param<Tuning, ParamEvaluation::BLOCK>(
         name, TUNING_440HZ_12TET, TUNING_MTS_ESP_NOTE_ON, TUNING_MTS_ESP_CONTINUOUS
@@ -188,7 +187,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy()
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
-        std::string const a,
+        std::string const& a,
         Number const b,
         Number const c,
         Number const d
@@ -197,7 +196,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
 
 
 template<class ModulatorSignalProducerClass>
-Voice<ModulatorSignalProducerClass>::Params::Params(std::string const name) noexcept
+Voice<ModulatorSignalProducerClass>::Params::Params(std::string const& name) noexcept
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
@@ -875,11 +874,11 @@ Frequency Voice<ModulatorSignalProducerClass>::detune(
 ) const noexcept {
     if constexpr (should_sync) {
         return OscillatorInaccuracy::detune(
-            frequency, level_param.get_value(), synced_oscillator_inaccuracy.get_inaccuracy()
+            frequency, level_param, synced_oscillator_inaccuracy.get_inaccuracy()
         );
     } else {
         return OscillatorInaccuracy::detune(
-            frequency, level_param.get_value(), oscillator_inaccuracy
+            frequency, level_param, oscillator_inaccuracy
         );
     }
 }

@@ -313,7 +313,7 @@ class DelegatingSignalProducer : public SignalProducer
     friend class SignalProducer;
 
     public:
-        DelegatingSignalProducer(
+        explicit DelegatingSignalProducer(
                 Sample const value,
                 DelegatingSignalProducer* delegate = NULL
         ) noexcept
@@ -384,7 +384,7 @@ TEST(can_query_last_rendered_block, {
     assert_eq(NULL, (void*)delegator.get_last_rendered_block(sample_count));
     assert_eq(0, (int)sample_count);
 
-    rendered_samples = SignalProducer::produce<DelegatingSignalProducer>(delegate, 123, 5);
+    SignalProducer::produce<DelegatingSignalProducer>(delegate, 123, 5);
     delegate.set_block_size(10);
     delegator.set_block_size(10);
 
@@ -465,7 +465,8 @@ class RendererWithCircularDependecy : public SignalProducer
 
     public:
         RendererWithCircularDependecy() noexcept
-            : SignalProducer(1)
+            : SignalProducer(1),
+            dependency(NULL)
         {
         }
 
@@ -536,6 +537,7 @@ class PreparerWithCircularDependecy : public SignalProducer
     public:
         PreparerWithCircularDependecy() noexcept
             : SignalProducer(1),
+            dependency(NULL),
             value(0)
         {
         }

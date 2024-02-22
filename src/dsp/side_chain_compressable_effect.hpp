@@ -39,7 +39,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 
     public:
         SideChainCompressableEffect(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
             SignalProducer* const buffer_owner = NULL

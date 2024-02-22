@@ -45,7 +45,7 @@ BiquadFilterSharedBuffers::BiquadFilterSharedBuffers()
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
-        std::string const name
+        std::string const& name
 ) noexcept
     : Param<Type, ParamEvaluation::BLOCK>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
 {
@@ -54,7 +54,7 @@ BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         TypeParam& type,
         BiquadFilterSharedBuffers* shared_buffers,
@@ -104,7 +104,7 @@ void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
     y_n_m1 = new Sample[this->channels];
     y_n_m2 = new Sample[this->channels];
 
-    reset();
+    BiquadFilter<InputSignalProducerClass>::reset();
     update_helper_variables();
 }
 
@@ -121,7 +121,7 @@ void BiquadFilter<InputSignalProducerClass>::update_helper_variables() noexcept
 
 template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::BiquadFilter(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         TypeParam& type,
         ToggleParam const& freq_log_scale_toggle,

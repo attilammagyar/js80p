@@ -40,7 +40,7 @@ class Filter : public SignalProducer
     friend class SignalProducer;
 
     public:
-        Filter(
+        explicit Filter(
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
             Integer const channels = 0,

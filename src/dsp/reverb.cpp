@@ -33,7 +33,7 @@ constexpr typename Reverb<InputSignalProducerClass>::Tuning Reverb<InputSignalPr
 
 template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::TypeParam::TypeParam(
-        std::string const name
+        std::string const& name
 ) noexcept
     : Param<Type, ParamEvaluation::BLOCK>(name, REVERB_1, REVERB_10, REVERB_1)
 {
@@ -42,7 +42,7 @@ Reverb<InputSignalProducerClass>::TypeParam::TypeParam(
 
 template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::Reverb(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(

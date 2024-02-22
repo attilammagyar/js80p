@@ -162,6 +162,8 @@ class Vst3Plugin
                 bool need_to_load_new_program;
 
             public:
+                /* No need to check the SDK. */
+                // cppcheck-suppress unknownMacro
                 OBJ_METHODS(Processor, Vst::AudioEffect)
                 DEFINE_INTERFACES
                 END_DEFINE_INTERFACES(Vst::AudioEffect)

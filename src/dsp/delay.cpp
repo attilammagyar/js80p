@@ -69,7 +69,7 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
     delay_buffer_size_float = 0.0;
 
     reallocate_delay_buffer_if_needed();
-    reset();
+    Delay<InputSignalProducerClass>::reset();
 
     this->register_child(gain);
     this->register_child(time);
@@ -177,7 +177,7 @@ template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
 {
     if (this->channels <= 0 || shared_buffer_owner != NULL) {
-        reset();
+        Delay<InputSignalProducerClass>::reset();
         return;
     }
 
@@ -187,6 +187,7 @@ void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
         delay_buffer[c] = new Sample[delay_buffer_size];
     }
 
+    Delay<InputSignalProducerClass>::reset();
     reset();
 }
 
@@ -610,6 +611,14 @@ void Delay<InputSignalProducerClass>::render(
 
 
 template<class InputSignalProducerClass, class FilterInputClass>
+/*
+Let Valgrind catch if we actually use uninitialized data. Not even GCC gets this
+right: the constructors which pass the yet uninitialized Delay object to
+Filter's constructor also explicitly set the number of channels based on the
+number of channels of the Delay's input, so the uninitialized Delay's
+get_channels() method never actually gets called.
+*/
+// cppcheck-suppress uninitMemberVar
 PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
@@ -637,7 +646,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
+
 template<class InputSignalProducerClass, class FilterInputClass>
+/* See above, PannedDelay(input, stereo_mode, tempo_sync). */
+// cppcheck-suppress uninitMemberVar
 PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,

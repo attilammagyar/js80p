@@ -34,7 +34,7 @@ namespace JS80P
 class Buffer
 {
     public:
-        Buffer(Integer const size, Integer const channels = 1)
+        explicit Buffer(Integer const size, Integer const channels = 1)
             : size(size),
             channels(channels),
             samples(NULL),
@@ -68,6 +68,12 @@ class Buffer
             delete[] samples;
         }
 
+        Buffer(Buffer const& buffer) = delete;
+        Buffer(Buffer&& buffer) = delete;
+
+        Buffer& operator=(Buffer const& buffer) = delete;
+        Buffer& operator=(Buffer&& buffer) = delete;
+
         void append(Sample const* const* samples, Integer const sample_count)
         {
             for (Integer channel = 0; channel != channels; ++channel) {
@@ -97,7 +103,7 @@ class Constant : public SignalProducer
     friend class SignalProducer;
 
     public:
-        Constant(Sample const value, Integer const channels = 1) noexcept
+        explicit Constant(Sample const value, Integer const channels = 1) noexcept
             : SignalProducer(channels, 0),
             value(value)
         {
@@ -131,7 +137,7 @@ class FixedSignalProducer : public SignalProducer
     public:
         static constexpr Integer CHANNELS = 2;
 
-        FixedSignalProducer(Sample const* const* fixed_samples) noexcept
+        explicit FixedSignalProducer(Sample const* const* fixed_samples) noexcept
             : SignalProducer(CHANNELS, 0),
             fixed_samples(fixed_samples)
         {
@@ -190,7 +196,7 @@ class SumOfSines : public SignalProducer
         {
         }
 
-        void reset() noexcept
+        void reset() noexcept override
         {
             current_time = 0.0;
             rendered_samples = 0;

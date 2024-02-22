@@ -36,7 +36,7 @@ class Mixer : public SignalProducer
     friend class SignalProducer;
 
     public:
-        Mixer(Integer const channels) noexcept;
+        explicit Mixer(Integer const channels) noexcept;
 
         void add(InputSignalProducerClass& input) noexcept;
         void set_weight(size_t const input_index, Number const weight) noexcept;
@@ -58,7 +58,8 @@ class Mixer : public SignalProducer
     private:
         class Input {
             public:
-                Input(InputSignalProducerClass* input);
+                explicit Input(InputSignalProducerClass* input);
+
                 Input(Input const& input) = default;
                 Input(Input&& input) = default;
 

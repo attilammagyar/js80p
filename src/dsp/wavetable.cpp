@@ -38,6 +38,12 @@ Number Wavetable::sines[Wavetable::SIZE] = {0.0};
 
 
 WavetableState::WavetableState() noexcept
+    : scale(1.0),
+    sample_index(0.0),
+    fewer_partials_weight(1.0),
+    nyquist_frequency(22100.0),
+    interpolation_limit(10.0),
+    table_indices{0, 0}
 {
 }
 

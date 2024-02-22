@@ -1,0 +1,8 @@
+// Too many false positives around the fprintf() calls in macros.
+*:tests/test.cpp
+
+// Ignoring SDKs and libs.
+missingIncludeSystem
+
+// Too many false positives.
+unusedFunction

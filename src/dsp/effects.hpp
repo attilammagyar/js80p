@@ -71,7 +71,7 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
 {
     public:
         Effects(
-            std::string const name,
+            std::string const& name,
             InputSignalProducerClass& input,
             BiquadFilterSharedBuffers& echo_filter_shared_buffers,
             BiquadFilterSharedBuffers& reverb_filter_shared_buffers

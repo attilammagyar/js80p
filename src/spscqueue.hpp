@@ -41,7 +41,7 @@ class SPSCQueue
     public:
         typedef typename std::vector<ItemClass>::size_type SizeType;
 
-        SPSCQueue(SizeType const capacity) noexcept;
+        explicit SPSCQueue(SizeType const capacity) noexcept;
 
         SPSCQueue(SPSCQueue<ItemClass> const& queue) = delete;
 

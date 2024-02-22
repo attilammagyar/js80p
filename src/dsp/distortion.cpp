@@ -32,6 +32,8 @@ namespace JS80P { namespace Distortion
 Tables tables;
 
 
+/* The fill_tables() method will initialize both f_tables and F0_tables. */
+// cppcheck-suppress uninitMemberVar
 Tables::Tables()
 {
     fill_tables(Type::SOFT, 3.0);
@@ -50,7 +52,7 @@ void Tables::fill_tables(Type const type, Number const steepness) noexcept
         Number const x = INPUT_MAX * ((Sample)i * SIZE_INV);
         f_table[i] = std::tanh(steepness * x * 0.5);
         F0_table[i] = (
-            x + steepness_inv_double * std::log(std::exp(-steepness * x) + 1.0)
+            x + steepness_inv_double * std::log1p(std::exp(-steepness * x))
         );
     }
 }
@@ -70,7 +72,7 @@ Table const& Tables::get_F0_table(Type const type) const noexcept
 
 template<class InputSignalProducerClass>
 Distortion<InputSignalProducerClass>::Distortion(
-        std::string const name,
+        std::string const& name,
         Type const type,
         InputSignalProducerClass& input,
         SignalProducer* const buffer_owner
@@ -86,7 +88,7 @@ Distortion<InputSignalProducerClass>::Distortion(
 
 template<class InputSignalProducerClass>
 Distortion<InputSignalProducerClass>::Distortion(
-        std::string const name,
+        std::string const& name,
         Type const type,
         InputSignalProducerClass& input,
         FloatParamS& level_leader,

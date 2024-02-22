@@ -88,7 +88,7 @@ class Envelope
             Sample* buffer
         ) noexcept;
 
-        Envelope(std::string const name) noexcept;
+        explicit Envelope(std::string const& name) noexcept;
 
         void update() noexcept;
         Integer get_change_index() const noexcept;
@@ -186,7 +186,7 @@ class Envelope
 
         static void render_constant(
             Seconds& time,
-            Number& value,
+            Number const value,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample* buffer
