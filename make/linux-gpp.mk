@@ -17,7 +17,6 @@
 ###############################################################################
 
 TARGET_OS = linux
-DIR_SEP = /
 
 FST = $(FST_DIR)/js80p.so
 FST_MAIN_SOURCES = src/plugin/fst/so.cpp
@@ -92,20 +91,12 @@ $(LIB_PATH)/libxcb-render.so: $(SYS_LIB_PATH)/libxcb-render.so.0 | $(LIB_PATH)
 # DEBUG_LOG ?= /tmp/debug.txt
 DEBUG_LOG ?=
 
-RM = rm -f
-MKDIR = mkdir
-
 EXE =
-DEV_EXE =
 
-CPP_DEV_PLATFORM = /usr/bin/g++
-CPP_TARGET_PLATFORM = /usr/bin/g++
-DOXYGEN = /usr/bin/doxygen
-VALGRIND ?= /usr/bin/valgrind --error-exitcode=99 --track-origins=yes --quiet
+CPP_TARGET_PLATFORM ?= /usr/bin/g++
 
 LINK_SO = $(CPP_TARGET_PLATFORM) -Wall -shared
 LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall
-LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall
 
 TARGET_PLATFORM_LFLAGS = \
     $(ARCH_LFLAGS) \
@@ -125,3 +116,5 @@ TARGET_PLATFORM_CXXFLAGS = \
     -fvisibility=hidden
 
 TARGET_PLATFORM_CXXINCS = -I/usr/include
+
+include make/linux.mk

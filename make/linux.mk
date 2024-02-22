@@ -16,13 +16,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
-TARGET_PLATFORM_CXXFLAGS = $(MINGW_CXXFLAGS)
-TARGET_PLATFORM_CXXINCS =
+DIR_SEP = /
 
-EXE = .exe
+RM ?= rm -f
+MKDIR ?= mkdir
 
-CPP_TARGET_PLATFORM ?= /usr/bin/$(TARGET_PLATFORM)-g++
-WINDRES ?= /usr/bin/$(TARGET_PLATFORM)-windres
+CPP_DEV_PLATFORM ?= /usr/bin/g++
+DOXYGEN ?= /usr/bin/doxygen
+VALGRIND ?= /usr/bin/valgrind
 
-include make/linux.mk
-include make/mingw.mk
+LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall
+
+DEV_EXE =
+
+VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --quiet
