@@ -16,6 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
+DIR_SEP = /
+
 TARGET_PLATFORM_CXXFLAGS = $(MINGW_CXXFLAGS)
 TARGET_PLATFORM_CXXINCS =
 

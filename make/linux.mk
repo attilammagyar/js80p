@@ -16,8 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
-DIR_SEP = /
-
 RM ?= rm -f
 MKDIR ?= mkdir
 
