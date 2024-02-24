@@ -80,13 +80,13 @@ $(LIB_PATH): | $(BUILD_DIR)
 	$(MKDIR) $@
 
 $(LIB_PATH)/libcairo.so: $(SYS_LIB_PATH)/libcairo.so.2 | $(LIB_PATH)
-	ln -s $< $@
+	ln -vs $< $@
 
 $(LIB_PATH)/libxcb.so: $(SYS_LIB_PATH)/libxcb.so.1 | $(LIB_PATH)
-	ln -s $< $@
+	ln -vs $< $@
 
 $(LIB_PATH)/libxcb-render.so: $(SYS_LIB_PATH)/libxcb-render.so.0 | $(LIB_PATH)
-	ln -s $< $@
+	ln -vs $< $@
 
 # DEBUG_LOG ?= STDERR
 # DEBUG_LOG ?= /tmp/debug.txt
