@@ -20,6 +20,8 @@
 ROOT_DIR ?= C:/mingw64
 DIR_SEP = \\
 
+DEV_PLATFORM_CLEAN =
+
 TARGET_PLATFORM_CXXFLAGS = \
 	-mwindows \
 	$(MINGW_CXXFLAGS) \

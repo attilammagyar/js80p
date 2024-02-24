@@ -18,11 +18,19 @@
 
 RM ?= rm -f
 MKDIR ?= mkdir
+COPY ?= cp -v
 
 CPP_DEV_PLATFORM ?= /usr/bin/g++
 CPPCHECK ?= /usr/bin/cppcheck
 DOXYGEN ?= /usr/bin/doxygen
 VALGRIND ?= /usr/bin/valgrind
+
+PDFLATEX ?= /usr/bin/pdflatex
+
+PDFLATEX_FLAGS = \
+	-halt-on-error \
+	-file-line-error \
+	-output-directory $(DEV_DIR)
 
 LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall
 
@@ -39,3 +47,17 @@ CPPCHECK_FLAGS = \
 	-I./tests
 
 VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --quiet
+
+pm-fm-equivalence.pdf: $(DEV_DIR)/pm-fm-equivalence.pdf
+	$(COPY) $< $@
+
+TEX_ARTIFACTS = \
+	$(DEV_DIR)/pm-fm-equivalence.aux \
+	$(DEV_DIR)/pm-fm-equivalence.log \
+	$(DEV_DIR)/pm-fm-equivalence.out \
+	$(DEV_DIR)/pm-fm-equivalence.pdf \
+	$(DEV_DIR)/pm-fm-equivalence.toc
+
+$(DEV_DIR)/pm-fm-equivalence.pdf: pm-fm-equivalence.tex | $(DEV_DIR)
+	$(PDFLATEX) $(PDFLATEX_FLAGS) $<
+	$(PDFLATEX) $(PDFLATEX_FLAGS) $<

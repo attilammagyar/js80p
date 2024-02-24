@@ -102,7 +102,8 @@ main()
         LICENSE.txt \
         make \
         Makefile \
-        pm-fm-equivalence.md \
+        pm-fm-equivalence.pdf \
+        pm-fm-equivalence.tex \
         presets \
         README.md \
         README.txt \

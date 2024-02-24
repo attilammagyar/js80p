@@ -26,5 +26,7 @@ EXE = .exe
 CPP_TARGET_PLATFORM ?= /usr/bin/$(TARGET_PLATFORM)-g++
 WINDRES ?= /usr/bin/$(TARGET_PLATFORM)-windres
 
+DEV_PLATFORM_CLEAN = $(TEX_ARTIFACTS)
+
 include make/linux.mk
 include make/mingw.mk
