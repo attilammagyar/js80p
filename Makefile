@@ -78,17 +78,17 @@ UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch$(DEV_EXE)
 	check_dsp \
 	check_param \
 	check_synth \
-	test_example \
 	clean \
 	dirs \
 	docs \
 	fst \
 	gui_playground \
-	perf \
 	log_tables_error_tsv \
+	perf \
 	show_fst_dir \
 	show_vst3_dir \
 	static_analysis \
+	test_example \
 	upgrade_patch \
 	vst3
 
