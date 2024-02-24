@@ -99,21 +99,21 @@ LINK_SO = $(CPP_TARGET_PLATFORM) -Wall -shared
 LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall
 
 TARGET_PLATFORM_LFLAGS = \
-    $(ARCH_LFLAGS) \
-    -lcairo \
-    -lxcb \
-    -lxcb-render
+	$(ARCH_LFLAGS) \
+	-lcairo \
+	-lxcb \
+	-lxcb-render
 
 LINK_FST = $(LINK_SO)
 LINK_VST3 = $(LINK_SO)
 
 TARGET_PLATFORM_CXXFLAGS = \
-    $(ARCH_CXXFLAGS) \
-    -Wno-strict-aliasing \
-    -Wno-int-to-pointer-cast \
-    -Wno-cpp \
-    -fPIC \
-    -fvisibility=hidden
+	$(ARCH_CXXFLAGS) \
+	-Wno-strict-aliasing \
+	-Wno-int-to-pointer-cast \
+	-Wno-cpp \
+	-fPIC \
+	-fvisibility=hidden
 
 TARGET_PLATFORM_CXXINCS = -I/usr/include
 

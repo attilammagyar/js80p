@@ -31,13 +31,13 @@ LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall
 DEV_EXE =
 
 CPPCHECK_FLAGS = \
-    --enable=all \
-    --error-exitcode=1 \
-    --force \
-    --inline-suppr \
-    --quiet \
-    --suppressions-list=.cppcheck \
-    -I./src \
-    -I./tests
+	--enable=all \
+	--error-exitcode=1 \
+	--force \
+	--inline-suppr \
+	--quiet \
+	--suppressions-list=.cppcheck \
+	-I./src \
+	-I./tests
 
 VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --quiet

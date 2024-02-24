@@ -31,8 +31,8 @@ VST3_MAIN_SOURCES = src/plugin/vst3/dll.cpp
 VST3_GUI_PLATFORM = kPlatformTypeHWND
 VST3_EXTRA = src/plugin/vst3/js80p.def
 VST3_PLUGIN_SOURCES = \
-    src/plugin/vst3/plugin.cpp \
-    src/plugin/vst3/plugin-win32.cpp
+	src/plugin/vst3/plugin.cpp \
+	src/plugin/vst3/plugin-win32.cpp
 
 DEV_PLATFORM_CLEAN =
 
