@@ -976,6 +976,7 @@ JS80P and want to compile it themselves.
  * [G++ 11.4.0+](https://gcc.gnu.org/)
  * [MinGW-w64 10+](https://www.mingw-w64.org/)
  * [Valgrind 3.18.1+](https://valgrind.org/)
+ * [Cppcheck 2.7](https://github.com/danmar/cppcheck)
  * [Doxygen 1.9.1+](https://www.doxygen.nl/)
 
 #### Windows
