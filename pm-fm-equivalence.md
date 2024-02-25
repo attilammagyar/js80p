@@ -2,4 +2,4 @@ When is Phase Modulation (PM) synthesis equivalent to Frequency Modulation (FM) 
 ===================================================================================================================
 
 This document has been moved to
-[pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/pm-fm-equivalence.pdf).
+[pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf).

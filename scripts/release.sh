@@ -91,6 +91,8 @@ main()
     log "Copying source"
 
     mkdir -p "$DIST_DIR_BASE/$source_dir"
+    mkdir -p "$DIST_DIR_BASE/$source_dir/doc"
+
     cp --verbose --recursive \
         build.bat \
         build.ps1 \
@@ -102,8 +104,7 @@ main()
         LICENSE.txt \
         make \
         Makefile \
-        pm-fm-equivalence.pdf \
-        pm-fm-equivalence.tex \
+        pm-fm-equivalence.md \
         presets \
         README.md \
         README.txt \
@@ -112,6 +113,11 @@ main()
         tests \
         NEWS.txt \
         "$DIST_DIR_BASE/$source_dir/"
+
+    cp --verbose --recursive \
+        doc/pm-fm-equivalence.pdf \
+        doc/pm-fm-equivalence.tex \
+        "$DIST_DIR_BASE/$source_dir/doc/"
 
     find "$DIST_DIR_BASE/$source_dir/" -name ".*.swp" -delete
 

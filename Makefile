@@ -28,7 +28,7 @@ BUILD_DIR = $(BUILD_DIR_BASE)$(DIR_SEP)$(TARGET_PLATFORM)-$(SUFFIX)-$(INSTRUCTIO
 DEV_DIR = $(BUILD_DIR_BASE)$(DIR_SEP)dev-$(DEV_OS)-$(SUFFIX)-$(INSTRUCTION_SET)
 DIST_DIR_BASE ?= dist
 DIST_DIR_PREFIX ?= $(DIST_DIR_BASE)$(DIR_SEP)js80p-$(VERSION_AS_FILE_NAME)-$(TARGET_OS)-$(SUFFIX)-$(INSTRUCTION_SET)
-DOC_DIR ?= doc
+API_DOC_DIR ?= doc/api
 
 TEST_MAX_ARRAY_PRINT ?= 20
 
@@ -415,12 +415,12 @@ vst3: $(VST3)
 
 vstxml: $(VSTXML)
 
-dirs: $(BUILD_DIR) $(DEV_DIR) $(DOC_DIR) $(FST_DIR) $(VST3_DIR)
+dirs: $(BUILD_DIR) $(DEV_DIR) $(API_DOC_DIR) $(FST_DIR) $(VST3_DIR)
 
 $(BUILD_DIR) $(DEV_DIR): | $(BUILD_DIR_BASE)
 	$(MKDIR) $@
 
-$(BUILD_DIR_BASE) $(DIST_DIR_BASE) $(DOC_DIR):
+$(BUILD_DIR_BASE) $(DIST_DIR_BASE) $(API_DOC_DIR):
 	$(MKDIR) $@
 
 clean:
@@ -441,7 +441,7 @@ clean:
 		$(VSTXML) \
 		$(VSTXMLGEN) \
 		$(VSTXMLGEN_OBJS)
-	$(RM) $(DOC_DIR)/html/*.* $(DOC_DIR)/html/search/*.*
+	$(RM) $(API_DOC_DIR)/html/*.* $(API_DOC_DIR)/html/search/*.*
 
 check: perf static_analysis upgrade_patch $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(DEV_DIR)
@@ -455,7 +455,7 @@ perf: $(DEV_DIR) $(PERF_TEST_BINS)
 
 log_tables_error_tsv: $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE)
 
-docs: Doxyfile $(DOC_DIR) $(DOC_DIR)/html/index.html
+docs: Doxyfile $(API_DOC_DIR) $(API_DOC_DIR)/html/index.html
 
 gui_playground: $(GUI_PLAYGROUND)
 
@@ -464,7 +464,7 @@ static_analysis:
 
 upgrade_patch: $(UPGRADE_PATCH)
 
-$(DOC_DIR)/html/index.html: \
+$(API_DOC_DIR)/html/index.html: \
 		Doxyfile \
 		$(JS80P_HEADERS) \
 		$(JS80P_SOURCES) \
@@ -475,7 +475,7 @@ $(DOC_DIR)/html/index.html: \
 		$(FST_SOURCES) \
 		$(VST3_HEADERS) \
 		$(VST3_SOURCES) \
-		| $(DOC_DIR)
+		| $(API_DOC_DIR)
 	$(DOXYGEN)
 
 $(FST): $(FST_EXTRA) $(FST_OBJS) | $(FST_DIR)

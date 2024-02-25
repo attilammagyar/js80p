@@ -48,7 +48,7 @@ CPPCHECK_FLAGS = \
 
 VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --quiet
 
-pm-fm-equivalence.pdf: $(DEV_DIR)/pm-fm-equivalence.pdf
+doc/pm-fm-equivalence.pdf: $(DEV_DIR)/pm-fm-equivalence.pdf
 	$(COPY) $< $@
 
 TEX_ARTIFACTS = \
@@ -58,6 +58,6 @@ TEX_ARTIFACTS = \
 	$(DEV_DIR)/pm-fm-equivalence.pdf \
 	$(DEV_DIR)/pm-fm-equivalence.toc
 
-$(DEV_DIR)/pm-fm-equivalence.pdf: pm-fm-equivalence.tex | $(DEV_DIR)
+$(DEV_DIR)/pm-fm-equivalence.pdf: doc/pm-fm-equivalence.tex | $(DEV_DIR)
 	$(PDFLATEX) $(PDFLATEX_FLAGS) $<
 	$(PDFLATEX) $(PDFLATEX_FLAGS) $<
