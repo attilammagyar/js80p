@@ -455,7 +455,10 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     ),
     log_range_inv(
         log_scale_toggle != NULL
-            ? 1.0 / (std::log2(leader.get_max_value() + log_scale_value_offset) + log_min_minus)
+            ? 1.0 / (
+                std::log2(leader.get_max_value() + log_scale_value_offset)
+                + log_min_minus
+            )
             : 1.0
     ),
     log_scale_table_max_index(leader.get_log_scale_table_max_index()),
@@ -736,7 +739,9 @@ void FloatParam<evaluation>::skip_round(
         this->cached_round = round;
 
         if (envelope_stage != EnvelopeStage::ENV_STG_NONE) {
-            Seconds const offset = this->sample_count_to_relative_time_offset(sample_count);
+            Seconds const offset = (
+                this->sample_count_to_relative_time_offset(sample_count)
+            );
 
             envelope_time += offset;
         }
@@ -1039,7 +1044,9 @@ void FloatParam<evaluation>::handle_envelope_cancel_event(
 
         EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
-        snapshot.release_time = std::min((Seconds)event.number_param_1, snapshot.release_time);
+        snapshot.release_time = std::min(
+            (Seconds)event.number_param_1, snapshot.release_time
+        );
     }
 
     envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
@@ -1081,7 +1088,9 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_midi_controller(
         MidiController* midi_controller
 ) noexcept {
-    Param<Number, evaluation>::template set_midi_controller< FloatParam<evaluation> >(*this, midi_controller);
+    Param<Number, evaluation>::template set_midi_controller< FloatParam<evaluation> >(
+        *this, midi_controller
+    );
 }
 
 
@@ -1099,7 +1108,9 @@ MidiController* FloatParam<evaluation>::get_midi_controller() const noexcept
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
 {
-    Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(*this, macro);
+    Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(
+        *this, macro
+    );
 }
 
 
@@ -1186,8 +1197,9 @@ void FloatParam<evaluation>::start_envelope(
 
 
 template<ParamEvaluation evaluation>
-Integer FloatParam<evaluation>::make_envelope_snapshot(Envelope const& envelope) noexcept
-{
+Integer FloatParam<evaluation>::make_envelope_snapshot(
+        Envelope const& envelope
+) noexcept {
     EnvelopeSnapshot snapshot;
 
     envelope.make_snapshot(envelope_randoms, snapshot);
@@ -1264,7 +1276,9 @@ Seconds FloatParam<evaluation>::end_envelope(
     }
 
     if constexpr (event == EVT_ENVELOPE_CANCEL) {
-        this->schedule(event, time_offset, 0, std::min(snapshot.release_time, duration));
+        this->schedule(
+            event, time_offset, 0, std::min(snapshot.release_time, duration)
+        );
     } else {
         this->schedule(event, time_offset);
     }
@@ -1279,7 +1293,9 @@ void FloatParam<evaluation>::cancel_envelope(
         Seconds const duration
 ) noexcept {
     envelope_canceled = true;
-    envelope_cancel_duration = end_envelope<EVT_ENVELOPE_CANCEL>(time_offset, duration);
+    envelope_cancel_duration = end_envelope<EVT_ENVELOPE_CANCEL>(
+        time_offset, duration
+    );
 }
 
 
@@ -1400,7 +1416,9 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
         return;
     }
 
-    Queue<SignalProducer::Event>::SizeType const last_ctl_event_index = number_of_ctl_events - 1;
+    Queue<SignalProducer::Event>::SizeType const last_ctl_event_index = (
+        number_of_ctl_events - 1
+    );
 
     Seconds previous_time_offset = 0.0;
     Number previous_ratio = value_to_ratio(this->get_raw_value());
@@ -1423,7 +1441,9 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
 
         time_offset = this->midi_controller->events[i].time_offset;
 
-        Number const controller_value = this->midi_controller->events[i].number_param_1;
+        Number const controller_value = (
+            this->midi_controller->events[i].number_param_1
+        );
         Seconds const duration = smooth_change_duration(
             previous_ratio,
             controller_value,
