@@ -448,7 +448,7 @@ class FloatParam : public Param<Number, evaluation>
             Number const random_2
         ) noexcept;
 
-        Integer make_envelope_snapshot(Envelope* const envelope) noexcept;
+        Integer make_envelope_snapshot(Envelope const& envelope) noexcept;
 
         void render_with_lfo(
             Integer const round,

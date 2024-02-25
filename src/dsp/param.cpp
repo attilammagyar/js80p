@@ -1175,7 +1175,7 @@ void FloatParam<evaluation>::start_envelope(
     update_envelope_randoms(random_1, random_2);
 
     envelope->update();
-    Integer const snapshot_id = make_envelope_snapshot(envelope);
+    Integer const snapshot_id = make_envelope_snapshot(*envelope);
 
     scheduled_envelope_snapshot_id = snapshot_id;
     envelope_canceled = false;
@@ -1186,11 +1186,11 @@ void FloatParam<evaluation>::start_envelope(
 
 
 template<ParamEvaluation evaluation>
-Integer FloatParam<evaluation>::make_envelope_snapshot(Envelope* const envelope) noexcept
+Integer FloatParam<evaluation>::make_envelope_snapshot(Envelope const& envelope) noexcept
 {
     EnvelopeSnapshot snapshot;
 
-    envelope->make_snapshot(envelope_randoms, snapshot);
+    envelope.make_snapshot(envelope_randoms, snapshot);
 
     std::vector<EnvelopeSnapshot>::size_type snapshot_id;
 
@@ -1293,7 +1293,7 @@ void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
     }
 
     envelope->update();
-    Integer const snapshot_id = make_envelope_snapshot(envelope);
+    Integer const snapshot_id = make_envelope_snapshot(*envelope);
 
     scheduled_envelope_snapshot_id = snapshot_id;
 
