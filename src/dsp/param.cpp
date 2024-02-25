@@ -415,6 +415,11 @@ FloatParam<evaluation>::FloatParam(
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::initialize_instance() noexcept
 {
+    if (evaluation == ParamEvaluation::SAMPLE) {
+        envelope_snapshots.reserve(2);
+        unused_envelope_snapshots.reserve(2);
+    }
+
     lfo = NULL;
 
     random_seed = 0.5;
@@ -1138,8 +1143,6 @@ void FloatParam<evaluation>::set_envelope(Envelope* const envelope) noexcept
     this->envelope = envelope;
 
     if (envelope != NULL) {
-        envelope_snapshots.reserve(2);
-        unused_envelope_snapshots.reserve(2);
         envelope->update();
     }
 
