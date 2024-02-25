@@ -829,7 +829,7 @@ The reason for JS80P having both kinds of modulation is that they are not
 always equivalent. They are only identical when the modulator signal is a
 sinusoid, but with each added harmonic, PM and FM start to differ more and
 more. A detailed mathematical explanation of this is shown in
-[pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf).
+[doc/pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf).
 
 <a id="faq-name" href="#toc">Table of Contents</a>
 
