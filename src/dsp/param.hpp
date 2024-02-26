@@ -404,6 +404,8 @@ class FloatParam : public Param<Number, evaluation>
                 bool is_done;
         };
 
+        static constexpr Integer INVALID_ENVELOPE_SNAPSHOT_ID = -1;
+
         void initialize_instance() noexcept;
 
         Number round_value(Number const value) const noexcept;

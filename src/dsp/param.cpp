@@ -695,7 +695,7 @@ bool FloatParam<evaluation>::is_constant_until(
     if (envelope != NULL) {
         if (
                 envelope->is_dynamic()
-                && active_envelope_snapshot_id >= 0
+                && active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID
                 && (
                     envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
                     || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
@@ -966,7 +966,10 @@ void FloatParam<evaluation>::handle_envelope_update_event(
 ) noexcept {
     Envelope* const envelope = get_envelope();
 
-    if (envelope == NULL || active_envelope_snapshot_id < 0) {
+    if (
+            envelope == NULL
+            || active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
+    ) {
         return;
     }
 
@@ -1002,7 +1005,7 @@ void FloatParam<evaluation>::handle_envelope_end_event(
 
     Seconds const latency = this->current_time - event.time_offset;
 
-    if (active_envelope_snapshot_id >= 0) {
+    if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
         store_envelope_value_at_event(latency);
     }
 
@@ -1044,7 +1047,7 @@ void FloatParam<evaluation>::handle_envelope_cancel_event(
 
     Seconds const latency = this->current_time - event.time_offset;
 
-    if (active_envelope_snapshot_id >= 0) {
+    if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
         store_envelope_value_at_event(latency);
 
         EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
@@ -1079,7 +1082,7 @@ void FloatParam<evaluation>::handle_cancel_event(
         if (envelope != NULL) {
             Seconds const latency = this->current_time - event.time_offset;
 
-            if (active_envelope_snapshot_id >= 0) {
+            if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
                 store_envelope_value_at_event(latency);
             }
         }
@@ -1159,8 +1162,8 @@ void FloatParam<evaluation>::clear_envelope_state() noexcept
 
     envelope_time = 0.0;
     envelope_cancel_duration = 0.0;
-    active_envelope_snapshot_id = -1;
-    scheduled_envelope_snapshot_id = -1;
+    active_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
+    scheduled_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
     envelope_stage = EnvelopeStage::ENV_STG_NONE;
     envelope_canceled = false;
     envelope_is_constant = true;
@@ -1267,7 +1270,10 @@ Seconds FloatParam<evaluation>::end_envelope(
 ) noexcept {
     Envelope* const envelope = get_envelope();
 
-    if (envelope == NULL || scheduled_envelope_snapshot_id < 0) {
+    if (
+            envelope == NULL
+            || scheduled_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
+    ) {
         return 0.0;
     }
 
@@ -1498,7 +1504,10 @@ void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::process_envelope(Envelope& envelope) noexcept
 {
-    if (!envelope.is_dynamic() || active_envelope_snapshot_id < 0) {
+    if (
+            !envelope.is_dynamic()
+            || active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
+    ) {
         return;
     }
 
@@ -1635,7 +1644,7 @@ void FloatParam<evaluation>::render_with_envelope(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (active_envelope_snapshot_id < 0) {
+    if (active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID) {
         Param<Number, evaluation>::render(
             round, first_sample_index, last_sample_index, buffer
         );
@@ -1678,7 +1687,7 @@ void FloatParam<evaluation>::render_with_envelope(
 
     if (envelope_stage == EnvelopeStage::ENV_STG_RELEASED) {
         unused_envelope_snapshots.push(active_envelope_snapshot_id);
-        active_envelope_snapshot_id = -1;
+        active_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
         envelope_is_constant = true;
     }
 }
