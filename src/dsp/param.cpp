@@ -836,11 +836,11 @@ void FloatParam<evaluation>::handle_event(
             break;
 
         case EVT_ENVELOPE_END:
-            handle_envelope_end_event(event);
+            handle_envelope_end_event<EVT_ENVELOPE_END>(event);
             break;
 
         case EVT_ENVELOPE_CANCEL:
-            handle_envelope_cancel_event(event);
+            handle_envelope_end_event<EVT_ENVELOPE_CANCEL>(event);
             break;
 
         default:
@@ -991,6 +991,7 @@ void FloatParam<evaluation>::handle_envelope_update_event(
 
 
 template<ParamEvaluation evaluation>
+template<SignalProducer::Event::Type event_type>
 void FloatParam<evaluation>::handle_envelope_end_event(
         SignalProducer::Event const& event
 ) noexcept {
@@ -1007,6 +1008,16 @@ void FloatParam<evaluation>::handle_envelope_end_event(
 
     if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
         store_envelope_value_at_event(latency);
+
+        if constexpr (event_type == EVT_ENVELOPE_CANCEL) {
+            EnvelopeSnapshot& snapshot = (
+                envelope_snapshots[active_envelope_snapshot_id]
+            );
+
+            snapshot.release_time = std::min(
+                (Seconds)event.number_param_1, snapshot.release_time
+            );
+        }
     }
 
     envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
@@ -1029,36 +1040,6 @@ void FloatParam<evaluation>::store_envelope_value_at_event(
     );
 
     this->store_new_value(ratio_to_value(ratio_at_time_of_event));
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_envelope_cancel_event(
-        SignalProducer::Event const& event
-) noexcept {
-    if (
-            JS80P_UNLIKELY(
-                envelope_stage == EnvelopeStage::ENV_STG_RELEASED
-                || envelope_stage == EnvelopeStage::ENV_STG_NONE
-            )
-    ) {
-        return;
-    }
-
-    Seconds const latency = this->current_time - event.time_offset;
-
-    if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
-        store_envelope_value_at_event(latency);
-
-        EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
-
-        snapshot.release_time = std::min(
-            (Seconds)event.number_param_1, snapshot.release_time
-        );
-    }
-
-    envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
-    envelope_time = latency;
 }
 
 
@@ -1263,7 +1244,7 @@ Seconds FloatParam<evaluation>::end_envelope(Seconds const time_offset) noexcept
 
 
 template<ParamEvaluation evaluation>
-template<SignalProducer::Event::Type event>
+template<SignalProducer::Event::Type event_type>
 Seconds FloatParam<evaluation>::end_envelope(
         Seconds const time_offset,
         Seconds const duration
@@ -1284,12 +1265,12 @@ Seconds FloatParam<evaluation>::end_envelope(
         envelope->make_end_snapshot(envelope_randoms, snapshot);
     }
 
-    if constexpr (event == EVT_ENVELOPE_CANCEL) {
+    if constexpr (event_type == EVT_ENVELOPE_CANCEL) {
         this->schedule(
-            event, time_offset, 0, std::min(snapshot.release_time, duration)
+            event_type, time_offset, 0, std::min(snapshot.release_time, duration)
         );
     } else {
-        this->schedule(event, time_offset);
+        this->schedule(event_type, time_offset);
     }
 
     return snapshot.release_time;

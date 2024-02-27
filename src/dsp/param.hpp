@@ -418,8 +418,9 @@ class FloatParam : public Param<Number, evaluation>
         void handle_log_ramp_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_start_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_update_event(SignalProducer::Event const& event) noexcept;
+
+        template<SignalProducer::Event::Type event_type>
         void handle_envelope_end_event(SignalProducer::Event const& event) noexcept;
-        void handle_envelope_cancel_event(SignalProducer::Event const& event) noexcept;
 
         void store_envelope_value_at_event(Seconds const latency) noexcept;
 
@@ -473,7 +474,7 @@ class FloatParam : public Param<Number, evaluation>
             Sample** buffer
         ) noexcept;
 
-        template<SignalProducer::Event::Type event>
+        template<SignalProducer::Event::Type event_type>
         Seconds end_envelope(
             Seconds const time_offset,
             Seconds const duration = 0.0
