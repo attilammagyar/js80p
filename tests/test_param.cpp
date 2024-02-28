@@ -1407,6 +1407,50 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
 })
 
 
+TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_released_in_time, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples_1[block_size] = {
+        10.0, 9.0, 8.0, 7.0, 6.0,
+    };
+    constexpr Sample expected_samples_2[block_size] = {
+        3.0, 0.0, 0.0, 0.0, 0.0,
+    };
+    FloatParamS param("P", 0.0, 10.0, 0.0);
+    Envelope envelope("env");
+    Sample const* const* rendered_samples;
+
+    param.set_block_size(block_size);
+    param.set_sample_rate(2.0);
+    param.set_envelope(&envelope);
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(1.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(1.0);
+    envelope.sustain_value.set_value(1.0);
+    envelope.release_time.set_value(5.0);
+    envelope.final_value.set_value(0.0);
+
+    param.start_envelope(0.0, 0.0, 0.0);
+    FloatParamS::produce<FloatParamS>(param, 1, block_size);
+
+    param.end_envelope(0.0);
+    envelope.initial_value.set_value(0.5);
+
+    rendered_samples = FloatParamS::produce<FloatParamS>(param, 2, block_size);
+    assert_eq(expected_samples_1, rendered_samples[0], block_size, 0.001);
+
+    envelope.release_time.set_value(3.0);
+
+    rendered_samples = FloatParamS::produce<FloatParamS>(param, 3, block_size);
+    assert_eq(expected_samples_2, rendered_samples[0], block_size, 0.001);
+})
+
+
 TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_dahds, {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {

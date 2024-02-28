@@ -1502,18 +1502,24 @@ void FloatParam<evaluation>::process_envelope(Envelope& envelope) noexcept
 
     Seconds const old_release_time = snapshot.release_time;
 
-    if (
-            envelope_stage == EnvelopeStage::ENV_STG_RELEASE
-            || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
-    ) {
-        envelope_time = 0.0;
-        envelope.make_end_snapshot(envelope_randoms, snapshot);
-    } else {
-        envelope.make_snapshot(envelope_randoms, snapshot);
-
-        if (envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN) {
+    switch (envelope_stage) {
+        case EnvelopeStage::ENV_STG_SUSTAIN:
+            envelope.make_snapshot(envelope_randoms, snapshot);
             envelope_time = 0.0;
-        }
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASE:
+            envelope.make_end_snapshot(envelope_randoms, snapshot);
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASED:
+            envelope.make_end_snapshot(envelope_randoms, snapshot);
+            envelope_time = 0.0;
+            break;
+
+        default:
+            envelope.make_snapshot(envelope_randoms, snapshot);
+            break;
     }
 
     snapshot.release_time = std::min(old_release_time, snapshot.release_time);
