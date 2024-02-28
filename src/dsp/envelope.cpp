@@ -427,7 +427,7 @@ void Envelope::set_up_next_dahds_target(
         duration = 0.0;
     } else {
         duration = DYNAMIC_ENVELOPE_RAMP_TIME;
-        time_until_target = duration;
+        time_until_target = DYNAMIC_ENVELOPE_RAMP_TIME;
     }
 }
 
