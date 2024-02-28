@@ -117,6 +117,9 @@ void Envelope::set_up_interpolation(
         Seconds const sampling_period,
         Number const duration_inv
 ) noexcept {
+    JS80P_ASSERT(duration > 0.0);
+    JS80P_ASSERT(time_until_target >= 0.0);
+
     Seconds const elapsed_time = duration - time_until_target;
 
     if (
