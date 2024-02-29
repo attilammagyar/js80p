@@ -1261,6 +1261,12 @@ Seconds FloatParam<evaluation>::end_envelope(
     EnvelopeSnapshot& snapshot = envelope_snapshots[scheduled_envelope_snapshot_id];
 
     if (envelope->is_dynamic()) {
+        /*
+        It is safe to update the release portion of the scheduled snapshot
+        in-place (rather than scheduling a new snapshot), because
+        process_envelope() would do it anyways, and we are not messing up any
+        previous stages in the middle of rendering them.
+        */
         envelope->update();
         envelope->make_end_snapshot(envelope_randoms, snapshot);
     }
