@@ -478,7 +478,7 @@ StandardWaveforms::StandardWaveforms() noexcept
         triangle_coefficients[i] = (
             8.0 * std::sin(i_pi / 2.0) / (i_pi * i_pi)
         );
-        square_coefficients[i] = (1 + plus_or_minus_one) * two_over_i_pi;
+        square_coefficients[i] = (1.0 + plus_or_minus_one) * two_over_i_pi;
     }
 
     for (Integer i = 0; i != Wavetable::SOFT_PARTIALS; ++i) {
