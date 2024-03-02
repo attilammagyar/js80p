@@ -45,7 +45,7 @@ class Widget : public WidgetBase
             HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         );
 
-        Widget(char const* const text);
+        explicit Widget(char const* const text);
         virtual ~Widget();
 
         virtual void set_text(char const* text) override;
@@ -69,7 +69,7 @@ class Widget : public WidgetBase
         {
             public:
                 Text();
-                Text(std::string const& text);
+                explicit Text(std::string const& text);
                 ~Text();
 
                 void set(std::string const& text);

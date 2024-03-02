@@ -44,7 +44,7 @@ void GUI::destroy()
 class Widget : public WidgetBase
 {
     public:
-        Widget(char const* const text) : WidgetBase(text)
+        explicit Widget(char const* const text) : WidgetBase(text)
         {
         }
 

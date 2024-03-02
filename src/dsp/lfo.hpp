@@ -44,7 +44,7 @@ class LFO : public SignalProducer
     public:
         typedef Oscillator<SignalProducer, true> Oscillator_;
 
-        LFO(std::string const& name) noexcept;
+        explicit LFO(std::string const& name) noexcept;
 
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro

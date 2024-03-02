@@ -163,7 +163,7 @@ class Widget : public WidgetBase
     public:
         static void process_events(XcbPlatform* xcb);
 
-        Widget(char const* const text);
+        explicit Widget(char const* const text);
         virtual ~Widget();
 
         virtual GUI::Image load_image(

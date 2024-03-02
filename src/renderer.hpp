@@ -36,7 +36,7 @@ class Renderer
             OVERWRITE = 1,
         };
 
-        Renderer(Synth& synth)
+        explicit Renderer(Synth& synth)
             : synth(synth),
             rendered(NULL),
             block_size(synth.get_block_size()),

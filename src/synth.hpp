@@ -769,7 +769,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         class ModeParam : public Param<Mode, ParamEvaluation::BLOCK>
         {
             public:
-                ModeParam(std::string const name) noexcept;
+                explicit ModeParam(std::string const& name) noexcept;
         };
 
         class NoteTuning
@@ -821,7 +821,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static Number calculate_inaccuracy_seed(Integer const voice) noexcept;
 
-        Synth(Integer const samples_between_gc = 8000) noexcept;
+        explicit Synth(Integer const samples_between_gc = 8000) noexcept;
         virtual ~Synth() override;
 
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
@@ -854,7 +854,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
          *        the audio thread.
          */
         void push_message(
-            MessageType const message,
+            MessageType const type,
             ParamId const param_id,
             Number const number_param,
             Byte const byte_param
@@ -872,7 +872,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
          * \brief Process a state changing message inside the audio thread.
          */
         void process_message(
-            MessageType const message,
+            MessageType const type,
             ParamId const param_id,
             Number const number_param,
             Byte const byte_param

@@ -637,7 +637,7 @@ class EventTestSignalProducer : public SignalProducer
     public:
         static constexpr Event::Type SET_VALUE = 1;
 
-        EventTestSignalProducer(Integer const channels = 1) noexcept
+        explicit EventTestSignalProducer(Integer const channels = 1) noexcept
             : SignalProducer(channels),
             value(0.0),
             render_calls(0)

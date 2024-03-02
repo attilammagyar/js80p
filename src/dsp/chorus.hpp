@@ -67,7 +67,7 @@ class Chorus : public Effect<InputSignalProducerClass>
         class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
         {
             public:
-                TypeParam(std::string const name) noexcept;
+                explicit TypeParam(std::string const name) noexcept;
         };
 
         Chorus(std::string const name, InputSignalProducerClass& input);

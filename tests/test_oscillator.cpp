@@ -51,7 +51,7 @@ typedef Oscillator<SignalProducer, true> SimpleLFO;
 class NonBandLimitedReferenceWaveform
 {
     public:
-        NonBandLimitedReferenceWaveform(Frequency const frequency)
+        explicit NonBandLimitedReferenceWaveform(Frequency const frequency)
             : frequency(frequency)
         {
         }
@@ -66,7 +66,7 @@ class NonBandLimitedReferenceWaveform
 class ReferenceZero : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceZero(Frequency const frequency)
+        explicit ReferenceZero(Frequency const frequency)
             : NonBandLimitedReferenceWaveform(frequency)
         {
         }
@@ -81,7 +81,7 @@ class ReferenceZero : public NonBandLimitedReferenceWaveform
 class ReferenceSine : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceSine(
+        explicit ReferenceSine(
                 Frequency const frequency_1,
                 Frequency const frequency_2 = 0.0,
                 Seconds const chirp_duration = 0.0,
@@ -118,7 +118,7 @@ class ReferenceSine : public NonBandLimitedReferenceWaveform
 class ReferenceSawtooth : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceSawtooth(Frequency const frequency)
+        explicit ReferenceSawtooth(Frequency const frequency)
             : NonBandLimitedReferenceWaveform(frequency)
         {
         }
@@ -136,7 +136,7 @@ class ReferenceSawtooth : public NonBandLimitedReferenceWaveform
 class ReferenceInverseSawtooth : public ReferenceSawtooth
 {
     public:
-        ReferenceInverseSawtooth(Frequency const frequency)
+        explicit ReferenceInverseSawtooth(Frequency const frequency)
             : ReferenceSawtooth(frequency)
         {
         }
@@ -151,7 +151,7 @@ class ReferenceInverseSawtooth : public ReferenceSawtooth
 class ReferenceTriangle : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceTriangle(Frequency const frequency)
+        explicit ReferenceTriangle(Frequency const frequency)
             : NonBandLimitedReferenceWaveform(frequency)
         {
         }
@@ -176,7 +176,7 @@ class ReferenceTriangle : public NonBandLimitedReferenceWaveform
 class ReferenceSquare : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceSquare(Frequency const frequency)
+        explicit ReferenceSquare(Frequency const frequency)
             : NonBandLimitedReferenceWaveform(frequency)
         {
         }
@@ -194,7 +194,7 @@ class ReferenceSquare : public NonBandLimitedReferenceWaveform
 class ReferenceSawtoothWithDisappearingPartial : public NonBandLimitedReferenceWaveform
 {
     public:
-        ReferenceSawtoothWithDisappearingPartial(Frequency const frequency)
+        explicit ReferenceSawtoothWithDisappearingPartial(Frequency const frequency)
             : NonBandLimitedReferenceWaveform(frequency)
         {
         }

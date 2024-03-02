@@ -298,7 +298,7 @@ class WidgetBase
             BOLD = 1,
         };
 
-        WidgetBase(char const* const text);
+        explicit WidgetBase(char const* const text);
         virtual ~WidgetBase();
 
         virtual int get_left() const;

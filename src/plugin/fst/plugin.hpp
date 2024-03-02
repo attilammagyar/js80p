@@ -258,16 +258,19 @@ class FstPlugin : public Midi::EventHandler
         {
             public:
                 Message();
-                Message(
+
+                explicit Message(
                     MessageType const type,
                     size_t const index = 0,
                     std::string const& serialized_data = ""
                 );
+
                 Message(
                     Midi::Controller const controller_id,
                     Number const new_value,
                     MidiController* const midi_controller
                 );
+
                 Message(Message const& message) = default;
                 Message(Message&& message) = default;
 

@@ -32,7 +32,7 @@ namespace JS80P
 class MtsEsp
 {
     public:
-        MtsEsp(Synth& synth) noexcept : synth(synth)
+        explicit MtsEsp(Synth& synth) noexcept : synth(synth)
         {
             client = MTS_RegisterClient();
         }

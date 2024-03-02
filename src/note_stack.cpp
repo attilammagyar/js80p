@@ -36,12 +36,12 @@ Midi::Word NoteStack::encode(
 
 
 void NoteStack::decode(
-    Midi::Word const item,
+    Midi::Word const word,
     Midi::Channel& channel,
     Midi::Note& note
 ) noexcept {
-    channel = (item >> 8) & 0x0f;
-    note = item & 0xff;
+    channel = (word >> 8) & 0x0f;
+    note = word & 0xff;
 }
 
 
@@ -113,9 +113,9 @@ bool NoteStack::is_invalid(
 }
 
 
-bool NoteStack::is_already_pushed(Midi::Word const item) const noexcept
+bool NoteStack::is_already_pushed(Midi::Word const word) const noexcept
 {
-    return head == item || previous[item] != INVALID_ITEM;
+    return head == word || previous[word] != INVALID_ITEM;
 }
 
 
@@ -152,24 +152,24 @@ void NoteStack::remove(Midi::Channel const channel, Midi::Note const note) noexc
     remove(encode(channel, note));
 }
 
-void NoteStack::remove(Midi::Word const item) noexcept
+void NoteStack::remove(Midi::Word const word) noexcept
 {
-    Midi::Word const next_item = next[item];
-    Midi::Word const previous_item = previous[item];
+    Midi::Word const next_item = next[word];
+    Midi::Word const previous_item = previous[word];
 
     if (next_item != INVALID_ITEM) {
         previous[next_item] = previous_item;
     }
 
-    if (item == head) {
+    if (word == head) {
         head = next_item;
     } else {
         if (previous_item != INVALID_ITEM) {
             next[previous_item] = next_item;
         }
 
-        next[item] = INVALID_ITEM;
-        previous[item] = INVALID_ITEM;
+        next[word] = INVALID_ITEM;
+        previous[word] = INVALID_ITEM;
     }
 }
 

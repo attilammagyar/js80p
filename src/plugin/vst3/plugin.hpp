@@ -175,7 +175,7 @@ class Vst3Plugin
         class GUI : public CPluginView
         {
             public:
-                GUI(Synth& synth);
+                explicit GUI(Synth& synth);
 
                 virtual ~GUI();
 

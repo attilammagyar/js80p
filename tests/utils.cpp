@@ -166,7 +166,7 @@ class SumOfSines : public SignalProducer
     friend class SignalProducer;
 
     public:
-        SumOfSines(
+        explicit SumOfSines(
                 Number const amplitude_1 = 0.0,
                 Frequency const frequency_1 = 0.0,
                 Number const amplitude_2 = 0.0,

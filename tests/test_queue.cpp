@@ -28,7 +28,7 @@ using namespace JS80P;
 class TestObj
 {
     public:
-        TestObj(int const v = 0) : value(v)
+        explicit TestObj(int const v = 0) : value(v)
         {
         }
 
@@ -44,8 +44,9 @@ class TestObj
 class TestObjQueue : public Queue<TestObj>
 {
     public:
-        TestObjQueue(Queue<TestObj>::SizeType const capacity = DEFAULT_CAPACITY)
-            : Queue<TestObj>(capacity)
+        explicit TestObjQueue(
+                Queue<TestObj>::SizeType const capacity = DEFAULT_CAPACITY
+        ) : Queue<TestObj>(capacity)
         {
         }
 
@@ -184,11 +185,11 @@ TEST(when_becomes_empty_then_resets, {
 TEST(elements_may_be_accessed_randomly, {
     TestObjQueue q;
 
-    q.push(10);
-    q.push(20);
-    q.push(30);
-    q.push(40);
-    q.push(50);
+    q.push(TestObj(10));
+    q.push(TestObj(20));
+    q.push(TestObj(30));
+    q.push(TestObj(40));
+    q.push(TestObj(50));
 
     assert_eq(10, q[0].value);
     assert_eq(10, q.pop().value);
@@ -205,12 +206,12 @@ TEST(elements_may_be_accessed_randomly, {
 TEST(elements_may_be_dropped_after_a_given_index, {
     TestObjQueue q;
 
-    q.push(10);
-    q.push(20);
-    q.push(30);
-    q.push(40);
-    q.push(50);
-    q.push(60);
+    q.push(TestObj(10));
+    q.push(TestObj(20));
+    q.push(TestObj(30));
+    q.push(TestObj(40));
+    q.push(TestObj(50));
+    q.push(TestObj(60));
 
     q.pop();
     q.drop(2);
@@ -225,9 +226,9 @@ TEST(elements_may_be_dropped_after_a_given_index, {
 TEST(the_entire_queue_may_be_dropped, {
     TestObjQueue q;
 
-    q.push(10);
-    q.push(20);
-    q.push(30);
+    q.push(TestObj(10));
+    q.push(TestObj(20));
+    q.push(TestObj(30));
 
     q.drop(0);
 
@@ -249,9 +250,9 @@ TEST(capacity_can_be_increased_on_demand, {
 TEST(items_may_be_modified_in_place, {
     TestObjQueue q(3);
 
-    q.push(10);
-    q.push(20);
-    q.push(30);
+    q.push(TestObj(10));
+    q.push(TestObj(20));
+    q.push(TestObj(30));
 
     q.front().value += 1;
     q[1].value += 1;

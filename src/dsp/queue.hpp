@@ -43,7 +43,7 @@ class Queue
         */
         static constexpr SizeType DEFAULT_CAPACITY = 0;
 
-        Queue(SizeType const capacity = DEFAULT_CAPACITY) noexcept;
+        explicit Queue(SizeType const capacity = DEFAULT_CAPACITY) noexcept;
 
         bool is_empty() const noexcept;
         void reserve(SizeType const capacity) noexcept;

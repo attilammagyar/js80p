@@ -70,7 +70,7 @@ Synth::ParamIdHashTable Synth::param_id_hash_table;
 std::string Synth::param_names_by_id[ParamId::PARAM_ID_COUNT];
 
 
-Synth::ModeParam::ModeParam(std::string const name) noexcept
+Synth::ModeParam::ModeParam(std::string const& name) noexcept
     : Param<Mode, ParamEvaluation::BLOCK>(name, MIX_AND_MOD, SPLIT_AT_C4, MIX_AND_MOD)
 {
 }
