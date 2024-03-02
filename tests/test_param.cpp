@@ -1528,7 +1528,11 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
 })
 
 
-TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
+void test_envelope_manual_update_dahds(
+        Toggle const is_dynamic,
+        Number const amount_before_update,
+        Number const amount_before_handling_events
+) {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {
         0.0, 1.0, 2.0, 3.0, 3.0,
@@ -1576,7 +1580,8 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
 
     FloatParamS::produce<FloatParamS>(follower, 1, 2);
 
-    envelope.amount.set_value(0.8);
+    envelope.dynamic.set_value(is_dynamic);
+    envelope.amount.set_value(amount_before_update);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(3.0);
@@ -1584,7 +1589,9 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
     envelope.hold_time.set_value(2.0);
     envelope.decay_time.set_value(4.0);
     envelope.sustain_value.set_value(0.75);
+
     follower.update_envelope(0.0);
+    envelope.amount.set_value(amount_before_handling_events);
 
     FloatParamS::produce<FloatParamS>(follower, 2, 2);
 
@@ -1607,6 +1614,16 @@ TEST(when_the_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_
         follower, 5, block_size
     );
     assert_eq(expected_r_samples, rendered_samples, block_size, DOUBLE_DELTA);
+}
+
+
+TEST(when_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
+    test_envelope_manual_update_dahds(ToggleParam::OFF, 0.8, 0.3);
+})
+
+
+TEST(when_dynamic_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
+    test_envelope_manual_update_dahds(ToggleParam::ON, 0.3, 0.8);
 })
 
 

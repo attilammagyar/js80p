@@ -978,8 +978,10 @@ void FloatParam<evaluation>::handle_envelope_update_event(
     active_envelope_snapshot_id = event.int_param;
     EnvelopeSnapshot& new_snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
-    envelope->update();
-    envelope->make_snapshot(envelope_randoms, new_snapshot);
+    if (envelope->is_dynamic()) {
+        envelope->update();
+        envelope->make_snapshot(envelope_randoms, new_snapshot);
+    }
 
     if (
             envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
