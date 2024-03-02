@@ -943,6 +943,10 @@ void FloatParam<evaluation>::handle_envelope_start_event(
         return;
     }
 
+    if (active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
+        unused_envelope_snapshots.push(active_envelope_snapshot_id);
+    }
+
     active_envelope_snapshot_id = event.int_param;
     EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
@@ -976,11 +980,12 @@ void FloatParam<evaluation>::handle_envelope_update_event(
     unused_envelope_snapshots.push(active_envelope_snapshot_id);
 
     active_envelope_snapshot_id = event.int_param;
-    EnvelopeSnapshot& new_snapshot = envelope_snapshots[active_envelope_snapshot_id];
 
     if (envelope->is_dynamic()) {
         envelope->update();
-        envelope->make_snapshot(envelope_randoms, new_snapshot);
+        envelope->make_snapshot(
+            envelope_randoms, envelope_snapshots[active_envelope_snapshot_id]
+        );
     }
 
     if (
