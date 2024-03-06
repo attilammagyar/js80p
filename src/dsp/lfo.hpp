@@ -63,10 +63,7 @@ class LFO : public SignalProducer
         void stop(Seconds const time_offset) noexcept;
         bool is_on() const noexcept;
 
-        void skip_round(
-            Integer const round,
-            Integer const sample_count
-        ) noexcept;
+        void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         typename Oscillator_::WaveformParam waveform;
         FloatParamS frequency;
@@ -94,6 +91,8 @@ class LFO : public SignalProducer
         ) noexcept;
 
     private:
+        static constexpr Number ALMOST_ZERO = 0.000001;
+
         void initialize_instance() noexcept;
 
         void apply_distortions(
