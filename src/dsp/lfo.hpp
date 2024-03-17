@@ -23,9 +23,11 @@
 
 #include "js80p.hpp"
 
+#include "dsp/envelope.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
+#include "dsp/wavetable.hpp"
 
 
 namespace JS80P
@@ -46,7 +48,7 @@ class LFO : public SignalProducer
 
         typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
 
-        explicit LFO(std::string const& name, Byte const index = -1) noexcept;
+        explicit LFO(std::string const& name) noexcept;
 
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro
@@ -62,6 +64,21 @@ class LFO : public SignalProducer
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
         bool is_on() const noexcept;
+
+        bool has_envelope() const noexcept;
+
+        void produce_with_envelope(
+            Seconds& envelope_time,
+            Sample& envelope_value,
+            EnvelopeStage& envelope_stage,
+            EnvelopeSnapshot const& envelope_snapshot,
+            WavetableState& wavetable_state,
+            Integer const round,
+            Integer const sample_count,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample* buffer
+        ) noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
@@ -127,8 +144,6 @@ class LFO : public SignalProducer
             Sample* target_buffer
         );
 
-        Byte const index;
-
         Oscillator_ oscillator;
 
         Sample const* min_buffer;
@@ -137,7 +152,6 @@ class LFO : public SignalProducer
         Sample const* randomness_buffer;
         Sample const* const* oscillator_buffer;
 };
-
 
 }
 

@@ -23,7 +23,6 @@
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
-#include "dsp/lfo_envelope_mapping.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -61,7 +60,6 @@ void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_lo
         max,
         default_value,
         0.0,
-        NULL,
         NULL,
         &toggle,
         table,

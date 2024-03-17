@@ -38,7 +38,6 @@
 #include "dsp/filter.cpp"
 #include "dsp/gain.cpp"
 #include "dsp/lfo.cpp"
-#include "dsp/lfo_envelope_mapping.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -96,8 +95,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         1.0,
         1.0,
         0.0,
-        (Envelope* const*)&envelopes_rw,
-        (LFO* const*)&lfos_rw
+        (Envelope* const*)&envelopes_rw
     ),
     phase_modulation_level(
         "PM",
@@ -105,8 +103,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         Constants::PM_MAX,
         Constants::PM_DEFAULT,
         0.0,
-        (Envelope* const*)&envelopes_rw,
-        (LFO* const*)&lfos_rw
+        (Envelope* const*)&envelopes_rw
 
     ),
     frequency_modulation_level(
@@ -115,8 +112,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         Constants::FM_MAX,
         Constants::FM_DEFAULT,
         0.0,
-        (Envelope* const*)&envelopes_rw,
-        (LFO* const*)&lfos_rw
+        (Envelope* const*)&envelopes_rw
 
     ),
     amplitude_modulation_level(
@@ -125,12 +121,10 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         Constants::AM_MAX,
         Constants::AM_DEFAULT,
         0.0,
-        (Envelope* const*)&envelopes_rw,
-        (LFO* const*)&lfos_rw
-
+        (Envelope* const*)&envelopes_rw
     ),
-    modulator_params("M", (Envelope* const*)&envelopes_rw, (LFO* const*)&lfos_rw),
-    carrier_params("C", (Envelope* const*)&envelopes_rw, (LFO* const*)&lfos_rw),
+    modulator_params("M", (Envelope* const*)&envelopes_rw),
+    carrier_params("C", (Envelope* const*)&envelopes_rw),
     messages(MESSAGE_QUEUE_SIZE),
     bus(
         OUT_CHANNELS,
@@ -151,7 +145,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_polyphonic(true),
     was_polyphonic(true),
     is_dirty_(false),
-    need_lfo_envelope_mapping_update(false),
     effects(
         "E",
         bus,
@@ -543,9 +536,7 @@ void Synth::create_voices() noexcept
             calculate_inaccuracy_seed((i + 23) % POLYPHONY),
             modulator_params,
             &biquad_filter_shared_buffers[0],
-            &biquad_filter_shared_buffers[1],
-            envelopes,
-            lfos
+            &biquad_filter_shared_buffers[1]
         );
         register_child(*modulators[i]);
 
@@ -560,9 +551,7 @@ void Synth::create_voices() noexcept
             frequency_modulation_level,
             phase_modulation_level,
             &biquad_filter_shared_buffers[2],
-            &biquad_filter_shared_buffers[3],
-            envelopes,
-            lfos
+            &biquad_filter_shared_buffers[3]
         );
         register_child(*carriers[i]);
     }
@@ -648,7 +637,7 @@ void Synth::create_lfos() noexcept
     Integer next_id = ParamId::L1FRQ;
 
     for (Byte i = 0; i != Constants::LFOS; ++i) {
-        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), i);
+        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)));
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
@@ -1053,19 +1042,19 @@ void Synth::trigger_note_on_voice(
 
     if (mode == MIX_AND_MOD) {
         modulators[voice]->note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
         carriers[voice]->note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     } else {
         if (note < mode + Midi::NOTE_B_2) {
             modulators[voice]->note_on(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
             );
         } else {
             carriers[voice]->note_on(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
             );
         }
     }
@@ -1157,15 +1146,15 @@ void Synth::trigger_note_on_voice_monophonic(
 ) noexcept {
     if (is_off) {
         voice.note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     } else if (voice.is_released()) {
         voice.retrigger(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     } else {
         voice.glide_to(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy, lfo_envelope_mapping
+            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     }
 }
@@ -1547,12 +1536,6 @@ void Synth::get_param_id_hash_table_statistics(
     param_id_hash_table.get_statistics(
         max_collisions, avg_collisions, avg_bucket_size
     );
-}
-
-
-LFOEnvelopeMapping const& Synth::get_lfo_envelope_mapping() const noexcept
-{
-    return lfo_envelope_mapping;
 }
 #endif
 
@@ -2585,8 +2568,6 @@ void Synth::process_messages() noexcept
             process_message(message);
         }
     }
-
-    update_lfo_envelope_mapping();
 }
 
 
@@ -2864,35 +2845,19 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2QLG: carrier_params.filter_2_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF1QLG: effects.filter_1_q_log_scale.set_ratio(ratio); break;
             case ParamId::EF2QLG: effects.filter_2_q_log_scale.set_ratio(ratio); break;
-            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
-            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); need_lfo_envelope_mapping_update = true; break;
+            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
 
     handle_refresh_param(param_id);
-}
-
-
-void Synth::update_lfo_envelope_mapping() noexcept
-{
-    if (JS80P_LIKELY(!need_lfo_envelope_mapping_update)) {
-        return;
-    }
-
-    need_lfo_envelope_mapping_update = false;
-
-    lfo_envelope_mapping.clear();
-
-    for (Byte i = 0; i != Constants::LFOS; ++i) {
-        lfo_envelope_mapping[i] = lfos_rw[i]->amount_envelope.get_value();
-    }
 }
 
 
@@ -3112,8 +3077,6 @@ void Synth::handle_clear() noexcept
             handle_set_param(param_id, get_param_default_ratio(param_id));
         }
     }
-
-    update_lfo_envelope_mapping();
 }
 
 

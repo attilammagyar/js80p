@@ -26,7 +26,6 @@
 #include "dsp/envelope.cpp"
 #include "dsp/filter.cpp"
 #include "dsp/lfo.cpp"
-#include "dsp/lfo_envelope_mapping.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"

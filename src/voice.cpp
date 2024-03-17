@@ -192,8 +192,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
         Number const c,
         Number const d,
         Number const e,
-        Envelope* const* envelopes,
-        LFO* const* lfos
+        Envelope* const* envelopes
 ) {
 }
 
@@ -201,14 +200,13 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(
         std::string const& name,
-        Envelope* const* envelopes,
-        LFO* const* lfos
+        Envelope* const* envelopes
 ) noexcept
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
     waveform(name + "WAV"),
-    amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes, lfos),
+    amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
     folding(
         name + "FLD",
@@ -216,8 +214,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::FOLD_MAX,
         Constants::FOLD_DEFAULT,
         0.0,
-        envelopes,
-        lfos
+        envelopes
     ),
     portamento_length(name + "PRT", 0.0, 3.0, 0.0),
     portamento_depth(name + "PRD", -2400.0, 2400.0, 0.0),
@@ -234,12 +231,11 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT,
         0.0,
-        envelopes,
-        lfos
+        envelopes
     ),
     width(name + "WID", -1.0, 1.0, 0.0),
-    panning(name + "PAN", -1.0, 1.0, 0.0, 0.0, envelopes, lfos),
-    volume(name + "VOL", 0.0, 1.0, 0.33, 0.0, envelopes, lfos),
+    panning(name + "PAN", -1.0, 1.0, 0.0, 0.0, envelopes),
+    volume(name + "VOL", 0.0, 1.0, 0.33, 0.0, envelopes),
 
     harmonic_0(name + "C1", -1.0, 1.0, 0.0),
     harmonic_1(name + "C2", -1.0, 1.0, 0.0),
@@ -262,7 +258,6 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
         envelopes,
-        lfos,
         &filter_1_freq_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
@@ -275,7 +270,6 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_Q_DEFAULT,
         0.0,
         envelopes,
-        lfos,
         &filter_1_q_log_scale,
         Math::log_biquad_filter_q_table(),
         Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
@@ -288,8 +282,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_GAIN_MAX,
         Constants::BIQUAD_FILTER_GAIN_DEFAULT,
         0.0,
-        envelopes,
-        lfos
+        envelopes
     ),
     filter_1_freq_inaccuracy(name + "F1FIA", 0.0, 1.0, 0.0),
     filter_1_q_inaccuracy(name + "F1QIA", 0.0, 0.4, 0.0),
@@ -304,7 +297,6 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
         envelopes,
-        lfos,
         &filter_2_freq_log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
@@ -317,7 +309,6 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_Q_DEFAULT,
         0.0,
         envelopes,
-        lfos,
         &filter_2_q_log_scale,
         Math::log_biquad_filter_q_table(),
         Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
@@ -330,14 +321,13 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         Constants::BIQUAD_FILTER_GAIN_MAX,
         Constants::BIQUAD_FILTER_GAIN_DEFAULT,
         0.0,
-        envelopes,
-        lfos
+        envelopes
     ),
     filter_2_freq_inaccuracy(name + "F2FIA", 0.0, 1.0, 0.0),
     filter_2_q_inaccuracy(name + "F2QIA", 0.0, 0.4, 0.0),
 
-    subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0, 0.0, envelopes, lfos),
-    distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes, lfos)
+    subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0, 0.0, envelopes),
+    distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes)
 {
 }
 
@@ -446,9 +436,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Number const oscillator_inaccuracy_seed,
         Params& param_leaders,
         BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers,
-        Envelope* const* envelopes,
-        LFO* const* lfos
+        BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
@@ -522,9 +510,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader,
         BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers,
-        Envelope* const* envelopes,
-        LFO* const* lfos
+        BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
@@ -705,8 +691,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy,
-        LFOEnvelopeMapping const& lfo_envelope_mapping
+        bool const should_sync_oscillator_inaccuracy
 ) noexcept {
     if (state == State::ON || note >= Midi::NOTES) {
         return;
@@ -737,22 +722,14 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     oscillator.cancel_events_at(time_offset);
 
-    wavefolder.folding.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    wavefolder.folding.start_envelope(time_offset, random_1, random_2);
 
     if constexpr (IS_CARRIER) {
-        distortion.level.start_envelope(
-            time_offset, random_1, random_2, lfo_envelope_mapping
-        );
+        distortion.level.start_envelope(time_offset, random_1, random_2);
     }
 
-    panning.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    volume.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    panning.start_envelope(time_offset, random_1, random_2);
+    volume.start_envelope(time_offset, random_1, random_2);
 
     if (should_sync_oscillator_inaccuracy) {
         set_up_oscillator_frequency<true>(
@@ -768,49 +745,25 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    oscillator.amplitude.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    oscillator.modulated_amplitude.start_envelope(time_offset, random_1, random_2);
+    oscillator.amplitude.start_envelope(time_offset, random_1, random_2);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.start_envelope(
-            time_offset, random_1, random_2, lfo_envelope_mapping
-        );
+        oscillator.subharmonic_amplitude.start_envelope(time_offset, random_1, random_2);
     }
 
-    oscillator.frequency.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    oscillator.phase.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    oscillator.frequency.start_envelope(time_offset, random_1, random_2);
+    oscillator.phase.start_envelope(time_offset, random_1, random_2);
 
-    oscillator.fine_detune.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    oscillator.fine_detune.start_envelope(time_offset, random_1, random_2);
 
-    filter_1.frequency.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    filter_1.q.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    filter_1.gain.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    filter_1.frequency.start_envelope(time_offset, random_1, random_2);
+    filter_1.q.start_envelope(time_offset, random_1, random_2);
+    filter_1.gain.start_envelope(time_offset, random_1, random_2);
 
-    filter_2.frequency.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    filter_2.q.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
-    filter_2.gain.start_envelope(
-        time_offset, random_1, random_2, lfo_envelope_mapping
-    );
+    filter_2.frequency.start_envelope(time_offset, random_1, random_2);
+    filter_2.q.start_envelope(time_offset, random_1, random_2);
+    filter_2.gain.start_envelope(time_offset, random_1, random_2);
 
     oscillator.start(time_offset);
 }
@@ -964,8 +917,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy,
-        LFOEnvelopeMapping const& lfo_envelope_mapping
+        bool const should_sync_oscillator_inaccuracy
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -979,8 +931,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         channel,
         velocity,
         previous_note,
-        should_sync_oscillator_inaccuracy,
-        lfo_envelope_mapping
+        should_sync_oscillator_inaccuracy
     );
 }
 
@@ -993,8 +944,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Midi::Channel const channel,
         Number const velocity,
         Midi::Note const previous_note,
-        bool const should_sync_oscillator_inaccuracy,
-        LFOEnvelopeMapping const& lfo_envelope_mapping
+        bool const should_sync_oscillator_inaccuracy
 ) noexcept {
     if (note >= Midi::NOTES) {
         return;
@@ -1010,8 +960,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
             channel,
             velocity,
             previous_note,
-            should_sync_oscillator_inaccuracy,
-            lfo_envelope_mapping
+            should_sync_oscillator_inaccuracy
         );
 
         return;

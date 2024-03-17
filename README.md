@@ -86,7 +86,7 @@ Table of Contents
  * [Frequently Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
-    * [Parameters, Envelopes, and polyphony: how do they work?](#faq-params-polyphony)
+    * [Parameters, Envelopes, LFOs, and polyphony: how do they work?](#faq-params-polyphony)
     * [The knobs in the waveform harmonics section don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
@@ -765,7 +765,7 @@ current computer, I'm not going to invest in a new one.
 
 <a id="faq-params-polyphony" href="#toc">Table of Contents</a>
 
-### Parameters, Envelopes, and polyphony: how do they work?
+### Parameters, Envelopes, LFOs, and polyphony: how do they work?
 
 By default, knobs and toggles act globally. This means that if you adjust a
 knob with your mouse, or if you assign a MIDI value (controller, note velocity,
@@ -780,6 +780,13 @@ to the envelope's settings. By default, these settings are only evaluated once
 for each note, at the very beginning of the note, so if the parameters of the
 envelope are changed, then it will only affect the notes that start after the
 adjustment.
+
+Similarly, if you assign an LFO to a parameter which supports Envelopes, and
+the LFO is associated with an Envelope, then the LFO becomes polyphonic, and
+its amount will be controlled by the Envelope for each polyphonic voice
+independently from the other voices. (Note that this is not transitive: if a
+parameter of a polyphonic LFO is controlled by another LFO, then the second LFO
+will not become polyphonic, even if it has an Envelope assigned to it.)
 
 To have polyphonic notes *sample and hold* a MIDI value or a Macro's momentary
 value for a parameter for the entire duration of the note, independently of
