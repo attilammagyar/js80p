@@ -150,6 +150,8 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
 
 #define JS80P_ENVELOPE_RENDER_DEBUG_FMT                 \
     "test_name=\"%s\"\n    "                            \
+        "rendering_mode=%d,\n    "                      \
+        "initial_buffer_value=%f,    \n"                \
         "batch_size=%d,\n    "                          \
         "elapsed_time_at_start=%f, "                    \
         "value_at_start=%f,\n    "                      \
@@ -158,6 +160,8 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
 
 #define JS80P_ENVELOPE_RENDER_DEBUG_PARAMS              \
     test_name,                                          \
+    (int)rendering_mode,                                \
+    initial_buffer_value,                               \
     (int)batch_size,                                    \
     elapsed_time_at_start,                              \
     value_at_start,                                     \
@@ -173,7 +177,7 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     envelope_durations[4]
 
 
-template<int expected_samples_count>
+template<int expected_samples_count, Envelope::RenderingMode rendering_mode>
 void test_envelope_rendering_with_batch_size(
         char const* const test_name,
         Integer const batch_size,
@@ -184,7 +188,8 @@ void test_envelope_rendering_with_batch_size(
         Number const value_at_start,
         Frequency const sample_rate,
         std::array<Sample, expected_samples_count> const& expected_samples,
-        bool const expected_constantness
+        bool const expected_constantness,
+        Sample const initial_buffer_value
 ) {
     Seconds const sampling_period = 1.0 / sample_rate;
 
@@ -207,21 +212,30 @@ void test_envelope_rendering_with_batch_size(
     EnvelopeStage stage = initial_stage;
     bool becomes_constant = false;
 
+    std::fill_n(buffer, expected_samples_count, initial_buffer_value);
+
     Integer index = 0;
 
     while (index != expected_samples_count) {
         Integer const increment = std::min(
             batch_size, expected_samples_count - index
         );
-        Number const calculated_first_value = Envelope::get_value_at_time(
-            snapshot,
-            time,
-            stage,
-            value,
-            sampling_period
+        Number const calculated_first_value = (
+            Envelope::get_value_at_time(
+                snapshot,
+                time,
+                stage,
+                value,
+                sampling_period
+            )
+            * (
+                rendering_mode == Envelope::RenderingMode::OVERWRITE
+                    ? 1.0
+                    : initial_buffer_value
+            )
         );
 
-        Envelope::render(
+        Envelope::render<rendering_mode>(
             snapshot,
             time,
             stage,
@@ -277,8 +291,17 @@ void test_envelope_rendering(
 ) {
     Integer const max_batch_size = std::min(12, expected_samples_count);
 
+    std::array<Sample, expected_samples_count> expected_zeros;
+    std::array<Sample, expected_samples_count> expected_samples_half;
+
+    std::fill(expected_zeros.begin(), expected_zeros.end(), 0.0);
+
+    for (int i = 0; i != expected_samples_count; ++i) {
+        expected_samples_half[i] = 0.5 * expected_samples[i];
+    }
+
     for (Integer batch_size = 1; batch_size != max_batch_size; ++batch_size) {
-        test_envelope_rendering_with_batch_size<expected_samples_count>(
+        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::OVERWRITE>(
             test_name,
             batch_size,
             envelope_values,
@@ -288,7 +311,47 @@ void test_envelope_rendering(
             value_at_start,
             sample_rate,
             expected_samples,
-            expected_constantness
+            expected_constantness,
+            0.0
+        );
+        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+            test_name,
+            batch_size,
+            envelope_values,
+            envelope_durations,
+            elapsed_time_at_start,
+            initial_stage,
+            value_at_start,
+            sample_rate,
+            expected_zeros,
+            expected_constantness,
+            0.0
+        );
+        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+            test_name,
+            batch_size,
+            envelope_values,
+            envelope_durations,
+            elapsed_time_at_start,
+            initial_stage,
+            value_at_start,
+            sample_rate,
+            expected_samples_half,
+            expected_constantness,
+            0.5
+        );
+        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+            test_name,
+            batch_size,
+            envelope_values,
+            envelope_durations,
+            elapsed_time_at_start,
+            initial_stage,
+            value_at_start,
+            sample_rate,
+            expected_samples,
+            expected_constantness,
+            1.0
         );
     }
 }
