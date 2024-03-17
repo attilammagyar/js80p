@@ -29,7 +29,8 @@ namespace JS80P
 
 LFO::LFO(
         std::string const& name,
-        Byte const index
+        Byte const index,
+        Envelope* const* const envelopes
 ) noexcept
     : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
@@ -44,7 +45,9 @@ LFO::LFO(
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
     index(index),
-    oscillator(waveform, amount, frequency, phase, tempo_sync, center)
+    can_have_envelope(envelopes != NULL),
+    oscillator(waveform, amount, frequency, phase, tempo_sync, center),
+    is_processing_envelopes(false)
 {
     initialize_instance();
 }
@@ -64,6 +67,14 @@ void LFO::initialize_instance() noexcept
     register_child(center);
     register_child(amount_envelope);
     register_child(oscillator);
+
+    if (can_have_envelope) {
+        env_buffer_1 = new Sample[block_size];
+        env_buffer_2 = new Sample[block_size];
+    } else {
+        env_buffer_1 = NULL;
+        env_buffer_2 = NULL;
+    }
 }
 
 
@@ -88,9 +99,39 @@ LFO::LFO(
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
     index(Constants::INVALID_LFO_INDEX),
-    oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
+    can_have_envelope(false),
+    oscillator(waveform, amount, frequency, phase, tempo_sync_, center),
+    is_processing_envelopes(false)
 {
     initialize_instance();
+}
+
+
+LFO::~LFO()
+{
+    if (can_have_envelope) {
+        delete[] env_buffer_1;
+        delete[] env_buffer_2;
+
+        env_buffer_1 = NULL;
+        env_buffer_2 = NULL;
+    }
+}
+
+
+void LFO::set_block_size(Integer const new_block_size) noexcept
+{
+    Integer const old_block_size = get_block_size();
+
+    SignalProducer::set_block_size(new_block_size);
+
+    if (can_have_envelope && old_block_size != new_block_size) {
+        delete[] env_buffer_1;
+        delete[] env_buffer_2;
+
+        env_buffer_1 = new Sample[new_block_size];
+        env_buffer_2 = new Sample[new_block_size];
+    }
 }
 
 
@@ -117,6 +158,31 @@ void LFO::stop(Seconds const time_offset) noexcept
 bool LFO::is_on() const noexcept
 {
     return oscillator.is_on();
+}
+
+
+bool LFO::has_envelope() noexcept
+{
+    if (is_processing_envelopes) {
+        return false;
+    }
+
+    is_processing_envelopes = true;
+
+    bool const has_envelope = (
+        amount_envelope.get_value() != Constants::INVALID_ENVELOPE_INDEX
+        || frequency.has_lfo_with_envelope()
+        || phase.has_lfo_with_envelope()
+        || min.has_lfo_with_envelope()
+        || max.has_lfo_with_envelope()
+        || amount.has_lfo_with_envelope()
+        || distortion.has_lfo_with_envelope()
+        || randomness.has_lfo_with_envelope()
+    );
+
+    is_processing_envelopes = false;
+
+    return has_envelope;
 }
 
 
@@ -175,6 +241,132 @@ void LFO::render(
             round, first_sample_index, last_sample_index, buffer[0], buffer[0]
         );
     }
+}
+
+
+void LFO::produce_with_envelope(
+        LFOEnvelopeState* const lfo_envelope_states,
+        Integer const round,
+        Integer const sample_count,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample* buffer
+) noexcept {
+    JS80P_ASSERT(index < Constants::LFOS);
+    JS80P_ASSERT(can_have_envelope);
+
+    LFOEnvelopeState& envelope_state = lfo_envelope_states[index];
+
+    if (is_processing_envelopes || !has_envelope()) {
+        Sample const* const* const lfo_buffer = SignalProducer::produce<LFO>(
+            *this, round, sample_count
+        );
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[i] = lfo_buffer[0][i];
+        }
+
+        return;
+    }
+
+    is_processing_envelopes = true;
+
+    bool envelope_is_constant = false;
+
+    if (envelope_state.envelope_stage == EnvelopeStage::ENV_STG_NONE) {
+        Wavetable::reset_state(
+            envelope_state.wavetable_state,
+            this->sampling_period,
+            this->nyquist_frequency,
+            frequency.get_value(),
+            0.0
+        );
+    }
+
+    oscillator.produce_for_lfo_with_envelope(
+        envelope_state.wavetable_state,
+        lfo_envelope_states,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        buffer,
+        env_buffer_1,
+        env_buffer_2
+    );
+
+    Envelope::render(
+        envelope_state.envelope_snapshot,
+        envelope_state.envelope_time,
+        envelope_state.envelope_stage,
+        envelope_is_constant,
+        envelope_state.value,
+        this->sample_rate,
+        this->sampling_period,
+        first_sample_index,
+        last_sample_index,
+        env_buffer_1
+    );
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        buffer[i] *= env_buffer_1[i];
+    }
+
+    distortion_buffer = distortion.produce_for_lfo_with_envelope(
+        lfo_envelope_states,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        env_buffer_1
+    );
+    randomness_buffer = randomness.produce_for_lfo_with_envelope(
+        lfo_envelope_states,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        env_buffer_2
+    );
+
+    if (center.get_value() == ToggleParam::OFF) {
+        apply_distortions(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    } else {
+        apply_distortions_centered(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    }
+
+    min_buffer = min.produce_for_lfo_with_envelope(
+        lfo_envelope_states,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        env_buffer_1
+    );
+    max_buffer = max.produce_for_lfo_with_envelope(
+        lfo_envelope_states,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        env_buffer_2
+    );
+
+    if (center.get_value() == ToggleParam::OFF) {
+        apply_range(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    } else {
+        apply_range_centered(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    }
+
+    is_processing_envelopes = false;
 }
 
 

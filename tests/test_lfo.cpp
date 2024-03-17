@@ -288,3 +288,28 @@ TEST(distortion_and_randomness_respect_min_and_max_values, {
 })
 
 
+TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_loop_between_lfos, {
+    LFO lfo_1("L1");
+    LFO lfo_2("L2");
+    LFO lfo_3("L3");
+
+    lfo_1.randomness.set_lfo(&lfo_2);
+    lfo_2.randomness.set_lfo(&lfo_3);
+    lfo_3.randomness.set_lfo(&lfo_1);
+
+    assert_false(lfo_1.has_envelope());
+    assert_false(lfo_2.has_envelope());
+    assert_false(lfo_3.has_envelope());
+
+    lfo_2.amount_envelope.set_value(0);
+
+    assert_true(lfo_1.has_envelope());
+    assert_true(lfo_2.has_envelope());
+    assert_true(lfo_3.has_envelope());
+
+    lfo_3.randomness.set_lfo(NULL);
+
+    assert_true(lfo_1.has_envelope());
+    assert_true(lfo_2.has_envelope());
+    assert_false(lfo_3.has_envelope());
+})
