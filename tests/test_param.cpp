@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -25,7 +26,6 @@
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
-#include "dsp/lfo_envelope_mapping.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -1069,13 +1069,17 @@ TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_o
         1.0, 1.0, 1.0, 1.0, 1.0,
         1.0, 1.0, 1.0, 1.0, 1.0,
     };
-    FloatParamS float_param("float", -1.0, 1.0, 0.0);
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope envelope("env");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -1.0, 1.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_sample_rate(1.0);
     float_param.set_value(1.0);
-    float_param.start_envelope(3.0, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(3.0, 0.0, 0.0);
     assert_eq(0.0, float_param.end_envelope(6.0), DOUBLE_DELTA);
     assert_eq(NULL, float_param.get_envelope());
 
@@ -1093,9 +1097,12 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
         0.0, 0.0, 1.0, 2.0, 3.0,
         3.0, 2.0, 1.0, 1.0, 1.0,
     };
-    FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -5.0, 5.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1115,7 +1122,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(0.3, 0.0, 0.0);
 
     assert_true(float_param.is_constant_until(1));
     assert_false(float_param.is_constant_until(2));
@@ -1134,9 +1141,12 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -5.0, 5.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1154,7 +1164,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(0.3, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1172,9 +1182,12 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
         5.0, 0.0, -1.0, -2.0, -2.0,
         -2.0, -2.0, -2.0, -2.0, -2.0,
     };
-    FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -5.0, 5.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1194,7 +1207,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.375);
 
-    float_param.start_envelope(1.0, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(1.0, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(1.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1212,9 +1225,12 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -5.0, 5.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1232,7 +1248,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
     envelope.amount.set_value(1.0);
@@ -1255,9 +1271,12 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS float_param("float", -5.0, 5.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", -5.0, 5.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     float_param.set_block_size(block_size);
@@ -1279,7 +1298,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
 
     envelope.release_time.set_value(6.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(0.3, 0.0, 0.0);
     float_param.cancel_envelope(4.0, 2.0);
 
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
@@ -1293,10 +1312,13 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamS follower(leader);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", -5.0, 5.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
     Sample const* const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1320,7 +1342,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
 
@@ -1340,10 +1362,13 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
         0.0, 0.0, 1.0, 2.0, 3.0,
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamS follower(leader);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", -5.0, 5.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
     Sample const* const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1367,7 +1392,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     envelope.release_time.set_value(3.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(6.0);
 
@@ -1388,9 +1413,12 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
         0.0, 5.0, 10.0, 10.0, 10.0,
         10.0, 8.0, 6.0, 3.0, 0.0,
     };
-    FloatParamS param("P", 0.0, 10.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS param("P", 0.0, 10.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     param.set_block_size(block_size);
@@ -1408,7 +1436,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
+    param.start_envelope(0.0, 0.0, 0.0);
     param.end_envelope(5.0);
     param.cancel_envelope(7.0, 2.0);
 
@@ -1425,9 +1453,12 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     constexpr Sample expected_samples_2[block_size] = {
         3.0, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS param("P", 0.0, 10.0, 0.0);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS param("P", 0.0, 10.0, 0.0, 0.0, envelopes);
     Sample const* const* rendered_samples;
 
     param.set_block_size(block_size);
@@ -1446,7 +1477,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
+    param.start_envelope(0.0, 0.0, 0.0);
     FloatParamS::produce<FloatParamS>(param, 1, block_size);
 
     param.end_envelope(0.0);
@@ -1472,10 +1503,13 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
         1.0, 1.0, 1.0, 1.0, 1.0,
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamS follower(leader);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", -5.0, 5.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1500,7 +1534,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     envelope.release_time.set_value(0.123);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(2.0);
 
@@ -1554,10 +1588,13 @@ void test_envelope_manual_update_dahds(
         1.0, 1.0, 1.0, 1.0, 1.0,
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
-    FloatParamS leader("follow", -5.0, 5.0, 0.0);
-    FloatParamS follower(leader);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", -5.0, 5.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size);
@@ -1582,7 +1619,7 @@ void test_envelope_manual_update_dahds(
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.3, 0.0, 0.0);
     FloatParamS::produce<FloatParamS>(follower, 0, 2);
 
     envelope.release_time.set_value(2.0);
@@ -1651,9 +1688,12 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
         0.0, 5.0, 10.0, 7.5, 5.0,
         5.0, 5.0, 3.0, 1.0, 1.0,
     };
-    FloatParamS float_param("float", 0.0, 10.0, 0.0);
     Envelope envelope("envelope");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", 0.0, 10.0, 0.0, 0.0, envelopes);
     Sample const* rendered_samples;
 
     envelope.dynamic.set_value(ToggleParam::ON);
@@ -1671,9 +1711,9 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(sample_rate);
     float_param.set_envelope(&envelope);
-    float_param.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(0.0, 0.0, 0.0);
     float_param.end_envelope(3.0);
-    float_param.start_envelope(5.0, 0.0, 0.0, lfo_envelope_mapping);
+    float_param.start_envelope(5.0, 0.0, 0.0);
     float_param.end_envelope(8.0);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -1700,10 +1740,13 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
         7.00, 6.75, 6.50, 6.25, 6.00,
         5.75, 5.50, 5.50, 5.50, 5.50,
     };
-    FloatParamS leader("follow", 0.0, 10.0, 0.0);
-    FloatParamS follower(leader);
     Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
     Sample const* rendered_samples;
 
     leader.set_block_size(block_size_max);
@@ -1726,7 +1769,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    follower.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.0, 0.0, 0.0);
 
     FloatParamS::produce<FloatParamS>(follower, 1, block_size_1);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -2044,6 +2087,522 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 })
 
 
+TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        NULL, &envelope, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("lfo");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * Envelope sample * LFO sample */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.0 * 0.1 * 0.5, 10.0 * 0.1 * 1.0,                     /* 1.0s -  2.0s delay    */
+        10.0 * 0.1 * 0.5, 10.0 * 0.4 * 0.0, 10.0 * 0.7 * 0.5,   /* 2.0s -  3.5s attack   */
+        10.0 * 1.0 * 1.0,                                       /* 3.5s -  4.0s hold     */
+        10.0 * 1.0 * 0.5, 10.0 * 0.9 * 0.0, 10.0 * 0.8 * 0.5,   /* 4.0s -  5.5s decay    */
+        10.0 * 0.7 * 1.0, 10.0 * 0.7 * 0.5, 10.0 * 0.7 * 0.0,   /* 5.5s -  7.0s sustain  */
+        10.0 * 0.7 * 0.5, 10.0 * 0.6 * 1.0,                     /* 7.0s         update   */
+        10.0 * 0.6 * 0.5, 10.0 * 0.5 * 0.0,                     /* 8.0s - 10.0s release  */
+        10.0 * 0.4 * 0.5, 10.0 * 0.2 * 1.0,                     /* 9.0s         cancel   */
+    };
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(sample_rate * 0.25);
+    lfo.amount_envelope.set_value(1);
+    lfo.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(1.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.5);
+    envelope.decay_time.set_value(1.5);
+    envelope.sustain_value.set_value(0.7);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.2);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(2.0, follower.get_value(), DOUBLE_DELTA);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+    FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 2, block_size
+    );
+})
+
+
+TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        NULL, &envelope, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("lfo");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * (Envelope sample * (LFO sample - 0.5) * (max - min) + (max - min) / 2) */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.0 * (0.1 * (+0.0) * 0.6 + 0.6),   /* 1.0s -  2.0s delay    */
+        10.0 * (0.1 * (+0.5) * 0.6 + 0.6),
+        10.0 * (0.1 * (+0.0) * 0.6 + 0.6),   /* 2.0s -  3.5s attack   */
+        10.0 * (0.4 * (-0.5) * 0.6 + 0.6),
+        10.0 * (0.7 * (+0.0) * 0.6 + 0.6),
+        10.0 * (1.0 * (+0.5) * 0.6 + 0.6),   /* 3.5s -  4.0s hold     */
+        10.0 * (1.0 * (+0.0) * 0.6 + 0.6),   /* 4.0s -  5.5s decay    */
+        10.0 * (0.9 * (-0.5) * 0.6 + 0.6),
+        10.0 * (0.8 * (+0.0) * 0.6 + 0.6),
+        10.0 * (0.7 * (+0.5) * 0.6 + 0.6),   /* 5.5s -  7.0s sustain  */
+        10.0 * (0.7 * (+0.0) * 0.6 + 0.6),
+        10.0 * (0.7 * (-0.5) * 0.6 + 0.6),
+        10.0 * (0.7 * (+0.0) * 0.6 + 0.6),   /* 7.0s         update   */
+        10.0 * (0.6 * (+0.5) * 0.6 + 0.6),
+        10.0 * (0.6 * (+0.0) * 0.6 + 0.6),   /* 8.0s - 10.0s release  */
+        10.0 * (0.5 * (-0.5) * 0.6 + 0.6),
+        10.0 * (0.4 * (+0.0) * 0.6 + 0.6),   /* 9.0s         cancel   */
+        10.0 * (0.2 * (+0.5) * 0.6 + 0.6),
+    };
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(sample_rate * 0.25);
+    lfo.amount_envelope.set_value(1);
+    lfo.min.set_value(0.3);
+    lfo.max.set_value(0.9);
+    lfo.center.set_value(ToggleParam::ON);
+    lfo.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(1.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.5);
+    envelope.decay_time.set_value(1.5);
+    envelope.sustain_value.set_value(0.7);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.2);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(10.0 * (0.2 * (+0.5) * 0.6 + 0.6), follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_during_rendering, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        NULL, &envelope, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("lfo");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * Envelope sample * LFO sample */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.0 * 0.1 * 0.5, 10.0 * 0.1 * 1.0,                     /* 1.0s -  2.0s delay    */
+        10.0 * 0.1 * 0.5, 10.0 * 0.4 * 0.0, 10.0 * 0.7 * 0.5,   /* 2.0s -  3.5s attack   */
+        10.0 * 1.0 * 1.0,                                       /* 3.5s -  4.0s hold     */
+        10.0 * 1.0 * 0.5, 10.0 * 0.9 * 0.0, 10.0 * 0.8 * 0.5,   /* 4.0s -  5.5s decay    */
+        10.0 * 0.7 * 1.0, 10.0 * 0.7 * 0.5, 10.0 * 0.7 * 0.0,   /* 5.5s -  7.0s sustain  */
+        10.0 * 0.7 * 0.5, 10.0 * 0.6 * 1.0,                     /* 7.0s         update   */
+        10.0 * 0.6 * 0.5, 10.0 * 0.5 * 0.0,                     /* 8.0s - 10.0s release  */
+        10.0 * 0.4 * 0.5, 10.0 * 0.2 * 1.0,                     /* 9.0s         cancel   */
+    };
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(sample_rate * 0.25);
+    lfo.amount_envelope.set_value(1);
+    lfo.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(1.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.5);
+    envelope.decay_time.set_value(5.0);
+    envelope.sustain_value.set_value(0.123);
+    envelope.release_time.set_value(5.0);
+    envelope.final_value.set_value(0.567);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, 7
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(&expected_samples[0], &rendered_samples[2], 5, DOUBLE_DELTA);
+
+    envelope.decay_time.set_value(1.5);
+    envelope.sustain_value.set_value(0.7);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 2, 7
+    );
+
+    assert_eq(&expected_samples[5], rendered_samples, 7, DOUBLE_DELTA);
+
+    follower.end_envelope(1.0);
+
+    envelope.sustain_value.set_value(0.6);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.2);
+
+    follower.cancel_envelope(2.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 3, 6
+    );
+
+    assert_eq(&expected_samples[12], rendered_samples, 6, DOUBLE_DELTA);
+    assert_eq(2.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendered_globally, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        NULL, &envelope, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo_1("lfo_1");
+    LFO lfo_2("lfo_2");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * LFO sample (the envelope has no effect) */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline would start at 1.0s */
+        10.0 * 0.5, 10.0 * 0.0,                     /* 1.0s -  2.0s delay    */
+        10.0 * 0.5, 10.0 * 1.0, 10.0 * 0.5,         /* 2.0s -  3.5s attack   */
+        10.0 * 0.0,                                 /* 3.5s -  4.0s hold     */
+        10.0 * 0.5, 10.0 * 1.0, 10.0 * 0.5,         /* 4.0s -  5.5s decay    */
+        10.0 * 0.0, 10.0 * 0.5, 10.0 * 1.0,         /* 5.5s -  7.0s sustain  */
+        10.0 * 0.5, 10.0 * 0.0,                     /* 7.0s         update   */
+        10.0 * 0.5, 10.0 * 1.0,                     /* 8.0s - 10.0s release  */
+        10.0 * 0.5, 10.0 * 0.0,                     /* 9.0s         cancel   */
+    };
+
+    lfo_1.set_block_size(block_size);
+    lfo_1.set_sample_rate(sample_rate);
+    lfo_1.min.set_lfo(&lfo_2);
+    lfo_1.max.set_lfo(&lfo_2);
+    lfo_1.start(0.0);
+
+    lfo_2.set_block_size(block_size);
+    lfo_2.set_sample_rate(sample_rate);
+    lfo_2.amount_envelope.set_value(1);
+    lfo_2.frequency.set_value(sample_rate * 0.25);
+    lfo_2.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo_1);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_false(leader.has_lfo_with_envelope());
+    assert_false(follower.has_lfo_with_envelope());
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(1.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.5);
+    envelope.decay_time.set_value(1.5);
+    envelope.sustain_value.set_value(0.7);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.2);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(0.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_lfos_with_envelopes_are_chained_then_only_the_first_one_is_rendered_with_envelope, {
+    /*
+    It would be nice to transitively render the LFO-s that have amount
+    envelopes with respect to the envelopes, but consider a setup like this:
+
+      LFO 1: amount_envelope: Envelope 1, min: LFO 2, max: LFO 3
+      LFO 2: amount_envelope: Envelope 2, max: LFO 3
+      LFO 3: amount_envelope: Envelope 3, min: LFO 2
+
+    Rendering:
+
+      1. LFO 1 renders LFO 2 with envelope
+        2. LFO 2 renders LFO 3 with envelope
+          3. LFO 3 renders LFO 2 globally (break up the dependency cycle)
+      4. LFO 1 renders LFO 3 with envelope
+        5. LFO 3 renders LFO 2 with envelope
+
+    Step 3 and 5 would require 2 separate wavetable states to be maintained for
+    LFO 3, in each envelope-capable parameter's state. The more complicated such
+    a dependency cycle becomes, the more wavetable states would be required.
+    */
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope_1("E1");
+    Envelope envelope_2("E2");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope_1, &envelope_2, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo_1("lfo1");
+    LFO lfo_2("lfo2");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * Envelope-1 sample * LFO-1 sample * LFO-2 sample */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.0 * 0.1 * 0.5 * 0.0, 10.0 * 0.1 * 1.0 * 0.5,     /* 1.0s -  2.0s delay    */
+        10.0 * 0.1 * 0.5 * 1.0, 10.0 * 0.4 * 0.0 * 0.5,     /* 2.0s -  3.5s attack   */
+        10.0 * 0.7 * 0.5 * 0.0,
+        10.0 * 1.0 * 1.0 * 0.5,                             /* 3.5s -  4.0s hold     */
+        10.0 * 1.0 * 0.5 * 1.0, 10.0 * 0.9 * 0.0 * 0.5,     /* 4.0s -  5.5s decay    */
+        10.0 * 0.8 * 0.5 * 0.0,
+        10.0 * 0.7 * 1.0 * 0.5, 10.0 * 0.7 * 0.5 * 1.0,     /* 5.5s -  7.0s sustain  */
+        10.0 * 0.7 * 0.0 * 0.5,
+        10.0 * 0.7 * 0.5 * 0.0, 10.0 * 0.6 * 1.0 * 0.5,     /* 7.0s         update   */
+        10.0 * 0.6 * 0.5 * 1.0, 10.0 * 0.5 * 0.0 * 0.5,     /* 8.0s - 10.0s release  */
+        10.0 * 0.4 * 0.5 * 0.0, 10.0 * 0.2 * 1.0 * 0.5,     /* 9.0s         cancel   */
+    };
+
+    lfo_1.set_block_size(block_size);
+    lfo_1.set_sample_rate(sample_rate);
+    lfo_1.frequency.set_value(sample_rate * 0.25);
+    lfo_1.amount_envelope.set_value(0);
+    lfo_1.amount.set_lfo(&lfo_2);
+    lfo_1.start(0.0);
+
+    lfo_2.set_block_size(block_size);
+    lfo_2.set_sample_rate(sample_rate);
+    lfo_2.frequency.set_value(sample_rate * 0.25);
+    lfo_2.phase.set_value(0.25);
+    lfo_2.amount_envelope.set_value(1);
+    lfo_2.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo_1);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope_1.amount.set_value(1.0);
+    envelope_1.initial_value.set_value(0.1);
+    envelope_1.delay_time.set_value(1.0);
+    envelope_1.attack_time.set_value(1.5);
+    envelope_1.peak_value.set_value(1.0);
+    envelope_1.hold_time.set_value(0.5);
+    envelope_1.decay_time.set_value(1.5);
+    envelope_1.sustain_value.set_value(0.7);
+    envelope_1.release_time.set_value(2.0);
+    envelope_1.final_value.set_value(0.2);
+
+    envelope_2.amount.set_value(0.1);
+    envelope_2.initial_value.set_value(1.0);
+    envelope_2.peak_value.set_value(1.0);
+    envelope_2.sustain_value.set_value(1.0);
+    envelope_2.final_value.set_value(1.0);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope_1.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(1.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the_first_one_is_rendered_with_envelope, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("lfo");
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    Sample const* rendered_samples;
+
+    /* 10 * Envelope-1 sample * LFO-poly sample * LFO-global sample */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.0 * 0.1 * 0.5 * 0.5, 10.0 * 0.1 * 1.0 * 0.0,     /* 1.0s -  2.0s delay    */
+        10.0 * 0.1 * 0.5 * 0.5, 10.0 * 0.4 * 0.0 * 1.0,     /* 2.0s -  3.5s attack   */
+        10.0 * 0.7 * 0.5 * 0.5,
+        10.0 * 1.0 * 1.0 * 0.0,                             /* 3.5s -  4.0s hold     */
+        10.0 * 1.0 * 0.5 * 0.5, 10.0 * 0.9 * 0.0 * 1.0,     /* 4.0s -  5.5s decay    */
+        10.0 * 0.8 * 0.5 * 0.5,
+        10.0 * 0.7 * 1.0 * 0.0, 10.0 * 0.7 * 0.5 * 0.5,     /* 5.5s -  7.0s sustain  */
+        10.0 * 0.7 * 0.0 * 1.0,
+        10.0 * 0.7 * 0.5 * 0.5, 10.0 * 0.6 * 1.0 * 0.0,     /* 7.0s         update   */
+        10.0 * 0.6 * 0.5 * 0.5, 10.0 * 0.5 * 0.0 * 1.0,     /* 8.0s - 10.0s release  */
+        10.0 * 0.4 * 0.5 * 0.5, 10.0 * 0.2 * 1.0 * 0.0,     /* 9.0s         cancel   */
+    };
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(sample_rate * 0.25);
+    lfo.amount_envelope.set_value(0);
+    lfo.amount.set_lfo(&lfo);
+    lfo.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.1);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(1.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.5);
+    envelope.decay_time.set_value(1.5);
+    envelope.sustain_value.set_value(0.7);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.2);
+
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(0.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
 TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_macro, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
@@ -2115,6 +2674,11 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     constexpr Sample expected_samples_log[] = {
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 6.0, 0.0,
     };
+    Envelope envelope("env");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
     ToggleParam log_scale("log", ToggleParam::OFF);
     FloatParamS leader(
         "freq",
@@ -2122,16 +2686,13 @@ TEST(a_float_param_may_use_logarithmic_scale, {
         max,
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
-        NULL,
-        NULL,
+        envelopes,
         &log_scale,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     );
     FloatParamS follower(leader);
-    Envelope envelope("env");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
     Sample const* rendered_samples;
     Sample rendered_samples_log[block_size];
 
@@ -2173,7 +2734,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     );
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
-    follower.start_envelope(0.0, 0.0, 0.0, lfo_envelope_mapping);
+    follower.start_envelope(0.0, 0.0, 0.0);
     follower.end_envelope(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
@@ -2373,12 +2934,15 @@ TEST(modulation_level_may_be_automated_with_envelope, {
         (Sample)(param_value + Modulator::VALUE * 3.0),
     };
     Envelope envelope("ENV");
-    LFOEnvelopeMapping const lfo_envelope_mapping;
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
 
     Modulator modulator;
-    FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0);
+    FloatParamS modulation_level_leader("MOD", 0.0, 3.0, 0.0, 0.0, envelopes);
     ModulatableFloatParam<Modulator> modulatable_float_param(
-        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0, envelopes
     );
     Sample const* const* rendered_samples;
 
@@ -2416,7 +2980,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     modulatable_float_param.set_sample_rate(sample_rate);
 
     modulatable_float_param.set_value(param_value);
-    modulatable_float_param.start_envelope(6.0, 0.0, 0.0, lfo_envelope_mapping);
+    modulatable_float_param.start_envelope(6.0, 0.0, 0.0);
     assert_eq(3.0, modulatable_float_param.end_envelope(12.0), DOUBLE_DELTA);
 
     assert_eq(

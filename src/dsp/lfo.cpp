@@ -27,23 +27,19 @@
 namespace JS80P
 {
 
-LFO::LFO(
-        std::string const& name,
-        Byte const index
-) noexcept
+LFO::LFO(std::string const& name) noexcept
     : SignalProducer(1, 12, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
-    frequency(name + "FRQ", 0.01, 30.0, 1.0, 0.0),
-    phase(name + "PHS", 0.0, 1.0, 0.0, 0.0),
-    min(name + "MIN", 0.0, 1.0, 0.0, 0.0),
-    max(name + "MAX", 0.0, 1.0, 1.0, 0.0),
-    amount(name + "AMT", 0.0, 0.5, 0.5, 0.0),
-    distortion(name + "DST", 0.0, 1.0, 0.0, 0.0),
-    randomness(name + "RND", 0.0, 1.0, 0.0, 0.0),
+    frequency(name + "FRQ", 0.01, 30.0, 1.0),
+    phase(name + "PHS", 0.0, 1.0, 0.0),
+    min(name + "MIN", 0.0, 1.0, 0.0),
+    max(name + "MAX", 0.0, 1.0, 1.0),
+    amount(name + "AMT", 0.0, 0.5, 0.5),
+    distortion(name + "DST", 0.0, 1.0, 0.0),
+    randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
-    index(index),
     oscillator(waveform, amount, frequency, phase, tempo_sync, center)
 {
     initialize_instance();
@@ -87,7 +83,6 @@ LFO::LFO(
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
     amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
-    index(Constants::INVALID_LFO_INDEX),
     oscillator(waveform, amount, frequency, phase, tempo_sync_, center)
 {
     initialize_instance();
@@ -117,6 +112,12 @@ void LFO::stop(Seconds const time_offset) noexcept
 bool LFO::is_on() const noexcept
 {
     return oscillator.is_on();
+}
+
+
+bool LFO::has_envelope() const noexcept
+{
+    return amount_envelope.get_value() != Constants::INVALID_ENVELOPE_INDEX;
 }
 
 
@@ -173,6 +174,85 @@ void LFO::render(
         );
         apply_range_centered(
             round, first_sample_index, last_sample_index, buffer[0], buffer[0]
+        );
+    }
+}
+
+
+void LFO::produce_with_envelope(
+        Seconds& envelope_time,
+        Sample& envelope_value,
+        EnvelopeStage& envelope_stage,
+        EnvelopeSnapshot const& envelope_snapshot,
+        WavetableState& wavetable_state,
+        Integer const round,
+        Integer const sample_count,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample* buffer
+) noexcept {
+    if (JS80P_UNLIKELY(!has_envelope())) {
+        Sample const* const lfo_buffer = SignalProducer::produce<LFO>(
+            *this, round, sample_count
+        )[0];
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[i] = lfo_buffer[i];
+        }
+
+        return;
+    }
+
+    min_buffer = FloatParamS::produce_if_not_constant(min, round, sample_count);
+    max_buffer = FloatParamS::produce_if_not_constant(max, round, sample_count);
+    distortion_buffer = FloatParamS::produce_if_not_constant(
+        distortion, round, sample_count
+    );
+    randomness_buffer = FloatParamS::produce_if_not_constant(
+        randomness, round, sample_count
+    );
+
+    oscillator.produce_for_lfo_with_envelope(
+        wavetable_state,
+        round,
+        sample_count,
+        first_sample_index,
+        last_sample_index,
+        buffer
+    );
+
+    bool envelope_is_constant = false;
+
+    Envelope::render<Envelope::RenderingMode::MULTIPLY>(
+        envelope_snapshot,
+        envelope_time,
+        envelope_stage,
+        envelope_is_constant,
+        envelope_value,
+        this->sample_rate,
+        this->sampling_period,
+        first_sample_index,
+        last_sample_index,
+        buffer
+    );
+
+    if (center.get_value() == ToggleParam::OFF) {
+        apply_distortions(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    } else {
+        apply_distortions_centered(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    }
+
+    if (center.get_value() == ToggleParam::OFF) {
+        apply_range(
+            round, first_sample_index, last_sample_index, buffer, buffer
+        );
+    } else {
+        apply_range_centered(
+            round, first_sample_index, last_sample_index, buffer, buffer
         );
     }
 }

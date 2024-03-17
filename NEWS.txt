@@ -1,4 +1,7 @@
-v?.?.? (2024-??-??)
+v?.?.? (2024-0?-??)
+ * LFO amount can now be controlled by an Envelope when the LFO is assigned to
+   a polyphonic parameter.
+ * The number of Envelopes has been increased to 12.
  * Filter Q parameter can also use logarithmic scale.
  * Various performance and RAM usage improvements.
  * The source distribution can now be compiled for RISC-V 64 systems thanks to

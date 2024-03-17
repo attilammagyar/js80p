@@ -25,7 +25,6 @@
 
 #include "js80p.hpp"
 
-#include "dsp/lfo_envelope_mapping.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/signal_producer.hpp"
 #include "dsp/queue.hpp"
@@ -228,6 +227,10 @@ class FloatParam : public Param<Number, evaluation>
         static constexpr SignalProducer::Event::Type EVT_ENVELOPE_UPDATE = 5;
         static constexpr SignalProducer::Event::Type EVT_ENVELOPE_END = 6;
         static constexpr SignalProducer::Event::Type EVT_ENVELOPE_CANCEL = 7;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_START = 8;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_UPDATE = 9;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_END = 10;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_CANCEL = 11;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -281,7 +284,6 @@ class FloatParam : public Param<Number, evaluation>
             Number const default_value = 0.0,
             Number const round_to = 0.0,
             Envelope* const* const envelopes = NULL,
-            LFO* const* const lfos = NULL,
             ToggleParam const* log_scale_toggle = NULL,
             Number const* log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
@@ -349,11 +351,12 @@ class FloatParam : public Param<Number, evaluation>
         Envelope* get_envelope() const noexcept;
         Envelope* const* get_envelopes() const noexcept;
 
+        bool has_lfo_with_envelope() const noexcept;
+
         void start_envelope(
             Seconds const time_offset,
             Number const random_1,
-            Number const random_2,
-            LFOEnvelopeMapping const& lfo_envelope_mapping
+            Number const random_2
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;
@@ -361,8 +364,7 @@ class FloatParam : public Param<Number, evaluation>
         void update_envelope(Seconds const time_offset) noexcept;
 
         void set_lfo(LFO* lfo) noexcept;
-        LFO const* get_lfo() const noexcept;
-        LFO* const* get_lfos() const noexcept;
+        LFO* get_lfo() const noexcept;
 
         virtual void reset() noexcept override;
 
@@ -413,6 +415,39 @@ class FloatParam : public Param<Number, evaluation>
                 bool is_done;
         };
 
+        class EnvelopeState
+        {
+            public:
+                explicit EnvelopeState(Envelope* const* const envelopes);
+
+                void clear() noexcept;
+
+                EnvelopeSnapshot& get_active_snapshot() noexcept;
+                EnvelopeSnapshot const& get_active_snapshot() const noexcept;
+
+                void activate_snapshot(Integer const snapshot_id) noexcept;
+
+                Envelope* const* const envelopes;
+
+                std::vector<EnvelopeSnapshot> snapshots;
+                Queue<std::vector<EnvelopeSnapshot>::size_type> unused_snapshots;
+                EnvelopeRandoms randoms;
+                WavetableState wavetable_state;
+                Number random_seed;
+                Sample lfo_envelope_value;
+                Seconds time;
+                Seconds cancel_duration;
+                Integer lfo_envelope_sample_count;
+                Integer active_snapshot_id;
+                Integer scheduled_snapshot_id;
+                EnvelopeStage stage;
+                Byte active_snapshot_envelope_index;
+                Byte scheduled_snapshot_envelope_index;
+                bool is_canceled;
+                bool is_constant;
+                bool lfo_has_envelope;
+        };
+
         static constexpr Integer INVALID_ENVELOPE_SNAPSHOT_ID = -1;
 
         void initialize_instance() noexcept;
@@ -428,14 +463,26 @@ class FloatParam : public Param<Number, evaluation>
         void handle_envelope_start_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_update_event(SignalProducer::Event const& event) noexcept;
 
+        void update_envelope_state_if_dynamic(
+            Envelope& envelope,
+            EnvelopeSnapshot& envelope_snapshot
+        ) noexcept;
+
         template<SignalProducer::Event::Type event_type>
         void handle_envelope_end_event(SignalProducer::Event const& event) noexcept;
+
+        void handle_lfo_envelope_start_event(SignalProducer::Event const& event) noexcept;
+        void handle_lfo_envelope_update_event(SignalProducer::Event const& event) noexcept;
+
+        template<SignalProducer::Event::Type event_type>
+        void handle_lfo_envelope_end_event(SignalProducer::Event const& event) noexcept;
 
         void store_envelope_value_at_event(Seconds const latency) noexcept;
 
         bool is_following_leader() const noexcept;
 
         Sample const* const* process_lfo(
+            LFO& lfo,
             Integer const round,
             Integer const sample_count
         ) noexcept;
@@ -469,6 +516,14 @@ class FloatParam : public Param<Number, evaluation>
             Sample** buffer
         ) noexcept;
 
+        void render_with_lfo_envelope(
+            LFO& lfo,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample* buffer
+        ) noexcept;
+
         void render_linear_ramp(
             Integer const round,
             Integer const first_sample_index,
@@ -483,16 +538,41 @@ class FloatParam : public Param<Number, evaluation>
             Sample** buffer
         ) noexcept;
 
+        void start_envelope(
+            Envelope& envelope,
+            Seconds const time_offset,
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
+
+        void start_lfo_envelope(
+            LFO const& lfo,
+            Seconds const time_offset,
+            Number const random_1,
+            Number const random_2
+        ) noexcept;
+
         template<SignalProducer::Event::Type event_type>
         Seconds end_envelope(
+            Envelope& envelope,
             Seconds const time_offset,
             Seconds const duration = 0.0
         ) noexcept;
 
+        template<SignalProducer::Event::Type event_type>
+        Seconds end_lfo_envelope(
+            Seconds const time_offset,
+            Seconds const duration = 0.0
+        ) noexcept;
+
+        void update_envelope(Envelope& envelope, Seconds const time_offset) noexcept;
+        void update_lfo_envelope(Seconds const time_offset) noexcept;
+
+        void check_leaked_envelope_snapshots(char const* event) const noexcept;
+
         FloatParam<evaluation>* const leader;
         Envelope* const* const envelopes;
-        LFO* const* const lfos;
-        WavetableState* const lfo_states;
+        EnvelopeState* const envelope_state;
         Number const round_to;
         Number const round_to_inv;
         ToggleParam const* const log_scale_toggle;
@@ -505,23 +585,12 @@ class FloatParam : public Param<Number, evaluation>
         bool const should_round;
         bool const is_ratio_same_as_value;
 
-        std::vector<EnvelopeSnapshot> envelope_snapshots;
-        Queue<std::vector<EnvelopeSnapshot>::size_type> unused_envelope_snapshots;
         LinearRampState linear_ramp_state;
-        EnvelopeRandoms envelope_randoms;
         LFO* lfo;
         Sample const* const* lfo_buffer;
         Envelope* envelope;
-        Number random_seed;
-        Seconds envelope_time;
-        Seconds envelope_cancel_duration;
-        Integer active_envelope_snapshot_id;
-        Integer scheduled_envelope_snapshot_id;
         Integer constantness_round;
-        EnvelopeStage envelope_stage;
         SignalProducer::Event::Type latest_event_type;
-        bool envelope_canceled;
-        bool envelope_is_constant;
         bool constantness;
 };
 
@@ -545,8 +614,7 @@ class ModulatableFloatParam : public FloatParamS
             Number const min_value = -1.0,
             Number const max_value = 1.0,
             Number const default_value = 0.0,
-            Envelope* const* const envelopes = NULL,
-            LFO* const* const lfos = NULL
+            Envelope* const* const envelopes = NULL
         ) noexcept;
 
         bool is_constant_in_next_round(
@@ -560,8 +628,7 @@ class ModulatableFloatParam : public FloatParamS
         void start_envelope(
             Seconds const time_offset,
             Number const random_1,
-            Number const random_2,
-            LFOEnvelopeMapping const& lfo_envelope_mapping
+            Number const random_2
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;

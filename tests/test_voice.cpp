@@ -30,7 +30,6 @@
 #include "dsp/envelope.cpp"
 #include "dsp/filter.cpp"
 #include "dsp/lfo.cpp"
-#include "dsp/lfo_envelope_mapping.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -71,9 +70,8 @@ TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
-    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true, lfo_envelope_mapping);
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true);
 
     voice.note_off(0.12 + 1.0, 123, 1, 0.5);
     assert_false(voice.is_off_after(2.0));
@@ -105,7 +103,6 @@ TEST(rendering_is_independent_of_chunk_size, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     params.waveform.set_value(SimpleOscillator::SINE);
     params.amplitude.set_value(1.0);
@@ -115,10 +112,10 @@ TEST(rendering_is_independent_of_chunk_size, {
     voice_1.set_sample_rate(sample_rate);
     voice_2.set_sample_rate(sample_rate);
 
-    voice_1.note_on(0.12, 42, 1, 0, 0.5, 1, true, lfo_envelope_mapping);
+    voice_1.note_on(0.12, 42, 1, 0, 0.5, 1, true);
     voice_1.note_off(0.12 + 1.0, 42, 1, 0.5);
 
-    voice_2.note_on(0.12, 123, 1, 0, 0.5, 1, true, lfo_envelope_mapping);
+    voice_2.note_on(0.12, 123, 1, 0, 0.5, 1, true);
     voice_2.note_off(0.12 + 1.0, 123, 1, 0.5);
 
     assert_rendering_is_independent_from_chunk_size<SimpleVoice>(
@@ -249,8 +246,12 @@ TEST(portamento, {
         0.00009
     );
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
-    SimpleVoice::Params params("");
     Envelope envelope("");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    SimpleVoice::Params params("", envelopes);
     SimpleVoice voice(
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
@@ -258,7 +259,6 @@ TEST(portamento, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -278,7 +278,7 @@ TEST(portamento, {
     params.portamento_length.set_value(portamento_length);
     params.portamento_depth.set_value(portamento_depth);
 
-    voice.note_on(note_start, 123, 1, 0, 1.0, 1, true, lfo_envelope_mapping);
+    voice.note_on(note_start, 123, 1, 0, 1.0, 1, true);
 
     SignalProducer::produce<SimpleVoice>(voice, 999999, block_size);
 
@@ -310,7 +310,6 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -322,7 +321,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     voice.set_sample_rate(sample_rate);
     voice.set_block_size(block_size);
 
-    voice.note_on(0.0, 123, 2, 3, 1.0, 1, true, lfo_envelope_mapping);
+    voice.note_on(0.0, 123, 2, 3, 1.0, 1, true);
 
     assert_eq(123, (int)voice.get_note_id());
     assert_eq(2, (int)voice.get_note());
@@ -367,8 +366,6 @@ void test_decay_before_note_off(
     constexpr Seconds hold_time = 0.1;
     constexpr Seconds decay_time = 0.01;
 
-    LFOEnvelopeMapping const lfo_envelope_mapping;
-
     Seconds const note_start = (
         (Number)(voice.get_block_size() * 2) / voice.get_sample_rate()
     );
@@ -396,7 +393,7 @@ void test_decay_before_note_off(
     }
 
     voice.reset();
-    voice.note_on(note_start, 42, 1, 0, 1.0, 1, true, lfo_envelope_mapping);
+    voice.note_on(note_start, 42, 1, 0, 1.0, 1, true);
 
     while (rendered_samples < sustain_start_samples) {
         assert_eq(
@@ -435,19 +432,23 @@ void test_decay_before_note_off(
 
 TEST(can_tell_if_note_decayed_before_note_off, {
     Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
     MidiController midi_controller;
     Macro macro("M");
     LFO lfo("L");
 
-    SimpleVoice::Params params_with_envelope("VE");
-    SimpleVoice::Params params_with_zero_amplitudes("VAS");
-    SimpleVoice::Params params_with_zero_volume("VV");
-    SimpleVoice::Params params_with_zero_subharmonic_amplitude("VS");
-    SimpleVoice::Params params_with_zero_amplitude("VA");
-    SimpleVoice::Params params_with_midi_controller("VMI");
-    SimpleVoice::Params params_with_macro("VMA");
-    SimpleVoice::Params params_with_lfo("VL");
+    SimpleVoice::Params params_with_envelope("VE", envelopes);
+    SimpleVoice::Params params_with_zero_amplitudes("VAS", envelopes);
+    SimpleVoice::Params params_with_zero_volume("VV", envelopes);
+    SimpleVoice::Params params_with_zero_subharmonic_amplitude("VS", envelopes);
+    SimpleVoice::Params params_with_zero_amplitude("VA", envelopes);
+    SimpleVoice::Params params_with_midi_controller("VMI", envelopes);
+    SimpleVoice::Params params_with_macro("VMA", envelopes);
+    SimpleVoice::Params params_with_lfo("VL", envelopes);
 
     SimpleVoice voice_with_envelope(
         FREQUENCIES,
@@ -625,9 +626,13 @@ TEST(can_glide_smoothly_to_a_new_note, {
     Buffer expected_output(sample_count, SimpleVoice::CHANNELS);
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
-    SimpleVoice::Params params_ref("R");
-    SimpleVoice::Params params("P");
     Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    SimpleVoice::Params params_ref("R", envelopes);
+    SimpleVoice::Params params("P", envelopes);
     SimpleVoice reference(
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
@@ -642,7 +647,6 @@ TEST(can_glide_smoothly_to_a_new_note, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     set_up_voice(voice, params, block_size, sample_rate);
     set_up_voice(reference, params_ref, block_size, sample_rate);
@@ -667,17 +671,17 @@ TEST(can_glide_smoothly_to_a_new_note, {
     params.portamento_length.set_value(glide_duration);
     params_ref.portamento_length.set_value(glide_duration);
 
-    reference.note_on(note_start, 123, 0, 0, 1.0, 0, true, lfo_envelope_mapping);
+    reference.note_on(note_start, 123, 0, 0, 1.0, 0, true);
     reference.note_off(glide_start, 123, 0, 1.0);
 
     envelope.peak_value.set_value(1.0);
     envelope.sustain_value.set_value(1.0);
     envelope.final_value.set_value(1.0);
 
-    reference.note_on(glide_start, 42, 1, 0, 1.0, 0, true, lfo_envelope_mapping);
+    reference.note_on(glide_start, 42, 1, 0, 1.0, 0, true);
 
-    voice.note_on(note_start, 123, 0, 0, 0.5, 0, true, lfo_envelope_mapping);
-    voice.glide_to(glide_start, 42, 1, 0, 1.0, 123, true, lfo_envelope_mapping);
+    voice.note_on(note_start, 123, 0, 0, 0.5, 0, true);
+    voice.glide_to(glide_start, 42, 1, 0, 1.0, 123, true);
 
     render_rounds<SimpleVoice>(reference, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -714,7 +718,6 @@ TEST(tuning_can_be_changed, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -724,7 +727,7 @@ TEST(tuning_can_be_changed, {
     params.tuning.set_value(SimpleVoice::TUNING_432HZ_12TET);
     params.oscillator_inaccuracy.set_value(1);
     params.oscillator_instability.set_value(1);
-    voice.note_on(0.0, 123, 2, 0, 1.0, 2, true, lfo_envelope_mapping);
+    voice.note_on(0.0, 123, 2, 0, 1.0, 2, true);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -761,7 +764,6 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -769,7 +771,7 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
     set_up_voice(voice, params, block_size, sample_rate);
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_NOTE_ON);
-    voice.note_on(0.0, 123, 1, 2, 1.0, 1, true, lfo_envelope_mapping);
+    voice.note_on(0.0, 123, 1, 2, 1.0, 1, true);
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
@@ -808,7 +810,6 @@ TEST(when_using_continuous_mts_esp_tuning_then_frequency_can_be_updated_before_e
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     expected.set_sample_rate(sample_rate);
     expected.set_block_size(block_size);
@@ -832,7 +833,7 @@ TEST(when_using_continuous_mts_esp_tuning_then_frequency_can_be_updated_before_e
     params.portamento_depth.set_value(portamento_depth);
 
     params.tuning.set_value(SimpleVoice::TUNING_MTS_ESP_CONTINUOUS);
-    voice.note_on(0.0, 123, 2, 2, 1.0, 2, true, lfo_envelope_mapping);
+    voice.note_on(0.0, 123, 2, 2, 1.0, 2, true);
     voice.update_note_frequency_for_continuous_mts_esp<true, true>(1);
 
     expected_output = SignalProducer::produce<SimpleOscillator>(expected, 1);
@@ -887,11 +888,10 @@ TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, 
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     params.oscillator_inaccuracy.set_value(1);
     params.oscillator_instability.set_value(1);
-    voice.note_on(0.0, 42, 1, 0, 0.5, 1, true, lfo_envelope_mapping);
+    voice.note_on(0.0, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);
     SignalProducer::produce<SimpleVoice>(voice, 1);
@@ -922,11 +922,10 @@ TEST(when_voice_is_reset_then_synced_inaccuracy_is_also_reset, {
         0.0,
         params
     );
-    LFOEnvelopeMapping const lfo_envelope_mapping;
 
     params.oscillator_inaccuracy.set_value(1);
     params.oscillator_instability.set_value(1);
-    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true, lfo_envelope_mapping);
+    voice.note_on(0.12, 42, 1, 0, 0.5, 1, true);
 
     voice.update_unstable_note_frequency<true>(1);
     SignalProducer::produce<SimpleVoice>(voice, 1);

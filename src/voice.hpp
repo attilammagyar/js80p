@@ -29,7 +29,6 @@
 #include "dsp/distortion.hpp"
 #include "dsp/envelope.hpp"
 #include "dsp/filter.hpp"
-#include "dsp/lfo_envelope_mapping.hpp"
 #include "dsp/math.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
@@ -152,8 +151,7 @@ class Voice : public SignalProducer
                     Number const c,
                     Number const d,
                     Number const e,
-                    Envelope* const* envelopes,
-                    LFO* const* lfos
+                    Envelope* const* envelopes
                 );
         };
 
@@ -162,8 +160,7 @@ class Voice : public SignalProducer
             public:
                 explicit Params(
                     std::string const& name,
-                    Envelope* const* envelopes = NULL,
-                    LFO* const* lfos = NULL
+                    Envelope* const* envelopes = NULL
                 ) noexcept;
 
                 TuningParam tuning;
@@ -264,9 +261,7 @@ class Voice : public SignalProducer
             Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
             BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL,
-            Envelope* const* envelopes = NULL,
-            LFO* const* lfos = NULL
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
         ) noexcept;
 
         Voice(
@@ -280,9 +275,7 @@ class Voice : public SignalProducer
             FloatParamS& frequency_modulation_level_leader,
             FloatParamS& phase_modulation_level_leader,
             BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL,
-            Envelope* const* envelopes = NULL,
-            LFO* const* lfos = NULL
+            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
         ) noexcept;
 
         virtual void reset() noexcept override;
@@ -300,8 +293,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy,
-            LFOEnvelopeMapping const& lfo_envelope_mapping
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void retrigger(
@@ -311,8 +303,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy,
-            LFOEnvelopeMapping const& lfo_envelope_mapping
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void glide_to(
@@ -322,8 +313,7 @@ class Voice : public SignalProducer
             Midi::Channel const channel,
             Number const velocity,
             Midi::Note const previous_note,
-            bool const should_sync_oscillator_inaccuracy,
-            LFOEnvelopeMapping const& lfo_envelope_mapping
+            bool const should_sync_oscillator_inaccuracy
         ) noexcept;
 
         void note_off(
