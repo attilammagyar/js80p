@@ -648,11 +648,7 @@ void Synth::create_lfos() noexcept
     Integer next_id = ParamId::L1FRQ;
 
     for (Byte i = 0; i != Constants::LFOS; ++i) {
-        LFO* lfo = new LFO(
-            std::string("L") + to_string((Integer)(i + 1)),
-            i,
-            (Envelope* const*)&envelopes_rw
-        );
+        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), i);
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
