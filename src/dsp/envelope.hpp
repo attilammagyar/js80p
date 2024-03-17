@@ -72,6 +72,12 @@ namespace JS80P
 class Envelope
 {
     public:
+        enum RenderingMode
+        {
+            OVERWRITE = 0,
+            MULTIPLY = 1,
+        };
+
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
         static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
 
@@ -83,6 +89,7 @@ class Envelope
                 Seconds const sampling_period
         ) noexcept;
 
+        template<RenderingMode rendering_mode = RenderingMode::OVERWRITE>
         static void render(
             EnvelopeSnapshot const& snapshot,
             Seconds& time,
@@ -192,6 +199,7 @@ class Envelope
             Number const duration_inv
         ) noexcept;
 
+        template<RenderingMode rendering_mode = RenderingMode::OVERWRITE>
         static void render_constant(
             Seconds& time,
             Number const value,

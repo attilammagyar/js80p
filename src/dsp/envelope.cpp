@@ -144,6 +144,7 @@ void Envelope::set_up_interpolation(
 }
 
 
+template<Envelope::RenderingMode rendering_mode>
 void Envelope::render(
         EnvelopeSnapshot const& snapshot,
         Seconds& time,
@@ -158,7 +159,7 @@ void Envelope::render(
 ) noexcept {
     if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
         becomes_constant = true;
-        render_constant(
+        render_constant<rendering_mode>(
             time,
             last_rendered_value,
             first_sample_index,
@@ -192,7 +193,9 @@ void Envelope::render(
 
         if (becomes_constant) {
             last_rendered_value = target_value;
-            render_constant(time, target_value, i, last_sample_index, buffer);
+            render_constant<rendering_mode>(
+                time, target_value, i, last_sample_index, buffer
+            );
 
             return;
         }
@@ -211,6 +214,7 @@ void Envelope::render(
             i + std::max((Integer)1, (Integer)(time_until_target * sample_rate))
         );
 
+        Number rendered_value = last_rendered_value;
         Number done_samples = 0.0;
         Number initial_ratio;
         Number delta;
@@ -246,15 +250,22 @@ void Envelope::render(
         for (; i != end_index; ++i, done_samples += 1.0) {
             Number const ratio = initial_ratio + done_samples * scale;
 
-            buffer[i] = initial_value + ratio * delta;
+            rendered_value = initial_value + ratio * delta;
+
+            if constexpr (rendering_mode == RenderingMode::OVERWRITE) {
+                buffer[i] = rendered_value;
+            } else {
+                buffer[i] *= rendered_value;
+            }
         }
 
+        last_rendered_value = rendered_value;
         time += done_samples * sampling_period;
-        last_rendered_value = buffer[i - 1];
     }
 }
 
 
+template<Envelope::RenderingMode rendering_mode>
 void Envelope::render_constant(
         Seconds& time,
         Number const value,
@@ -265,7 +276,11 @@ void Envelope::render_constant(
     time = 0.0;
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        buffer[i] = value;
+        if constexpr (rendering_mode == RenderingMode::OVERWRITE) {
+            buffer[i] = value;
+        } else {
+            buffer[i] *= value;
+        }
     }
 }
 
