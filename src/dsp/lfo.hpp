@@ -23,11 +23,9 @@
 
 #include "js80p.hpp"
 
-#include "dsp/envelope.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
-#include "dsp/wavetable.hpp"
 
 
 namespace JS80P
@@ -48,11 +46,7 @@ class LFO : public SignalProducer
 
         typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
 
-        explicit LFO(
-            std::string const& name,
-            Byte const index = -1,
-            Envelope* const* const envelopes = NULL
-        ) noexcept;
+        explicit LFO(std::string const& name, Byte const index = -1) noexcept;
 
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro
@@ -65,24 +59,9 @@ class LFO : public SignalProducer
             Number const phase_offset
         ) noexcept;
 
-        virtual ~LFO();
-
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
-
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
         bool is_on() const noexcept;
-
-        bool has_envelope() noexcept;
-
-        void produce_with_envelope(
-            LFOEnvelopeState* const lfo_envelope_states,
-            Integer const round,
-            Integer const sample_count,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample* buffer
-        ) noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
@@ -99,13 +78,6 @@ class LFO : public SignalProducer
         AmountEnvelopeParam amount_envelope;
 
     protected:
-        void start_envelope(
-            Seconds const time_offset,
-            LFO* const lfo,
-            LFOEnvelopeState* const lfo_envelope_states,
-            EnvelopeRandoms const& envelope_randoms
-        ) noexcept;
-
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -156,21 +128,16 @@ class LFO : public SignalProducer
         );
 
         Byte const index;
-        bool const can_have_envelope;
 
         Oscillator_ oscillator;
-
-        Sample* env_buffer_1;
-        Sample* env_buffer_2;
 
         Sample const* min_buffer;
         Sample const* max_buffer;
         Sample const* distortion_buffer;
         Sample const* randomness_buffer;
         Sample const* const* oscillator_buffer;
-
-        bool is_processing_envelopes;
 };
+
 
 }
 

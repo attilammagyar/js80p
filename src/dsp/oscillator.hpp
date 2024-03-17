@@ -165,18 +165,6 @@ class Oscillator : public SignalProducer
         void stop(Seconds const time_offset) noexcept;
         bool is_on() const noexcept;
 
-        void produce_for_lfo_with_envelope(
-            WavetableState& wavetable_state,
-            LFOEnvelopeState* const lfo_envelope_states,
-            Integer const round,
-            Integer const sample_count,
-            Integer const first_sample_index,
-            Integer const last_sample_index,
-            Sample* const buffer_1,
-            Sample* const buffer_2,
-            Sample* const buffer_3
-        ) noexcept;
-
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         WaveformParam& waveform;
@@ -232,17 +220,13 @@ class Oscillator : public SignalProducer
         void compute_amplitude_buffer(
             Sample const* const amplitude_buffer,
             Integer const round,
-            Integer const sample_count,
-            Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const sample_count
         ) noexcept;
 
         void compute_frequency_buffer(
             Sample const* const frequency_buffer,
             Integer const round,
-            Integer const sample_count,
-            Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const sample_count
         ) noexcept;
 
         Frequency compute_frequency(
@@ -254,9 +238,7 @@ class Oscillator : public SignalProducer
         void compute_phase_buffer(
             Sample const* const phase_buffer,
             Integer const round,
-            Integer const sample_count,
-            Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const sample_count
         ) noexcept;
 
         void handle_start_event(Event const& event) noexcept;
@@ -266,11 +248,10 @@ class Oscillator : public SignalProducer
 
         template<bool has_subharmonic>
         void render(
-            WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample** buffer
         ) noexcept;
 
         template<
@@ -279,20 +260,18 @@ class Oscillator : public SignalProducer
             bool has_subharmonic
         >
         void render_with_constant_frequency(
-            WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample** buffer
         ) noexcept;
 
         template<bool single_partial, bool has_subharmonic>
         void render_with_changing_frequency(
-            WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample** buffer
         ) noexcept;
 
         template<
@@ -301,7 +280,6 @@ class Oscillator : public SignalProducer
             Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC
         >
         Sample render_sample(
-            WavetableState& wavetable_state,
             Sample const amplitude,
             Sample const frequency,
             Sample const phase,

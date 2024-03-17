@@ -27,8 +27,6 @@
 
 #include "dsp/math.hpp"
 
-// #include "debug.hpp"
-
 
 namespace JS80P
 {
@@ -313,18 +311,6 @@ ToggleParam::ToggleParam(std::string const& name, Toggle const default_value)
 }
 
 
-void EnvelopeSnapshot::update_release(EnvelopeSnapshot const& snapshot) noexcept
-{
-    if (change_index == snapshot.change_index) {
-        return;
-    }
-
-    release_time = snapshot.release_time;
-    final_value = snapshot.final_value;
-    change_index = snapshot.change_index;
-}
-
-
 template<ParamEvaluation evaluation>
 template<class FloatParamClass>
 Sample const* const* FloatParam<evaluation>::produce(
@@ -402,9 +388,7 @@ FloatParam<evaluation>::FloatParam(
     leader(NULL),
     envelopes(envelopes),
     lfos(lfos),
-    lfo_envelope_states(
-        envelopes != NULL ? new LFOEnvelopeState[Constants::LFOS] : NULL
-    ),
+    lfo_states(envelopes != NULL ? new WavetableState[Constants::LFOS] : NULL),
     round_to(round_to),
     round_to_inv(round_to > 0.0 ? 1.0 / round_to : 0.0),
     log_scale_toggle(log_scale_toggle),
@@ -442,8 +426,8 @@ void FloatParam<evaluation>::initialize_instance() noexcept
     );
 
     if (envelopes != NULL) {
-        envelope_snapshots.reserve(8);
-        unused_envelope_snapshots.reserve(8);
+        envelope_snapshots.reserve(2);
+        unused_envelope_snapshots.reserve(2);
     }
 
     lfo = NULL;
@@ -459,8 +443,6 @@ void FloatParam<evaluation>::initialize_instance() noexcept
     constantness = false;
 
     latest_event_type = EVT_SET_VALUE;
-
-    lfo_has_envelope = false;
 }
 
 
@@ -477,9 +459,7 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
     leader(&leader),
     envelopes(leader.get_envelopes()),
     lfos(leader.get_lfos()),
-    lfo_envelope_states(
-        envelopes != NULL ? new LFOEnvelopeState[Constants::LFOS] : NULL
-    ),
+    lfo_states(envelopes != NULL ? new WavetableState[Constants::LFOS] : NULL),
     round_to(0.0),
     round_to_inv(0.0),
     log_scale_toggle(leader.get_log_scale_toggle()),
@@ -514,37 +494,9 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
 template<ParamEvaluation evaluation>
 FloatParam<evaluation>::~FloatParam()
 {
-    if (lfo_envelope_states != NULL) {
-        delete[] lfo_envelope_states;
+    if (lfo_states != NULL) {
+        delete[] lfo_states;
     }
-
-    check_leaked_envelope_snapshots("destructor");
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::check_leaked_envelope_snapshots(char const* event) const noexcept
-{
-    // JS80P_DEBUG(
-        // (
-            // "%s: %s [%p] has %d remaining envelope snapshot(s),"
-            // " lfo_has_envelope=%s, leader=%p, latest_event_type=%d,"
-            // " envelope_stage=%d, envelope_time=%f\n"
-        // ),
-        // event,
-        // this->get_name().c_str(),
-        // (void*)this,
-        // (int)envelope_snapshots.size() - (int)unused_envelope_snapshots.length(),
-        // lfo_has_envelope ? "true" : "false",
-        // (void*)leader,
-        // (int)latest_event_type,
-        // (int)envelope_stage,
-        // envelope_time
-    // );
-    JS80P_ASSERT(
-        ((Integer)envelope_snapshots.size() - (Integer)unused_envelope_snapshots.length())
-        < (Integer)(lfo_has_envelope ? Constants::LFOS : 2)
-    );
 }
 
 
@@ -568,7 +520,7 @@ Number FloatParam<evaluation>::get_value() const noexcept
 template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::is_following_leader() const noexcept
 {
-    return leader != NULL && leader->get_envelope() == NULL && !lfo_has_envelope;
+    return leader != NULL && leader->get_envelope() == NULL;
 }
 
 
@@ -750,8 +702,6 @@ bool FloatParam<evaluation>::is_constant_until(
         return leader->is_constant_until(sample_count);
     }
 
-    LFO* const lfo = get_lfo();
-
     if (lfo != NULL) {
         return false;
     }
@@ -915,26 +865,6 @@ void FloatParam<evaluation>::handle_event(
             handle_envelope_end_event<EVT_ENVELOPE_CANCEL>(event);
             break;
 
-        case EVT_LFO_ENVELOPE_RESET:
-            handle_lfo_envelope_reset_event(event);
-            break;
-
-        case EVT_LFO_ENVELOPE_START:
-            handle_lfo_envelope_start_event(event);
-            break;
-
-        case EVT_LFO_ENVELOPE_UPDATE:
-            handle_lfo_envelope_update_event(event);
-            break;
-
-        case EVT_LFO_ENVELOPE_END:
-            handle_lfo_envelope_end_event<EVT_LFO_ENVELOPE_END>(event);
-            break;
-
-        case EVT_LFO_ENVELOPE_CANCEL:
-            handle_lfo_envelope_end_event<EVT_LFO_ENVELOPE_CANCEL>(event);
-            break;
-
         default:
             break;
     }
@@ -1070,66 +1000,22 @@ void FloatParam<evaluation>::handle_envelope_update_event(
     }
 
     unused_envelope_snapshots.push(active_envelope_snapshot_id);
+
     active_envelope_snapshot_id = event.int_param;
 
     if (envelope->is_dynamic()) {
-        update_envelope_state_if_dynamic(
-            *envelope,
-            envelope_snapshots[active_envelope_snapshot_id],
-            envelope_time,
-            envelope_stage
+        envelope->update();
+        envelope->make_snapshot(
+            envelope_randoms, envelope_snapshots[active_envelope_snapshot_id]
         );
-    } else if (
+    }
+
+    if (
             envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
             || envelope_stage == EnvelopeStage::ENV_STG_RELEASED
     ) {
         envelope_time = 0.0;
     }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_envelope_state_if_dynamic(
-        Envelope& envelope,
-        EnvelopeSnapshot& envelope_snapshot,
-        Seconds& envelope_time,
-        EnvelopeStage const envelope_stage
-) noexcept {
-    if (!envelope.is_dynamic()) {
-        return;
-    }
-
-    envelope.update();
-
-    if (envelope_snapshot.change_index == envelope.get_change_index()) {
-        return;
-    }
-
-    Seconds const old_release_time = envelope_snapshot.release_time;
-
-    switch (envelope_stage) {
-        case EnvelopeStage::ENV_STG_SUSTAIN:
-            envelope.make_snapshot(envelope_randoms, envelope_snapshot);
-            envelope_time = 0.0;
-            break;
-
-        case EnvelopeStage::ENV_STG_RELEASE:
-            envelope.make_end_snapshot(envelope_randoms, envelope_snapshot);
-            break;
-
-        case EnvelopeStage::ENV_STG_RELEASED:
-            envelope.make_end_snapshot(envelope_randoms, envelope_snapshot);
-            envelope_time = 0.0;
-            break;
-
-        default:
-            envelope.make_snapshot(envelope_randoms, envelope_snapshot);
-            break;
-    }
-
-    envelope_snapshot.release_time = std::min(
-        old_release_time, envelope_snapshot.release_time
-    );
 }
 
 
@@ -1183,151 +1069,6 @@ void FloatParam<evaluation>::store_envelope_value_at_event(
     );
 
     this->store_new_value(ratio_to_value(ratio_at_time_of_event));
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_lfo_envelope_reset_event(
-        SignalProducer::Event const& event
-) noexcept {
-    lfo_envelope_mapping.clear();
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-        if (lfo_envelope_state.active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
-            unused_envelope_snapshots.push(lfo_envelope_state.active_envelope_snapshot_id);
-        }
-
-        lfo_envelope_state.active_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
-        lfo_envelope_state.envelope_stage = EnvelopeStage::ENV_STG_NONE;
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_lfo_envelope_start_event(
-        SignalProducer::Event const& event
-) noexcept {
-    Byte const lfo_index = event.byte_param_1;
-    Byte const envelope_index = event.byte_param_2;
-    Integer const envelope_snapshot_id = event.int_param;
-    Seconds const latency = this->current_time - event.time_offset;
-
-    lfo_envelope_mapping[lfo_index] = envelope_index;
-
-    LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-    lfo_envelope_state.active_envelope_snapshot_id = envelope_snapshot_id;
-    lfo_envelope_state.envelope_stage = EnvelopeStage::ENV_STG_DAHD;
-
-    EnvelopeSnapshot& envelope_snapshot = envelope_snapshots[envelope_snapshot_id];
-    Envelope& envelope = *envelopes[envelope_index];
-
-    if (envelope.is_dynamic()) {
-        envelope.update();
-        envelope.make_snapshot(envelope_randoms, envelope_snapshot);
-    }
-
-    lfo_envelope_state.envelope_snapshot = envelope_snapshot;
-    lfo_envelope_state.envelope_time = latency;
-    lfo_envelope_state.value = lfo_envelope_state.envelope_snapshot.initial_value;
-
-    Wavetable::reset_state(
-        lfo_envelope_state.wavetable_state,
-        this->sampling_period,
-        this->nyquist_frequency,
-        lfos[lfo_index]->frequency.get_value(),
-        latency
-    );
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_lfo_envelope_update_event(
-        SignalProducer::Event const& event
-) noexcept {
-    Byte const lfo_index = event.byte_param_1;
-    Byte const envelope_index = lfo_envelope_mapping[lfo_index];
-    LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-    if (
-            envelope_index == Constants::INVALID_ENVELOPE_INDEX
-            || lfo_envelope_state.active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
-    ) {
-        return;
-    }
-
-    unused_envelope_snapshots.push(lfo_envelope_state.active_envelope_snapshot_id);
-    lfo_envelope_state.active_envelope_snapshot_id = event.int_param;
-    lfo_envelope_state.envelope_snapshot = (
-        envelope_snapshots[lfo_envelope_state.active_envelope_snapshot_id]
-    );
-
-    Envelope& envelope = *envelopes[envelope_index];
-
-    if (envelope.is_dynamic()) {
-        update_envelope_state_if_dynamic(
-            envelope,
-            lfo_envelope_state.envelope_snapshot,
-            lfo_envelope_state.envelope_time,
-            lfo_envelope_state.envelope_stage
-        );
-    } else if (
-            lfo_envelope_state.envelope_stage == EnvelopeStage::ENV_STG_SUSTAIN
-            || lfo_envelope_state.envelope_stage == EnvelopeStage::ENV_STG_RELEASED
-    ) {
-        lfo_envelope_state.envelope_time = 0.0;
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-template<SignalProducer::Event::Type event_type>
-void FloatParam<evaluation>::handle_lfo_envelope_end_event(
-        SignalProducer::Event const& event
-) noexcept {
-    Byte const lfo_index = event.byte_param_1;
-    LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-    if (
-            JS80P_UNLIKELY(
-                lfo_envelope_state.envelope_stage == EnvelopeStage::ENV_STG_NONE
-                || lfo_envelope_state.envelope_stage == EnvelopeStage::ENV_STG_RELEASED
-            )
-    ) {
-        return;
-    }
-
-    Seconds const latency = this->current_time - event.time_offset;
-
-    if (lfo_envelope_state.active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
-        lfo_envelope_state.value = Envelope::get_value_at_time(
-            lfo_envelope_state.envelope_snapshot,
-            lfo_envelope_state.envelope_time - latency,
-            lfo_envelope_state.envelope_stage,
-            lfo_envelope_state.value,
-            this->sampling_period
-        );
-
-        /*
-        Not checking if the envelope is dynamic, because the scheduled snapshot
-        is changed by end_lfo_envelope() if and only if the envelope is dynamic.
-        */
-        lfo_envelope_state.envelope_snapshot.update_release(
-            envelope_snapshots[lfo_envelope_state.active_envelope_snapshot_id]
-        );
-
-        if constexpr (event_type == EVT_LFO_ENVELOPE_CANCEL) {
-            lfo_envelope_state.envelope_snapshot.release_time = std::min(
-                (Seconds)event.number_param_1,
-                lfo_envelope_state.envelope_snapshot.release_time
-            );
-        }
-    }
-
-    lfo_envelope_state.envelope_time = latency;
-    lfo_envelope_state.envelope_stage = EnvelopeStage::ENV_STG_RELEASE;
 }
 
 
@@ -1436,27 +1177,6 @@ void FloatParam<evaluation>::clear_envelope_state() noexcept
     envelope_stage = EnvelopeStage::ENV_STG_NONE;
     envelope_canceled = false;
     envelope_is_constant = true;
-
-    if (lfo_envelope_states == NULL) {
-        return;
-    }
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-        lfo_envelope_state.active_envelope_snapshot_id = (
-            INVALID_ENVELOPE_SNAPSHOT_ID
-        );
-        lfo_envelope_state.scheduled_envelope_snapshot_id = (
-            INVALID_ENVELOPE_SNAPSHOT_ID
-        );
-        lfo_envelope_state.envelope_time = 0.0;
-        lfo_envelope_state.value = 1.0;
-        lfo_envelope_state.envelope_stage = EnvelopeStage::ENV_STG_NONE;
-        lfo_envelope_state.scheduled_envelope_snapshot_envelope_index = (
-            Constants::INVALID_ENVELOPE_INDEX
-        );
-    }
 }
 
 
@@ -1464,17 +1184,6 @@ template<ParamEvaluation evaluation>
 Envelope* FloatParam<evaluation>::get_envelope() const noexcept
 {
     return leader == NULL ? envelope : leader->get_envelope();
-}
-
-
-template<ParamEvaluation evaluation>
-bool FloatParam<evaluation>::has_lfo_with_envelope() const noexcept
-{
-    if (leader != NULL) {
-        return leader->has_lfo_with_envelope();
-    }
-
-    return lfo != NULL && lfo->has_envelope();
 }
 
 
@@ -1494,99 +1203,20 @@ void FloatParam<evaluation>::start_envelope(
 ) noexcept {
     Envelope* const envelope = get_envelope();
 
-    if (envelope != NULL) {
-        start_envelope(*envelope, time_offset, random_1, random_2);
+    if (envelope == NULL) {
         return;
     }
 
-    LFO* const lfo = get_lfo();
-
-    if (lfo != NULL) {
-        start_lfo_envelope(*lfo, time_offset, random_1, random_2, lfo_envelope_mapping);
-    } else {
-        lfo_has_envelope = false;
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::start_envelope(
-        Envelope& envelope,
-        Seconds const time_offset,
-        Number const random_1,
-        Number const random_2
-) noexcept {
     update_envelope_randoms(random_1, random_2);
 
-    envelope.update();
-    Integer const snapshot_id = make_envelope_snapshot(envelope);
+    envelope->update();
+    Integer const snapshot_id = make_envelope_snapshot(*envelope);
 
     scheduled_envelope_snapshot_id = snapshot_id;
     envelope_canceled = false;
 
     this->cancel_events_after(time_offset);
     this->schedule(EVT_ENVELOPE_START, time_offset, snapshot_id);
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::start_lfo_envelope(
-        LFO& lfo,
-        Seconds const time_offset,
-        Number const random_1,
-        Number const random_2,
-        LFOEnvelopeMapping const& lfo_envelope_mapping
-) noexcept {
-    lfo_has_envelope = lfo.has_envelope();
-
-    if (!lfo_has_envelope) {
-        return;
-    }
-
-    envelope_canceled = false;
-
-    this->cancel_events_after(time_offset);
-    this->schedule(EVT_LFO_ENVELOPE_RESET, time_offset);
-
-    envelope_randoms[0] = random_1;
-    envelope_randoms[1] = random_2;
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        Byte const envelope_index = lfo_envelope_mapping[lfo_index];
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-        if (envelope_index == Constants::INVALID_ENVELOPE_INDEX) {
-            lfo_envelope_state.scheduled_envelope_snapshot_id = (
-                INVALID_ENVELOPE_SNAPSHOT_ID
-            );
-            lfo_envelope_state.scheduled_envelope_snapshot_envelope_index = (
-                Constants::INVALID_ENVELOPE_INDEX
-            );
-
-            continue;
-        }
-
-        update_envelope_randoms(envelope_randoms[0], envelope_randoms[1]);
-
-        Envelope& envelope = *envelopes[envelope_index];
-
-        envelope.update();
-
-        Integer const snapshot_id = make_envelope_snapshot(envelope);
-
-        this->schedule(
-            EVT_LFO_ENVELOPE_START,
-            time_offset,
-            snapshot_id,
-            0.0,
-            0.0,
-            lfo_index,
-            envelope_index
-        );
-
-        lfo_envelope_state.scheduled_envelope_snapshot_id = snapshot_id;
-        lfo_envelope_state.scheduled_envelope_snapshot_envelope_index = envelope_index;
-    }
 }
 
 
@@ -1646,44 +1276,36 @@ Seconds FloatParam<evaluation>::end_envelope(Seconds const time_offset) noexcept
         return envelope_cancel_duration;
     }
 
-    Envelope* const envelope = get_envelope();
-
-    if (envelope != NULL) {
-        return end_envelope<EVT_ENVELOPE_END>(*envelope, time_offset);
-    }
-
-    LFO* const lfo = get_lfo();
-
-    if (lfo != NULL) {
-        return end_lfo_envelope<EVT_LFO_ENVELOPE_END>(time_offset);
-    }
-
-    return 0.0;
+    return end_envelope<EVT_ENVELOPE_END>(time_offset);
 }
 
 
 template<ParamEvaluation evaluation>
 template<SignalProducer::Event::Type event_type>
 Seconds FloatParam<evaluation>::end_envelope(
-        Envelope& envelope,
         Seconds const time_offset,
         Seconds const duration
 ) noexcept {
-    if (scheduled_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID) {
+    Envelope* const envelope = get_envelope();
+
+    if (
+            envelope == NULL
+            || scheduled_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
+    ) {
         return 0.0;
     }
 
     EnvelopeSnapshot& snapshot = envelope_snapshots[scheduled_envelope_snapshot_id];
 
-    if (envelope.is_dynamic()) {
+    if (envelope->is_dynamic()) {
         /*
         It is safe to update the release portion of the scheduled snapshot
         in-place (rather than scheduling a new snapshot), because
         process_envelope() would do it anyways, and we are not messing up any
         previous stages in the middle of rendering them.
         */
-        envelope.update();
-        envelope.make_end_snapshot(envelope_randoms, snapshot);
+        envelope->update();
+        envelope->make_end_snapshot(envelope_randoms, snapshot);
     }
 
     if constexpr (event_type == EVT_ENVELOPE_CANCEL) {
@@ -1699,87 +1321,14 @@ Seconds FloatParam<evaluation>::end_envelope(
 
 
 template<ParamEvaluation evaluation>
-template<SignalProducer::Event::Type event_type>
-Seconds FloatParam<evaluation>::end_lfo_envelope(
-        Seconds const time_offset,
-        Seconds const duration
-) noexcept {
-    if (!lfo_has_envelope) {
-        return 0.0;
-    }
-
-    Seconds release_time = duration;
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-        Byte const envelope_index = (
-            lfo_envelope_state.scheduled_envelope_snapshot_envelope_index
-        );
-
-        if (
-                lfo_envelope_state.scheduled_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
-                || envelope_index == Constants::INVALID_ENVELOPE_INDEX
-        ) {
-            continue;
-        }
-
-        Envelope& envelope = *envelopes[envelope_index];
-        EnvelopeSnapshot& snapshot = (
-            envelope_snapshots[lfo_envelope_state.scheduled_envelope_snapshot_id]
-        );
-
-        if (envelope.is_dynamic()) {
-            envelope.update();
-            envelope.make_end_snapshot(envelope_randoms, snapshot);
-        }
-
-        if constexpr (event_type == EVT_LFO_ENVELOPE_CANCEL) {
-            this->schedule(
-                event_type,
-                time_offset,
-                0,
-                std::min(snapshot.release_time, duration),
-                0.0,
-                lfo_index
-            );
-        } else {
-            release_time = std::max(release_time, snapshot.release_time);
-            this->schedule(event_type, time_offset, 0, 0.0, 0.0, lfo_index);
-        }
-    }
-
-    return release_time;
-}
-
-
-template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::cancel_envelope(
         Seconds const time_offset,
         Seconds const duration
 ) noexcept {
     envelope_canceled = true;
-
-    Envelope* const envelope = get_envelope();
-
-    if (envelope != NULL) {
-        envelope_cancel_duration = end_envelope<EVT_ENVELOPE_CANCEL>(
-            *envelope, time_offset, duration
-        );
-
-        return;
-    }
-
-    LFO* const lfo = get_lfo();
-
-    if (lfo != NULL) {
-        envelope_cancel_duration = end_lfo_envelope<EVT_LFO_ENVELOPE_CANCEL>(
-            time_offset, duration
-        );
-
-        return;
-    }
-
-    envelope_cancel_duration = 0.0;
+    envelope_cancel_duration = end_envelope<EVT_ENVELOPE_CANCEL>(
+        time_offset, duration
+    );
 }
 
 
@@ -1788,27 +1337,12 @@ void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
 {
     Envelope* const envelope = get_envelope();
 
-    if (envelope != NULL) {
-        update_envelope(*envelope, time_offset);
-
+    if (envelope == NULL) {
         return;
     }
 
-    LFO* const lfo = get_lfo();
-
-    if (lfo != NULL) {
-        update_lfo_envelope(time_offset);
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_envelope(
-        Envelope& envelope,
-        Seconds const time_offset
-) noexcept {
-    envelope.update();
-    Integer const snapshot_id = make_envelope_snapshot(envelope);
+    envelope->update();
+    Integer const snapshot_id = make_envelope_snapshot(*envelope);
 
     scheduled_envelope_snapshot_id = snapshot_id;
 
@@ -1817,52 +1351,14 @@ void FloatParam<evaluation>::update_envelope(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_lfo_envelope(Seconds const time_offset) noexcept
-{
-    if (!lfo_has_envelope) {
-        return;
-    }
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-        Byte const envelope_index = (
-            lfo_envelope_state.scheduled_envelope_snapshot_envelope_index
-        );
-
-        if (
-                lfo_envelope_state.scheduled_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
-                || envelope_index == Constants::INVALID_ENVELOPE_INDEX
-        ) {
-            continue;
-        }
-
-        Envelope& envelope = *envelopes[envelope_index];
-
-        envelope.update();
-
-        Integer const snapshot_id = make_envelope_snapshot(envelope);
-
-        lfo_envelope_state.scheduled_envelope_snapshot_id = snapshot_id;
-        this->schedule(
-            EVT_LFO_ENVELOPE_UPDATE, time_offset, snapshot_id, 0.0, 0.0, lfo_index
-        );
-    }
-}
-
-
-template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_lfo(LFO* lfo) noexcept
 {
     this->lfo = lfo;
-    lfo_has_envelope = false;
-
-    this->cancel_events();
-    clear_envelope_state();
 }
 
 
 template<ParamEvaluation evaluation>
-LFO* FloatParam<evaluation>::get_lfo() const noexcept
+LFO const* FloatParam<evaluation>::get_lfo() const noexcept
 {
     return leader == NULL ? lfo : leader->get_lfo();
 }
@@ -1879,8 +1375,6 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::reset() noexcept
 {
     SignalProducer::reset();
-
-    check_leaked_envelope_snapshots("reset");
     clear_envelope_state();
 }
 
@@ -1892,10 +1386,8 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
 ) noexcept {
     Param<Number, evaluation>::initialize_rendering(round, sample_count);
 
-    LFO* const lfo = get_lfo();
-
     if (lfo != NULL) {
-        return process_lfo(*lfo, round, sample_count);
+        return process_lfo(round, sample_count);
     } else if (this->midi_controller != NULL) {
         if (is_logarithmic()) {
             process_midi_controller_events<true>();
@@ -1918,40 +1410,10 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
 
 template<ParamEvaluation evaluation>
 Sample const* const* FloatParam<evaluation>::process_lfo(
-        LFO& lfo,
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    if (lfo_has_envelope) {
-        lfo_envelope_sample_count = sample_count;
-
-        for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-            Byte const envelope_index = lfo_envelope_mapping[lfo_index];
-
-            if (JS80P_LIKELY(envelope_index == Constants::INVALID_ENVELOPE_INDEX)) {
-                continue;
-            }
-
-            LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-            if (lfo_envelope_state.active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID) {
-                continue;
-            }
-
-            Envelope& envelope = *envelopes[envelope_index];
-
-            update_envelope_state_if_dynamic(
-                envelope,
-                lfo_envelope_state.envelope_snapshot,
-                lfo_envelope_state.envelope_time,
-                lfo_envelope_state.envelope_stage
-            );
-        }
-
-        return NULL;
-    }
-
-    lfo_buffer = SignalProducer::produce<LFO>(lfo, round, sample_count);
+    lfo_buffer = SignalProducer::produce<LFO>(*lfo, round, sample_count);
 
     if (is_ratio_same_as_value) {
         if (sample_count > 0) {
@@ -1962,37 +1424,6 @@ Sample const* const* FloatParam<evaluation>::process_lfo(
     }
 
     return NULL;
-}
-
-
-template<ParamEvaluation evaluation>
-Sample const* FloatParam<evaluation>::produce_for_lfo_with_envelope(
-        LFOEnvelopeState* const lfo_envelope_states,
-        Integer const round,
-        Integer const sample_count,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample* const buffer
-) noexcept {
-    LFO* const lfo = get_lfo();
-
-    if (lfo == NULL) {
-        return FloatParamS::produce_if_not_constant< FloatParam<evaluation> >(
-            *this, round, sample_count
-        );
-    }
-
-    render_with_lfo_envelope(
-        *lfo,
-        lfo_envelope_states,
-        round,
-        sample_count,
-        first_sample_index,
-        last_sample_index,
-        buffer
-    );
-
-    return buffer;
 }
 
 
@@ -2104,16 +1535,44 @@ void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::process_envelope(Envelope& envelope) noexcept
 {
-    if (active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID) {
+    if (
+            !envelope.is_dynamic()
+            || active_envelope_snapshot_id == INVALID_ENVELOPE_SNAPSHOT_ID
+    ) {
         return;
     }
 
-    update_envelope_state_if_dynamic(
-        envelope,
-        envelope_snapshots[active_envelope_snapshot_id],
-        envelope_time,
-        envelope_stage
-    );
+    EnvelopeSnapshot& snapshot = envelope_snapshots[active_envelope_snapshot_id];
+
+    envelope.update();
+
+    if (snapshot.change_index == envelope.get_change_index()) {
+        return;
+    }
+
+    Seconds const old_release_time = snapshot.release_time;
+
+    switch (envelope_stage) {
+        case EnvelopeStage::ENV_STG_SUSTAIN:
+            envelope.make_snapshot(envelope_randoms, snapshot);
+            envelope_time = 0.0;
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASE:
+            envelope.make_end_snapshot(envelope_randoms, snapshot);
+            break;
+
+        case EnvelopeStage::ENV_STG_RELEASED:
+            envelope.make_end_snapshot(envelope_randoms, snapshot);
+            envelope_time = 0.0;
+            break;
+
+        default:
+            envelope.make_snapshot(envelope_randoms, snapshot);
+            break;
+    }
+
+    snapshot.release_time = std::min(old_release_time, snapshot.release_time);
 }
 
 
@@ -2147,106 +1606,17 @@ void FloatParam<evaluation>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if constexpr (evaluation != ParamEvaluation::SAMPLE) {
-        return;
-    }
-
-    LFO* const lfo = get_lfo();
-
-    if (lfo != NULL) {
-        if (lfo_has_envelope) {
-            render_with_lfo_envelope(
-                *lfo,
-                round,
-                lfo_envelope_sample_count,
-                first_sample_index,
-                last_sample_index,
-                buffer[0]
-            );
-        } else {
+    if constexpr (evaluation == ParamEvaluation::SAMPLE) {
+        if (lfo != NULL) {
             render_with_lfo(round, first_sample_index, last_sample_index, buffer);
-        }
-    } else if (is_ramping()) {
-        render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
-    } else if (get_envelope() != NULL) {
-        render_with_envelope(round, first_sample_index, last_sample_index, buffer);
-    } else {
-        Param<Number, evaluation>::render(
-            round, first_sample_index, last_sample_index, buffer
-        );
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::render_with_lfo_envelope(
-        LFO& lfo,
-        Integer const round,
-        Integer const sample_count,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample* buffer
-) noexcept {
-    render_with_lfo_envelope(
-        lfo,
-        lfo_envelope_states,
-        round,
-        sample_count,
-        first_sample_index,
-        last_sample_index,
-        buffer
-    );
-
-    if (last_sample_index != first_sample_index) {
-        this->store_new_value(buffer[last_sample_index - 1]);
-    }
-
-    for (Byte lfo_index = 0; lfo_index != Constants::LFOS; ++lfo_index) {
-        LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[lfo_index];
-
-        if (lfo_envelope_state.envelope_stage == EnvelopeStage::ENV_STG_RELEASED) {
-            if (lfo_envelope_state.active_envelope_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID) {
-                unused_envelope_snapshots.push(lfo_envelope_state.active_envelope_snapshot_id);
-            }
-
-            lfo_envelope_state.active_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
-            lfo_envelope_state.envelope_time = 0.0;
-            lfo_envelope_state.value = 1.0;
-        }
-    }
-}
-
-
-template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::render_with_lfo_envelope(
-        LFO& lfo,
-        LFOEnvelopeState* const lfo_envelope_states,
-        Integer const round,
-        Integer const sample_count,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample* buffer
-) noexcept {
-    lfo.produce_with_envelope(
-        lfo_envelope_states,
-        round,
-        sample_count,
-        first_sample_index,
-        last_sample_index,
-        buffer
-    );
-
-    if (is_ratio_same_as_value) {
-        return;
-    }
-
-    if (is_logarithmic()) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[i] = ratio_to_value_log(buffer[i]);
-        }
-    } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[i] = ratio_to_value_raw(buffer[i]);
+        } else if (is_ramping()) {
+            render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
+        } else if (get_envelope() != NULL) {
+            render_with_envelope(round, first_sample_index, last_sample_index, buffer);
+        } else {
+            Param<Number, evaluation>::render(
+                round, first_sample_index, last_sample_index, buffer
+            );
         }
     }
 }
@@ -2259,22 +1629,20 @@ void FloatParam<evaluation>::render_with_lfo(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (is_ratio_same_as_value) {
+    Sample sample;
+
+    if (is_logarithmic()) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = lfo_buffer[0][i];
-        }
-    } else if (is_logarithmic()) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = ratio_to_value_log(lfo_buffer[0][i]);
+            buffer[0][i] = sample = (Sample)ratio_to_value_log(lfo_buffer[0][i]);
         }
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = ratio_to_value_raw(lfo_buffer[0][i]);
+            buffer[0][i] = sample = (Sample)ratio_to_value_raw(lfo_buffer[0][i]);
         }
     }
 
     if (last_sample_index != first_sample_index) {
-        this->store_new_value(buffer[0][last_sample_index - 1]);
+        this->store_new_value((Number)sample);
     }
 }
 
@@ -2358,7 +1726,6 @@ void FloatParam<evaluation>::render_with_envelope(
         unused_envelope_snapshots.push(active_envelope_snapshot_id);
         active_envelope_snapshot_id = INVALID_ENVELOPE_SNAPSHOT_ID;
         envelope_is_constant = true;
-        envelope_time = 0.0;
     }
 }
 
