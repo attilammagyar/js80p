@@ -259,10 +259,10 @@ class ControllerSelector : public Widget
 };
 
 
-class KnobStates
+class ParamStateImages
 {
     public:
-        KnobStates(
+        ParamStateImages(
             WidgetBase* widget,
             GUI::Image free_image,
             GUI::Image controlled_image,
@@ -273,7 +273,7 @@ class KnobStates
             int const height
         );
 
-        ~KnobStates();
+        ~ParamStateImages();
 
         size_t const count;
         int const width;
@@ -315,7 +315,7 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* format,
             double const scale,
-            KnobStates* knob_states
+            ParamStateImages* knob_states
         );
 
         KnobParamEditor(
@@ -332,7 +332,7 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* const* const options,
             int const number_of_options,
-            KnobStates* knob_states
+            ParamStateImages* knob_states
         );
 
         void set_sync_param_id(Synth::ParamId const param_id);
@@ -400,7 +400,7 @@ class KnobParamEditor : public TransparentWidget
                     int const left,
                     int const top,
                     Number const steps,
-                    KnobStates* knob_states
+                    ParamStateImages* knob_states
                 );
 
                 virtual ~Knob();
@@ -434,7 +434,7 @@ class KnobParamEditor : public TransparentWidget
                 Number const steps;
 
                 KnobParamEditor& editor;
-                KnobStates* knob_states;
+                ParamStateImages* knob_states;
                 GUI::Image knob_state;
                 Number prev_x;
                 Number prev_y;
@@ -464,7 +464,7 @@ class KnobParamEditor : public TransparentWidget
         bool const has_room_for_texts;
 
         ControllerSelector& controller_selector;
-        KnobStates* knob_states;
+        ParamStateImages* knob_states;
         Synth& synth;
         Number ratio;
         Knob* knob;
