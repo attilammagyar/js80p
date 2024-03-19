@@ -666,14 +666,18 @@ KnobParamEditor::KnobParamEditor(
         KnobStates* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
-    knob_top(knob_top),
-    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
+    is_continuous(param_id < Synth::FLOAT_PARAMS),
     format(format),
     scale(scale),
+    discrete_step_size(
+        !is_continuous ? 1.001 / synth.get_param_max_value(param_id) : 0.0
+    ),
     options(NULL),
     number_of_options(0),
     value_font_size(11),
     controller_choices(controller_choices),
+    knob_top(knob_top),
+    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     controller_selector(controller_selector),
     knob_states(knob_states),
     synth(synth),
@@ -702,14 +706,18 @@ KnobParamEditor::KnobParamEditor(
         KnobStates* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
-    knob_top(knob_top),
-    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
+    is_continuous(param_id < Synth::FLOAT_PARAMS),
     format(NULL),
     scale(1.0),
+    discrete_step_size(
+        !is_continuous ? 1.001 / synth.get_param_max_value(param_id) : 0.0
+    ),
     options(options),
     number_of_options(number_of_options),
     value_font_size(10),
     controller_choices(controller_choices),
+    knob_top(knob_top),
+    has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     controller_selector(controller_selector),
     knob_states(knob_states),
     synth(synth),
@@ -822,13 +830,12 @@ void KnobParamEditor::update_editor()
 
 void KnobParamEditor::adjust_ratio(Number const delta)
 {
-    if (param_id < Synth::FLOAT_PARAMS) {
+    if (is_continuous) {
         handle_ratio_change(ratio + delta);
     } else {
-        Number const discrete_delta = (
-            (delta > 0 ? 1.001 : -1.001) / synth.get_param_max_value(param_id)
+        handle_ratio_change(
+            ratio + (delta < 0 ? - discrete_step_size : discrete_step_size)
         );
-        handle_ratio_change(ratio + discrete_delta);
     }
 }
 
@@ -1180,10 +1187,7 @@ bool KnobParamEditor::Knob::mouse_move(
 
         mouse_move_delta += delta;
 
-        if (
-                editor.param_id < Synth::FLOAT_PARAMS
-                || std::fabs(mouse_move_delta) > 0.03
-        ) {
+        if (editor.is_continuous || std::fabs(mouse_move_delta) > 0.03) {
             editor.adjust_ratio(delta);
             mouse_move_delta = 0.0;
         }

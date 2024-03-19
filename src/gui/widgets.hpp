@@ -357,6 +357,7 @@ class KnobParamEditor : public TransparentWidget
         void stop_editing();
 
         Synth::ParamId const param_id;
+        bool const is_continuous;
 
     protected:
         virtual void set_up(
@@ -449,16 +450,18 @@ class KnobParamEditor : public TransparentWidget
         void update_value_str();
         void update_controller_str();
 
-        int const knob_top;
-        bool const has_room_for_texts;
-
         char const* const format;
         double const scale;
+
+        Number const discrete_step_size;
 
         char const* const* const options;
         int const number_of_options;
         int const value_font_size;
         int const controller_choices;
+
+        int const knob_top;
+        bool const has_room_for_texts;
 
         ControllerSelector& controller_selector;
         KnobStates* knob_states;
