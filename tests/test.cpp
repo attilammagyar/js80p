@@ -336,8 +336,11 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \def assert_lt(a, b, message_fmt, ...)
  * \hideinitializer
  * \brief Fail the test if \c a is not less than \c b. C-strings are compared
- *        with \c strcmp() .
- * \param a, b          (int|double|char*|std::string) Values to be compared
+ *        with \c strcmp() . Number arrays are compared elementwise.
+ * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
+ *                      be compared.
+ * \param length        [optional] Array length when \c a[] and \c b[] are
+ *                      arrays.
  * \param message_fmt   (char*) [optional] Custom failure message printf()-style
  *                      format string.
  * \param ...           [optional] Format string parameters.
@@ -357,8 +360,11 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \def assert_lte(a, b, message_fmt, ...)
  * \hideinitializer
  * \brief Fail the test if \c a is not less than or equal to \c b. C-strings are
- *        compared with \c strcmp() .
- * \param a, b          (int|double|char*|std::string) Values to be compared
+ *        compared with \c strcmp() . Number arrays are compared elementwise.
+ * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
+ *                      be compared.
+ * \param length        [optional] Array length when \c a[] and \c b[] are
+ *                      arrays.
  * \param message_fmt   (char*) [optional] Custom failure message printf()-style
  *                      format string.
  * \param ...           [optional] Format string parameters.
@@ -378,8 +384,11 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \def assert_gt(a, b, message_fmt, ...)
  * \hideinitializer
  * \brief Fail the test if \c a is not greater than \c b. C-strings are compared
- *        with \c strcmp() .
- * \param a, b          (int|double|char*|std::string) Values to be compared
+ *        with \c strcmp() . Number arrays are compared elementwise.
+ * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
+ *                      be compared.
+ * \param length        [optional] Array length when \c a[] and \c b[] are
+ *                      arrays.
  * \param message_fmt   (char*) [optional] Custom failure message printf()-style
  *                      format string.
  * \param ...           [optional] Format string parameters.
@@ -399,8 +408,11 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \def assert_gte(a, b, message_fmt, ...)
  * \hideinitializer
  * \brief Fail the test if \c a is not greater than or equal to \c b. C-strings
- *        are compared with \c strcmp() .
- * \param a, b          (int|double|char*|std::string) Values to be compared
+ *        are compared with \c strcmp() . Number arrays are compared elementwise.
+ * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
+ *                      be compared.
+ * \param length        [optional] Array length when \c a[] and \c b[] are
+ *                      arrays.
  * \param message_fmt   (char*) [optional] Custom failure message printf()-style
  *                      format string.
  * \param ...           [optional] Format string parameters.
@@ -868,12 +880,12 @@ static bool _name(                                                          \
     }                                                                       \
     int first_mismatch = -1;                                                \
     for (int i = 0; i != length; ++i) {                                     \
-        if (a[i] != b[i]) {                                                 \
+        if (!(a[i] _op b[i])) {                                             \
             first_mismatch = i;                                             \
             break;                                                          \
         }                                                                   \
     }                                                                       \
-    if (first_mismatch _op -1) {                                            \
+    if (first_mismatch == -1) {                                             \
         _TEST_PASS();                                                       \
         return true;                                                        \
     } else {                                                                \
@@ -901,6 +913,26 @@ static bool _name(                                                          \
         _ASSERT_ARRAY_OP_METHOD(neq, !=, long long int, _TEST_LLINT_F, std::abs)
         _ASSERT_ARRAY_OP_METHOD(neq, !=, float, _TEST_DBL_F, std::fabs)
         _ASSERT_ARRAY_OP_METHOD(neq, !=, double, _TEST_DBL_F, std::fabs)
+
+        _ASSERT_ARRAY_OP_METHOD(lt, <, int, _TEST_INT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(lt, <, long long int, _TEST_LLINT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(lt, <, float, _TEST_DBL_F, std::fabs)
+        _ASSERT_ARRAY_OP_METHOD(lt, <, double, _TEST_DBL_F, std::fabs)
+
+        _ASSERT_ARRAY_OP_METHOD(lte, <=, int, _TEST_INT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(lte, <=, long long int, _TEST_LLINT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(lte, <=, float, _TEST_DBL_F, std::fabs)
+        _ASSERT_ARRAY_OP_METHOD(lte, <=, double, _TEST_DBL_F, std::fabs)
+
+        _ASSERT_ARRAY_OP_METHOD(gt, >, int, _TEST_INT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(gt, >, long long int, _TEST_LLINT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(gt, >, float, _TEST_DBL_F, std::fabs)
+        _ASSERT_ARRAY_OP_METHOD(gt, >, double, _TEST_DBL_F, std::fabs)
+
+        _ASSERT_ARRAY_OP_METHOD(gte, >=, int, _TEST_INT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(gte, >=, long long int, _TEST_LLINT_F, std::abs)
+        _ASSERT_ARRAY_OP_METHOD(gte, >=, float, _TEST_DBL_F, std::fabs)
+        _ASSERT_ARRAY_OP_METHOD(gte, >=, double, _TEST_DBL_F, std::fabs)
 
 
 #define _ASSERT_FLOAT_ARRAY_OP_METHOD(_name, _op, _type)                    \
