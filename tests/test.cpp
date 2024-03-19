@@ -282,7 +282,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \brief Fail the test if the given parameters are not equal. C-strings are
  *        compared with \c strcmp() .
  * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
- *                      be compared
+ *                      be compared.
  * \param length        [optional] Array length when \c a[] and \c b[] are
  *                      arrays.
  * \param tolerance     (double) [optional] When \c a and \c b are of the type
@@ -310,7 +310,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \brief Fail the test if the given parameters are equal. C-strings are
  *        compared with \c strcmp() .
  * \param a, b          (int|int[]|double|double[]|char*|std::string) Values to
- *                      be compared
+ *                      be compared.
  * \param length        [optional] Array length when \c a[] and \c b[] are
  *                      arrays.
  * \param tolerance     (double) [optional] When \c a and \c b are of the type
@@ -424,7 +424,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  *
  * \param a, b          double[] Arrays to be compared.
  * \param length        Array length.
- * \param tolerance     (double) When the average difference between the 
+ * \param tolerance     (double) When the average difference between the
  *                      elements of \c a and \c b is not greater than this
  *                      value, then they are considered equal and the assertion
  *                      succeeds.
