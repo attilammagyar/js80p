@@ -1479,6 +1479,7 @@ TextBoxParamEditor::TextBoxParamEditor(
     param_id(param_id),
     synth(synth),
     ratio(0.0),
+    step_size(1.001 / synth.get_param_max_value(param_id)),
     options(options),
     options_count(options_count),
     text_left(text_left),
@@ -1567,19 +1568,33 @@ bool TextBoxParamEditor::mouse_up(int const x, int const y)
 {
     TransparentWidget::mouse_up(x, y);
 
-    if (ratio > 0.99999) {
-        ratio = 0.0;
-    } else {
-        Number const delta = 1.001 / synth.get_param_max_value(param_id);
+    set_ratio(ratio + step_size);
 
-        ratio = GUI::clamp_ratio(ratio + delta);
+    return false;
+}
+
+
+void TextBoxParamEditor::set_ratio(Number const new_ratio)
+{
+    Number const old_ratio = ratio;
+
+    if (
+            (new_ratio > 1.0 && old_ratio > 0.999999)
+            || std::fabs(new_ratio) < 0.000001
+    ) {
+        ratio = 0.0;
+    } else if (
+            (new_ratio < 0.0 && old_ratio < 0.000001)
+            || std::fabs(new_ratio - 1.0) < 0.000001
+    ) {
+        ratio = 1.0;
+    } else {
+        ratio = GUI::clamp_ratio(new_ratio);
     }
 
     synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
     update_value_str();
     redraw();
-
-    return false;
 }
 
 
@@ -1603,6 +1618,16 @@ bool TextBoxParamEditor::mouse_leave(int const x, int const y)
     stop_editing();
 
     return true;
+}
+
+
+bool TextBoxParamEditor::mouse_wheel(Number const delta, bool const modifier)
+{
+    TransparentWidget::mouse_wheel(delta, modifier);
+
+    set_ratio(ratio + (delta < 0 ? - step_size : step_size));
+
+    return false;
 }
 
 

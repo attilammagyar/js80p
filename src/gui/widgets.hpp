@@ -628,6 +628,9 @@ class TextBoxParamEditor : public TransparentWidget
         virtual bool mouse_up(int const x, int const y) override;
         virtual bool mouse_move(int const x, int const y, bool const modifier) override;
         virtual bool mouse_leave(int const x, int const y) override;
+        virtual bool mouse_wheel(Number const delta, bool const modifier) override;
+
+        void set_ratio(Number const new_ratio);
 
         virtual void update_value_str();
         void update_value_str(Byte const value);
@@ -641,6 +644,8 @@ class TextBoxParamEditor : public TransparentWidget
     private:
         void start_editing();
         void stop_editing();
+
+        Number const step_size;
 
         char const* const* const options;
         int const options_count;
