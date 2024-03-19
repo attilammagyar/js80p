@@ -559,7 +559,7 @@ bool ControllerSelector::Controller::mouse_leave(int const x, int const y)
 }
 
 
-KnobStates::KnobStates(
+ParamStateImages::ParamStateImages(
         WidgetBase* widget,
         GUI::Image free_image,
         GUI::Image controlled_image,
@@ -584,7 +584,7 @@ KnobStates::KnobStates(
 }
 
 
-GUI::Image* KnobStates::split_image(GUI::Image image) const
+GUI::Image* ParamStateImages::split_image(GUI::Image image) const
 {
     if (image == NULL) {
         return NULL;
@@ -602,7 +602,7 @@ GUI::Image* KnobStates::split_image(GUI::Image image) const
 }
 
 
-KnobStates::~KnobStates()
+ParamStateImages::~ParamStateImages()
 {
     if (free_image != NULL) {
         free_images = free_images_(free_images);
@@ -632,7 +632,7 @@ KnobStates::~KnobStates()
 }
 
 
-GUI::Image* KnobStates::free_images_(GUI::Image* images) const
+GUI::Image* ParamStateImages::free_images_(GUI::Image* images) const
 {
     if (images == NULL) {
         return NULL;
@@ -663,7 +663,7 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* format,
         double const scale,
-        KnobStates* knob_states
+        ParamStateImages* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
@@ -703,7 +703,7 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* const* const options,
         int const number_of_options,
-        KnobStates* knob_states
+        ParamStateImages* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
@@ -987,7 +987,7 @@ KnobParamEditor::Knob::Knob(
         int const left,
         int const top,
         Number const steps,
-        KnobStates* knob_states
+        ParamStateImages* knob_states
 ) : Widget(text, left, top, knob_states->width, knob_states->height, Type::KNOB),
     steps(steps),
     editor(editor),

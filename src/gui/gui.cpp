@@ -1400,7 +1400,7 @@ GUI::GUI(
 
     dummy_widget = new Widget("");
 
-    knob_states = new KnobStates(
+    knob_states = new ParamStateImages(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESFREE"),
         dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED"),
@@ -1411,7 +1411,7 @@ GUI::GUI(
         48
     );
 
-    screw_states = new KnobStates(
+    screw_states = new ParamStateImages(
         dummy_widget,
         dummy_widget->load_image(this->platform_data, "SCREWSTATES"),
         NULL,
@@ -1548,7 +1548,7 @@ void GUI::build_about_body(char const* sdk_version)
 }
 
 
-void GUI::build_macros_1_body(KnobStates* knob_states)
+void GUI::build_macros_1_body(ParamStateImages* knob_states)
 {
     macros_1_body = new TabBody("Macros 1-10");
 
@@ -1647,7 +1647,7 @@ void GUI::build_macros_1_body(KnobStates* knob_states)
 }
 
 
-void GUI::build_macros_2_body(KnobStates* knob_states)
+void GUI::build_macros_2_body(ParamStateImages* knob_states)
 {
     macros_2_body = new TabBody("Macros 11-20");
 
@@ -1746,7 +1746,7 @@ void GUI::build_macros_2_body(KnobStates* knob_states)
 }
 
 
-void GUI::build_effects_body(KnobStates* knob_states)
+void GUI::build_effects_body(ParamStateImages* knob_states)
 {
     effects_body = new TabBody("Effects");
 
@@ -1832,7 +1832,7 @@ void GUI::build_effects_body(KnobStates* knob_states)
 }
 
 
-void GUI::build_envelopes_1_body(KnobStates* knob_states, KnobStates* screw_states)
+void GUI::build_envelopes_1_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
 {
     envelopes_1_body = new TabBody("Envelopes");
 
@@ -1950,7 +1950,7 @@ void GUI::build_envelopes_1_body(KnobStates* knob_states, KnobStates* screw_stat
 }
 
 
-void GUI::build_envelopes_2_body(KnobStates* knob_states, KnobStates* screw_states)
+void GUI::build_envelopes_2_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
 {
     envelopes_2_body = new TabBody("Envelopes");
 
@@ -2068,7 +2068,7 @@ void GUI::build_envelopes_2_body(KnobStates* knob_states, KnobStates* screw_stat
 }
 
 
-void GUI::build_lfos_body(KnobStates* knob_states)
+void GUI::build_lfos_body(ParamStateImages* knob_states)
 {
     lfos_body = new TabBody("LFOs");
 
@@ -2216,7 +2216,7 @@ void GUI::build_lfos_body(KnobStates* knob_states)
 }
 
 
-void GUI::build_synth_body(KnobStates* knob_states, KnobStates* screw_states)
+void GUI::build_synth_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
 {
     synth_body = new TabBody("Synth");
 

@@ -34,7 +34,7 @@ class ControllerSelector;
 class ExportPatchButton;
 class ExternallyCreatedWindow;
 class ImportPatchButton;
-class KnobStates;
+class ParamStateImages;
 class KnobParamEditor;
 class StatusLine;
 class TabBody;
@@ -228,13 +228,26 @@ class GUI
         void destroy();
 
         void build_about_body(char const* sdk_version);
-        void build_macros_1_body(KnobStates* knob_states);
-        void build_macros_2_body(KnobStates* knob_states);
-        void build_effects_body(KnobStates* knob_states);
-        void build_envelopes_1_body(KnobStates* knob_states, KnobStates* screw_states);
-        void build_envelopes_2_body(KnobStates* knob_states, KnobStates* screw_states);
-        void build_lfos_body(KnobStates* knob_states);
-        void build_synth_body(KnobStates* knob_states, KnobStates* screw_states);
+        void build_macros_1_body(ParamStateImages* knob_states);
+        void build_macros_2_body(ParamStateImages* knob_states);
+        void build_effects_body(ParamStateImages* knob_states);
+
+        void build_envelopes_1_body(
+            ParamStateImages* knob_states,
+            ParamStateImages* screw_states
+        );
+
+        void build_envelopes_2_body(
+            ParamStateImages* knob_states,
+            ParamStateImages* screw_states
+        );
+
+        void build_lfos_body(ParamStateImages* knob_states);
+
+        void build_synth_body(
+            ParamStateImages* knob_states,
+            ParamStateImages* screw_states
+        );
 
         bool const show_vst_logo;
 
@@ -250,8 +263,8 @@ class GUI
         Image synth_image;
         Image vst_logo_image;
 
-        KnobStates* knob_states;
-        KnobStates* screw_states;
+        ParamStateImages* knob_states;
+        ParamStateImages* screw_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
