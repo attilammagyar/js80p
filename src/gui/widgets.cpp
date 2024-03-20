@@ -1557,7 +1557,7 @@ bool TextBoxParamEditor::paint()
     TransparentWidget::paint();
 
     draw_text(
-        value_str, 9, text_left, 0, text_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+        value_str, 10, text_left, 0, text_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
     );
 
     return true;
