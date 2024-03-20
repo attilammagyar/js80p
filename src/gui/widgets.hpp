@@ -659,8 +659,8 @@ class TextBoxParamEditor : public TransparentWidget
 class TuningSelector : public TextBoxParamEditor
 {
     public:
-        static constexpr int WIDTH = 90;
-        static constexpr int HEIGHT = 20;
+        static constexpr int WIDTH = 93;
+        static constexpr int HEIGHT = 23;
 
         TuningSelector(
             GUI& gui,

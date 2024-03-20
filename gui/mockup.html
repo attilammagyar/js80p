@@ -153,16 +153,17 @@ html, body {
 
 #osc-1-tuning,
 #osc-2-tuning {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 23px;
   background: #000000;
-  border: inset 2px #9090b0;
-  width: 130px;
-  height: 20px;
+  border: inset 1px #9090b0;
+  width: 136px;
+  height: 23px;
   margin: 0;
   padding: 0;
   position: absolute;
   top: 2px;
-  left: 150px;
+  left: 148px;
   border-radius: 3px;
 }
 
@@ -171,7 +172,7 @@ html, body {
   padding-left: 10px;
 }
 
-h1 {
+h1 span {
   filter: drop-shadow(2px 2px 3px #000000);
 }
 
@@ -243,6 +244,15 @@ h1 {
   vertical-align: bottom;
 }
 
+.block h1.envelope label {
+  overflow: initial;
+}
+
+.block h1.envelope span.title {
+  display: inline-block;
+  width: 56px;
+}
+
 .block h1 label.freq {
   position: relative;
   left: 2px;
@@ -274,9 +284,13 @@ h1 {
   margin-top: 2px;
 }
 
+.block h1.envelope label.sync {
+  margin-right: 7px;
+}
+
 .block h1 label.inaccuracy {
-  margin-left: 30px;
   margin-top: -2px;
+  margin-right: 0;
   height: 24px;
 }
 
@@ -287,22 +301,34 @@ h1 {
 }
 
 .block h1 label.center {
-  margin-left: 55px;
+  margin-left: 123px;
   margin-top: 2px;
 }
 
 .block h1 label.envelope {
-  margin-left: 35px;
+  margin-left: 15px;
   margin-bottom: -3px;
-  line-height: 12px;
+  line-height: 15px;
   height: 20px;
   overflow: visible;
 }
 
 .block h1 label.envelope input {
-  width: 25px;
-  height: 19px;
-  margin-top: -2px;
+  width: 27px;
+  height: 23px;
+  margin-top: -3px;
+  border: inset 1px #9090b0;
+}
+
+.block h1 label.shape {
+  margin-right: 2px;
+}
+
+.block h1 label.shape input {
+  width: 23px;
+  height: 23px;
+  margin-top: -3px;
+  border: inset 1px #9090b0;
 }
 
 #main div input,
@@ -620,7 +646,7 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">
-        <h1>Osc 1 (modulator)</h1>
+        <h1><span>Osc 1 (modulator)</span></h1>
         <div id="osc-1-tuning"><span>440 12TET</span></div>
         <div id="osc-1-main" class="osc-main block"></div>
         <div id="osc-1-filter-1" class="block osc-filter">
@@ -642,7 +668,7 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-2" class="osc main-block block">
-        <h1>Osc 2 (carrier)</h1>
+        <h1><span>Osc 2 (carrier)</span></h1>
         <div id="osc-2-tuning"><span>MTS-ESP (ERR)</span></div>
         <div id="osc-2-main" class="osc-main block"></div>
         <div id="osc-2-filter-1" class="block">
@@ -672,68 +698,62 @@ function make_tabs(active)
     </div>
     <div class="border" id="effects">
       <div id="volume-1" class="effect main-block block">
-        <h1>
-          Vol 1
-        </h1>
+        <h1><span>Vol 1</span></h1>
         <div id="volume-1-params" class="block"></div>
       </div>
       <div id="overdrive" class="effect main-block block">
-        <h1>Odrv</h1>
+        <h1><span>Odrv</span></h1>
         <div id="overdrive-params" class="block"></div>
       </div>
       <div id="distortion" class="effect main-block block">
-        <h1>Dist</h1>
+        <h1><span>Dist</span></h1>
         <div id="distortion-params" class="block"></div>
       </div>
       <div id="filter-1" class="effect main-block block">
         <h1>
-          Filter 1
-          <label class="freq"><input type="text" /> LG F</label>
-          <label class="q"><input type="text" /> LG Q</label>
+          <span>Filter 1</span>
+          <label class="freq"><input type="text" /><span> LG F</span></label>
+          <label class="q"><input type="text" /><span> LG Q</span></label>
         </h1>
         <div id="filter-1-params" class="block"></div>
       </div>
       <div id="filter-2" class="effect main-block block">
         <h1>
           Filter 2
-          <label class="freq"><input type="text" /> LG F</label>
-          <label class="q"><input type="text" /> LG Q</label>
+          <label class="freq"><input type="text" /><span> LG F</span></label>
+          <label class="q"><input type="text" /><span> LG Q</span></label>
         </h1>
         <div id="filter-2-params" class="block"></div>
       </div>
       <div id="volume-2" class="effect main-block block">
-        <h1>
-          Vol 2
-        </h1>
+        <h1><span>Vol 2</span></h1>
         <div id="volume-2-params" class="block"></div>
       </div>
       <div id="chorus" class="effect main-block block">
         <h1>
-          Chorus
-          <label class="freq"><input type="text" /> LOG FREQS</label>
-          <label class="sync">TEMPO SYNC <input type="text" /></label>
+          <span>Chorus</span>
+          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
+          <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="chorus-params" class="block"></div>
       </div>
       <div id="echo" class="effect main-block block">
         <h1>
-          Echo
-          <label class="freq"><input type="text" /> LOG FREQS</label>
-          <label class="sync">TEMPO SYNC <input type="text" /></label>
+          <span>Echo</span>
+          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
+          <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
       </div>
       <div id="reverb" class="effect main-block block">
         <h1>
-          Reverb
-          <label class="freq"><input type="text" /> LOG FREQS</label>
+          <span>Reverb</span>
+          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
         </h1>
         <div id="reverb-params" class="block"></div>
       </div>
       <div id="volume-3" class="effect main-block block">
-        <h1>
-          Vol 3
-        </h1>
+        <h1><span>Vol 3</span></h1>
         <div id="volume-3-params" class="block"></div>
       </div>
     </div>
@@ -966,7 +986,8 @@ window.onload = function ()
             k3 = document.createElement("div");
             k3.setAttribute("class", "group");
             h = document.createElement("h1");
-            h.innerHTML = "Macro " + String(o * 10 + i);
+            h.innerHTML = "<span>Macro " + String(o * 10 + i) + "</span>";
+
             d.appendChild(h);
             k1.appendChild(k2);
             k1.appendChild(k3);
@@ -988,22 +1009,22 @@ window.onload = function ()
           d = document.createElement("div");
           d.setAttribute("class", "block main-block");
           h = document.createElement("h1");
-          h.innerHTML = "Envelope " + String(i);
-
-          l = document.createElement("label");
-          l.innerHTML = "DYNAMIC ";
-          l.setAttribute("class", "dynamic");
-          n = document.createElement("input");
-          n.setAttribute("type", "text");
-          l.appendChild(n);
-          l2 = document.createElement("label");
-          l2.innerHTML = "";
-          l2.setAttribute("class", "inaccuracy");
-          n2 = document.createElement("input");
-          n2.setAttribute("type", "text");
-          l2.appendChild(n2);
-          h.appendChild(l2);
-          h.appendChild(l);
+          h.setAttribute("class", "envelope");
+          h.innerHTML = [
+            '<span class="title">Env ' + String(i) + '</span>',
+            '<label class="shape">',
+              '<input type="text" />',
+              '<input type="text" />',
+              '<input type="text" />',
+            '</label>',
+            '<label class="inaccuracy"><input type="text" /></label>',
+            '<label class="dynamic">',
+              '<span>DYN</span><input type="text" />',
+            '</label>',
+            '<label class="sync">',
+              '<span>BPM</span><input type="text" />',
+            '</label>'
+          ].join("");
 
           d.appendChild(h);
 
@@ -1042,31 +1063,19 @@ window.onload = function ()
         k1 = document.createElement("div");
         k1.setAttribute("class", "block");
         h = document.createElement("h1");
-        h.innerHTML = "LFO " + String(i);
-        l = document.createElement("label");
-        l.innerHTML = "TEMPO SYNC ";
-        l.setAttribute("class", "sync");
-        n = document.createElement("input");
-        n.setAttribute("type", "text");
+        h.innerHTML = [
+          '<span>LFO ' + String(i) + '</span>',
+          '<label class="center">',
+            '<span>CENTER </span><input type="text" />',
+          '</label>',
+          '<label class="envelope">',
+            '<span>AMT ENV </span><input type="text" />',
+          '</label>',
+          '<label class="sync">',
+            '<span>BPM SYNC </span><input type="text" />',
+          '</label>',
+        ].join("");
 
-        l3 = document.createElement("label");
-        l3.innerHTML = "ENVELOPE ";
-        l3.setAttribute("class", "envelope");
-        n3 = document.createElement("input");
-        n3.setAttribute("type", "text");
-
-        l2 = document.createElement("label");
-        l2.innerHTML = "CENTER ";
-        l2.setAttribute("class", "center");
-        n2 = document.createElement("input");
-        n2.setAttribute("type", "text");
-
-        l3.appendChild(n3);
-        h.appendChild(l3);
-        l2.appendChild(n2);
-        h.appendChild(l2);
-        l.appendChild(n);
-        h.appendChild(l);
         d.appendChild(h);
         d.appendChild(k1);
 
