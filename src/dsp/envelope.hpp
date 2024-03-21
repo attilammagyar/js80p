@@ -51,15 +51,23 @@ namespace JS80P
  *          |           |            |       |                |   |
  *          |           |            |       |                |   |
  * Delay    | Attack    | Hold       | Decay | Sustain        | Release
- *
- *
- * param.envelope_time  how much time will have elapsed since the last event
- *                      (envelope start, release start, sustain level change,
- *                      etc.), at the next sample to be rendered
- *
- * param.value          last rendered value
  * \endcode
  *
+ * Envelope-capable parameters hold their envelope rendering state:
+ *
+ * - \c Seconds \c time \n
+ *   How much time will have elapsed since the last envelope event (start,
+ *   release start, sustain level change, etc.), at the next sample to be
+ *   rendered.
+ *
+ * - \c Number \c last_rendered_value \n
+ *   Last rendered value. (At the start, the envelope's initial value.)
+ *
+ * - \c EnvelopeStage \c stage \n
+ *   Which stage (delay, attack, hold, etc.) was active when the last sample
+ *   was rendered.
+ *
+ * (\c Envelope::render() will update these as necessary.)
  */
 class Envelope
 {
