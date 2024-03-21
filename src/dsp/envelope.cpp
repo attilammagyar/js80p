@@ -520,21 +520,21 @@ void Envelope::update() noexcept
     bool is_dirty;
 
     is_dirty = update_change_index(delay_time, delay_time_change_index);
-    is_dirty |= update_change_index(attack_time, attack_time_change_index);
-    is_dirty |= update_change_index(hold_time, hold_time_change_index);
-    is_dirty |= update_change_index(decay_time, decay_time_change_index);
+    is_dirty = update_change_index(attack_time, attack_time_change_index) || is_dirty;
+    is_dirty = update_change_index(hold_time, hold_time_change_index) || is_dirty;
+    is_dirty = update_change_index(decay_time, decay_time_change_index) || is_dirty;
 
-    is_dirty |= update_change_index<ToggleParam>(dynamic, dynamic_change_index);
+    is_dirty = update_change_index<ToggleParam>(dynamic, dynamic_change_index) || is_dirty;
 
-    is_dirty |= update_change_index(amount, amount_change_index);
-    is_dirty |= update_change_index(initial_value, initial_value_change_index);
-    is_dirty |= update_change_index(peak_value, peak_value_change_index);
-    is_dirty |= update_change_index(sustain_value, sustain_value_change_index);
-    is_dirty |= update_change_index(release_time, release_time_change_index);
-    is_dirty |= update_change_index(final_value, final_value_change_index);
+    is_dirty = update_change_index(amount, amount_change_index) || is_dirty;
+    is_dirty = update_change_index(initial_value, initial_value_change_index) || is_dirty;
+    is_dirty = update_change_index(peak_value, peak_value_change_index) || is_dirty;
+    is_dirty = update_change_index(sustain_value, sustain_value_change_index) || is_dirty;
+    is_dirty = update_change_index(release_time, release_time_change_index) || is_dirty;
+    is_dirty = update_change_index(final_value, final_value_change_index) || is_dirty;
 
-    is_dirty |= update_change_index(time_inaccuracy, time_inaccuracy_change_index);
-    is_dirty |= update_change_index(value_inaccuracy, value_inaccuracy_change_index);
+    is_dirty = update_change_index(time_inaccuracy, time_inaccuracy_change_index) || is_dirty;
+    is_dirty = update_change_index(value_inaccuracy, value_inaccuracy_change_index) || is_dirty;
 
     if (is_dirty) {
         ++change_index;
