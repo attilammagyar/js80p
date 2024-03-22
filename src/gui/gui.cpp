@@ -2095,7 +2095,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 393,   6,  90, 24, 66, Synth::ParamId::L1SYN);
     TOGG(lfos_body, 186,   6,  75, 24, 51, Synth::ParamId::L1CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L1AEN], 272, 7, aew, aeh, aetl, aetw, synth, Synth::ParamId::L1AEN, ae, aec
         )
     );
@@ -2111,7 +2111,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 873,   6,  90, 24, 66, Synth::ParamId::L2SYN);
     TOGG(lfos_body, 666,   6,  75, 24, 51, Synth::ParamId::L2CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L2AEN], 752, 7, aew, aeh, aetl, aetw, synth, Synth::ParamId::L2AEN, ae, aec
         )
     );
@@ -2127,7 +2127,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 393, 146,  90, 24, 66, Synth::ParamId::L3SYN);
     TOGG(lfos_body, 186, 146,  75, 24, 51, Synth::ParamId::L3CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L3AEN], 272, 147, aew, aeh, aetl, aetw, synth, Synth::ParamId::L3AEN, ae, aec
         )
     );
@@ -2143,7 +2143,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 873, 146,  90, 24, 66, Synth::ParamId::L4SYN);
     TOGG(lfos_body, 666, 146,  75, 24, 51, Synth::ParamId::L4CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L4AEN], 752, 147, aew, aeh, aetl, aetw, synth, Synth::ParamId::L4AEN, ae, aec
         )
     );
@@ -2159,7 +2159,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 393, 286,  90, 24, 66, Synth::ParamId::L5SYN);
     TOGG(lfos_body, 186, 286,  75, 24, 51, Synth::ParamId::L5CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L5AEN], 272, 287, aew, aeh, aetl, aetw, synth, Synth::ParamId::L5AEN, ae, aec
         )
     );
@@ -2175,7 +2175,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 873, 286,  90, 24, 66, Synth::ParamId::L6SYN);
     TOGG(lfos_body, 666, 286,  75, 24, 51, Synth::ParamId::L6CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L6AEN], 752, 287, aew, aeh, aetl, aetw, synth, Synth::ParamId::L6AEN, ae, aec
         )
     );
@@ -2191,7 +2191,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 393, 426,  90, 24, 66, Synth::ParamId::L7SYN);
     TOGG(lfos_body, 186, 426,  75, 24, 51, Synth::ParamId::L7CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L7AEN], 272, 427, aew, aeh, aetl, aetw, synth, Synth::ParamId::L7AEN, ae, aec
         )
     );
@@ -2207,7 +2207,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     TOGG(lfos_body, 873, 426,  90, 24, 66, Synth::ParamId::L8SYN);
     TOGG(lfos_body, 666, 426,  75, 24, 51, Synth::ParamId::L8CEN);
     lfos_body->own(
-        new TextBoxParamEditor(
+        new DiscreteParamEditor(
             *this, GUI::PARAMS[Synth::ParamId::L8AEN], 752, 427, aew, aeh, aetl, aetw, synth, Synth::ParamId::L8AEN, ae, aec
         )
     );
