@@ -1264,7 +1264,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
 
         template<class ParamClass>
-        void register_param(ParamId const param_id, ParamClass& param) noexcept;
+        void register_param(ParamId const param_id, ParamClass const& param) noexcept;
 
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;

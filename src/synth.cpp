@@ -701,7 +701,7 @@ void Synth::register_param_as_child(
 
 
 template<class ParamClass>
-void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
+void Synth::register_param(ParamId const param_id, ParamClass const& param) noexcept
 {
     std::string const& name = param.get_name();
 
