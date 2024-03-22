@@ -51,7 +51,7 @@ class GUI
     public:
         typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
-        typedef void* Image; ///< \breif GUI platform dependent image handle.
+        typedef void* Image; ///< \brief GUI platform dependent image handle.
 
         typedef std::vector<WidgetBase*> Widgets;
 
