@@ -1331,13 +1331,24 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
 #define SCREW_W 20
 #define SCREW_H 20
 
+constexpr int pos_rel_offset_left = 0;
+constexpr int pos_rel_offset_top = 0;
+
+#define POSITION_RELATIVE_BEGIN(left, top)                          \
+    do {                                                            \
+        constexpr int pos_rel_offset_left = left;                   \
+        constexpr int pos_rel_offset_top = top;                     \
+
+#define POSITION_RELATIVE_END()                                     \
+    } while (false)
+
 #define KNOB(owner, left, top, param_id, ctls, varg1, varg2, ks)    \
     owner->own(                                                     \
         new KnobParamEditor(                                        \
             *this,                                                  \
             GUI::PARAMS[param_id],                                  \
-            left,                                                   \
-            top,                                                    \
+            pos_rel_offset_left + left,                             \
+            pos_rel_offset_top + top,                               \
             KNOB_W,                                                 \
             KNOB_H,                                                 \
             KNOB_TOP,                                               \
@@ -1356,8 +1367,8 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         new KnobParamEditor(                                        \
             *this,                                                  \
             GUI::PARAMS[param_id],                                  \
-            left,                                                   \
-            top,                                                    \
+            pos_rel_offset_left + left,                             \
+            pos_rel_offset_top + top,                               \
             SCREW_W,                                                \
             SCREW_H,                                                \
             0,                                                      \
@@ -1376,8 +1387,8 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         new ToggleSwitchParamEditor(                                \
             *this,                                                  \
             GUI::PARAMS[param_id],                                  \
-            left,                                                   \
-            top,                                                    \
+            pos_rel_offset_left + left,                             \
+            pos_rel_offset_top + top,                               \
             width,                                                  \
             height,                                                 \
             box_left,                                               \
@@ -1606,94 +1617,134 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
 
     background->own(macros_1_body);
 
-    KNOB(macros_1_body,  21 + KNOB_W * 0,  44, Synth::ParamId::M1IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 1,  44, Synth::ParamId::M1MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 2,  44, Synth::ParamId::M1MAX,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(17, 14);
 
-    KNOB(macros_1_body,  21 + KNOB_W * 0, 164, Synth::ParamId::M1AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 1, 164, Synth::ParamId::M1DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 2, 164, Synth::ParamId::M1RND,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M1IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M1MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M1MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M1AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M1DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M1RND,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body, 211 + KNOB_W * 0,  44, Synth::ParamId::M2IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 1,  44, Synth::ParamId::M2MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 2,  44, Synth::ParamId::M2MAX,  MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_1_body, 211 + KNOB_W * 0, 164, Synth::ParamId::M2AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 1, 164, Synth::ParamId::M2DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 2, 164, Synth::ParamId::M2RND,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_1_body, 401 + KNOB_W * 0,  44, Synth::ParamId::M3IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 1,  44, Synth::ParamId::M3MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 2,  44, Synth::ParamId::M3MAX,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(207, 14);
 
-    KNOB(macros_1_body, 401 + KNOB_W * 0, 164, Synth::ParamId::M3AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 1, 164, Synth::ParamId::M3DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 2, 164, Synth::ParamId::M3RND,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M2IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M2MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M2MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M2AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M2DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M2RND,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body, 591 + KNOB_W * 0,  44, Synth::ParamId::M4IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 1,  44, Synth::ParamId::M4MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 2,  44, Synth::ParamId::M4MAX,  MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_1_body, 591 + KNOB_W * 0, 164, Synth::ParamId::M4AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 1, 164, Synth::ParamId::M4DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 2, 164, Synth::ParamId::M4RND,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_1_body, 781 + KNOB_W * 0,  44, Synth::ParamId::M5IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 1,  44, Synth::ParamId::M5MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 2,  44, Synth::ParamId::M5MAX,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(397, 14);
 
-    KNOB(macros_1_body, 781 + KNOB_W * 0, 164, Synth::ParamId::M5AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 1, 164, Synth::ParamId::M5DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 2, 164, Synth::ParamId::M5RND,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M3IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M3MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M3MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M3AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M3DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M3RND,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,  21 + KNOB_W * 0, 324, Synth::ParamId::M6IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 1, 324, Synth::ParamId::M6MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 2, 324, Synth::ParamId::M6MAX,  MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_1_body,  21 + KNOB_W * 0, 444, Synth::ParamId::M6AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 1, 444, Synth::ParamId::M6DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body,  21 + KNOB_W * 2, 444, Synth::ParamId::M6RND,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_1_body, 211 + KNOB_W * 0, 324, Synth::ParamId::M7IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 1, 324, Synth::ParamId::M7MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 2, 324, Synth::ParamId::M7MAX,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(587, 14);
 
-    KNOB(macros_1_body, 211 + KNOB_W * 0, 444, Synth::ParamId::M7AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 1, 444, Synth::ParamId::M7DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 211 + KNOB_W * 2, 444, Synth::ParamId::M7RND,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M4IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M4MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M4MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M4AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M4DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M4RND,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body, 401 + KNOB_W * 0, 324, Synth::ParamId::M8IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 1, 324, Synth::ParamId::M8MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 2, 324, Synth::ParamId::M8MAX,  MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_1_body, 401 + KNOB_W * 0, 444, Synth::ParamId::M8AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 1, 444, Synth::ParamId::M8DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 401 + KNOB_W * 2, 444, Synth::ParamId::M8RND,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_1_body, 591 + KNOB_W * 0, 324, Synth::ParamId::M9IN,   MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 1, 324, Synth::ParamId::M9MIN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 2, 324, Synth::ParamId::M9MAX,  MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(777, 14);
 
-    KNOB(macros_1_body, 591 + KNOB_W * 0, 444, Synth::ParamId::M9AMT,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 1, 444, Synth::ParamId::M9DST,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 591 + KNOB_W * 2, 444, Synth::ParamId::M9RND,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M5IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M5MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M5MAX,  MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M5AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M5DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M5RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_1_body, 781 + KNOB_W * 0, 324, Synth::ParamId::M10IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 1, 324, Synth::ParamId::M10MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 2, 324, Synth::ParamId::M10MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(17, 294);
 
-    KNOB(macros_1_body, 781 + KNOB_W * 0, 444, Synth::ParamId::M10AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 1, 444, Synth::ParamId::M10DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_1_body, 781 + KNOB_W * 2, 444, Synth::ParamId::M10RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M6IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M6MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M6MAX,  MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M6AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M6DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M6RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(207, 294);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M7IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M7MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M7MAX,  MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M7AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M7DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M7RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(397, 294);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M8IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M8MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M8MAX,  MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M8AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M8DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M8RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(587, 294);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M9IN,   MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M9MIN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M9MAX,  MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M9AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M9DST,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M9RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(777, 294);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M10IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M10MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M10MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M10AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M10DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M10RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
 
     macros_1_body->hide();
 }
@@ -1705,94 +1756,134 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
 
     background->own(macros_2_body);
 
-    KNOB(macros_2_body,  21 + KNOB_W * 0,  44, Synth::ParamId::M11IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 1,  44, Synth::ParamId::M11MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 2,  44, Synth::ParamId::M11MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(17, 14);
 
-    KNOB(macros_2_body,  21 + KNOB_W * 0, 164, Synth::ParamId::M11AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 1, 164, Synth::ParamId::M11DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 2, 164, Synth::ParamId::M11RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M11IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M11MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M11MAX, MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M11AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M11DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M11RND, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body, 211 + KNOB_W * 0,  44, Synth::ParamId::M12IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 1,  44, Synth::ParamId::M12MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 2,  44, Synth::ParamId::M12MAX, MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_2_body, 211 + KNOB_W * 0, 164, Synth::ParamId::M12AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 1, 164, Synth::ParamId::M12DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 2, 164, Synth::ParamId::M12RND, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_2_body, 401 + KNOB_W * 0,  44, Synth::ParamId::M13IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 1,  44, Synth::ParamId::M13MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 2,  44, Synth::ParamId::M13MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(207, 14);
 
-    KNOB(macros_2_body, 401 + KNOB_W * 0, 164, Synth::ParamId::M13AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 1, 164, Synth::ParamId::M13DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 2, 164, Synth::ParamId::M13RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M12IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M12MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M12MAX, MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M12AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M12DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M12RND, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body, 591 + KNOB_W * 0,  44, Synth::ParamId::M14IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 1,  44, Synth::ParamId::M14MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 2,  44, Synth::ParamId::M14MAX, MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_2_body, 591 + KNOB_W * 0, 164, Synth::ParamId::M14AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 1, 164, Synth::ParamId::M14DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 2, 164, Synth::ParamId::M14RND, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_2_body, 781 + KNOB_W * 0,  44, Synth::ParamId::M15IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 1,  44, Synth::ParamId::M15MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 2,  44, Synth::ParamId::M15MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(397, 14);
 
-    KNOB(macros_2_body, 781 + KNOB_W * 0, 164, Synth::ParamId::M15AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 1, 164, Synth::ParamId::M15DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 2, 164, Synth::ParamId::M15RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M13IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M13MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M13MAX, MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M13AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M13DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M13RND, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,  21 + KNOB_W * 0, 324, Synth::ParamId::M16IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 1, 324, Synth::ParamId::M16MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 2, 324, Synth::ParamId::M16MAX, MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_2_body,  21 + KNOB_W * 0, 444, Synth::ParamId::M16AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 1, 444, Synth::ParamId::M16DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body,  21 + KNOB_W * 2, 444, Synth::ParamId::M16RND, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_2_body, 211 + KNOB_W * 0, 324, Synth::ParamId::M17IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 1, 324, Synth::ParamId::M17MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 2, 324, Synth::ParamId::M17MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(587, 14);
 
-    KNOB(macros_2_body, 211 + KNOB_W * 0, 444, Synth::ParamId::M17AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 1, 444, Synth::ParamId::M17DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 211 + KNOB_W * 2, 444, Synth::ParamId::M17RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M14IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M14MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M14MAX, MM__C,  "%.2f", 100.0, knob_states);
 
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M14AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M14DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M14RND, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body, 401 + KNOB_W * 0, 324, Synth::ParamId::M18IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 1, 324, Synth::ParamId::M18MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 2, 324, Synth::ParamId::M18MAX, MM__C,  "%.2f", 100.0, knob_states);
-
-    KNOB(macros_2_body, 401 + KNOB_W * 0, 444, Synth::ParamId::M18AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 1, 444, Synth::ParamId::M18DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 401 + KNOB_W * 2, 444, Synth::ParamId::M18RND, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_2_body, 591 + KNOB_W * 0, 324, Synth::ParamId::M19IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 1, 324, Synth::ParamId::M19MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 2, 324, Synth::ParamId::M19MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(777, 14);
 
-    KNOB(macros_2_body, 591 + KNOB_W * 0, 444, Synth::ParamId::M19AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 1, 444, Synth::ParamId::M19DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 591 + KNOB_W * 2, 444, Synth::ParamId::M19RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M15IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M15MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M15MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M15AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M15DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M15RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
 
 
-    KNOB(macros_2_body, 781 + KNOB_W * 0, 324, Synth::ParamId::M20IN,  MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 1, 324, Synth::ParamId::M20MIN, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 2, 324, Synth::ParamId::M20MAX, MM__C,  "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(17, 294);
 
-    KNOB(macros_2_body, 781 + KNOB_W * 0, 444, Synth::ParamId::M20AMT, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 1, 444, Synth::ParamId::M20DST, MM__C,  "%.2f", 100.0, knob_states);
-    KNOB(macros_2_body, 781 + KNOB_W * 2, 444, Synth::ParamId::M20RND, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M16IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M16MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M16MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M16AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M16DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M16RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(207, 294);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M17IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M17MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M17MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M17AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M17DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M17RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(397, 294);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M18IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M18MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M18MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M18AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M18DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M18RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(587, 294);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M19IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M19MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M19MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M19AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M19DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M19RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(777, 294);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M20IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M20MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M20MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M20AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M20DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M20RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
 
     macros_2_body->hide();
 }
@@ -1891,112 +1982,136 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     background->own(envelopes_1_body);
 
 
-    KNOB(envelopes_1_body,  37 + KNOB_W * 0,  45, Synth::ParamId::N1AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 1,  45, Synth::ParamId::N1INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 2,  45, Synth::ParamId::N1PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 3,  45, Synth::ParamId::N1SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 4,  45, Synth::ParamId::N1FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(33, 13);
 
-    KNOB(envelopes_1_body,  37 + KNOB_W * 0, 165, Synth::ParamId::N1DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 1, 165, Synth::ParamId::N1ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 2, 165, Synth::ParamId::N1HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 3, 165, Synth::ParamId::N1DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 4, 165, Synth::ParamId::N1REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N1AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N1INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N1PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N1SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N1FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_1_body, 285, 17, Synth::ParamId::N1TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 305, 17, Synth::ParamId::N1VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N1DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N1ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N1HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N1DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N1REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_1_body, 231,  15, 46, 24, 25, Synth::ParamId::N1DYN);
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N1TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N1VIN, "%.2f%%", 100.0, screw_states);
 
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N1DYN);
 
-    KNOB(envelopes_1_body, 343 + KNOB_W * 0,  45, Synth::ParamId::N2AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 1,  45, Synth::ParamId::N2INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 2,  45, Synth::ParamId::N2PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 3,  45, Synth::ParamId::N2SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 4,  45, Synth::ParamId::N2FIN,  MM___,     "%.2f", 100.0, knob_states);
-
-    KNOB(envelopes_1_body, 343 + KNOB_W * 0, 165, Synth::ParamId::N2DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 1, 165, Synth::ParamId::N2ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 2, 165, Synth::ParamId::N2HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 3, 165, Synth::ParamId::N2DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 4, 165, Synth::ParamId::N2REL,  MM___,     "%.3f", 1.0, knob_states);
-
-    SCREW(envelopes_1_body, 591, 17, Synth::ParamId::N2TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 611, 17, Synth::ParamId::N2VIN, "%.2f%%", 100.0, screw_states);
-
-    TOGG(envelopes_1_body, 537,  15, 46, 24, 25, Synth::ParamId::N2DYN);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_1_body, 649 + KNOB_W * 0,  45, Synth::ParamId::N3AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 1,  45, Synth::ParamId::N3INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 2,  45, Synth::ParamId::N3PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 3,  45, Synth::ParamId::N3SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 4,  45, Synth::ParamId::N3FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(339, 13);
 
-    KNOB(envelopes_1_body, 649 + KNOB_W * 0, 165, Synth::ParamId::N3DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 1, 165, Synth::ParamId::N3ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 2, 165, Synth::ParamId::N3HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 3, 165, Synth::ParamId::N3DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 4, 165, Synth::ParamId::N3REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N2AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N2INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N2PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N2SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N2FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_1_body, 897, 17, Synth::ParamId::N3TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 917, 17, Synth::ParamId::N3VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N2DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N2ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N2HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N2DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N2REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_1_body, 843,  15, 46, 24, 25, Synth::ParamId::N3DYN);
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N2TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N2VIN, "%.2f%%", 100.0, screw_states);
 
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N2DYN);
 
-    KNOB(envelopes_1_body,  37 + KNOB_W * 0, 323, Synth::ParamId::N4AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 1, 323, Synth::ParamId::N4INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 2, 323, Synth::ParamId::N4PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 3, 323, Synth::ParamId::N4SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 4, 323, Synth::ParamId::N4FIN,  MM___,     "%.2f", 100.0, knob_states);
-
-    KNOB(envelopes_1_body,  37 + KNOB_W * 0, 443, Synth::ParamId::N4DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 1, 443, Synth::ParamId::N4ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 2, 443, Synth::ParamId::N4HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 3, 443, Synth::ParamId::N4DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body,  37 + KNOB_W * 4, 443, Synth::ParamId::N4REL,  MM___,     "%.3f", 1.0, knob_states);
-
-    SCREW(envelopes_1_body, 285, 297, Synth::ParamId::N4TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 305, 297, Synth::ParamId::N4VIN, "%.2f%%", 100.0, screw_states);
-
-    TOGG(envelopes_1_body, 231, 295, 46, 24, 25, Synth::ParamId::N4DYN);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_1_body, 343 + KNOB_W * 0, 323, Synth::ParamId::N5AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 1, 323, Synth::ParamId::N5INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 2, 323, Synth::ParamId::N5PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 3, 323, Synth::ParamId::N5SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 4, 323, Synth::ParamId::N5FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(645, 13);
 
-    KNOB(envelopes_1_body, 343 + KNOB_W * 0, 443, Synth::ParamId::N5DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 1, 443, Synth::ParamId::N5ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 2, 443, Synth::ParamId::N5HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 3, 443, Synth::ParamId::N5DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 343 + KNOB_W * 4, 443, Synth::ParamId::N5REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N3AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N3INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N3PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N3SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N3FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_1_body, 591, 297, Synth::ParamId::N5TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 611, 297, Synth::ParamId::N5VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N3DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N3ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N3HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N3DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N3REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_1_body, 537, 295, 46, 24, 25, Synth::ParamId::N5DYN);
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N3TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N3VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N3DYN);
+
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_1_body, 649 + KNOB_W * 0, 323, Synth::ParamId::N6AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 1, 323, Synth::ParamId::N6INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 2, 323, Synth::ParamId::N6PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 3, 323, Synth::ParamId::N6SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 4, 323, Synth::ParamId::N6FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(33, 293);
 
-    KNOB(envelopes_1_body, 649 + KNOB_W * 0, 443, Synth::ParamId::N6DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 1, 443, Synth::ParamId::N6ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 2, 443, Synth::ParamId::N6HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 3, 443, Synth::ParamId::N6DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_1_body, 649 + KNOB_W * 4, 443, Synth::ParamId::N6REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N4AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N4INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N4PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N4SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N4FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_1_body, 897, 297, Synth::ParamId::N6TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_1_body, 917, 297, Synth::ParamId::N6VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N4DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N4ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N4HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N4DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N4REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_1_body, 843, 295, 46, 24, 25, Synth::ParamId::N6DYN);
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N4TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N4VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N4DYN);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(339, 293);
+
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N5AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N5INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N5PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N5SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N5FIN,  MM___,     "%.2f", 100.0, knob_states);
+
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N5DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N5ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N5HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N5DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N5REL,  MM___,     "%.3f", 1.0, knob_states);
+
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N5TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N5VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N5DYN);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(645, 293);
+
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N6AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N6INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N6PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N6SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N6FIN,  MM___,     "%.2f", 100.0, knob_states);
+
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N6DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N6ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N6HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N6DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N6REL,  MM___,     "%.3f", 1.0, knob_states);
+
+    SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N6TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N6VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N6DYN);
+
+    POSITION_RELATIVE_END();
 
     envelopes_1_body->hide();
 }
@@ -2009,112 +2124,136 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     background->own(envelopes_2_body);
 
 
-    KNOB(envelopes_2_body,  37 + KNOB_W * 0,  45, Synth::ParamId::N7AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 1,  45, Synth::ParamId::N7INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 2,  45, Synth::ParamId::N7PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 3,  45, Synth::ParamId::N7SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 4,  45, Synth::ParamId::N7FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(33, 13);
 
-    KNOB(envelopes_2_body,  37 + KNOB_W * 0, 165, Synth::ParamId::N7DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 1, 165, Synth::ParamId::N7ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 2, 165, Synth::ParamId::N7HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 3, 165, Synth::ParamId::N7DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 4, 165, Synth::ParamId::N7REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N7AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N7INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N7PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N7SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N7FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_2_body, 285, 17, Synth::ParamId::N7TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 305, 17, Synth::ParamId::N7VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N7DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N7ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N7HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N7DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N7REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_2_body, 231,  15, 46, 24, 25, Synth::ParamId::N7DYN);
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N7TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N7VIN, "%.2f%%", 100.0, screw_states);
 
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N7DYN);
 
-    KNOB(envelopes_2_body, 343 + KNOB_W * 0,  45, Synth::ParamId::N8AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 1,  45, Synth::ParamId::N8INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 2,  45, Synth::ParamId::N8PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 3,  45, Synth::ParamId::N8SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 4,  45, Synth::ParamId::N8FIN,  MM___,     "%.2f", 100.0, knob_states);
-
-    KNOB(envelopes_2_body, 343 + KNOB_W * 0, 165, Synth::ParamId::N8DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 1, 165, Synth::ParamId::N8ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 2, 165, Synth::ParamId::N8HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 3, 165, Synth::ParamId::N8DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 4, 165, Synth::ParamId::N8REL,  MM___,     "%.3f", 1.0, knob_states);
-
-    SCREW(envelopes_2_body, 591, 17, Synth::ParamId::N8TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 611, 17, Synth::ParamId::N8VIN, "%.2f%%", 100.0, screw_states);
-
-    TOGG(envelopes_2_body, 537,  15, 46, 24, 25, Synth::ParamId::N8DYN);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_2_body, 649 + KNOB_W * 0,  45, Synth::ParamId::N9AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 1,  45, Synth::ParamId::N9INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 2,  45, Synth::ParamId::N9PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 3,  45, Synth::ParamId::N9SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 4,  45, Synth::ParamId::N9FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(339, 13);
 
-    KNOB(envelopes_2_body, 649 + KNOB_W * 0, 165, Synth::ParamId::N9DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 1, 165, Synth::ParamId::N9ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 2, 165, Synth::ParamId::N9HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 3, 165, Synth::ParamId::N9DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 4, 165, Synth::ParamId::N9REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N8AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N8INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N8PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N8SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N8FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_2_body, 897, 17, Synth::ParamId::N9TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 917, 17, Synth::ParamId::N9VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N8DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N8ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N8HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N8DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N8REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_2_body, 843,  15, 46, 24, 25, Synth::ParamId::N9DYN);
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N8TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N8VIN, "%.2f%%", 100.0, screw_states);
 
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N8DYN);
 
-    KNOB(envelopes_2_body,  37 + KNOB_W * 0, 323, Synth::ParamId::N10AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 1, 323, Synth::ParamId::N10INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 2, 323, Synth::ParamId::N10PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 3, 323, Synth::ParamId::N10SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 4, 323, Synth::ParamId::N10FIN,  MM___,     "%.2f", 100.0, knob_states);
-
-    KNOB(envelopes_2_body,  37 + KNOB_W * 0, 443, Synth::ParamId::N10DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 1, 443, Synth::ParamId::N10ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 2, 443, Synth::ParamId::N10HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 3, 443, Synth::ParamId::N10DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body,  37 + KNOB_W * 4, 443, Synth::ParamId::N10REL,  MM___,     "%.3f", 1.0, knob_states);
-
-    SCREW(envelopes_2_body, 285, 297, Synth::ParamId::N10TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 305, 297, Synth::ParamId::N10VIN, "%.2f%%", 100.0, screw_states);
-
-    TOGG(envelopes_2_body, 231, 295, 46, 24, 25, Synth::ParamId::N10DYN);
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_2_body, 343 + KNOB_W * 0, 323, Synth::ParamId::N11AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 1, 323, Synth::ParamId::N11INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 2, 323, Synth::ParamId::N11PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 3, 323, Synth::ParamId::N11SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 4, 323, Synth::ParamId::N11FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(645, 13);
 
-    KNOB(envelopes_2_body, 343 + KNOB_W * 0, 443, Synth::ParamId::N11DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 1, 443, Synth::ParamId::N11ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 2, 443, Synth::ParamId::N11HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 3, 443, Synth::ParamId::N11DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 343 + KNOB_W * 4, 443, Synth::ParamId::N11REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N9AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N9INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N9PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N9SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N9FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_2_body, 591, 297, Synth::ParamId::N11TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 611, 297, Synth::ParamId::N11VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N9DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N9ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N9HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N9DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N9REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_2_body, 537, 295, 46, 24, 25, Synth::ParamId::N11DYN);
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N9TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N9VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N9DYN);
+
+    POSITION_RELATIVE_END();
 
 
-    KNOB(envelopes_2_body, 649 + KNOB_W * 0, 323, Synth::ParamId::N12AMT,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 1, 323, Synth::ParamId::N12INI,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 2, 323, Synth::ParamId::N12PK,   MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 3, 323, Synth::ParamId::N12SUS,  MM___,     "%.2f", 100.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 4, 323, Synth::ParamId::N12FIN,  MM___,     "%.2f", 100.0, knob_states);
+    POSITION_RELATIVE_BEGIN(33, 293);
 
-    KNOB(envelopes_2_body, 649 + KNOB_W * 0, 443, Synth::ParamId::N12DEL,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 1, 443, Synth::ParamId::N12ATK,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 2, 443, Synth::ParamId::N12HLD,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 3, 443, Synth::ParamId::N12DEC,  MM___,     "%.3f", 1.0, knob_states);
-    KNOB(envelopes_2_body, 649 + KNOB_W * 4, 443, Synth::ParamId::N12REL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N10AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N10INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N10PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N10SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N10FIN,  MM___,     "%.2f", 100.0, knob_states);
 
-    SCREW(envelopes_2_body, 897, 297, Synth::ParamId::N12TIN, "%.2f%%", 100.0, screw_states);
-    SCREW(envelopes_2_body, 917, 297, Synth::ParamId::N12VIN, "%.2f%%", 100.0, screw_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N10DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N10ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N10HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N10DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N10REL,  MM___,     "%.3f", 1.0, knob_states);
 
-    TOGG(envelopes_2_body, 843, 295, 46, 24, 25, Synth::ParamId::N12DYN);
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N10TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N10VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N10DYN);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(339, 293);
+
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N11AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N11INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N11PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N11SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N11FIN,  MM___,     "%.2f", 100.0, knob_states);
+
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N11DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N11ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N11HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N11DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N11REL,  MM___,     "%.3f", 1.0, knob_states);
+
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N11TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N11VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N11DYN);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(645, 293);
+
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N12AMT,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N12INI,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N12PK,   MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N12SUS,  MM___,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4,  32, Synth::ParamId::N12FIN,  MM___,     "%.2f", 100.0, knob_states);
+
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0, 152, Synth::ParamId::N12DEL,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 1, 152, Synth::ParamId::N12ATK,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 2, 152, Synth::ParamId::N12HLD,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 3, 152, Synth::ParamId::N12DEC,  MM___,     "%.3f", 1.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 4, 152, Synth::ParamId::N12REL,  MM___,     "%.3f", 1.0, knob_states);
+
+    SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N12TIN, "%.2f%%", 100.0, screw_states);
+    SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N12VIN, "%.2f%%", 100.0, screw_states);
+
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N12DYN);
+
+    POSITION_RELATIVE_END();
 
     envelopes_2_body->hide();
 }
@@ -2136,133 +2275,165 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     constexpr char const* const* ae = JS80P::GUI::LFO_AMOUNT_ENVELOPES;
     constexpr int aec = JS80P::GUI::LFO_AMOUNT_ENVELOPES_COUNT;
 
-    KNOB(lfos_body,  16 + KNOB_W * 0,  32, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 1,  32, Synth::ParamId::L1FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 2,  32, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 3,  32, Synth::ParamId::L1MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 4,  32, Synth::ParamId::L1MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 5,  32, Synth::ParamId::L1AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 6,  32, Synth::ParamId::L1DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 7,  32, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 393,   6,  90, 24, 66, Synth::ParamId::L1SYN);
-    TOGG(lfos_body, 186,   6,  75, 24, 51, Synth::ParamId::L1CEN);
+    POSITION_RELATIVE_BEGIN(12, 4);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L1FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L1MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L1MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L1AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L1DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L1SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L1CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L1AEN], 272, 7, aew, aeh, aetl, aetw, synth, Synth::ParamId::L1AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L1AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L1AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body, 496 + KNOB_W * 0,  32, Synth::ParamId::L2WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 1,  32, Synth::ParamId::L2FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 2,  32, Synth::ParamId::L2PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 3,  32, Synth::ParamId::L2MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 4,  32, Synth::ParamId::L2MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 5,  32, Synth::ParamId::L2AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 6,  32, Synth::ParamId::L2DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 7,  32, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 873,   6,  90, 24, 66, Synth::ParamId::L2SYN);
-    TOGG(lfos_body, 666,   6,  75, 24, 51, Synth::ParamId::L2CEN);
+    POSITION_RELATIVE_BEGIN(492, 4);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L2WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L2FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L2PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L2MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L2MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L2AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L2DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L2SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L2CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L2AEN], 752, 7, aew, aeh, aetl, aetw, synth, Synth::ParamId::L2AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L2AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L2AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body,  16 + KNOB_W * 0, 172, Synth::ParamId::L3WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 1, 172, Synth::ParamId::L3FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 2, 172, Synth::ParamId::L3PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 3, 172, Synth::ParamId::L3MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 4, 172, Synth::ParamId::L3MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 5, 172, Synth::ParamId::L3AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 6, 172, Synth::ParamId::L3DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 7, 172, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 393, 146,  90, 24, 66, Synth::ParamId::L3SYN);
-    TOGG(lfos_body, 186, 146,  75, 24, 51, Synth::ParamId::L3CEN);
+    POSITION_RELATIVE_BEGIN(12, 144);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L3WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L3FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L3PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L3MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L3MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L3AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L3DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L3SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L3CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L3AEN], 272, 147, aew, aeh, aetl, aetw, synth, Synth::ParamId::L3AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L3AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L3AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body, 496 + KNOB_W * 0, 172, Synth::ParamId::L4WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 1, 172, Synth::ParamId::L4FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 2, 172, Synth::ParamId::L4PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 3, 172, Synth::ParamId::L4MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 4, 172, Synth::ParamId::L4MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 5, 172, Synth::ParamId::L4AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 6, 172, Synth::ParamId::L4DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 7, 172, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 873, 146,  90, 24, 66, Synth::ParamId::L4SYN);
-    TOGG(lfos_body, 666, 146,  75, 24, 51, Synth::ParamId::L4CEN);
+    POSITION_RELATIVE_BEGIN(492, 144);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L4WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L4FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L4PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L4MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L4MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L4AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L4DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L4SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L4CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L4AEN], 752, 147, aew, aeh, aetl, aetw, synth, Synth::ParamId::L4AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L4AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L4AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body,  16 + KNOB_W * 0, 312, Synth::ParamId::L5WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 1, 312, Synth::ParamId::L5FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 2, 312, Synth::ParamId::L5PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 3, 312, Synth::ParamId::L5MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 4, 312, Synth::ParamId::L5MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 5, 312, Synth::ParamId::L5AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 6, 312, Synth::ParamId::L5DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 7, 312, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 393, 286,  90, 24, 66, Synth::ParamId::L5SYN);
-    TOGG(lfos_body, 186, 286,  75, 24, 51, Synth::ParamId::L5CEN);
+    POSITION_RELATIVE_BEGIN(12, 284);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L5WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L5FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L5PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L5MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L5MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L5AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L5DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L5SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L5CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L5AEN], 272, 287, aew, aeh, aetl, aetw, synth, Synth::ParamId::L5AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L5AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L5AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body, 496 + KNOB_W * 0, 312, Synth::ParamId::L6WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 1, 312, Synth::ParamId::L6FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 2, 312, Synth::ParamId::L6PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 3, 312, Synth::ParamId::L6MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 4, 312, Synth::ParamId::L6MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 5, 312, Synth::ParamId::L6AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 6, 312, Synth::ParamId::L6DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 7, 312, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 873, 286,  90, 24, 66, Synth::ParamId::L6SYN);
-    TOGG(lfos_body, 666, 286,  75, 24, 51, Synth::ParamId::L6CEN);
+    POSITION_RELATIVE_BEGIN(492, 284);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L6WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L6FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L6PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L6MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L6MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L6AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L6DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L6SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L6CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L6AEN], 752, 287, aew, aeh, aetl, aetw, synth, Synth::ParamId::L6AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L6AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L6AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body,  16 + KNOB_W * 0, 452, Synth::ParamId::L7WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 1, 452, Synth::ParamId::L7FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 2, 452, Synth::ParamId::L7PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 3, 452, Synth::ParamId::L7MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 4, 452, Synth::ParamId::L7MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 5, 452, Synth::ParamId::L7AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 6, 452, Synth::ParamId::L7DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,  16 + KNOB_W * 7, 452, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 393, 426,  90, 24, 66, Synth::ParamId::L7SYN);
-    TOGG(lfos_body, 186, 426,  75, 24, 51, Synth::ParamId::L7CEN);
+    POSITION_RELATIVE_BEGIN(12, 424);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L7WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L7FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L7PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L7MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L7MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L7AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L7DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L7SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L7CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L7AEN], 272, 427, aew, aeh, aetl, aetw, synth, Synth::ParamId::L7AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L7AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L7AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
-    KNOB(lfos_body, 496 + KNOB_W * 0, 452, Synth::ParamId::L8WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 1, 452, Synth::ParamId::L8FRQ,  MML_C,    "%.2f", 1.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 2, 452, Synth::ParamId::L8PHS,  MML_C,    "%.1f", 360.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 3, 452, Synth::ParamId::L8MIN,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 4, 452, Synth::ParamId::L8MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 5, 452, Synth::ParamId::L8AMT,  MML_C,    "%.2f", 200.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 6, 452, Synth::ParamId::L8DST,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body, 496 + KNOB_W * 7, 452, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
-    TOGG(lfos_body, 873, 426,  90, 24, 66, Synth::ParamId::L8SYN);
-    TOGG(lfos_body, 666, 426,  75, 24, 51, Synth::ParamId::L8CEN);
+    POSITION_RELATIVE_BEGIN(492, 424);
+    constexpr int ael = pos_rel_offset_left + 260;
+    constexpr int aet = pos_rel_offset_top + 3;
+    KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L8WAV,  MM___,    wf, wfc, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L8FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L8PHS,  MML_C,    "%.1f", 360.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L8MIN,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L8MAX,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L8AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L8DST,  MML_C,    "%.2f", 100.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L8SYN);
+    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L8CEN);
     lfos_body->own(
         new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L8AEN], 752, 427, aew, aeh, aetl, aetw, synth, Synth::ParamId::L8AEN, ae, aec
+            *this, GUI::PARAMS[Synth::ParamId::L8AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L8AEN, ae, aec
         )
     );
+    POSITION_RELATIVE_END();
 
     lfos_body->hide();
 }
