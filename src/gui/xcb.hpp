@@ -257,7 +257,7 @@ class Widget : public WidgetBase
             | Type::TAB_SELECTOR
             | Type::STATUS_LINE
             | Type::TOGGLE_SWITCH
-            | Type::TEXT_BOX_PARAM_EDITOR
+            | Type::DISCRETE_PARAM_EDITOR
         );
 
         class Resource;

@@ -172,13 +172,13 @@ ToggleSwitchParamEditor* TabBody::own(ToggleSwitchParamEditor* toggle_switch_par
 }
 
 
-TextBoxParamEditor* TabBody::own(TextBoxParamEditor* text_box_param_editor)
+DiscreteParamEditor* TabBody::own(DiscreteParamEditor* discrete_param_editor)
 {
-    Widget::own(text_box_param_editor);
+    Widget::own(discrete_param_editor);
 
-    text_box_param_editors.push_back(text_box_param_editor);
+    discrete_param_editors.push_back(discrete_param_editor);
 
-    return text_box_param_editor;
+    return discrete_param_editor;
 }
 
 
@@ -212,7 +212,7 @@ void TabBody::refresh_all_params()
         (*it)->refresh();
     }
 
-    for (GUI::TextBoxParamEditors::iterator it = text_box_param_editors.begin(); it != text_box_param_editors.end(); ++it) {
+    for (GUI::DiscreteParamEditors::iterator it = discrete_param_editors.begin(); it != discrete_param_editors.end(); ++it) {
         (*it)->refresh();
     }
 }
@@ -1462,28 +1462,28 @@ void ToggleSwitchParamEditor::stop_editing()
 }
 
 
-TextBoxParamEditor::TextBoxParamEditor(
+DiscreteParamEditor::DiscreteParamEditor(
         GUI& gui,
         char const* const text,
         int const left,
         int const top,
         int const width,
         int const height,
-        int const text_left,
-        int const text_width,
+        int const value_left,
+        int const value_width,
         Synth& synth,
         Synth::ParamId const param_id,
         char const* const* const options,
         int const options_count
-) : TransparentWidget(text, left, top, width, height, Type::TEXT_BOX_PARAM_EDITOR),
+) : TransparentWidget(text, left, top, width, height, Type::DISCRETE_PARAM_EDITOR),
     param_id(param_id),
     synth(synth),
     ratio(0.0),
     step_size(1.001 / synth.get_param_max_value(param_id)),
     options(options),
     options_count(options_count),
-    text_left(text_left),
-    text_width(text_width),
+    value_left(value_left),
+    value_width(value_width),
     is_editing_(false)
 {
     set_gui(gui);
@@ -1491,7 +1491,7 @@ TextBoxParamEditor::TextBoxParamEditor(
 }
 
 
-void TextBoxParamEditor::refresh()
+void DiscreteParamEditor::refresh()
 {
     if (is_editing()) {
         return;
@@ -1512,13 +1512,13 @@ void TextBoxParamEditor::refresh()
 }
 
 
-void TextBoxParamEditor::update_value_str()
+void DiscreteParamEditor::update_value_str()
 {
     update_value_str(synth.int_param_ratio_to_display_value(param_id, ratio));
 }
 
 
-void TextBoxParamEditor::update_value_str(Byte const value)
+void DiscreteParamEditor::update_value_str(Byte const value)
 {
     GUI::param_ratio_to_str(
         synth,
@@ -1534,37 +1534,37 @@ void TextBoxParamEditor::update_value_str(Byte const value)
 }
 
 
-bool TextBoxParamEditor::is_editing() const
+bool DiscreteParamEditor::is_editing() const
 {
     return is_editing_;
 }
 
 
-void TextBoxParamEditor::start_editing()
+void DiscreteParamEditor::start_editing()
 {
     is_editing_ = true;
 }
 
 
-void TextBoxParamEditor::stop_editing()
+void DiscreteParamEditor::stop_editing()
 {
     is_editing_ = false;
 }
 
 
-bool TextBoxParamEditor::paint()
+bool DiscreteParamEditor::paint()
 {
     TransparentWidget::paint();
 
     draw_text(
-        value_str, 10, text_left, 0, text_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+        value_str, 10, value_left, 0, value_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
     );
 
     return true;
 }
 
 
-bool TextBoxParamEditor::mouse_up(int const x, int const y)
+bool DiscreteParamEditor::mouse_up(int const x, int const y)
 {
     TransparentWidget::mouse_up(x, y);
 
@@ -1574,7 +1574,7 @@ bool TextBoxParamEditor::mouse_up(int const x, int const y)
 }
 
 
-void TextBoxParamEditor::set_ratio(Number const new_ratio)
+void DiscreteParamEditor::set_ratio(Number const new_ratio)
 {
     Number const old_ratio = ratio;
 
@@ -1599,7 +1599,7 @@ void TextBoxParamEditor::set_ratio(Number const new_ratio)
 
 
 
-bool TextBoxParamEditor::mouse_move(int const x, int const y, bool const modifier)
+bool DiscreteParamEditor::mouse_move(int const x, int const y, bool const modifier)
 {
     TransparentWidget::mouse_move(x, y, modifier);
 
@@ -1610,7 +1610,7 @@ bool TextBoxParamEditor::mouse_move(int const x, int const y, bool const modifie
 }
 
 
-bool TextBoxParamEditor::mouse_leave(int const x, int const y)
+bool DiscreteParamEditor::mouse_leave(int const x, int const y)
 {
     TransparentWidget::mouse_leave(x, y);
 
@@ -1621,7 +1621,7 @@ bool TextBoxParamEditor::mouse_leave(int const x, int const y)
 }
 
 
-bool TextBoxParamEditor::mouse_wheel(Number const delta, bool const modifier)
+bool DiscreteParamEditor::mouse_wheel(Number const delta, bool const modifier)
 {
     TransparentWidget::mouse_wheel(delta, modifier);
 
@@ -1638,7 +1638,7 @@ TuningSelector::TuningSelector(
         int const top,
         Synth& synth,
         Synth::ParamId const param_id
-) : TextBoxParamEditor(
+) : DiscreteParamEditor(
         gui,
         text,
         left,
@@ -1689,7 +1689,7 @@ void TuningSelector::update_value_str()
     Byte const value = synth.int_param_ratio_to_display_value(param_id, ratio);
 
     if ((Modulator::Tuning)value < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
-        TextBoxParamEditor::update_value_str(value);
+        DiscreteParamEditor::update_value_str(value);
 
         return;
     }

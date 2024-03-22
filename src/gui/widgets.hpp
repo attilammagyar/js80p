@@ -123,7 +123,7 @@ class TabBody : public TransparentWidget
 
         KnobParamEditor* own(KnobParamEditor* knob_param_editor);
         ToggleSwitchParamEditor* own(ToggleSwitchParamEditor* toggle_switch_param_editor);
-        TextBoxParamEditor* own(TextBoxParamEditor* text_box_param_editor);
+        DiscreteParamEditor* own(DiscreteParamEditor* discrete_param_editor);
 
         void stop_editing();
 
@@ -133,7 +133,7 @@ class TabBody : public TransparentWidget
     private:
         GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitchParamEditors toggle_switch_param_editors;
-        GUI::TextBoxParamEditors text_box_param_editors;
+        GUI::DiscreteParamEditors discrete_param_editors;
 };
 
 
@@ -601,18 +601,18 @@ class ToggleSwitchParamEditor: public TransparentWidget
 };
 
 
-class TextBoxParamEditor : public TransparentWidget
+class DiscreteParamEditor : public TransparentWidget
 {
     public:
-        TextBoxParamEditor(
+        DiscreteParamEditor(
             GUI& gui,
             char const* const text,
             int const left,
             int const top,
             int const width,
             int const height,
-            int const text_left,
-            int const text_width,
+            int const value_left,
+            int const value_width,
             Synth& synth,
             Synth::ParamId const param_id,
             char const* const* const options,
@@ -652,13 +652,13 @@ class TextBoxParamEditor : public TransparentWidget
         char const* const* const options;
         int const options_count;
 
-        int const text_left;
-        int const text_width;
+        int const value_left;
+        int const value_width;
         bool is_editing_;
 };
 
 
-class TuningSelector : public TextBoxParamEditor
+class TuningSelector : public DiscreteParamEditor
 {
     public:
         static constexpr int WIDTH = 93;
