@@ -315,7 +315,7 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* format,
             double const scale,
-            ParamStateImages* knob_states
+            ParamStateImages const* knob_states
         );
 
         KnobParamEditor(
@@ -332,7 +332,7 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* const* const options,
             int const number_of_options,
-            ParamStateImages* knob_states
+            ParamStateImages const* knob_states
         );
 
         void set_sync_param_id(Synth::ParamId const param_id);
@@ -400,7 +400,7 @@ class KnobParamEditor : public TransparentWidget
                     int const left,
                     int const top,
                     Number const steps,
-                    ParamStateImages* knob_states
+                    ParamStateImages const* knob_states
                 );
 
                 virtual ~Knob();
@@ -433,8 +433,9 @@ class KnobParamEditor : public TransparentWidget
             private:
                 Number const steps;
 
+                ParamStateImages const* const knob_states;
+
                 KnobParamEditor& editor;
-                ParamStateImages* knob_states;
                 GUI::Image knob_state;
                 Number prev_x;
                 Number prev_y;
@@ -455,6 +456,8 @@ class KnobParamEditor : public TransparentWidget
 
         Number const discrete_step_size;
 
+        ParamStateImages const* knob_states;
+
         char const* const* const options;
         int const number_of_options;
         int const value_font_size;
@@ -464,7 +467,6 @@ class KnobParamEditor : public TransparentWidget
         bool const has_room_for_texts;
 
         ControllerSelector& controller_selector;
-        ParamStateImages* knob_states;
         Synth& synth;
         Number ratio;
         Knob* knob;
