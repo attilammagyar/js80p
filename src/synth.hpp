@@ -74,7 +74,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
 
         static constexpr Integer ENVELOPE_FLOAT_PARAMS = 12;
-        static constexpr Integer ENVELOPE_TOGGLE_PARAMS = 1;
+        static constexpr Integer ENVELOPE_DISCRETE_PARAMS = 5;
 
         static constexpr Integer MIDI_CONTROLLERS = 128;
 
@@ -687,7 +687,59 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L7AEN = 507,     ///< LFO 7 Amount Envelope
             L8AEN = 508,     ///< LFO 8 Amount Envelope
 
-            PARAM_ID_COUNT = 509,
+            N1SYN = 509,     ///< Envelope 1 Tempo Synchronization
+            N2SYN = 510,     ///< Envelope 2 Tempo Synchronization
+            N3SYN = 511,     ///< Envelope 3 Tempo Synchronization
+            N4SYN = 512,     ///< Envelope 4 Tempo Synchronization
+            N5SYN = 513,     ///< Envelope 5 Tempo Synchronization
+            N6SYN = 514,     ///< Envelope 6 Tempo Synchronization
+            N7SYN = 515,     ///< Envelope 7 Tempo Synchronization
+            N8SYN = 516,     ///< Envelope 8 Tempo Synchronization
+            N9SYN = 517,     ///< Envelope 9 Tempo Synchronization
+            N10SYN = 518,    ///< Envelope 10 Tempo Synchronization
+            N11SYN = 519,    ///< Envelope 11 Tempo Synchronization
+            N12SYN = 520,    ///< Envelope 12 Tempo Synchronization
+
+            N1ASH = 521,     ///< Envelope 1 Attack Shape
+            N2ASH = 522,     ///< Envelope 2 Attack Shape
+            N3ASH = 523,     ///< Envelope 3 Attack Shape
+            N4ASH = 524,     ///< Envelope 4 Attack Shape
+            N5ASH = 525,     ///< Envelope 5 Attack Shape
+            N6ASH = 526,     ///< Envelope 6 Attack Shape
+            N7ASH = 527,     ///< Envelope 7 Attack Shape
+            N8ASH = 528,     ///< Envelope 8 Attack Shape
+            N9ASH = 529,     ///< Envelope 9 Attack Shape
+            N10ASH = 530,    ///< Envelope 10 Attack Shape
+            N11ASH = 531,    ///< Envelope 11 Attack Shape
+            N12ASH = 532,    ///< Envelope 12 Attack Shape
+
+            N1DSH = 533,     ///< Envelope 1 Decay Shape
+            N2DSH = 534,     ///< Envelope 2 Decay Shape
+            N3DSH = 535,     ///< Envelope 3 Decay Shape
+            N4DSH = 536,     ///< Envelope 4 Decay Shape
+            N5DSH = 537,     ///< Envelope 5 Decay Shape
+            N6DSH = 538,     ///< Envelope 6 Decay Shape
+            N7DSH = 539,     ///< Envelope 7 Decay Shape
+            N8DSH = 540,     ///< Envelope 8 Decay Shape
+            N9DSH = 541,     ///< Envelope 9 Decay Shape
+            N10DSH = 542,    ///< Envelope 10 Decay Shape
+            N11DSH = 543,    ///< Envelope 11 Decay Shape
+            N12DSH = 544,    ///< Envelope 12 Decay Shape
+
+            N1RSH = 545,     ///< Envelope 1 Release Shape
+            N2RSH = 546,     ///< Envelope 2 Release Shape
+            N3RSH = 547,     ///< Envelope 3 Release Shape
+            N4RSH = 548,     ///< Envelope 4 Release Shape
+            N5RSH = 549,     ///< Envelope 5 Release Shape
+            N6RSH = 550,     ///< Envelope 6 Release Shape
+            N7RSH = 551,     ///< Envelope 7 Release Shape
+            N8RSH = 552,     ///< Envelope 8 Release Shape
+            N9RSH = 553,     ///< Envelope 9 Release Shape
+            N10RSH = 554,    ///< Envelope 10 Release Shape
+            N11RSH = 555,    ///< Envelope 11 Release Shape
+            N12RSH = 556,    ///< Envelope 12 Release Shape
+
+            PARAM_ID_COUNT = 557,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
@@ -1267,8 +1319,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x100;
                 static constexpr Integer MASK = ENTRIES - 1;
-                static constexpr Integer MULTIPLIER = 6201;
-                static constexpr Integer SHIFT = 10;
+                static constexpr Integer MULTIPLIER = 3189;
+                static constexpr Integer SHIFT = 11;
 
                 static Integer hash(std::string const& name) noexcept;
 

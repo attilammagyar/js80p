@@ -81,6 +81,21 @@ class Envelope
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
         static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
 
+        typedef Byte Shape;
+
+        static constexpr Shape SHAPE_SMOOTH_SMOOTH = 0;
+        static constexpr Shape SHAPE_SMOOTH_SMOOTH_STEEP = 1;
+        static constexpr Shape SHAPE_SMOOTH_SMOOTH_STEEPER = 2;
+        static constexpr Shape SHAPE_SMOOTH_SHARP = 3;
+        static constexpr Shape SHAPE_SMOOTH_SHARP_STEEP = 4;
+        static constexpr Shape SHAPE_SMOOTH_SHARP_STEEPER = 5;
+        static constexpr Shape SHAPE_SHARP_SMOOTH = 6;
+        static constexpr Shape SHAPE_SHARP_SMOOTH_STEEP = 7;
+        static constexpr Shape SHAPE_SHARP_SMOOTH_STEEPER = 8;
+        static constexpr Shape SHAPE_LINEAR = 9;
+
+        typedef Param<Shape, ParamEvaluation::BLOCK> ShapeParam;
+
         static Number get_value_at_time(
                 EnvelopeSnapshot const& snapshot,
                 Seconds const time,
@@ -121,6 +136,10 @@ class Envelope
         ) const noexcept;
 
         ToggleParam dynamic;
+        ToggleParam tempo_sync;
+        ShapeParam attack_shape;
+        ShapeParam decay_shape;
+        ShapeParam release_shape;
         FloatParamB amount;
         FloatParamB initial_value;
         FloatParamB delay_time;
@@ -222,6 +241,10 @@ class Envelope
         ) const noexcept;
 
         Integer dynamic_change_index;
+        Integer tempo_sync_change_index;
+        Integer attack_shape_change_index;
+        Integer decay_shape_change_index;
+        Integer release_shape_change_index;
         Integer amount_change_index;
         Integer initial_value_change_index;
         Integer delay_time_change_index;

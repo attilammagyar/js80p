@@ -84,7 +84,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_FLOAT_PARAMS
-        + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_TOGGLE_PARAMS)
+        + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
     polyphonic("POLY", ToggleParam::ON),
@@ -629,6 +629,58 @@ void Synth::create_envelopes() noexcept
     register_param_as_child<ToggleParam>(ParamId::N10DYN, envelopes_rw[9]->dynamic);
     register_param_as_child<ToggleParam>(ParamId::N11DYN, envelopes_rw[10]->dynamic);
     register_param_as_child<ToggleParam>(ParamId::N12DYN, envelopes_rw[11]->dynamic);
+
+    register_param_as_child<ToggleParam>(ParamId::N1SYN, envelopes_rw[0]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N2SYN, envelopes_rw[1]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N3SYN, envelopes_rw[2]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N4SYN, envelopes_rw[3]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N5SYN, envelopes_rw[4]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N6SYN, envelopes_rw[5]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N7SYN, envelopes_rw[6]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N8SYN, envelopes_rw[7]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N9SYN, envelopes_rw[8]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N10SYN, envelopes_rw[9]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N11SYN, envelopes_rw[10]->tempo_sync);
+    register_param_as_child<ToggleParam>(ParamId::N12SYN, envelopes_rw[11]->tempo_sync);
+
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N1ASH, envelopes_rw[0]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N2ASH, envelopes_rw[1]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N3ASH, envelopes_rw[2]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N4ASH, envelopes_rw[3]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N5ASH, envelopes_rw[4]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N6ASH, envelopes_rw[5]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N7ASH, envelopes_rw[6]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N8ASH, envelopes_rw[7]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N9ASH, envelopes_rw[8]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N10ASH, envelopes_rw[9]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N11ASH, envelopes_rw[10]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N12ASH, envelopes_rw[11]->attack_shape);
+
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N1DSH, envelopes_rw[0]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N2DSH, envelopes_rw[1]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N3DSH, envelopes_rw[2]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N4DSH, envelopes_rw[3]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N5DSH, envelopes_rw[4]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N6DSH, envelopes_rw[5]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N7DSH, envelopes_rw[6]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N8DSH, envelopes_rw[7]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N9DSH, envelopes_rw[8]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N10DSH, envelopes_rw[9]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N11DSH, envelopes_rw[10]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N12DSH, envelopes_rw[11]->decay_shape);
+
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N1RSH, envelopes_rw[0]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N2RSH, envelopes_rw[1]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N3RSH, envelopes_rw[2]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N4RSH, envelopes_rw[3]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N5RSH, envelopes_rw[4]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N6RSH, envelopes_rw[5]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N7RSH, envelopes_rw[6]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N8RSH, envelopes_rw[7]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N9RSH, envelopes_rw[8]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N10RSH, envelopes_rw[9]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N11RSH, envelopes_rw[10]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(ParamId::N12RSH, envelopes_rw[11]->release_shape);
 }
 
 
@@ -1789,6 +1841,54 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_default_ratio();
         case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_default_ratio();
         case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_default_ratio();
+        case ParamId::N1SYN: return envelopes_rw[0]->tempo_sync.get_default_ratio();
+        case ParamId::N2SYN: return envelopes_rw[1]->tempo_sync.get_default_ratio();
+        case ParamId::N3SYN: return envelopes_rw[2]->tempo_sync.get_default_ratio();
+        case ParamId::N4SYN: return envelopes_rw[3]->tempo_sync.get_default_ratio();
+        case ParamId::N5SYN: return envelopes_rw[4]->tempo_sync.get_default_ratio();
+        case ParamId::N6SYN: return envelopes_rw[5]->tempo_sync.get_default_ratio();
+        case ParamId::N7SYN: return envelopes_rw[6]->tempo_sync.get_default_ratio();
+        case ParamId::N8SYN: return envelopes_rw[7]->tempo_sync.get_default_ratio();
+        case ParamId::N9SYN: return envelopes_rw[8]->tempo_sync.get_default_ratio();
+        case ParamId::N10SYN: return envelopes_rw[9]->tempo_sync.get_default_ratio();
+        case ParamId::N11SYN: return envelopes_rw[10]->tempo_sync.get_default_ratio();
+        case ParamId::N12SYN: return envelopes_rw[11]->tempo_sync.get_default_ratio();
+        case ParamId::N1ASH: return envelopes_rw[0]->attack_shape.get_default_ratio();
+        case ParamId::N2ASH: return envelopes_rw[1]->attack_shape.get_default_ratio();
+        case ParamId::N3ASH: return envelopes_rw[2]->attack_shape.get_default_ratio();
+        case ParamId::N4ASH: return envelopes_rw[3]->attack_shape.get_default_ratio();
+        case ParamId::N5ASH: return envelopes_rw[4]->attack_shape.get_default_ratio();
+        case ParamId::N6ASH: return envelopes_rw[5]->attack_shape.get_default_ratio();
+        case ParamId::N7ASH: return envelopes_rw[6]->attack_shape.get_default_ratio();
+        case ParamId::N8ASH: return envelopes_rw[7]->attack_shape.get_default_ratio();
+        case ParamId::N9ASH: return envelopes_rw[8]->attack_shape.get_default_ratio();
+        case ParamId::N10ASH: return envelopes_rw[9]->attack_shape.get_default_ratio();
+        case ParamId::N11ASH: return envelopes_rw[10]->attack_shape.get_default_ratio();
+        case ParamId::N12ASH: return envelopes_rw[11]->attack_shape.get_default_ratio();
+        case ParamId::N1DSH: return envelopes_rw[0]->decay_shape.get_default_ratio();
+        case ParamId::N2DSH: return envelopes_rw[1]->decay_shape.get_default_ratio();
+        case ParamId::N3DSH: return envelopes_rw[2]->decay_shape.get_default_ratio();
+        case ParamId::N4DSH: return envelopes_rw[3]->decay_shape.get_default_ratio();
+        case ParamId::N5DSH: return envelopes_rw[4]->decay_shape.get_default_ratio();
+        case ParamId::N6DSH: return envelopes_rw[5]->decay_shape.get_default_ratio();
+        case ParamId::N7DSH: return envelopes_rw[6]->decay_shape.get_default_ratio();
+        case ParamId::N8DSH: return envelopes_rw[7]->decay_shape.get_default_ratio();
+        case ParamId::N9DSH: return envelopes_rw[8]->decay_shape.get_default_ratio();
+        case ParamId::N10DSH: return envelopes_rw[9]->decay_shape.get_default_ratio();
+        case ParamId::N11DSH: return envelopes_rw[10]->decay_shape.get_default_ratio();
+        case ParamId::N12DSH: return envelopes_rw[11]->decay_shape.get_default_ratio();
+        case ParamId::N1RSH: return envelopes_rw[0]->release_shape.get_default_ratio();
+        case ParamId::N2RSH: return envelopes_rw[1]->release_shape.get_default_ratio();
+        case ParamId::N3RSH: return envelopes_rw[2]->release_shape.get_default_ratio();
+        case ParamId::N4RSH: return envelopes_rw[3]->release_shape.get_default_ratio();
+        case ParamId::N5RSH: return envelopes_rw[4]->release_shape.get_default_ratio();
+        case ParamId::N6RSH: return envelopes_rw[5]->release_shape.get_default_ratio();
+        case ParamId::N7RSH: return envelopes_rw[6]->release_shape.get_default_ratio();
+        case ParamId::N8RSH: return envelopes_rw[7]->release_shape.get_default_ratio();
+        case ParamId::N9RSH: return envelopes_rw[8]->release_shape.get_default_ratio();
+        case ParamId::N10RSH: return envelopes_rw[9]->release_shape.get_default_ratio();
+        case ParamId::N11RSH: return envelopes_rw[10]->release_shape.get_default_ratio();
+        case ParamId::N12RSH: return envelopes_rw[11]->release_shape.get_default_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -2043,6 +2143,54 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_max_value();
         case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_max_value();
         case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_max_value();
+        case ParamId::N1SYN: return envelopes_rw[0]->tempo_sync.get_max_value();
+        case ParamId::N2SYN: return envelopes_rw[1]->tempo_sync.get_max_value();
+        case ParamId::N3SYN: return envelopes_rw[2]->tempo_sync.get_max_value();
+        case ParamId::N4SYN: return envelopes_rw[3]->tempo_sync.get_max_value();
+        case ParamId::N5SYN: return envelopes_rw[4]->tempo_sync.get_max_value();
+        case ParamId::N6SYN: return envelopes_rw[5]->tempo_sync.get_max_value();
+        case ParamId::N7SYN: return envelopes_rw[6]->tempo_sync.get_max_value();
+        case ParamId::N8SYN: return envelopes_rw[7]->tempo_sync.get_max_value();
+        case ParamId::N9SYN: return envelopes_rw[8]->tempo_sync.get_max_value();
+        case ParamId::N10SYN: return envelopes_rw[9]->tempo_sync.get_max_value();
+        case ParamId::N11SYN: return envelopes_rw[10]->tempo_sync.get_max_value();
+        case ParamId::N12SYN: return envelopes_rw[11]->tempo_sync.get_max_value();
+        case ParamId::N1ASH: return envelopes_rw[0]->attack_shape.get_max_value();
+        case ParamId::N2ASH: return envelopes_rw[1]->attack_shape.get_max_value();
+        case ParamId::N3ASH: return envelopes_rw[2]->attack_shape.get_max_value();
+        case ParamId::N4ASH: return envelopes_rw[3]->attack_shape.get_max_value();
+        case ParamId::N5ASH: return envelopes_rw[4]->attack_shape.get_max_value();
+        case ParamId::N6ASH: return envelopes_rw[5]->attack_shape.get_max_value();
+        case ParamId::N7ASH: return envelopes_rw[6]->attack_shape.get_max_value();
+        case ParamId::N8ASH: return envelopes_rw[7]->attack_shape.get_max_value();
+        case ParamId::N9ASH: return envelopes_rw[8]->attack_shape.get_max_value();
+        case ParamId::N10ASH: return envelopes_rw[9]->attack_shape.get_max_value();
+        case ParamId::N11ASH: return envelopes_rw[10]->attack_shape.get_max_value();
+        case ParamId::N12ASH: return envelopes_rw[11]->attack_shape.get_max_value();
+        case ParamId::N1DSH: return envelopes_rw[0]->decay_shape.get_max_value();
+        case ParamId::N2DSH: return envelopes_rw[1]->decay_shape.get_max_value();
+        case ParamId::N3DSH: return envelopes_rw[2]->decay_shape.get_max_value();
+        case ParamId::N4DSH: return envelopes_rw[3]->decay_shape.get_max_value();
+        case ParamId::N5DSH: return envelopes_rw[4]->decay_shape.get_max_value();
+        case ParamId::N6DSH: return envelopes_rw[5]->decay_shape.get_max_value();
+        case ParamId::N7DSH: return envelopes_rw[6]->decay_shape.get_max_value();
+        case ParamId::N8DSH: return envelopes_rw[7]->decay_shape.get_max_value();
+        case ParamId::N9DSH: return envelopes_rw[8]->decay_shape.get_max_value();
+        case ParamId::N10DSH: return envelopes_rw[9]->decay_shape.get_max_value();
+        case ParamId::N11DSH: return envelopes_rw[10]->decay_shape.get_max_value();
+        case ParamId::N12DSH: return envelopes_rw[11]->decay_shape.get_max_value();
+        case ParamId::N1RSH: return envelopes_rw[0]->release_shape.get_max_value();
+        case ParamId::N2RSH: return envelopes_rw[1]->release_shape.get_max_value();
+        case ParamId::N3RSH: return envelopes_rw[2]->release_shape.get_max_value();
+        case ParamId::N4RSH: return envelopes_rw[3]->release_shape.get_max_value();
+        case ParamId::N5RSH: return envelopes_rw[4]->release_shape.get_max_value();
+        case ParamId::N6RSH: return envelopes_rw[5]->release_shape.get_max_value();
+        case ParamId::N7RSH: return envelopes_rw[6]->release_shape.get_max_value();
+        case ParamId::N8RSH: return envelopes_rw[7]->release_shape.get_max_value();
+        case ParamId::N9RSH: return envelopes_rw[8]->release_shape.get_max_value();
+        case ParamId::N10RSH: return envelopes_rw[9]->release_shape.get_max_value();
+        case ParamId::N11RSH: return envelopes_rw[10]->release_shape.get_max_value();
+        case ParamId::N12RSH: return envelopes_rw[11]->release_shape.get_max_value();
         default: return 0.0; /* This should never be reached. */
     }
 }
@@ -2305,6 +2453,54 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.ratio_to_value(ratio);
         case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.ratio_to_value(ratio);
         case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.ratio_to_value(ratio);
+        case ParamId::N1SYN: return envelopes_rw[0]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N2SYN: return envelopes_rw[1]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N3SYN: return envelopes_rw[2]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N4SYN: return envelopes_rw[3]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N5SYN: return envelopes_rw[4]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N6SYN: return envelopes_rw[5]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N7SYN: return envelopes_rw[6]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N8SYN: return envelopes_rw[7]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N9SYN: return envelopes_rw[8]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N10SYN: return envelopes_rw[9]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N11SYN: return envelopes_rw[10]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N12SYN: return envelopes_rw[11]->tempo_sync.ratio_to_value(ratio);
+        case ParamId::N1ASH: return envelopes_rw[0]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N2ASH: return envelopes_rw[1]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N3ASH: return envelopes_rw[2]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N4ASH: return envelopes_rw[3]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N5ASH: return envelopes_rw[4]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N6ASH: return envelopes_rw[5]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N7ASH: return envelopes_rw[6]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N8ASH: return envelopes_rw[7]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N9ASH: return envelopes_rw[8]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N10ASH: return envelopes_rw[9]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N11ASH: return envelopes_rw[10]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N12ASH: return envelopes_rw[11]->attack_shape.ratio_to_value(ratio);
+        case ParamId::N1DSH: return envelopes_rw[0]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N2DSH: return envelopes_rw[1]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N3DSH: return envelopes_rw[2]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N4DSH: return envelopes_rw[3]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N5DSH: return envelopes_rw[4]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N6DSH: return envelopes_rw[5]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N7DSH: return envelopes_rw[6]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N8DSH: return envelopes_rw[7]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N9DSH: return envelopes_rw[8]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N10DSH: return envelopes_rw[9]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N11DSH: return envelopes_rw[10]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N12DSH: return envelopes_rw[11]->decay_shape.ratio_to_value(ratio);
+        case ParamId::N1RSH: return envelopes_rw[0]->release_shape.ratio_to_value(ratio);
+        case ParamId::N2RSH: return envelopes_rw[1]->release_shape.ratio_to_value(ratio);
+        case ParamId::N3RSH: return envelopes_rw[2]->release_shape.ratio_to_value(ratio);
+        case ParamId::N4RSH: return envelopes_rw[3]->release_shape.ratio_to_value(ratio);
+        case ParamId::N5RSH: return envelopes_rw[4]->release_shape.ratio_to_value(ratio);
+        case ParamId::N6RSH: return envelopes_rw[5]->release_shape.ratio_to_value(ratio);
+        case ParamId::N7RSH: return envelopes_rw[6]->release_shape.ratio_to_value(ratio);
+        case ParamId::N8RSH: return envelopes_rw[7]->release_shape.ratio_to_value(ratio);
+        case ParamId::N9RSH: return envelopes_rw[8]->release_shape.ratio_to_value(ratio);
+        case ParamId::N10RSH: return envelopes_rw[9]->release_shape.ratio_to_value(ratio);
+        case ParamId::N11RSH: return envelopes_rw[10]->release_shape.ratio_to_value(ratio);
+        case ParamId::N12RSH: return envelopes_rw[11]->release_shape.ratio_to_value(ratio);
         default: return 0; /* This should never be reached. */
     }
 }
@@ -2853,6 +3049,54 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); break;
             case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); break;
             case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); break;
+            case ParamId::N1SYN: envelopes_rw[0]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N2SYN: envelopes_rw[1]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N3SYN: envelopes_rw[2]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N4SYN: envelopes_rw[3]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N5SYN: envelopes_rw[4]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N6SYN: envelopes_rw[5]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N7SYN: envelopes_rw[6]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N8SYN: envelopes_rw[7]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N9SYN: envelopes_rw[8]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N10SYN: envelopes_rw[9]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N11SYN: envelopes_rw[10]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N12SYN: envelopes_rw[11]->tempo_sync.set_ratio(ratio); break;
+            case ParamId::N1ASH: envelopes_rw[0]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N2ASH: envelopes_rw[1]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N3ASH: envelopes_rw[2]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N4ASH: envelopes_rw[3]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N5ASH: envelopes_rw[4]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N6ASH: envelopes_rw[5]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N7ASH: envelopes_rw[6]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N8ASH: envelopes_rw[7]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N9ASH: envelopes_rw[8]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N10ASH: envelopes_rw[9]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N11ASH: envelopes_rw[10]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N12ASH: envelopes_rw[11]->attack_shape.set_ratio(ratio); break;
+            case ParamId::N1DSH: envelopes_rw[0]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N2DSH: envelopes_rw[1]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N3DSH: envelopes_rw[2]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N4DSH: envelopes_rw[3]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N5DSH: envelopes_rw[4]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N6DSH: envelopes_rw[5]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N7DSH: envelopes_rw[6]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N8DSH: envelopes_rw[7]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N9DSH: envelopes_rw[8]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N10DSH: envelopes_rw[9]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N11DSH: envelopes_rw[10]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N12DSH: envelopes_rw[11]->decay_shape.set_ratio(ratio); break;
+            case ParamId::N1RSH: envelopes_rw[0]->release_shape.set_ratio(ratio); break;
+            case ParamId::N2RSH: envelopes_rw[1]->release_shape.set_ratio(ratio); break;
+            case ParamId::N3RSH: envelopes_rw[2]->release_shape.set_ratio(ratio); break;
+            case ParamId::N4RSH: envelopes_rw[3]->release_shape.set_ratio(ratio); break;
+            case ParamId::N5RSH: envelopes_rw[4]->release_shape.set_ratio(ratio); break;
+            case ParamId::N6RSH: envelopes_rw[5]->release_shape.set_ratio(ratio); break;
+            case ParamId::N7RSH: envelopes_rw[6]->release_shape.set_ratio(ratio); break;
+            case ParamId::N8RSH: envelopes_rw[7]->release_shape.set_ratio(ratio); break;
+            case ParamId::N9RSH: envelopes_rw[8]->release_shape.set_ratio(ratio); break;
+            case ParamId::N10RSH: envelopes_rw[9]->release_shape.set_ratio(ratio); break;
+            case ParamId::N11RSH: envelopes_rw[10]->release_shape.set_ratio(ratio); break;
+            case ParamId::N12RSH: envelopes_rw[11]->release_shape.set_ratio(ratio); break;
             default: break; /* This should never be reached. */
         }
     }
@@ -3609,6 +3853,54 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_ratio();
         case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_ratio();
         case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_ratio();
+        case ParamId::N1SYN: return envelopes_rw[0]->tempo_sync.get_ratio();
+        case ParamId::N2SYN: return envelopes_rw[1]->tempo_sync.get_ratio();
+        case ParamId::N3SYN: return envelopes_rw[2]->tempo_sync.get_ratio();
+        case ParamId::N4SYN: return envelopes_rw[3]->tempo_sync.get_ratio();
+        case ParamId::N5SYN: return envelopes_rw[4]->tempo_sync.get_ratio();
+        case ParamId::N6SYN: return envelopes_rw[5]->tempo_sync.get_ratio();
+        case ParamId::N7SYN: return envelopes_rw[6]->tempo_sync.get_ratio();
+        case ParamId::N8SYN: return envelopes_rw[7]->tempo_sync.get_ratio();
+        case ParamId::N9SYN: return envelopes_rw[8]->tempo_sync.get_ratio();
+        case ParamId::N10SYN: return envelopes_rw[9]->tempo_sync.get_ratio();
+        case ParamId::N11SYN: return envelopes_rw[10]->tempo_sync.get_ratio();
+        case ParamId::N12SYN: return envelopes_rw[11]->tempo_sync.get_ratio();
+        case ParamId::N1ASH: return envelopes_rw[0]->attack_shape.get_ratio();
+        case ParamId::N2ASH: return envelopes_rw[1]->attack_shape.get_ratio();
+        case ParamId::N3ASH: return envelopes_rw[2]->attack_shape.get_ratio();
+        case ParamId::N4ASH: return envelopes_rw[3]->attack_shape.get_ratio();
+        case ParamId::N5ASH: return envelopes_rw[4]->attack_shape.get_ratio();
+        case ParamId::N6ASH: return envelopes_rw[5]->attack_shape.get_ratio();
+        case ParamId::N7ASH: return envelopes_rw[6]->attack_shape.get_ratio();
+        case ParamId::N8ASH: return envelopes_rw[7]->attack_shape.get_ratio();
+        case ParamId::N9ASH: return envelopes_rw[8]->attack_shape.get_ratio();
+        case ParamId::N10ASH: return envelopes_rw[9]->attack_shape.get_ratio();
+        case ParamId::N11ASH: return envelopes_rw[10]->attack_shape.get_ratio();
+        case ParamId::N12ASH: return envelopes_rw[11]->attack_shape.get_ratio();
+        case ParamId::N1DSH: return envelopes_rw[0]->decay_shape.get_ratio();
+        case ParamId::N2DSH: return envelopes_rw[1]->decay_shape.get_ratio();
+        case ParamId::N3DSH: return envelopes_rw[2]->decay_shape.get_ratio();
+        case ParamId::N4DSH: return envelopes_rw[3]->decay_shape.get_ratio();
+        case ParamId::N5DSH: return envelopes_rw[4]->decay_shape.get_ratio();
+        case ParamId::N6DSH: return envelopes_rw[5]->decay_shape.get_ratio();
+        case ParamId::N7DSH: return envelopes_rw[6]->decay_shape.get_ratio();
+        case ParamId::N8DSH: return envelopes_rw[7]->decay_shape.get_ratio();
+        case ParamId::N9DSH: return envelopes_rw[8]->decay_shape.get_ratio();
+        case ParamId::N10DSH: return envelopes_rw[9]->decay_shape.get_ratio();
+        case ParamId::N11DSH: return envelopes_rw[10]->decay_shape.get_ratio();
+        case ParamId::N12DSH: return envelopes_rw[11]->decay_shape.get_ratio();
+        case ParamId::N1RSH: return envelopes_rw[0]->release_shape.get_ratio();
+        case ParamId::N2RSH: return envelopes_rw[1]->release_shape.get_ratio();
+        case ParamId::N3RSH: return envelopes_rw[2]->release_shape.get_ratio();
+        case ParamId::N4RSH: return envelopes_rw[3]->release_shape.get_ratio();
+        case ParamId::N5RSH: return envelopes_rw[4]->release_shape.get_ratio();
+        case ParamId::N6RSH: return envelopes_rw[5]->release_shape.get_ratio();
+        case ParamId::N7RSH: return envelopes_rw[6]->release_shape.get_ratio();
+        case ParamId::N8RSH: return envelopes_rw[7]->release_shape.get_ratio();
+        case ParamId::N9RSH: return envelopes_rw[8]->release_shape.get_ratio();
+        case ParamId::N10RSH: return envelopes_rw[9]->release_shape.get_ratio();
+        case ParamId::N11RSH: return envelopes_rw[10]->release_shape.get_ratio();
+        case ParamId::N12RSH: return envelopes_rw[11]->release_shape.get_ratio();
         default: return 0.0; /* This should never be reached. */
     }
 }
