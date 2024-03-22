@@ -1548,7 +1548,7 @@ void GUI::build_about_body(char const* sdk_version)
 }
 
 
-void GUI::build_macros_1_body(ParamStateImages* knob_states)
+void GUI::build_macros_1_body(ParamStateImages const* knob_states)
 {
     macros_1_body = new TabBody("Macros 1-10");
 
@@ -1647,7 +1647,7 @@ void GUI::build_macros_1_body(ParamStateImages* knob_states)
 }
 
 
-void GUI::build_macros_2_body(ParamStateImages* knob_states)
+void GUI::build_macros_2_body(ParamStateImages const* knob_states)
 {
     macros_2_body = new TabBody("Macros 11-20");
 
@@ -1746,7 +1746,7 @@ void GUI::build_macros_2_body(ParamStateImages* knob_states)
 }
 
 
-void GUI::build_effects_body(ParamStateImages* knob_states)
+void GUI::build_effects_body(ParamStateImages const* knob_states)
 {
     effects_body = new TabBody("Effects");
 
@@ -1832,7 +1832,7 @@ void GUI::build_effects_body(ParamStateImages* knob_states)
 }
 
 
-void GUI::build_envelopes_1_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
+void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
 {
     envelopes_1_body = new TabBody("Envelopes");
 
@@ -1950,7 +1950,7 @@ void GUI::build_envelopes_1_body(ParamStateImages* knob_states, ParamStateImages
 }
 
 
-void GUI::build_envelopes_2_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
+void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
 {
     envelopes_2_body = new TabBody("Envelopes");
 
@@ -2068,7 +2068,7 @@ void GUI::build_envelopes_2_body(ParamStateImages* knob_states, ParamStateImages
 }
 
 
-void GUI::build_lfos_body(ParamStateImages* knob_states)
+void GUI::build_lfos_body(ParamStateImages const* knob_states)
 {
     lfos_body = new TabBody("LFOs");
 
@@ -2216,7 +2216,7 @@ void GUI::build_lfos_body(ParamStateImages* knob_states)
 }
 
 
-void GUI::build_synth_body(ParamStateImages* knob_states, ParamStateImages* screw_states)
+void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
 {
     synth_body = new TabBody("Synth");
 

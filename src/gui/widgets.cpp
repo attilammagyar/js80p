@@ -663,7 +663,7 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* format,
         double const scale,
-        ParamStateImages* knob_states
+        ParamStateImages const* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
@@ -672,6 +672,7 @@ KnobParamEditor::KnobParamEditor(
     discrete_step_size(
         !is_continuous ? 1.001 / synth.get_param_max_value(param_id) : 0.0
     ),
+    knob_states(knob_states),
     options(NULL),
     number_of_options(0),
     value_font_size(11),
@@ -679,7 +680,6 @@ KnobParamEditor::KnobParamEditor(
     knob_top(knob_top),
     has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     controller_selector(controller_selector),
-    knob_states(knob_states),
     synth(synth),
     ratio(0.0),
     knob(NULL),
@@ -703,7 +703,7 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* const* const options,
         int const number_of_options,
-        ParamStateImages* knob_states
+        ParamStateImages const* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
@@ -712,6 +712,7 @@ KnobParamEditor::KnobParamEditor(
     discrete_step_size(
         !is_continuous ? 1.001 / synth.get_param_max_value(param_id) : 0.0
     ),
+    knob_states(knob_states),
     options(options),
     number_of_options(number_of_options),
     value_font_size(10),
@@ -719,7 +720,6 @@ KnobParamEditor::KnobParamEditor(
     knob_top(knob_top),
     has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
     controller_selector(controller_selector),
-    knob_states(knob_states),
     synth(synth),
     ratio(0.0),
     knob(NULL),
@@ -987,11 +987,11 @@ KnobParamEditor::Knob::Knob(
         int const left,
         int const top,
         Number const steps,
-        ParamStateImages* knob_states
+        ParamStateImages const* knob_states
 ) : Widget(text, left, top, knob_states->width, knob_states->height, Type::KNOB),
     steps(steps),
-    editor(editor),
     knob_states(knob_states),
+    editor(editor),
     knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
