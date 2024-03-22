@@ -499,6 +499,10 @@ void Envelope::set_up_next_release_target(
 
 Envelope::Envelope(std::string const& name) noexcept
     : dynamic(name + "DYN", ToggleParam::OFF),
+    tempo_sync(name + "SYN", ToggleParam::OFF),
+    attack_shape(name + "ASH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
+    decay_shape(name + "DSH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
+    release_shape(name + "RSH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
     amount(name + "AMT",            0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),
     delay_time(name + "DEL",        0.0,    6.0,  0.0),
@@ -512,6 +516,10 @@ Envelope::Envelope(std::string const& name) noexcept
     time_inaccuracy(name + "TIN",   0.0,    1.0,  0.0),
     value_inaccuracy(name + "VIN",  0.0,    1.0,  0.0),
     dynamic_change_index(-1),
+    tempo_sync_change_index(-1),
+    attack_shape_change_index(-1),
+    decay_shape_change_index(-1),
+    release_shape_change_index(-1),
     amount_change_index(-1),
     initial_value_change_index(-1),
     delay_time_change_index(-1),
@@ -540,6 +548,11 @@ void Envelope::update() noexcept
     is_dirty = update_change_index(decay_time, decay_time_change_index) || is_dirty;
 
     is_dirty = update_change_index<ToggleParam>(dynamic, dynamic_change_index) || is_dirty;
+    is_dirty = update_change_index<ToggleParam>(tempo_sync, tempo_sync_change_index) || is_dirty;
+
+    is_dirty = update_change_index<ShapeParam>(attack_shape, attack_shape_change_index) || is_dirty;
+    is_dirty = update_change_index<ShapeParam>(decay_shape, decay_shape_change_index) || is_dirty;
+    is_dirty = update_change_index<ShapeParam>(release_shape, release_shape_change_index) || is_dirty;
 
     is_dirty = update_change_index(amount, amount_change_index) || is_dirty;
     is_dirty = update_change_index(initial_value, initial_value_change_index) || is_dirty;
