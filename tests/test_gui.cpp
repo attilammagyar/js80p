@@ -40,7 +40,7 @@ void assert_ratio_as_str(
         Number const scale,
         char const* const format,
         char const* const* const options = NULL,
-        int const number_of_options = 0
+        size_t const number_of_options = 0
 ) {
     constexpr size_t buffer_size = 16;
     char buffer[buffer_size];
@@ -63,13 +63,13 @@ void assert_ratio_as_str(
         "ratio=%f, format=\"%s\", number_of_options=%d",
         ratio,
         format == NULL ? "<NULL>" : format,
-        number_of_options
+        (int)number_of_options
     );
 }
 
 
 TEST(param_ratio_to_str, {
-    constexpr int number_of_options = 6;
+    constexpr size_t number_of_options = 6;
     constexpr Synth::ParamId mc1 = Synth::ParamId::MC1;
     constexpr Synth::ParamId mwav = Synth::ParamId::MWAV;
     char const* const options[number_of_options] = {

@@ -168,7 +168,7 @@ class GUI
             Number const scale,
             char const* const format,
             char const* const* const options,
-            int const number_of_options,
+            size_t const number_of_options,
             char* const buffer,
             size_t const buffer_size
         );
@@ -216,7 +216,7 @@ class GUI
             Synth::ParamId const param_id,
             Number const ratio,
             char const* const* const options,
-            int const number_of_options,
+            size_t const number_of_options,
             char* const buffer,
             size_t const buffer_size
         );
