@@ -56,15 +56,17 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(LIB_PATH)/libxcb.so \
 	$(LIB_PATH)/libxcb-render.so \
 	$(BUILD_DIR)/img_about.o \
-	$(BUILD_DIR)/img_macros1.o \
-	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_effects.o \
 	$(BUILD_DIR)/img_envelopes1.o \
 	$(BUILD_DIR)/img_envelopes2.o \
+	$(BUILD_DIR)/img_env_shapes-01.o \
+	$(BUILD_DIR)/img_env_shapes-10.o \
 	$(BUILD_DIR)/img_knob_states-controlled.o \
 	$(BUILD_DIR)/img_knob_states-free.o \
 	$(BUILD_DIR)/img_knob_states-none.o \
 	$(BUILD_DIR)/img_lfos.o \
+	$(BUILD_DIR)/img_macros1.o \
+	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_screw_states.o \
 	$(BUILD_DIR)/img_screw_states_synced.o \
 	$(BUILD_DIR)/img_synth.o \

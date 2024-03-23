@@ -39,16 +39,16 @@
 
 extern unsigned char _binary_gui_img_about_png_start;
 extern unsigned char _binary_gui_img_about_png_end;
-extern unsigned char _binary_gui_img_macros1_png_start;
-extern unsigned char _binary_gui_img_macros1_png_end;
-extern unsigned char _binary_gui_img_macros2_png_start;
-extern unsigned char _binary_gui_img_macros2_png_end;
 extern unsigned char _binary_gui_img_effects_png_start;
 extern unsigned char _binary_gui_img_effects_png_end;
 extern unsigned char _binary_gui_img_envelopes1_png_start;
 extern unsigned char _binary_gui_img_envelopes1_png_end;
 extern unsigned char _binary_gui_img_envelopes2_png_start;
 extern unsigned char _binary_gui_img_envelopes2_png_end;
+extern unsigned char _binary_gui_img_env_shapes_01_png_start;
+extern unsigned char _binary_gui_img_env_shapes_01_png_end;
+extern unsigned char _binary_gui_img_env_shapes_10_png_start;
+extern unsigned char _binary_gui_img_env_shapes_10_png_end;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_start;
 extern unsigned char _binary_gui_img_knob_states_controlled_png_end;
 extern unsigned char _binary_gui_img_knob_states_free_png_start;
@@ -57,6 +57,10 @@ extern unsigned char _binary_gui_img_knob_states_none_png_start;
 extern unsigned char _binary_gui_img_knob_states_none_png_end;
 extern unsigned char _binary_gui_img_lfos_png_start;
 extern unsigned char _binary_gui_img_lfos_png_end;
+extern unsigned char _binary_gui_img_macros1_png_start;
+extern unsigned char _binary_gui_img_macros1_png_end;
+extern unsigned char _binary_gui_img_macros2_png_start;
+extern unsigned char _binary_gui_img_macros2_png_end;
 extern unsigned char _binary_gui_img_screw_states_png_start;
 extern unsigned char _binary_gui_img_screw_states_png_end;
 extern unsigned char _binary_gui_img_screw_states_synced_png_start;
@@ -82,20 +86,6 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         )
     },
     {
-        "MACROS1",
-        Widget::Resource(
-            &_binary_gui_img_macros1_png_start,
-            &_binary_gui_img_macros1_png_end
-        )
-    },
-    {
-        "MACROS2",
-        Widget::Resource(
-            &_binary_gui_img_macros2_png_start,
-            &_binary_gui_img_macros2_png_end
-        )
-    },
-    {
         "EFFECTS",
         Widget::Resource(
             &_binary_gui_img_effects_png_start,
@@ -114,6 +104,20 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         Widget::Resource(
             &_binary_gui_img_envelopes2_png_start,
             &_binary_gui_img_envelopes2_png_end
+        )
+    },
+    {
+        "ENVSHAPES01",
+        Widget::Resource(
+            &_binary_gui_img_env_shapes_01_png_start,
+            &_binary_gui_img_env_shapes_01_png_end
+        )
+    },
+    {
+        "ENVSHAPES10",
+        Widget::Resource(
+            &_binary_gui_img_env_shapes_10_png_start,
+            &_binary_gui_img_env_shapes_10_png_end
         )
     },
     {
@@ -142,6 +146,20 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         Widget::Resource(
             &_binary_gui_img_lfos_png_start,
             &_binary_gui_img_lfos_png_end
+        )
+    },
+    {
+        "MACROS1",
+        Widget::Resource(
+            &_binary_gui_img_macros1_png_start,
+            &_binary_gui_img_macros1_png_end
+        )
+    },
+    {
+        "MACROS2",
+        Widget::Resource(
+            &_binary_gui_img_macros2_png_start,
+            &_binary_gui_img_macros2_png_end
         )
     },
     {

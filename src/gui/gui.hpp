@@ -234,12 +234,16 @@ class GUI
 
         void build_envelopes_1_body(
             ParamStateImages const* knob_states,
-            ParamStateImages const* screw_states
+            ParamStateImages const* screw_states,
+            ParamStateImages const* envelope_shapes_01,
+            ParamStateImages const* envelope_shapes_10
         );
 
         void build_envelopes_2_body(
             ParamStateImages const* knob_states,
-            ParamStateImages const* screw_states
+            ParamStateImages const* screw_states,
+            ParamStateImages const* envelope_shapes_01,
+            ParamStateImages const* envelope_shapes_10
         );
 
         void build_lfos_body(ParamStateImages const* knob_states);
@@ -265,6 +269,8 @@ class GUI
 
         ParamStateImages const* knob_states;
         ParamStateImages const* screw_states;
+        ParamStateImages const* envelope_shapes_01;
+        ParamStateImages const* envelope_shapes_10;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;

@@ -571,12 +571,13 @@ ParamStateImages::ParamStateImages(
 ) : count(count),
     width(width),
     height(height),
-    last_index((Number)(count - 1)),
     widget(widget),
     free_image(free_image),
     controlled_image(controlled_image),
     synced_image(synced_image),
-    none_image(none_image)
+    none_image(none_image),
+    last_index(count - 1),
+    last_index_float((Number)last_index)
 {
     free_images = split_image(free_image);
     controlled_images = split_image(controlled_image);
@@ -646,6 +647,14 @@ GUI::Image* ParamStateImages::free_images_(GUI::Image* images) const
     delete[] images;
 
     return NULL;
+}
+
+
+size_t ParamStateImages::ratio_to_index(Number const ratio) const
+{
+    size_t const index = (size_t)std::round(last_index_float * ratio);
+
+    return index <= last_index ? index : last_index;
 }
 
 
@@ -1045,11 +1054,7 @@ void KnobParamEditor::Knob::update()
         return;
     }
 
-    size_t index = (size_t)(knob_states->last_index * this->ratio);
-
-    if (index == 0 && this->ratio > 0.000001) {
-        index = 1;
-    }
+    size_t const index = knob_states->ratio_to_index(this->ratio);
 
     if (is_controlled) {
         set_image(knob_states->controlled_images[index]);
@@ -1475,11 +1480,74 @@ DiscreteParamEditor::DiscreteParamEditor(
         Synth::ParamId const param_id,
         char const* const* const options,
         size_t const number_of_options
+) : DiscreteParamEditor(
+    gui,
+    text,
+    left,
+    top,
+    width,
+    height,
+    value_left,
+    value_width,
+    synth,
+    param_id,
+    options,
+    number_of_options,
+    NULL
+) {
+}
+
+
+DiscreteParamEditor::DiscreteParamEditor(
+        GUI& gui,
+        char const* const text,
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        int const value_left,
+        int const value_width,
+        Synth& synth,
+        Synth::ParamId const param_id,
+        ParamStateImages const* state_images
+) : DiscreteParamEditor(
+    gui,
+    text,
+    left,
+    top,
+    width,
+    height,
+    value_left,
+    value_width,
+    synth,
+    param_id,
+    NULL,
+    0,
+    state_images
+) {
+}
+
+
+DiscreteParamEditor::DiscreteParamEditor(
+        GUI& gui,
+        char const* const text,
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        int const value_left,
+        int const value_width,
+        Synth& synth,
+        Synth::ParamId const param_id,
+        char const* const* const options,
+        size_t const number_of_options,
+        ParamStateImages const* state_images
 ) : TransparentWidget(text, left, top, width, height, Type::DISCRETE_PARAM_EDITOR),
     param_id(param_id),
     synth(synth),
     ratio(0.0),
     step_size(1.001 / synth.get_param_max_value(param_id)),
+    state_images(state_images),
     options(options),
     number_of_options(number_of_options),
     value_left(value_left),
@@ -1487,7 +1555,17 @@ DiscreteParamEditor::DiscreteParamEditor(
     is_editing_(false)
 {
     set_gui(gui);
-    update_value_str();
+}
+
+
+
+void DiscreteParamEditor::set_up(
+        GUI::PlatformData platform_data,
+        WidgetBase* parent
+) {
+    Widget::set_up(platform_data, parent);
+
+    update();
 }
 
 
@@ -1502,7 +1580,7 @@ void DiscreteParamEditor::refresh()
 
     if (is_changed) {
         ratio = GUI::clamp_ratio(new_ratio);
-        update_value_str();
+        update();
         redraw();
     } else {
         synth.push_message(
@@ -1512,9 +1590,13 @@ void DiscreteParamEditor::refresh()
 }
 
 
-void DiscreteParamEditor::update_value_str()
+void DiscreteParamEditor::update()
 {
-    update_value_str(synth.int_param_ratio_to_display_value(param_id, ratio));
+    if (options != NULL) {
+        update_value_str(synth.int_param_ratio_to_display_value(param_id, ratio));
+    } else if (state_images != NULL) {
+        set_image(state_images->free_images[state_images->ratio_to_index(ratio)]);
+    }
 }
 
 
@@ -1556,9 +1638,11 @@ bool DiscreteParamEditor::paint()
 {
     TransparentWidget::paint();
 
-    draw_text(
-        value_str, 10, value_left, 0, value_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
-    );
+    if (state_images == NULL) {
+        draw_text(
+            value_str, 10, value_left, 0, value_width, height, GUI::TEXT_COLOR, GUI::TEXT_BACKGROUND
+        );
+    }
 
     return true;
 }
@@ -1593,7 +1677,7 @@ void DiscreteParamEditor::set_ratio(Number const new_ratio)
     }
 
     synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
-    update_value_str();
+    update();
     redraw();
 }
 
@@ -1674,7 +1758,7 @@ void TuningSelector::refresh()
     if (is_changed) {
         ratio = GUI::clamp_ratio(new_ratio);
         is_mts_esp_connected = new_is_mts_esp_connected;
-        update_value_str();
+        update();
         redraw();
     } else {
         synth.push_message(
@@ -1684,12 +1768,12 @@ void TuningSelector::refresh()
 }
 
 
-void TuningSelector::update_value_str()
+void TuningSelector::update()
 {
     Byte const value = synth.int_param_ratio_to_display_value(param_id, ratio);
 
     if ((Modulator::Tuning)value < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
-        DiscreteParamEditor::update_value_str(value);
+        update_value_str(value);
 
         return;
     }
