@@ -390,8 +390,8 @@ void ControllerSelector::select_controller(
 
     for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
         if (
-                controllers[i]->required_capability == 0
-                || (controllers[i]->required_capability & controller_choices) != 0
+                controllers[i]->required_capability == GUI::ControllerCapability::NONE
+                || ((int)controllers[i]->required_capability & controller_choices) != 0
         ) {
             controllers[i]->show();
         } else {
@@ -702,7 +702,7 @@ KnobParamEditor::KnobParamEditor(
         Synth::ParamId const param_id,
         int const controller_choices,
         char const* const* const options,
-        int const number_of_options,
+        size_t const number_of_options,
         ParamStateImages const* knob_states
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
@@ -1474,14 +1474,14 @@ DiscreteParamEditor::DiscreteParamEditor(
         Synth& synth,
         Synth::ParamId const param_id,
         char const* const* const options,
-        int const options_count
+        size_t const number_of_options
 ) : TransparentWidget(text, left, top, width, height, Type::DISCRETE_PARAM_EDITOR),
     param_id(param_id),
     synth(synth),
     ratio(0.0),
     step_size(1.001 / synth.get_param_max_value(param_id)),
     options(options),
-    options_count(options_count),
+    number_of_options(number_of_options),
     value_left(value_left),
     value_width(value_width),
     is_editing_(false)
@@ -1527,7 +1527,7 @@ void DiscreteParamEditor::update_value_str(Byte const value)
         1.0,
         NULL,
         options,
-        options_count,
+        number_of_options,
         value_str,
         TEXT_MAX_LENGTH
     );

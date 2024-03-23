@@ -1103,7 +1103,7 @@ void GUI::param_ratio_to_str(
         Number const scale,
         char const* const format,
         char const* const* const options,
-        int const number_of_options,
+        size_t const number_of_options,
         char* const buffer,
         size_t const buffer_size
 ) {
@@ -1159,7 +1159,7 @@ void GUI::param_ratio_to_str_int(
         Synth::ParamId const param_id,
         Number const ratio,
         char const* const* const options,
-        int const number_of_options,
+        size_t const number_of_options,
         char* const buffer,
         size_t const buffer_size
 ) {
@@ -1167,7 +1167,7 @@ void GUI::param_ratio_to_str_int(
         synth.int_param_ratio_to_display_value(param_id, ratio)
     );
 
-    if (((int)value >= number_of_options) || ((int)value < 0)) {
+    if ((size_t)value >= number_of_options) {
         buffer[0] = '\x00';
 
         return;

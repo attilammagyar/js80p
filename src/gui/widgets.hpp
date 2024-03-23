@@ -331,7 +331,7 @@ class KnobParamEditor : public TransparentWidget
             Synth::ParamId const param_id,
             int const controller_choices,
             char const* const* const options,
-            int const number_of_options,
+            size_t const number_of_options,
             ParamStateImages const* knob_states
         );
 
@@ -459,7 +459,7 @@ class KnobParamEditor : public TransparentWidget
         ParamStateImages const* knob_states;
 
         char const* const* const options;
-        int const number_of_options;
+        size_t const number_of_options;
         int const value_font_size;
         int const controller_choices;
 
@@ -616,7 +616,7 @@ class DiscreteParamEditor : public TransparentWidget
             Synth& synth,
             Synth::ParamId const param_id,
             char const* const* const options,
-            int const options_count
+            size_t const number_of_options
         );
 
         virtual void refresh();
@@ -650,7 +650,7 @@ class DiscreteParamEditor : public TransparentWidget
         Number const step_size;
 
         char const* const* const options;
-        int const options_count;
+        size_t const number_of_options;
 
         int const value_left;
         int const value_width;
