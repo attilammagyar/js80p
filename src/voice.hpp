@@ -57,7 +57,7 @@ class OscillatorInaccuracyParam : public Param<OscillatorInaccuracyLevel, ParamE
 class OscillatorInaccuracy
 {
     public:
-        static constexpr Integer MAX_LEVEL = 60;
+        static constexpr Byte MAX_LEVEL = 60;
 
         static constexpr Number MIN = 0.1;
         static constexpr Number MAX = 1.0;
