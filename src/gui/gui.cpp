@@ -1397,6 +1397,24 @@ constexpr int pos_rel_offset_top = 0;
         )                                                           \
     )
 
+#define DPET(owner, l, t, w, h, vl, vw, param_id, opts, nopts)      \
+    owner->own(                                                     \
+        new DiscreteParamEditor(                                    \
+            *this,                                                  \
+            GUI::PARAMS[param_id],                                  \
+            pos_rel_offset_left + l,                                \
+            pos_rel_offset_top + t,                                 \
+            w,                                                      \
+            h,                                                      \
+            vl,                                                     \
+            vw,                                                     \
+            synth,                                                  \
+            param_id,                                               \
+            opts,                                                   \
+            nopts                                                   \
+        )                                                           \
+    )
+
 #define M____ (ControllerCapability::MIDI_CONTROLLER)
 
 #define MM___ (                                                 \
@@ -2268,16 +2286,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
 
-    constexpr int aew = 90;
-    constexpr int aeh = 21;
-    constexpr int aetw = 25;
-    constexpr int aetl = 62;
     constexpr char const* const* ae = JS80P::GUI::LFO_AMOUNT_ENVELOPES;
     constexpr int aec = JS80P::GUI::LFO_AMOUNT_ENVELOPES_COUNT;
 
     POSITION_RELATIVE_BEGIN(12, 4);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L1FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2288,16 +2300,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L1SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L1CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L1AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L1AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L1AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 4);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L2WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L2FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L2PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2308,16 +2314,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L2SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L2CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L2AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L2AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L2AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 144);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L3WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L3FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L3PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2328,16 +2328,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L3SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L3CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L3AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L3AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L3AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 144);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L4WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L4FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L4PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2348,16 +2342,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L4SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L4CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L4AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L4AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L4AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 284);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L5WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L5FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L5PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2368,16 +2356,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L5SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L5CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L5AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L5AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L5AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 284);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L6WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L6FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L6PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2388,16 +2370,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L6SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L6CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L6AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L6AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L6AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 424);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L7WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L7FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L7PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2408,16 +2384,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L7SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L7CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L7AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L7AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L7AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 424);
-    constexpr int ael = pos_rel_offset_left + 260;
-    constexpr int aet = pos_rel_offset_top + 3;
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L8WAV,  MM___,    wf, wfc, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L8FRQ,  MML_C,    "%.2f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L8PHS,  MML_C,    "%.1f", 360.0, knob_states);
@@ -2428,11 +2398,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L8SYN);
     TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L8CEN);
-    lfos_body->own(
-        new DiscreteParamEditor(
-            *this, GUI::PARAMS[Synth::ParamId::L8AEN], ael, aet, aew, aeh, aetl, aetw, synth, Synth::ParamId::L8AEN, ae, aec
-        )
-    );
+    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L8AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     lfos_body->hide();
