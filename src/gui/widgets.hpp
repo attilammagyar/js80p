@@ -275,11 +275,11 @@ class ParamStateImages
 
         ~ParamStateImages();
 
+        size_t ratio_to_index(Number const ratio) const;
+
         size_t const count;
         int const width;
         int const height;
-
-        Number const last_index;
 
         WidgetBase* widget;
 
@@ -295,6 +295,9 @@ class ParamStateImages
     private:
         GUI::Image* split_image(GUI::Image image) const;
         GUI::Image* free_images_(GUI::Image* images) const;
+
+        size_t const last_index;
+        Number const last_index_float;
 };
 
 
@@ -619,12 +622,28 @@ class DiscreteParamEditor : public TransparentWidget
             size_t const number_of_options
         );
 
+        DiscreteParamEditor(
+            GUI& gui,
+            char const* const text,
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            int const value_left,
+            int const value_width,
+            Synth& synth,
+            Synth::ParamId const param_id,
+            ParamStateImages const* state_images
+        );
+
         virtual void refresh();
 
         Synth::ParamId const param_id;
 
     protected:
         static constexpr size_t TEXT_MAX_LENGTH = 24;
+
+        virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent) override;
 
         virtual bool paint() override;
         virtual bool mouse_up(int const x, int const y) override;
@@ -634,7 +653,7 @@ class DiscreteParamEditor : public TransparentWidget
 
         void set_ratio(Number const new_ratio);
 
-        virtual void update_value_str();
+        virtual void update();
         void update_value_str(Byte const value);
 
         bool is_editing() const;
@@ -644,10 +663,28 @@ class DiscreteParamEditor : public TransparentWidget
         Number ratio;
 
     private:
+        DiscreteParamEditor(
+            GUI& gui,
+            char const* const text,
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            int const value_left,
+            int const value_width,
+            Synth& synth,
+            Synth::ParamId const param_id,
+            char const* const* const options,
+            size_t const number_of_options,
+            ParamStateImages const* state_images
+        );
+
         void start_editing();
         void stop_editing();
 
         Number const step_size;
+
+        ParamStateImages const* const state_images;
 
         char const* const* const options;
         size_t const number_of_options;
@@ -676,7 +713,7 @@ class TuningSelector : public DiscreteParamEditor
         virtual void refresh() override;
 
     protected:
-        virtual void update_value_str() override;
+        virtual void update() override;
 
     private:
         bool is_mts_esp_connected;

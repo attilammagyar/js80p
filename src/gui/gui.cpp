@@ -1397,6 +1397,23 @@ constexpr int pos_rel_offset_top = 0;
         )                                                           \
     )
 
+#define DPEI(owner, left, top, w, h, vleft, vwidth, param_id, imgs) \
+    owner->own(                                                     \
+        new DiscreteParamEditor(                                    \
+            *this,                                                  \
+            GUI::PARAMS[param_id],                                  \
+            pos_rel_offset_left + left,                             \
+            pos_rel_offset_top + top,                               \
+            w,                                                      \
+            h,                                                      \
+            vleft,                                                  \
+            vwidth,                                                 \
+            synth,                                                  \
+            param_id,                                               \
+            imgs                                                    \
+        )                                                           \
+    )
+
 #define DPET(owner, l, t, w, h, vl, vw, param_id, opts, nopts)      \
     owner->own(                                                     \
         new DiscreteParamEditor(                                    \
@@ -1503,6 +1520,28 @@ GUI::GUI(
         SCREW_H
     );
 
+    envelope_shapes_01 = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "ENVSHAPES01"),
+        NULL,
+        NULL,
+        NULL,
+        10,
+        21,
+        21
+    );
+
+    envelope_shapes_10 = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "ENVSHAPES10"),
+        NULL,
+        NULL,
+        NULL,
+        10,
+        21,
+        21
+    );
+
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
     macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
     macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
@@ -1529,8 +1568,8 @@ GUI::GUI(
     build_macros_1_body(knob_states);
     build_macros_2_body(knob_states);
     build_effects_body(knob_states);
-    build_envelopes_1_body(knob_states, screw_states);
-    build_envelopes_2_body(knob_states, screw_states);
+    build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
+    build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_lfos_body(knob_states);
     build_synth_body(knob_states, screw_states);
 
@@ -1993,8 +2032,12 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
 }
 
 
-void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
-{
+void GUI::build_envelopes_1_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* screw_states,
+        ParamStateImages const* envelope_shapes_01,
+        ParamStateImages const* envelope_shapes_10
+) {
     envelopes_1_body = new TabBody("Envelopes");
 
     background->own(envelopes_1_body);
@@ -2018,6 +2061,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N1VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N1DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N1SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N1ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N1DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N1RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2040,6 +2088,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N2VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N2DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N2SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N2ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N2DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N2RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2062,6 +2115,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N3VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N3DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N3SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N3ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N3DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N3RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2084,6 +2142,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N4VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N4DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N4SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N4ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N4DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N4RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2106,6 +2169,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N5VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N5DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N5SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N5ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N5DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N5RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2128,6 +2196,11 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N6VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N6DYN);
+    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N6SYN);
+
+    DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N6ASH, envelope_shapes_01);
+    DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N6DSH, envelope_shapes_10);
+    DPEI(envelopes_1_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N6RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2135,8 +2208,12 @@ void GUI::build_envelopes_1_body(ParamStateImages const* knob_states, ParamState
 }
 
 
-void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
-{
+void GUI::build_envelopes_2_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* screw_states,
+        ParamStateImages const* envelope_shapes_01,
+        ParamStateImages const* envelope_shapes_10
+) {
     envelopes_2_body = new TabBody("Envelopes");
 
     background->own(envelopes_2_body);
@@ -2160,6 +2237,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N7VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N7DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N7SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N7ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N7DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N7RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2182,6 +2264,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N8VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N8DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N8SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N8ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N8DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N8RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2204,6 +2291,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N9VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N9DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N9SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N9ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N9DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N9RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2226,6 +2318,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N10VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N10DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N10SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N10ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N10DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N10RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2248,6 +2345,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N11VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N11DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N11SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N11ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N11DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N11RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2270,6 +2372,11 @@ void GUI::build_envelopes_2_body(ParamStateImages const* knob_states, ParamState
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N12VIN, "%.2f%%", 100.0, screw_states);
 
     TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N12DYN);
+    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N12SYN);
+
+    DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N12ASH, envelope_shapes_01);
+    DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N12DSH, envelope_shapes_10);
+    DPEI(envelopes_2_body, 113, 4, 21, 21, 0, 21, Synth::ParamId::N12RSH, envelope_shapes_10);
 
     POSITION_RELATIVE_END();
 
@@ -2533,6 +2640,8 @@ GUI::~GUI()
 
     delete knob_states;
     delete screw_states;
+    delete envelope_shapes_01;
+    delete envelope_shapes_10;
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(macros_1_image);

@@ -41,15 +41,17 @@ GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
 
 GUI_IMAGES = \
 	gui/img/about.bmp \
-	gui/img/macros1.bmp \
-	gui/img/macros2.bmp \
 	gui/img/effects.bmp \
 	gui/img/envelopes1.bmp \
 	gui/img/envelopes2.bmp \
+	gui/img/env_shapes-01.bmp \
+	gui/img/env_shapes-10.bmp \
 	gui/img/knob_states-controlled.bmp \
 	gui/img/knob_states-free.bmp \
 	gui/img/knob_states-none.bmp \
 	gui/img/lfos.bmp \
+	gui/img/macros1.bmp \
+	gui/img/macros2.bmp \
 	gui/img/screw_states.bmp \
 	gui/img/screw_states_synced.bmp \
 	gui/img/synth.bmp \
