@@ -192,7 +192,7 @@ TEST(filter_inaccuracy, {
         {   0.00,    0.33,    0.00},
         { 500.00, 2500.00, 5000.00},
         0.002006,
-        0.176
+        0.177
     );
     test_inaccurate_filter(
         BiquadFilter<SumOfSines>::NOTCH,
@@ -216,7 +216,7 @@ TEST(filter_inaccuracy, {
         {   0.33,    0.66,    0.33},
         { 500.00, 2500.00, 5000.00},
         0.00000494331,
-        0.2
+        0.201
     );
     test_inaccurate_filter(
         BiquadFilter<SumOfSines>::LOW_SHELF,
@@ -417,6 +417,6 @@ TEST(filter_inaccuracy, {
         {   0.33,    0.00,    0.33},
         { 500.00,    0.00, 5000.00},
         0.0,
-        0.086
+        0.087
     );
 })

@@ -277,11 +277,11 @@ class Math
 
         static constexpr int RANDOMS = 0x0200;
         static constexpr int RANDOMS_MAX_INDEX = RANDOMS - 1;
-        static constexpr Number RANDOM_SCALE = (Number)RANDOMS;
+        static constexpr Number RANDOM_SCALE = (Number)RANDOMS_MAX_INDEX;
 
         static constexpr int DISTORTION_TABLE_SIZE = 0x0800;
         static constexpr int DISTORTION_TABLE_MAX_INDEX = DISTORTION_TABLE_SIZE - 1;
-        static constexpr Number DISTORTION_SCALE = (Number)DISTORTION_TABLE_SIZE;
+        static constexpr Number DISTORTION_SCALE = (Number)DISTORTION_TABLE_MAX_INDEX;
 
         static constexpr Number SINE_SCALE = (Number)SIN_TABLE_SIZE / PI_DOUBLE;
 
