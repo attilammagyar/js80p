@@ -584,7 +584,7 @@ bool Envelope::is_dynamic() const noexcept
 
 
 template<class ParamType = FloatParamB>
-bool Envelope::update_change_index(ParamType const& param, Integer& change_index)
+bool Envelope::update_change_index(ParamType const& param, Integer& change_index) noexcept
 {
     Integer const new_change_index = param.get_change_index();
 

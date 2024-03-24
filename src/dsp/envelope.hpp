@@ -228,7 +228,7 @@ class Envelope
         ) noexcept;
 
         template<class ParamType>
-        bool update_change_index(ParamType const& param, Integer& change_index);
+        bool update_change_index(ParamType const& param, Integer& change_index) noexcept;
 
         Number randomize_value(
             FloatParamB const& param,
