@@ -302,6 +302,8 @@ FST_SOURCES = \
 	$(FST_MAIN_SOURCES) \
 	$(JS80P_SOURCES)
 
+VSTXMLGEN_SOURCES = src/plugin/fst/vstxmlgen.cpp
+
 VST3_HEADERS = \
 	$(JS80P_HEADERS) \
 	src/plugin/vst3/plugin.hpp
@@ -336,6 +338,8 @@ UPGRADE_PATCH_SOURCES = src/upgrade_patch.cpp
 
 MTS_ESP_SOURCES = lib/mtsesp/Client/libMTSClient.cpp
 MTS_ESP_HEADERS = lib/mtsesp/Client/libMTSClient.h
+
+CPPCHECK_DONE = $(BUILD_DIR)/cppcheck-done.txt
 
 TEST_LIBS = \
 	tests/test.cpp \
@@ -426,6 +430,7 @@ $(BUILD_DIR_BASE) $(DIST_DIR_BASE) $(API_DOC_DIR):
 
 clean:
 	$(RM) \
+		$(CPPCHECK_DONE) \
 		$(DEV_DIR)/chord.o \
 		$(DEV_PLATFORM_CLEAN) \
 		$(FST) \
@@ -444,7 +449,7 @@ clean:
 		$(VSTXMLGEN_OBJS)
 	$(RM) $(API_DOC_DIR)/html/*.* $(API_DOC_DIR)/html/search/*.*
 
-check: perf static_analysis upgrade_patch $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
+check: perf $(CPPCHECK_DONE) upgrade_patch $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(DEV_DIR)
 check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(DEV_DIR)
 check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(DEV_DIR)
@@ -460,8 +465,26 @@ docs: Doxyfile $(API_DOC_DIR) $(API_DOC_DIR)/html/index.html
 
 gui_playground: $(GUI_PLAYGROUND)
 
-static_analysis:
+static_analysis: $(CPPCHECK_DONE)
+
+$(CPPCHECK_DONE): \
+		$(FST_HEADERS) \
+		$(FST_SOURCES) \
+		$(GUI_HEADERS) \
+		$(GUI_PLAYGROUND_SOURCES) \
+		$(GUI_SOURCES) \
+		$(JS80P_HEADERS) \
+		$(JS80P_SOURCES) \
+		$(MTS_ESP_HEADERS) \
+		$(MTS_ESP_SOURCES) \
+		$(UPGRADE_PATCH_SOURCES) \
+		$(VST3_HEADERS) \
+		$(VST3_SOURCES) \
+		$(VSTXMLGEN_SOURCES) \
+		$(TEST_CPPS) \
+		$(TEST_LIBS)
 	$(CPPCHECK) $(CPPCHECK_FLAGS) src/ tests/
+	echo > $@
 
 upgrade_patch: $(UPGRADE_PATCH)
 
@@ -560,7 +583,7 @@ $(VSTXML): $(VSTXMLGEN) | $(DIST_DIR_BASE)
 $(VSTXMLGEN): $(VSTXMLGEN_OBJS) | $(DEV_DIR)
 	$(LINK_DEV_EXE) $^ -o $@
 
-$(OBJ_DEV_VSTXMLGEN): src/plugin/fst/vstxmlgen.cpp $(FST_HEADERS) | $(DEV_DIR)
+$(OBJ_DEV_VSTXMLGEN): $(VSTXMLGEN_SOURCES) $(FST_HEADERS) | $(DEV_DIR)
 	$(COMPILE_DEV) \
 		$(FST_CXXINCS) $(FST_CXXFLAGS) $(MTS_ESP_CXXFLAGS) \
 		-c -o $@ $<
