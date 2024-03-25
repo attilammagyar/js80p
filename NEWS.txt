@@ -1,6 +1,7 @@
 v?.?.? (2024-0?-??)
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
    a polyphonic parameter.
+ * Envelope attack, decay, and release shape can now be configured.
  * The number of Envelopes has been increased to 12.
  * Filter Q parameter can also use logarithmic scale.
  * Various performance and RAM usage improvements.

@@ -168,6 +168,9 @@ constexpr size_t ENVELOPE_RANDOMS_COUNT = 9;
 typedef Number EnvelopeRandoms[ENVELOPE_RANDOMS_COUNT];
 
 
+typedef Byte EnvelopeShape;
+
+
 /* The VST 3 SDK uses a macro named "RELEASE", hence the prefix. */
 enum EnvelopeStage {
     ENV_STG_NONE = 0,
@@ -201,6 +204,10 @@ class EnvelopeSnapshot
         Seconds release_time;
 
         Integer change_index;
+
+        EnvelopeShape attack_shape;
+        EnvelopeShape decay_shape;
+        EnvelopeShape release_shape;
 };
 
 

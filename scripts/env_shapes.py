@@ -44,6 +44,9 @@ PURPLE_3 = (230, 140, 250)
 YELLOW_1 = (255, 175, 120)
 YELLOW_2 = (255, 215, 140)
 YELLOW_3 = (255, 255, 160)
+RED_1 = (210, 100, 100)
+RED_2 = (230, 140, 140)
+RED_3 = (250, 180, 180)
 
 SUBPIXELS = 5
 
@@ -54,28 +57,9 @@ STROKE_WIDTH = int(SUBPIXELS * 3.5 + 0.5)
 
 
 FUNCTIONS = (
-    # Antiderivative of 6 * (x - x ^ 2).
-    # Construction: the idea is to map [0, 1] to itself with a smooth function f
-    # for which all of the following properties hold:
-    #  1. f(0) = 0.
-    #  2. f(1) = 1.
-    #  3. f'(0) = f'(1) = 0 (ie. connect smoothly to the constant 0 and 1
-    #     functions on the respective ends).
-    #  4. f'(x) > 0 for all x where 0 < x < 1.
-    #  5. f'(x) = f'(1 - x) for all x where 0 < x < 1.
-    #  6. f''(1 / 2) = 0.
-    #  7. f''(x) > 0 for all x where 0 <= x < 1 / 2.
-    #  8. f''(x) < 0 for all x where 1 / 2 < x <= 1.
-    # The 1 / 4 - (x - 1 / 2) ^ 2 function is almost perfect for the role of
-    # f', but it needs to be scaled by 6 in order to make f fit the bill.
-    # Expansion and simplification gives 6 * (x - x ^ 2).
+    # See Math::apply_envelope_shape().
     (CYAN_1, lambda x: ((-2.0 * x + 3.0) * x) * x),
-
-    # Antiderivative of 30 * ((x - x ^ 2) ^ 2). Same idea as above but steeper.
     (CYAN_2, lambda x: ((((6.0 * x - 15.0) * x + 10.0) * x) * x) * x),
-
-    # Antiderivative of 2772 * ((x - x ^ 2) ^ 5). Same idea as above but even
-    # more steep.
     (CYAN_3, lambda x: ((((((((((-252.0 * x + 1386.0) * x - 3080.0) * x + 3465.0) * x - 1980.0) * x + 462.0) * x) * x) * x) * x) * x) * x),
 
     (PURPLE_1, lambda x: x ** 2.0),
@@ -85,6 +69,10 @@ FUNCTIONS = (
     (YELLOW_1, lambda x: x * (1.0 - log(x + 0.001)) / (1.0 - log(1.001))),
     (YELLOW_2, lambda x: (x * (1.0 - log(x + 0.001)) / (1.0 - log(1.001))) ** (2.0 / 3.0)),
     (YELLOW_3, lambda x: (x * (1.0 - log(x + 0.001)) / (1.0 - log(1.001))) ** (1.0 / 3.0)),
+
+    (RED_1, lambda x: ((4.0 * x - 6.0) * x + 3.0) * x),
+    (RED_2, lambda x: ((((16.0 * x - 40.0) * x + 40.0) * x - 20.0) * x + 5.0) * x),
+    (RED_3, lambda x: ((((((((((1024.0 * x - 5632.0) * x + 14080.0) * x - 21120.0) * x + 21120.0) * x - 14784.0) * x + 7392.0) * x - 2640.0) * x + 660.0) * x - 110.0) * x + 11.0) * x),
 
     (LIGHT_GREY, lambda x: x),
 )

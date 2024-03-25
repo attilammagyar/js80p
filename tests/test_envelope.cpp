@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <string>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -698,4 +699,140 @@ TEST(envelope_rendering, {
         },
         true
     );
+})
+
+
+constexpr int SHAPE_TEST_SAMPLE_COUNT = 9;
+constexpr int SHAPE_TEST_REL_LENGTH = SHAPE_TEST_SAMPLE_COUNT + 1;
+
+
+std::string shape_test_array_to_string(Sample const samples[SHAPE_TEST_SAMPLE_COUNT])
+{
+    constexpr int max_length = 256;
+    char buffer[max_length];
+    int pos = 0;
+
+    std::fill_n(buffer, max_length, '\x00');
+
+    for (int i = 0; i != SHAPE_TEST_SAMPLE_COUNT && pos < max_length; ++i) {
+        int const written = snprintf(
+            &buffer[pos], (size_t)max_length, "%.5f ", samples[i]
+        );
+
+        if (written <= 0) {
+            break;
+        }
+
+        pos += written;
+    }
+
+    return std::string(buffer);
+}
+
+
+void test_envelope_shape(
+        EnvelopeShape const shape,
+        Sample const reference_samples[SHAPE_TEST_SAMPLE_COUNT],
+        char const expected_relations[SHAPE_TEST_REL_LENGTH]
+) {
+    constexpr Frequency sample_rate = (Frequency)(SHAPE_TEST_SAMPLE_COUNT - 2);
+    constexpr Seconds sampling_period = 1.0 / sample_rate;
+    constexpr EnvelopeRandoms randoms = {
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    };
+
+    Envelope envelope("E");
+    EnvelopeSnapshot snapshot;
+    Sample buffer_1[SHAPE_TEST_SAMPLE_COUNT];
+    Sample buffer_2[SHAPE_TEST_SAMPLE_COUNT];
+    char actual_relations[SHAPE_TEST_REL_LENGTH];
+    Number last_rendered_value = 0.0;
+    Seconds time = 0.0;
+    EnvelopeStage stage = EnvelopeStage::ENV_STG_DAHD;
+    bool becomes_constant;
+
+    std::fill_n(actual_relations, SHAPE_TEST_REL_LENGTH, '\x00');
+
+    envelope.attack_shape.set_value(shape);
+    envelope.initial_value.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value((sample_rate - 1.0) / sample_rate);
+    envelope.hold_time.set_value(1.0);
+
+    envelope.make_snapshot(randoms, snapshot);
+
+    Envelope::render<Envelope::RenderingMode::OVERWRITE>(
+        snapshot,
+        time,
+        stage,
+        becomes_constant,
+        last_rendered_value,
+        sample_rate,
+        sampling_period,
+        0,
+        SHAPE_TEST_SAMPLE_COUNT,
+        buffer_1
+    );
+
+    for (int i = 0; i != SHAPE_TEST_SAMPLE_COUNT; ++i) {
+        if (Math::is_close(buffer_1[i], reference_samples[i])) {
+            actual_relations[i] = '=';
+        } else if (buffer_1[i] < reference_samples[i]) {
+            actual_relations[i] = '<';
+        } else {
+            actual_relations[i] = '>';
+        }
+    }
+
+    assert_eq(
+        expected_relations,
+        actual_relations,
+        "shape=%d\n    reference=%s\n     rendered=%s",
+        (int)shape,
+        shape_test_array_to_string(reference_samples).c_str(),
+        shape_test_array_to_string(buffer_1).c_str()
+    );
+
+    last_rendered_value = 0.0;
+    time = 0.0;
+    stage = EnvelopeStage::ENV_STG_DAHD;
+
+    for (int i = 0; i != SHAPE_TEST_SAMPLE_COUNT; ++i) {
+        last_rendered_value = Envelope::get_value_at_time(
+            snapshot,
+            time,
+            stage,
+            last_rendered_value,
+            sampling_period
+        );
+
+        buffer_2[i] = last_rendered_value;
+        time += sampling_period;
+    }
+
+    assert_eq(
+        buffer_1, buffer_2, SHAPE_TEST_SAMPLE_COUNT, DOUBLE_DELTA, "shape=%d", (int)shape
+    );
+}
+
+
+TEST(envelope_shapes, {
+    constexpr Sample reference_samples[SHAPE_TEST_REL_LENGTH] = {
+        0.0, 1.0 / 6.0, 2.0 / 6.0, 3.0 / 6.0, 4.0 / 6.0, 5.0 / 6.0, 1.0, 1.0, 1.0,
+    };
+
+    test_envelope_shape(Envelope::SHAPE_LINEAR, reference_samples, "=========");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH, reference_samples, "=<<=>>===");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH_STEEP, reference_samples, "=<<=>>===");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH_STEEPER, reference_samples, "=<<=>>===");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP, reference_samples, "=<<<<<===");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP_STEEP, reference_samples, "=<<<<<===");
+    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP_STEEPER, reference_samples, "=<<<<<===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH, reference_samples, "=>>>>>===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH_STEEP, reference_samples, "=>>>>>===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH_STEEPER, reference_samples, "=>>>>>===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP, reference_samples, "=>>=<<===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP_STEEP, reference_samples, "=>>=<<===");
+    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP_STEEPER, reference_samples, "=>>=<<===");
 })
