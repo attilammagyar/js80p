@@ -24,6 +24,7 @@
 
 #include "js80p.hpp"
 
+#include "dsp/math.hpp"
 #include "dsp/param.hpp"
 
 
@@ -81,20 +82,21 @@ class Envelope
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
         static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
 
-        typedef Byte Shape;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH = Math::EnvelopeShape::SMOOTH_SMOOTH;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEP = Math::EnvelopeShape::SMOOTH_SMOOTH_STEEP;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEPER = Math::EnvelopeShape::SMOOTH_SMOOTH_STEEPER;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP = Math::EnvelopeShape::SMOOTH_SHARP;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEP = Math::EnvelopeShape::SMOOTH_SHARP_STEEP;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEPER = Math::EnvelopeShape::SMOOTH_SHARP_STEEPER;
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH = Math::EnvelopeShape::SHARP_SMOOTH;
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEP = Math::EnvelopeShape::SHARP_SMOOTH_STEEP;
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEPER = Math::EnvelopeShape::SHARP_SMOOTH_STEEPER;
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP = Math::EnvelopeShape::SHARP_SHARP;
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEP = Math::EnvelopeShape::SHARP_SHARP_STEEP;
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEPER = Math::EnvelopeShape::SHARP_SHARP_STEEPER;
+        static constexpr EnvelopeShape SHAPE_LINEAR = 12;
 
-        static constexpr Shape SHAPE_SMOOTH_SMOOTH = 0;
-        static constexpr Shape SHAPE_SMOOTH_SMOOTH_STEEP = 1;
-        static constexpr Shape SHAPE_SMOOTH_SMOOTH_STEEPER = 2;
-        static constexpr Shape SHAPE_SMOOTH_SHARP = 3;
-        static constexpr Shape SHAPE_SMOOTH_SHARP_STEEP = 4;
-        static constexpr Shape SHAPE_SMOOTH_SHARP_STEEPER = 5;
-        static constexpr Shape SHAPE_SHARP_SMOOTH = 6;
-        static constexpr Shape SHAPE_SHARP_SMOOTH_STEEP = 7;
-        static constexpr Shape SHAPE_SHARP_SMOOTH_STEEPER = 8;
-        static constexpr Shape SHAPE_LINEAR = 9;
-
-        typedef Param<Shape, ParamEvaluation::BLOCK> ShapeParam;
+        typedef Param<EnvelopeShape, ParamEvaluation::BLOCK> ShapeParam;
 
         static Number get_value_at_time(
                 EnvelopeSnapshot const& snapshot,
@@ -104,7 +106,7 @@ class Envelope
                 Seconds const sampling_period
         ) noexcept;
 
-        template<RenderingMode rendering_mode = RenderingMode::OVERWRITE>
+        template<RenderingMode rendering_mode>
         static void render(
             EnvelopeSnapshot const& snapshot,
             Seconds& time,
@@ -165,6 +167,7 @@ class Envelope
             Number& target_value,
             Seconds& time_until_target,
             Seconds& duration,
+            EnvelopeShape& shape,
             bool& becomes_constant,
             Seconds const sampling_period
         ) noexcept;
@@ -178,6 +181,7 @@ class Envelope
             Number& target_value,
             Seconds& time_until_target,
             Seconds& duration,
+            EnvelopeShape& shape,
             bool& becomes_constant,
             Seconds const sampling_period
         ) noexcept;
@@ -190,6 +194,7 @@ class Envelope
             Number const target_value,
             Seconds& time_until_target,
             Seconds& duration,
+            EnvelopeShape& shape,
             bool& becomes_constant
         ) noexcept;
 
@@ -201,30 +206,60 @@ class Envelope
             Number& target_value,
             Seconds& time_until_target,
             Seconds& duration,
+            EnvelopeShape& shape,
             bool& becomes_constant
         ) noexcept;
 
-        template<bool adjust_initial_value_during_dahds>
+        template<bool adjust_initial_value_during_dahds, bool need_shaping_for_initial_value_adjustment>
         static void set_up_interpolation(
             Number& initial_value,
             Number& delta,
             Number& initial_ratio,
             Number const last_rendered_value,
             Number const target_value,
-            EnvelopeStage const stage,
             Seconds const duration,
             Seconds const time_until_target,
             Seconds const sampling_period,
-            Number const duration_inv
+            Number const duration_inv,
+            EnvelopeStage const stage,
+            EnvelopeShape const shape
         ) noexcept;
 
-        template<RenderingMode rendering_mode = RenderingMode::OVERWRITE>
+        template<bool need_shaping>
+        static Number find_adjusted_initial_value(
+            Seconds const elapsed_time,
+            Seconds const sampling_period,
+            Number const duration_inv,
+            Number const last_rendered_value,
+            Number const target_value,
+            EnvelopeShape const shape
+        ) noexcept;
+
+        template<RenderingMode rendering_mode>
         static void render_constant(
             Seconds& time,
             Number const value,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample* buffer
+        ) noexcept;
+
+        template<RenderingMode rendering_mode, bool need_shaping>
+        static void render(
+            Seconds& time,
+            EnvelopeStage const stage,
+            Number& last_rendered_value,
+            Number& initial_value,
+            Number const target_value,
+            Seconds const duration,
+            Seconds const time_until_target,
+            Frequency const sample_rate,
+            Seconds const sampling_period,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            EnvelopeShape const shape,
+            Sample* buffer,
+            Integer& i
         ) noexcept;
 
         template<class ParamType>

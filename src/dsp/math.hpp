@@ -36,6 +36,21 @@ namespace JS80P
 class Math
 {
     public:
+        enum EnvelopeShape {
+            SMOOTH_SMOOTH = 0,
+            SMOOTH_SMOOTH_STEEP = 1,
+            SMOOTH_SMOOTH_STEEPER = 2,
+            SMOOTH_SHARP = 3,
+            SMOOTH_SHARP_STEEP = 4,
+            SMOOTH_SHARP_STEEPER = 5,
+            SHARP_SMOOTH = 6,
+            SHARP_SMOOTH_STEEP = 7,
+            SHARP_SMOOTH_STEEPER = 8,
+            SHARP_SHARP = 9,
+            SHARP_SHARP_STEEP = 10,
+            SHARP_SHARP_STEEPER = 11,
+        };
+
         static constexpr Number PI = 3.14159265358979323846264338327950288419716939937510;
         static constexpr Number PI_DOUBLE = 2.0 * PI;
         static constexpr Number PI_HALF = PI / 2.0;
@@ -104,6 +119,8 @@ class Math
         static constexpr Number DB_MIN = -120.0;
         static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
         static constexpr Number LINEAR_TO_DB_MAX = 5.0;
+
+        static constexpr int ENVELOPE_SHAPE_TABLE_SIZE = 0x0400;
 
         static bool is_abs_small(Number const x, Number const threshold = 0.000001) noexcept;
 
@@ -219,6 +236,11 @@ class Math
         static Number randomize_centered_lfo(Number const level, Number const number) noexcept;
 
         /**
+         * \brief Apply the given shaping function to an envelope value.
+         */
+        static Number apply_envelope_shape(EnvelopeShape const shape, Number const value) noexcept;
+
+        /**
          * \brief Look up the given floating point, non-negative \c index in the
          *        given table, with linear interpolation. If \c index is greater
          *        than or equal to \c max_index, then the last element of the
@@ -303,6 +325,9 @@ class Math
             (Number)LINEAR_TO_DB_TABLE_SIZE / LINEAR_TO_DB_MAX
         );
 
+        static constexpr int ENVELOPE_SHAPE_TABLE_MAX_INDEX = ENVELOPE_SHAPE_TABLE_SIZE - 1;
+        static constexpr Number ENVELOPE_SHAPE_SCALE = (Number)ENVELOPE_SHAPE_TABLE_MAX_INDEX;
+
         static Math const math;
 
         static Number iterate_exp(Number const x, Number const scale) noexcept;
@@ -315,6 +340,20 @@ class Math
         void init_log_biquad_filter_freq() noexcept;
         void init_log_biquad_filter_q() noexcept;
         void init_linear_to_db() noexcept;
+        void init_envelope_shapes() noexcept;
+
+        Number env_shape_smooth_smooth(Number const x) noexcept;
+        Number env_shape_smooth_smooth_steep(Number const x) noexcept;
+        Number env_shape_smooth_smooth_steeper(Number const x) noexcept;
+        Number env_shape_smooth_sharp(Number const x) noexcept;
+        Number env_shape_smooth_sharp_steep(Number const x) noexcept;
+        Number env_shape_smooth_sharp_steeper(Number const x) noexcept;
+        Number env_shape_sharp_smooth(Number const x) noexcept;
+        Number env_shape_sharp_smooth_steep(Number const x) noexcept;
+        Number env_shape_sharp_smooth_steeper(Number const x) noexcept;
+        Number env_shape_sharp_sharp(Number const x) noexcept;
+        Number env_shape_sharp_sharp_steep(Number const x) noexcept;
+        Number env_shape_sharp_sharp_steeper(Number const x) noexcept;
 
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;
@@ -330,6 +369,7 @@ class Math
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
         Number log_biquad_filter_q[LOG_BIQUAD_FILTER_Q_TABLE_SIZE];
         Number linear_to_dbs[LINEAR_TO_DB_TABLE_SIZE];
+        Number envelope_shapes[12][ENVELOPE_SHAPE_TABLE_SIZE];
 };
 
 }

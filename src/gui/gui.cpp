@@ -1526,7 +1526,7 @@ GUI::GUI(
         NULL,
         NULL,
         NULL,
-        10,
+        13,
         21,
         21
     );
@@ -1537,7 +1537,7 @@ GUI::GUI(
         NULL,
         NULL,
         NULL,
-        10,
+        13,
         21,
         21
     );
