@@ -654,6 +654,14 @@ size_t ParamStateImages::ratio_to_index(Number const ratio) const
 {
     size_t const index = (size_t)std::round(last_index_float * ratio);
 
+    if (index == 0 && last_index != 0 && ratio >= 0.000001) {
+        /*
+        Reserve the first image for 0.
+        (E.g. screw_states images utilize this behaviour.)
+        */
+        return 1;
+    }
+
     return index <= last_index ? index : last_index;
 }
 
