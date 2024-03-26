@@ -38,8 +38,8 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
 
     public:
         typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
-        typedef HighShelfPannedDelay<HighPassedInput> CombFilter1;
-        typedef HighShelfPannedDelay< HighShelfDelay<HighPassedInput> > CombFilter2;
+        typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter1;
+        typedef DistortedHighShelfPannedDelay< DistortedHighShelfDelay<HighPassedInput> > CombFilter2;
 
         Echo(
             std::string const& name,
@@ -53,6 +53,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS damping_gain;
         FloatParamS width;
         FloatParamS high_pass_frequency;
+        FloatParamS distortion_level;
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
 

@@ -45,6 +45,7 @@ def main(argv):
     print_cases(param_objs, "return $.ratio_to_value(ratio);");
     print_cases(param_objs, "$.set_ratio(ratio); break;");
     print_cases(param_objs, "return $.get_ratio();");
+    print_cases(param_objs, "is_assigned = assign_controller<FloatParamS>($, ctl_id); break;");
 
     return 0
 
@@ -144,6 +145,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
 
         ("$EDEL", " ///< $ Echo Delay", "effects.echo.delay_time"),
         ("$EFB", "  ///< $ Echo Feedback", "effects.echo.feedback"),
+        ("$EDST", " ///< $ Echo Distortion", "effects.echo.distortion_level"),
         ("$EDF", "  ///< $ Echo Dampening Frequency", "effects.echo.damping_frequency"),
         ("$EDG", "  ///< $ Echo Dampening Gain", "effects.echo.damping_gain"),
         ("$EWID", " ///< $ Echo Stereo Width", "effects.echo.width"),
@@ -156,6 +158,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$EDRY", " ///< $ Echo Dry Volume", "effects.echo.dry"),
 
         ("$RRS", "  ///< $ Reverb Room Size", "effects.reverb.room_size"),
+        ("$RDST", " ///< $ Reverb Distortion", "effects.reverb.distortion_level"),
         ("$RDF", "  ///< $ Reverb Dampening Frequency", "effects.reverb.damping_frequency"),
         ("$RDG", "  ///< $ Reverb Dampening Gain", "effects.reverb.damping_gain"),
         ("$RWID", " ///< $ Reverb Stereo Width", "effects.reverb.width"),

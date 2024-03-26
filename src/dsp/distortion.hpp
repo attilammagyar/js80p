@@ -34,8 +34,9 @@ namespace JS80P { namespace Distortion
 enum Type {
     SOFT = 0,
     HEAVY = 1,
+    DELAY_FEEDBACK = 2,
 
-    NUMBER_OF_TYPES = 2,
+    NUMBER_OF_TYPES = 3,
 };
 
 
@@ -59,7 +60,8 @@ class Tables
     private:
         static constexpr Sample SIZE_INV = 1.0 / (Sample)SIZE;
 
-        void fill_tables(Type const type, Number const steepness) noexcept;
+        void initialize_tables(Type const type, Number const steepness) noexcept;
+        void initialize_delay_feedback_tables() noexcept;
 
         Table f_tables[Type::NUMBER_OF_TYPES];
         Table F0_tables[Type::NUMBER_OF_TYPES];

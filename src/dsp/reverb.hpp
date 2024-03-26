@@ -43,7 +43,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         typedef Byte Type;
 
         typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
-        typedef HighShelfPannedDelay<HighPassedInput> CombFilter;
+        typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter;
 
         class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
         {
@@ -76,6 +76,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS damping_gain;
         FloatParamS width;
         FloatParamS high_pass_frequency;
+        FloatParamS distortion_level;
         ToggleParam log_scale_frequencies;
 
     protected:

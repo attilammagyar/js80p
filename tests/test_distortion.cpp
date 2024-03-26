@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <cmath>
+
 #include "test.cpp"
 #include "utils.cpp"
 
@@ -162,4 +165,64 @@ TEST(when_input_is_silent_then_distortion_is_no_op, {
     distorted_buffer = SignalProducer::produce<Distortion_>(distortion, 1, BLOCK_SIZE);
 
     assert_eq(input_buffer, distorted_buffer);
+})
+
+
+TEST(delay_feedback_distortion_will_eventually_decay_completely, {
+    constexpr Integer block_size = 2048;
+    constexpr Integer channels = 1;
+    Sample zeros[block_size];
+    Sample channel[block_size];
+    Sample const* const buffer[channels] = {channel};
+    FixedSignalProducer input(buffer, channels);
+    Distortion::Distortion<FixedSignalProducer> distortion(
+        "D", Distortion::Type::DELAY_FEEDBACK, input
+    );
+    distortion.level.set_value(1.0);
+    Sample const* const* rendered = NULL;
+    Sample peak;
+    Sample previous_peak = 999.0;
+    Integer peak_index;
+
+    std::fill_n(zeros, block_size, 0.0);
+
+    distortion.set_block_size(block_size);
+
+    for (Integer i = 0; i != block_size; ++i) {
+        constexpr Sample amplitude = Distortion::Tables::INPUT_MAX + 2.0;
+
+        Number const x = (Number)i / (Number)block_size;
+
+        channel[i] = amplitude * std::sin(Math::PI_DOUBLE * x);
+    }
+
+    for (Integer round = 0; round != 100; ++round) {
+        rendered = SignalProducer::produce< Distortion::Distortion<FixedSignalProducer> >(
+            distortion, round
+        );
+
+        SignalProducer::find_peak(rendered, channels, block_size, peak, peak_index);
+
+        if (round < 50) {
+            assert_lt(peak, previous_peak, "round=%d", (int)round);
+            assert_gt(peak, 0.0, "round=%d", (int)round);
+        } else {
+            assert_true(
+                peak == 0.0 || peak < previous_peak,
+                "round=%d,\n    peak=%.20e,\n    previous_peak=%.20e",
+                (int)round,
+                peak,
+                previous_peak
+            );
+        }
+
+        previous_peak = peak;
+
+        for (Integer i = 0; i != block_size; ++i) {
+            channel[i] = rendered[0][i] * Constants::DELAY_FEEDBACK_MAX;
+        }
+    }
+
+    assert_eq(rendered[0], zeros, block_size, 0.0);
+    assert_eq(0.0, peak, 0.0);
 })

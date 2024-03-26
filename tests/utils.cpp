@@ -137,8 +137,11 @@ class FixedSignalProducer : public SignalProducer
     public:
         static constexpr Integer CHANNELS = 2;
 
-        explicit FixedSignalProducer(Sample const* const* fixed_samples) noexcept
-            : SignalProducer(CHANNELS, 0),
+        explicit FixedSignalProducer(
+                Sample const* const* const fixed_samples,
+                Integer const channels = CHANNELS
+        ) noexcept
+            : SignalProducer(channels, 0),
             fixed_samples(fixed_samples)
         {
         }
@@ -146,6 +149,12 @@ class FixedSignalProducer : public SignalProducer
         Integer get_cached_round() const noexcept
         {
             return this->cached_round;
+        }
+
+        void set_fixed_samples(Sample const* const* const fixed_samples) noexcept
+        {
+            this->fixed_samples = fixed_samples;
+            this->cached_round = -1;
         }
 
     protected:
@@ -157,7 +166,7 @@ class FixedSignalProducer : public SignalProducer
         }
 
     private:
-        Sample const* const* const fixed_samples;
+        Sample const* const* fixed_samples;
 };
 
 

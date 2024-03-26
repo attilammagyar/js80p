@@ -116,6 +116,9 @@ class Math
 
         static constexpr Number LOG_BIQUAD_FILTER_Q_VALUE_OFFSET = 1.0;
 
+        static constexpr Number LINEAR_TO_DB_GAIN_SCALE = 20.0;
+        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / LINEAR_TO_DB_GAIN_SCALE;
+
         static constexpr Number DB_MIN = -120.0;
         static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
         static constexpr Number LINEAR_TO_DB_MAX = 5.0;
@@ -317,8 +320,6 @@ class Math
 
         static constexpr int LINEAR_TO_DB_TABLE_SIZE = 0x0800;
         static constexpr int LINEAR_TO_DB_TABLE_MAX_INDEX = LINEAR_TO_DB_TABLE_SIZE - 1;
-        static constexpr Number LINEAR_TO_DB_GAIN_SCALE = 20.0;
-        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / LINEAR_TO_DB_GAIN_SCALE;
 
         /* LINEAR_TO_DB_MIN is considered to be approximately 0.0 */
         static constexpr Number LINEAR_TO_DB_SCALE = (

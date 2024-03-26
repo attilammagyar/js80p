@@ -4,6 +4,8 @@ v?.?.? (2024-0?-??)
  * Envelope attack, decay, and release shape can now be configured.
  * The number of Envelopes has been increased to 12.
  * Filter Q parameter can also use logarithmic scale.
+ * The Echo and Reverb effects can now apply gradually increasing distortion to
+   the delayed signal.
  * Various performance and RAM usage improvements.
  * The source distribution can now be compiled for RISC-V 64 systems thanks to
    @aimixsaka.
