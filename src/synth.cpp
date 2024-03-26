@@ -491,6 +491,7 @@ void Synth::register_effects_params() noexcept
 
     register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
     register_param<FloatParamS>(ParamId::EEFB, effects.echo.feedback);
+    register_param<FloatParamS>(ParamId::EESAT, effects.echo.distortion_level);
     register_param<FloatParamS>(ParamId::EEDF, effects.echo.damping_frequency);
     register_param<FloatParamS>(ParamId::EEDG, effects.echo.damping_gain);
     register_param<FloatParamS>(ParamId::EEWID, effects.echo.width);
@@ -506,6 +507,7 @@ void Synth::register_effects_params() noexcept
 
     register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
     register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
+    register_param<FloatParamS>(ParamId::ERSAT, effects.reverb.distortion_level);
     register_param<FloatParamS>(ParamId::ERDF, effects.reverb.damping_frequency);
     register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
     register_param<FloatParamS>(ParamId::ERWID, effects.reverb.width);
@@ -1722,6 +1724,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::ECDRY: return effects.chorus.dry.get_default_ratio();
         case ParamId::EEDEL: return effects.echo.delay_time.get_default_ratio();
         case ParamId::EEFB: return effects.echo.feedback.get_default_ratio();
+        case ParamId::EESAT: return effects.echo.distortion_level.get_default_ratio();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_default_ratio();
         case ParamId::EEDG: return effects.echo.damping_gain.get_default_ratio();
         case ParamId::EEWID: return effects.echo.width.get_default_ratio();
@@ -1733,6 +1736,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::EEWET: return effects.echo.wet.get_default_ratio();
         case ParamId::EEDRY: return effects.echo.dry.get_default_ratio();
         case ParamId::ERRS: return effects.reverb.room_size.get_default_ratio();
+        case ParamId::ERSAT: return effects.reverb.distortion_level.get_default_ratio();
         case ParamId::ERDF: return effects.reverb.damping_frequency.get_default_ratio();
         case ParamId::ERDG: return effects.reverb.damping_gain.get_default_ratio();
         case ParamId::ERWID: return effects.reverb.width.get_default_ratio();
@@ -2024,6 +2028,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::ECDRY: return effects.chorus.dry.get_max_value();
         case ParamId::EEDEL: return effects.echo.delay_time.get_max_value();
         case ParamId::EEFB: return effects.echo.feedback.get_max_value();
+        case ParamId::EESAT: return effects.echo.distortion_level.get_max_value();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_max_value();
         case ParamId::EEDG: return effects.echo.damping_gain.get_max_value();
         case ParamId::EEWID: return effects.echo.width.get_max_value();
@@ -2035,6 +2040,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::EEWET: return effects.echo.wet.get_max_value();
         case ParamId::EEDRY: return effects.echo.dry.get_max_value();
         case ParamId::ERRS: return effects.reverb.room_size.get_max_value();
+        case ParamId::ERSAT: return effects.reverb.distortion_level.get_max_value();
         case ParamId::ERDF: return effects.reverb.damping_frequency.get_max_value();
         case ParamId::ERDG: return effects.reverb.damping_gain.get_max_value();
         case ParamId::ERWID: return effects.reverb.width.get_max_value();
@@ -2322,6 +2328,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::ECDRY: return effects.chorus.dry.ratio_to_value(ratio);
         case ParamId::EEDEL: return effects.echo.delay_time.ratio_to_value(ratio);
         case ParamId::EEFB: return effects.echo.feedback.ratio_to_value(ratio);
+        case ParamId::EESAT: return effects.echo.distortion_level.ratio_to_value(ratio);
         case ParamId::EEDF: return effects.echo.damping_frequency.ratio_to_value(ratio);
         case ParamId::EEDG: return effects.echo.damping_gain.ratio_to_value(ratio);
         case ParamId::EEWID: return effects.echo.width.ratio_to_value(ratio);
@@ -2333,6 +2340,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::EEWET: return effects.echo.wet.ratio_to_value(ratio);
         case ParamId::EEDRY: return effects.echo.dry.ratio_to_value(ratio);
         case ParamId::ERRS: return effects.reverb.room_size.ratio_to_value(ratio);
+        case ParamId::ERSAT: return effects.reverb.distortion_level.ratio_to_value(ratio);
         case ParamId::ERDF: return effects.reverb.damping_frequency.ratio_to_value(ratio);
         case ParamId::ERDG: return effects.reverb.damping_gain.ratio_to_value(ratio);
         case ParamId::ERWID: return effects.reverb.width.ratio_to_value(ratio);
@@ -2622,6 +2630,7 @@ Sample const* const* Synth::initialize_rendering(
 
     FloatParamS::produce_if_not_constant(effects.echo.delay_time, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.feedback, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.distortion_level, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.damping_frequency, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.damping_gain, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.width, round, sample_count);
@@ -2634,6 +2643,7 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.echo.dry, round, sample_count);
 
     FloatParamS::produce_if_not_constant(effects.reverb.room_size, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.reverb.distortion_level, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.damping_frequency, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.damping_gain, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.reverb.width, round, sample_count);
@@ -2930,6 +2940,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::ECDRY: effects.chorus.dry.set_ratio(ratio); break;
             case ParamId::EEDEL: effects.echo.delay_time.set_ratio(ratio); break;
             case ParamId::EEFB: effects.echo.feedback.set_ratio(ratio); break;
+            case ParamId::EESAT: effects.echo.distortion_level.set_ratio(ratio); break;
             case ParamId::EEDF: effects.echo.damping_frequency.set_ratio(ratio); break;
             case ParamId::EEDG: effects.echo.damping_gain.set_ratio(ratio); break;
             case ParamId::EEWID: effects.echo.width.set_ratio(ratio); break;
@@ -2941,6 +2952,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::EEWET: effects.echo.wet.set_ratio(ratio); break;
             case ParamId::EEDRY: effects.echo.dry.set_ratio(ratio); break;
             case ParamId::ERRS: effects.reverb.room_size.set_ratio(ratio); break;
+            case ParamId::ERSAT: effects.reverb.distortion_level.set_ratio(ratio); break;
             case ParamId::ERDF: effects.reverb.damping_frequency.set_ratio(ratio); break;
             case ParamId::ERDG: effects.reverb.damping_gain.set_ratio(ratio); break;
             case ParamId::ERWID: effects.reverb.width.set_ratio(ratio); break;
@@ -3734,6 +3746,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::ECDRY: return effects.chorus.dry.get_ratio();
         case ParamId::EEDEL: return effects.echo.delay_time.get_ratio();
         case ParamId::EEFB: return effects.echo.feedback.get_ratio();
+        case ParamId::EESAT: return effects.echo.distortion_level.get_ratio();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_ratio();
         case ParamId::EEDG: return effects.echo.damping_gain.get_ratio();
         case ParamId::EEWID: return effects.echo.width.get_ratio();
@@ -3745,6 +3758,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::EEWET: return effects.echo.wet.get_ratio();
         case ParamId::EEDRY: return effects.echo.dry.get_ratio();
         case ParamId::ERRS: return effects.reverb.room_size.get_ratio();
+        case ParamId::ERSAT: return effects.reverb.distortion_level.get_ratio();
         case ParamId::ERDF: return effects.reverb.damping_frequency.get_ratio();
         case ParamId::ERDG: return effects.reverb.damping_gain.get_ratio();
         case ParamId::ERWID: return effects.reverb.width.get_ratio();
