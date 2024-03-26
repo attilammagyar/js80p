@@ -38,7 +38,6 @@ Tables::Tables()
 {
     fill_tables(Type::SOFT, 3.0);
     fill_tables(Type::HEAVY, 10.0);
-    fill_tables(Type::DELAY, 6.0);
 }
 
 

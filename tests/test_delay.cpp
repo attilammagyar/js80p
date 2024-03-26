@@ -23,7 +23,6 @@
 
 #include "dsp/biquad_filter.cpp"
 #include "dsp/delay.cpp"
-#include "dsp/distortion.cpp"
 #include "dsp/envelope.cpp"
 #include "dsp/filter.cpp"
 #include "dsp/gain.cpp"
@@ -520,8 +519,6 @@ TEST(identical_delays_may_share_delay_buffer, {
 
 template<class PannedDelayClass>
 void test_panned_delay(
-        PannedDelayClass& panned_delay,
-        FixedSignalProducer& input,
         char const* class_name,
         Integer const block_size,
         Integer const rounds,
@@ -533,13 +530,12 @@ void test_panned_delay(
 
     Integer const sample_count = rounds * block_size;
 
+    FixedSignalProducer input(input_buffer);
     Buffer output(sample_count, FixedSignalProducer::CHANNELS);
+    PannedDelayClass panned_delay(input, PannedDelayStereoMode::FLIPPED);
 
-    input.set_fixed_samples(input_buffer);
     input.set_sample_rate(sample_rate);
     input.set_block_size(block_size);
-
-    panned_delay.reset();
 
     panned_delay.set_sample_rate(sample_rate);
     panned_delay.set_block_size(block_size);
@@ -558,7 +554,7 @@ void test_panned_delay(
             expected_output[c],
             output.samples[c],
             sample_count,
-            0.000015,
+            DOUBLE_DELTA,
             "class=%s, panning_scale=%f, channel=%d",
             class_name,
             panning_scale,
@@ -571,11 +567,8 @@ void test_panned_delay(
 
 
 template<class PannedDelayClass>
-void test_panned_delay(
-        PannedDelayClass& panned_delay,
-        FixedSignalProducer& input,
-        char const* class_name
-) {
+void test_panned_delay(char const* class_name)
+{
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
     constexpr Integer sample_count = rounds * block_size;
@@ -621,32 +614,18 @@ void test_panned_delay(
     };
 
     test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, 1.0, input_buffer, expected_output_full_panning
+        class_name, block_size, rounds, 1.0, input_buffer, expected_output_full_panning
     );
     test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, -1.0, input_buffer, expected_output_opposite_panning
+        class_name, block_size, rounds, -1.0, input_buffer, expected_output_opposite_panning
     );
     test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, 0.000001, input_buffer, expected_output_no_panning
+        class_name, block_size, rounds, 0.000001, input_buffer, expected_output_no_panning
     );
 }
 
 
 TEST(output_may_be_panned, {
-    FloatParamS distortion("DST", 0.0, 1.0, 0.00001);
-    FixedSignalProducer input(NULL);
-    PannedDelay<FixedSignalProducer> panned_delay(
-        input, PannedDelayStereoMode::FLIPPED
-    );
-    DistortedHighShelfPannedDelay<FixedSignalProducer> distorted_delay(
-        input, PannedDelayStereoMode::FLIPPED, distortion
-    );
-
-
-    test_panned_delay< PannedDelay<FixedSignalProducer> >(
-        panned_delay, input, "PannedDelay"
-    );
-    test_panned_delay< DistortedHighShelfPannedDelay<FixedSignalProducer> >(
-        distorted_delay, input, "DistortedHighShelfPannedDelay"
-    );
+    test_panned_delay< PannedDelay<FixedSignalProducer> >("PannedDelay");
+    test_panned_delay< HighShelfPannedDelay<FixedSignalProducer> >("HighShelfPannedDelay");
 })

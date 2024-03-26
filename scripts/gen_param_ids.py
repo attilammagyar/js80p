@@ -144,7 +144,6 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
 
         ("$EDEL", " ///< $ Echo Delay", "effects.echo.delay_time"),
         ("$EFB", "  ///< $ Echo Feedback", "effects.echo.feedback"),
-        ("$ESAT", " ///< $ Echo Saturation", "effects.echo.distortion_level"),
         ("$EDF", "  ///< $ Echo Dampening Frequency", "effects.echo.damping_frequency"),
         ("$EDG", "  ///< $ Echo Dampening Gain", "effects.echo.damping_gain"),
         ("$EWID", " ///< $ Echo Stereo Width", "effects.echo.width"),
@@ -157,7 +156,6 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$EDRY", " ///< $ Echo Dry Volume", "effects.echo.dry"),
 
         ("$RRS", "  ///< $ Reverb Room Size", "effects.reverb.room_size"),
-        ("$RSAT", " ///< $ Reverb Saturation", "effects.reverb.distortion_level"),
         ("$RDF", "  ///< $ Reverb Dampening Frequency", "effects.reverb.damping_frequency"),
         ("$RDG", "  ///< $ Reverb Dampening Gain", "effects.reverb.damping_gain"),
         ("$RWID", " ///< $ Reverb Stereo Width", "effects.reverb.width"),

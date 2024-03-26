@@ -34,9 +34,8 @@ namespace JS80P { namespace Distortion
 enum Type {
     SOFT = 0,
     HEAVY = 1,
-    DELAY = 2,
 
-    NUMBER_OF_TYPES = 3,
+    NUMBER_OF_TYPES = 2,
 };
 
 

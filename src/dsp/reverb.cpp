@@ -48,7 +48,7 @@ Reverb<InputSignalProducerClass>::Reverb(
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
-        13 + COMB_FILTERS,
+        12 + COMB_FILTERS,
         &mixer
     ),
     type(name+ "TYP"),
@@ -79,7 +79,6 @@ Reverb<InputSignalProducerClass>::Reverb(
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
-    distortion_level(name + "SAT", 0.0, 1.0, 0.0),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     mixer(input.get_channels()),
     high_pass_filter_type(""),
@@ -112,8 +111,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
+            damping_gain
         },
         {
             high_pass_filter,
@@ -124,9 +122,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -137,9 +133,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -150,9 +144,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -163,9 +155,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -176,9 +166,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -189,9 +177,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -202,9 +188,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -215,9 +199,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
         {
             high_pass_filter,
@@ -228,9 +210,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
             damping_frequency,
-            damping_gain,
-            distortion_level
-
+            damping_gain
         },
     },
     previous_type(255)
@@ -243,7 +223,6 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(damping_gain);
     this->register_child(width);
     this->register_child(high_pass_frequency);
-    this->register_child(distortion_level);
     this->register_child(log_scale_frequencies);
 
     this->register_child(high_pass_filter_type);

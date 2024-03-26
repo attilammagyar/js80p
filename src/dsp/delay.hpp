@@ -25,7 +25,6 @@
 
 #include "dsp/filter.hpp"
 #include "dsp/biquad_filter.hpp"
-#include "dsp/distortion.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
@@ -319,33 +318,26 @@ class PannedDelay : public Filter<FilterInputClass>
 
 
 template<class InputSignalProducerClass>
-using DistortedDelay = Distortion::Distortion< Delay<InputSignalProducerClass> >;
+using HighShelfDelay = BiquadFilter< Delay<InputSignalProducerClass> >;
 
 
 template<class InputSignalProducerClass>
-using DistortedHighShelfDelay = BiquadFilter< DistortedDelay<InputSignalProducerClass> >;
+using HighShelfPannedDelayBase = PannedDelay< InputSignalProducerClass, HighShelfDelay<InputSignalProducerClass> >;
 
 
 template<class InputSignalProducerClass>
-using DistortedHighShelfPannedDelayBase = PannedDelay<
-    InputSignalProducerClass, DistortedHighShelfDelay<InputSignalProducerClass>
->;
-
-
-template<class InputSignalProducerClass>
-class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<InputSignalProducerClass>
+class HighShelfPannedDelay : public HighShelfPannedDelayBase<InputSignalProducerClass>
 {
     friend class SignalProducer;
 
     public:
-        DistortedHighShelfPannedDelay(
+        HighShelfPannedDelay(
             InputSignalProducerClass& input,
             PannedDelayStereoMode const stereo_mode,
-            FloatParamS& distortion_level_leader,
             ToggleParam const* tempo_sync = NULL
         );
 
-        DistortedHighShelfPannedDelay(
+        HighShelfPannedDelay(
             InputSignalProducerClass& input,
             PannedDelayStereoMode const stereo_mode,
             FloatParamS& panning_leader,
@@ -354,11 +346,10 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
-            FloatParamS& distortion_level_leader,
             ToggleParam const* tempo_sync = NULL
         );
 
-        DistortedHighShelfPannedDelay(
+        HighShelfPannedDelay(
             InputSignalProducerClass& input,
             PannedDelayStereoMode const stereo_mode,
             FloatParamS& panning_leader,
@@ -368,21 +359,19 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
-            FloatParamS& distortion_level_leader,
             ToggleParam const* tempo_sync = NULL
         );
 
     private:
-        static constexpr Integer NUMBER_OF_CHILDREN = 4;
+        static constexpr Integer NUMBER_OF_CHILDREN = 3;
 
         void initialize_instance() noexcept;
 
-        typename DistortedHighShelfDelay<InputSignalProducerClass>::TypeParam high_shelf_filter_type;
+        typename HighShelfDelay<InputSignalProducerClass>::TypeParam high_shelf_filter_type;
         FloatParamS high_shelf_filter_q;
-        DistortedDelay<InputSignalProducerClass> distortion;
 
     public:
-        DistortedHighShelfDelay<InputSignalProducerClass> high_shelf_filter;
+        HighShelfDelay<InputSignalProducerClass> high_shelf_filter;
 };
 
 }
