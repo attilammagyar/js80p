@@ -43,6 +43,24 @@ enum Type {
 typedef Sample Table[0x2000];
 
 
+/**
+ * \brief Lookup table for the Distortion effect.
+ *
+ * The tables hold values of various shaping functions which
+ * - map values between -3.0 and 3.0 to the [-1.0, 1.0] interval,
+ * - and for which f(x) = -f(-x) for all real valued x,
+ * - and which are monotonically increasing,
+ * - and which map the [-1.0, 1.0] interval to the [-1.0 + A, 1.0 - A] interval
+ *   for some sufficiently small or zero A constant.
+ *
+ * Due to the symmetry, the tables actually only contain values for the
+ * [0.0, 3.0] interval.
+ *
+ * The f tables contain the values for the shaping functions, and the F0 tables
+ * hold their respective antiderivatives.
+ *
+ * \sa Distortion
+ */
 class Tables
 {
     public:
