@@ -241,6 +241,8 @@ Number Math::env_shape_smooth_smooth(Number const x) noexcept
     The 1 / 4 - (x - 1 / 2) ^ 2 function is almost perfect for the role of
     f', but it needs to be scaled by 6 in order to make f fit the bill.
     After expanding and simplifying, we get 6 * (x - x ^ 2).
+
+    See also: https://en.wikipedia.org/wiki/Horner%27s_method
     */
 
     return ((-2.0 * x + 3.0) * x) * x;
