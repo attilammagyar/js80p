@@ -19,17 +19,33 @@
 import os.path
 import sys
 
-from math import exp, log, tanh
+from math import exp, log1p, tanh
 
 import matplotlib.pyplot as plt
 
 
+INPUT_MAX = 3.0
+INPUT_MIN = - INPUT_MAX
+
+
 def f(x, steepness):
+    if x < INPUT_MIN:
+        return -1.0
+
+    if x > INPUT_MAX:
+        return 1.0
+
     return tanh(steepness * x * 0.5)
 
 
 def F0(x, steepness):
-    return x + (2.0 / steepness) * log(exp(-steepness * x) + 1.0)
+    if x < INPUT_MIN:
+        return -x
+
+    if x > INPUT_MAX:
+        return x
+
+    return x + (2.0 / steepness) * log1p(exp(-steepness * x))
 
 
 def main(argv):
@@ -45,23 +61,25 @@ def main(argv):
 
         return 2
 
-    N = 20000
-    max_input = 3.0
-    prev = -max_input
+    N = 30000
+    width = 5.0
+    prev = -width
     F0_prev = F0(prev, steepness)
 
     xs = []
     fs = []
+    F0s = []
     approximations = []
 
     for i in range(N):
         x = (2.0 * (i / N)) - 1.0
-        x = max_input * x
+        x = width * x
         delta = x - prev
         F0_x = F0(x, steepness)
 
         xs.append(x)
         fs.append(f(x, steepness))
+        F0s.append(F0_x)
 
         if abs(delta) > 0.0:
             approximations.append((F0_x - F0_prev) / delta)
@@ -73,6 +91,7 @@ def main(argv):
 
     plt.plot(xs, fs)
     plt.plot(xs, approximations)
+    plt.plot(xs, F0s)
     plt.show()
 
     return 0
