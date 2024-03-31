@@ -482,7 +482,8 @@ $(CPPCHECK_DONE): \
 		$(VST3_SOURCES) \
 		$(VSTXMLGEN_SOURCES) \
 		$(TEST_CPPS) \
-		$(TEST_LIBS)
+		$(TEST_LIBS) \
+		| $(BUILD_DIR)
 	$(CPPCHECK) $(CPPCHECK_FLAGS) src/ tests/
 	echo > $@
 
