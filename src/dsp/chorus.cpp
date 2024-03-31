@@ -58,7 +58,12 @@ Chorus<InputSignalProducerClass>::Chorus(
     greater than 1.0. (The Oscillator oscillates between -1.0 and 1.0.)
     */
     depth(name + "DPT", 0.0, 0.5, 0.15 * 0.5),
-    feedback(name + "FB", 0.0, 0.999 * FEEDBACK_SCALE_INV, 0.0),
+    feedback(
+        name + "FB",
+        Constants::DELAY_FEEDBACK_MIN * FEEDBACK_SCALE_INV,
+        Constants::DELAY_FEEDBACK_MAX * FEEDBACK_SCALE_INV,
+        Constants::DELAY_FEEDBACK_MIN * FEEDBACK_SCALE_INV
+    ),
     damping_frequency(
         name + "DF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,

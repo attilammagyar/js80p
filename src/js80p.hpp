@@ -106,6 +106,10 @@ namespace Constants {
 
     constexpr Integer CHORUS_FEEDBACK_SCALE = 4;
 
+    constexpr Number DELAY_FEEDBACK_DEFAULT = 0.75;
+    constexpr Number DELAY_FEEDBACK_MIN = 0.0;
+    constexpr Number DELAY_FEEDBACK_MAX = 0.999;
+
     constexpr Number DELAY_GAIN_DEFAULT = 0.5;
     constexpr Number DELAY_GAIN_MIN = 0.0;
     constexpr Number DELAY_GAIN_MAX = 1.0;

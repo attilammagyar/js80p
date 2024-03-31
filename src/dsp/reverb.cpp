@@ -52,7 +52,12 @@ Reverb<InputSignalProducerClass>::Reverb(
         &mixer
     ),
     type(name+ "TYP"),
-    room_size(name + "RS", 0.0, 0.999, 0.75),
+    room_size(
+        name + "RS",
+        Constants::DELAY_FEEDBACK_MIN,
+        Constants::DELAY_FEEDBACK_MAX,
+        Constants::DELAY_FEEDBACK_DEFAULT
+    ),
     damping_frequency(
         name + "DF",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,

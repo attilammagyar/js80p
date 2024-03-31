@@ -43,9 +43,9 @@ Echo<InputSignalProducerClass>::Echo(
     ),
     feedback(
         name + "FB",
-        0.0,
-        0.999,
-        0.75
+        Constants::DELAY_FEEDBACK_MIN,
+        Constants::DELAY_FEEDBACK_MAX,
+        Constants::DELAY_FEEDBACK_DEFAULT
     ),
     damping_frequency(
         name + "DF",
