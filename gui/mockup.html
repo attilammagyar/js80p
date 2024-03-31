@@ -121,7 +121,6 @@ html, body {
   margin: 2px;
   border: inset 1px #808098;
   border-radius: 6px;
-/*  overflow: hidden; /**/
   background: #000000;
   text-align: left;
 }
@@ -173,7 +172,47 @@ html, body {
 }
 
 h1 span {
-  filter: drop-shadow(2px 2px 3px #000000);
+  filter: drop-shadow(2px 2px 1px #000000);
+}
+
+.effect.main-block h1 span {
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+}
+
+.effect.main-block h1 label span {
+  padding-right: 3px;
+  padding-left: 2px;
+}
+
+#lfos .main-block h1 label {
+  height: 20px;
+  line-height: 20px;
+}
+
+.effect.main-block h1 label.sync,
+.effect.main-block h1 label {
+  height: 20px;
+  line-height: 20px;
+  margin-top: 1px;
+}
+
+#lfos .main-block h1,
+.effect.main-block h1 {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#lfos .main-block h1 {
+  height: 22px;
+  line-height: 22px;
+}
+
+.effect.main-block h1 {
+  padding-top: 1px;
+  height: 20px;
+  line-height: 20px;
 }
 
 .main-block h1 {
@@ -307,7 +346,6 @@ h1 span {
 
 .block h1 label.envelope {
   margin-left: 15px;
-  margin-bottom: -3px;
   line-height: 15px;
   height: 20px;
   overflow: visible;
@@ -489,7 +527,7 @@ svg.icon {
 .border > span {
   font-size: 12px;
   z-index: 2000;
-  filter: drop-shadow(2px 2px 2px #030408);
+  filter: drop-shadow(2px 2px 1px #030408);
 }
 
 .sc11 {
@@ -719,7 +757,7 @@ function make_tabs(active)
       </div>
       <div id="filter-2" class="effect main-block block">
         <h1>
-          Filter 2
+          <span>Filter 2</span>
           <label class="freq"><input type="text" /><span> LG F</span></label>
           <label class="q"><input type="text" /><span> LG Q</span></label>
         </h1>
@@ -949,7 +987,7 @@ window.onload = function ()
 
     create_knob("echo-params", "DEL s", "0.5");
     create_knob("echo-params", "FB %", "70");
-    create_knob("echo-params", "DST %", "70");
+    create_knob("echo-params", "DIST %", "70");
     create_knob("echo-params", "DF Hz", "6000");
     create_knob("echo-params", "DG dB", "-6");
     create_knob("echo-params", "WID %", "-100");
@@ -963,7 +1001,7 @@ window.onload = function ()
 
     create_knob("reverb-params", "TYPE", "0");
     create_knob("reverb-params", "ROOM %", "90");
-    create_knob("reverb-params", "DST %", "70");
+    create_knob("reverb-params", "DIST %", "70");
     create_knob("reverb-params", "DF Hz", "6000");
     create_knob("reverb-params", "DG dB", "-6");
     create_knob("reverb-params", "WID %", "-100");
