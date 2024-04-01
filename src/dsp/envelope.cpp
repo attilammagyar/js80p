@@ -25,6 +25,7 @@
 #include "dsp/envelope.hpp"
 
 #include "dsp/math.hpp"
+#include "dsp/signal_producer.hpp"
 
 
 namespace JS80P
@@ -695,7 +696,17 @@ Envelope::Envelope(std::string const& name) noexcept
     value_inaccuracy_change_index(-1),
     change_index(-1)
 {
+    update_bpm(tempo_sync.get_bpm());
     update();
+}
+
+
+void Envelope::update_bpm(Number const new_bpm) noexcept
+{
+    JS80P_ASSERT(new_bpm >= SignalProducer::MIN_BPM);
+
+    bpm = new_bpm;
+    tempo_sync_time_scale = Math::SECONDS_IN_ONE_MINUTE / new_bpm;
 }
 
 
@@ -725,6 +736,15 @@ void Envelope::update() noexcept
     is_dirty = update_change_index(time_inaccuracy, time_inaccuracy_change_index) || is_dirty;
     is_dirty = update_change_index(value_inaccuracy, value_inaccuracy_change_index) || is_dirty;
 
+    if (is_tempo_synced()) {
+        Number const new_bpm = tempo_sync.get_bpm();
+
+        if (JS80P_UNLIKELY(!Math::is_close(bpm, new_bpm))) {
+            update_bpm(new_bpm);
+            is_dirty = true;
+        }
+    }
+
     if (is_dirty) {
         ++change_index;
         change_index &= 0x7fffffff;
@@ -741,6 +761,12 @@ Integer Envelope::get_change_index() const noexcept
 bool Envelope::is_dynamic() const noexcept
 {
     return dynamic.get_value() == ToggleParam::ON;
+}
+
+
+bool Envelope::is_tempo_synced() const noexcept
+{
+    return tempo_sync.get_value() == ToggleParam::ON;
 }
 
 
@@ -796,6 +822,14 @@ void Envelope::make_snapshot(
     snapshot.attack_shape = attack_shape.get_value();
     snapshot.decay_shape = decay_shape.get_value();
     snapshot.release_shape = release_shape.get_value();
+
+    if (tempo_sync.get_value() == ToggleParam::ON) {
+        snapshot.delay_time *= tempo_sync_time_scale;
+        snapshot.attack_time *= tempo_sync_time_scale;
+        snapshot.hold_time *= tempo_sync_time_scale;
+        snapshot.decay_time *= tempo_sync_time_scale;
+        snapshot.release_time *= tempo_sync_time_scale;
+    }
 }
 
 
@@ -815,6 +849,10 @@ void Envelope::make_end_snapshot(
         snapshot.release_time = randomize_time(release_time, randoms[8]);
     } else {
         snapshot.release_time = release_time.get_value();
+    }
+
+    if (tempo_sync.get_value() == ToggleParam::ON) {
+        snapshot.release_time *= tempo_sync_time_scale;
     }
 
     snapshot.release_shape = release_shape.get_value();

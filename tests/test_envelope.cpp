@@ -88,6 +88,106 @@ TEST(when_a_param_of_an_envelope_changes_then_the_change_index_of_the_envelope_i
 })
 
 
+TEST(when_the_tempo_is_changed_then_tempo_synced_envelope_change_index_is_changed, {
+    Envelope tempo_synced("T");
+    Envelope not_tempo_synced("N");
+    Integer old_change_index_tempo_synced;
+    Integer old_change_index_not_tempo_synced;
+
+    tempo_synced.tempo_sync.set_value(ToggleParam::ON);
+    not_tempo_synced.tempo_sync.set_value(ToggleParam::OFF);
+
+    assert_true(tempo_synced.is_tempo_synced());
+    assert_false(not_tempo_synced.is_tempo_synced());
+
+    tempo_synced.update();
+    not_tempo_synced.update();
+
+    old_change_index_tempo_synced = tempo_synced.get_change_index();
+    old_change_index_not_tempo_synced = not_tempo_synced.get_change_index();
+
+    tempo_synced.tempo_sync.set_bpm(123.0);
+    not_tempo_synced.tempo_sync.set_bpm(123.0);
+
+    tempo_synced.update();
+    not_tempo_synced.update();
+
+    assert_neq((int)old_change_index_tempo_synced, (int)tempo_synced.get_change_index());
+    assert_eq((int)old_change_index_not_tempo_synced, (int)not_tempo_synced.get_change_index());
+})
+
+
+void test_tempo_synced_snapshot_creation(
+        Envelope& envelope,
+        Number const time_inaccuracy,
+        Number const time_scale
+) {
+    constexpr EnvelopeRandoms randoms = {
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    };
+    EnvelopeSnapshot snapshot;
+
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(2.0);
+    envelope.hold_time.set_value(3.0);
+    envelope.decay_time.set_value(4.0);
+    envelope.release_time.set_value(5.0);
+    envelope.time_inaccuracy.set_value(time_inaccuracy);
+
+    envelope.update();
+    envelope.make_snapshot(randoms, snapshot);
+
+    assert_eq(snapshot.delay_time, 1.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(snapshot.attack_time, 2.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(snapshot.hold_time, 3.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(snapshot.decay_time, 4.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(snapshot.release_time, 5.0 * time_scale, DOUBLE_DELTA);
+
+    envelope.release_time.set_value(6.0);
+    envelope.update();
+
+    envelope.make_end_snapshot(randoms, snapshot);
+
+    assert_eq(snapshot.release_time, 6.0 * time_scale, DOUBLE_DELTA);
+}
+
+
+TEST(when_envelope_is_tempo_synced_then_snapshot_times_are_measured_in_beats_instead_of_seconds, {
+    Envelope tempo_synced("T");
+    Envelope not_tempo_synced("N");
+
+    tempo_synced.tempo_sync.set_value(ToggleParam::ON);
+    tempo_synced.tempo_sync.set_bpm(120.0);
+    not_tempo_synced.tempo_sync.set_value(ToggleParam::OFF);
+    not_tempo_synced.tempo_sync.set_bpm(120.0);
+
+    tempo_synced.update();
+    not_tempo_synced.update();
+
+    test_tempo_synced_snapshot_creation(not_tempo_synced, 0.0, 1.0);
+    test_tempo_synced_snapshot_creation(tempo_synced, 0.0, 0.5);
+
+    test_tempo_synced_snapshot_creation(not_tempo_synced, 1.0, 1.0);
+    test_tempo_synced_snapshot_creation(tempo_synced, 1.0, 0.5);
+})
+
+
+TEST(too_small_bpm_is_ignored_when_considering_tempo_sync, {
+    Envelope envelope("E");
+    Integer old_change_index;
+
+    envelope.tempo_sync.set_value(ToggleParam::ON);
+    envelope.update();
+
+    old_change_index = envelope.get_change_index();
+
+    envelope.tempo_sync.set_bpm(0.0);
+    envelope.update();
+
+    assert_eq((int)old_change_index, (int)envelope.get_change_index());
+})
+
+
 TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     constexpr Number amount = 0.1;
     constexpr Number initial_value = 0.3;

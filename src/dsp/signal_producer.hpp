@@ -79,6 +79,7 @@ class SignalProducer
         available, then toggling tempo-sync becomes no-op.
         */
         static constexpr Number DEFAULT_BPM = 60.0;
+        static constexpr Number MIN_BPM = 0.000001;
 
         static constexpr Event::Type EVT_CANCEL = 0;
 

@@ -126,6 +126,7 @@ class Envelope
         Integer get_change_index() const noexcept;
 
         bool is_dynamic() const noexcept;
+        bool is_tempo_synced() const noexcept;
 
         void make_snapshot(
             EnvelopeRandoms const& randoms,
@@ -262,6 +263,8 @@ class Envelope
             Integer& i
         ) noexcept;
 
+        void update_bpm(Number const new_bpm) noexcept;
+
         template<class ParamType>
         bool update_change_index(ParamType const& param, Integer& change_index) noexcept;
 
@@ -274,6 +277,9 @@ class Envelope
             FloatParamB const& param,
             Number const random
         ) const noexcept;
+
+        Number bpm;
+        Number tempo_sync_time_scale;
 
         Integer dynamic_change_index;
         Integer tempo_sync_change_index;
