@@ -41,6 +41,7 @@ main()
 
     run_tests "$executable" 23 80
     run_tests "$executable" 26 10
+    run_tests "$executable" 35 90
 }
 
 run_tests()
