@@ -331,6 +331,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::ECDRY] = "Chorus Dry Volume (%)",
 
     [Synth::ParamId::EEDEL] = "Echo Delay (s)",
+    [Synth::ParamId::EEINV] = "Echo Input Volume (%)",
     [Synth::ParamId::EEFB] = "Echo Feedback (%)",
     [Synth::ParamId::EEDST] = "Echo Distortion (%)",
     [Synth::ParamId::EEDF] = "Echo Dampening Frequency (Hz)",
@@ -1999,21 +2000,22 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     TOGG(effects_body, 480, 145,  96, 24,  0, Synth::ParamId::ECLOG);
     TOGG(effects_body, 720, 145,  90, 24, 66, Synth::ParamId::ECSYN);
 
-    KNOB(effects_body, 113 + KNOB_W * 0,   313, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 1,   313, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 2,   313, Synth::ParamId::EEDST,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 3,   313, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 4,   313, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 5,   313, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 6,   313, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 7,   313, Synth::ParamId::EECTH,  MM___,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 8,   313, Synth::ParamId::EECAT,  MM___,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 9,   313, Synth::ParamId::EECRL,  MM___,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 10,  313, Synth::ParamId::EECR,   MM___,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 11,  313, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 113 + KNOB_W * 12,  313, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TOGG(effects_body, 306, 285,  96, 24,  0, Synth::ParamId::EELOG);
-    TOGG(effects_body, 778, 285,  90, 24, 66, Synth::ParamId::EESYN);
+    KNOB(effects_body,  84 + KNOB_W * 0,   313, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 1,   313, Synth::ParamId::EEINV,  MML__,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 2,   313, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 3,   313, Synth::ParamId::EEDST,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 4,   313, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 5,   313, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 6,   313, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 7,   313, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 8,   313, Synth::ParamId::EECTH,  MM___,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 9,   313, Synth::ParamId::EECAT,  MM___,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 10,  313, Synth::ParamId::EECRL,  MM___,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 11,  313, Synth::ParamId::EECR,   MM___,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 12,  313, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  84 + KNOB_W * 13,  313, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TOGG(effects_body, 335, 285,  96, 24,  0, Synth::ParamId::EELOG);
+    TOGG(effects_body, 807, 285,  90, 24, 66, Synth::ParamId::EESYN);
 
     KNOB(effects_body,  62 + KNOB_W * 0,   453, Synth::ParamId::ERTYP,  MM___,      rt, rtc, knob_states);
     KNOB(effects_body,  62 + KNOB_W * 1,   453, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);

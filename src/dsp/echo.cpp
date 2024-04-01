@@ -33,7 +33,7 @@ Echo<InputSignalProducerClass>::Echo(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
-        name, input, 15, &comb_filter_2
+        name, input, 17, &comb_filter_2
     ),
     delay_time(
         name + "DEL",
@@ -41,6 +41,7 @@ Echo<InputSignalProducerClass>::Echo(
         Constants::DELAY_TIME_MAX,
         Constants::DELAY_TIME_DEFAULT
     ),
+    input_volume(name + "INV", 0.0, 2.0, 1.0),
     feedback(
         name + "FB",
         Constants::DELAY_FEEDBACK_MIN,
@@ -89,12 +90,18 @@ Echo<InputSignalProducerClass>::Echo(
         Constants::BIQUAD_FILTER_GAIN_MAX,
         0.0
     ),
+    gain(input, input_volume),
     high_pass_filter(
-        input,
+        gain,
         high_pass_filter_type,
         high_pass_frequency,
         high_pass_filter_q,
-        high_pass_filter_gain
+        high_pass_filter_gain,
+        NULL,
+        0.0,
+        NULL,
+        NULL,
+        &gain
     ),
     comb_filter_1(
         high_pass_filter,
@@ -124,6 +131,7 @@ Echo<InputSignalProducerClass>::Echo(
     comb_filter_2_buffer(NULL)
 {
     this->register_child(delay_time);
+    this->register_child(input_volume);
     this->register_child(feedback);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
@@ -137,6 +145,7 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(high_pass_filter_q);
     this->register_child(high_pass_filter_gain);
 
+    this->register_child(gain);
     this->register_child(high_pass_filter);
     this->register_child(comb_filter_1);
     this->register_child(comb_filter_2);

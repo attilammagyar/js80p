@@ -44,8 +44,8 @@ def main(argv):
     print_cases(param_objs, "return $.get_max_value();");
     print_cases(param_objs, "return $.ratio_to_value(ratio);");
     print_cases(param_objs, "$.set_ratio(ratio); break;");
-    print_cases(param_objs, "return $.get_ratio();");
     print_cases(param_objs, "is_assigned = assign_controller<FloatParamS>($, ctl_id); break;");
+    print_cases(param_objs, "return $.get_ratio();");
 
     return 0
 
@@ -144,6 +144,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$CDRY", " ///< $ Chorus Dry Volume", "effects.chorus.dry"),
 
         ("$EDEL", " ///< $ Echo Delay", "effects.echo.delay_time"),
+        ("$EINV", " ///< $ Echo Input Volume", "effects.echo.input_volume"),
         ("$EFB", "  ///< $ Echo Feedback", "effects.echo.feedback"),
         ("$EDST", " ///< $ Echo Distortion", "effects.echo.distortion_level"),
         ("$EDF", "  ///< $ Echo Dampening Frequency", "effects.echo.damping_frequency"),

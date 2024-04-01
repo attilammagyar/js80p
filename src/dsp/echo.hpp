@@ -23,6 +23,7 @@
 
 #include "dsp/biquad_filter.hpp"
 #include "dsp/delay.hpp"
+#include "dsp/gain.hpp"
 #include "dsp/param.hpp"
 #include "dsp/side_chain_compressable_effect.hpp"
 #include "dsp/signal_producer.hpp"
@@ -37,7 +38,8 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
+        typedef Gain<InputSignalProducerClass> BoostedInput;
+        typedef BiquadFilter<BoostedInput> HighPassedInput;
         typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter1;
         typedef DistortedHighShelfPannedDelay< DistortedHighShelfDelay<HighPassedInput> > CombFilter2;
 
@@ -48,6 +50,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         );
 
         FloatParamS delay_time;
+        FloatParamS input_volume;
         FloatParamS feedback;
         FloatParamS damping_frequency;
         FloatParamS damping_gain;
@@ -75,6 +78,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS high_pass_filter_q;
         FloatParamS high_pass_filter_gain;
 
+        BoostedInput gain;
         HighPassedInput high_pass_filter;
         CombFilter1 comb_filter_1;
         CombFilter2 comb_filter_2;

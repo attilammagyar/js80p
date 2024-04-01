@@ -94,6 +94,7 @@ params = [
     "EEDRY",
     "EEFB",
     "EEHPF",
+    "EEINV",
     "EELOG",
     "EEDST",
     "EESYN",

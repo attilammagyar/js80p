@@ -490,6 +490,7 @@ void Synth::register_effects_params() noexcept
     register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_frequencies);
 
     register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
+    register_param<FloatParamS>(ParamId::EEINV, effects.echo.input_volume);
     register_param<FloatParamS>(ParamId::EEFB, effects.echo.feedback);
     register_param<FloatParamS>(ParamId::EEDST, effects.echo.distortion_level);
     register_param<FloatParamS>(ParamId::EEDF, effects.echo.damping_frequency);
@@ -1741,6 +1742,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::ECWET: return effects.chorus.wet.get_default_ratio();
         case ParamId::ECDRY: return effects.chorus.dry.get_default_ratio();
         case ParamId::EEDEL: return effects.echo.delay_time.get_default_ratio();
+        case ParamId::EEINV: return effects.echo.input_volume.get_default_ratio();
         case ParamId::EEFB: return effects.echo.feedback.get_default_ratio();
         case ParamId::EEDST: return effects.echo.distortion_level.get_default_ratio();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_default_ratio();
@@ -2045,6 +2047,7 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::ECWET: return effects.chorus.wet.get_max_value();
         case ParamId::ECDRY: return effects.chorus.dry.get_max_value();
         case ParamId::EEDEL: return effects.echo.delay_time.get_max_value();
+        case ParamId::EEINV: return effects.echo.input_volume.get_max_value();
         case ParamId::EEFB: return effects.echo.feedback.get_max_value();
         case ParamId::EEDST: return effects.echo.distortion_level.get_max_value();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_max_value();
@@ -2345,6 +2348,7 @@ Number Synth::float_param_ratio_to_display_value(
         case ParamId::ECWET: return effects.chorus.wet.ratio_to_value(ratio);
         case ParamId::ECDRY: return effects.chorus.dry.ratio_to_value(ratio);
         case ParamId::EEDEL: return effects.echo.delay_time.ratio_to_value(ratio);
+        case ParamId::EEINV: return effects.echo.input_volume.ratio_to_value(ratio);
         case ParamId::EEFB: return effects.echo.feedback.ratio_to_value(ratio);
         case ParamId::EEDST: return effects.echo.distortion_level.ratio_to_value(ratio);
         case ParamId::EEDF: return effects.echo.damping_frequency.ratio_to_value(ratio);
@@ -2647,6 +2651,7 @@ Sample const* const* Synth::initialize_rendering(
     FloatParamS::produce_if_not_constant(effects.chorus.dry, round, sample_count);
 
     FloatParamS::produce_if_not_constant(effects.echo.delay_time, round, sample_count);
+    FloatParamS::produce_if_not_constant(effects.echo.input_volume, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.feedback, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.distortion_level, round, sample_count);
     FloatParamS::produce_if_not_constant(effects.echo.damping_frequency, round, sample_count);
@@ -2957,6 +2962,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::ECWET: effects.chorus.wet.set_ratio(ratio); break;
             case ParamId::ECDRY: effects.chorus.dry.set_ratio(ratio); break;
             case ParamId::EEDEL: effects.echo.delay_time.set_ratio(ratio); break;
+            case ParamId::EEINV: effects.echo.input_volume.set_ratio(ratio); break;
             case ParamId::EEFB: effects.echo.feedback.set_ratio(ratio); break;
             case ParamId::EEDST: effects.echo.distortion_level.set_ratio(ratio); break;
             case ParamId::EEDF: effects.echo.damping_frequency.set_ratio(ratio); break;
@@ -3267,6 +3273,7 @@ void Synth::handle_assign_controller(
             case ParamId::ECWET: is_assigned = assign_controller<FloatParamS>(effects.chorus.wet, ctl_id); break;
             case ParamId::ECDRY: is_assigned = assign_controller<FloatParamS>(effects.chorus.dry, ctl_id); break;
             case ParamId::EEDEL: is_assigned = assign_controller<FloatParamS>(effects.echo.delay_time, ctl_id); break;
+            case ParamId::EEINV: is_assigned = assign_controller<FloatParamS>(effects.echo.input_volume, ctl_id); break;
             case ParamId::EEFB: is_assigned = assign_controller<FloatParamS>(effects.echo.feedback, ctl_id); break;
             case ParamId::EEDST: is_assigned = assign_controller<FloatParamS>(effects.echo.distortion_level, ctl_id); break;
             case ParamId::EEDF: is_assigned = assign_controller<FloatParamS>(effects.echo.damping_frequency, ctl_id); break;
@@ -3765,6 +3772,7 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::ECWET: return effects.chorus.wet.get_ratio();
         case ParamId::ECDRY: return effects.chorus.dry.get_ratio();
         case ParamId::EEDEL: return effects.echo.delay_time.get_ratio();
+        case ParamId::EEINV: return effects.echo.input_volume.get_ratio();
         case ParamId::EEFB: return effects.echo.feedback.get_ratio();
         case ParamId::EEDST: return effects.echo.distortion_level.get_ratio();
         case ParamId::EEDF: return effects.echo.damping_frequency.get_ratio();
