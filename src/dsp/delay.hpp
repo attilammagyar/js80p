@@ -26,6 +26,7 @@
 #include "dsp/filter.hpp"
 #include "dsp/biquad_filter.hpp"
 #include "dsp/distortion.hpp"
+#include "dsp/math.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
@@ -42,9 +43,8 @@ class Delay : public Filter<InputSignalProducerClass>
         static constexpr Integer OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC = 2;
 
     public:
-        static constexpr Seconds ONE_MINUTE = 60.0;
         static constexpr Number BPM_MIN = (
-            ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
+            Math::SECONDS_IN_ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
         );
 
         explicit Delay(

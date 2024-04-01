@@ -213,7 +213,9 @@ class Oscillator : public SignalProducer
         void handle_event(Event const& event) noexcept;
 
     private:
-        static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = 1.0 / 60.0;
+        static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = (
+            1.0 / Math::SECONDS_IN_ONE_MINUTE
+        );
 
         static constexpr Integer NUMBER_OF_CHILDREN = 8;
         static constexpr Integer NUMBER_OF_EVENTS = 4;

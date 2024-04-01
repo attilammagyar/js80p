@@ -62,6 +62,8 @@ class Math
         static constexpr Number LN_OF_2 = std::log(2.0);
         static constexpr Number LN_OF_10 = std::log(10.0);
 
+        static constexpr Seconds SECONDS_IN_ONE_MINUTE = 60.0;
+
         static constexpr Number POW_10_MIN = (
             Constants::BIQUAD_FILTER_GAIN_MIN * Constants::BIQUAD_FILTER_GAIN_SCALE
         ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.

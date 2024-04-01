@@ -417,7 +417,7 @@ TEST(when_tempo_sync_is_on_then_delay_time_is_measured_in_beats_instead_of_secon
 
 TEST(when_tempo_sync_is_on_but_tempo_is_too_slow_then_the_minimum_tempo_is_used, {
     constexpr Number time_scale = (
-        Delay<FixedSignalProducer>::BPM_MIN / Delay<FixedSignalProducer>::ONE_MINUTE
+        Delay<FixedSignalProducer>::BPM_MIN / Math::SECONDS_IN_ONE_MINUTE
     );
 
     test_basic_delay(1.0, 0.1, ToggleParam::OFF);

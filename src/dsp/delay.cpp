@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include "dsp/delay.hpp"
-#include "dsp/math.hpp"
 
 
 namespace JS80P
@@ -297,7 +296,9 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 
     time_scale = (
         tempo_sync != NULL && tempo_sync->get_value() == ToggleParam::ON
-            ? (ONE_MINUTE / std::max(BPM_MIN, this->bpm)) * this->sample_rate
+            ? (
+                Math::SECONDS_IN_ONE_MINUTE / std::max(BPM_MIN, this->bpm)
+            ) * this->sample_rate
             : this->sample_rate
     );
 
