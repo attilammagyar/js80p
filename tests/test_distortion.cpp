@@ -196,7 +196,7 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
         channel[i] = amplitude * std::sin(Math::PI_DOUBLE * x);
     }
 
-    for (Integer round = 0; round != 100; ++round) {
+    for (Integer round = 0; round != 1000; ++round) {
         rendered = SignalProducer::produce< Distortion::Distortion<FixedSignalProducer> >(
             distortion, round
         );
@@ -209,7 +209,7 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
         } else {
             assert_true(
                 peak == 0.0 || peak < previous_peak,
-                "round=%d,\n    peak=%.20e,\n    previous_peak=%.20e",
+                "round=%d,\n             peak=%.20e,\n    previous_peak=%.20e",
                 (int)round,
                 peak,
                 previous_peak

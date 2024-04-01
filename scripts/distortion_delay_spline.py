@@ -30,28 +30,31 @@ import matplotlib.pyplot as plt
 # See Distortion::Tables::initialize_delay_feedback_tables() for a detailed
 # explanation
 
+# The spline will be linear on the [0, gamma] interval.
+gamma = 1.0 / 16.0
 
-# Parameter: f'(0) := beta
-# Increasing beta reduces the distortion.
-beta = 0.0
+# Parameter: f'(gamma) := beta
+beta = 11.0 / 16.0
 
-# Parameter: f(1) := alpha
-# This formula picks a large alpha for the given beta.
-alpha = (beta + 5.0 + sqrt(beta ** 2.0 - 6.0 * beta + 5.0)) / 8.0 - 0.001
+# Parameter: f(1) = alpha
+alpha = 445.0 / 512.0
+
 
 alpha_m_1_o_4 = (alpha - 1.0) / 4.0
 
 
-A = 1.0 - 3.0 * alpha + beta
-B = 4.0 * alpha - 2.0 * beta - 1.0
-C = beta
-cf = (-5.0 * alpha + 7.0 - beta / 3.0) / 4.0
+# These will be set by solve_spline()
+A = B = C = D = cf = ch = 0.0
 
 cg = -9.0 * alpha_m_1_o_4
 
 
-f = lambda x: ((A * x + B) * x + C) * x
-F = lambda x: ((((A / 4.0) * x + (B / 3.0)) * x + (C / 2.0)) * x) * x + cf
+h = lambda x: beta * x
+H = lambda x: (1.0 / 2.0) * beta * x ** 2.0 + ch
+
+
+f = lambda x: ((A * x + B) * x + C) * x + D
+F = lambda x: ((((A / 4.0) * x + (B / 3.0)) * x + (C / 2.0)) * x + D) * x + cf
 
 
 g = lambda x: (
@@ -68,37 +71,42 @@ G = lambda x: (
 INPUT_MAX = 3.0
 
 
-def check_spline_params():
-    F_eq_mtx = np.array(
+def solve_spline():
+    global A, B, C, D, cf, ch
+
+    A1 = 3.0 * gamma ** 4.0
+    B1 = 4.0 * gamma ** 3.0
+    C1 = 6.0 * gamma ** 2.0
+    D1 = 12.0 * gamma
+
+    A5 = 3.0 * gamma ** 2.0
+    B5 = 2.0 * gamma
+
+    A6 = gamma ** 3.0 - 1.0
+    B6 = gamma ** 2.0 - 1.0
+    C6 = gamma - 1.0
+
+    eq_mtx = np.array(
         [
-            [1.0, 1.0, 0.0],
-            [3.0, 2.0, 0.0],
-            [3.0, 4.0, 12.0],
+            [-12.0,  12.0,    D1,    A1,    B1,    C1],
+            [  0.0,  12.0,  12.0,   3.0,   4.0,   6.0],
+            [  0.0,   0.0,   1.0,   1.0,   1.0,   1.0],
+            [  0.0,   0.0,   0.0,   3.0,   2.0,   1.0],
+            [  0.0,   0.0,   0.0,    A5,    B5,   1.0],
+            [  0.0,   0.0,   0.0,    A6,    B6,    C6],
         ]
     )
-    F_eq = np.array(
+    eq_v = np.array(
         [
-            alpha - beta,
-            1.0 - alpha - beta,
-            19.0 * alpha - 7.0 + 12.0 * cg - 6.0 * C
+            6.0 * beta * gamma ** 2.0,
+            20.0 - 8.0 * alpha,
+            alpha,
+            1.0 - alpha,
+            beta,
+            beta * gamma - alpha,
         ]
     )
-    A_cmp, B_cmp, cf_cmp = la.inv(F_eq_mtx).dot(F_eq)
-
-    checks = (
-        ("A", A, A_cmp),
-        ("B", B, B_cmp),
-        ("cf", cf, cf_cmp),
-    )
-
-    for name, value, cmp in checks:
-        if abs(value - cmp) > 0.000001:
-            raise ValueError(
-                f"Calculation error in {name}:\n"
-                f"      manual: {value}\n"
-                f"    computed: {cmp}\n"
-                f"        diff: {abs(value - cmp)}"
-            )
+    ch, cf, D, A, B, C = la.inv(eq_mtx).dot(eq_v)
 
 
 def spline(x):
@@ -114,7 +122,10 @@ def spline(x):
     if x >= 1.0:
         return sgn * g(x)
 
-    return sgn * f(x)
+    if x >= gamma:
+        return sgn * f(x)
+
+    return sgn * h(x)
 
 
 def spline_int(x):
@@ -127,59 +138,76 @@ def spline_int(x):
     if x >= 1.0:
         return G(x)
 
-    return F(x)
+    if x >= gamma:
+        return F(x)
 
-
-def spline_n_times(x, n):
-    for i in range(n):
-        x = spline(x)
-
-    return x
+    return H(x)
 
 
 def main(argv):
     N = 20000
     width = 5.0
 
-    check_spline_params()
+    solve_spline()
 
     funcs = (
-        ([], lambda x: 0),
-        ([], lambda x: x),
-        ([], lambda x: spline(x)),
-        ([], lambda x: spline_int(x)),
-        ([], lambda x: spline_n_times(x, 5)),
-        ([], lambda x: spline_n_times(x, 10)),
-        ([], lambda x: spline_n_times(x, 25)),
+        (lambda x: 0, (([], 1),)),
+        (lambda x: x, (([], 1),)),
+        (lambda x: spline_int(x), (([], 1),)),
+        (
+            lambda x: spline(x),
+            (([], 1), ([], 5), ([], 25), ([], 35), ([], 10), ([], 5), ([], 3)),
+        ),
     )
-    values = tuple([] for f in funcs)
 
     xs = []
+
+    min_d = 999.0
 
     for i in range(N):
         x = (2.0 * (i / N)) - 1.0
         x = width * x
 
+        if x > 0.0:
+            s = spline(x)
+            d = x - s
+
+            if d < min_d:
+                min_d = d
+
         xs.append(x)
 
-        for values, f in funcs:
-            values.append(f(x))
+        for f, iters in funcs:
+            fx = x
+
+            for values, n in iters:
+                for i in range(n):
+                    fx = f(fx)
+
+                values.append(fx)
+
+    values = [v for f, iters in funcs for v, n in iters]
 
     print(f"""
+min_d = {min_d}
+
 alpha = {alpha}
 beta = {beta}
-
-A = {A}
-B = {B}
-C = {C}
-cf = {cf}
+gamma = {gamma}
 
 cg = {cg}
 
+constexpr Number A = {A};
+constexpr Number B = {B};
+constexpr Number C = {C};
+constexpr Number D = {D};
+constexpr Number cf = {cf};
+constexpr Number ch = {ch};
+
 """)
 
-    for values, _ in funcs:
-        plt.plot(xs, values)
+    for v in values:
+        plt.plot(xs, v)
 
     plt.show()
 

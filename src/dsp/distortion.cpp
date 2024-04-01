@@ -76,9 +76,9 @@ void Tables::initialize_delay_feedback_tables() noexcept
 
     To overcome these problems, we need a shaping function which stays below
     the y = x line so that the distortion will never be able to undo the
-    gain reduction on the feedback path, but still manages to treat louder
-    signals differently from quieter ones. In other words, repeated applications
-    of the shaping function must not converge to any fixed points other than 0.
+    gain reduction on the feedback path, but still manages to achieve noticable
+    distortion. In other words, repeated applications of the shaping function
+    must not converge to any fixed points other than 0.
 
     The shaping function must also satisfy the assumptions of the Distortion
     class:
@@ -87,177 +87,171 @@ void Tables::initialize_delay_feedback_tables() noexcept
        these at the respective boundaries of the [INPUT_MIN, INPUT_MAX]
        interval,
 
-     - and its antiderivative must connect to the y = x line as smoothly as
-       possible in order to avoid glitches in the ADAA algorithm,
+     - its antiderivative must connect to the y = x line at INPUT_MAX and to the
+       y = -x at INPUT_MIN as smoothly as possible in order to avoid glitches
+       being produced by the ADAA algorithm,
 
-     - and both the function and its antiderivative must play nicely when the
-       function is flipped around 0.0 using the -f(-x) formula.
+     - both the function and its antiderivative must play nicely near 0 when the
+       function is flipped using the -f(-x) formula.
 
     With these in mind, a spline seems to be a usable choice. The Distortion
     class already takes care of the negative half of the function's domain, so
     it's enough to construct the shaper function for only positive numbers. The
-    spline is composed of two polynomials:
+    spline is composed of three polynomials, for some gamma parameter in (0, 1):
 
-        f : [0, 1] --> [0, 1]
-        g : [1, 3] --> [0, 1]
+        h : [0, gamma] --> [0, 1]
+        f : [gamma, 1] --> [0, 1]
+        g : [1, 3] --> [0, 1]o
 
-    These are connected at x = 1, and let alpha denote the desired value of the
-    shaper function there:
 
-        f(1) = g(1) = alpha
+                { g(x)  if x >= 1
+        s(x) := { f(x)  if x >= gamma
+                { h(x)  if gamma > x >= 0
 
     Let f'(x) and F(x) denote the derivative and the antiderivative of the f
     function respectively, let g'(x) and G(x) denote the derivative and the
-    antiderivative of the g function respectively.
+    antiderivative of the g function respectively, and let h'(x) and H(x) denote
+    the derivative and the antiderivative of the h function respectively. For
+    the antiderivatives, let cf, cg, and ch denote the constants of integration
+    for f, g, and h respectively.
+
+    The purpose of the h function is to make the shaper function linear for
+    quiet signals so they tail of the feedback delay will decay into silence
+    without any more distortion. For some beta parameter in (0, 1]:
+
+        h(x) := beta * x
+        H(x) := (1/2) * beta * x^2 + ch
+        h'(x) = beta
+
+    The three functions are connected at x = gamma and x = 1 respectively. Let
+    alpha denote a parameter which controls the value of the shaping function
+    at x = 1:
+
+        f(1) = g(1) = alpha
 
     In order to join these functions and their antiderivatives smoothly, and to
     satisfy the requirements of the Distortion class, the following properties
     must hold:
 
-        1. f(0) = 0                 (f can be flipped around 0)
-        2. f(1) = g(1) = alpha      (f and g join continuously)
-        3. f'(1) = g'(1)            (f and g join smoothly)
-        4. F(1) = G(1)              (F and G join continuously)
-        5. g(3) = 1                 (g joins continuously to y = 1 at x = 3)
-        6. g'(3) = 0                (g joins smoothly to y = 1 at x = 3)
-        7. G(3) = 3                 (G joins continuously to y = x at x = 3)
+         1. h(0) = 0                (h can be flipped around 0)
+         2. f(gamma) = h(gamma)     (f and h join continuously)
+         3. f'(gamma) = h'(gamma)   (f and h join smoothly)
+         4. F(gamma) = H(gamma)     (F and H join continuously)
+         5. f(1) = g(1) = alpha     (f and g join continuously)
+         6. f'(1) = g(1)            (f and g join smoothly)
+         7. F(1) = G(1)             (F and G join continuously)
+         8. g(3) = 1                (g joins continuously to y = 1 at x = 3)
+         9. g'(3) = 0               (g joins smoothly to y = 1 at x = 3)
+        10. G(3) = 3                (G joins continuously to y = x at x = 3)
 
     Loud signals should decay slowly, so alpha should be relatively high, but
     the effect shouldn't immediately start to hard clip at 1 either, so alpha
     should stay below 1 as well. This motivates adding the following
-    restriction on requirement 3:
+    restriction on requirement 5:
 
-        3. f'(1) = g'(1) = 1 - alpha
-
-    Signals which get close to 0 should eventually decay completely:
-
-        8. f'(0) = 0
+        5. f'(1) = g'(1) = 1 - alpha
 
     The requirements for g can be satisfied by an upside down parabola which has
     a single root at x = 3, and is squeezed and shifted so that requirement 2
     and 5 are satisfied:
 
         g(x) := ((alpha - 1) / 4) * (x - 3)^2 + 1
-
-    Then, with cg denoting the constant of integration, G becomes:
-
         G(x) = ((alpha - 1) / 4) * (1/3 * x^3 - 3 * x^2 + 9 * x) + x + cg
 
-    To satisfy requirement 7, cg must be:
+    To satisfy requirement 10, cg must be:
 
         cg = -9 * (alpha - 1) / 4
 
     With this, g and G are complete.
 
-    There are 4 requirements for f, and one more for F, so a third degree
-    polynomial should be enough. For some constants A, B, C, and D, and with cf
-    being the constant of integration, let:
+    There are six requirements which f, f', F, and H must fulfill. Requirement 4
+    is a constraint on ch, and the remaining five requirements constrain f and
+    cf. This suggests a third degree polynomial:
 
         f(x) := A * x^3 + B * x^2 + C * x + D
-
-    Then:
-
         f'(x) = 3 * A * x^2 + 2 * B * x + C
-
-    and
-
         F(x) = (1/4) * A * x^4 + (1/3) * B * x^3 + (1/2) * C * x^2 + D * x + cf
 
-    From requirement 1 and 8, C = 0 and D = 0 are obtained.
+    The requirements can be written as a system of equation:
 
-    Requirement 2 and 3 poses the follwing system of equations after
-    expanding f(1) and f'(1):
+        1. From f(1) = g(1) = alpha:
 
-            A +     B = alpha
-        3 * A + 2 * B = 1 - alpha
+               A + B + C + D = alpha
 
-    From these we obtain:
+        2. From f'(1) = g'(1) = 1 - alpha:
 
-        A = 1 - 3 * alpha
-        B = 4 * alpha - 1
+               3 * A + 2 * B + C = 1 - alpha
 
-    Now cf can be obtained from requirement 4:
+        3. From f(beta) = h(beta):
 
-        cf = (-5 * alpha + 7) / 4
+               gamma^3 * A + gamma^2 * B + gamma * C + D = beta * gamma
 
-    With this, f and F are also complete.
+        4. From f'(gamma) = h'(gamma):
 
-    As for the choice of the alpha, it should be as great as possible while
-    satisfying the following requirements for 0 < x < 1:
+               3 * gamma^2 * A + 2 * gamma * B + C = beta
 
-        a) f(x) != x        (f does not touch or cross the y = x line)
-        b) f'(x) > 0        (f is strictly monotonically increasing)
-        c) alpha < 1        (avoid hard-clipping at x = 1)
+        5. From F(1) = G(1):
 
-    The f function touching or crossing the y = x line is described by the
-    following equation:
+               (1/4) * A + (1/3) * B + (1/2) * C + D + cf = (20 - 8 * alpha) / 12
 
-        f(x) - x = 0
+        6. From F(gamma) = H(gamma):
 
-    Expanding:
+                 (1/4) * gamma^4 * A
+               + (1/3) * gamma^3 * B
+               + (1/2) * gamma^2 * C
+               +           gamma * D
+               + cf
+               = (20 - 8 * alpha) / 12
 
-        f(x) - x = (A * x^2 + B * x - 1) * x = 0
+    After rearranging and scaling, the following table can be constructed:
 
-    Since 0 < x < 1, the only way the equality can hold is:
+          ch      cf       D       A       B       C |
+        ---------------------------------------------+--------------------
+         -12      12      D1      A1      B1      C1 | 6 * gamma^2 * beta
+           0      12      12       3       4       6 | 20 - 8 * alpha
+           0       0       1       1       1       1 | alpha
+           0       0       0       3       2       1 | 1 - alpha
+           0       0       0      A5      B5       1 | beta
+           0       0       0      A6      B6      C6 | beta * gamma - alpha
 
-        A * x^2 + B * x - 1 = 0
+    Where:
 
-    Expanding and solving this quadratic equation for x > 0 yields:
+        A1 :=  3 * gamma^4
+        B1 :=  4 * gamma^3
+        C1 :=  6 * gamma^2
+        D1 := 12 * gamma
 
-        x1, x2 = (-B +/- sqrt(B^2 + 4 * A)) / (2 * A)
+        A5 := 3 * gamma^2
+        B5 := 2 * gamma
 
-    Touching at a single point occurs when there's only a single root:
+        A6 := gamma^3 - 1
+        B6 := gamma^2 - 1
+        C6 := gamma   - 1
 
-        B^2 + 4 * A = 0
+    Multiplying the vector on the right with the inverse of the matrix on the
+    left produces a vector that contains the values for ch, cf, D, A, B, and C.
 
-    Substituting and simplifying:
+    Note: alpha, beta, and gamma must be chosen so that the following equation
+    does not have any other real solutions on the [0, 3] interval than 0:
 
-        4 * alpha^2 - 5 * alpha + 5/4 = 0
-
-    Solving this for alpha:
-
-        alpha = (5 +/- sqrt(5)) / 8
-
-    In order to eliminate the real-valued solutions of the f(x) - x = 0
-    equation, and thus, to prevent f from having a fixed point for any x > 0,
-    the following inequality must hold:
-
-        4 * alpha^2 - 5 * alpha + 5/4 < 0
-
-    The coefficient of alpha^2 is positive, therefore the parabola is convex,
-    and the alpha values which satisfy the inequality are located between the
-    roots. From that interval, a sufficiently high value should be picked for
-    alpha, give or take for interpolation and floating point errors.
-
-    Note: an alpha which does not eliminate the real-valued solutions of
-    f(x) = x = 0, but pushes them outside the (0, 1) interval may also be a
-    usable choice, but actually, the rest of the requirements will discard
-    solutions from this approach.
-
-    Solving f'(x) > 0 with 0 < x < 1 for alpha yields 3 choices:
-
-    1. 1/4 < alpha < 1/3
-    2. alpha = 1/3 (f becomes quadratic)
-    3. 1/3 < alpha < 1
-
-    These boil down to 1/4 < alpha < 1. Though values between 1/4 and
-    (5 - sqrt(5)) / 8 do satisfy all the requirements, the higher values are
-    preferred in order to minimize the loss of loudness caused by the
-    distortion effect on the delay feedback line.
-
-    In conclusion, the best choice for alpha is a value a little bit below
-    (5 + sqrt(5)) / 8.
+        s(x) - x = 0
     */
-    constexpr Number alpha = (5.0 + std::sqrt(5.0)) / 8.0 - 0.001;
 
-    constexpr Number alpha_m_1 = alpha - 1.0;
-    constexpr Number alpha_m_1_o_4 = alpha_m_1 / 4.0;
+    constexpr Number alpha = 445.0 / 512.0;
+    constexpr Number beta = 11.0 / 16.0;
+    constexpr Number gamma = 1.0 / 16.0;
 
-    constexpr Number A = 1.0 - 3.0 * alpha;
-    constexpr Number B = 4.0 * alpha - 1.0;
-    constexpr Number cf = (-5.0 * alpha + 7.0) / 4.0;
+    constexpr Number alpha_m1o4 = (alpha - 1.0) / 4.0;
 
-    constexpr Number cg = -9.0 * alpha_m_1_o_4;
+    constexpr Number A = -1.074222222222222;
+    constexpr Number B = 1.4151666666666665;
+    constexpr Number C = 0.5231927083333334;
+    constexpr Number D = 0.005003472222222305;
+    constexpr Number cf = 0.6174730902777777;
+
+    constexpr Number cg = -9.0 * alpha_m1o4;
+
+    constexpr Number ch = 0.6175759633382161;
 
     Table& f_table = f_tables[(int)Type::DELAY_FEEDBACK];
     Table& F0_table = F0_tables[(int)Type::DELAY_FEEDBACK];
@@ -269,29 +263,34 @@ void Tables::initialize_delay_feedback_tables() noexcept
     */
     f_table[0] = 0.0;
     f_table[1] = 0.0;
-    f_table[2] = 0.0;
-    F0_table[0] = cf;
-    F0_table[1] = cf;
-    F0_table[2] = cf;
+    F0_table[0] = ch;
+    F0_table[1] = ch;
 
-    for (Integer i = 3; i != SIZE; ++i) {
+    for (Integer i = 2; i != SIZE; ++i) {
         Number const x = INPUT_MAX * ((Sample)i * SIZE_INV);
 
-        if (x <= 1.0) {
-            f_table[i] = (A * x + B) * std::pow(x, 2.0);
-            F0_table[i] = ((A / 4.0) * x + B / 3.0) * std::pow(x, 3.0) + cf;
-        } else {
+        if (x >= 1.0) {
+            /* g(x) and G(x) */
             f_table[i] = (
-                (alpha_m_1_o_4 * x - 6.0 * alpha_m_1_o_4) * x
-                + 9.0 * alpha_m_1_o_4 + 1.0
+                (alpha_m1o4 * x - 6.0 * alpha_m1o4) * x + 9.0 * alpha_m1o4 + 1.0
             );
             F0_table[i] = (
                 (
-                    ((alpha_m_1_o_4 / 3.0) * x - 3.0 * alpha_m_1_o_4) * x
-                    + 9.0 * alpha_m_1_o_4 + 1.0
+                    ((alpha_m1o4 / 3.0) * x - 3.0 * alpha_m1o4) * x
+                    + 9.0 * alpha_m1o4 + 1.0
                 ) * x
                 + cg
             );
+        } else if (x >= gamma) {
+            /* f(x) and F(x) */
+            f_table[i] = ((A * x + B) * x + C) * x + D;
+            F0_table[i] = (
+                ((((A / 4.0) * x + (B / 3.0)) * x + (C / 2.0)) * x + D) * x + cf
+            );
+        } else {
+            /* h(x) and H(x) */
+            f_table[i] = beta * x;
+            F0_table[i] = beta * std::pow(x, 2.0) / 2.0 + ch;
         }
     }
 }
