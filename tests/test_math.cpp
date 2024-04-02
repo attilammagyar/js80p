@@ -445,7 +445,7 @@ TEST(ratio_to_exact_log_biquad_filter_frequency, {
     assert_eq(min, Math::ratio_to_exact_log_biquad_filter_frequency(0.0), DOUBLE_DELTA);
     assert_eq(max, Math::ratio_to_exact_log_biquad_filter_frequency(1.0), DOUBLE_DELTA);
     assert_eq(
-        std::sqrt(min * (max / min)),
+        min * std::sqrt(max / min),
         Math::ratio_to_exact_log_biquad_filter_frequency(0.5),
         DOUBLE_DELTA
     );
@@ -461,7 +461,7 @@ TEST(ratio_to_exact_log_biquad_filter_q, {
     assert_eq(min, Math::ratio_to_exact_log_biquad_filter_q(0.0), DOUBLE_DELTA);
     assert_eq(max, Math::ratio_to_exact_log_biquad_filter_q(1.0), DOUBLE_DELTA);
     assert_eq(
-        std::sqrt(min_p1 * (max_p1 / min_p1)) - 1.0,
+        min_p1 * std::sqrt(max_p1 / min_p1) - 1.0,
         Math::ratio_to_exact_log_biquad_filter_q(0.5),
         DOUBLE_DELTA
     );
