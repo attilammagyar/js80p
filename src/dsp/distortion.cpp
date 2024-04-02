@@ -68,17 +68,24 @@ void Tables::initialize_delay_feedback_tables() noexcept
     /*
     A tanh(steepness * x) distortion does not play nice with feedback: if the
     steepness is low, then it doesn't have a chance to add noticable distortion
-    before the signal fades away, but greater steepness values which produce any
-    significant distortion prevent lower signals from ringing down, because no
-    matter how much gain reduction is applied on the feedback path, there will
-    be a small, non-zero signal level which will be amplified by the distortion
-    more than it can be reduced by the feedback gain.
+    before the signal decays, but greater steepness values which produce any
+    significant distortion prevent lower signals from ringing down completely,
+    since
 
-    To overcome these problems, we need a shaping function which stays below
-    the y = x line so that the distortion will never be able to undo the
-    gain reduction on the feedback path, but still manages to achieve noticable
-    distortion. In other words, repeated applications of the shaping function
-    must not converge to any fixed points other than 0.
+        d/dx tanh(steepness * x) = steepness * sech(steepness * x)^2
+
+    which is equal to the steepness parameter at x = 0. This, and the
+    interpolation and floating point errors, and the error of the numerical
+    differentiation in the ADAA algorithm, are enough to boost signal levels
+    near zero back to a level where the gain reduction on the delay feedback
+    path is undone (for any sensible level of reduction).
+
+    To prevent this, we need a shaping function which stays below the y = x
+    line so that the distortion will never be able to undo the gain reduction,
+    but still manages to achieve noticable distortion. In other words, repeated
+    applications of the shaping function must not converge to any fixed points
+    other than 0, at least not on the interval that is used by the Distortion
+    class.
 
     The shaping function must also satisfy the assumptions of the Distortion
     class:
@@ -87,9 +94,9 @@ void Tables::initialize_delay_feedback_tables() noexcept
        these at the respective boundaries of the [INPUT_MIN, INPUT_MAX]
        interval,
 
-     - its antiderivative must connect to the y = x line at INPUT_MAX and to the
-       y = -x at INPUT_MIN as smoothly as possible in order to avoid glitches
-       being produced by the ADAA algorithm,
+     - its antiderivative must connect to the y = x line at x = INPUT_MAX and to
+       the y = -x line at x = INPUT_MIN continuously and smoothly, in order to
+       avoid glitches being produced by the ADAA algorithm,
 
      - both the function and its antiderivative must play nicely near 0 when the
        function is flipped using the -f(-x) formula.
