@@ -38,7 +38,7 @@ DEV_EXE = .exe
 
 CPP_DEV_PLATFORM ?= $(ROOT_DIR)/bin/g++.exe
 CPP_TARGET_PLATFORM ?= $(CPP_DEV_PLATFORM)
-CPPCHECK ?= echo Skipping
+CPPCHECK ?= echo Skipping Cppcheck:
 DOXYGEN ?= "C:/Program Files/doxygen/bin/doxygen.exe"
 VALGRIND ?=
 WINDRES ?= $(ROOT_DIR)/bin/windres.exe
