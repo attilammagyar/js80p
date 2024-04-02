@@ -138,13 +138,14 @@ void Math::init_log_biquad_filter_freq() noexcept
 }
 
 
-Number Math::ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept
-{
-    constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
-    constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
-    constexpr Number range = max / min;
-
-    return min * std::pow(range, ratio);
+Number Math::ratio_to_exact_log_biquad_filter_frequency(
+        Number const ratio
+) noexcept {
+    return ratio_to_exact_log_value(
+        ratio,
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+    );
 }
 
 
@@ -363,13 +364,28 @@ Number Math::env_shape_sharp_smooth_steeper(Number const x) noexcept
 }
 
 
-Number Math::ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept
+Number Math::ratio_to_exact_log_biquad_filter_q(Number const ratio) noexcept
 {
-    constexpr Number min = Constants::BIQUAD_FILTER_Q_MIN + LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
-    constexpr Number max = Constants::BIQUAD_FILTER_Q_MAX + LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
-    constexpr Number range = max / min;
+    return ratio_to_exact_log_value(
+        ratio,
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        LOG_BIQUAD_FILTER_Q_VALUE_OFFSET
+    );
+}
 
-    return min * std::pow(range, ratio) - LOG_BIQUAD_FILTER_Q_VALUE_OFFSET;
+
+Number Math::ratio_to_exact_log_value(
+        Number const ratio,
+        Number const min,
+        Number const max,
+        Number const offset
+) noexcept {
+    Number const min_with_offset = min + offset;
+    Number const max_with_offset = max + offset;
+    Number const range = max_with_offset / min_with_offset;
+
+    return min_with_offset * std::pow(range, ratio) - offset;
 }
 
 

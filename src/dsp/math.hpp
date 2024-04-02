@@ -168,14 +168,14 @@ class Math
          *        logarithmic scale for a given ratio between 0.0 and 1.0.
          *        Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_biquad_filter_frequency(Number ratio) noexcept;
+        static Number ratio_to_exact_log_biquad_filter_frequency(Number const ratio) noexcept;
 
         /**
          * \brief Calcualte the exact biquad filter Q value using a
          *        logarithmic scale for a given ratio between 0.0 and 1.0.
          *        Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_biquad_filter_q(Number ratio) noexcept;
+        static Number ratio_to_exact_log_biquad_filter_q(Number const ratio) noexcept;
 
         /**
          * \brief Initialize a lookup table for a logarithmic scale param.
@@ -334,6 +334,13 @@ class Math
         static Math const math;
 
         static Number iterate_exp(Number const x, Number const scale) noexcept;
+
+        static Number ratio_to_exact_log_value(
+            Number const ratio,
+            Number const min,
+            Number const max,
+            Number const offset = 0.0
+        ) noexcept;
 
         Math() noexcept;
 
