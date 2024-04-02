@@ -2404,7 +2404,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(12, 4);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L1FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L1FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L1MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L1MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2418,7 +2418,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(492, 4);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L2WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L2FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L2FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L2PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L2MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L2MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2432,7 +2432,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(12, 144);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L3WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L3FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L3FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L3PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L3MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L3MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2446,7 +2446,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(492, 144);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L4WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L4FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L4FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L4PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L4MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L4MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2460,7 +2460,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(12, 284);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L5WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L5FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L5FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L5PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L5MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L5MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2474,7 +2474,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(492, 284);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L6WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L6FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L6FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L6PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L6MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L6MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2488,7 +2488,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(12, 424);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L7WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L7FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L7FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L7PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L7MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L7MAX,  MML_C,    "%.2f", 100.0, knob_states);
@@ -2502,7 +2502,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
     POSITION_RELATIVE_BEGIN(492, 424);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L8WAV,  MM___,    wf, wfc, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L8FRQ,  MML_C,    "%.2f", 1.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 1,  28, Synth::ParamId::L8FRQ,  MML_C,    "%.3f", 1.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L8PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L8MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L8MAX,  MML_C,    "%.2f", 100.0, knob_states);
