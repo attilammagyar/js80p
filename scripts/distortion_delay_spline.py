@@ -34,10 +34,10 @@ import matplotlib.pyplot as plt
 gamma = 1.0 / 16.0
 
 # Parameter: f'(gamma) := beta
-beta = 11.0 / 16.0
+beta = 5.0 / 8.0
 
 # Parameter: f(1) = alpha
-alpha = 445.0 / 512.0
+alpha = 899.0 / 1024.0
 
 
 alpha_m_1_o_4 = (alpha - 1.0) / 4.0
@@ -156,7 +156,7 @@ def main(argv):
         (lambda x: spline_int(x), (([], 1),)),
         (
             lambda x: spline(x),
-            (([], 1), ([], 5), ([], 25), ([], 35), ([], 10), ([], 5), ([], 3)),
+            (([], 1), ([], 5), ([], 35), ([], 90), ([], 10), ([], 5), ([], 3)),
         ),
     )
 

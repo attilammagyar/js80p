@@ -237,21 +237,21 @@ void Tables::initialize_delay_feedback_tables() noexcept
         s(x) - x = 0
     */
 
-    constexpr Number alpha = 445.0 / 512.0;
-    constexpr Number beta = 11.0 / 16.0;
+    constexpr Number alpha = 899.0 / 1024.0;
+    constexpr Number beta = 5.0 / 8.0;
     constexpr Number gamma = 1.0 / 16.0;
 
     constexpr Number alpha_m1o4 = (alpha - 1.0) / 4.0;
 
-    constexpr Number A = -1.074222222222222;
-    constexpr Number B = 1.4151666666666665;
-    constexpr Number C = 0.5231927083333334;
-    constexpr Number D = 0.005003472222222305;
-    constexpr Number cf = 0.6174730902777777;
+    constexpr Number A = -1.186148148148148;
+    constexpr Number B = 1.6221944444444443;
+    constexpr Number C = 0.43612586805555564;
+    constexpr Number D = 0.005757523148148036;
+    constexpr Number cf = 0.613365306712963;
 
     constexpr Number cg = -9.0 * alpha_m1o4;
 
-    constexpr Number ch = 0.6175759633382161;
+    constexpr Number ch = 0.613483746846517;
 
     Table& f_table = f_tables[(int)Type::DELAY_FEEDBACK];
     Table& F0_table = F0_tables[(int)Type::DELAY_FEEDBACK];
@@ -281,16 +281,22 @@ void Tables::initialize_delay_feedback_tables() noexcept
                 ) * x
                 + cg
             );
+
+            JS80P_ASSERT(alpha <= f_table[i] && f_table[i] <= 1.0);
         } else if (x >= gamma) {
             /* f(x) and F(x) */
             f_table[i] = ((A * x + B) * x + C) * x + D;
             F0_table[i] = (
                 ((((A / 4.0) * x + (B / 3.0)) * x + (C / 2.0)) * x + D) * x + cf
             );
+
+            JS80P_ASSERT(0.0 < f_table[i] && f_table[i] < x);
         } else {
             /* h(x) and H(x) */
             f_table[i] = beta * x;
             F0_table[i] = beta * std::pow(x, 2.0) / 2.0 + ch;
+
+            JS80P_ASSERT(0.0 <= f_table[i] && f_table[i] <= x);
         }
     }
 }
