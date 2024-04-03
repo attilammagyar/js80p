@@ -45,7 +45,8 @@ void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_lo
         Number const default_value,
         Number const value_offset,
         Number const tolerance_percent,
-        Number const min_tolerance
+        Number const min_tolerance,
+        char const* const table_name
 ) {
     constexpr int resolution = 20000;
     constexpr int iterations = 50000;
@@ -82,7 +83,8 @@ void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_lo
                 value,
                 param.get_value(),
                 std::max(min_tolerance, value * tolerance_percent),
-                "i=%d (%d), j=%d (%d)",
+                "table=%s, i=%d (%d), j=%d (%d)",
+                table_name,
                 i,
                 resolution,
                 j,
@@ -95,6 +97,30 @@ void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_lo
 
 TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable, {
     assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+        Math::log_chorus_lfo_freq_table(),
+        Math::LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_CHORUS_LFO_FREQ_TABLE_INDEX_SCALE,
+        Constants::CHORUS_LFO_FREQUENCY_MIN,
+        Constants::CHORUS_LFO_FREQUENCY_MAX,
+        Constants::CHORUS_LFO_FREQUENCY_DEFAULT,
+        0.0,
+        0.0082,
+        0.0020,
+        "Chorus LFO logarithmic frequency"
+    );
+    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+        Math::log_lfo_freq_table(),
+        Math::LOG_LFO_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_LFO_FREQ_TABLE_INDEX_SCALE,
+        Constants::LFO_FREQUENCY_MIN,
+        Constants::LFO_FREQUENCY_MAX,
+        Constants::LFO_FREQUENCY_DEFAULT,
+        0.0,
+        0.0066,
+        0.0020,
+        "LFO logarithmic frequencies"
+    );
+    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE,
@@ -103,7 +129,8 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
         0.0021, /* 0.21% */
-        0.0
+        0.0,
+        "biquad filter logarithmic frequencies"
     );
     assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
         Math::log_biquad_filter_q_table(),
@@ -114,6 +141,7 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         Constants::BIQUAD_FILTER_Q_DEFAULT,
         Math::LOG_BIQUAD_FILTER_Q_VALUE_OFFSET,
         0.0029,
-        0.0054
+        0.0054,
+        "biquad filter logarithmic Q"
     );
 })

@@ -43,7 +43,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 18 + VOICES * 3, &mixer),
+) : Effect<InputSignalProducerClass>(name, input, 19 + VOICES * 3, &mixer),
     type(name+ "TYP"),
     delay_time(
         name + "DEL",
@@ -51,7 +51,18 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::CHORUS_DELAY_TIME_MAX,
         Constants::CHORUS_DELAY_TIME_DEFAULT
     ),
-    frequency(name + "FRQ", 0.001, 20.0, 0.15),
+    frequency(
+        name + "FRQ",
+        Constants::CHORUS_LFO_FREQUENCY_MIN,
+        Constants::CHORUS_LFO_FREQUENCY_MAX,
+        Constants::CHORUS_LFO_FREQUENCY_DEFAULT,
+        0.0,
+        NULL,
+        &log_scale_lfo_frequency,
+        Math::log_chorus_lfo_freq_table(),
+        Math::LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_CHORUS_LFO_FREQ_TABLE_INDEX_SCALE
+    ),
     /*
     The depth parameter will lead the amount parameter of the LFOs which is
     expected to be scaled by 0.5 so that the LFO's oscillation range is not
@@ -71,7 +82,7 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
         0.0,
         NULL,
-        &log_scale_frequencies,
+        &log_scale_filter_frequencies,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
@@ -85,13 +96,14 @@ Chorus<InputSignalProducerClass>::Chorus(
         20.0,
         0.0,
         NULL,
-        &log_scale_frequencies,
+        &log_scale_filter_frequencies,
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
-    log_scale_frequencies(name + "LOG", ToggleParam::OFF),
+    log_scale_filter_frequencies(name + "LOG", ToggleParam::OFF),
+    log_scale_lfo_frequency(name + "LLG", ToggleParam::OFF),
     biquad_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -166,7 +178,8 @@ Chorus<InputSignalProducerClass>::Chorus(
     this->register_child(width);
     this->register_child(high_pass_frequency);
     this->register_child(tempo_sync);
-    this->register_child(log_scale_frequencies);
+    this->register_child(log_scale_filter_frequencies);
+    this->register_child(log_scale_lfo_frequency);
 
     this->register_child(biquad_filter_q);
 

@@ -92,7 +92,8 @@ class Chorus : public Effect<InputSignalProducerClass>
         FloatParamS high_pass_frequency;
 
         ToggleParam tempo_sync;
-        ToggleParam log_scale_frequencies;
+        ToggleParam log_scale_filter_frequencies;
+        ToggleParam log_scale_lfo_frequency;
 
     protected:
         Sample const* const* initialize_rendering(

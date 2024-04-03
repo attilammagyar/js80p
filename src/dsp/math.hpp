@@ -88,6 +88,34 @@ class Math
             std::max(LN_OF_10 * POW_10_MAX, -1.0 * LN_OF_10 * POW_10_INV_MIN)
         ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
 
+        static constexpr int LOG_LFO_FREQ_TABLE_SIZE = 0x400;
+
+        static constexpr int LOG_LFO_FREQ_TABLE_MAX_INDEX = (
+            LOG_LFO_FREQ_TABLE_SIZE - 1
+        );
+
+        static constexpr Number LOG_LFO_FREQ_TABLE_MAX_INDEX_INV = (
+            1.0 / (Number)LOG_LFO_FREQ_TABLE_MAX_INDEX
+        );
+
+        static constexpr Number LOG_LFO_FREQ_TABLE_INDEX_SCALE = (
+            (Number)LOG_LFO_FREQ_TABLE_MAX_INDEX
+        );
+
+        static constexpr int LOG_CHORUS_LFO_FREQ_TABLE_SIZE = LOG_LFO_FREQ_TABLE_SIZE;
+
+        static constexpr int LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX = (
+            LOG_LFO_FREQ_TABLE_MAX_INDEX
+        );
+
+        static constexpr Number LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX_INV = (
+            LOG_LFO_FREQ_TABLE_MAX_INDEX_INV
+        );
+
+        static constexpr Number LOG_CHORUS_LFO_FREQ_TABLE_INDEX_SCALE = (
+            LOG_LFO_FREQ_TABLE_INDEX_SCALE
+        );
+
         static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE = 0x1000;
 
         static constexpr int LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX = (
@@ -160,8 +188,24 @@ class Math
         static Number db_to_linear(Number const db) noexcept;
         static Number linear_to_db(Number const linear) noexcept;
 
+        static Number const* log_chorus_lfo_freq_table() noexcept;
+        static Number const* log_lfo_freq_table() noexcept;
         static Number const* log_biquad_filter_freq_table() noexcept;
         static Number const* log_biquad_filter_q_table() noexcept;
+
+        /**
+         * \brief Calcualte the exact LFO frequency value as used by the Chorus
+         *        effect using a logarithmic scale for a given ratio between
+         *        0.0 and 1.0. Intended for testing purposes.
+         */
+        static Number ratio_to_exact_log_chorus_lfo_frequency(Number const ratio) noexcept;
+
+        /**
+         * \brief Calcualte the exact LFO frequency value using a
+         *        logarithmic scale for a given ratio between 0.0 and 1.0.
+         *        Intended for testing purposes.
+         */
+        static Number ratio_to_exact_log_lfo_frequency(Number const ratio) noexcept;
 
         /**
          * \brief Calcualte the exact biquad filter frequency value using a
@@ -347,6 +391,8 @@ class Math
         void init_sines() noexcept;
         void init_randoms() noexcept;
         void init_distortion() noexcept;
+        void init_log_chorus_lfo_freq() noexcept;
+        void init_log_lfo_freq() noexcept;
         void init_log_biquad_filter_freq() noexcept;
         void init_log_biquad_filter_q() noexcept;
         void init_linear_to_db() noexcept;
@@ -376,6 +422,8 @@ class Math
         Number randoms_centered_lfo[RANDOMS];
         Number distortion[DISTORTION_TABLE_SIZE];
         Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
+        Number log_chorus_lfo_freq[LOG_CHORUS_LFO_FREQ_TABLE_SIZE];
+        Number log_lfo_freq[LOG_LFO_FREQ_TABLE_SIZE];
         Number log_biquad_filter_freq[LOG_BIQUAD_FILTER_FREQ_TABLE_SIZE];
         Number log_biquad_filter_q[LOG_BIQUAD_FILTER_Q_TABLE_SIZE];
         Number linear_to_dbs[LINEAR_TO_DB_TABLE_SIZE];

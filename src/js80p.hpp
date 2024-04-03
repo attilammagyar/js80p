@@ -83,6 +83,10 @@ namespace Constants {
     constexpr Byte LFOS = 8;
     constexpr Byte INVALID_LFO_INDEX = LFOS;
 
+    constexpr Number LFO_FREQUENCY_DEFAULT = 1.0;
+    constexpr Number LFO_FREQUENCY_MIN = 0.01;
+    constexpr Number LFO_FREQUENCY_MAX = 30.0;
+
     constexpr Number AM_DEFAULT = 0.0;
     constexpr Number AM_MAX = 3.0;
     constexpr Number AM_MIN = 0.0;
@@ -105,6 +109,10 @@ namespace Constants {
     constexpr Number CHORUS_DELAY_TIME_MAX = 1.0;
 
     constexpr Integer CHORUS_FEEDBACK_SCALE = 4;
+
+    constexpr Number CHORUS_LFO_FREQUENCY_DEFAULT = 0.15;
+    constexpr Number CHORUS_LFO_FREQUENCY_MIN = 0.001;
+    constexpr Number CHORUS_LFO_FREQUENCY_MAX = 20.0;
 
     constexpr Number DELAY_FEEDBACK_DEFAULT = 0.75;
     constexpr Number DELAY_FEEDBACK_MIN = 0.0;

@@ -487,7 +487,8 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ECWET, effects.chorus.wet);
     register_param<FloatParamS>(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
-    register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_frequencies);
+    register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_filter_frequencies);
+    register_param<ToggleParam>(ParamId::ECLLG, effects.chorus.log_scale_lfo_frequency);
 
     register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
     register_param<FloatParamS>(ParamId::EEINV, effects.echo.input_volume);
@@ -713,6 +714,15 @@ void Synth::create_lfos() noexcept
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L6WAV, lfos_rw[5]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
     register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
+
+    register_param<ToggleParam>(ParamId::L1LOG, lfos_rw[0]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L2LOG, lfos_rw[1]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L3LOG, lfos_rw[2]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L4LOG, lfos_rw[3]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L5LOG, lfos_rw[4]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L6LOG, lfos_rw[5]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L7LOG, lfos_rw[6]->freq_log_scale);
+    register_param<ToggleParam>(ParamId::L8LOG, lfos_rw[7]->freq_log_scale);
 
     register_param<ToggleParam>(ParamId::L1SYN, lfos_rw[0]->tempo_sync);
     register_param<ToggleParam>(ParamId::L2SYN, lfos_rw[1]->tempo_sync);
@@ -1785,6 +1795,14 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_default_ratio();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_default_ratio();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_default_ratio();
+        case ParamId::L1LOG: return lfos_rw[0]->freq_log_scale.get_default_ratio();
+        case ParamId::L2LOG: return lfos_rw[1]->freq_log_scale.get_default_ratio();
+        case ParamId::L3LOG: return lfos_rw[2]->freq_log_scale.get_default_ratio();
+        case ParamId::L4LOG: return lfos_rw[3]->freq_log_scale.get_default_ratio();
+        case ParamId::L5LOG: return lfos_rw[4]->freq_log_scale.get_default_ratio();
+        case ParamId::L6LOG: return lfos_rw[5]->freq_log_scale.get_default_ratio();
+        case ParamId::L7LOG: return lfos_rw[6]->freq_log_scale.get_default_ratio();
+        case ParamId::L8LOG: return lfos_rw[7]->freq_log_scale.get_default_ratio();
         case ParamId::L1CEN: return lfos_rw[0]->center.get_default_ratio();
         case ParamId::L2CEN: return lfos_rw[1]->center.get_default_ratio();
         case ParamId::L3CEN: return lfos_rw[2]->center.get_default_ratio();
@@ -1809,7 +1827,8 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_default_ratio();
         case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_default_ratio();
         case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_default_ratio();
-        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_default_ratio();
+        case ParamId::ECLOG: return effects.chorus.log_scale_filter_frequencies.get_default_ratio();
+        case ParamId::ECLLG: return effects.chorus.log_scale_lfo_frequency.get_default_ratio();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_default_ratio();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_default_ratio();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_default_ratio();
@@ -2090,6 +2109,14 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_max_value();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_max_value();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_max_value();
+        case ParamId::L1LOG: return lfos_rw[0]->freq_log_scale.get_max_value();
+        case ParamId::L2LOG: return lfos_rw[1]->freq_log_scale.get_max_value();
+        case ParamId::L3LOG: return lfos_rw[2]->freq_log_scale.get_max_value();
+        case ParamId::L4LOG: return lfos_rw[3]->freq_log_scale.get_max_value();
+        case ParamId::L5LOG: return lfos_rw[4]->freq_log_scale.get_max_value();
+        case ParamId::L6LOG: return lfos_rw[5]->freq_log_scale.get_max_value();
+        case ParamId::L7LOG: return lfos_rw[6]->freq_log_scale.get_max_value();
+        case ParamId::L8LOG: return lfos_rw[7]->freq_log_scale.get_max_value();
         case ParamId::L1CEN: return lfos_rw[0]->center.get_max_value();
         case ParamId::L2CEN: return lfos_rw[1]->center.get_max_value();
         case ParamId::L3CEN: return lfos_rw[2]->center.get_max_value();
@@ -2114,7 +2141,8 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_max_value();
         case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_max_value();
         case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_max_value();
-        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_max_value();
+        case ParamId::ECLOG: return effects.chorus.log_scale_filter_frequencies.get_max_value();
+        case ParamId::ECLLG: return effects.chorus.log_scale_lfo_frequency.get_max_value();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_max_value();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_max_value();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_max_value();
@@ -2403,6 +2431,14 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::L6WAV: return lfos_rw[5]->waveform.ratio_to_value(ratio);
         case ParamId::L7WAV: return lfos_rw[6]->waveform.ratio_to_value(ratio);
         case ParamId::L8WAV: return lfos_rw[7]->waveform.ratio_to_value(ratio);
+        case ParamId::L1LOG: return lfos_rw[0]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L2LOG: return lfos_rw[1]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L3LOG: return lfos_rw[2]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L4LOG: return lfos_rw[3]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L5LOG: return lfos_rw[4]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L6LOG: return lfos_rw[5]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L7LOG: return lfos_rw[6]->freq_log_scale.ratio_to_value(ratio);
+        case ParamId::L8LOG: return lfos_rw[7]->freq_log_scale.ratio_to_value(ratio);
         case ParamId::L1CEN: return lfos_rw[0]->center.ratio_to_value(ratio);
         case ParamId::L2CEN: return lfos_rw[1]->center.ratio_to_value(ratio);
         case ParamId::L3CEN: return lfos_rw[2]->center.ratio_to_value(ratio);
@@ -2427,7 +2463,8 @@ Byte Synth::int_param_ratio_to_display_value(
         case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.ratio_to_value(ratio);
         case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.ratio_to_value(ratio);
         case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.ratio_to_value(ratio);
-        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.ratio_to_value(ratio);
+        case ParamId::ECLOG: return effects.chorus.log_scale_filter_frequencies.ratio_to_value(ratio);
+        case ParamId::ECLLG: return effects.chorus.log_scale_lfo_frequency.ratio_to_value(ratio);
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.ratio_to_value(ratio);
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.ratio_to_value(ratio);
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.ratio_to_value(ratio);
@@ -3005,6 +3042,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::L6WAV: lfos_rw[5]->waveform.set_ratio(ratio); break;
             case ParamId::L7WAV: lfos_rw[6]->waveform.set_ratio(ratio); break;
             case ParamId::L8WAV: lfos_rw[7]->waveform.set_ratio(ratio); break;
+            case ParamId::L1LOG: lfos_rw[0]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L2LOG: lfos_rw[1]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L3LOG: lfos_rw[2]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L4LOG: lfos_rw[3]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L5LOG: lfos_rw[4]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L6LOG: lfos_rw[5]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L7LOG: lfos_rw[6]->freq_log_scale.set_ratio(ratio); break;
+            case ParamId::L8LOG: lfos_rw[7]->freq_log_scale.set_ratio(ratio); break;
             case ParamId::L1CEN: lfos_rw[0]->center.set_ratio(ratio); break;
             case ParamId::L2CEN: lfos_rw[1]->center.set_ratio(ratio); break;
             case ParamId::L3CEN: lfos_rw[2]->center.set_ratio(ratio); break;
@@ -3029,7 +3074,8 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             case ParamId::CF2LOG: carrier_params.filter_2_freq_log_scale.set_ratio(ratio); break;
             case ParamId::EF1LOG: effects.filter_1_freq_log_scale.set_ratio(ratio); break;
             case ParamId::EF2LOG: effects.filter_2_freq_log_scale.set_ratio(ratio); break;
-            case ParamId::ECLOG: effects.chorus.log_scale_frequencies.set_ratio(ratio); break;
+            case ParamId::ECLOG: effects.chorus.log_scale_filter_frequencies.set_ratio(ratio); break;
+            case ParamId::ECLLG: effects.chorus.log_scale_lfo_frequency.set_ratio(ratio); break;
             case ParamId::EELOG: effects.echo.log_scale_frequencies.set_ratio(ratio); break;
             case ParamId::ERLOG: effects.reverb.log_scale_frequencies.set_ratio(ratio); break;
             case ParamId::N1DYN: envelopes_rw[0]->dynamic.set_ratio(ratio); break;
@@ -3815,6 +3861,14 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::L6WAV: return lfos_rw[5]->waveform.get_ratio();
         case ParamId::L7WAV: return lfos_rw[6]->waveform.get_ratio();
         case ParamId::L8WAV: return lfos_rw[7]->waveform.get_ratio();
+        case ParamId::L1LOG: return lfos_rw[0]->freq_log_scale.get_ratio();
+        case ParamId::L2LOG: return lfos_rw[1]->freq_log_scale.get_ratio();
+        case ParamId::L3LOG: return lfos_rw[2]->freq_log_scale.get_ratio();
+        case ParamId::L4LOG: return lfos_rw[3]->freq_log_scale.get_ratio();
+        case ParamId::L5LOG: return lfos_rw[4]->freq_log_scale.get_ratio();
+        case ParamId::L6LOG: return lfos_rw[5]->freq_log_scale.get_ratio();
+        case ParamId::L7LOG: return lfos_rw[6]->freq_log_scale.get_ratio();
+        case ParamId::L8LOG: return lfos_rw[7]->freq_log_scale.get_ratio();
         case ParamId::L1CEN: return lfos_rw[0]->center.get_ratio();
         case ParamId::L2CEN: return lfos_rw[1]->center.get_ratio();
         case ParamId::L3CEN: return lfos_rw[2]->center.get_ratio();
@@ -3839,7 +3893,8 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamId::CF2LOG: return carrier_params.filter_2_freq_log_scale.get_ratio();
         case ParamId::EF1LOG: return effects.filter_1_freq_log_scale.get_ratio();
         case ParamId::EF2LOG: return effects.filter_2_freq_log_scale.get_ratio();
-        case ParamId::ECLOG: return effects.chorus.log_scale_frequencies.get_ratio();
+        case ParamId::ECLOG: return effects.chorus.log_scale_filter_frequencies.get_ratio();
+        case ParamId::ECLLG: return effects.chorus.log_scale_lfo_frequency.get_ratio();
         case ParamId::EELOG: return effects.echo.log_scale_frequencies.get_ratio();
         case ParamId::ERLOG: return effects.reverb.log_scale_frequencies.get_ratio();
         case ParamId::N1DYN: return envelopes_rw[0]->dynamic.get_ratio();

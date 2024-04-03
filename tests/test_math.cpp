@@ -438,6 +438,34 @@ TEST(randomize_centered_lfo, {
 })
 
 
+TEST(ratio_to_exact_log_chorus_lfo_frequency, {
+    constexpr Number min = Constants::CHORUS_LFO_FREQUENCY_MIN;
+    constexpr Number max = Constants::CHORUS_LFO_FREQUENCY_MAX;
+
+    assert_eq(min, Math::ratio_to_exact_log_chorus_lfo_frequency(0.0), DOUBLE_DELTA);
+    assert_eq(max, Math::ratio_to_exact_log_chorus_lfo_frequency(1.0), DOUBLE_DELTA);
+    assert_eq(
+        min * std::sqrt(max / min),
+        Math::ratio_to_exact_log_chorus_lfo_frequency(0.5),
+        DOUBLE_DELTA
+    );
+})
+
+
+TEST(ratio_to_exact_log_lfo_frequency, {
+    constexpr Number min = Constants::LFO_FREQUENCY_MIN;
+    constexpr Number max = Constants::LFO_FREQUENCY_MAX;
+
+    assert_eq(min, Math::ratio_to_exact_log_lfo_frequency(0.0), DOUBLE_DELTA);
+    assert_eq(max, Math::ratio_to_exact_log_lfo_frequency(1.0), DOUBLE_DELTA);
+    assert_eq(
+        min * std::sqrt(max / min),
+        Math::ratio_to_exact_log_lfo_frequency(0.5),
+        DOUBLE_DELTA
+    );
+})
+
+
 TEST(ratio_to_exact_log_biquad_filter_frequency, {
     constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
     constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;

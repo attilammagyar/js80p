@@ -83,6 +83,7 @@ class LFO : public SignalProducer
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         typename Oscillator_::WaveformParam waveform;
+        ToggleParam freq_log_scale;
         FloatParamS frequency;
         FloatParamS phase;
         FloatParamS min;

@@ -28,9 +28,21 @@ namespace JS80P
 {
 
 LFO::LFO(std::string const& name) noexcept
-    : SignalProducer(1, 12, 0, &oscillator),
+    : SignalProducer(1, 13, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
-    frequency(name + "FRQ", 0.01, 30.0, 1.0),
+    freq_log_scale(name + "LOG", ToggleParam::OFF),
+    frequency(
+        name + "FRQ",
+        Constants::LFO_FREQUENCY_MIN,
+        Constants::LFO_FREQUENCY_MAX,
+        Constants::LFO_FREQUENCY_DEFAULT,
+        0.0,
+        NULL,
+        &freq_log_scale,
+        Math::log_lfo_freq_table(),
+        Math::LOG_LFO_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_LFO_FREQ_TABLE_INDEX_SCALE
+    ),
     phase(name + "PHS", 0.0, 1.0, 0.0),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(name + "MAX", 0.0, 1.0, 1.0),
@@ -56,6 +68,7 @@ void LFO::initialize_instance() noexcept
     register_child(amount);
     register_child(distortion);
     register_child(randomness);
+    register_child(freq_log_scale);
     register_child(tempo_sync);
     register_child(center);
     register_child(amount_envelope);
@@ -71,8 +84,9 @@ LFO::LFO(
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
-    : SignalProducer(1, 12, 0, &oscillator),
+    : SignalProducer(1, 13, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    freq_log_scale(name + "LOG", ToggleParam::OFF),
     frequency(frequency_leader),
     phase(name + "PHS", 0.0, 1.0, phase_offset),
     min(name + "MIN", 0.0, 1.0, 0.0),

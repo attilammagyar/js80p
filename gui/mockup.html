@@ -302,8 +302,14 @@ h1 span {
   left: 2px;
 }
 
+#chorus h1 label.lfo-freq {
+  position: relative;
+  left: 75px;
+  width: 140px;
+}
+
 #chorus h1 label.freq {
-  left: 250px;
+  left: 105px;
 }
 
 #echo h1 label.freq {
@@ -340,8 +346,13 @@ h1 span {
 }
 
 .block h1 label.center {
-  margin-left: 123px;
+  margin-left: 3px;
   margin-top: 2px;
+}
+
+.block h1 label.log-freq {
+  margin-left: 16px;
+  width: 114px;
 }
 
 .block h1 label.envelope {
@@ -770,7 +781,8 @@ function make_tabs(active)
       <div id="chorus" class="effect main-block block">
         <h1>
           <span>Chorus</span>
-          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
+          <label class="lfo-freq"><input type="text" /><span> LOG LFO FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LOG FILTER FREQS</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="chorus-params" class="block"></div>
@@ -1106,6 +1118,9 @@ window.onload = function ()
         h = document.createElement("h1");
         h.innerHTML = [
           '<span>LFO ' + String(i) + '</span>',
+          '<label class="log-freq">',
+            '<input type="text" /><span> LOG FREQ</span>',
+          '</label>',
           '<label class="center">',
             '<span>CENTER </span><input type="text" />',
           '</label>',

@@ -245,6 +245,15 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("L7WAV", " ///< LFO 7 Waveform", "lfos_rw[6]->waveform"),
         ("L8WAV", " ///< LFO 8 Waveform", "lfos_rw[7]->waveform"),
 
+        ("L1LOG", " ///< LFO 1 Logarithmic Frequency", "lfos_rw[0]->freq_log_scale"),
+        ("L2LOG", " ///< LFO 2 Logarithmic Frequency", "lfos_rw[1]->freq_log_scale"),
+        ("L3LOG", " ///< LFO 3 Logarithmic Frequency", "lfos_rw[2]->freq_log_scale"),
+        ("L4LOG", " ///< LFO 4 Logarithmic Frequency", "lfos_rw[3]->freq_log_scale"),
+        ("L5LOG", " ///< LFO 5 Logarithmic Frequency", "lfos_rw[4]->freq_log_scale"),
+        ("L6LOG", " ///< LFO 6 Logarithmic Frequency", "lfos_rw[5]->freq_log_scale"),
+        ("L7LOG", " ///< LFO 7 Logarithmic Frequency", "lfos_rw[6]->freq_log_scale"),
+        ("L8LOG", " ///< LFO 8 Logarithmic Frequency", "lfos_rw[7]->freq_log_scale"),
+
         ("L1CEN", " ///< LFO 1 Center", "lfos_rw[0]->center"),
         ("L2CEN", " ///< LFO 2 Center", "lfos_rw[1]->center"),
         ("L3CEN", " ///< LFO 3 Center", "lfos_rw[2]->center"),
@@ -273,7 +282,8 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("CF2LOG", "///< Carrier Filter 2 Logarithmic Frequency", "carrier_params.filter_2_freq_log_scale"),
         ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency", "effects.filter_1_freq_log_scale"),
         ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency", "effects.filter_2_freq_log_scale"),
-        ("ECLOG", " ///< Effects Chorus Logarithmic Filter Frequencies", "effects.chorus.log_scale_frequencies"),
+        ("ECLOG", " ///< Effects Chorus Logarithmic Filter Frequencies", "effects.chorus.log_scale_filter_frequencies"),
+        ("ECLLG", " ///< Effects Chorus Logarithmic LFO Frequency", "effects.chorus.log_scale_lfo_frequency"),
         ("EELOG", " ///< Effects Echo Logarithmic Filter Frequencies", "effects.echo.log_scale_frequencies"),
         ("ERLOG", " ///< Effects Reverb Logarithmic Filter Frequencies", "effects.reverb.log_scale_frequencies"),
 

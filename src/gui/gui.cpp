@@ -743,6 +743,15 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L7WAV] = "LFO 7 Waveform",
     [Synth::ParamId::L8WAV] = "LFO 8 Waveform",
 
+    [Synth::ParamId::L1LOG] = "LFO 1 Logarithmic Frequency",
+    [Synth::ParamId::L2LOG] = "LFO 2 Logarithmic Frequency",
+    [Synth::ParamId::L3LOG] = "LFO 3 Logarithmic Frequency",
+    [Synth::ParamId::L4LOG] = "LFO 4 Logarithmic Frequency",
+    [Synth::ParamId::L5LOG] = "LFO 5 Logarithmic Frequency",
+    [Synth::ParamId::L6LOG] = "LFO 6 Logarithmic Frequency",
+    [Synth::ParamId::L7LOG] = "LFO 7 Logarithmic Frequency",
+    [Synth::ParamId::L8LOG] = "LFO 8 Logarithmic Frequency",
+
     [Synth::ParamId::L1CEN] = "LFO 1 Center",
     [Synth::ParamId::L2CEN] = "LFO 2 Center",
     [Synth::ParamId::L3CEN] = "LFO 3 Center",
@@ -772,6 +781,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EF1LOG] = "Filter 1 Logarithmic Frequency",
     [Synth::ParamId::EF2LOG] = "Filter 2 Logarithmic Frequency",
     [Synth::ParamId::ECLOG] = "Chorus Logarithmic Filter Frequencies",
+    [Synth::ParamId::ECLLG] = "Chorus Logarithmic LFO Frequency",
     [Synth::ParamId::EELOG] = "Echo Logarithmic Filter Frequencies",
     [Synth::ParamId::ERLOG] = "Reverb Logarithmic Filter Frequencies",
 
@@ -1997,7 +2007,8 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     KNOB(effects_body, 171 + KNOB_W * 8,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body, 171 + KNOB_W * 9,   173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body, 171 + KNOB_W * 10,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TOGG(effects_body, 480, 145,  96, 24,  0, Synth::ParamId::ECLOG);
+    TOGG(effects_body, 305, 145, 114, 24,  0, Synth::ParamId::ECLLG);
+    TOGG(effects_body, 480, 145, 136, 24,  0, Synth::ParamId::ECLOG);
     TOGG(effects_body, 720, 145,  90, 24, 66, Synth::ParamId::ECSYN);
 
     KNOB(effects_body,  84 + KNOB_W * 0,   313, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
@@ -2411,9 +2422,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L1AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L1DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L1LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L1CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L1SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L1CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L1AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L1AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 4);
@@ -2425,9 +2437,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L2AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L2DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L2LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L2CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L2SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L2CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L2AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L2AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 144);
@@ -2439,9 +2452,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L3AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L3DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L3LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L3CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L3SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L3CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L3AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L3AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 144);
@@ -2453,9 +2467,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L4AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L4DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L4LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L4CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L4SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L4CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L4AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L4AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 284);
@@ -2467,9 +2482,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L5AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L5DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L5LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L5CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L5SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L5CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L5AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L5AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 284);
@@ -2481,9 +2497,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L6AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L6DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L6LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L6CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L6SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L6CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L6AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L6AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(12, 424);
@@ -2495,9 +2512,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L7AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L7DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L7LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L7CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L7SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L7CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L7AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L7AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     POSITION_RELATIVE_BEGIN(492, 424);
@@ -2509,9 +2527,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L8AMT,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L8DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
+    TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L8LOG);
+    TOGG(lfos_body, 184, 2, 75, 24, 51, Synth::ParamId::L8CEN);
     TOGG(lfos_body, 381, 2, 90, 24, 66, Synth::ParamId::L8SYN);
-    TOGG(lfos_body, 174, 2, 75, 24, 51, Synth::ParamId::L8CEN);
-    DPET(lfos_body, 260, 3, 90, 21, 62, 25, Synth::ParamId::L8AEN, ae, aec);
+    DPET(lfos_body, 270, 3, 90, 21, 62, 25, Synth::ParamId::L8AEN, ae, aec);
     POSITION_RELATIVE_END();
 
     lfos_body->hide();

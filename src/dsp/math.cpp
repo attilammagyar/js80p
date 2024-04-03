@@ -35,6 +35,8 @@ Math::Math() noexcept
     init_sines();
     init_randoms();
     init_distortion();
+    init_log_chorus_lfo_freq();
+    init_log_lfo_freq();
     init_log_biquad_filter_freq();
     init_log_biquad_filter_q();
     init_linear_to_db();
@@ -122,6 +124,38 @@ void Math::init_log_table(
 }
 
 
+void Math::init_log_chorus_lfo_freq() noexcept
+{
+    init_log_table(
+        log_chorus_lfo_freq,
+        LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX,
+        LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX_INV,
+        Constants::CHORUS_LFO_FREQUENCY_MIN,
+        Constants::CHORUS_LFO_FREQUENCY_MAX,
+        0.673152483192833,
+        [](Number const ratio) -> Number {
+            return ratio_to_exact_log_chorus_lfo_frequency(ratio);
+        }
+    );
+}
+
+
+void Math::init_log_lfo_freq() noexcept
+{
+    init_log_table(
+        log_lfo_freq,
+        LOG_LFO_FREQ_TABLE_MAX_INDEX,
+        LOG_LFO_FREQ_TABLE_MAX_INDEX_INV,
+        Constants::LFO_FREQUENCY_MIN,
+        Constants::LFO_FREQUENCY_MAX,
+        0.67190664335359,
+        [](Number const ratio) -> Number {
+            return ratio_to_exact_log_lfo_frequency(ratio);
+        }
+    );
+}
+
+
 void Math::init_log_biquad_filter_freq() noexcept
 {
     init_log_table(
@@ -134,6 +168,24 @@ void Math::init_log_biquad_filter_freq() noexcept
         [](Number const ratio) -> Number {
             return ratio_to_exact_log_biquad_filter_frequency(ratio);
         }
+    );
+}
+
+
+Number Math::ratio_to_exact_log_chorus_lfo_frequency(Number const ratio) noexcept
+{
+    return ratio_to_exact_log_value(
+        ratio,
+        Constants::CHORUS_LFO_FREQUENCY_MIN,
+        Constants::CHORUS_LFO_FREQUENCY_MAX
+    );
+}
+
+
+Number Math::ratio_to_exact_log_lfo_frequency(Number const ratio) noexcept
+{
+    return ratio_to_exact_log_value(
+        ratio, Constants::LFO_FREQUENCY_MIN, Constants::LFO_FREQUENCY_MAX
     );
 }
 
@@ -524,6 +576,18 @@ Number Math::linear_to_db(Number const linear) noexcept
             )
             : DB_MIN
     );
+}
+
+
+Number const* Math::log_chorus_lfo_freq_table() noexcept
+{
+    return math.log_chorus_lfo_freq;
+}
+
+
+Number const* Math::log_lfo_freq_table() noexcept
+{
+    return math.log_lfo_freq;
 }
 
 
