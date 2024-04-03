@@ -32,10 +32,8 @@
 using namespace JS80P;
 
 
-Synth synth;
-
-
 void assert_ratio_as_str(
+        Synth const& synth,
         char const* const expected,
         Synth::ParamId param_id,
         Number const ratio,
@@ -83,20 +81,22 @@ TEST(param_ratio_to_str, {
         "sixth",
     };
 
-    assert_ratio_as_str("-1.000", mc1, 0.0, 1.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("1.000", mc1, 1.0, 1.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("-10.000", mc1, 0.0, 10.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("10.000", mc1, 1.0, 10.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("-5.000", mc1, 0.25, 10.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("5.000", mc1, 0.75, 10.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("0.000", mc1, 0.5, 10.0, "%.3f", NULL, 0);
-    assert_ratio_as_str("0.00", mc1, 0.4999999, 10.0, "%.2f", NULL, 0);
+    Synth synth;
 
-    assert_ratio_as_str("first", mwav, 0.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str("second", mwav, 1.0 / 10.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str("third", mwav, 2.0 / 10.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str("", mwav, 1.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str("", mwav, -1.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "-1.000", mc1, 0.0, 1.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "1.000", mc1, 1.0, 1.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "-10.000", mc1, 0.0, 10.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "10.000", mc1, 1.0, 10.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "-5.000", mc1, 0.25, 10.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "5.000", mc1, 0.75, 10.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "0.000", mc1, 0.5, 10.0, "%.3f", NULL, 0);
+    assert_ratio_as_str(synth, "0.00", mc1, 0.4999999, 10.0, "%.2f", NULL, 0);
+
+    assert_ratio_as_str(synth, "first", mwav, 0.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "second", mwav, 1.0 / 10.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "third", mwav, 2.0 / 10.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "", mwav, 1.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "", mwav, -1.0, 0.0, NULL, options, number_of_options);
 })
 
 
@@ -111,6 +111,8 @@ TEST(clamp_ratio, {
 
 
 TEST(gui_initialization, {
+    Synth synth;
+
     GUI gui(NULL, NULL, NULL, synth, false);
     gui.show();
 })
