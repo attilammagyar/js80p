@@ -22,6 +22,9 @@ v?.?.? (2024-0?-??)
    assigned only to the amplitude parameter of the oscillators, but not to
    the first oscillator's subharmonic amplitude which was left at the default 0
    setting. (E.g. the Bells 1 and 2 presets while holding the sustain pedal.)
+ * Bugfix: the FST plugin will no longer crash if it is loaded in a host which
+   does not supply a host-callback. (Hosts like that are probably rare, and
+   features like tempo-synchronization cannot work in such hosts.)
 
 v2.4.4 (2023-11-19)
  * Reduced RAM usage.

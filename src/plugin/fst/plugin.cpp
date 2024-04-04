@@ -114,12 +114,14 @@ static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
 
 
 AEffect* FstPlugin::create_instance(
-        audioMasterCallback const host_callback,
+        audioMasterCallback const host_callback_ptr,
         GUI::PlatformData const platform_data
 ) noexcept {
     AEffect* effect = new AEffect();
 
-    FstPlugin* fst_plugin = new FstPlugin(effect, host_callback, platform_data);
+    FstPlugin* fst_plugin = new FstPlugin(
+        effect, host_callback_ptr, platform_data
+    );
 
     memset(effect, 0, sizeof(AEffect));
 
@@ -450,12 +452,12 @@ FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
 
 FstPlugin::FstPlugin(
         AEffect* const effect,
-        audioMasterCallback const host_callback,
+        audioMasterCallback const host_callback_ptr,
         GUI::PlatformData const platform_data
 ) noexcept
     : synth(),
     effect(effect),
-    host_callback(host_callback),
+    host_callback_ptr(host_callback_ptr),
     platform_data(platform_data),
     gui(NULL),
     renderer(synth),
@@ -713,7 +715,7 @@ void FstPlugin::need_idle() noexcept
     /* see the comment at the bottom */
     constexpr int audioMasterNeedIdle = 14;
 
-    host_callback(effect, audioMasterNeedIdle, 0, 0, NULL, 0.0f);
+    host_callback(audioMasterNeedIdle);
 }
 
 
@@ -775,7 +777,7 @@ void FstPlugin::resume() noexcept
     synth.running_status = 0;
     this->running_status = 0;
     renderer.reset();
-    host_callback(effect, audioMasterWantMidi, 0, 1, NULL, 0.0f);
+    host_callback(audioMasterWantMidi, 0, 1);
     process_internal_messages_in_gui_thread();
     need_idle();
 }
@@ -798,6 +800,21 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
         remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
         to_gui_messages.push(Message(MessageType::PARAMS_CHANGED));
     }
+}
+
+
+VstIntPtr FstPlugin::host_callback(
+        VstInt32 op_code,
+        VstInt32 index,
+        VstIntPtr ivalue,
+        void* pointer,
+        float fvalue
+) const noexcept {
+    if (host_callback_ptr == NULL) {
+        return 0;
+    }
+
+    return host_callback_ptr(effect, op_code, index, ivalue, pointer, fvalue);
 }
 
 
@@ -850,7 +867,6 @@ void FstPlugin::generate_samples(
     // for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
         // if (JS80P_UNLIKELY(parameters[i].needs_host_update())) {
             // host_callback(
-                // effect,
                 // audioMasterAutomate,
                 // (VstInt32)i,
                 // 0,
@@ -935,9 +951,7 @@ Midi::Byte FstPlugin::float_to_midi_byte(float const value) const noexcept
 void FstPlugin::update_bpm() noexcept
 {
     VstTimeInfo const* time_info = (
-        (VstTimeInfo const*)host_callback(
-            effect, audioMasterGetTime, 0, kVstTempoValid, NULL, 0.0f
-        )
+        (VstTimeInfo const*)host_callback(audioMasterGetTime, 0, kVstTempoValid)
     );
 
     if (time_info == NULL || (time_info->flags & kVstTempoValid) == 0) {
@@ -952,7 +966,7 @@ void FstPlugin::update_host_display() noexcept
 {
     if (need_host_update) {
         need_host_update = false;
-        host_callback(effect, audioMasterUpdateDisplay, 0, 0, NULL, 0.0f);
+        host_callback(audioMasterUpdateDisplay);
     }
 }
 

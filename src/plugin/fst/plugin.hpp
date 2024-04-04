@@ -92,7 +92,7 @@ class FstPlugin : public Midi::EventHandler
         );
 
         static AEffect* create_instance(
-            audioMasterCallback const host_callback,
+            audioMasterCallback const host_callback_ptr,
             GUI::PlatformData const platform_data
         ) noexcept;
 
@@ -144,7 +144,7 @@ class FstPlugin : public Midi::EventHandler
 
         FstPlugin(
             AEffect* const effect,
-            audioMasterCallback const host_callback,
+            audioMasterCallback const host_callback_ptr,
             GUI::PlatformData const platform_data
         ) noexcept;
 
@@ -301,6 +301,14 @@ class FstPlugin : public Midi::EventHandler
             Synth& synth
         ) noexcept;
 
+        VstIntPtr host_callback(
+            VstInt32 op_code,
+            VstInt32 index = 0,
+            VstIntPtr ivalue = 0,
+            void* pointer = NULL,
+            float fvalue = 0.0f
+        ) const noexcept;
+
         void clear_received_midi_cc() noexcept;
 
         void prepare_rendering(Integer const sample_count) noexcept;
@@ -342,7 +350,7 @@ class FstPlugin : public Midi::EventHandler
         Parameters parameters;
 
         AEffect* const effect;
-        audioMasterCallback const host_callback;
+        audioMasterCallback const host_callback_ptr;
         GUI::PlatformData const platform_data;
 
         ERect window_rect;
