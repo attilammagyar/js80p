@@ -53,6 +53,7 @@ constexpr Synth::MessageType SET_PARAM = Synth::MessageType::SET_PARAM;
 constexpr Synth::MessageType REFRESH_PARAM = Synth::MessageType::REFRESH_PARAM;
 constexpr Synth::MessageType ASSIGN_CONTROLLER = Synth::MessageType::ASSIGN_CONTROLLER;
 constexpr Synth::MessageType CLEAR = Synth::MessageType::CLEAR;
+constexpr Synth::MessageType CLEAR_DIRTY_FLAG = Synth::MessageType::CLEAR_DIRTY_FLAG;
 
 
 constexpr Integer PEAK_CTL_TEST_BLOCK_SIZE = 8192;
@@ -978,6 +979,11 @@ TEST(when_synth_config_changes_then_synth_becomes_dirty, {
     assert_message_dirtiness(synth, ASSIGN_CONTROLLER, true);
     assert_message_dirtiness(synth, REFRESH_PARAM, false);
     assert_message_dirtiness(synth, CLEAR, true);
+
+    synth.push_message(
+        SET_PARAM, Synth::ParamId::CVOL, 0.123, Synth::ControllerId::MACRO_1
+    );
+    assert_message_dirtiness(synth, CLEAR_DIRTY_FLAG, false);
 })
 
 

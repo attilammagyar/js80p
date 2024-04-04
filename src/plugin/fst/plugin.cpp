@@ -432,6 +432,14 @@ void FstPlugin::populate_parameters(
         synth.midi_controllers[Synth::ControllerId::SUSTAIN_PEDAL],
         synth
     );
+
+    Parameter patch_changed = Parameter(
+        PATCH_CHANGED_PARAMETER_SHORT_NAME, NULL, Synth::ControllerId::NONE
+    );
+
+    patch_changed.set_value(0.0f);
+
+    parameters[PATCH_CHANGED_PARAMETER_INDEX] = patch_changed;
 }
 
 
@@ -665,6 +673,10 @@ void FstPlugin::process_internal_messages_in_gui_thread() noexcept
                 handle_params_changed();
                 break;
 
+            case MessageType::SYNTH_WAS_DIRTY:
+                handle_synth_was_dirty();
+                break;
+
             default:
                 break;
         }
@@ -701,6 +713,25 @@ void FstPlugin::handle_bank_changed(std::string const& serialized_bank) noexcept
 void FstPlugin::handle_params_changed() noexcept
 {
     need_host_update = true;
+}
+
+
+void FstPlugin::handle_synth_was_dirty() noexcept
+{
+    Parameter& dirty = parameters[PATCH_CHANGED_PARAMETER_INDEX];
+
+    float const new_value = dirty.get_value() + 0.01f;
+
+    dirty.set_value(new_value < 1.0f ? new_value : 0.0f);
+    need_host_update = true;
+
+    host_callback(
+        audioMasterAutomate,
+        (VstInt32)PATCH_CHANGED_PARAMETER_INDEX,
+        0,
+        NULL,
+        new_value
+    );
 }
 
 
@@ -917,7 +948,9 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
 
     mts_esp.update_connection_status();
 
-    if (JS80P_LIKELY(!(synth.is_dirty() || need_bank_update))) {
+    bool const is_dirty = synth.is_dirty();
+
+    if (JS80P_LIKELY(!(is_dirty || need_bank_update))) {
         return;
     }
 
@@ -936,6 +969,10 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
         Message(MessageType::PROGRAM_CHANGED, current_program, current_patch)
     );
     to_gui_messages.push(Message(MessageType::BANK_CHANGED, 0, serialized_bank));
+
+    if (is_dirty) {
+        to_gui_messages.push(Message(MessageType::SYNTH_WAS_DIRTY));
+    }
 }
 
 
@@ -1283,6 +1320,10 @@ float FstPlugin::get_parameter(size_t index) noexcept
 
 void FstPlugin::set_parameter(size_t index, float value) noexcept
 {
+    if (index == PATCH_CHANGED_PARAMETER_INDEX) {
+        return;
+    }
+
     Parameter& param = parameters[index];
 
     param.set_value(value);
@@ -1308,7 +1349,9 @@ void FstPlugin::set_parameter(size_t index, float value) noexcept
 
 bool FstPlugin::is_automatable(size_t index) noexcept
 {
-    return index < NUMBER_OF_PARAMETERS;
+    return (
+        index != PATCH_CHANGED_PARAMETER_INDEX && index < NUMBER_OF_PARAMETERS
+    );
 }
 
 

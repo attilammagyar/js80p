@@ -2853,6 +2853,10 @@ void Synth::process_message(Message const& message) noexcept
             is_dirty_ = true;
             break;
 
+        case MessageType::CLEAR_DIRTY_FLAG:
+            is_dirty_ = false;
+            break;
+
         default:
             break;
     }

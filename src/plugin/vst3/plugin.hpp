@@ -58,7 +58,11 @@ class Vst3Plugin
         static constexpr char const* MSG_SHARE_SYNTH = "JS80PSynth";
         static constexpr char const* MSG_SHARE_SYNTH_SYNTH = "Synth";
 
+        static constexpr char const* MSG_SYNTH_DIRTY = "JS80PDirty";
+
         static constexpr Vst::ProgramListID PROGRAM_LIST_ID = Vst::kCtrlProgramChange;
+
+        static constexpr Vst::ParamID PATCH_CHANGED_PARAM_ID = 255;
 
         static std::string read_stream(IBStream* stream);
 
@@ -238,6 +242,8 @@ class Vst3Plugin
                     Synth::ControllerId const controller_id,
                     Vst::ParamID const param_id
                 ) const;
+
+                Vst::RangeParameter* set_up_patch_changed_param() const;
 
                 Bank const bank;
 

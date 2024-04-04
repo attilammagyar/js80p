@@ -64,6 +64,17 @@ using namespace Steinberg;
     } while (false)
 
 
+#define JS80P_VST3_SEND_EMPTY_MSG(msg_id)                                   \
+    do {                                                                    \
+        IPtr<Vst::IMessage> message = owned(allocateMessage());             \
+                                                                            \
+        if (message) {                                                      \
+            message->setMessageID(msg_id);                                  \
+            sendMessage(message);                                           \
+        }                                                                   \
+    } while (false)
+
+
 namespace JS80P
 {
 
@@ -255,6 +266,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
             synth,
             (*bank)[new_program].serialize()
         );
+        synth.clear_dirty_flag();
     }
 
     if (data.numOutputs == 0 || data.numSamples < 1) {
@@ -267,6 +279,11 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
     generate_samples(data);
 
     mts_esp.update_connection_status();
+
+    if (synth.is_dirty()) {
+        synth.clear_dirty_flag();
+        JS80P_VST3_SEND_EMPTY_MSG(MSG_SYNTH_DIRTY);
+    }
 
     return kResultOk;
 }
@@ -554,6 +571,12 @@ tresult PLUGIN_API Vst3Plugin::Processor::setState(IBStream* state)
     }
 
     Serializer::import_patch_in_gui_thread(synth, read_stream(state));
+    synth.push_message(
+        Synth::MessageType::CLEAR_DIRTY_FLAG,
+        Synth::ParamId::INVALID_PARAM_ID,
+        0.0,
+        0
+    );
 
     return kResultOk;
 }
@@ -744,6 +767,8 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         )
     );
 
+    parameters.addParameter(set_up_patch_changed_param());
+
     return result;
 }
 
@@ -809,6 +834,26 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
 }
 
 
+Vst::RangeParameter* Vst3Plugin::Controller::set_up_patch_changed_param() const
+{
+    Vst::RangeParameter* param = new Vst::RangeParameter(
+        USTRING("Patch Changed"),
+        PATCH_CHANGED_PARAM_ID,
+        USTRING("%"),
+        0.0,
+        100.0,
+        0.0,
+        0,
+        Vst::ParameterInfo::kIsReadOnly,
+        Vst::kRootUnitId,
+        USTRING("Changed")
+    );
+    param->setPrecision(1);
+
+    return param;
+}
+
+
 tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
         int32 bus_index,
         int16 channel,
@@ -855,6 +900,17 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
 
             return kResultOk;
         }
+    } else if (FIDStringsEqual(message->getMessageID(), MSG_SYNTH_DIRTY)) {
+        /*
+        Calling setDirty(true) would suffice, the dummy parameter dance is done
+        only to keep parameter behaviour in sync with the FST plugin.
+        */
+        Vst::ParamValue const new_value = getParamNormalized(PATCH_CHANGED_PARAM_ID) + 0.01;
+
+        setParamNormalized(PATCH_CHANGED_PARAM_ID, new_value < 1.0 ? new_value : 0.0);
+        setDirty(true);
+
+        return kResultOk;
     }
 
     return EditControllerEx1::notify(message);

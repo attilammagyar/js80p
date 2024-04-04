@@ -75,7 +75,11 @@ class FstPlugin : public Midi::EventHandler
                 float value;
         };
 
-        static constexpr size_t NUMBER_OF_PARAMETERS = 72;
+        static constexpr size_t NUMBER_OF_PARAMETERS = 73;
+
+        static constexpr size_t PATCH_CHANGED_PARAMETER_INDEX = 72;
+        static constexpr char const* PATCH_CHANGED_PARAMETER_SHORT_NAME = "Changed";
+        static constexpr char const* PATCH_CHANGED_PARAMETER_LONG_NAME = "Patch Changed";
 
         typedef Parameter Parameters[NUMBER_OF_PARAMETERS];
 
@@ -252,6 +256,7 @@ class FstPlugin : public Midi::EventHandler
             PROGRAM_CHANGED = 6,
             BANK_CHANGED = 7,
             PARAMS_CHANGED = 8,
+            SYNTH_WAS_DIRTY = 9,
         };
 
         class Message
@@ -343,7 +348,7 @@ class FstPlugin : public Midi::EventHandler
 
         void handle_bank_changed(std::string const& serialized_bank) noexcept;
         void handle_params_changed() noexcept;
-
+        void handle_synth_was_dirty() noexcept;
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
 

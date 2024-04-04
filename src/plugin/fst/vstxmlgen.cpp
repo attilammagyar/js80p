@@ -93,7 +93,18 @@ void generate_xml(std::ofstream& out_file)
             (Synth::ControllerId)controller_id
         );
 
-        write_param(out_file, i, controller.long_name, controller.short_name);
+        if (i == FstPlugin::PATCH_CHANGED_PARAMETER_INDEX) {
+            write_param(
+                out_file,
+                i,
+                FstPlugin::PATCH_CHANGED_PARAMETER_LONG_NAME,
+                FstPlugin::PATCH_CHANGED_PARAMETER_SHORT_NAME
+            );
+        } else {
+            write_param(
+                out_file, i, controller.long_name, controller.short_name
+            );
+        }
     }
 
     write_line(out_file, "</VSTParametersStructure>");

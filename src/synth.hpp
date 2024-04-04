@@ -98,6 +98,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                                     ///< controller assignments, and reset all
                                     ///< parameters to their default values.
 
+            CLEAR_DIRTY_FLAG = 5,   ///< Clear the dirty flag.
+
             INVALID,
         };
 
