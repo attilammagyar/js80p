@@ -336,7 +336,6 @@ class FstPlugin : public Midi::EventHandler
         void handle_bank_changed(std::string const& serialized_bank) noexcept;
         void handle_params_changed() noexcept;
 
-        void handle_mts_esp_status(size_t const index) noexcept;
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
 
