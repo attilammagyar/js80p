@@ -294,7 +294,16 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return CCONST('N', 'v', 'E', 'f');
 
         case effCanDo:
-            if (strcmp("receiveVstMidiEvent", (char const*)pointer) == 0) {
+            /*
+            Though receiveVstMidiEvent should be enough, JUCE's implementation
+            of effCanDo checks the other two as well, probably for good reason,
+            e.g. compatibility with certain hosts.
+            */
+            if (
+                    strcmp("receiveVstMidiEvent", (char const*)pointer) == 0
+                    || strcmp("receiveVstMidiEvents", (char const*)pointer) == 0
+                    || strcmp("receiveVstEvents", (char const*)pointer) == 0
+            ) {
                 return 1;
             }
 
