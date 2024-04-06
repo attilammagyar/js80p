@@ -890,20 +890,9 @@ void FstPlugin::generate_samples(
     parameter automation.
 
     Also, since parameter handling seems to be done in the GUI thread and
-    generate_samples() is run in the audio thread, this call would cross
-    threads, which is probably unsafe in most hosts.
+    generate_samples() is run in the audio thread, calling audioMasterAutomate
+    would cross threads, which is probably unsafe in most hosts.
     */
-    // for (size_t i = 0; i != NUMBER_OF_PARAMETERS; ++i) {
-        // if (JS80P_UNLIKELY(parameters[i].needs_host_update())) {
-            // host_callback(
-                // audioMasterAutomate,
-                // (VstInt32)i,
-                // 0,
-                // NULL,
-                // parameters[i].get_value()
-            // );
-        // }
-    // }
 }
 
 
