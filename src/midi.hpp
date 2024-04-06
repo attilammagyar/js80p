@@ -771,7 +771,11 @@ size_t EventDispatcher<EventHandlerClass>::process_note_on(
         return next_byte;
     }
 
-    event_handler.note_on(time_offset, channel, (Note)note, velocity);
+    if (velocity == 0) {
+        event_handler.note_off(time_offset, channel, (Note)note, 64);
+    } else {
+        event_handler.note_on(time_offset, channel, (Note)note, velocity);
+    }
 
     return next_byte;
 }

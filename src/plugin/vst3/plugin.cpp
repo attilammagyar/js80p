@@ -424,12 +424,14 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
     switch (event.type) {
         case Event::Type::NOTE_ON:
             mts_esp.update_note_tuning(event.channel, event.note_or_ctl);
-            synth.note_on(
-                event.time_offset,
-                event.channel,
-                event.note_or_ctl,
-                float_to_midi_byte(event.velocity_or_value)
-            );
+            Midi::Byte const velocity = float_to_midi_byte(event.velocity_or_value);
+
+            if (velocity == 0) {
+                synth.note_off(event.time_offset, event.channel, event.note_or_ctl, 64);
+            } else {
+                synth.note_on(event.time_offset, event.channel, event.note_or_ctl, velocity);
+            }
+
             break;
 
         case Event::Type::NOTE_PRESSURE:
