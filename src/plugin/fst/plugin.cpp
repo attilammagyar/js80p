@@ -725,13 +725,11 @@ void FstPlugin::handle_synth_was_dirty() noexcept
     dirty.set_value(new_value < 1.0f ? new_value : 0.0f);
     need_host_update = true;
 
-    host_callback(
-        audioMasterAutomate,
-        (VstInt32)PATCH_CHANGED_PARAMETER_INDEX,
-        0,
-        NULL,
-        new_value
-    );
+    VstInt32 const index = (VstInt32)PATCH_CHANGED_PARAMETER_INDEX;
+
+    host_callback(audioMasterBeginEdit, index);
+    host_callback(audioMasterAutomate, index, 0, NULL, new_value);
+    host_callback(audioMasterEndEdit, index);
 }
 
 
