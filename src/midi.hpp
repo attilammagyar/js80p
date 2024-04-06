@@ -19,6 +19,7 @@
 #ifndef JS80P__MIDI_HPP
 #define JS80P__MIDI_HPP
 
+#include <cstddef>
 #include <cstdint>
 
 #include "js80p.hpp"
@@ -39,6 +40,8 @@ typedef Byte Command;
 class EventHandler
 {
     public:
+        EventHandler() : running_status(0) {}
+
         void note_off(
             Seconds const time_offset,
             Channel const channel,
@@ -86,27 +89,149 @@ class EventHandler
         ) noexcept {}
 
         void all_sound_off(
-            Seconds const time_offset, Channel const channel
+            Seconds const time_offset,
+            Channel const channel
         ) noexcept {}
 
         void reset_all_controllers(
-            Seconds const time_offset, Channel const channel
+            Seconds const time_offset,
+            Channel const channel
         ) noexcept {}
 
         void all_notes_off(
-            Seconds const time_offset, Channel const channel
+            Seconds const time_offset,
+            Channel const channel
         ) noexcept {}
+
+        Byte running_status;
 };
 
 
-class Dispatcher
+template<class EventHandlerClass>
+class EventDispatcher
 {
     public:
-        template<class EventHandlerClass>
-        static void dispatch(
+        /**
+         * \brief Parse and dispatch the events found in the buffer.
+         *
+         * \sa dispatch_event()
+         */
+        static size_t dispatch_events(
             EventHandlerClass& event_handler,
             Seconds const time_offset,
-            Byte const bytes[4]
+            Byte const* const buffer,
+            size_t const buffer_size
+        ) noexcept;
+
+        /**
+         * \brief Parse and dispatch the first event that can be read from the
+         *        buffer.
+         *
+         * If the \c running_status member of the \c EventHandlerClass object
+         * indicates a previously established valid running status (MSB is 1),
+         * then data bytes (MSB is 0) at the beginning of the buffer are parsed
+         * as if a new event with the same status byte was received. Otherwise
+         * data bytes at the beginning of the buffer are skipped over.
+         *
+         * \return Number of bytes processed.
+         */
+        static size_t dispatch_event(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const* const buffer,
+            size_t const buffer_size
+        ) noexcept;
+
+    private:
+        static constexpr Byte STATUS_MASK = 0x80;
+        static constexpr Byte MESSAGE_TYPE_MASK = 0xf0;
+        static constexpr Byte CHANNEL_MASK = 0x0f;
+
+        static bool is_status_byte(Byte const byte) noexcept;
+        static bool is_data_byte(Byte const byte) noexcept;
+
+        static size_t process_note_off(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_note_on(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_aftertouch(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_control_change(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_program_change(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_channel_pressure(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static size_t process_pitch_bend_change(
+            EventHandlerClass& event_handler,
+            Seconds const time_offset,
+            Byte const channel,
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
+        ) noexcept;
+
+        static bool parse_data_byte(
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte,
+            Byte& byte
+        ) noexcept;
+
+        static bool parse_data_bytes(
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte,
+            Byte& byte_1,
+            Byte& byte_2
+        ) noexcept;
+
+        static size_t skip_remaining_data_bytes(
+            Byte const* const buffer,
+            size_t const buffer_size,
+            size_t& next_byte
         ) noexcept;
 };
 
@@ -489,72 +614,334 @@ constexpr Command CONTROL_CHANGE_ALL_NOTES_OFF          = 0x7b;
 
 
 template<class EventHandlerClass>
-void Dispatcher::dispatch(
+size_t EventDispatcher<EventHandlerClass>::dispatch_events(
         EventHandlerClass& event_handler,
         Seconds const time_offset,
-        Byte const bytes[4]
+        Byte const* const buffer,
+        size_t const buffer_size
 ) noexcept {
-    Command msg_type = bytes[0] & 0xf0;
-    Channel channel = bytes[0] & 0x0f;
-    Byte d1 = bytes[1] & 0x7f;
-    Byte d2 = bytes[2] & 0x7f;
+    size_t next_byte = 0;
+
+    while (next_byte != buffer_size) {
+        next_byte += dispatch_event(
+            event_handler, time_offset, &buffer[next_byte], buffer_size - next_byte
+        );
+    }
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::dispatch_event(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const* const buffer,
+        size_t const buffer_size
+) noexcept {
+    size_t next_byte = 0;
+
+    if (buffer_size < 1) {
+        return next_byte;
+    }
+
+    Byte status = buffer[next_byte];
+
+    if (is_status_byte(status)) {
+        ++next_byte;
+        event_handler.running_status = status;
+    } else {
+        status = event_handler.running_status;
+
+        if (!is_status_byte(status)) {
+            return skip_remaining_data_bytes(buffer, buffer_size, next_byte);
+        }
+    }
+
+    Command msg_type = status & MESSAGE_TYPE_MASK;
+    Channel channel = status & CHANNEL_MAX;
 
     switch (msg_type) {
         case NOTE_OFF:
-            event_handler.note_off(time_offset, channel, (Note)d1, d2);
-            break;
+            return process_note_off(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case NOTE_ON:
-            event_handler.note_on(time_offset, channel, (Note)d1, d2);
-            break;
+            return process_note_on(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case AFTERTOUCH:
-            event_handler.aftertouch(time_offset, channel, (Note)d1, d2);
-            break;
+            return process_aftertouch(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case CONTROL_CHANGE:
-            if (d1 < CONTROL_CHANGE_ALL_SOUND_OFF) {
-                /*
-                Some hosts (e.g. FL Studio 21) swallow most MIDI CC messages,
-                so the interpretation logic of those with special meanings (e.g.
-                sustain pedal) is better performed in the control_change()
-                method of the event handler, which also handles exported plugin
-                parameters.
-                */
-
-                Controller const controller = (Controller)d1;
-
-                event_handler.control_change(time_offset, channel, controller, d2);
-            } else {
-                switch ((Command)d1) {
-                    case CONTROL_CHANGE_ALL_SOUND_OFF:
-                        event_handler.all_sound_off(time_offset, channel);
-                        break;
-
-                    case CONTROL_CHANGE_RESET_ALL_CONTROLLERS:
-                        event_handler.reset_all_controllers(time_offset, channel);
-                        break;
-
-                    case CONTROL_CHANGE_ALL_NOTES_OFF:
-                        event_handler.all_notes_off(time_offset, channel);
-                        break;
-                }
-            }
-
-            break;
+            return process_control_change(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case PROGRAM_CHANGE:
-            event_handler.program_change(time_offset, channel, d1);
-            break;
+            return process_program_change(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case CHANNEL_PRESSURE:
-            event_handler.channel_pressure(time_offset, channel, d1);
-            break;
+            return process_channel_pressure(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
 
         case PITCH_BEND_CHANGE:
-            event_handler.pitch_wheel_change(time_offset, channel, (d2 << 7) | d1);
-            break;
+            return process_pitch_bend_change(
+                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+            );
+
+        default:
+            return skip_remaining_data_bytes(buffer, buffer_size, next_byte);
     }
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+bool EventDispatcher<EventHandlerClass>::is_status_byte(Byte const byte) noexcept
+{
+    return (byte & STATUS_MASK) != 0;
+}
+
+
+template<class EventHandlerClass>
+bool EventDispatcher<EventHandlerClass>::is_data_byte(Byte const byte) noexcept
+{
+    return (byte & STATUS_MASK) == 0;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_note_off(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte note;
+    Byte velocity;
+
+    if (!parse_data_bytes(buffer, buffer_size, next_byte, note, velocity)) {
+        return next_byte;
+    }
+
+    event_handler.note_off(time_offset, channel, (Note)note, velocity);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_note_on(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte note;
+    Byte velocity;
+
+    if (!parse_data_bytes(buffer, buffer_size, next_byte, note, velocity)) {
+        return next_byte;
+    }
+
+    event_handler.note_on(time_offset, channel, (Note)note, velocity);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_aftertouch(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte note;
+    Byte pressure;
+
+    if (!parse_data_bytes(buffer, buffer_size, next_byte, note, pressure)) {
+        return next_byte;
+    }
+
+    event_handler.aftertouch(time_offset, channel, (Note)note, pressure);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_control_change(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte d1;
+    Byte d2;
+
+    if (!parse_data_bytes(buffer, buffer_size, next_byte, d1, d2)) {
+        return next_byte;
+    }
+
+    if (d1 < CONTROL_CHANGE_ALL_SOUND_OFF) {
+        /*
+        Interpretation of MIDI CC messages that belong to special controllers
+        (e.g. sustain pedal) is left for the event handler. This aligns with the
+        restrictions that are imposed by hosts which swallow most of the raw CC
+        messages and instead, require plugins to export parameters that can be
+        assigned to MIDI controllers (for example, FL Studio 21).
+        */
+
+        event_handler.control_change(time_offset, channel, (Controller)d1, d2);
+    } else {
+        switch ((Command)d1) {
+            case CONTROL_CHANGE_ALL_SOUND_OFF:
+                event_handler.all_sound_off(time_offset, channel);
+                break;
+
+            case CONTROL_CHANGE_RESET_ALL_CONTROLLERS:
+                event_handler.reset_all_controllers(time_offset, channel);
+                break;
+
+            case CONTROL_CHANGE_ALL_NOTES_OFF:
+                event_handler.all_notes_off(time_offset, channel);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_program_change(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte new_program;
+
+    if (!parse_data_byte(buffer, buffer_size, next_byte, new_program)) {
+        return next_byte;
+    }
+
+    event_handler.program_change(time_offset, channel, new_program);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_channel_pressure(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte pressure;
+
+    if (!parse_data_byte(buffer, buffer_size, next_byte, pressure)) {
+        return next_byte;
+    }
+
+    event_handler.channel_pressure(time_offset, channel, pressure);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::process_pitch_bend_change(
+        EventHandlerClass& event_handler,
+        Seconds const time_offset,
+        Byte const channel,
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    Byte lsb;
+    Byte msb;
+
+    if (!parse_data_bytes(buffer, buffer_size, next_byte, lsb, msb)) {
+        return next_byte;
+    }
+
+    event_handler.pitch_wheel_change(time_offset, channel, (msb << 7) | lsb);
+
+    return next_byte;
+}
+
+
+template<class EventHandlerClass>
+bool EventDispatcher<EventHandlerClass>::parse_data_bytes(
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte,
+        Byte& byte_1,
+        Byte& byte_2
+) noexcept {
+    return (
+        parse_data_byte(buffer, buffer_size, next_byte, byte_1)
+        && parse_data_byte(buffer, buffer_size, next_byte, byte_2)
+    );
+}
+
+
+template<class EventHandlerClass>
+bool EventDispatcher<EventHandlerClass>::parse_data_byte(
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte,
+        Byte& byte
+) noexcept {
+    if (next_byte >= buffer_size || !is_data_byte(buffer[next_byte])) {
+        return false;
+    }
+
+    byte = buffer[next_byte];
+    ++next_byte;
+
+    return true;
+}
+
+
+template<class EventHandlerClass>
+size_t EventDispatcher<EventHandlerClass>::skip_remaining_data_bytes(
+        Byte const* const buffer,
+        size_t const buffer_size,
+        size_t& next_byte
+) noexcept {
+    while (next_byte < buffer_size && is_data_byte(buffer[next_byte])) {
+        ++next_byte;
+    }
+
+    return next_byte;
 }
 
 } }

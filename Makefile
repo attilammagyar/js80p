@@ -242,6 +242,7 @@ TESTS = \
 	$(TESTS_SYNTH) \
 	test_gui \
 	test_bank \
+	test_midi \
 	test_serializer
 
 PERF_TESTS = \
@@ -714,6 +715,13 @@ $(DEV_DIR)/test_math$(DEV_EXE): \
 		| $(DEV_DIR)
 	$(COMPILE_DEV) -o $@ $<
 	$@
+
+$(DEV_DIR)/test_midi$(DEV_EXE): \
+		tests/test_midi.cpp src/midi.hpp src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(DEV_DIR)
+	$(COMPILE_DEV) -o $@ $<
+	$(RUN_WITH_VALGRIND) $@
 
 $(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		tests/test_midi_controller.cpp \

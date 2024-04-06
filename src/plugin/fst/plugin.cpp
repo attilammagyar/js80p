@@ -734,6 +734,8 @@ void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
     }
 
     synth.set_sample_rate((Frequency)new_sample_rate);
+    synth.running_status = 0;
+    this->running_status = 0;
     renderer.reset();
 }
 
@@ -742,6 +744,8 @@ void FstPlugin::set_block_size(VstIntPtr const new_block_size) noexcept
 {
     process_internal_messages_in_gui_thread();
     renderer.reset();
+    synth.running_status = 0;
+    this->running_status = 0;
 }
 
 
@@ -750,6 +754,8 @@ void FstPlugin::suspend() noexcept
     process_internal_messages_in_gui_thread();
     need_idle();
     synth.suspend();
+    synth.running_status = 0;
+    this->running_status = 0;
     renderer.reset();
 }
 
@@ -757,6 +763,8 @@ void FstPlugin::suspend() noexcept
 void FstPlugin::resume() noexcept
 {
     synth.resume();
+    synth.running_status = 0;
+    this->running_status = 0;
     renderer.reset();
     host_callback(effect, audioMasterWantMidi, 0, 1, NULL, 0.0f);
     process_internal_messages_in_gui_thread();
@@ -798,8 +806,12 @@ void FstPlugin::process_vst_midi_event(VstMidiEvent const* const event) noexcept
     );
     Midi::Byte const* const midi_bytes = (Midi::Byte const*)event->midiData;
 
-    Midi::Dispatcher::dispatch<FstPlugin>(*this, time_offset, midi_bytes);
-    Midi::Dispatcher::dispatch<Synth>(synth, time_offset, midi_bytes);
+    Midi::EventDispatcher<FstPlugin>::dispatch_event(
+        *this, time_offset, midi_bytes, 4
+    );
+    Midi::EventDispatcher<Synth>::dispatch_event(
+        synth, time_offset, midi_bytes, 4
+    );
 }
 
 
