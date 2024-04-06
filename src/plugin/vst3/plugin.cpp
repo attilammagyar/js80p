@@ -422,7 +422,7 @@ void Vst3Plugin::Processor::process_events() noexcept
 void Vst3Plugin::Processor::process_event(Event const event) noexcept
 {
     switch (event.type) {
-        case Event::Type::NOTE_ON:
+        case Event::Type::NOTE_ON: {
             mts_esp.update_note_tuning(event.channel, event.note_or_ctl);
             Midi::Byte const velocity = float_to_midi_byte(event.velocity_or_value);
 
@@ -433,6 +433,7 @@ void Vst3Plugin::Processor::process_event(Event const event) noexcept
             }
 
             break;
+        }
 
         case Event::Type::NOTE_PRESSURE:
             synth.aftertouch(
