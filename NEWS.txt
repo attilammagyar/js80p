@@ -18,8 +18,8 @@ v?.?.? (2024-0?-??)
  * Bugfix: neither the FST nor the VST 3 plugin notified the host when a
    parameter was changed or a patch was loaded from file, so the host wouldn't
    ask the user when exiting whether to write unsaved changes to disk, and the
-   undo history wasn't updated either. Now both plugins will notify the host
-   when something is changed on JS80P's user interface.
+   undo history wasn't updated either. Now both plugin types will notify the
+   host when something is changed on JS80P's user interface.
  * Bugfix: dynamic envelope parameter changes could produce glitches, sudden
    jumps, and some sections of the envelope could get lost, especially in
    monophonic mode.
