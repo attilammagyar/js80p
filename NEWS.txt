@@ -9,12 +9,17 @@ v?.?.? (2024-0?-??)
  * Filter Q parameter can also use logarithmic scale.
  * The Echo and Reverb effects can now apply gradually increasing distortion to
    the delayed signal.
+ * Improved MIDI compatibility, including responding to Monophonic Mode ON/OFF
+   messages.
  * Various performance and RAM usage improvements.
  * The source distribution can now be compiled for RISC-V 64 systems thanks to
    @aimixsaka.
  * New preset: Analog Brass.
  * FST: hosts which support VSTXML files can now show full length parameter
    names instead of abbreviations.
+ * Bugfix: some MIDI devices send Note Off messages as Note On messages with 0
+   velocity. These messages were misinterpreted, but now they will be handled
+   correctly.
  * Bugfix: neither the FST nor the VST 3 plugin notified the host when a
    parameter was changed or a patch was loaded from file, so the host wouldn't
    ask the user when exiting whether to write unsaved changes to disk, and the
