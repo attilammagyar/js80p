@@ -210,7 +210,7 @@ TEST(midi_controller_changes_can_affect_parameters, {
         synth, Synth::ParamId::MFIN, Synth::ControllerId::PITCH_WHEEL
     );
     assign_controller(
-        synth, Synth::ParamId::MAMP, Synth::ControllerId::VELOCITY
+        synth, Synth::ParamId::MAMP, Synth::ControllerId::TRIGGERED_VELOCITY
     );
     assign_controller(
         synth, Synth::ParamId::CWAV, Synth::ControllerId::MODULATION_WHEEL
@@ -1327,4 +1327,75 @@ TEST(can_switch_between_polyphonic_and_monophonic_modes, {
 
     synth.mono_mode_off(0.0, 0);
     assert_eq(ToggleParam::ON, synth.polyphonic.get_value());
+})
+
+
+TEST(triggered_and_released_note_and_velocity_controllers_are_maintained, {
+    constexpr Number A_2 = (Number)Midi::NOTE_A_2 / 127.0;
+    constexpr Number A_5 = (Number)Midi::NOTE_A_5 / 127.0;
+
+    constexpr Number tolerance = 1.0 / 512.0;
+
+    Synth synth;
+
+    synth.triggered_note.change(0.0, 0.0);
+    synth.triggered_velocity.change(0.0, 0.0);
+    synth.released_note.change(0.0, 0.0);
+    synth.released_velocity.change(0.0, 0.0);
+
+    synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);
+
+    assert_eq(A_5, synth.triggered_note.get_value(), tolerance);
+    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(0.0, synth.released_note.get_value(), tolerance);
+    assert_eq(0.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.note_off(0.0, 1, Midi::NOTE_A_5, 108);
+    synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
+
+    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_off(0.0, 1, Midi::NOTE_A_2, 48);
+
+    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
+
+    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.polyphonic.set_value(ToggleParam::OFF);
+
+    synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
+    synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);
+
+    assert_eq(A_5, synth.triggered_note.get_value(), tolerance);
+    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.note_off(0.0, 1, Midi::NOTE_A_5, 108);
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_off(0.0, 1, Midi::NOTE_A_2, 48);
+
+    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
+
+    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
 })

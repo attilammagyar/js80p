@@ -799,8 +799,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             PITCH_WHEEL =               128,                        ///< Pitch Wheel
 
-            NOTE =                      129,                        ///< Note
-            VELOCITY =                  130,                        ///< Velocity
+            TRIGGERED_NOTE =            129,                        ///< Triggered Note
+            TRIGGERED_VELOCITY =        130,                        ///< Triggered Note's Velocity
 
             MACRO_1 =                   131,                        ///< Macro 1
             MACRO_2 =                   132,                        ///< Macro 2
@@ -857,7 +857,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ENVELOPE_11 =               176,                        ///< Envelope 11
             ENVELOPE_12 =               177,                        ///< Envelope 12
 
-            CONTROLLER_ID_COUNT =       178,
+            RELEASED_NOTE =             178,                        ///< Released Note
+            RELEASED_VELOCITY =         179,                        ///< Released Note's Velocity
+
+            CONTROLLER_ID_COUNT =       180,
             INVALID_CONTROLLER_ID =     CONTROLLER_ID_COUNT,
         };
 
@@ -1127,8 +1130,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Carrier::Params carrier_params;
 
         MidiController pitch_wheel;
-        MidiController note;
-        MidiController velocity;
+        MidiController triggered_note;
+        MidiController released_note;
+        MidiController triggered_velocity;
+        MidiController released_velocity;
         MidiController channel_pressure_ctl;
         MidiController osc_1_peak;
         MidiController osc_2_peak;

@@ -95,7 +95,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int CONTROLLERS_COUNT = 121;
+        static constexpr int CONTROLLERS_COUNT = 123;
 
         static char const* const MODES[];
         static int const MODES_COUNT;

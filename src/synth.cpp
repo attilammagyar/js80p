@@ -1024,8 +1024,8 @@ void Synth::note_on(
     note_stack.push(channel, note, velocity_float);
 
     if (polyphonic.get_value() == ToggleParam::ON) {
-        this->velocity.change(time_offset, velocity_float);
-        this->note.change(time_offset, midi_byte_to_float(note));
+        this->triggered_velocity.change(time_offset, velocity_float);
+        this->triggered_note.change(time_offset, midi_byte_to_float(note));
 
         note_on_polyphonic(time_offset, channel, note, velocity_float);
     } else {
@@ -1149,8 +1149,8 @@ void Synth::note_on_monophonic(
         Number const velocity,
         bool const trigger_if_off
 ) noexcept {
-    this->velocity.change(time_offset, velocity);
-    this->note.change(time_offset, midi_byte_to_float(note));
+    this->triggered_velocity.change(time_offset, velocity);
+    this->triggered_note.change(time_offset, midi_byte_to_float(note));
 
     Modulator* const modulator = modulators[0];
     Carrier* const carrier = carriers[0];
@@ -1243,11 +1243,9 @@ void Synth::aftertouch(
         Midi::Note const note,
         Midi::Byte const pressure
 ) noexcept {
-    this->note.change(time_offset, midi_byte_to_float(note));
-
-    if (midi_note_to_voice_assignments[channel][note] == INVALID_VOICE) {
-        return;
-    }
+    // if (midi_note_to_voice_assignments[channel][note] == INVALID_VOICE) {
+        // return;
+    // }
 
     // Integer const voice = midi_note_to_voice_assignments[channel][note];
 }
@@ -1313,6 +1311,7 @@ void Synth::note_off(
     bool const is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
 
     Modulator* const modulator = modulators[voice];
+    Carrier* const carrier = carriers[voice];
 
     if (is_sustaining) {
         Integer note_id;
@@ -1320,8 +1319,6 @@ void Synth::note_off(
         if (modulator->is_on()) {
             note_id = modulator->get_note_id();
         } else {
-            Carrier* const carrier = carriers[voice];
-
             if (!carrier->is_on()) {
                 return;
             }
@@ -1338,6 +1335,11 @@ void Synth::note_off(
         return;
     }
 
+    Number const velocity_float = midi_byte_to_float(velocity);
+
+    this->released_velocity.change(time_offset, velocity_float);
+    this->released_note.change(time_offset, midi_byte_to_float(note));
+
     if (!is_polyphonic && was_note_stack_top && !note_stack.is_empty()) {
         Number previous_velocity;
         Midi::Channel previous_channel;
@@ -1350,12 +1352,7 @@ void Synth::note_off(
         return;
     }
 
-    Number const velocity_float = midi_byte_to_float(velocity);
-
     modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
-
-    Carrier* const carrier = carriers[voice];
-
     carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
 }
 
@@ -1425,6 +1422,9 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
             Midi::Note const note = deferred_note_off.get_note();
             Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
 
+            this->released_velocity.change(time_offset, velocity);
+            this->released_note.change(time_offset, midi_byte_to_float(note));
+
             modulators[voice]->note_off(time_offset, note_id, note, velocity);
             carriers[voice]->note_off(time_offset, note_id, note, velocity);
         }
@@ -1433,10 +1433,26 @@ void Synth::sustain_off(Seconds const time_offset) noexcept
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const note_id = deferred_note_off.get_note_id();
 
-            if (modulators[0]->get_note_id() == note_id || carriers[0]->get_note_id() == note_id) {
+            bool const modulator_playing = modulators[0]->get_note_id() == note_id;
+            bool const carrier_playing = carriers[0]->get_note_id() == note_id;
+
+            if (modulator_playing || carrier_playing) {
+                Number velocity;
                 Number previous_velocity;
-                Midi::Channel previous_channel;
+                Midi::Note note;
                 Midi::Note previous_note;
+                Midi::Channel previous_channel;
+
+                if (modulator_playing) {
+                    velocity = modulators[0]->get_velocity();
+                    note = modulators[0]->get_note();
+                } else {
+                    velocity = carriers[0]->get_velocity();
+                    note = carriers[0]->get_note();
+                }
+
+                this->released_velocity.change(time_offset, velocity);
+                this->released_note.change(time_offset, midi_byte_to_float(note));
 
                 note_stack.top(previous_channel, previous_note, previous_velocity);
 
@@ -3408,8 +3424,9 @@ bool Synth::assign_controller_to_discrete_param(
         case NONE: is_special = true; break;
 
         case PITCH_WHEEL: midi_controller = &pitch_wheel; break;
-        case NOTE: midi_controller = &note; break;
-        case VELOCITY: midi_controller = &velocity; break;
+
+        case TRIGGERED_NOTE: midi_controller = &triggered_note; break;
+        case TRIGGERED_VELOCITY: midi_controller = &triggered_velocity; break;
 
         case MACRO_1: macro = macros[0]; break;
         case MACRO_2: macro = macros[1]; break;
@@ -3421,6 +3438,29 @@ bool Synth::assign_controller_to_discrete_param(
         case MACRO_8: macro = macros[7]; break;
         case MACRO_9: macro = macros[8]; break;
         case MACRO_10: macro = macros[9]; break;
+
+        case LFO_1:
+        case LFO_2:
+        case LFO_3:
+        case LFO_4:
+        case LFO_5:
+        case LFO_6:
+        case LFO_7:
+        case LFO_8:
+            break;
+
+        case ENVELOPE_1:
+        case ENVELOPE_2:
+        case ENVELOPE_3:
+        case ENVELOPE_4:
+        case ENVELOPE_5:
+        case ENVELOPE_6:
+            break;
+
+        case CHANNEL_PRESSURE: break;
+
+        case MIDI_LEARN: is_special = true; break;
+
         case MACRO_11: macro = macros[10]; break;
         case MACRO_12: macro = macros[11]; break;
         case MACRO_13: macro = macros[12]; break;
@@ -3432,20 +3472,12 @@ bool Synth::assign_controller_to_discrete_param(
         case MACRO_19: macro = macros[18]; break;
         case MACRO_20: macro = macros[19]; break;
 
-        case LFO_1:
-        case LFO_2:
-        case LFO_3:
-        case LFO_4:
-        case LFO_5:
-        case LFO_6:
-        case LFO_7:
-        case LFO_8:
-        case ENVELOPE_1:
-        case ENVELOPE_2:
-        case ENVELOPE_3:
-        case ENVELOPE_4:
-        case ENVELOPE_5:
-        case ENVELOPE_6:
+        case OSC_1_PEAK: midi_controller = &osc_1_peak; break;
+        case OSC_2_PEAK: midi_controller = &osc_2_peak; break;
+        case VOL_1_PEAK: midi_controller = &vol_1_peak; break;
+        case VOL_2_PEAK: midi_controller = &vol_2_peak; break;
+        case VOL_3_PEAK: midi_controller = &vol_3_peak; break;
+
         case ENVELOPE_7:
         case ENVELOPE_8:
         case ENVELOPE_9:
@@ -3454,15 +3486,8 @@ bool Synth::assign_controller_to_discrete_param(
         case ENVELOPE_12:
             break;
 
-        case CHANNEL_PRESSURE: break;
-
-        case OSC_1_PEAK: midi_controller = &osc_1_peak; break;
-        case OSC_2_PEAK: midi_controller = &osc_2_peak; break;
-        case VOL_1_PEAK: midi_controller = &vol_1_peak; break;
-        case VOL_2_PEAK: midi_controller = &vol_2_peak; break;
-        case VOL_3_PEAK: midi_controller = &vol_3_peak; break;
-
-        case MIDI_LEARN: is_special = true; break;
+        case RELEASED_NOTE: midi_controller = &released_note; break;
+        case RELEASED_VELOCITY: midi_controller = &released_velocity; break;
 
         default: {
             if (is_supported_midi_controller(controller_id)) {
@@ -3610,8 +3635,10 @@ bool Synth::assign_controller(
         case NONE: return true;
 
         case PITCH_WHEEL: param.set_midi_controller(&pitch_wheel); return true;
-        case NOTE: param.set_midi_controller(&note); return true;
-        case VELOCITY: param.set_midi_controller(&velocity); return true;
+        case TRIGGERED_NOTE: param.set_midi_controller(&triggered_note); return true;
+        case RELEASED_NOTE: param.set_midi_controller(&released_note); return true;
+        case TRIGGERED_VELOCITY: param.set_midi_controller(&triggered_velocity); return true;
+        case RELEASED_VELOCITY: param.set_midi_controller(&released_velocity); return true;
 
         case MACRO_1: param.set_macro(macros[0]); return true;
         case MACRO_2: param.set_macro(macros[1]); return true;
@@ -3992,8 +4019,10 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
 void Synth::clear_midi_controllers() noexcept
 {
     pitch_wheel.clear();
-    note.clear();
-    velocity.clear();
+    triggered_note.clear();
+    released_note.clear();
+    triggered_velocity.clear();
+    released_velocity.clear();
     channel_pressure_ctl.clear();
     osc_1_peak.clear();
     osc_2_peak.clear();

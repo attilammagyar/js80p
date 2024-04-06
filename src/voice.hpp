@@ -332,6 +332,7 @@ class Voice : public SignalProducer
         Integer get_note_id() const noexcept;
         Midi::Note get_note() const noexcept;
         Midi::Channel get_channel() const noexcept;
+        Number get_velocity() const noexcept;
         Number get_inaccuracy() const noexcept;
 
         template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
@@ -374,7 +375,8 @@ class Voice : public SignalProducer
         void save_note_info(
             Integer const note_id,
             Midi::Note const note,
-            Midi::Channel const channel
+            Midi::Channel const channel,
+            Number const velocity
         ) noexcept;
 
         Frequency get_note_frequency(
@@ -430,6 +432,7 @@ class Voice : public SignalProducer
         Number note_panning_value;
         Frequency nominal_frequency;
         Frequency note_frequency;
+        Number velocity;
         State state;
         Integer note_id;
         Midi::Note note;

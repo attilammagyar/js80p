@@ -9,6 +9,9 @@ v?.?.? (2024-0?-??)
  * Filter Q parameter can also use logarithmic scale.
  * The Echo and Reverb effects can now apply gradually increasing distortion to
    the delayed signal.
+ * The released note and the release velocity can also be used as a parameter
+   controller. (Note: unfortunately, most MIDI keyboards don't send meaningful
+   note release velocities.)
  * Improved MIDI compatibility, including responding to Monophonic Mode ON/OFF
    messages.
  * Various performance and RAM usage improvements.

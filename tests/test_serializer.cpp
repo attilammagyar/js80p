@@ -98,7 +98,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
         Synth::MessageType::ASSIGN_CONTROLLER,
         Synth::ParamId::CVOL,
         0.0,
-        Synth::ControllerId::VELOCITY
+        Synth::ControllerId::TRIGGERED_VELOCITY
     );
     synth_2.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,

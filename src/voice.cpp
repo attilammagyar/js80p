@@ -709,7 +709,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
 
     state = State::ON;
 
-    save_note_info(note_id, note, channel);
+    save_note_info(note_id, note, channel, velocity);
 
     filter_1.update_inaccuracy(1.0 - random_1, random_2);
     filter_2.update_inaccuracy(1.0 - random_2, random_1);
@@ -773,8 +773,10 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::save_note_info(
         Integer const note_id,
         Midi::Note const note,
-        Midi::Channel const channel
+        Midi::Channel const channel,
+        Number const velocity
 ) noexcept {
+    this->velocity = velocity;
     this->note_id = note_id;
     this->note = note;
     this->channel = channel;
@@ -966,7 +968,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         return;
     }
 
-    save_note_info(note_id, note, channel);
+    save_note_info(note_id, note, channel, velocity);
 
     wavefolder.folding.update_envelope(time_offset);
 
@@ -1241,6 +1243,13 @@ template<class ModulatorSignalProducerClass>
 Midi::Note Voice<ModulatorSignalProducerClass>::get_note() const noexcept
 {
     return note;
+}
+
+
+template<class ModulatorSignalProducerClass>
+Number Voice<ModulatorSignalProducerClass>::get_velocity() const noexcept
+{
+    return velocity;
 }
 
 
