@@ -38,15 +38,6 @@ def main(argv):
     print(f"{INDENTATION}PARAM_ID_COUNT = {param_id},")
     print(f"{INDENTATION}INVALID_PARAM_ID = PARAM_ID_COUNT,")
 
-    print("")
-
-    print_cases(param_objs, "return $.get_default_ratio();");
-    print_cases(param_objs, "return $.get_max_value();");
-    print_cases(param_objs, "return $.ratio_to_value(ratio);");
-    print_cases(param_objs, "$.set_ratio(ratio); break;");
-    print_cases(param_objs, "is_assigned = assign_controller<FloatParamS>($, ctl_id); break;");
-    print_cases(param_objs, "return $.get_ratio();");
-
     return 0
 
 
@@ -418,15 +409,6 @@ def print_params(
         print("")
 
     return param_id
-
-
-def print_cases(param_objs, template):
-    print("")
-    print("/******************************************************************************/")
-    print("")
-
-    for name, obj in param_objs:
-        print(f"        case ParamId::{name}: " + template.replace("$", obj))
 
 
 if __name__ == "__main__":

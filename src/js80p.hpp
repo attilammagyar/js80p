@@ -32,6 +32,7 @@
 #define JS80P_ASSERT(condition)
 #endif
 
+#define JS80P_ASSERT_NOT_REACHED() JS80P_ASSERT(false)
 
 
 #define JS80P_TO_STRING(x) _JS80P_EXPAND(x)

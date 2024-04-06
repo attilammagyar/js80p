@@ -100,7 +100,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             CLEAR_DIRTY_FLAG = 5,   ///< Clear the dirty flag.
 
-            INVALID,
+            INVALID_MESSAGE_TYPE,
         };
 
         enum ParamId {
@@ -1368,6 +1368,15 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Midi::Byte velocity;
         };
 
+        enum ParamType {
+            OTHER = 0,
+            SAMPLE_EVALUATED_FLOAT = 1,
+            BLOCK_EVALUATED_FLOAT = 2,
+            TOGGLE = 3,
+            ENVELOPE_SHAPE = 4,
+            INVALID_PARAM_TYPE = 5,
+        };
+
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
 
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
@@ -1419,7 +1428,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
 
         template<class ParamClass>
-        void register_param(ParamId const param_id, ParamClass const& param) noexcept;
+        void register_param(ParamId const param_id, ParamClass& param) noexcept;
+
+        ParamType find_param_type(ParamId const param_id) const noexcept;
+
+        bool is_controlling_supported(
+            ParamId const param_id,
+            ParamType const type
+        ) const noexcept;
 
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
@@ -1534,6 +1550,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];
         BiquadFilterSharedBuffers biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
+        FloatParamS* sample_evaluated_float_params[ParamId::PARAM_ID_COUNT];
+        FloatParamB* block_evaluated_float_params[ParamId::PARAM_ID_COUNT];
+        ToggleParam* toggle_params[ParamId::PARAM_ID_COUNT];
+        Envelope::ShapeParam* envelope_shape_params[ParamId::PARAM_ID_COUNT];
         std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
         std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
         Envelope* envelopes_rw[Constants::ENVELOPES];
