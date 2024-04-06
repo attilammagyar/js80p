@@ -1415,6 +1415,24 @@ void Synth::all_notes_off(
 }
 
 
+void Synth::mono_mode_on(
+        Seconds const time_offset,
+        Midi::Channel const channel
+) noexcept {
+    polyphonic.set_value(ToggleParam::OFF);
+    handle_refresh_param(ParamId::POLY);
+}
+
+
+void Synth::mono_mode_off(
+        Seconds const time_offset,
+        Midi::Channel const channel
+) noexcept {
+    polyphonic.set_value(ToggleParam::ON);
+    handle_refresh_param(ParamId::POLY);
+}
+
+
 Sample const* const* Synth::generate_samples(
         Integer const round,
         Integer const sample_count

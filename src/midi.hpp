@@ -103,6 +103,16 @@ class EventHandler
             Channel const channel
         ) noexcept {}
 
+        void mono_mode_on(
+            Seconds const time_offset,
+            Channel const channel
+        ) noexcept {}
+
+        void mono_mode_off(
+            Seconds const time_offset,
+            Channel const channel
+        ) noexcept {}
+
         Byte running_status;
 };
 
@@ -611,6 +621,10 @@ constexpr Command PITCH_BEND_CHANGE                 = 0xe0;
 constexpr Command CONTROL_CHANGE_ALL_SOUND_OFF          = 0x78;
 constexpr Command CONTROL_CHANGE_RESET_ALL_CONTROLLERS  = 0x79;
 constexpr Command CONTROL_CHANGE_ALL_NOTES_OFF          = 0x7b;
+constexpr Command CONTROL_CHANGE_OMNI_MODE_OFF          = 0x7c;
+constexpr Command CONTROL_CHANGE_OMNI_MODE_ON           = 0x7d;
+constexpr Command CONTROL_CHANGE_MONO_MODE_ON           = 0x7e;
+constexpr Command CONTROL_CHANGE_MONO_MODE_OFF          = 0x7f;
 
 
 template<class EventHandlerClass>
@@ -822,7 +836,19 @@ size_t EventDispatcher<EventHandlerClass>::process_control_change(
                 break;
 
             case CONTROL_CHANGE_ALL_NOTES_OFF:
+            case CONTROL_CHANGE_OMNI_MODE_OFF:
+            case CONTROL_CHANGE_OMNI_MODE_ON:
                 event_handler.all_notes_off(time_offset, channel);
+                break;
+
+            case CONTROL_CHANGE_MONO_MODE_ON:
+                event_handler.all_notes_off(time_offset, channel);
+                event_handler.mono_mode_on(time_offset, channel);
+                break;
+
+            case CONTROL_CHANGE_MONO_MODE_OFF:
+                event_handler.all_notes_off(time_offset, channel);
+                event_handler.mono_mode_off(time_offset, channel);
                 break;
 
             default:

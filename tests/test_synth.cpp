@@ -1311,3 +1311,14 @@ TEST(updating_voice_inaccuracy_many_times_yields_uniform_distribution, {
         );
     }
 })
+
+
+TEST(can_switch_between_polyphonic_and_monophonic_modes, {
+    Synth synth;
+
+    synth.mono_mode_on(0.0, 0);
+    assert_eq(ToggleParam::OFF, synth.polyphonic.get_value());
+
+    synth.mono_mode_off(0.0, 0);
+    assert_eq(ToggleParam::ON, synth.polyphonic.get_value());
+})

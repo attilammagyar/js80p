@@ -129,6 +129,20 @@ class MidiEventLogger : public Midi::EventHandler
             log_event("ALL_NOTES_OFF", time_offset, channel);
         }
 
+        void mono_mode_on(
+                Seconds const time_offset,
+                Midi::Channel const channel
+        ) noexcept {
+            log_event("MONO_MODE_ON", time_offset, channel);
+        }
+
+        void mono_mode_off(
+                Seconds const time_offset,
+                Midi::Channel const channel
+        ) noexcept {
+            log_event("MONO_MODE_OFF", time_offset, channel);
+        }
+
         std::string events;
 
     private:
@@ -251,9 +265,25 @@ TEST(parses_known_midi_messages_and_ignores_unknown_and_invalid_ones, {
     assert_eq("ALL_SOUND_OFF 8.0 0x06\n", parse_midi(8.0, "\xb6\x78\x00", 3));
     assert_eq("RESET_ALL_CONTROLLERS 9.0 0x06\n", parse_midi(9.0, "\xb6\x79\x00", 3));
     assert_eq("ALL_NOTES_OFF 10.0 0x06\n", parse_midi(10.0, "\xb6\x7b\x00", 3));
+    assert_eq("ALL_NOTES_OFF 11.0 0x06\n", parse_midi(11.0, "\xb6\x7c\x00", 3));
+    assert_eq("ALL_NOTES_OFF 12.0 0x06\n", parse_midi(12.0, "\xb6\x7d\x00", 3));
     assert_eq(
-        "NOTE_ON 11.0 0x06 0x42 0x70\n",
-        parse_midi(11.0, "\x01\xff\x7f\x7f\x86\x99\xff\x96\x42\x70\xff")
+        (
+            "ALL_NOTES_OFF 13.0 0x06\n"
+            "MONO_MODE_ON 13.0 0x06\n"
+        ),
+        parse_midi(13.0, "\xb6\x7e\x00", 3)
+    );
+    assert_eq(
+        (
+            "ALL_NOTES_OFF 14.0 0x06\n"
+            "MONO_MODE_OFF 14.0 0x06\n"
+        ),
+        parse_midi(14.0, "\xb6\x7f\x00", 3)
+    );
+    assert_eq(
+        "NOTE_ON 15.0 0x06 0x42 0x70\n",
+        parse_midi(15.0, "\x01\xff\x7f\x7f\x86\x99\xff\x96\x42\x70\xff")
     );
 })
 

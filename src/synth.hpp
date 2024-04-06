@@ -955,15 +955,28 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ) noexcept;
 
         void all_sound_off(
-            Seconds const time_offset, Midi::Channel const channel
+            Seconds const time_offset,
+            Midi::Channel const channel
         ) noexcept;
 
         void reset_all_controllers(
-            Seconds const time_offset, Midi::Channel const channel
+            Seconds const time_offset,
+            Midi::Channel const channel
         ) noexcept;
 
         void all_notes_off(
-            Seconds const time_offset, Midi::Channel const channel
+            Seconds const time_offset,
+            Midi::Channel const channel
+        ) noexcept;
+
+        void mono_mode_on(
+            Seconds const time_offset,
+            Midi::Channel const channel
+        ) noexcept;
+
+        void mono_mode_off(
+            Seconds const time_offset,
+            Midi::Channel const channel
         ) noexcept;
 
         ToggleParam polyphonic;
