@@ -174,7 +174,7 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
 
 TEST(lfo_performance, {
     /*
-    Usage: ./build/x86_64-gpp/test_lfo-scale lfo_performance ON|OFF number-of-samples-to-render
+    Usage: time ./build/dev-linux-x86_64-avx/test_lfo lfo_performance ON|OFF number-of-samples
     */
     LFO lfo("L1");
 
