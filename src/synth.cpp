@@ -2355,6 +2355,17 @@ bool Synth::assign_controller_to_discrete_param(
         case RELEASED_NOTE: midi_controller = &released_note; break;
         case RELEASED_VELOCITY: midi_controller = &released_velocity; break;
 
+        case MACRO_21: macro = macros[20]; break;
+        case MACRO_22: macro = macros[21]; break;
+        case MACRO_23: macro = macros[22]; break;
+        case MACRO_24: macro = macros[23]; break;
+        case MACRO_25: macro = macros[24]; break;
+        case MACRO_26: macro = macros[25]; break;
+        case MACRO_27: macro = macros[26]; break;
+        case MACRO_28: macro = macros[27]; break;
+        case MACRO_29: macro = macros[28]; break;
+        case MACRO_30: macro = macros[29]; break;
+
         default: {
             if (is_supported_midi_controller(controller_id)) {
                 midi_controller = midi_controllers[controller_id];
@@ -2562,6 +2573,17 @@ bool Synth::assign_controller(
 
         case RELEASED_NOTE: param.set_midi_controller(&released_note); return true;
         case RELEASED_VELOCITY: param.set_midi_controller(&released_velocity); return true;
+
+        case MACRO_21: param.set_macro(macros[20]); return true;
+        case MACRO_22: param.set_macro(macros[21]); return true;
+        case MACRO_23: param.set_macro(macros[22]); return true;
+        case MACRO_24: param.set_macro(macros[23]); return true;
+        case MACRO_25: param.set_macro(macros[24]); return true;
+        case MACRO_26: param.set_macro(macros[25]); return true;
+        case MACRO_27: param.set_macro(macros[26]); return true;
+        case MACRO_28: param.set_macro(macros[27]); return true;
+        case MACRO_29: param.set_macro(macros[28]); return true;
+        case MACRO_30: param.set_macro(macros[29]); return true;
 
         default: {
             if (is_supported_midi_controller(controller_id)) {

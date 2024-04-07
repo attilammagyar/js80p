@@ -58,10 +58,11 @@ def main(argv):
         ("effects", 623),
         ("macros1", 1235),
         ("macros2", 1847),
-        ("envelopes1", 2459),
-        ("envelopes2", 3071),
-        ("lfos", 3683),
-        ("about", 4295),
+        ("macros3", 2459),
+        ("envelopes1", 3071),
+        ("envelopes2", 3683),
+        ("lfos", 4295),
+        ("about", 4907),
     )
 
     for file_name, top in tabs:

@@ -161,7 +161,7 @@ class TabSelector : public TransparentWidget
     public:
         static constexpr int LEFT = 3;
         static constexpr int TOP = 2;
-        static constexpr int WIDTH = 80;
+        static constexpr int WIDTH = 72;
         static constexpr int HEIGHT = 28;
 
         TabSelector(
@@ -218,7 +218,6 @@ class ControllerSelector : public Widget
         class Controller : public Widget
         {
             public:
-                static constexpr int WIDTH = 240;
                 static constexpr int HEIGHT = 18;
 
                 Controller(
@@ -227,6 +226,7 @@ class ControllerSelector : public Widget
                     char const* const text,
                     int const left,
                     int const top,
+                    int const width,
                     Synth::ControllerId const controller_id
                 );
 

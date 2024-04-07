@@ -178,7 +178,7 @@ def print_macros(param_id: int, param_objs: list) -> int:
         ("$#RND", " ///< $ # Randomness", ""),
     ]
 
-    return print_params(param_id, param_objs, "Macro", "M", 20, params)
+    return print_params(param_id, param_objs, "Macro", "M", 30, params)
 
 
 def print_envelopes_params(param_id: int, param_objs: list) -> int:

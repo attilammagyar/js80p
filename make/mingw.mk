@@ -52,6 +52,7 @@ GUI_IMAGES = \
 	gui/img/lfos.bmp \
 	gui/img/macros1.bmp \
 	gui/img/macros2.bmp \
+	gui/img/macros3.bmp \
 	gui/img/screw_states.bmp \
 	gui/img/screw_states_synced.bmp \
 	gui/img/synth.bmp \

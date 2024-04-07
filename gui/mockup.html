@@ -60,7 +60,8 @@ html, body {
 }
 
 #controllers-1 .main-block,
-#controllers-2 .main-block {
+#controllers-2 .main-block,
+#controllers-3 .main-block {
   margin: 12px 2px;
   padding: 1px 2px;
 }
@@ -72,12 +73,14 @@ html, body {
 }
 
 #controllers-1 .main-block,
-#controllers-2 .main-block {
+#controllers-2 .main-block,
+#controllers-3 .main-block {
   width: 180px;
 }
 
 #controllers-1 .block .group:nth-child(2),
 #controllers-2 .block .group:nth-child(2),
+#controllers-3 .block .group:nth-child(2),
 #envelopes-1 .block .group:nth-child(2),
 #envelopes-2 .block .group:nth-child(2) {
   margin-top: 20px;
@@ -471,7 +474,7 @@ body.hide-objects #osc-2-tuning span {
   font-family: Arial, Sans-serif;
   font-size: 14px;
   background: #202030;
-  width: 72px;
+  width: 64px;
   height: 20px;
   line-height: 22px;
   margin: 0;
@@ -629,8 +632,9 @@ function make_tabs(active)
     var tabs = [
             "Synth",
             "Effects",
-            "MCR 1-10",
-            "MCR 11-20",
+            "MC 1-10",
+            "MC 11-20",
+            "MC 21-30",
             "ENV 1-6",
             "ENV 7-12",
             "LFOs",
@@ -829,7 +833,7 @@ function make_tabs(active)
     <div class="tabs">
       <script type="text/javascript">make_tabs(4);</script>
     </div>
-    <div class="border" id="envelopes-1">
+    <div class="border" id="controllers-3">
     </div>
   </div>
 
@@ -837,7 +841,7 @@ function make_tabs(active)
     <div class="tabs">
       <script type="text/javascript">make_tabs(5);</script>
     </div>
-    <div class="border" id="envelopes-2">
+    <div class="border" id="envelopes-1">
     </div>
   </div>
 
@@ -845,13 +849,21 @@ function make_tabs(active)
     <div class="tabs">
       <script type="text/javascript">make_tabs(6);</script>
     </div>
-    <div class="border" id="lfos">
+    <div class="border" id="envelopes-2">
     </div>
   </div>
 
   <div class="background">
     <div class="tabs">
       <script type="text/javascript">make_tabs(7);</script>
+    </div>
+    <div class="border" id="lfos">
+    </div>
+  </div>
+
+  <div class="background">
+    <div class="tabs">
+      <script type="text/javascript">make_tabs(8);</script>
     </div>
     <div class="border" id="about">
     </div>
@@ -1028,7 +1040,7 @@ window.onload = function ()
 
     create_knob("volume-3-params", "VOL %", "1.0");
 
-    for (o = 0; o <= 1; ++o) {
+    for (o = 0; o <= 2; ++o) {
         for (i = 1; i <= 10; ++i) {
             d = document.createElement("div");
             d.setAttribute("class", "main-block block");

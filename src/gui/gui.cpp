@@ -500,6 +500,76 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M20DST] = "Macro 20 Distortion (%)",
     [Synth::ParamId::M20RND] = "Macro 20 Randomness (%)",
 
+    [Synth::ParamId::M21IN] = "Macro 21 Input (%)",
+    [Synth::ParamId::M21MIN] = "Macro 21 Minimum Value (%)",
+    [Synth::ParamId::M21MAX] = "Macro 21 Maximum Value (%)",
+    [Synth::ParamId::M21AMT] = "Macro 21 Amount (%)",
+    [Synth::ParamId::M21DST] = "Macro 21 Distortion (%)",
+    [Synth::ParamId::M21RND] = "Macro 21 Randomness (%)",
+
+    [Synth::ParamId::M22IN] = "Macro 22 Input (%)",
+    [Synth::ParamId::M22MIN] = "Macro 22 Minimum Value (%)",
+    [Synth::ParamId::M22MAX] = "Macro 22 Maximum Value (%)",
+    [Synth::ParamId::M22AMT] = "Macro 22 Amount (%)",
+    [Synth::ParamId::M22DST] = "Macro 22 Distortion (%)",
+    [Synth::ParamId::M22RND] = "Macro 22 Randomness (%)",
+
+    [Synth::ParamId::M23IN] = "Macro 23 Input (%)",
+    [Synth::ParamId::M23MIN] = "Macro 23 Minimum Value (%)",
+    [Synth::ParamId::M23MAX] = "Macro 23 Maximum Value (%)",
+    [Synth::ParamId::M23AMT] = "Macro 23 Amount (%)",
+    [Synth::ParamId::M23DST] = "Macro 23 Distortion (%)",
+    [Synth::ParamId::M23RND] = "Macro 23 Randomness (%)",
+
+    [Synth::ParamId::M24IN] = "Macro 24 Input (%)",
+    [Synth::ParamId::M24MIN] = "Macro 24 Minimum Value (%)",
+    [Synth::ParamId::M24MAX] = "Macro 24 Maximum Value (%)",
+    [Synth::ParamId::M24AMT] = "Macro 24 Amount (%)",
+    [Synth::ParamId::M24DST] = "Macro 24 Distortion (%)",
+    [Synth::ParamId::M24RND] = "Macro 24 Randomness (%)",
+
+    [Synth::ParamId::M25IN] = "Macro 25 Input (%)",
+    [Synth::ParamId::M25MIN] = "Macro 25 Minimum Value (%)",
+    [Synth::ParamId::M25MAX] = "Macro 25 Maximum Value (%)",
+    [Synth::ParamId::M25AMT] = "Macro 25 Amount (%)",
+    [Synth::ParamId::M25DST] = "Macro 25 Distortion (%)",
+    [Synth::ParamId::M25RND] = "Macro 25 Randomness (%)",
+
+    [Synth::ParamId::M26IN] = "Macro 26 Input (%)",
+    [Synth::ParamId::M26MIN] = "Macro 26 Minimum Value (%)",
+    [Synth::ParamId::M26MAX] = "Macro 26 Maximum Value (%)",
+    [Synth::ParamId::M26AMT] = "Macro 26 Amount (%)",
+    [Synth::ParamId::M26DST] = "Macro 26 Distortion (%)",
+    [Synth::ParamId::M26RND] = "Macro 26 Randomness (%)",
+
+    [Synth::ParamId::M27IN] = "Macro 27 Input (%)",
+    [Synth::ParamId::M27MIN] = "Macro 27 Minimum Value (%)",
+    [Synth::ParamId::M27MAX] = "Macro 27 Maximum Value (%)",
+    [Synth::ParamId::M27AMT] = "Macro 27 Amount (%)",
+    [Synth::ParamId::M27DST] = "Macro 27 Distortion (%)",
+    [Synth::ParamId::M27RND] = "Macro 27 Randomness (%)",
+
+    [Synth::ParamId::M28IN] = "Macro 28 Input (%)",
+    [Synth::ParamId::M28MIN] = "Macro 28 Minimum Value (%)",
+    [Synth::ParamId::M28MAX] = "Macro 28 Maximum Value (%)",
+    [Synth::ParamId::M28AMT] = "Macro 28 Amount (%)",
+    [Synth::ParamId::M28DST] = "Macro 28 Distortion (%)",
+    [Synth::ParamId::M28RND] = "Macro 28 Randomness (%)",
+
+    [Synth::ParamId::M29IN] = "Macro 29 Input (%)",
+    [Synth::ParamId::M29MIN] = "Macro 29 Minimum Value (%)",
+    [Synth::ParamId::M29MAX] = "Macro 29 Maximum Value (%)",
+    [Synth::ParamId::M29AMT] = "Macro 29 Amount (%)",
+    [Synth::ParamId::M29DST] = "Macro 29 Distortion (%)",
+    [Synth::ParamId::M29RND] = "Macro 29 Randomness (%)",
+
+    [Synth::ParamId::M30IN] = "Macro 30 Input (%)",
+    [Synth::ParamId::M30MIN] = "Macro 30 Minimum Value (%)",
+    [Synth::ParamId::M30MAX] = "Macro 30 Maximum Value (%)",
+    [Synth::ParamId::M30AMT] = "Macro 30 Amount (%)",
+    [Synth::ParamId::M30DST] = "Macro 30 Distortion (%)",
+    [Synth::ParamId::M30RND] = "Macro 30 Randomness (%)",
+
     [Synth::ParamId::N1AMT] = "Envelope 1 Amount (%)",
     [Synth::ParamId::N1INI] = "Envelope 1 Initial Level (%)",
     [Synth::ParamId::N1DEL] = "Envelope 1 Delay Time (s)",
@@ -886,8 +956,8 @@ GUI::Controller const GUI::CONTROLLERS[] = {
     Controller(0, ControllerCapability::NONE, Synth::ControllerId::NONE, "(none)", "(none)"),
 
     Controller(1, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::TRIGGERED_NOTE, "Triggered Note", "Note on"),
-    Controller(2, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::RELEASED_NOTE, "Released Note", "Note off"),
-    Controller(3, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::TRIGGERED_VELOCITY, "Triggered Velocity", "Vel on"),
+    Controller(2, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::TRIGGERED_VELOCITY, "Triggered Velocity", "Vel on"),
+    Controller(3, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::RELEASED_NOTE, "Released Note", "Note off"),
     Controller(4, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::RELEASED_VELOCITY, "Released Velocity", "Vel off"),
     Controller(5, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::PITCH_WHEEL, "Pitch Wheel", "PtchWh"),
     Controller(6, ControllerCapability::MIDI_CONTROLLER, Synth::ControllerId::OSC_1_PEAK, "Osc 1 Out Peak", "O1 Pk"),
@@ -990,28 +1060,38 @@ GUI::Controller const GUI::CONTROLLERS[] = {
     Controller(100, ControllerCapability::MACRO, Synth::ControllerId::MACRO_18, "Macro 18", "MCR 18"),
     Controller(101, ControllerCapability::MACRO, Synth::ControllerId::MACRO_19, "Macro 19", "MCR 19"),
     Controller(102, ControllerCapability::MACRO, Synth::ControllerId::MACRO_20, "Macro 20", "MCR 20"),
+    Controller(103, ControllerCapability::MACRO, Synth::ControllerId::MACRO_21, "Macro 21", "MCR 21"),
+    Controller(104, ControllerCapability::MACRO, Synth::ControllerId::MACRO_22, "Macro 22", "MCR 22"),
+    Controller(105, ControllerCapability::MACRO, Synth::ControllerId::MACRO_23, "Macro 23", "MCR 23"),
+    Controller(106, ControllerCapability::MACRO, Synth::ControllerId::MACRO_24, "Macro 24", "MCR 24"),
+    Controller(107, ControllerCapability::MACRO, Synth::ControllerId::MACRO_25, "Macro 25", "MCR 25"),
+    Controller(108, ControllerCapability::MACRO, Synth::ControllerId::MACRO_26, "Macro 26", "MCR 26"),
+    Controller(109, ControllerCapability::MACRO, Synth::ControllerId::MACRO_27, "Macro 27", "MCR 27"),
+    Controller(110, ControllerCapability::MACRO, Synth::ControllerId::MACRO_28, "Macro 28", "MCR 28"),
+    Controller(111, ControllerCapability::MACRO, Synth::ControllerId::MACRO_29, "Macro 29", "MCR 29"),
+    Controller(112, ControllerCapability::MACRO, Synth::ControllerId::MACRO_30, "Macro 30", "MCR 30"),
 
-    Controller(103, ControllerCapability::LFO, Synth::ControllerId::LFO_1, "LFO 1", "LFO 1"),
-    Controller(104, ControllerCapability::LFO, Synth::ControllerId::LFO_2, "LFO 2", "LFO 2"),
-    Controller(105, ControllerCapability::LFO, Synth::ControllerId::LFO_3, "LFO 3", "LFO 3"),
-    Controller(106, ControllerCapability::LFO, Synth::ControllerId::LFO_4, "LFO 4", "LFO 4"),
-    Controller(107, ControllerCapability::LFO, Synth::ControllerId::LFO_5, "LFO 5", "LFO 5"),
-    Controller(108, ControllerCapability::LFO, Synth::ControllerId::LFO_6, "LFO 6", "LFO 6"),
-    Controller(109, ControllerCapability::LFO, Synth::ControllerId::LFO_7, "LFO 7", "LFO 7"),
-    Controller(110, ControllerCapability::LFO, Synth::ControllerId::LFO_8, "LFO 8", "LFO 8"),
+    Controller(113, ControllerCapability::LFO, Synth::ControllerId::LFO_1, "LFO 1", "LFO 1"),
+    Controller(114, ControllerCapability::LFO, Synth::ControllerId::LFO_2, "LFO 2", "LFO 2"),
+    Controller(115, ControllerCapability::LFO, Synth::ControllerId::LFO_3, "LFO 3", "LFO 3"),
+    Controller(116, ControllerCapability::LFO, Synth::ControllerId::LFO_4, "LFO 4", "LFO 4"),
+    Controller(117, ControllerCapability::LFO, Synth::ControllerId::LFO_5, "LFO 5", "LFO 5"),
+    Controller(118, ControllerCapability::LFO, Synth::ControllerId::LFO_6, "LFO 6", "LFO 6"),
+    Controller(119, ControllerCapability::LFO, Synth::ControllerId::LFO_7, "LFO 7", "LFO 7"),
+    Controller(120, ControllerCapability::LFO, Synth::ControllerId::LFO_8, "LFO 8", "LFO 8"),
 
-    Controller(111, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_1, "Envelope 1", "ENV 1"),
-    Controller(112, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_2, "Envelope 2", "ENV 2"),
-    Controller(113, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_3, "Envelope 3", "ENV 3"),
-    Controller(114, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_4, "Envelope 4", "ENV 4"),
-    Controller(115, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_5, "Envelope 5", "ENV 5"),
-    Controller(116, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_6, "Envelope 6", "ENV 6"),
-    Controller(117, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_7, "Envelope 7", "ENV 7"),
-    Controller(118, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_8, "Envelope 8", "ENV 8"),
-    Controller(119, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_9, "Envelope 9", "ENV 9"),
-    Controller(120, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_10, "Envelope 10", "ENV 10"),
-    Controller(121, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_11, "Envelope 11", "ENV 11"),
-    Controller(122, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_12, "Envelope 12", "ENV 12"),
+    Controller(121, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_1, "Envelope 1", "ENV 1"),
+    Controller(122, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_2, "Envelope 2", "ENV 2"),
+    Controller(123, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_3, "Envelope 3", "ENV 3"),
+    Controller(124, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_4, "Envelope 4", "ENV 4"),
+    Controller(125, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_5, "Envelope 5", "ENV 5"),
+    Controller(126, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_6, "Envelope 6", "ENV 6"),
+    Controller(127, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_7, "Envelope 7", "ENV 7"),
+    Controller(128, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_8, "Envelope 8", "ENV 8"),
+    Controller(129, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_9, "Envelope 9", "ENV 9"),
+    Controller(130, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_10, "Envelope 10", "ENV 10"),
+    Controller(131, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_11, "Envelope 11", "ENV 11"),
+    Controller(132, ControllerCapability::ENVELOPE, Synth::ControllerId::ENVELOPE_12, "Envelope 12", "ENV 12"),
 };
 
 
@@ -1236,6 +1316,16 @@ GUI::Color GUI::controller_id_to_text_color(Synth::ControllerId const controller
         case Synth::ControllerId::MACRO_18:
         case Synth::ControllerId::MACRO_19:
         case Synth::ControllerId::MACRO_20:
+        case Synth::ControllerId::MACRO_21:
+        case Synth::ControllerId::MACRO_22:
+        case Synth::ControllerId::MACRO_23:
+        case Synth::ControllerId::MACRO_24:
+        case Synth::ControllerId::MACRO_25:
+        case Synth::ControllerId::MACRO_26:
+        case Synth::ControllerId::MACRO_27:
+        case Synth::ControllerId::MACRO_28:
+        case Synth::ControllerId::MACRO_29:
+        case Synth::ControllerId::MACRO_30:
             return CTL_COLOR_MACRO_TEXT;
 
         case Synth::ControllerId::LFO_1:
@@ -1306,6 +1396,16 @@ GUI::Color GUI::controller_id_to_bg_color(Synth::ControllerId const controller_i
         case Synth::ControllerId::MACRO_18:
         case Synth::ControllerId::MACRO_19:
         case Synth::ControllerId::MACRO_20:
+        case Synth::ControllerId::MACRO_21:
+        case Synth::ControllerId::MACRO_22:
+        case Synth::ControllerId::MACRO_23:
+        case Synth::ControllerId::MACRO_24:
+        case Synth::ControllerId::MACRO_25:
+        case Synth::ControllerId::MACRO_26:
+        case Synth::ControllerId::MACRO_27:
+        case Synth::ControllerId::MACRO_28:
+        case Synth::ControllerId::MACRO_29:
+        case Synth::ControllerId::MACRO_30:
             return CTL_COLOR_MACRO_BG;
 
         case Synth::ControllerId::LFO_1:
@@ -1504,6 +1604,7 @@ GUI::GUI(
     about_body(NULL),
     macros_1_body(NULL),
     macros_2_body(NULL),
+    macros_3_body(NULL),
     effects_body(NULL),
     envelopes_1_body(NULL),
     envelopes_2_body(NULL),
@@ -1564,6 +1665,7 @@ GUI::GUI(
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
     macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
     macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
+    macros_3_image = dummy_widget->load_image(this->platform_data, "MACROS3");
     effects_image = dummy_widget->load_image(this->platform_data, "EFFECTS");
     envelopes_1_image = dummy_widget->load_image(this->platform_data, "ENVELOPES1");
     envelopes_2_image = dummy_widget->load_image(this->platform_data, "ENVELOPES2");
@@ -1586,6 +1688,7 @@ GUI::GUI(
     build_about_body(sdk_version);
     build_macros_1_body(knob_states);
     build_macros_2_body(knob_states);
+    build_macros_3_body(knob_states);
     build_effects_body(knob_states);
     build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
@@ -1631,10 +1734,19 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
+            macros_3_image,
+            macros_3_body,
+            "Macros 21-30",
+            TabSelector::LEFT + TabSelector::WIDTH * 4
+        )
+    );
+    background->own(
+        new TabSelector(
+            background,
             envelopes_1_image,
             envelopes_1_body,
             "Envelopes 1-6",
-            TabSelector::LEFT + TabSelector::WIDTH * 4
+            TabSelector::LEFT + TabSelector::WIDTH * 5
         )
     );
     background->own(
@@ -1643,7 +1755,7 @@ GUI::GUI(
             envelopes_2_image,
             envelopes_2_body,
             "Envelopes 7-12",
-            TabSelector::LEFT + TabSelector::WIDTH * 5
+            TabSelector::LEFT + TabSelector::WIDTH * 6
         )
     );
     background->own(
@@ -1652,7 +1764,7 @@ GUI::GUI(
             lfos_image,
             lfos_body,
             "LFOs",
-            TabSelector::LEFT + TabSelector::WIDTH * 6
+            TabSelector::LEFT + TabSelector::WIDTH * 7
         )
     );
     background->own(
@@ -1661,7 +1773,7 @@ GUI::GUI(
             about_image,
             about_body,
             "About",
-            TabSelector::LEFT + TabSelector::WIDTH * 7
+            TabSelector::LEFT + TabSelector::WIDTH * 8
         )
     );
 
@@ -1962,6 +2074,145 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     POSITION_RELATIVE_END();
 
     macros_2_body->hide();
+}
+
+
+void GUI::build_macros_3_body(ParamStateImages const* knob_states)
+{
+    macros_3_body = new TabBody("Macros 21-30");
+
+    background->own(macros_3_body);
+
+    POSITION_RELATIVE_BEGIN(17, 14);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M21IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M21MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M21MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M21AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M21DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M21RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(207, 14);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M22IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M22MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M22MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M22AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M22DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M22RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(397, 14);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M23IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M23MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M23MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M23AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M23DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M23RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(587, 14);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M24IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M24MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M24MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M24AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M24DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M24RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(777, 14);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M25IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M25MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M25MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M25AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M25DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M25RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(17, 294);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M26IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M26MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M26MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M26AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M26DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M26RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(207, 294);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M27IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M27MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M27MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M27AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M27DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M27RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(397, 294);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M28IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M28MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M28MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M28AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M28DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M28RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(587, 294);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M29IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M29MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M29MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M29AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M29DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M29RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+
+    POSITION_RELATIVE_BEGIN(777, 294);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0,  30, Synth::ParamId::M30IN,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M30MIN, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M30MAX, MM__C,  "%.2f", 100.0, knob_states);
+
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M30AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M30DST, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M30RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    POSITION_RELATIVE_END();
+
+    macros_3_body->hide();
 }
 
 
@@ -2677,6 +2928,7 @@ GUI::~GUI()
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(macros_1_image);
     dummy_widget->delete_image(macros_2_image);
+    dummy_widget->delete_image(macros_3_image);
     dummy_widget->delete_image(effects_image);
     dummy_widget->delete_image(envelopes_1_image);
     dummy_widget->delete_image(envelopes_2_image);
@@ -2804,6 +3056,18 @@ int WidgetBase::get_left() const
 int WidgetBase::get_top() const
 {
     return top;
+}
+
+
+int WidgetBase::get_width() const
+{
+    return width;
+}
+
+
+int WidgetBase::get_height() const
+{
+    return height;
 }
 
 

@@ -95,7 +95,7 @@ class GUI
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
 
-        static constexpr int CONTROLLERS_COUNT = 123;
+        static constexpr int CONTROLLERS_COUNT = 133;
 
         static char const* const MODES[];
         static int const MODES_COUNT;
@@ -230,6 +230,7 @@ class GUI
         void build_about_body(char const* sdk_version);
         void build_macros_1_body(ParamStateImages const* knob_states);
         void build_macros_2_body(ParamStateImages const* knob_states);
+        void build_macros_3_body(ParamStateImages const* knob_states);
         void build_effects_body(ParamStateImages const* knob_states);
 
         void build_envelopes_1_body(
@@ -260,6 +261,7 @@ class GUI
         Image about_image;
         Image macros_1_image;
         Image macros_2_image;
+        Image macros_3_image;
         Image effects_image;
         Image envelopes_1_image;
         Image envelopes_2_image;
@@ -276,6 +278,7 @@ class GUI
         TabBody* about_body;
         TabBody* macros_1_body;
         TabBody* macros_2_body;
+        TabBody* macros_3_body;
         TabBody* effects_body;
         TabBody* envelopes_1_body;
         TabBody* envelopes_2_body;
@@ -328,6 +331,8 @@ class WidgetBase
 
         virtual int get_left() const;
         virtual int get_top() const;
+        virtual int get_width() const;
+        virtual int get_height() const;
         virtual WidgetBase* get_parent() const;
 
         virtual void set_text(char const* text);

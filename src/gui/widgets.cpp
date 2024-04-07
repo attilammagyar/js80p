@@ -316,12 +316,13 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
     Widget::set_up(platform_data, parent);
 
     constexpr int max_top = HEIGHT - Controller::HEIGHT;
-    constexpr int group_separation = 3;
+    constexpr int group_separation = 5;
 
     GUI::ControllerCapability previous_required_capability = GUI::ControllerCapability::NONE;
     Synth::ControllerId previous_id = Synth::ControllerId::NONE;
     int top = TITLE_HEIGHT;
-    int left = 10;
+    int left = 6;
+    int column = 0;
 
     for (int i = 0; i != GUI::CONTROLLERS_COUNT; ++i) {
         Synth::ControllerId const id = GUI::CONTROLLERS[i].id;
@@ -329,26 +330,37 @@ void ControllerSelector::set_up(GUI::PlatformData platform_data, WidgetBase* par
         GUI::ControllerCapability const required_capability = (
             GUI::CONTROLLERS[i].required_capability
         );
+        int const width = column > 1 ? 162 : 238;
 
         if (
-                required_capability != previous_required_capability
+                (
+                    required_capability != previous_required_capability
+                    && top > TITLE_HEIGHT
+                )
                 || previous_id == Synth::ControllerId::MIDI_LEARN
+                || previous_id == Synth::ControllerId::MACRO_10
+                || previous_id == Synth::ControllerId::MACRO_20
         ) {
             top += group_separation;
-            previous_required_capability = required_capability;
         }
 
         previous_id = id;
+        previous_required_capability = required_capability;
 
         controllers[i] = (Controller*)this->own(
-            new Controller(*this, required_capability, text, left, top, id)
+            new Controller(*this, required_capability, text, left, top, width, id)
         );
 
         top += Controller::HEIGHT;
 
-        if (top > max_top || id == Synth::ControllerId::MACRO_10) {
+        if (
+                top > max_top
+                || id == Synth::ControllerId::UNDEFINED_39
+                || id == Synth::ControllerId::MACRO_30
+        ) {
             top = TITLE_HEIGHT;
-            left += Controller::WIDTH;
+            left += controllers[i]->get_width();
+            ++column;
         }
     }
 }
@@ -455,8 +467,9 @@ ControllerSelector::Controller::Controller(
         char const* const text,
         int const left,
         int const top,
+        int const width,
         Synth::ControllerId const controller_id
-) : Widget(text, left, top, WIDTH, HEIGHT, Type::CONTROLLER),
+) : Widget(text, left, top, width, HEIGHT, Type::CONTROLLER),
     required_capability(required_capability),
     controller_id(controller_id),
     controller_selector(controller_selector),
@@ -512,7 +525,7 @@ bool ControllerSelector::Controller::paint()
         color,
         background,
         FontWeight::BOLD,
-        6,
+        3,
         TextAlignment::LEFT
     );
 
