@@ -712,12 +712,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         Integer const first_sample_index,
         Integer const last_sample_index
 ) noexcept {
-    constexpr Byte NONE = 0;
-    constexpr Byte FREQUENCY = 1;
-    constexpr Byte DETUNE = 2;
-    constexpr Byte FINE_DETUNE = 4;
-    constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
-
     Sample const* const detune_buffer = (
         FloatParamS::produce_if_not_constant(detune, round, sample_count)
     );
@@ -725,134 +719,8 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         FloatParamS::produce_if_not_constant(fine_detune, round, sample_count)
     );
 
-    Byte const_param_flags = (
-        frequency_buffer == NULL ? FREQUENCY : NONE
-    );
-
-    if (detune_buffer == NULL) {
-        const_param_flags |= DETUNE;
-    }
-
-    if (fine_detune_buffer == NULL) {
-        const_param_flags |= FINE_DETUNE;
-    }
-
-    switch (const_param_flags) {
-        case NONE: {
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    (Number)frequency_buffer[i],
-                    (Number)detune_buffer[i],
-                    (Number)fine_detune_buffer[i]
-                );
-            }
-
-            break;
-        }
-
-        case FREQUENCY: {
-            Number const frequency_value = frequency.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    frequency_value,
-                    (Number)detune_buffer[i],
-                    (Number)fine_detune_buffer[i]
-                );
-            }
-
-            break;
-        }
-
-        case DETUNE: {
-            Number const detune_value = detune.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    (Number)frequency_buffer[i],
-                    detune_value,
-                    (Number)fine_detune_buffer[i]
-                );
-            }
-
-            break;
-        }
-
-        case FREQUENCY | DETUNE: {
-            Number const frequency_value = frequency.get_value();
-            Number const detune_value = detune.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    frequency_value,
-                    detune_value,
-                    (Number)fine_detune_buffer[i]
-                );
-            }
-
-            break;
-        }
-
-        case FINE_DETUNE: {
-            Number const fine_detune_value = fine_detune.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    (Number)frequency_buffer[i],
-                    (Number)detune_buffer[i],
-                    fine_detune_value
-                );
-            }
-
-            break;
-        }
-
-        case FREQUENCY | FINE_DETUNE: {
-            Number const frequency_value = frequency.get_value();
-            Number const fine_detune_value = fine_detune.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    frequency_value,
-                    (Number)detune_buffer[i],
-                    fine_detune_value
-                );
-            }
-
-            break;
-        }
-
-        case DETUNE | FINE_DETUNE: {
-            Number const detune_value = detune.get_value();
-            Number const fine_detune_value = fine_detune.get_value();
-
-            computed_frequency_is_constant = false;
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                computed_frequency_buffer[i] = compute_frequency(
-                    (Number)frequency_buffer[i],
-                    detune_value,
-                    fine_detune_value
-                );
-            }
-
-            break;
-        }
-
-        default:
-        case ALL: {
+    if constexpr (is_lfo) {
+        if (frequency_buffer == NULL) {
             Number const frequency_value = frequency.get_value();
             Number const detune_value = detune.get_value();
             Number const fine_detune_value = fine_detune.get_value();
@@ -861,8 +729,160 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             computed_frequency_value = compute_frequency(
                 frequency_value, detune_value, fine_detune_value
             );
+        } else {
+            Number const detune_value = detune.get_value();
+            Number const fine_detune_value = fine_detune.get_value();
 
-            break;
+            computed_frequency_is_constant = false;
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                computed_frequency_buffer[i] = compute_frequency(
+                    (Number)frequency_buffer[i],
+                    detune_value,
+                    fine_detune_value
+                );
+            }
+        }
+    } else {
+        constexpr Byte NONE = 0;
+        constexpr Byte FREQUENCY = 1;
+        constexpr Byte DETUNE = 2;
+        constexpr Byte FINE_DETUNE = 4;
+        constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
+
+        Byte const const_param_flags = (
+            (frequency_buffer == NULL ? FREQUENCY : NONE)
+            | (detune_buffer == NULL ? DETUNE : NONE)
+            | (fine_detune_buffer == NULL ? FINE_DETUNE : NONE)
+        );
+
+        switch (const_param_flags) {
+            case NONE: {
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        (Number)frequency_buffer[i],
+                        (Number)detune_buffer[i],
+                        (Number)fine_detune_buffer[i]
+                    );
+                }
+
+                break;
+            }
+
+            case FREQUENCY: {
+                Number const frequency_value = frequency.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        frequency_value,
+                        (Number)detune_buffer[i],
+                        (Number)fine_detune_buffer[i]
+                    );
+                }
+
+                break;
+            }
+
+            case DETUNE: {
+                Number const detune_value = detune.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        (Number)frequency_buffer[i],
+                        detune_value,
+                        (Number)fine_detune_buffer[i]
+                    );
+                }
+
+                break;
+            }
+
+            case FREQUENCY | DETUNE: {
+                Number const frequency_value = frequency.get_value();
+                Number const detune_value = detune.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        frequency_value,
+                        detune_value,
+                        (Number)fine_detune_buffer[i]
+                    );
+                }
+
+                break;
+            }
+
+            case FINE_DETUNE: {
+                Number const fine_detune_value = fine_detune.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        (Number)frequency_buffer[i],
+                        (Number)detune_buffer[i],
+                        fine_detune_value
+                    );
+                }
+
+                break;
+            }
+
+            case FREQUENCY | FINE_DETUNE: {
+                Number const frequency_value = frequency.get_value();
+                Number const fine_detune_value = fine_detune.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        frequency_value,
+                        (Number)detune_buffer[i],
+                        fine_detune_value
+                    );
+                }
+
+                break;
+            }
+
+            case DETUNE | FINE_DETUNE: {
+                Number const detune_value = detune.get_value();
+                Number const fine_detune_value = fine_detune.get_value();
+
+                computed_frequency_is_constant = false;
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    computed_frequency_buffer[i] = compute_frequency(
+                        (Number)frequency_buffer[i],
+                        detune_value,
+                        fine_detune_value
+                    );
+                }
+
+                break;
+            }
+
+            default:
+            case ALL: {
+                Number const frequency_value = frequency.get_value();
+                Number const detune_value = detune.get_value();
+                Number const fine_detune_value = fine_detune.get_value();
+
+                computed_frequency_is_constant = true;
+                computed_frequency_value = compute_frequency(
+                    frequency_value, detune_value, fine_detune_value
+                );
+
+                break;
+            }
         }
     }
 }
