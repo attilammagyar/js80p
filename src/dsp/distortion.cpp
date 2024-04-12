@@ -66,26 +66,26 @@ void Tables::initialize_tables(Type const type, Number const steepness) noexcept
 void Tables::initialize_delay_feedback_tables() noexcept
 {
     /*
-    A tanh(steepness * x) distortion does not play nice with feedback: if the
-    steepness is low, then it doesn't have a chance to add noticable distortion
-    before the signal decays, but greater steepness values which produce any
-    significant distortion prevent lower signals from ringing down completely,
-    since
+    A tanh(steepness * x) distortion does not play nice with delay feedback: if
+    the steepness is low, then it doesn't have a chance to add noticable
+    distortion before the signal decays, but greater steepness values (which
+    produce any significant distortion) prevent lower signals from ringing down
+    completely, since
 
         d/dx tanh(steepness * x) = steepness * sech(steepness * x)^2
 
-    which is equal to the steepness parameter at x = 0. This, and the
+    which is equal to the steepness parameter itself at x = 0. This, and the
     interpolation and floating point errors, and the error of the numerical
-    differentiation in the ADAA algorithm, are enough to boost signal levels
-    near zero back to a level where the gain reduction on the delay feedback
-    path is undone (for any sensible level of reduction).
+    differentiation in the ADAA wave shaping algorithm, are enough to boost
+    signal levels near zero back to a level where the gain reduction on the
+    delay feedback path is undone for any sensible level of reduction.
 
-    To prevent this, we need a shaping function which stays below the y = x
-    line so that the distortion will never be able to undo the gain reduction,
-    but still manages to achieve noticable distortion. In other words, repeated
-    applications of the shaping function must not converge to any fixed points
-    other than 0, at least not on the interval that is used by the Distortion
-    class.
+    To prevent this, we need a soft clipping function which stays below the
+    y = x line so that the distortion will never be able to win over the gain
+    reduction, but still manages to achieve noticable saturation. In other
+    words, repeated applications of the shaping function must not converge to
+    any other fixed points than 0 (at least, not on the interval that is used by
+    the Distortion class).
 
     The shaping function must also satisfy the assumptions of the Distortion
     class:
@@ -108,7 +108,7 @@ void Tables::initialize_delay_feedback_tables() noexcept
 
         h : [0, gamma] --> [0, 1]
         f : [gamma, 1] --> [0, 1]
-        g : [1, 3] --> [0, 1]o
+        g : [1, 3] --> [0, 1]
 
 
                 { g(x)  if x >= 1
@@ -123,8 +123,8 @@ void Tables::initialize_delay_feedback_tables() noexcept
     for f, g, and h respectively.
 
     The purpose of the h function is to make the shaper function linear for
-    quiet signals so they tail of the feedback delay will decay into silence
-    without any more distortion. For some beta parameter in (0, 1]:
+    quiet signals, so the tail of the feedback delay will decay into silence
+    without any additional distortion. For some beta parameter in (0, 1]:
 
         h(x) := beta * x
         H(x) := (1/2) * beta * x^2 + ch
