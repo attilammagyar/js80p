@@ -18,7 +18,7 @@ v?.?.? (2024-0?-??)
  * Various performance and RAM usage improvements.
  * The source distribution can now be compiled for RISC-V 64 systems thanks to
    @aimixsaka.
- * New preset: Analog Brass.
+ * New presets: Analog Brass, Bouncy.
  * FST: hosts which support VSTXML files can now show full length parameter
    names instead of abbreviations.
  * Bugfix: some MIDI devices send Note Off messages as Note On messages with 0

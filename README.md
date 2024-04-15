@@ -80,6 +80,7 @@ Table of Contents
     * [Gloomy Brass Raindrops](#preset-gloomy-brass-raindrops)
     * [Sawyer](#preset-sawyer)
     * [Analog Brass](#preset-analog-brass)
+    * [Bouncy](#preset-bouncy)
  * [Bugs](#bugs)
  * [Signal Chain (Simplified)](#signal)
  * [Features](#features)
@@ -608,6 +609,13 @@ Distortion knob of Macro 12 and 13.)
 Turn the mod wheel down and play with low velocity for a soft, smooth, warm,
 and fat analog brass sound. Turn it up and play fortissimo for big bright
 swells. Aftertouch adds a slow vibrato.
+
+<a id="preset-bouncy"></a>
+
+### Bouncy
+
+The sound of a ping-pong ball dropping on a glockenspiel, showcasing a use of
+LFO amount envelopes.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 

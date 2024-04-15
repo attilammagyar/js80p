@@ -35,7 +35,7 @@
 namespace JS80P
 {
 
-size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = 36;
+size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = 37;
 
 Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
@@ -4211,6 +4211,71 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "N3RSH = 0.583333333333333\n"
             "N4RSH = 0.583333333333333\n"
             "N5RSH = 0.583333333333333\n"
+        )
+    ),
+
+    Program(
+        "Bouncy",
+        "Prog037",
+        (
+            "[js80p]\n"
+            "MAMPctl = 0.589843750\n"
+            "MVOLctl = 0.550781250\n"
+            "MC1 = 0.750\n"
+            "MC2 = 0.650\n"
+            "MC3 = 0.5450\n"
+            "MC4 = 0.5250\n"
+            "MC8 = 0.5050\n"
+            "MC9 = 0.510\n"
+            "MC10 = 0.5150\n"
+            "CVOL = 0.0\n"
+            "EEFB = 0.500750750750751\n"
+            "EEWID = 0.250\n"
+            "EEHPF = 0.297024501446689\n"
+            "EEWET = 0.20\n"
+            "EEDRY = 0.80\n"
+            "ERRS = 0.805750750750752\n"
+            "ERWID = 0.750\n"
+            "ERHPF = 0.297024501446689\n"
+            "ERWET = 0.10\n"
+            "ERDRY = 0.90\n"
+            "N1INI = 1.0\n"
+            "N1ATK = 0.0\n"
+            "N1HLD = 0.0\n"
+            "N1DEC = 0.0\n"
+            "N1SUS = 1.0\n"
+            "N1REL = 0.501666666666667\n"
+            "N1FIN = 1.0\n"
+            "N2ATK = 0.835000000000001\n"
+            "N2HLD = 0.0\n"
+            "N2DEC = 0.0\n"
+            "N2SUS = 1.0\n"
+            "N2REL = 0.501666666666667\n"
+            "N2FIN = 1.0\n"
+            "N3ATK = 0.00080\n"
+            "N3HLD = 0.0750\n"
+            "N3DEC = 0.396666666666666\n"
+            "N3SUS = 0.0\n"
+            "N3REL = 0.501666666666667\n"
+            "L1FRQctl = 0.55468750\n"
+            "L1PHS = 0.50\n"
+            "L1MAX = 0.60\n"
+            "L2FRQ = 0.0\n"
+            "L2PHS = 0.250\n"
+            "L2MIN = 0.050\n"
+            "L2MAX = 0.50\n"
+            "MWAV = 1.0\n"
+            "L1WAV = 0.3750\n"
+            "N6DYN = 1.0\n"
+            "ERTYP = 0.222222222222222\n"
+            "MTUN = 1.0\n"
+            "CTUN = 1.0\n"
+            "L1AEN = 0.0\n"
+            "L2AEN = 0.083333333333333\n"
+            "N2ASH = 0.0\n"
+            "N3ASH = 0.666666666666667\n"
+            "N3DSH = 0.50\n"
+            "N3RSH = 0.583333333333333\n"
         )
     ),
 
