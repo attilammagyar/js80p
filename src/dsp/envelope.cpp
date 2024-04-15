@@ -44,7 +44,8 @@ EnvelopeSnapshot::EnvelopeSnapshot() noexcept
     change_index(-1),
     attack_shape(Envelope::SHAPE_LINEAR),
     decay_shape(Envelope::SHAPE_LINEAR),
-    release_shape(Envelope::SHAPE_LINEAR)
+    release_shape(Envelope::SHAPE_LINEAR),
+    envelope_index(Constants::INVALID_ENVELOPE_INDEX)
 {
 }
 
@@ -787,6 +788,7 @@ bool Envelope::update_change_index(ParamType const& param, Integer& change_index
 
 void Envelope::make_snapshot(
         EnvelopeRandoms const& randoms,
+        Byte const envelope_index,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
     snapshot.change_index = get_change_index();
@@ -819,10 +821,6 @@ void Envelope::make_snapshot(
         snapshot.release_time = release_time.get_value();
     }
 
-    snapshot.attack_shape = attack_shape.get_value();
-    snapshot.decay_shape = decay_shape.get_value();
-    snapshot.release_shape = release_shape.get_value();
-
     if (tempo_sync.get_value() == ToggleParam::ON) {
         snapshot.delay_time *= tempo_sync_time_scale;
         snapshot.attack_time *= tempo_sync_time_scale;
@@ -830,11 +828,18 @@ void Envelope::make_snapshot(
         snapshot.decay_time *= tempo_sync_time_scale;
         snapshot.release_time *= tempo_sync_time_scale;
     }
+
+    snapshot.attack_shape = attack_shape.get_value();
+    snapshot.decay_shape = decay_shape.get_value();
+    snapshot.release_shape = release_shape.get_value();
+
+    snapshot.envelope_index = envelope_index;
 }
 
 
 void Envelope::make_end_snapshot(
         EnvelopeRandoms const& randoms,
+        Byte const envelope_index,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
     snapshot.change_index = get_change_index();
@@ -856,6 +861,8 @@ void Envelope::make_end_snapshot(
     }
 
     snapshot.release_shape = release_shape.get_value();
+
+    snapshot.envelope_index = envelope_index;
 }
 
 

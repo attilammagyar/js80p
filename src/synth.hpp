@@ -41,6 +41,7 @@
 #include "dsp/filter.hpp"
 #include "dsp/gain.hpp"
 #include "dsp/lfo.hpp"
+#include "dsp/lfo_envelope_list.hpp"
 #include "dsp/macro.hpp"
 #include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"

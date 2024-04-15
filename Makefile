@@ -174,6 +174,7 @@ VSTXMLGEN_OBJS = \
 PARAM_COMPONENTS = \
 	dsp/envelope \
 	dsp/lfo \
+	dsp/lfo_envelope_list \
 	dsp/macro \
 	dsp/math \
 	dsp/midi_controller \
@@ -212,6 +213,7 @@ TESTS_BASIC = \
 TESTS_PARAM = \
 	test_envelope \
 	test_lfo \
+	test_lfo_envelope_list \
 	test_macro \
 	test_midi_controller \
 	test_oscillator \
@@ -719,6 +721,15 @@ $(DEV_DIR)/test_lfo$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) \
 		$(TEST_BASIC_BINS)
+	$(COMPILE_DEV) -o $@ $<
+	$(RUN_WITH_VALGRIND) $@
+
+$(DEV_DIR)/test_lfo_envelope_list$(DEV_EXE): \
+		tests/test_lfo_envelope_list.cpp \
+		src/dsp/lfo_envelope_list.cpp src/dsp/lfo_envelope_list.hpp \
+		src/js80p.hpp \
+		$(TEST_LIBS) \
+		| $(DEV_DIR)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 

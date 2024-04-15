@@ -784,9 +784,13 @@ adjustment.
 Similarly, if you assign an LFO to a parameter which supports Envelopes, and
 the LFO is associated with an Envelope, then the LFO becomes polyphonic, and
 its amount will be controlled by the Envelope for each polyphonic voice
-independently from the other voices. (Note that this is not transitive: if a
-parameter of a polyphonic LFO is controlled by another LFO, then the second LFO
-will not become polyphonic, even if it has an Envelope assigned to it.)
+independently from the other voices. (Note that this is transitive up to a
+limit: if a parameter of a polyphonic LFO is controlled by another LFO, then
+the second LFO will also become polyphonic if it has an Envelope assigned to
+it. An LFO chain like this can contain up to 6 LFOs and Envelopes, and if a
+chain contains more than that, or has dependency cycles where LFOs control
+each other's parameters, then some of the LFOs in the chain will be treated as
+if there weren't any Envelopes assigned to them.)
 
 To have polyphonic notes *sample and hold* a MIDI value or a Macro's momentary
 value for a parameter for the entire duration of the note, independently of

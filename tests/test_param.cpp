@@ -26,6 +26,7 @@
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/lfo_envelope_list.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -2095,7 +2096,7 @@ TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo,
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo("lfo");
+    LFO lfo("lfo", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;
@@ -2172,7 +2173,7 @@ TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo("lfo");
+    LFO lfo("lfo", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;
@@ -2257,7 +2258,7 @@ TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_duri
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo("lfo");
+    LFO lfo("lfo", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;
@@ -2345,8 +2346,8 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo_1("lfo_1");
-    LFO lfo_2("lfo_2");
+    LFO lfo_1("lfo_1", true);
+    LFO lfo_2("lfo_2", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;
@@ -2416,27 +2417,7 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
 })
 
 
-TEST(when_lfos_with_envelopes_are_chained_then_only_the_first_one_is_rendered_with_envelope, {
-    /*
-    It would be nice to transitively render the LFO-s that have amount
-    envelopes with respect to the envelopes, but consider a setup like this:
-
-      LFO 1: amount_envelope: Envelope 1, min: LFO 2, max: LFO 3
-      LFO 2: amount_envelope: Envelope 2, max: LFO 3
-      LFO 3: amount_envelope: Envelope 3, min: LFO 2
-
-    Rendering:
-
-      1. LFO 1 renders LFO 2 with envelope
-        2. LFO 2 renders LFO 3 with envelope
-          3. LFO 3 renders LFO 2 globally (break up the dependency cycle)
-      4. LFO 1 renders LFO 3 with envelope
-        5. LFO 3 renders LFO 2 with envelope
-
-    Step 3 and 5 would require 2 separate wavetable states to be maintained for
-    LFO 3, in each envelope-capable parameter's state. The more complicated such
-    a dependency cycle becomes, the more wavetable states would be required.
-    */
+TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope_1("E1");
@@ -2445,26 +2426,33 @@ TEST(when_lfos_with_envelopes_are_chained_then_only_the_first_one_is_rendered_wi
         &envelope_1, &envelope_2, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo_1("lfo1");
-    LFO lfo_2("lfo2");
+    LFO lfo_1("lfo1", true);
+    LFO lfo_2("lfo2", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;
 
-    /* 10 * Envelope-1 sample * LFO-1 sample * LFO-2 sample */
+    /* 10 * Envelope-1 sample * LFO-1 sample * Envelope-2 sample * LFO-2 sample */
     Sample expected_samples[block_size - 2] = {
         /* the param's own LFO-envelope timeline starts at 1.0s */
-        10.0 * 0.1 * 0.5 * 0.0, 10.0 * 0.1 * 1.0 * 0.5,     /* 1.0s -  2.0s delay    */
-        10.0 * 0.1 * 0.5 * 1.0, 10.0 * 0.4 * 0.0 * 0.5,     /* 2.0s -  3.5s attack   */
-        10.0 * 0.7 * 0.5 * 0.0,
-        10.0 * 1.0 * 1.0 * 0.5,                             /* 3.5s -  4.0s hold     */
-        10.0 * 1.0 * 0.5 * 1.0, 10.0 * 0.9 * 0.0 * 0.5,     /* 4.0s -  5.5s decay    */
-        10.0 * 0.8 * 0.5 * 0.0,
-        10.0 * 0.7 * 1.0 * 0.5, 10.0 * 0.7 * 0.5 * 1.0,     /* 5.5s -  7.0s sustain  */
-        10.0 * 0.7 * 0.0 * 0.5,
-        10.0 * 0.7 * 0.5 * 0.0, 10.0 * 0.6 * 1.0 * 0.5,     /* 7.0s         update   */
-        10.0 * 0.6 * 0.5 * 1.0, 10.0 * 0.5 * 0.0 * 0.5,     /* 8.0s - 10.0s release  */
-        10.0 * 0.4 * 0.5 * 0.0, 10.0 * 0.2 * 1.0 * 0.5,     /* 9.0s         cancel   */
+        10.00 * 0.10 * 0.50 * 0.05 * 1.00,
+        10.00 * 0.10 * 1.00 * 0.05 * 0.50,      /* 1.0s -  2.0s delay    */
+        10.00 * 0.10 * 0.50 * 0.05 * 0.00,
+        10.00 * 0.40 * 0.00 * 0.20 * 0.50,      /* 2.0s -  3.5s attack   */
+        10.00 * 0.70 * 0.50 * 0.35 * 1.00,
+        10.00 * 1.00 * 1.00 * 0.50 * 0.50,      /* 3.5s -  4.0s hold     */
+        10.00 * 1.00 * 0.50 * 0.50 * 0.00,
+        10.00 * 0.90 * 0.00 * 0.45 * 0.50,      /* 4.0s -  5.5s decay    */
+        10.00 * 0.80 * 0.50 * 0.40 * 1.00,
+        10.00 * 0.70 * 1.00 * 0.35 * 0.50,
+        10.00 * 0.70 * 0.50 * 0.35 * 0.00,      /* 5.5s -  7.0s sustain  */
+        10.00 * 0.70 * 0.00 * 0.35 * 0.50,
+        10.00 * 0.70 * 0.50 * 0.35 * 1.00,
+        10.00 * 0.60 * 1.00 * 0.30 * 0.50,      /* 7.0s         update   */
+        10.00 * 0.60 * 0.50 * 0.30 * 0.00,
+        10.00 * 0.50 * 0.00 * 0.25 * 0.50,      /* 8.0s - 10.0s release  */
+        10.00 * 0.40 * 0.50 * 0.20 * 1.00,
+        10.00 * 0.20 * 1.00 * 0.10 * 0.50,      /* 9.0s         cancel   */
     };
 
     lfo_1.set_block_size(block_size);
@@ -2502,15 +2490,21 @@ TEST(when_lfos_with_envelopes_are_chained_then_only_the_first_one_is_rendered_wi
     envelope_1.release_time.set_value(2.0);
     envelope_1.final_value.set_value(0.2);
 
-    envelope_2.amount.set_value(0.1);
-    envelope_2.initial_value.set_value(1.0);
+    envelope_2.amount.set_value(0.5);
+    envelope_2.initial_value.set_value(0.1);
+    envelope_2.delay_time.set_value(1.0);
+    envelope_2.attack_time.set_value(1.5);
     envelope_2.peak_value.set_value(1.0);
-    envelope_2.sustain_value.set_value(1.0);
-    envelope_2.final_value.set_value(1.0);
+    envelope_2.hold_time.set_value(0.5);
+    envelope_2.decay_time.set_value(1.5);
+    envelope_2.sustain_value.set_value(0.7);
+    envelope_2.release_time.set_value(2.0);
+    envelope_2.final_value.set_value(0.2);
 
     follower.start_envelope(1.0, 0.0, 0.0);
 
     envelope_1.sustain_value.set_value(0.6);
+    envelope_2.sustain_value.set_value(0.6);
     follower.update_envelope(7.0);
 
     follower.end_envelope(8.0);
@@ -2523,7 +2517,7 @@ TEST(when_lfos_with_envelopes_are_chained_then_only_the_first_one_is_rendered_wi
     assert_false(std::isnan(rendered_samples[0]));
     assert_false(std::isnan(rendered_samples[1]));
     assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
-    assert_eq(1.0, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(0.1, follower.get_value(), DOUBLE_DELTA);
 })
 
 
@@ -2535,7 +2529,7 @@ TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    LFO lfo("lfo");
+    LFO lfo("lfo", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
     Sample const* rendered_samples;

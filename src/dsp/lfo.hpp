@@ -24,6 +24,7 @@
 #include "js80p.hpp"
 
 #include "dsp/envelope.hpp"
+#include "dsp/lfo_envelope_list.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
@@ -48,7 +49,10 @@ class LFO : public SignalProducer
 
         typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
 
-        explicit LFO(std::string const& name) noexcept;
+        explicit LFO(
+            std::string const& name,
+            bool const can_have_envelope = false
+        ) noexcept;
 
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro
@@ -61,18 +65,20 @@ class LFO : public SignalProducer
             Number const phase_offset
         ) noexcept;
 
+        virtual ~LFO();
+
+        virtual void set_block_size(Integer const new_block_size) noexcept override;
+
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
         bool is_on() const noexcept;
 
         bool has_envelope() const noexcept;
 
+        void collect_envelopes(LFOEnvelopeList& envelope_list) noexcept;
+
         void produce_with_envelope(
-            Seconds& envelope_time,
-            Sample& envelope_value,
-            EnvelopeStage& envelope_stage,
-            EnvelopeSnapshot const& envelope_snapshot,
-            WavetableState& wavetable_state,
+            LFOEnvelopeStates& lfo_envelope_states,
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
@@ -109,49 +115,238 @@ class LFO : public SignalProducer
         ) noexcept;
 
     private:
+        class Visitor
+        {
+            public:
+                bool should_visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) const noexcept;
+
+                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+
+                void visit_lfo_as_global(LFO& lfo) noexcept;
+
+                void visit_amount_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& amount
+                ) noexcept;
+
+                void visit_frequency_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& frequency
+                ) noexcept;
+
+                void visit_phase_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& phase
+                ) noexcept;
+
+                void visit_oscillator(
+                    LFO& lfo,
+                    Byte const depth,
+                    Oscillator_& oscillator
+                ) noexcept;
+
+                void visit_distortion_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& distortion
+                ) noexcept;
+
+                void visit_randomness_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& randomness
+                ) noexcept;
+
+                void visit_min_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& min
+                ) noexcept;
+
+                void visit_max_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& max
+                ) noexcept;
+        };
+
+        class EnvelopeCollector : public Visitor
+        {
+            public:
+                EnvelopeCollector(LFOEnvelopeList& envelope_list) noexcept;
+
+                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+
+            private:
+                LFOEnvelopeList* envelope_list;
+        };
+
+        class LFOWithEnvelopeRenderer : public Visitor
+        {
+            public:
+                LFOWithEnvelopeRenderer(
+                    LFOEnvelopeStates& lfo_envelope_states,
+                    Integer const round,
+                    Integer const sample_count,
+                    Integer const first_sample_index,
+                    Integer const last_sample_index,
+                    Sample* buffer
+                ) noexcept;
+
+                bool should_visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) const noexcept;
+
+                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+
+                void visit_lfo_as_global(LFO& lfo) noexcept;
+
+                void visit_amount_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& amount
+                ) noexcept;
+
+                void visit_frequency_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& frequency
+                ) noexcept;
+
+                void visit_phase_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& phase
+                ) noexcept;
+
+                void visit_oscillator(
+                    LFO& lfo,
+                    Byte const depth,
+                    Oscillator_& oscillator
+                ) noexcept;
+
+                void visit_distortion_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& distortion
+                ) noexcept;
+
+                void visit_randomness_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& randomness
+                ) noexcept;
+
+                void visit_min_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& min
+                ) noexcept;
+
+                void visit_max_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS& max
+                ) noexcept;
+
+            private:
+                LFOEnvelopeStates& lfo_envelope_states;
+                Sample* const buffer;
+                Sample const* param_buffer_1;
+                Sample const* param_buffer_2;
+                Sample const* param_buffer_3;
+                Integer const round;
+                Integer const sample_count;
+                Integer const first_sample_index;
+                Integer const last_sample_index;
+        };
+
         static constexpr Number ALMOST_ZERO = 0.000001;
 
         void initialize_instance() noexcept;
 
         void apply_distortions(
+            Sample const* const distortion_buffer,
+            Sample const* const randomness_buffer,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* source_buffer,
-            Sample* target_buffer
+            Sample const* const source_buffer,
+            Sample* const target_buffer
         );
 
         void apply_range(
+            Sample const* const min_buffer,
+            Sample const* const max_buffer,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* source_buffer,
-            Sample* target_buffer
+            Sample const* const source_buffer,
+            Sample* const target_buffer
         );
 
         void apply_distortions_centered(
+            Sample const* const distortion_buffer,
+            Sample const* const randomness_buffer,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* source_buffer,
-            Sample* target_buffer
+            Sample const* const source_buffer,
+            Sample* const target_buffer
         );
 
         void apply_range_centered(
+            Sample const* const min_buffer,
+            Sample const* const max_buffer,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample const* source_buffer,
-            Sample* target_buffer
+            Sample const* const source_buffer,
+            Sample* const target_buffer
         );
 
+        template<class VisitorClass>
+        void traverse_lfo_graph(
+            LFO& lfo,
+            Byte& depth,
+            VisitorClass& visitor
+        ) noexcept;
+
+        template<class VisitorClass>
+        bool should_visit_lfo_as_polyphonic(
+            LFO const& lfo,
+            Byte const depth,
+            VisitorClass const& visitor
+        ) noexcept;
+
+        template<class VisitorClass>
+        void visit_param_lfo(
+            LFO* lfo,
+            Byte& depth,
+            VisitorClass& visitor
+        ) noexcept;
+
+        bool const can_have_envelope;
+
         Oscillator_ oscillator;
+
+        Sample* env_buffer_1;
+        Sample* env_buffer_2;
 
         Sample const* min_buffer;
         Sample const* max_buffer;
         Sample const* distortion_buffer;
         Sample const* randomness_buffer;
         Sample const* const* oscillator_buffer;
+
+        bool is_being_visited;
 };
 
 }

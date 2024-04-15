@@ -130,11 +130,13 @@ class Envelope
 
         void make_snapshot(
             EnvelopeRandoms const& randoms,
+            Byte const envelope_index,
             EnvelopeSnapshot& snapshot
         ) const noexcept;
 
         void make_end_snapshot(
             EnvelopeRandoms const& randoms,
+            Byte const envelope_index,
             EnvelopeSnapshot& snapshot
         ) const noexcept;
 

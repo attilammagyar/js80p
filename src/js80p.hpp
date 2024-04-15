@@ -75,6 +75,7 @@ namespace Constants {
     constexpr int PLUGIN_VERSION_INT = JS80P_VERSION_INT;
 
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
+    constexpr Byte PARAM_LFO_ENVELOPE_STATES = 6;
 
     constexpr Byte ENVELOPES = 12;
     constexpr Byte ENVELOPE_INDEX_MASK = 0x0f;

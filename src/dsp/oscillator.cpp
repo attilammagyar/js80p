@@ -521,23 +521,12 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::produce_for_lfo_with_enve
         Integer const sample_count,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* const buffer
+        Sample* const buffer,
+        Sample const* const amplitude_buffer,
+        Sample const* const frequency_buffer,
+        Sample const* const phase_buffer
 ) noexcept {
     wavetable = wavetables[waveform.get_value()];
-
-    Sample const* const amplitude_buffer = (
-        FloatParamS::produce_if_not_constant(amplitude, round, sample_count)
-    );
-    Sample const* const frequency_buffer = (
-        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
-            frequency, round, sample_count
-        )
-    );
-    Sample const* const phase_buffer = (
-        FloatParamS::produce_if_not_constant<ModulatedFloatParam>(
-            phase, round, sample_count
-        )
-    );
 
     compute_amplitude_buffer(
         amplitude_buffer, round, sample_count, first_sample_index, last_sample_index

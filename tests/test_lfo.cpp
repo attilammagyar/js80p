@@ -26,6 +26,7 @@
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/lfo_envelope_list.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -287,10 +288,11 @@ TEST(distortion_and_randomness_respect_min_and_max_values, {
 })
 
 
-TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_loop_between_lfos, {
+TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_dependency_cycle_between_lfos, {
     LFO lfo_1("L1");
     LFO lfo_2("L2");
     LFO lfo_3("L3");
+    LFOEnvelopeList envelope_list;
 
     lfo_1.randomness.set_lfo(&lfo_2);
     lfo_2.randomness.set_lfo(&lfo_3);
@@ -300,9 +302,20 @@ TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_loop_between_lfos, {
     assert_false(lfo_2.has_envelope());
     assert_false(lfo_3.has_envelope());
 
-    lfo_2.amount_envelope.set_value(0);
+    lfo_1.amount_envelope.set_value(3);
+    lfo_2.amount_envelope.set_value(5);
+    lfo_3.amount_envelope.set_value(9);
 
-    assert_false(lfo_1.has_envelope());
+    assert_true(lfo_1.has_envelope());
     assert_true(lfo_2.has_envelope());
-    assert_false(lfo_3.has_envelope());
+    assert_true(lfo_3.has_envelope());
+
+    lfo_1.collect_envelopes(envelope_list);
+
+    assert_eq(3, envelope_list[0]);
+    assert_eq(5, envelope_list[1]);
+    assert_eq(9, envelope_list[2]);
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, envelope_list[3]);
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, envelope_list[4]);
+    assert_eq(Constants::INVALID_ENVELOPE_INDEX, envelope_list[5]);
 })

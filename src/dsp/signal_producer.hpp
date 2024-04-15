@@ -52,7 +52,8 @@ class SignalProducer
                     Integer const int_param = 0,
                     Number const number_param_1 = 0.0,
                     Number const number_param_2 = 0.0,
-                    Byte const byte_param = 0
+                    Byte const byte_param_1 = 0,
+                    Byte const byte_param_2 = 0
                 ) noexcept;
 
                 Event& operator=(Event const& event) noexcept = default;
@@ -62,7 +63,8 @@ class SignalProducer
                 Integer int_param;
                 Number number_param_1;
                 Number number_param_2;
-                Byte byte_param;
+                Byte byte_param_1;
+                Byte byte_param_2;
                 Type type;
         };
 
@@ -170,7 +172,8 @@ class SignalProducer
             Integer const int_param = 0,
             Number const number_param_1 = 0.0,
             Number const number_param_2 = 0.0,
-            Byte const byte_param = 0
+            Byte const byte_param_1 = 0,
+            Byte const byte_param_2 = 0
         ) noexcept;
 
         void cancel_events() noexcept;

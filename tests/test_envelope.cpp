@@ -28,6 +28,7 @@
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/lfo_envelope_list.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -135,20 +136,22 @@ void test_tempo_synced_snapshot_creation(
     envelope.time_inaccuracy.set_value(time_inaccuracy);
 
     envelope.update();
-    envelope.make_snapshot(randoms, snapshot);
+    envelope.make_snapshot(randoms, 1, snapshot);
 
     assert_eq(snapshot.delay_time, 1.0 * time_scale, DOUBLE_DELTA);
     assert_eq(snapshot.attack_time, 2.0 * time_scale, DOUBLE_DELTA);
     assert_eq(snapshot.hold_time, 3.0 * time_scale, DOUBLE_DELTA);
     assert_eq(snapshot.decay_time, 4.0 * time_scale, DOUBLE_DELTA);
     assert_eq(snapshot.release_time, 5.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(1, snapshot.envelope_index);
 
     envelope.release_time.set_value(6.0);
     envelope.update();
 
-    envelope.make_end_snapshot(randoms, snapshot);
+    envelope.make_end_snapshot(randoms, 2, snapshot);
 
     assert_eq(snapshot.release_time, 6.0 * time_scale, DOUBLE_DELTA);
+    assert_eq(2, snapshot.envelope_index);
 }
 
 
@@ -233,7 +236,7 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     envelope.value_inaccuracy.set_value(value_inaccuracy);
 
     envelope.update();
-    envelope.make_snapshot(randoms, snapshot);
+    envelope.make_snapshot(randoms, 0, snapshot);
 
     assert_eq(value_scale * initial_value, snapshot.initial_value, DOUBLE_DELTA);
     assert_eq(value_scale * peak_value, snapshot.peak_value, DOUBLE_DELTA);
@@ -860,7 +863,7 @@ void test_envelope_shape(
     envelope.attack_time.set_value((sample_rate - 1.0) / sample_rate);
     envelope.hold_time.set_value(1.0);
 
-    envelope.make_snapshot(randoms, snapshot);
+    envelope.make_snapshot(randoms, 0, snapshot);
 
     Envelope::render<Envelope::RenderingMode::OVERWRITE>(
         snapshot,

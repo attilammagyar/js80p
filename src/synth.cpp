@@ -40,6 +40,7 @@
 #include "dsp/filter.cpp"
 #include "dsp/gain.cpp"
 #include "dsp/lfo.cpp"
+#include "dsp/lfo_envelope_list.cpp"
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
@@ -700,7 +701,7 @@ void Synth::create_lfos() noexcept
     Integer next_id = ParamId::L1FRQ;
 
     for (Byte i = 0; i != Constants::LFOS; ++i) {
-        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)));
+        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), true);
         lfos_rw[i] = lfo;
 
         register_child(*lfo);

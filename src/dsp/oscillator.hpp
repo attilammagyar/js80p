@@ -171,7 +171,10 @@ class Oscillator : public SignalProducer
             Integer const sample_count,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* const buffer
+            Sample* const buffer,
+            Sample const* const amplitude_buffer,
+            Sample const* const frequency_buffer,
+            Sample const* const phase_buffer
         ) noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
