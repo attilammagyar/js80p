@@ -673,6 +673,12 @@ TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     test_filter(filter_clone_2, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
     test_filter(filter_unique, input, expected_unique, 0.12, 1, BLOCK_SIZE);
+
+    delete[] shared_buffers.b0_buffer;
+    delete[] shared_buffers.b1_buffer;
+    delete[] shared_buffers.b2_buffer;
+    delete[] shared_buffers.a1_buffer;
+    delete[] shared_buffers.a2_buffer;
 })
 
 
@@ -877,6 +883,12 @@ TEST(silent_input_fast_path_keeps_continuity, {
     test_fast_path_continuity(
         block_size, block_size, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
     );
+
+    delete[] shared_buffers.b0_buffer;
+    delete[] shared_buffers.b1_buffer;
+    delete[] shared_buffers.b2_buffer;
+    delete[] shared_buffers.a1_buffer;
+    delete[] shared_buffers.a2_buffer;
 })
 
 

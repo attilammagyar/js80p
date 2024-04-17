@@ -46,7 +46,7 @@ CPPCHECK_FLAGS = \
 	-I./src \
 	-I./tests
 
-VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --quiet
+VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --leak-check=yes --quiet
 
 doc/pm-fm-equivalence.pdf: $(DEV_DIR)/pm-fm-equivalence.pdf
 	$(COPY) $< $@

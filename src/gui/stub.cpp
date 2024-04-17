@@ -18,6 +18,9 @@
 #ifndef JS80P__GUI_STUB_CPP
 #define JS80P__GUI_STUB_CPP
 
+#include <cstddef>
+#include <string>
+
 #include "js80p.hpp"
 #include "synth.hpp"
 
@@ -98,6 +101,20 @@ class Widget : public WidgetBase
     private:
         class DummyObject
         {
+            public:
+                DummyObject() {
+                    constexpr size_t size = 1024 * 1024;
+                    constexpr size_t size_half = size / 2;
+
+                    data.reserve(size);
+                    data = "Dummy GUI object";
+
+                    while (data.length() < size_half) {
+                        data += data;
+                    }
+                }
+
+                std::string data;
         };
 };
 
