@@ -44,10 +44,8 @@ constexpr int VOICE_TUNINGS = 4;
 typedef Frequency FrequencyTable[VOICE_TUNINGS - 2][Midi::NOTES];
 typedef Frequency PerChannelFrequencyTable[Midi::CHANNELS][Midi::NOTES];
 
-typedef Byte OscillatorInaccuracyLevel;
 
-
-class OscillatorInaccuracyParam : public Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>
+class OscillatorInaccuracyParam : public ByteParam
 {
     public:
         explicit OscillatorInaccuracyParam(std::string const& name) noexcept;
@@ -132,9 +130,7 @@ class Voice : public SignalProducer
 
         typedef VolumeApplier ModulationOut;
 
-        typedef Byte Tuning;
-
-        class TuningParam : public Param<Tuning, ParamEvaluation::BLOCK>
+        class TuningParam : public ByteParam
         {
             public:
                 explicit TuningParam(std::string const& name) noexcept;
@@ -249,10 +245,10 @@ class Voice : public SignalProducer
 
         static constexpr Integer CHANNELS = 2;
 
-        static constexpr Tuning TUNING_440HZ_12TET = 0;
-        static constexpr Tuning TUNING_432HZ_12TET = 1;
-        static constexpr Tuning TUNING_MTS_ESP_CONTINUOUS = 2;
-        static constexpr Tuning TUNING_MTS_ESP_NOTE_ON = 3;
+        static constexpr Byte TUNING_440HZ_12TET = 0;
+        static constexpr Byte TUNING_432HZ_12TET = 1;
+        static constexpr Byte TUNING_MTS_ESP_CONTINUOUS = 2;
+        static constexpr Byte TUNING_MTS_ESP_NOTE_ON = 3;
 
         Voice(
             FrequencyTable const& frequencies,

@@ -35,7 +35,7 @@ template<class InputSignalProducerClass>
 Reverb<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const& name
 ) noexcept
-    : Param<Type, ParamEvaluation::BLOCK>(name, REVERB_1, REVERB_10, REVERB_1)
+    : ByteParam(name, REVERB_1, REVERB_10, REVERB_1)
 {
 }
 

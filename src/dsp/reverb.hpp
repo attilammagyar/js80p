@@ -40,27 +40,25 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef Byte Type;
-
         typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
         typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter;
 
-        class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
+        class TypeParam : public ByteParam
         {
             public:
                 explicit TypeParam(std::string const& name) noexcept;
         };
 
-        static constexpr Type REVERB_1  = 0;
-        static constexpr Type REVERB_2  = 1;
-        static constexpr Type REVERB_3  = 2;
-        static constexpr Type REVERB_4  = 3;
-        static constexpr Type REVERB_5  = 4;
-        static constexpr Type REVERB_6  = 5;
-        static constexpr Type REVERB_7  = 6;
-        static constexpr Type REVERB_8  = 7;
-        static constexpr Type REVERB_9  = 8;
-        static constexpr Type REVERB_10 = 9;
+        static constexpr Byte REVERB_1  = 0;
+        static constexpr Byte REVERB_2  = 1;
+        static constexpr Byte REVERB_3  = 2;
+        static constexpr Byte REVERB_4  = 3;
+        static constexpr Byte REVERB_5  = 4;
+        static constexpr Byte REVERB_6  = 5;
+        static constexpr Byte REVERB_7  = 6;
+        static constexpr Byte REVERB_8  = 7;
+        static constexpr Byte REVERB_9  = 8;
+        static constexpr Byte REVERB_10 = 9;
 
         Reverb(
             std::string const& name,
@@ -263,7 +261,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         HighPassedInput high_pass_filter;
         CombFilter comb_filters[COMB_FILTERS];
-        Type previous_type;
+        Byte previous_type;
 };
 
 }

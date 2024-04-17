@@ -161,9 +161,7 @@ void OscillatorInaccuracy::reset() noexcept
 
 
 OscillatorInaccuracyParam::OscillatorInaccuracyParam(std::string const& name) noexcept
-    : Param<OscillatorInaccuracyLevel, ParamEvaluation::BLOCK>(
-        name, 0, OscillatorInaccuracy::MAX_LEVEL, 0
-    )
+    : ByteParam(name, 0, OscillatorInaccuracy::MAX_LEVEL, 0)
 {
 }
 
@@ -172,7 +170,7 @@ template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
         std::string const& name
 ) noexcept
-    : Param<Tuning, ParamEvaluation::BLOCK>(
+    : ByteParam(
         name, TUNING_440HZ_12TET, TUNING_MTS_ESP_NOTE_ON, TUNING_MTS_ESP_CONTINUOUS
     )
 {
@@ -876,7 +874,8 @@ Frequency Voice<ModulatorSignalProducerClass>::get_note_frequency(
         Midi::Note const note,
         Midi::Channel const channel
 ) const noexcept {
-    Tuning const tuning = param_leaders.tuning.get_value();
+    Byte const tuning = param_leaders.tuning.get_value();
+
     return (
         tuning >= TUNING_MTS_ESP_CONTINUOUS
             ? per_channel_frequencies[channel][note]

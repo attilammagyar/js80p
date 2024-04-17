@@ -286,8 +286,14 @@ h1 span {
   vertical-align: bottom;
 }
 
+.block h1.macro label,
 .block h1.envelope label {
   overflow: initial;
+}
+
+.block h1.macro span.title {
+  width: 112px;
+  display: inline-block;
 }
 
 .block h1.envelope span.title {
@@ -1051,7 +1057,13 @@ window.onload = function ()
             k3 = document.createElement("div");
             k3.setAttribute("class", "group");
             h = document.createElement("h1");
-            h.innerHTML = "<span>Macro " + String(o * 10 + i) + "</span>";
+            h.setAttribute("class", "macro");
+            h.innerHTML = [
+              '<span class="title">Macro ' + String(o * 10 + i) + '</span>',
+              '<label class="shape">',
+                'DIST <input type="text" />',
+              '</label>',
+            ].join("");
 
             d.appendChild(h);
             k1.appendChild(k2);

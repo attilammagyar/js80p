@@ -50,6 +50,12 @@ EnvelopeSnapshot::EnvelopeSnapshot() noexcept
 }
 
 
+Envelope::ShapeParam::ShapeParam(std::string const& name) noexcept
+    : ByteParam(name, SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR)
+{
+}
+
+
 Number Envelope::get_value_at_time(
         EnvelopeSnapshot const& snapshot,
         Seconds const time,
@@ -663,9 +669,9 @@ void Envelope::set_up_next_release_target(
 Envelope::Envelope(std::string const& name) noexcept
     : dynamic(name + "DYN", ToggleParam::OFF),
     tempo_sync(name + "SYN", ToggleParam::OFF),
-    attack_shape(name + "ASH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
-    decay_shape(name + "DSH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
-    release_shape(name + "RSH", SHAPE_SMOOTH_SMOOTH, SHAPE_LINEAR, SHAPE_LINEAR),
+    attack_shape(name + "ASH"),
+    decay_shape(name + "DSH"),
+    release_shape(name + "RSH"),
     amount(name + "AMT",            0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),
     delay_time(name + "DEL",        0.0,    6.0,  0.0),

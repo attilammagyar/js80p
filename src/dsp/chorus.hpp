@@ -42,29 +42,27 @@ class Chorus : public Effect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef Byte Type;
-
-        static constexpr Type CHORUS_1  = 0;
-        static constexpr Type CHORUS_2  = 1;
-        static constexpr Type CHORUS_3  = 2;
-        static constexpr Type CHORUS_4  = 3;
-        static constexpr Type CHORUS_5  = 4;
-        static constexpr Type CHORUS_6  = 5;
-        static constexpr Type CHORUS_7  = 6;
-        static constexpr Type CHORUS_8  = 7;
-        static constexpr Type CHORUS_9  = 8;
-        static constexpr Type CHORUS_10 = 9;
-        static constexpr Type CHORUS_11 = 10;
-        static constexpr Type CHORUS_12 = 11;
-        static constexpr Type CHORUS_13 = 12;
-        static constexpr Type CHORUS_14 = 13;
-        static constexpr Type CHORUS_15 = 14;
+        static constexpr Byte CHORUS_1  = 0;
+        static constexpr Byte CHORUS_2  = 1;
+        static constexpr Byte CHORUS_3  = 2;
+        static constexpr Byte CHORUS_4  = 3;
+        static constexpr Byte CHORUS_5  = 4;
+        static constexpr Byte CHORUS_6  = 5;
+        static constexpr Byte CHORUS_7  = 6;
+        static constexpr Byte CHORUS_8  = 7;
+        static constexpr Byte CHORUS_9  = 8;
+        static constexpr Byte CHORUS_10 = 9;
+        static constexpr Byte CHORUS_11 = 10;
+        static constexpr Byte CHORUS_12 = 11;
+        static constexpr Byte CHORUS_13 = 12;
+        static constexpr Byte CHORUS_14 = 13;
+        static constexpr Byte CHORUS_15 = 14;
 
         typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
         typedef PannedDelay<HighPassedInput> CombFilter;
         typedef BiquadFilter< Mixer<CombFilter> > HighShelfFilter;
 
-        class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
+        class TypeParam : public ByteParam
         {
             public:
                 explicit TypeParam(std::string const name) noexcept;
@@ -323,7 +321,7 @@ class Chorus : public Effect<InputSignalProducerClass>
         HighShelfFilter high_shelf_filter;
         Gain<HighShelfFilter> feedback_gain;
         Sample const* const* chorused;
-        Type previous_type;
+        Byte previous_type;
         bool should_start_lfos;
 };
 

@@ -53,7 +53,7 @@ typedef Frequency SumOfSinesFrequencies[3];
 
 void test_inaccurate_filter_with_random(
         Number const random,
-        BiquadFilter<SumOfSines>::Type const filter_type,
+        Byte const filter_type,
         Frequency const frequency,
         Number const q,
         Number const gain,
@@ -129,7 +129,7 @@ void test_inaccurate_filter_with_random(
 
 
 void test_inaccurate_filter(
-        BiquadFilter<SumOfSines>::Type const filter_type,
+        Byte const filter_type,
         Frequency const frequency,
         Number const q,
         Number const gain,

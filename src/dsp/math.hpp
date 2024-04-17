@@ -37,19 +37,28 @@ class Math
 {
     public:
         enum EnvelopeShape {
-            SMOOTH_SMOOTH = 0,
-            SMOOTH_SMOOTH_STEEP = 1,
-            SMOOTH_SMOOTH_STEEPER = 2,
-            SMOOTH_SHARP = 3,
-            SMOOTH_SHARP_STEEP = 4,
-            SMOOTH_SHARP_STEEPER = 5,
-            SHARP_SMOOTH = 6,
-            SHARP_SMOOTH_STEEP = 7,
-            SHARP_SMOOTH_STEEPER = 8,
-            SHARP_SHARP = 9,
-            SHARP_SHARP_STEEP = 10,
-            SHARP_SHARP_STEEPER = 11,
+            ENV_SHAPE_SMOOTH_SMOOTH = 0,
+            ENV_SHAPE_SMOOTH_SMOOTH_STEEP = 1,
+            ENV_SHAPE_SMOOTH_SMOOTH_STEEPER = 2,
+            ENV_SHAPE_SMOOTH_SHARP = 3,
+            ENV_SHAPE_SMOOTH_SHARP_STEEP = 4,
+            ENV_SHAPE_SMOOTH_SHARP_STEEPER = 5,
+            ENV_SHAPE_SHARP_SMOOTH = 6,
+            ENV_SHAPE_SHARP_SMOOTH_STEEP = 7,
+            ENV_SHAPE_SHARP_SMOOTH_STEEPER = 8,
+            ENV_SHAPE_SHARP_SHARP = 9,
+            ENV_SHAPE_SHARP_SHARP_STEEP = 10,
+            ENV_SHAPE_SHARP_SHARP_STEEPER = 11,
         };
+
+        enum DistortionShape {
+            DIST_SHAPE_SMOOTH_SMOOTH = 0,
+            DIST_SHAPE_SMOOTH_SHARP = 1,
+            DIST_SHAPE_SHARP_SMOOTH = 2,
+            DIST_SHAPE_SHARP_SHARP = 3,
+        };
+
+        static constexpr int DISTORTIONS = 4;
 
         static constexpr Number PI = 3.14159265358979323846264338327950288419716939937510;
         static constexpr Number PI_DOUBLE = 2.0 * PI;
@@ -262,11 +271,15 @@ class Math
          * \brief Apply a steep, tanh() based distortion to the given value
          *        between 0.0 and 1.0.
          */
-        static Number distort(Number const level, Number const number) noexcept;
+        static Number distort(
+            Number const level,
+            Number const number,
+            DistortionShape const shape = DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH
+        ) noexcept;
 
         /**
          * \brief Same as \c Math::distort(), but input and output are between
-         *        -0.5 and 0.5.
+         *        -0.5 and 0.5, and only smooth-smooth distortion is supported.
          */
         static Number distort_centered_lfo(Number const level, Number const number) noexcept;
 
@@ -390,7 +403,7 @@ class Math
 
         void init_sines() noexcept;
         void init_randoms() noexcept;
-        void init_distortion() noexcept;
+        void init_distortions() noexcept;
         void init_log_chorus_lfo_freq() noexcept;
         void init_log_lfo_freq() noexcept;
         void init_log_biquad_filter_freq() noexcept;
@@ -398,18 +411,18 @@ class Math
         void init_linear_to_db() noexcept;
         void init_envelope_shapes() noexcept;
 
-        Number env_shape_smooth_smooth(Number const x) noexcept;
-        Number env_shape_smooth_smooth_steep(Number const x) noexcept;
-        Number env_shape_smooth_smooth_steeper(Number const x) noexcept;
-        Number env_shape_smooth_sharp(Number const x) noexcept;
-        Number env_shape_smooth_sharp_steep(Number const x) noexcept;
-        Number env_shape_smooth_sharp_steeper(Number const x) noexcept;
-        Number env_shape_sharp_smooth(Number const x) noexcept;
-        Number env_shape_sharp_smooth_steep(Number const x) noexcept;
-        Number env_shape_sharp_smooth_steeper(Number const x) noexcept;
-        Number env_shape_sharp_sharp(Number const x) noexcept;
-        Number env_shape_sharp_sharp_steep(Number const x) noexcept;
-        Number env_shape_sharp_sharp_steeper(Number const x) noexcept;
+        Number shape_smooth_smooth(Number const x) noexcept;
+        Number shape_smooth_smooth_steep(Number const x) noexcept;
+        Number shape_smooth_smooth_steeper(Number const x) noexcept;
+        Number shape_smooth_sharp(Number const x) noexcept;
+        Number shape_smooth_sharp_steep(Number const x) noexcept;
+        Number shape_smooth_sharp_steeper(Number const x) noexcept;
+        Number shape_sharp_smooth(Number const x) noexcept;
+        Number shape_sharp_smooth_steep(Number const x) noexcept;
+        Number shape_sharp_smooth_steeper(Number const x) noexcept;
+        Number shape_sharp_sharp(Number const x) noexcept;
+        Number shape_sharp_sharp_steep(Number const x) noexcept;
+        Number shape_sharp_sharp_steeper(Number const x) noexcept;
 
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;
@@ -420,7 +433,7 @@ class Math
         Number cosines[SIN_TABLE_SIZE];
         Number randoms[RANDOMS];
         Number randoms_centered_lfo[RANDOMS];
-        Number distortion[DISTORTION_TABLE_SIZE];
+        Number distortions[DISTORTIONS][DISTORTION_TABLE_SIZE];
         Number distortion_centered_lfo[DISTORTION_TABLE_SIZE];
         Number log_chorus_lfo_freq[LOG_CHORUS_LFO_FREQ_TABLE_SIZE];
         Number log_lfo_freq[LOG_LFO_FREQ_TABLE_SIZE];

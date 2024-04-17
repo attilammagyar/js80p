@@ -19,7 +19,7 @@
 import os.path
 import sys
 
-from math import log
+from math import log, tanh
 
 
 try:
@@ -56,7 +56,7 @@ SEGMENTS = 20
 STROKE_WIDTH = int(SUBPIXELS * 3.5 + 0.5)
 
 
-FUNCTIONS = (
+ENV_SHAPES = (
     # See Math::apply_envelope_shape().
     (CYAN_1, lambda x: ((-2.0 * x + 3.0) * x) * x),
     (CYAN_2, lambda x: ((((6.0 * x - 15.0) * x + 10.0) * x) * x) * x),
@@ -78,28 +78,42 @@ FUNCTIONS = (
 )
 
 
+MACRO_DISTORTIONS = (
+    (CYAN_2, lambda x: tanh(8.0 * (x * 2.0 - 1.0)) * 0.5 + 0.5),
+    (PURPLE_2, ENV_SHAPES[5][1]),
+    (YELLOW_2, ENV_SHAPES[8][1]),
+    (RED_2, ENV_SHAPES[11][1]),
+)
+
+
 def main(argv):
     out_dir = os.path.join(os.path.dirname(argv[0]), "../gui/img/")
-    generate_env_shapes(os.path.join(out_dir, "env_shapes-01.png"), 0.0, 1.0)
-    generate_env_shapes(os.path.join(out_dir, "env_shapes-10.png"), 1.0, 0.0)
+    generate_image(
+        os.path.join(out_dir, "env_shapes-01.png"), 0.0, 1.0, ENV_SHAPES
+    )
+    generate_image(
+        os.path.join(out_dir, "env_shapes-10.png"), 1.0, 0.0, ENV_SHAPES
+    )
+    generate_image(
+        os.path.join(out_dir, "macro_distortions.png"), 0.0, 1.0, MACRO_DISTORTIONS
+    )
 
 
-def generate_env_shapes(out_file, start, end):
-    env_shapes = Image.new("RGB", (WIDTH, HEIGHT * len(FUNCTIONS)), (0, 0, 0))
-    env_shapes_canvas = ImageDraw.Draw(env_shapes)
+def generate_image(out_file, start, end, funcs):
+    image = Image.new("RGB", (WIDTH, HEIGHT * len(funcs)), (0, 0, 0))
 
-    for i, (color, f) in enumerate(FUNCTIONS):
+    for i, (color, f) in enumerate(funcs):
         plot = draw_plot(f, start, end, color)
-        env_shapes.paste(plot, (0, HEIGHT * i, WIDTH, HEIGHT * (i + 1)))
+        image.paste(plot, (0, HEIGHT * i, WIDTH, HEIGHT * (i + 1)))
 
-    env_shapes.save(out_file)
+    image.save(out_file)
 
 
 def draw_plot(f, start, end, color):
     w = WIDTH * SUBPIXELS
     h = HEIGHT * SUBPIXELS
-    plot = Image.new("RGB", (w, h), (0, 0, 0))
-    plot_canvas = ImageDraw.Draw(plot)
+    plot_image = Image.new("RGB", (w, h), (0, 0, 0))
+    plot_canvas = ImageDraw.Draw(plot_image)
 
     border = int(STROKE_WIDTH * 0.66 + 0.5)
 
@@ -121,7 +135,7 @@ def draw_plot(f, start, end, color):
 
     plot_canvas.line(segments, fill=color, width=STROKE_WIDTH, joint="curve")
 
-    return plot.resize((WIDTH, HEIGHT), Image.BICUBIC)
+    return plot_image.resize((WIDTH, HEIGHT), Image.BICUBIC)
 
 
 if __name__ == "__main__":

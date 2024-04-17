@@ -23,6 +23,7 @@
 
 #include "js80p.hpp"
 
+#include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/param.hpp"
 
@@ -38,6 +39,17 @@ namespace JS80P
 class Macro : public MidiController
 {
     public:
+        static constexpr Byte DIST_SHAPE_SMOOTH_SMOOTH = Math::DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH;
+        static constexpr Byte DIST_SHAPE_SMOOTH_SHARP = Math::DistortionShape::DIST_SHAPE_SMOOTH_SHARP;
+        static constexpr Byte DIST_SHAPE_SHARP_SMOOTH = Math::DistortionShape::DIST_SHAPE_SHARP_SMOOTH;
+        static constexpr Byte DIST_SHAPE_SHARP_SHARP = Math::DistortionShape::DIST_SHAPE_SHARP_SHARP;
+
+        class DistortionShapeParam : public ByteParam
+        {
+            public:
+                explicit DistortionShapeParam(std::string const& name) noexcept;
+        };
+
         explicit Macro(std::string const& name = "") noexcept;
 
         void update() noexcept;
@@ -48,11 +60,15 @@ class Macro : public MidiController
         FloatParamB amount;
         FloatParamB distortion;
         FloatParamB randomness;
+        DistortionShapeParam distortion_shape;
 
     private:
         bool update_change_indices() noexcept;
+
+        template<class ParamClass>
         bool update_change_index(
-            FloatParamB& param, Integer& change_index
+            ParamClass& param,
+            Integer& change_index
         ) const noexcept;
 
         Integer input_change_index;
@@ -61,6 +77,7 @@ class Macro : public MidiController
         Integer amount_change_index;
         Integer distortion_change_index;
         Integer randomness_change_index;
+        Integer distortion_shape_change_index;
         bool is_updating;
 };
 

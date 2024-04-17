@@ -61,17 +61,15 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef Byte Type;
+        static constexpr Byte LOW_PASS = 0;
+        static constexpr Byte HIGH_PASS = 1;
+        static constexpr Byte BAND_PASS = 2;
+        static constexpr Byte NOTCH = 3;
+        static constexpr Byte PEAKING = 4;
+        static constexpr Byte LOW_SHELF = 5;
+        static constexpr Byte HIGH_SHELF = 6;
 
-        static constexpr Type LOW_PASS = 0;
-        static constexpr Type HIGH_PASS = 1;
-        static constexpr Type BAND_PASS = 2;
-        static constexpr Type NOTCH = 3;
-        static constexpr Type PEAKING = 4;
-        static constexpr Type LOW_SHELF = 5;
-        static constexpr Type HIGH_SHELF = 6;
-
-        class TypeParam : public Param<Type, ParamEvaluation::BLOCK>
+        class TypeParam : public ByteParam
         {
             public:
                 explicit TypeParam(std::string const& name) noexcept;

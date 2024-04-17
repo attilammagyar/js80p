@@ -1576,7 +1576,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
 
 
 void test_envelope_manual_update_dahds(
-        Toggle const is_dynamic,
+        Byte const is_dynamic,
         Number const amount_before_update,
         Number const amount_before_handling_events
 ) {

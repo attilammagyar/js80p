@@ -35,7 +35,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const name
 ) noexcept
-    : Param<Type, ParamEvaluation::BLOCK>(name, CHORUS_1, CHORUS_15, CHORUS_1)
+    : ByteParam(name, CHORUS_1, CHORUS_15, CHORUS_1)
 {
 }
 

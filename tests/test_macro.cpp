@@ -109,17 +109,24 @@ TEST(change_index_is_updated_only_when_there_is_an_actual_change, {
 })
 
 
+Number apply_macro(Macro& macro, Number const input_value)
+{
+    macro.input.set_value(input_value);
+    macro.update();
+
+    return macro.get_value();
+}
+
+
 void assert_macro_value(
         Macro& macro,
         Number const input_value,
         Number const expected_value,
         Number const tolerance = 0.01
 ) {
-    macro.input.set_value(input_value);
-    macro.update();
-    assert_eq(
-        expected_value, macro.get_value(), tolerance, "input=%f", input_value
-    );
+    Number const value = apply_macro(macro, input_value);
+
+    assert_eq(expected_value, value, tolerance, "input=%f", input_value);
 }
 
 
@@ -143,6 +150,34 @@ TEST(can_distort_the_value, {
     assert_macro_value(macro, 0.8, min + adjusted_max);
     assert_macro_value(macro, 0.9, min + adjusted_max);
     assert_macro_value(macro, 1.0, min + adjusted_max);
+})
+
+
+TEST(distortion_shape_can_be_changed, {
+    Macro macro;
+
+    macro.distortion.set_value(0.5);
+
+    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SMOOTH_SHARP);
+    assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "smooth-sharp");
+    assert_gt(0.25, apply_macro(macro, 0.25), "smooth-sharp");
+    assert_gt(0.50, apply_macro(macro, 0.50), "smooth-sharp");
+    assert_gt(0.75, apply_macro(macro, 0.75), "smooth-sharp");
+    assert_eq(1.00, apply_macro(macro, 1.00), DOUBLE_DELTA, "smooth-sharp");
+
+    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SHARP_SMOOTH);
+    assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "sharp-smooth");
+    assert_lt(0.25, apply_macro(macro, 0.25), "sharp-smooth");
+    assert_lt(0.50, apply_macro(macro, 0.50), "sharp-smooth");
+    assert_lt(0.75, apply_macro(macro, 0.75), "sharp-smooth");
+    assert_eq(1.00, apply_macro(macro, 1.00), DOUBLE_DELTA, "sharp-smooth");
+
+    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SHARP_SHARP);
+    assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "sharp-sharp");
+    assert_lt(0.25, apply_macro(macro, 0.25), "sharp-sharp");
+    assert_eq(0.50, apply_macro(macro, 0.50), DOUBLE_DELTA, "sharp-sharp");
+    assert_gt(0.75, apply_macro(macro, 0.75), "sharp-sharp");
+    assert_eq(1.00, apply_macro(macro, 1.00), DOUBLE_DELTA, "sharp-sharp");
 })
 
 

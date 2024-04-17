@@ -39,8 +39,8 @@ ToggleParam Oscillator<ModulatorSignalProducerClass, is_lfo>::dummy_toggle("", T
 template<class ModulatorSignalProducerClass, bool is_lfo>
 Oscillator<ModulatorSignalProducerClass, is_lfo>::WaveformParam::WaveformParam(
         std::string const& name,
-        Waveform const max_value
-) noexcept : Param<Waveform, ParamEvaluation::BLOCK>(name, SINE, max_value, SINE)
+        Byte const max_value
+) noexcept : ByteParam(name, SINE, max_value, SINE)
 {
 }
 
@@ -559,7 +559,7 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Waveform const waveform = this->waveform.get_value();
+    Byte const waveform = this->waveform.get_value();
 
     if constexpr (is_lfo) {
         apply_toggle_params(bpm);

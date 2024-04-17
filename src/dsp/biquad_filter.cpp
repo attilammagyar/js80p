@@ -47,7 +47,7 @@ template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
         std::string const& name
 ) noexcept
-    : Param<Type, ParamEvaluation::BLOCK>(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
+    : ByteParam(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
 {
 }
 

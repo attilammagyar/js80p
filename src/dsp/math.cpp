@@ -34,7 +34,7 @@ Math::Math() noexcept
 {
     init_sines();
     init_randoms();
-    init_distortion();
+    init_distortions();
     init_log_chorus_lfo_freq();
     init_log_lfo_freq();
     init_log_biquad_filter_freq();
@@ -79,14 +79,34 @@ void Math::init_randoms() noexcept
 }
 
 
-void Math::init_distortion() noexcept
+void Math::init_distortions() noexcept
 {
-    Number const max_inv = 1.0 / (Number)DISTORTION_TABLE_MAX_INDEX;
+    constexpr Number max_inv = 1.0 / (Number)DISTORTION_TABLE_MAX_INDEX;
+
+    Number xs[DISTORTION_TABLE_SIZE];
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        Number const x = 2.0 * ((Number)i * max_inv) - 1.0;
-        distortion_centered_lfo[i] = std::tanh(8.0 * x) * 0.5;
-        distortion[i] = distortion_centered_lfo[i] + 0.5;
+        xs[i] = (Number)i * max_inv;
+    }
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        distortion_centered_lfo[i] = std::tanh(8.0 * (2.0 * xs[i] - 1.0)) * 0.5;
+    }
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        distortions[0][i] = distortion_centered_lfo[i] + 0.5;
+    }
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        distortions[1][i] = shape_smooth_sharp_steeper(xs[i]);
+    }
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        distortions[2][i] = shape_sharp_smooth_steeper(xs[i]);
+    }
+
+    for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
+        distortions[3][i] = shape_sharp_sharp_steeper(xs[i]);
     }
 }
 
@@ -237,18 +257,18 @@ void Math::init_envelope_shapes() noexcept
     for (int i = 1; i != ENVELOPE_SHAPE_TABLE_MAX_INDEX; ++i) {
         Number const ratio = (Number)i / end;
 
-        envelope_shapes[0][i] = env_shape_smooth_smooth(ratio);
-        envelope_shapes[1][i] = env_shape_smooth_smooth_steep(ratio);
-        envelope_shapes[2][i] = env_shape_smooth_smooth_steeper(ratio);
-        envelope_shapes[3][i] = env_shape_smooth_sharp(ratio);
-        envelope_shapes[4][i] = env_shape_smooth_sharp_steep(ratio);
-        envelope_shapes[5][i] = env_shape_smooth_sharp_steeper(ratio);
-        envelope_shapes[6][i] = env_shape_sharp_smooth(ratio);
-        envelope_shapes[7][i] = env_shape_sharp_smooth_steep(ratio);
-        envelope_shapes[8][i] = env_shape_sharp_smooth_steeper(ratio);
-        envelope_shapes[9][i] = env_shape_sharp_sharp(ratio);
-        envelope_shapes[10][i] = env_shape_sharp_sharp_steep(ratio);
-        envelope_shapes[11][i] = env_shape_sharp_sharp_steeper(ratio);
+        envelope_shapes[0][i] = shape_smooth_smooth(ratio);
+        envelope_shapes[1][i] = shape_smooth_smooth_steep(ratio);
+        envelope_shapes[2][i] = shape_smooth_smooth_steeper(ratio);
+        envelope_shapes[3][i] = shape_smooth_sharp(ratio);
+        envelope_shapes[4][i] = shape_smooth_sharp_steep(ratio);
+        envelope_shapes[5][i] = shape_smooth_sharp_steeper(ratio);
+        envelope_shapes[6][i] = shape_sharp_smooth(ratio);
+        envelope_shapes[7][i] = shape_sharp_smooth_steep(ratio);
+        envelope_shapes[8][i] = shape_sharp_smooth_steeper(ratio);
+        envelope_shapes[9][i] = shape_sharp_sharp(ratio);
+        envelope_shapes[10][i] = shape_sharp_sharp_steep(ratio);
+        envelope_shapes[11][i] = shape_sharp_sharp_steeper(ratio);
     }
 
     envelope_shapes[0][ENVELOPE_SHAPE_TABLE_MAX_INDEX] = 1.0;
@@ -266,7 +286,7 @@ void Math::init_envelope_shapes() noexcept
 }
 
 
-Number Math::env_shape_smooth_smooth(Number const x) noexcept
+Number Math::shape_smooth_smooth(Number const x) noexcept
 {
     /*
     Antiderivative of 6 * (x - x ^ 2).
@@ -302,22 +322,22 @@ Number Math::env_shape_smooth_smooth(Number const x) noexcept
 }
 
 
-Number Math::env_shape_smooth_smooth_steep(Number const x) noexcept
+Number Math::shape_smooth_smooth_steep(Number const x) noexcept
 {
     /*
     Antiderivative of 30 * ((x - x ^ 2) ^ 2).
-    Same idea as in env_shape_smooth_smooth() but steeper.
+    Same idea as in shape_smooth_smooth() but steeper.
     */
 
     return ((((6.0 * x - 15.0) * x + 10.0) * x) * x) * x;
 }
 
 
-Number Math::env_shape_smooth_smooth_steeper(Number const x) noexcept
+Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of 2772 * ((x - x ^ 2) ^ 5).
-    Same idea as in env_shape_smooth_smooth() but a lot steeper.
+    Same idea as in shape_smooth_smooth() but a lot steeper.
     */
 
     constexpr Number a = -252.0;
@@ -333,11 +353,11 @@ Number Math::env_shape_smooth_smooth_steeper(Number const x) noexcept
 }
 
 
-Number Math::env_shape_sharp_sharp(Number const x) noexcept
+Number Math::shape_sharp_sharp(Number const x) noexcept
 {
     /*
     Antiderivative of (2 * x - 1) ^ 2.
-    Same idea as in env_shape_smooth_smooth() but the derivative at the
+    Same idea as in shape_smooth_smooth() but the derivative at the
     endpoints is positive, and 0 in the middle.
     */
 
@@ -345,22 +365,22 @@ Number Math::env_shape_sharp_sharp(Number const x) noexcept
 }
 
 
-Number Math::env_shape_sharp_sharp_steep(Number const x) noexcept
+Number Math::shape_sharp_sharp_steep(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 2.
-    Same idea as in env_shape_sharp_sharp() but steeper near the endpoints.
+    Same idea as in shape_sharp_sharp() but steeper near the endpoints.
     */
 
     return ((((16.0 * x - 40.0) * x + 40.0) * x - 20.0) * x + 5.0) * x;
 }
 
 
-Number Math::env_shape_sharp_sharp_steeper(Number const x) noexcept
+Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 5.
-    Same idea as in env_shape_sharp_sharp() but even more steep near the
+    Same idea as in shape_sharp_sharp() but even more steep near the
     endpoints.
     */
 
@@ -380,37 +400,37 @@ Number Math::env_shape_sharp_sharp_steeper(Number const x) noexcept
 }
 
 
-Number Math::env_shape_smooth_sharp(Number const x) noexcept
+Number Math::shape_smooth_sharp(Number const x) noexcept
 {
     return std::pow(x, 2.0);
 }
 
 
-Number Math::env_shape_smooth_sharp_steep(Number const x) noexcept
+Number Math::shape_smooth_sharp_steep(Number const x) noexcept
 {
     return std::pow(x, 3.0);
 }
 
 
-Number Math::env_shape_smooth_sharp_steeper(Number const x) noexcept
+Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
 {
     return std::pow(x, 5.0);
 }
 
 
-Number Math::env_shape_sharp_smooth(Number const x) noexcept
+Number Math::shape_sharp_smooth(Number const x) noexcept
 {
     return x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001));
 }
 
 
-Number Math::env_shape_sharp_smooth_steep(Number const x) noexcept
+Number Math::shape_sharp_smooth_steep(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001)), 2.0 / 3.0);
 }
 
 
-Number Math::env_shape_sharp_smooth_steeper(Number const x) noexcept
+Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001)), 1.0 / 3.0);
 }
@@ -693,8 +713,11 @@ Number Math::combine(
 }
 
 
-Number Math::distort(Number const level, Number const number) noexcept
-{
+Number Math::distort(
+        Number const level,
+        Number const number,
+        DistortionShape const shape
+) noexcept {
     if (level < 0.0001) {
         return number;
     }
@@ -702,7 +725,9 @@ Number Math::distort(Number const level, Number const number) noexcept
     return combine(
         level,
         lookup(
-            math.distortion, DISTORTION_TABLE_MAX_INDEX, number * DISTORTION_SCALE
+            math.distortions[(int)shape],
+            DISTORTION_TABLE_MAX_INDEX,
+            number * DISTORTION_SCALE
         ),
         number
     );

@@ -308,8 +308,19 @@ void Param<NumberType, evaluation>::render(
 }
 
 
-ToggleParam::ToggleParam(std::string const& name, Toggle const default_value)
-    : Param<Toggle, ParamEvaluation::BLOCK>(name, OFF, ON, default_value)
+ByteParam::ByteParam(
+        std::string const& name,
+        Byte const min_value,
+        Byte const max_value,
+        Byte const default_value
+) noexcept
+    : Param<Byte, ParamEvaluation::BLOCK>(name, min_value, max_value, default_value)
+{
+}
+
+
+ToggleParam::ToggleParam(std::string const& name, Byte const default_value)
+    : ByteParam(name, OFF, ON, default_value)
 {
 }
 

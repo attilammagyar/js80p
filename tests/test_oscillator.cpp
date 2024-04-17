@@ -227,7 +227,7 @@ void assert_oscillator_output_is_close_to_reference(
         Integer const block_size,
         Integer const rounds,
         Number const tolerance,
-        typename OscillatorClass::Waveform const waveform = OscillatorClass::SINE
+        Byte const waveform = OscillatorClass::SINE
 ) {
     Integer const sample_count = rounds * block_size;
     Sample expected_samples[sample_count];
@@ -257,7 +257,7 @@ void assert_oscillator_output_is_close_to_reference(
 
 template<class ReferenceWaveformClass>
 void test_basic_waveform(
-        SimpleOscillator::Waveform const waveform,
+        Byte const waveform,
         Number const tolerance,
         Frequency const sample_rate = SAMPLE_RATE,
         Frequency const frequency = 100.0,

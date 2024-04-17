@@ -74,7 +74,7 @@ std::string Synth::param_names_by_id[ParamId::PARAM_ID_COUNT];
 
 
 Synth::ModeParam::ModeParam(std::string const& name) noexcept
-    : Param<Mode, ParamEvaluation::BLOCK>(name, MIX_AND_MOD, SPLIT_AT_C4, MIX_AND_MOD)
+    : ByteParam(name, MODE_MIX_AND_MOD, MODE_SPLIT_AT_C4, MODE_MIX_AND_MOD)
 {
 }
 
@@ -86,7 +86,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + 41 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
-        + MACROS * MACRO_FLOAT_PARAMS
+        + MACROS * MACRO_PARAMS
         + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
@@ -174,8 +174,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
         sample_evaluated_float_params[i] = NULL;
         block_evaluated_float_params[i] = NULL;
-        toggle_params[i] = NULL;
-        envelope_shape_params[i] = NULL;
+        byte_params[i] = NULL;
     }
 
     build_frequency_table();
@@ -604,6 +603,14 @@ void Synth::create_macros() noexcept
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->distortion);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->randomness);
     }
+
+    next_id = ParamId::M1DSH;
+
+    for (Integer i = 0; i != MACROS; ++i) {
+        register_param_as_child<Macro::DistortionShapeParam>(
+            (ParamId)next_id++, macros_rw[i]->distortion_shape
+        );
+    }
 }
 
 
@@ -826,10 +833,8 @@ void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
         sample_evaluated_float_params[index] = &param;
     } else if constexpr (std::is_same<ParamClass, FloatParamB>::value) {
         block_evaluated_float_params[index] = &param;
-    } else if constexpr (std::is_same<ParamClass, ToggleParam>::value) {
-        toggle_params[index] = &param;
-    } else if constexpr (std::is_same<ParamClass, Envelope::ShapeParam>::value) {
-        envelope_shape_params[index] = &param;
+    } else if constexpr (std::is_base_of<ByteParam, ParamClass>::value) {
+        byte_params[index] = (ByteParam*)&param;
     }
 }
 
@@ -850,12 +855,8 @@ Synth::ParamType Synth::find_param_type(ParamId const param_id) const noexcept
         return ParamType::BLOCK_EVALUATED_FLOAT;
     }
 
-    if (toggle_params[index] != NULL) {
-        return ParamType::TOGGLE;
-    }
-
-    if (envelope_shape_params[index] != NULL) {
-        return ParamType::ENVELOPE_SHAPE;
+    if (byte_params[index] != NULL) {
+        return ParamType::BYTE;
     }
 
     return ParamType::OTHER;
@@ -1147,13 +1148,13 @@ void Synth::trigger_note_on_voice(
 ) noexcept {
     assign_voice_and_note_id(voice, channel, note);
 
-    Mode const mode = this->mode.get_value();
+    Byte const mode = this->mode.get_value();
     bool const should_sync_oscillator_inaccuracy = this->should_sync_oscillator_inaccuracy();
 
     modulators[voice]->update_inaccuracy(cached_round);
     carriers[voice]->update_inaccuracy(cached_round);
 
-    if (mode == MIX_AND_MOD) {
+    if (mode == MODE_MIX_AND_MOD) {
         modulators[voice]->note_on(
             time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
@@ -1216,13 +1217,13 @@ void Synth::note_on_monophonic(
 
     assign_voice_and_note_id(0, channel, note);
 
-    Mode const mode = this->mode.get_value();
+    Byte const mode = this->mode.get_value();
     bool const should_sync_oscillator_inaccuracy = this->should_sync_oscillator_inaccuracy();
 
     modulator->update_inaccuracy(cached_round);
     carrier->update_inaccuracy(cached_round);
 
-    if (mode == MIX_AND_MOD) {
+    if (mode == MODE_MIX_AND_MOD) {
         trigger_note_on_voice_monophonic<Modulator>(
             *modulator, modulator_off, time_offset, channel, note, velocity, should_sync_oscillator_inaccuracy
         );
@@ -1688,51 +1689,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
         case ParamType::BLOCK_EVALUATED_FLOAT:
             return block_evaluated_float_params[index]->get_default_ratio();
 
-        case ParamType::TOGGLE:
-            return toggle_params[index]->get_default_ratio();
-
-        case ParamType::ENVELOPE_SHAPE:
-            return envelope_shape_params[index]->get_default_ratio();
+        case ParamType::BYTE:
+            return byte_params[index]->get_default_ratio();
 
         default:
-            break;
-    }
-
-    switch (param_id) {
-        case ParamId::MODE: return mode.get_default_ratio();
-        case ParamId::MWAV: return modulator_params.waveform.get_default_ratio();
-        case ParamId::CWAV: return carrier_params.waveform.get_default_ratio();
-        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_default_ratio();
-        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_default_ratio();
-        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_default_ratio();
-        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_default_ratio();
-        case ParamId::EF1TYP: return effects.filter_1_type.get_default_ratio();
-        case ParamId::EF2TYP: return effects.filter_2_type.get_default_ratio();
-        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_default_ratio();
-        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_default_ratio();
-        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_default_ratio();
-        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_default_ratio();
-        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_default_ratio();
-        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_default_ratio();
-        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_default_ratio();
-        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_default_ratio();
-        case ParamId::ERTYP: return effects.reverb.type.get_default_ratio();
-        case ParamId::ECTYP: return effects.chorus.type.get_default_ratio();
-        case ParamId::MTUN: return modulator_params.tuning.get_default_ratio();
-        case ParamId::CTUN: return carrier_params.tuning.get_default_ratio();
-        case ParamId::MOIA: return modulator_params.oscillator_inaccuracy.get_default_ratio();
-        case ParamId::MOIS: return modulator_params.oscillator_instability.get_default_ratio();
-        case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_default_ratio();
-        case ParamId::COIS: return carrier_params.oscillator_instability.get_default_ratio();
-        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_default_ratio();
-        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_default_ratio();
-        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_default_ratio();
-        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_default_ratio();
-        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_default_ratio();
-        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_default_ratio();
-        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_default_ratio();
-        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_default_ratio();
-        default: JS80P_ASSERT_NOT_REACHED(); return 0.0;
+            JS80P_ASSERT_NOT_REACHED();
+            return 0.0;
     }
 }
 
@@ -1755,51 +1717,12 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
         case ParamType::BLOCK_EVALUATED_FLOAT:
             return block_evaluated_float_params[index]->get_max_value();
 
-        case ParamType::TOGGLE:
-            return toggle_params[index]->get_max_value();
-
-        case ParamType::ENVELOPE_SHAPE:
-            return envelope_shape_params[index]->get_max_value();
+        case ParamType::BYTE:
+            return byte_params[index]->get_max_value();
 
         default:
-            break;
-    }
-
-    switch (param_id) {
-        case ParamId::MODE: return mode.get_max_value();
-        case ParamId::MWAV: return modulator_params.waveform.get_max_value();
-        case ParamId::CWAV: return carrier_params.waveform.get_max_value();
-        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_max_value();
-        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_max_value();
-        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_max_value();
-        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_max_value();
-        case ParamId::EF1TYP: return effects.filter_1_type.get_max_value();
-        case ParamId::EF2TYP: return effects.filter_2_type.get_max_value();
-        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_max_value();
-        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_max_value();
-        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_max_value();
-        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_max_value();
-        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_max_value();
-        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_max_value();
-        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_max_value();
-        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_max_value();
-        case ParamId::ERTYP: return effects.reverb.type.get_max_value();
-        case ParamId::ECTYP: return effects.chorus.type.get_max_value();
-        case ParamId::MTUN: return modulator_params.tuning.get_max_value();
-        case ParamId::CTUN: return carrier_params.tuning.get_max_value();
-        case ParamId::MOIA: return modulator_params.oscillator_inaccuracy.get_max_value();
-        case ParamId::MOIS: return modulator_params.oscillator_instability.get_max_value();
-        case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_max_value();
-        case ParamId::COIS: return carrier_params.oscillator_instability.get_max_value();
-        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_max_value();
-        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_max_value();
-        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_max_value();
-        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_max_value();
-        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_max_value();
-        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_max_value();
-        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_max_value();
-        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_max_value();
-        default: JS80P_ASSERT_NOT_REACHED(); return 0.0;
+            JS80P_ASSERT_NOT_REACHED();
+            return 0.0;
     }
 }
 
@@ -1819,12 +1742,13 @@ Number Synth::float_param_ratio_to_display_value(
             return block_evaluated_float_params[index]->ratio_to_value(ratio);
 
         default:
+            JS80P_ASSERT_NOT_REACHED();
             return 0.0;
     }
 }
 
 
-Byte Synth::int_param_ratio_to_display_value(
+Byte Synth::byte_param_ratio_to_display_value(
         ParamId const param_id,
         Number const ratio
 ) const noexcept {
@@ -1832,51 +1756,12 @@ Byte Synth::int_param_ratio_to_display_value(
     ParamType const type = find_param_type(param_id);
 
     switch (type) {
-        case ParamType::TOGGLE:
-            return toggle_params[index]->ratio_to_value(ratio);
-
-        case ParamType::ENVELOPE_SHAPE:
-            return envelope_shape_params[index]->ratio_to_value(ratio);
+        case ParamType::BYTE:
+            return byte_params[index]->ratio_to_value(ratio);
 
         default:
-            break;
-    }
-
-    switch (param_id) {
-        case ParamId::MODE: return mode.ratio_to_value(ratio);
-        case ParamId::MWAV: return modulator_params.waveform.ratio_to_value(ratio);
-        case ParamId::CWAV: return carrier_params.waveform.ratio_to_value(ratio);
-        case ParamId::MF1TYP: return modulator_params.filter_1_type.ratio_to_value(ratio);
-        case ParamId::MF2TYP: return modulator_params.filter_2_type.ratio_to_value(ratio);
-        case ParamId::CF1TYP: return carrier_params.filter_1_type.ratio_to_value(ratio);
-        case ParamId::CF2TYP: return carrier_params.filter_2_type.ratio_to_value(ratio);
-        case ParamId::EF1TYP: return effects.filter_1_type.ratio_to_value(ratio);
-        case ParamId::EF2TYP: return effects.filter_2_type.ratio_to_value(ratio);
-        case ParamId::L1WAV: return lfos_rw[0]->waveform.ratio_to_value(ratio);
-        case ParamId::L2WAV: return lfos_rw[1]->waveform.ratio_to_value(ratio);
-        case ParamId::L3WAV: return lfos_rw[2]->waveform.ratio_to_value(ratio);
-        case ParamId::L4WAV: return lfos_rw[3]->waveform.ratio_to_value(ratio);
-        case ParamId::L5WAV: return lfos_rw[4]->waveform.ratio_to_value(ratio);
-        case ParamId::L6WAV: return lfos_rw[5]->waveform.ratio_to_value(ratio);
-        case ParamId::L7WAV: return lfos_rw[6]->waveform.ratio_to_value(ratio);
-        case ParamId::L8WAV: return lfos_rw[7]->waveform.ratio_to_value(ratio);
-        case ParamId::ERTYP: return effects.reverb.type.ratio_to_value(ratio);
-        case ParamId::ECTYP: return effects.chorus.type.ratio_to_value(ratio);
-        case ParamId::MTUN: return modulator_params.tuning.ratio_to_value(ratio);
-        case ParamId::CTUN: return carrier_params.tuning.ratio_to_value(ratio);
-        case ParamId::MOIA: return modulator_params.oscillator_inaccuracy.ratio_to_value(ratio);
-        case ParamId::MOIS: return modulator_params.oscillator_instability.ratio_to_value(ratio);
-        case ParamId::COIA: return carrier_params.oscillator_inaccuracy.ratio_to_value(ratio);
-        case ParamId::COIS: return carrier_params.oscillator_instability.ratio_to_value(ratio);
-        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.ratio_to_value(ratio);
-        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.ratio_to_value(ratio);
-        default: JS80P_ASSERT_NOT_REACHED(); return 0;
+            JS80P_ASSERT_NOT_REACHED();
+            return 0;
     }
 }
 
@@ -2083,65 +1968,22 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
     size_t const index = (size_t)param_id;
     ParamType const type = find_param_type(param_id);
 
-    if (type == ParamType::OTHER) {
-        switch (param_id) {
-            case ParamId::MODE: mode.set_ratio(ratio); break;
-            case ParamId::MWAV: modulator_params.waveform.set_ratio(ratio); break;
-            case ParamId::CWAV: carrier_params.waveform.set_ratio(ratio); break;
-            case ParamId::MF1TYP: modulator_params.filter_1_type.set_ratio(ratio); break;
-            case ParamId::MF2TYP: modulator_params.filter_2_type.set_ratio(ratio); break;
-            case ParamId::CF1TYP: carrier_params.filter_1_type.set_ratio(ratio); break;
-            case ParamId::CF2TYP: carrier_params.filter_2_type.set_ratio(ratio); break;
-            case ParamId::EF1TYP: effects.filter_1_type.set_ratio(ratio); break;
-            case ParamId::EF2TYP: effects.filter_2_type.set_ratio(ratio); break;
-            case ParamId::L1WAV: lfos_rw[0]->waveform.set_ratio(ratio); break;
-            case ParamId::L2WAV: lfos_rw[1]->waveform.set_ratio(ratio); break;
-            case ParamId::L3WAV: lfos_rw[2]->waveform.set_ratio(ratio); break;
-            case ParamId::L4WAV: lfos_rw[3]->waveform.set_ratio(ratio); break;
-            case ParamId::L5WAV: lfos_rw[4]->waveform.set_ratio(ratio); break;
-            case ParamId::L6WAV: lfos_rw[5]->waveform.set_ratio(ratio); break;
-            case ParamId::L7WAV: lfos_rw[6]->waveform.set_ratio(ratio); break;
-            case ParamId::L8WAV: lfos_rw[7]->waveform.set_ratio(ratio); break;
-            case ParamId::ERTYP: effects.reverb.type.set_ratio(ratio); break;
-            case ParamId::ECTYP: effects.chorus.type.set_ratio(ratio); break;
-            case ParamId::MTUN: modulator_params.tuning.set_ratio(ratio); break;
-            case ParamId::CTUN: carrier_params.tuning.set_ratio(ratio); break;
-            case ParamId::MOIA: modulator_params.oscillator_inaccuracy.set_ratio(ratio); break;
-            case ParamId::MOIS: modulator_params.oscillator_instability.set_ratio(ratio); break;
-            case ParamId::COIA: carrier_params.oscillator_inaccuracy.set_ratio(ratio); break;
-            case ParamId::COIS: carrier_params.oscillator_instability.set_ratio(ratio); break;
-            case ParamId::L1AEN: lfos_rw[0]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L2AEN: lfos_rw[1]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L3AEN: lfos_rw[2]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L4AEN: lfos_rw[3]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L5AEN: lfos_rw[4]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L6AEN: lfos_rw[5]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L7AEN: lfos_rw[6]->amount_envelope.set_ratio(ratio); break;
-            case ParamId::L8AEN: lfos_rw[7]->amount_envelope.set_ratio(ratio); break;
-            default: JS80P_ASSERT_NOT_REACHED(); break;
-        }
-    } else {
-        switch (type) {
-            case ParamType::SAMPLE_EVALUATED_FLOAT:
-                sample_evaluated_float_params[index]->set_ratio(ratio);
-                break;
+    switch (type) {
+        case ParamType::SAMPLE_EVALUATED_FLOAT:
+            sample_evaluated_float_params[index]->set_ratio(ratio);
+            break;
 
-            case ParamType::BLOCK_EVALUATED_FLOAT:
-                block_evaluated_float_params[index]->set_ratio(ratio);
-                break;
+        case ParamType::BLOCK_EVALUATED_FLOAT:
+            block_evaluated_float_params[index]->set_ratio(ratio);
+            break;
 
-            case ParamType::TOGGLE:
-                toggle_params[index]->set_ratio(ratio);
-                break;
+        case ParamType::BYTE:
+            byte_params[index]->set_ratio(ratio);
+            break;
 
-            case ParamType::ENVELOPE_SHAPE:
-                envelope_shape_params[index]->set_ratio(ratio);
-                break;
-
-            default:
-                JS80P_ASSERT_NOT_REACHED();
-                break;
-        }
+        default:
+            JS80P_ASSERT_NOT_REACHED();
+            break;
     }
 
     handle_refresh_param(param_id);
@@ -2157,7 +1999,7 @@ void Synth::handle_assign_controller(
     ParamType const type = find_param_type(param_id);
     bool is_assigned = false;
 
-    if (!is_controlling_supported(param_id, type)) {
+    if (!may_be_controllable(param_id, type)) {
         return;
     }
 
@@ -2174,8 +2016,8 @@ void Synth::handle_assign_controller(
             );
             break;
 
-        case ParamType::OTHER:
-            is_assigned = assign_controller_to_discrete_param(param_id, ctl_id);
+        case ParamType::BYTE:
+            is_assigned = assign_controller_to_byte_param(param_id, ctl_id);
             break;
 
         default:
@@ -2195,15 +2037,21 @@ void Synth::handle_assign_controller(
 }
 
 
-bool Synth::is_controlling_supported(
+bool Synth::may_be_controllable(
         ParamId const param_id,
         ParamType const type
 ) const noexcept {
     switch (type) {
-        case ParamType::TOGGLE:
-        case ParamType::ENVELOPE_SHAPE:
+        case ParamType::OTHER:
         case ParamType::INVALID_PARAM_TYPE:
             return false;
+
+        case ParamType::BYTE:
+            /*
+            The assign_controller_to_byte_param() method ignores those that are
+            not intended to be controlled.
+            */
+            return true;
 
         default:
             break;
@@ -2278,7 +2126,7 @@ void Synth::handle_clear() noexcept
 }
 
 
-bool Synth::assign_controller_to_discrete_param(
+bool Synth::assign_controller_to_byte_param(
         ParamId const param_id,
         ControllerId const controller_id
 ) noexcept {
@@ -2611,51 +2459,12 @@ Number Synth::get_param_ratio(ParamId const param_id) const noexcept
         case ParamType::BLOCK_EVALUATED_FLOAT:
             return block_evaluated_float_params[index]->get_ratio();
 
-        case ParamType::TOGGLE:
-            return toggle_params[index]->get_ratio();
-
-        case ParamType::ENVELOPE_SHAPE:
-            return envelope_shape_params[index]->get_ratio();
+        case ParamType::BYTE:
+            return byte_params[index]->get_ratio();
 
         default:
-            break;
-    }
-
-    switch (param_id) {
-        case ParamId::MODE: return mode.get_ratio();
-        case ParamId::MWAV: return modulator_params.waveform.get_ratio();
-        case ParamId::CWAV: return carrier_params.waveform.get_ratio();
-        case ParamId::MF1TYP: return modulator_params.filter_1_type.get_ratio();
-        case ParamId::MF2TYP: return modulator_params.filter_2_type.get_ratio();
-        case ParamId::CF1TYP: return carrier_params.filter_1_type.get_ratio();
-        case ParamId::CF2TYP: return carrier_params.filter_2_type.get_ratio();
-        case ParamId::EF1TYP: return effects.filter_1_type.get_ratio();
-        case ParamId::EF2TYP: return effects.filter_2_type.get_ratio();
-        case ParamId::L1WAV: return lfos_rw[0]->waveform.get_ratio();
-        case ParamId::L2WAV: return lfos_rw[1]->waveform.get_ratio();
-        case ParamId::L3WAV: return lfos_rw[2]->waveform.get_ratio();
-        case ParamId::L4WAV: return lfos_rw[3]->waveform.get_ratio();
-        case ParamId::L5WAV: return lfos_rw[4]->waveform.get_ratio();
-        case ParamId::L6WAV: return lfos_rw[5]->waveform.get_ratio();
-        case ParamId::L7WAV: return lfos_rw[6]->waveform.get_ratio();
-        case ParamId::L8WAV: return lfos_rw[7]->waveform.get_ratio();
-        case ParamId::ERTYP: return effects.reverb.type.get_ratio();
-        case ParamId::ECTYP: return effects.chorus.type.get_ratio();
-        case ParamId::MTUN: return modulator_params.tuning.get_ratio();
-        case ParamId::CTUN: return carrier_params.tuning.get_ratio();
-        case ParamId::MOIA: return modulator_params.oscillator_inaccuracy.get_ratio();
-        case ParamId::MOIS: return modulator_params.oscillator_instability.get_ratio();
-        case ParamId::COIA: return carrier_params.oscillator_inaccuracy.get_ratio();
-        case ParamId::COIS: return carrier_params.oscillator_instability.get_ratio();
-        case ParamId::L1AEN: return lfos_rw[0]->amount_envelope.get_ratio();
-        case ParamId::L2AEN: return lfos_rw[1]->amount_envelope.get_ratio();
-        case ParamId::L3AEN: return lfos_rw[2]->amount_envelope.get_ratio();
-        case ParamId::L4AEN: return lfos_rw[3]->amount_envelope.get_ratio();
-        case ParamId::L5AEN: return lfos_rw[4]->amount_envelope.get_ratio();
-        case ParamId::L6AEN: return lfos_rw[5]->amount_envelope.get_ratio();
-        case ParamId::L7AEN: return lfos_rw[6]->amount_envelope.get_ratio();
-        case ParamId::L8AEN: return lfos_rw[7]->amount_envelope.get_ratio();
-        default: JS80P_ASSERT_NOT_REACHED(); return 0.0;
+            JS80P_ASSERT_NOT_REACHED();
+            return 0.0;
     }
 }
 

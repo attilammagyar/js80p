@@ -44,12 +44,12 @@ constexpr Frequency SAMPLE_RATE = 11025.0;
 constexpr Integer BLOCK_SIZE = 2048;
 constexpr Integer CHANNELS = 1;
 
-constexpr Toggle OFF = ToggleParam::OFF;
-constexpr Toggle ON = ToggleParam::ON;
+constexpr Byte OFF = ToggleParam::OFF;
+constexpr Byte ON = ToggleParam::ON;
 
 
 void test_lfo(
-        Toggle const tempo_sync,
+        Byte const tempo_sync,
         Number const bpm,
         Frequency const frequency,
         Frequency const expected_frequency
@@ -231,7 +231,7 @@ TEST(lfo_performance, {
 void test_lfo_modifier_statistics(
         Number const distortion,
         Number const randomness,
-        Toggle const centered,
+        Byte const centered,
         Number const tolerance
 ) {
     LFO lfo("L1");

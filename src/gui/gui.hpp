@@ -228,9 +228,22 @@ class GUI
         void destroy();
 
         void build_about_body(char const* sdk_version);
-        void build_macros_1_body(ParamStateImages const* knob_states);
-        void build_macros_2_body(ParamStateImages const* knob_states);
-        void build_macros_3_body(ParamStateImages const* knob_states);
+
+        void build_macros_1_body(
+            ParamStateImages const* knob_states,
+            ParamStateImages const* macro_distortions
+        );
+
+        void build_macros_2_body(
+            ParamStateImages const* knob_states,
+            ParamStateImages const* macro_distortions
+        );
+
+        void build_macros_3_body(
+            ParamStateImages const* knob_states,
+            ParamStateImages const* macro_distortions
+        );
+
         void build_effects_body(ParamStateImages const* knob_states);
 
         void build_envelopes_1_body(
@@ -273,6 +286,7 @@ class GUI
         ParamStateImages const* screw_states;
         ParamStateImages const* envelope_shapes_01;
         ParamStateImages const* envelope_shapes_10;
+        ParamStateImages const* macro_distortions;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;

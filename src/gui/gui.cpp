@@ -31,20 +31,20 @@ bool GUI::controllers_by_id_initialized = false;
 
 
 char const* const GUI::MODES[] = {
-    [Synth::MIX_AND_MOD] = "Mix&Mod",
-    [Synth::SPLIT_AT_C3] = "Split C3",
-    [Synth::SPLIT_AT_Db3] = "Split Db3",
-    [Synth::SPLIT_AT_D3] = "Split D3",
-    [Synth::SPLIT_AT_Eb3] = "Split Eb3",
-    [Synth::SPLIT_AT_E3] = "Split E3",
-    [Synth::SPLIT_AT_F3] = "Split F3",
-    [Synth::SPLIT_AT_Gb3] = "Split Gb3",
-    [Synth::SPLIT_AT_G3] = "Split G3",
-    [Synth::SPLIT_AT_Ab3] = "Split Ab3",
-    [Synth::SPLIT_AT_A3] = "Split A3",
-    [Synth::SPLIT_AT_Bb3] = "Split Bb3",
-    [Synth::SPLIT_AT_B3] = "Split B3",
-    [Synth::SPLIT_AT_C4] = "Split C4",
+    [Synth::MODE_MIX_AND_MOD] = "Mix&Mod",
+    [Synth::MODE_SPLIT_AT_C3] = "Split C3",
+    [Synth::MODE_SPLIT_AT_Db3] = "Split Db3",
+    [Synth::MODE_SPLIT_AT_D3] = "Split D3",
+    [Synth::MODE_SPLIT_AT_Eb3] = "Split Eb3",
+    [Synth::MODE_SPLIT_AT_E3] = "Split E3",
+    [Synth::MODE_SPLIT_AT_F3] = "Split F3",
+    [Synth::MODE_SPLIT_AT_Gb3] = "Split Gb3",
+    [Synth::MODE_SPLIT_AT_G3] = "Split G3",
+    [Synth::MODE_SPLIT_AT_Ab3] = "Split Ab3",
+    [Synth::MODE_SPLIT_AT_A3] = "Split A3",
+    [Synth::MODE_SPLIT_AT_Bb3] = "Split Bb3",
+    [Synth::MODE_SPLIT_AT_B3] = "Split B3",
+    [Synth::MODE_SPLIT_AT_C4] = "Split C4",
 };
 
 int const GUI::MODES_COUNT = Synth::MODES;
@@ -949,6 +949,37 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N10RSH] = "Envelope 10 Release Shape",
     [Synth::ParamId::N11RSH] = "Envelope 11 Release Shape",
     [Synth::ParamId::N12RSH] = "Envelope 12 Release Shape",
+
+    [Synth::ParamId::M1DSH] = "Macro 1 Distortion Shape",
+    [Synth::ParamId::M2DSH] = "Macro 2 Distortion Shape",
+    [Synth::ParamId::M3DSH] = "Macro 3 Distortion Shape",
+    [Synth::ParamId::M4DSH] = "Macro 4 Distortion Shape",
+    [Synth::ParamId::M5DSH] = "Macro 5 Distortion Shape",
+    [Synth::ParamId::M6DSH] = "Macro 6 Distortion Shape",
+    [Synth::ParamId::M7DSH] = "Macro 7 Distortion Shape",
+    [Synth::ParamId::M8DSH] = "Macro 8 Distortion Shape",
+    [Synth::ParamId::M9DSH] = "Macro 9 Distortion Shape",
+    [Synth::ParamId::M10DSH] = "Macro 10 Distortion Shape",
+    [Synth::ParamId::M11DSH] = "Macro 11 Distortion Shape",
+    [Synth::ParamId::M12DSH] = "Macro 12 Distortion Shape",
+    [Synth::ParamId::M13DSH] = "Macro 13 Distortion Shape",
+    [Synth::ParamId::M14DSH] = "Macro 14 Distortion Shape",
+    [Synth::ParamId::M15DSH] = "Macro 15 Distortion Shape",
+    [Synth::ParamId::M16DSH] = "Macro 16 Distortion Shape",
+    [Synth::ParamId::M17DSH] = "Macro 17 Distortion Shape",
+    [Synth::ParamId::M18DSH] = "Macro 18 Distortion Shape",
+    [Synth::ParamId::M19DSH] = "Macro 19 Distortion Shape",
+    [Synth::ParamId::M20DSH] = "Macro 20 Distortion Shape",
+    [Synth::ParamId::M21DSH] = "Macro 21 Distortion Shape",
+    [Synth::ParamId::M22DSH] = "Macro 22 Distortion Shape",
+    [Synth::ParamId::M23DSH] = "Macro 23 Distortion Shape",
+    [Synth::ParamId::M24DSH] = "Macro 24 Distortion Shape",
+    [Synth::ParamId::M25DSH] = "Macro 25 Distortion Shape",
+    [Synth::ParamId::M26DSH] = "Macro 26 Distortion Shape",
+    [Synth::ParamId::M27DSH] = "Macro 27 Distortion Shape",
+    [Synth::ParamId::M28DSH] = "Macro 28 Distortion Shape",
+    [Synth::ParamId::M29DSH] = "Macro 29 Distortion Shape",
+    [Synth::ParamId::M30DSH] = "Macro 30 Distortion Shape",
 };
 
 
@@ -1259,7 +1290,7 @@ void GUI::param_ratio_to_str_int(
         size_t const buffer_size
 ) {
     Byte const value = (
-        synth.int_param_ratio_to_display_value(param_id, ratio)
+        synth.byte_param_ratio_to_display_value(param_id, ratio)
     );
 
     if ((size_t)value >= number_of_options) {
@@ -1662,6 +1693,17 @@ GUI::GUI(
         21
     );
 
+    macro_distortions = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "MACRODIST"),
+        NULL,
+        NULL,
+        NULL,
+        4,
+        21,
+        21
+    );
+
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
     macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
     macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
@@ -1686,9 +1728,9 @@ GUI::GUI(
     controller_selector = new ControllerSelector(*background, synth);
 
     build_about_body(sdk_version);
-    build_macros_1_body(knob_states);
-    build_macros_2_body(knob_states);
-    build_macros_3_body(knob_states);
+    build_macros_1_body(knob_states, macro_distortions);
+    build_macros_2_body(knob_states, macro_distortions);
+    build_macros_3_body(knob_states, macro_distortions);
     build_effects_body(knob_states);
     build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
@@ -1799,8 +1841,10 @@ void GUI::build_about_body(char const* sdk_version)
 }
 
 
-void GUI::build_macros_1_body(ParamStateImages const* knob_states)
-{
+void GUI::build_macros_1_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* macro_distortions
+) {
     macros_1_body = new TabBody("Macros 1-10");
 
     background->own(macros_1_body);
@@ -1815,6 +1859,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M1DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M1RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M1DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1827,6 +1873,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M2AMT,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M2DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M2RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M2DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -1841,6 +1889,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M3DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M3RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M3DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1853,6 +1903,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M4AMT,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M4DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M4RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M4DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -1867,6 +1919,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M5DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M5RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M5DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1879,6 +1933,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M6AMT,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M6DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M6RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M6DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -1893,6 +1949,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M7DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M7RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M7DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1905,6 +1963,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M8AMT,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M8DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M8RND,  MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M8DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -1919,6 +1979,8 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M9DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M9RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M9DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1932,14 +1994,18 @@ void GUI::build_macros_1_body(ParamStateImages const* knob_states)
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M10DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M10RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M10DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
     macros_1_body->hide();
 }
 
 
-void GUI::build_macros_2_body(ParamStateImages const* knob_states)
-{
+void GUI::build_macros_2_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* macro_distortions
+) {
     macros_2_body = new TabBody("Macros 11-20");
 
     background->own(macros_2_body);
@@ -1954,6 +2020,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M11DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M11RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M11DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1966,6 +2034,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M12AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M12DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M12RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M12DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -1980,6 +2050,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M13DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M13RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M13DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -1992,6 +2064,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M14AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M14DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M14RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M14DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2006,6 +2080,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M15DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M15RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M15DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2018,6 +2094,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M16AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M16DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M16RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M16DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2032,6 +2110,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M17DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M17RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M17DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2044,6 +2124,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M18AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M18DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M18RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M18DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2058,6 +2140,8 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M19DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M19RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M19DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2071,14 +2155,18 @@ void GUI::build_macros_2_body(ParamStateImages const* knob_states)
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M20DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M20RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M20DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
     macros_2_body->hide();
 }
 
 
-void GUI::build_macros_3_body(ParamStateImages const* knob_states)
-{
+void GUI::build_macros_3_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* macro_distortions
+) {
     macros_3_body = new TabBody("Macros 21-30");
 
     background->own(macros_3_body);
@@ -2093,6 +2181,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M21DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M21RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M21DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2105,6 +2195,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M22AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M22DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M22RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M22DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2119,6 +2211,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M23DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M23RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M23DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2131,6 +2225,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M24AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M24DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M24RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M24DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2145,6 +2241,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M25DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M25RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M25DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2157,6 +2255,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M26AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M26DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M26RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M26DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2171,6 +2271,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M27DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M27RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M27DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2183,6 +2285,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M28AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M28DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M28RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M28DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2197,6 +2301,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M29DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M29RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M29DSH, macro_distortions);
+
     POSITION_RELATIVE_END();
 
 
@@ -2209,6 +2315,8 @@ void GUI::build_macros_3_body(ParamStateImages const* knob_states)
     KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M30AMT, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M30DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M30RND, MM__C,  "%.2f", 100.0, knob_states);
+
+    DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M30DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
 
@@ -2924,6 +3032,7 @@ GUI::~GUI()
     delete screw_states;
     delete envelope_shapes_01;
     delete envelope_shapes_10;
+    delete macro_distortions;
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(macros_1_image);

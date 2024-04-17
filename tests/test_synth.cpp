@@ -77,7 +77,7 @@ class FrequenciesTestSynth : public Synth
         {
         }
 
-        Frequency get_frequency(Modulator::Tuning const tuning, Midi::Note const note) const
+        Frequency get_frequency(Byte const tuning, Midi::Note const note) const
         {
             return frequencies[tuning][note];
         }
@@ -255,9 +255,9 @@ TEST(can_look_up_param_id_by_name, {
         max_collisions, avg_collisions, avg_bucket_size
     );
 
-    assert_lte((int)max_collisions, 6);
-    assert_lte(avg_bucket_size, 2.7);
-    assert_lte(avg_collisions, 3.2);
+    assert_lte((int)max_collisions, 7);
+    assert_lte(avg_bucket_size, 2.75);
+    assert_lte(avg_collisions, 3.3);
 
     assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(""));
     assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(" \n"));
@@ -274,7 +274,7 @@ TEST(can_look_up_param_id_by_name, {
 void test_operating_mode(
         Number const expected_vol_a3,
         Number const expected_vol_a5,
-        Synth::Mode const mode
+        Byte const mode
 ) {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
@@ -334,10 +334,10 @@ void test_operating_mode(
 
 TEST(operating_mode, {
     test_operating_mode(
-        OUT_VOLUME_PER_CHANNEL, OUT_VOLUME_PER_CHANNEL, Synth::MIX_AND_MOD
+        OUT_VOLUME_PER_CHANNEL, OUT_VOLUME_PER_CHANNEL, Synth::MODE_MIX_AND_MOD
     );
-    test_operating_mode(OUT_VOLUME_PER_CHANNEL, 0, Synth::SPLIT_AT_C4);
-    test_operating_mode(0, OUT_VOLUME_PER_CHANNEL, Synth::SPLIT_AT_C3);
+    test_operating_mode(OUT_VOLUME_PER_CHANNEL, 0, Synth::MODE_SPLIT_AT_C4);
+    test_operating_mode(0, OUT_VOLUME_PER_CHANNEL, Synth::MODE_SPLIT_AT_C3);
 })
 
 

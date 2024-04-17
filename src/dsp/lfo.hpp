@@ -47,7 +47,7 @@ class LFO : public SignalProducer
     public:
         typedef Oscillator<SignalProducer, true> Oscillator_;
 
-        typedef Param<Byte, ParamEvaluation::BLOCK> AmountEnvelopeParam;
+        typedef ByteParam AmountEnvelopeParam;
 
         explicit LFO(
             std::string const& name,

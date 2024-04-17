@@ -139,18 +139,32 @@ class Param : public SignalProducer
 };
 
 
-typedef Byte Toggle;
-
-
-class ToggleParam : public Param<Toggle, ParamEvaluation::BLOCK>
+class ByteParam : public Param<Byte, ParamEvaluation::BLOCK>
 {
     friend class SignalProducer;
 
     public:
-        static constexpr Toggle OFF = 0;
-        static constexpr Toggle ON = 1;
+        ByteParam(
+            std::string const& name,
+            Byte const min_value,
+            Byte const max_value,
+            Byte const default_value
+        ) noexcept;
+};
 
-        ToggleParam(std::string const& name, Toggle const default_value);
+
+template class Param<Byte, ParamEvaluation::BLOCK>;
+
+
+class ToggleParam : public ByteParam
+{
+    friend class SignalProducer;
+
+    public:
+        static constexpr Byte OFF = 0;
+        static constexpr Byte ON = 1;
+
+        ToggleParam(std::string const& name, Byte const default_value);
 };
 
 

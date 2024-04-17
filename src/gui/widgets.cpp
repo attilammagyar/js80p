@@ -1427,7 +1427,7 @@ bool ToggleSwitchParamEditor::paint()
 {
     TransparentWidget::paint();
 
-    Toggle const toggle = synth.int_param_ratio_to_display_value(param_id, ratio);
+    Byte const toggle = synth.byte_param_ratio_to_display_value(param_id, ratio);
     GUI::Color const color = (
         toggle == ToggleParam::ON ? GUI::TOGGLE_ON_COLOR : GUI::TOGGLE_OFF_COLOR
     );
@@ -1614,7 +1614,7 @@ void DiscreteParamEditor::refresh()
 void DiscreteParamEditor::update()
 {
     if (options != NULL) {
-        update_value_str(synth.int_param_ratio_to_display_value(param_id, ratio));
+        update_value_str(synth.byte_param_ratio_to_display_value(param_id, ratio));
     } else if (state_images != NULL) {
         set_image(state_images->free_images[state_images->ratio_to_index(ratio)]);
     }
@@ -1791,9 +1791,9 @@ void TuningSelector::refresh()
 
 void TuningSelector::update()
 {
-    Byte const value = synth.int_param_ratio_to_display_value(param_id, ratio);
+    Byte const value = synth.byte_param_ratio_to_display_value(param_id, ratio);
 
-    if ((Modulator::Tuning)value < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
+    if (value < Modulator::TUNING_MTS_ESP_CONTINUOUS) {
         update_value_str(value);
 
         return;

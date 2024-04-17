@@ -92,7 +92,7 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
 void test_basic_delay(
         Number const time_scale,
         Number const bpm,
-        Toggle const tempo_sync_state
+        Byte const tempo_sync_state
 ) {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
@@ -202,7 +202,7 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
 void test_delay_with_feedback(
         Number const time_scale,
         Number const bpm,
-        Toggle const tempo_sync_state
+        Byte const tempo_sync_state
 ) {
     constexpr Integer block_size = 3;
     constexpr Integer rounds = 4;

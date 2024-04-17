@@ -173,7 +173,7 @@ void assert_completed(
 }
 
 
-void test_silent_input_is_no_op(BiquadFilter<SumOfSines>::Type const type)
+void test_silent_input_is_no_op(Byte const type)
 {
     constexpr Number low_amplitude = 1e-9;
 
@@ -680,7 +680,7 @@ void test_fast_path_continuity(
         Integer const block_size,
         Integer const batch_size,
         BiquadFilterSharedBuffers* const shared_buffers,
-        BiquadFilter<FixedSignalProducer>::Type const type,
+        Byte const type,
         Number const q,
         Sample const silent_round_input_sample
 ) {
@@ -882,7 +882,7 @@ TEST(silent_input_fast_path_keeps_continuity, {
 
 void set_up_chunk_size_independent_test(
         BiquadFilter<SumOfSines>& filter,
-        BiquadFilter<SumOfSines>::Type const type,
+        Byte const type,
         SumOfSines& input
 ) {
     constexpr Frequency sample_rate = 44100.0;
@@ -902,7 +902,7 @@ void set_up_chunk_size_independent_test(
 
 
 void assert_filter_rendering_is_independent_of_chunk_size(
-        BiquadFilter<SumOfSines>::Type const type,
+        Byte const type,
         char const* message
 ) {
     SumOfSines input_1(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);

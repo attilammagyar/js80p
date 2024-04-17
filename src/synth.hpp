@@ -80,9 +80,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer MIDI_CONTROLLERS = 128;
 
         static constexpr Integer MACROS = 30;
-        static constexpr Integer MACRO_FLOAT_PARAMS = 6;
-
-        static constexpr Integer LFO_FLOAT_PARAMS = 7;
+        static constexpr Integer MACRO_PARAMS = 7;
 
         enum MessageType {
             SET_PARAM = 1,          ///< Set the given parameter's ratio to
@@ -788,8 +786,38 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N10RSH = 626,    ///< Envelope 10 Release Shape
             N11RSH = 627,    ///< Envelope 11 Release Shape
             N12RSH = 628,    ///< Envelope 12 Release Shape
+            M1DSH = 629,     ///< Macro 1 Distortion Shape
+            M2DSH = 630,     ///< Macro 2 Distortion Shape
+            M3DSH = 631,     ///< Macro 3 Distortion Shape
+            M4DSH = 632,     ///< Macro 4 Distortion Shape
+            M5DSH = 633,     ///< Macro 5 Distortion Shape
+            M6DSH = 634,     ///< Macro 6 Distortion Shape
+            M7DSH = 635,     ///< Macro 7 Distortion Shape
+            M8DSH = 636,     ///< Macro 8 Distortion Shape
+            M9DSH = 637,     ///< Macro 9 Distortion Shape
+            M10DSH = 638,    ///< Macro 10 Distortion Shape
+            M11DSH = 639,    ///< Macro 11 Distortion Shape
+            M12DSH = 640,    ///< Macro 12 Distortion Shape
+            M13DSH = 641,    ///< Macro 13 Distortion Shape
+            M14DSH = 642,    ///< Macro 14 Distortion Shape
+            M15DSH = 643,    ///< Macro 15 Distortion Shape
+            M16DSH = 644,    ///< Macro 16 Distortion Shape
+            M17DSH = 645,    ///< Macro 17 Distortion Shape
+            M18DSH = 646,    ///< Macro 18 Distortion Shape
+            M19DSH = 647,    ///< Macro 19 Distortion Shape
+            M20DSH = 648,    ///< Macro 20 Distortion Shape
+            M21DSH = 649,    ///< Macro 21 Distortion Shape
+            M22DSH = 650,    ///< Macro 22 Distortion Shape
+            M23DSH = 651,    ///< Macro 23 Distortion Shape
+            M24DSH = 652,    ///< Macro 24 Distortion Shape
+            M25DSH = 653,    ///< Macro 25 Distortion Shape
+            M26DSH = 654,    ///< Macro 26 Distortion Shape
+            M27DSH = 655,    ///< Macro 27 Distortion Shape
+            M28DSH = 656,    ///< Macro 28 Distortion Shape
+            M29DSH = 657,    ///< Macro 29 Distortion Shape
+            M30DSH = 658,    ///< Macro 30 Distortion Shape
 
-            PARAM_ID_COUNT = 629,
+            PARAM_ID_COUNT = 659,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
@@ -946,22 +974,20 @@ class Synth : public Midi::EventHandler, public SignalProducer
             INVALID_CONTROLLER_ID =     CONTROLLER_ID_COUNT,
         };
 
-        typedef Byte Mode;
-
-        static constexpr Mode MIX_AND_MOD = 0;
-        static constexpr Mode SPLIT_AT_C3 = 1;
-        static constexpr Mode SPLIT_AT_Db3 = 2;
-        static constexpr Mode SPLIT_AT_D3 = 3;
-        static constexpr Mode SPLIT_AT_Eb3 = 4;
-        static constexpr Mode SPLIT_AT_E3 = 5;
-        static constexpr Mode SPLIT_AT_F3 = 6;
-        static constexpr Mode SPLIT_AT_Gb3 = 7;
-        static constexpr Mode SPLIT_AT_G3 = 8;
-        static constexpr Mode SPLIT_AT_Ab3 = 9;
-        static constexpr Mode SPLIT_AT_A3 = 10;
-        static constexpr Mode SPLIT_AT_Bb3 = 11;
-        static constexpr Mode SPLIT_AT_B3 = 12;
-        static constexpr Mode SPLIT_AT_C4 = 13;
+        static constexpr Byte MODE_MIX_AND_MOD = 0;
+        static constexpr Byte MODE_SPLIT_AT_C3 = 1;
+        static constexpr Byte MODE_SPLIT_AT_Db3 = 2;
+        static constexpr Byte MODE_SPLIT_AT_D3 = 3;
+        static constexpr Byte MODE_SPLIT_AT_Eb3 = 4;
+        static constexpr Byte MODE_SPLIT_AT_E3 = 5;
+        static constexpr Byte MODE_SPLIT_AT_F3 = 6;
+        static constexpr Byte MODE_SPLIT_AT_Gb3 = 7;
+        static constexpr Byte MODE_SPLIT_AT_G3 = 8;
+        static constexpr Byte MODE_SPLIT_AT_Ab3 = 9;
+        static constexpr Byte MODE_SPLIT_AT_A3 = 10;
+        static constexpr Byte MODE_SPLIT_AT_Bb3 = 11;
+        static constexpr Byte MODE_SPLIT_AT_B3 = 12;
+        static constexpr Byte MODE_SPLIT_AT_C4 = 13;
 
         static constexpr int MODES = 14;
 
@@ -988,7 +1014,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Byte byte_param;
         };
 
-        class ModeParam : public Param<Mode, ParamEvaluation::BLOCK>
+        class ModeParam : public ByteParam
         {
             public:
                 explicit ModeParam(std::string const& name) noexcept;
@@ -1121,7 +1147,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number const ratio
         ) const noexcept;
 
-        Byte int_param_ratio_to_display_value(
+        Byte byte_param_ratio_to_display_value(
             ParamId const param_id,
             Number const ratio
         ) const noexcept;
@@ -1385,8 +1411,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 static constexpr Integer ENTRIES = 0x100;
                 static constexpr Integer MASK = ENTRIES - 1;
-                static constexpr Integer MULTIPLIER = 1367;
-                static constexpr Integer SHIFT = 11;
+                static constexpr Integer MULTIPLIER = 1401;
+                static constexpr Integer SHIFT = 7;
 
                 static Integer hash(std::string const& name) noexcept;
 
@@ -1454,9 +1480,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             OTHER = 0,
             SAMPLE_EVALUATED_FLOAT = 1,
             BLOCK_EVALUATED_FLOAT = 2,
-            TOGGLE = 3,
-            ENVELOPE_SHAPE = 4,
-            INVALID_PARAM_TYPE = 5,
+            BYTE = 3,
+            INVALID_PARAM_TYPE = 4,
         };
 
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
@@ -1514,7 +1539,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         ParamType find_param_type(ParamId const param_id) const noexcept;
 
-        bool is_controlling_supported(
+        bool may_be_controllable(
             ParamId const param_id,
             ParamType const type
         ) const noexcept;
@@ -1549,7 +1574,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void handle_clear() noexcept;
 
-        bool assign_controller_to_discrete_param(
+        bool assign_controller_to_byte_param(
             ParamId const param_id,
             ControllerId const controller_id
         ) noexcept;
@@ -1634,8 +1659,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         BiquadFilterSharedBuffers biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
         FloatParamS* sample_evaluated_float_params[ParamId::PARAM_ID_COUNT];
         FloatParamB* block_evaluated_float_params[ParamId::PARAM_ID_COUNT];
-        ToggleParam* toggle_params[ParamId::PARAM_ID_COUNT];
-        Envelope::ShapeParam* envelope_shape_params[ParamId::PARAM_ID_COUNT];
+        ByteParam* byte_params[ParamId::PARAM_ID_COUNT];
         std::atomic<Number> param_ratios[ParamId::PARAM_ID_COUNT];
         std::atomic<Byte> controller_assignments[ParamId::PARAM_ID_COUNT];
         Envelope* envelopes_rw[Constants::ENVELOPES];

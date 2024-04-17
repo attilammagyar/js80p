@@ -67,18 +67,16 @@ class Oscillator : public SignalProducer
             FloatParamB
         >::type SubharmonicAmplitude;
 
-        typedef Byte Waveform;
-
-        static constexpr Waveform SINE = 0;
-        static constexpr Waveform SAWTOOTH = 1;
-        static constexpr Waveform SOFT_SAWTOOTH = 2;
-        static constexpr Waveform INVERSE_SAWTOOTH = 3;
-        static constexpr Waveform SOFT_INVERSE_SAWTOOTH = 4;
-        static constexpr Waveform TRIANGLE = 5;
-        static constexpr Waveform SOFT_TRIANGLE = 6;
-        static constexpr Waveform SQUARE = 7;
-        static constexpr Waveform SOFT_SQUARE = 8;
-        static constexpr Waveform CUSTOM = 9;
+        static constexpr Byte SINE = 0;
+        static constexpr Byte SAWTOOTH = 1;
+        static constexpr Byte SOFT_SAWTOOTH = 2;
+        static constexpr Byte INVERSE_SAWTOOTH = 3;
+        static constexpr Byte SOFT_INVERSE_SAWTOOTH = 4;
+        static constexpr Byte TRIANGLE = 5;
+        static constexpr Byte SOFT_TRIANGLE = 6;
+        static constexpr Byte SQUARE = 7;
+        static constexpr Byte SOFT_SQUARE = 8;
+        static constexpr Byte CUSTOM = 9;
 
         static constexpr int WAVEFORMS = 10;
 
@@ -86,12 +84,12 @@ class Oscillator : public SignalProducer
         static constexpr Number FREQUENCY_MAX = 24000.0;
         static constexpr Number FREQUENCY_DEFAULT = 440.0;
 
-        class WaveformParam : public Param<Waveform, ParamEvaluation::BLOCK>
+        class WaveformParam : public ByteParam
         {
             public:
                 explicit WaveformParam(
                     std::string const& name,
-                    Waveform const max_value = CUSTOM
+                    Byte const max_value = CUSTOM
                 ) noexcept;
         };
 
@@ -337,9 +335,6 @@ class Oscillator : public SignalProducer
         bool phase_is_constant;
         bool subharmonic_amplitude_is_constant;
 };
-
-
-template class Param<SimpleOscillator::Waveform, ParamEvaluation::BLOCK>;
 
 }
 
