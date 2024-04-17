@@ -40,7 +40,6 @@ class Mixer : public SignalProducer
 
         void add(InputSignalProducerClass& input) noexcept;
         void set_weight(size_t const input_index, Number const weight) noexcept;
-        void set_output_buffer(Sample** output) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -81,7 +80,6 @@ class Mixer : public SignalProducer
             Sample** buffer
         ) noexcept;
 
-        Sample** output;
         std::vector<Input> inputs;
         bool has_weights;
 };

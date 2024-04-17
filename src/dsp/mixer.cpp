@@ -30,7 +30,6 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Mixer<InputSignalProducerClass>::Mixer(Integer const channels) noexcept
     : SignalProducer(channels, 0),
-    output(NULL),
     has_weights(false)
 {
 }
@@ -51,13 +50,6 @@ void Mixer<InputSignalProducerClass>::set_weight(
     if (input_index < inputs.size()) {
         inputs[input_index].weight = weight;
     }
-}
-
-
-template<class InputSignalProducerClass>
-void Mixer<InputSignalProducerClass>::set_output_buffer(Sample** output) noexcept
-{
-    this->output = output;
 }
 
 
@@ -107,9 +99,8 @@ void Mixer<InputSignalProducerClass>::render(
         Sample** buffer
 ) noexcept {
     Integer const channels = get_channels();
-    Sample** output = this->output != NULL ? this->output : buffer;
 
-    render_silence(round, first_sample_index, last_sample_index, output);
+    render_silence(round, first_sample_index, last_sample_index, buffer);
 
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
         if (JS80P_UNLIKELY(it->weight < SILENCE_WEIGHT)) {
@@ -119,9 +110,9 @@ void Mixer<InputSignalProducerClass>::render(
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (has_weights) {
-                    output[c][i] += it->weight * it->buffer[c][i];
+                    buffer[c][i] += it->weight * it->buffer[c][i];
                 } else {
-                    output[c][i] += it->buffer[c][i];
+                    buffer[c][i] += it->buffer[c][i];
                 }
             }
         }

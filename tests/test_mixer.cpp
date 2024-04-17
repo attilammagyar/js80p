@@ -66,9 +66,7 @@ TEST(renders_and_sums_positive_weight_input_signals, {
     FixedSignalProducer input_2(input_buffer_2);
     FixedSignalProducer input_3(input_buffer_3);
     Mixer<FixedSignalProducer> mixer(CHANNELS);
-    Sample output_1[block_size] = {1.0, 1.0, 1.0, 1.0, 1.0};
-    Sample output_2[block_size] = {-1.0, -1.0, -1.0, -1.0, -1.0};
-    Sample* output[] = {output_1, output_2};
+    Sample const* const* rendered;
 
     mixer.add(input_1);
     mixer.add(input_2);
@@ -90,13 +88,12 @@ TEST(renders_and_sums_positive_weight_input_signals, {
     mixer.set_sample_rate(sample_rate);
     mixer.set_block_size(block_size);
 
-    mixer.set_output_buffer(output);
-    SignalProducer::produce< Mixer<FixedSignalProducer> >(mixer, 1);
+    rendered = SignalProducer::produce< Mixer<FixedSignalProducer> >(mixer, 1);
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_eq(
             expected_output[c],
-            output[c],
+            rendered[c],
             block_size,
             DOUBLE_DELTA,
             "channel=%d",

@@ -302,7 +302,6 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
         update_tunings(type);
     }
 
-    mixer.set_output_buffer(this->buffer);
     SignalProducer::produce< Mixer<CombFilter> >(mixer, round, sample_count);
 
     return NULL;
