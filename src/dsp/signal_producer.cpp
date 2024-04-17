@@ -48,7 +48,7 @@ Sample const* const* SignalProducer::produce(
         return signal_producer.cached_buffer;
     }
 
-    Sample** buffer = signal_producer.buffer_owner->buffer;
+    Sample** buffer = signal_producer.get_buffer();
 
     signal_producer.cached_buffer = buffer;
 
@@ -506,6 +506,12 @@ Integer SignalProducer::sample_count_or_block_size(
 void SignalProducer::register_child(SignalProducer& signal_producer) noexcept
 {
     children.push_back(&signal_producer);
+}
+
+
+Sample** SignalProducer::get_buffer() const noexcept
+{
+    return buffer_owner->buffer;
 }
 
 

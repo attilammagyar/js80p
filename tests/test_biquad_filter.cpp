@@ -302,6 +302,23 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_sile
 })
 
 
+TEST(when_buffer_is_external_and_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_silent, {
+    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
+    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilter<SumOfSines> filter("", input, filter_type, NULL, 0.0, NULL, NULL, &input);
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
+    filter.frequency.set_value(NYQUIST_FREQUENCY + 1.0);
+
+    schedule_small_param_changes(filter, NYQUIST_FREQUENCY + 1.0, 0.03, -6.0);
+
+    test_filter(filter, input, expected, 0.0);
+
+    assert_completed(filter, NYQUIST_FREQUENCY + 1.0, 0.03, -6.0);
+})
+
+
 TEST(high_pass_filter_attenuates_frequencies_below_the_given_frequency, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);

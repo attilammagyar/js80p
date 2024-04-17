@@ -485,7 +485,7 @@ void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    this->render_silence(round, 0, sample_count, this->buffer);
+    this->render_silence(round, 0, sample_count, this->get_buffer());
     this->mark_round_as_silent(round);
 
     if (JS80P_UNLIKELY(sample_count < 1)) {

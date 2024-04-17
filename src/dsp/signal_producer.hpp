@@ -245,6 +245,8 @@ class SignalProducer
 
         void register_child(SignalProducer& signal_producer) noexcept;
 
+        Sample** get_buffer() const noexcept;
+
         Integer const channels;
 
         Queue<Event> events;
