@@ -88,9 +88,11 @@ class Chorus : public Effect<InputSignalProducerClass>
         FloatParamS damping_gain;
         FloatParamS width;
         FloatParamS high_pass_frequency;
+        FloatParamS high_pass_q;
 
         ToggleParam tempo_sync;
         ToggleParam log_scale_filter_frequencies;
+        ToggleParam log_scale_high_pass_q;
         ToggleParam log_scale_lfo_frequency;
 
     protected:

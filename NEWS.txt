@@ -11,6 +11,8 @@ v?.?.? (2024-0?-??)
  * Filter Q parameter can also use logarithmic scale.
  * The Echo and Reverb effects can now apply gradually increasing distortion to
    the delayed signal.
+ * The Q factor of the highpass filter can now be adjusted in the Chorus, Echo,
+   and Reverb effects.
  * The released note and the release velocity can also be used as a parameter
    controller. (Note: unfortunately, most MIDI keyboards don't send meaningful
    note release velocities.)

@@ -33,7 +33,7 @@ Echo<InputSignalProducerClass>::Echo(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
-        name, input, 17, &comb_filter_2
+        name, input, 18, &comb_filter_2
     ),
     delay_time(
         name + "DEL",
@@ -74,16 +74,24 @@ Echo<InputSignalProducerClass>::Echo(
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
+    high_pass_q(
+        name + "HPQ",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT,
+        0.0,
+        NULL,
+        &log_scale_high_pass_q,
+        Math::log_biquad_filter_q_table(),
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE,
+        Math::LOG_BIQUAD_FILTER_Q_VALUE_OFFSET
+    ),
     distortion_level(name + "DST", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
+    log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
     high_pass_filter_type(""),
-    high_pass_filter_q(
-        "",
-        Constants::BIQUAD_FILTER_Q_MIN,
-        Constants::BIQUAD_FILTER_Q_MAX,
-        Constants::BIQUAD_FILTER_Q_DEFAULT
-    ),
     high_pass_filter_gain(
         "",
         Constants::BIQUAD_FILTER_GAIN_MIN,
@@ -95,7 +103,7 @@ Echo<InputSignalProducerClass>::Echo(
         gain,
         high_pass_filter_type,
         high_pass_frequency,
-        high_pass_filter_q,
+        high_pass_q,
         high_pass_filter_gain,
         NULL,
         0.0,
@@ -137,12 +145,13 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(damping_gain);
     this->register_child(width);
     this->register_child(high_pass_frequency);
+    this->register_child(high_pass_q);
     this->register_child(distortion_level);
     this->register_child(tempo_sync);
     this->register_child(log_scale_frequencies);
+    this->register_child(log_scale_high_pass_q);
 
     this->register_child(high_pass_filter_type);
-    this->register_child(high_pass_filter_q);
     this->register_child(high_pass_filter_gain);
 
     this->register_child(gain);

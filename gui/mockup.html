@@ -301,6 +301,7 @@ h1 span {
   width: 56px;
 }
 
+.block h1 label.log-q,
 .block h1 label.freq {
   position: relative;
   left: 2px;
@@ -321,12 +322,25 @@ h1 span {
   left: 105px;
 }
 
+#chorus h1 label.log-q {
+  left: 183px;
+  width: 72px;
+}
+
 #echo h1 label.freq {
   left: 210px;
 }
 
+#echo h1 label.log-q {
+  left: 333px;
+}
+
 #reverb h1 label.freq {
   left: 134px;
+}
+
+#reverb h1 label.log-q {
+  left: 257px;
 }
 
 .block h1 label.dynamic,
@@ -791,8 +805,9 @@ function make_tabs(active)
       <div id="chorus" class="effect main-block block">
         <h1>
           <span>Chorus</span>
-          <label class="lfo-freq"><input type="text" /><span> LOG LFO FREQS</span></label>
-          <label class="freq"><input type="text" /><span> LOG FILTER FREQS</span></label>
+          <label class="lfo-freq"><input type="text" /><span> LG LFO FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
+          <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="chorus-params" class="block"></div>
@@ -800,7 +815,8 @@ function make_tabs(active)
       <div id="echo" class="effect main-block block">
         <h1>
           <span>Echo</span>
-          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
+          <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
@@ -808,7 +824,8 @@ function make_tabs(active)
       <div id="reverb" class="effect main-block block">
         <h1>
           <span>Reverb</span>
-          <label class="freq"><input type="text" /><span> LOG FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
+          <label class="log-q"><input type="text" /><span> LG Q</span></label>
         </h1>
         <div id="reverb-params" class="block"></div>
       </div>
@@ -1011,7 +1028,8 @@ window.onload = function ()
     create_knob("chorus-params", "DF Hz", "6000");
     create_knob("chorus-params", "DG dB", "-6");
     create_knob("chorus-params", "WID %", "-100");
-    create_knob("chorus-params", "HP Hz", "100");
+    create_knob("chorus-params", "HP F Hz", "100");
+    create_knob("chorus-params", "HP Q", "1");
     create_knob("chorus-params", "WET %", "50");
     create_knob("chorus-params", "DRY %", "60");
 
@@ -1022,7 +1040,8 @@ window.onload = function ()
     create_knob("echo-params", "DF Hz", "6000");
     create_knob("echo-params", "DG dB", "-6");
     create_knob("echo-params", "WID %", "-100");
-    create_knob("echo-params", "HP Hz", "100");
+    create_knob("echo-params", "HP F Hz", "100");
+    create_knob("echo-params", "HP Q", "1");
     create_knob("echo-params", "CTH dB", "-30");
     create_knob("echo-params", "CATK s", "0.0");
     create_knob("echo-params", "CREL s", "0.0");
@@ -1036,7 +1055,8 @@ window.onload = function ()
     create_knob("reverb-params", "DF Hz", "6000");
     create_knob("reverb-params", "DG dB", "-6");
     create_knob("reverb-params", "WID %", "-100");
-    create_knob("reverb-params", "HP Hz", "100");
+    create_knob("reverb-params", "HP F Hz", "100");
+    create_knob("reverb-params", "HP Q", "1");
     create_knob("reverb-params", "CTH db", "-30");
     create_knob("reverb-params", "CATK s", "0.0");
     create_knob("reverb-params", "CREL s", "0.0");
@@ -1143,7 +1163,7 @@ window.onload = function ()
         h.innerHTML = [
           '<span>LFO ' + String(i) + '</span>',
           '<label class="log-freq">',
-            '<input type="text" /><span> LOG FREQ</span>',
+            '<input type="text" /><span> LG FREQ</span>',
           '</label>',
           '<label class="center">',
             '<span>CENTER </span><input type="text" />',

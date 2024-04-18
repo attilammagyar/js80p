@@ -491,10 +491,12 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ECDG, effects.chorus.damping_gain);
     register_param<FloatParamS>(ParamId::ECWID, effects.chorus.width);
     register_param<FloatParamS>(ParamId::ECHPF, effects.chorus.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::ECHPQ, effects.chorus.high_pass_q);
     register_param<FloatParamS>(ParamId::ECWET, effects.chorus.wet);
     register_param<FloatParamS>(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
     register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_filter_frequencies);
+    register_param<ToggleParam>(ParamId::ECLHQ, effects.chorus.log_scale_high_pass_q);
     register_param<ToggleParam>(ParamId::ECLLG, effects.chorus.log_scale_lfo_frequency);
 
     register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
@@ -505,6 +507,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EEDG, effects.echo.damping_gain);
     register_param<FloatParamS>(ParamId::EEWID, effects.echo.width);
     register_param<FloatParamS>(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::EEHPQ, effects.echo.high_pass_q);
     register_param<FloatParamB>(ParamId::EECTH, effects.echo.side_chain_compression_threshold);
     register_param<FloatParamB>(ParamId::EECAT, effects.echo.side_chain_compression_attack_time);
     register_param<FloatParamB>(ParamId::EECRL, effects.echo.side_chain_compression_release_time);
@@ -513,6 +516,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
     register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
+    register_param<ToggleParam>(ParamId::EELHQ, effects.echo.log_scale_high_pass_q);
 
     register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
     register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
@@ -521,6 +525,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
     register_param<FloatParamS>(ParamId::ERWID, effects.reverb.width);
     register_param<FloatParamS>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_param<FloatParamS>(ParamId::ERHPQ, effects.reverb.high_pass_q);
     register_param<FloatParamB>(ParamId::ERCTH, effects.reverb.side_chain_compression_threshold);
     register_param<FloatParamB>(ParamId::ERCAT, effects.reverb.side_chain_compression_attack_time);
     register_param<FloatParamB>(ParamId::ERCRL, effects.reverb.side_chain_compression_release_time);
@@ -528,6 +533,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
     register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
+    register_param<ToggleParam>(ParamId::ERLHQ, effects.reverb.log_scale_high_pass_q);
 
     register_param<FloatParamS>(ParamId::EV3V, effects.volume_3_gain);
 }

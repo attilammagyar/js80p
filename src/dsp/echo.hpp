@@ -56,9 +56,11 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         FloatParamS damping_gain;
         FloatParamS width;
         FloatParamS high_pass_frequency;
+        FloatParamS high_pass_q;
         FloatParamS distortion_level;
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
+        ToggleParam log_scale_high_pass_q;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -75,7 +77,6 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
 
     private:
         typename HighPassedInput::TypeParam high_pass_filter_type;
-        FloatParamS high_pass_filter_q;
         FloatParamS high_pass_filter_gain;
 
         BoostedInput gain;

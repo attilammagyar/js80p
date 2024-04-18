@@ -43,7 +43,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 19 + VOICES * 3, &mixer),
+) : Effect<InputSignalProducerClass>(name, input, 21 + VOICES * 3, &mixer),
     type(name+ "TYP"),
     delay_time(
         name + "DEL",
@@ -101,8 +101,22 @@ Chorus<InputSignalProducerClass>::Chorus(
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE
     ),
+    high_pass_q(
+        name + "HPQ",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT,
+        0.0,
+        NULL,
+        &log_scale_high_pass_q,
+        Math::log_biquad_filter_q_table(),
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
+        Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE,
+        Math::LOG_BIQUAD_FILTER_Q_VALUE_OFFSET
+    ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     log_scale_filter_frequencies(name + "LOG", ToggleParam::OFF),
+    log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
     log_scale_lfo_frequency(name + "LLG", ToggleParam::OFF),
     biquad_filter_q(
         "",
@@ -121,7 +135,7 @@ Chorus<InputSignalProducerClass>::Chorus(
         input,
         high_pass_filter_type,
         high_pass_frequency,
-        biquad_filter_q,
+        high_pass_q,
         high_pass_filter_gain
     ),
     lfos{
@@ -177,8 +191,10 @@ Chorus<InputSignalProducerClass>::Chorus(
     this->register_child(damping_gain);
     this->register_child(width);
     this->register_child(high_pass_frequency);
+    this->register_child(high_pass_q);
     this->register_child(tempo_sync);
     this->register_child(log_scale_filter_frequencies);
+    this->register_child(log_scale_high_pass_q);
     this->register_child(log_scale_lfo_frequency);
 
     this->register_child(biquad_filter_q);
