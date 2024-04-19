@@ -314,33 +314,33 @@ h1 span {
 
 #chorus h1 label.lfo-freq {
   position: relative;
-  left: 75px;
+  left: 115px;
   width: 140px;
 }
 
 #chorus h1 label.freq {
-  left: 105px;
+  left: 145px;
 }
 
 #chorus h1 label.log-q {
-  left: 183px;
+  left: 18px;
   width: 72px;
 }
 
 #echo h1 label.freq {
-  left: 210px;
+  left: 266px;
 }
 
 #echo h1 label.log-q {
-  left: 333px;
+  left: 94px;
 }
 
 #reverb h1 label.freq {
-  left: 134px;
+  left: 189px;
 }
 
 #reverb h1 label.log-q {
-  left: 257px;
+  left: 18px;
 }
 
 .block h1 label.dynamic,
@@ -805,9 +805,9 @@ function make_tabs(active)
       <div id="chorus" class="effect main-block block">
         <h1>
           <span>Chorus</span>
+          <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="lfo-freq"><input type="text" /><span> LG LFO FREQS</span></label>
           <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
-          <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="chorus-params" class="block"></div>
@@ -815,8 +815,8 @@ function make_tabs(active)
       <div id="echo" class="effect main-block block">
         <h1>
           <span>Echo</span>
-          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
+          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
@@ -824,8 +824,8 @@ function make_tabs(active)
       <div id="reverb" class="effect main-block block">
         <h1>
           <span>Reverb</span>
-          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
+          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
         </h1>
         <div id="reverb-params" class="block"></div>
       </div>
@@ -1020,6 +1020,8 @@ window.onload = function ()
 
     create_knob("volume-2-params", "VOL %", "1.0");
 
+    create_knob("chorus-params", "HP F Hz", "100");
+    create_knob("chorus-params", "HP Q", "1");
     create_knob("chorus-params", "TYPE", "0");
     create_knob("chorus-params", "DEL s", "0.5");
     create_knob("chorus-params", "FRQ Hz", "1.5");
@@ -1028,20 +1030,18 @@ window.onload = function ()
     create_knob("chorus-params", "DF Hz", "6000");
     create_knob("chorus-params", "DG dB", "-6");
     create_knob("chorus-params", "WID %", "-100");
-    create_knob("chorus-params", "HP F Hz", "100");
-    create_knob("chorus-params", "HP Q", "1");
     create_knob("chorus-params", "WET %", "50");
     create_knob("chorus-params", "DRY %", "60");
 
-    create_knob("echo-params", "DEL s", "0.5");
     create_knob("echo-params", "IN V %", "70");
+    create_knob("echo-params", "HP F Hz", "100");
+    create_knob("echo-params", "HP Q", "1");
+    create_knob("echo-params", "DEL s", "0.5");
     create_knob("echo-params", "FB %", "70");
     create_knob("echo-params", "DIST %", "70");
     create_knob("echo-params", "DF Hz", "6000");
     create_knob("echo-params", "DG dB", "-6");
     create_knob("echo-params", "WID %", "-100");
-    create_knob("echo-params", "HP F Hz", "100");
-    create_knob("echo-params", "HP Q", "1");
     create_knob("echo-params", "CTH dB", "-30");
     create_knob("echo-params", "CATK s", "0.0");
     create_knob("echo-params", "CREL s", "0.0");
@@ -1049,14 +1049,14 @@ window.onload = function ()
     create_knob("echo-params", "WET %", "50");
     create_knob("echo-params", "DRY %", "60");
 
+    create_knob("reverb-params", "HP F Hz", "100");
+    create_knob("reverb-params", "HP Q", "1");
     create_knob("reverb-params", "TYPE", "0");
     create_knob("reverb-params", "ROOM %", "90");
     create_knob("reverb-params", "DIST %", "70");
     create_knob("reverb-params", "DF Hz", "6000");
     create_knob("reverb-params", "DG dB", "-6");
     create_knob("reverb-params", "WID %", "-100");
-    create_knob("reverb-params", "HP F Hz", "100");
-    create_knob("reverb-params", "HP Q", "1");
     create_knob("reverb-params", "CTH db", "-30");
     create_knob("reverb-params", "CATK s", "0.0");
     create_knob("reverb-params", "CREL s", "0.0");
