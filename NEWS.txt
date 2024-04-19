@@ -5,6 +5,7 @@ v?.?.? (2024-0?-??)
  * Envelope attack, decay, and release shape can now be configured.
  * Envelope time parameters can now be tempo-synced, so that their unit of
    measurement becomes beats instead of seconds.
+ * Voices can now update Envelope settings optionally at note end as well.
  * The number of Envelopes has been increased to 12.
  * The number of Macros has been increased to 30.
  * Macro distortion shape can now be configured.

@@ -667,7 +667,15 @@ void Envelope::set_up_next_release_target(
 
 
 Envelope::Envelope(std::string const& name) noexcept
-    : dynamic(name + "DYN", ToggleParam::OFF),
+    : update_mode(
+        /*
+        Envelopes used to have only 2 update modes: never update (static), or
+        update continuously (dynamic), and an on-off toggle was used for
+        turning on dynamic updates. The parameter's name is kept in order to be
+        able to load old presets and host application saved states.
+        */
+        name + "DYN", UPDATE_MODE_STATIC, UPDATE_MODE_DYNAMIC, UPDATE_MODE_STATIC
+    ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     attack_shape(name + "ASH"),
     decay_shape(name + "DSH"),
@@ -684,7 +692,7 @@ Envelope::Envelope(std::string const& name) noexcept
     final_value(name + "FIN",       0.0,    1.0,  0.0),
     time_inaccuracy(name + "TIN",   0.0,    1.0,  0.0),
     value_inaccuracy(name + "VIN",  0.0,    1.0,  0.0),
-    dynamic_change_index(-1),
+    update_mode_change_index(-1),
     tempo_sync_change_index(-1),
     attack_shape_change_index(-1),
     decay_shape_change_index(-1),
@@ -726,7 +734,7 @@ void Envelope::update() noexcept
     is_dirty = update_change_index(hold_time, hold_time_change_index) || is_dirty;
     is_dirty = update_change_index(decay_time, decay_time_change_index) || is_dirty;
 
-    is_dirty = update_change_index<ToggleParam>(dynamic, dynamic_change_index) || is_dirty;
+    is_dirty = update_change_index<ByteParam>(update_mode, update_mode_change_index) || is_dirty;
     is_dirty = update_change_index<ToggleParam>(tempo_sync, tempo_sync_change_index) || is_dirty;
 
     is_dirty = update_change_index<ShapeParam>(attack_shape, attack_shape_change_index) || is_dirty;
@@ -767,7 +775,7 @@ Integer Envelope::get_change_index() const noexcept
 
 bool Envelope::is_dynamic() const noexcept
 {
-    return dynamic.get_value() == ToggleParam::ON;
+    return update_mode.get_value() == UPDATE_MODE_DYNAMIC;
 }
 
 

@@ -45,7 +45,7 @@ using namespace JS80P;
 TEST(an_envelope_is_a_collection_of_params, {
     Envelope envelope("N1");
 
-    assert_eq("N1DYN", envelope.dynamic.get_name());
+    assert_eq("N1DYN", envelope.update_mode.get_name());
     assert_eq("N1AMT", envelope.amount.get_name());
     assert_eq("N1INI", envelope.initial_value.get_name());
     assert_eq("N1DEL", envelope.delay_time.get_name());
@@ -64,10 +64,13 @@ TEST(an_envelope_is_a_collection_of_params, {
 TEST(can_tell_whether_envelope_is_dynamic, {
     Envelope envelope("E");
 
-    envelope.dynamic.set_value(ToggleParam::OFF);
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
     assert_false(envelope.is_dynamic());
 
-    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_END);
+    assert_false(envelope.is_dynamic());
+
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
     assert_true(envelope.is_dynamic());
 })
 
@@ -78,12 +81,12 @@ TEST(when_a_param_of_an_envelope_changes_then_the_change_index_of_the_envelope_i
 
     old_change_index = envelope.get_change_index();
     envelope.amount.set_value(0.99);
-    envelope.dynamic.set_value(ToggleParam::OFF);
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
     envelope.update();
     assert_neq((int)old_change_index, (int)envelope.get_change_index());
 
     old_change_index = envelope.get_change_index();
-    envelope.dynamic.set_value(ToggleParam::ON);
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
     envelope.update();
     assert_neq((int)old_change_index, (int)envelope.get_change_index());
 })

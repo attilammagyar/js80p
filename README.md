@@ -808,10 +808,10 @@ have to use an Envelope: turn up all the levels of the Envelope to 100%, assign
 the MIDI value or the Macro to the Amount parameter of the Envelope, and assign
 the Envelope to control the parameter.
 
-If an Envelope is switched to Dynamic mode, then polyphonic notes will still
-track their own independent timelines for each parameter that has that Envelope
-assigned, but the parameter's value will converge to the value that it should
-have at each moment according to the momentary settings of the Envelope.
+If an Envelope is switched to Dynamic update mode, then polyphonic notes will
+still track their own independent timelines for each parameter that has that
+Envelope assigned, but the parameter's value will converge to the value that it
+should have at each moment according to the momentary settings of the Envelope.
 
 <a id="faq-custom-wave" href="#toc">Table of Contents</a>
 

@@ -689,7 +689,7 @@ TEST(decaying_voices_are_garbage_collected, {
     set_param(synth, Synth::ParamId::MAMP, 0.5);
     set_param(synth, Synth::ParamId::CAMP, 0.5);
 
-    set_param(synth, Synth::ParamId::N1DYN, 0.0);
+    set_param(synth, Synth::ParamId::N1UPD, 0.0);
     set_param(synth, Synth::ParamId::N1AMT, 1.0);
     set_param(synth, Synth::ParamId::N1INI, 0.0);
     set_param(synth, Synth::ParamId::N1DEL, 0.0);
@@ -730,7 +730,7 @@ TEST(decaying_voices_are_garbage_collected, {
 
 void set_up_quickly_decaying_envelope(Synth& synth)
 {
-    set_param(synth, Synth::ParamId::N1DYN, 0.0);
+    set_param(synth, Synth::ParamId::N1UPD, 0.0);
     set_param(synth, Synth::ParamId::N1AMT, 1.0);
     set_param(synth, Synth::ParamId::N1INI, 0.0);
     set_param(synth, Synth::ParamId::N1DEL, 0.0);

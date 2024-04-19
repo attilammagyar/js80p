@@ -96,6 +96,10 @@ class Envelope
         static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEPER;
         static constexpr EnvelopeShape SHAPE_LINEAR = 12;
 
+        static constexpr Byte UPDATE_MODE_STATIC = 0;
+        static constexpr Byte UPDATE_MODE_END = 1;
+        static constexpr Byte UPDATE_MODE_DYNAMIC = 2;
+
         class ShapeParam : public ByteParam
         {
             public:
@@ -144,7 +148,7 @@ class Envelope
             EnvelopeSnapshot& snapshot
         ) const noexcept;
 
-        ToggleParam dynamic;
+        ByteParam update_mode;
         ToggleParam tempo_sync;
         ShapeParam attack_shape;
         ShapeParam decay_shape;
@@ -287,7 +291,7 @@ class Envelope
         Number bpm;
         Number tempo_sync_time_scale;
 
-        Integer dynamic_change_index;
+        Integer update_mode_change_index;
         Integer tempo_sync_change_index;
         Integer attack_shape_change_index;
         Integer decay_shape_change_index;

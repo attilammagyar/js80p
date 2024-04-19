@@ -642,18 +642,18 @@ void Synth::create_envelopes() noexcept
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->value_inaccuracy);
     }
 
-    register_param_as_child<ToggleParam>(ParamId::N1DYN, envelopes_rw[0]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N2DYN, envelopes_rw[1]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N3DYN, envelopes_rw[2]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N4DYN, envelopes_rw[3]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N5DYN, envelopes_rw[4]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N6DYN, envelopes_rw[5]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N7DYN, envelopes_rw[6]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N8DYN, envelopes_rw[7]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N9DYN, envelopes_rw[8]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N10DYN, envelopes_rw[9]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N11DYN, envelopes_rw[10]->dynamic);
-    register_param_as_child<ToggleParam>(ParamId::N12DYN, envelopes_rw[11]->dynamic);
+    register_param_as_child<ByteParam>(ParamId::N1UPD, envelopes_rw[0]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N2UPD, envelopes_rw[1]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N3UPD, envelopes_rw[2]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N4UPD, envelopes_rw[3]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N5UPD, envelopes_rw[4]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N6UPD, envelopes_rw[5]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N7UPD, envelopes_rw[6]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N8UPD, envelopes_rw[7]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N9UPD, envelopes_rw[8]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N10UPD, envelopes_rw[9]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N11UPD, envelopes_rw[10]->update_mode);
+    register_param_as_child<ByteParam>(ParamId::N12UPD, envelopes_rw[11]->update_mode);
 
     register_param_as_child<ToggleParam>(ParamId::N1SYN, envelopes_rw[0]->tempo_sync);
     register_param_as_child<ToggleParam>(ParamId::N2SYN, envelopes_rw[1]->tempo_sync);

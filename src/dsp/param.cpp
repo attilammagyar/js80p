@@ -1411,11 +1411,9 @@ void FloatParam<evaluation>::handle_lfo_envelope_end_event(
             this->sampling_period
         );
 
-        if constexpr (event_type == EVT_LFO_ENVELOPE_CANCEL) {
-            snapshot.release_time = std::min(
-                (Seconds)event.number_param_1, snapshot.release_time
-            );
-        }
+        snapshot.change_index = event.int_param;
+        snapshot.final_value = event.number_param_1;
+        snapshot.release_time = (Seconds)event.number_param_2;
     }
 
     lfo_envelope_state.time = latency;
@@ -1791,18 +1789,9 @@ Seconds FloatParam<evaluation>::end_envelope(
         envelope_state->snapshots[envelope_state->scheduled_snapshot_id]
     );
 
-    if (envelope.is_dynamic()) {
-        /*
-        It is safe to update the release portion of the scheduled snapshot
-        in-place (rather than scheduling a new snapshot), because
-        process_envelope() would do it anyways, and we are not messing up any
-        previous stages in the middle of rendering them.
-        */
-        envelope.update();
-        envelope.make_end_snapshot(
-            envelope_state->randoms, Constants::INVALID_ENVELOPE_INDEX, snapshot
-        );
-    }
+    update_envelope_release_if_not_static(
+        envelope, Constants::INVALID_ENVELOPE_INDEX, snapshot
+    );
 
     if constexpr (event_type == EVT_ENVELOPE_CANCEL) {
         this->schedule(
@@ -1813,6 +1802,29 @@ Seconds FloatParam<evaluation>::end_envelope(
     }
 
     return snapshot.release_time;
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::update_envelope_release_if_not_static(
+        Envelope& envelope,
+        Byte const envelope_index,
+        EnvelopeSnapshot& snapshot
+) noexcept {
+    if (envelope.update_mode.get_value() == Envelope::UPDATE_MODE_STATIC) {
+        return;
+    }
+
+    /*
+    It is safe to update the release portion of the scheduled snapshot
+    in-place (rather than scheduling a new snapshot), because
+    process_envelope() would do it anyways, and we are not messing up any
+    previous stages in the middle of rendering them.
+    */
+    envelope.update();
+    envelope.make_end_snapshot(
+        envelope_state->randoms, envelope_index, snapshot
+    );
 }
 
 
@@ -1846,23 +1858,27 @@ Seconds FloatParam<evaluation>::end_lfo_envelope(
             envelope_state->snapshots[lfo_envelope_state.scheduled_snapshot_id]
         );
 
-        if (envelope.is_dynamic()) {
-            envelope.update();
-            envelope.make_end_snapshot(envelope_state->randoms, envelope_index, snapshot);
-        }
+        update_envelope_release_if_not_static(envelope, envelope_index, snapshot);
 
         if constexpr (event_type == EVT_LFO_ENVELOPE_CANCEL) {
             this->schedule(
                 event_type,
                 time_offset,
-                0,
+                envelope.get_change_index(),
+                snapshot.final_value,
                 std::min(snapshot.release_time, duration),
-                0.0,
                 i
             );
         } else {
             release_time = std::max(release_time, snapshot.release_time);
-            this->schedule(event_type, time_offset, 0, 0.0, 0.0, i);
+            this->schedule(
+                event_type,
+                time_offset,
+                envelope.get_change_index(),
+                snapshot.final_value,
+                snapshot.release_time,
+                i
+            );
         }
     }
 

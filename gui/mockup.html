@@ -343,7 +343,17 @@ h1 span {
   left: 18px;
 }
 
-.block h1 label.dynamic,
+.block h1 label.update {
+  margin-left: 3px;
+}
+
+.block h1 label.update input {
+  width: 50px;
+  height: 23px;
+  margin-top: -3px;
+  border: inset 1px #9090b0;
+}
+
 .block h1 label.inaccuracy,
 .block h1 label.poly,
 .block h1 label.sync {
@@ -353,7 +363,7 @@ h1 span {
 }
 
 .block h1.envelope label.sync {
-  margin-right: 7px;
+  margin-right: 3px;
 }
 
 .block h1 label.inaccuracy {
@@ -1114,10 +1124,10 @@ window.onload = function ()
               '<input type="text" />',
               '<input type="text" />',
             '</label>',
-            '<label class="inaccuracy"><input type="text" /></label>',
-            '<label class="dynamic">',
-              '<span>DYN</span><input type="text" />',
+            '<label class="update">',
+              '<input type="text" />',
             '</label>',
+            '<label class="inaccuracy"><input type="text" /></label>',
             '<label class="sync">',
               '<span>BPM</span><input type="text" />',
             '</label>'

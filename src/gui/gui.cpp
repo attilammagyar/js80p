@@ -212,6 +212,15 @@ char const* const GUI::LFO_AMOUNT_ENVELOPES[] = {
 int const GUI::LFO_AMOUNT_ENVELOPES_COUNT = 13;
 
 
+char const* const GUI::ENVELOPE_UPDATE_TYPES[] = {
+    "STA",
+    "END",
+    "DYN",
+};
+
+int const GUI::ENVELOPE_UPDATE_TYPES_COUNT = 3;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -861,18 +870,18 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::ERLOG] = "Reverb Logarithmic Filter Frequencies",
     [Synth::ParamId::ERLHQ] = "Reverb Logarithmic Highpass Q Factor",
 
-    [Synth::ParamId::N1DYN] = "Envelope 1 Dynamic",
-    [Synth::ParamId::N2DYN] = "Envelope 2 Dynamic",
-    [Synth::ParamId::N3DYN] = "Envelope 3 Dynamic",
-    [Synth::ParamId::N4DYN] = "Envelope 4 Dynamic",
-    [Synth::ParamId::N5DYN] = "Envelope 5 Dynamic",
-    [Synth::ParamId::N6DYN] = "Envelope 6 Dynamic",
-    [Synth::ParamId::N7DYN] = "Envelope 7 Dynamic",
-    [Synth::ParamId::N8DYN] = "Envelope 8 Dynamic",
-    [Synth::ParamId::N9DYN] = "Envelope 9 Dynamic",
-    [Synth::ParamId::N10DYN] = "Envelope 10 Dynamic",
-    [Synth::ParamId::N11DYN] = "Envelope 11 Dynamic",
-    [Synth::ParamId::N12DYN] = "Envelope 12 Dynamic",
+    [Synth::ParamId::N1UPD] = "Envelope 1 Update Mode",
+    [Synth::ParamId::N2UPD] = "Envelope 2 Update Mode",
+    [Synth::ParamId::N3UPD] = "Envelope 3 Update Mode",
+    [Synth::ParamId::N4UPD] = "Envelope 4 Update Mode",
+    [Synth::ParamId::N5UPD] = "Envelope 5 Update Mode",
+    [Synth::ParamId::N6UPD] = "Envelope 6 Update Mode",
+    [Synth::ParamId::N7UPD] = "Envelope 7 Update Mode",
+    [Synth::ParamId::N8UPD] = "Envelope 8 Update Mode",
+    [Synth::ParamId::N9UPD] = "Envelope 9 Update Mode",
+    [Synth::ParamId::N10UPD] = "Envelope 10 Update Mode",
+    [Synth::ParamId::N11UPD] = "Envelope 11 Update Mode",
+    [Synth::ParamId::N12UPD] = "Envelope 12 Update Mode",
 
     [Synth::ParamId::POLY] = "Polyphonic",
 
@@ -2436,6 +2445,9 @@ void GUI::build_envelopes_1_body(
 
     background->own(envelopes_1_body);
 
+    constexpr char const* const* ut = JS80P::GUI::ENVELOPE_UPDATE_TYPES;
+    constexpr int utc = JS80P::GUI::ENVELOPE_UPDATE_TYPES_COUNT;
+
 
     POSITION_RELATIVE_BEGIN(33, 13);
 
@@ -2454,8 +2466,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N1TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N1VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N1DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N1SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N1UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N1SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N1ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N1DSH, envelope_shapes_10);
@@ -2481,8 +2493,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N2TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N2VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N2DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N2SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N2UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N2SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N2ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N2DSH, envelope_shapes_10);
@@ -2508,8 +2520,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N3TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N3VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N3DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N3SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N3UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N3SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N3ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N3DSH, envelope_shapes_10);
@@ -2535,8 +2547,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N4TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N4VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N4DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N4SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N4UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N4SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N4ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N4DSH, envelope_shapes_10);
@@ -2562,8 +2574,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N5TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N5VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N5DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N5SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N5UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N5SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N5ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N5DSH, envelope_shapes_10);
@@ -2589,8 +2601,8 @@ void GUI::build_envelopes_1_body(
     SCREW(envelopes_1_body, 252, 4, Synth::ParamId::N6TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_1_body, 272, 4, Synth::ParamId::N6VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N6DYN);
-    TOGG(envelopes_1_body, 145, 2, 46, 24, 25, Synth::ParamId::N6SYN);
+    DPET(envelopes_1_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N6UPD, ut, utc);
+    TOGG(envelopes_1_body, 198, 2, 46, 24, 25, Synth::ParamId::N6SYN);
 
     DPEI(envelopes_1_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N6ASH, envelope_shapes_01);
     DPEI(envelopes_1_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N6DSH, envelope_shapes_10);
@@ -2612,6 +2624,9 @@ void GUI::build_envelopes_2_body(
 
     background->own(envelopes_2_body);
 
+    constexpr char const* const* ut = JS80P::GUI::ENVELOPE_UPDATE_TYPES;
+    constexpr int utc = JS80P::GUI::ENVELOPE_UPDATE_TYPES_COUNT;
+
 
     POSITION_RELATIVE_BEGIN(33, 13);
 
@@ -2630,8 +2645,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N7TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N7VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N7DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N7SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N7UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N7SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N7ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N7DSH, envelope_shapes_10);
@@ -2657,8 +2672,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N8TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N8VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N8DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N8SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N8UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N8SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N8ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N8DSH, envelope_shapes_10);
@@ -2684,8 +2699,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N9TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N9VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N9DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N9SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N9UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N9SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N9ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N9DSH, envelope_shapes_10);
@@ -2711,8 +2726,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N10TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N10VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N10DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N10SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N10UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N10SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N10ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N10DSH, envelope_shapes_10);
@@ -2738,8 +2753,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N11TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N11VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N11DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N11SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N11UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N11SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N11ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N11DSH, envelope_shapes_10);
@@ -2765,8 +2780,8 @@ void GUI::build_envelopes_2_body(
     SCREW(envelopes_2_body, 252, 4, Synth::ParamId::N12TIN, "%.2f%%", 100.0, screw_states);
     SCREW(envelopes_2_body, 272, 4, Synth::ParamId::N12VIN, "%.2f%%", 100.0, screw_states);
 
-    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N12DYN);
-    TOGG(envelopes_2_body, 145, 2, 46, 24, 25, Synth::ParamId::N12SYN);
+    DPET(envelopes_2_body, 143, 4, 48, 21, 0, 48, Synth::ParamId::N12UPD, ut, utc);
+    TOGG(envelopes_2_body, 198, 2, 46, 24, 25, Synth::ParamId::N12SYN);
 
     DPEI(envelopes_2_body,  63, 4, 21, 21, 0, 21, Synth::ParamId::N12ASH, envelope_shapes_01);
     DPEI(envelopes_2_body,  88, 4, 21, 21, 0, 21, Synth::ParamId::N12DSH, envelope_shapes_10);

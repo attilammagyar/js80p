@@ -643,6 +643,12 @@ class FloatParam : public Param<Number, evaluation>
         void update_envelope(Envelope& envelope, Seconds const time_offset) noexcept;
         void update_lfo_envelope(Seconds const time_offset) noexcept;
 
+        void update_envelope_release_if_not_static(
+            Envelope& envelope,
+            Byte const envelope_index,
+            EnvelopeSnapshot& snapshot
+        ) noexcept;
+
         void check_leaked_envelope_snapshots(char const* event) const noexcept;
 
         FloatParam<evaluation>* const leader;

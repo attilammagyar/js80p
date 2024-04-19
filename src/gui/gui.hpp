@@ -121,6 +121,9 @@ class GUI
         static char const* const LFO_AMOUNT_ENVELOPES[];
         static int const LFO_AMOUNT_ENVELOPES_COUNT;
 
+        static char const* const ENVELOPE_UPDATE_TYPES[];
+        static int const ENVELOPE_UPDATE_TYPES_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];

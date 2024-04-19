@@ -382,7 +382,7 @@ void test_decay_before_note_off(
     );
 
     if (envelope != NULL) {
-        envelope->dynamic.set_value(ToggleParam::OFF);
+        envelope->update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
         envelope->amount.set_value(1.0);
         envelope->initial_value.set_value(0.0);
         envelope->delay_time.set_value(delay_time);
