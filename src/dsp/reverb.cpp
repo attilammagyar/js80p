@@ -139,7 +139,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -152,7 +151,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -165,7 +163,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -178,7 +175,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -191,7 +187,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -204,7 +199,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -217,7 +211,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -230,7 +223,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
         {
             high_pass_filter,
@@ -243,7 +235,6 @@ Reverb<InputSignalProducerClass>::Reverb(
             damping_frequency,
             damping_gain,
             distortion_level
-
         },
     },
     previous_type(255)
