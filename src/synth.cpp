@@ -63,7 +63,7 @@
 namespace JS80P
 {
 
-std::vector<bool> Synth::supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
+std::vector<bool> Synth::supported_midi_controllers;
 
 bool Synth::supported_midi_controllers_initialized = false;
 
@@ -231,9 +231,7 @@ void Synth::initialize_supported_midi_controllers() noexcept
 
     supported_midi_controllers_initialized = true;
 
-    supported_midi_controllers.reserve(
-        (std::vector<bool>::size_type)MIDI_CONTROLLERS
-    );
+    std::vector<bool> supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
 
     supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
     supported_midi_controllers[ControllerId::BREATH] = true;
@@ -304,6 +302,8 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_37] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_38] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
+
+    Synth::supported_midi_controllers = supported_midi_controllers;
 }
 
 
