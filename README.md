@@ -663,6 +663,8 @@ Features
  * Last-note priority monophonic mode.
     * Legato playing will either retrigger or smoothly glide to the next note,
       depending on the portamento length setting.
+ * Polyphonic and monophonic hold mode to keep notes ringing without a sustain
+   pedal.
  * 2 oscillators with 10 waveforms:
     * sine,
     * sawtooth,
@@ -702,17 +704,18 @@ Features
     * distortion,
     * 2 more filters,
     * chorus,
-    * stereo echo (with side-chaining),
-    * stereo reverb (with side-chaining),
+    * stereo echo (with distortion and side-chaining),
+    * stereo reverb (with distortion and side-chaining),
     * volume controls at various points of the signal chain.
- * 12 envelopes.
- * 8 low-frequency oscillators (LFO).
+ * 12 envelopes with customizable shapes.
+ * 8 low-frequency oscillators (LFO) with optional amount envelope and
+   polyphony.
  * Filter and envelope imperfection settings for analog-like feel.
  * MIDI controllers and macros.
  * Channel pressure (aftertouch).
  * MIDI learn.
  * Logarithmic or linear scale filter frequencies.
- * Tempo synchronization for LFOs and effects.
+ * Tempo synchronization for envelopes, LFOs, and effects.
  * Use the peak level at various points of the signal chain to control
    parameters:
     * oscillator 1 output,
