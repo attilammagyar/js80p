@@ -841,6 +841,8 @@ void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
         block_evaluated_float_params[index] = &param;
     } else if constexpr (std::is_base_of<ByteParam, ParamClass>::value) {
         byte_params[index] = (ByteParam*)&param;
+    } else {
+        JS80P_ASSERT_NOT_REACHED();
     }
 }
 
@@ -1705,9 +1707,12 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 }
 
 
-bool Synth::is_toggle_param(ParamId const param_id) const noexcept
+bool Synth::is_discrete_param(ParamId const param_id) const noexcept
 {
-    return param_id >= ParamId::L1SYN && param_id < ParamId::PARAM_ID_COUNT;
+    return (
+        JS80P_LIKELY(param_id < ParamId::PARAM_ID_COUNT) && 
+        byte_params[(size_t)param_id] != NULL
+    );
 }
 
 

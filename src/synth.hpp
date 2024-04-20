@@ -1158,7 +1158,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number const ratio
         ) const noexcept;
 
-        bool is_toggle_param(ParamId const param_id) const noexcept;
+        bool is_discrete_param(ParamId const param_id) const noexcept;
 
         Number get_param_max_value(ParamId const param_id) const noexcept;
         Number get_param_ratio_atomic(ParamId const param_id) const noexcept;

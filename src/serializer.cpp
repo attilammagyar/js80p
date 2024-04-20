@@ -302,14 +302,19 @@ void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
         )
     );
 
+    /*
+    Load discrete parameters first because they may affect how float param
+    ratios are to be interpreted (especially the log-scale toggles).
+    */
+
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (synth.is_toggle_param(it->param_id)) {
+        if (synth.is_discrete_param(it->param_id)) {
             send_message<thread>(synth, *it);
         }
     }
 
     for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
-        if (!synth.is_toggle_param(it->param_id)) {
+        if (!synth.is_discrete_param(it->param_id)) {
             send_message<thread>(synth, *it);
         }
     }
