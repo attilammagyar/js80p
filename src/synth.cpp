@@ -82,7 +82,7 @@ Synth::ModeParam::ModeParam(std::string const& name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        7                           /* POLY + MODE + MIX + PM + FM + AM + bus   */
+        7                           /* NH + MODE + MIX + PM + FM + AM + bus     */
         + 41 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
@@ -90,7 +90,18 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
-    polyphonic("POLY", ToggleParam::ON),
+    /*
+    Before held note handling modes, only polyphonic and monophonic modes were
+    available, and an on-off toggle was used for switching between them.  For
+    backward compatibility with old presets and saved plugin states, the
+    original name of the parameter is kept.
+    */
+    note_handling(
+        "POLY",
+        NOTE_HANDLING_MONOPHONIC,
+        NOTE_HANDLING_POLYPHONIC,
+        NOTE_HANDLING_POLYPHONIC
+    ),
     mode("MODE"),
     modulator_add_volume(
         "MIX",
@@ -144,9 +155,9 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     next_note_id(0),
     previous_note(Midi::NOTE_MAX + 1),
     is_learning(false),
-    is_sustaining(false),
-    is_polyphonic(true),
-    was_polyphonic(true),
+    is_sustain_pedal_on(false),
+    is_polyphonic_(true),
+    is_holding_(false),
     is_dirty_(false),
     effects(
         "E",
@@ -339,7 +350,7 @@ void Synth::build_frequency_table() noexcept
 
 void Synth::register_main_params() noexcept
 {
-    register_param_as_child<ToggleParam>(ParamId::POLY, polyphonic);
+    register_param_as_child<ByteParam>(ParamId::NH, note_handling);
 
     register_param_as_child<ModeParam>(ParamId::MODE, mode);
 
@@ -1060,6 +1071,29 @@ void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const c
 }
 
 
+bool Synth::is_polyphonic() const noexcept
+{
+    return (note_handling.get_value() & NOTE_HANDLING_POLYPHONIC_MASK) != 0;
+}
+
+
+bool Synth::is_monophonic() const noexcept
+{
+    return !is_polyphonic();
+}
+
+
+bool Synth::is_holding() const noexcept
+{
+    Byte const note_handling = this->note_handling.get_value();
+
+    return (
+        note_handling == NOTE_HANDLING_HOLD_MONOPHONIC
+        || note_handling == NOTE_HANDLING_HOLD_POLYPHONIC
+    );
+}
+
+
 void Synth::start_lfos() noexcept
 {
     for (Byte i = 0; i != Constants::LFOS; ++i) {
@@ -1080,7 +1114,7 @@ void Synth::note_on(
 
     note_stack.push(channel, note, velocity_float);
 
-    if (polyphonic.get_value() == ToggleParam::ON) {
+    if (is_polyphonic()) {
         this->triggered_velocity.change(time_offset, velocity_float);
         this->triggered_note.change(time_offset, midi_byte_to_float(note));
 
@@ -1365,12 +1399,11 @@ void Synth::note_off(
 
     midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
 
-    bool const is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
-
     Modulator* const modulator = modulators[voice];
     Carrier* const carrier = carriers[voice];
+    bool const is_holding = this->is_holding();
 
-    if (is_sustaining) {
+    if (is_sustain_pedal_on || is_holding) {
         Integer note_id;
 
         if (modulator->is_on()) {
@@ -1383,7 +1416,7 @@ void Synth::note_off(
             note_id = carriers[voice]->get_note_id();
         }
 
-        if (is_polyphonic || was_note_stack_top) {
+        if (is_polyphonic() || was_note_stack_top) {
             deferred_note_offs.push_back(
                 DeferredNoteOff(note_id, channel, note, velocity, voice)
             );
@@ -1397,7 +1430,7 @@ void Synth::note_off(
     this->released_velocity.change(time_offset, velocity_float);
     this->released_note.change(time_offset, midi_byte_to_float(note));
 
-    if (!is_polyphonic && was_note_stack_top && !note_stack.is_empty()) {
+    if (is_monophonic() && was_note_stack_top && !note_stack.is_empty()) {
         Number previous_velocity;
         Midi::Channel previous_channel;
         Midi::Note previous_note;
@@ -1456,14 +1489,20 @@ void Synth::control_change(
 
 void Synth::sustain_on(Seconds const time_offset) noexcept
 {
-    is_sustaining = true;
+    is_sustain_pedal_on = true;
 }
 
 
 void Synth::sustain_off(Seconds const time_offset) noexcept
 {
-    bool const is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
-    is_sustaining = false;
+    is_sustain_pedal_on = false;
+    release_held_notes(time_offset);
+}
+
+
+void Synth::release_held_notes(Seconds const time_offset) noexcept
+{
+    bool const is_polyphonic = this->is_polyphonic();
 
     if (is_polyphonic || note_stack.is_empty()) {
         for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
@@ -1614,8 +1653,10 @@ void Synth::mono_mode_on(
         Seconds const time_offset,
         Midi::Channel const channel
 ) noexcept {
-    polyphonic.set_value(ToggleParam::OFF);
-    handle_refresh_param(ParamId::POLY);
+    note_handling.set_value(
+        is_holding() ? NOTE_HANDLING_HOLD_MONOPHONIC : NOTE_HANDLING_MONOPHONIC
+    );
+    handle_refresh_param(ParamId::NH);
 }
 
 
@@ -1623,8 +1664,10 @@ void Synth::mono_mode_off(
         Seconds const time_offset,
         Midi::Channel const channel
 ) noexcept {
-    polyphonic.set_value(ToggleParam::ON);
-    handle_refresh_param(ParamId::POLY);
+    note_handling.set_value(
+        is_holding() ? NOTE_HANDLING_HOLD_POLYPHONIC : NOTE_HANDLING_POLYPHONIC
+    );
+    handle_refresh_param(ParamId::NH);
 }
 
 
@@ -1798,13 +1841,6 @@ Sample const* const* Synth::initialize_rendering(
 ) noexcept {
     process_messages();
 
-    was_polyphonic = is_polyphonic;
-    is_polyphonic = polyphonic.get_value() == ToggleParam::ON;
-
-    if (was_polyphonic && !is_polyphonic) {
-        stop_polyphonic_notes();
-    }
-
     samples_since_gc += sample_count;
 
     if (samples_since_gc > samples_between_gc) {
@@ -1926,6 +1962,20 @@ void Synth::process_messages() noexcept
         if (messages.pop(message)) {
             process_message(message);
         }
+    }
+
+    bool const was_polyphonic = is_polyphonic_;
+    is_polyphonic_ = is_polyphonic();
+
+    if (was_polyphonic && !is_polyphonic_) {
+        stop_polyphonic_notes();
+    }
+
+    bool const was_holding = is_holding_;
+    is_holding_ = is_holding();
+
+    if (was_holding && !(is_holding_ || is_sustain_pedal_on)) {
+        release_held_notes(0.0);
     }
 }
 
@@ -2514,7 +2564,7 @@ void Synth::clear_midi_note_to_voice_assignments() noexcept
 
 void Synth::clear_sustain() noexcept
 {
-    is_sustaining = false;
+    is_sustain_pedal_on = false;
     deferred_note_offs.clear();
 }
 

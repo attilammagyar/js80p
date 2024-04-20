@@ -221,6 +221,16 @@ char const* const GUI::ENVELOPE_UPDATE_TYPES[] = {
 int const GUI::ENVELOPE_UPDATE_TYPES_COUNT = 3;
 
 
+char const* const GUI::NOTE_HANDLING_MODES[] = {
+    "MONO",
+    "M HOLD",
+    "P HOLD",
+    "POLY",
+};
+
+int const GUI::NOTE_HANDLING_MODES_COUNT = 4;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -883,7 +893,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N11UPD] = "Envelope 11 Update Mode",
     [Synth::ParamId::N12UPD] = "Envelope 12 Update Mode",
 
-    [Synth::ParamId::POLY] = "Polyphonic",
+    [Synth::ParamId::NH] = "Note Handling",
 
     [Synth::ParamId::ERTYP] = "Reverb Type",
     [Synth::ParamId::ECTYP] = "Chorus Type",
@@ -2931,6 +2941,9 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 
 void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
 {
+    constexpr char const* const* nh = JS80P::GUI::NOTE_HANDLING_MODES;
+    constexpr int nhc = JS80P::GUI::NOTE_HANDLING_MODES_COUNT;
+
     synth_body = new TabBody("Synth");
 
     background->own(synth_body);
@@ -2955,7 +2968,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     SCREW(synth_body, 324, 288, Synth::ParamId::COIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIA);
     SCREW(synth_body, 344, 288, Synth::ParamId::COIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIS);
 
-    TOGG(synth_body, 9, 31, 66, 24, 5, Synth::ParamId::POLY);
+    DPET(synth_body, 13, 32, 58, 19, 0, 58, Synth::ParamId::NH, nh, nhc);
 
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 0, Synth::ParamId::MODE,   MM___,      md, mdc, knob_states);
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 1, Synth::ParamId::MIX,    MML_C,      "%.2f", 100.0, knob_states);

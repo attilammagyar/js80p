@@ -721,7 +721,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N10UPD = 561,    ///< Envelope 10 Update Mode
             N11UPD = 562,    ///< Envelope 11 Update Mode
             N12UPD = 563,    ///< Envelope 12 Update Mode
-            POLY = 564,      ///< Polyphonic
+            NH = 564,        ///< Note Handling
             ERTYP = 565,     ///< Effects Reverb Type
             ECTYP = 566,     ///< Effects Chorus Type
             MTUN = 567,      ///< Modulator Tuning
@@ -997,6 +997,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr int MODES = 14;
 
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC = 0;
+        static constexpr Byte NOTE_HANDLING_HOLD_MONOPHONIC = 1;
+        static constexpr Byte NOTE_HANDLING_HOLD_POLYPHONIC = 2;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC = 3;
+
         class Message
         {
             public:
@@ -1098,6 +1103,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         NoteTunings& collect_active_notes(Integer& active_notes_count) noexcept;
         void update_note_tuning(NoteTuning const& note_tuning) noexcept;
         void update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept;
+
+        bool is_polyphonic() const noexcept;
+        bool is_monophonic() const noexcept;
+
+        bool is_holding() const noexcept;
 
         Sample const* const* generate_samples(
             Integer const round, Integer const sample_count
@@ -1233,7 +1243,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
-        ToggleParam polyphonic;
+        ByteParam note_handling;
         ModeParam mode;
         FloatParamS modulator_add_volume;
         FloatParamS phase_modulation_level;
@@ -1490,6 +1500,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             INVALID_PARAM_TYPE = 4,
         };
 
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_MASK = 0x02;
+
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
 
         static constexpr Number MIDI_WORD_SCALE = 1.0 / 16384.0;
@@ -1644,6 +1656,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         void stop_polyphonic_notes() noexcept;
 
+        void release_held_notes(Seconds const time_offset) noexcept;
+
         void update_param_states() noexcept;
 
         void garbage_collect_voices() noexcept;
@@ -1683,9 +1697,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer next_note_id;
         Midi::Note previous_note;
         bool is_learning;
-        bool is_sustaining;
-        bool is_polyphonic;
-        bool was_polyphonic;
+        bool is_sustain_pedal_on;
+        bool is_polyphonic_;
+        bool is_holding_;
         bool is_dirty_;
         std::atomic<bool> is_mts_esp_connected_;
 

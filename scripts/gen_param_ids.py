@@ -297,7 +297,7 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("N11UPD", "///< Envelope 11 Update Mode", "envelopes_rw[10]->update_mode"),
         ("N12UPD", "///< Envelope 12 Update Mode", "envelopes_rw[11]->update_mode"),
 
-        ("POLY", "  ///< Polyphonic", "polyphonic"),
+        ("NH", "    ///< Note Handling", "note_handling"),
 
         ("ERTYP", " ///< Effects Reverb Type", "effects.reverb.type"),
 

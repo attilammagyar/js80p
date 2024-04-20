@@ -664,6 +664,55 @@ TEST(sustain_pedal, {
 })
 
 
+TEST(hold_note, {
+    constexpr Frequency sample_rate = 3000.0;
+    constexpr Seconds note_on = 0.0;
+    constexpr Seconds note_off = 0.2;
+    constexpr Seconds sustain_off = 1.0;
+    constexpr Integer block_size = 4196;
+    Synth synth_1;
+    Synth synth_2;
+    Sample const* const* synth_1_samples;
+    Sample const* const* synth_2_samples;
+
+    synth_1.set_sample_rate(sample_rate);
+    synth_2.set_sample_rate(sample_rate);
+
+    synth_1.set_block_size(block_size);
+    synth_2.set_block_size(block_size);
+
+    synth_1.resume();
+    synth_2.resume();
+
+    synth_1.note_on(note_on, 1, Midi::NOTE_A_3, 114);
+    synth_1.note_off(sustain_off, 1, Midi::NOTE_A_3, 114);
+
+    set_param(
+        synth_2,
+        Synth::ParamId::NH,
+        synth_2.note_handling.value_to_ratio(Synth::NOTE_HANDLING_HOLD_POLYPHONIC)
+    );
+    synth_2.process_messages();
+
+    synth_2.note_on(note_on, 1, Midi::NOTE_A_3, 114);
+    synth_2.note_off(note_off, 1, Midi::NOTE_A_3, 114);
+    synth_2.control_change(sustain_off, 1, Midi::SUSTAIN_PEDAL, 0);
+
+    synth_1_samples = SignalProducer::produce<Synth>(synth_1, 1);
+    synth_2_samples = SignalProducer::produce<Synth>(synth_2, 1);
+
+    for (Integer c = 0; c != synth_1.get_channels(); ++c) {
+        assert_eq(
+            synth_1_samples[c],
+            synth_2_samples[c],
+            block_size,
+            "channel=%d",
+            (int)c
+        );
+    }
+})
+
+
 TEST(decaying_voices_are_garbage_collected, {
     constexpr Seconds note_start = 0.002;
     constexpr Seconds decay_time = 0.001;
@@ -747,7 +796,11 @@ void set_up_quickly_decaying_envelope(Synth& synth)
 }
 
 
-TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decayed_clone_while_sustaining, {
+void test_gc_decayed_vs_new_note_while_sustaining(
+        void(*sustain_on)(Synth& synth),
+        void(*sustain_off)(Synth& synth),
+        char const* const sustain_type
+) {
     constexpr Integer block_size = 2048;
 
     Synth synth(0);
@@ -764,7 +817,7 @@ TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decay
 
     synth.process_messages();
 
-    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    sustain_on(synth);
     synth.note_on(0.001, 1, Midi::NOTE_A_3, 100);
     SignalProducer::produce<Synth>(synth, 1); /* note starts then decays */
 
@@ -776,21 +829,63 @@ TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decay
     SignalProducer::produce<Synth>(synth, 2); /* first voice gets garbage collected */
 
     synth.note_off(0.0, 1, Midi::NOTE_A_3, 100); /* also deferred */
-    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should be released */
+    sustain_off(synth); /* second voice should be released */
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
 
     expected_samples = new Sample[block_size];
     std::fill_n(expected_samples, block_size, 0.0);
 
-    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
-    assert_eq(expected_samples, rendered_samples[1], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA, sustain_type);
+    assert_eq(expected_samples, rendered_samples[1], block_size, DOUBLE_DELTA, sustain_type);
 
     delete[] expected_samples;
+}
+
+
+void sustain_pedal_on(Synth& synth)
+{
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+}
+
+
+void sustain_pedal_off(Synth& synth)
+{
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
+}
+
+
+void hold_mode_on(Synth& synth)
+{
+    set_param(
+        synth,
+        Synth::ParamId::NH,
+        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_HOLD_POLYPHONIC)
+    );
+}
+
+
+void hold_mode_off(Synth& synth)
+{
+    set_param(
+        synth,
+        Synth::ParamId::NH,
+        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLYPHONIC)
+    );
+}
+
+
+TEST(garbage_collector_does_not_deallocate_newly_triggered_note_instead_of_decayed_clone_while_sustaining, {
+    test_gc_decayed_vs_new_note_while_sustaining(&sustain_pedal_on, &sustain_pedal_off, "pedal");
+    test_gc_decayed_vs_new_note_while_sustaining(&hold_mode_on, &hold_mode_off, "hold");
 })
 
 
-TEST(garbage_collected_and_deferred_stopped_reallocated_notes_are_not_released_again_when_sustain_pedal_is_lifted, {
+void test_gc_reallocated_notes_while_sustaining(
+        void(*sustain_on)(Synth& synth),
+        void(*sustain_off)(Synth& synth),
+        char const* const sustain_type
+) {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
 
@@ -817,7 +912,7 @@ TEST(garbage_collected_and_deferred_stopped_reallocated_notes_are_not_released_a
 
     synth.process_messages();
 
-    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    sustain_on(synth);
     synth.note_on(0.000001, 1, Midi::NOTE_A_3, 127);
     SignalProducer::produce<Synth>(synth, 1); /* note starts then decays */
 
@@ -828,17 +923,27 @@ TEST(garbage_collected_and_deferred_stopped_reallocated_notes_are_not_released_a
     synth.process_messages();
 
     synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
-    synth.control_change(0.000001, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should keep ringing */
+    sustain_off(synth); /* second voice should keep ringing */
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
     expected_samples = SignalProducer::produce<SumOfSines>(expected, 3);
 
-    assert_eq(expected_samples[0], rendered_samples[0], block_size, 0.001);
-    assert_eq(expected_samples[1], rendered_samples[1], block_size, 0.001);
+    assert_eq(expected_samples[0], rendered_samples[0], block_size, 0.001, sustain_type);
+    assert_eq(expected_samples[1], rendered_samples[1], block_size, 0.001, sustain_type);
+}
+
+
+TEST(garbage_collected_and_deferred_stopped_reallocated_notes_are_not_released_again_when_sustain_pedal_is_lifted, {
+    test_gc_reallocated_notes_while_sustaining(&sustain_pedal_on, &sustain_pedal_off, "pedal");
+    test_gc_reallocated_notes_while_sustaining(&hold_mode_on, &hold_mode_off, "hold");
 })
 
 
-TEST(note_off_stops_notes_that_are_triggered_multiple_times_during_sustaining, {
+void test_note_off_notes_that_are_triggered_multiple_times_during_sustaining(
+        void(*sustain_on)(Synth& synth),
+        void(*sustain_off)(Synth& synth),
+        char const* const sustain_type
+) {
     constexpr Frequency sample_rate = 3000.0;
     constexpr Integer block_size = 3000;
     Synth synth;
@@ -854,13 +959,13 @@ TEST(note_off_stops_notes_that_are_triggered_multiple_times_during_sustaining, {
 
     synth.resume();
 
-    synth.control_change(0.01, 1, Midi::SUSTAIN_PEDAL, 127);
+    sustain_on(synth);
     synth.note_on(0.02, 1, Midi::NOTE_A_3, 127);
     synth.note_off(0.03, 1, Midi::NOTE_A_3, 127);
     synth.note_on(0.04, 1, Midi::NOTE_A_3, 127);
     synth.note_off(0.05, 1, Midi::NOTE_A_3, 127);
     synth.note_on(0.06, 1, Midi::NOTE_A_3, 127);
-    synth.control_change(0.07, 1, Midi::SUSTAIN_PEDAL, 0);
+    sustain_off(synth);
     synth.note_off(0.08, 1, Midi::NOTE_A_3, 127);
 
     SignalProducer::produce<Synth>(synth, 1, block_size / 10);
@@ -877,10 +982,24 @@ TEST(note_off_stops_notes_that_are_triggered_multiple_times_during_sustaining, {
             (int)c
         );
     }
+}
+
+
+TEST(note_off_stops_notes_that_are_triggered_multiple_times_during_sustaining, {
+    test_note_off_notes_that_are_triggered_multiple_times_during_sustaining(
+        &sustain_pedal_on, &sustain_pedal_off, "pedal"
+    );
+    test_note_off_notes_that_are_triggered_multiple_times_during_sustaining(
+        &hold_mode_on, &hold_mode_off, "hold"
+    );
 })
 
 
-TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_note_ringing_if_key_is_still_held_down, {
+void test_sustain_off_while_key_is_still_held(
+        void(*sustain_on)(Synth& synth),
+        void(*sustain_off)(Synth& synth),
+        char const* const sustain_type
+) {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
 
@@ -907,7 +1026,7 @@ TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_n
 
     synth.process_messages();
 
-    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    sustain_on(synth);
     synth.note_on(0.000001, 1, Midi::NOTE_A_3, 127);
     SignalProducer::produce<Synth>(synth, 1); /* note starts then decays */
     SignalProducer::produce<Synth>(synth, 2); /* voice gets garbage collected */
@@ -917,13 +1036,25 @@ TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_n
 
     synth.note_off(0.0, 1, Midi::NOTE_A_3, 127); /* note off is deferred due to sustain pedal */
     synth.note_on(0.0000001, 1, Midi::NOTE_A_3, 127); /* new voice allocated to the note */
-    synth.control_change(0.0000002, 1, Midi::SUSTAIN_PEDAL, 0); /* second voice should keep ringing */
+    sustain_off(synth); /* second voice should keep ringing */
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
     expected_samples = SignalProducer::produce<SumOfSines>(expected, 3);
 
     assert_eq(expected_samples[0], rendered_samples[0], block_size, 0.001);
     assert_eq(expected_samples[1], rendered_samples[1], block_size, 0.001);
+}
+
+
+TEST(sustain_off_leaves_garbage_collected_and_deferred_stopped_and_reallocated_note_ringing_if_key_is_still_held_down, {
+    test_sustain_off_while_key_is_still_held(
+        &sustain_pedal_on,
+        [](Synth& synth) -> void {
+            synth.control_change(0.0000002, 1, Midi::SUSTAIN_PEDAL, 0);
+        },
+        "pedal"
+    );
+    test_sustain_off_while_key_is_still_held(&hold_mode_on, &hold_mode_off, "hold");
 })
 
 
@@ -1323,10 +1454,35 @@ TEST(can_switch_between_polyphonic_and_monophonic_modes, {
     Synth synth;
 
     synth.mono_mode_on(0.0, 0);
-    assert_eq(ToggleParam::OFF, synth.polyphonic.get_value());
+    assert_eq(Synth::NOTE_HANDLING_MONOPHONIC, synth.note_handling.get_value());
+    assert_false(synth.is_polyphonic());
+    assert_true(synth.is_monophonic());
+    assert_false(synth.is_holding());
 
     synth.mono_mode_off(0.0, 0);
-    assert_eq(ToggleParam::ON, synth.polyphonic.get_value());
+    assert_eq(Synth::NOTE_HANDLING_POLYPHONIC, synth.note_handling.get_value());
+    assert_true(synth.is_polyphonic());
+    assert_false(synth.is_monophonic());
+    assert_false(synth.is_holding());
+
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_HOLD_POLYPHONIC);
+    synth.mono_mode_on(0.0, 0);
+    assert_eq(
+        Synth::NOTE_HANDLING_HOLD_MONOPHONIC,
+        synth.note_handling.get_value()
+    );
+    assert_false(synth.is_polyphonic());
+    assert_true(synth.is_monophonic());
+    assert_true(synth.is_holding());
+
+    synth.mono_mode_off(0.0, 0);
+    assert_eq(
+        Synth::NOTE_HANDLING_HOLD_POLYPHONIC,
+        synth.note_handling.get_value()
+    );
+    assert_true(synth.is_polyphonic());
+    assert_false(synth.is_monophonic());
+    assert_true(synth.is_holding());
 })
 
 
@@ -1373,7 +1529,7 @@ TEST(triggered_and_released_note_and_velocity_controllers_are_maintained, {
     assert_eq(A_2, synth.released_note.get_value(), tolerance);
     assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
 
-    synth.polyphonic.set_value(ToggleParam::OFF);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONOPHONIC);
 
     synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
     synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);

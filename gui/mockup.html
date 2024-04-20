@@ -354,8 +354,20 @@ h1 span {
   border: inset 1px #9090b0;
 }
 
+#main div label.note-handling {
+  height: 23px;
+  margin-bottom: -2px;
+}
+
+#main div label.note-handling input {
+  border: inset 1px #9090b0;
+  width: 58px;
+  height: 21px;
+  top: 0;
+  border-radius: 3px;
+}
+
 .block h1 label.inaccuracy,
-.block h1 label.poly,
 .block h1 label.sync {
   margin-right: 3px;
   float: right;
@@ -725,7 +737,7 @@ function make_tabs(active)
           </svg>
         </div>
         <div>
-          <label class="poly"><input type="text" /> POLY</label>
+          <label class="note-handling"><input type="text" /></label>
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">
