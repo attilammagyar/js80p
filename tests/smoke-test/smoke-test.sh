@@ -33,7 +33,7 @@ main()
             suffix=""
         fi
 
-        for architecture in "32:sse2" "64:sse2" "64:avx"
+        for architecture in "x86:sse2" "x86_64:sse2" "x86_64:avx"
         do
             info="plugin_type='$plugin_type', architecture='$architecture'"
 
@@ -55,17 +55,17 @@ main()
         done
     done
 
-    info="plugin_type='vst3', architecture='64:avx'"
-    run_test_wine "$src_dir" "" "vst3" "_bundle" "64:avx" "platform='wine', $info"
-    run_test_linux "$src_dir" "" "vst3" "_bundle" "64:avx" "platform='linux', $info"
+    info="plugin_type='vst3', architecture='x86_64:avx'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "x86_64:avx" "platform='wine', $info"
+    run_test_linux "$src_dir" "" "vst3" "_bundle" "x86_64:avx" "platform='linux', $info"
 
-    info="plugin_type='vst3', architecture='64:sse2'"
-    run_test_wine "$src_dir" "" "vst3" "_bundle" "64:sse2" "platform='wine', $info"
-    run_test_linux "$src_dir" "" "vst3" "_bundle" "64:sse2" "platform='linux', $info"
+    info="plugin_type='vst3', architecture='x86_64:sse2'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "x86_64:sse2" "platform='wine', $info"
+    run_test_linux "$src_dir" "" "vst3" "_bundle" "x86_64:sse2" "platform='linux', $info"
 
-    info="plugin_type='vst3', architecture='32:sse2'"
-    run_test_wine "$src_dir" "" "vst3" "_bundle" "32:sse2" "platform='wine', $info"
-    # run_test_linux "$src_dir" "" "vst3" "_bundle" "32:sse2" "platform='linux', $info"
+    info="plugin_type='vst3', architecture='x86:sse2'"
+    run_test_wine "$src_dir" "" "vst3" "_bundle" "x86:sse2" "platform='wine', $info"
+    # run_test_linux "$src_dir" "" "vst3" "_bundle" "x86:sse2" "platform='linux', $info"
 
     # As of VST 3.7.8, loading the 32 bit plugin into a 32 bit host application
     # from a VST 3 bundle on a 64 bit Linux system is broken:
@@ -89,14 +89,14 @@ run_test_wine()
 
     instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
     architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
-    reaper_exe="$WINE_DIR/reaper$architecture/reaper.exe"
+    reaper_exe="$WINE_DIR/reaper-$architecture/reaper.exe"
     rendered_wav="$WINE_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
 
     if [[ "$infix" != "" ]]
     then
-        infix="$infix-${architecture}bit"
+        infix="$infix-${architecture}"
     fi
 
     rm -vrf "$WINE_TEST_DIR"/{test.{rpp,wav},js80p.{dll,vst3}}
@@ -108,7 +108,7 @@ run_test_wine()
     if [[ ! -f "$reaper_exe" ]]
     then
         echo "ERROR: expected $reaper_exe to be" >&2
-        echo "       a $architecture bit portable installation of Reaper that is configured" >&2
+        echo "       a(n) $architecture portable installation of Reaper that is configured" >&2
         echo "       to look for VST plugins in the 'C:\\test' directory," >&2
         echo "       and to render with a buffer size of 1024 samples." >&2
         return 1
@@ -133,14 +133,14 @@ run_test_linux()
 
     instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
     architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
-    reaper_exe=~/programs/"reaper$architecture/reaper"
+    reaper_exe=~/programs/"reaper-$architecture/reaper"
     rendered_wav="$LINUX_TEST_DIR/test.wav"
 
     echo "Running test; $msg_info" >&2
 
     if [[ "$infix" != "" ]]
     then
-        infix="$infix-${architecture}bit"
+        infix="$infix-${architecture}"
     fi
 
     rm -vrf "$LINUX_TEST_DIR"/{test.{rpp,wav},js80p.{so,vst3}}
@@ -156,7 +156,7 @@ run_test_linux()
     if [[ ! -x "$reaper_exe" ]]
     then
         echo "ERROR: expected $reaper_exe to be" >&2
-        echo "       a $architecture bit portable installation of Reaper that is configured" >&2
+        echo "       a(n) $architecture portable installation of Reaper that is configured" >&2
         echo "       to look for VST plugins in the '$LINUX_TEST_DIR' directory," >&2
         echo "       and to render with a buffer size of 1024 samples." >&2
         return 1
