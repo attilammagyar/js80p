@@ -30,6 +30,7 @@ Table of Contents
 -----------------
 
  * [Table of Contents](#toc)
+ * [Features](#features)
  * [System Requirements](#system-reqs)
     * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
@@ -39,10 +40,27 @@ Table of Contents
     * [VST 3 Single File on Linux](#vst3-single-linux)
     * [FST (VST 2.4) on Windows](#fst-windows)
     * [FST (VST 2.4) on Linux](#fst-linux)
+    * [Setting up MTS-ESP Tuning Providers](#install-tuning)
+       * [Windows](#mts-esp-windows)
+       * [Linux](#mts-esp-linux)
  * [Usage](#usage)
- * [Tuning](#tuning)
-    * [Setting up MTS-ESP on Windows](#mts-esp-windows)
-    * [Setting up MTS-ESP on Linux](#mts-esp-linux)
+    * [Signal Chain (Simplified)](#usage-signal)
+    * [Knobs, controllers](#usage-knobs)
+    * [Synthesizer (Synth)](#usage-synth)
+       * [Main Panel](#usage-synth-main)
+       * [Common Oscillator Settings](#usage-synth-common)
+       * [Oscillator 1 (Modulator)](#usage-synth-modulator)
+       * [Oscillator 2 (Carrier)](#usage-synth-carrier)
+    * [Effects](#usage-effects)
+       * [Volume Controls](#usage-effects-volume)
+       * [Distortions](#usage-effects-distortions)
+       * [Filters](#usage-effects-filters)
+       * [Chorus](#usage-effects-chorus)
+       * [Echo](#usage-effects-echo)
+       * [Reverb](#usage-effects-reverb)
+    * [Macros (MC)](#usage-macros)
+    * [Envelopes (ENV)](#usage-envelopes)
+    * [LFOs](#usage-lfos)
  * [Presets](#presets)
     * [Blank](#preset-blank)
     * [Bright Organ](#preset-bright-organ)
@@ -82,8 +100,6 @@ Table of Contents
     * [Analog Brass](#preset-analog-brass)
     * [Bouncy](#preset-bouncy)
  * [Bugs](#bugs)
- * [Signal Chain (Simplified)](#signal)
- * [Features](#features)
  * [Frequently Asked Questions](#faq)
     * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
@@ -101,17 +117,91 @@ Table of Contents
     * [Compiling](#dev-compile)
     * [Theory](#dev-theory)
 
-<a id="system-reqs"></a>
+<a id="features"></a>
+
+Features
+--------
+
+ * 64 notes polyphony.
+ * Last-note priority monophonic mode.
+    * Legato playing will either retrigger or smoothly glide to the next note,
+      depending on the portamento length setting.
+ * Polyphonic and monophonic hold mode to keep notes ringing without a sustain
+   pedal.
+ * 2 oscillators with 10 waveforms:
+    * sine,
+    * sawtooth,
+    * soft sawtooth,
+    * inverse sawtooth,
+    * soft inverse sawtooth,
+    * triangle,
+    * soft triangle,
+    * square,
+    * soft square,
+    * custom.
+ * 2 filters for each oscillator, 7 filter types:
+    * low-pass,
+    * high-pass,
+    * band-pass,
+    * notch,
+    * bell (peaking),
+    * low-shelf,
+    * high-shelf.
+ * Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.
+ * Adjustable oscillator pitch inaccuracy and instability, for analog-like
+   liveliness and warmth.
+    * Set the same inaccuracy or instability level for the two oscillators to
+      synchronize their imperfections within a single polyphonic voice, so that
+      the effect will only occur between multiple voices, but not between the
+      oscillators within a single voice.
+ * Microtuning support via the MTS-ESP tuning protocol by
+   [ODDSound](https://oddsound.com/).
+ * Portamento.
+ * Wavefolder.
+ * Split keyboard.
+ * Amplitude modulation.
+ * Frequency modulation.
+ * Phase modulation.
+ * Built-in effects:
+    * overdrive,
+    * distortion,
+    * 2 more filters,
+    * chorus,
+    * stereo echo (with distortion and side-chaining),
+    * stereo reverb (with distortion and side-chaining),
+    * volume controls at various points of the signal chain.
+ * 12 envelopes with customizable shapes.
+ * 8 low-frequency oscillators (LFO) with optional amount envelope and
+   polyphony.
+ * Filter and envelope imperfection settings for analog-like feel.
+ * MIDI controllers and macros.
+ * Channel pressure (aftertouch).
+ * MIDI learn.
+ * Logarithmic or linear scale filter frequencies.
+ * Tempo synchronization for envelopes, LFOs, and effects.
+ * Use the peak level at various points of the signal chain to control
+   parameters:
+    * oscillator 1 output,
+    * oscillator 2 output,
+    * volume control 1 input,
+    * volume control 2 input,
+    * volume control 3 input.
+
+<a id="system-reqs" href="#toc">Table of Contents</a>
 
 System Requirements
 -------------------
 
- * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04)
- * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
-    * separate packages are available for AVX capable 64 bit processors
+ * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).
+ * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
+    * Separate packages are available for AVX capable 64 bit processors for
+      better performance and CPU utilization.
  * RAM: 200-300 MB per instance, depending on buffer sizes, sample rate, etc.
 
-Tested with [REAPER](https://www.reaper.fm/) 6.79.
+Tested with [REAPER](https://www.reaper.fm/) 7.14.
+
+A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
+gives good performance and low latency.
 
 Note: a RISC-V 64 port is available as a
 [separate project](https://github.com/aimixsaka/js80p/) by
@@ -220,58 +310,13 @@ folder.
 
 Note: VST 2.4 plugins are usually put in the `~/.vst` directory.
 
-<a id="usage" href="#toc">Table of Contents</a>
+<a id="install-tuning"></a>
 
-Usage
------
-
- * Move the cursor over a knob, and use the mouse wheel for adjusting its
-   value, or start dragging it.
-
- * Hold down the Control key while adjusting a knob for fine grained
-   adjustments.
-
- * Double click on a knob to reset it to its default value.
-
- * Click on the area below a knob to assign a controller to it.
-
- * A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
-   gives good performance and low latency.
-
-<a id="tuning" href="#toc">Table of Contents</a>
-
-Tuning
-------
-
-Each oscillator can be tuned separately by clicking on the tuning selector in
-the title bar of the oscillator, allowing maximum flexibility; for example, you
-can have continuously updated tuning for one oscillator, and have the other
-update its frequency tables only for `NOTE ON` events.
-
-The following tuning options are available:
-
- * `C MTS-ESP`: continuously query information from an MTS-ESP tuning provider
-   (usually another plugin) when at least one note is playing, and update the
-   frequency of all sounding notes that haven't reached the Release portion of
-   their volume envelopes yet, on the fly. The tuning selector displays "`on`"
-   when a tuning provider is available, and "`off`" when no tuning provider is
-   found.  In the latter case, notes will fall back to 440 Hz 12 tone equal
-   temperament.
-
- * `N MTS-ESP`: query tuning information from an MTS-ESP tuning provider
-   (usually another plugin) for evey `NOTE ON` MIDI event. Already sounding
-   notes are kept unchanged. The tuning selector displays "`on`" when a tuning
-   provider is available, and "`off`" when no tuning provider is found. In the
-   latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
-
- * `440 12TET`: the usual [12 tone equal temperament](https://en.wikipedia.org/wiki/Equal_temperament)
-   tuning, where the `A4` MIDI note is 440 Hz.
-
- * `432 12TET`: 12 tone equal temperament with `A4` set to 432 Hz.
+### Setting up MTS-ESP Tuning Providers
 
 <a id="mts-esp-windows"></a>
 
-### Setting up MTS-ESP on Windows
+#### Windows
 
 Download and install either the free [MTS-ESP Mini](https://oddsound.com/mtsespmini.php)
 plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
@@ -292,7 +337,7 @@ and put it in a folder where Windows can find it:
 
 <a id="mts-esp-linux"></a>
 
-### Setting up MTS-ESP on Linux
+#### Linux
 
 As of November, 2023, there is no official distribution of the MTS-ESP tuning
 provider plugins by [ODDSound](https://oddsound.com/) for Linux, however, there
@@ -304,6 +349,466 @@ To use MTS-ESP, you may have to download the `libMTS.so` library from the
 and put it in the `/usr/local/lib` directory, if it is not already installed on
 your system.  As of November, 2023, `libMTS.so` is only available for `x86_64`
 Linux systems.
+
+<a id="usage" href="#toc">Table of Contents</a>
+
+Usage
+-----
+
+<a id="usage-signal"></a>
+
+### Signal Chain (Simplified)
+
+                                                               (x64)
+    Oscillator --> Filter --> Wavefolder --> Filter --> Volume ---------> Mixer
+                     ^                                       |            ^   |
+                     |                                       |            |   |
+    Sub-oscillator --+                                       |            |   |
+                                                             |            |   |
+     (Frequency, Phase, and Amplitude Modulation)            |            |   |
+     +-------------------------------------------------------+            |   |
+     |                                                                    |   |
+     v                                                                    |   |
+     Oscillator                                                           |   |
+     |                                                                    |   |
+     v                                                          (x64)     |   |
+     Filter --> Wavefolder --> Distortion --> Filter --> Volume ----------+   |
+                                                                              |
+            +-----------------------------------------------------------------+
+            |
+            v
+            Volume --> Overdrive --> Distortion --> Filter --> Filter --+
+                                                                        |
+            +-----------------------------------------------------------+
+            |
+            v
+            Volume --> Chorus --> Echo --> Reverb --> Volume --> Out
+
+<a id="usage-knobs" href="#toc">Table of Contents</a>
+
+### Knobs, Controllers
+
+ * Move the mouse cursor over a knob or a small screw icon, and use the mouse
+   wheel or move the mouse while holding down the left mouse button for
+   adjusting the value.
+
+ * Hold down the Control key on the keyboard while adjusting a knob for fine
+   grained adjustments.
+
+ * Double click on a knob to reset it to its default value.
+
+ * Click on the area below a knob to assign a controller (Macro, MIDI CC,
+   Envelope, or LFO) to it, or to remove a previously assigned controller. When
+   a knob has a controller assigned to it, its value can no longer be changed
+   manually, it's entirely controlled by the selected controller.
+
+<a id="usage-synth" href="#toc">Table of Contents</a>
+
+### Synthesizer (Synth)
+
+This tab contains the foundational settings of the sound.
+
+<a id="usage-synth-main"></a>
+
+#### Main Panel
+
+##### Import Patch, Export Patch
+
+The two icons at the top left corner allow saving and loading synth settings
+(often called "patches" or "presets") as ordinary files, e.g. for transferring
+sounds across projects, different host applications, computers, etc.
+
+<a id="usage-synth-main-nh"></a>
+
+##### Note Handling
+
+Click on the black bar below the Import Patch an Export Patch icons, or use the
+mouse wheel while holding the mouse cursor over it to change how JS80P handles
+note events. The available options are:
+
+ * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
+
+ * **MONO**: monophonic mode, only a single note can be played at a time.
+
+    * When a new note start event is received while a previous note is still
+      playing (e.g. legato), then the new note takes priority: the old note is
+      stopped, and the new note is started.
+
+    * If the new note is released, and the previous note is still held, then
+      the previous note is restarted.
+
+    * If the [PRT](#usage-synth-common-prt) setting of an oscillator is set
+      to a value above 0, then that oscillator will smootly glide its frequency
+      and volume to match the new note's pitch and velocity.
+
+ * **M HOLD**: same as **MONO**, but note stop events are ignored until a
+   different note handling setting is selected, or until a sustain pedal off
+   event is received.
+
+ * **P HOLD**: same as **POLY**, but note stop events are ignored until a
+   different note handling setting is selected, or until a sustain pedal off
+   event is received.
+
+<a id="usage-synth-main-mode"></a>
+
+##### Operating Mode (MODE)
+
+Choose whether to mix the sound of the two oscillators or route low notes to
+one oscillator, and higher notes to the other. The available options are:
+
+ * **Mix&Mod**: the sound of the two oscillators can be mixed into the output,
+   and the sound of the second oscillator (carrier) can be modulated in various
+   ways by the first oscillator (modulator).
+
+ * **Split C3**, **Split Db3**, etc.: notes below the selected split point are
+   played only on the first oscillator, notes above the split point (inclusive)
+   are played only on the second oscillator.
+
+##### Modulator Additive Volume (MIX)
+
+When the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, this
+knob controls how loud the first oscillator can be heard in the output. Turn it
+down to 0% in order to make the first oscillator contribute to the final sound
+only via modulation.
+
+##### Phase Modulation (PM)
+
+Turn it up to have the first oscillator modulate the phase of the second
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+position.
+
+##### Frequency Modulation (FM)
+
+Turn it up to have the first oscillator modulate the frequency of the second
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+position.
+
+##### Amplitude Modulation (AM)
+
+Turn it up to have the first oscillator modulate the amplitude of the second
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+position. (This is also known as "ring modulation".)
+
+<a id="usage-synth-common" href="#toc">Table of Contents</a>
+
+#### Common Oscillator Settings
+
+<a id="usage-synth-common-tuning"></a>
+
+##### Tuning
+
+Click on the black bar next to the oscillator's name or use the mouse wheel
+while holding the mouse cursor over it in order to change the tuning. The
+available options are:
+
+ * **C MTS-ESP**: use an [external tuning provider](#install-tuning) for
+   determining the frequency of each note. Frequencies of notes which haven't
+   reached the release stage of their envelopes are updated continuously. The
+   connection to the tuning provider is indicated by "on" or "off" appearing in
+   the tuning selector box. If the connection to the tuning provider is broken,
+   then 440 Hz based
+   [12 tone equal temperament](https://en.wikipedia.org/wiki/Equal_temperament)
+   is used.
+
+ * **N MTS-ESP**: use an [external tuning provider](#install-tuning) for
+   determining the frequency of each note. Note frequencies are updated only
+   when a new note is started. The connection to the tuning provider is
+   indicated by the "on" or "off" sign. If the connection to the tuning
+   provider is broken, then 440 Hz based 12 tone equal temperament is used.
+
+ * **440 12TET**: the usual 12 tone equal temperament with the A4 note being
+   tuned to 440 Hz.
+
+ * **432 12TET**: 12 tone equal temperament with the A4 note being tuned to
+   432 Hz.
+
+##### Oscillator Inaccuracy
+
+The first screw icon next to the [tuning selector](#usage-synth-common-tuning)
+adds a level of randomization to the oscillator's frequency, mimicing the
+imperfectness of analog synthesizers. The more the screw is turned, the more
+off each note will be from the correct pitch.
+
+When the inaccuracy of the two oscillators is set to the same value, and the
+[MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, then the
+oscillators will synchronize their randomness: each note will be off from the
+correct pitch by a random amount, but within a single voice, the two
+oscillators will be off by the same amount.
+
+##### Oscillator Instability
+
+The second screw icon next to the [tuning selector](#usage-synth-common-tuning)
+adds a level of randomization to the oscillator's frequency over time, mimicing
+the imperfectness of analog synthesizers. The more the screw is turned, the
+more the oscillator will diverge from the correct pitch, hovering sometimes
+above, and sometimes below.
+
+When the instability of the two oscillators is set to the same value, and the
+[MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, then the
+oscillators will synchronize their random divergence: each note will be off
+from the correct pitch by a random amount, but within a single voice, the two
+oscillators will always be off by the same amount, and will always diverge by
+the same amount in the same direction.
+
+<a id="usage-synth-common-prt"></a>
+
+##### Portamento Length (PRT)
+
+The time it takes for the oscillator's frequency to reach the current note's
+pitch starting from the pitch of the previous note.
+
+When the synthesizer is in [MONO](#usage-synth-main-nh) mode, and
+notes are played in a legato fashion (notes are started before the previous
+ones would have ended), then it also controls how long the oscillator's
+amplitude will take to match the velocity of the latest note.
+
+##### Portamento Depth (PRD)
+
+When set to a non-zero value (specified in cents), then oscillator frequency
+will glide to the current note's pitch from a fixed level of detuning in
+accordance with the [PRT](#usage-synth-common-prt) setting.
+
+When its value is 0 s, then the starting frequency of the glide will be the
+pitch of the previous note.
+
+##### Detune (DTN)
+
+Coarse detune, specifying how many semitones higher or lower the oscillator
+should play above or below the note's actual pitch.
+
+##### Fine Detune (FIN)
+
+Fine detune, specifying how many cents higher or lower the oscillator should
+play above or below the note's actual pitch.
+
+##### Amplitude (AMP)
+
+Sets the volume of the oscillator before any filtering and shaping.
+
+<a id="usage-synth-common-filter"></a>
+
+##### Filter Logarithmic Frequency (LG F)
+
+The toggle switch above the [FREQ](#usage-synth-common-freq) knob can switch
+between using a linear or a logarithmic scale for the knob.
+
+<a id="usage-synth-common-lgq"></a>
+
+##### Filter Logarithmic Q Factor (LG Q)
+
+The toggle switch above the [Q](#usage-synth-common-q) knob can switch
+between using a linear or a logarithmic scale for the knob.
+
+##### Filter Frequency Inaccuracy
+
+The first little screw next to the [LG Q](#usage-synth-common-lgq) switch adds
+a level of randomization to the filter's frequency to mimic imperfections of
+analog synthesizers.
+
+Be careful with this, because with certain filter settings, too much
+randomization can produce loud sound artifacts or make the filter completely
+silent.
+
+##### Filter Q Inaccuracy
+
+The second little screw next to the [LG Q](#usage-synth-common-lgq) switch adds
+a level of randomization to the filter's Q factor to mimic imperfections of
+analog synthesizers.
+
+Be careful with this, because with certain filter settings, too much
+randomization can produce loud sound artifacts or make the filter completely
+silent.
+
+<a id="usage-synth-common-type"></a>
+
+##### Filter Type (TYPE)
+
+The following filter types are available:
+
+ * **LP**: low-pass filter, the frequencies above the
+   [cutoff frequency](#usage-synth-common-freq) are attenuated. The
+   [Q factor](#usage-synth-common-q) controls the resonance.
+
+ * **HP**: high-pass filter, the frequencies below the
+   [cutoff frequency](#usage-synth-common-freq) are attenuated. The
+   [Q factor](#usage-synth-common-q) controls the resonance.
+
+ * **BP**: band-pass filter, the frequencies outside a band around the
+   [cutoff frequency](#usage-synth-common-freq) are filtered out. The
+   [Q factor](#usage-synth-common-q) controls the width of the band. (Low Q
+   value makes the band wide, high Q value makes the band narrow.)
+
+ * **Notch**: band-stop filter, the frequencies inside a band around the
+   [cutoff frequency](#usage-synth-common-freq) are filtered out. The
+   [Q factor](#usage-synth-common-q) controls the width of the band. (Low Q
+   value makes the band wide, high Q value makes the band narrow.)
+
+ * **Bell**: boosts or attenuates a band of frequencies around the
+   [cutoff frequency](#usage-synth-common-freq). The
+   [Q factor](#usage-synth-common-q) controls the width of the band. (Low Q
+   value makes the band wide, high Q value makes the band narrow.)
+
+ * **LS**: low-shelf filter, boosts or attenuates frequencies belove the
+   [cutoff frequency](#usage-synth-common-freq).
+
+ * **HS**: high-shelf filter, boosts or attenuates frequencies above the
+   [cutoff frequency](#usage-synth-common-freq).
+
+<a id="usage-synth-common-freq"></a>
+
+##### Filter Frequency (FREQ)
+
+The cutoff frequency of the filter.
+
+Be careful with this, because depending on other settings of the filter, a too
+low or too high cutoff frequency can produce loud sound artifacts or it can
+make the filter completely silent.
+
+<a id="usage-synth-common-q"></a>
+
+##### Filter Q Factor (Q)
+
+The quality factor of the filter. Its precise meaning depends on the position
+of the [TYPE](#usage-synth-common-type) knob. This knob has no effect for
+the low-shelf and high-shelf filters.
+
+Be careful with this, because depending on other settings of the filter, a too
+low or too high Q factor can produce loud sound artifacts or it can
+make the filter completely silent.
+
+##### Filter Gain (GAIN)
+
+Controls the boosting or attenuation when the [TYPE](#usage-synth-common-type)
+knob is in the Bell, LS (low-shelf), or HS (high-shelf) positions. It has no
+effect on other filter types.
+
+Be careful with this, because too much boosting can make the signal too loud.
+
+##### Wave Folding (FOLD)
+
+A wave folder is a similar wave shaping effect to a clipping distortion, but
+the portion of the signal that is above the maximum level is not clipped, but
+reflected back on itself. Then if it reaches the maximum amplitue again in the
+opposite direction, then it is reflected again and again. This process adds a
+lot of complexity to the sound, making it sound metallic.
+
+##### Velocity Sensitivity (VEL S)
+
+Controls how the oscillator's volume reacts to note velocity. When it's set to
+0%, then the oscillator will use a fix volume for each note. Between 0% and
+100%, the oscillator's volume will react to velocity linearly. Above 100%, the
+oscillator's volume will react to note velocity more and more logarithmically.
+
+##### Volume (VOL)
+
+The last chance to control the oscillator's volume after wave shaping and
+filtering.
+
+##### Width (WID)
+
+When set to 0%, the oscillator will play all notes exactly in the middle of the
+stereo field. When set to a positive value, higher notes will lean towards the
+right side of the stereo field, and bass notes will lean towards the left. When
+set to a negative value, high notes will lean towards the left side, and bass
+notes will lean towards the right.
+
+##### Panning (PAN)
+
+Changes the position of the oscillator in the stereo field. Positive values
+move the oscillator towards the right side, negative values move it towards the
+left side.
+
+##### Waveform (WAV)
+
+Selects the waveform of the oscillator. The available options are:
+
+ * **Sine**: simple sine wave without any harmonics above the fundamental.
+
+ * **Saw**: sawtooth wave, ramps slowly, drops quickly. Contains both even and
+   odd harmonics.
+
+ * **Soft Sw**: a softer, warmer version of the sawtooth wave. Less prone to
+   aliasing when various modulations and wave folding are engaged.
+
+ * **Inv Saw**: inverse sawtooth wave, rises quickly, drops slowly. Contains
+   both even and odd harmonics.
+
+ * **Soft I S**: a softer, warmer version of the inverse sawtooth wave. Less
+   prone to aliasing when various modulations and wave folding are engaged.
+
+ * **Triangle**: rises slowly, drops slowly. Contasins only odd harmonics.
+
+ * **Soft Tri**: a softer, warmer version of the triangle wave. Less prone to
+    aliasing when various modulations and wave folding are engaged.
+
+ * **Square**: rises quickly, stays up for half a period, then drops quickly
+   and stays down for half a period. Contains only odd harmonics.
+
+ * **Soft Sqr**: a softer, warmer version of the square wave. Less prone to
+    aliasing when various modulations and wave folding are engaged.
+
+ * **Custom**: the amplitudes of the waveform's harmonics can be set using the
+   10 knobs in the _Waveform & harmonics for the Custom waveform_ section.
+   Useful for emulating tonewheel organ sounds.
+
+<a id="usage-synth-modulator" href="#toc">Table of Contents</a>
+
+#### Oscillator 1 (Modulator)
+
+##### Subharmonic Amplitude (SUB)
+
+Sets how loud the subharmonic oscillator should be. The subharmonic oscillator
+plays a sine wave exactly one octave below the oscillator's main frequency.
+
+<a id="usage-synth-carrier"></a>
+
+#### Oscillator 2 (Carrier)
+
+##### Distortion (DIST)
+
+Soft-clipping distortion.
+
+<a id="usage-effects" href="#toc">Table of Contents</a>
+
+### Effects
+
+<a id="usage-effects-volume"></a>
+
+#### Volume Controls
+
+<a id="usage-effects-distortions"></a>
+
+#### Distortions
+
+<a id="usage-effects-filters"></a>
+
+#### Filters
+
+See [oscillator filters](#usage-synth-common-filter).
+
+<a id="usage-effects-chorus"></a>
+
+#### Chorus
+
+<a id="usage-effects-echo" href="#toc">Table of Contents</a>
+
+#### Echo
+
+<a id="usage-effects-reverb" href="#toc">Table of Contents</a>
+
+#### Reverb
+
+<a id="usage-macros" href="#toc">Table of Contents</a>
+
+### Macros (MC)
+
+<a id="usage-envelopes" href="#toc">Table of Contents</a>
+
+### Envelopes (ENV)
+
+<a id="usage-lfos" href="#toc">Table of Contents</a>
+
+### LFOs
 
 <a id="presets" href="#toc">Table of Contents</a>
 
@@ -624,105 +1129,6 @@ Bugs
 
 If you find bugs, please report them at
 [https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
-
-<a id="signal" href="#toc">Table of Contents</a>
-
-Signal Chain (Simplified)
--------------------------
-                                                               (x64)
-    Oscillator --> Filter --> Wavefolder --> Filter --> Volume ---------> Mixer
-                     ^                                       |            ^   |
-                     |                                       |            |   |
-    Sub-oscillator --+                                       |            |   |
-                                                             |            |   |
-     (Frequency, Phase, and Amplitude Modulation)            |            |   |
-     +-------------------------------------------------------+            |   |
-     |                                                                    |   |
-     v                                                                    |   |
-     Oscillator                                                           |   |
-     |                                                                    |   |
-     v                                                          (x64)     |   |
-     Filter --> Wavefolder --> Distortion --> Filter --> Volume ----------+   |
-                                                                              |
-            +-----------------------------------------------------------------+
-            |
-            v
-            Volume --> Overdrive --> Distortion --> Filter --> Filter --+
-                                                                        |
-            +-----------------------------------------------------------+
-            |
-            v
-            Volume --> Chorus --> Echo --> Reverb --> Volume --> Out
-
-<a id="features" href="#toc">Table of Contents</a>
-
-Features
---------
-
- * 64 notes polyphony.
- * Last-note priority monophonic mode.
-    * Legato playing will either retrigger or smoothly glide to the next note,
-      depending on the portamento length setting.
- * Polyphonic and monophonic hold mode to keep notes ringing without a sustain
-   pedal.
- * 2 oscillators with 10 waveforms:
-    * sine,
-    * sawtooth,
-    * soft sawtooth,
-    * inverse sawtooth,
-    * soft inverse sawtooth,
-    * triangle,
-    * soft triangle,
-    * square,
-    * soft square,
-    * custom.
- * 2 filters for each oscillator, 7 filter types:
-    * low-pass,
-    * high-pass,
-    * band-pass,
-    * notch,
-    * bell (peaking),
-    * low-shelf,
-    * high-shelf.
- * Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.
- * Adjustable oscillator pitch inaccuracy and instability, for analog-like
-   liveliness and warmth.
-    * Set the same inaccuracy or instability level for the two oscillators to
-      synchronize their imperfections within a single polyphonic voice, so that
-      the effect will only occur between multiple voices, but not between the
-      oscillators within a single voice.
- * Microtuning support via the MTS-ESP tuning protocol by
-   [ODDSound](https://oddsound.com/).
- * Portamento.
- * Wavefolder.
- * Split keyboard.
- * Amplitude modulation.
- * Frequency modulation.
- * Phase modulation.
- * Built-in effects:
-    * overdrive,
-    * distortion,
-    * 2 more filters,
-    * chorus,
-    * stereo echo (with distortion and side-chaining),
-    * stereo reverb (with distortion and side-chaining),
-    * volume controls at various points of the signal chain.
- * 12 envelopes with customizable shapes.
- * 8 low-frequency oscillators (LFO) with optional amount envelope and
-   polyphony.
- * Filter and envelope imperfection settings for analog-like feel.
- * MIDI controllers and macros.
- * Channel pressure (aftertouch).
- * MIDI learn.
- * Logarithmic or linear scale filter frequencies.
- * Tempo synchronization for envelopes, LFOs, and effects.
- * Use the peak level at various points of the signal chain to control
-   parameters:
-    * oscillator 1 output,
-    * oscillator 2 output,
-    * volume control 1 input,
-    * volume control 2 input,
-    * volume control 3 input.
 
 <a id="faq" href="#toc">Table of Contents</a>
 
