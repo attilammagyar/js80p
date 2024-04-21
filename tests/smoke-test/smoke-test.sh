@@ -11,6 +11,14 @@ WINE_TEST_DIR="$WINE_DIR"/test
 
 LINUX_TEST_DIR=/tmp/js80p-smoke-test
 
+# Some Reaper versions (e.g. 7.14) seem to send MIDI CC and parameter change
+# events in varying order and with slight timing differences in some cases.
+# There's a point in the test project where this can cause a short, slight
+# difference in the start of a note in the monophonic synth track every once
+# in a while, so we need to retry once or twice before concluding that it's
+# the plugin's fault that the reference rendering could not be reproduced.
+TRIES=3
+
 
 main()
 {
@@ -86,6 +94,8 @@ run_test_wine()
     local instruction_set
     local reaper_exe
     local rendered_wav
+    local try
+    local ret
 
     instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
     architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
@@ -114,8 +124,26 @@ run_test_wine()
         return 1
     fi
 
-    wine "$reaper_exe" -renderproject "C:\\test\\test.rpp" 2>&1 | tee /tmp/"wine-$architecture-$plugin_type.txt"
-    verify_rendered_file "$src_dir" "$rendered_wav"
+    for ((try=0;try<$TRIES;++try))
+    do
+        sleep 1
+
+        wine "$reaper_exe" -renderproject "C:\\test\\test.rpp" 2>&1 | tee /tmp/"wine-$architecture-$plugin_type-$try.txt"
+
+        set +e
+        verify_rendered_file "$try" "$src_dir" "$rendered_wav" "$msg_info"
+        ret=$?
+        set -e
+
+        if [[ $ret -eq 0 ]]
+        then
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    return 1
 }
 
 
@@ -130,6 +158,8 @@ run_test_linux()
     local instruction_set
     local reaper_exe
     local rendered_wav
+    local try
+    local ret
 
     instruction_set="$(printf "%s\n" "$architecture" | cut -d ":" -f 2)"
     architecture="$(printf "%s\n" "$architecture" | cut -d ":" -f 1)"
@@ -162,15 +192,36 @@ run_test_linux()
         return 1
     fi
 
-    "$reaper_exe" -renderproject "$LINUX_TEST_DIR/test.rpp" 2>&1 | tee /tmp/"linux-$architecture-$plugin_type.txt"
-    verify_rendered_file "$src_dir" "$rendered_wav"
+    for ((try=0;try<$TRIES;++try))
+    do
+        sleep 1
+
+        "$reaper_exe" -renderproject "$LINUX_TEST_DIR/test.rpp" 2>&1 | tee /tmp/"linux-$architecture-$plugin_type-$try.txt"
+
+        set +e
+        verify_rendered_file "$try" "$src_dir" "$rendered_wav" "$msg_info"
+        ret=$?
+        set -e
+
+        if [[ $ret -eq 0 ]]
+        then
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    return 1
 }
 
 
 verify_rendered_file()
 {
-    local expected_flac="$1/smoke-test.flac"
-    local rendered_wav="$2"
+    local try=$(($1+1))
+    local expected_flac="$2/smoke-test.flac"
+    local rendered_wav="$3"
+    local msg_info="$4"
+    local fail=1
     local stat
     local min
     local max
@@ -189,20 +240,16 @@ verify_rendered_file()
         printf "%s\n" "$stat" \
             | grep "Maximum *amplitude" | cut -d":" -f2 | tr -d " "
     )
-    [[ "$max" =~ ^-*0\.000 ]] || fail "rendered_wav='$rendered_wav', $msg_info" "$stat"
-    [[ "$min" =~ ^-*0\.000 ]] || fail "rendered_wav='$rendered_wav', $msg_info" "$stat"
 
-    echo "PASS; $msg_info" >&2
-}
+    if [[ "$max" =~ ^-*0\.000 ]] && [[ "$min" =~ ^-*0\.000 ]]
+    then
+        echo "PASS (try $try); $msg_info" >&2
 
+        return 0
+    fi
 
-fail()
-{
-    local msg_info="$1"
-    local stat="$2"
-
-    cat <<ERROR
-FAIL: unexpected rendered sound; $msg_info
+    cat >&2 <<ERROR
+FAIL (try $try): unexpected rendered sound; rendered_wav='$rendered_wav', $msg_info
 
 SoX stat for difference:
 
@@ -211,7 +258,7 @@ $stat
 (NOTE: set Reaper's rendering buffer size to 1024 samples.)
 ERROR
 
-    exit 1
+    return 1
 }
 
 
