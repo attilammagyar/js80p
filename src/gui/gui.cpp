@@ -338,27 +338,27 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::EV2V] = "Volume 2 (%)",
 
-    [Synth::ParamId::ECDEL] = "Chorus Delay (s)",
+    [Synth::ParamId::ECDEL] = "Chorus Delay Time (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",
     [Synth::ParamId::ECDPT] = "Chorus Depth (%)",
     [Synth::ParamId::ECFB] = "Chorus Feedback (%)",
     [Synth::ParamId::ECDF] = "Chorus Dampening Frequency (Hz)",
     [Synth::ParamId::ECDG] = "Chorus Dampening Gain (dB)",
     [Synth::ParamId::ECWID] = "Chorus Stereo Width (%)",
-    [Synth::ParamId::ECHPF] = "Chorus Highpass Frequency (Hz)",
-    [Synth::ParamId::ECHPQ] = "Chorus Highpass Q Factor",
+    [Synth::ParamId::ECHPF] = "Chorus High-pass Frequency (Hz)",
+    [Synth::ParamId::ECHPQ] = "Chorus High-pass Q Factor",
     [Synth::ParamId::ECWET] = "Chorus Wet Volume (%)",
     [Synth::ParamId::ECDRY] = "Chorus Dry Volume (%)",
 
-    [Synth::ParamId::EEDEL] = "Echo Delay (s)",
+    [Synth::ParamId::EEDEL] = "Echo Delay Time (s)",
     [Synth::ParamId::EEINV] = "Echo Input Volume (%)",
     [Synth::ParamId::EEFB] = "Echo Feedback (%)",
     [Synth::ParamId::EEDST] = "Echo Distortion (%)",
     [Synth::ParamId::EEDF] = "Echo Dampening Frequency (Hz)",
     [Synth::ParamId::EEDG] = "Echo Dampening Gain (dB)",
     [Synth::ParamId::EEWID] = "Echo Stereo Width (%)",
-    [Synth::ParamId::EEHPF] = "Echo Highpass Frequency (Hz)",
-    [Synth::ParamId::EEHPQ] = "Echo Highpass Q Factor",
+    [Synth::ParamId::EEHPF] = "Echo High-pass Frequency (Hz)",
+    [Synth::ParamId::EEHPQ] = "Echo High-pass Q Factor",
     [Synth::ParamId::EECTH] = "Echo SC. Compr. Threshold (dB)",
     [Synth::ParamId::EECAT] = "Echo SC. Compr. Attack Time (s)",
     [Synth::ParamId::EECRL] = "Echo SC. Compr. Release Time (s)",
@@ -366,13 +366,13 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EEWET] = "Echo Wet Volume (%)",
     [Synth::ParamId::EEDRY] = "Echo Dry Volume (%)",
 
-    [Synth::ParamId::ERRS] = "Reverb Room Size (%)",
+    [Synth::ParamId::ERRR] = "Reverb Room Reflectivity (%)",
     [Synth::ParamId::ERDST] = "Reverb Distortion (%)",
     [Synth::ParamId::ERDF] = "Reverb Dampening Frequency (Hz)",
     [Synth::ParamId::ERDG] = "Reverb Dampening Gain (dB)",
     [Synth::ParamId::ERWID] = "Reverb Stereo Width (%)",
-    [Synth::ParamId::ERHPF] = "Reverb Highpass Frequency (Hz)",
-    [Synth::ParamId::ERHPQ] = "Reverb Highpass Q Factor",
+    [Synth::ParamId::ERHPF] = "Reverb High-pass Frequency (Hz)",
+    [Synth::ParamId::ERHPQ] = "Reverb High-pass Q Factor",
     [Synth::ParamId::ERCTH] = "Reverb SC. Compr. Threshold (dB)",
     [Synth::ParamId::ERCAT] = "Reverb SC. Compr. Attack Time (s)",
     [Synth::ParamId::ERCRL] = "Reverb SC. Compr. Release Time (s)",
@@ -873,12 +873,12 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EF1LOG] = "Filter 1 Logarithmic Frequency",
     [Synth::ParamId::EF2LOG] = "Filter 2 Logarithmic Frequency",
     [Synth::ParamId::ECLOG] = "Chorus Logarithmic Filter Frequencies",
-    [Synth::ParamId::ECLHQ] = "Chorus Logarithmic Highpass Q Factor",
+    [Synth::ParamId::ECLHQ] = "Chorus Logarithmic High-pass Q Factor",
     [Synth::ParamId::ECLLG] = "Chorus Logarithmic LFO Frequency",
     [Synth::ParamId::EELOG] = "Echo Logarithmic Filter Frequencies",
-    [Synth::ParamId::EELHQ] = "Echo Logarithmic Highpass Q Factor",
+    [Synth::ParamId::EELHQ] = "Echo Logarithmic High-pass Q Factor",
     [Synth::ParamId::ERLOG] = "Reverb Logarithmic Filter Frequencies",
-    [Synth::ParamId::ERLHQ] = "Reverb Logarithmic Highpass Q Factor",
+    [Synth::ParamId::ERLHQ] = "Reverb Logarithmic High-pass Q Factor",
 
     [Synth::ParamId::N1UPD] = "Envelope 1 Update Mode",
     [Synth::ParamId::N2UPD] = "Envelope 2 Update Mode",
@@ -2392,9 +2392,9 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     KNOB(effects_body, 142 + KNOB_W * 3,   173, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
     KNOB(effects_body, 142 + KNOB_W * 4,   173, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
     KNOB(effects_body, 142 + KNOB_W * 5,   173, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 6,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 7,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 8,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body, 142 + KNOB_W * 6,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body, 142 + KNOB_W * 7,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body, 142 + KNOB_W * 8,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
     KNOB(effects_body, 142 + KNOB_W * 9,   173, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body, 142 + KNOB_W * 10,  173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body, 142 + KNOB_W * 11,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
@@ -2407,10 +2407,10 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     KNOB(effects_body,  55 + KNOB_W * 1,   313, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 2,   313, Synth::ParamId::EEHPQ,  MML__,      "%.3f", 1.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 3,   313, Synth::ParamId::EEDEL,  MML__,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body,  55 + KNOB_W * 4,   313, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  55 + KNOB_W * 5,   313, Synth::ParamId::EEDST,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  55 + KNOB_W * 6,   313, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body,  55 + KNOB_W * 7,   313, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  55 + KNOB_W * 4,   313, Synth::ParamId::EEDST,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  55 + KNOB_W * 5,   313, Synth::ParamId::EEDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body,  55 + KNOB_W * 6,   313, Synth::ParamId::EEDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  55 + KNOB_W * 7,   313, Synth::ParamId::EEFB,   MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 8,   313, Synth::ParamId::EEWID,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 9,   313, Synth::ParamId::EECTH,  MM___,      "%.2f", 1.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 10,  313, Synth::ParamId::EECAT,  MM___,      "%.3f", 1.0, knob_states);
@@ -2419,13 +2419,13 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     KNOB(effects_body,  55 + KNOB_W * 13,  313, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 14,  313, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TOGG(effects_body, 190, 285,  50, 24,  0, Synth::ParamId::EELHQ);
-    TOGG(effects_body, 422, 285,  96, 24,  0, Synth::ParamId::EELOG);
+    TOGG(effects_body, 422, 285, 136, 24,  0, Synth::ParamId::EELOG);
     TOGG(effects_body, 836, 285,  90, 24, 66, Synth::ParamId::EESYN);
 
     KNOB(effects_body,  33 + KNOB_W * 0,   453, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 1,   453, Synth::ParamId::ERHPQ,  MML__,      "%.3f", 1.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 2,   453, Synth::ParamId::ERTYP,  MM___,      rt, rtc, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 3,   453, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  33 + KNOB_W * 3,   453, Synth::ParamId::ERRR,   MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 4,   453, Synth::ParamId::ERDST,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 5,   453, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 6,   453, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
@@ -2437,7 +2437,7 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     KNOB(effects_body,  33 + KNOB_W * 12,  453, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  33 + KNOB_W * 13,  453, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TOGG(effects_body, 110, 425,  50, 24,  0, Synth::ParamId::ERLHQ);
-    TOGG(effects_body, 342, 425,  96, 24,  0, Synth::ParamId::ERLOG);
+    TOGG(effects_body, 342, 425, 136, 24,  0, Synth::ParamId::ERLOG);
 
     KNOB(effects_body, 886 + KNOB_W * 0,   453, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
 

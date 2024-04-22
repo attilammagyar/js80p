@@ -69,7 +69,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         virtual void reset() noexcept override;
 
         TypeParam type;
-        FloatParamS room_size;
+        FloatParamS room_reflectivity;
         FloatParamS damping_frequency;
         FloatParamS damping_gain;
         FloatParamS width;

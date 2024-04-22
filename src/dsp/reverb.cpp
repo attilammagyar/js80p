@@ -52,7 +52,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         &mixer
     ),
     type(name+ "TYP"),
-    room_size(
+    room_reflectivity(
         name + "RS",
         Constants::DELAY_FEEDBACK_MIN,
         Constants::DELAY_FEEDBACK_MAX,
@@ -120,7 +120,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][0].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -132,7 +132,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][1].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -144,7 +144,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][2].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -156,7 +156,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][3].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -168,7 +168,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][4].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -180,7 +180,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][5].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -192,7 +192,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][6].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -204,7 +204,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][7].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -216,7 +216,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][8].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -228,7 +228,7 @@ Reverb<InputSignalProducerClass>::Reverb(
             high_pass_filter,
             PannedDelayStereoMode::NORMAL,
             width,
-            room_size,
+            room_reflectivity,
             TUNINGS[0][9].delay_time,
             DELAY_TIME_MAX,
             high_shelf_filter_shared_buffers,
@@ -242,7 +242,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(mixer);
 
     this->register_child(type);
-    this->register_child(room_size);
+    this->register_child(room_reflectivity);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
     this->register_child(width);

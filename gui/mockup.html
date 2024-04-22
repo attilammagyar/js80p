@@ -828,7 +828,7 @@ function make_tabs(active)
         <h1>
           <span>Chorus</span>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
-          <label class="lfo-freq"><input type="text" /><span> LG LFO FREQS</span></label>
+          <label class="lfo-freq"><input type="text" /><span> LG LFO FREQ</span></label>
           <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
@@ -838,7 +838,7 @@ function make_tabs(active)
         <h1>
           <span>Echo</span>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
-          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
@@ -847,7 +847,7 @@ function make_tabs(active)
         <h1>
           <span>Reverb</span>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
-          <label class="freq"><input type="text" /><span> LG FREQS</span></label>
+          <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
         </h1>
         <div id="reverb-params" class="block"></div>
       </div>
@@ -1046,11 +1046,11 @@ window.onload = function ()
     create_knob("chorus-params", "HP Q", "1");
     create_knob("chorus-params", "TYPE", "0");
     create_knob("chorus-params", "DEL s", "0.5");
-    create_knob("chorus-params", "FRQ Hz", "1.5");
+    create_knob("chorus-params", "FREQ Hz", "1.5");
     create_knob("chorus-params", "DPT %", "0.5");
-    create_knob("chorus-params", "FB %", "70");
     create_knob("chorus-params", "DF Hz", "6000");
     create_knob("chorus-params", "DG dB", "-6");
+    create_knob("chorus-params", "FB %", "70");
     create_knob("chorus-params", "WID %", "-100");
     create_knob("chorus-params", "WET %", "50");
     create_knob("chorus-params", "DRY %", "60");
@@ -1059,10 +1059,10 @@ window.onload = function ()
     create_knob("echo-params", "HP F Hz", "100");
     create_knob("echo-params", "HP Q", "1");
     create_knob("echo-params", "DEL s", "0.5");
-    create_knob("echo-params", "FB %", "70");
     create_knob("echo-params", "DIST %", "70");
     create_knob("echo-params", "DF Hz", "6000");
     create_knob("echo-params", "DG dB", "-6");
+    create_knob("echo-params", "FB %", "70");
     create_knob("echo-params", "WID %", "-100");
     create_knob("echo-params", "CTH dB", "-30");
     create_knob("echo-params", "CATK s", "0.0");
