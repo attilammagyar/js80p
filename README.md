@@ -31,9 +31,11 @@ Table of Contents
 
  * [Table of Contents](#toc)
  * [Features](#features)
- * [System Requirements](#system-reqs)
-    * [Dependencies on Linux](#linux-deps)
  * [Installation](#install)
+    * [Choosing a Distribution](#install-dist)
+    * [System Requirements](#system-reqs)
+       * [Dependencies on Windows](#windows-deps)
+       * [Dependencies on Linux](#linux-deps)
     * [VST 3 Bundle on Windows](#vst3-bundle-windows)
     * [VST 3 Bundle on Linux](#vst3-bundle-linux)
     * [VST 3 Single File on Windows](#vst3-single-windows)
@@ -45,7 +47,8 @@ Table of Contents
        * [Linux](#mts-esp-linux)
  * [Usage](#usage)
     * [Signal Chain (Simplified)](#usage-signal)
-    * [Knobs, controllers](#usage-knobs)
+    * [Knobs](#usage-knobs)
+    * [Controllers](#usage-controllers)
     * [Synthesizer (Synth)](#usage-synth)
        * [Main Panel](#usage-synth-main)
        * [Common Oscillator Settings](#usage-synth-common)
@@ -59,7 +62,7 @@ Table of Contents
        * [Echo](#usage-effects-echo)
        * [Reverb](#usage-effects-reverb)
     * [Macros (MC)](#usage-macros)
-    * [Envelopes (ENV)](#usage-envelopes)
+    * [Envelopes Generators (ENV)](#usage-envelopes)
     * [LFOs](#usage-lfos)
  * [Presets](#presets)
     * [Blank](#preset-blank)
@@ -108,8 +111,8 @@ Table of Contents
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
     * [Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?](#faq-pm-fm)
     * [Where does the name come from?](#faq-name)
-    * [FL Studio: How to assign a MIDI CC to a JS80P parameter?](#faq-flstudio-midicc)
-    * [FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?](#faq-flstudio-aftertouch)
+    * [FL Studio: How to assign a MIDI CC to a JS80P knob?](#faq-flstudio-midicc)
+    * [FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?](#faq-flstudio-aftertouch)
     * [FL Studio: How to use the Sustain Pedal?](#faq-flstudio-sustain)
  * [Development](#dev)
     * [Tools](#dev-tools)
@@ -177,7 +180,7 @@ Features
  * MIDI controllers and macros.
  * Channel pressure (aftertouch).
  * MIDI learn.
- * Logarithmic or linear scale filter frequencies.
+ * Logarithmic or linear scale filter cutoff frequencies.
  * Tempo synchronization for envelopes, LFOs, and effects.
  * Use the peak level at various points of the signal chain to control
    parameters:
@@ -187,46 +190,14 @@ Features
     * volume control 2 input,
     * volume control 3 input.
 
-<a id="system-reqs" href="#toc">Table of Contents</a>
-
-System Requirements
--------------------
-
- * Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).
- * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
-    * Separate packages are available for AVX capable 64 bit processors for
-      better performance and CPU utilization.
- * RAM: 200-300 MB per instance, depending on buffer sizes, sample rate, etc.
-
-Tested with [REAPER](https://www.reaper.fm/) 7.14.
-
-A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
-gives good performance and low latency.
-
-Note: a RISC-V 64 port is available as a
-[separate project](https://github.com/aimixsaka/js80p/) by
-[@aimixsaka](https://github.com/aimixsaka/).
-
-<a id="linux-deps"></a>
-
-### Dependencies on Linux
-
-On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
-the `kdialog` or the `zenity` application are required to run JS80P. To install
-them on Debian based distributions (e.g. Ubuntu), you can use the following
-command:
-
-    sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
-
-Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
-then you will have to install the 32 bit version of the libraries, for example:
-
-    sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
-
 <a id="install" href="#toc">Table of Contents</a>
 
 Installation
 ------------
+
+<a id="install-dist"></a>
+
+### Choosing a Distribution
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
@@ -245,6 +216,54 @@ matches the CPU architecture for which your plugin host application was built.
 (For example, some 32 bit (i686) versions of Reaper are known to be unable to
 recognize VST 3 bundles when running on a 64 bit Linux system, so you would
 have to download the 32 bit VST 3 Single File JS80P package.)
+
+<a id="system-reqs" href="#toc">Table of Contents</a>
+
+### System Requirements
+
+ * **Operating System**: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).
+ * **CPU**: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
+    * Separate packages are available for AVX capable 64 bit processors for
+      better performance and CPU utilization.
+ * **RAM**: 200-300 MB per instance, depending on buffer sizes, sample rate,
+   etc.
+
+Tested with [REAPER](https://www.reaper.fm/) 7.14.
+
+A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
+gives good performance and low latency.
+
+Note: a RISC-V 64 port is available as a
+[separate project](https://github.com/aimixsaka/js80p/) by
+[@aimixsaka](https://github.com/aimixsaka/).
+
+<a id="windows-deps"></a>
+
+#### Dependencies on Windows
+
+Typical Windows systems usually have the MSVC library already installed, but in
+case you need it, you can download it from
+[Microsoft's website](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist).
+
+(Most people need the `X64` version of this library. To use the 32 bit version
+of the plugin, you will need the `X86` version of the library. See the
+[Choosing a Distribution](#install-dist) section for more information.)
+
+<a id="linux-deps"></a>
+
+#### Dependencies on Linux
+
+On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
+the `kdialog` or the `zenity` application are required to run JS80P. To install
+them on Debian based distributions (e.g. Ubuntu), you can use the following
+command:
+
+    sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
+
+Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
+then you will have to install the 32 bit version of the libraries, for example:
+
+    sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
 
 <a id="vst3-bundle-windows"></a>
 
@@ -386,7 +405,10 @@ Usage
 
 <a id="usage-knobs" href="#toc">Table of Contents</a>
 
-### Knobs, Controllers
+### Knobs
+
+Most of the parameters that control various aspects of the sound that are
+produced by JS80P can be adjusted via virtual knobs on the screen:
 
  * Move the mouse cursor over a knob or a small screw icon, and use the mouse
    wheel or move the mouse while holding down the left mouse button for
@@ -397,10 +419,83 @@ Usage
 
  * Double click on a knob to reset it to its default value.
 
- * Click on the area below a knob to assign a controller (Macro, MIDI CC,
-   Envelope, or LFO) to it, or to remove a previously assigned controller. When
-   a knob has a controller assigned to it, its value can no longer be changed
-   manually, it's entirely controlled by the selected controller.
+ * Click on the area below a knob to assign a [controller](#usage-controllers)
+   to it, or to remove a previously assigned one. When a knob has a controller
+   assigned to it, its value can no longer be changed manually, it's set and
+   continuously adjusted by the selected controller. (Note: if you accidentally
+   open the controller selector screen, and you want to close it without
+   changing anything, then just click on the controller or the "none" option
+   that is already selected.)
+
+<a id="usage-controllers" href="#toc">Table of Contents</a>
+
+### Controllers
+
+Controllers are various events and automations that can be used for setting the
+momentary value (on a relative scale between 0% and 100%) of a
+[JS80P parameter knob](#usage-knobs):
+
+ * **MIDI CC**: [MIDI Control Change](https://midi.org/midi-1-0-control-change-messages)
+   messages are usually sent when various faders, knobs, and wheels are
+   adjusted on a MIDI device. For example, the modulation wheel on a keyboard
+   usually sends a CC 1 message, the expression pedal is usually associated
+   with CC 11 messages, the sustain pedal is CC 64, etc.
+
+ * **MIDI Learn**: this is a wild card MIDI CC controller: when it is assigned
+   to a parameter, JS80P will replace the assignment with the first MIDI CC
+   event type that it receives. This is useful when you don't know the MIDI CC
+   number of a knob or fader on your MIDI device.
+
+   (Note that JS80P does not process certain MIDI CC event types that are
+   reserved in the [MIDI specification](https://midi.org/midi-1-0-control-change-messages)
+   for special uses. If your device sends such messages as if they were general
+   purpose messages, then it is recommended to change its configuration in
+   order to avoid compatibility problems.)
+
+ * **Triggered Note**: a value which is associated with note pitch and which is
+   updated everytime a new note starts to play, e.g. when a key is pressed on a
+   MIDI keyboard. Using this in [macros](#usage-macros) is an extremely
+   flexible way to set up key tracking for any parameter of the sound.
+
+ * **Triggered Velocity**: the speed with which a key on a MIDI keyboard is
+   pressed, or more generally, a measure of how strongly a note is to be played
+   (where 50% of the nominal range would be mezzo-forte). JS80P automatically
+   uses this value to adjust the amplitude of oscillator signals (depending on
+   the [VEL S](#usage-synth-common-vels) parameter), but it can also be used
+   for controlling other parameters as well. For example, by assigning this
+   controller to [filter cutoff frequency](#usage-synth-common-freq) parameters
+   (especially with using [macros](#usage-macros)), you can brighten up forte
+   notes while keeping softer notes warmer, darker.
+
+ * **Released Note**:  a value which is associated with note pitch and which is
+   updated everytime a note stops, e.g. when a key is released on a MIDI
+   keyboard.
+
+ * **Released Velocity**: the speed with which a key on a MIDI keyboard is
+   released, or more generally, a measure of how softly a note is to be
+   stopped. Unfortunately, most MIDI devices don't provide this data.
+
+ * **Pitch Wheel**: this represents the controller that can be used on MIDI
+   instruments to do pitch bends. (On a typical MIDI keyboard, this is a wheel
+   that automatically returns to the center position when released.)
+
+ * **Osc 1 Out Peak**, **Osc 2 Out Peak**, **Vol 1 In Peak**,
+   **Vol 2 In Peak**, **Vol 3 In Peak**: JS80P continuously measures the peak
+   amplitude of the signal at various points of the signal chain. These
+   controllers make it possible to use this information for adjusting the
+   parameters of the sound.
+
+ * **Channel Aftertouch**: some keyboards can measure how the pressure on
+   pressed keys change over time, making it possible to add dynamic expression
+   to notes over time while they are playing.
+
+ * **Macros**: MIDI-based controller values go from 0% to 100% on a linear
+   scale, which is often quite limiting. [Macros](#usage-macros) are JS80P's
+   way of customizing how a MIDI event affects a certain parameter.
+
+ * **LFOs**: see [low-frequency oscillators](#usage-lfos).
+
+ * **Envelopes**: see [envelope generators](#usage-envelopes).
 
 <a id="usage-synth" href="#toc">Table of Contents</a>
 
@@ -599,7 +694,7 @@ between using a linear or a logarithmic scale for the knob.
 The toggle switch above the [Q](#usage-synth-common-q) knob can switch
 between using a linear or a logarithmic scale for the knob.
 
-##### Filter Frequency Inaccuracy
+##### Filter Cutoff Frequency Inaccuracy
 
 The first little screw next to the [LG Q](#usage-synth-common-lgq) switch adds
 a level of randomization to the filter's frequency to mimic imperfections of
@@ -656,7 +751,7 @@ The following filter types are available:
 
 <a id="usage-synth-common-freq"></a>
 
-##### Filter Frequency (FREQ)
+##### Filter Cutoff Frequency (FREQ)
 
 The cutoff frequency of the filter.
 
@@ -691,6 +786,8 @@ the portion of the signal that is above the maximum level is not clipped, but
 reflected back on itself. Then if it reaches the maximum amplitue again in the
 opposite direction, then it is reflected again and again. This process adds a
 lot of complexity to the sound, making it sound metallic.
+
+<a id="usage-synth-common-vels"></a>
 
 ##### Velocity Sensitivity (VEL S)
 
@@ -776,9 +873,27 @@ Soft-clipping distortion.
 
 #### Volume Controls
 
+There are three volume controls placed at strategic points of the effects
+chain. Their purpose is twofold: they control the loudness of the signal, and
+they also measure the incoming peaks for the signal loudness based
+[controllers](#usage-controllers).
+
+Note that the first volume controller goes up to 200% so that you can boost the
+signal which is going into the
+[distortion effects](#usage-effects-distortions).
+
 <a id="usage-effects-distortions"></a>
 
 #### Distortions
+
+##### Overdrive (Odrv, GAIN)
+
+Subtle saturation and soft-clipping distortion to add a little bit of
+crunchiness to the sound.
+
+##### Distortion (Dist, GAIN)
+
+Heavy distortion for angrier sounds with a lot of bite.
 
 <a id="usage-effects-filters"></a>
 
@@ -790,13 +905,263 @@ See [oscillator filters](#usage-synth-common-filter).
 
 #### Chorus
 
+The chorus effect mixes a signal with slightly delayed copies of itself, and
+modulates the delay times with low-frequency oscillators so that the cloned
+signals have a subtle variation in their phase and pitch relative to the
+original signal and to each other. This creates the illusion of having many
+different instances of the signal, making it sound bigger and fatter.
+
+##### Logarithmic High-pass Filter Q Factor (LG Q)
+
+The first component in the Chorus effect is a high-pass filter, in order to
+to control the low end of the sound, and to avoid bass frequencies becoming
+muddy. This toggle switch makes the resonance parameter of the high-pass filter
+use a logarithmic scale instead of a linear scale.
+
+##### Logarithmic LFO Frequency (LG LFO FREQ)
+
+Switch between a linear and a logarithmic scale for the
+[LFO frequency (FREQ)](#usage-effects-chorus-freq) parameter.
+
+##### Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)
+
+Switch between a linear and a logarithmic scale for the high-pass
+filter at the beginning of the Chorus effect's signal chain, and for the
+high-shelf filter near the end of it.
+
+##### Tempo Sync (BPM SYNC)
+
+Turn on tempo synchronization for the low-frequency oscillators and the delays
+in the effect, so that what they normally measure in terms of seconds will be
+measured in terms of beats instead.
+
+Note: in order to prevent the memory that is allocated for delay buffers from
+growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+synchronization.
+
+##### High-pass Filter Cutoff Frequency (HP F)
+
+Set the cutoff frequency of the high-pass filter that is at the beginning of
+the signal chain of the effect in order to keep it from making bass frequencies
+too muddy.
+
+##### High-pass Filter Cutoff Frequency (HP Q)
+
+Set the resonance of the high-pass filter that is at the beginning of
+the signal chain of the effect.
+
+##### Type (TYPE)
+
+Select the chorus type. Different chorus types feature a different number of
+voices (ranging from 3 up to 7) which are arranged in various different
+positions in the stereo field (with regards to the
+[WIDTH](#usage-effects-chorus-wid) parameter as well), with various different
+loudness values, etc.
+
+##### Delay Time (DEL)
+
+The maximum time by which the chorus voices are lagging behind the main voice.
+
+<a id="usage-effects-chorus-freq"></a>
+
+##### LFO Frequency (FREQ)
+
+Controls how quickly the lag of each chorus voice varies.
+
+##### Depth (DPT)
+
+Control how much the chorus voices vary their lag behind the main voice.
+
+##### Dampening Frequency (DF)
+
+Chorus voices are sent into a high-shelf filter which can be used for
+attenuating higher frequencies, making the chorused sound warmer, darker.
+This parameter sets the cutoff frequency of the filter.
+
+##### Dampening Gain (DG)
+
+Control how much the high-shelf filter attenuates high frequencies.
+
+##### Feedback (FB)
+
+Tell how loud the output of the effect is to be mixed back into its input. Be
+careful with this, because too much feedback can lead to a loud runaway signal
+feedback loop.
+
+<a id="usage-effects-chorus-wid"></a>
+
+##### Stereo Width (WID)
+
+Set the stereo spread of the chorus. When set to 0%, all the voices are placed
+in the middle of the stereo field.
+
+##### Wet Volume (WET)
+
+Control the loudness of the chorused signal.
+
+##### Dry Volume (DRY)
+
+Control the loudness of the original, unmodified input signal.
+
 <a id="usage-effects-echo" href="#toc">Table of Contents</a>
 
 #### Echo
 
+The Echo effect repeats the input signal with a delay, optionally with various
+levels of filtering and distortion, and with side-chain compression.
+
+##### Logarithmic High-pass Filter Q Factor (LG Q)
+
+The first component in the Echo effect is a high-pass filter, in order to
+to control the low end of the sound, and to avoid bass frequencies becoming
+muddy. This toggle switch makes the resonance parameter of the high-pass filter
+use a logarithmic scale instead of a linear scale.
+
+##### Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)
+
+Switch between a linear and a logarithmic scale for the high-pass
+filter at the beginning of the Echo effect's signal chain, and for the
+high-shelf filter near the end of it.
+
+##### Tempo Sync (BPM SYNC)
+
+Turn on tempo synchronization for the delay lines in the effect, so that time
+will be measured in therms of beats instead of in terms of seconds.
+
+Note: in order to prevent the memory that is allocated for delay buffers from
+growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+synchronization.
+
+##### Input Volume (IN V)
+
+Control the input signal level for the effect. This parameter goes from 0% to
+200%, so that the signal can be boosted for the
+[distortion](#usage-effects-echo-dist) that is built into the effect.
+
+##### High-pass Filter Cutoff Frequency (HP F)
+
+Set the cutoff frequency of the high-pass filter that is at the beginning of
+the signal chain of the effect in order to keep it from making bass frequencies
+too muddy.
+
+##### High-pass Filter Cutoff Frequency (HP Q)
+
+Set the resonance for the high-pass filter that is at the beginning of
+the signal chain of the effect.
+
+##### Delay Time (DEL)
+
+Set how long the echo signal will lag behind the original signal.
+
+Note: to simulate the feel of old tape delays, assign an [LFO](#usage-lfos) to
+the delay time parameter which is set to oscillate very slowly, by a really low
+amount, maybe with a tiny amount of randomization.
+
+<a id="usage-effects-echo-dist"></a>
+
+##### Distortion (DIST)
+
+Add some saturation or soft-clipping distortion to the delayed signal. This can
+also come handy for simulating slightly overdriven analog tape delay effect
+units.
+
+##### Dampening Frequency (DF)
+
+The delayed signal is sent into a high-shelf filter which can be used for
+attenuating higher frequencies, making the echo sound warmer, darker.
+This parameter sets the cutoff frequency of the filter.
+
+##### Dampening Gain (DG)
+
+Control how much the high-shelf filter attenuates high frequencies.
+
+##### Feedback (FB)
+
+Tell how loud the output of the effect is to be mixed back into its input. Be
+careful with this, because too much feedback can lead to a loud runaway signal
+feedback loop.
+
+##### Stereo Width (WID)
+
+Set the stereo spread of the echos. The further away this value is from 0%, the
+further from the center the echos will be, bouncing back and forth between the
+right and left speaker.
+
+<a id="usage-effects-echo-cth"></a>
+
+##### Side-chain Compression Threshold (CTH)
+
+Threshold for the side-chain compression: when the input signal goes above this
+level, the effect will reduce the volume of the echos in order to keep them
+from stealing the spotlight from the original signal in the mix. Once the input
+signal goes below the threshold, the echos will be brought up to their intended
+level.
+
+##### Side-chain Compression Attack Time (CATK)
+
+Set how fast or how slow the compression should kick in when the raw signal
+goes above the threshold.
+
+##### Side-chain Compression Release Time (CREL)
+
+Set how fast or how slow the compression should bring back the echo signal to
+its normal level once the raw input signal goes below the threshold.
+
+##### Side-chain Compression Ratio (CR)
+
+Control the amount of compression that is applied to the echo signal based on
+the loudness of the raw input signa.
+
+For example, if the [compression threshold](#usage-effects-echo-cth) is -11 dB,
+and the input signal is -5 dB, then the input is 6 dB louder than the
+threshold, because `-11 + 6 = -5`. A compression ratio of 3 will turn this 6 dB
+difference into `6 / 3 = 2` dB, so the target gain will be `-11 + 2 = -9` dB,
+which means a -4 dB signal reduction. The trick with side-chaining is that the
+necessary loudness reduction is calculated for one signal, but applied to
+another; in this case, the echo signal is the one which gets the -4 dB
+reduction, in order to let the raw sound shine.
+
+Later, if the input signal reaches -2 dB, then the difference from the -11 dB
+threshold will be 9 dB. Since `9 / 3 = 3`, and `-11 + 3 = -8`, the -2 dB signal
+will need a -6 dB reduction in order to hit the -8 dB signal level. Therefore,
+a reduction of -6 dB will be applied to the echo signal.
+
+Then when the input signal goes below -11 dB, no more loudness reduction will
+be applied to the echo signal.
+
+##### Wet Volume (WET)
+
+Control the loudness of the echo signal.
+
+##### Dry Volume (DRY)
+
+Control the loudness of the original, unmodified input signal.
+
 <a id="usage-effects-reverb" href="#toc">Table of Contents</a>
 
 #### Reverb
+
+The Reverb effect combines multiple delay lines to simulate sound reflections
+that can be heard in various rooms, optionally with various levels of filtering
+and distortion, and with side-chain compression.
+
+The signal chain is similar to the one in the
+[Echo effect](#usage-effects-echo), so many of the parameters work the same way
+as described there.
+
+Only the parameters that are unique to the Reverb effect are listed below.
+
+##### Type (TYPE)
+
+Select from various distributions and numbers of reflections, ranging from
+small rooms with just a handful of reflection points, to large cathedrals with
+many spread out reflections.
+
+##### Room Reflectivity (ROOM)
+
+Control how reflective the room is, in other words, how loud are the sounds
+that bounce off its walls. The higher this value, the longer it takes for the
+reverberation to decay into silence after the raw input signal goes quiet.
 
 <a id="usage-macros" href="#toc">Table of Contents</a>
 
@@ -804,7 +1169,7 @@ See [oscillator filters](#usage-synth-common-filter).
 
 <a id="usage-envelopes" href="#toc">Table of Contents</a>
 
-### Envelopes (ENV)
+### Envelope Generators (ENV)
 
 <a id="usage-lfos" href="#toc">Table of Contents</a>
 
@@ -1249,7 +1614,7 @@ parameters can also be automated using the host application's usual automation
 editor. For the sake of consistency, the FST plugin also exports automatable
 parameters for each supported MIDI CC message.
 
-  [midicc]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
+  [midicc]: https://midi.org/midi-1-0-control-change-messages
 
 For example, in both plugin types, you might assign the
 `MIDI CC 1 (Modulation Wheel)` controller to the Phase Modulation (PM)
@@ -1287,23 +1652,21 @@ and so JS80P was born.
 
 <a id="faq-flstudio-midicc" href="#toc">Table of Contents</a>
 
-### FL Studio: How to assign a MIDI CC to a JS80P parameter?
+### FL Studio: How to assign a MIDI CC to a JS80P knob?
 
-Unlike decent audio software (like for example
-[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
-does not send all MIDI events that come out of your MIDI keyboard to plugins,
-and unfortunately, [MIDI Control Change (MIDI CC)][midicc2] messages are among
-the kinds of MIDI data that it swallows. To make everything work, you have to
-assign the MIDI CC events to a plugin parameter.
+[FL Studio](https://www.image-line.com/fl-studio/) does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, [MIDI Control Change (MIDI CC)][midicc2] messages are among the
+kinds of MIDI data that it swallows. To make everything work, you have to
+connect the MIDI CC events of your device to one of the MIDI CC helper proxy
+parameters that are provided by JS80P. (JS80P does not directly expose its
+parameters to the host, in order to avoid conflicts between the host's
+automations and JS80P's internal controller assignments.)
 
-  [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
-
-JS80P does not directly export its parameters (in order to avoid conflict
-between the host's automations and JS80P's internal control assignments), but
-it exports proxy parameters which represent MIDI CC messages that it handles.
+  [midicc2]: https://midi.org/midi-1-0-control-change-messages
 
 For example, let's say a physical knob on your MIDI keyboard is configured to
-send its values in `MIDI CC 7` messages. To make this knob turn the _Phase
+send its changes in `MIDI CC 7` messages. To make this knob turn the _Phase
 Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 
 1. Click on the small triangle in the top left corner of the plugin window of
@@ -1324,18 +1687,17 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 
 <a id="faq-flstudio-aftertouch" href="#toc">Table of Contents</a>
 
-### FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?
+### FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?
 
-Unlike decent audio software (like for example
-[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
-does not send all MIDI events that come out of your MIDI keyboard to plugins,
-and unfortunately, Channel Pressure (also known as Channel Aftertouch)
-messages are among the kinds MIDI data that it swallows.
+[FL Studio](https://www.image-line.com/fl-studio/) does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, Channel Pressure (also known as Channel Aftertouch) messages are
+among the kinds of MIDI data that it swallows.
 
 Getting the Channel Pressure to work in FL Studio is a similar, but slightly
-more complicated procedure than setting up MIDI CC. For example, to make
-Channel Pressure control the _Phase Modulation (PM)_ virtual knob in JS80P, you
-have to do the following steps:
+more complicated procedure than [setting up MIDI CC](#faq-flstudio-midicc).
+For example, to make Channel Pressure control the _Phase Modulation (PM)_
+virtual knob in JS80P, you have to do the following steps:
 
 1. Click on the small triangle in the top left corner of the plugin window of
    JS80P, and select the "_Browse parameters_" menu item.
@@ -1360,24 +1722,24 @@ have to do the following steps:
 
 ### FL Studio: How to use the Sustain Pedal?
 
-Unlike decent audio software (like for example
-[REAPER](https://www.reaper.fm/)), [FL Studio](https://www.image-line.com/fl-studio/)
-does not send all MIDI events that come out of your MIDI keyboard to plugins,
-and unfortunately, the [MIDI Control Change (MIDI CC)][midicc2] message which
+[FL Studio](https://www.image-line.com/fl-studio/) does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, the [MIDI Control Change (MIDI CC)][midicc3] message which
 contains information about the sustain pedal's state is among the kinds of MIDI
 data that it swallows.
 
-To add insult to injury, it pretends that it notifies the plugin about the
-pedal's state, but in reality, it just defers sending `NOTE OFF` events until
-the pedal is released. This might give the desired effect in some cases, but it
-breaks patches that assign additional functionality to the pedal besides
-sustaining notes.
+To add insult to injury, FL Studio pretends that it notifies the plugin about
+the pedal's state, but in reality, it just defers sending `NOTE OFF` events
+until the pedal is released. This might give the desired effect in some cases,
+but it breaks patches that assign additional functionality to the pedal besides
+sustaining notes, like for example lengthening envelope release times.
 
 To make everything work, you have to assign the sustain pedal's MIDI CC events
-to the plugin parameter where JS80P expects them, and you have to turn off
-FL Studio's default behavior of handling the pedal on behalf of plugins.
+to the MIDI CC helper proxy parameter where JS80P expects them, and you have to
+turn off FL Studio's default behavior of handling the pedal on behalf of
+plugins.
 
-  [midicc2]: https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
+  [midicc3]: https://midi.org/midi-1-0-control-change-messages
 
 1. Open "_Options / MIDI settings_" from the main menu.
 
