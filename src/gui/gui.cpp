@@ -1005,6 +1005,8 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M28DSH] = "Macro 28 Distortion Shape",
     [Synth::ParamId::M29DSH] = "Macro 29 Distortion Shape",
     [Synth::ParamId::M30DSH] = "Macro 30 Distortion Shape",
+    [Synth::ParamId::MFX4] = "Modulator Fine Detune x4",
+    [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
 };
 
 
@@ -1536,23 +1538,38 @@ constexpr int pos_rel_offset_top = 0;
     } while (false)
 
 #define KNOB(owner, left, top, param_id, ctls, varg1, varg2, ks)    \
-    owner->own(                                                     \
-        new KnobParamEditor(                                        \
-            *this,                                                  \
-            GUI::PARAMS[param_id],                                  \
-            pos_rel_offset_left + left,                             \
-            pos_rel_offset_top + top,                               \
-            KNOB_W,                                                 \
-            KNOB_H,                                                 \
-            KNOB_TOP,                                               \
-            *controller_selector,                                   \
-            synth,                                                  \
-            param_id,                                               \
-            ctls,                                                   \
-            varg1,                                                  \
-            varg2,                                                  \
-            ks                                                      \
-        )                                                           \
+    KNOB4(                                                          \
+        owner,                                                      \
+        left,                                                       \
+        top,                                                        \
+        param_id,                                                   \
+        ctls,                                                       \
+        varg1,                                                      \
+        varg2,                                                      \
+        ks,                                                         \
+        Synth::ParamId::INVALID_PARAM_ID                            \
+    )
+
+
+#define KNOB4(owner, left, top, param_id, ctls, varg1, varg2, ks, x4_param_id)  \
+    owner->own(                                                                 \
+        new KnobParamEditor(                                                    \
+            *this,                                                              \
+            GUI::PARAMS[param_id],                                              \
+            pos_rel_offset_left + left,                                         \
+            pos_rel_offset_top + top,                                           \
+            KNOB_W,                                                             \
+            KNOB_H,                                                             \
+            KNOB_TOP,                                                           \
+            *controller_selector,                                               \
+            synth,                                                              \
+            param_id,                                                           \
+            ctls,                                                               \
+            varg1,                                                              \
+            varg2,                                                              \
+            ks,                                                                 \
+            x4_param_id                                                         \
+        )                                                                       \
     )
 
 #define SCREW(owner, left, top, param_id, varg1, varg2, ks)         \
@@ -2997,7 +3014,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     KNOB(synth_body,  87 + KNOB_W * 0,      36, Synth::ParamId::MPRT,   MM___,      "%.3f", 1.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 1,      36, Synth::ParamId::MPRD,   MM___,      "%.2f", 1.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 2,      36, Synth::ParamId::MDTN,   MM__C,      "%.f", Constants::DETUNE_SCALE, knob_states);
-    KNOB(synth_body,  87 + KNOB_W * 3,      36, Synth::ParamId::MFIN,   MMLEC,      "%.2f", 1.0, knob_states);
+    KNOB4(synth_body, 87 + KNOB_W * 3,      36, Synth::ParamId::MFIN,   MMLEC,      "%.2f", 1.0, knob_states, Synth::ParamId::MFX4);
     KNOB(synth_body,  87 + KNOB_W * 4,      36, Synth::ParamId::MAMP,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 5,      36, Synth::ParamId::MSUB,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 6,      36, Synth::ParamId::MFLD,   MMLEC,      "%.2f", 100.0 / Constants::FOLD_MAX, knob_states);
@@ -3005,6 +3022,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     KNOB(synth_body,  87 + KNOB_W * 8,      36, Synth::ParamId::MVOL,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 9,      36, Synth::ParamId::MWID,   MM___,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 10,     36, Synth::ParamId::MPAN,   MMLEC,      "%.2f", 100.0, knob_states);
+    TOGG(synth_body, 630, 7, 63, 24, 42, Synth::ParamId::MFX4);
 
     KNOB(synth_body, 735 + KNOB_W * 0,      36, Synth::ParamId::MF1TYP, MM___,      ft, ftc, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 1,      36, Synth::ParamId::MF1FRQ, MMLEC,      "%.1f", 1.0, knob_states);
@@ -3039,7 +3057,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     KNOB(synth_body,  87 + KNOB_W * 0,     316, Synth::ParamId::CPRT,   MM___,      "%.3f", 1.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 1,     316, Synth::ParamId::CPRD,   MM___,      "%.2f", 1.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 2,     316, Synth::ParamId::CDTN,   MM__C,      "%.f", 0.01, knob_states);
-    KNOB(synth_body,  87 + KNOB_W * 3,     316, Synth::ParamId::CFIN,   MMLEC,      "%.2f", 1.0, knob_states);
+    KNOB4(synth_body, 87 + KNOB_W * 3,     316, Synth::ParamId::CFIN,   MMLEC,      "%.2f", 1.0, knob_states, Synth::ParamId::CFX4);
     KNOB(synth_body,  87 + KNOB_W * 4,     316, Synth::ParamId::CAMP,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 5,     316, Synth::ParamId::CFLD,   MMLEC,      "%.2f", 100.0 / Constants::FOLD_MAX, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 6,     316, Synth::ParamId::CDG,    MMLEC,      "%.2f", 100.0, knob_states);
@@ -3047,6 +3065,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     KNOB(synth_body,  87 + KNOB_W * 8,     316, Synth::ParamId::CVOL,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 9,     316, Synth::ParamId::CWID,   MM___,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 10,    316, Synth::ParamId::CPAN,   MMLEC,      "%.2f", 100.0, knob_states);
+    TOGG(synth_body, 630, 287, 63, 24, 42, Synth::ParamId::CFX4);
 
     KNOB(synth_body, 735 + KNOB_W * 0,     316, Synth::ParamId::CF1TYP, MM___,      ft, ftc, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 1,     316, Synth::ParamId::CF1FRQ, MMLEC,      "%.1f", 1.0, knob_states);

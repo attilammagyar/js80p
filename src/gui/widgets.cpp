@@ -693,9 +693,11 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* format,
         double const scale,
-        ParamStateImages const* knob_states
+        ParamStateImages const* knob_states,
+        Synth::ParamId const scale_x4_toggle_param_id
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
+    scale_x4_toggle_param_id(scale_x4_toggle_param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
     format(format),
     scale(scale),
@@ -709,11 +711,13 @@ KnobParamEditor::KnobParamEditor(
     controller_choices(controller_choices),
     knob_top(knob_top),
     has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
+    can_scale_x4(scale_x4_toggle_param_id != Synth::ParamId::INVALID_PARAM_ID),
     controller_selector(controller_selector),
     synth(synth),
     ratio(0.0),
     knob(NULL),
-    has_controller_(false)
+    has_controller_(false),
+    is_scaled_x4(false)
 {
     set_gui(gui);
 }
@@ -733,9 +737,11 @@ KnobParamEditor::KnobParamEditor(
         int const controller_choices,
         char const* const* const options,
         size_t const number_of_options,
-        ParamStateImages const* knob_states
+        ParamStateImages const* knob_states,
+        Synth::ParamId const scale_x4_toggle_param_id
 ) : TransparentWidget(text, left, top, width, height, Type::KNOB_PARAM_EDITOR),
     param_id(param_id),
+    scale_x4_toggle_param_id(scale_x4_toggle_param_id),
     is_continuous(param_id < Synth::FLOAT_PARAMS),
     format(NULL),
     scale(1.0),
@@ -749,12 +755,14 @@ KnobParamEditor::KnobParamEditor(
     controller_choices(controller_choices),
     knob_top(knob_top),
     has_room_for_texts(height >= knob_top + knob_states->height + TEXTS_HEIGHT),
+    can_scale_x4(scale_x4_toggle_param_id != Synth::ParamId::INVALID_PARAM_ID),
     controller_selector(controller_selector),
     synth(synth),
     ratio(0.0),
     knob(NULL),
     controller_id(Synth::ControllerId::NONE),
-    has_controller_(false)
+    has_controller_(false),
+    is_scaled_x4(false)
 {
     set_gui(gui);
 }
@@ -777,7 +785,8 @@ void KnobParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase* parent
     own(knob);
     update_editor(
         synth.get_param_ratio_atomic(param_id),
-        synth.get_param_controller_id_atomic(param_id)
+        synth.get_param_controller_id_atomic(param_id),
+        should_be_scaled_x4()
     );
 }
 
@@ -804,24 +813,56 @@ void KnobParamEditor::refresh()
         synth.get_param_controller_id_atomic(param_id)
     );
     Number const new_ratio = synth.get_param_ratio_atomic(param_id);
+    bool const new_is_scaled_x4 = should_be_scaled_x4();
 
     has_controller_ = new_controller_id > Synth::Synth::ControllerId::NONE;
 
-    if (knob->update_sync_status() || new_ratio != ratio || new_controller_id != controller_id) {
-        update_editor(new_ratio, new_controller_id);
+    if (
+            knob->update_sync_status()
+            || new_ratio != ratio
+            || new_controller_id != controller_id
+            || new_is_scaled_x4 != is_scaled_x4
+    ) {
+        update_editor(new_ratio, new_controller_id, new_is_scaled_x4);
     } else {
         synth.push_message(
             Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
         );
+
+        if (can_scale_x4) {
+            synth.push_message(
+                Synth::MessageType::REFRESH_PARAM,
+                scale_x4_toggle_param_id,
+                0.0,
+                0
+            );
+        }
     }
+}
+
+
+bool KnobParamEditor::should_be_scaled_x4() const
+{
+    if (!can_scale_x4) {
+        return false;
+    }
+
+    Number const ratio = synth.get_param_ratio_atomic(scale_x4_toggle_param_id);
+    Byte const toggle = synth.byte_param_ratio_to_display_value(
+        scale_x4_toggle_param_id, ratio
+    );
+
+    return toggle == ToggleParam::ON;
 }
 
 
 void KnobParamEditor::update_editor(
         Number const new_ratio,
-        Synth::ControllerId const new_controller_id
+        Synth::ControllerId const new_controller_id,
+        bool const new_is_scaled_x4
 ) {
     controller_id = new_controller_id;
+    is_scaled_x4 = new_is_scaled_x4;
     update_editor(new_ratio);
 }
 
@@ -898,7 +939,7 @@ void KnobParamEditor::update_value_str()
         synth,
         param_id,
         ratio,
-        scale,
+        is_scaled_x4 ? 4.0 * scale : scale,
         format,
         options,
         number_of_options,

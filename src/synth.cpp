@@ -83,7 +83,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         7                           /* NH + MODE + MIX + PM + FM + AM + bus     */
-        + 41 * 2                    /* Modulator::Params + Carrier::Params      */
+        + 42 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_PARAMS
@@ -375,6 +375,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::MPRD, modulator_params.portamento_depth);
     register_param_as_child<FloatParamS>(ParamId::MDTN, modulator_params.detune);
     register_param_as_child<FloatParamS>(ParamId::MFIN, modulator_params.fine_detune);
+    register_param_as_child<ToggleParam>(ParamId::MFX4, modulator_params.fine_detune_x4);
     register_param_as_child<FloatParamB>(ParamId::MWID, modulator_params.width);
     register_param_as_child<FloatParamS>(ParamId::MPAN, modulator_params.panning);
     register_param_as_child<FloatParamS>(ParamId::MVOL, modulator_params.volume);
@@ -429,6 +430,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::CPRD, carrier_params.portamento_depth);
     register_param_as_child<FloatParamS>(ParamId::CDTN, carrier_params.detune);
     register_param_as_child<FloatParamS>(ParamId::CFIN, carrier_params.fine_detune);
+    register_param_as_child<ToggleParam>(ParamId::CFX4, carrier_params.fine_detune_x4);
     register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
     register_param_as_child<FloatParamS>(ParamId::CPAN, carrier_params.panning);
     register_param_as_child<FloatParamS>(ParamId::CVOL, carrier_params.volume);

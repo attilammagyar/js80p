@@ -121,6 +121,7 @@ class Oscillator : public SignalProducer
             FloatParamS& subharmonic_leader,
             FloatParamS& detune_leader,
             FloatParamS& fine_detune_leader,
+            ToggleParam& fine_detune_x4_leader,
             FloatParamB& harmonic_0_leader,
             FloatParamB& harmonic_1_leader,
             FloatParamB& harmonic_2_leader,
@@ -138,6 +139,7 @@ class Oscillator : public SignalProducer
             FloatParamS& amplitude_leader,
             FloatParamS& detune_leader,
             FloatParamS& fine_detune_leader,
+            ToggleParam& fine_detune_x4_leader,
             FloatParamB& harmonic_0_leader,
             FloatParamB& harmonic_1_leader,
             FloatParamB& harmonic_2_leader,
@@ -186,6 +188,8 @@ class Oscillator : public SignalProducer
         ModulatedFloatParam phase;
         FloatParamS detune;
         FloatParamS fine_detune;
+
+        ToggleParam& fine_detune_x4;
 
         FloatParamB& harmonic_0;
         FloatParamB& harmonic_1;

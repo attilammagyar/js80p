@@ -318,7 +318,8 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* format,
             double const scale,
-            ParamStateImages const* knob_states
+            ParamStateImages const* knob_states,
+            Synth::ParamId const scale_x4_toggle_param_id = Synth::ParamId::INVALID_PARAM_ID
         );
 
         KnobParamEditor(
@@ -335,7 +336,8 @@ class KnobParamEditor : public TransparentWidget
             int const controller_choices,
             char const* const* const options,
             size_t const number_of_options,
-            ParamStateImages const* knob_states
+            ParamStateImages const* knob_states,
+            Synth::ParamId const scale_x4_toggle_param_id = Synth::ParamId::INVALID_PARAM_ID
         );
 
         void set_sync_param_id(Synth::ParamId const param_id);
@@ -347,10 +349,13 @@ class KnobParamEditor : public TransparentWidget
         void handle_controller_change(Synth::ControllerId const new_controller_id);
 
         void refresh();
+
         void update_editor(
             Number const new_ratio,
-            Synth::ControllerId const new_controller_id
+            Synth::ControllerId const new_controller_id,
+            bool const new_is_scaled_x4
         );
+
         void update_editor(Number const new_ratio);
         void update_editor(Synth::ControllerId const new_controller_id);
         void update_editor();
@@ -360,6 +365,7 @@ class KnobParamEditor : public TransparentWidget
         void stop_editing();
 
         Synth::ParamId const param_id;
+        Synth::ParamId const scale_x4_toggle_param_id;
         bool const is_continuous;
 
     protected:
@@ -454,6 +460,8 @@ class KnobParamEditor : public TransparentWidget
         void update_value_str();
         void update_controller_str();
 
+        bool should_be_scaled_x4() const;
+
         char const* const format;
         double const scale;
 
@@ -468,6 +476,7 @@ class KnobParamEditor : public TransparentWidget
 
         int const knob_top;
         bool const has_room_for_texts;
+        bool const can_scale_x4;
 
         ControllerSelector& controller_selector;
         Synth& synth;
@@ -478,6 +487,7 @@ class KnobParamEditor : public TransparentWidget
         char title[TITLE_MAX_LENGTH];
         Synth::ControllerId controller_id;
         bool has_controller_;
+        bool is_scaled_x4;
 };
 
 

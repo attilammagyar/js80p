@@ -231,6 +231,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
         0.0,
         envelopes
     ),
+    fine_detune_x4(name + "FX4", ToggleParam::OFF),
     width(name + "WID", -1.0, 1.0, 0.0),
     panning(name + "PAN", -1.0, 1.0, 0.0, 0.0, envelopes),
     volume(name + "VOL", 0.0, 1.0, 0.33, 0.0, envelopes),
@@ -448,6 +449,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.subharmonic_amplitude,
         param_leaders.detune,
         param_leaders.fine_detune,
+        param_leaders.fine_detune_x4,
         param_leaders.harmonic_0,
         param_leaders.harmonic_1,
         param_leaders.harmonic_2,
@@ -521,6 +523,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.amplitude,
         param_leaders.detune,
         param_leaders.fine_detune,
+        param_leaders.fine_detune_x4,
         param_leaders.harmonic_0,
         param_leaders.harmonic_1,
         param_leaders.harmonic_2,

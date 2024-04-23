@@ -174,6 +174,8 @@ html, body {
   padding-left: 10px;
 }
 
+#osc-1-fin-x4 label span,
+#osc-2-fin-x4 label span,
 h1 span {
   filter: drop-shadow(2px 2px 1px #000000);
 }
@@ -277,6 +279,8 @@ h1 span {
 }
 
 #main div label,
+#osc-1-fin-x4 label,
+#osc-2-fin-x4 label,
 .block h1 label {
   display: inline-block;
   height: 16px;
@@ -425,7 +429,42 @@ h1 span {
   border: inset 1px #9090b0;
 }
 
+#osc-1-fin-x4 label {
+  line-height: 17px;
+}
+
+#osc-2-fin-x4 label {
+  line-height: 18px;
+}
+
+#osc-1-fin-x4 label span,
+#osc-2-fin-x4 label span {
+  display: inline-block;
+  top: -2px;
+  position: relative;
+}
+
+#osc-1-fin-x4 input,
+#osc-2-fin-x4 input {
+  margin-left: 3px;
+}
+
+#osc-1-fin-x4,
+#osc-2-fin-x4 {
+  width: 90px;
+  height: 24px;
+  position: absolute;
+}
+
+#osc-1-fin-x4,
+#osc-2-fin-x4 {
+  top: 2px;
+  left: 549px;
+}
+
 #main div input,
+#osc-1-fin-x4 input,
+#osc-2-fin-x4 input,
 .block h1 input {
   position: relative;
   background-color: black;
@@ -743,6 +782,9 @@ function make_tabs(active)
       <div id="osc-1" class="osc main-block block">
         <h1><span>Osc 1 (modulator)</span></h1>
         <div id="osc-1-tuning"><span>440 12TET</span></div>
+        <div id="osc-1-fin-x4">
+          <label><span>FIN x4</span><input type="text" /></label>
+        </div>
         <div id="osc-1-main" class="osc-main block"></div>
         <div id="osc-1-filter-1" class="block osc-filter">
           <h1>
@@ -764,7 +806,10 @@ function make_tabs(active)
       </div>
       <div id="osc-2" class="osc main-block block">
         <h1><span>Osc 2 (carrier)</span></h1>
-        <div id="osc-2-tuning"><span>MTS-ESP (ERR)</span></div>
+        <div id="osc-2-tuning"><span>C MTS-ESP on</span></div>
+        <div id="osc-2-fin-x4">
+          <label><span>FIN x4</span><input type="text" /></label>
+        </div>
         <div id="osc-2-main" class="osc-main block"></div>
         <div id="osc-2-filter-1" class="block">
           <h1>

@@ -1,4 +1,5 @@
 v?.?.? (2024-0?-??)
+ * Oscillator fine detune range can now go from -4 octaves to +4 octaves.
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
    a polyphonic parameter.
  * LFO frequency can now use logarithmic scale.

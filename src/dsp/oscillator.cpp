@@ -57,8 +57,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         1.0,
         1.0
     ),
-    amplitude("", 0.0, 1.0, 1.0),
-    subharmonic_amplitude("", 0.0, 1.0, 0.0),
+    amplitude("A", 0.0, 1.0, 1.0),
+    subharmonic_amplitude("SA", 0.0, 1.0, 0.0),
     frequency(
         "MF",
         FREQUENCY_MIN,
@@ -72,17 +72,18 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         0.0
     ),
     detune(
-        "",
+        "D",
         Constants::DETUNE_MIN,
         Constants::DETUNE_MAX,
         Constants::DETUNE_DEFAULT
     ),
     fine_detune(
-        "",
+        "FD",
         Constants::FINE_DETUNE_MIN,
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
+    fine_detune_x4(dummy_toggle),
     harmonic_0(dummy_param),
     harmonic_1(dummy_param),
     harmonic_2(dummy_param),
@@ -179,8 +180,8 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         1.0,
         1.0
     ),
-    amplitude("", 0.0, 1.0, 1.0),
-    subharmonic_amplitude("", 0.0, 1.0, 0.0),
+    amplitude("A", 0.0, 1.0, 1.0),
+    subharmonic_amplitude("SA", 0.0, 1.0, 0.0),
     frequency(
         modulator,
         frequency_modulation_level_leader,
@@ -191,17 +192,18 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     ),
     phase(modulator, phase_modulation_level_leader, "MP", 0.0, 1.0, 0.0),
     detune(
-        "",
+        "D",
         Constants::DETUNE_MIN,
         Constants::DETUNE_MAX,
         Constants::DETUNE_DEFAULT
     ),
     fine_detune(
-        "",
+        "FD",
         Constants::FINE_DETUNE_MIN,
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
+    fine_detune_x4(dummy_toggle),
     harmonic_0(dummy_param),
     harmonic_1(dummy_param),
     harmonic_2(dummy_param),
@@ -230,23 +232,24 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
-    modulated_amplitude("X", 0.0, 1.0, 1.0),
+    modulated_amplitude("MA", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
-    subharmonic_amplitude("", 0.0, 1.0, 0.0),
+    subharmonic_amplitude("SA", 0.0, 1.0, 0.0),
     frequency(frequency_leader),
     phase(phase_leader),
     detune(
-        "",
+        "D",
         Constants::DETUNE_MIN,
         Constants::DETUNE_MAX,
         Constants::DETUNE_DEFAULT
     ),
     fine_detune(
-        "",
+        "FD",
         Constants::FINE_DETUNE_MIN,
         Constants::FINE_DETUNE_MAX,
         Constants::FINE_DETUNE_DEFAULT
     ),
+    fine_detune_x4(dummy_toggle),
     harmonic_0(dummy_param),
     harmonic_1(dummy_param),
     harmonic_2(dummy_param),
@@ -271,6 +274,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamS& subharmonic_leader,
         FloatParamS& detune_leader,
         FloatParamS& fine_detune_leader,
+        ToggleParam& fine_detune_x4_leader,
         FloatParamB& harmonic_0_leader,
         FloatParamB& harmonic_1_leader,
         FloatParamB& harmonic_2_leader,
@@ -284,13 +288,14 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
 ) noexcept
     : SignalProducer(1, NUMBER_OF_CHILDREN, NUMBER_OF_EVENTS),
     waveform(waveform),
-    modulated_amplitude("XX", 0.0, 1.0, 1.0),
+    modulated_amplitude("MA2", 0.0, 1.0, 1.0),
     amplitude(amplitude_leader),
     subharmonic_amplitude(subharmonic_leader),
     frequency("MF2", FREQUENCY_MIN, FREQUENCY_MAX, FREQUENCY_DEFAULT),
     phase("MP2", 0.0, 1.0, 0.0),
     detune(detune_leader),
     fine_detune(fine_detune_leader),
+    fine_detune_x4(fine_detune_x4_leader),
     harmonic_0(harmonic_0_leader),
     harmonic_1(harmonic_1_leader),
     harmonic_2(harmonic_2_leader),
@@ -314,6 +319,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
         FloatParamS& amplitude_leader,
         FloatParamS& detune_leader,
         FloatParamS& fine_detune_leader,
+        ToggleParam& fine_detune_x4_leader,
         FloatParamB& harmonic_0_leader,
         FloatParamB& harmonic_1_leader,
         FloatParamB& harmonic_2_leader,
@@ -359,6 +365,7 @@ Oscillator<ModulatorSignalProducerClass, is_lfo>::Oscillator(
     ),
     detune(detune_leader),
     fine_detune(fine_detune_leader),
+    fine_detune_x4(fine_detune_x4_leader),
     harmonic_0(harmonic_0_leader),
     harmonic_1(harmonic_1_leader),
     harmonic_2(harmonic_2_leader),
@@ -739,6 +746,10 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         constexpr Byte FINE_DETUNE = 4;
         constexpr Byte ALL = FREQUENCY | DETUNE | FINE_DETUNE;
 
+        Number const fine_detune_scale = (
+            fine_detune_x4.get_value() == ToggleParam::ON ? 4.0 : 1.0
+        );
+
         Byte const const_param_flags = (
             (frequency_buffer == NULL ? FREQUENCY : NONE)
             | (detune_buffer == NULL ? DETUNE : NONE)
@@ -753,7 +764,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         (Number)detune_buffer[i],
-                        (Number)fine_detune_buffer[i]
+                        fine_detune_scale * (Number)fine_detune_buffer[i]
                     );
                 }
 
@@ -769,7 +780,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
                     computed_frequency_buffer[i] = compute_frequency(
                         frequency_value,
                         (Number)detune_buffer[i],
-                        (Number)fine_detune_buffer[i]
+                        fine_detune_scale * (Number)fine_detune_buffer[i]
                     );
                 }
 
@@ -785,7 +796,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         detune_value,
-                        (Number)fine_detune_buffer[i]
+                        fine_detune_scale * (Number)fine_detune_buffer[i]
                     );
                 }
 
@@ -802,7 +813,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
                     computed_frequency_buffer[i] = compute_frequency(
                         frequency_value,
                         detune_value,
-                        (Number)fine_detune_buffer[i]
+                        fine_detune_scale * (Number)fine_detune_buffer[i]
                     );
                 }
 
@@ -810,7 +821,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             }
 
             case FINE_DETUNE: {
-                Number const fine_detune_value = fine_detune.get_value();
+                Number const fine_detune_value = (
+                    fine_detune_scale * fine_detune.get_value()
+                );
 
                 computed_frequency_is_constant = false;
 
@@ -827,7 +840,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
             case FREQUENCY | FINE_DETUNE: {
                 Number const frequency_value = frequency.get_value();
-                Number const fine_detune_value = fine_detune.get_value();
+                Number const fine_detune_value = (
+                    fine_detune_scale * fine_detune.get_value()
+                );
 
                 computed_frequency_is_constant = false;
 
@@ -844,7 +859,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
             case DETUNE | FINE_DETUNE: {
                 Number const detune_value = detune.get_value();
-                Number const fine_detune_value = fine_detune.get_value();
+                Number const fine_detune_value = (
+                    fine_detune_scale * fine_detune.get_value()
+                );
 
                 computed_frequency_is_constant = false;
 
@@ -863,7 +880,9 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             case ALL: {
                 Number const frequency_value = frequency.get_value();
                 Number const detune_value = detune.get_value();
-                Number const fine_detune_value = fine_detune.get_value();
+                Number const fine_detune_value = (
+                    fine_detune_scale * fine_detune.get_value()
+                );
 
                 computed_frequency_is_constant = true;
                 computed_frequency_value = compute_frequency(

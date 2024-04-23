@@ -645,6 +645,13 @@ from the correct pitch by a random amount, but within a single voice, the two
 oscillators will always be off by the same amount, and will always diverge by
 the same amount in the same direction.
 
+##### Finde Detune x4 (FIN x4)
+
+The [Fine Detune (FIN)](#usage-synth-common-fin) parameter goes from -1200
+cents to +1200 cents (-1 octave to +1 octave), but if you want to go extreme
+with pitch bends, this toggle switch can increase the range to -4800 cents to
++4800 cents (-4 octaves to +4 octaves).
+
 <a id="usage-synth-common-prt"></a>
 
 ##### Portamento Length (PRT)
@@ -670,6 +677,8 @@ pitch of the previous note.
 
 Coarse detune, specifying how many semitones higher or lower the oscillator
 should play above or below the note's actual pitch.
+
+<a id="usage-synth-common-fin"></a>
 
 ##### Fine Detune (FIN)
 

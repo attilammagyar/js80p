@@ -171,6 +171,7 @@ class Voice : public SignalProducer
                 FloatParamB portamento_depth;
                 FloatParamS detune;
                 FloatParamS fine_detune;
+                ToggleParam fine_detune_x4;
                 FloatParamB width;
                 FloatParamS panning;
                 FloatParamS volume;

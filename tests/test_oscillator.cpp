@@ -338,7 +338,8 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     SumOfSines expected_2(0.5, 440.0, 0.3, 440.0 * 2.0, 0.2, 440.0 * 9.0, 1, (Number)block_size / sample_rate);
 
     FloatParamS amplitude("", 0.0, 1.0, 1.0);
-    FloatParamS dummy_param("", 0.0, 1.0, 0.0);
+    FloatParamS dummy_float_param("", 0.0, 1.0, 0.0);
+    ToggleParam dummy_toggle_param("", ToggleParam::OFF);
     FloatParamB harmonic_0("", -1.0, 1.0, 0.0);
     FloatParamB harmonic_1("", -1.0, 1.0, 0.0);
     FloatParamB harmonic_8("", -1.0, 1.0, 0.0);
@@ -348,9 +349,10 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     SimpleOscillator oscillator(
         waveform_param,
         amplitude,
-        dummy_param,
-        dummy_param,
-        dummy_param,
+        dummy_float_param,
+        dummy_float_param,
+        dummy_float_param,
+        dummy_toggle_param,
         harmonic_0,
         harmonic_1,
         harmonic_rest,
@@ -369,8 +371,8 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     amplitude.set_sample_rate(sample_rate);
     amplitude.set_block_size(block_size);
 
-    dummy_param.set_sample_rate(sample_rate);
-    dummy_param.set_block_size(block_size);
+    dummy_float_param.set_sample_rate(sample_rate);
+    dummy_float_param.set_block_size(block_size);
 
     harmonic_0.set_sample_rate(sample_rate);
     harmonic_0.set_block_size(block_size);
@@ -850,6 +852,34 @@ TEST(sine_wave_scheduled_to_be_25hz_and_scheduled_to_be_detuned_and_fine_detuned
         reference_sine, oscillator, SAMPLE_RATE, block_size, rounds, 0.01
     );
     assert_completed(oscillator);
+})
+
+
+TEST(fine_detune_range_can_be_increased, {
+    constexpr Integer block_size = 256;
+    constexpr Integer rounds = 10;
+    ReferenceSine reference_sine(100.0);
+    SimpleOscillator::WaveformParam waveform("");
+    SimpleOscillator oscillator(waveform);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+    oscillator.waveform.set_value(SimpleOscillator::SINE);
+
+    oscillator.frequency.set_value(20.0);
+    oscillator.frequency.schedule_value(ALMOST_IMMEDIATELY, 25.0);
+    oscillator.detune.set_value(2000.0);
+    oscillator.detune.schedule_value(ALMOST_IMMEDIATELY, 2200.0);
+    oscillator.fine_detune.set_value(-50.0);
+    oscillator.fine_detune.schedule_value(ALMOST_IMMEDIATELY, 50.0);
+
+    oscillator.fine_detune_x4.set_value(ToggleParam::ON);
+
+    assert_oscillator_output_is_close_to_reference(
+        reference_sine, oscillator, SAMPLE_RATE, block_size, rounds, 0.01
+    );
+
+    oscillator.fine_detune_x4.set_value(ToggleParam::OFF);
 })
 
 

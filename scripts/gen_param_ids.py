@@ -410,6 +410,9 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("M28DSH", "///< Macro 28 Distortion Shape", "macros_rw[27]->distortion_shape"),
         ("M29DSH", "///< Macro 29 Distortion Shape", "macros_rw[28]->distortion_shape"),
         ("M30DSH", "///< Macro 30 Distortion Shape", "macros_rw[29]->distortion_shape"),
+
+        ("MFX4", "  ///< Modulator Fine Detune x4", "modulator_params.fine_detune_x4"),
+        ("CFX4", "  ///< Carrier Fine Detune x4", "carrier_params.fine_detune_x4"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

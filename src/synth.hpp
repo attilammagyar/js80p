@@ -822,8 +822,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M28DSH = 662,    ///< Macro 28 Distortion Shape
             M29DSH = 663,    ///< Macro 29 Distortion Shape
             M30DSH = 664,    ///< Macro 30 Distortion Shape
+            MFX4 = 665,      ///< Modulator Fine Detune x4
+            CFX4 = 666,      ///< Carrier Fine Detune x4
 
-            PARAM_ID_COUNT = 665,
+            PARAM_ID_COUNT = 667,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
