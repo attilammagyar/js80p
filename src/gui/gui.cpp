@@ -1263,9 +1263,11 @@ void GUI::param_ratio_to_str(
             synth, param_id, ratio, scale, format, buffer, buffer_size
         );
     } else if (options != NULL) {
-        param_ratio_to_str_int(
+        param_ratio_to_str_options(
             synth, param_id, ratio, options, number_of_options, buffer, buffer_size
         );
+    } else {
+        param_ratio_to_str_int(synth, param_id, ratio, buffer, buffer_size);
     }
 
     buffer[buffer_size - 1] = '\x00';
@@ -1305,7 +1307,7 @@ void GUI::param_ratio_to_str_float(
 }
 
 
-void GUI::param_ratio_to_str_int(
+void GUI::param_ratio_to_str_options(
         Synth const& synth,
         Synth::ParamId const param_id,
         Number const ratio,
@@ -1325,6 +1327,22 @@ void GUI::param_ratio_to_str_int(
     }
 
     strncpy(buffer, options[value], buffer_size - 1);
+}
+
+
+void GUI::param_ratio_to_str_int(
+        Synth const& synth,
+        Synth::ParamId const param_id,
+        Number const ratio,
+        char* const buffer,
+        size_t const buffer_size
+) {
+    Byte const value = (
+        synth.byte_param_ratio_to_display_value(param_id, ratio)
+    );
+
+    snprintf(buffer, buffer_size, "%hhu", value);
+    buffer[buffer_size - 1] = '\x00';
 }
 
 

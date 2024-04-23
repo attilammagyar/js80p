@@ -576,6 +576,8 @@ class ToggleSwitchParamEditor: public TransparentWidget
 
         void refresh();
 
+        bool is_on() const;
+
         Synth::ParamId const param_id;
 
     protected:
@@ -590,6 +592,9 @@ class ToggleSwitchParamEditor: public TransparentWidget
         virtual bool mouse_leave(int const x, int const y) override;
 
     private:
+        static constexpr size_t TITLE_MAX_LENGTH = 64;
+
+        void update_title();
         bool is_editing() const;
         void start_editing();
         void stop_editing();
@@ -598,6 +603,7 @@ class ToggleSwitchParamEditor: public TransparentWidget
 
         Synth& synth;
 
+        char title[TITLE_MAX_LENGTH];
         Number default_ratio;
         Number ratio;
         bool is_editing_;
@@ -642,6 +648,7 @@ class DiscreteParamEditor : public TransparentWidget
 
     protected:
         static constexpr size_t TEXT_MAX_LENGTH = 24;
+        static constexpr size_t TITLE_MAX_LENGTH = 64;
 
         virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent) override;
 
@@ -656,10 +663,13 @@ class DiscreteParamEditor : public TransparentWidget
         virtual void update();
         void update_value_str(Byte const value);
 
+        void update_title();
+
         bool is_editing() const;
 
         Synth& synth;
         char value_str[TEXT_MAX_LENGTH];
+        char title[TITLE_MAX_LENGTH];
         Number ratio;
 
     private:
@@ -691,6 +701,7 @@ class DiscreteParamEditor : public TransparentWidget
 
         int const value_left;
         int const value_width;
+
         bool is_editing_;
 };
 

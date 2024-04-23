@@ -906,16 +906,14 @@ void KnobParamEditor::update_value_str()
         TEXT_MAX_LENGTH
     );
 
-    if (!has_room_for_texts) {
-        snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, value_str);
-        title[TITLE_MAX_LENGTH - 1] = '\x00';
+    snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, value_str);
+    title[TITLE_MAX_LENGTH - 1] = '\x00';
 
-        knob->set_text(title);
+    knob->set_text(title);
 
-        if (knob->is_editing()) {
-            gui->set_status_line(title);
-            gui->redraw_status_line();
-        }
+    if (knob->is_editing()) {
+        gui->set_status_line(title);
+        gui->redraw_status_line();
     }
 }
 
@@ -1399,6 +1397,7 @@ void ToggleSwitchParamEditor::set_up(GUI::PlatformData platform_data, WidgetBase
 
     default_ratio = synth.get_param_default_ratio(param_id);
     ratio = default_ratio;
+    update_title();
     refresh();
     redraw();
 }
@@ -1420,6 +1419,8 @@ void ToggleSwitchParamEditor::refresh()
             Synth::MessageType::REFRESH_PARAM, param_id, 0.0, 0
         );
     }
+
+    update_title();
 }
 
 
@@ -1440,11 +1441,18 @@ bool ToggleSwitchParamEditor::paint()
 
 bool ToggleSwitchParamEditor::mouse_up(int const x, int const y)
 {
-    ratio = ratio < 0.5 ? 1.0 : 0.0;
+    ratio = is_on() ? 0.0 : 1.0;
     synth.push_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
+    update_title();
     redraw();
 
     return true;
+}
+
+
+bool ToggleSwitchParamEditor::is_on() const
+{
+    return ratio >= 0.5;
 }
 
 
@@ -1452,7 +1460,7 @@ bool ToggleSwitchParamEditor::mouse_move(int const x, int const y, bool const mo
 {
     TransparentWidget::mouse_move(x, y, modifier);
 
-    gui->set_status_line(text);
+    gui->set_status_line(title);
     start_editing();
 
     return true;
@@ -1467,6 +1475,18 @@ bool ToggleSwitchParamEditor::mouse_leave(int const x, int const y)
     stop_editing();
 
     return true;
+}
+
+
+void ToggleSwitchParamEditor::update_title()
+{
+    snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, is_on() ? "ON" : "OFF");
+    title[TITLE_MAX_LENGTH - 1] = '\x00';
+
+    if (is_editing()) {
+        gui->set_status_line(title);
+        gui->redraw_status_line();
+    }
 }
 
 
@@ -1613,9 +1633,9 @@ void DiscreteParamEditor::refresh()
 
 void DiscreteParamEditor::update()
 {
-    if (options != NULL) {
-        update_value_str(synth.byte_param_ratio_to_display_value(param_id, ratio));
-    } else if (state_images != NULL) {
+    update_value_str(synth.byte_param_ratio_to_display_value(param_id, ratio));
+
+    if (state_images != NULL) {
         set_image(state_images->free_images[state_images->ratio_to_index(ratio)]);
     }
 }
@@ -1634,6 +1654,19 @@ void DiscreteParamEditor::update_value_str(Byte const value)
         value_str,
         TEXT_MAX_LENGTH
     );
+    update_title();
+}
+
+
+void DiscreteParamEditor::update_title()
+{
+    snprintf(title, TITLE_MAX_LENGTH, "%s: %s", text, value_str);
+    title[TITLE_MAX_LENGTH - 1] = '\x00';
+
+    if (is_editing()) {
+        gui->set_status_line(title);
+        gui->redraw_status_line();
+    }
 }
 
 
@@ -1708,7 +1741,7 @@ bool DiscreteParamEditor::mouse_move(int const x, int const y, bool const modifi
 {
     TransparentWidget::mouse_move(x, y, modifier);
 
-    gui->set_status_line(text);
+    gui->set_status_line(title);
     start_editing();
 
     return true;
@@ -1806,6 +1839,7 @@ void TuningSelector::update()
         (int)value < GUI::TUNINGS_COUNT ? GUI::TUNINGS[value] : "???",
         is_mts_esp_connected ? "on" : "off"
     );
+    update_title();
 }
 
 }

@@ -217,12 +217,21 @@ class GUI
             char* const buffer,
             size_t const buffer_size
         );
-        static void param_ratio_to_str_int(
+
+        static void param_ratio_to_str_options(
             Synth const& synth,
             Synth::ParamId const param_id,
             Number const ratio,
             char const* const* const options,
             size_t const number_of_options,
+            char* const buffer,
+            size_t const buffer_size
+        );
+
+        static void param_ratio_to_str_int(
+            Synth const& synth,
+            Synth::ParamId const param_id,
+            Number const ratio,
             char* const buffer,
             size_t const buffer_size
         );
