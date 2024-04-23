@@ -710,8 +710,8 @@ a level of randomization to the filter's frequency to mimic imperfections of
 analog synthesizers.
 
 Be careful with this, because with certain filter settings, too much
-randomization can produce loud sound artifacts or make the filter completely
-silent.
+randomization can produce loud noises and sound artifacts or make the filter
+completely silent.
 
 ##### Filter Q Inaccuracy
 
@@ -720,8 +720,8 @@ a level of randomization to the filter's Q factor to mimic imperfections of
 analog synthesizers.
 
 Be careful with this, because with certain filter settings, too much
-randomization can produce loud sound artifacts or make the filter completely
-silent.
+randomization can produce loud noises and sound artifacts or make the filter
+completely silent.
 
 <a id="usage-synth-common-type"></a>
 
@@ -765,8 +765,8 @@ The following filter types are available:
 The cutoff frequency of the filter.
 
 Be careful with this, because depending on other settings of the filter, a too
-low or too high cutoff frequency can produce loud sound artifacts or it can
-make the filter completely silent.
+low or too high cutoff frequency can produce loud noises and sound artifacts or
+it can make the filter completely silent.
 
 <a id="usage-synth-common-q"></a>
 
@@ -777,7 +777,7 @@ of the [TYPE](#usage-synth-common-type) knob. This knob has no effect for
 the low-shelf and high-shelf filters.
 
 Be careful with this, because depending on other settings of the filter, a too
-low or too high Q factor can produce loud sound artifacts or it can
+low or too high Q factor can produce loud noises and sound artifacts or it can
 make the filter completely silent.
 
 ##### Filter Gain (GAIN)
@@ -938,11 +938,12 @@ Switch between a linear and a logarithmic scale for the high-pass
 filter at the beginning of the Chorus effect's signal chain, and for the
 high-shelf filter near the end of it.
 
-##### Tempo Sync (BPM SYNC)
+##### Tempo Synchronization (BPM SYNC)
 
 Turn on tempo synchronization for the low-frequency oscillators and the delays
 in the effect, so that what they normally measure in terms of seconds will be
-measured in terms of beats instead.
+measured in terms of beats instead. (This only works in hosts which provide
+tempo information to plugins.)
 
 Note: in order to prevent the memory that is allocated for delay buffers from
 growing arbitrarily large, JS80P will not go below 30 BPM for tempo
@@ -1035,7 +1036,8 @@ high-shelf filter near the end of it.
 ##### Tempo Sync (BPM SYNC)
 
 Turn on tempo synchronization for the delay lines in the effect, so that time
-will be measured in therms of beats instead of in terms of seconds.
+will be measured in therms of beats instead of in terms of seconds. (This only
+works in hosts which provide tempo information to plugins.)
 
 Note: in order to prevent the memory that is allocated for delay buffers from
 growing arbitrarily large, JS80P will not go below 30 BPM for tempo
@@ -1176,9 +1178,214 @@ reverberation to decay into silence after the raw input signal goes quiet.
 
 ### Macros (MC)
 
+Macros are [controllers](#usage-controllers) that can combine and transform
+other momentary value based controllers, like
+[MIDI CC](https://midi.org/midi-1-0-control-change-messages), pitch wheel
+position, and even other macros. Basic controllers like the modulation wheel of
+a MIDI keyboard go from 0% to 100% on a linear scale. Macros can (for example)
+make it go from 80% down to 30% and use a non-linear curve in between.
+
+The typical usage of a macro is to assign a controller to its
+[input (IN)](#usage-macros-in) parameter, set up the minimum, maximum,
+distortion, etc.  parameters, and then assign the macro to an oscillator,
+filter, effect, envelope, or LFO parameter. Assigning various other controllers
+(e.g. note value, velocity, other macros, etc.) to the parameters of a macros
+can result in interesting and creative interactions between controllers.
+
+#### Distortion Shape
+
+The little function graph icon at the top right corner of a macro selects the
+non-linearity shape that the macro will use when its
+[distortion (DIST)](#usage-macros-dist) parameter is set to a value above 0%.
+
+<a id="usage-macros-in"></a>
+
+#### Input (IN)
+
+Assign the controller that you want to transform via the macro to this
+parameter.
+
+<a id="usage-macros-min"></a>
+
+#### Minimum Value (MIN)
+
+The macro will output this value when either its [input](#usage-macros-in) or
+its [amount](#usage-macros-amt) parameter is at the 0% position.
+
+<a id="usage-macros-max"></a>
+
+#### Maximum Value (MAX)
+
+The macro will output this value when both its [input](#usage-macros-in) and
+its [amount](#usage-macros-amt) parameters are at the 100% position.
+
+<a id="usage-macros-amt"></a>
+
+#### Amount (AMT)
+
+Scale the [input](#usage-macros-in) by this amount.
+
+<a id="usage-macros-dist"></a>
+
+#### Distortion (DIST)
+
+Tell how far the macro should diverge from the linear path between its
+[minimum](#usage-macros-min) and [maximum](#usage-macros-max) values.
+
+#### Randomness (RAND)
+
+Set how much the macro's value should be randomized while still staying between
+the [minimum](#usage-macros-min) and [maximum](#usage-macros-max) values.
+
 <a id="usage-envelopes" href="#toc">Table of Contents</a>
 
 ### Envelope Generators (ENV)
+
+An envelope generator is a [controller](#usage-controllers) that shapes the
+sound over time by defining target values for parameters which will be reached
+in a given amount of time after a note is triggered.
+
+Many of the [synthesis parameters](#usage-synth) are polyphonic, which means
+that each simultaneously playing voice can use different values and run
+their own individual timelinle for those parameters, as long as an envelope is
+assigned to them.
+
+Envelopes in JS80P use DAHDSR stages to reach four different values for their
+assigned parameters:
+
+ * **Delay**: when a note is triggered, the parameter will stay on the initial
+   level for this amount of time.
+
+ * **Attack**: the parameter will reach the peak level in this amount of time.
+
+ * **Hold**: the parameter will stay on the peak level for this long.
+
+ * **Decay**: the parameter will reach the sustain level in this amount of
+   time.
+
+ * **Sustain**: once the D-A-H-D stages are complete, the parameter will stay
+   on the sustain level until the note is stopped. (If the sustain level is 0%,
+   then JS80P will automatically release the note when this stage is reached.)
+
+ * **Release**: once the note is stopped, the parameter will take this long to
+   reach the final level.
+
+Note: when an envelope is assigned to an amplitude or volume parameter, it is
+recommended to have its initial and final level be set to 0%.
+
+The transitions between values can take various different shapes:
+
+ * **Linear**: follow a straight line towards the target value.
+
+ * **Smooth-smooth**: start slowly, then pick up some speed, and then slow down
+   again before landing on the target value.
+
+ * **Smooth-sharp**: start slowly, then as the time to reach the target value
+   starts to run out, pick up more and more speed, and reach it quickly.
+
+ * **Sharp-smooth**: start quickly, then as the target value is getting closer,
+   slow down and land on it gently and smoothly.
+
+ * **Sharp-sharp**: start quickly, then lose momentum near the midpoint, and
+   when the time to reach the target value starts to run out, pick up the speed
+   again and reach it quickly.
+
+Each non-linear shape has 3 different versions with various steepness.
+
+#### Attack Shape
+
+The first icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the initial level to the peak level.
+
+#### Decay Shape
+
+The second icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the peak level to the sustain level.
+
+#### Release Shape
+
+The third icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the sustain level to the final level.
+
+#### Update Mode
+
+When a note is triggered and a voice starts to track its own envelope timeline
+for a parameter, its default behaviour is to capture a snapshot of the envelope
+settings at that moment, and run the envelope generator with those values.
+Changing the envelope settings after this moment has no effect at all on
+already engaged voices while they are playing. This behaviour can be adjusted
+by selecting a different update strategy using the box next to the transition
+shapes. The available options are:
+
+ * **STA**: static envelope: the default behaviour where the envelope settings
+   are never updated by voices while they are playing a note.
+
+ * **END**: the same as the static mode, except that the envelope settings
+   snapshot is updated once when the note is released.
+
+ * **DYN**: dynamic envelope: the voice will continuously update the envelope
+   snapshot, and adjust the controlled parameter's value so that it converges
+   to the level where it should be according to the momentary state of the
+   envelope settings.
+
+#### Tempo Synchronization (BPM)
+
+The time interval of each stage will be measured in terms of beats instead of
+in seconds if the host provides tempo information to the plugin.
+
+#### Time Inaccuracy
+
+The first little screw in the top right corner of envelope settings adds
+randomization to envelope stage lengths. Useful for simulating imperfectness of
+analog hardware.
+
+#### Level Inaccuracy
+
+The second little screw in the top right corner of envelope settings adds
+randomization to envelope levels. Useful for simulating imperfectness of analog
+hardware.
+
+#### Amount (AMT)
+
+Scales all four levels of the envelope.
+
+#### Initial Level (INI)
+
+The level where the envelope starts.
+
+#### Peak Level (PEAK)
+
+Target level for the Attack stage.
+
+#### Sustain Level (SUS)
+
+Target level for the Decay stage.
+
+#### Final Level (FIN)
+
+Target level for the Release stage.
+
+#### Delay Time (DEL)
+
+How long the envelope will stay on the initial level before the Attack stage
+begins.
+
+#### Attack Time (ATK)
+
+How long it will take to reach the peak level from the initial level.
+
+#### Hold Time (HOLD)
+
+How long the envelope will stay on the peak level.
+
+#### Decay Time (DEC)
+
+How long it will take to reach the sustain level from the peak level.
+
+#### Release Time (REL)
+
+How long it will take to reach the final level from the value where the
+parameter is at when the note stop event is received.
 
 <a id="usage-lfos" href="#toc">Table of Contents</a>
 
