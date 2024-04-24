@@ -63,7 +63,7 @@ Table of Contents
        * [Reverb](#usage-effects-reverb)
     * [Macros (MC)](#usage-macros)
     * [Envelopes Generators (ENV)](#usage-envelopes)
-    * [LFOs](#usage-lfos)
+    * [Low-Frequency Oscillators (LFOs)](#usage-lfos)
  * [Presets](#presets)
     * [Blank](#preset-blank)
     * [Bright Organ](#preset-bright-organ)
@@ -592,9 +592,9 @@ position. (This is also known as "ring modulation".)
 
 ##### Tuning
 
-Click on the black bar next to the oscillator's name or use the mouse wheel
-while holding the mouse cursor over it in order to change the tuning. The
-available options are:
+Click on the black bar next to the oscillator's name, or use the mouse wheel
+while holding the mouse cursor over it to change the tuning. The available
+options are:
 
  * **C MTS-ESP**: use an [external tuning provider](#install-tuning) for
    determining the frequency of each note. Frequencies of notes which haven't
@@ -1194,7 +1194,8 @@ can result in interesting and creative interactions between controllers.
 
 #### Distortion Shape
 
-The little function graph icon at the top right corner of a macro selects the
+Click on the little function graph icon at the top right corner of a macro, or
+use the mouse wheel while holding the mouse cursor over it to select the
 non-linearity shape that the macro will use when its
 [distortion (DIST)](#usage-macros-dist) parameter is set to a value above 0%.
 
@@ -1296,16 +1297,22 @@ Each non-linear shape has 3 different versions with various steepness.
 
 The first icon in the header row of envelope settings selects the shape that
 defines how the envelope will go from the initial level to the peak level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.
 
 #### Decay Shape
 
 The second icon in the header row of envelope settings selects the shape that
 defines how the envelope will go from the peak level to the sustain level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.
 
 #### Release Shape
 
 The third icon in the header row of envelope settings selects the shape that
 defines how the envelope will go from the sustain level to the final level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.
 
 #### Update Mode
 
@@ -1314,8 +1321,9 @@ for a parameter, its default behaviour is to capture a snapshot of the envelope
 settings at that moment, and run the envelope generator with those values.
 Changing the envelope settings after this moment has no effect at all on
 already engaged voices while they are playing. This behaviour can be adjusted
-by selecting a different update strategy using the box next to the transition
-shapes. The available options are:
+by selecting a different update strategy by clicking on the box next to the
+transition shapes, or using the mouse wheel while holding the cursor over it.
+The available options are:
 
  * **STA**: static envelope: the default behaviour where the envelope settings
    are never updated by voices while they are playing a note.
@@ -1389,7 +1397,9 @@ parameter is at when the note stop event is received.
 
 <a id="usage-lfos" href="#toc">Table of Contents</a>
 
-### LFOs
+### Low-Frequency Oscillators (LFOs)
+
+
 
 <a id="presets" href="#toc">Table of Contents</a>
 
