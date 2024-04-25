@@ -1,4 +1,6 @@
-v?.?.? (2024-0?-??)
+v2.9.0 (2024-04-26)
+ * NOTE: this is a preview version of v3.0.0, it might not be ready for
+   production use.
  * Oscillator fine detune range can now go from -4 octaves to +4 octaves.
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
    a polyphonic parameter.
@@ -27,7 +29,9 @@ v?.?.? (2024-0?-??)
  * Various performance and RAM usage improvements.
  * The source distribution can now be compiled for RISC-V 64 systems thanks to
    @aimixsaka.
- * New presets: Analog Brass, Bouncy.
+ * New presets: Analog Brass AT, Analog Brass mod, Bouncy.
+ * All parameters and features are now explained in detail in the
+   documentation.
  * FST: hosts which support VSTXML files can now show full length parameter
    names instead of abbreviations.
  * Bugfix: some MIDI devices send Note Off messages as Note On messages with 0
