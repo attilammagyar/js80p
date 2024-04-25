@@ -209,3 +209,34 @@ TEST(can_randomize_the_value, {
         true, min, mean, amount * max, mean, (mean - min) / 2.0, statistics, 0.025
     );
 })
+
+
+TEST(can_shift_midpoint, {
+    Macro macro;
+
+    macro.midpoint.set_value(0.7);
+
+    assert_macro_value(macro, 0.00, 0.00);
+    assert_macro_value(macro, 0.25, 0.35);
+    assert_macro_value(macro, 0.50, 0.70);
+    assert_macro_value(macro, 0.75, 0.85);
+    assert_macro_value(macro, 1.00, 1.00);
+
+    macro.distortion.set_value(1.0);
+
+    assert_macro_value(macro, 0.00, 0.00);
+    assert_macro_value(macro, 0.25, 0.00);
+    assert_macro_value(macro, 0.50, 0.99);
+    assert_macro_value(macro, 0.75, 0.99);
+    assert_macro_value(macro, 1.00, 1.00);
+
+    macro.min.set_value(0.1);
+    macro.max.set_value(0.8);
+    macro.distortion.set_value(0.0);
+
+    assert_macro_value(macro, 0.00, 0.10);
+    assert_macro_value(macro, 0.25, 0.10 + 0.35 * (0.80 - 0.10));
+    assert_macro_value(macro, 0.50, 0.10 + 0.70 * (0.80 - 0.10));
+    assert_macro_value(macro, 0.75, 0.10 + 0.85 * (0.80 - 0.10));
+    assert_macro_value(macro, 1.00, 0.80);
+})

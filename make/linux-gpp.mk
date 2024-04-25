@@ -65,10 +65,11 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(BUILD_DIR)/img_knob_states-free.o \
 	$(BUILD_DIR)/img_knob_states-none.o \
 	$(BUILD_DIR)/img_lfos.o \
+	$(BUILD_DIR)/img_macro_distortions.o \
+	$(BUILD_DIR)/img_macro_midpoint_states.o \
 	$(BUILD_DIR)/img_macros1.o \
 	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_macros3.o \
-	$(BUILD_DIR)/img_macro_distortions.o \
 	$(BUILD_DIR)/img_screw_states.o \
 	$(BUILD_DIR)/img_screw_states_synced.o \
 	$(BUILD_DIR)/img_synth.o \

@@ -604,7 +604,7 @@ void Synth::create_midi_controllers() noexcept
 
 void Synth::create_macros() noexcept
 {
-    Integer next_id = ParamId::M1IN;
+    Integer next_id = ParamId::M1MID;
 
     for (Integer i = 0; i != MACROS; ++i) {
         /*
@@ -615,6 +615,7 @@ void Synth::create_macros() noexcept
 
         macros_rw[i] = macro;
 
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->midpoint);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->input);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->min);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->max);
@@ -2129,6 +2130,36 @@ bool Synth::may_be_controllable(
         case ParamId::CF1QIA:
         case ParamId::CF2FIA:
         case ParamId::CF2QIA:
+        case ParamId::M1MID:
+        case ParamId::M2MID:
+        case ParamId::M3MID:
+        case ParamId::M4MID:
+        case ParamId::M5MID:
+        case ParamId::M6MID:
+        case ParamId::M7MID:
+        case ParamId::M8MID:
+        case ParamId::M9MID:
+        case ParamId::M10MID:
+        case ParamId::M11MID:
+        case ParamId::M12MID:
+        case ParamId::M13MID:
+        case ParamId::M14MID:
+        case ParamId::M15MID:
+        case ParamId::M16MID:
+        case ParamId::M17MID:
+        case ParamId::M18MID:
+        case ParamId::M19MID:
+        case ParamId::M20MID:
+        case ParamId::M21MID:
+        case ParamId::M22MID:
+        case ParamId::M23MID:
+        case ParamId::M24MID:
+        case ParamId::M25MID:
+        case ParamId::M26MID:
+        case ParamId::M27MID:
+        case ParamId::M28MID:
+        case ParamId::M29MID:
+        case ParamId::M30MID:
         case ParamId::N1TIN:
         case ParamId::N1VIN:
         case ParamId::N2TIN:

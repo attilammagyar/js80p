@@ -54,6 +54,7 @@ class Macro : public MidiController
 
         void update() noexcept;
 
+        FloatParamB midpoint;
         FloatParamB input;
         FloatParamB min;
         FloatParamB max;
@@ -71,6 +72,7 @@ class Macro : public MidiController
             Integer& change_index
         ) const noexcept;
 
+        Integer midpoint_change_index;
         Integer input_change_index;
         Integer min_change_index;
         Integer max_change_index;

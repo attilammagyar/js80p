@@ -246,17 +246,20 @@ class GUI
 
         void build_macros_1_body(
             ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions
+            ParamStateImages const* macro_distortions,
+            ParamStateImages const* macro_midpoint_states
         );
 
         void build_macros_2_body(
             ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions
+            ParamStateImages const* macro_distortions,
+            ParamStateImages const* macro_midpoint_states
         );
 
         void build_macros_3_body(
             ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions
+            ParamStateImages const* macro_distortions,
+            ParamStateImages const* macro_midpoint_states
         );
 
         void build_effects_body(ParamStateImages const* knob_states);
@@ -302,6 +305,7 @@ class GUI
         ParamStateImages const* envelope_shapes_01;
         ParamStateImages const* envelope_shapes_10;
         ParamStateImages const* macro_distortions;
+        ParamStateImages const* macro_midpoint_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;

@@ -57,14 +57,16 @@ extern unsigned char _binary_gui_img_knob_states_none_png_start;
 extern unsigned char _binary_gui_img_knob_states_none_png_end;
 extern unsigned char _binary_gui_img_lfos_png_start;
 extern unsigned char _binary_gui_img_lfos_png_end;
+extern unsigned char _binary_gui_img_macro_distortions_png_start;
+extern unsigned char _binary_gui_img_macro_distortions_png_end;
+extern unsigned char _binary_gui_img_macro_midpoint_states_png_start;
+extern unsigned char _binary_gui_img_macro_midpoint_states_png_end;
 extern unsigned char _binary_gui_img_macros1_png_start;
 extern unsigned char _binary_gui_img_macros1_png_end;
 extern unsigned char _binary_gui_img_macros2_png_start;
 extern unsigned char _binary_gui_img_macros2_png_end;
 extern unsigned char _binary_gui_img_macros3_png_start;
 extern unsigned char _binary_gui_img_macros3_png_end;
-extern unsigned char _binary_gui_img_macro_distortions_png_start;
-extern unsigned char _binary_gui_img_macro_distortions_png_end;
 extern unsigned char _binary_gui_img_screw_states_png_start;
 extern unsigned char _binary_gui_img_screw_states_png_end;
 extern unsigned char _binary_gui_img_screw_states_synced_png_start;
@@ -178,6 +180,13 @@ std::map<std::string, Widget::Resource> const Widget::IMAGES{
         Widget::Resource(
             &_binary_gui_img_macro_distortions_png_start,
             &_binary_gui_img_macro_distortions_png_end
+        )
+    },
+    {
+        "MACROMID",
+        Widget::Resource(
+            &_binary_gui_img_macro_midpoint_states_png_start,
+            &_binary_gui_img_macro_midpoint_states_png_end
         )
     },
     {

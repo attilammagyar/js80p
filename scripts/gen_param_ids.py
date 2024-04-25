@@ -173,6 +173,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
 
 def print_macros(param_id: int, param_objs: list) -> int:
     params = [
+        ("$#MID", " ///< $ # Midpoint", ""),
         ("$#IN", "  ///< $ # Input", ""),
         ("$#MIN", " ///< $ # Minimum Value", ""),
         ("$#MAX", " ///< $ # Maximum Value", ""),

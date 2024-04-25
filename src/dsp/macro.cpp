@@ -40,6 +40,7 @@ Macro::DistortionShapeParam::DistortionShapeParam(
 
 Macro::Macro(std::string const& name) noexcept
     : MidiController(),
+    midpoint(name + "MID", 0.0, 1.0, 0.5),
     input(name + "IN", 0.0, 1.0, 0.5),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(name + "MAX", 0.0, 1.0, 1.0),
@@ -47,6 +48,7 @@ Macro::Macro(std::string const& name) noexcept
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     distortion_shape(name + "DSH"),
+    midpoint_change_index(0),
     input_change_index(0),
     min_change_index(0),
     max_change_index(0),
@@ -73,12 +75,19 @@ void Macro::update() noexcept
         return;
     }
 
+    Number const midpoint_value = midpoint.get_value();
+    Number const input_value = input.get_value();
+    Number const shifted_input_value = (
+        input_value < 0.5
+            ? 2.0 * input_value * midpoint_value
+            : (midpoint_value + (2.0 * input_value - 1.0) * (1.0 - midpoint_value))
+    );
     Number const min_value = min.get_value();
     Number const computed_value = Math::randomize(
         randomness.get_value(),
         Math::distort(
             distortion.get_value(),
-            input.get_value(),
+            shifted_input_value,
             (Math::DistortionShape)distortion_shape.get_value()
         )
     );
@@ -96,7 +105,8 @@ bool Macro::update_change_indices() noexcept
 {
     bool is_dirty;
 
-    is_dirty = update_change_index<FloatParamB>(input, input_change_index);
+    is_dirty = update_change_index<FloatParamB>(midpoint, midpoint_change_index);
+    is_dirty = update_change_index<FloatParamB>(input, input_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(min, min_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(max, max_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(amount, amount_change_index) || is_dirty;

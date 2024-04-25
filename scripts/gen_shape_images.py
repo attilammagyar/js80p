@@ -35,6 +35,7 @@ except ImportError as error:
 
 BLACK = (0, 0, 0)
 LIGHT_GREY = (200, 200, 200)
+GREEN = (100, 255, 140)
 CYAN_1 = (120, 200, 230)
 CYAN_2 = (140, 210, 240)
 CYAN_3 = (160, 220, 250)
@@ -97,6 +98,15 @@ def main(argv):
     generate_image(
         os.path.join(out_dir, "macro_distortions.png"), 0.0, 1.0, MACRO_DISTORTIONS
     )
+    generate_image(
+        os.path.join(out_dir, "macro_midpoint_states.png"),
+        0.0,
+        1.0,
+        tuple(
+            make_midpoint_shift_function(i / 127.0)
+            for i in range(128)
+        )
+    )
 
 
 def generate_image(out_file, start, end, funcs):
@@ -136,6 +146,44 @@ def draw_plot(f, start, end, color):
     plot_canvas.line(segments, fill=color, width=STROKE_WIDTH, joint="curve")
 
     return plot_image.resize((WIDTH, HEIGHT), Image.BICUBIC)
+
+
+def make_midpoint_shift_function(midpoint):
+    func = lambda x: shift_midpoint(midpoint, x)
+    color = None
+
+    if midpoint <= 0.5:
+        s = 2.0 * midpoint
+        color = vint(vsum(vscale(1.0 - s, GREEN), vscale(s, LIGHT_GREY)))
+    elif midpoint <= 0.75:
+        s = 4.0 * (midpoint - 0.5)
+        color = vint(vsum(vscale(1.0 - s, LIGHT_GREY), vscale(s, YELLOW_2)))
+    else:
+        s = 4.0 * (midpoint - 0.75)
+        color = vint(vsum(vscale(1.0 - s, YELLOW_2), vscale(s, RED_1)))
+
+    return (color, func)
+
+
+def shift_midpoint(midpoint, x):
+    x2 = 2.0 * x
+
+    if x2 < 1.0:
+        return x2 * midpoint
+
+    return midpoint + (x2 - 1.0) * (1.0 - midpoint)
+
+
+def vint(x):
+    return tuple(int(xi) for xi in x)
+
+
+def vsum(a, b):
+    return tuple(ai + bi for ai, bi in zip(a, b))
+
+
+def vscale(scalar, vector):
+    return tuple(scalar * vi for vi in vector)
 
 
 if __name__ == "__main__":

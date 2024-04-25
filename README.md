@@ -100,7 +100,8 @@ Table of Contents
     * [Gloomy Brass](#preset-gloomy-brass)
     * [Gloomy Brass Raindrops](#preset-gloomy-brass-raindrops)
     * [Sawyer](#preset-sawyer)
-    * [Analog Brass](#preset-analog-brass)
+    * [Analog Brass AT](#preset-analog-brass-at)
+    * [Analog Brass mod](#preset-analog-brass-mod)
     * [Bouncy](#preset-bouncy)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
@@ -1192,9 +1193,20 @@ filter, effect, envelope, or LFO parameter. Assigning various other controllers
 (e.g. note value, velocity, other macros, etc.) to the parameters of a macros
 can result in interesting and creative interactions between controllers.
 
+#### Midpoint
+
+Move the mouse cursor over the first function graph icon at the top right
+corner of a macro, and start moving it while holding the left mouse button
+down, or start using the mouse wheel to adjust the midpoint of the macro's
+[input](#usage-macros-in).
+
+This is most useful when the input of the macro is associated with the pitch
+bend wheel of a MIDI keyboard, and you want precise control over the range that
+is covered by the lower and the upper half of the wheel's movement.
+
 #### Distortion Shape
 
-Click on the little function graph icon at the top right corner of a macro, or
+Click on the second function graph icon at the top right corner of a macro, or
 use the mouse wheel while holding the mouse cursor over it to select the
 non-linearity shape that the macro will use when its
 [distortion (DIST)](#usage-macros-dist) parameter is set to a value above 0%.
@@ -1698,13 +1710,22 @@ oscillators are required to make this sound good in stereo - instead, the
 effect is achieved through trickery with the Note controller and the
 Distortion knob of Macro 12 and 13.)
 
-<a id="preset-analog-brass"></a>
+<a id="preset-analog-brass-at"></a>
 
-### Analog Brass
+### Analog Brass AT
 
-Turn the mod wheel down and play with low velocity for a soft, smooth, warm,
+Play softly, pianissimo for a soft, smooth, warm, and fat analog brass sound.
+Play fortissimo and use aftertouch for big bright swells. The mod wheel adds
+vibrato, and the pitch wheel goes from -3 octaves to +1 octave.
+
+<a id="preset-analog-brass-mod"></a>
+
+### Analog Brass mod
+
+Turn the mod wheel down and play softly, pianissimo for a soft, smooth, warm,
 and fat analog brass sound. Turn it up and play fortissimo for big bright
-swells. Aftertouch adds a slow vibrato.
+swells. Aftertouch adds vibrato, and the pitch wheel goes from -3 octaves to
++1 octave.
 
 <a id="preset-bouncy"></a>
 

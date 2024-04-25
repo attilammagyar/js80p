@@ -51,6 +51,7 @@ GUI_IMAGES = \
 	gui/img/knob_states-none.bmp \
 	gui/img/lfos.bmp \
 	gui/img/macro_distortions.bmp \
+	gui/img/macro_midpoint_states.bmp \
 	gui/img/macros1.bmp \
 	gui/img/macros2.bmp \
 	gui/img/macros3.bmp \

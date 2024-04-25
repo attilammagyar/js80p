@@ -382,6 +382,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::EV3V] = "Volume 3 (%)",
 
+    [Synth::ParamId::M1MID] = "Macro 1 Midpoint",
     [Synth::ParamId::M1IN] = "Macro 1 Input (%)",
     [Synth::ParamId::M1MIN] = "Macro 1 Minimum Value (%)",
     [Synth::ParamId::M1MAX] = "Macro 1 Maximum Value (%)",
@@ -389,6 +390,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M1DST] = "Macro 1 Distortion (%)",
     [Synth::ParamId::M1RND] = "Macro 1 Randomness (%)",
 
+    [Synth::ParamId::M2MID] = "Macro 2 Midpoint",
     [Synth::ParamId::M2IN] = "Macro 2 Input (%)",
     [Synth::ParamId::M2MIN] = "Macro 2 Minimum Value (%)",
     [Synth::ParamId::M2MAX] = "Macro 2 Maximum Value (%)",
@@ -396,6 +398,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M2DST] = "Macro 2 Distortion (%)",
     [Synth::ParamId::M2RND] = "Macro 2 Randomness (%)",
 
+    [Synth::ParamId::M3MID] = "Macro 3 Midpoint",
     [Synth::ParamId::M3IN] = "Macro 3 Input (%)",
     [Synth::ParamId::M3MIN] = "Macro 3 Minimum Value (%)",
     [Synth::ParamId::M3MAX] = "Macro 3 Maximum Value (%)",
@@ -403,6 +406,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M3DST] = "Macro 3 Distortion (%)",
     [Synth::ParamId::M3RND] = "Macro 3 Randomness (%)",
 
+    [Synth::ParamId::M4MID] = "Macro 4 Midpoint",
     [Synth::ParamId::M4IN] = "Macro 4 Input (%)",
     [Synth::ParamId::M4MIN] = "Macro 4 Minimum Value (%)",
     [Synth::ParamId::M4MAX] = "Macro 4 Maximum Value (%)",
@@ -410,6 +414,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M4DST] = "Macro 4 Distortion (%)",
     [Synth::ParamId::M4RND] = "Macro 4 Randomness (%)",
 
+    [Synth::ParamId::M5MID] = "Macro 5 Midpoint",
     [Synth::ParamId::M5IN] = "Macro 5 Input (%)",
     [Synth::ParamId::M5MIN] = "Macro 5 Minimum Value (%)",
     [Synth::ParamId::M5MAX] = "Macro 5 Maximum Value (%)",
@@ -417,6 +422,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M5DST] = "Macro 5 Distortion (%)",
     [Synth::ParamId::M5RND] = "Macro 5 Randomness (%)",
 
+    [Synth::ParamId::M6MID] = "Macro 6 Midpoint",
     [Synth::ParamId::M6IN] = "Macro 6 Input (%)",
     [Synth::ParamId::M6MIN] = "Macro 6 Minimum Value (%)",
     [Synth::ParamId::M6MAX] = "Macro 6 Maximum Value (%)",
@@ -424,6 +430,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M6DST] = "Macro 6 Distortion (%)",
     [Synth::ParamId::M6RND] = "Macro 6 Randomness (%)",
 
+    [Synth::ParamId::M7MID] = "Macro 7 Midpoint",
     [Synth::ParamId::M7IN] = "Macro 7 Input (%)",
     [Synth::ParamId::M7MIN] = "Macro 7 Minimum Value (%)",
     [Synth::ParamId::M7MAX] = "Macro 7 Maximum Value (%)",
@@ -431,6 +438,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M7DST] = "Macro 7 Distortion (%)",
     [Synth::ParamId::M7RND] = "Macro 7 Randomness (%)",
 
+    [Synth::ParamId::M8MID] = "Macro 8 Midpoint",
     [Synth::ParamId::M8IN] = "Macro 8 Input (%)",
     [Synth::ParamId::M8MIN] = "Macro 8 Minimum Value (%)",
     [Synth::ParamId::M8MAX] = "Macro 8 Maximum Value (%)",
@@ -438,6 +446,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M8DST] = "Macro 8 Distortion (%)",
     [Synth::ParamId::M8RND] = "Macro 8 Randomness (%)",
 
+    [Synth::ParamId::M9MID] = "Macro 9 Midpoint",
     [Synth::ParamId::M9IN] = "Macro 9 Input (%)",
     [Synth::ParamId::M9MIN] = "Macro 9 Minimum Value (%)",
     [Synth::ParamId::M9MAX] = "Macro 9 Maximum Value (%)",
@@ -445,6 +454,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M9DST] = "Macro 9 Distortion (%)",
     [Synth::ParamId::M9RND] = "Macro 9 Randomness (%)",
 
+    [Synth::ParamId::M10MID] = "Macro 10 Midpoint",
     [Synth::ParamId::M10IN] = "Macro 10 Input (%)",
     [Synth::ParamId::M10MIN] = "Macro 10 Minimum Value (%)",
     [Synth::ParamId::M10MAX] = "Macro 10 Maximum Value (%)",
@@ -452,6 +462,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M10DST] = "Macro 10 Distortion (%)",
     [Synth::ParamId::M10RND] = "Macro 10 Randomness (%)",
 
+    [Synth::ParamId::M11MID] = "Macro 11 Midpoint",
     [Synth::ParamId::M11IN] = "Macro 11 Input (%)",
     [Synth::ParamId::M11MIN] = "Macro 11 Minimum Value (%)",
     [Synth::ParamId::M11MAX] = "Macro 11 Maximum Value (%)",
@@ -459,6 +470,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M11DST] = "Macro 11 Distortion (%)",
     [Synth::ParamId::M11RND] = "Macro 11 Randomness (%)",
 
+    [Synth::ParamId::M12MID] = "Macro 12 Midpoint",
     [Synth::ParamId::M12IN] = "Macro 12 Input (%)",
     [Synth::ParamId::M12MIN] = "Macro 12 Minimum Value (%)",
     [Synth::ParamId::M12MAX] = "Macro 12 Maximum Value (%)",
@@ -466,6 +478,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M12DST] = "Macro 12 Distortion (%)",
     [Synth::ParamId::M12RND] = "Macro 12 Randomness (%)",
 
+    [Synth::ParamId::M13MID] = "Macro 13 Midpoint",
     [Synth::ParamId::M13IN] = "Macro 13 Input (%)",
     [Synth::ParamId::M13MIN] = "Macro 13 Minimum Value (%)",
     [Synth::ParamId::M13MAX] = "Macro 13 Maximum Value (%)",
@@ -473,6 +486,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M13DST] = "Macro 13 Distortion (%)",
     [Synth::ParamId::M13RND] = "Macro 13 Randomness (%)",
 
+    [Synth::ParamId::M14MID] = "Macro 14 Midpoint",
     [Synth::ParamId::M14IN] = "Macro 14 Input (%)",
     [Synth::ParamId::M14MIN] = "Macro 14 Minimum Value (%)",
     [Synth::ParamId::M14MAX] = "Macro 14 Maximum Value (%)",
@@ -480,6 +494,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M14DST] = "Macro 14 Distortion (%)",
     [Synth::ParamId::M14RND] = "Macro 14 Randomness (%)",
 
+    [Synth::ParamId::M15MID] = "Macro 15 Midpoint",
     [Synth::ParamId::M15IN] = "Macro 15 Input (%)",
     [Synth::ParamId::M15MIN] = "Macro 15 Minimum Value (%)",
     [Synth::ParamId::M15MAX] = "Macro 15 Maximum Value (%)",
@@ -487,6 +502,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M15DST] = "Macro 15 Distortion (%)",
     [Synth::ParamId::M15RND] = "Macro 15 Randomness (%)",
 
+    [Synth::ParamId::M16MID] = "Macro 16 Midpoint",
     [Synth::ParamId::M16IN] = "Macro 16 Input (%)",
     [Synth::ParamId::M16MIN] = "Macro 16 Minimum Value (%)",
     [Synth::ParamId::M16MAX] = "Macro 16 Maximum Value (%)",
@@ -494,6 +510,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M16DST] = "Macro 16 Distortion (%)",
     [Synth::ParamId::M16RND] = "Macro 16 Randomness (%)",
 
+    [Synth::ParamId::M17MID] = "Macro 17 Midpoint",
     [Synth::ParamId::M17IN] = "Macro 17 Input (%)",
     [Synth::ParamId::M17MIN] = "Macro 17 Minimum Value (%)",
     [Synth::ParamId::M17MAX] = "Macro 17 Maximum Value (%)",
@@ -501,6 +518,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M17DST] = "Macro 17 Distortion (%)",
     [Synth::ParamId::M17RND] = "Macro 17 Randomness (%)",
 
+    [Synth::ParamId::M18MID] = "Macro 18 Midpoint",
     [Synth::ParamId::M18IN] = "Macro 18 Input (%)",
     [Synth::ParamId::M18MIN] = "Macro 18 Minimum Value (%)",
     [Synth::ParamId::M18MAX] = "Macro 18 Maximum Value (%)",
@@ -508,6 +526,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M18DST] = "Macro 18 Distortion (%)",
     [Synth::ParamId::M18RND] = "Macro 18 Randomness (%)",
 
+    [Synth::ParamId::M19MID] = "Macro 19 Midpoint",
     [Synth::ParamId::M19IN] = "Macro 19 Input (%)",
     [Synth::ParamId::M19MIN] = "Macro 19 Minimum Value (%)",
     [Synth::ParamId::M19MAX] = "Macro 19 Maximum Value (%)",
@@ -515,6 +534,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M19DST] = "Macro 19 Distortion (%)",
     [Synth::ParamId::M19RND] = "Macro 19 Randomness (%)",
 
+    [Synth::ParamId::M20MID] = "Macro 20 Midpoint",
     [Synth::ParamId::M20IN] = "Macro 20 Input (%)",
     [Synth::ParamId::M20MIN] = "Macro 20 Minimum Value (%)",
     [Synth::ParamId::M20MAX] = "Macro 20 Maximum Value (%)",
@@ -522,6 +542,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M20DST] = "Macro 20 Distortion (%)",
     [Synth::ParamId::M20RND] = "Macro 20 Randomness (%)",
 
+    [Synth::ParamId::M21MID] = "Macro 21 Midpoint",
     [Synth::ParamId::M21IN] = "Macro 21 Input (%)",
     [Synth::ParamId::M21MIN] = "Macro 21 Minimum Value (%)",
     [Synth::ParamId::M21MAX] = "Macro 21 Maximum Value (%)",
@@ -529,6 +550,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M21DST] = "Macro 21 Distortion (%)",
     [Synth::ParamId::M21RND] = "Macro 21 Randomness (%)",
 
+    [Synth::ParamId::M22MID] = "Macro 22 Midpoint",
     [Synth::ParamId::M22IN] = "Macro 22 Input (%)",
     [Synth::ParamId::M22MIN] = "Macro 22 Minimum Value (%)",
     [Synth::ParamId::M22MAX] = "Macro 22 Maximum Value (%)",
@@ -536,6 +558,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M22DST] = "Macro 22 Distortion (%)",
     [Synth::ParamId::M22RND] = "Macro 22 Randomness (%)",
 
+    [Synth::ParamId::M23MID] = "Macro 23 Midpoint",
     [Synth::ParamId::M23IN] = "Macro 23 Input (%)",
     [Synth::ParamId::M23MIN] = "Macro 23 Minimum Value (%)",
     [Synth::ParamId::M23MAX] = "Macro 23 Maximum Value (%)",
@@ -543,6 +566,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M23DST] = "Macro 23 Distortion (%)",
     [Synth::ParamId::M23RND] = "Macro 23 Randomness (%)",
 
+    [Synth::ParamId::M24MID] = "Macro 24 Midpoint",
     [Synth::ParamId::M24IN] = "Macro 24 Input (%)",
     [Synth::ParamId::M24MIN] = "Macro 24 Minimum Value (%)",
     [Synth::ParamId::M24MAX] = "Macro 24 Maximum Value (%)",
@@ -550,6 +574,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M24DST] = "Macro 24 Distortion (%)",
     [Synth::ParamId::M24RND] = "Macro 24 Randomness (%)",
 
+    [Synth::ParamId::M25MID] = "Macro 25 Midpoint",
     [Synth::ParamId::M25IN] = "Macro 25 Input (%)",
     [Synth::ParamId::M25MIN] = "Macro 25 Minimum Value (%)",
     [Synth::ParamId::M25MAX] = "Macro 25 Maximum Value (%)",
@@ -557,6 +582,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M25DST] = "Macro 25 Distortion (%)",
     [Synth::ParamId::M25RND] = "Macro 25 Randomness (%)",
 
+    [Synth::ParamId::M26MID] = "Macro 26 Midpoint",
     [Synth::ParamId::M26IN] = "Macro 26 Input (%)",
     [Synth::ParamId::M26MIN] = "Macro 26 Minimum Value (%)",
     [Synth::ParamId::M26MAX] = "Macro 26 Maximum Value (%)",
@@ -564,6 +590,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M26DST] = "Macro 26 Distortion (%)",
     [Synth::ParamId::M26RND] = "Macro 26 Randomness (%)",
 
+    [Synth::ParamId::M27MID] = "Macro 27 Midpoint",
     [Synth::ParamId::M27IN] = "Macro 27 Input (%)",
     [Synth::ParamId::M27MIN] = "Macro 27 Minimum Value (%)",
     [Synth::ParamId::M27MAX] = "Macro 27 Maximum Value (%)",
@@ -571,6 +598,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M27DST] = "Macro 27 Distortion (%)",
     [Synth::ParamId::M27RND] = "Macro 27 Randomness (%)",
 
+    [Synth::ParamId::M28MID] = "Macro 28 Midpoint",
     [Synth::ParamId::M28IN] = "Macro 28 Input (%)",
     [Synth::ParamId::M28MIN] = "Macro 28 Minimum Value (%)",
     [Synth::ParamId::M28MAX] = "Macro 28 Maximum Value (%)",
@@ -578,6 +606,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M28DST] = "Macro 28 Distortion (%)",
     [Synth::ParamId::M28RND] = "Macro 28 Randomness (%)",
 
+    [Synth::ParamId::M29MID] = "Macro 29 Midpoint",
     [Synth::ParamId::M29IN] = "Macro 29 Input (%)",
     [Synth::ParamId::M29MIN] = "Macro 29 Minimum Value (%)",
     [Synth::ParamId::M29MAX] = "Macro 29 Maximum Value (%)",
@@ -585,6 +614,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M29DST] = "Macro 29 Distortion (%)",
     [Synth::ParamId::M29RND] = "Macro 29 Randomness (%)",
 
+    [Synth::ParamId::M30MID] = "Macro 30Midpoint",
     [Synth::ParamId::M30IN] = "Macro 30 Input (%)",
     [Synth::ParamId::M30MIN] = "Macro 30 Minimum Value (%)",
     [Synth::ParamId::M30MAX] = "Macro 30 Maximum Value (%)",
@@ -1642,6 +1672,26 @@ constexpr int pos_rel_offset_top = 0;
         )                                                           \
     )
 
+#define MACMID(owner, left, top, param_id, varg1, varg2, ks)        \
+    owner->own(                                                     \
+        new KnobParamEditor(                                        \
+            *this,                                                  \
+            GUI::PARAMS[param_id],                                  \
+            pos_rel_offset_left + left,                             \
+            pos_rel_offset_top + top,                               \
+            21,                                                     \
+            21,                                                     \
+            0,                                                      \
+            *controller_selector,                                   \
+            synth,                                                  \
+            param_id,                                               \
+            0,                                                      \
+            varg1,                                                  \
+            varg2,                                                  \
+            ks                                                      \
+        )                                                           \
+    )
+
 #define M____ (ControllerCapability::MIDI_CONTROLLER)
 
 #define MM___ (                                                 \
@@ -1764,6 +1814,17 @@ GUI::GUI(
         21
     );
 
+    macro_midpoint_states = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "MACROMID"),
+        NULL,
+        NULL,
+        NULL,
+        128,
+        21,
+        21
+    );
+
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
     macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
     macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
@@ -1788,9 +1849,9 @@ GUI::GUI(
     controller_selector = new ControllerSelector(*background, synth);
 
     build_about_body(sdk_version);
-    build_macros_1_body(knob_states, macro_distortions);
-    build_macros_2_body(knob_states, macro_distortions);
-    build_macros_3_body(knob_states, macro_distortions);
+    build_macros_1_body(knob_states, macro_distortions, macro_midpoint_states);
+    build_macros_2_body(knob_states, macro_distortions, macro_midpoint_states);
+    build_macros_3_body(knob_states, macro_distortions, macro_midpoint_states);
     build_effects_body(knob_states);
     build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
@@ -1903,7 +1964,8 @@ void GUI::build_about_body(char const* sdk_version)
 
 void GUI::build_macros_1_body(
         ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions
+        ParamStateImages const* macro_distortions,
+        ParamStateImages const* macro_midpoint_states
 ) {
     macros_1_body = new TabBody("Macros 1-10");
 
@@ -1919,6 +1981,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M1DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M1RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M1MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M1DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -1934,6 +1997,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M2DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M2RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M2MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M2DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -1949,6 +2013,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M3DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M3RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M3MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M3DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -1964,6 +2029,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M4DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M4RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M4MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M4DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -1979,6 +2045,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M5DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M5RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M5MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M5DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -1994,6 +2061,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M6DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M6RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M6MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M6DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2009,6 +2077,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M7DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M7RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M7MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M7DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2024,6 +2093,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M8DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M8RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M8MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M8DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2039,6 +2109,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M9DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M9RND,  MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M9MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M9DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2054,6 +2125,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M10DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M10RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_1_body, 131, 4, Synth::ParamId::M10MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_1_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M10DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2064,7 +2136,8 @@ void GUI::build_macros_1_body(
 
 void GUI::build_macros_2_body(
         ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions
+        ParamStateImages const* macro_distortions,
+        ParamStateImages const* macro_midpoint_states
 ) {
     macros_2_body = new TabBody("Macros 11-20");
 
@@ -2080,6 +2153,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M11DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M11RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M11MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M11DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2095,6 +2169,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M12DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M12RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M12MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M12DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2110,6 +2185,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M13DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M13RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M13MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M13DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2125,6 +2201,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M14DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M14RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M14MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M14DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2140,6 +2217,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M15DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M15RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M15MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M15DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2155,6 +2233,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M16DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M16RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M16MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M16DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2170,6 +2249,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M17DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M17RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M17MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M17DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2185,6 +2265,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M18DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M18RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M18MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M18DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2200,6 +2281,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M19DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M19RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M19MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M19DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2215,6 +2297,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M20DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M20RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_2_body, 131, 4, Synth::ParamId::M20MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_2_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M20DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2225,7 +2308,8 @@ void GUI::build_macros_2_body(
 
 void GUI::build_macros_3_body(
         ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions
+        ParamStateImages const* macro_distortions,
+        ParamStateImages const* macro_midpoint_states
 ) {
     macros_3_body = new TabBody("Macros 21-30");
 
@@ -2241,6 +2325,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M21DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M21RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M21MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M21DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2256,6 +2341,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M22DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M22RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M22MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M22DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2271,6 +2357,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M23DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M23RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M23MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M23DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2286,6 +2373,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M24DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M24RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M24MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M24DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2301,6 +2389,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M25DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M25RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M25MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M25DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2316,6 +2405,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M26DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M26RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M26MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M26DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2331,6 +2421,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M27DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M27RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M27MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M27DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2346,6 +2437,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M28DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M28RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M28MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M28DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2361,6 +2453,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M29DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M29RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M29MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M29DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -2376,6 +2469,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M30DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M30RND, MM__C,  "%.2f", 100.0, knob_states);
 
+    MACMID(macros_3_body, 131, 4, Synth::ParamId::M30MID, "%.2f%%", 100.0, macro_midpoint_states);
     DPEI(macros_3_body,  153, 4, 21, 21, 0, 21, Synth::ParamId::M30DSH, macro_distortions);
 
     POSITION_RELATIVE_END();
@@ -3110,6 +3204,7 @@ GUI::~GUI()
     delete envelope_shapes_01;
     delete envelope_shapes_10;
     delete macro_distortions;
+    delete macro_midpoint_states;
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(macros_1_image);
