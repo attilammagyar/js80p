@@ -825,6 +825,8 @@ Changes the position of the oscillator in the stereo field. Positive values
 move the oscillator towards the right side, negative values move it towards the
 left side.
 
+<a id="usage-synth-common-wav"></a>
+
 ##### Waveform (WAV)
 
 Selects the waveform of the oscillator. The available options are:
@@ -1411,7 +1413,99 @@ parameter is at when the note stop event is received.
 
 ### Low-Frequency Oscillators (LFOs)
 
+A low-frequency oscillator (LFO) is a controller which makes a parameter's
+value oscillate back and forth between two values.
 
+#### Logarithmic Frequency (LG FREQ)
+
+Toggle the [frequency](#usage-lfos-freq) parameter of the LFO between a
+logarithmic and a linear scale.
+
+<a id="usage-lfos-center"></a>
+
+#### Center (CENTER)
+
+Make the LFO oscillate around the midpoint of the [minimum](#usage-lfos-min)
+and [maximum](#usage-lfos-max) values instead of between the two extremes.
+This makes a difference when the [amount](#usage-lfos-amt) parameter of the LFO
+is set to a value below 100%: by default, the LFO will oscillate above the
+minimum value, and it won't reach the maximum, but when the LFO is centered, it
+will not reach either extremes, it will stay within a radius of the midpoint
+which is half the value of the amount parameter. (This is similar to the
+unipolar/bipolar LFO modes in other synthesizers.)
+
+#### Amount Envelope (AMT ENV)
+
+Click on the black box next to the [centering](#usage-lfos-center) switch in
+the header row of an LFO, or use the mouse wheel while holding the cursor above
+it to associate an [envelope generator](#usage-envelopes) with the LFO. When an
+LFO with an amount envelope is assigned to a
+[synthesis parameter](#usage-synth) that can accept control from envelope
+generators as well, then each voice will run their own envelope and LFO
+timeline for that parameter when a new note is triggered.
+
+Furthermore, if a parameter of an LFO which has an amount envelope is
+controlled by another LFO which also has an amount envelope, then each new note
+will have its own timeline for both of those LFOs and envelopes. (Up to 6
+timelines can be maintained by each parameter for each note. When that limit
+runs out, or when there's a dependency cycle between LFOs, then some of the
+LFOs will be run globally, as if there was no envelope assigned to them.)
+
+Note that when the LFO is assigned to a parameter which doesn't accept control
+from envelope generators, then the amount envelope has no effect.
+
+<a id="usage-lfos-bpm"></a>
+
+#### Tempo Synchronization (BPM SYNC)
+
+The LFO's [frequency](#usage-lfos-freq) is normally measured in Hertz (Hz)
+which means "cycles per second". Click on the BPM SYNC switch to change that to
+"cycles per beat" instead. (This only works in hosts which provide tempo
+information to plugins.)
+
+#### Waveform (WAV)
+
+Same as the [waveform parameter](#usage-synth-common-wav) of the audio-range
+oscillators, except that LFOs don't have the "Custom" option.
+
+<a id="usage-lfos-freq"></a>
+
+#### Frequency (FREQ)
+
+Set how many oscillations to do per second (or per beat, when the
+[BPM SYNC](#usage-lfos-bpm) switch is turned on).
+
+#### Phase (PHS)
+
+Shift the (initial) phase of the oscillator.
+
+<a id="usage-lfos-min"></a>
+
+#### Minimum Value (MIN)
+
+Set the lowest value of the oscillation. When it is greater than the
+[maximum](#usage-lfos-max) value, then the waveform is flipped upside down.
+
+<a id="usage-lfos-max"></a>
+
+#### Maximum Value (MAX)
+
+Set the highest value of the oscillation. When it is less than the
+[minimum](#usage-lfos-min) value, then the waveform is flipped upside down.
+
+<a id="usage-lfos-amt"></a>
+
+#### Amount (AMT)
+
+Set the amplitude of the oscillation.
+
+#### Distortion (DIST)
+
+Distort the waveform with a soft-clipping distortion.
+
+#### Randomness (RAND)
+
+Randomize the waveform.
 
 <a id="presets" href="#toc">Table of Contents</a>
 
