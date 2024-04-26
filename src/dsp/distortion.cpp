@@ -213,13 +213,13 @@ void Tables::initialize_delay_feedback_tables() noexcept
     After rearranging and scaling, the following table can be constructed:
 
           ch      cf       D       A       B       C |
-        ---------------------------------------------+--------------------
-         -12      12      D1      A1      B1      C1 | 6 * gamma^2 * beta
-           0      12      12       3       4       6 | 20 - 8 * alpha
-           0       0       1       1       1       1 | alpha
-           0       0       0       3       2       1 | 1 - alpha
-           0       0       0      A5      B5       1 | beta
-           0       0       0      A6      B6      C6 | beta * gamma - alpha
+        ---------------------------------------------+----
+         -12      12      D1      A1      B1      C1 | V1
+           0      12      12       3       4       6 | V2
+           0       0       1       1       1       1 | V3
+           0       0       0       3       2       1 | V4
+           0       0       0      A5      B5       1 | V5
+           0       0       0      A6      B6      C6 | V6
 
     Where:
 
@@ -235,8 +235,16 @@ void Tables::initialize_delay_feedback_tables() noexcept
         B6 := gamma^2 - 1
         C6 := gamma   - 1
 
-    Multiplying the vector on the right with the inverse of the matrix on the
-    left produces a vector that contains the values for ch, cf, D, A, B, and C.
+        V1 := 6 * gamma^2 * beta
+        V2 := 20 - 8 * alpha
+        V3 := alpha
+        V4 := 1 - alpha
+        V5 := beta
+        V6 := beta * gamma - alpha
+
+    Multiplying the vector on the right (V1, ..., V6) with the inverse of the
+    matrix on the left produces a vector that contains the values for ch, cf,
+    D, A, B, and C.
 
     Note: alpha, beta, and gamma must be chosen so that the following equation
     does not have any other real solutions on the [0, 3] interval than 0:
