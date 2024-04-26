@@ -2637,22 +2637,18 @@ Sample const* const* ModulatableFloatParam<ModulatorSignalProducerClass>::initia
         modulation_level, round, sample_count
     );
 
-    if (modulation_level_buffer == NULL) {
-        is_no_op = modulation_level.get_value() <= MODULATION_LEVEL_INSIGNIFICANT;
+    is_no_op = (
+        modulation_level_buffer == NULL
+        && modulation_level.get_value() <= MODULATION_LEVEL_INSIGNIFICANT
+    );
 
-        if (is_no_op) {
-            return buffer;
-        } else {
-            modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-                modulator, round, sample_count
-            )[0];
-        }
-    } else {
-        is_no_op = false;
-        modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
-            modulator, round, sample_count
-        )[0];
+    if (is_no_op) {
+        return buffer;
     }
+
+    modulator_buffer = SignalProducer::produce<ModulatorSignalProducerClass>(
+        modulator, round, sample_count
+    )[0];
 
     return NULL;
 }
