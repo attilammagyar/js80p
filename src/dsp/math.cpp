@@ -380,8 +380,7 @@ Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 5.
-    Same idea as in shape_sharp_sharp() but even more steep near the
-    endpoints.
+    Same idea as in shape_sharp_sharp() but even steeper near the endpoints.
     */
 
     constexpr Number a = 1024.0;
