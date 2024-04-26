@@ -121,7 +121,7 @@
  * \code{.unparsed}
  * Running tests from tests/test_example.cpp
  *  running (tests/test_example.cpp:4 booleans)
- *    pass (tests/test_example.cpp:4 booleans)
+ *    passed (tests/test_example.cpp:4 booleans)
  *  running (tests/test_example.cpp:12 ints)
  *
  *  FAIL (tests/test_example.cpp:18 ints): failed to assert that a >= b
@@ -129,6 +129,7 @@
  *   b=2 (0x2) // 3 - 1
  *   message=Custom parametric message
  *
+ *    FAILED (tests/test_example.cpp:12 ints)
  *  running (tests/test_example.cpp:22 doubles)
  *
  *  FAIL (tests/test_example.cpp:29 doubles): failed to assert that a == b
@@ -138,6 +139,7 @@
  *   tolerance=0.100000000 (1.000000000000e-01)
  *   message=Custom parametric message
  *
+ *    FAILED (tests/test_example.cpp:22 doubles)
  *  running (tests/test_example.cpp:39 c_strings)
  *
  *  FAIL (tests/test_example.cpp:48 c_strings): failed to assert that a >= b
@@ -145,6 +147,7 @@
  *   b=<NULL> // some_func()
  *   message=Custom parametric message
  *
+ *    FAILED (tests/test_example.cpp:39 c_strings)
  *  running (tests/test_example.cpp:52 arrays)
  *
  *  FAIL (tests/test_example.cpp:75 arrays): failed to assert that a != b
@@ -178,6 +181,7 @@
  *             19:	19.000000000 (1.900000000000e+01)	19.000000000 (1.900000000000e+01)	0.000000000 (0.000000000000e+00)
  *            ...
  *
+ *    FAILED (tests/test_example.cpp:52 arrays)
  *  running (tests/test_example.cpp:79 double_arrays_close)
  *
  *  FAIL (tests/test_example.cpp:79 double_arrays_close): failed to assert that a is close to b
@@ -200,6 +204,7 @@
  *              8:	1.000000000 (1.000000000000e+00)	1.100000000 (1.100000000000e+00)	0.100000000 (1.000000000000e-01)
  *              9:	1.000000000 (1.000000000000e+00)	0.900000000 (9.000000000000e-01)	0.100000000 (1.000000000000e-01)
  *
+ *    FAILED (tests/test_example.cpp:79 double_arrays_close)
  *
  * Summary for tests/test_example.cpp: 1 passed, 5 failed, 32 assertions
  * \endcode
@@ -226,11 +231,10 @@ class _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__) : public _Test         \
         {                                                                   \
         }                                                                   \
                                                                             \
-        virtual void run(int const argc, char const* const* argv) override  \
+    protected:                                                              \
+        virtual void call_test_func() override                              \
         {                                                                   \
-            initialize(argc, argv);                                         \
             test_ ## name();                                                \
-            finalize();                                                     \
         }                                                                   \
 };                                                                          \
 _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
@@ -246,13 +250,9 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_true(condition, ...) do {                                    \
-    if (                                                                    \
-        !_TestAssert::true_(                                                \
-            __FILE__, __LINE__, #condition, condition, ## __VA_ARGS__       \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::true_(                                                     \
+        __FILE__, __LINE__, #condition, condition, ## __VA_ARGS__           \
+    );                                                                      \
 } while (false)
 
 
@@ -266,13 +266,9 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_false(condition, ...) do {                                   \
-    if (                                                                    \
-        !_TestAssert::false_(                                               \
-            __FILE__, __LINE__, #condition, condition, ## __VA_ARGS__       \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::false_(                                                    \
+        __FILE__, __LINE__, #condition, condition, ## __VA_ARGS__           \
+    );                                                                      \
 } while (false)
 
 
@@ -294,13 +290,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_eq(a, b, ...) do {                                           \
-    if (                                                                    \
-        !_TestAssert::eq(                                                   \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::eq(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);      \
 } while (false)
 
 
@@ -322,13 +312,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_neq(a, b, ...) do {                                          \
-    if (                                                                    \
-        !_TestAssert::neq(                                                  \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::neq(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);     \
 } while (false)
 
 
@@ -346,13 +330,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_lt(a, b, ...) do {                                           \
-    if (                                                                    \
-        !_TestAssert::lt(                                                   \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::lt(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);      \
 } while (false)
 
 
@@ -370,13 +348,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_lte(a, b, ...) do {                                          \
-    if (                                                                    \
-        !_TestAssert::lte(                                                  \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::lte(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);     \
 } while (false)
 
 
@@ -394,13 +366,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_gt(a, b, ...) do {                                           \
-    if (                                                                    \
-        !_TestAssert::gt(                                                   \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::gt(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);      \
 } while (false)
 
 
@@ -418,13 +384,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  * \param ...           [optional] Format string parameters.
  */
 #define assert_gte(a, b, ...) do {                                          \
-    if (                                                                    \
-        !_TestAssert::gte(                                                  \
-            __FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__                \
-        )                                                                   \
-    ) {                                                                     \
-        return;                                                             \
-    }                                                                       \
+    _TestAssert::gte(__FILE__, __LINE__, #a, #b, a, b, ## __VA_ARGS__);     \
 } while (false)
 
 
@@ -444,14 +404,10 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
  *                      format string.
  * \param ...           [optional] Format string parameters.
  */
-#define assert_close(a, b, length, tolerance, ...) do {                         \
-    if (                                                                        \
-        !_TestAssert::close(                                                    \
-            __FILE__, __LINE__, #a, #b, a, b, length, tolerance, ## __VA_ARGS__ \
-        )                                                                       \
-    ) {                                                                         \
-        return;                                                                 \
-    }                                                                           \
+#define assert_close(a, b, length, tolerance, ...) do {                     \
+    _TestAssert::close(                                                     \
+        __FILE__, __LINE__, #a, #b, a, b, length, tolerance, ## __VA_ARGS__ \
+    );                                                                      \
 } while (false)
 
 
@@ -471,6 +427,7 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <exception>
 #include <string>
 #include <vector>
 
@@ -482,13 +439,13 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
 
 #define _TEST_STR_OR(str, null_value) (str ? str : null_value)
 #define _TEST_NULL_PTR_STR "<NULL>"
+#define _TEST_FILE() __FILE__
 
 
 int _test_result = 0;
 int _test_started = 0;
 int _test_assertions = 0;
 int _test_failed = 0;
-bool _test_current_test_passed = true;
 char const* _test_name = NULL;
 char const* _test_file = NULL;
 int _test_line = -1;
@@ -497,8 +454,21 @@ std::vector<std::string> TEST_ARGV;
 
 
 class _Test;
+
+
 typedef std::vector<_Test*> _Tests;
+
 _Tests _tests;
+
+
+class _TestFailed : public std::exception
+{
+    public:
+        char const* what() const noexcept override
+        {
+            return "Test Failed";
+        }
+};
 
 
 class _Test
@@ -515,12 +485,43 @@ class _Test
             _tests.push_back(this);
         }
 
+        void run(int const argc, char const* const* argv)
+        {
+            initialize(argc, argv);
+
+            try {
+                call_test_func();
+            } catch (_TestFailed const& tf) {
+                fprintf(
+                    stderr,
+                    "   FAILED (%s:%d %s)\n",
+                    _TEST_STR_OR(file, "UNKNOWN"),
+                    line,
+                    _TEST_STR_OR(name, "UNKNOWN")
+                );
+                finalize<false>();
+
+                return;
+            }
+
+            finalize<true>();
+        }
+
+        char const* const name;
+        char const* const file;
+        int const line;
+
+    protected:
+        virtual void call_test_func()
+        {
+        }
+
+    private:
         void initialize(int const argc, char const* const* argv)
         {
             _test_name = name;
             _test_file = file;
             _test_line = line;
-            _test_current_test_passed = true;
             ++_test_started;
 
             TEST_ARGV.clear();
@@ -533,32 +534,29 @@ class _Test
                 fprintf(
                     stderr,
                     "\nRunning tests from %s\n",
-                    _TEST_STR_OR(_test_file, "UNKNOWN")
+                    _TEST_STR_OR(file, "UNKNOWN")
                 );
             }
 
             fprintf(
                 stderr,
                 " running (%s:%d %s)\n",
-                _TEST_STR_OR(_test_file, "UNKNOWN"),
-                _test_line,
-                _TEST_STR_OR(_test_name, "UNKNOWN")
+                _TEST_STR_OR(file, "UNKNOWN"),
+                line,
+                _TEST_STR_OR(name, "UNKNOWN")
             );
         }
 
-        virtual void run(int const argc, char const* const* argv)
-        {
-        }
-
+        template<bool passed>
         void finalize()
         {
-            if (_test_current_test_passed) {
+            if constexpr (passed) {
                 fprintf(
                     stderr,
-                    "   pass (%s:%d %s)\n",
-                    _TEST_STR_OR(_test_file, "UNKNOWN"),
-                    _test_line,
-                    _TEST_STR_OR(_test_name, "UNKNOWN")
+                    "   passed (%s:%d %s)\n",
+                    _TEST_STR_OR(file, "UNKNOWN"),
+                    line,
+                    _TEST_STR_OR(name, "UNKNOWN")
                 );
             } else {
                 ++_test_failed;
@@ -567,21 +565,13 @@ class _Test
             _test_name = NULL;
             _test_line = -1;
         }
-
-        char const* const name;
-        char const* const file;
-        int const line;
 };
 
 
 int main(int argc, char const* argv[])
 {
     if (_tests.size() < 1) {
-        fprintf(
-            stderr,
-            "\nFAIL: No tests found in %s\n\n",
-            _TEST_STR_OR(_test_file, argv[0])
-        );
+        fprintf(stderr, "\nFAIL: No tests found in %s\n\n", _TEST_FILE());
 
         return 2;
     }
@@ -657,7 +647,6 @@ int main(int argc, char const* argv[])
     }                                                                       \
     fprintf(stderr, "\n");                                                  \
     _test_result = 1;                                                       \
-    _test_current_test_passed = false;                                      \
     ++_test_assertions;                                                     \
 } while (false)
 
@@ -693,6 +682,9 @@ int main(int argc, char const* argv[])
 } while (false)
 
 
+#define _TEST_ABORT() throw _TestFailed()
+
+
 #define _TEST_ARGS char const* const file, int const line
 #define _TEST_VARGS char const* const message = NULL, ...
 
@@ -700,7 +692,7 @@ int main(int argc, char const* argv[])
 class _TestAssert
 {
     public:
-        static bool true_(
+        static void true_(
                 _TEST_ARGS,
                 char const* condition_str,
                 bool const condition,
@@ -708,8 +700,6 @@ class _TestAssert
         ) {
             if (condition) {
                 _TEST_PASS();
-
-                return true;
             } else {
                 _TEST_FAIL(
                     file,
@@ -717,12 +707,11 @@ class _TestAssert
                     "condition is true\n  condition=false // %s",
                     condition_str
                 );
-
-                return false;
+                _TEST_ABORT();
             }
         }
 
-        static bool false_(
+        static void false_(
                 _TEST_ARGS,
                 char const* condition_str,
                 bool const condition,
@@ -730,8 +719,6 @@ class _TestAssert
         ) {
             if (!condition) {
                 _TEST_PASS();
-
-                return true;
             } else {
                 _TEST_FAIL(
                     file,
@@ -739,8 +726,7 @@ class _TestAssert
                     "condition is false\n  condition=true // %s",
                     condition_str
                 );
-
-                return false;
+                _TEST_ABORT();
             }
         }
 
@@ -752,7 +738,7 @@ class _TestAssert
 
 
 #define _ASSERT_A_OP_B_METHOD(_name, _op, _type, _type_f, _conv)            \
-static bool _name(                                                          \
+static void _name(                                                          \
         _TEST_ARGS,                                                         \
         char const* a_src,                                                  \
         char const* b_src,                                                  \
@@ -762,7 +748,6 @@ static bool _name(                                                          \
 ) {                                                                         \
     if (a _op b) {                                                          \
         _TEST_PASS();                                                       \
-        return true;                                                        \
     } else {                                                                \
         _TEST_FAIL(                                                         \
             file,                                                           \
@@ -771,7 +756,7 @@ static bool _name(                                                          \
             _conv(a, _type), a_src,                                         \
             _conv(b, _type), b_src                                          \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
 }
 
@@ -815,7 +800,7 @@ static bool _name(                                                          \
 
 
 #define _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(_name, _cmp, _op, _type, _zero)  \
-static bool _name(                                                            \
+static void _name(                                                            \
         _TEST_ARGS,                                                           \
         char const* a_src,                                                    \
         char const* b_src,                                                    \
@@ -827,7 +812,6 @@ static bool _name(                                                            \
     _type const diff = a - b;                                                 \
     if (std::fabs(diff) _cmp tolerance) {                                     \
         _TEST_PASS();                                                         \
-        return true;                                                          \
     } else {                                                                  \
         _TEST_FAIL(                                                           \
             file,                                                             \
@@ -841,7 +825,7 @@ static bool _name(                                                            \
             diff, diff,                                                       \
             tolerance, tolerance                                              \
         );                                                                    \
-        return false;                                                         \
+        _TEST_ABORT();                                                        \
     }                                                                         \
 }
 
@@ -853,7 +837,7 @@ static bool _name(                                                            \
 
 
 #define _ASSERT_ARRAY_OP_METHOD(_name, _op, _type, _type_f, _abs_fn)        \
-static bool _name(                                                          \
+static void _name(                                                          \
         _TEST_ARGS,                                                         \
         char const* a_src,                                                  \
         char const* b_src,                                                  \
@@ -864,7 +848,7 @@ static bool _name(                                                          \
 ) {                                                                         \
     if (a == NULL && b == NULL) {                                           \
         _TEST_PASS();                                                       \
-        return true;                                                        \
+        return;                                                             \
     }                                                                       \
     if (a == NULL || b == NULL) {                                           \
         _TEST_FAIL(                                                         \
@@ -876,7 +860,7 @@ static bool _name(                                                          \
             b_src,                                                          \
             (void*)b                                                        \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
     int first_mismatch = -1;                                                \
     for (int i = 0; i != length; ++i) {                                     \
@@ -887,7 +871,6 @@ static bool _name(                                                          \
     }                                                                       \
     if (first_mismatch == -1) {                                             \
         _TEST_PASS();                                                       \
-        return true;                                                        \
     } else {                                                                \
         _TEST_FAIL(                                                         \
             file,                                                           \
@@ -900,7 +883,7 @@ static bool _name(                                                          \
         _TEST_PRINT_ARRAYS(                                                 \
             a, b, length, first_mismatch, _type_f, _abs_fn                  \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
 }
 
@@ -936,7 +919,7 @@ static bool _name(                                                          \
 
 
 #define _ASSERT_FLOAT_ARRAY_OP_METHOD(_name, _op, _type)                    \
-static bool _name(                                                          \
+static void _name(                                                          \
         _TEST_ARGS,                                                         \
         char const* a_src,                                                  \
         char const* b_src,                                                  \
@@ -948,7 +931,7 @@ static bool _name(                                                          \
 ) {                                                                         \
     if (a == NULL && b == NULL) {                                           \
         _TEST_PASS();                                                       \
-        return true;                                                        \
+        return;                                                             \
     }                                                                       \
     if (a == NULL || b == NULL) {                                           \
         _TEST_FAIL(                                                         \
@@ -960,7 +943,7 @@ static bool _name(                                                          \
             b_src,                                                          \
             (void*)b                                                        \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
     int first_mismatch = -1;                                                \
     for (int i = 0; i != length; ++i) {                                     \
@@ -971,7 +954,6 @@ static bool _name(                                                          \
     }                                                                       \
     if (first_mismatch _op -1) {                                            \
         _TEST_PASS();                                                       \
-        return true;                                                        \
     } else {                                                                \
         _TEST_FAIL(                                                         \
             file,                                                           \
@@ -987,7 +969,7 @@ static bool _name(                                                          \
         _TEST_PRINT_ARRAYS(                                                 \
             a, b, length, first_mismatch, _TEST_DBL_F, std::fabs            \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
 }
 
@@ -999,7 +981,7 @@ static bool _name(                                                          \
 
 
 #define _ASSERT_FLOAT_ARRAY_CLOSE_METHOD(_type, _zero)                      \
-static bool close(                                                          \
+static void close(                                                          \
         _TEST_ARGS,                                                         \
         char const* a_src,                                                  \
         char const* b_src,                                                  \
@@ -1011,7 +993,7 @@ static bool close(                                                          \
 ) {                                                                         \
     if (length < 1) {                                                       \
         _TEST_PASS();                                                       \
-        return true;                                                        \
+        return;                                                             \
     }                                                                       \
     _type diff_sum = _zero;                                                 \
     _type max_mismatch = _zero;                                             \
@@ -1028,7 +1010,6 @@ static bool close(                                                          \
     avg_diff = diff_sum / (_type)length;                                    \
     if (avg_diff <= tolerance) {                                            \
         _TEST_PASS();                                                       \
-        return true;                                                        \
     } else {                                                                \
         _TEST_FAIL(                                                         \
             file,                                                           \
@@ -1048,7 +1029,7 @@ static bool close(                                                          \
         _TEST_PRINT_ARRAYS(                                                 \
             a, b, length, max_mismatch_index, _TEST_DBL_F, std::fabs        \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
 }
 
@@ -1057,7 +1038,7 @@ static bool close(                                                          \
 
 
 #define _ASSERT_CSTR_A_OP_B_METHOD(_name, _op)                              \
-static bool _name(                                                          \
+static void _name(                                                          \
         _TEST_ARGS,                                                         \
         char const* a_src,                                                  \
         char const* b_src,                                                  \
@@ -1070,7 +1051,6 @@ static bool _name(                                                          \
         || (a != NULL && b != NULL && strcmp(a, b) _op 0)                   \
     ) {                                                                     \
         _TEST_PASS();                                                       \
-        return true;                                                        \
     } else {                                                                \
         _TEST_FAIL(                                                         \
             file,                                                           \
@@ -1081,7 +1061,7 @@ static bool _name(                                                          \
             _TEST_STR_OR(b, _TEST_NULL_PTR_STR),                            \
             b_src                                                           \
         );                                                                  \
-        return false;                                                       \
+        _TEST_ABORT();                                                      \
     }                                                                       \
 }
 
