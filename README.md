@@ -583,7 +583,7 @@ position.
 
 Turn it up to have the first oscillator modulate the amplitude of the second
 oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
-position. (This is also known as "ring modulation".)
+position.
 
 <a id="usage-synth-common" href="#toc">Table of Contents</a>
 
