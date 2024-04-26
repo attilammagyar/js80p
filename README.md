@@ -2221,4 +2221,10 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
 
  * [The World's Smallest Hash Table by Orson Peters](https://orlp.net/blog/worlds-smallest-hash-table/)
 
+ * [Horner's method for polynomial evaluation](https://en.wikipedia.org/wiki/Horner%27s_method)
+
+ * [Splines](https://en.wikipedia.org/wiki/Spline_(mathematics))
+
+ * [Matrix inversion](https://en.wikipedia.org/wiki/Invertible_matrix)
+
 <a href="#toc">Table of Contents</a>
