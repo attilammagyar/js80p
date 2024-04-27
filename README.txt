@@ -1,7 +1,14 @@
 JS80P
 =====
 
-A MIDI driven, performance oriented, versatile synthesizer VST plugin.
+JS80P is a MIDI driven, performance oriented, versatile, free and open source
+synthesizer VST plugin for Linux and Windows.
+
+JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
+effects, envelopes, LFOs, and powerful macros to shape your sound with
+subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
+monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
+imperfection emulation.
 
 To download JS80P, visit its website at https://attilammagyar.github.io/js80p/
 
@@ -22,6 +29,17 @@ System Requirements
 Note: a RISC-V 64 port is available as a separate project by @aimixsaka at
 https://github.com/aimixsaka/js80p/
 
+Dependencies on Windows
+-----------------------
+
+Typical Windows systems usually have the MSVC library already installed, but in
+case you need it, you can download it from Microsoft's website at
+https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist .
+
+(Most people need the "X64" version of this library. To use the 32 bit version
+of the plugin, you will need the "X86" version of the library. See the
+Before Installing: Choosing a Distribution section below for more information.)
+
 Dependencies on Linux
 ---------------------
 
@@ -37,8 +55,8 @@ then you will have to install the 32 bit version of the libraries, for example:
 
     sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
 
-Before Installing
------------------
+Before Installing: Choosing a Distribution
+------------------------------------------
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
@@ -53,9 +71,9 @@ If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
 
-(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
 recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package.)
+have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
 
 Installing the VST 3 Bundle on Windows
 --------------------------------------
@@ -119,18 +137,31 @@ Note: VST 2.4 plugins are usually put in the "~/.vst" directory.
 Usage
 -----
 
- * Move the cursor over a knob, and use the mouse wheel for adjusting its
-   value, or start dragging it.
+Most of the parameters that control various aspects of the sound that are
+produced by JS80P can be adjusted via virtual knobs on the screen:
 
- * Hold down the Control key while adjusting a knob for fine grained
-   adjustments.
+ * Move the mouse cursor over a knob or a small screw icon, and use the mouse
+   wheel or move the mouse while holding down the left mouse button for
+   adjusting the value.
+
+ * Hold down the Control key on the keyboard while adjusting a knob for fine
+   grained adjustments.
 
  * Double click on a knob to reset it to its default value.
 
- * Click on the area below a knob to assign a controller to it.
+ * Click on the area below a knob to assign a controller to it, or to remove a
+   previously assigned one. When a knob has a controller assigned to it, its
+   value can no longer be changed manually, it's set and continuously adjusted
+   by the selected controller. (Note: if you accidentally open the controller
+   selector screen, and you want to close it without changing anything, then
+   just click on the "none" option or the controller that is already selected.)
 
- * A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
-   gives good performance and low latency.
+   Controllers are various events and automations that can be used for setting
+   the momentary value (on a relative scale between 0% and 100%) of a JS80P
+   parameter knob.
+
+Open the "README.html" file from the ZIP archive in a browser for a detailed
+explanation of each parameter and controller.
 
 Tuning
 ------
@@ -216,4 +247,5 @@ https://github.com/attilammagyar/js80p/issues
 Documentation
 -------------
 
-See "README.html" for more information.
+Open the "README.html" file from the ZIP archive in a browser for more
+information.

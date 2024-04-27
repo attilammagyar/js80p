@@ -32,7 +32,7 @@ Table of Contents
  * [Table of Contents](#toc)
  * [Features](#features)
  * [Installation](#install)
-    * [Choosing a Distribution](#install-dist)
+    * [Before Installing: Choosing a Distribution](#install-dist)
     * [System Requirements](#system-reqs)
        * [Dependencies on Windows](#windows-deps)
        * [Dependencies on Linux](#linux-deps)
@@ -198,7 +198,7 @@ Installation
 
 <a id="install-dist"></a>
 
-### Choosing a Distribution
+### Before Installing: Choosing a Distribution
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
@@ -214,9 +214,9 @@ If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
 
-(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
 recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package.)
+have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
 
 <a id="system-reqs" href="#toc">Table of Contents</a>
 
@@ -248,7 +248,8 @@ case you need it, you can download it from
 
 (Most people need the `X64` version of this library. To use the 32 bit version
 of the plugin, you will need the `X86` version of the library. See the
-[Choosing a Distribution](#install-dist) section for more information.)
+[Before Installing: Choosing a Distribution](#install-dist) section for more
+information.)
 
 <a id="linux-deps"></a>
 
@@ -425,7 +426,7 @@ produced by JS80P can be adjusted via virtual knobs on the screen:
    assigned to it, its value can no longer be changed manually, it's set and
    continuously adjusted by the selected controller. (Note: if you accidentally
    open the controller selector screen, and you want to close it without
-   changing anything, then just click on the controller or the "none" option
+   changing anything, then just click on the "none" option or the controller
    that is already selected.)
 
 <a id="usage-controllers" href="#toc">Table of Contents</a>
@@ -1859,9 +1860,9 @@ If your plugin host application fails to recognize JS80P from the VST 3 bundle,
 then you have to download and install the VST 3 Single File version that
 matches the CPU architecture for which your plugin host application was built.
 
-(For example, some 32 bit (i686) versions of Reaper are known to be unable to
+(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
 recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package.)
+have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
 
 The 32 bit versions are usually only needed by those who deliberately use a 32
 bit plugin host application, e.g. because they want to keep using some really
