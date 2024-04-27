@@ -2210,7 +2210,7 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
 
  * [Horner's method for polynomial evaluation](https://en.wikipedia.org/wiki/Horner%27s_method)
 
- * [Splines](https://en.wikipedia.org/wiki/Spline_(mathematics))
+ * [Splines](https://en.wikipedia.org/wiki/Spline_%28mathematics%29)
 
  * [Matrix inversion](https://en.wikipedia.org/wiki/Invertible_matrix)
 
