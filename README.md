@@ -105,7 +105,6 @@ Table of Contents
     * [Bouncy](#preset-bouncy)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
-    * [Which distribution should I download?](#faq-which)
     * [Mac version?](#faq-mac)
     * [Parameters, Envelopes, LFOs, and polyphony: how do they work?](#faq-params-polyphony)
     * [The knobs in the waveform harmonics section don't do anything, is this a bug?](#faq-custom-wave)
@@ -217,6 +216,17 @@ matches the CPU architecture for which your plugin host application was built.
 (For example, some 32 bit (i686) VST 3 hosts are known to be unable to
 recognize VST 3 bundles when running on a 64 bit Linux system, so you would
 have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
+
+The 32 bit versions are usually only needed by those who deliberately use a 32
+bit plugin host application, e.g. because they want to keep using some really
+old plugins which are not available for 64 bit systems.
+
+If you are in doubt, then try the VST 3 bundle, and if your plugin host
+application doesn't recognize it, then try the 64 bit VST 3 version, then the
+64 bit FST version, then the 32 bit VST 3 version, and so on.
+
+Note that all versions use the same high-precision sound synthesis engine
+internally, so the CPU architecture does not affect the sound quality.
 
 <a id="system-reqs" href="#toc">Table of Contents</a>
 
@@ -1329,6 +1339,8 @@ defines how the envelope will go from the sustain level to the final level.
 Click on it to select a different shape, or use the mouse wheel while holding
 the cursor over it.
 
+<a id="usage-envelopes-update"></a>
+
 #### Update Mode
 
 When a note is triggered and a voice starts to track its own envelope timeline
@@ -1367,6 +1379,8 @@ analog hardware.
 The second little screw in the top right corner of envelope settings adds
 randomization to envelope levels. Useful for simulating imperfectness of analog
 hardware.
+
+<a id="usage-envelopes-amt"></a>
 
 #### Amount (AMT)
 
@@ -1434,6 +1448,8 @@ minimum value, and it won't reach the maximum, but when the LFO is centered, it
 will not reach either extremes, it will stay within a radius of the midpoint
 which is half the value of the amount parameter. (This is similar to the
 unipolar/bipolar LFO modes in other synthesizers.)
+
+<a id="usage-lfos-amtenv"></a>
 
 #### Amount Envelope (AMT ENV)
 
@@ -1842,40 +1858,7 @@ If you find bugs, please report them at
 Frequently Asked Questions
 --------------------------
 
-<a id="faq-which"></a>
-
-### Which distribution should I download?
-
-If your plugin host application does not support VST 3, but does support
-VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with the VST 3 bundle on both Windows and Linux.
-
-If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
-and you use a 64 bit plugin host application, then you should download a JS80P
-package that is optimized for AVX compatible processors. If you have an older
-computer, or if you experience crashes, then you should go with one of the
-[SSE2](https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
-
-If your plugin host application fails to recognize JS80P from the VST 3 bundle,
-then you have to download and install the VST 3 Single File version that
-matches the CPU architecture for which your plugin host application was built.
-
-(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
-recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
-
-The 32 bit versions are usually only needed by those who deliberately use a 32
-bit plugin host application, e.g. because they want to keep using some really
-old plugins which are not available for 64 bit systems.
-
-If you are in doubt, then try the VST 3 bundle, and if your plugin host
-application doesn't recognize it, then try the 64 bit VST 3 version, then the
-64 bit FST version, then the 32 bit VST 3 version, and so on.
-
-Note that all versions use the same high-precision sound synthesis engine
-internally, so the CPU architecture does not affect the sound quality.
-
-<a id="faq-mac" href="#toc">Table of Contents</a>
+<a id="faq-mac"></a>
 
 ### Mac version?
 
@@ -1892,49 +1875,51 @@ current computer, I'm not going to invest in a new one.
 ### Parameters, Envelopes, LFOs, and polyphony: how do they work?
 
 By default, knobs and toggles act globally. This means that if you adjust a
-knob with your mouse, or if you assign a MIDI value (controller, note velocity,
-etc.), a Macro, or an LFO to it and adjust the parameter via that, or if you
-use <a href="#faq-automation">automation in your plugin host application</a>,
-then that parameter will change for all sounding notes.
+knob with your mouse, or if you assign a MIDI event (controller change, note
+velocity, etc.), a [macro](#usage-macros), or an [LFO](#usage-lfos) to it and
+adjust the parameter via that, or if you use
+[automation in your plugin host application](#faq-automation), then that
+parameter will change for all sounding notes.
 
-But if you assign an Envelope as a controller to a parameter, then each
-polyphonic note will use its own timeline for that parameter, and the
-parameter's value will change over time for each note independently according
-to the envelope's settings. By default, these settings are only evaluated once
-for each note, at the very beginning of the note, so if the parameters of the
-envelope are changed, then it will only affect the notes that start after the
-adjustment.
+But if you assign an [envelope generator](#usage-envelopes) as a
+[controller](#usage-controllers) to a parameter, then each voice will use its
+own timeline for that parameter, and the parameter's value will change over
+time for each simultaneously sounding note independently from each other,
+according to the envelope's settings. By default, envelope generator settings
+are only evaluated once for each note, at the very beginning of the note, so if
+the parameters of the envelope generator are changed, then it will only affect
+the notes that start after the adjustment. This behaviour can be changed by
+setting a different [update mode](#usage-envelopes-update) for the envelope
+generator.
 
-Similarly, if you assign an LFO to a parameter which supports Envelopes, and
-the LFO is associated with an Envelope, then the LFO becomes polyphonic, and
-its amount will be controlled by the Envelope for each polyphonic voice
-independently from the other voices. (Note that this is transitive up to a
-limit: if a parameter of a polyphonic LFO is controlled by another LFO, then
-the second LFO will also become polyphonic if it has an Envelope assigned to
-it. An LFO chain like this can contain up to 6 LFOs and Envelopes, and if a
-chain contains more than that, or has dependency cycles where LFOs control
+Similarly, if you assign an [LFO](#usage-lfos) to a parameter which can accept
+control from [envelope generators](#usage-envelopes), and the LFO is associated
+with an [amount envelope](#usage-lfos-amtenv), then the LFO becomes polyphonic,
+and its amount will be controlled by the envelope generator for each polyphonic
+voice independently from the other voices. Note that this is transitive up to
+a limit: if a parameter of a polyphonic LFO is controlled by another LFO, then
+the second LFO will also become polyphonic if it has an amount envelope
+assigned to it. An LFO chain like this can contain up to 6 LFOs and envelopes.
+If a chain contains more than that, or has dependency cycles where LFOs control
 each other's parameters, then some of the LFOs in the chain will be treated as
-if there weren't any Envelopes assigned to them.)
+if there weren't any envelopes assigned to them.
 
-To have polyphonic notes *sample and hold* a MIDI value or a Macro's momentary
-value for a parameter for the entire duration of the note, independently of
-other notes and subsequent changes of the value (e.g. to use lower filter
-cutoff frequency for low-velocity notes so that they sound softer), then you
-have to use an Envelope: turn up all the levels of the Envelope to 100%, assign
-the MIDI value or the Macro to the Amount parameter of the Envelope, and assign
-the Envelope to control the parameter.
-
-If an Envelope is switched to Dynamic update mode, then polyphonic notes will
-still track their own independent timelines for each parameter that has that
-Envelope assigned, but the parameter's value will converge to the value that it
-should have at each moment according to the momentary settings of the Envelope.
+To have polyphonic voice parameters *sample and hold* a
+[MIDI value](#usage-controllers) or a [macro](#usage-macros)'s momentary value
+for the entire duration of a note, independently of other voices and subsequent
+changes of the value (e.g. to use lower
+[filter cutoff frequency](#usage-synth-common-freq) for
+low-velocity notes so that they sound softer), then you have to use an
+envelope generator: turn up all the levels of the envelope to 100%, assign the
+MIDI value or the macro to the [amount](#usage-envelopes-amt) parameter of the
+envelope, and assign the envelope to control the parameter.
 
 <a id="faq-custom-wave" href="#toc">Table of Contents</a>
 
 ### The knobs in the waveform harmonics section don't do anything, is this a bug?
 
-To hear the effect of those knobs, you have to select the _Custom_ waveworm
-using the `WAV` knob in the Waveform section of the oscillators.
+To hear the effect of those knobs, you have to select the _Custom_
+[waveworm](#usage-synth-common-wav) for the oscillator.
 
 (Note that these parameters are CPU-intensive to process, so they are not
 sample accurate, they are not smoothed, and they are processed only once for
@@ -1947,8 +1932,9 @@ or assign a controller to them, then you might hear "steps" or even clicks.)
 
 The intended way of automating JS80P's parameters is to assign a
 [MIDI Control Change][midicc] (MIDI CC) message to a parameter (or use _MIDI
-Learn_), and turn the corresponding knob on your MIDI keyboard while playing,
-or edit the MIDI CC events in your host application's MIDI editor.
+Learn_) as a [controller](#usage-controllers), and turn the corresponding knob
+on your MIDI keyboard while playing, or edit the MIDI CC events in your host
+application's MIDI editor.
 
 However, the VST 3 plugin format requires plugins to export a proxy parameter
 for each MIDI CC message that they want to receive, and as a side-effect, these
@@ -1971,8 +1957,8 @@ turning the modulation wheel on a MIDI keyboard.
 
 The reason for JS80P having both kinds of modulation is that they are not
 always equivalent. They are only identical when the modulator signal is a
-sinusoid, but with each added harmonic, PM and FM start to differ more and
-more. A detailed mathematical explanation of this is shown in
+simple sinusoid. With each added harmonic to the modulator, PM and FM start to
+differ more and more. A detailed mathematical explanation of this is shown in
 [doc/pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf).
 
 <a id="faq-name" href="#toc">Table of Contents</a>
