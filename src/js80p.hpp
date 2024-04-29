@@ -78,8 +78,8 @@ namespace Constants {
     constexpr Byte PARAM_LFO_ENVELOPE_STATES = 6;
 
     constexpr Byte ENVELOPES = 12;
-    constexpr Byte ENVELOPE_INDEX_MASK = 0x0f;
     constexpr Byte ENVELOPE_INDEX_BITS = 4;
+    constexpr Byte ENVELOPE_INDEX_MASK = (1 << ENVELOPE_INDEX_BITS) - 1;
     constexpr Byte INVALID_ENVELOPE_INDEX = ENVELOPES;
 
     constexpr Byte LFOS = 8;
