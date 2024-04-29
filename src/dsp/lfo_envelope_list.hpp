@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__LFO_ENVELOPE_LIST_HPP
 #define JS80P__DSP__LFO_ENVELOPE_LIST_HPP
 
+#include <cstdint>
+
 #include "js80p.hpp"
 
 
@@ -32,11 +34,11 @@ class LFOEnvelopeList
         {
             public:
                 static constexpr Byte to_byte(
-                    Integer const list,
+                    uint64_t const list,
                     Byte const index
                 ) noexcept;
 
-                EnvelopeIndex(Integer& list, Byte const index);
+                EnvelopeIndex(uint64_t& list, Byte const index);
                 EnvelopeIndex(EnvelopeIndex const& envelope_index) = delete;
                 EnvelopeIndex(EnvelopeIndex&& envelope_index) = delete;
 
@@ -50,13 +52,13 @@ class LFOEnvelopeList
                 static constexpr Byte index_to_offset(Byte const index) noexcept;
 
                 static constexpr Byte byte_at_offset(
-                    Integer const list,
+                    uint64_t const list,
                     Byte const offset
                 ) noexcept;
 
                 Byte const offset;
 
-                Integer& list;
+                uint64_t& list;
         };
 
     public:
@@ -84,7 +86,7 @@ class LFOEnvelopeList
         EnvelopeIndex operator[](Byte const index) noexcept;
 
     private:
-        Integer list;
+        uint64_t list;
 };
 
 }

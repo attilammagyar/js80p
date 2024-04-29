@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__LFO_ENVELOPE_LIST_CPP
 #define JS80P__DSP__LFO_ENVELOPE_LIST_CPP
 
+#include <cstddef>
+
 #include "dsp/lfo_envelope_list.hpp"
 
 
@@ -26,7 +28,7 @@ namespace JS80P
 {
 
 constexpr Byte LFOEnvelopeList::EnvelopeIndex::to_byte(
-        Integer const list,
+        uint64_t const list,
         Byte const index
 ) noexcept {
     return byte_at_offset(list, index_to_offset(index));
@@ -34,7 +36,7 @@ constexpr Byte LFOEnvelopeList::EnvelopeIndex::to_byte(
 
 
 constexpr Byte LFOEnvelopeList::EnvelopeIndex::byte_at_offset(
-        Integer const list,
+        uint64_t const list,
         Byte const offset
 ) noexcept {
     return (Byte)((list >> offset) & Constants::ENVELOPE_INDEX_MASK);
@@ -50,7 +52,7 @@ constexpr Byte LFOEnvelopeList::EnvelopeIndex::index_to_offset(
 }
 
 
-LFOEnvelopeList::EnvelopeIndex::EnvelopeIndex(Integer& list, Byte const index)
+LFOEnvelopeList::EnvelopeIndex::EnvelopeIndex(uint64_t& list, Byte const index)
     : offset(index_to_offset(index)),
     list(list)
 {
@@ -68,7 +70,7 @@ LFOEnvelopeList::EnvelopeIndex& LFOEnvelopeList::EnvelopeIndex::operator=(
 ) {
     list &= ~(Constants::ENVELOPE_INDEX_MASK << offset);
     list |= (
-        (Integer)(envelope_index & Constants::ENVELOPE_INDEX_MASK) << offset
+        (uint64_t)(envelope_index & Constants::ENVELOPE_INDEX_MASK) << offset
     );
 
     return *this;
@@ -77,6 +79,13 @@ LFOEnvelopeList::EnvelopeIndex& LFOEnvelopeList::EnvelopeIndex::operator=(
 
 LFOEnvelopeList::LFOEnvelopeList() : list(0)
 {
+    JS80P_ASSERT(
+        (Integer)Constants::INVALID_ENVELOPE_INDEX <= (Integer)((1 << Constants::ENVELOPE_INDEX_BITS) - 1)
+    );
+    JS80P_ASSERT(
+        (size_t)(Constants::ENVELOPE_INDEX_BITS * Constants::ENVELOPES) <= sizeof(list) * 8
+    );
+
     clear();
 }
 
