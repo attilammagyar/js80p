@@ -62,7 +62,7 @@ Table of Contents
        * [Echo](#usage-effects-echo)
        * [Reverb](#usage-effects-reverb)
     * [Macros (MC)](#usage-macros)
-    * [Envelopes Generators (ENV)](#usage-envelopes)
+    * [Envelope Generators (ENV)](#usage-envelopes)
     * [Low-Frequency Oscillators (LFOs)](#usage-lfos)
  * [Presets](#presets)
     * [Blank](#preset-blank)
