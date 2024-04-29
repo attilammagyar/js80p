@@ -66,7 +66,8 @@ class Param : public SignalProducer
             NumberType const max_value,
             NumberType const default_value,
             Integer const number_of_events = 0,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const number_of_children = 0
         ) noexcept;
 
         ParamEvaluation get_evaluation() const noexcept;
@@ -333,7 +334,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const* log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
             Number const log_scale_table_index_scale = 0.0,
-            Number const log_scale_value_offset = 0.0
+            Number const log_scale_value_offset = 0.0,
+            Number const number_of_children = 0
         ) noexcept;
 
         /**

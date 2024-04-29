@@ -505,6 +505,8 @@ Integer SignalProducer::sample_count_or_block_size(
 
 void SignalProducer::register_child(SignalProducer& signal_producer) noexcept
 {
+    JS80P_ASSERT(children.size() < children.capacity());
+
     children.push_back(&signal_producer);
 }
 

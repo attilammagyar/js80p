@@ -41,11 +41,12 @@ Param<NumberType, evaluation>::Param(
         NumberType const max_value,
         NumberType const default_value,
         Integer const number_of_events,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const number_of_children
 ) noexcept
     : SignalProducer(
         evaluation == ParamEvaluation::SAMPLE ? 1 : 0,
-        0,
+        number_of_children,
         number_of_events,
         buffer_owner
     ),
@@ -393,10 +394,17 @@ FloatParam<evaluation>::FloatParam(
         Number const* log_scale_table,
         int const log_scale_table_max_index,
         Number const log_scale_table_index_scale,
-        Number const log_scale_value_offset
+        Number const log_scale_value_offset,
+        Number const number_of_children
 ) noexcept
     : Param<Number, evaluation>(
-        name, min_value, max_value, default_value, NUMBER_OF_EVENTS
+        name,
+        min_value,
+        max_value,
+        default_value,
+        NUMBER_OF_EVENTS,
+        NULL,
+        number_of_children
     ),
     leader(NULL),
     envelopes(envelopes),
@@ -2603,7 +2611,20 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         Number const default_value,
         Envelope* const* envelopes
 ) noexcept
-    : FloatParamS(name, min_value, max_value, default_value, 0.0, envelopes),
+    : FloatParamS(
+        name,
+        min_value,
+        max_value,
+        default_value,
+        0.0,
+        envelopes,
+        NULL,
+        NULL,
+        0,
+        0.0,
+        0.0,
+        1
+    ),
     modulation_level(modulation_level_leader),
     modulator(modulator)
 {
