@@ -1,6 +1,4 @@
-v2.9.0 (2024-04-26)
- * NOTE: this is a preview version of v3.0.0, it might not be ready for
-   production use.
+v3.0.0 (2024-05-??)
  * Oscillator fine detune range can now go from -4 octaves to +4 octaves.
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
    a polyphonic parameter.
@@ -52,6 +50,9 @@ v2.9.0 (2024-04-26)
  * Bugfix: the FST plugin will no longer crash if it is loaded in a host which
    does not supply a host-callback. (Hosts like that are probably rare, and
    features like tempo-synchronization cannot work in such hosts.)
+
+v2.9.0 (2024-04-26)
+ * Preview version of v3.0.0, not ready for production use.
 
 v2.4.4 (2023-11-19)
  * Reduced RAM usage.
