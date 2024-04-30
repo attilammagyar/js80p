@@ -546,15 +546,21 @@ Number FloatParam<evaluation>::get_value() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_value();
-    } else if (this->midi_controller != NULL) {
-        return round_value(ratio_to_value(this->midi_controller->get_value()));
-    } else if (this->macro != NULL) {
+    }
+
+    if constexpr (evaluation == ParamEvaluation::BLOCK) {
+        if (this->midi_controller != NULL) {
+            return round_value(ratio_to_value(this->midi_controller->get_value()));
+        }
+    }
+
+    if (this->macro != NULL) {
         this->macro->update();
 
         return round_value(ratio_to_value(this->macro->get_value()));
-    } else {
-        return this->get_raw_value();
     }
+
+    return this->get_raw_value();
 }
 
 
@@ -617,12 +623,18 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_ratio();
-    } else if (this->macro != NULL) {
+    }
+
+    if constexpr (evaluation == ParamEvaluation::BLOCK) {
+        if (this->midi_controller != NULL) {
+            return this->midi_controller->get_value();
+        }
+    }
+
+    if (this->macro != NULL) {
         this->macro->update();
 
         return this->macro->get_value();
-    } else if (this->midi_controller != NULL) {
-        return this->midi_controller->get_value();
     }
 
     return std::min(1.0, std::max(0.0, value_to_ratio(this->get_raw_value())));
@@ -783,7 +795,6 @@ bool FloatParam<evaluation>::is_constant_in_next_round(
     }
 
     constantness_round = round;
-
     constantness = is_constant_until(sample_count);
 
     return constantness;
@@ -865,6 +876,9 @@ void FloatParam<evaluation>::skip_round(
     } else if (this->cached_round != round && !this->events.is_empty()) {
         this->current_time += (Seconds)sample_count * this->sampling_period;
         this->cached_round = round;
+
+        this->constantness_round = round;
+        this->constantness = true;
 
         if (
                 envelope_state != NULL

@@ -32,8 +32,13 @@ v3.0.0 (2024-05-??)
    documentation.
  * FST: hosts which support VSTXML files can now show full length parameter
    names instead of abbreviations.
+ * Bugfix: when a MIDI-based controller (or its proxy parameter) was assigned
+   directly to a parameter (ie. not via a Macro), and a buffer size greater
+   than 256 samples was in use, then changes of the controller could produce
+   sudden jumps and audible glitches in the parameter's value. Now these
+   changes are always performed smoothly.
  * Bugfix: some MIDI devices send Note Off messages as Note On messages with 0
-   velocity. These messages were misinterpreted, but now they will be handled
+   velocity. These messages were misinterpreted, but now they are handled
    correctly.
  * Bugfix: neither the FST nor the VST 3 plugin notified the host when a
    parameter was changed or a patch was loaded from file, so the host wouldn't

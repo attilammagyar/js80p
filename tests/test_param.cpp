@@ -885,6 +885,9 @@ TEST(float_param_can_automatically_skip_constant_rounds, {
     Sample const* second_round_2;
     Sample const* third_round_1;
     Sample const* third_round_2;
+    bool first_round_was_constant;
+    bool second_round_was_constant;
+    bool third_round_was_constant;
 
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(2.0);
@@ -895,24 +898,40 @@ TEST(float_param_can_automatically_skip_constant_rounds, {
     first_round = FloatParamS::produce_if_not_constant(
         float_param, 0, short_round_length
     );
+    first_round_was_constant = float_param.is_constant_in_next_round(
+        0, short_round_length
+    );
+
     second_round_1 = FloatParamS::produce_if_not_constant(
         float_param, 1, short_round_length
     );
     second_round_2 = FloatParamS::produce_if_not_constant<FloatParamS>(
         float_param, 1, short_round_length
     );
+    second_round_was_constant = float_param.is_constant_in_next_round(
+        1, short_round_length
+    );
+
     third_round_1 = FloatParamS::produce_if_not_constant<FloatParamS>(
         float_param, 2, short_round_length
     );
     third_round_2 = FloatParamS::produce_if_not_constant<FloatParamS>(
         float_param, 2, short_round_length
     );
+    third_round_was_constant = float_param.is_constant_in_next_round(
+        2, short_round_length
+    );
 
     assert_eq(NULL, first_round);
+    assert_true(first_round_was_constant);
+
     assert_eq(NULL, second_round_1);
     assert_eq(NULL, second_round_2);
+    assert_true(second_round_was_constant);
+
     assert_eq(expected_samples, third_round_1, short_round_length, DOUBLE_DELTA);
     assert_eq(expected_samples, third_round_2, short_round_length, DOUBLE_DELTA);
+    assert_false(third_round_was_constant);
 })
 
 
@@ -932,6 +951,12 @@ TEST(auto_skipping_a_follower_float_param_advances_the_clock_of_the_leader, {
     Sample const* second_round_2;
     Sample const* third_round_1;
     Sample const* third_round_2;
+    bool first_round_was_constant_leader;
+    bool second_round_was_constant_leader;
+    bool third_round_was_constant_leader;
+    bool first_round_was_constant_follower;
+    bool second_round_was_constant_follower;
+    bool third_round_was_constant_follower;
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(2.0);
@@ -945,24 +970,52 @@ TEST(auto_skipping_a_follower_float_param_advances_the_clock_of_the_leader, {
     first_round = FloatParamS::produce_if_not_constant(
         follower, 0, short_round_length
     );
+    first_round_was_constant_leader = leader.is_constant_in_next_round(
+        0, short_round_length
+    );
+    first_round_was_constant_follower = follower.is_constant_in_next_round(
+        0, short_round_length
+    );
+
     second_round_1 = FloatParamS::produce_if_not_constant(
         follower, 1, short_round_length
     );
     second_round_2 = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 1, short_round_length
     );
+    second_round_was_constant_leader = leader.is_constant_in_next_round(
+        1, short_round_length
+    );
+    second_round_was_constant_follower = follower.is_constant_in_next_round(
+        1, short_round_length
+    );
+
     third_round_1 = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 2, short_round_length
     );
     third_round_2 = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 2, short_round_length
     );
+    third_round_was_constant_leader = leader.is_constant_in_next_round(
+        1, short_round_length
+    );
+    third_round_was_constant_follower = follower.is_constant_in_next_round(
+        1, short_round_length
+    );
 
     assert_eq(NULL, first_round);
+    assert_true(first_round_was_constant_leader);
+    assert_true(first_round_was_constant_follower);
+
     assert_eq(NULL, second_round_1);
     assert_eq(NULL, second_round_2);
+    assert_true(second_round_was_constant_leader);
+    assert_true(second_round_was_constant_follower);
+
     assert_eq(expected_samples, third_round_1, short_round_length, DOUBLE_DELTA);
     assert_eq(expected_samples, third_round_2, short_round_length, DOUBLE_DELTA);
+    assert_true(third_round_was_constant_leader);
+    assert_true(third_round_was_constant_follower);
 })
 
 
@@ -1858,7 +1911,38 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
 })
 
 
-TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
+TEST(when_a_midi_controller_is_assigned_to_a_block_evaluated_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
+    constexpr Integer block_size = 5;
+    FloatParamB float_param("float", -5.0, 5.0, 3.0, 0.5);
+    MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
+
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(1.0);
+    float_param.set_midi_controller(&midi_controller);
+
+    assert_eq((void*)&midi_controller, (void*)float_param.get_midi_controller());
+
+    change_index_1 = float_param.get_change_index();
+    midi_controller.change(1.5, 0.2514);
+    change_index_2 = float_param.get_change_index();
+
+    assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
+
+    assert_neq((int)change_index_1, (int)change_index_2);
+
+    midi_controller.change(0.0, 0.35);
+    float_param.set_midi_controller(NULL);
+    assert_eq(-1.5, float_param.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_a_midi_controller_is_assigned_to_a_sample_evaluated_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, -2.5, -2.5, -2.5,
@@ -1882,16 +1966,14 @@ TEST(when_a_midi_controller_is_assigned_to_a_float_param_then_float_param_value_
     midi_controller.change(1.5, 0.2514);
     change_index_2 = float_param.get_change_index();
 
-    /* Non-sample-exact param usage. */
-    assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
-    assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
+    assert_eq(3.0, float_param.get_value(), DOUBLE_DELTA);
+    assert_eq(0.8, float_param.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
     assert_false(float_param.is_constant_until(2));
     assert_false(float_param.is_constant_until(3));
 
-    /* Sample-exact param usage. */
     assert_false(float_param.is_constant_in_next_round(1, block_size));
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
     assert_false(float_param.is_constant_in_next_round(1, block_size));
@@ -1953,7 +2035,39 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
 })
 
 
-TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
+TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_block_evaluated_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
+    constexpr Integer block_size = 5;
+    FloatParamB leader("float", -5.0, 5.0, 3.0, 0.5);
+    FloatParamB follower(leader);
+    MidiController midi_controller;
+    Integer change_index_1;
+    Integer change_index_2;
+
+    midi_controller.change(0.0, 0.8);
+    midi_controller.clear();
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_midi_controller(&midi_controller);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+
+    change_index_1 = follower.get_change_index();
+    midi_controller.change(1.5, 0.2514);
+    change_index_2 = follower.get_change_index();
+    assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
+
+    assert_neq((int)change_index_1, (int)change_index_2);
+
+    midi_controller.change(0.0, 0.35);
+    leader.set_midi_controller(NULL);
+    assert_eq(-1.5, follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, -2.5, -2.5, -2.5,
@@ -1979,8 +2093,8 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_float_param_then_the_
     change_index_1 = follower.get_change_index();
     midi_controller.change(1.5, 0.2514);
     change_index_2 = follower.get_change_index();
-    assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
-    assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
+    assert_eq(3.0, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(0.8, follower.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 

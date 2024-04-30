@@ -422,19 +422,19 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
 TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_replaced_by_the_first_supported_changing_midi_controller, {
     Synth synth;
 
-    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::MIDI_LEARN);
-    assign_controller(synth, Synth::ParamId::MVOL, Synth::ControllerId::MIDI_LEARN);
+    assign_controller(synth, Synth::ParamId::CC1, Synth::ControllerId::MIDI_LEARN);
+    assign_controller(synth, Synth::ParamId::MC1, Synth::ControllerId::MIDI_LEARN);
     assign_controller(synth, Synth::ParamId::MWAV, Synth::ControllerId::MIDI_LEARN);
 
     synth.process_messages();
 
     assert_eq(
         Synth::ControllerId::MIDI_LEARN,
-        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::CC1)
     );
     assert_eq(
         Synth::ControllerId::MIDI_LEARN,
-        synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::MC1)
     );
     assert_eq(
         Synth::ControllerId::MIDI_LEARN,
@@ -447,20 +447,20 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
 
     assert_eq(
         Synth::ControllerId::GENERAL_1,
-        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::CC1)
     );
     assert_eq(
         Synth::ControllerId::GENERAL_1,
-        synth.get_param_controller_id_atomic(Synth::ParamId::MVOL)
+        synth.get_param_controller_id_atomic(Synth::ParamId::MC1)
     );
     assert_eq(
         Synth::ControllerId::GENERAL_1,
         synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
     );
-    assert_neq(NULL, synth.modulator_params.volume.get_midi_controller());
-    assert_neq(NULL, synth.carrier_params.volume.get_midi_controller());
-    assert_eq(25.0 / 127.0, synth.modulator_params.volume.get_value(), DOUBLE_DELTA);
-    assert_eq(25.0 / 127.0, synth.carrier_params.volume.get_value(), DOUBLE_DELTA);
+    assert_neq(NULL, synth.modulator_params.harmonic_0.get_midi_controller());
+    assert_neq(NULL, synth.carrier_params.harmonic_0.get_midi_controller());
+    assert_eq(25.0 / 127.0, synth.modulator_params.harmonic_0.get_ratio(), DOUBLE_DELTA);
+    assert_eq(25.0 / 127.0, synth.carrier_params.harmonic_0.get_ratio(), DOUBLE_DELTA);
 });
 
 
