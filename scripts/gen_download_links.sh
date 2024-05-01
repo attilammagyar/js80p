@@ -80,9 +80,13 @@ get_arch()
 {
     local file_name="$1"
 
-    printf "%s\n" "$file_name" \
-        | cut -d"-" -f4 \
-        | cut -c1-2
+    if [[ "$file_name" =~ x86_64 ]]
+    then
+        echo "64"
+        return
+    fi
+
+    echo "32"
 }
 
 get_plugin_type()
