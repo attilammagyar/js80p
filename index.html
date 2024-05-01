@@ -60,7 +60,13 @@ h3 {
 }
 
 h4 {
-  font-size: 17px;
+  font-size: 18px;
+  margin: 6px;
+  margin-top: 12px;
+}
+
+h5 {
+  font-size: 16px;
   margin: 6px;
   margin-top: 12px;
 }
@@ -149,10 +155,9 @@ video {
   margin: 12px;
 }
 
-img.vst {
-  max-width: 474px;
-  max-height: 443px;
-  width: 36%;
+#vst-img {
+  max-width: 23vmin;
+  max-height: 23vmin;
 }
 
 code {
@@ -173,7 +178,7 @@ div.section > p {
   left: 0px;
   right: 0px;
   min-height: 36px;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.7);
   margin: 0 auto;
   text-align: center;
   filter: drop-shadow(0 6px 12px #000);
@@ -191,7 +196,7 @@ div.section > p {
   padding-top: 48px;
 }
 
-#home img {
+#js80p-img {
   max-width: 980px;
   width: 90%;
 }
@@ -203,6 +208,42 @@ div.section > p {
 small {
   font-size: 12px;
 }
+
+#readme h2,
+#readme h3,
+#readme h4,
+#readme h5,
+#readme h6 {
+  margin-top: 36px;
+}
+
+#readme h3 { margin-left: 1vmin; }
+#readme h4 { margin-left: 2vmin; }
+#readme h5 { margin-left: 3vmin; }
+#readme h6 { margin-left: 4vmin; }
+
+#readme p,
+#readme ul {
+  margin-left: 5vmin;
+  margin-right: 5vmin;
+}
+
+#readme ul ul,
+#readme ul p {
+  margin-left: 0.3vmin;
+}
+
+#readme pre {
+  margin-left: 6vmin;
+  margin-right: 6vmin;
+}
+
+#readme p > a[href="#toc"] {
+  display: block;
+  text-align: right;
+  margin-right: 1vmin;
+}
+
 </style>
 </head>
 <body>
@@ -212,9 +253,9 @@ small {
         <li><p><a href="#home">Home</a></p></li>
         <li><p><a href="#download">Download</a></p></li>
         <li><p><a href="#demos">Demos</a></p></li>
-        <li><p><a href="#usage">Installation &amp; Usage</a></p></li>
-        <li><p><a href="#about">About</a></p></li>
-        <li><p><a href="#faq">F. A. Q.</a></p></li>
+        <li><p><a href="#install">Installation</a></p></li>
+        <li><p><a href="#readme">Documentation</a></p></li>
+        <li><p><a href="#faq">F.A.Q.</a></p></li>
       </ul>
     </nav>
   </div>
@@ -227,7 +268,7 @@ small {
         synthesizer VST plugin for Linux and Windows
       </div>
       <div class="center">
-        <img src="js80p.png" alt="JS80P screenshot" />
+        <img id="js80p-img" src="js80p.png" alt="JS80P screenshot" />
       </div>
 
       <div class="center">
@@ -237,13 +278,17 @@ small {
         monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
         imperfection emulation.
       </div>
+
+      <div class="center">
+        <img id="vst-img" src="vst_compatible.png" alt="JS80P is VST compatible - VST&reg; is a trademark of Steinberg Media Technologies GmbH, registered in Europe and other countries." />
+      </div>
     </div>
 
     <div id="download">
       <h2 class="center">Download (v2.4.4)</h2>
       <div class="section">
         <p class="center">
-          <a href="#faq-which">Which distribution should I download?</a>
+          <a href="#install-dist">Which distribution should I download?</a>
         </p>
 
         <div class="columns">
@@ -254,27 +299,27 @@ small {
               <h4>Windows and Linux, 64 bit</h4>
               <ul>
                 <li>
-                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-avx-vst3_bundle.zip">Download (3.9M)</a>
+                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-avx-vst3_bundle.zip">Download (4.4M)</a>
                 </li>
               </ul>
 
               <h4>Windows</h4>
               <ul>
                 <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-64bit-avx-vst3_single_file.zip">Download (2.2M)</a>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86_64-avx-vst3_single_file.zip">Download (2.5M)</a>
                 </li>
                 <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-64bit-avx-fst.zip">Download (2.0M)</a>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86_64-avx-fst.zip">Download (2.2M)</a>
                 </li>
               </ul>
 
               <h4>Linux</h4>
               <ul>
                 <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-64bit-avx-vst3_single_file.zip">Download (1.6M)</a>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86_64-avx-vst3_single_file.zip">Download (1.8M)</a>
                 </li>
                 <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-64bit-avx-fst.zip">Download (1.4M)</a>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86_64-avx-fst.zip">Download (1.6M)</a>
                 </li>
               </ul>
             </div>
@@ -287,39 +332,39 @@ small {
               <h4>Windows and Linux, 64 bit and 32 bit</h4>
               <ul>
                 <li>
-                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-sse2-vst3_bundle.zip">Download (9.0M)</a>
+                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-sse2-vst3_bundle.zip">Download (11M)</a>
                 </li>
               </ul>
 
               <h4>Windows</h4>
               <ul>
                 <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-64bit-sse2-vst3_single_file.zip">Download (2.3M)</a>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86_64-sse2-vst3_single_file.zip">Download (2.5M)</a>
                 </li>
                 <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-64bit-sse2-fst.zip">Download (2.0M)</a>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86_64-sse2-fst.zip">Download (2.2M)</a>
                 </li>
                 <li>
-                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-32bit-sse2-vst3_single_file.zip">Download (2.3M)</a>
+                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86-sse2-vst3_single_file.zip">Download (2.5M)</a>
                 </li>
                 <li>
-                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-windows-32bit-sse2-fst.zip">Download (2.0M)</a>
+                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-windows-x86-sse2-fst.zip">Download (2.2M)</a>
                 </li>
               </ul>
 
               <h4>Linux</h4>
               <ul>
                 <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-64bit-sse2-vst3_single_file.zip">Download (1.6M)</a>
+                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86_64-sse2-vst3_single_file.zip">Download (1.8M)</a>
                 </li>
                 <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-64bit-sse2-fst.zip">Download (1.4M)</a>
+                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86_64-sse2-fst.zip">Download (1.6M)</a>
                 </li>
                 <li>
-                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-32bit-sse2-vst3_single_file.zip">Download (1.6M)</a>
+                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86-sse2-vst3_single_file.zip">Download (1.8M)</a>
                 </li>
                 <li>
-                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-linux-32bit-sse2-fst.zip">Download (1.4M)</a>
+                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-linux-x86-sse2-fst.zip">Download (1.7M)</a>
                 </li>
               </ul>
             </div>
@@ -329,113 +374,70 @@ small {
         <h3>Source Code</h3>
         <ul>
           <li>
-            Source: <a href="https://github.com/attilammagyar/js80p/releases/download/v2.4.4/js80p-2_4_4-src.zip">Download (8.2M)</a>
+            Source: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.0.0/js80p-3_0_0-src.zip">Download (9.7M)</a>
           </li>
         </ul>
       </div>
 
       <div class="section">
-        <h3>What's New in v2.4.4</h3>
+        <h3>What's New in v3.0.0</h3>
         <ul>
-          <li><p>Reduced RAM usage.</p></li>
-          <li><p>Bugfix: hosts that use variable length rendering blocks could cause JS80P in
-          some circumstance to leave garbage in the buffers of delay based effects
-          when they decayed into silence, which (depending on the settings of the
-          patch) could produce audible glitches. Now the delay buffers are properly
-          cleaered when both their input and their feedback line decays into silence.</p></li>
-          <li><p>Bugfix: despite the efforts in v1.5.1, in some circumstances, short delay
-          times (lower than 3-5 milliseconds) could still make the feedback lines
-          noisy in delay based effects in hosts which use variable rendering block
-          size (e.g. FL Studio). The rendering logic has been adjusted to prevent
-          delay feedback lines from falling behind and becoming discontinuous when the
-          host requests a large rendering batch after a sequence of short ones.</p></li>
-        </ul>
-
-        <h3>What's New in v2.4.2</h3>
-        <ul>
-          <li><p>The MTS-ESP mode (continuous or note-on) is now shown at the beginning of
-          the tuning selector for better readability.</p></li>
-          <li><p>Bugfix: Envelope 3 of the Dystopian Cathedral preset was accidentally
-          configured to be dynamic.</p></li>
-          <li><p>Bugfix: inaccuracy has been turned off for the unused oscillator in the
-          Gloomy Brass preset.</p></li>
-          <li><p>Bugfix: the release time of Envelope 4 in the Gloomy Brass Raindrops preset
-          has been increased so that when a Note Off event occurs right after the
-          "raindrop" sound kicks in, its decay is more natural.</p></li>
-          <li><p>Bugfix: MTS-ESP related information has been corrected in README.txt.</p></li>
-        </ul>
-
-        <h3>What's New in v2.4.1</h3>
-        <ul>
-          <li><p>Bugfix: fixed a potential crash or memory corruption when MIDI channel
-          number is greater than 8.</p></li>
-          <li><p>Bugfix: fixed several typos in the documentation.</p></li>
-        </ul>
-
-        <h3>What's New in v2.4.0</h3>
-        <ul>
-          <li><p>Support for microtonal and any other tunings via MTS-ESP, one-click switch
-          between 440 Hz and 432 Hz equal temperament tunings.</p></li>
-          <li><p>Analog inaccuracy and instability emulation for oscillator pitch, and
-          inaccuracy settings for filter frequency and Q factor, and envelope time and
-          level.</p></li>
-          <li><p>New presets: Gloomy Brass, Gloomy Brass Raindrops, Sawyer.</p></li>
-          <li><p>Bugfix: the typo in the label of the dynamic envelope toggle has been
-          corrected.</p></li>
-        </ul>
-
-        <h3>What's New in v2.3.2</h3>
-        <ul>
-          <li><p>New preset: Dystopian Cathedral.</p></li>
-          <li><p>New parameter for the Modulator: sub-harmonic sine wave amplitude.</p></li>
-          <li><p>New parameter for the Carrier: Distortion.</p></li>
-          <li><p>Bugfix: fixed a crash when side chaining was turned on for the Reverb or
-          Echo effects, and the Chorus effect got overloaded by too much feedback</p></li>
-          <li><p>Bugfix: reduced unwanted noises in the Acid Lead presets.</p></li>
-        </ul>
-
-        <h3>What's New in v2.2.0</h3>
-        <ul>
-          <li><p>New parameter for the Chorus effect: switch between 15 different
-          configurations, with up to 7 voices.</p></li>
-          <li><p>New parameter for the Reverb effect: switch between 10 different
-          tunings.</p></li>
-        </ul>
-
-        <h3>What's New in v2.1.0</h3>
-        <ul>
-          <li><p>Echo and Reverb now support side-chain compression: clean up the sound by
-          reducing the volume of the wet signal while the dry signal is loud, and
-          gradually bring up the wet signal once the dry signal goes below the
-          threshold.</p></li>
-          <li><p>Multiple volume controls have been added to the effect chain. The one before
-          the overdrive and distortion goes up to 200%, allowing the effects to be
-          pushed really hard.</p></li>
-          <li><p>Signal peak levels at various points of the signal chain can now be used for
-          controlling parameters and macros.</p></li>
-        </ul>
-
-        <h3>What's New in v2.0.3</h3>
-        <ul>
-          <li><p>Implemented monophonic mode for smooth legato playing</p></li>
-          <li><p>New preset: Monophonic Saw</p></li>
-          <li><p>Flexible Controllers have been renamed to Macros.</p></li>
-          <li><p>Reduced RAM and CPU usage, especially when the plugin is idle.</p></li>
-          <li><p>Documented how Envelopes work in the synth with regards to polyphony.</p></li>
-          <li><p>Reduced patch size and improved patch import and export performance by
-          omitting redundant information from patches.</p></li>
-          <li><p>Improved responsivity of the FST plugin to host events (by requesting the
-          "effIdle" message from the host) when the plugin's own window is closed or
-          hidden.</p></li>
-          <li><p>It is now possible to assign Macros to discrete parameters like Filter Types
-          and Waveforms.</p></li>
-          <li><p>Bugfix: fixed a bug with program name saving and loading in the FST plugin.</p></li>
-          <li><p>Bugfix: fixed possible crashes in the FST plugin when using automation.</p></li>
-          <li><p>Bugfix: fixed a problem in filter state handling which could lead to
-                 occasional signal discontinuities and glitches.</p></li>
-          <li><p>Bugfix: fixed a potential crash around GUI and audio engine communication.</p></li>
-          <li><p>Bugfix: the FST plugin sometimes switched to the blank preset while loading
-                 banks, saved projects, or when doing a preset change or MIDI program change.</p></li>
+          <li><p>Oscillator fine detune range can now go from -4 octaves to +4 octaves.</p></li>
+          <li><p>LFO amount can now be controlled by an Envelope when the LFO is assigned to
+          a polyphonic parameter.</p></li>
+          <li><p>LFO frequency can now use logarithmic scale.</p></li>
+          <li><p>Envelope attack, decay, and release shape can now be configured.</p></li>
+          <li><p>Envelope time parameters can now be tempo-synced, so that their unit of
+          measurement becomes beats instead of seconds.</p></li>
+          <li><p>Voices can now update Envelope settings optionally at note end as well.</p></li>
+          <li><p>The number of Envelopes has been increased to 12.</p></li>
+          <li><p>The number of Macros has been increased to 30.</p></li>
+          <li><p>Macro distortion shape can now be configured.</p></li>
+          <li><p>The midpoint of Macros can now be customized, making it easier to shape the
+          pitch bend wheel's range.</p></li>
+          <li><p>Filter Q parameter can also use logarithmic scale.</p></li>
+          <li><p>The Echo and Reverb effects can now apply gradually increasing distortion to
+          the delayed signal.</p></li>
+          <li><p>The Q factor of the high-pass filter can now be adjusted in the Chorus,
+          Echo, and Reverb effects.</p></li>
+          <li><p>The released note and the release velocity can also be used as a parameter
+          controller. (Note: unfortunately, most MIDI keyboards don't send meaningful
+          note release velocities.)</p></li>
+          <li><p>Improved MIDI compatibility, including responding to Monophonic Mode ON/OFF
+          messages.</p></li>
+          <li><p>New operating modes: monophonic hold and polyphonic hold to keep notes
+          ringing without a sustain pedal.</p></li>
+          <li><p>Various performance and RAM usage improvements.</p></li>
+          <li><p>The source distribution can now be compiled for RISC-V 64 systems thanks to
+          <a href="https://github.com/aimixsaka">@aimixsaka</a>.</p></li>
+          <li><p>New presets: Analog Brass AT, Analog Brass mod, Bouncy.</p></li>
+          <li><p>All parameters and features are now explained in detail in the
+          documentation.</p></li>
+          <li><p>FST: hosts which support VSTXML files can now show full length parameter
+          names instead of abbreviations.</p></li>
+          <li><p><strong>Bugfix</strong>: when a MIDI-based controller (or its proxy parameter) was assigned
+          directly to a parameter (ie. not via a Macro), and a buffer size greater
+          than 256 samples was in use, then changes of the controller could produce
+          sudden jumps and audible glitches in the parameter's value. Now these
+          changes are always performed smoothly.</p></li>
+          <li><p><strong>Bugfix</strong>: some MIDI devices send Note Off messages as Note On messages with 0
+          velocity. These messages were misinterpreted, but now they are handled
+          correctly.</p></li>
+          <li><p><strong>Bugfix</strong>: neither the FST nor the VST 3 plugin notified the host when a
+          parameter was changed or a patch was loaded from file, so the host wouldn't
+          ask the user when exiting whether to write unsaved changes to disk, and the
+          undo history wasn't updated either. Now both plugin types will notify the
+          host when something is changed on JS80P's user interface.</p></li>
+          <li><p><strong>Bugfix</strong>: dynamic envelope parameter changes could produce glitches, sudden
+          jumps, and some sections of the envelope could get lost, especially in
+          monophonic mode.</p></li>
+          <li><p><strong>Bugfix</strong>: decayed notes were not garbage collected when envelopes were
+          assigned only to the amplitude parameter of the oscillators, but not to
+          the first oscillator's subharmonic amplitude which was left at the default 0
+          setting. (E.g. the Bells 1 and 2 presets while holding the sustain pedal.)</p></li>
+          <li><p><strong>Bugfix</strong>: the FST plugin will no longer crash if it is loaded in a host which
+          does not supply a host-callback. (Hosts like that are probably rare, and
+          features like tempo-synchronization cannot work in such hosts.)</p></li>
         </ul>
       </div>
 
@@ -501,933 +503,2177 @@ small {
       </div>
     </div>
 
-    <div id="usage">
-      <h2 class="center">Installation &amp; Usage</h2>
-
-      <div class="section">
-        <h3>System Requirements</h3>
-        <ul>
-          <li>Operating System: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04 or newer)</li>
-          <li>
-            CPU: SSE2 support, 32 bit (i686) or 64 bit (x86-64)
-            <ul>
-              <li>separate packages are available for AVX capable 64 bit processors</li>
-            </ul>
-          </li>
-          <li>RAM: 200-300 MB per instance, depending on buffer sizes, sample rate, etc.</li>
-        </ul>
-
-        <p>
-          Note: a RISC-V 64 port is available as a
-          <a href="https://github.com/aimixsaka/js80p" target="_blank">separate project</a>
-          by <a href="https://github.com/aimixsaka/" target="_blank">@aimixsaka</a>.
-        </p>
-
-        <div class="indent">
-          <h4>Dependencies on Linux</h4>
-          <p>
-            On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and
-            <code>libcairo</code> libraries, and either the <code>kdialog</code> or
-            the <code>zenity</code> application are required to run JS80P. To install
-            them on Debian based distributions (e.g. Ubuntu), you can use the
-            following command:
-          </p>
-          <pre class="code"><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog</code></pre>
-          <p>
-            Note that if you want to run the 32 bit version of JS80P on a 64 bit
-            system, then you will have to install the 32 bit version of the
-            libraries, for example:
-          </p>
-          <pre class="code"><code>sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog</code></pre>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Before Installing</h3>
-
-        <p>If your plugin host application does not support VST 3, but does support
-        VST 2.4, then you have to download and install the FST version of JS80P.
-        Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
-
-        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions" target="_blank">AVX instructions</a>
-        and you use a 64 bit plugin host application, then you should download a JS80P
-        package that is optimized for AVX compatible processors. If you have an older
-        computer, or if you experience crashes, then you should go with one of the
-        <a href="https://en.wikipedia.org/wiki/SSE2" target="_blank">SSE2</a> compatible JS80P packages.</p>
-
-        <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
-        then you have to download and install the VST 3 Single File version that
-        matches the CPU architecture for which your plugin host application was built.</p>
-
-        <p>(For example, some 32 bit (i686) versions of Reaper are known to be unable to
-        recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-        have to download the 32 bit VST 3 Single File JS80P package.)</p>
-      </div>
-
-      <div class="section">
-        <h3 id="installation">Installation</h3>
-        <ul>
-          <li>
-            <h4 id="install-vst3-bundle-windows">VST 3 Bundle on Windows</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the entire <code>js80p.vst3</code> folder to your VST 3 folder which is
-              usually <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
-            </ol>
-          </li>
-          <li>
-            <h4 id="install-vst3-bundle-linux">VST 3 Bundle on Linux</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
-              usually <code>~/.vst3</code>.</li>
-            </ol>
-          </li>
-          <li>
-            <h4 id="install-vst3-single-file-windows">VST 3 Single File on Windows</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.vst3</code> file to your VST 3 folder which is usually
-              <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
-            </ol>
-          </li>
-          <li>
-            <h4 id="install-vst3-single-file-linux">VST 3 Single File on Linux</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
-              <code>~/.vst3</code>.</li>
-            </ol>
-          </li>
-          <li>
-            <h4 id="install-fst-windows">FST (VST 2.4) on Windows</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.dll</code> file to the folder where you keep your VST 2.4 plugins.</li>
-            </ol>
-
-            <p>Note: VST 2.4 plugins are usually put in the <code>C:\Program Files\VstPlugins</code>
-            folder.</p>
-          </li>
-          <li>
-            <h4 id="install-fst-linux">FST (VST 2.4) on Linux</h4>
-            <ol>
-              <li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
-              <li>Extract the ZIP archive.</li>
-              <li>Copy the <code>js80p.so</code> file to the directory where you keep your VST 2.4
-              plugins.</li>
-            </ol>
-
-            <p>Note: VST 2.4 plugins are usually put in the <code>~/.vst</code> directory.</p>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h3>Usage</h3>
-        <ul>
-          <li>
-            <p>
-              Move the cursor over a knob, and use the mouse wheel for adjusting its
-              value, or start dragging it.
-            </p>
-          </li>
-          <li>
-            <p>
-              Hold down the Control key while adjusting a knob for fine grained
-              adjustments.
-            </p>
-          </li>
-          <li><p>Double click on a knob to reset it to its default value.</p></li>
-          <li><p>Click on the area below a knob to assign a controller to it.</p></li>
-          <li>
-            <p>
-              It is recommended to use a small buffer size for lower latency, for
-              example, 3-6 milliseconds, or 128 or 256 samples at 44.1 kHz sample rate.
-            </p>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h3>Tuning</h3>
-        <p>
-          Each oscillator can be tuned separately by clicking on the tuning selector in
-          the title bar of the oscillator, allowing maximum flexibility; for example, you
-          can have continuously updated tuning for one oscillator, and have the other
-          update its frequency tables only for <code>NOTE ON</code> events.
-        </p>
-        <p>The following options are available:</p>
-        <ul>
-          <li>
-            <p>
-              <code>C MTS-ESP</code>: continuously query information from an MTS-ESP tuning provider
-              (usually another plugin) when at least one note is playing, and update the
-              frequency of all sounding notes that haven't reached the Release portion of
-              their volume envelopes yet, on the fly. The tuning selector displays "<code>on</code>"
-              when a tuning provider is available, and "<code>off</code>" when no tuning provider is
-              found.  In the latter case, notes will fall back to 440 Hz 12 tone equal
-              temperament.
-            </p>
-          </li>
-          <li>
-            <p>
-              <code>N MTS-ESP</code>: query tuning information from an MTS-ESP tuning provider
-              (usually another plugin) for evey <code>NOTE ON</code> MIDI event. Already sounding
-              notes are kept unchanged. The tuning selector displays "<code>on</code>" when a tuning
-              provider is available, and "<code>off</code>" when no tuning provider is found. In the
-              latter case, new notes will fall back to 440 Hz 12 tone equal temperament.
-            </p>
-          </li>
-          <li>
-            <p>
-              <code>440 12TET</code>: the usual
-              <a href="https://en.wikipedia.org/wiki/Equal_temperament" target="_blank">12 tone equal temperament</a>
-              tuning, where the <code>A4</code> MIDI note is 440 Hz.
-            </p>
-          </li>
-          <li>
-            <p>
-              <code>432 12TET</code>: 12 tone equal temperament with <code>A4</code> set to 432 Hz.
-            </p>
-          </li>
-        </ul>
-        <h4>Setting up MTS-ESP on Windows</h4>
-        <p>
-          Download and install either the free
-          <a href="https://oddsound.com/mtsespmini.php" target="_blank">MTS-ESP Mini</a>
-          plugin or the paid <a href="https://oddsound.com/mtsespsuite.php" target="_blank">MTS-ESP Suite</a>
-          plugin by <a href="https://oddsound.com/" target="_blank">ODDSound</a>.
-          Follow the instuctions on the website, where you can also find the
-          User Guide documentation for each product.
-        </p>
-        <p>
-          Note: it is possible to use a different tuning provider without installing any
-          of the above plugins, but you may have to manually download the <code>LIBMTS.dll</code>
-          library from the <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win" target="_blank">ODDSound/MTS-ESP GitHub repository</a>,
-          and put it in a folder where Windows can find it:
-        </p>
-        <ul>
-          <li>
-            <p>On 64 bit Windows:</p>
-            <ul>
-              <li>
-                <p>
-                  put the 64 bit DLL into the <code>Program Files\Common Files\MTS-ESP</code> folder,
-                </p>
-              </li>
-              <li>
-                <p>
-                  put the 32 bit DLL into the <code>Program Files (x86)\Common Files\MTS-ESP</code>
-                  folder.
-                </p>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <p>
-              On 32 bit Windows, put the 32 bit version of <code>LIBMTS.dll</code> into the
-              <code>Program Files\Common Files\MTS-ESP</code> folder.
-            </p>
-          </li>
-        </ul>
-        <h4>Setting up MTS-ESP on Linux</h4>
-        <p>
-          As of November, 2023, there is no official distribution of the MTS-ESP tuning
-          provider plugins by <a href="https://oddsound.com/" target="_blank">ODDSound</a> for Linux, however, there
-          are plugins which can act as a tuning provider, for example,
-          <a href="https://surge-synthesizer.github.io/" target="_blank">Surge XT</a>.
-        </p>
-        <p>
-          To use MTS-ESP, you may have to download the <code>libMTS.so</code> library from the
-          <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux" target="_blank">ODDSound/MTS-ESP GitHub repository</a>,
-          and put it in the <code>/usr/local/lib</code> directory, if it is not already installed on
-          your system. As of November, 2023, <code>libMTS.so</code> is only available for <code>x86_64</code>
-          Linux systems.
-        </p>
-      </div>
-
-      <div class="section">
-        <h3>Source, Bugs, Development</h3>
-        <p>
-          The source code is available at
-          <a href="https://github.com/attilammagyar/js80p">https://github.com/attilammagyar/js80p</a>,
-          under the terms of the GNU General Public License Version 3.
-        </p>
-        <p>
-          If you find bugs, please report them at
-          <a href="https://github.com/attilammagyar/js80p/issues">https://github.com/attilammagyar/js80p/issues</a>.
-        </p>
-      </div>
-
-      <div class="section">
-        <h3>Presets</h3>
-        <p>JS80P has a few built-in presets, and in case you don't like your DAW's preset
-        browser, you can load and save them as ordinary files. For each plugin type,
-        you can find these presets in the <code>presets</code> folder in the ZIP archive, and you
-        can load them into JS80P by clicking on the <em>Import Patch</em> icon near the top
-        left corner of the main screen of the plugin.</p>
-
-        <div class="section">
-          <p><a id="preset-blank"></a></p>
-
-          <h4>Blank</h4>
-
-          <p>The default, empty patch, a blank canvas.</p>
-
-          <p><a id="preset-bright-organ"></a></p>
-
-          <h4>Bright Organ</h4>
-
-          <p>A bright, clean, Hammond-like organ sound. Aftertouch and mod wheel increase
-          the vibrato. The softer you play, the slower the attack, the harder you play,
-          the harder the attack.</p>
-
-          <p><a id="preset-chariots-aftertouch"></a></p>
-
-          <h4>Chariots-Aftertouch</h4>
-
-          <p>A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
-          and inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
-          you use aftertouch. The mod wheel controls the vibrato of notes above C3, and
-          the pitch wheel also affects only these notes.</p>
-
-          <p><a id="preset-chariots"></a></p>
-
-          <h4>Chariots</h4>
-
-          <p>A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
-          and inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
-          depending on the velocity. The harder you play, the longer it takes for the
-          wavefolder to kick in. The mod wheel controls the vibrato of notes above
-          C3, and the pitch wheel also affects only these notes.</p>
-
-          <p><a id="preset-demo-1"></a></p>
-
-          <h4>Demo 1</h4>
-
-          <p>The patch from the first demo video of JS80P. The mod wheel makes the sound
-          brighter, the volume knob (CC 7) adjusts the inverse sawtooth LFO which
-          controls the filter before the wavefolder.</p>
-
-          <p><a id="preset-demo-2"></a></p>
-
-          <h4>Demo 2</h4>
-
-          <p>The patch from the second demo video of JS80P. This split keyboard patch has
-          slow tremolo bass notes below Gb3, with extremely long release (just press a
-          key, and you're good for about 2 measures with your left hand being free, even
-          without a sustain pedal), and plucky lead notes, with the mod wheel and the
-          volume knob (CC 7) controlling the timbre. (However, it is not recommended
-          with this patch to adjust the mod wheel while a right hand note is playing.)</p>
-
-          <p><a id="preset-kalimba"></a></p>
-
-          <h4>Kalimba</h4>
-
-          <p>A simple kalimba sound with percussive attack and short decay. The sustain
-          pedal adds more reverb and echo, and lengthens note decay.</p>
-
-          <p><a id="preset-rock-organ"></a></p>
-
-          <h4>Rock Organ</h4>
-
-          <p>A little darker, overdriven Hammond-like organ sound. Aftertouch and mod wheel
-          increase the vibrato. The softer you play, the slower the attack, the harder
-          you play, the harder the attack.</p>
-
-          <p><a id="preset-sandstorm"></a></p>
-
-          <h4>Sandstorm</h4>
-
-          <p>A dirty, harsh, detuned FM lead sound. Mod wheel and aftertouch make it even
-          dirtier and harsher.</p>
-
-          <p><a id="preset-stereo-saw"></a></p>
-
-          <h4>Stereo Saw</h4>
-
-          <p>A little bit metallic sounding sawtooth wave. Note velocity slightly affects
-          the timbre, mod wheel and aftertouch add wavefolding. The volume knob
-          adjusts an LFO which controls filter resonance.</p>
-
-          <p><a id="preset-acid-lead-1"></a></p>
-
-          <h4>Acid Lead 1</h4>
-
-          <p>Sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
-          the vibrato, the sustain pedal lengthens the decay.</p>
-
-          <p><a id="preset-acid-lead-2"></a></p>
-
-          <h4>Acid Lead 2</h4>
-
-          <p>Square wave based acid lead sound. Aftertouch and mod wheel increase
-          the vibrato, the sustain pedal lengthens the decay.</p>
-
-          <p><a id="preset-acid-lead-3"></a></p>
-
-          <h4>Acid Lead 3</h4>
-
-          <p>Another sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
-          the vibrato, the sustain pedal lengthens the decay.</p>
-
-          <p><a id="preset-bells-1"></a></p>
-
-          <h4>Bells 1</h4>
-
-          <p>A bright bell sound. Aftertouch and mod wheel increase the vibrato,
-          the sustain pedal lengthens the decay.</p>
-
-          <p><a id="preset-bells-2"></a></p>
-
-          <h4>Bells 2</h4>
-
-          <p>A slightly darker bell sound. Aftertouch and mod wheel increase the vibrato,
-          the sustain pedal lengthens the decay.</p>
-
-          <p><a id="preset-flute"></a></p>
-
-          <h4>Flute</h4>
-
-          <p>A synth flute sound with a couple of tricks: the pitch of the notes decreases
-          slightly when they end, and the mod wheel adds a little embellishment to the
-          beginning of each note. Aftertouch adds more emphasis to the note.</p>
-
-          <p><a id="preset-fm-womp-1"></a></p>
-
-          <h4>FM Womp 1</h4>
-
-          <p>A clean FM sound where the modulator and the carrier use different envelopes,
-          so the notes start with a slight "wah" effect. Aftertouch and mod wheel
-          increase the vibrato. Aftertouch also adds more modulation.</p>
-
-          <p><a id="preset-fm-womp-2"></a></p>
-
-          <h4>FM Womp 2</h4>
-
-          <p>A slightly distorted FM sound where the modulator and the carrier use
-          different envelopes, so the notes start with a slight "wah" effect. Aftertouch
-          and mod wheel increase the vibrato. Aftertouch also adds more modulation,
-          making the sound brighter and more distorted.</p>
-
-          <p><a id="preset-fm-womp-3"></a></p>
-
-          <h4>FM Womp 3</h4>
-
-          <p>A more distorted FM sound where the modulator and the carrier use different
-          envelopes, so the notes start with a slight "wah" effect. Aftertouch and mod
-          wheel increase the vibrato. Aftertouch also adds more modulation, making the
-          sound brighter and more distorted.</p>
-
-          <p><a id="preset-tech-noir-lead-1"></a></p>
-
-          <h4>Tech Noir Lead 1</h4>
-
-          <p>A brass sound for futuristic sci-fi dystopias with a slower filter sweep at
-          the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
-          aftertouch adds emphasis and brightness.</p>
-
-          <p><a id="preset-tech-noir-lead-2"></a></p>
-
-          <h4>Tech Noir Lead 2</h4>
-
-          <p>A brass sound for futuristic sci-fi dystopias with a harsher filter sweep at
-          the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
-          aftertouch adds emphasis and brightness.</p>
-
-          <p><a id="preset-tech-noir-lead-3"></a></p>
-
-          <h4>Tech Noir Lead 3</h4>
-
-          <p>A darker brass sound for futuristic sci-fi dystopias with a filter sweep at
-          the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
-          aftertouch adds emphasis and brightness.</p>
-
-          <p><a id="preset-derezzed"></a></p>
-
-          <h4>Derezzed</h4>
-
-          <p>This Daft Punk inspired patch is built around sawtooth waves with lots of
-          distortions. Mod wheel makes upcoming notes brighter (without affecting
-          the currently sounding ones), and it increases the distortion. Aftertouch
-          adds vibrato.</p>
-
-          <p><a id="preset-ambient-pad-1"></a></p>
-
-          <h4>Ambient Pad 1</h4>
-
-          <p>Slowly evolving pad sound with sci-fi vibe. The mod wheel destabilizes
-          the tuning, the aftertouch increases that effect, and adds slight distortions.</p>
-
-          <p><a id="preset-ambient-pad-2"></a></p>
-
-          <h4>Ambient Pad 2</h4>
-
-          <p>Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
-          the tuning, the aftertouch increases that effect, and adds slight distortions.</p>
-
-          <p><a id="preset-ambient-pad-3"></a></p>
-
-          <h4>Ambient Pad 3</h4>
-
-          <p>Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
-          the tuning, the aftertouch increases that effect, and adds ghostly, distant
-          screams.</p>
-
-          <p><a id="preset-saw-piano"></a></p>
-
-          <h4>Saw Piano</h4>
-
-          <p>A sawtooth wave based sound where high notes decay quickly, lower notes
-          decay slowly, but decay time is also affected by note velocity. The harder
-          you play, the brighter and richer the timbre, and the harder the note attack.
-          Mod wheel controls the vibrato, and aftertouch controls filtering. The
-          sustain pedal lengthens note decay.</p>
-
-          <p><a id="preset-saw-piano-reversed"></a></p>
-
-          <h4>Saw Piano Reversed</h4>
-
-          <p>A sawtooth wave based sound which sounds like as if you were playing
-          a recording backwards. The time it takes for notes to un-decay depends on
-          note pitch and velocity. The harder you play, the brighter and richer the
-          sound gets. Mod wheel controls the vibrato, aftertouch adjusts the filtering.</p>
-
-          <p><a id="preset-nightmare-lead"></a></p>
-
-          <h4>Nightmare Lead</h4>
-
-          <p>Starts out as a nice, filtered sawtooth wave, but as you begin to turn the mod
-          wheel and add some aftertouch, it becomes more and more menacing and distorted,
-          until it finally descends into madness.</p>
-
-          <p><a id="preset-tremolo-lead"></a></p>
-
-          <h4>Tremolo Lead</h4>
-
-          <p>Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
-          the filter and adds a tremolo effect. Filtering also responds to note velocity.</p>
-
-          <p><a id="preset-monophonic-saw"></a></p>
-
-          <h4>Monophonic Saw</h4>
-
-          <p>A sawtooth wave based monophonic, sustained sound with smooth legato glides.
-          The harder you play, the brighter and richer the timbre, and the harder the
-          note attack. Mod wheel controls the vibrato, and aftertouch controls the
-          filtering and the wavefolder. The sustain pedal lengthens note decay.</p>
-
-          <p><a id="preset-dystopian-cathedral"></a></p>
-
-          <h4>Dystopian Cathedral</h4>
-
-          <p>Play softly and this futuristic organ-like patch will sound smooth as butter,
-          but when you start playing with more force, the sound will become angry, fat,
-          and in-your-face. The mod wheel increases the level of madness.</p>
-
-          <a id="preset-gloomy-brass"></a>
-
-          <h4>Gloomy Brass</h4>
-
-          <p>Turn the mod wheel down for a soft, warm, and fat sound, turn it up for
-          brassy swells, distortion, and reverb. Aftertouch adds some harshness and
-          vibrato.</p>
-
-          <a id="preset-gloomy-brass-raindrops"></a>
-
-          <h4>Gloomy Brass Raindrops</h4>
-
-          <p>A version of Gloomy Brass where each note is followed by a raindrop after a
-          random amount of time.</p>
-
-          <a id="preset-sawyer"></a>
-
-          <h4>Sawyer</h4>
-
-          <p>Recreation of the iconic bass and lead sound from Tom Sawyer by Rush. Notes
-          below middle C will do the well-known resonance sweep and then turn into a
-          dark growl (which you can spice up with the mod wheel and some aftertouch),
-          and notes above middle C will be bright, but will lose much of their
-          brightness while doing a huge vibrato when you turn up the mod wheel or apply
-          aftertouch. (Note that this is not a split-keyboard patch, because both
-          oscillators are required to make this sound good in stereo - instead, the
-          effect is achieved through trickery with the Note controller and the
-          Distortion knob of Macro 12 and 13.)</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="about">
-      <h2 class="center">About</h2>
-
-      <div class="section">
-        <h3>Signal Chain (Simplified)</h3>
-        <p class="center">
-          <a class="img" href="js80p-signal-chain.svg" target="_blank">
-            <img id="signal-chain-img" src="js80p-signal-chain.svg" alt="Signal Chain" />
-          </a>
-        </p>
-      </div>
-
-      <div class="section">
-        <h3>Features</h3>
-        <ul>
-          <li>64 notes polyphony.</li>
-          <li>
-            Last-note priority monophonic mode.
-            <ul>
-              <li>Legato playing will either retrigger or smoothly glide to the next note,
-              depending on the portamento length setting.</li>
-            </ul>
-          </li>
-          <li>
-            2 oscillators with 10 waveforms:
-            <ul>
-              <li>sine,</li>
-              <li>sawtooth,</li>
-              <li>soft sawtooth,</li>
-              <li>inverse sawtooth,</li>
-              <li>soft inverse sawtooth,</li>
-              <li>triangle,</li>
-              <li>soft triangle,</li>
-              <li>square,</li>
-              <li>soft square,</li>
-              <li>custom.</li>
-            </ul>
-          </li>
-          <li>
-            2 filters for each oscillator, 7 filter types:
-            <ul>
-              <li>low-pass,</li>
-              <li>high-pass,</li>
-              <li>band-pass,</li>
-              <li>notch,</li>
-              <li>bell (peaking),</li>
-              <li>low-shelf,</li>
-              <li>high-shelf.</li>
-            </ul>
-          </li>
-          <li>Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.</li>
-          <li>
-            Adjustable oscillator pitch inaccuracy and instability, for analog-like
-            liveliness and warmth.
-            <ul>
-              <li>Set the same inaccuracy or instability level for the two
-              oscillators to synchronize their imperfections within a single
-              polyphonic voice, so that the effect will only occur between
-              multiple voices, but not between the oscillators within a single
-              voice.</li>
-            </ul>
-          </li>
-          <li>
-            Microtuning support via the MTS-ESP tuning protocol by
-            <a href="https://oddsound.com/" target="_blank">ODDSound</a>.
-          </li>
-          <li>Portamento.</li>
-          <li>Wavefolder.</li>
-          <li>Split keyboard.</li>
-          <li>Amplitude modulation.</li>
-          <li>Frequency modulation.</li>
-          <li>Phase modulation.</li>
-          <li>
-            Built-in effects:
-            <ul>
-              <li>overdrive,</li>
-              <li>distortion,</li>
-              <li>2 more filters,</li>
-              <li>chorus,</li>
-              <li>stereo echo (with side-chaining),</li>
-              <li>stereo reverb (with side-chaining),</li>
-              <li>volume controls at various points of the signal chain.</li>
-            </ul>
-          </li>
-          <li>6 envelopes.</li>
-          <li>8 low-frequency oscillators (LFO).</li>
-          <li>Filter and envelope imperfection settings for analog-like feel.</li>
-          <li>MIDI controllers and macros.</li>
-          <li>Channel pressure (aftertouch).</li>
-          <li>MIDI learn.</li>
-          <li>Logarithmic or linear scale filter frequencies.</li>
-          <li>Tempo synchronization for LFOs and effects.</li>
-          <li>
-            Use the peak level at various points of the signal chain to control
-            parameters:
-            <ul>
-              <li>oscillator 1 output,</li>
-              <li>oscillator 2 output,</li>
-              <li>volume control 1 input,</li>
-              <li>volume control 2 input,</li>
-              <li>volume control 3 input.</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h3>Trademark Information</h3>
-        <div class="section">
-          <img class="vst" src="vst_compatible.png" alt="JS80P is VST compatible - VST&reg; is a trademark of Steinberg Media Technologies GmbH, registered in Europe and other countries." />
-        </div>
-      </div>
-    </div>
-
-    <div id="faq">
-      <h2 class="center">Frequently Asked Questions</h2>
-
-      <div class="section">
-        <ul>
-          <li><a href="#faq-which">Which distribution should I download?</a></li>
-          <li><a href="#faq-mac">Mac version?</a></li>
-          <li><a href="#faq-params-polyphony">Parameters, Envelopes, and polyphony: how do they work?</a></li>
-          <li><a href="#faq-custom-wave">The knobs in the waveform harmonics section don't do anything, is this a bug?</a></li>
-          <li><a href="#faq-automation">How can parameters be automated? What parameters does the plugin export?</a></li>
-          <li><a href="#faq-pm-fm">Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</a></li>
-          <li><a href="#faq-name">Where does the name come from?</a></li>
-          <li><a href="#faq-flstudio-midicc">FL Studio: How to assign a MIDI CC to a JS80P parameter?</a></li>
-          <li><a href="#faq-flstudio-aftertouch">FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?</a></li>
-          <li><a href="#faq-flstudio-sustain">FL Studio: How to use the Sustain Pedal?</a></li>
-        </ul>
-      </div>
-
-      <div class="section" id="faq-which">
-        <h3>Which distribution should I download?</h3>
-
-        <p>If your plugin host application does not support VST 3, but does support
-        VST 2.4, then you have to download and install the FST version of JS80P.
-        Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
-
-        <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions" target="_blank">AVX instructions</a>
-        and you use a 64 bit plugin host application, then you should download a JS80P
-        package that is optimized for AVX compatible processors. If you have an older
-        computer, or if you experience crashes, then you should go with one of the
-        <a href="https://en.wikipedia.org/wiki/SSE2" target="_blank">SSE2</a> compatible JS80P packages.</p>
-
-        <p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
-        then you have to download and install the VST 3 Single File version that
-        matches the CPU architecture for which your plugin host application was built.</p>
-
-        <p>(For example, some 32 bit (i686) versions of Reaper are known to be unable to
-        recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-        have to download the 32 bit VST 3 Single File JS80P package.)</p>
-
-        <p>The 32 bit versions are usually only needed by those who deliberately use a 32
-        bit plugin host application, e.g. because they want to keep using some really
-        old plugins which are not available for 64 bit systems.</p>
-
-        <p>If you are in doubt, then try the VST 3 bundle, and if your plugin host
-        application doesn't recognize it, then try the 64 bit VST 3 version, then the
-        64 bit FST version, then the 32 bit VST 3 version, and so on.</p>
-
-        <p>Note that all versions use the same high-precision sound synthesis engine
-        internally, so the CPU architecture does not affect the sound quality.</p>
-      </div>
-
-      <div class="section" id="faq-mac">
-        <h3>Mac version?</h3>
-
-        <p>Sorry, it's not likely to happen anytime soon, unless someone is willing to
-        create and maintain a Mac fork of JS80P. For me to do it, it would require
-        quite a large investment, both in terms of effort and financially. If MacOS
-        would be available (at a reasonable price) for installing it in a virtual
-        machine that could be used for testing, I'd consider that. But as long as it
-        cannot be obtained (legally) without also buying a Mac, and I'm happy with my
-        current computer, I'm not going to invest in a new one.</p>
-      </div>
-
-      <div class="section" id="faq-params-polyphony">
-        <h3>Parameters, Envelopes, and polyphony: how do they work?</h3>
-
-        <p>By default, knobs and toggles act globally. This means that if you adjust a
-        knob with your mouse, or if you assign a MIDI value (controller, note velocity,
-        etc.), a Macro, or an LFO to it and adjust the parameter via that, or if you
-        use <a href="#faq-automation">automation in your plugin host application</a>,
-        then that parameter will change for all sounding notes.</p>
-
-        <p>But if you assign an Envelope as a controller to a parameter, then each
-        polyphonic note will use its own timeline for that parameter, and the
-        parameter's value will change over time for each note independently according
-        to the envelope's settings. By default, these settings are only evaluated once
-        for each note, at the very beginning of the note, so if the parameters of the
-        envelope are changed, then it will only affect the notes that start after the
-        adjustment.</p>
-
-        <p>To have polyphonic notes <em>sample and hold</em> a MIDI value or a Macro's momentary
-        value for a parameter for the entire duration of the note, independently of
-        other notes and subsequent changes of the value (e.g. to use lower filter
-        cutoff frequency for low-velocity notes so that they sound softer), then you
-        have to use an Envelope: turn up all the levels of the Envelope to 100%, assign
-        the MIDI value or the Macro to the Amount parameter of the Envelope, and assign
-        the Envelope to control the parameter.</p>
-
-        <p>If an Envelope is switched to Dynamic mode, then polyphonic notes will still
-        track their own independent timelines for each parameter that has that Envelope
-        assigned, but the parameter's value will converge to the value that it should
-        have at each moment according to the momentary settings of the Envelope.</p>
-      </div>
-
-      <div class="section" id="faq-custom-wave">
-        <h3>The knobs in the waveform harmonics section don't do anything, is this a bug?</h3>
-
-        <p>To hear the effect of those knobs, you have to select the <em>Custom</em> waveworm
-        using the <code>WAV</code> knob in the Waveform section of the oscillators.</p>
-
-        <p>(Note that these parameters are CPU-intensive to process, so they are not
-        sample accurate, they are not smoothed, and they are processed only once for
-        each rendering block. Due to this, if you change them while a note is playing,
-        or assign a controller to them, then you might hear "steps" or even clicks.)</p>
-      </div>
-
-      <div class="section" id="faq-automation">
-        <h3>How can parameters be automated? What parameters does the plugin export?</h3>
-
-        <p>The intended way of automating JS80P's parameters is to assign a
-        <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change</a>
-        (MIDI CC) message to a parameter (or use <em>MIDI Learn</em>), and turn
-        the corresponding knob on your MIDI keyboard while playing, or edit the
-        MIDI CC events in your host application's MIDI editor.</p>
-
-        <p>However, the VST 3 plugin format requires plugins to export a proxy parameter
-        for each MIDI CC message that they want to receive, and as a side-effect, these
-        parameters can also be automated using the host application's usual automation
-        editor. For the sake of consistency, the FST plugin also exports automatable
-        parameters for each supported MIDI CC message.</p>
-
-        <p>For example, in both plugin types, you might assign the
-        <code>MIDI CC 1 (Modulation Wheel)</code> controller to the Phase Modulation (PM)
-        parameter of the synthesizer, and then add automation in the host application
-        to the <code>MIDI CC 1 (Modulation Wheel)</code> (VST 3) or <code>ModWh</code> (FST) parameter. JS80P
-        will then interpret the changes of this parameter the same way as if you were
-        turning the modulation wheel on a MIDI keyboard.</p>
-      </div>
-
-      <div class="section" id="faq-pm-fm">
-        <h3>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</h3>
-
-        <p>The reason for JS80P having both kinds of modulation is that they are not
-        always equivalent. They are only identical when the modulator signal is a
-        sinusoid, but with each added harmonic, PM and FM start to differ more and
-        more. A detailed mathematical explanation of this is shown in
-        <a href="https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf" target="_blank">here</a>.</p>
-      </div>
-
-      <div class="section" id="faq-name">
-        <h3>Where does the name come from?</h3>
-
-        <p>In 2022, I started developing a browser-based synthesizer using the
-        <a href="https://www.w3.org/TR/webaudio/" target="_blank">Web Audio API</a>,
-        mostly being inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80" target="_blank">Yamaha CS-80</a>.
-        I named that project <a href="https://attilammagyar.github.io/toys/js-80/" target="_blank">JS-80</a>.
-        Then I started adding one little feature and customization option after
-        the other, then it got out of hand, and I also started finding
-        limitations of doing audio in the browser. So I decided to implement a
-        cleaned up version of this synth in C++ as a DAW plugin (with a better
-        waveshaper antialiasing method than what's available in the browser),
-        and so JS80P was born.</p>
-      </div>
-
-      <div class="section" id="faq-flstudio-midicc">
-        <h3>FL Studio: How to assign a MIDI CC to a JS80P parameter?</h3>
-
-        <p>Unlike decent audio software (like for example
-        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
-        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
-        does not send all MIDI events that come out of your MIDI keyboard to plugins,
-        and unfortunately, <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a> messages are among
-        the kinds of MIDI data that it swallows. To make everything work, you have to
-        assign the MIDI CC events to a plugin parameter.</p>
-
-        <p>JS80P does not directly export its parameters (in order to avoid conflict
-        between the host's automations and JS80P's internal control assignments), but
-        it exports proxy parameters which represent MIDI CC messages that it handles.</p>
-
-        <p>For example, let's say a physical knob on your MIDI keyboard is configured to
-        send its values in <code>MIDI CC 7</code> messages. To make this knob turn the <em>Phase
-        Modulation (PM)</em> virtual knob in JS80P, you have to do the following steps:</p>
-
-        <ol>
-          <li><p>Click on the small triangle in the top left corner of the plugin window of
-          JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-          <li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST 3) in
-          the browser. Click on it with the right mouse button.</p></li>
-          <li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
-          <li><p>Turn the knob on your MIDI keyboard until FL Studio recognizes it.</p></li>
-          <li><p>Now click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
-          JS80P's interface.</p></li>
-          <li><p>Select either the "<em>MIDI CC 7 (Volume)</em>" option, or the "<em>MIDI Learn</em>"
-          option, and turn the physical knob on your MIDI keyboard again.</p></li>
-        </ol>
-      </div>
-
-      <div class="section" id="faq-flstudio-aftertouch">
-        <h3>FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P parameter?</h3>
-
-        <p>Unlike decent audio software (like for example
-        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
-        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
-        does not send all MIDI events that come out of your MIDI keyboard to plugins,
-        and unfortunately, Channel Pressure (also known as Channel Aftertouch)
-        messages are among the kinds MIDI data that it swallows.</p>
-
-        <p>Getting the Channel Pressure to work in FL Studio is a similar, but slightly
-        more complicated procedure than setting up MIDI CC. For example, to make
-        Channel Pressure control the <em>Phase Modulation (PM)</em> virtual knob in JS80P, you
-        have to do the following steps:</p>
-
-        <ol>
-          <li><p>Click on the small triangle in the top left corner of the plugin window of
-          JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-          <li><p>Press a piano key on your MIDI keyboard, and hold it down without triggering
-          aftertouch.</p></li>
-          <li><p>While holding the piano key down, find the parameter named "<em>Ch AT</em>" (FST)
-          or "<em>Channel Aftertouch</em>" (VST 3) in FL Studio's browser. Click on it with
-          the right mouse button.</p></li>
-          <li><p>Select the "<em>Link to controller...</em>" menu item (keep holding the piano key).</p></li>
-          <li><p>Now push the piano key harder to trigger aftertouch.</p></li>
-          <li><p>Click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
-          JS80P's interface.</p></li>
-          <li><p>Select the "<em>Channel Aftertouch</em>" option.</p></li>
-        </ol>
-      </div>
-
-      <div class="section" id="faq-flstudio-sustain">
-        <h3>FL Studio: How to use the Sustain Pedal?</h3>
-
-        <p>Unlike decent audio software (like for example
-        <a href="https://www.reaper.fm/" target="_blank">REAPER</a>),
-        <a href="https://www.image-line.com/fl-studio/" target="_blank">FL Studio</a>
-        does not send all MIDI events that come out of your MIDI keyboard to plugins,
-        and unfortunately, the <a href="https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2" target="_blank">MIDI Control Change (MIDI CC)</a> message which
-        contains information about the sustain pedal's state is among the kinds of MIDI
-        data that it swallows.</p>
-
-        <p>To add insult to injury, it pretends that it notifies the plugin about the
-        pedal's state, but in reality, it just defers sending <code>NOTE OFF</code> events until
-        the pedal is released. This might give the desired effect in some cases, but it
-        breaks patches that assign additional functionality to the pedal besides
-        sustaining notes.</p>
-
-        <p>To make everything work, you have to assign the sustain pedal's MIDI CC events
-        to the plugin parameter where JS80P expects them, and you have to turn off
-        FL Studio's default behavior of handling the pedal on behalf of plugins.</p>
-
-        <ol>
-          <li><p>Open "<em>Options / MIDI settings</em>" from the main menu.</p></li>
-          <li><p>Turn off the "<em>Foot pedal controls note off</em>" option.</p></li>
-          <li><p>Close the <em>Settings</em> dialog window.</p></li>
-          <li><p>Click on the small triangle in the top left corner of the plugin window of
-          JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
-          <li><p>Find the parameter named "<em>Sustn</em>" (FST) or "<em>MIDI CC 64 (Sustain Pedal)</em>"
-          (VST 3) in the browser. Click on it with the right mouse button.</p></li>
-          <li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
-          <li><p>Press the pedal.</p></li>
-        </ol>
-      </div>
+    <div id="readme">
+
+<p><a id="toc"></a></p>
+
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#toc">Table of Contents</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#install">Installation</a>
+<ul>
+<li><a href="#install-dist">Before Installing: Choosing a Distribution</a></li>
+<li><a href="#system-reqs">System Requirements</a>
+<ul>
+<li><a href="#windows-deps">Dependencies on Windows</a></li>
+<li><a href="#linux-deps">Dependencies on Linux</a></li>
+</ul></li>
+<li><a href="#vst3-bundle-windows">VST 3 Bundle on Windows</a></li>
+<li><a href="#vst3-bundle-linux">VST 3 Bundle on Linux</a></li>
+<li><a href="#vst3-single-windows">VST 3 Single File on Windows</a></li>
+<li><a href="#vst3-single-linux">VST 3 Single File on Linux</a></li>
+<li><a href="#fst-windows">FST (VST 2.4) on Windows</a></li>
+<li><a href="#fst-linux">FST (VST 2.4) on Linux</a></li>
+<li><a href="#install-tuning">Setting up MTS-ESP Tuning Providers</a>
+<ul>
+<li><a href="#mts-esp-windows">Windows</a></li>
+<li><a href="#mts-esp-linux">Linux</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#usage">Usage</a>
+<ul>
+<li><a href="#usage-signal">Signal Chain (Simplified)</a></li>
+<li><a href="#usage-knobs">Knobs</a></li>
+<li><a href="#usage-controllers">Controllers</a></li>
+<li><a href="#usage-synth">Synthesizer (Synth)</a>
+<ul>
+<li><a href="#usage-synth-main">Main Panel</a></li>
+<li><a href="#usage-synth-common">Common Oscillator Settings</a></li>
+<li><a href="#usage-synth-modulator">Oscillator 1 (Modulator)</a></li>
+<li><a href="#usage-synth-carrier">Oscillator 2 (Carrier)</a></li>
+</ul></li>
+<li><a href="#usage-effects">Effects</a>
+<ul>
+<li><a href="#usage-effects-volume">Volume Controls</a></li>
+<li><a href="#usage-effects-distortions">Distortions</a></li>
+<li><a href="#usage-effects-filters">Filters</a></li>
+<li><a href="#usage-effects-chorus">Chorus</a></li>
+<li><a href="#usage-effects-echo">Echo</a></li>
+<li><a href="#usage-effects-reverb">Reverb</a></li>
+</ul></li>
+<li><a href="#usage-macros">Macros (MC)</a></li>
+<li><a href="#usage-envelopes">Envelope Generators (ENV)</a></li>
+<li><a href="#usage-lfos">Low-Frequency Oscillators (LFOs)</a></li>
+</ul></li>
+<li><a href="#presets">Presets</a>
+<ul>
+<li><a href="#preset-blank">Blank</a></li>
+<li><a href="#preset-bright-organ">Bright Organ</a></li>
+<li><a href="#preset-chariots-aftertouch">Chariots-Aftertouch</a></li>
+<li><a href="#preset-chariots">Chariots</a></li>
+<li><a href="#preset-demo-1">Demo 1</a></li>
+<li><a href="#preset-demo-2">Demo 2</a></li>
+<li><a href="#preset-kalimba">Kalimba</a></li>
+<li><a href="#preset-rock-organ">Rock Organ</a></li>
+<li><a href="#preset-sandstorm">Sandstorm</a></li>
+<li><a href="#preset-stereo-saw">Stereo Saw</a></li>
+<li><a href="#preset-acid-lead-1">Acid Lead 1</a></li>
+<li><a href="#preset-acid-lead-2">Acid Lead 2</a></li>
+<li><a href="#preset-acid-lead-3">Acid Lead 3</a></li>
+<li><a href="#preset-bells-1">Bells 1</a></li>
+<li><a href="#preset-bells-2">Bells 2</a></li>
+<li><a href="#preset-flute">Flute</a></li>
+<li><a href="#preset-fm-womp-1">FM Womp 1</a></li>
+<li><a href="#preset-fm-womp-2">FM Womp 2</a></li>
+<li><a href="#preset-fm-womp-3">FM Womp 3</a></li>
+<li><a href="#preset-tech-noir-lead-1">Tech Noir Lead 1</a></li>
+<li><a href="#preset-tech-noir-lead-2">Tech Noir Lead 2</a></li>
+<li><a href="#preset-tech-noir-lead-3">Tech Noir Lead 3</a></li>
+<li><a href="#preset-derezzed">Derezzed</a></li>
+<li><a href="#preset-ambient-pad-1">Ambient Pad 1</a></li>
+<li><a href="#preset-ambient-pad-2">Ambient Pad 2</a></li>
+<li><a href="#preset-ambient-pad-3">Ambient Pad 3</a></li>
+<li><a href="#preset-saw-piano">Saw Piano</a></li>
+<li><a href="#preset-saw-piano-reversed">Saw Piano Reversed</a></li>
+<li><a href="#preset-nightmare-lead">Nightmare Lead</a></li>
+<li><a href="#preset-tremolo-lead">Tremolo Lead</a></li>
+<li><a href="#preset-monophonic-saw">Monophonic Saw</a></li>
+<li><a href="#preset-dystopian-cathedral">Dystopian Cathedral</a></li>
+<li><a href="#preset-gloomy-brass">Gloomy Brass</a></li>
+<li><a href="#preset-gloomy-brass-raindrops">Gloomy Brass Raindrops</a></li>
+<li><a href="#preset-sawyer">Sawyer</a></li>
+<li><a href="#preset-analog-brass-at">Analog Brass AT</a></li>
+<li><a href="#preset-analog-brass-mod">Analog Brass mod</a></li>
+<li><a href="#preset-bouncy">Bouncy</a></li>
+</ul></li>
+<li><a href="#bugs">Bugs</a></li>
+<li><a href="#faq">Frequently Asked Questions</a>
+<ul>
+<li><a href="#faq-mac">Mac version?</a></li>
+<li><a href="#faq-params-polyphony">Parameters, Envelopes, LFOs, and polyphony: how do they work?</a></li>
+<li><a href="#faq-custom-wave">The knobs in the waveform harmonics section don't do anything, is this a bug?</a></li>
+<li><a href="#faq-automation">How can parameters be automated? What parameters does the plugin export?</a></li>
+<li><a href="#faq-pm-fm">Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</a></li>
+<li><a href="#faq-name">Where does the name come from?</a></li>
+<li><a href="#faq-flstudio-midicc">FL Studio: How to assign a MIDI CC to a JS80P knob?</a></li>
+<li><a href="#faq-flstudio-aftertouch">FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?</a></li>
+<li><a href="#faq-flstudio-sustain">FL Studio: How to use the Sustain Pedal?</a></li>
+</ul></li>
+<li><a href="#dev">Development</a>
+<ul>
+<li><a href="#dev-tools">Tools</a></li>
+<li><a href="#dev-dep">Dependencies</a></li>
+<li><a href="#dev-compile">Compiling</a></li>
+<li><a href="#dev-theory">Theory</a></li>
+</ul></li>
+</ul>
+
+<p><a id="features"></a></p>
+
+<h2>Features</h2>
+
+<ul>
+<li>64 notes polyphony.</li>
+<li>Last-note priority monophonic mode.
+<ul>
+<li>Legato playing will either retrigger or smoothly glide to the next note,
+depending on the portamento length setting.</li>
+</ul></li>
+<li>Polyphonic and monophonic hold modes to keep notes ringing without a sustain
+pedal.</li>
+<li>2 oscillators with 10 waveforms:
+<ul>
+<li>sine,</li>
+<li>sawtooth,</li>
+<li>soft sawtooth,</li>
+<li>inverse sawtooth,</li>
+<li>soft inverse sawtooth,</li>
+<li>triangle,</li>
+<li>soft triangle,</li>
+<li>square,</li>
+<li>soft square,</li>
+<li>custom.</li>
+</ul></li>
+<li>2 filters for each oscillator, 7 filter types:
+<ul>
+<li>low-pass,</li>
+<li>high-pass,</li>
+<li>band-pass,</li>
+<li>notch,</li>
+<li>bell (peaking),</li>
+<li>low-shelf,</li>
+<li>high-shelf.</li>
+</ul></li>
+<li>Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.</li>
+<li>Adjustable oscillator pitch inaccuracy and instability, for analog-like
+liveliness and warmth.
+<ul>
+<li>Set the same inaccuracy or instability level for the two oscillators to
+synchronize their imperfections within a single polyphonic voice, so that
+the effect will only occur between multiple voices, but not between the
+oscillators within a single voice.</li>
+</ul></li>
+<li>Microtuning support via the MTS-ESP tuning protocol by
+<a href="https://oddsound.com/">ODDSound</a>.</li>
+<li>Portamento.</li>
+<li>Wavefolder.</li>
+<li>Split keyboard.</li>
+<li>Amplitude modulation.</li>
+<li>Frequency modulation.</li>
+<li>Phase modulation.</li>
+<li>Built-in effects:
+<ul>
+<li>overdrive,</li>
+<li>distortion,</li>
+<li>2 more filters,</li>
+<li>chorus,</li>
+<li>stereo echo (with distortion and side-chaining),</li>
+<li>stereo reverb (with distortion and side-chaining),</li>
+<li>volume controls at various points of the signal chain.</li>
+</ul></li>
+<li>12 envelopes with customizable shapes.</li>
+<li>8 low-frequency oscillators (LFO) with optional amount envelope and
+polyphony.</li>
+<li>Filter and envelope imperfection settings for analog-like feel.</li>
+<li>MIDI controllers and macros.</li>
+<li>Channel pressure (aftertouch).</li>
+<li>MIDI learn.</li>
+<li>Logarithmic or linear scale filter cutoff frequencies.</li>
+<li>Tempo synchronization for envelopes, LFOs, and effects.</li>
+<li>Use the peak level at various points of the signal chain to control
+parameters:
+<ul>
+<li>oscillator 1 output,</li>
+<li>oscillator 2 output,</li>
+<li>volume control 1 input,</li>
+<li>volume control 2 input,</li>
+<li>volume control 3 input.</li>
+</ul></li>
+</ul>
+
+<p><a id="install" href="#toc">Table of Contents</a></p>
+
+<h2>Installation</h2>
+
+<p><a id="install-dist"></a></p>
+
+<h3>Before Installing: Choosing a Distribution</h3>
+
+<p>If your plugin host application does not support VST 3, but does support
+VST 2.4, then you have to download and install the FST version of JS80P.
+Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
+
+<p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
+and you use a 64 bit plugin host application, then you should download a JS80P
+package that is optimized for AVX compatible processors. If you have an older
+computer, or if you experience crashes, then you should go with one of the
+<a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
+
+<p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
+then you have to download and install the VST 3 Single File version that
+matches the CPU architecture for which your plugin host application was built.</p>
+
+<p>(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
+recognize VST 3 bundles when running on a 64 bit Linux system, so you would
+have to download the 32 bit VST 3 Single File JS80P package for such hosts.)</p>
+
+<p>The 32 bit versions are usually only needed by those who deliberately use a 32
+bit plugin host application, e.g. because they want to keep using some really
+old plugins which are not available for 64 bit systems.</p>
+
+<p>If you are in doubt, then try the VST 3 bundle, and if your plugin host
+application doesn't recognize it, then try the 64 bit VST 3 version, then the
+64 bit FST version, then the 32 bit VST 3 version, and so on.</p>
+
+<p>Note that all versions use the same high-precision sound synthesis engine
+internally, so the CPU architecture does not affect the sound quality.</p>
+
+<p><a id="system-reqs" href="#toc">Table of Contents</a></p>
+
+<h3>System Requirements</h3>
+
+<ul>
+<li><strong>Operating System</strong>: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).</li>
+<li><strong>CPU</strong>: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
+<ul>
+<li>Separate packages are available for AVX capable 64 bit processors for
+better performance and CPU utilization.</li>
+</ul></li>
+<li><strong>RAM</strong>: 200-300 MB per instance, depending on buffer sizes, sample rate,
+etc.</li>
+</ul>
+
+<p>Tested with <a href="https://www.reaper.fm/">REAPER</a> 7.14.</p>
+
+<p>A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
+gives good performance and low latency.</p>
+
+<p>Note: a RISC-V 64 port is available as a
+<a href="https://github.com/aimixsaka/js80p/">separate project</a> by
+<a href="https://github.com/aimixsaka/">@aimixsaka</a>.</p>
+
+<p><a id="windows-deps"></a></p>
+
+<h4>Dependencies on Windows</h4>
+
+<p>Typical Windows systems usually have the MSVC library already installed, but in
+case you need it, you can download it from
+<a href="https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist">Microsoft's website</a>.</p>
+
+<p>(Most people need the <code>X64</code> version of this library. To use the 32 bit version
+of the plugin, you will need the <code>X86</code> version of the library. See the
+<a href="#install-dist">Before Installing: Choosing a Distribution</a> section for more
+information.)</p>
+
+<p><a id="linux-deps"></a></p>
+
+<h4>Dependencies on Linux</h4>
+
+<p>On Linux, the <code>libxcb</code>, <code>libxcb-render</code>, and <code>libcairo</code> libraries, and either
+the <code>kdialog</code> or the <code>zenity</code> application are required to run JS80P. To install
+them on Debian based distributions (e.g. Ubuntu), you can use the following
+command:</p>
+
+<pre><code>sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
+</code></pre>
+
+<p>Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
+then you will have to install the 32 bit version of the libraries, for example:</p>
+
+<pre><code>sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
+</code></pre>
+
+<p><a id="vst3-bundle-windows"></a></p>
+
+<h3>VST 3 Bundle on Windows</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the entire <code>js80p.vst3</code> folder to your VST 3 folder which is
+usually <code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
+</ol>
+
+<p><a id="vst3-bundle-linux"></a></p>
+
+<h3>VST 3 Bundle on Linux</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the entire <code>js80p.vst3</code> directory to your VST 3 directory which is
+usually <code>~/.vst3</code>.</li>
+</ol>
+
+<p><a id="vst3-single-windows"></a></p>
+
+<h3>VST 3 Single File on Windows</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the <code>js80p.vst3</code> file to your VST 3 folder which is usually
+<code>C:\Users\YourUserName\AppData\Local\Programs\Common\VST3</code>.</li>
+</ol>
+
+<p><a id="vst3-single-linux"></a></p>
+
+<h3>VST 3 Single File on Linux</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the <code>js80p.vst3</code> file to your VST 3 directory which is usually
+<code>~/.vst3</code>.</li>
+</ol>
+
+<p><a id="fst-windows"></a></p>
+
+<h3>FST (VST 2.4) on Windows</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the <code>js80p.dll</code> file to the folder where you keep your VST 2.4 plugins.</li>
+<li>Optionally, if your host application can load <code>.vstxml</code> files, it is
+recommended to copy the <code>js80p.vstxml</code> file as well to the folder where
+you keep your VST 2.4 plugins.</li>
+</ol>
+
+<p>Note: VST 2.4 plugins are usually put in the <code>C:\Program Files\VstPlugins</code>
+folder.</p>
+
+<p><a id="fst-linux"></a></p>
+
+<h3>FST (VST 2.4) on Linux</h3>
+
+<ol>
+<li><a href="https://attilammagyar.github.io/js80p/index.html#download">Download JS80P</a>.</li>
+<li>Extract the ZIP archive.</li>
+<li>Copy the <code>js80p.so</code> file to the directory where you keep your VST 2.4
+plugins.</li>
+<li>Optionally, if your host application can load <code>.vstxml</code> files, it is
+recommended to copy the <code>js80p.vstxml</code> file as well to the directory where
+you keep your VST 2.4 plugins.</li>
+</ol>
+
+<p>Note: VST 2.4 plugins are usually put in the <code>~/.vst</code> directory.</p>
+
+<p><a id="install-tuning"></a></p>
+
+<h3>Setting up MTS-ESP Tuning Providers</h3>
+
+<p><a id="mts-esp-windows"></a></p>
+
+<h4>Windows</h4>
+
+<p>Download and install either the free <a href="https://oddsound.com/mtsespmini.php">MTS-ESP Mini</a>
+plugin or the paid <a href="https://oddsound.com/mtsespsuite.php">MTS-ESP Suite</a> plugin
+by <a href="https://oddsound.com/">ODDSound</a>. Follow the instructions on the website,
+where you can also find the User Guide documentation for each product.</p>
+
+<p>Note: it is possible to use a different tuning provider without installing any
+of the above plugins, but you may have to manually download the <code>LIBMTS.dll</code>
+library from the <a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win">ODDSound/MTS-ESP GitHub repository</a>,
+and put it in a folder where Windows can find it:</p>
+
+<ul>
+<li>On 64 bit Windows:
+<ul>
+<li>put the 64 bit DLL into the <code>Program Files\Common Files\MTS-ESP</code> folder,</li>
+<li>put the 32 bit DLL into the <code>Program Files (x86)\Common Files\MTS-ESP</code>
+folder.</li>
+</ul></li>
+<li>On 32 bit Windows, put the 32 bit version of <code>LIBMTS.dll</code> into the
+<code>Program Files\Common Files\MTS-ESP</code> folder.</li>
+</ul>
+
+<p><a id="mts-esp-linux"></a></p>
+
+<h4>Linux</h4>
+
+<p>As of November, 2023, there is no official distribution of the MTS-ESP tuning
+provider plugins by <a href="https://oddsound.com/">ODDSound</a> for Linux, however, there
+are plugins which can act as a tuning provider, for example,
+<a href="https://surge-synthesizer.github.io/">Surge XT</a>.</p>
+
+<p>To use MTS-ESP, you may have to download the <code>libMTS.so</code> library from the
+<a href="https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux">ODDSound/MTS-ESP GitHub repository</a>,
+and put it in the <code>/usr/local/lib</code> directory, if it is not already installed on
+your system.  As of November, 2023, <code>libMTS.so</code> is only available for <code>x86_64</code>
+Linux systems.</p>
+
+<p><a id="usage" href="#toc">Table of Contents</a></p>
+
+<h2>Usage</h2>
+
+<p><a id="usage-signal"></a></p>
+
+<h3>Signal Chain (Simplified)</h3>
+
+<p class="center">
+  <a class="img" href="js80p-signal-chain.svg" target="_blank">
+    <img id="signal-chain-img" src="js80p-signal-chain.svg" alt="Signal Chain" />
+  </a>
+</p>
+
+<p><a id="usage-knobs" href="#toc">Table of Contents</a></p>
+
+<h3>Knobs</h3>
+
+<p>Most of the parameters that control various aspects of the sound that are
+produced by JS80P can be adjusted via virtual knobs on the screen:</p>
+
+<ul>
+<li><p>Move the mouse cursor over a knob or a small screw icon, and use the mouse
+wheel or move the mouse while holding down the left mouse button for
+adjusting the value.</p></li>
+<li><p>Hold down the Control key on the keyboard while adjusting a knob for fine
+grained adjustments.</p></li>
+<li><p>Double click on a knob to reset it to its default value.</p></li>
+<li><p>Click on the area below a knob to assign a <a href="#usage-controllers">controller</a>
+to it, or to remove a previously assigned one. When a knob has a controller
+assigned to it, its value can no longer be changed manually, it's set and
+continuously adjusted by the selected controller. (Note: if you accidentally
+open the controller selector screen, and you want to close it without
+changing anything, then just click on the "none" option or the controller
+that is already selected.)</p></li>
+</ul>
+
+<p><a id="usage-controllers" href="#toc">Table of Contents</a></p>
+
+<h3>Controllers</h3>
+
+<p>Controllers are various events and automations that can be used for setting the
+momentary value (on a relative scale between 0% and 100%) of a
+<a href="#usage-knobs">JS80P parameter knob</a>:</p>
+
+<ul>
+<li><p><strong>MIDI CC</strong>: <a href="https://midi.org/midi-1-0-control-change-messages">MIDI Control Change</a>
+messages are usually sent when various faders, knobs, and wheels are
+adjusted on a MIDI device. For example, the modulation wheel on a keyboard
+usually sends a CC 1 message, the expression pedal is usually associated
+with CC 11 messages, the sustain pedal is CC 64, etc.</p></li>
+<li><p><strong>MIDI Learn</strong>: this is a wild card MIDI CC controller: when it is assigned
+to a parameter, JS80P will replace the assignment with the first MIDI CC
+event type that it receives. This is useful when you don't know the MIDI CC
+number of a knob or fader on your MIDI device.</p>
+
+<p>(Note that JS80P does not process certain MIDI CC event types that are
+reserved in the <a href="https://midi.org/midi-1-0-control-change-messages">MIDI specification</a>
+for special uses. If your device sends such messages as if they were general
+purpose messages, then it is recommended to change its configuration in
+order to avoid compatibility problems.)</p></li>
+<li><p><strong>Triggered Note</strong>: a value which is associated with note pitch and which is
+updated every time a new note starts to play, e.g. when a key is pressed on
+a MIDI keyboard. Using this in <a href="#usage-macros">macros</a> is an extremely
+flexible way to set up key tracking for any parameter of the sound.</p></li>
+<li><p><strong>Triggered Velocity</strong>: the speed with which a key on a MIDI keyboard is
+pressed, or more generally, a measure of how strongly a note is to be played
+(where 50% of the nominal range would be mezzo-forte). JS80P automatically
+uses this value to adjust the amplitude of oscillator signals (depending on
+the <a href="#usage-synth-common-vels">VEL S</a> parameter), but it can also be used
+for controlling other parameters as well. For example, by assigning this
+controller to <a href="#usage-synth-common-freq">filter cutoff frequency</a> parameters
+(especially with using <a href="#usage-macros">macros</a>), you can brighten up forte
+notes while keeping softer notes warmer, darker.</p></li>
+<li><p><strong>Released Note</strong>:  a value which is associated with note pitch and which is
+updated every time a note stops, e.g. when a key is released on a MIDI
+keyboard.</p></li>
+<li><p><strong>Released Velocity</strong>: the speed with which a key on a MIDI keyboard is
+released, or more generally, a measure of how softly a note is to be
+stopped. Unfortunately, most MIDI devices don't provide this data.</p></li>
+<li><p><strong>Pitch Wheel</strong>: this represents the controller that can be used on MIDI
+instruments to do pitch bends. (On a typical MIDI keyboard, this is a wheel
+that automatically returns to the center position when released.)</p></li>
+<li><p><strong>Osc 1 Out Peak</strong>, <strong>Osc 2 Out Peak</strong>, <strong>Vol 1 In Peak</strong>,
+<strong>Vol 2 In Peak</strong>, <strong>Vol 3 In Peak</strong>: JS80P continuously measures the peak
+amplitude of the signal at various points of the signal chain. These
+controllers make it possible to use this information for adjusting the
+parameters of the sound.</p></li>
+<li><p><strong>Channel Aftertouch</strong>: some keyboards can measure how the pressure on
+pressed keys change over time, making it possible to add dynamic expression
+to notes over time while they are playing.</p></li>
+<li><p><strong>Macros</strong>: MIDI-based controller values go from 0% to 100% on a linear
+scale, which is often quite limiting. <a href="#usage-macros">Macros</a> are JS80P's
+way of customizing how a MIDI event affects a certain parameter.</p></li>
+<li><p><strong>LFOs</strong>: see <a href="#usage-lfos">low-frequency oscillators</a>.</p></li>
+<li><p><strong>Envelopes</strong>: see <a href="#usage-envelopes">envelope generators</a>.</p></li>
+</ul>
+
+<p><a id="usage-synth" href="#toc">Table of Contents</a></p>
+
+<h3>Synthesizer (Synth)</h3>
+
+<p>This tab contains the foundational settings of the sound.</p>
+
+<p><a id="usage-synth-main"></a></p>
+
+<h4>Main Panel</h4>
+
+<h5>Import Patch, Export Patch</h5>
+
+<p>The two icons at the top left corner allow saving and loading synth settings
+(often called "patches" or "presets") as ordinary files, e.g. for transferring
+sounds across projects, different host applications, computers, etc.</p>
+
+<p><a id="usage-synth-main-nh"></a></p>
+
+<h5>Note Handling</h5>
+
+<p>Click on the black bar below the Import Patch and Export Patch icons, or use
+the mouse wheel while holding the mouse cursor over it to change how JS80P
+handles note events. The available options are:</p>
+
+<ul>
+<li><p><strong>POLY</strong>: polyphonic mode, 64 notes can be played simultaneously.</p></li>
+<li><p><strong>MONO</strong>: monophonic mode, only a single note can be played at a time.</p>
+
+<ul>
+<li><p>When a new note start event is received while a previous note is still
+playing (e.g. legato), then the new note takes priority: the old note is
+stopped, and the new note is started.</p></li>
+<li><p>If the new note is released, and the previous note is still held, then
+the previous note is restarted.</p></li>
+<li><p>If the <a href="#usage-synth-common-prt">PRT</a> setting of an oscillator is set
+to a value above 0, then that oscillator will smoothly glide its
+frequency and volume to match the new note's pitch and velocity.</p></li>
+</ul></li>
+<li><p><strong>M HOLD</strong>: same as <strong>MONO</strong>, but note stop events are ignored until a
+different note handling setting is selected, or until a sustain pedal off
+event is received.</p></li>
+<li><p><strong>P HOLD</strong>: same as <strong>POLY</strong>, but note stop events are ignored until a
+different note handling setting is selected, or until a sustain pedal off
+event is received.</p></li>
+</ul>
+
+<p><a id="usage-synth-main-mode"></a></p>
+
+<h5>Operating Mode (MODE)</h5>
+
+<p>Choose whether to mix the sound of the two oscillators or route low notes to
+one oscillator, and higher notes to the other. The available options are:</p>
+
+<ul>
+<li><p><strong>Mix&amp;Mod</strong>: the sound of the two oscillators can be mixed into the output,
+and the sound of the second oscillator (carrier) can be modulated in various
+ways by the first oscillator (modulator).</p></li>
+<li><p><strong>Split C3</strong>, <strong>Split Db3</strong>, etc.: notes below the selected split point are
+played only on the first oscillator, notes above the split point (inclusive)
+are played only on the second oscillator.</p></li>
+</ul>
+
+<h5>Modulator Additive Volume (MIX)</h5>
+
+<p>When the <a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod position, this
+knob controls how loud the first oscillator can be heard in the output. Turn it
+down to 0% in order to make the first oscillator contribute to the final sound
+only via modulation.</p>
+
+<h5>Phase Modulation (PM)</h5>
+
+<p>Turn it up to have the first oscillator modulate the phase of the second
+oscillator when the <a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod
+position.</p>
+
+<h5>Frequency Modulation (FM)</h5>
+
+<p>Turn it up to have the first oscillator modulate the frequency of the second
+oscillator when the <a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod
+position.</p>
+
+<h5>Amplitude Modulation (AM)</h5>
+
+<p>Turn it up to have the first oscillator modulate the amplitude of the second
+oscillator when the <a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod
+position.</p>
+
+<p><a id="usage-synth-common" href="#toc">Table of Contents</a></p>
+
+<h4>Common Oscillator Settings</h4>
+
+<p><a id="usage-synth-common-tuning"></a></p>
+
+<h5>Tuning</h5>
+
+<p>Click on the black bar next to the oscillator's name, or use the mouse wheel
+while holding the mouse cursor over it to change the tuning. The available
+options are:</p>
+
+<ul>
+<li><p><strong>C MTS-ESP</strong>: use an <a href="#install-tuning">external tuning provider</a> for
+determining the frequency of each note. Frequencies of notes which haven't
+reached the release stage of their envelopes are updated continuously. The
+connection to the tuning provider is indicated by "on" or "off" appearing in
+the tuning selector box. If the connection to the tuning provider is broken,
+then 440 Hz based
+<a href="https://en.wikipedia.org/wiki/Equal_temperament">12 tone equal temperament</a>
+is used.</p></li>
+<li><p><strong>N MTS-ESP</strong>: use an <a href="#install-tuning">external tuning provider</a> for
+determining the frequency of each note. Note frequencies are updated only
+when a new note is started. The connection to the tuning provider is
+indicated by the "on" or "off" sign. If the connection to the tuning
+provider is broken, then 440 Hz based 12 tone equal temperament is used.</p></li>
+<li><p><strong>440 12TET</strong>: the usual 12 tone equal temperament with the A4 note being
+tuned to 440 Hz.</p></li>
+<li><p><strong>432 12TET</strong>: 12 tone equal temperament with the A4 note being tuned to
+432 Hz.</p></li>
+</ul>
+
+<h5>Oscillator Inaccuracy</h5>
+
+<p>The first screw icon next to the <a href="#usage-synth-common-tuning">tuning selector</a>
+adds a level of randomization to the oscillator's frequency, mimicking the
+imperfectness of analog synthesizers. The more the screw is turned, the more
+off each note will be from the correct pitch.</p>
+
+<p>When the inaccuracy of the two oscillators is set to the same value, and the
+<a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod position, then the
+oscillators will synchronize their randomness: each note will be off from the
+correct pitch by a random amount, but within a single voice, the two
+oscillators will be off by the same amount.</p>
+
+<h5>Oscillator Instability</h5>
+
+<p>The second screw icon next to the <a href="#usage-synth-common-tuning">tuning selector</a>
+adds a level of randomization to the oscillator's frequency over time,
+mimicking the imperfectness of analog synthesizers. The more the screw is
+turned, the more the oscillator will diverge from the correct pitch, hovering
+sometimes above, and sometimes below.</p>
+
+<p>When the instability of the two oscillators is set to the same value, and the
+<a href="#usage-synth-main-mode">MODE</a> knob is in the Mix&amp;Mod position, then the
+oscillators will synchronize their random divergence: each note will be off
+from the correct pitch by a random amount, but within a single voice, the two
+oscillators will always be off by the same amount, and will always diverge by
+the same amount in the same direction.</p>
+
+<h5>Fine Detune x4 (FIN x4)</h5>
+
+<p>The <a href="#usage-synth-common-fin">Fine Detune (FIN)</a> parameter goes from -1200
+cents to +1200 cents (-1 octave to +1 octave), but if you want to go extreme
+with pitch bends, this toggle switch can increase the range to -4800 cents to
++4800 cents (-4 octaves to +4 octaves).</p>
+
+<p><a id="usage-synth-common-prt"></a></p>
+
+<h5>Portamento Length (PRT)</h5>
+
+<p>The time it takes for the oscillator's frequency to reach the current note's
+pitch starting from the pitch of the previous note.</p>
+
+<p>When the synthesizer is in <a href="#usage-synth-main-nh">MONO</a> mode, and
+notes are played in a legato fashion (notes are started before the previous
+ones would have ended), then it also controls how long the oscillator's
+amplitude will take to match the velocity of the latest note.</p>
+
+<h5>Portamento Depth (PRD)</h5>
+
+<p>When set to a non-zero value (specified in cents), the oscillator's frequency
+will glide to the current note's pitch from a fixed level of detuning in
+accordance with the <a href="#usage-synth-common-prt">PRT</a> setting.</p>
+
+<p>When its value is 0 s, then the starting frequency of the glide will be the
+pitch of the previous note.</p>
+
+<h5>Detune (DTN)</h5>
+
+<p>Coarse detune, specifying how many semitones higher or lower the oscillator
+should play above or below the note's actual pitch.</p>
+
+<p><a id="usage-synth-common-fin"></a></p>
+
+<h5>Fine Detune (FIN)</h5>
+
+<p>Fine detune, specifying how many cents higher or lower the oscillator should
+play above or below the note's actual pitch.</p>
+
+<h5>Amplitude (AMP)</h5>
+
+<p>Sets the volume of the oscillator before any filtering and shaping.</p>
+
+<p><a id="usage-synth-common-filter"></a></p>
+
+<h5>Filter Logarithmic Frequency (LG F)</h5>
+
+<p>The toggle switch above the <a href="#usage-synth-common-freq">FREQ</a> knob can switch
+between using a linear or a logarithmic scale for the knob.</p>
+
+<p><a id="usage-synth-common-lgq"></a></p>
+
+<h5>Filter Logarithmic Q Factor (LG Q)</h5>
+
+<p>The toggle switch above the <a href="#usage-synth-common-q">Q</a> knob can switch
+between using a linear or a logarithmic scale for the knob.</p>
+
+<h5>Filter Cutoff Frequency Inaccuracy</h5>
+
+<p>The first little screw next to the <a href="#usage-synth-common-lgq">LG Q</a> switch adds
+a level of randomization to the filter's frequency to mimic imperfections of
+analog synthesizers.</p>
+
+<p>Be careful with this, because with certain filter settings, too much
+randomization can produce loud noises and sound artifacts or make the filter
+completely silent.</p>
+
+<h5>Filter Q Inaccuracy</h5>
+
+<p>The second little screw next to the <a href="#usage-synth-common-lgq">LG Q</a> switch adds
+a level of randomization to the filter's Q factor to mimic imperfections of
+analog synthesizers.</p>
+
+<p>Be careful with this, because with certain filter settings, too much
+randomization can produce loud noises and sound artifacts or make the filter
+completely silent.</p>
+
+<p><a id="usage-synth-common-type"></a></p>
+
+<h5>Filter Type (TYPE)</h5>
+
+<p>The following filter types are available:</p>
+
+<ul>
+<li><p><strong>LP</strong>: low-pass filter, the frequencies above the
+<a href="#usage-synth-common-freq">cutoff frequency</a> are attenuated. The
+<a href="#usage-synth-common-q">Q factor</a> controls the resonance.</p></li>
+<li><p><strong>HP</strong>: high-pass filter, the frequencies below the
+<a href="#usage-synth-common-freq">cutoff frequency</a> are attenuated. The
+<a href="#usage-synth-common-q">Q factor</a> controls the resonance.</p></li>
+<li><p><strong>BP</strong>: band-pass filter, the frequencies outside a band around the
+<a href="#usage-synth-common-freq">cutoff frequency</a> are filtered out. The
+<a href="#usage-synth-common-q">Q factor</a> controls the width of the band. (Low Q
+value makes the band wide, high Q value makes the band narrow.)</p></li>
+<li><p><strong>Notch</strong>: band-stop filter, the frequencies inside a band around the
+<a href="#usage-synth-common-freq">cutoff frequency</a> are filtered out. The
+<a href="#usage-synth-common-q">Q factor</a> controls the width of the band. (Low Q
+value makes the band wide, high Q value makes the band narrow.)</p></li>
+<li><p><strong>Bell</strong>: boosts or attenuates a band of frequencies around the
+<a href="#usage-synth-common-freq">cutoff frequency</a>. The
+<a href="#usage-synth-common-q">Q factor</a> controls the width of the band. (Low Q
+value makes the band wide, high Q value makes the band narrow.)</p></li>
+<li><p><strong>LS</strong>: low-shelf filter, boosts or attenuates frequencies below the
+<a href="#usage-synth-common-freq">cutoff frequency</a>.</p></li>
+<li><p><strong>HS</strong>: high-shelf filter, boosts or attenuates frequencies above the
+<a href="#usage-synth-common-freq">cutoff frequency</a>.</p></li>
+</ul>
+
+<p><a id="usage-synth-common-freq"></a></p>
+
+<h5>Filter Cutoff Frequency (FREQ)</h5>
+
+<p>The cutoff frequency of the filter.</p>
+
+<p>Be careful with this, because depending on other settings of the filter, a too
+low or too high cutoff frequency can produce loud noises and sound artifacts or
+it can make the filter completely silent.</p>
+
+<p><a id="usage-synth-common-q"></a></p>
+
+<h5>Filter Q Factor (Q)</h5>
+
+<p>The quality factor of the filter. Its precise meaning depends on the position
+of the <a href="#usage-synth-common-type">TYPE</a> knob. This knob has no effect for
+the low-shelf and high-shelf filters.</p>
+
+<p>Be careful with this, because depending on other settings of the filter, a too
+low or too high Q factor can produce loud noises and sound artifacts or it can
+make the filter completely silent.</p>
+
+<h5>Filter Gain (GAIN)</h5>
+
+<p>Controls the boosting or attenuation when the <a href="#usage-synth-common-type">TYPE</a>
+knob is in the Bell, LS (low-shelf), or HS (high-shelf) positions. It has no
+effect on other filter types.</p>
+
+<p>Be careful with this, because too much boosting can make the signal too loud.</p>
+
+<h5>Wave Folding (FOLD)</h5>
+
+<p>A wave folder is a similar wave shaping effect to a clipping distortion, but
+the portion of the signal that is above the maximum level is not clipped, but
+reflected back on itself. Then if it reaches the maximum amplitude again in the
+opposite direction, then it is reflected again and again. This process adds a
+lot of complexity to the sound, making it sound metallic.</p>
+
+<p><a id="usage-synth-common-vels"></a></p>
+
+<h5>Velocity Sensitivity (VEL S)</h5>
+
+<p>Controls how the oscillator's volume reacts to note velocity. When it's set to
+0%, then the oscillator will use a fixed volume for each note. Between 0% and
+100%, the oscillator's volume will react to velocity linearly. Above 100%, the
+oscillator's volume will react to note velocity more and more logarithmically.</p>
+
+<h5>Volume (VOL)</h5>
+
+<p>The last chance to control the oscillator's volume after wave shaping and
+filtering.</p>
+
+<h5>Width (WID)</h5>
+
+<p>When set to 0%, the oscillator will play all notes exactly in the middle of the
+stereo field. When set to a positive value, higher notes will lean towards the
+right side of the stereo field, and bass notes will lean towards the left. When
+set to a negative value, high notes will lean towards the left side, and bass
+notes will lean towards the right.</p>
+
+<h5>Panning (PAN)</h5>
+
+<p>Changes the position of the oscillator in the stereo field. Positive values
+move the oscillator towards the right side, negative values move it towards the
+left side.</p>
+
+<p><a id="usage-synth-common-wav"></a></p>
+
+<h5>Waveform (WAV)</h5>
+
+<p>Selects the waveform of the oscillator. The available options are:</p>
+
+<ul>
+<li><p><strong>Sine</strong>: simple sine wave without any harmonics above the fundamental.</p></li>
+<li><p><strong>Saw</strong>: sawtooth wave, ramps slowly, drops quickly. Contains both even and
+odd harmonics.</p></li>
+<li><p><strong>Soft Sw</strong>: a softer, warmer version of the sawtooth wave. Less prone to
+aliasing when various modulations and wave folding are engaged.</p></li>
+<li><p><strong>Inv Saw</strong>: inverse sawtooth wave, rises quickly, drops slowly. Contains
+both even and odd harmonics.</p></li>
+<li><p><strong>Soft I S</strong>: a softer, warmer version of the inverse sawtooth wave. Less
+prone to aliasing when various modulations and wave folding are engaged.</p></li>
+<li><p><strong>Triangle</strong>: rises slowly, drops slowly. Contains only odd harmonics.</p></li>
+<li><p><strong>Soft Tri</strong>: a softer, warmer version of the triangle wave. Less prone to
+aliasing when various modulations and wave folding are engaged.</p></li>
+<li><p><strong>Square</strong>: rises quickly, stays up for half a period, then drops quickly
+and stays down for half a period. Contains only odd harmonics.</p></li>
+<li><p><strong>Soft Sqr</strong>: a softer, warmer version of the square wave. Less prone to
+aliasing when various modulations and wave folding are engaged.</p></li>
+<li><p><strong>Custom</strong>: the amplitudes of the waveform's harmonics can be set using the
+10 knobs in the <em>Waveform &amp; harmonics for the Custom waveform</em> section.
+Useful for emulating tonewheel organ sounds.</p></li>
+</ul>
+
+<p><a id="usage-synth-modulator" href="#toc">Table of Contents</a></p>
+
+<h4>Oscillator 1 (Modulator)</h4>
+
+<h5>Subharmonic Amplitude (SUB)</h5>
+
+<p>Sets how loud the subharmonic oscillator should be. The subharmonic oscillator
+plays a sine wave exactly one octave below the oscillator's main frequency.</p>
+
+<p><a id="usage-synth-carrier"></a></p>
+
+<h4>Oscillator 2 (Carrier)</h4>
+
+<h5>Distortion (DIST)</h5>
+
+<p>Soft-clipping distortion.</p>
+
+<p><a id="usage-effects" href="#toc">Table of Contents</a></p>
+
+<h3>Effects</h3>
+
+<p><a id="usage-effects-volume"></a></p>
+
+<h4>Volume Controls</h4>
+
+<p>There are three volume controls placed at strategic points of the effects
+chain. Their purpose is twofold: they control the loudness of the signal, and
+they also measure the incoming peaks for the signal loudness based
+<a href="#usage-controllers">controllers</a>.</p>
+
+<p>Note that the first volume controller goes up to 200% so that you can boost the
+signal which is going into the
+<a href="#usage-effects-distortions">distortion effects</a>.</p>
+
+<p><a id="usage-effects-distortions"></a></p>
+
+<h4>Distortions</h4>
+
+<h5>Overdrive (Odrv, GAIN)</h5>
+
+<p>Subtle saturation and soft-clipping distortion to add a little bit of
+crunchiness to the sound.</p>
+
+<h5>Distortion (Dist, GAIN)</h5>
+
+<p>Heavy distortion for angrier sounds with a lot of bite.</p>
+
+<p><a id="usage-effects-filters"></a></p>
+
+<h4>Filters</h4>
+
+<p>See <a href="#usage-synth-common-filter">oscillator filters</a>.</p>
+
+<p><a id="usage-effects-chorus"></a></p>
+
+<h4>Chorus</h4>
+
+<p>The chorus effect mixes a signal with slightly delayed copies of itself, and
+modulates the delay times with low-frequency oscillators so that the cloned
+signals have a subtle variation in their phase and pitch relative to the
+original signal and to each other. This creates the illusion of having many
+different instances of the signal, making it sound bigger and fatter.</p>
+
+<h5>Logarithmic High-pass Filter Q Factor (LG Q)</h5>
+
+<p>The first component in the Chorus effect is a high-pass filter, in order to
+control the low end of the sound, and to avoid bass frequencies becoming muddy.
+This toggle switch makes the resonance parameter of the high-pass filter use a
+logarithmic scale instead of a linear scale.</p>
+
+<h5>Logarithmic LFO Frequency (LG LFO FREQ)</h5>
+
+<p>Switch between a linear and a logarithmic scale for the
+<a href="#usage-effects-chorus-freq">LFO frequency (FREQ)</a> parameter.</p>
+
+<h5>Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)</h5>
+
+<p>Switch between a linear and a logarithmic scale for the high-pass
+filter at the beginning of the Chorus effect's signal chain, and for the
+high-shelf filter near the end of it.</p>
+
+<h5>Tempo Synchronization (BPM SYNC)</h5>
+
+<p>Turn on tempo synchronization for the low-frequency oscillators and the delays
+in the effect, so that what they normally measure in terms of seconds will be
+measured in terms of beats instead. (This only works in hosts which provide
+tempo information to plugins.)</p>
+
+<p>Note: in order to prevent the memory that is allocated for delay buffers from
+growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+synchronization.</p>
+
+<h5>High-pass Filter Cutoff Frequency (HP F)</h5>
+
+<p>Set the cutoff frequency of the high-pass filter that is at the beginning of
+the signal chain of the effect in order to keep it from making bass frequencies
+too muddy.</p>
+
+<h5>High-pass Filter Cutoff Frequency (HP Q)</h5>
+
+<p>Set the resonance of the high-pass filter that is at the beginning of
+the signal chain of the effect.</p>
+
+<h5>Type (TYPE)</h5>
+
+<p>Select the chorus type. Different chorus types feature a different number of
+voices (ranging from 3 up to 7) which are arranged in various different
+positions in the stereo field (with regards to the
+<a href="#usage-effects-chorus-wid">WIDTH</a> parameter as well), with various different
+loudness values, etc.</p>
+
+<h5>Delay Time (DEL)</h5>
+
+<p>The maximum time by which the chorus voices are lagging behind the main voice.</p>
+
+<p><a id="usage-effects-chorus-freq"></a></p>
+
+<h5>LFO Frequency (FREQ)</h5>
+
+<p>Controls how quickly the lag of each chorus voice varies.</p>
+
+<h5>Depth (DPT)</h5>
+
+<p>Control how much the chorus voices vary their lag behind the main voice.</p>
+
+<h5>Dampening Frequency (DF)</h5>
+
+<p>Chorus voices are sent into a high-shelf filter which can be used for
+attenuating higher frequencies, making the chorused sound warmer, darker.
+This parameter sets the cutoff frequency of the filter.</p>
+
+<h5>Dampening Gain (DG)</h5>
+
+<p>Control how much the high-shelf filter attenuates high frequencies.</p>
+
+<h5>Feedback (FB)</h5>
+
+<p>Tell how loud the output of the effect is to be mixed back into its input. Be
+careful with this, because too much feedback can lead to a loud runaway signal
+feedback loop.</p>
+
+<p><a id="usage-effects-chorus-wid"></a></p>
+
+<h5>Stereo Width (WID)</h5>
+
+<p>Set the stereo spread of the chorus. When set to 0%, all the voices are placed
+in the middle of the stereo field.</p>
+
+<h5>Wet Volume (WET)</h5>
+
+<p>Control the loudness of the chorused signal.</p>
+
+<h5>Dry Volume (DRY)</h5>
+
+<p>Control the loudness of the original, unmodified input signal.</p>
+
+<p><a id="usage-effects-echo" href="#toc">Table of Contents</a></p>
+
+<h4>Echo</h4>
+
+<p>The Echo effect repeats the input signal with a delay, optionally with various
+levels of filtering and distortion, and with side-chain compression.</p>
+
+<h5>Logarithmic High-pass Filter Q Factor (LG Q)</h5>
+
+<p>The first component in the Echo effect is a high-pass filter, in order to
+control the low end of the sound, and to avoid bass frequencies becoming muddy.
+This toggle switch makes the resonance parameter of the high-pass filter use a
+logarithmic scale instead of a linear scale.</p>
+
+<h5>Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)</h5>
+
+<p>Switch between a linear and a logarithmic scale for the high-pass
+filter at the beginning of the Echo effect's signal chain, and for the
+high-shelf filter near the end of it.</p>
+
+<h5>Tempo Sync (BPM SYNC)</h5>
+
+<p>Turn on tempo synchronization for the delay lines in the effect, so that time
+will be measured in terms of beats instead of in terms of seconds. (This only
+works in hosts which provide tempo information to plugins.)</p>
+
+<p>Note: in order to prevent the memory that is allocated for delay buffers from
+growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+synchronization.</p>
+
+<h5>Input Volume (IN V)</h5>
+
+<p>Control the input signal level for the effect. This parameter goes from 0% to
+200%, so that the signal can be boosted for the
+<a href="#usage-effects-echo-dist">distortion</a> that is built into the effect.</p>
+
+<h5>High-pass Filter Cutoff Frequency (HP F)</h5>
+
+<p>Set the cutoff frequency of the high-pass filter that is at the beginning of
+the signal chain of the effect in order to keep it from making bass frequencies
+too muddy.</p>
+
+<h5>High-pass Filter Cutoff Frequency (HP Q)</h5>
+
+<p>Set the resonance for the high-pass filter that is at the beginning of
+the signal chain of the effect.</p>
+
+<h5>Delay Time (DEL)</h5>
+
+<p>Set how long the echo signal will lag behind the original signal.</p>
+
+<p>Note: to simulate the feel of old tape delays, assign an <a href="#usage-lfos">LFO</a> to
+the delay time parameter which is set to oscillate very slowly, by a really low
+amount, maybe with a tiny amount of randomization.</p>
+
+<p><a id="usage-effects-echo-dist"></a></p>
+
+<h5>Distortion (DIST)</h5>
+
+<p>Add some saturation or soft-clipping distortion to the delayed signal. This can
+also come handy for simulating slightly overdriven analog tape delay effect
+units.</p>
+
+<h5>Dampening Frequency (DF)</h5>
+
+<p>The delayed signal is sent into a high-shelf filter which can be used for
+attenuating higher frequencies, making the echo sound warmer, darker.
+This parameter sets the cutoff frequency of the filter.</p>
+
+<h5>Dampening Gain (DG)</h5>
+
+<p>Control how much the high-shelf filter attenuates high frequencies.</p>
+
+<h5>Feedback (FB)</h5>
+
+<p>Tell how loud the output of the effect is to be mixed back into its input. Be
+careful with this, because too much feedback can lead to a loud runaway signal
+feedback loop.</p>
+
+<h5>Stereo Width (WID)</h5>
+
+<p>Set the stereo spread of the echos. The further away this value is from 0%, the
+further from the center the echos will be, bouncing back and forth between the
+right and left speaker.</p>
+
+<p><a id="usage-effects-echo-cth"></a></p>
+
+<h5>Side-chain Compression Threshold (CTH)</h5>
+
+<p>Threshold for the side-chain compression: when the input signal goes above this
+level, the effect will reduce the volume of the echos in order to keep them
+from stealing the spotlight from the original signal in the mix. Once the input
+signal goes below the threshold, the echos will be brought up to their intended
+level.</p>
+
+<h5>Side-chain Compression Attack Time (CATK)</h5>
+
+<p>Set how fast or how slow the compression should kick in when the raw signal
+goes above the threshold.</p>
+
+<h5>Side-chain Compression Release Time (CREL)</h5>
+
+<p>Set how fast or how slow the compression should bring back the echo signal to
+its normal level once the raw input signal goes below the threshold.</p>
+
+<h5>Side-chain Compression Ratio (CR)</h5>
+
+<p>Control the amount of compression that is applied to the echo signal based on
+the loudness of the raw input signal.</p>
+
+<p>For example, if the <a href="#usage-effects-echo-cth">compression threshold</a> is -11 dB,
+and the input signal is -5 dB, then the input is 6 dB louder than the
+threshold, because <code>-11 + 6 = -5</code>. A compression ratio of 3 will turn this 6 dB
+difference into <code>6 / 3 = 2</code> dB, so the target gain will be <code>-11 + 2 = -9</code> dB,
+which means a -4 dB signal reduction. The trick with side-chaining is that the
+necessary loudness reduction is calculated for one signal, but applied to
+another; in this case, the echo signal is the one which gets the -4 dB
+reduction, in order to let the raw sound shine.</p>
+
+<p>Later, if the input signal reaches -2 dB, then the difference from the -11 dB
+threshold will be 9 dB. Since <code>9 / 3 = 3</code>, and <code>-11 + 3 = -8</code>, the -2 dB signal
+will need a -6 dB reduction in order to hit the -8 dB signal level. Therefore,
+a reduction of -6 dB will be applied to the echo signal.</p>
+
+<p>Then when the input signal goes below -11 dB, no more loudness reduction will
+be applied to the echo signal.</p>
+
+<h5>Wet Volume (WET)</h5>
+
+<p>Control the loudness of the echo signal.</p>
+
+<h5>Dry Volume (DRY)</h5>
+
+<p>Control the loudness of the original, unmodified input signal.</p>
+
+<p><a id="usage-effects-reverb" href="#toc">Table of Contents</a></p>
+
+<h4>Reverb</h4>
+
+<p>The Reverb effect combines multiple delay lines to simulate sound reflections
+that can be heard in various rooms, optionally with various levels of filtering
+and distortion, and with side-chain compression.</p>
+
+<p>The signal chain is similar to the one in the
+<a href="#usage-effects-echo">Echo effect</a>, so many of the parameters work the same way
+as described there.</p>
+
+<p>Only the parameters that are unique to the Reverb effect are listed below.</p>
+
+<h5>Type (TYPE)</h5>
+
+<p>Select from various distributions and numbers of reflections, ranging from
+small rooms with just a handful of reflection points, to large cathedrals with
+many spread out reflections.</p>
+
+<h5>Room Reflectivity (ROOM)</h5>
+
+<p>Control how reflective the room is, in other words, how loud are the sounds
+that bounce off its walls. The higher this value, the longer it takes for the
+reverberation to decay into silence after the raw input signal goes quiet.</p>
+
+<p><a id="usage-macros" href="#toc">Table of Contents</a></p>
+
+<h3>Macros (MC)</h3>
+
+<p>Macros are <a href="#usage-controllers">controllers</a> that can combine and transform
+other momentary value based controllers, like
+<a href="https://midi.org/midi-1-0-control-change-messages">MIDI CC</a>, pitch wheel
+position, and even other macros. Basic controllers like the modulation wheel of
+a MIDI keyboard go from 0% to 100% on a linear scale. Macros can (for example)
+make it go from 80% down to 30% and use a non-linear curve in between.</p>
+
+<p>The typical usage of a macro is to assign a controller to its
+<a href="#usage-macros-in">input (IN)</a> parameter, set up the minimum, maximum,
+distortion, etc.  parameters, and then assign the macro to an oscillator,
+filter, effect, envelope, or LFO parameter. Assigning various other controllers
+(e.g. note value, velocity, other macros, etc.) to the parameters of a macros
+can result in interesting and creative interactions between controllers.</p>
+
+<h4>Midpoint</h4>
+
+<p>Move the mouse cursor over the first function graph icon at the top right
+corner of a macro, and start moving it while holding the left mouse button
+down, or start using the mouse wheel to adjust the midpoint of the macro's
+<a href="#usage-macros-in">input</a>.</p>
+
+<p>This is most useful when the input of the macro is associated with the pitch
+bend wheel of a MIDI keyboard, and you want precise control over the range that
+is covered by the lower and the upper half of the wheel's movement.</p>
+
+<h4>Distortion Shape</h4>
+
+<p>Click on the second function graph icon at the top right corner of a macro, or
+use the mouse wheel while holding the mouse cursor over it to select the
+non-linearity shape that the macro will use when its
+<a href="#usage-macros-dist">distortion (DIST)</a> parameter is set to a value above 0%.</p>
+
+<p><a id="usage-macros-in"></a></p>
+
+<h4>Input (IN)</h4>
+
+<p>Assign the controller that you want to transform via the macro to this
+parameter.</p>
+
+<p><a id="usage-macros-min"></a></p>
+
+<h4>Minimum Value (MIN)</h4>
+
+<p>The macro will output this value when either its <a href="#usage-macros-in">input</a> or
+its <a href="#usage-macros-amt">amount</a> parameter is at the 0% position.</p>
+
+<p><a id="usage-macros-max"></a></p>
+
+<h4>Maximum Value (MAX)</h4>
+
+<p>The macro will output this value when both its <a href="#usage-macros-in">input</a> and
+its <a href="#usage-macros-amt">amount</a> parameters are at the 100% position.</p>
+
+<p><a id="usage-macros-amt"></a></p>
+
+<h4>Amount (AMT)</h4>
+
+<p>Scale the <a href="#usage-macros-in">input</a> by this amount.</p>
+
+<p><a id="usage-macros-dist"></a></p>
+
+<h4>Distortion (DIST)</h4>
+
+<p>Tell how far the macro should diverge from the linear path between its
+<a href="#usage-macros-min">minimum</a> and <a href="#usage-macros-max">maximum</a> values.</p>
+
+<h4>Randomness (RAND)</h4>
+
+<p>Set how much the macro's value should be randomized while still staying between
+the <a href="#usage-macros-min">minimum</a> and <a href="#usage-macros-max">maximum</a> values.</p>
+
+<p><a id="usage-envelopes" href="#toc">Table of Contents</a></p>
+
+<h3>Envelope Generators (ENV)</h3>
+
+<p>An envelope generator is a <a href="#usage-controllers">controller</a> that shapes the
+sound over time by defining target values for parameters which will be reached
+in a given amount of time after a note is triggered.</p>
+
+<p>Many of the <a href="#usage-synth">synthesis parameters</a> are polyphonic, which means
+that each simultaneously playing voice can use different values and run
+their own individual timeline for those parameters, as long as an envelope is
+assigned to them.</p>
+
+<p>Envelopes in JS80P use DAHDSR stages to reach four different values for their
+assigned parameters:</p>
+
+<ul>
+<li><p><strong>Delay</strong>: when a note is triggered, the parameter will stay on the initial
+level for this amount of time.</p></li>
+<li><p><strong>Attack</strong>: the parameter will reach the peak level in this amount of time.</p></li>
+<li><p><strong>Hold</strong>: the parameter will stay on the peak level for this long.</p></li>
+<li><p><strong>Decay</strong>: the parameter will reach the sustain level in this amount of
+time.</p></li>
+<li><p><strong>Sustain</strong>: once the D-A-H-D stages are complete, the parameter will stay
+on the sustain level until the note is stopped. (If the sustain level is 0%,
+then JS80P will automatically release the note when this stage is reached.)</p></li>
+<li><p><strong>Release</strong>: once the note is stopped, the parameter will take this long to
+reach the final level.</p></li>
+</ul>
+
+<p>Note: when an envelope is assigned to an amplitude or volume parameter, it is
+recommended to have its initial and final level be set to 0%.</p>
+
+<p>The transitions between values can take various different shapes:</p>
+
+<ul>
+<li><p><strong>Linear</strong>: follow a straight line towards the target value.</p></li>
+<li><p><strong>Smooth-smooth</strong>: start slowly, then pick up some speed, and then slow down
+again before landing on the target value.</p></li>
+<li><p><strong>Smooth-sharp</strong>: start slowly, then as the time to reach the target value
+starts to run out, pick up more and more speed, and reach it quickly.</p></li>
+<li><p><strong>Sharp-smooth</strong>: start quickly, then as the target value is getting closer,
+slow down and land on it gently and smoothly.</p></li>
+<li><p><strong>Sharp-sharp</strong>: start quickly, then lose momentum near the midpoint, and
+when the time to reach the target value starts to run out, pick up the speed
+again and reach it quickly.</p></li>
+</ul>
+
+<p>Each non-linear shape has 3 different versions with various steepness.</p>
+
+<h4>Attack Shape</h4>
+
+<p>The first icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the initial level to the peak level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.</p>
+
+<h4>Decay Shape</h4>
+
+<p>The second icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the peak level to the sustain level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.</p>
+
+<h4>Release Shape</h4>
+
+<p>The third icon in the header row of envelope settings selects the shape that
+defines how the envelope will go from the sustain level to the final level.
+Click on it to select a different shape, or use the mouse wheel while holding
+the cursor over it.</p>
+
+<p><a id="usage-envelopes-update"></a></p>
+
+<h4>Update Mode</h4>
+
+<p>When a note is triggered and a voice starts to track its own envelope timeline
+for a parameter, its default behaviour is to capture a snapshot of the envelope
+settings at that moment, and run the envelope generator with those values.
+Changing the envelope settings after this moment has no effect at all on
+already engaged voices while they are playing. This behaviour can be adjusted
+by selecting a different update strategy by clicking on the box next to the
+transition shapes, or using the mouse wheel while holding the cursor over it.
+The available options are:</p>
+
+<ul>
+<li><p><strong>STA</strong>: static envelope: the default behaviour where the envelope settings
+are never updated by voices while they are playing a note.</p></li>
+<li><p><strong>END</strong>: the same as the static mode, except that the envelope settings
+snapshot is updated once when the note is released.</p></li>
+<li><p><strong>DYN</strong>: dynamic envelope: the voice will continuously update the envelope
+snapshot, and adjust the controlled parameter's value so that it converges
+to the level where it should be according to the momentary state of the
+envelope settings.</p></li>
+</ul>
+
+<h4>Tempo Synchronization (BPM)</h4>
+
+<p>The time interval of each stage will be measured in terms of beats instead of
+in seconds if the host provides tempo information to the plugin.</p>
+
+<h4>Time Inaccuracy</h4>
+
+<p>The first little screw in the top right corner of envelope settings adds
+randomization to envelope stage lengths. Useful for simulating imperfectness of
+analog hardware.</p>
+
+<h4>Level Inaccuracy</h4>
+
+<p>The second little screw in the top right corner of envelope settings adds
+randomization to envelope levels. Useful for simulating imperfectness of analog
+hardware.</p>
+
+<p><a id="usage-envelopes-amt"></a></p>
+
+<h4>Amount (AMT)</h4>
+
+<p>Scales all four levels of the envelope.</p>
+
+<h4>Initial Level (INI)</h4>
+
+<p>The level where the envelope starts.</p>
+
+<h4>Peak Level (PEAK)</h4>
+
+<p>Target level for the Attack stage.</p>
+
+<h4>Sustain Level (SUS)</h4>
+
+<p>Target level for the Decay stage.</p>
+
+<h4>Final Level (FIN)</h4>
+
+<p>Target level for the Release stage.</p>
+
+<h4>Delay Time (DEL)</h4>
+
+<p>How long the envelope will stay on the initial level before the Attack stage
+begins.</p>
+
+<h4>Attack Time (ATK)</h4>
+
+<p>How long it will take to reach the peak level from the initial level.</p>
+
+<h4>Hold Time (HOLD)</h4>
+
+<p>How long the envelope will stay on the peak level.</p>
+
+<h4>Decay Time (DEC)</h4>
+
+<p>How long it will take to reach the sustain level from the peak level.</p>
+
+<h4>Release Time (REL)</h4>
+
+<p>How long it will take to reach the final level from the value where the
+parameter is at when the note stop event is received.</p>
+
+<p><a id="usage-lfos" href="#toc">Table of Contents</a></p>
+
+<h3>Low-Frequency Oscillators (LFOs)</h3>
+
+<p>A low-frequency oscillator (LFO) is a controller which makes a parameter's
+value oscillate back and forth between two values.</p>
+
+<h4>Logarithmic Frequency (LG FREQ)</h4>
+
+<p>Toggle the <a href="#usage-lfos-freq">frequency</a> parameter of the LFO between a
+logarithmic and a linear scale.</p>
+
+<p><a id="usage-lfos-center"></a></p>
+
+<h4>Center (CENTER)</h4>
+
+<p>Make the LFO oscillate around the midpoint of the <a href="#usage-lfos-min">minimum</a>
+and <a href="#usage-lfos-max">maximum</a> values instead of between the two extremes.
+This makes a difference when the <a href="#usage-lfos-amt">amount</a> parameter of the LFO
+is set to a value below 100%: by default, the LFO will oscillate above the
+minimum value, and it won't reach the maximum, but when the LFO is centered, it
+will not reach either extremes, it will stay within a radius of the midpoint
+which is half the value of the amount parameter. (This is similar to the
+unipolar/bipolar LFO modes in other synthesizers.)</p>
+
+<p><a id="usage-lfos-amtenv"></a></p>
+
+<h4>Amount Envelope (AMT ENV)</h4>
+
+<p>Click on the black box next to the <a href="#usage-lfos-center">centering</a> switch in
+the header row of an LFO, or use the mouse wheel while holding the cursor above
+it to associate an <a href="#usage-envelopes">envelope generator</a> with the LFO. When an
+LFO with an amount envelope is assigned to a
+<a href="#usage-synth">synthesis parameter</a> that can accept control from envelope
+generators as well, then each voice will run their own envelope and LFO
+timeline for that parameter when a new note is triggered.</p>
+
+<p>Furthermore, if a parameter of an LFO which has an amount envelope is
+controlled by another LFO which also has an amount envelope, then each new note
+will have its own timeline for both of those LFOs and envelopes. (Up to 6
+timelines can be maintained by each parameter for each note. When that limit
+runs out, or when there's a dependency cycle between LFOs, then some of the
+LFOs will be run globally, as if there was no envelope assigned to them.)</p>
+
+<p>Note that when the LFO is assigned to a parameter which doesn't accept control
+from envelope generators, then the amount envelope has no effect.</p>
+
+<p><a id="usage-lfos-bpm"></a></p>
+
+<h4>Tempo Synchronization (BPM SYNC)</h4>
+
+<p>The LFO's <a href="#usage-lfos-freq">frequency</a> is normally measured in Hertz (Hz)
+which means "cycles per second". Click on the BPM SYNC switch to change that to
+"cycles per beat" instead. (This only works in hosts which provide tempo
+information to plugins.)</p>
+
+<h4>Waveform (WAV)</h4>
+
+<p>Same as the <a href="#usage-synth-common-wav">waveform parameter</a> of the audio-range
+oscillators, except that LFOs don't have the "Custom" option.</p>
+
+<p><a id="usage-lfos-freq"></a></p>
+
+<h4>Frequency (FREQ)</h4>
+
+<p>Set how many oscillations to do per second (or per beat, when the
+<a href="#usage-lfos-bpm">BPM SYNC</a> switch is turned on).</p>
+
+<h4>Phase (PHS)</h4>
+
+<p>Shift the (initial) phase of the oscillator.</p>
+
+<p><a id="usage-lfos-min"></a></p>
+
+<h4>Minimum Value (MIN)</h4>
+
+<p>Set the lowest value of the oscillation. When it is greater than the
+<a href="#usage-lfos-max">maximum</a> value, then the waveform is flipped upside down.</p>
+
+<p><a id="usage-lfos-max"></a></p>
+
+<h4>Maximum Value (MAX)</h4>
+
+<p>Set the highest value of the oscillation. When it is less than the
+<a href="#usage-lfos-min">minimum</a> value, then the waveform is flipped upside down.</p>
+
+<p><a id="usage-lfos-amt"></a></p>
+
+<h4>Amount (AMT)</h4>
+
+<p>Set the amplitude of the oscillation.</p>
+
+<h4>Distortion (DIST)</h4>
+
+<p>Distort the waveform with a soft-clipping distortion.</p>
+
+<h4>Randomness (RAND)</h4>
+
+<p>Randomize the waveform.</p>
+
+<p><a id="presets" href="#toc">Table of Contents</a></p>
+
+<h2>Presets</h2>
+
+<p>JS80P has a few built-in presets, and in case you don't like your plugin host
+application's preset browser, you can load and save them as ordinary files. For
+each plugin type, you can find these presets in the <code>presets</code> folder in the ZIP
+archive, and you can load them into JS80P by clicking on the <em>Import Patch</em>
+icon near the top left corner of the main screen of the plugin.</p>
+
+<p><a id="preset-blank"></a></p>
+
+<h3>Blank</h3>
+
+<p>The default, empty patch, a blank canvas.</p>
+
+<p><a id="preset-bright-organ"></a></p>
+
+<h3>Bright Organ</h3>
+
+<p>A bright, clean, Hammond-like organ sound. Aftertouch and mod wheel increase
+the vibrato. The softer you play, the slower the attack, the harder you play,
+the harder the attack.</p>
+
+<p><a id="preset-chariots-aftertouch"></a></p>
+
+<h3>Chariots-Aftertouch</h3>
+
+<p>A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
+an inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
+you use aftertouch. The mod wheel controls the vibrato of notes above C3, and
+the pitch wheel also affects only these notes.</p>
+
+<p><a id="preset-chariots"></a></p>
+
+<h3>Chariots</h3>
+
+<p>A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
+an inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
+depending on the velocity. The harder you play, the longer it takes for the
+wavefolder to kick in. The mod wheel controls the vibrato of notes above
+C3, and the pitch wheel also affects only these notes.</p>
+
+<p><a id="preset-demo-1"></a></p>
+
+<h3>Demo 1</h3>
+
+<p>The patch from the first demo video of JS80P. The mod wheel makes the sound
+brighter, the volume knob (CC 7) adjusts the inverse sawtooth LFO which
+controls the filter before the wavefolder.</p>
+
+<p><a id="preset-demo-2"></a></p>
+
+<h3>Demo 2</h3>
+
+<p>The patch from the second demo video of JS80P. This split keyboard patch has
+slow tremolo bass notes below Gb3, with extremely long release (just press a
+key, and you're good for about 2 measures with your left hand being free, even
+without a sustain pedal), and plucky lead notes, with the mod wheel and the
+volume knob (CC 7) controlling the timbre. (However, it is not recommended
+with this patch to adjust the mod wheel while a right hand note is playing.)</p>
+
+<p><a id="preset-kalimba"></a></p>
+
+<h3>Kalimba</h3>
+
+<p>A simple kalimba sound with percussive attack and short decay. The sustain
+pedal adds more reverb and echo, and lengthens note decay.</p>
+
+<p><a id="preset-rock-organ"></a></p>
+
+<h3>Rock Organ</h3>
+
+<p>A little darker, overdriven Hammond-like organ sound. Aftertouch and mod wheel
+increase the vibrato. The softer you play, the slower the attack, the harder
+you play, the harder the attack.</p>
+
+<p><a id="preset-sandstorm"></a></p>
+
+<h3>Sandstorm</h3>
+
+<p>A dirty, harsh, detuned FM lead sound. Mod wheel and aftertouch make it even
+dirtier and harsher.</p>
+
+<p><a id="preset-stereo-saw"></a></p>
+
+<h3>Stereo Saw</h3>
+
+<p>A little bit metallic sounding sawtooth wave. Note velocity slightly affects
+the timbre, mod wheel and aftertouch add wavefolding. The volume knob
+adjusts an LFO which controls filter resonance.</p>
+
+<p><a id="preset-acid-lead-1"></a></p>
+
+<h3>Acid Lead 1</h3>
+
+<p>Sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.</p>
+
+<p><a id="preset-acid-lead-2"></a></p>
+
+<h3>Acid Lead 2</h3>
+
+<p>Square wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.</p>
+
+<p><a id="preset-acid-lead-3"></a></p>
+
+<h3>Acid Lead 3</h3>
+
+<p>Another sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
+the vibrato, the sustain pedal lengthens the decay.</p>
+
+<p><a id="preset-bells-1"></a></p>
+
+<h3>Bells 1</h3>
+
+<p>A bright bell sound. Aftertouch and mod wheel increase the vibrato,
+the sustain pedal lengthens the decay.</p>
+
+<p><a id="preset-bells-2"></a></p>
+
+<h3>Bells 2</h3>
+
+<p>A slightly darker bell sound. Aftertouch and mod wheel increase the vibrato,
+the sustain pedal lengthens the decay.</p>
+
+<p><a id="preset-flute"></a></p>
+
+<h3>Flute</h3>
+
+<p>A synth flute sound with a couple of tricks: the pitch of the notes decreases
+slightly when they end, and the mod wheel adds a little embellishment to the
+beginning of each note. Aftertouch adds more emphasis to the note.</p>
+
+<p><a id="preset-fm-womp-1"></a></p>
+
+<h3>FM Womp 1</h3>
+
+<p>A clean FM sound where the modulator and the carrier use different envelopes,
+so the notes start with a slight "wah" effect. Aftertouch and mod wheel
+increase the vibrato. Aftertouch also adds more modulation.</p>
+
+<p><a id="preset-fm-womp-2"></a></p>
+
+<h3>FM Womp 2</h3>
+
+<p>A slightly distorted FM sound where the modulator and the carrier use
+different envelopes, so the notes start with a slight "wah" effect. Aftertouch
+and mod wheel increase the vibrato. Aftertouch also adds more modulation,
+making the sound brighter and more distorted.</p>
+
+<p><a id="preset-fm-womp-3"></a></p>
+
+<h3>FM Womp 3</h3>
+
+<p>A more distorted FM sound where the modulator and the carrier use different
+envelopes, so the notes start with a slight "wah" effect. Aftertouch and mod
+wheel increase the vibrato. Aftertouch also adds more modulation, making the
+sound brighter and more distorted.</p>
+
+<p><a id="preset-tech-noir-lead-1"></a></p>
+
+<h3>Tech Noir Lead 1</h3>
+
+<p>A brass sound for futuristic sci-fi dystopias with a slower filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.</p>
+
+<p><a id="preset-tech-noir-lead-2"></a></p>
+
+<h3>Tech Noir Lead 2</h3>
+
+<p>A brass sound for futuristic sci-fi dystopias with a harsher filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.</p>
+
+<p><a id="preset-tech-noir-lead-3"></a></p>
+
+<h3>Tech Noir Lead 3</h3>
+
+<p>A darker brass sound for futuristic sci-fi dystopias with a filter sweep at
+the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
+aftertouch adds emphasis and brightness.</p>
+
+<p><a id="preset-derezzed"></a></p>
+
+<h3>Derezzed</h3>
+
+<p>This Daft Punk inspired patch is built around sawtooth waves with lots of
+distortions. Mod wheel makes upcoming notes brighter (without affecting
+the currently sounding ones), and it increases the distortion. Aftertouch
+adds vibrato.</p>
+
+<p><a id="preset-ambient-pad-1"></a></p>
+
+<h3>Ambient Pad 1</h3>
+
+<p>Slowly evolving pad sound with sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds slight distortions.</p>
+
+<p><a id="preset-ambient-pad-2"></a></p>
+
+<h3>Ambient Pad 2</h3>
+
+<p>Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds slight distortions.</p>
+
+<p><a id="preset-ambient-pad-3"></a></p>
+
+<h3>Ambient Pad 3</h3>
+
+<p>Slowly evolving pad sound with a dark sci-fi vibe. The mod wheel destabilizes
+the tuning, the aftertouch increases that effect, and adds ghostly, distant
+screams.</p>
+
+<p><a id="preset-saw-piano"></a></p>
+
+<h3>Saw Piano</h3>
+
+<p>A sawtooth wave based sound where high notes decay quickly, lower notes
+decay slowly, but decay time is also affected by note velocity. The harder
+you play, the brighter and richer the timbre, and the harder the note attack.
+Mod wheel controls the vibrato, and aftertouch controls filtering. The
+sustain pedal lengthens note decay.</p>
+
+<p><a id="preset-saw-piano-reversed"></a></p>
+
+<h3>Saw Piano Reversed</h3>
+
+<p>A sawtooth wave based sound which sounds like as if you were playing
+a recording backwards. The time it takes for notes to un-decay depends on
+note pitch and velocity. The harder you play, the brighter and richer the
+sound gets. Mod wheel controls the vibrato, aftertouch adjusts the filtering.</p>
+
+<p><a id="preset-nightmare-lead"></a></p>
+
+<h3>Nightmare Lead</h3>
+
+<p>Starts out as a nice, filtered sawtooth wave, but as you begin to turn the mod
+wheel and add some aftertouch, it becomes more and more menacing and distorted,
+until it finally descends into madness.</p>
+
+<p><a id="preset-tremolo-lead"></a></p>
+
+<h3>Tremolo Lead</h3>
+
+<p>Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
+the filter and adds a tremolo effect. Filtering also responds to note velocity.</p>
+
+<p><a id="preset-monophonic-saw"></a></p>
+
+<h3>Monophonic Saw</h3>
+
+<p>A sawtooth wave based monophonic, sustained sound with smooth legato glides.
+The harder you play, the brighter and richer the timbre, and the harder the
+note attack. Mod wheel controls the vibrato, and aftertouch controls the
+filtering and the wavefolder. The sustain pedal lengthens note decay.</p>
+
+<p><a id="preset-dystopian-cathedral"></a></p>
+
+<h3>Dystopian Cathedral</h3>
+
+<p>Play softly and this futuristic organ-like patch will sound smooth as butter,
+but when you start playing with more force, the sound will become angry, fat,
+and in-your-face. The mod wheel increases the level of madness.</p>
+
+<p><a id="preset-gloomy-brass"></a></p>
+
+<h3>Gloomy Brass</h3>
+
+<p>Turn the mod wheel down for a soft, warm, and fat sound, turn it up for
+brassy swells, distortion, and reverb. Aftertouch adds some harshness and
+vibrato.</p>
+
+<p><a id="preset-gloomy-brass-raindrops"></a></p>
+
+<h3>Gloomy Brass Raindrops</h3>
+
+<p>A version of Gloomy Brass where each note is followed by a raindrop after a
+random amount of time.</p>
+
+<p><a id="preset-sawyer"></a></p>
+
+<h3>Sawyer</h3>
+
+<p>Recreation of the iconic bass and lead sound from Tom Sawyer by Rush. Notes
+below middle C will do the well-known resonance sweep and then turn into a
+dark growl (which you can spice up with the mod wheel and some aftertouch),
+and notes above middle C will be bright, but will lose much of their
+brightness while doing a huge vibrato when you turn up the mod wheel or apply
+aftertouch. (Note that this is not a split-keyboard patch, because both
+oscillators are required to make this sound good in stereo - instead, the
+effect is achieved through trickery with the Note controller and the
+Distortion knob of Macro 12 and 13.)</p>
+
+<p><a id="preset-analog-brass-at"></a></p>
+
+<h3>Analog Brass AT</h3>
+
+<p>Play softly, pianissimo for a soft, smooth, warm, and fat analog brass sound.
+Play fortissimo and use aftertouch for big bright swells. The mod wheel adds
+vibrato, and the pitch wheel goes from -3 octaves to +1 octave.</p>
+
+<p><a id="preset-analog-brass-mod"></a></p>
+
+<h3>Analog Brass mod</h3>
+
+<p>Turn the mod wheel down and play softly, pianissimo for a soft, smooth, warm,
+and fat analog brass sound. Turn it up and play fortissimo for big bright
+swells. Aftertouch adds vibrato, and the pitch wheel goes from -3 octaves to
++1 octave.</p>
+
+<p><a id="preset-bouncy"></a></p>
+
+<h3>Bouncy</h3>
+
+<p>The sound of a ping-pong ball dropping on a glockenspiel, showcasing a use of
+LFO amount envelopes.</p>
+
+<p><a id="bugs" href="#toc">Table of Contents</a></p>
+
+<h2>Bugs</h2>
+
+<p>If you find bugs, please report them at
+<a href="https://github.com/attilammagyar/js80p/issues">https://github.com/attilammagyar/js80p/issues</a>.</p>
+
+<p><a id="faq" href="#toc">Table of Contents</a></p>
+
+<h2>Frequently Asked Questions</h2>
+
+<p><a id="faq-mac"></a></p>
+
+<h3>Mac version?</h3>
+
+<p>Sorry, it's not likely to happen anytime soon, unless someone is willing to
+create and maintain a Mac fork of JS80P. For me to do it, it would require
+quite a large investment, both in terms of effort and financially. If MacOS
+would be available (at a reasonable price) for installing it in a virtual
+machine that could be used for testing, I'd consider that. But as long as it
+cannot be obtained (legally) without also buying a Mac, and I'm happy with my
+current computer, I'm not going to invest in a new one.</p>
+
+<p><a id="faq-params-polyphony" href="#toc">Table of Contents</a></p>
+
+<h3>Parameters, Envelopes, LFOs, and polyphony: how do they work?</h3>
+
+<p>By default, knobs and toggles act globally. This means that if you adjust a
+knob with your mouse, or if you assign a MIDI event (controller change, note
+velocity, etc.), a <a href="#usage-macros">macro</a>, or an <a href="#usage-lfos">LFO</a> to it and
+adjust the parameter via that, or if you use
+<a href="#faq-automation">automation in your plugin host application</a>, then that
+parameter will change for all sounding notes.</p>
+
+<p>But if you assign an <a href="#usage-envelopes">envelope generator</a> as a
+<a href="#usage-controllers">controller</a> to a parameter, then each voice will use its
+own timeline for that parameter, and the parameter's value will change over
+time for each simultaneously sounding note independently from each other,
+according to the envelope's settings. By default, envelope generator settings
+are only evaluated once for each note, at the very beginning of the note, so if
+the parameters of the envelope generator are changed, then it will only affect
+the notes that start after the adjustment. This behaviour can be changed by
+setting a different <a href="#usage-envelopes-update">update mode</a> for the envelope
+generator.</p>
+
+<p>Similarly, if you assign an <a href="#usage-lfos">LFO</a> to a parameter which can accept
+control from <a href="#usage-envelopes">envelope generators</a>, and the LFO is associated
+with an <a href="#usage-lfos-amtenv">amount envelope</a>, then the LFO becomes polyphonic,
+and its amount will be controlled by the envelope generator for each polyphonic
+voice independently from the other voices. Note that this is transitive up to
+a limit: if a parameter of a polyphonic LFO is controlled by another LFO, then
+the second LFO will also become polyphonic if it has an amount envelope
+assigned to it. An LFO chain like this can contain up to 6 LFOs and envelopes.
+If a chain contains more than that, or has dependency cycles where LFOs control
+each other's parameters, then some of the LFOs in the chain will be treated as
+if there weren't any envelopes assigned to them.</p>
+
+<p>To have polyphonic voice parameters <em>sample and hold</em> a
+<a href="#usage-controllers">MIDI value</a> or a <a href="#usage-macros">macro</a>'s momentary value
+for the entire duration of a note, independently of other voices and subsequent
+changes of the value (e.g. to use lower
+<a href="#usage-synth-common-freq">filter cutoff frequency</a> for
+low-velocity notes so that they sound softer), then you have to use an
+envelope generator: turn up all the levels of the envelope to 100%, assign the
+MIDI value or the macro to the <a href="#usage-envelopes-amt">amount</a> parameter of the
+envelope, and assign the envelope to control the parameter.</p>
+
+<p><a id="faq-custom-wave" href="#toc">Table of Contents</a></p>
+
+<h3>The knobs in the waveform harmonics section don't do anything, is this a bug?</h3>
+
+<p>To hear the effect of those knobs, you have to select the <em>Custom</em>
+<a href="#usage-synth-common-wav">waveform</a> for the oscillator.</p>
+
+<p>(Note that these parameters are CPU-intensive to process, so they are not
+sample accurate, they are not smoothed, and they are processed only once for
+each rendering block. Due to this, if you change them while a note is playing,
+or assign a controller to them, then you might hear "steps" or even clicks.)</p>
+
+<p><a id="faq-automation" href="#toc">Table of Contents</a></p>
+
+<h3>How can parameters be automated? What parameters does the plugin export?</h3>
+
+<p>The intended way of automating JS80P's parameters is to assign a
+<a href="https://midi.org/midi-1-0-control-change-messages">MIDI Control Change</a> (MIDI CC) message to a parameter (or use <em>MIDI
+Learn</em>) as a <a href="#usage-controllers">controller</a>, and turn the corresponding knob
+on your MIDI keyboard while playing, or edit the MIDI CC events in your host
+application's MIDI editor.</p>
+
+<p>However, the VST 3 plugin format requires plugins to export a proxy parameter
+for each MIDI CC message that they want to receive, and as a side-effect, these
+parameters can also be automated using the host application's usual automation
+editor. For the sake of consistency, the FST plugin also exports automatable
+parameters for each supported MIDI CC message.</p>
+
+<p>For example, in both plugin types, you might assign the
+<code>MIDI CC 1 (Modulation Wheel)</code> controller to the Phase Modulation (PM)
+parameter of the synthesizer, and then add automation in the host application
+to the <code>MIDI CC 1 (Modulation Wheel)</code> (VST 3) or <code>ModWh</code> (FST) parameter. JS80P
+will then interpret the changes of this parameter the same way as if you were
+turning the modulation wheel on a MIDI keyboard.</p>
+
+<p><a id="faq-pm-fm" href="#toc">Table of Contents</a></p>
+
+<h3>Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?</h3>
+
+<p>The reason for JS80P having both kinds of modulation is that they are not
+always equivalent. They are only identical when the modulator signal is a
+simple sinusoid. With each added harmonic to the modulator, PM and FM start to
+differ more and more. A detailed mathematical explanation of this is shown in
+<a href="https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf">doc/pm-fm-equivalence.pdf</a>.</p>
+
+<p><a id="faq-name" href="#toc">Table of Contents</a></p>
+
+<h3>Where does the name come from?</h3>
+
+<p>In 2022, I started developing a browser-based synthesizer using the <a href="https://www.w3.org/TR/webaudio/">Web Audio
+API</a>, mostly being inspired by the <a href="https://en.wikipedia.org/wiki/Yamaha_CS-80">Yamaha CS-80</a>. I named that
+project <a href="https://attilammagyar.github.io/toys/js-80/">JS-80</a>. Then I started adding one little feature and
+customization option after the other, then it got out of hand, and I also
+started finding limitations of doing audio in the browser. So I decided to
+implement a cleaned up version of this synth in C++ as a DAW plugin (with a
+better waveshaper antialiasing method than what's available in the browser),
+and so JS80P was born.</p>
+
+<p><a id="faq-flstudio-midicc" href="#toc">Table of Contents</a></p>
+
+<h3>FL Studio: How to assign a MIDI CC to a JS80P knob?</h3>
+
+<p><a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, <a href="https://midi.org/midi-1-0-control-change-messages">MIDI Control Change (MIDI CC)</a> messages are among the
+kinds of MIDI data that it swallows. To make everything work, you have to
+connect the MIDI CC events of your device to one of the MIDI CC helper proxy
+parameters that are provided by JS80P. (JS80P does not directly expose its
+parameters to the host, in order to avoid conflicts between the host's
+automations and JS80P's internal controller assignments.)</p>
+
+<p>For example, let's say a physical knob on your MIDI keyboard is configured to
+send its changes in <code>MIDI CC 7</code> messages. To make this knob turn the <em>Phase
+Modulation (PM)</em> virtual knob in JS80P, you have to do the following steps:</p>
+
+<ol>
+<li><p>Click on the small triangle in the top left corner of the plugin window of
+JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
+<li><p>Find the parameter named "<em>Vol</em>" (FST) or "<em>MIDI CC 7 (Volume)</em>" (VST 3) in
+the browser. Click on it with the right mouse button.</p></li>
+<li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
+<li><p>Turn the knob on your MIDI keyboard until FL Studio recognizes it.</p></li>
+<li><p>Now click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
+JS80P's interface.</p></li>
+<li><p>Select either the "<em>MIDI CC 7 (Volume)</em>" option, or the "<em>MIDI Learn</em>"
+option, and turn the physical knob on your MIDI keyboard again.</p></li>
+</ol>
+
+<p><a id="faq-flstudio-aftertouch" href="#toc">Table of Contents</a></p>
+
+<h3>FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?</h3>
+
+<p><a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, Channel Pressure (also known as Channel Aftertouch) messages are
+among the kinds of MIDI data that it swallows.</p>
+
+<p>Getting the Channel Pressure to work in FL Studio is a similar, but slightly
+more complicated procedure than <a href="#faq-flstudio-midicc">setting up MIDI CC</a>.
+For example, to make Channel Pressure control the <em>Phase Modulation (PM)</em>
+virtual knob in JS80P, you have to do the following steps:</p>
+
+<ol>
+<li><p>Click on the small triangle in the top left corner of the plugin window of
+JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
+<li><p>Press a piano key on your MIDI keyboard, and hold it down without triggering
+aftertouch.</p></li>
+<li><p>While holding the piano key down, find the parameter named "<em>Ch AT</em>" (FST)
+or "<em>Channel Aftertouch</em>" (VST 3) in FL Studio's browser. Click on it with
+the right mouse button.</p></li>
+<li><p>Select the "<em>Link to controller...</em>" menu item (keep holding the piano key).</p></li>
+<li><p>Now push the piano key harder to trigger aftertouch.</p></li>
+<li><p>Click on the area below the <em>Phase Modulation (PM)</em> virtual knob in
+JS80P's interface.</p></li>
+<li><p>Select the "<em>Channel Aftertouch</em>" option.</p></li>
+</ol>
+
+<p><a id="faq-flstudio-sustain" href="#toc">Table of Contents</a></p>
+
+<h3>FL Studio: How to use the Sustain Pedal?</h3>
+
+<p><a href="https://www.image-line.com/fl-studio/">FL Studio</a> does not send all MIDI
+events that come out of a MIDI keyboard to plugins by default, and
+unfortunately, the <a href="https://midi.org/midi-1-0-control-change-messages">MIDI Control Change (MIDI CC)</a> message which
+contains information about the sustain pedal's state is among the kinds of MIDI
+data that it swallows.</p>
+
+<p>To add insult to injury, FL Studio pretends that it notifies the plugin about
+the pedal's state, but in reality, it just defers sending <code>NOTE OFF</code> events
+until the pedal is released. This might give the desired effect in some cases,
+but it breaks patches that assign additional functionality to the pedal besides
+sustaining notes, like for example lengthening envelope release times.</p>
+
+<p>To make everything work, you have to assign the sustain pedal's MIDI CC events
+to the MIDI CC helper proxy parameter where JS80P expects them, and you have to
+turn off FL Studio's default behavior of handling the pedal on behalf of
+plugins.</p>
+
+<ol>
+<li><p>Open "<em>Options / MIDI settings</em>" from the main menu.</p></li>
+<li><p>Turn off the "<em>Foot pedal controls note off</em>" option.</p></li>
+<li><p>Close the <em>Settings</em> dialog window.</p></li>
+<li><p>Click on the small triangle in the top left corner of the plugin window of
+JS80P, and select the "<em>Browse parameters</em>" menu item.</p></li>
+<li><p>Find the parameter named "<em>Sustn</em>" (FST) or "<em>MIDI CC 64 (Sustain Pedal)</em>"
+(VST 3) in the browser. Click on it with the right mouse button.</p></li>
+<li><p>Select the "<em>Link to controller...</em>" menu item.</p></li>
+<li><p>Press the pedal.</p></li>
+</ol>
+
+<p><a id="dev" href="#toc">Table of Contents</a></p>
+
+<h2>Development</h2>
+
+<p>This section contains information for those who downloaded the source code of
+JS80P and want to compile it themselves.</p>
+
+<p><a id="dev-tools"></a></p>
+
+<h3>Tools</h3>
+
+<h4>Linux</h4>
+
+<ul>
+<li><a href="https://www.gnu.org/software/make/">GNU Make 4.3+</a></li>
+<li><a href="https://gcc.gnu.org/">G++ 11.4.0+</a></li>
+<li><a href="https://www.mingw-w64.org/">MinGW-w64 10+</a></li>
+<li><a href="https://valgrind.org/">Valgrind 3.18.1+</a></li>
+<li><a href="https://github.com/danmar/cppcheck">Cppcheck 2.7</a></li>
+<li><a href="https://www.doxygen.nl/">Doxygen 1.9.1+</a></li>
+</ul>
+
+<h4>Windows</h4>
+
+<ul>
+<li><a href="https://winlibs.com/">WinLibs MinGW-w64 13.1.0+ (MSVCRT)</a></li>
+<li><a href="https://www.doxygen.nl/">Doxygen 1.9.6+</a></li>
+</ul>
+
+<p><a id="dev-dep"></a></p>
+
+<h3>Dependencies</h3>
+
+<p>The <code>lib/</code> directory contains code from the following projects:</p>
+
+<ul>
+<li><a href="https://git.iem.at/zmoelnig/FST">FST</a></li>
+<li><a href="https://github.com/ODDSound/MTS-ESP">MTS-ESP</a></li>
+<li><a href="https://github.com/steinbergmedia/vst3sdk">VST 3 SDK</a></li>
+</ul>
+
+<p>Note that the <code>lib/</code> directory does not include the whole SDK packages, it only
+contains what's required for compiling JS80P.</p>
+
+<h4>Linux</h4>
+
+<p>To compile JS80P on e.g. Ubuntu Linux 22.04 for all supported platforms, the
+following packages need to be installed:</p>
+
+<pre><code>apt-get install \
+    binutils \
+    build-essential \
+    g++ \
+    gcc-multilib \
+    g++-multilib \
+    libcairo2-dev \
+    libcairo2-dev:i386 \
+    libx11-dev \
+    libx11-dev:i386 \
+    libxcb1-dev \
+    libxcb1-dev:i386 \
+    libxcb-render0-dev \
+    libxcb-render0-dev:i386 \
+    mingw-w64
+</code></pre>
+
+<p><a id="dev-compile"></a></p>
+
+<h3>Compiling</h3>
+
+<h4>Windows</h4>
+
+<p>Assuming that you have installed MinGW-w64 to <code>C:\mingw64</code>, you can use the
+following commands to run tests and compile JS80P for Windows:</p>
+
+<pre><code>SET PATH=C:\mingw64\bin;%PATH%
+SET TARGET_PLATFORM=x86_64-w64-mingw32
+SET DEV_OS=windows
+
+mingw32-make.exe check
+mingw32-make.exe all
+</code></pre>
+
+<h4>Linux</h4>
+
+<p>Run <code>make check</code> for running tests.</p>
+
+<p>The following commands (on a 64 bit Linux environment) will compile JS80P for
+64 bit Windows, 32 bit Windows, <code>x86_64</code> Linux, <code>x86</code> Linux, and
+<code>RISC-V 64</code> Linux respectively:</p>
+
+<pre><code>TARGET_PLATFORM=x86_64-w64-mingw32 make all
+TARGET_PLATFORM=i686-w64-mingw32 make all
+TARGET_PLATFORM=x86_64-gpp make all
+TARGET_PLATFORM=i686-gpp make all
+TARGET_PLATFORM=riscv64-gpp make all
+</code></pre>
+
+<p><a id="dev-theory" href="#toc">Table of Contents</a></p>
+
+<h3>Theory</h3>
+
+<ul>
+<li><p><a href="https://www.music.mcgill.ca/~gary/307/week4/wavetables.html">Wavetable Synthesis from McGill University</a></p></li>
+<li><p><a href="https://www.music.mcgill.ca/~gary/307/week5/bandlimited.html">Bandlimited Synthesis of Classic Waveforms from McGill University</a></p></li>
+<li><p><a href="https://www.w3.org/TR/2021/REC-webaudio-20210617/">W3C Web Audio API (2021. June 17)</a></p></li>
+<li><p><a href="https://www.w3.org/TR/2021/NOTE-audio-eq-cookbook-20210608/">W3C's adaptation of Audio-EQ-Cookbook.txt by Robert Bristow-Johnson</a></p></li>
+<li><p><a href="https://www.soundonsound.com/techniques/amplitude-modulation">Amplitude Modulation from Sound on Sound</a></p></li>
+<li><p><a href="https://www.soundonsound.com/techniques/introduction-frequency-modulation">An Introduction To Frequency Modulation from Sound on Sound</a></p></li>
+<li><p><a href="https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf">Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time Convolution
+by Julian D. Parker, Vadim Zavalishin, Efflam Le
+Bivic</a>
+(a.k.a. Antiderivative Antialiasing, ADAA)</p></li>
+<li><p><a href="https://ccrma.stanford.edu/~jos/pasp/Freeverb.html">Freeverb (by Jezar at Dreampoint) explained in Physical Audio Signal Processing, by Julius O. Smith III</a></p></li>
+<li><p><a href="https://www.youtube.com/watch?v=qdrp6k4rcP4">Lock-Free Programming With Modern C++ by Timur Doumler</a></p></li>
+<li><p><a href="https://dlmf.nist.gov/3.3#ii">Lagrange Interpolation with Equally-Spaced Nodes from NIST Digital Library of Mathematical Functions</a></p></li>
+<li><p><a href="https://codingforspeed.com/using-faster-exponential-approximation/">Using Faster Exponential Approximation from CodingForSpeed.COM </a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator">Multiply-with-carry pseudorandom number generator</a></p></li>
+<li><p><a href="https://orlp.net/blog/worlds-smallest-hash-table/">The World's Smallest Hash Table by Orson Peters</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Horner%27s_method">Horner's method for polynomial evaluation</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Spline_%28mathematics%29">Splines</a></p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Invertible_matrix">Matrix inversion</a></p></li>
+</ul>
+
+<p><a href="#toc">Table of Contents</a></p>
+
     </div>
   </div>
 
