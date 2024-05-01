@@ -625,14 +625,23 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
         return leader->get_ratio();
     }
 
-    if constexpr (evaluation == ParamEvaluation::BLOCK) {
-        if (this->midi_controller != NULL) {
-            return this->midi_controller->get_value();
-        }
+    if (this->midi_controller != NULL) {
+        /*
+        This can get out of sync with the actual value for a few moments, and it
+        doesn't take rounding into account, but in practice, this does not
+        affect the sound and event handling in any way.
+        */
+        return this->midi_controller->get_value();
     }
 
     if (this->macro != NULL) {
         this->macro->update();
+
+        /*
+        This can get out of sync with the actual value for a few moments, and it
+        doesn't take rounding into account, but in practice, this does not
+        affect the sound and event handling in any way.
+        */
 
         return this->macro->get_value();
     }

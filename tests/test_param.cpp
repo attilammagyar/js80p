@@ -1967,7 +1967,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_sample_evaluated_float_param_then_f
     change_index_2 = float_param.get_change_index();
 
     assert_eq(3.0, float_param.get_value(), DOUBLE_DELTA);
-    assert_eq(0.8, float_param.get_ratio(), DOUBLE_DELTA);
+    assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
@@ -1979,6 +1979,8 @@ TEST(when_a_midi_controller_is_assigned_to_a_sample_evaluated_float_param_then_f
     assert_false(float_param.is_constant_in_next_round(1, block_size));
 
     assert_eq(expected_samples, rendered_samples[0], block_size, 0.01);
+    assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
 
     midi_controller.change(0.0, 0.35);
     float_param.set_midi_controller(NULL);
@@ -2094,7 +2096,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_floa
     midi_controller.change(1.5, 0.2514);
     change_index_2 = follower.get_change_index();
     assert_eq(3.0, follower.get_value(), DOUBLE_DELTA);
-    assert_eq(0.8, follower.get_ratio(), DOUBLE_DELTA);
+    assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
@@ -2108,6 +2110,8 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_floa
 
     assert_eq(expected_samples, follower_samples[0], block_size, 0.01);
     assert_eq((void*)leader_samples, (void*)follower_samples);
+    assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
 
     midi_controller.change(0.0, 0.35);
     leader.set_midi_controller(NULL);
