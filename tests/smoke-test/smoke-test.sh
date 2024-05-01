@@ -17,7 +17,7 @@ LINUX_TEST_DIR=/tmp/js80p-smoke-test
 # difference in the start of a note in the monophonic synth track every once
 # in a while, so we need to retry once or twice before concluding that it's
 # the plugin's fault that the reference rendering could not be reproduced.
-TRIES=3
+TRIES=5
 
 
 main()
