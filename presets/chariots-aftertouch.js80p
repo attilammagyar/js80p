@@ -1,5 +1,5 @@
 ; A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
-; and inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
+; an inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
 ; you use aftertouch. The mod wheel controls the vibrato of notes above C3, and
 ; the pitch wheel also affects only these notes.
 [js80p]

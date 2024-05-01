@@ -1,4 +1,4 @@
-v3.0.0 (2024-05-??)
+v3.0.0 (2024-05-01)
  * Oscillator fine detune range can now go from -4 octaves to +4 octaves.
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
    a polyphonic parameter.
@@ -15,8 +15,8 @@ v3.0.0 (2024-05-??)
  * Filter Q parameter can also use logarithmic scale.
  * The Echo and Reverb effects can now apply gradually increasing distortion to
    the delayed signal.
- * The Q factor of the highpass filter can now be adjusted in the Chorus, Echo,
-   and Reverb effects.
+ * The Q factor of the high-pass filter can now be adjusted in the Chorus,
+   Echo, and Reverb effects.
  * The released note and the release velocity can also be used as a parameter
    controller. (Note: unfortunately, most MIDI keyboards don't send meaningful
    note release velocities.)
@@ -62,10 +62,10 @@ v2.9.0 (2024-04-26)
 v2.4.4 (2023-11-19)
  * Reduced RAM usage.
  * Bugfix: hosts that use variable length rendering blocks could cause JS80P in
-   some circumstance to leave garbage in the buffers of delay based effects
+   some circumstances to leave garbage in the buffers of delay based effects
    when they decayed into silence, which (depending on the settings of the
    patch) could produce audible glitches. Now the delay buffers are properly
-   cleaered when both their input and their feedback line decays into silence.
+   cleared when both their input and their feedback line decays into silence.
  * Bugfix: despite the efforts in v1.5.1, in some circumstances, short delay
    times (lower than 3-5 milliseconds) could still make the feedback lines
    noisy in delay based effects in hosts which use variable length rendering
@@ -168,7 +168,7 @@ v1.9.9 (2023-08-03)
    that's how they should sound when the plugin is used without one.
 
 v1.9.8 (2023-07-29)
- * Bugfix: fixed logarithmic scale filter frequency persistency. When a
+ * Bugfix: fixed logarithmic scale filter frequency persistence. When a
    logarithmic scale filter frequency parameter had no controller assigned to
    it, then patch save and load operations, and DAW project save and reopen
    operations caused the filter frequency to significantly drift upwards.

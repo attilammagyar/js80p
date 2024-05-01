@@ -129,7 +129,7 @@ Features
  * Last-note priority monophonic mode.
     * Legato playing will either retrigger or smoothly glide to the next note,
       depending on the portamento length setting.
- * Polyphonic and monophonic hold mode to keep notes ringing without a sustain
+ * Polyphonic and monophonic hold modes to keep notes ringing without a sustain
    pedal.
  * 2 oscillators with 10 waveforms:
     * sine,
@@ -351,7 +351,7 @@ Note: VST 2.4 plugins are usually put in the `~/.vst` directory.
 
 Download and install either the free [MTS-ESP Mini](https://oddsound.com/mtsespmini.php)
 plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
-by [ODDSound](https://oddsound.com/). Follow the instuctions on the website,
+by [ODDSound](https://oddsound.com/). Follow the instructions on the website,
 where you can also find the User Guide documentation for each product.
 
 Note: it is possible to use a different tuning provider without installing any
@@ -465,8 +465,8 @@ momentary value (on a relative scale between 0% and 100%) of a
    order to avoid compatibility problems.)
 
  * **Triggered Note**: a value which is associated with note pitch and which is
-   updated everytime a new note starts to play, e.g. when a key is pressed on a
-   MIDI keyboard. Using this in [macros](#usage-macros) is an extremely
+   updated every time a new note starts to play, e.g. when a key is pressed on
+   a MIDI keyboard. Using this in [macros](#usage-macros) is an extremely
    flexible way to set up key tracking for any parameter of the sound.
 
  * **Triggered Velocity**: the speed with which a key on a MIDI keyboard is
@@ -480,7 +480,7 @@ momentary value (on a relative scale between 0% and 100%) of a
    notes while keeping softer notes warmer, darker.
 
  * **Released Note**:  a value which is associated with note pitch and which is
-   updated everytime a note stops, e.g. when a key is released on a MIDI
+   updated every time a note stops, e.g. when a key is released on a MIDI
    keyboard.
 
  * **Released Velocity**: the speed with which a key on a MIDI keyboard is
@@ -529,9 +529,9 @@ sounds across projects, different host applications, computers, etc.
 
 ##### Note Handling
 
-Click on the black bar below the Import Patch an Export Patch icons, or use the
-mouse wheel while holding the mouse cursor over it to change how JS80P handles
-note events. The available options are:
+Click on the black bar below the Import Patch and Export Patch icons, or use
+the mouse wheel while holding the mouse cursor over it to change how JS80P
+handles note events. The available options are:
 
  * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
 
@@ -545,8 +545,8 @@ note events. The available options are:
       the previous note is restarted.
 
     * If the [PRT](#usage-synth-common-prt) setting of an oscillator is set
-      to a value above 0, then that oscillator will smootly glide its frequency
-      and volume to match the new note's pitch and velocity.
+      to a value above 0, then that oscillator will smoothly glide its
+      frequency and volume to match the new note's pitch and velocity.
 
  * **M HOLD**: same as **MONO**, but note stop events are ignored until a
    different note handling setting is selected, or until a sustain pedal off
@@ -581,19 +581,19 @@ only via modulation.
 ##### Phase Modulation (PM)
 
 Turn it up to have the first oscillator modulate the phase of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
 position.
 
 ##### Frequency Modulation (FM)
 
 Turn it up to have the first oscillator modulate the frequency of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
 position.
 
 ##### Amplitude Modulation (AM)
 
 Turn it up to have the first oscillator modulate the amplitude of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mode
+oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
 position.
 
 <a id="usage-synth-common" href="#toc">Table of Contents</a>
@@ -632,7 +632,7 @@ options are:
 ##### Oscillator Inaccuracy
 
 The first screw icon next to the [tuning selector](#usage-synth-common-tuning)
-adds a level of randomization to the oscillator's frequency, mimicing the
+adds a level of randomization to the oscillator's frequency, mimicking the
 imperfectness of analog synthesizers. The more the screw is turned, the more
 off each note will be from the correct pitch.
 
@@ -645,10 +645,10 @@ oscillators will be off by the same amount.
 ##### Oscillator Instability
 
 The second screw icon next to the [tuning selector](#usage-synth-common-tuning)
-adds a level of randomization to the oscillator's frequency over time, mimicing
-the imperfectness of analog synthesizers. The more the screw is turned, the
-more the oscillator will diverge from the correct pitch, hovering sometimes
-above, and sometimes below.
+adds a level of randomization to the oscillator's frequency over time,
+mimicking the imperfectness of analog synthesizers. The more the screw is
+turned, the more the oscillator will diverge from the correct pitch, hovering
+sometimes above, and sometimes below.
 
 When the instability of the two oscillators is set to the same value, and the
 [MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, then the
@@ -657,7 +657,7 @@ from the correct pitch by a random amount, but within a single voice, the two
 oscillators will always be off by the same amount, and will always diverge by
 the same amount in the same direction.
 
-##### Finde Detune x4 (FIN x4)
+##### Fine Detune x4 (FIN x4)
 
 The [Fine Detune (FIN)](#usage-synth-common-fin) parameter goes from -1200
 cents to +1200 cents (-1 octave to +1 octave), but if you want to go extreme
@@ -678,7 +678,7 @@ amplitude will take to match the velocity of the latest note.
 
 ##### Portamento Depth (PRD)
 
-When set to a non-zero value (specified in cents), then oscillator frequency
+When set to a non-zero value (specified in cents), the oscillator's frequency
 will glide to the current note's pitch from a fixed level of detuning in
 accordance with the [PRT](#usage-synth-common-prt) setting.
 
@@ -764,7 +764,7 @@ The following filter types are available:
    [Q factor](#usage-synth-common-q) controls the width of the band. (Low Q
    value makes the band wide, high Q value makes the band narrow.)
 
- * **LS**: low-shelf filter, boosts or attenuates frequencies belove the
+ * **LS**: low-shelf filter, boosts or attenuates frequencies below the
    [cutoff frequency](#usage-synth-common-freq).
 
  * **HS**: high-shelf filter, boosts or attenuates frequencies above the
@@ -804,7 +804,7 @@ Be careful with this, because too much boosting can make the signal too loud.
 
 A wave folder is a similar wave shaping effect to a clipping distortion, but
 the portion of the signal that is above the maximum level is not clipped, but
-reflected back on itself. Then if it reaches the maximum amplitue again in the
+reflected back on itself. Then if it reaches the maximum amplitude again in the
 opposite direction, then it is reflected again and again. This process adds a
 lot of complexity to the sound, making it sound metallic.
 
@@ -813,7 +813,7 @@ lot of complexity to the sound, making it sound metallic.
 ##### Velocity Sensitivity (VEL S)
 
 Controls how the oscillator's volume reacts to note velocity. When it's set to
-0%, then the oscillator will use a fix volume for each note. Between 0% and
+0%, then the oscillator will use a fixed volume for each note. Between 0% and
 100%, the oscillator's volume will react to velocity linearly. Above 100%, the
 oscillator's volume will react to note velocity more and more logarithmically.
 
@@ -856,7 +856,7 @@ Selects the waveform of the oscillator. The available options are:
  * **Soft I S**: a softer, warmer version of the inverse sawtooth wave. Less
    prone to aliasing when various modulations and wave folding are engaged.
 
- * **Triangle**: rises slowly, drops slowly. Contasins only odd harmonics.
+ * **Triangle**: rises slowly, drops slowly. Contains only odd harmonics.
 
  * **Soft Tri**: a softer, warmer version of the triangle wave. Less prone to
     aliasing when various modulations and wave folding are engaged.
@@ -937,9 +937,9 @@ different instances of the signal, making it sound bigger and fatter.
 ##### Logarithmic High-pass Filter Q Factor (LG Q)
 
 The first component in the Chorus effect is a high-pass filter, in order to
-to control the low end of the sound, and to avoid bass frequencies becoming
-muddy. This toggle switch makes the resonance parameter of the high-pass filter
-use a logarithmic scale instead of a linear scale.
+control the low end of the sound, and to avoid bass frequencies becoming muddy.
+This toggle switch makes the resonance parameter of the high-pass filter use a
+logarithmic scale instead of a linear scale.
 
 ##### Logarithmic LFO Frequency (LG LFO FREQ)
 
@@ -1037,9 +1037,9 @@ levels of filtering and distortion, and with side-chain compression.
 ##### Logarithmic High-pass Filter Q Factor (LG Q)
 
 The first component in the Echo effect is a high-pass filter, in order to
-to control the low end of the sound, and to avoid bass frequencies becoming
-muddy. This toggle switch makes the resonance parameter of the high-pass filter
-use a logarithmic scale instead of a linear scale.
+control the low end of the sound, and to avoid bass frequencies becoming muddy.
+This toggle switch makes the resonance parameter of the high-pass filter use a
+logarithmic scale instead of a linear scale.
 
 ##### Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)
 
@@ -1050,7 +1050,7 @@ high-shelf filter near the end of it.
 ##### Tempo Sync (BPM SYNC)
 
 Turn on tempo synchronization for the delay lines in the effect, so that time
-will be measured in therms of beats instead of in terms of seconds. (This only
+will be measured in terms of beats instead of in terms of seconds. (This only
 works in hosts which provide tempo information to plugins.)
 
 Note: in order to prevent the memory that is allocated for delay buffers from
@@ -1135,7 +1135,7 @@ its normal level once the raw input signal goes below the threshold.
 ##### Side-chain Compression Ratio (CR)
 
 Control the amount of compression that is applied to the echo signal based on
-the loudness of the raw input signa.
+the loudness of the raw input signal.
 
 For example, if the [compression threshold](#usage-effects-echo-cth) is -11 dB,
 and the input signal is -5 dB, then the input is 6 dB louder than the
@@ -1273,7 +1273,7 @@ in a given amount of time after a note is triggered.
 
 Many of the [synthesis parameters](#usage-synth) are polyphonic, which means
 that each simultaneously playing voice can use different values and run
-their own individual timelinle for those parameters, as long as an envelope is
+their own individual timeline for those parameters, as long as an envelope is
 assigned to them.
 
 Envelopes in JS80P use DAHDSR stages to reach four different values for their
@@ -1554,7 +1554,7 @@ the harder the attack.
 ### Chariots-Aftertouch
 
 A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
-and inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
+an inverse sawtooth LFO, notes above C3 get some wavefolding treatment if
 you use aftertouch. The mod wheel controls the vibrato of notes above C3, and
 the pitch wheel also affects only these notes.
 
@@ -1563,7 +1563,7 @@ the pitch wheel also affects only these notes.
 ### Chariots
 
 A Vangelis-inspired split keyboard patch. Notes below C3 are modulated with
-and inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
+an inverse sawtooth LFO, notes above C3 get some wavefolding treatment,
 depending on the velocity. The harder you play, the longer it takes for the
 wavefolder to kick in. The mod wheel controls the vibrato of notes above
 C3, and the pitch wheel also affects only these notes.
@@ -1919,7 +1919,7 @@ envelope, and assign the envelope to control the parameter.
 ### The knobs in the waveform harmonics section don't do anything, is this a bug?
 
 To hear the effect of those knobs, you have to select the _Custom_
-[waveworm](#usage-synth-common-wav) for the oscillator.
+[waveform](#usage-synth-common-wav) for the oscillator.
 
 (Note that these parameters are CPU-intensive to process, so they are not
 sample accurate, they are not smoothed, and they are processed only once for

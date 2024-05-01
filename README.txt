@@ -197,7 +197,7 @@ Setting up MTS-ESP on Windows
 
 Download and install either the free MTS-ESP MINI plugin from
 https://oddsound.com/mtsespmini.php or the paid MTS-ESP SUITE plugin from
-https://oddsound.com/mtsespsuite.php by ODDSound. Follow the instuctions on
+https://oddsound.com/mtsespsuite.php by ODDSound. Follow the instructions on
 the website, where you can also find the User Guide documentation for each
 product.
 
