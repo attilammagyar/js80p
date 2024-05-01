@@ -31,4 +31,5 @@ class IBStream;
 
 struct KeyCode;
 
-} // Steinberg
+//------------------------------------------------------------------------
+} // namespace Steinberg

@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -35,6 +35,11 @@
 //-----------------------------------------------------------------------------
 
 /// \cond ignore
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundef-prefix"
+#endif
 
 #include "aaxwrapper_gui.h"
 #include "aaxwrapper.h"
@@ -144,3 +149,7 @@ AAX_Result AAXWrapper_GUI::TimerWakeup ()
 	return AAX_CEffectGUI::TimerWakeup ();
 }
 /// \endcond
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

@@ -6,6 +6,7 @@ include(CMakePrintHelpers)
 include(SMTG_UniversalBinary)
 include(SMTG_CodeSign)
 include(SMTG_SetDebugExecutable)
+include(SMTG_AddCommonOptions)
 
 # Customize output location for binaries by setting SMTG_CUSTOM_BINARY_LOCATION via command line
 # cmd: cmake -GXcode -DSMTG_CUSTOM_BINARY_LOCATION="MyPath"
@@ -427,6 +428,10 @@ endfunction(smtg_target_make_plugin_package)
 #
 # @param target cmake target
 function(smtg_target_create_resources_folder target)
+    get_target_property(DISABLE_CREATE_RESOURCE_FOLDER ${target} SMTG_DISABLE_CREATE_RESOURCE_FOLDER)
+	if(DEFINED DISABLE_CREATE_RESOURCE_FOLDER AND DISABLE_CREATE_RESOURCE_FOLDER EQUAL 1)
+		return()
+	endif()
     get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
     get_target_property(PLUGIN_PACKAGE_RESOURCES ${target} SMTG_PLUGIN_PACKAGE_RESOURCES)
     set(resources_folder "${PLUGIN_PACKAGE_PATH}/${PLUGIN_PACKAGE_RESOURCES}")

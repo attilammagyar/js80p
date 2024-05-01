@@ -9,7 +9,7 @@
 // 
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -231,7 +231,7 @@ class WinPlatformTimer : public Timer
 public:
 //------------------------------------------------------------------------
 	WinPlatformTimer (ITimerCallback* callback, uint32 milliseconds);
-	~WinPlatformTimer ();
+	~WinPlatformTimer () override;
 
 	void stop () override;
 	bool verify () const { return id != 0; }
@@ -356,10 +356,19 @@ uint64 getTicks64 ()
 //------------------------------------------------------------------------
 } // namespace SystemTime
 
+static CreateTimerFunc createTimerFunc = nullptr;
+
+//------------------------------------------------------------------------
+void InjectCreateTimerFunction (CreateTimerFunc f)
+{
+	createTimerFunc = f;
+}
+
 //------------------------------------------------------------------------
 Timer* Timer::create (ITimerCallback* callback, uint32 milliseconds)
 {
-	assert (false && "DEPRECATED No Linux implementation");
+	if (createTimerFunc)
+		return createTimerFunc (callback, milliseconds);
 	return nullptr;
 }
 

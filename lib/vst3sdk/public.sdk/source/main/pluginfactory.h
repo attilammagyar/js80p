@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -164,7 +164,30 @@ END_FACTORY
 	{ TUID lcid = cid; static PClassInfoW componentClass (lcid,cardinality,category,name,classFlags,subCategories,0,version,sdkVersion);\
 	gPluginFactory->registerClass (&componentClass,createMethod); }
 
+#define DEF_CLASS_W2(cid,cardinality,category,name,classFlags,subCategories,vendor,version,sdkVersion,createMethod) \
+	{ TUID lcid = cid; static PClassInfoW componentClass (lcid,cardinality,category,name,classFlags,subCategories,vendor,version,sdkVersion);\
+	gPluginFactory->registerClass (&componentClass,createMethod); }
+
 #define END_FACTORY	} else gPluginFactory->addRef (); \
 	return gPluginFactory; }
+
+#define DEF_VST3_CLASS(pluginName, pluginVst3Categories, classFlags, pluginVersion, processorCID, \
+                       processorCreateFunc, controllerCID, controllerCreateFunc)                  \
+	{                                                                                             \
+		{                                                                                         \
+			const Steinberg::TUID lcid = processorCID;                                            \
+			static Steinberg::PClassInfo2 processorClass (                                        \
+			    lcid, Steinberg::PClassInfo::kManyInstances, kVstAudioEffectClass, pluginName,    \
+			    classFlags, pluginVst3Categories, 0, pluginVersion, kVstVersionString);           \
+			gPluginFactory->registerClass (&processorClass, processorCreateFunc);                 \
+		}                                                                                         \
+		{                                                                                         \
+			const Steinberg::TUID lcid = controllerCID;                                           \
+			static Steinberg::PClassInfo2 controllerClass (                                       \
+			    lcid, Steinberg::PClassInfo::kManyInstances, kVstComponentControllerClass,        \
+			    pluginName, 0, "", 0, pluginVersion, kVstVersionString);                          \
+			gPluginFactory->registerClass (&controllerClass, controllerCreateFunc);               \
+		}                                                                                         \
+	}
 
 /** @} */

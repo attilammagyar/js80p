@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -53,7 +53,7 @@ struct AAX_CID
 	char str[10] {0};
 	AAX_CID () {}
 	AAX_CID (Steinberg::Vst::ParamID id) { set (id); }
-	void set (Steinberg::Vst::ParamID id) { sprintf (str, "p%lX", static_cast<unsigned long> (id)); }
+	void set (Steinberg::Vst::ParamID id) { snprintf (str, 10, "p%lX", static_cast<unsigned long> (id)); }
 	operator const char* () const { return str; }
 };
 

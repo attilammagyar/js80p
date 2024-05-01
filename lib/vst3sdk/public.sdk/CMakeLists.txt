@@ -1,39 +1,30 @@
 
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(smtg_public_sdk VERSION 1.0.0)
 
 #--sdk common----------------
-if(VST_SDK)
-    set(VST_COMMON_SRC
-        source/vst/vstpresetfile.cpp
-        source/vst/vstpresetfile.h
-    )
-endif(VST_SDK)
 add_library(sdk_common
     STATIC
         source/common/commoniids.cpp
         source/common/openurl.cpp
         source/common/openurl.h
-        source/common/readfile.cpp
-        source/common/readfile.h
         source/common/systemclipboard.h
         source/common/systemclipboard_linux.cpp
         source/common/systemclipboard_win32.cpp
         source/common/threadchecker.h
         source/common/threadchecker_linux.cpp
         source/common/threadchecker_win32.cpp
-        ${VST_COMMON_SRC}
 )
-if(SMTG_MAC)
+if(VST_SDK)
     target_sources(sdk_common 
         PRIVATE
-            source/common/threadchecker_mac.mm
-            source/common/systemclipboard_mac.mm
+		    source/common/readfile.cpp
+            source/common/readfile.h
+            source/vst/vstpresetfile.cpp
+            source/vst/vstpresetfile.h
     )
-endif(SMTG_MAC)
-
-if(NOT VST_SDK)
+else()
     target_sources(sdk_common 
         PRIVATE
             source/common/pvaluecontainer.cpp
@@ -41,7 +32,14 @@ if(NOT VST_SDK)
             source/common/pattributes.cpp
             source/common/pattributes.h
     )
-endif(NOT VST_SDK)
+endif(VST_SDK)
+if(SMTG_MAC)
+    target_sources(sdk_common 
+        PRIVATE
+            source/common/threadchecker_mac.mm
+            source/common/systemclipboard_mac.mm
+    )
+endif(SMTG_MAC)
 
 # add dependencies
 target_link_libraries(sdk_common 
@@ -54,6 +52,25 @@ target_include_directories(sdk_common
         ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 smtg_target_setup_universal_binary(sdk_common)
+
+if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
+	get_target_property(sdk_common_SOURCES sdk_common SOURCES)
+    add_library(sdk_common_ios 
+        STATIC 
+            ${sdk_common_SOURCES}
+    )
+    smtg_target_set_platform_ios(sdk_common_ios)
+    set_target_properties(sdk_common_ios
+        PROPERTIES
+            ${SDK_IDE_LIBS_FOLDER}
+    )
+    target_link_libraries(sdk_common_ios 
+        PUBLIC 
+            base_ios
+            pluginterfaces_ios
+    )
+	target_compile_features(sdk_common_ios PUBLIC cxx_std_17)
+endif()
 
 #--sdk plugin----------------
 add_library(sdk
@@ -71,7 +88,11 @@ if(VST_SDK)
         PRIVATE
             source/main/moduleinit.cpp
             source/main/moduleinit.h
+            source/vst/utility/alignedalloc.h
             source/vst/utility/audiobuffers.h
+            source/vst/utility/dataexchange.cpp
+            source/vst/utility/dataexchange.h
+            source/vst/utility/memoryibstream.h
             source/vst/utility/processcontextrequirements.h
             source/vst/utility/processdataslicer.h
             source/vst/utility/ringbuffer.h
@@ -79,6 +100,8 @@ if(VST_SDK)
             source/vst/utility/sampleaccurate.h
             source/vst/utility/stringconvert.cpp
             source/vst/utility/stringconvert.h
+            source/vst/utility/systemtime.h
+            source/vst/utility/systemtime.cpp
             source/vst/utility/testing.cpp
             source/vst/utility/testing.h
             source/vst/utility/vst2persistence.h
@@ -108,7 +131,7 @@ endif(VST_SDK)
 
 target_compile_features(sdk
     PUBLIC
-        cxx_std_14
+        cxx_std_17
 )
 
 # add dependencies
@@ -124,22 +147,22 @@ smtg_target_setup_universal_binary(sdk)
 get_target_property(sdk_SOURCES sdk SOURCES)
 
 # iOS target
-if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
     add_library(sdk_ios 
         STATIC 
             ${sdk_SOURCES}
     )
-    smtg_set_platform_ios(sdk_ios)
+    smtg_target_set_platform_ios(sdk_ios)
     set_target_properties(sdk_ios
         PROPERTIES
             ${SDK_IDE_LIBS_FOLDER}
     )
     target_link_libraries(sdk_ios 
         PUBLIC 
-            base_ios
-            pluginterfaces_ios
+            sdk_common_ios
     )
-endif(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+	target_compile_features(sdk_ios PUBLIC cxx_std_17)
+endif(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
 
 #--for hosting----------------
 if(VST_SDK)
@@ -177,10 +200,9 @@ if(VST_SDK)
     )
     smtg_target_setup_universal_binary(sdk_hosting)
 
-    get_target_property(sdk_hosting_SOURCES sdk_hosting SOURCES)
-
     # iOS target for hosting
-    if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+    if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
+	    get_target_property(sdk_hosting_SOURCES sdk_hosting SOURCES)
         add_library(sdk_hosting_ios STATIC 
             ${sdk_hosting_SOURCES}
         )
@@ -191,8 +213,12 @@ if(VST_SDK)
         )
         target_link_libraries(sdk_hosting_ios
             PUBLIC 
-                base_ios
-                pluginterfaces_ios
+                sdk_common_ios
         )
-    endif(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+		target_compile_features(sdk_hosting_ios PUBLIC cxx_std_17)
+		target_include_directories(sdk_hosting_ios
+			PUBLIC
+				${CMAKE_CURRENT_SOURCE_DIR}/..
+		)
+    endif(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
 endif(VST_SDK)

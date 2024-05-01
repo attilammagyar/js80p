@@ -2,7 +2,7 @@
 # pluginterfaces should actually be a header-only library,
 # but it has some sources as well which need compilation.
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.19.0)
 
 project(smtg_pluginterfaces)
 
@@ -71,6 +71,7 @@ if (VST_SDK)
             vst/ivstcontextmenu.h
             vst/ivsteditcontroller.h
             vst/ivstevents.h
+            vst/ivstdataexchange.h
             vst/ivsthostapplication.h
             vst/ivstinterappaudio.h
             vst/ivstmessage.h
@@ -84,6 +85,7 @@ if (VST_SDK)
             vst/ivstplugview.h
             vst/ivstprefetchablesupport.h
             vst/ivstprocesscontext.h
+            vst/ivstremapparamid.h
             vst/ivstrepresentation.h
             vst/ivstunits.h
             vst/vstpresetkeys.h
@@ -108,14 +110,15 @@ target_include_directories(pluginterfaces PUBLIC
 
 target_compile_features(pluginterfaces
     PUBLIC
-        cxx_std_11
+        cxx_std_17
 )
 
 smtg_target_setup_universal_binary(pluginterfaces)
 
 # iOS target
-if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
 	get_target_property(PLUGINTERFACES_SOURCES pluginterfaces SOURCES)
 	add_library(pluginterfaces_ios STATIC ${PLUGINTERFACES_SOURCES})
 	smtg_target_set_platform_ios(pluginterfaces_ios)
+	target_compile_features(pluginterfaces_ios PUBLIC cxx_std_17)
 endif()

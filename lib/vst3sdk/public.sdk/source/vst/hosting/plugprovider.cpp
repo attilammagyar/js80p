@@ -8,28 +8,28 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
-//   * Redistributions of source code must retain the above copyright notice, 
+//
+//   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation 
+//     this list of conditions and the following disclaimer in the documentation
 //     and/or other materials provided with the distribution.
 //   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this 
+//     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 // OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
@@ -66,6 +66,16 @@ PlugProvider::PlugProvider (const PluginFactory& factory, ClassInfo classInfo, b
 PlugProvider::~PlugProvider ()
 {
 	terminatePlugin ();
+}
+
+//------------------------------------------------------------------------
+template <typename Proc>
+void PlugProvider::printError (Proc p) const
+{
+	if (errorStream)
+	{
+		p (*errorStream);
+	}
 }
 
 //------------------------------------------------------------------------
@@ -116,7 +126,8 @@ tresult PLUGIN_API PlugProvider::getComponentUID (FUID& uid) const
 }
 
 //------------------------------------------------------------------------
-tresult PLUGIN_API PlugProvider::releasePlugIn (IComponent* iComponent, IEditController* iController)
+tresult PLUGIN_API PlugProvider::releasePlugIn (IComponent* iComponent,
+                                                IEditController* iController)
 {
 	if (iComponent)
 		iComponent->release ();
@@ -136,6 +147,7 @@ tresult PLUGIN_API PlugProvider::releasePlugIn (IComponent* iComponent, IEditCon
 bool PlugProvider::setupPlugin (FUnknown* hostContext)
 {
 	bool res = false;
+	bool isSingleComponent = false;
 
 	//---create Plug-in here!--------------
 	// create its component part
@@ -143,11 +155,34 @@ bool PlugProvider::setupPlugin (FUnknown* hostContext)
 	if (component)
 	{
 		// initialize the component with our context
-		res = (component->initialize (hostContext) == kResultOk);
+		FUnknownPtr<IPluginBase> plugBase (component);
+		if (plugBase)
+		{
+			res = (plugBase->initialize (hostContext) == kResultOk);
+			if (res == false)
+			{
+				printError ([&] (std::ostream& stream) {
+					stream << "Failed to initialize component of " << classInfo.name () << "!\n";
+				});
+				return false;
+			}
+		}
+		else
+		{
+			printError ([&] (std::ostream& stream) {
+				stream << "Failed to get IPluginBase from component of " << classInfo.name ()
+				       << "!\n";
+			});
+			return false;
+		}
 
 		// try to create the controller part from the component
 		// (for Plug-ins which did not succeed to separate component from controller)
-		if (res && component->queryInterface (IEditController::iid, (void**)&controller) != kResultTrue)
+		if (component->queryInterface (IEditController::iid, (void**)&controller) == kResultTrue)
+		{
+			isSingleComponent = true;
+		}
+		else
 		{
 			TUID controllerCID;
 
@@ -159,27 +194,51 @@ bool PlugProvider::setupPlugin (FUnknown* hostContext)
 				if (controller)
 				{
 					// initialize the component with our context
-					res = (controller->initialize (hostContext) == kResultOk);
+					FUnknownPtr<IPluginBase> plugCtrlBase (controller);
+					if (plugCtrlBase)
+					{
+						res = (plugCtrlBase->initialize (hostContext) == kResultOk);
+						if (res == false)
+						{
+							printError ([&] (std::ostream& stream) {
+								stream << "Failed to initialize controller of " << classInfo.name ()
+								       << "!\n";
+							});
+						}
+					}
+					else
+					{
+						printError ([&] (std::ostream& stream) {
+							stream << "Failed to get IPluginBase from controller of "
+							       << classInfo.name () << "!\n";
+						});
+						return false;
+					}
 				}
+			}
+			else
+			{
+				printError ([&] (std::ostream& stream) {
+					stream << "Component does not provide a required controller class ID ["
+					       << classInfo.name () << "]!\n";
+				});
 			}
 		}
 		if (!res)
 		{
-			component = nullptr;
-			controller = nullptr;
-			if (errorStream)
-			{
-				*errorStream << "Failed to initialize instance of " << classInfo.name () << "!\n";
-			}
+			component.reset ();
+			controller.reset ();
 		}
 	}
 	else if (errorStream)
 	{
-		*errorStream << "Failed to create instance of " << classInfo.name () << "!\n";
+		printError ([&] (std::ostream& stream) {
+			stream << "Failed to create component instance of " << classInfo.name () << "!\n";
+		});
 	}
 
-	if (res)
-		connectComponents ();
+	if (res && !isSingleComponent)
+		return connectComponents ();
 
 	return res;
 }
@@ -197,23 +256,28 @@ bool PlugProvider::connectComponents ()
 
 	bool res = false;
 
-	componentCP = NEW ConnectionProxy (compICP);
-	controllerCP = NEW ConnectionProxy (contrICP);
+	componentCP = owned (new ConnectionProxy (compICP));
+	controllerCP = owned (new ConnectionProxy (contrICP));
 
-	if (componentCP->connect (contrICP) != kResultTrue)
+	tresult tres = componentCP->connect (contrICP);
+	if (tres != kResultTrue)
 	{
-		// TODO: Alert or what for non conformant plugin ?
+		printError ([&] (std::ostream& stream) {
+			stream << "Failed to connect the component with the controller with result code '"
+			       << tres << "'!\n";
+		});
+		return false;
 	}
-	else
+	tres = controllerCP->connect (compICP);
+	if (tres != kResultTrue)
 	{
-		if (controllerCP->connect (compICP) != kResultTrue)
-		{
-			// TODO: Alert or what for non conformant plugin ?
-		}
-		else
-			res = true;
+		printError ([&] (std::ostream& stream) {
+			stream << "Failed to connect the controller with the component with result code '"
+			       << tres << "'!\n";
+		});
+		return false;
 	}
-	return res;
+	return true;
 }
 
 //------------------------------------------------------------------------
@@ -225,8 +289,8 @@ bool PlugProvider::disconnectComponents ()
 	bool res = componentCP->disconnect ();
 	res &= controllerCP->disconnect ();
 
-	componentCP = nullptr;
-	controllerCP = nullptr;
+	componentCP.reset ();
+	controllerCP.reset ();
 
 	return res;
 }
@@ -240,14 +304,43 @@ void PlugProvider::terminatePlugin ()
 	if (component)
 	{
 		controllerIsComponent = FUnknownPtr<IEditController> (component).getInterface () != nullptr;
-		component->terminate ();
+
+		FUnknownPtr<IPluginBase> plugBase (component);
+		if (plugBase)
+			plugBase->terminate ();
+		else
+		{
+			printError ([&](std::ostream& stream) {
+				stream << "Failed to get IPluginBase from component of " << classInfo.name ()
+					<< "!\n";
+				});
+		}
 	}
 
 	if (controller && controllerIsComponent == false)
-		controller->terminate ();
+	{
+		FUnknownPtr<IPluginBase> plugCtrlBase (controller);
+		if (plugCtrlBase)
+			plugCtrlBase->terminate ();
+		else
+		{
+			printError ([&](std::ostream& stream) {
+				stream << "Failed to get IPluginBase from controller of " << classInfo.name ()
+					<< "!\n";
+				});
+		}
+	}
 
-	component = nullptr;
-	controller = nullptr;
+	component.reset ();
+	controller.reset ();
 }
+
+//------------------------------------------------------------------------
+void PlugProvider::setErrorStream (std::ostream* stream)
+{
+	errorStream = stream;
 }
-} // namespaces
+
+//------------------------------------------------------------------------
+} // Vst
+} // Steinberg

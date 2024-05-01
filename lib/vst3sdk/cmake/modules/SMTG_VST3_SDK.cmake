@@ -14,4 +14,4 @@ include(SMTG_AAXSupport)
 include(SMTG_VstGuiSupport)
 include(SMTG_UniversalBinary)
 include(SMTG_AddVST3Options)
-include(SMTG_FindJack)
+

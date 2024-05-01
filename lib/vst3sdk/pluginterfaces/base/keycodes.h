@@ -147,7 +147,7 @@ enum KeyModifier
 	kShiftKey     = 1 << 0, ///< same on Windows and macOS
 	kAlternateKey = 1 << 1, ///< same on Windows and macOS
 	kCommandKey   = 1 << 2, ///< Windows: ctrl key; macOS: cmd key
-	kControlKey   = 1 << 3  ///< Wndows: win key, macOS: ctrl key
+	kControlKey   = 1 << 3  ///< Windows: win key, macOS: ctrl key
 };
 
 /** Simple data-struct representing a key-stroke on the keyboard. */

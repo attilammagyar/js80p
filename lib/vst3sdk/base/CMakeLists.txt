@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(smtg_base)
 
@@ -88,7 +88,7 @@ target_compile_options(base
 
 target_compile_features(base
     PUBLIC
-        cxx_std_11
+        cxx_std_17
 )
 
 if(MSVC)
@@ -98,13 +98,13 @@ endif(MSVC)
 smtg_target_setup_universal_binary(base)
 
 # iOS target
-if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
     get_target_property(BASE_SOURCES base SOURCES)
     add_library(base_ios
         STATIC
             ${BASE_SOURCES}
     )
-    smtg_set_platform_ios(base_ios)
+    smtg_target_set_platform_ios(base_ios)
     
     # Compiler switches are PUBLIC and will be populated.
     target_compile_options(base_ios 
@@ -113,4 +113,5 @@ if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
             "$<$<CONFIG:Release>:-DRELEASE=1>"
             "$<$<CONFIG:RelWithDebInfo>:-DRELEASE=1>"
     )
-endif(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+	target_compile_features(base_ios PUBLIC cxx_std_17)
+endif(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)

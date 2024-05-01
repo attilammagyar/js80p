@@ -26,7 +26,7 @@ if(SMTG_MAC)
         )
         target_compile_features(${target}
             PUBLIC
-                cxx_std_14
+                cxx_std_17
         )
         target_link_libraries(${target} 
             PRIVATE 
@@ -39,7 +39,7 @@ if(SMTG_MAC)
         endif()
 
         #--------------------------------------------------------------------------------------------------------
-        if(SMTG_IOS_DEVELOPMENT_TEAM)
+        if(SMTG_ENABLE_IOS_TARGETS)
             set(target auv3wrapperios)
             add_library(${target}
                 STATIC
@@ -53,10 +53,10 @@ if(SMTG_MAC)
                 PROPERTIES
                     LINK_FLAGS "-Wl,-F/Library/Frameworks"
             )
-            smtg_set_platform_ios(${target})
+            smtg_target_set_platform_ios(${target})
             target_compile_features(${target}
                 PUBLIC
-                    cxx_std_14
+                    cxx_std_17
             )
             target_link_libraries(${target}
                 PRIVATE

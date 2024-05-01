@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 // This file is part of a Steinberg SDK. It is subject to the license terms
 // in the LICENSE file found in the top-level directory of this distribution
-// and at www.steinberg.net/sdklicenses. 
+// and at www.steinberg.net/sdklicenses.
 // No part of the SDK, including this file, may be copied, modified, propagated,
 // or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
@@ -144,6 +144,12 @@ namespace FUnknownImpl {
 
 /** Typedef to keep everything in this namespace. */
 using Unknown = FUnknown;
+
+/** A base class which hides the FUnknown::iid static var */
+struct HideIIDBase : FUnknown
+{
+	using iid = void;
+};
 
 /** Common destroyer policy for ski object instances.*/
 struct Destroyer
@@ -449,7 +455,7 @@ using ImplementsNonDestroyable =
 /** Shortcut namespace for implementing FUnknown based objects. */
 namespace U {
 
-using FUnknownImpl::Unknown;
+using Unknown = FUnknownImpl::HideIIDBase;
 using FUnknownImpl::UID;
 using FUnknownImpl::Extends;
 using FUnknownImpl::Implements;
@@ -460,5 +466,5 @@ using FUnknownImpl::cast;
 using FUnknownImpl::getTUID;
 
 //------------------------------------------------------------------------
-} // U
-} // Steinberg
+} // namespace U
+} // namespace Steinberg

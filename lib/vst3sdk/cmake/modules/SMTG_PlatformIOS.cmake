@@ -10,7 +10,7 @@ function(smtg_target_set_platform_ios target)
     endif(NOT SMTG_MAC)
     set_target_properties(${target}
         PROPERTIES
-            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET  "9.0"
+            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET  "11.0"
             XCODE_ATTRIBUTE_SDKROOT                     "iphoneos"
             XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY      "1,2"
             XCODE_ATTRIBUTE_SUPPORTS_MACCATALYST        "NO"

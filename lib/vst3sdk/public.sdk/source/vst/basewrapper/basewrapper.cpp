@@ -4,11 +4,11 @@
 // Category    : Helpers
 // Filename    : public.sdk/source/vst/vst2wrapper/basewrapper.cpp
 // Created by  : Steinberg, 01/2009
-// Description : VST 3 -> VST 2 Wrapper
+// Description : VST 3 -> XXX Wrapper
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -78,7 +78,7 @@ static CFBundleRef GetBundleFromExecutable (const char* filepath)
 {
 	// AutoreleasePool ap;
 	char* fname = strdup (filepath);
-	int pos = strlen (fname);
+	size_t pos = strlen (fname);
 	int level = 3;
 	while (level > 0 && --pos >= 0)
 	{

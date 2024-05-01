@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // This Software Development Kit may not be distributed in parts or its entirety
 // without prior written agreement by Steinberg Media Technologies GmbH.
@@ -34,7 +34,7 @@
 #include "systemclipboard.h"
 #include "pluginterfaces/base/fplatform.h"
 
-#if SMTG_OS_MACOS
+#if SMTG_OS_OSX
 #import <Cocoa/Cocoa.h>
 
 //------------------------------------------------------------------------
@@ -71,5 +71,18 @@ bool getTextFromClipboard (std::string& text)
 //------------------------------------------------------------------------
 } // namespace SystemClipboard
 } // namespace Steinberg
+
+#elif SMTG_OS_IOS
+//------------------------------------------------------------------------
+bool copyTextToClipboard (const std::string& text)
+{
+	return false;
+}
+
+//------------------------------------------------------------------------
+bool getTextFromClipboard (std::string& text)
+{
+	return false;
+}
 
 #endif // SMTG_OS_MACOS

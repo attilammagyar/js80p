@@ -11,11 +11,10 @@ function(smtg_target_codesign target)
         if(ARGC GREATER 2)
             set(team "${ARGV1}")
             set(identity "${ARGV2}")
-            message(STATUS "[SMTG] Codesign ${target} with team '${team}' and identity '${identity}")
+            message(STATUS "[SMTG] Codesign ${target} with team '${team}' and identity '${identity}'")
             set(SMTG_CODESIGN_ATTRIBUTES 
-                XCODE_ATTRIBUTE_DEVELOPMENT_TEAM    ${team}
+                XCODE_ATTRIBUTE_DEVELOPMENT_TEAM    "${team}"
                 XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY  "${identity}"
-                XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "${SMTG_XCODE_OTHER_CODE_SIGNING_FLAGS}"
             )
         else()
             message(STATUS "[SMTG] Codesign ${target} for local machine only")
@@ -23,22 +22,29 @@ function(smtg_target_codesign target)
                 XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "-"
             )
         endif(ARGC GREATER 2)
+        if(SMTG_XCODE_OTHER_CODE_SIGNING_FLAGS)
+            set(SMTG_CODESIGN_ATTRIBUTES 
+                ${SMTG_CODESIGN_ATTRIBUTES}
+                XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "${SMTG_XCODE_OTHER_CODE_SIGNING_FLAGS}"
+            )
+        endif()
+        message(DEBUG "[SMTG] Code Sign Attributes: ${SMTG_CODESIGN_ATTRIBUTES}")
         set_target_properties(${target}
             PROPERTIES
                 ${SMTG_CODESIGN_ATTRIBUTES}
         )
-		if(SMTG_XCODE_MANUAL_CODE_SIGN_STYLE)
-			set_target_properties(${target}
-				PROPERTIES
-					XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Manual"
-			)
-		endif(SMTG_XCODE_MANUAL_CODE_SIGN_STYLE)
-		if(SMTG_MAC AND (XCODE_VERSION VERSION_GREATER_EQUAL 12))
-			# make sure that the executable is signed before cmake post build commands are run as the
-			# Xcode code-sign step is run after the post build commands are run which would prevent
-			# using the target output on system where everything needs to be code-signed.
-			target_link_options(${target} PRIVATE LINKER:-adhoc_codesign)
-		endif()
+        if(SMTG_XCODE_MANUAL_CODE_SIGN_STYLE)
+            set_target_properties(${target}
+                PROPERTIES
+                    XCODE_ATTRIBUTE_CODE_SIGN_STYLE "Manual"
+            )
+        endif(SMTG_XCODE_MANUAL_CODE_SIGN_STYLE)
+        if(SMTG_MAC AND (XCODE_VERSION VERSION_GREATER_EQUAL 12))
+            # make sure that the executable is signed before cmake post build commands are run as the
+            # Xcode code-sign step is run after the post build commands are run which would prevent
+            # using the target output on system where everything needs to be code-signed.
+            target_link_options(${target} PRIVATE LINKER:-adhoc_codesign)
+        endif()
     endif(XCODE AND (NOT SMTG_DISABLE_CODE_SIGNING))
 endfunction(smtg_target_codesign)
 

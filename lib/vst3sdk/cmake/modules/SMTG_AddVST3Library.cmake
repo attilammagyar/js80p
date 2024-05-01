@@ -166,9 +166,23 @@ function(smtg_add_vst3plugin_with_pkgname target pkg_name)
     endif()
 
     add_library(${target} MODULE "${SOURCES}")
+  
     smtg_target_set_vst_win_architecture_name(${target})
     smtg_target_make_plugin_package(${target} ${pkg_name} vst3)
 
+    ####################
+    # Workaround for Xcode 15 not allowing to add adhoc_codesign linker setting
+    ####################
+    if(SMTG_MAC AND XCODE_VERSION VERSION_GREATER_EQUAL 15)
+	    get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
+        add_custom_command(
+            TARGET ${target} POST_BUILD
+            COMMENT "[SMTG] Adhoc codesign workaround for Xcode 15"
+            COMMAND codesign --force --verbose --sign -
+                "${PLUGIN_PACKAGE_PATH}"
+        )
+	endif()
+    
     if(SMTG_ENABLE_TARGET_VARS_LOG)
         smtg_target_dump_plugin_package_variables(${target})
     endif(SMTG_ENABLE_TARGET_VARS_LOG)
@@ -240,8 +254,20 @@ endfunction(smtg_add_vst3plugin)
 # @param sign_identity which code signing identity to use
 # @param target The target to which a VST3 Plug-in will be added.
 function(smtg_add_ios_vst3plugin target sign_identity pkg_name)
-    if(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+    if(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
         add_library(${target} MODULE ${ARGN})
+        set_target_properties(${target}
+            PROPERTIES 
+                XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY  "${SMTG_CODE_SIGN_IDENTITY_IOS}"
+                XCODE_ATTRIBUTE_ENABLE_BITCODE      "NO"
+				SMTG_DISABLE_CREATE_RESOURCE_FOLDER	1
+        )
+		if(SMTG_IOS_DEVELOPMENT_TEAM)
+			set_target_properties(${target}
+				PROPERTIES 
+					XCODE_ATTRIBUTE_DEVELOPMENT_TEAM    ${SMTG_IOS_DEVELOPMENT_TEAM}
+			)
+		endif(SMTG_IOS_DEVELOPMENT_TEAM)
         smtg_target_make_plugin_package(${target} ${pkg_name} vst3)
 
         if(SMTG_ENABLE_TARGET_VARS_LOG)
@@ -249,13 +275,6 @@ function(smtg_add_ios_vst3plugin target sign_identity pkg_name)
         endif(SMTG_ENABLE_TARGET_VARS_LOG)
 
         smtg_target_set_platform_ios(${target})
-        set_target_properties(${target}
-            PROPERTIES 
-                XCODE_ATTRIBUTE_DEVELOPMENT_TEAM    ${SMTG_IOS_DEVELOPMENT_TEAM}
-                XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY  "${SMTG_CODE_SIGN_IDENTITY_IOS}"
-                XCODE_ATTRIBUTE_ENABLE_BITCODE      "NO"
-        )
-
         get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
         add_custom_command(
             TARGET ${target} POST_BUILD
@@ -264,7 +283,7 @@ function(smtg_add_ios_vst3plugin target sign_identity pkg_name)
                 "${PLUGIN_PACKAGE_PATH}"
         )
 
-    endif(SMTG_MAC AND XCODE AND SMTG_IOS_DEVELOPMENT_TEAM)
+    endif(SMTG_MAC AND XCODE AND SMTG_ENABLE_IOS_TARGETS)
 endfunction(smtg_add_ios_vst3plugin)
 
 #------------------------------------------------------------------------

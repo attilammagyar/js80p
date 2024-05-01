@@ -50,7 +50,9 @@ macro(smtg_setup_platform_toolset)
             endif(SMTG_ENABLE_ADDRESS_SANITIZER)
         else()
             set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-            add_compile_options(-Wsuggest-override)     # Suggest override when missing 
+            if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+                add_compile_options(-Wsuggest-override)     # Suggest override when missing
+            endif()
             if(SMTG_MAC)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
                 link_libraries(c++)

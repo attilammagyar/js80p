@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -717,7 +717,7 @@ AAX_Result AAXWrapper_Parameters::GetChunk (AAX_CTypeID chunkID, AAX_SPlugInChun
 	FGuard guard (mWrapper->mSyncCalls);
 	// assume GetChunkSize called before and size of oChunk correct
 	oChunk->fVersion = 1;
-	oChunk->fSize = mWrapper->mChunk.getSize ();
+	oChunk->fSize = static_cast<int32_t> (mWrapper->mChunk.getSize ());
 	memcpy (oChunk->fData, mWrapper->mChunk.getData (),
 	        static_cast<size_t> (mWrapper->mChunk.getSize ()));
 	strncpy (reinterpret_cast<char*> (oChunk->fName), AAXWRAPPER_CONTROLS_CHUNK_DESCRIPTION, 31);
@@ -779,7 +779,7 @@ AAX_Result AAXWrapper_Parameters::NotificationReceived (AAX_CTypeID iNotificatio
 		case AAX_eNotificationEvent_SideChainBeingDisconnected:
 			mWrapper->setSideChainEnable (false);
 			break;
-		//--- The host has changed its latency compensation for this Plug-in instance.
+		//--- The host has changed its latency compensation for this plug-in instance.
 		case AAX_eNotificationEvent_SignalLatencyChanged:
 		{
 			int32_t outSample;

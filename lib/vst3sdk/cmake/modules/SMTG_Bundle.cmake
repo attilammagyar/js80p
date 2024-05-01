@@ -14,7 +14,7 @@ include(CMakeParseArguments)
 #]=======================================================================]
 function(smtg_target_set_bundle target)
     if(NOT SMTG_MAC)
-        message(FATAL_ERROR "[SMTG] smtg_target_set_bundle only works on macOS, use it in an if(SMTG_MAC) block")
+        return()
     endif(NOT SMTG_MAC)
 
     set(options 

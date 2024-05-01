@@ -8,7 +8,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -35,6 +35,12 @@
 //-----------------------------------------------------------------------------
 
 #include "pluginfactory.h"
+
+#if SMTG_OS_LINUX
+#include "pluginterfaces/base/funknownimpl.h"
+#include "pluginterfaces/gui/iplugview.h"
+#include "base/source/timer.h"
+#endif
 
 #include <cstdlib>
 
@@ -260,10 +266,82 @@ tresult PLUGIN_API CPluginFactory::createInstance (FIDString cid, FIDString _iid
 	return kNoInterface;
 }
 
+#if SMTG_OS_LINUX
 //------------------------------------------------------------------------
-tresult PLUGIN_API CPluginFactory::setHostContext (FUnknown* /*context*/)
+namespace /*anonymous*/ {
+
+//------------------------------------------------------------------------
+class LinuxPlatformTimer : public U::Extends<Timer, U::Directly<Linux::ITimerHandler>>
 {
-	return kNotImplemented;
+public:
+	~LinuxPlatformTimer () noexcept override { stop (); }
+
+	tresult init (ITimerCallback* cb, uint32 timeout)
+	{
+		if (!runLoop || cb == nullptr || timeout == 0)
+			return kResultFalse;
+		auto result = runLoop->registerTimer (this, timeout);
+		if (result == kResultTrue)
+		{
+			callback = cb;
+			timerRegistered = true;
+		}
+		return result;
+	}
+
+	void PLUGIN_API onTimer () override { callback->onTimer (this); }
+
+	void stop () override
+	{
+		if (timerRegistered)
+		{
+			if (runLoop)
+				runLoop->unregisterTimer (this);
+			timerRegistered = false;
+		}
+	}
+
+	bool timerRegistered {false};
+	ITimerCallback* callback;
+
+	static IPtr<Linux::IRunLoop> runLoop;
+};
+IPtr<Linux::IRunLoop> LinuxPlatformTimer::runLoop;
+
+//------------------------------------------------------------------------
+Timer* createLinuxTimer (ITimerCallback* cb, uint32 milliseconds)
+{
+	if (!LinuxPlatformTimer::runLoop)
+		return nullptr;
+	auto timer = NEW LinuxPlatformTimer;
+	if (timer->init (cb, milliseconds) == kResultTrue)
+		return timer;
+	timer->release ();
+	return nullptr;
 }
 
+} // anonymous
+#endif // SMTG_OS_LINUX
+
+//------------------------------------------------------------------------
+tresult PLUGIN_API CPluginFactory::setHostContext (FUnknown* context)
+{
+#if SMTG_OS_LINUX
+	if (auto runLoop = U::cast<Linux::IRunLoop> (context))
+	{
+		LinuxPlatformTimer::runLoop = runLoop;
+		InjectCreateTimerFunction (createLinuxTimer);
+	}
+	else
+	{
+		LinuxPlatformTimer::runLoop.reset ();
+		InjectCreateTimerFunction (nullptr);
+	}
+	return kResultTrue;
+#else
+	return kNotImplemented;
+#endif
+}
+
+//------------------------------------------------------------------------
 } // namespace Steinberg

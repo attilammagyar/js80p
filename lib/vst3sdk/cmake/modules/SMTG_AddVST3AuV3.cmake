@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------
 include(SMTG_CodeSign)
 
-if(SMTG_MAC AND SMTG_ADD_VSTGUI)
+if(SMTG_MAC)
     if(XCODE)
         set(SMTG_AUV3_FOLDER FOLDER "AudioUnit V3")
 
@@ -191,8 +191,8 @@ if(SMTG_MAC AND SMTG_ADD_VSTGUI)
 
                 smtg_target_set_platform_ios(${app-target})
                 smtg_target_set_platform_ios(${app-extension-target})
-                smtg_target_codesign(${app-target} ${SMTG_IOS_DEVELOPMENT_TEAM} "${SMTG_IOS_DEVELOPMENT_TEAM}")
-                smtg_target_codesign(${app-extension-target} ${SMTG_IOS_DEVELOPMENT_TEAM} "${SMTG_IOS_DEVELOPMENT_TEAM}")
+                smtg_target_codesign(${app-target} ${SMTG_IOS_DEVELOPMENT_TEAM} "${SMTG_CODE_SIGN_IDENTITY_IOS}")
+                smtg_target_codesign(${app-extension-target} ${SMTG_IOS_DEVELOPMENT_TEAM} "${SMTG_CODE_SIGN_IDENTITY_IOS}")
 
                 set_target_properties(${app-target} 
                     PROPERTIES 
@@ -217,4 +217,4 @@ if(SMTG_MAC AND SMTG_ADD_VSTGUI)
         endfunction(smtg_add_auv3)
 
     endif(XCODE)
-endif(SMTG_MAC AND SMTG_ADD_VSTGUI)
+endif(SMTG_MAC)

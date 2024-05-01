@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2023, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -70,7 +70,7 @@ public:
 	
 	/** Destructor.
 		The destructor unloads the library.*/
-	~FDynLibrary ();
+	~FDynLibrary () override;
 
 	/** Loads the library if not already loaded.
 		This function is normally called by FDynLibrary(). 
