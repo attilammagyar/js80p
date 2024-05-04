@@ -10,7 +10,12 @@ subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
 monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
 imperfection emulation.
 
-To download JS80P, visit its website at https://attilammagyar.github.io/js80p/
+To download JS80P, visit its website at https://attilammagyar.github.io/js80p ,
+or look for the "Releases" section at its GitHub page at
+https://github.com/attilammagyar/js80p .
+
+See the "Before Installing: Choosing a Distribution" section below to find out
+which package you need.
 
 The source code is available at https://github.com/attilammagyar/js80p under
 the terms of the GNU General Public License Version 3.
@@ -60,20 +65,79 @@ Before Installing: Choosing a Distribution
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with the VST 3 bundle on both Windows and Linux.
+Otherwise, you should go with a VST 3 bundle on both Windows and Linux.
 
 If your CPU supports AVX instructions and you use a 64 bit plugin host
-application, then you should download a JS80P package that is optimized for AVX
-compatible processors. If you have an older computer, or if you experience
-crashes, then you should go with one of the SSE2 compatible JS80P packages.
+application (also known as "x86_64"), then you should download a JS80P package
+that is optimized for AVX compatible processors. If you have an older computer,
+or if you experience crashes, then you should go with one of the
+SSE2 compatible JS80P packages.
 
-If your plugin host application fails to recognize JS80P from the VST 3 bundle,
-then you have to download and install the VST 3 Single File version that
-matches the CPU architecture for which your plugin host application was built.
+If you are using an older VST 3 host, or if you are running a 32 bit (also
+known as "i686" or "x86") VST 3 host on a 64 bit Linux system, then it might
+not be able to load the VST 3 bundle, so you will have to go with a VST 3
+single file JS80P package that matches the architecture of your host
+application.
 
-(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
-recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package for such hosts.)
+The 32 bit versions are usually only needed by those who deliberately use a 32
+bit plugin host application, e.g. because they want to keep using some really
+old plugins which are not available for 64 bit systems.
+
+If you are in doubt, then try the VST 3 bundle, and if your plugin host
+application doesn't recognize it, then try the 64 bit VST 3 single file
+version, then the 64 bit FST version, then the 32 bit VST 3 single file
+version, and so on.
+
+Note that all versions use the same high-precision sound synthesis engine
+internally, so the CPU architecture does not affect the sound quality.
+
+Here's what's in what package:
+
+ * "js80p-X_Y_Z-avx-vst3_bundle.zip": VST 3 bundle for modern (AVX compatible)
+   CPUs. This is what most people need.
+
+ * "js80p-X_Y_Z-linux-x86_64-avx-fst.zip": FST version for Linux, 64 bit,
+   modern (AVX compatible) CPUs.
+
+ * "js80p-X_Y_Z-linux-x86_64-avx-vst3_single_file.zip": VST 3 single file
+   version for Linux, 64 bit, modern (AVX compatible) CPUs.
+
+ * "js80p-X_Y_Z-linux-x86_64-sse2-fst.zip": FST version for Linux, 64 bit,
+   older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-linux-x86_64-sse2-vst3_single_file.zip": VST 3 single file
+   version for Linux, 64 bit, older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-linux-x86-sse2-fst.zip": FST version for Linux, 32 bit,
+   older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-linux-x86-sse2-vst3_single_file.zip": VST 3 single file version
+   for Linux, 32 bit, older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-src.zip": the source code of the plugin which you can
+   compile for any CPU architecture. (See the "Development" section in the
+   documentation for the details.)
+
+ * "js80p-X_Y_Z-sse2-vst3_bundle.zip": VST 3 bundle for older (SSE2 compatible)
+   CPUs.
+
+ * "js80p-X_Y_Z-windows-x86_64-avx-fst.zip": FST version for Windows, 64 bit,
+   modern (AVX compatible) CPUs.
+
+ * "js80p-X_Y_Z-windows-x86_64-avx-vst3_single_file.zip": VST 3 single file
+   version for Windows, 64 bit, modern (AVX compatible) CPUs.
+
+ * "js80p-X_Y_Z-windows-x86_64-sse2-fst.zip": FST version for Windows, 64 bit,
+   older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-windows-x86_64-sse2-vst3_single_file.zip": VST 3 single file
+   version for Windows, 64 bit, older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-windows-x86-sse2-fst.zip": FST version for Windows, 32 bit,
+   older (SSE2 compatible) CPUs.
+
+ * "js80p-X_Y_Z-windows-x86-sse2-vst3_single_file.zip": VST 3 single file
+   version for Windows, 32 bit, older (SSE2 compatible) CPUs.
 
 Installing the VST 3 Bundle on Windows
 --------------------------------------
