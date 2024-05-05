@@ -730,32 +730,89 @@ parameters:
 
 <p>If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with the VST 3 bundle on both Windows and Linux.</p>
+Otherwise, you should go with a VST 3 bundle on both Windows and Linux.</p>
 
 <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
-and you use a 64 bit plugin host application, then you should download a JS80P
-package that is optimized for AVX compatible processors. If you have an older
-computer, or if you experience crashes, then you should go with one of the
-<a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
+and you use a 64 bit plugin host application (also known as "<code>x86_64</code>"), then
+you should download a JS80P package that is optimized for AVX compatible
+processors. If you have an older computer, or if you experience crashes, then
+you should go with one of the <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a>
+compatible JS80P packages.</p>
 
-<p>If your plugin host application fails to recognize JS80P from the VST 3 bundle,
-then you have to download and install the VST 3 Single File version that
-matches the CPU architecture for which your plugin host application was built.</p>
-
-<p>(For example, some 32 bit (i686) VST 3 hosts are known to be unable to
-recognize VST 3 bundles when running on a 64 bit Linux system, so you would
-have to download the 32 bit VST 3 Single File JS80P package for such hosts.)</p>
+<p>If you are using an older VST 3 host, or if you are running a 32 bit (also
+known as "<code>i686</code>" or "<code>x86</code>") VST 3 host on a 64 bit Linux system, then it might
+not be able to load the VST 3 bundle, so you will have to go with a VST 3
+single file JS80P package that matches the architecture of your host
+application.</p>
 
 <p>The 32 bit versions are usually only needed by those who deliberately use a 32
 bit plugin host application, e.g. because they want to keep using some really
 old plugins which are not available for 64 bit systems.</p>
 
 <p>If you are in doubt, then try the VST 3 bundle, and if your plugin host
-application doesn't recognize it, then try the 64 bit VST 3 version, then the
-64 bit FST version, then the 32 bit VST 3 version, and so on.</p>
+application doesn't recognize it, then try the 64 bit VST 3 single file
+edition, then the 64 bit FST version, then the 32 bit VST 3 single file
+edition, and so on.</p>
 
 <p>Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.</p>
+
+<h4>Packages</h4>
+
+<ul>
+<li><p>VST 3 bundles for both Windows and Linux:</p>
+
+<ul>
+<li><p><code>js80p-X_Y_Z-avx-vst3_bundle.zip</code>: for modern (AVX), 64 bit CPUs. This is
+what most people need.</p></li>
+<li><p><code>js80p-X_Y_Z-sse2-vst3_bundle.zip</code>: for older (SSE2), 64 or 32
+bit CPUs.</p></li>
+</ul></li>
+<li><p>VST 3 single file editions for Windows:</p>
+
+<ul>
+<li><p><code>js80p-X_Y_Z-windows-x86_64-avx-vst3_single_file.zip</code>: for modern
+(AVX), 64 bit CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-windows-x86_64-sse2-vst3_single_file.zip</code>: for older
+(SSE2), 64 bit CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-windows-x86-sse2-vst3_single_file.zip</code>: for older (SSE2),
+32 bit CPUs.</p></li>
+</ul></li>
+<li><p>VST 3 single file editions for Linux:</p>
+
+<ul>
+<li><p><code>js80p-X_Y_Z-linux-x86_64-avx-vst3_single_file.zip</code>: for modern (AVX),
+64 bit CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-linux-x86_64-sse2-vst3_single_file.zip</code>: for older
+(SSE2), 64 bit CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-linux-x86-sse2-vst3_single_file.zip</code>: for older (SSE2),
+32 bit CPUs.</p></li>
+</ul></li>
+<li><p>FST editions for Windows:</p>
+
+<ul>
+<li><p><code>js80p-X_Y_Z-windows-x86_64-avx-fst.zip</code>: for modern (AVX), 64 bit
+CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-windows-x86_64-sse2-fst.zip</code>: for older (SSE2), 64 bit
+CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-windows-x86-sse2-fst.zip</code>: for older (SSE2), 32 bit CPUs.</p></li>
+</ul></li>
+<li><p>FST editions for Linux:</p>
+
+<ul>
+<li><p><code>js80p-X_Y_Z-linux-x86_64-avx-fst.zip</code>: for modern (AVX), 64 bit CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-linux-x86_64-sse2-fst.zip</code>: for older (SSE2), 64 bit
+CPUs.</p></li>
+<li><p><code>js80p-X_Y_Z-linux-x86-sse2-fst.zip</code>: for older (SSE2), 32 bit CPUs.</p></li>
+</ul></li>
+<li><p>Source:</p>
+
+<ul>
+<li><code>js80p-X_Y_Z-src.zip</code>: the source code of the plugin which you can
+compile for any CPU architecture. (See the "<a href="#dev">Development</a>" section
+for the details.)</li>
+</ul></li>
+</ul>
 
 <p><a id="system-reqs" href="#toc">Table of Contents</a></p>
 
