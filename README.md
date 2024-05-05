@@ -19,13 +19,11 @@ To download JS80P, visit its website at
 or look for the "[Releases](https://github.com/attilammagyar/js80p/releases)"
 section at its GitHub page at
 [https://github.com/attilammagyar/js80p](https://github.com/attilammagyar/js80p).
+(The source code is also available on GitHub under the terms of the GNU General
+Public License Version 3.)
 
-(See the "[Before Installing: Choosing a Distribution](#install-dist)" section
-below to find out which package you need.)
-
-The source code is available at
-[https://github.com/attilammagyar/js80p](https://github.com/attilammagyar/js80p)
-under the terms of the GNU General Public License Version 3.
+See the "[Before Installing: Choosing a Distribution](#install-dist)" section
+below to find out which package you need.
 
 > VST® is a trademark of Steinberg Media Technologies GmbH, registered in
 > Europe and other countries.
