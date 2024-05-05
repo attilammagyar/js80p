@@ -86,53 +86,63 @@ version, and so on.
 Note that all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
 
-Here's what's in what package:
+Packages
+~~~~~~~~
 
- * "js80p-X_Y_Z-avx-vst3_bundle.zip": VST 3 bundle for modern (AVX compatible)
-   CPUs. This is what most people need.
+ * VST 3 bundles for both Windows and Linux:
 
- * "js80p-X_Y_Z-linux-x86_64-avx-fst.zip": FST version for Linux, 64 bit,
-   modern (AVX compatible) CPUs.
+    * "js80p-X_Y_Z-avx-vst3_bundle.zip": for modern (AVX), 64 bit CPUs. This is
+      what most people need.
 
- * "js80p-X_Y_Z-linux-x86_64-avx-vst3_single_file.zip": VST 3 single file
-   version for Linux, 64 bit, modern (AVX compatible) CPUs.
+    * "js80p-X_Y_Z-sse2-vst3_bundle.zip": for older (SSE2), 64 or 32
+      bit CPUs.
 
- * "js80p-X_Y_Z-linux-x86_64-sse2-fst.zip": FST version for Linux, 64 bit,
-   older (SSE2 compatible) CPUs.
+ * VST 3 single file editions for Windows:
 
- * "js80p-X_Y_Z-linux-x86_64-sse2-vst3_single_file.zip": VST 3 single file
-   version for Linux, 64 bit, older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86_64-avx-vst3_single_file.zip": for modern
+      (AVX), 64 bit CPUs.
 
- * "js80p-X_Y_Z-linux-x86-sse2-fst.zip": FST version for Linux, 32 bit,
-   older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86_64-sse2-vst3_single_file.zip": for older
+      (SSE2), 64 bit CPUs.
 
- * "js80p-X_Y_Z-linux-x86-sse2-vst3_single_file.zip": VST 3 single file version
-   for Linux, 32 bit, older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86-sse2-vst3_single_file.zip": for older (SSE2),
+      32 bit CPUs.
 
- * "js80p-X_Y_Z-src.zip": the source code of the plugin which you can
-   compile for any CPU architecture. (See the "Development" section in the
-   documentation for the details.)
+ * VST 3 single file editions for Linux:
 
- * "js80p-X_Y_Z-sse2-vst3_bundle.zip": VST 3 bundle for older (SSE2 compatible)
-   CPUs.
+    * "js80p-X_Y_Z-linux-x86_64-avx-vst3_single_file.zip": for modern (AVX),
+      64 bit CPUs.
 
- * "js80p-X_Y_Z-windows-x86_64-avx-fst.zip": FST version for Windows, 64 bit,
-   modern (AVX compatible) CPUs.
+    * "js80p-X_Y_Z-linux-x86_64-sse2-vst3_single_file.zip": for older
+      (SSE2), 64 bit CPUs.
 
- * "js80p-X_Y_Z-windows-x86_64-avx-vst3_single_file.zip": VST 3 single file
-   version for Windows, 64 bit, modern (AVX compatible) CPUs.
+    * "js80p-X_Y_Z-linux-x86-sse2-vst3_single_file.zip": for older (SSE2),
+      32 bit CPUs.
 
- * "js80p-X_Y_Z-windows-x86_64-sse2-fst.zip": FST version for Windows, 64 bit,
-   older (SSE2 compatible) CPUs.
+ * FST editions for Windows:
 
- * "js80p-X_Y_Z-windows-x86_64-sse2-vst3_single_file.zip": VST 3 single file
-   version for Windows, 64 bit, older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86_64-avx-fst.zip": for modern (AVX), 64 bit
+      CPUs.
 
- * "js80p-X_Y_Z-windows-x86-sse2-fst.zip": FST version for Windows, 32 bit,
-   older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86_64-sse2-fst.zip": for older (SSE2), 64 bit
+      CPUs.
 
- * "js80p-X_Y_Z-windows-x86-sse2-vst3_single_file.zip": VST 3 single file
-   version for Windows, 32 bit, older (SSE2 compatible) CPUs.
+    * "js80p-X_Y_Z-windows-x86-sse2-fst.zip": for older (SSE2), 32 bit CPUs.
+
+ * FST editions for Linux:
+
+    * "js80p-X_Y_Z-linux-x86_64-avx-fst.zip": for modern (AVX), 64 bit CPUs.
+
+    * "js80p-X_Y_Z-linux-x86_64-sse2-fst.zip": for older (SSE2), 64 bit
+      CPUs.
+
+    * "js80p-X_Y_Z-linux-x86-sse2-fst.zip": for older (SSE2), 32 bit CPUs.
+
+ * Source:
+
+    * "js80p-X_Y_Z-src.zip": the source code of the plugin which you can
+      compile for any CPU architecture. (See the "Development" section in the
+      documentation.)
 
 Installing the VST 3 Bundle on Windows
 --------------------------------------
