@@ -234,6 +234,9 @@ internally, so the CPU architecture does not affect the sound quality.
 
 #### Packages
 
+These are the file names that you will find on GitHub on the
+"[Releases](https://github.com/attilammagyar/js80p/releases)" page:
+
  * VST 3 bundles for both Windows and Linux:
 
     * `js80p-X_Y_Z-avx-vst3_bundle.zip`: for modern (AVX), 64 bit CPUs. This is
