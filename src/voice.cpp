@@ -178,8 +178,16 @@ Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
 
 
 template<class ModulatorSignalProducerClass>
-Voice<ModulatorSignalProducerClass>::Dummy::Dummy()
+Voice<ModulatorSignalProducerClass>::Dummy::Dummy() noexcept
 {
+}
+
+
+template<class ModulatorSignalProducerClass>
+Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
+        std::string const& a,
+        Byte const b
+) noexcept {
 }
 
 
@@ -191,7 +199,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
         Number const d,
         Number const e,
         Envelope* const* envelopes
-) {
+) noexcept {
 }
 
 
@@ -326,7 +334,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
     filter_2_q_inaccuracy(name + "F2QIA", 0.0, 0.4, 0.0),
 
     subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0, 0.0, envelopes),
-    distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes)
+    distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes),
+    distortion_type(name + "DT", Distortion::TYPE_TANH_10)
 {
 }
 
@@ -554,7 +563,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     wavefolder(filter_1, param_leaders.folding, &oscillator),
     distortion(
         "DIST",
-        Distortion::Type::HEAVY,
+        param_leaders.distortion_type,
         wavefolder,
         param_leaders.distortion,
         &oscillator

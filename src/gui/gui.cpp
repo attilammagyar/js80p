@@ -231,6 +231,35 @@ char const* const GUI::NOTE_HANDLING_MODES[] = {
 int const GUI::NOTE_HANDLING_MODES_COUNT = 4;
 
 
+char const* const GUI::DISTORTION_TYPES[] = {
+    "tanh 3x",
+    "tanh 5x",
+    "tanh 10x",
+    "1+3",
+    "1+5",
+    "1+3+5",
+    "square",
+    "triangle",
+    "bit 1",
+    "bit 2",
+    "bit 3",
+    "bit 4",
+    "bit 4.6",
+    "bit 5",
+    "bit 5.6",
+    "bit 6",
+    "bit 6.6",
+    "bit 7",
+    "bit 7.6",
+    "bit 8",
+    "bit 8.6",
+    "bit 9",
+    "reduce",
+};
+
+int const GUI::DISTORTION_TYPES_COUNT = Distortion::TYPES;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -297,7 +326,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CWID] = "Carrier Width (%)",
     [Synth::ParamId::CPAN] = "Carrier Pan (%)",
     [Synth::ParamId::CVOL] = "Carrier Volume (%)",
-    [Synth::ParamId::CDG] = "Carrier Distortion Gain (%)",
+    [Synth::ParamId::CDL] = "Carrier Distortion Level (%)",
 
     [Synth::ParamId::CC1] = "Carrier Custom Waveform 1st Harmonic (%)",
     [Synth::ParamId::CC2] = "Carrier Custom Waveform 2nd Harmonic (%)",
@@ -324,9 +353,9 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::EV1V] = "Volume 1 (%)",
 
-    [Synth::ParamId::EOG] = "Overdrive Gain (%)",
+    [Synth::ParamId::ED1L] = "Distortion 1 Level (%)",
 
-    [Synth::ParamId::EDG] = "Distortion Gain (%)",
+    [Synth::ParamId::ED2L] = "Distortion 2 Level (%)",
 
     [Synth::ParamId::EF1FRQ] = "Filter 1 Frequency (Hz)",
     [Synth::ParamId::EF1Q] = "Filter 1 Q Factor",
@@ -851,7 +880,11 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::MF2TYP] = "Modulator Filter 2 Type",
 
     [Synth::ParamId::CF1TYP] = "Carrier Filter 1 Type",
+    [Synth::ParamId::CDTYP] = "Carrier Distortion Type",
     [Synth::ParamId::CF2TYP] = "Carrier Filter 2 Type",
+
+    [Synth::ParamId::ED1TYP] = "Distortion 1 Type",
+    [Synth::ParamId::ED2TYP] = "Distortion 2 Type",
 
     [Synth::ParamId::EF1TYP] = "Filter 1 Type",
     [Synth::ParamId::EF2TYP] = "Filter 2 Type",
@@ -2493,11 +2526,16 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     constexpr char const* const* rt = JS80P::GUI::REVERB_TYPES;
     constexpr int rtc = JS80P::GUI::REVERB_TYPES_COUNT;
 
+    constexpr char const* const* dt = JS80P::GUI::DISTORTION_TYPES;
+    constexpr int dtc = JS80P::GUI::DISTORTION_TYPES_COUNT;
+
     KNOB(effects_body,  39 + KNOB_W * 0,    34, Synth::ParamId::EV1V,   MML_C,      "%.2f", 100.0, knob_states);
 
-    KNOB(effects_body, 141 + KNOB_W * 0,    34, Synth::ParamId::EOG,    MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 141 + KNOB_W * 0,    34, Synth::ParamId::ED1L,   MML_C,      "%.2f", 100.0, knob_states);
+    DPET(effects_body, 140, 6, 60, 21, 0, 60, Synth::ParamId::ED1TYP, dt, dtc);
 
-    KNOB(effects_body, 242 + KNOB_W * 0,    34, Synth::ParamId::EDG,    MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 242 + KNOB_W * 0,    34, Synth::ParamId::ED2L,   MML_C,      "%.2f", 100.0, knob_states);
+    DPET(effects_body, 241, 6, 60, 21, 0, 60, Synth::ParamId::ED2TYP, dt, dtc);
 
     KNOB(effects_body, 341 + KNOB_W * 0,    34, Synth::ParamId::EF1TYP, MM___,      ft, ftc, knob_states);
     KNOB(effects_body, 341 + KNOB_W * 1,    34, Synth::ParamId::EF1FRQ, MML_C,      "%.1f", 1.0, knob_states);
@@ -3085,6 +3123,8 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
+    constexpr char const* const* dt = JS80P::GUI::DISTORTION_TYPES;
+    constexpr int dtc = JS80P::GUI::DISTORTION_TYPES_COUNT;
 
     ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
@@ -3154,12 +3194,13 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     KNOB4(synth_body, 87 + KNOB_W * 3,     316, Synth::ParamId::CFIN,   MMLEC,      "%.2f", 1.0, knob_states, Synth::ParamId::CFX4);
     KNOB(synth_body,  87 + KNOB_W * 4,     316, Synth::ParamId::CAMP,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 5,     316, Synth::ParamId::CFLD,   MMLEC,      "%.2f", 100.0 / Constants::FOLD_MAX, knob_states);
-    KNOB(synth_body,  87 + KNOB_W * 6,     316, Synth::ParamId::CDG,    MMLEC,      "%.2f", 100.0, knob_states);
+    KNOB(synth_body,  87 + KNOB_W * 6,     316, Synth::ParamId::CDL,    MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 7,     316, Synth::ParamId::CVS,    MM___,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 8,     316, Synth::ParamId::CVOL,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 9,     316, Synth::ParamId::CWID,   MM___,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  87 + KNOB_W * 10,    316, Synth::ParamId::CPAN,   MMLEC,      "%.2f", 100.0, knob_states);
     TOGG(synth_body, 630, 287, 63, 24, 42, Synth::ParamId::CFX4);
+    DPET(synth_body, 419, 288, 60, 21, 0, 60, Synth::ParamId::CDTYP, dt, dtc);
 
     KNOB(synth_body, 735 + KNOB_W * 0,     316, Synth::ParamId::CF1TYP, MM___,      ft, ftc, knob_states);
     KNOB(synth_body, 735 + KNOB_W * 1,     316, Synth::ParamId::CF1FRQ, MMLEC,      "%.1f", 1.0, knob_states);

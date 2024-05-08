@@ -31,13 +31,21 @@ Effects<InputSignalProducerClass>::Effects(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& echo_filter_shared_buffers,
         BiquadFilterSharedBuffers& reverb_filter_shared_buffers
-) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 19, input.get_channels()),
+) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 21, input.get_channels()),
     volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
     volume_3_gain(name + "V3V", 0.0, 1.0, 1.0),
+    /*
+    The distortion type used to be fixed, and the two effects were called
+    Overdrive and Distortion. Level parameter names are kept for
+    backward-compatibility, and new param names use the old scheme for
+    consistency.
+    */
+    distortion_1_type("OT", Distortion::TYPE_TANH_3),
+    distortion_2_type("DT", Distortion::TYPE_TANH_10),
     volume_1(input, volume_1_gain),
-    overdrive(name + "O", Distortion::Type::SOFT, volume_1, &volume_1),
-    distortion(name + "D", Distortion::Type::HEAVY, overdrive, &volume_1),
+    distortion_1(name + "O", distortion_1_type, volume_1, &volume_1),
+    distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
     filter_1_freq_log_scale(name + "F1LOG", ToggleParam::OFF),
@@ -46,7 +54,7 @@ Effects<InputSignalProducerClass>::Effects(
     filter_2_q_log_scale(name + "F2QLG", ToggleParam::OFF),
     filter_1(
         name + "F1",
-        distortion,
+        distortion_2,
         filter_1_type,
         filter_1_freq_log_scale,
         filter_1_q_log_scale,
@@ -69,9 +77,11 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(volume_1_gain);
     this->register_child(volume_2_gain);
     this->register_child(volume_3_gain);
+    this->register_child(distortion_1_type);
+    this->register_child(distortion_2_type);
     this->register_child(volume_1);
-    this->register_child(overdrive);
-    this->register_child(distortion);
+    this->register_child(distortion_1);
+    this->register_child(distortion_2);
     this->register_child(filter_1_type);
     this->register_child(filter_2_type);
     this->register_child(filter_1_freq_log_scale);

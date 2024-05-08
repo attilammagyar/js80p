@@ -127,6 +127,9 @@ class GUI
         static char const* const NOTE_HANDLING_MODES[];
         static int const NOTE_HANDLING_MODES_COUNT;
 
+        static char const* const DISTORTION_TYPES[];
+        static int const DISTORTION_TYPES_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];

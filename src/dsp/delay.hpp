@@ -342,6 +342,7 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             InputSignalProducerClass& input,
             PannedDelayStereoMode const stereo_mode,
             FloatParamS& distortion_level_leader,
+            Distortion::TypeParam const& distortion_type,
             ToggleParam const* tempo_sync = NULL
         );
 
@@ -355,6 +356,7 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
             FloatParamS& distortion_level_leader,
+            Distortion::TypeParam const& distortion_type,
             ToggleParam const* tempo_sync = NULL
         );
 
@@ -369,6 +371,7 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             FloatParamS& high_shelf_filter_frequency_leader,
             FloatParamS& high_shelf_filter_gain_leader,
             FloatParamS& distortion_level_leader,
+            Distortion::TypeParam const& distortion_type,
             ToggleParam const* tempo_sync = NULL
         );
 

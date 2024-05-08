@@ -23,6 +23,7 @@
 
 #include "dsp/biquad_filter.hpp"
 #include "dsp/delay.hpp"
+#include "dsp/distortion.hpp"
 #include "dsp/gain.hpp"
 #include "dsp/param.hpp"
 #include "dsp/side_chain_compressable_effect.hpp"
@@ -77,6 +78,7 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
 
     private:
         typename HighPassedInput::TypeParam high_pass_filter_type;
+        Distortion::TypeParam distortion_type;
         FloatParamS high_pass_filter_gain;
 
         BoostedInput gain;

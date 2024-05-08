@@ -19,6 +19,8 @@
 #ifndef JS80P__TESTS__UTILS_CPP
 #define JS80P__TESTS__UTILS_CPP
 
+#include <algorithm>
+
 #include "utils.hpp"
 
 #include "js80p.hpp"
@@ -48,11 +50,9 @@ class Buffer
 
             for (Integer channel = 0; channel != channels; ++channel) {
                 samples[channel] = new Sample[size];
-
-                for (Integer i = 0; i != size; ++i) {
-                    samples[channel][i] = 0.0;
-                }
             }
+
+            fill(0.0);
         }
 
         ~Buffer()
@@ -73,6 +73,13 @@ class Buffer
 
         Buffer& operator=(Buffer const& buffer) = delete;
         Buffer& operator=(Buffer&& buffer) = delete;
+
+        void fill(Sample const value)
+        {
+            for (Integer channel = 0; channel != channels; ++channel) {
+                std::fill_n(this->samples[channel], size, value);
+            }
+        }
 
         void append(Sample const* const* samples, Integer const sample_count)
         {

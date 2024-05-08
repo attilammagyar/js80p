@@ -256,7 +256,7 @@ TEST(can_look_up_param_id_by_name, {
     );
 
     assert_lte((int)max_collisions, 7);
-    assert_lte(avg_bucket_size, 2.9);
+    assert_lte(avg_bucket_size, 3.0);
     assert_lte(avg_collisions, 3.5);
 
     assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(""));
@@ -597,8 +597,8 @@ TEST(effects, {
 
     set_param(synth, Synth::ParamId::MWAV, inv_saw_as_ratio);
     set_param(synth, Synth::ParamId::CWAV, inv_saw_as_ratio);
-    set_param(synth, Synth::ParamId::EOG, 0.2);
-    set_param(synth, Synth::ParamId::EDG, 0.2);
+    set_param(synth, Synth::ParamId::ED1L, 0.2);
+    set_param(synth, Synth::ParamId::ED2L, 0.2);
     set_param(synth, Synth::ParamId::EF1FRQ, 0.75);
     set_param(synth, Synth::ParamId::EF2FRQ, 0.75);
     set_param(synth, Synth::ParamId::ECDPT, 1.0);

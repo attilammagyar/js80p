@@ -639,8 +639,9 @@ TEST(output_may_be_panned, {
     PannedDelay<FixedSignalProducer> panned_delay(
         input, PannedDelayStereoMode::FLIPPED
     );
+    Distortion::TypeParam distortion_type("DSTTYP", Distortion::TYPE_DELAY_FEEDBACK);
     DistortedHighShelfPannedDelay<FixedSignalProducer> distorted_delay(
-        input, PannedDelayStereoMode::FLIPPED, distortion
+        input, PannedDelayStereoMode::FLIPPED, distortion, distortion_type
     );
 
 

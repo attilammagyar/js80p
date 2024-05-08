@@ -174,6 +174,17 @@ html, body {
   padding-left: 10px;
 }
 
+#osc-2-dist-type {
+  line-height: 23px;
+  width: 58px;
+  height: 23px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 2px;
+  left: 336px;
+}
+
 #osc-1-fin-x4 label span,
 #osc-2-fin-x4 label span,
 h1 span {
@@ -347,15 +358,45 @@ h1 span {
   left: 18px;
 }
 
+
+
+#osc-2-dist-type label.dist-type,
+#dist-1-type,
+#dist-2-type {
+  margin-left: 1px;
+}
+
 .block h1 label.update {
   margin-left: 3px;
 }
 
+#dist-1-type,
+#dist-2-type {
+  top: 0;
+  height: 24px;
+  margin-top: -3px;
+}
+
+#dist-1-type input,
+#dist-2-type input {
+  top: 0;
+  margin-top: 0;
+  height: 23px;
+  border: inset 1px #9090b0;
+}
+
+#osc-2-dist-type label.dist-type input,
 .block h1 label.update input {
   width: 50px;
   height: 23px;
   margin-top: -3px;
   border: inset 1px #9090b0;
+}
+
+#osc-2-dist-type label.dist-type input,
+#dist-1-type input,
+#dist-2-type input {
+  width: 62px;
 }
 
 #main div label.note-handling {
@@ -469,6 +510,7 @@ h1 span {
 #main div input,
 #osc-1-fin-x4 input,
 #osc-2-fin-x4 input,
+#osc-2-dist-type input,
 .block h1 input {
   position: relative;
   background-color: black;
@@ -674,7 +716,7 @@ svg.icon {
 .sc21 {
   position: absolute;
   top: 337px;
-  left: 377px;
+  left: 379px;
   display: block;
 }
 
@@ -811,6 +853,7 @@ function make_tabs(active)
       <div id="osc-2" class="osc main-block block">
         <h1><span>Osc 2 (carrier)</span></h1>
         <div id="osc-2-tuning"><span>C MTS-ESP on</span></div>
+        <div id="osc-2-dist-type"><label class="dist-type"><input type="text" /></label></div>
         <div id="osc-2-fin-x4">
           <label><span>FIN x4</span><input type="text" /></label>
         </div>
@@ -846,11 +889,11 @@ function make_tabs(active)
         <div id="volume-1-params" class="block"></div>
       </div>
       <div id="overdrive" class="effect main-block block">
-        <h1><span>Odrv</span></h1>
+        <h1><label id="dist-1-type"><input type="text" /></label></h1>
         <div id="overdrive-params" class="block"></div>
       </div>
       <div id="distortion" class="effect main-block block">
-        <h1><span>Dist</span></h1>
+        <h1><label id="dist-2-type"><input type="text" /></label></h1>
         <div id="distortion-params" class="block"></div>
       </div>
       <div id="filter-1" class="effect main-block block">
@@ -1075,9 +1118,9 @@ window.onload = function ()
 
     create_knob("volume-1-params", "VOL %", "1.0");
 
-    create_knob("overdrive-params", "GAIN %", "50");
+    create_knob("overdrive-params", "DIST %", "50");
 
-    create_knob("distortion-params", "GAIN %", "50");
+    create_knob("distortion-params", "DIST %", "50");
 
     create_knob("filter-1-params", "TYPE", "low-shelf");
     create_knob("filter-1-params", "FREQ Hz", "2000");

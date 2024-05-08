@@ -56,13 +56,16 @@ constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
 TEST(while_distortion_level_is_close_to_zero_the_original_signal_is_barely_affected, {
     SumOfSines input(1.0, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
+    Distortion::TypeParam type("T", Distortion::TYPE_TANH_10);
+    Distortion_ distortion("D", type, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
+    type.set_block_size(BLOCK_SIZE);
     distortion.set_block_size(BLOCK_SIZE);
     input.set_block_size(BLOCK_SIZE);
 
+    type.set_sample_rate(SAMPLE_RATE);
     distortion.set_sample_rate(SAMPLE_RATE);
     input.set_sample_rate(SAMPLE_RATE);
 
@@ -105,13 +108,16 @@ void naive_distort(Number const level, Buffer &buffer)
 void test_distortion(Number const original_signal_level)
 {
     SumOfSines input(original_signal_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
+    Distortion::TypeParam type("T", Distortion::TYPE_TANH_10);
+    Distortion_ distortion("D", type, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
+    type.set_block_size(BLOCK_SIZE);
     distortion.set_block_size(BLOCK_SIZE);
     input.set_block_size(BLOCK_SIZE);
 
+    type.set_sample_rate(SAMPLE_RATE);
     distortion.set_sample_rate(SAMPLE_RATE);
     input.set_sample_rate(SAMPLE_RATE);
 
@@ -150,13 +156,16 @@ TEST(when_distortion_level_is_high_then_the_signal_is_distorted, {
 
 TEST(when_input_is_silent_then_distortion_is_no_op, {
     SumOfSines input(1e-9, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
-    Distortion_ distortion("D", Distortion::Type::HEAVY, input);
+    Distortion::TypeParam type("T", Distortion::TYPE_TANH_10);
+    Distortion_ distortion("D", type, input);
     Sample const* const* input_buffer;
     Sample const* const* distorted_buffer;
 
+    type.set_block_size(BLOCK_SIZE);
     distortion.set_block_size(BLOCK_SIZE);
     input.set_block_size(BLOCK_SIZE);
 
+    type.set_sample_rate(SAMPLE_RATE);
     distortion.set_sample_rate(SAMPLE_RATE);
     input.set_sample_rate(SAMPLE_RATE);
 
@@ -176,9 +185,8 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
     Sample channel[block_size];
     Sample const* const buffer[channels] = {channel};
     FixedSignalProducer input(buffer, channels);
-    Distortion::Distortion<FixedSignalProducer> distortion(
-        "D", Distortion::Type::DELAY_FEEDBACK, input
-    );
+    Distortion::TypeParam type("T", Distortion::TYPE_DELAY_FEEDBACK);
+    Distortion::Distortion<FixedSignalProducer> distortion("D", type, input);
     distortion.level.set_value(1.0);
     Sample const* const* rendered = NULL;
     Sample peak;
@@ -187,6 +195,7 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
 
     std::fill_n(zeros, block_size, 0.0);
 
+    type.set_block_size(block_size);
     distortion.set_block_size(block_size);
 
     for (Integer i = 0; i != block_size; ++i) {
@@ -226,4 +235,62 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
 
     assert_eq(rendered[0], zeros, block_size, 0.0);
     assert_eq(0.0, peak, 0.0);
+})
+
+
+void assert_distortion_type_switching_is_smooth(
+        Byte const type_1,
+        Byte const type_2
+) {
+    SumOfSines input(0.70, 220.0, 0.0, 0.0, 0.0, 0.0, 1);
+    Distortion::TypeParam type("T", type_1);
+    Distortion_ distortion("D", type, input);
+    Sample limit[BLOCK_SIZE];
+    Sample const* const* output;
+
+    type.set_block_size(BLOCK_SIZE);
+    distortion.set_block_size(BLOCK_SIZE);
+    input.set_block_size(BLOCK_SIZE);
+
+    type.set_sample_rate(SAMPLE_RATE);
+    distortion.set_sample_rate(SAMPLE_RATE);
+    input.set_sample_rate(SAMPLE_RATE);
+
+    distortion.level.set_value(1.0);
+
+    SignalProducer::produce<Distortion_>(distortion, 1,BLOCK_SIZE);
+    type.set_value(type_2);
+    output = SignalProducer::produce<Distortion_>(distortion, 2, BLOCK_SIZE);
+
+    std::fill_n(limit, BLOCK_SIZE, 1.0);
+    assert_gte(
+        limit, output[0], BLOCK_SIZE, "type_1=%hhu, type_2=%hhu", type_1, type_2
+    );
+
+    std::fill_n(limit, BLOCK_SIZE, -1.0);
+    assert_lte(
+        limit, output[0], BLOCK_SIZE, "type_1=%hhu, type_2=%hhu", type_1, type_2
+    );
+}
+
+
+TEST(switching_distortion_types_is_smooth, {
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_HARMONIC_13, Distortion::TYPE_HARMONIC_15
+    );
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_HARMONIC_15, Distortion::TYPE_HARMONIC_13
+    );
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_BIT_CRUSH_1, Distortion::TYPE_TANH_10
+    );
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_TANH_10, Distortion::TYPE_BIT_CRUSH_1
+    );
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_HARMONIC_135, Distortion::TYPE_HARMONIC_SQR
+    );
+    assert_distortion_type_switching_is_smooth(
+        Distortion::TYPE_HARMONIC_SQR, Distortion::TYPE_HARMONIC_135
+    );
 })

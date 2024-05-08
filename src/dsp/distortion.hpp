@@ -31,12 +31,40 @@
 namespace JS80P { namespace Distortion
 {
 
-enum Type {
-    SOFT = 0,
-    HEAVY = 1,
-    DELAY_FEEDBACK = 2,
+constexpr Byte TYPE_TANH_3          = 0;
+constexpr Byte TYPE_TANH_5          = 1;
+constexpr Byte TYPE_TANH_10         = 2;
 
-    NUMBER_OF_TYPES = 3,
+constexpr Byte TYPE_HARMONIC_13     = 3;
+constexpr Byte TYPE_HARMONIC_15     = 4;
+constexpr Byte TYPE_HARMONIC_135    = 5;
+constexpr Byte TYPE_HARMONIC_SQR    = 6;
+constexpr Byte TYPE_HARMONIC_TRI    = 7;
+
+constexpr Byte TYPE_BIT_CRUSH_1     = 8;
+constexpr Byte TYPE_BIT_CRUSH_2     = 9;
+constexpr Byte TYPE_BIT_CRUSH_3     = 10;
+constexpr Byte TYPE_BIT_CRUSH_4     = 11;
+constexpr Byte TYPE_BIT_CRUSH_4_6   = 12;
+constexpr Byte TYPE_BIT_CRUSH_5     = 13;
+constexpr Byte TYPE_BIT_CRUSH_5_6   = 14;
+constexpr Byte TYPE_BIT_CRUSH_6     = 15;
+constexpr Byte TYPE_BIT_CRUSH_6_6   = 16;
+constexpr Byte TYPE_BIT_CRUSH_7     = 17;
+constexpr Byte TYPE_BIT_CRUSH_7_6   = 18;
+constexpr Byte TYPE_BIT_CRUSH_8     = 19;
+constexpr Byte TYPE_BIT_CRUSH_8_6   = 20;
+constexpr Byte TYPE_BIT_CRUSH_9     = 21;
+
+constexpr Byte TYPE_DELAY_FEEDBACK  = 22;
+
+constexpr Byte TYPES                = 23;
+
+
+class TypeParam : public ByteParam
+{
+    public:
+        TypeParam(std::string const& name, Byte const default_type) noexcept;
 };
 
 
@@ -72,17 +100,62 @@ class Tables
 
         Tables();
 
-        Table const& get_f_table(Type const type) const noexcept;
-        Table const& get_F0_table(Type const type) const noexcept;
+        Table const& get_f_table(Byte const type) const noexcept;
+        Table const& get_F0_table(Byte const type) const noexcept;
 
     private:
         static constexpr Sample SIZE_INV = 1.0 / (Sample)SIZE;
 
-        void initialize_tables(Type const type, Number const steepness) noexcept;
+        void initialize_tanh_tables(
+            Byte const type,
+            Number const steepness
+        ) noexcept;
+
+        template<class H>
+        void initialize_spline_tables(
+                Byte const type,
+                H const& h,
+                Number const alpha,
+                Number const gamma,
+                Number const A,
+                Number const B,
+                Number const C,
+                Number const D,
+                Number const cf
+        ) noexcept;
+
+        void initialize_harmonic_tables(
+            Byte const type,
+            Number const w1,
+            Number const w3,
+            Number const w5,
+            Number const alpha,
+            Number const gamma,
+            Number const A,
+            Number const B,
+            Number const C,
+            Number const D,
+            Number const cf,
+            Number const ch
+        ) noexcept;
+
+        void initialize_bit_crush_tables(
+            Byte const type,
+            Integer const k,
+            Number const alpha,
+            Number const gamma,
+            Number const A,
+            Number const B,
+            Number const C,
+            Number const D,
+            Number const cf,
+            Number const ch
+        ) noexcept;
+
         void initialize_delay_feedback_tables() noexcept;
 
-        Table f_tables[Type::NUMBER_OF_TYPES];
-        Table F0_tables[Type::NUMBER_OF_TYPES];
+        Table f_tables[TYPES];
+        Table F0_tables[TYPES];
 };
 
 
@@ -99,16 +172,17 @@ class Distortion : public Filter<InputSignalProducerClass>
     friend class JS80P::SignalProducer;
 
     public:
+
         Distortion(
             std::string const& name,
-            Type const type,
+            TypeParam const& type,
             InputSignalProducerClass& input,
             SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
         Distortion(
             std::string const& name,
-            Type const type,
+            TypeParam const& type,
             InputSignalProducerClass& input,
             FloatParamS& level_leader,
             SignalProducer* const buffer_owner = NULL
@@ -145,23 +219,25 @@ class Distortion : public Filter<InputSignalProducerClass>
         void initialize_instance() noexcept;
 
         Sample distort(
+            Table const& f_table,
+            Table const& F0_table,
             Sample const input_sample,
             Sample& previous_input_sample,
             Sample& F0_previous_input_sample
         ) noexcept;
 
-        Sample f(Sample const x) const noexcept;
-        Sample F0(Sample const x) const noexcept;
-
+        Sample f(Table const& f_table, Sample const x) const noexcept;
+        Sample F0(Table const& F0_table, Sample const x) const noexcept;
         Sample lookup(Table const& table, Sample const x) const noexcept;
 
-        Table const& f_table;
-        Table const& F0_table;
+        TypeParam const& type;
 
         Sample const* level_buffer;
         Sample* previous_input_sample;
         Sample* F0_previous_input_sample;
         Number level_value;
+        Byte previous_type;
+        Byte current_type;
 };
 
 } }

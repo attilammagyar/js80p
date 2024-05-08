@@ -74,7 +74,7 @@ def print_oscillator_params(param_id: int, param_objs: list, group: str, prefix:
         ]
     elif prefix == "C":
         params += [
-            ("$DG", "   ///< $ Distortion Gain", osc_name + "_params.distortion"),
+            ("$DL", "   ///< $ Distortion Level", osc_name + "_params.distortion"),
         ]
 
     params += [
@@ -109,9 +109,9 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
     params = [
         ("$V1V", "  ///< $ Volume 1", "effects.volume_1_gain"),
 
-        ("$OG", "   ///< $ Overdrive Gain", "effects.overdrive.level"),
+        ("$D1L", "  ///< $ Distortion 1 Level", "effects.distortion_1.level"),
 
-        ("$DG", "   ///< $ Distortion Gain", "effects.distortion.level"),
+        ("$D2L", "  ///< $ Distortion 2 Level", "effects.distortion_2.level"),
 
         ("$F1FRQ", "///< $ Filter 1 Frequency", "effects.filter_1.frequency"),
         ("$F1Q", "  ///< $ Filter 1 Q Factor", "effects.filter_1.q"),
@@ -226,7 +226,11 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("MF1TYP", "///< Modulator Filter 1 Type", "modulator_params.filter_1_type"),
         ("MF2TYP", "///< Modulator Filter 2 Type", "modulator_params.filter_2_type"),
         ("CF1TYP", "///< Carrier Filter 1 Type", "carrier_params.filter_1_type"),
+        ("CDTYP", " ///< Carrier Distortion Type", "carrier.distortion_type"),
         ("CF2TYP", "///< Carrier Filter 2 Type", "carrier_params.filter_2_type"),
+
+        ("ED1TYP", "///< Effects Distortion 1 Type", "effects.distortion_1_type"),
+        ("ED2TYP", "///< Effects Distortion 2 Type", "effects.distortion_2_type"),
 
         ("EF1TYP", "///< Effects Filter 1 Type", "effects.filter_1_type"),
         ("EF2TYP", "///< Effects Filter 2 Type", "effects.filter_2_type"),

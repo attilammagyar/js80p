@@ -139,7 +139,9 @@ class Voice : public SignalProducer
         class Dummy
         {
             public:
-                Dummy();
+                Dummy() noexcept;
+
+                Dummy(std::string const& a, Byte const b) noexcept;
 
                 Dummy(
                     std::string const& a,
@@ -148,7 +150,7 @@ class Voice : public SignalProducer
                     Number const d,
                     Number const e,
                     Envelope* const* envelopes
-                );
+                ) noexcept;
         };
 
         class Params
@@ -207,6 +209,7 @@ class Voice : public SignalProducer
 
                 typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type subharmonic_amplitude;
                 typename std::conditional<IS_CARRIER, FloatParamS, Dummy>::type distortion;
+                typename std::conditional<IS_CARRIER, Distortion::TypeParam, Dummy>::type distortion_type;
         };
 
         class VolumeApplier : public Filter<Filter2>

@@ -959,6 +959,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
     FloatParamS& distortion_level_leader,
+    Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
 ) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
@@ -972,7 +973,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     ),
     distortion(
         "",
-        Distortion::Type::DELAY_FEEDBACK,
+        distortion_type,
         this->delay,
         distortion_level_leader,
         &this->delay
@@ -1007,6 +1008,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     FloatParamS& high_shelf_filter_frequency_leader,
     FloatParamS& high_shelf_filter_gain_leader,
     FloatParamS& distortion_level_leader,
+    Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
 ) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
         input,
@@ -1027,7 +1029,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     ),
     distortion(
         "",
-        Distortion::Type::DELAY_FEEDBACK,
+        distortion_type,
         this->delay,
         distortion_level_leader,
         &this->delay
@@ -1061,6 +1063,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     FloatParamS& high_shelf_filter_frequency_leader,
     FloatParamS& high_shelf_filter_gain_leader,
     FloatParamS& distortion_level_leader,
+    Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
 ) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
         input,
@@ -1082,7 +1085,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     ),
     distortion(
         "",
-        Distortion::Type::DELAY_FEEDBACK,
+        distortion_type,
         this->delay,
         distortion_level_leader,
         &this->delay

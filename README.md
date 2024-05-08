@@ -2278,4 +2278,6 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
 
  * [Matrix inversion](https://en.wikipedia.org/wiki/Invertible_matrix)
 
+ * [Chebyshev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials)
+
 <a href="#toc">Table of Contents</a>

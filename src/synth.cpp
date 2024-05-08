@@ -83,7 +83,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         7                           /* NH + MODE + MIX + PM + FM + AM + bus     */
-        + 42 * 2                    /* Modulator::Params + Carrier::Params      */
+        + 43 * 2                    /* Modulator::Params + Carrier::Params      */
         + POLYPHONY * 2             /* modulators + carriers                    */
         + 1                         /* effects                                  */
         + MACROS * MACRO_PARAMS
@@ -434,7 +434,9 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
     register_param_as_child<FloatParamS>(ParamId::CPAN, carrier_params.panning);
     register_param_as_child<FloatParamS>(ParamId::CVOL, carrier_params.volume);
-    register_param_as_child<FloatParamS>(ParamId::CDG, carrier_params.distortion);
+
+    register_param_as_child<Distortion::TypeParam>(ParamId::CDTYP, carrier_params.distortion_type);
+    register_param_as_child<FloatParamS>(ParamId::CDL, carrier_params.distortion);
 
     register_param_as_child<FloatParamB>(ParamId::CC1, carrier_params.harmonic_0);
     register_param_as_child<FloatParamB>(ParamId::CC2, carrier_params.harmonic_1);
@@ -475,9 +477,11 @@ void Synth::register_effects_params() noexcept
 {
     register_param<FloatParamS>(ParamId::EV1V, effects.volume_1_gain);
 
-    register_param<FloatParamS>(ParamId::EOG, effects.overdrive.level);
+    register_param<Distortion::TypeParam>(ParamId::ED1TYP, effects.distortion_1_type);
+    register_param<FloatParamS>(ParamId::ED1L, effects.distortion_1.level);
 
-    register_param<FloatParamS>(ParamId::EDG, effects.distortion.level);
+    register_param<Distortion::TypeParam>(ParamId::ED2TYP, effects.distortion_2_type);
+    register_param<FloatParamS>(ParamId::ED2L, effects.distortion_2.level);
 
     register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
     register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_freq_log_scale);
