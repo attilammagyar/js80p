@@ -318,6 +318,9 @@ void Tables::initialize_tanh_tables(
         Number const steepness
 ) noexcept {
     Sample const steepness_inv_double = 2.0 / steepness;
+    Sample const c = (
+        - steepness_inv_double * std::log1p(std::exp(-steepness * INPUT_MAX))
+    );
 
     Table& f_table = f_tables[type];
     Table& F0_table = F0_tables[type];
@@ -327,7 +330,7 @@ void Tables::initialize_tanh_tables(
 
         f_table[i] = std::tanh(steepness * x * 0.5);
         F0_table[i] = (
-            x + steepness_inv_double * std::log1p(std::exp(-steepness * x))
+            x + steepness_inv_double * std::log1p(std::exp(-steepness * x)) + c
         );
     }
 }

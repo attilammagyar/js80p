@@ -37,8 +37,8 @@ def tanh_f(x, steepness):
     return tanh(steepness * x * 0.5)
 
 
-def tanh_F0(x, steepness):
-    return x + (2.0 / steepness) * log1p(exp(-steepness * x))
+def tanh_F0(x, steepness, c):
+    return x + (2.0 / steepness) * log1p(exp(-steepness * x)) + c
 
 
 def join(alpha, gamma, h, dh, H):
@@ -168,11 +168,15 @@ def harmonics(type_const, alpha, gamma, w1, w3, w5, norm=1.0):
 SQR = (4.0 / pi, 4.0 / (3.0 * pi), 4.0 / (5.0 * pi))
 TRI = (8.0 / (1.0 * pi) ** 2.0, -8.0 / (3.0 * pi) ** 2.0, 8.0 / (5.0 * pi) ** 2.0)
 
+TANH_F0_3_C = INPUT_MAX - tanh_F0(INPUT_MAX, 3.0, 0.0)
+TANH_F0_5_C = INPUT_MAX - tanh_F0(INPUT_MAX, 5.0, 0.0)
+TANH_F0_10_C = INPUT_MAX - tanh_F0(INPUT_MAX, 10.0, 0.0)
+
 
 DISTORTIONS = (
-    (1.0, 1.0, (lambda x: tanh_f(x, 3.0), lambda x: tanh_F0(x, 3.0))),
-    (1.0, 1.0, (lambda x: tanh_f(x, 5.0), lambda x: tanh_F0(x, 5.0))),
-    (1.0, 1.0, (lambda x: tanh_f(x, 10.0), lambda x: tanh_F0(x, 10.0))),
+    (1.0, 1.0, (lambda x: tanh_f(x, 3.0), lambda x: tanh_F0(x, 3.0, TANH_F0_3_C))),
+    (1.0, 1.0, (lambda x: tanh_f(x, 5.0), lambda x: tanh_F0(x, 5.0, TANH_F0_5_C))),
+    (1.0, 1.0, (lambda x: tanh_f(x, 10.0), lambda x: tanh_F0(x, 10.0, TANH_F0_10_C))),
 
     harmonics("TYPE_HARMONIC_13",    0.90, 0.80, 1.0, 1.0, 0.0, norm=1.10),
     harmonics("TYPE_HARMONIC_15",    0.90, 0.80, 1.0, 0.0, 1.0, norm=0.67),
