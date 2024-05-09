@@ -96,7 +96,7 @@ def join(alpha, gamma, h, dh, H):
 
 def bit_crush(type_const, k, alpha, gamma):
     PI2k = PI2 * k
-    W = 1.0 / (1.7 * pi * k)
+    W = 1.0 / (1.4 * pi * k)
 
     h_k = lambda x: x - W * sin(PI2k * x)
     dh_k = lambda x: 1 - W * cos(PI2k * x)
@@ -238,6 +238,7 @@ def main(argv):
     F0_x = 0.0
     f_x = 0.0
     M = 0.0
+    gM = 0.0
 
     for i in range(N):
         x = (2.0 * (i / N)) - 1.0
@@ -254,13 +255,18 @@ def main(argv):
             F0_x = F0(x)
             f_x = f(x)
 
+        abs_f_x = abs(f_x)
+
+        if abs_f_x > gM:
+            gM = abs_f_x
+
         if x < -1.0:
             guide.append(-1.0)
         elif x > 1.0:
             guide.append(1.0)
         else:
-            if 0 <= x <= gamma and abs(f_x) > M:
-                M = abs(f_x)
+            if 0 <= x <= gamma and abs_f_x > M:
+                M = abs_f_x
 
             guide.append(x)
 
@@ -280,6 +286,7 @@ def main(argv):
         prev = x
         F0_prev = F0_x
 
+    print(f"global_max={gM}", file=sys.stderr)
     print(f"max={M}", file=sys.stderr)
     print(f"norm={1.0 / M}", file=sys.stderr)
     print(f"norm_alpha={alpha / M}", file=sys.stderr)
