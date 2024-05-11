@@ -1555,3 +1555,63 @@ TEST(triggered_and_released_note_and_velocity_controllers_are_maintained, {
     assert_eq(A_2, synth.released_note.get_value(), tolerance);
     assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
 })
+
+
+TEST(when_sustained_notes_are_to_be_retriggered_then_note_on_retriggers_already_sounding_note, {
+    constexpr Frequency sample_rate = 3000.0;
+    constexpr Integer block_size = 4196;
+    Synth synth_1;
+    Synth synth_2;
+    Sample const* const* synth_1_samples;
+    Sample const* const* synth_2_samples;
+
+    synth_1.set_sample_rate(sample_rate);
+    synth_2.set_sample_rate(sample_rate);
+
+    synth_1.set_block_size(block_size);
+    synth_2.set_block_size(block_size);
+
+    synth_1.resume();
+    synth_2.resume();
+
+    assign_controller(synth_1, Synth::ParamId::MVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth_1, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_1);
+
+    assign_controller(synth_2, Synth::ParamId::MVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth_2, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_1);
+
+    synth_1.process_messages();
+    synth_2.process_messages();
+
+    synth_1.envelopes[0]->release_time.set_value(Modulator::ENVELOPE_CANCEL_DURATION);
+    synth_2.envelopes[0]->release_time.set_value(Modulator::ENVELOPE_CANCEL_DURATION);
+
+    synth_1.note_on(0.0, 1, Midi::NOTE_A_0, 100);
+    synth_1.note_off(0.5, 1, Midi::NOTE_A_0, 100);
+    synth_1.note_on(
+        0.5 + Modulator::ENVELOPE_CANCEL_DURATION, 1, Midi::NOTE_A_0, 100
+    );
+    synth_1.note_off(1.0, 1, Midi::NOTE_A_0, 100);
+
+    synth_2.retrigger_sustained_notes.set_value(ToggleParam::ON);
+    synth_2.note_handling.set_value(Synth::NOTE_HANDLING_HOLD_POLYPHONIC);
+    synth_2.note_on(0.0, 1, Midi::NOTE_A_0, 100);
+    synth_2.note_off(0.1, 1, Midi::NOTE_A_0, 100);
+    synth_2.note_on(0.5, 1, Midi::NOTE_A_0, 100);
+    synth_2.note_off(0.6, 1, Midi::NOTE_A_0, 100);
+    synth_2.control_change(1.0, 1, Midi::SUSTAIN_PEDAL, 0);
+
+    synth_1_samples = SignalProducer::produce<Synth>(synth_1, 1);
+    synth_2_samples = SignalProducer::produce<Synth>(synth_2, 1);
+
+    for (Integer c = 0; c != synth_1.get_channels(); ++c) {
+        assert_close(
+            synth_1_samples[c],
+            synth_2_samples[c],
+            block_size,
+            0.03,
+            "channel=%d",
+            (int)c
+        );
+    }
+})

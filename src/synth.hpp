@@ -857,8 +857,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30DSH = 697,    ///< Macro 30 Distortion Shape
             MFX4 = 698,      ///< Modulator Fine Detune x4
             CFX4 = 699,      ///< Carrier Fine Detune x4
+            RTSUS = 700,     ///< Retrigger Sustained Notes
 
-            PARAM_ID_COUNT = 700,
+            PARAM_ID_COUNT = 701,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
@@ -1278,6 +1279,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
+        ToggleParam retrigger_sustained_notes;
         ByteParam note_handling;
         ModeParam mode;
         FloatParamS modulator_add_volume;
@@ -1664,6 +1666,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             bool const trigger_if_off
         ) noexcept;
 
+        template<bool retrigger>
         void trigger_note_on_voice(
             Integer const voice,
             Seconds const time_offset,

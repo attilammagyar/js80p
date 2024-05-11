@@ -938,7 +938,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
 
     cancel_note_smoothly(time_offset);
     note_on(
-        time_offset + SMOOTH_NOTE_CANCELLATION_DURATION,
+        time_offset + ENVELOPE_CANCEL_DURATION,
         note_id,
         note,
         channel,
@@ -1156,40 +1156,40 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 ) noexcept {
     state = State::OFF;
 
-    wavefolder.folding.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    wavefolder.folding.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     if constexpr (IS_CARRIER) {
-        distortion.level.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+        distortion.level.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     }
 
-    panning.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    volume.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    panning.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    volume.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    oscillator.amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.modulated_amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    oscillator.amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+        oscillator.subharmonic_amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     }
 
-    oscillator.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    oscillator.phase.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    oscillator.phase.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
-    oscillator.stop(time_offset + SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.stop(time_offset + ENVELOPE_CANCEL_DURATION);
 
-    oscillator.fine_detune.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    oscillator.fine_detune.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
-    filter_1.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    filter_1.q.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    filter_1.gain.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_1.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    filter_1.q.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    filter_1.gain.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
-    filter_2.frequency.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    filter_2.q.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
-    filter_2.gain.cancel_envelope(time_offset, SMOOTH_NOTE_CANCELLATION_DURATION);
+    filter_2.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    filter_2.q.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    filter_2.gain.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 }
 
 

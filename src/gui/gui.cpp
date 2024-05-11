@@ -1070,6 +1070,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M30DSH] = "Macro 30 Distortion Shape",
     [Synth::ParamId::MFX4] = "Modulator Fine Detune x4",
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
+    [Synth::ParamId::RTSUS] = "Retrigger Sustained Notes",
 };
 
 

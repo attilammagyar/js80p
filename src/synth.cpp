@@ -82,14 +82,15 @@ Synth::ModeParam::ModeParam(std::string const& name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        7                           /* NH + MODE + MIX + PM + FM + AM + bus     */
-        + 43 * 2                    /* Modulator::Params + Carrier::Params      */
-        + POLYPHONY * 2             /* modulators + carriers                    */
-        + 1                         /* effects                                  */
+        8                           /* RT + NH + MODE + MIX + PM + FM + AM + bus    */
+        + 43 * 2                    /* Modulator::Params + Carrier::Params          */
+        + POLYPHONY * 2             /* modulators + carriers                        */
+        + 1                         /* effects                                      */
         + MACROS * MACRO_PARAMS
         + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
+    retrigger_sustained_notes("RTSUS", ToggleParam::OFF),
     /*
     Before held note handling modes, only polyphonic and monophonic modes were
     available, and an on-off toggle was used for switching between them.  For
@@ -350,10 +351,9 @@ void Synth::build_frequency_table() noexcept
 
 void Synth::register_main_params() noexcept
 {
+    register_param_as_child<ToggleParam>(ParamId::RTSUS, retrigger_sustained_notes);
     register_param_as_child<ByteParam>(ParamId::NH, note_handling);
-
     register_param_as_child<ModeParam>(ParamId::MODE, mode);
-
     register_param_as_child<FloatParamS>(ParamId::MIX, modulator_add_volume);
     register_param_as_child<FloatParamS>(ParamId::PM, phase_modulation_level);
     register_param_as_child<FloatParamS>(ParamId::FM, frequency_modulation_level);
@@ -1166,7 +1166,15 @@ void Synth::note_on_polyphonic(
         Midi::Note const note,
         Number const velocity
 ) noexcept {
-    if (midi_note_to_voice_assignments[channel][note] != INVALID_VOICE) {
+    Integer const voice = midi_note_to_voice_assignments[channel][note];
+
+    if (voice != INVALID_VOICE) {
+        if (retrigger_sustained_notes.get_value() == ToggleParam::OFF) {
+            return;
+        }
+
+        trigger_note_on_voice<true>(voice, time_offset, channel, note, velocity);
+
         return;
     }
 
@@ -1181,13 +1189,14 @@ void Synth::note_on_polyphonic(
             continue;
         }
 
-        trigger_note_on_voice(next_voice, time_offset, channel, note, velocity);
+        trigger_note_on_voice<false>(next_voice, time_offset, channel, note, velocity);
 
         break;
     }
 }
 
 
+template<bool retrigger>
 void Synth::trigger_note_on_voice(
         Integer const voice,
         Seconds const time_offset,
@@ -1204,21 +1213,42 @@ void Synth::trigger_note_on_voice(
     carriers[voice]->update_inaccuracy(cached_round);
 
     if (mode == MODE_MIX_AND_MOD) {
-        modulators[voice]->note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
-        );
-        carriers[voice]->note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
-        );
-    } else {
-        if (note < mode + Midi::NOTE_B_2) {
-            modulators[voice]->note_on(
+        if constexpr (retrigger) {
+            modulators[voice]->retrigger(
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            );
+            carriers[voice]->retrigger(
                 time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
             );
         } else {
+            modulators[voice]->note_on(
+                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            );
             carriers[voice]->note_on(
                 time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
             );
+        }
+    } else {
+        if (note < mode + Midi::NOTE_B_2) {
+            if constexpr (retrigger) {
+                modulators[voice]->retrigger(
+                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                );
+            } else {
+                modulators[voice]->note_on(
+                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                );
+            }
+        } else {
+            if constexpr (retrigger) {
+                carriers[voice]->retrigger(
+                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                );
+            } else {
+                carriers[voice]->note_on(
+                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                );
+            }
         }
     }
 
@@ -1258,7 +1288,7 @@ void Synth::note_on_monophonic(
 
     if (modulator_off && carrier_off) {
         if (trigger_if_off) {
-            trigger_note_on_voice(0, time_offset, channel, note, velocity);
+            trigger_note_on_voice<false>(0, time_offset, channel, note, velocity);
         }
 
         return;
@@ -1404,13 +1434,16 @@ void Synth::note_off(
         return;
     }
 
-    midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
-
     Modulator* const modulator = modulators[voice];
     Carrier* const carrier = carriers[voice];
     bool const is_holding = this->is_holding();
+    bool const is_monophonic = this->is_monophonic();
 
     if (is_sustain_pedal_on || is_holding) {
+        if (is_monophonic || retrigger_sustained_notes.get_value() == ToggleParam::OFF) {
+            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+        }
+
         Integer note_id;
 
         if (modulator->is_on()) {
@@ -1432,12 +1465,14 @@ void Synth::note_off(
         return;
     }
 
+    midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
+
     Number const velocity_float = midi_byte_to_float(velocity);
 
     this->released_velocity.change(time_offset, velocity_float);
     this->released_note.change(time_offset, midi_byte_to_float(note));
 
-    if (is_monophonic() && was_note_stack_top && !note_stack.is_empty()) {
+    if (is_monophonic && was_note_stack_top && !note_stack.is_empty()) {
         Number previous_velocity;
         Midi::Channel previous_channel;
         Midi::Note previous_note;

@@ -254,6 +254,8 @@ class Voice : public SignalProducer
         static constexpr Byte TUNING_MTS_ESP_CONTINUOUS = 2;
         static constexpr Byte TUNING_MTS_ESP_NOTE_ON = 3;
 
+        static constexpr Seconds ENVELOPE_CANCEL_DURATION = 0.01;
+
         Voice(
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
@@ -360,8 +362,6 @@ class Voice : public SignalProducer
         typedef typename std::conditional<IS_CARRIER, Distortion_, Dummy>::type DistortionInstance;
 
         static constexpr Number NOTE_PANNING_SCALE = 2.0 / (Number)Midi::NOTE_MAX;
-
-        static constexpr Seconds SMOOTH_NOTE_CANCELLATION_DURATION = 0.01;
 
         static constexpr Seconds MTS_ESP_CORRECTION_DURATION = 0.003;
 
