@@ -125,7 +125,15 @@ AEffect* FstPlugin::create_instance(
 
     memset(effect, 0, sizeof(AEffect));
 
+    effect->magic = kEffectMagic;
     effect->dispatcher = &dispatch;
+    effect->process = &process_accumulating;
+    effect->getParameter = &get_parameter;
+    effect->setParameter = &set_parameter;
+    effect->numPrograms = (VstInt32)Bank::NUMBER_OF_PROGRAMS;
+    effect->numParams = (VstInt32)NUMBER_OF_PARAMETERS;
+    effect->numInputs = FstPlugin::IN_CHANNELS;
+    effect->numOutputs = FstPlugin::OUT_CHANNELS;
     effect->flags = (
         effFlagsHasEditor
         | effFlagsIsSynth
@@ -133,19 +141,12 @@ AEffect* FstPlugin::create_instance(
         | effFlagsCanDoubleReplacing
         | effFlagsProgramChunks
     );
-    effect->magic = kEffectMagic;
-    effect->numInputs = 0;
-    effect->numOutputs = (VstInt32)FstPlugin::OUT_CHANNELS;
-    effect->numPrograms = (VstInt32)Bank::NUMBER_OF_PROGRAMS;
-    effect->numParams = (VstInt32)NUMBER_OF_PARAMETERS;
+    effect->initialDelay = fst_plugin->get_latency_samples();
     effect->object = (void*)fst_plugin;
-    effect->process = &process_accumulating;
-    effect->processReplacing = &process_replacing;
-    effect->processDoubleReplacing = &process_double_replacing;
-    effect->getParameter = &get_parameter;
-    effect->setParameter = &set_parameter;
     effect->uniqueID = CCONST('a', 'm', 'j', '8');
     effect->version = FstPlugin::VERSION;
+    effect->processReplacing = &process_replacing;
+    effect->processDoubleReplacing = &process_double_replacing;
 
     return effect;
 }
@@ -339,7 +340,7 @@ void VSTCALLBACK FstPlugin::process_accumulating(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    fst_plugin->generate_and_add_samples(frames, outdata);
+    fst_plugin->generate_and_add_samples(frames, indata, outdata);
 }
 
 
@@ -351,7 +352,7 @@ void VSTCALLBACK FstPlugin::process_replacing(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    fst_plugin->generate_samples<float>(frames, outdata);
+    fst_plugin->generate_samples<float>(frames, indata, outdata);
 }
 
 
@@ -363,7 +364,7 @@ void VSTCALLBACK FstPlugin::process_double_replacing(
 ) {
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    fst_plugin->generate_samples<double>(frames, outdata);
+    fst_plugin->generate_samples<double>(frames, indata, outdata);
 }
 
 
@@ -733,6 +734,12 @@ void FstPlugin::handle_synth_was_dirty() noexcept
 }
 
 
+VstInt32 FstPlugin::get_latency_samples() const noexcept
+{
+    return (VstInt32)renderer.get_latency_samples();
+}
+
+
 void FstPlugin::initialize() noexcept
 {
     need_idle();
@@ -873,14 +880,15 @@ void FstPlugin::process_vst_midi_event(VstMidiEvent const* const event) noexcept
 template<typename NumberType>
 void FstPlugin::generate_samples(
         VstInt32 const sample_count,
-        NumberType** samples
+        NumberType const* const* const in_samples,
+        NumberType** out_samples
 ) noexcept {
     if (sample_count < 1) {
         return;
     }
 
     prepare_rendering(sample_count);
-    renderer.render<NumberType>(sample_count, samples);
+    renderer.render<NumberType>(sample_count, in_samples, out_samples);
     finalize_rendering(sample_count);
 
     /*
@@ -997,14 +1005,17 @@ void FstPlugin::update_host_display() noexcept
 
 void FstPlugin::generate_and_add_samples(
         VstInt32 const sample_count,
-        float** samples
+        float const* const* const in_samples,
+        float** out_samples
 ) noexcept {
     if (sample_count < 1) {
         return;
     }
 
     prepare_rendering(sample_count);
-    renderer.render<float, Renderer::Operation::ADD>(sample_count, samples);
+    renderer.render<float, Renderer::Operation::ADD>(
+        sample_count, in_samples, out_samples
+    );
     finalize_rendering(sample_count);
 }
 

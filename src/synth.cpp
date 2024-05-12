@@ -1715,8 +1715,11 @@ void Synth::mono_mode_off(
 
 Sample const* const* Synth::generate_samples(
         Integer const round,
-        Integer const sample_count
+        Integer const sample_count,
+        Sample const* const* const input
 ) noexcept {
+    bus.set_input(input);
+
     return SignalProducer::produce<Synth>(*this, round, sample_count);
 }
 
@@ -2756,6 +2759,7 @@ Synth::Bus::Bus(
     carriers(carriers),
     modulator_params(modulator_params),
     carrier_params(carrier_params),
+    input(NULL),
     modulator_add_volume(modulator_add_volume),
     modulators_buffer(NULL),
     carriers_buffer(NULL)
@@ -2791,6 +2795,12 @@ void Synth::Bus::set_block_size(Integer const new_block_size) noexcept
 
         reallocate_buffers();
     }
+}
+
+
+void Synth::Bus::set_input(Sample const* const* const input) noexcept
+{
+    this->input = input;
 }
 
 
@@ -2875,7 +2885,11 @@ Sample const* const* Synth::Bus::initialize_rendering(
         }
     }
 
-    if (active_modulators_count == 0 && active_carriers_count == 0) {
+    if (
+            active_modulators_count == 0
+            && active_carriers_count == 0
+            && (JS80P_UNLIKELY(input == NULL) || is_silent(input, sample_count, channels))
+    ) {
         mark_round_as_silent(round);
 
         return buffer;
@@ -2952,9 +2966,26 @@ void Synth::Bus::render(
     mix_modulators(round, first_sample_index, last_sample_index);
     mix_carriers(round, first_sample_index, last_sample_index);
 
-    for (Integer c = 0; c != channels; ++c) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = modulators_buffer[c][i] + carriers_buffer[c][i];
+    if (JS80P_LIKELY(input != NULL)) {
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* const in_channel = input[c];
+            Sample const* const mod_channel = modulators_buffer[c];
+            Sample const* const car_channel = carriers_buffer[c];
+            Sample* const out_channel = buffer[c];
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                out_channel[i] = in_channel[i] + mod_channel[i] + car_channel[i];
+            }
+        }
+    } else {
+        for (Integer c = 0; c != channels; ++c) {
+            Sample const* const mod_channel = modulators_buffer[c];
+            Sample const* const car_channel = carriers_buffer[c];
+            Sample* const out_channel = buffer[c];
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                out_channel[i] = mod_channel[i] + car_channel[i];
+            }
         }
     }
 }

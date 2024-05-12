@@ -146,6 +146,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::initialize(FUnknown* context)
     }
 
     addEventInput(STR16("Event Input"), 1);
+    addAudioInput(STR16("AudioInput"), Vst::SpeakerArr::kStereo);
     addAudioOutput(STR16("AudioOutput"), Vst::SpeakerArr::kStereo);
 
     return kResultOk;
@@ -158,7 +159,10 @@ tresult PLUGIN_API Vst3Plugin::Processor::setBusArrangements(
     Vst::SpeakerArrangement* outputs,
     int32 number_of_outputs
 ) {
-    if (number_of_inputs == 0 && number_of_outputs == 1 && outputs[0] == Vst::SpeakerArr::kStereo)
+    if (
+            number_of_inputs == 1 && inputs[1] == Vst::SpeakerArr::kStereo
+            && number_of_outputs == 1 && outputs[0] == Vst::SpeakerArr::kStereo
+    )
     {
         return AudioEffect::setBusArrangements(
             inputs, number_of_inputs, outputs, number_of_outputs
@@ -545,16 +549,24 @@ void Vst3Plugin::Processor::generate_samples(Vst::ProcessData& data) noexcept
     if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64) {
         renderer.render<double>(
             (Integer)data.numSamples,
+            (double**)getChannelBuffersPointer(processSetup, data.inputs[0]),
             (double**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32) {
         renderer.render<float>(
             (Integer)data.numSamples,
+            (float**)getChannelBuffersPointer(processSetup, data.inputs[0]),
             (float**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else {
         return;
     }
+}
+
+
+uint32 PLUGIN_API Vst3Plugin::Processor::getLatencySamples()
+{
+    return (uint32)renderer.get_latency_samples();
 }
 
 

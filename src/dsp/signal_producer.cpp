@@ -298,18 +298,26 @@ bool SignalProducer::is_silent(
     }
 
     cached_silence_round = round;
+    cached_silence = is_silent(cached_buffer, sample_count, channels);
 
+    return cached_silence;
+}
+
+
+bool SignalProducer::is_silent(
+        Sample const* const* const buffer,
+        Integer const sample_count,
+        Integer const channels
+) const noexcept {
     for (Integer c = 0; c != channels; ++c) {
-        for (Integer i = 0; i != sample_count; ++i) {
-            if (!Math::is_abs_small(cached_buffer[c][i], SILENCE_THRESHOLD)) {
-                cached_silence = false;
+        Sample const* const channel = buffer[c];
 
+        for (Integer i = 0; i != sample_count; ++i) {
+            if (!Math::is_abs_small(channel[i], SILENCE_THRESHOLD)) {
                 return false;
             }
         }
     }
-
-    cached_silence = true;
 
     return true;
 }

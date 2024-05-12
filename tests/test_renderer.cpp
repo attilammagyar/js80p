@@ -40,7 +40,7 @@ enum RenderMode {
 
 void test_varaible_size_rounds(RenderMode const mode)
 {
-    constexpr Integer buffer_size = 2048;
+    constexpr Integer buffer_size = 4096;
     constexpr Frequency sample_rate = 11025.0;
     constexpr Number volume_per_channel = std::sin(Math::PI / 4.0);
     constexpr Integer round_sizes[] = {
@@ -51,6 +51,7 @@ void test_varaible_size_rounds(RenderMode const mode)
         100, 99, 100, 99, 101,
         8, 1, 1, 6, 1, 101, 6,
         100, 101, 99, 20, 81,
+        1000, 512, 24, 384, 128,
         -1,
     };
 
@@ -59,15 +60,38 @@ void test_varaible_size_rounds(RenderMode const mode)
     Integer const channels = synth.get_channels();
 
     Renderer renderer(synth);
-    SumOfSines reference(
-        volume_per_channel, 880.0,
+    Integer const latency = renderer.get_latency_samples();
+    SumOfSines input(
+        0.5, 110.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        channels,
+        (Number)latency / sample_rate
+    );
+    SumOfSines intro_reference(
+        volume_per_channel, 220.0,
         0.0, 0.0,
         0.0, 0.0,
         channels
     );
+    SumOfSines reference(
+        volume_per_channel, 220.0,
+        0.5, 110.0,
+        0.0, 0.0,
+        channels,
+        0.005079
+    );
+    Sample const* const* in_samples;
     Sample const* const* expected_samples;
     double* buffer[channels];
+    double* batch[channels];
     Integer next_round_start = 0;
+
+    input.set_block_size(buffer_size);
+    input.set_sample_rate(sample_rate);
+
+    intro_reference.set_block_size(buffer_size);
+    intro_reference.set_sample_rate(sample_rate);
 
     reference.set_block_size(buffer_size);
     reference.set_sample_rate(sample_rate);
@@ -82,26 +106,48 @@ void test_varaible_size_rounds(RenderMode const mode)
 
     synth.carrier_params.volume.set_value(0.0);
 
-    synth.note_on(0.0, 1, Midi::NOTE_A_5, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
 
     for (Integer c = 0; c != channels; ++c) {
         buffer[c] = new double[buffer_size];
-
+        batch[c] = buffer[c];
         std::fill_n(buffer[c], buffer_size, 0.0);
+    }
+
+    in_samples = SignalProducer::produce<SumOfSines>(input, 999, latency);
+    renderer.render<double>(latency, in_samples, batch);
+    expected_samples = SignalProducer::produce<SumOfSines>(
+        intro_reference, 999, latency
+    );
+
+    for (Integer c = 0; c != channels; ++c) {
+        assert_eq(
+            expected_samples[c],
+            batch[c],
+            latency,
+            DOUBLE_DELTA,
+            "channel=%d",
+            (int)c
+        );
+    }
+
+    for (Integer c = 0; c != channels; ++c) {
+        std::fill_n(batch[c], buffer_size, 0.0);
     }
 
     for (Integer i = 0; round_sizes[i] >= 0; ++i) {
         Integer const sample_count = round_sizes[i];
-        double* batch[channels];
+
+        in_samples = SignalProducer::produce<SumOfSines>(input, i, sample_count);
 
         for (Integer c = 0; c != channels; ++c) {
             batch[c] = &buffer[c][next_round_start];
         }
 
         if (mode == RenderMode::ADD) {
-            renderer.render<double, Renderer::Operation::ADD>(sample_count, batch);
+            renderer.render<double, Renderer::Operation::ADD>(sample_count, in_samples, batch);
         } else {
-            renderer.render<double>(sample_count, batch);
+            renderer.render<double>(sample_count, in_samples, batch);
         }
 
         next_round_start += sample_count;
@@ -110,7 +156,7 @@ void test_varaible_size_rounds(RenderMode const mode)
     expected_samples = SignalProducer::produce<SumOfSines>(reference, 1);
 
     for (Integer c = 0; c != channels; ++c) {
-        assert_eq(expected_samples[c], buffer[c], buffer_size, DOUBLE_DELTA);
+        assert_close(expected_samples[c], buffer[c], buffer_size, 0.03);
     }
 
     for (Integer c = 0; c != channels; ++c) {

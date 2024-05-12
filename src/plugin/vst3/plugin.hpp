@@ -128,7 +128,8 @@ class Vst3Plugin
                 tresult PLUGIN_API setActive(TBool state) SMTG_OVERRIDE;
                 tresult PLUGIN_API process(Vst::ProcessData& data) SMTG_OVERRIDE;
 
-                uint32 PLUGIN_API getTailSamples () SMTG_OVERRIDE;
+                uint32 PLUGIN_API getLatencySamples() SMTG_OVERRIDE;
+                uint32 PLUGIN_API getTailSamples() SMTG_OVERRIDE;
 
                 tresult PLUGIN_API setState(IBStream* state) SMTG_OVERRIDE;
                 tresult PLUGIN_API getState(IBStream* state) SMTG_OVERRIDE;

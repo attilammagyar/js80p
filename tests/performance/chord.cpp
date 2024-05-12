@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -195,7 +196,8 @@ void render_sound(
     Bank bank;
     WavBuffer buffer;
     Renderer renderer(synth);
-    Sample* samples[Synth::OUT_CHANNELS];
+    Sample* rendered[Synth::OUT_CHANNELS];
+    Sample* input[Synth::IN_CHANNELS];
     std::vector<Midi::Note> notes = {
         Midi::NOTE_C_2,
         Midi::NOTE_C_3,
@@ -216,7 +218,10 @@ void render_sound(
     Midi::Byte velocity = initial_velocity;
 
     for (Integer i = 0; i != Synth::OUT_CHANNELS; ++i) {
-        samples[i] = new Sample[BLOCK_SIZE];
+        rendered[i] = new Sample[BLOCK_SIZE];
+        input[i] = new Sample[BLOCK_SIZE];
+
+        std::fill_n(input[i], BLOCK_SIZE, 0.0);
     }
 
     Serializer::import_patch_in_audio_thread(synth, bank[program_index].serialize());
@@ -255,11 +260,11 @@ void render_sound(
             }
         }
 
-        renderer.render<Sample>((Integer)BLOCK_SIZE, samples);
+        renderer.render<Sample>((Integer)BLOCK_SIZE, input, rendered);
 
         for (size_t i = 0; i != BLOCK_SIZE; ++i) {
-            buffer.append24(sample_to_wav(samples[0][i]));
-            buffer.append24(sample_to_wav(samples[1][i]));
+            buffer.append24(sample_to_wav(rendered[0][i]));
+            buffer.append24(sample_to_wav(rendered[1][i]));
         }
 
         out_file.write(buffer.get_buffer(), buffer.get_buffer_pos());
@@ -267,8 +272,11 @@ void render_sound(
     }
 
     for (Integer i = 0; i != Synth::OUT_CHANNELS; ++i) {
-        delete[] samples[i];
-        samples[i] = NULL;
+        delete[] rendered[i];
+        rendered[i] = NULL;
+
+        delete[] input[i];
+        input[i] = NULL;
     }
 }
 

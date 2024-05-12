@@ -1615,3 +1615,63 @@ TEST(when_sustained_notes_are_to_be_retriggered_then_note_on_retriggers_already_
         );
     }
 })
+
+
+TEST(input_is_mixed_into_the_effects_chain, {
+    constexpr Frequency sample_rate = 11025.0;
+    constexpr Integer block_size = 4096;
+
+    Synth synth;
+    SumOfSines input(
+        1.0, 110.0,
+        0.5, 5000.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    SumOfSines expected(
+        1.0, 110.0,
+        1.0, 220.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* in_samples;
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.suspend();
+
+    synth.set_block_size(block_size);
+    input.set_block_size(block_size);
+    expected.set_block_size(block_size);
+
+    synth.set_sample_rate(sample_rate);
+    input.set_sample_rate(sample_rate);
+    expected.set_sample_rate(sample_rate);
+
+    synth.resume();
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.panning.set_value(1.0);
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.panning.set_value(-1.0);
+    synth.effects.filter_1.frequency.set_value(3000.0);
+    synth.effects.filter_1.q.set_value(0.0);
+    synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
+
+    in_samples = SignalProducer::produce<SumOfSines>(input, 1);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = synth.generate_samples(1, block_size, in_samples);
+
+    for (Integer c = 0; c != synth.get_channels(); ++c) {
+        assert_close(
+            expected_samples[c],
+            rendered_samples[c],
+            block_size,
+            0.05,
+            "channel=%d",
+            (int)c
+        );
+    }
+})

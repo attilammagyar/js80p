@@ -83,6 +83,7 @@ class FstPlugin : public Midi::EventHandler
 
         typedef Parameter Parameters[NUMBER_OF_PARAMETERS];
 
+        static constexpr VstInt32 IN_CHANNELS = (VstInt32)Synth::IN_CHANNELS;
         static constexpr VstInt32 OUT_CHANNELS = (VstInt32)Synth::OUT_CHANNELS;
         static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
 
@@ -154,6 +155,7 @@ class FstPlugin : public Midi::EventHandler
 
         ~FstPlugin();
 
+        VstInt32 get_latency_samples() const noexcept;
         void initialize() noexcept;
         void need_idle() noexcept;
         VstIntPtr idle() noexcept;
@@ -167,12 +169,14 @@ class FstPlugin : public Midi::EventHandler
         template<typename NumberType>
         void generate_samples(
             VstInt32 const sample_count,
-            NumberType** samples
+            NumberType const* const* const in_samples,
+            NumberType** out_samples
         ) noexcept;
 
         void generate_and_add_samples(
             VstInt32 const sample_count,
-            float** samples
+            float const* const* const in_samples,
+            float** out_samples
         ) noexcept;
 
         VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;

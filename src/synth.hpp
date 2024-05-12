@@ -73,6 +73,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer POLYPHONY = VOICE_INDEX_MASK + 1;
 
         static constexpr Integer OUT_CHANNELS = Carrier::CHANNELS;
+        static constexpr Integer IN_CHANNELS = OUT_CHANNELS;
 
         static constexpr Integer ENVELOPE_FLOAT_PARAMS = 12;
         static constexpr Integer ENVELOPE_DISCRETE_PARAMS = 5;
@@ -1146,7 +1147,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_holding() const noexcept;
 
         Sample const* const* generate_samples(
-            Integer const round, Integer const sample_count
+            Integer const round,
+            Integer const sample_count,
+            Sample const* const* const input = NULL
         ) noexcept;
 
         /**
@@ -1345,6 +1348,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const new_block_size
                 ) noexcept override;
 
+                void set_input(Sample const* const* const input) noexcept;
+
                 void find_modulators_peak(
                     Integer const sample_count,
                     Sample& peak,
@@ -1417,6 +1422,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Carrier* const* const carriers;
                 Modulator::Params const& modulator_params;
                 Carrier::Params const& carrier_params;
+                Sample const* const* input;
                 Modulator* active_modulators[POLYPHONY];
                 Carrier* active_carriers[POLYPHONY];
                 size_t active_modulators_count;

@@ -230,6 +230,12 @@ class SignalProducer
             Sample** buffer
         ) noexcept;
 
+        bool is_silent(
+            Sample const* const* const buffer,
+            Integer const sample_count,
+            Integer const channels
+        ) const noexcept;
+
         void mark_round_as_silent(Integer const round) noexcept;
 
         bool has_upcoming_events(Integer const sample_count) const noexcept;
