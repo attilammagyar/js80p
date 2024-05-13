@@ -248,6 +248,7 @@ def preset_file_name_to_program_name(file_name):
             .title()
             .replace("Fm ", "FM ")
             .replace(" At", " AT")
+            .replace("Lo-Fi ", "Lo-fi ")
             .replace(" Mod", " mod")
     )
 

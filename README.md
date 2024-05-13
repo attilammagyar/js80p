@@ -107,6 +107,7 @@ Table of Contents
     * [Analog Brass AT](#preset-analog-brass-at)
     * [Analog Brass mod](#preset-analog-brass-mod)
     * [Bouncy](#preset-bouncy)
+    * [Lo-fi Keys](#preset-lo-fi-keys)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -1908,6 +1909,17 @@ swells. Aftertouch adds vibrato, and the pitch wheel goes from -3 octaves to
 
 The sound of a ping-pong ball dropping on a glockenspiel, showcasing a use of
 LFO amount envelopes.
+
+<a id="preset-lo-fi-keys"></a>
+
+### Lo-fi Keys
+
+Starts out as an electric piano with lots of echo and reverb, but the more
+you turn up the mod wheel, the more unstable the pitch becomes, and the more
+distortions and fluttering the tape delay produces. Turn up the pitch wheel to
+boost the mids and apply a high-pass filter, and turn it down to slow down the
+tape delay and lower the pitch of the oscillators. Aftertouch adds a brief
+flute-like triangle pad sound to the mix.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
