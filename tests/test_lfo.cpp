@@ -319,3 +319,50 @@ TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_dependency_cycle_betwee
     assert_eq(Constants::INVALID_ENVELOPE_INDEX, envelope_list[4]);
     assert_eq(Constants::INVALID_ENVELOPE_INDEX, envelope_list[5]);
 })
+
+
+void test_inverted_min_max_lfo(
+        Byte const centering,
+        Number const min,
+        Number const max,
+        Number const amount,
+        Number const exp_phase,
+        Number const exp_min,
+        Number const exp_max
+) {
+    LFO expected("E");
+    LFO lfo("L");
+    Sample const* const* expected_samples;
+    Sample const* const* rendered_samples;
+
+    expected.set_block_size(BLOCK_SIZE);
+    lfo.set_block_size(BLOCK_SIZE);
+
+    expected.set_sample_rate(SAMPLE_RATE);
+    lfo.set_sample_rate(SAMPLE_RATE);
+
+    expected.phase.set_ratio(exp_phase);
+    expected.min.set_ratio(exp_min);
+    expected.max.set_ratio(exp_max);
+    expected.frequency.set_value(20.0);
+
+    lfo.min.set_ratio(min);
+    lfo.max.set_ratio(max);
+    lfo.amount.set_ratio(amount);
+    lfo.center.set_ratio(centering);
+    lfo.frequency.set_value(20.0);
+
+    expected.start(0.0);
+    lfo.start(0.0);
+
+    expected_samples = SignalProducer::produce<LFO>(expected, 1);
+    rendered_samples = SignalProducer::produce<LFO>(lfo, 1);
+
+    assert_eq(expected_samples[0], rendered_samples[0], BLOCK_SIZE, DOUBLE_DELTA);
+}
+
+
+TEST(min_and_max_values_may_be_inverted, {
+    test_inverted_min_max_lfo(ToggleParam::ON, 0.7, 0.2, 0.6, 0.5, 0.3, 0.6);
+    test_inverted_min_max_lfo(ToggleParam::OFF, 0.7, 0.2, 0.6, 0.5, 0.4, 0.7);
+})

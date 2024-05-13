@@ -818,6 +818,21 @@ void LFO::apply_distortions(
 }
 
 
+#define JS80P_ASSERT_LFO_LIMITS(v, mi, ma)                                  \
+    JS80P_ASSERT(                                                           \
+        (                                                                   \
+            (mi) <= (ma)                                                    \
+            && ((mi) <= (v) || Math::is_close((v), (mi)))                   \
+            && ((v) <= (ma) || Math::is_close((v), (ma)))                   \
+        )                                                                   \
+        || (                                                                \
+            (ma) <= (mi)                                                    \
+            && ((ma) <= (v) || Math::is_close((v), (ma)))                   \
+            && ((v) <= (mi) || Math::is_close((v), (mi)))                   \
+        )                                                                   \
+    )
+
+
 void LFO::apply_range(
         Sample const* const min_buffer,
         Sample const* const max_buffer,
@@ -841,8 +856,7 @@ void LFO::apply_range(
                     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                         target_buffer[i] = source_buffer[i];
 
-                        JS80P_ASSERT(target_buffer[i] >= min_value);
-                        JS80P_ASSERT(target_buffer[i] <= max_value);
+                        JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
                     }
                 }
             } else {
@@ -851,8 +865,7 @@ void LFO::apply_range(
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                     target_buffer[i] = min_value + range * source_buffer[i];
 
-                    JS80P_ASSERT(target_buffer[i] >= min_value);
-                    JS80P_ASSERT(target_buffer[i] <= max_value);
+                    JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
                 }
             }
         } else {
@@ -862,8 +875,7 @@ void LFO::apply_range(
 
                 target_buffer[i] = min_value + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value);
-                JS80P_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         }
     } else {
@@ -876,8 +888,7 @@ void LFO::apply_range(
 
                 target_buffer[i] = min_buffer[i] + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value);
-                JS80P_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -887,8 +898,7 @@ void LFO::apply_range(
 
                 target_buffer[i] = min_buffer[i] + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value);
-                JS80P_ASSERT(target_buffer[i] <= max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         }
     }
@@ -972,14 +982,9 @@ void LFO::apply_range_centered(
             Sample const range = max_value - min_value;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = (
-                    center + range * (source_buffer[i])
-                );
+                target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value || Math::is_close(target_buffer[i], min_value));
-                JS80P_ASSERT(target_buffer[i] <= max_value || Math::is_close(target_buffer[i], max_value));
-
-                target_buffer[i] = std::min(max_value, std::max(min_value, target_buffer[i]));
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -987,14 +992,9 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                target_buffer[i] = (
-                    center + range * (source_buffer[i])
-                );
+                target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value || Math::is_close(target_buffer[i], min_value));
-                JS80P_ASSERT(target_buffer[i] <= max_value || Math::is_close(target_buffer[i], max_value));
-
-                target_buffer[i] = std::min(max_value, std::max(min_value, target_buffer[i]));
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         }
     } else {
@@ -1006,14 +1006,9 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                target_buffer[i] = (
-                    center + range * (source_buffer[i])
-                );
+                target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value || Math::is_close(target_buffer[i], min_value));
-                JS80P_ASSERT(target_buffer[i] <= max_value || Math::is_close(target_buffer[i], max_value));
-
-                target_buffer[i] = std::min(max_value, std::max(min_value, target_buffer[i]));
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -1022,14 +1017,9 @@ void LFO::apply_range_centered(
                 Sample const center = (min_value + max_value) * 0.5;
                 Sample const range = max_value - min_value;
 
-                target_buffer[i] = (
-                    center + range * (source_buffer[i])
-                );
+                target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT(target_buffer[i] >= min_value || Math::is_close(target_buffer[i], min_value));
-                JS80P_ASSERT(target_buffer[i] <= max_value || Math::is_close(target_buffer[i], max_value));
-
-                target_buffer[i] = std::min(max_value, std::max(min_value, target_buffer[i]));
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         }
     }
