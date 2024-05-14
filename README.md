@@ -1914,12 +1914,13 @@ LFO amount envelopes.
 
 ### Lo-fi Keys
 
-Starts out as an electric piano with lots of echo and reverb, but the more
-you turn up the mod wheel, the more unstable the pitch becomes, and the more
-distortions and fluttering the tape delay produces. Turn up the pitch wheel to
-boost the mids and apply a high-pass filter, and turn it down to slow down the
-tape delay and lower the pitch of the oscillators. Aftertouch adds a brief
-flute-like triangle pad sound to the mix.
+Starts out as an electric piano drenched in lots of echo and reverb, but the
+more you turn up the mod wheel, the more unstable the pitch becomes, and the
+more distortions and fluttering the tape delay produces. Turn up the pitch
+wheel to boost the mids and apply a high-pass filter, and turn it down to slow
+down the tape delay and lower the pitch of the oscillators. Aftertouch adds a
+brief flute-like triangle pad sound to the mix. High velocity notes will have
+quick attack, low velocity notes will start slowly.
 
 <a id="bugs" href="#toc">Table of Contents</a>
 
