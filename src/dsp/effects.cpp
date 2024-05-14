@@ -41,8 +41,8 @@ Effects<InputSignalProducerClass>::Effects(
     backward-compatibility, and new param names use the old scheme for
     consistency.
     */
-    distortion_1_type("OT", Distortion::TYPE_TANH_3),
-    distortion_2_type("DT", Distortion::TYPE_TANH_10),
+    distortion_1_type(name + "OT", Distortion::TYPE_TANH_3),
+    distortion_2_type(name + "DT", Distortion::TYPE_TANH_10),
     volume_1(input, volume_1_gain),
     distortion_1(name + "O", distortion_1_type, volume_1, &volume_1),
     distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1),
