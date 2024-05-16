@@ -183,11 +183,11 @@ void Serializer::import_patch(Synth& synth, std::string const& serialized) noexc
 
 Serializer::Lines* Serializer::parse_lines(std::string const& serialized) noexcept
 {
-    constexpr Integer max_line_pos = MAX_SIZE - 1;
+    constexpr size_t max_line_pos = MAX_SIZE - 1;
     Lines* lines = new Lines();
     char* line = new char[MAX_SIZE];
     std::string::const_iterator const end = serialized.end();
-    Integer line_pos = 0;
+    size_t line_pos = 0;
     bool truncating = false;
 
     for (std::string::const_iterator it = serialized.begin(); it != end; ++it) {
@@ -344,7 +344,7 @@ bool Serializer::parse_section_name(
 ) noexcept {
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
-    Integer pos = 0;
+    size_t pos = 0;
 
     std::fill_n(section_name, 8, '\x00');
 
@@ -388,7 +388,7 @@ bool Serializer::parse_line_until_value(
         std::string::const_iterator& it,
         std::string::const_iterator const& end,
         char param_name[Constants::PARAM_NAME_MAX_LENGTH],
-        char suffix[4]
+        Suffix& suffix
 ) noexcept {
     return (
         !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
@@ -410,7 +410,7 @@ void Serializer::process_line(
     Synth::ParamId param_id;
     Number number;
     char param_name[Constants::PARAM_NAME_MAX_LENGTH];
-    char suffix[4];
+    Suffix suffix;
     bool is_controller_assignment;
 
     if (
@@ -482,8 +482,8 @@ bool Serializer::parse_param_name(
         std::string::const_iterator const& end,
         char* param_name
 ) noexcept {
-    constexpr Integer param_name_pos_max = Constants::PARAM_NAME_MAX_LENGTH - 1;
-    Integer param_name_pos = 0;
+    constexpr size_t param_name_pos_max = Constants::PARAM_NAME_MAX_LENGTH - 1;
+    size_t param_name_pos = 0;
 
     std::fill_n(param_name, Constants::PARAM_NAME_MAX_LENGTH, '\x00');
 
@@ -506,20 +506,20 @@ bool Serializer::parse_param_name(
 bool Serializer::parse_suffix(
         std::string::const_iterator& it,
         std::string::const_iterator const& end,
-        char* suffix
+        Suffix& suffix
 ) noexcept {
-    Integer suffix_pos = 0;
+    size_t suffix_pos = 0;
 
     if (it == end) {
         return false;
     }
 
-    std::fill_n(suffix, 4, '\x00');
+    std::fill_n(suffix, SUFFIX_MAX_LENGTH, '\x00');
 
     while (is_lowercase_letter(*it)) {
         suffix[suffix_pos++] = *(it++);
 
-        if (suffix_pos >= 4 || it == end) {
+        if (suffix_pos >= SUFFIX_MAX_LENGTH || it == end) {
             return false;
         }
     }

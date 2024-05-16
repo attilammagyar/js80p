@@ -19,6 +19,7 @@
 #ifndef JS80P__SERIALIZER_HPP
 #define JS80P__SERIALIZER_HPP
 
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -32,7 +33,11 @@ namespace JS80P
 class Serializer
 {
     public:
-        static constexpr Integer MAX_SIZE = 256 * 1024;
+        static constexpr size_t SUFFIX_MAX_LENGTH = 4;
+
+        typedef char Suffix[SUFFIX_MAX_LENGTH];
+
+        static constexpr size_t MAX_SIZE = 256 * 1024;
 
         static std::string const LINE_END;
 
@@ -48,7 +53,7 @@ class Serializer
             std::string::const_iterator& it,
             std::string::const_iterator const& end,
             char param_name[Constants::PARAM_NAME_MAX_LENGTH],
-            char suffix[4]
+            Suffix& suffix
         ) noexcept;
 
         static bool skipping_remaining_whitespace_or_comment_reaches_the_end(
@@ -142,7 +147,7 @@ class Serializer
         static bool parse_suffix(
             std::string::const_iterator& it,
             std::string::const_iterator const& end,
-            char* suffix
+            Suffix& suffix
         ) noexcept;
 
         static bool parse_equal_sign(

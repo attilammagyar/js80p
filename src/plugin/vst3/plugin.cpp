@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
 
 #include <vst3sdk/base/source/fstreamer.h>
@@ -602,7 +603,7 @@ std::string Vst3Plugin::read_stream(IBStream* stream)
     */
 
     char* buffer = new char[Serializer::MAX_SIZE];
-    Integer i;
+    size_t i;
     int32 bytes_read;
     char8 c;
 

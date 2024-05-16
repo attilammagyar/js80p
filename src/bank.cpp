@@ -209,7 +209,7 @@ void Bank::Program::import_without_update(
     std::string serialized_params("");
     char section_name[8];
     char param_name[8];
-    char suffix[4];
+    Serializer::Suffix suffix;
     bool is_js80p_section = false;
     bool found_program_name = false;
 

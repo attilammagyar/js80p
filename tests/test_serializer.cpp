@@ -263,13 +263,13 @@ TEST(imported_values_are_clamped, {
 
 
 TEST(extremely_long_lines_may_be_truncated, {
-    constexpr Integer spaces_count = Serializer::MAX_SIZE * 2 + 123;
+    constexpr size_t spaces_count = Serializer::MAX_SIZE * 2 + 123;
     Synth synth;
     std::string patch("[js80p]\n");
     std::string spaces(" ");
     std::string long_line("");
 
-    for (Integer i = spaces_count; i != 0;)
+    for (size_t i = spaces_count; i != 0;)
     {
         if ((i & 1) != 0) {
             long_line += spaces;
