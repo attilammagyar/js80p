@@ -224,11 +224,13 @@ int const GUI::ENVELOPE_UPDATE_TYPES_COUNT = 3;
 char const* const GUI::NOTE_HANDLING_MODES[] = {
     "MONO",
     "M HOLD",
-    "P HOLD",
     "POLY",
+    "P HOLD",
+    "P RET",
+    "PH RET",
 };
 
-int const GUI::NOTE_HANDLING_MODES_COUNT = 4;
+int const GUI::NOTE_HANDLING_MODES_COUNT = 6;
 
 
 char const* const GUI::DISTORTION_TYPES[] = {
@@ -1070,7 +1072,6 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M30DSH] = "Macro 30 Distortion Shape",
     [Synth::ParamId::MFX4] = "Modulator Fine Detune x4",
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
-    [Synth::ParamId::RTSUS] = "Retrigger Sustained Notes",
 };
 
 

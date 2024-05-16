@@ -162,6 +162,11 @@ class Serializer
         ) noexcept;
 
         static Number to_number(std::string const& text) noexcept;
+
+        static Number upgrade_old_note_handling_param(
+            Synth const& synth,
+            Number const old_value
+        ) noexcept;
 };
 
 }

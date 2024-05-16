@@ -858,9 +858,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30DSH = 697,    ///< Macro 30 Distortion Shape
             MFX4 = 698,      ///< Modulator Fine Detune x4
             CFX4 = 699,      ///< Carrier Fine Detune x4
-            RTSUS = 700,     ///< Retrigger Sustained Notes
 
-            PARAM_ID_COUNT = 701,
+            PARAM_ID_COUNT = 700,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
@@ -1035,9 +1034,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr int MODES = 14;
 
         static constexpr Byte NOTE_HANDLING_MONOPHONIC = 0;
-        static constexpr Byte NOTE_HANDLING_HOLD_MONOPHONIC = 1;
-        static constexpr Byte NOTE_HANDLING_HOLD_POLYPHONIC = 2;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC = 3;
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD = 1;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC = 2;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD = 3;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER = 4;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD = 5;
 
         class Message
         {
@@ -1143,8 +1144,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         bool is_polyphonic() const noexcept;
         bool is_monophonic() const noexcept;
-
         bool is_holding() const noexcept;
+        bool is_retriggering() const noexcept;
 
         Sample const* const* generate_samples(
             Integer const round,
@@ -1282,7 +1283,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
-        ToggleParam retrigger_sustained_notes;
         ByteParam note_handling;
         ModeParam mode;
         FloatParamS modulator_add_volume;
@@ -1543,7 +1543,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             INVALID_PARAM_TYPE = 4,
         };
 
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_MASK = 0x02;
+        static constexpr Byte NOTE_HANDLING_MASK_POLYPHONIC = 0x06;
+        static constexpr Byte NOTE_HANDLING_MASK_HOLD = 0x01;
+        static constexpr Byte NOTE_HANDLING_MASK_RETRIGGER = 0x04;
 
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
 

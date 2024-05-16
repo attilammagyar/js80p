@@ -572,3 +572,39 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
     assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.modulator_params.tuning.get_value());
     assert_eq((int)Carrier::TUNING_MTS_ESP_NOTE_ON, (int)synth.carrier_params.tuning.get_value());
 })
+
+
+void assert_note_handling_upgrade(
+        std::string const& old_serialized_note_handling,
+        Byte const expected_value
+) {
+    Synth synth;
+    std::string patch = "";
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += old_serialized_note_handling;
+    patch += Serializer::LINE_END;
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
+
+    assert_eq(
+        expected_value,
+        synth.note_handling.get_value(),
+        "old_serialized_note_handling=\"%s\"",
+        old_serialized_note_handling.c_str()
+    );
+}
+
+
+TEST(old_note_handling_parameter_is_upgraded, {
+    assert_note_handling_upgrade("POLY = 0.0", Synth::NOTE_HANDLING_MONOPHONIC);
+    assert_note_handling_upgrade(
+        "POLY = 0.333333333333333", Synth::NOTE_HANDLING_MONOPHONIC_HOLD
+    );
+    assert_note_handling_upgrade(
+        "POLY = 0.666666666666667", Synth::NOTE_HANDLING_POLYPHONIC_HOLD
+    );
+    assert_note_handling_upgrade("POLY = 1.0", Synth::NOTE_HANDLING_POLYPHONIC);
+    assert_note_handling_upgrade("", Synth::NOTE_HANDLING_POLYPHONIC);
+})

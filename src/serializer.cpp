@@ -422,6 +422,20 @@ void Serializer::process_line(
         return;
     }
 
+    if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "POLY", Constants::PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
+        std::string const& new_name(synth.note_handling.get_name());
+
+        std::fill_n(param_name, Constants::PARAM_NAME_MAX_LENGTH, '\x00');
+        strncpy(param_name, new_name.c_str(), new_name.length());
+        param_name[Constants::PARAM_NAME_MAX_LENGTH - 1] = '\x00';
+
+        number = upgrade_old_note_handling_param(synth, number);
+    }
+
     param_id = synth.get_param_id(param_name);
     is_controller_assignment = CONTROLLER_SUFFIX == suffix;
 
@@ -446,6 +460,27 @@ void Serializer::process_line(
             Synth::Message(Synth::MessageType::SET_PARAM, param_id, number, 0)
         );
     }
+}
+
+
+Number Serializer::upgrade_old_note_handling_param(
+        Synth const& synth,
+        Number const old_value
+) noexcept {
+    constexpr Byte NEW_VALUES[] = {
+        Synth::NOTE_HANDLING_MONOPHONIC,
+        Synth::NOTE_HANDLING_MONOPHONIC_HOLD,
+        Synth::NOTE_HANDLING_POLYPHONIC_HOLD,
+        Synth::NOTE_HANDLING_POLYPHONIC,
+    };
+
+    Byte const old_value_byte = std::round(old_value * 3.0);
+
+    if (JS80P_UNLIKELY(old_value_byte > 3)) {
+        return synth.note_handling.get_default_ratio();
+    }
+
+    return synth.note_handling.value_to_ratio(NEW_VALUES[old_value_byte]);
 }
 
 

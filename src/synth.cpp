@@ -82,25 +82,18 @@ Synth::ModeParam::ModeParam(std::string const& name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        8                           /* RT + NH + MODE + MIX + PM + FM + AM + bus    */
-        + 43 * 2                    /* Modulator::Params + Carrier::Params          */
-        + POLYPHONY * 2             /* modulators + carriers                        */
-        + 1                         /* effects                                      */
+        7                           /* NH + MODE + MIX + PM + FM + AM + bus */
+        + 43 * 2                    /* Modulator::Params + Carrier::Params  */
+        + POLYPHONY * 2             /* modulators + carriers                */
+        + 1                         /* effects                              */
         + MACROS * MACRO_PARAMS
         + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
-    retrigger_sustained_notes("RTSUS", ToggleParam::OFF),
-    /*
-    Before held note handling modes, only polyphonic and monophonic modes were
-    available, and an on-off toggle was used for switching between them.  For
-    backward compatibility with old presets and saved plugin states, the
-    original name of the parameter is kept.
-    */
     note_handling(
-        "POLY",
+        "NH",
         NOTE_HANDLING_MONOPHONIC,
-        NOTE_HANDLING_POLYPHONIC,
+        NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD,
         NOTE_HANDLING_POLYPHONIC
     ),
     mode("MODE"),
@@ -351,7 +344,6 @@ void Synth::build_frequency_table() noexcept
 
 void Synth::register_main_params() noexcept
 {
-    register_param_as_child<ToggleParam>(ParamId::RTSUS, retrigger_sustained_notes);
     register_param_as_child<ByteParam>(ParamId::NH, note_handling);
     register_param_as_child<ModeParam>(ParamId::MODE, mode);
     register_param_as_child<FloatParamS>(ParamId::MIX, modulator_add_volume);
@@ -1080,7 +1072,7 @@ void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const c
 
 bool Synth::is_polyphonic() const noexcept
 {
-    return (note_handling.get_value() & NOTE_HANDLING_POLYPHONIC_MASK) != 0;
+    return (note_handling.get_value() & NOTE_HANDLING_MASK_POLYPHONIC) != 0;
 }
 
 
@@ -1092,12 +1084,13 @@ bool Synth::is_monophonic() const noexcept
 
 bool Synth::is_holding() const noexcept
 {
-    Byte const note_handling = this->note_handling.get_value();
+    return (note_handling.get_value() & NOTE_HANDLING_MASK_HOLD) != 0;
+}
 
-    return (
-        note_handling == NOTE_HANDLING_HOLD_MONOPHONIC
-        || note_handling == NOTE_HANDLING_HOLD_POLYPHONIC
-    );
+
+bool Synth::is_retriggering() const noexcept
+{
+    return (note_handling.get_value() & NOTE_HANDLING_MASK_RETRIGGER) != 0;
 }
 
 
@@ -1169,7 +1162,7 @@ void Synth::note_on_polyphonic(
     Integer const voice = midi_note_to_voice_assignments[channel][note];
 
     if (voice != INVALID_VOICE) {
-        if (retrigger_sustained_notes.get_value() == ToggleParam::OFF) {
+        if (!is_retriggering()) {
             return;
         }
 
@@ -1440,7 +1433,7 @@ void Synth::note_off(
     bool const is_monophonic = this->is_monophonic();
 
     if (is_sustain_pedal_on || is_holding) {
-        if (is_monophonic || retrigger_sustained_notes.get_value() == ToggleParam::OFF) {
+        if (is_monophonic || !is_retriggering()) {
             midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
         }
 
@@ -1696,7 +1689,7 @@ void Synth::mono_mode_on(
         Midi::Channel const channel
 ) noexcept {
     note_handling.set_value(
-        is_holding() ? NOTE_HANDLING_HOLD_MONOPHONIC : NOTE_HANDLING_MONOPHONIC
+        is_holding() ? NOTE_HANDLING_MONOPHONIC_HOLD : NOTE_HANDLING_MONOPHONIC
     );
     handle_refresh_param(ParamId::NH);
 }
@@ -1707,7 +1700,7 @@ void Synth::mono_mode_off(
         Midi::Channel const channel
 ) noexcept {
     note_handling.set_value(
-        is_holding() ? NOTE_HANDLING_HOLD_POLYPHONIC : NOTE_HANDLING_POLYPHONIC
+        is_holding() ? NOTE_HANDLING_POLYPHONIC_HOLD : NOTE_HANDLING_POLYPHONIC
     );
     handle_refresh_param(ParamId::NH);
 }
