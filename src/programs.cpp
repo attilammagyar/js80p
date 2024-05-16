@@ -3265,7 +3265,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "CF2LOG = 1.0\n"
             "EF1LOG = 1.0\n"
             "EF2LOG = 1.0\n"
-            "POLY = 0.0\n"
+            "NH = 0.0\n"
         )
     ),
 
@@ -3978,7 +3978,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "EF2LOG = 1.0\n"
             "N2DYN = 1.0\n"
             "N4DYN = 1.0\n"
-            "POLY = 0.0\n"
+            "NH = 0.0\n"
             "ERTYP = 1.0\n"
             "ECTYP = 0.285714285714286\n"
             "MOIA = 0.10\n"
