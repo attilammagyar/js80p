@@ -133,6 +133,7 @@ class Param : public SignalProducer
         Integer macro_change_index;
 
     private:
+        Number const range_as_float_number;
         Number const range_inv;
 
         Integer change_index;

@@ -58,7 +58,8 @@ Param<NumberType, evaluation>::Param(
     midi_controller(NULL),
     macro(NULL),
     macro_change_index(-1),
-    range_inv(1.0 / (Number)range),
+    range_as_float_number((Number)range),
+    range_inv(1.0 / range_as_float_number),
     change_index(0),
     value(default_value)
 {
@@ -194,9 +195,9 @@ NumberType Param<NumberType, evaluation>::ratio_to_value(
         Number const ratio
 ) const noexcept {
     if constexpr (std::is_floating_point<NumberType>::value) {
-        return clamp(min_value + (NumberType)((Number)range * ratio));
+        return clamp(min_value + (NumberType)(range_as_float_number * ratio));
     } else {
-        return clamp(min_value + (NumberType)std::round((Number)range * ratio));
+        return clamp(min_value + (NumberType)std::round(range_as_float_number * ratio));
     }
 }
 
