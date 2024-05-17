@@ -734,12 +734,15 @@ with pitch bends, this toggle switch can increase the range to -4800 cents to
 ##### Portamento Length (PRT)
 
 The time it takes for the oscillator's frequency to reach the current note's
-pitch starting from the pitch of the previous note.
+pitch starting from the pitch of the previous note, or from the value that is
+specified with the [Portamento Depth](#usage-synth-common-prd) parameter.
 
 When the synthesizer is in [MONO](#usage-synth-main-nh) mode, and
 notes are played in a legato fashion (notes are started before the previous
 ones would have ended), then it also controls how long the oscillator's
 amplitude will take to match the velocity of the latest note.
+
+<a id="usage-synth-common-prd"></a>
 
 ##### Portamento Depth (PRD)
 
@@ -1281,6 +1284,13 @@ down, or start using the mouse wheel to adjust the midpoint of the macro's
 This is most useful when the input of the macro is associated with the pitch
 bend wheel of a MIDI keyboard, and you want precise control over the range that
 is covered by the lower and the upper half of the wheel's movement.
+
+Example: assign the pitch wheel to the [Input](#usage-macros-in) of Macro 1,
+and set its Midpoint to 75%. Now if you assign Macro 1 to a knob, then
+when the pitch wheel is at 50%, the knob's position will be at 75%. Moving the
+pitch wheel from 50% to 0% will make the knob move from 75% to 0%, and the
+pitch wheel's movement between 50% and 100% will move the knob from between 75%
+and 100%.
 
 #### Distortion Shape
 
