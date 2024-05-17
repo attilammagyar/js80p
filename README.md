@@ -118,7 +118,7 @@ Table of Contents
     * [Where does the name come from?](#faq-name)
     * [FL Studio: How to assign a MIDI CC to a JS80P knob?](#faq-flstudio-midicc)
     * [FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?](#faq-flstudio-aftertouch)
-    * [FL Studio: How to use the Sustain Pedal?](#faq-flstudio-sustain)
+    * [FL Studio: How to set up the Sustain Pedal?](#faq-flstudio-sustain)
  * [Development](#dev)
     * [Tools](#dev-tools)
     * [Dependencies](#dev-dep)
@@ -518,12 +518,20 @@ momentary value (on a relative scale between 0% and 100%) of a
    usually sends a CC 1 message, the expression pedal is usually associated
    with CC 11 messages, the sustain pedal is CC 64, etc.
 
+   **Note**: some host applications don't send MIDI CC messages to plugins by
+   default, but can be configured to do so. For example, the steps for getting
+   MIDI CC to work in FL Studio are described in the following F. A. Q.
+   entries:
+
+    * [FL Studio: How to assign a MIDI CC to a JS80P knob?](#faq-flstudio-midicc)
+    * [FL Studio: How to use the Sustain Pedal?](#faq-flstudio-sustain)
+
  * **MIDI Learn**: this is a wild card MIDI CC controller: when it is assigned
    to a parameter, JS80P will replace the assignment with the first MIDI CC
    event type that it receives. This is useful when you don't know the MIDI CC
    number of a knob or fader on your MIDI device.
 
-   (Note that JS80P does not process certain MIDI CC event types that are
+   **Note**: JS80P does not process certain MIDI CC event types that are
    reserved in the [MIDI specification](https://midi.org/midi-1-0-control-change-messages)
    for special uses. If your device sends such messages as if they were general
    purpose messages, then it is recommended to change its configuration in
@@ -565,6 +573,13 @@ momentary value (on a relative scale between 0% and 100%) of a
  * **Channel Aftertouch**: some keyboards can measure how the pressure on
    pressed keys change over time, making it possible to add dynamic expression
    to notes over time while they are playing.
+
+   **Note**: some host applications don't provide aftertouch information to
+   plugins by default, but can be configured to do so. For example, the steps
+   for getting it to work in FL Studio are described in the following F. A. Q.
+   entry:
+
+    * [FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?](#faq-flstudio-aftertouch)
 
  * **Macros**: MIDI-based controller values go from 0% to 100% on a linear
    scale, which is often quite limiting. [Macros](#usage-macros) are JS80P's
@@ -2135,7 +2150,7 @@ virtual knob in JS80P, you have to do the following steps:
 
 <a id="faq-flstudio-sustain" href="#toc">Table of Contents</a>
 
-### FL Studio: How to use the Sustain Pedal?
+### FL Studio: How to set up the Sustain Pedal?
 
 [FL Studio](https://www.image-line.com/fl-studio/) does not send all MIDI
 events that come out of a MIDI keyboard to plugins by default, and
