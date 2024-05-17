@@ -613,11 +613,9 @@ Click on the black bar below the Import Patch and Export Patch icons, or use
 the mouse wheel while holding the mouse cursor over it to change how JS80P
 handles note events. The available options are:
 
- * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
-
  * **MONO**: monophonic mode, only a single note can be played at a time.
 
-    * When a new note start event is received while a previous note is still
+    * When a new Note Start event is received while a previous note is still
       playing (e.g. legato), then the new note takes priority: the old note is
       stopped, and the new note is started.
 
@@ -628,13 +626,52 @@ handles note events. The available options are:
       to a value above 0, then that oscillator will smoothly glide its
       frequency and volume to match the new note's pitch and velocity.
 
- * **M HOLD**: same as **MONO**, but note stop events are ignored until a
-   different note handling setting is selected, or until a sustain pedal off
+ * **M HOLD**: same as **MONO**, but Note Stop events are ignored until a
+   different note handling setting is selected, or until a Sustain Pedal Off
    event is received.
 
- * **P HOLD**: same as **POLY**, but note stop events are ignored until a
-   different note handling setting is selected, or until a sustain pedal off
+ * **M IS**: same as **MONO**, but sustain pedal events are ignored while
+   the corresponding [MIDI CC](#usage-controllers) controller is still
+   maintained, allowing the pedal to be used as a 0% / 100% switch without
+   sustaining notes.
+
+ * **M H IS**: same as **M HOLD**, but sustain pedal events are ignored while
+   the corresponding [MIDI CC](#usage-controllers) controller is still
+   maintained, allowing the pedal to be used as a 0% / 100% switch without
+   releasing the sustained note. (Since there's no way in this mode to stop
+   a note, it is a good idea to use volume envelopes which decay into silence.)
+
+ * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
+
+ * **P HOLD**: same as **POLY**, but Note Stop events are ignored until a
+   different note handling setting is selected, or until a Sustain Pedal Off
    event is received.
+
+ * **P IS**: same as **POLY**, but sustain pedal events are ignored while
+   the corresponding [MIDI CC](#usage-controllers) controller is still
+   maintained, allowing the pedal to be used as a 0% / 100% switch without
+   sustaining notes.
+
+ * **P H IS**: same as **P HOLD**, but sustain pedal events are ignored while
+   the corresponding [MIDI CC](#usage-controllers) controller is still
+   maintained, allowing the pedal to be used as a 0% / 100% switch without
+   releasing the sustained notes. (Since there's no way in this mode to stop
+   notes, it is a good idea to use volume envelopes which decay into silence.)
+
+ * **P RET**: same as **POLY**, but when a Note Start event is received for a
+   note that is already being held by the sustain pedal, then instead of
+   triggering the same note on a different voice, the synth will retrigger the
+   already sounding voice.
+
+ * **P H RET**: same as **P HOLD**, but Note Stop events are ignored until a
+   different note handling setting is selected, or until a Sustain Pedal Off
+   event is received.
+
+ * **P H R IS**: same as **P H RET**, but sustain pedal events are ignored
+   while the corresponding [MIDI CC](#usage-controllers) controller is still
+   maintained, allowing the pedal to be used as a 0% / 100% switch without
+   releasing the sustained notes. (Since there's no way in this mode to stop
+   notes, it is a good idea to use volume envelopes which decay into silence.)
 
 <a id="usage-synth-main-mode"></a>
 
@@ -1512,7 +1549,7 @@ How long it will take to reach the sustain level from the peak level.
 #### Release Time (REL)
 
 How long it will take to reach the final level from the value where the
-parameter is at when the note stop event is received.
+parameter is at when the Note Stop event is received.
 
 <a id="usage-lfos" href="#toc">Table of Contents</a>
 
@@ -2159,7 +2196,7 @@ contains information about the sustain pedal's state is among the kinds of MIDI
 data that it swallows.
 
 To add insult to injury, FL Studio pretends that it notifies the plugin about
-the pedal's state, but in reality, it just defers sending `NOTE OFF` events
+the pedal's state, but in reality, it just defers sending Note Stop events
 until the pedal is released. This might give the desired effect in some cases,
 but it breaks patches that assign additional functionality to the pedal besides
 sustaining notes, like for example lengthening envelope release times.

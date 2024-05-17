@@ -93,7 +93,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     note_handling(
         "NH",
         NOTE_HANDLING_MONOPHONIC,
-        NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD,
+        NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS,
         NOTE_HANDLING_POLYPHONIC
     ),
     mode("MODE"),
@@ -1072,7 +1072,7 @@ void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const c
 
 bool Synth::is_polyphonic() const noexcept
 {
-    return (note_handling.get_value() & NOTE_HANDLING_MASK_POLYPHONIC) != 0;
+    return (note_handling.get_value() & NOTE_HANDLING_MASK_POLY_OR_RETRIG) != 0;
 }
 
 
@@ -1084,13 +1084,24 @@ bool Synth::is_monophonic() const noexcept
 
 bool Synth::is_holding() const noexcept
 {
-    return (note_handling.get_value() & NOTE_HANDLING_MASK_HOLD) != 0;
+    Byte const nh = note_handling.get_value();
+
+    return (
+        (nh & NOTE_HANDLING_MASK_HOLD) != 0
+        || nh == NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS
+    );
 }
 
 
 bool Synth::is_retriggering() const noexcept
 {
     return (note_handling.get_value() & NOTE_HANDLING_MASK_RETRIGGER) != 0;
+}
+
+
+bool Synth::is_ignoring_sustain_pedal() const noexcept
+{
+    return (note_handling.get_value() & NOTE_HANDLING_MASK_IGSUS) != 0;
 }
 
 
@@ -1524,12 +1535,20 @@ void Synth::control_change(
 
 void Synth::sustain_on(Seconds const time_offset) noexcept
 {
+    if (is_ignoring_sustain_pedal()) {
+        return;
+    }
+
     is_sustain_pedal_on = true;
 }
 
 
 void Synth::sustain_off(Seconds const time_offset) noexcept
 {
+    if (is_ignoring_sustain_pedal()) {
+        return;
+    }
+
     is_sustain_pedal_on = false;
     release_held_notes(time_offset);
 }
@@ -1689,7 +1708,7 @@ void Synth::mono_mode_on(
         Midi::Channel const channel
 ) noexcept {
     note_handling.set_value(
-        is_holding() ? NOTE_HANDLING_MONOPHONIC_HOLD : NOTE_HANDLING_MONOPHONIC
+        note_handling.get_value() & (~NOTE_HANDLING_MASK_POLY_OR_RETRIG)
     );
     handle_refresh_param(ParamId::NH);
 }
@@ -1700,7 +1719,7 @@ void Synth::mono_mode_off(
         Midi::Channel const channel
 ) noexcept {
     note_handling.set_value(
-        is_holding() ? NOTE_HANDLING_POLYPHONIC_HOLD : NOTE_HANDLING_POLYPHONIC
+        note_handling.get_value() | NOTE_HANDLING_MASK_POLYPHONIC
     );
     handle_refresh_param(ParamId::NH);
 }

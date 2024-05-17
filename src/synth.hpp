@@ -1033,13 +1033,26 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static constexpr int MODES = 14;
 
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC = 0;
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD = 1;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC = 2;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD = 3;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER = 4;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD = 5;
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC                      = 0b0000;
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD                 = 0b0001;
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC_IGSUS                = 0b0010;
+        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD_IGSUS           = 0b0011;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC                      = 0b0100;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD                 = 0b0101;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_IGSUS                = 0b0110;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD_IGSUS           = 0b0111;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER            = 0b1000;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD       = 0b1001;
+        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS = 0b1010;
 
+    private:
+        static constexpr Byte NOTE_HANDLING_MASK_HOLD                       = 0b0001;
+        static constexpr Byte NOTE_HANDLING_MASK_IGSUS                      = 0b0010;
+        static constexpr Byte NOTE_HANDLING_MASK_POLYPHONIC                 = 0b0100;
+        static constexpr Byte NOTE_HANDLING_MASK_RETRIGGER                  = 0b1000;
+        static constexpr Byte NOTE_HANDLING_MASK_POLY_OR_RETRIG             = 0b1100;
+
+    public:
         class Message
         {
             public:
@@ -1146,6 +1159,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         bool is_monophonic() const noexcept;
         bool is_holding() const noexcept;
         bool is_retriggering() const noexcept;
+        bool is_ignoring_sustain_pedal() const noexcept;
 
         Sample const* const* generate_samples(
             Integer const round,
@@ -1542,10 +1556,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             BYTE = 3,
             INVALID_PARAM_TYPE = 4,
         };
-
-        static constexpr Byte NOTE_HANDLING_MASK_POLYPHONIC = 0x06;
-        static constexpr Byte NOTE_HANDLING_MASK_HOLD = 0x01;
-        static constexpr Byte NOTE_HANDLING_MASK_RETRIGGER = 0x04;
 
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
 

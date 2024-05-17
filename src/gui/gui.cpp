@@ -224,13 +224,18 @@ int const GUI::ENVELOPE_UPDATE_TYPES_COUNT = 3;
 char const* const GUI::NOTE_HANDLING_MODES[] = {
     "MONO",
     "M HOLD",
+    "M IS",
+    "M H IS",
     "POLY",
     "P HOLD",
+    "P IS",
+    "P H IS",
     "P RET",
-    "PH RET",
+    "P H RET",
+    "P H R IS",
 };
 
-int const GUI::NOTE_HANDLING_MODES_COUNT = 6;
+int const GUI::NOTE_HANDLING_MODES_COUNT = 11;
 
 
 char const* const GUI::DISTORTION_TYPES[] = {
