@@ -1681,25 +1681,31 @@ void Synth::all_notes_off(
         Seconds const time_offset,
         Midi::Channel const channel
 ) noexcept {
-    for (Midi::Channel channel_ = 0; channel_ != Midi::CHANNELS; ++channel_) {
-        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            Integer const voice = midi_note_to_voice_assignments[channel_][note];
+    for (Integer voice = 0; voice != POLYPHONY; ++voice) {
+        Modulator* const modulator = modulators[voice];
 
-            if (voice == INVALID_VOICE) {
-                continue;
-            }
+        if (modulator->is_on()) {
+            modulator->note_off(
+                time_offset, modulator->get_note_id(), modulator->get_note(), 0.0
+            );
+        }
 
-            midi_note_to_voice_assignments[channel_][note] = INVALID_VOICE;
+        Carrier* const carrier = carriers[voice];
 
-            Modulator* const modulator = modulators[voice];
-
-            modulator->note_off(time_offset, modulator->get_note_id(), note, 0.0);
-
-            Carrier* const carrier = carriers[voice];
-
-            carrier->note_off(time_offset, carrier->get_note_id(), note, 0.0);
+        if (carrier->is_on()) {
+            carrier->note_off(
+                0.0, carrier->get_note_id(), carrier->get_note(), 0.0
+            );
         }
     }
+
+    for (Midi::Channel channel_ = 0; channel_ != Midi::CHANNELS; ++channel_) {
+        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
+            midi_note_to_voice_assignments[channel_][note] = INVALID_VOICE;
+        }
+    }
+
+    note_stack.clear();
 }
 
 

@@ -419,6 +419,46 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
 })
 
 
+TEST(all_notes_off_message_clears_note_stack, {
+    constexpr Integer block_size = 4096;
+    constexpr Frequency sample_rate = 4096.0;
+
+    Synth synth;
+    Sample const* const* rendered_samples;
+    Sample* expected_samples = new Sample[block_size];
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    synth.resume();
+
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONOPHONIC);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(0.0);
+    synth.carrier_params.volume.set_value(0.0);
+
+    synth.note_on(0.0, 2, Midi::NOTE_A_2, 127);
+    synth.note_on(0.0, 3, Midi::NOTE_A_3, 127);
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_off(0.0, 3, Midi::NOTE_A_3, 127);
+    synth.all_notes_off(0.0, 1);
+    synth.control_change(0.1, 1, Midi::SUSTAIN_PEDAL, 0);
+
+    std::fill_n(expected_samples, block_size, 0.0);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, rendered_samples[1], block_size, DOUBLE_DELTA);
+
+    delete[] expected_samples;
+})
+
+
 TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_replaced_by_the_first_supported_changing_midi_controller, {
     Synth synth;
 
