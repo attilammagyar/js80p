@@ -31,7 +31,7 @@ Midi::Word NoteStack::encode(
     Midi::Channel const channel,
     Midi::Note const note
 ) noexcept {
-    return ((channel & 0x0f) << 8) | (note & 0xff);
+    return ((Midi::Word)(channel & 0x0f) << 8) | (Midi::Word)note;
 }
 
 
@@ -40,8 +40,14 @@ void NoteStack::decode(
     Midi::Channel& channel,
     Midi::Note& note
 ) noexcept {
-    channel = (word >> 8) & 0x0f;
-    note = word & 0xff;
+    channel = (Midi::Channel)(word >> 8) & 0x0f;
+    note = get_note(word);
+}
+
+
+Midi::Note NoteStack::get_note(Midi::Word const word) noexcept
+{
+    return word & 0xff;
 }
 
 
@@ -58,6 +64,8 @@ void NoteStack::clear() noexcept
     std::fill_n(velocities, ITEMS, 0.0);
 
     head = INVALID_ITEM;
+    lowest_ = INVALID_ITEM;
+    highest_ = INVALID_ITEM;
 }
 
 
@@ -80,6 +88,18 @@ void NoteStack::top(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
 }
 
 
+void NoteStack::lowest(Midi::Channel& channel, Midi::Note& note) const noexcept
+{
+    decode(lowest_, channel, note);
+}
+
+
+void NoteStack::highest(Midi::Channel& channel, Midi::Note& note) const noexcept
+{
+    decode(highest_, channel, note);
+}
+
+
 void NoteStack::push(
         Midi::Channel const channel,
         Midi::Note const note,
@@ -92,7 +112,7 @@ void NoteStack::push(
     Midi::Word const item = encode(channel, note);
 
     if (is_already_pushed(item)) {
-        remove(item);
+        remove<false>(item);
     }
 
     if (head != INVALID_ITEM) {
@@ -102,6 +122,14 @@ void NoteStack::push(
     next[item] = head;
     head = item;
     velocities[item] = velocity;
+
+    if (lowest_ == INVALID_ITEM || note < get_note(lowest_)) {
+        lowest_ = item;
+    }
+
+    if (highest_ == INVALID_ITEM || note > get_note(highest_)) {
+        highest_ = item;
+    }
 }
 
 
@@ -138,8 +166,50 @@ void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
 
     next[item] = INVALID_ITEM;
 
-    decode(item, channel, note);
     velocity = velocities[item];
+    decode(item, channel, note);
+
+    update_extremes(item);
+}
+
+
+void NoteStack::update_extremes(Midi::Word const changed_item) noexcept
+{
+    if (is_empty()) {
+        lowest_ = INVALID_ITEM;
+        highest_ = INVALID_ITEM;
+
+        return;
+    }
+
+    if (changed_item == lowest_) {
+        lowest_ = INVALID_ITEM;
+    }
+
+    if (changed_item == highest_) {
+        highest_ = INVALID_ITEM;
+    }
+
+    Midi::Word item = head;
+    Midi::Note lowest_note = get_note(lowest_);
+    Midi::Note highest_note = get_note(highest_);
+    Midi::Note note;
+
+    for (size_t i = 0; item != INVALID_ITEM && i != ITEMS; ++i) {
+        note = get_note(item);
+
+        if (lowest_ == INVALID_ITEM || note < lowest_note) {
+            lowest_note = note;
+            lowest_ = item;
+        }
+
+        if (highest_ == INVALID_ITEM || note > highest_note) {
+            highest_note = note;
+            highest_ = item;
+        }
+
+        item = next[item];
+    }
 }
 
 
@@ -149,9 +219,11 @@ void NoteStack::remove(Midi::Channel const channel, Midi::Note const note) noexc
         return;
     }
 
-    remove(encode(channel, note));
+    remove<true>(encode(channel, note));
 }
 
+
+template<bool should_update_extremes>
 void NoteStack::remove(Midi::Word const word) noexcept
 {
     Midi::Word const next_item = next[word];
@@ -171,29 +243,32 @@ void NoteStack::remove(Midi::Word const word) noexcept
         next[word] = INVALID_ITEM;
         previous[word] = INVALID_ITEM;
     }
+
+    if constexpr (should_update_extremes) {
+        update_extremes(word);
+    }
 }
 
 
 // void NoteStack::dump() const noexcept
 // {
-    // Midi::Channel channel;
-    // Midi::Note note;
+    // fprintf(stderr, "  top=\t%hx\n", head);
+    // fprintf(stderr, "  lowest=\t%hx\n", lowest_);
+    // fprintf(stderr, "  highest=\t%hx\n", highest_);
 
-    // fprintf(stderr, "  top:\t%hhx\n  nxt:\t[", head);
+    // fprintf(stderr, "  next=\t[");
 
     // for (Midi::Word i = 0; i != ITEMS; ++i) {
         // if (next[i] != INVALID_ITEM) {
-            // decode(next[i], channel, note);
-            // fprintf(stderr, "%hhx:(%hhx,%hhx), ", i, channel, note);
+            // fprintf(stderr, "%hx-->%hx, ", i, next[i]);
         // }
     // }
 
-    // fprintf(stderr, "]\n  prev:\t[");
+    // fprintf(stderr, "]\n  prev=\t[");
 
     // for (Midi::Word i = 0; i != ITEMS; ++i) {
         // if (previous[i] != INVALID_ITEM) {
-            // decode(previous[i], channel, note);
-            // fprintf(stderr, "%hhx:(%hhx,%hhx), ", i, channel, note);
+            // fprintf(stderr, "%hx-->%hx, ", i, previous[i]);
         // }
     // }
 

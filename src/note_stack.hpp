@@ -30,8 +30,8 @@ namespace JS80P
 
 /**
  * \brief A stack (LIFO) for unique \c Midi::Channel and \c Midi::Note pairs
- *        where all operations cost O(1), including removing an element by value
- *        from the middle.
+ *        where all operations cost O(1) most of the time, including removing an
+ *        element by value from the middle.
  */
 class NoteStack
 {
@@ -43,6 +43,8 @@ class NoteStack
         bool is_top(Midi::Channel const channel, Midi::Note const note) const noexcept;
 
         void top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept;
+        void lowest(Midi::Channel& channel, Midi::Note& note) const noexcept;
+        void highest(Midi::Channel& channel, Midi::Note& note) const noexcept;
 
         void push(
             Midi::Channel const channel,
@@ -70,11 +72,16 @@ class NoteStack
             Midi::Note& note
         ) noexcept;
 
+        static Midi::Note get_note(Midi::Word const word) noexcept;
+
         // void dump() const noexcept;
 
         bool is_invalid(Midi::Channel const channel, Midi::Note const note) const noexcept;
 
+        template<bool should_update_extremes>
         void remove(Midi::Word const word) noexcept;
+
+        void update_extremes(Midi::Word const changed_item) noexcept;
 
         bool is_already_pushed(Midi::Word const word) const noexcept;
 
@@ -97,6 +104,8 @@ class NoteStack
         Midi::Word previous[ITEMS];
 
         Midi::Word head;
+        Midi::Word lowest_;
+        Midi::Word highest_;
 };
 
 }

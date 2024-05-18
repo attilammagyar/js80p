@@ -62,6 +62,24 @@ using namespace JS80P;
         assert_eq(expected_velocity, velocity, DOUBLE_DELTA);                       \
     } while (false)
 
+#define assert_extreme(extreme_type, expected_channel, expected_note, note_stack)   \
+    do {                                                                            \
+        Midi::Channel channel = Midi::INVALID_CHANNEL;                              \
+        Midi::Note note = Midi::INVALID_NOTE;                                       \
+                                                                                    \
+        assert_false(note_stack.is_empty());                                        \
+                                                                                    \
+        note_stack.extreme_type(channel, note);                                     \
+        assert_eq(expected_channel, channel);                                       \
+        assert_eq(expected_note, note);                                             \
+    } while (false)
+
+#define assert_highest(expected_channel, expected_note, note_stack)                 \
+    assert_extreme(highest, expected_channel, expected_note, note_stack)
+
+#define assert_lowest(expected_channel, expected_note, note_stack)                  \
+    assert_extreme(lowest, expected_channel, expected_note, note_stack)
+
 #define assert_pop(                                                                 \
         expected_popped_channel,                                                    \
         expected_popped_note,                                                       \
@@ -487,4 +505,98 @@ TEST(stays_consistent_after_many_operations, {
     assert_pop(5, Midi::NOTE_A_3, 0.1, 0, Midi::INVALID_NOTE, 0.0, note_stack);
 
     assert_empty(note_stack);
+})
+
+
+TEST(keeps_track_of_highest_and_lowest_note, {
+    NoteStack note_stack;
+    Number velocity = -1.0;
+    Midi::Channel channel = Midi::INVALID_CHANNEL;
+    Midi::Note note = Midi::INVALID_NOTE;
+
+    note_stack.push(5, Midi::NOTE_A_1, 1.0);
+    assert_lowest(5, Midi::NOTE_A_1, note_stack);
+    assert_highest(5, Midi::NOTE_A_1, note_stack);
+
+    note_stack.push(5, Midi::NOTE_A_3, 1.0);
+    assert_lowest(5, Midi::NOTE_A_1, note_stack);
+    assert_highest(5, Midi::NOTE_A_3, note_stack);
+
+    note_stack.push(5, Midi::NOTE_A_5, 1.0);
+    assert_lowest(5, Midi::NOTE_A_1, note_stack);
+    assert_highest(5, Midi::NOTE_A_5, note_stack);
+
+    note_stack.pop(channel, note, velocity);
+    assert_lowest(5, Midi::NOTE_A_1, note_stack);
+    assert_highest(5, Midi::NOTE_A_3, note_stack);
+
+    note_stack.push(5, Midi::NOTE_A_2, 1.0);
+    assert_lowest(5, Midi::NOTE_A_1, note_stack);
+    assert_highest(5, Midi::NOTE_A_3, note_stack);
+
+    note_stack.remove(5, Midi::NOTE_A_1);
+    assert_lowest(5, Midi::NOTE_A_2, note_stack);
+    assert_highest(5, Midi::NOTE_A_3, note_stack);
+
+    note_stack.pop(channel, note, velocity);
+    assert_lowest(5, Midi::NOTE_A_3, note_stack);
+    assert_highest(5, Midi::NOTE_A_3, note_stack);
+})
+
+
+TEST(avoids_unnecessary_extremum_updates, {
+    NoteStack note_stack;
+    Number velocity = -1.0;
+    Midi::Channel channel = Midi::INVALID_CHANNEL;
+    Midi::Note note = Midi::INVALID_NOTE;
+
+    note_stack.push(1, Midi::NOTE_A_1, 1.0);
+    note_stack.push(2, Midi::NOTE_A_1, 1.0);
+    note_stack.push(3, Midi::NOTE_A_1, 1.0);
+    note_stack.push(4, Midi::NOTE_A_1, 1.0);
+    note_stack.push(5, Midi::NOTE_A_1, 1.0);
+    note_stack.push(1, Midi::NOTE_A_5, 1.0);
+    note_stack.push(2, Midi::NOTE_A_5, 1.0);
+    note_stack.push(3, Midi::NOTE_A_5, 1.0);
+    note_stack.push(4, Midi::NOTE_A_5, 1.0);
+    note_stack.push(5, Midi::NOTE_A_5, 1.0);
+
+    assert_lowest(1, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.pop(channel, note, velocity);
+    assert_lowest(1, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(5, Midi::NOTE_A_1);
+    assert_lowest(1, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(3, Midi::NOTE_A_1);
+    assert_lowest(1, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(3, Midi::NOTE_A_5);
+    assert_lowest(1, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(1, Midi::NOTE_A_1);
+    assert_lowest(4, Midi::NOTE_A_1, note_stack);
+    assert_highest(1, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(1, Midi::NOTE_A_5);
+    assert_lowest(4, Midi::NOTE_A_1, note_stack);
+    assert_highest(4, Midi::NOTE_A_5, note_stack);
+
+    note_stack.pop(channel, note, velocity);
+    assert_lowest(4, Midi::NOTE_A_1, note_stack);
+    assert_highest(2, Midi::NOTE_A_5, note_stack);
+
+    note_stack.remove(4, Midi::NOTE_A_1);
+    assert_lowest(2, Midi::NOTE_A_1, note_stack);
+    assert_highest(2, Midi::NOTE_A_5, note_stack);
+
+    note_stack.pop(channel, note, velocity);
+    assert_lowest(2, Midi::NOTE_A_1, note_stack);
+    assert_highest(2, Midi::NOTE_A_1, note_stack);
 })
