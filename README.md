@@ -171,8 +171,7 @@ Features
  * Frequency modulation.
  * Phase modulation.
  * Built-in effects:
-    * overdrive,
-    * distortion,
+    * various distortions,
     * 2 more filters,
     * chorus,
     * stereo echo (with distortion and side-chaining),
@@ -183,7 +182,13 @@ Features
    polyphony.
  * Filter and envelope imperfection settings for analog-like feel.
  * MIDI controllers and macros.
- * Channel pressure (aftertouch).
+ * Channel pressure (aftertouch), with optional semi-polyphonic
+   operation modes (even with MIDI keyboards that are only capable of
+   paraphonic aftertouch):
+    * last pressed key,
+    * oldest pressed key,
+    * lowest pressed key,
+    * or highest pressed key.
  * MIDI learn.
  * Logarithmic or linear scale filter cutoff frequencies.
  * Tempo synchronization for envelopes, LFOs, and effects.
@@ -194,6 +199,7 @@ Features
     * volume control 1 input,
     * volume control 2 input,
     * volume control 3 input.
+ * Route external audio into the effects chain of JS80P.
 
 <a id="install" href="#toc">Table of Contents</a>
 
@@ -503,6 +509,15 @@ produced by JS80P can be adjusted via virtual knobs on the screen:
    open the controller selector screen, and you want to close it without
    changing anything, then just click on the "none" option or the controller
    that is already selected.)
+
+By default, JS80P parameters are paraphonic, which means that when there are
+multiple voices playing different musical notes, all of them share the same
+value for each parameter. Many of the parameters on the
+[Synthesizer (Synth)](#usage-synth) tab can be changed to be polyphonic or
+optionally semi-polyphonic by associating them with
+[envelope generators](#usage-envelopes) or
+[low-frequency oscillators](#usage-lfos) that have envelope generators assigned
+to them.
 
 <a id="usage-controllers" href="#toc">Table of Contents</a>
 
@@ -1006,13 +1021,19 @@ plays a sine wave exactly one octave below the oscillator's main frequency.
 
 ##### Distortion (DIST)
 
-Soft-clipping distortion.
+Same as the [distortions](#usage-effects-distortions) on the
+[Effects](#usage-effects) tab, but with polyphonic controller capabilities.
 
 <a id="usage-effects" href="#toc">Table of Contents</a>
 
 ### Effects
 
 <a id="usage-effects-volume"></a>
+
+#### External Input Volume (Input)
+
+Control how loud external audio is mixed with the signal from the oscillators
+before entering the effects chain when JS80P is used as an audio effect.
 
 #### Volume Controls
 
@@ -1029,14 +1050,86 @@ signal which is going into the
 
 #### Distortions
 
-##### Overdrive (Odrv, GAIN)
+##### Distortion Type
 
-Subtle saturation and soft-clipping distortion to add a little bit of
-crunchiness to the sound.
+Click on the black box in the header section of the distortion effects, or use
+the mouse wheel while holding the cursor above it to select the type of
+distortion:
 
-##### Distortion (Dist, GAIN)
+ * **tanh 3x**: gentle saturation or soft clipping.
 
-Heavy distortion for angrier sounds with a lot of bite.
+ * **tanh 5x**: more prominent soft clipping.
+
+ * **tanh 10x**: heavy distortion.
+
+ * **1+3**: harmonic distortion, adding the 3rd harmonic at lower signal
+   levels; soft clipping at higher signal levels.
+
+ * **1+5**: harmonic distortion, adding the 5th harmonic at lower signal
+   levels; soft clipping at higher signal levels.
+
+ * **1+3+5**: harmonic distortion, adding the 3rd and 5th harmonics at lower
+   signal levels; soft clipping at higher signal levels.
+
+ * **square**: harmonic distortion, adding the 3rd and 5th harmonics at lower
+   signal levels, with proportions known from the square wave; soft clipping at
+   higher signal levels.
+
+ * **triangle**: harmonic distortion, adding the 3rd and 5th harmonics at lower
+   signal levels, with proportions known from the triangle wave; soft clipping
+   at higher signal levels.
+
+ * **bit 1**: band-limited bit crusher-like effect with 2 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 2**: band-limited bit crusher-like effect with 4 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 3**: band-limited bit crusher-like effect with 8 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 4**: band-limited bit crusher-like effect with 16 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 4.6**: band-limited bit crusher-like effect with 24 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 5**: band-limited bit crusher-like effect with 32 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 5.6**: band-limited bit crusher-like effect with 48 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 6**: band-limited bit crusher-like effect with 64 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 6.6**: band-limited bit crusher-like effect with 96 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 7**: band-limited bit crusher-like effect with 128 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 7.6**: band-limited bit crusher-like effect with 192 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 8**: band-limited bit crusher-like effect with 256 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 8.6**: band-limited bit crusher-like effect with 384 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **bit 9**: band-limited bit crusher-like effect with 512 stages at lower
+   signal levels, soft clipping at higher signal levels.
+
+ * **reduce**: soft clipping distortion that also slightly reduces the volume
+   of the input signal. (This is what the [Echo](#usage-effects-echo) and the
+   [Reverb](#usage-effects-reverb) effects use internally on the feedback line
+   to make sure that the signal will decay eventually, even with high
+   distortion levels.)
+
+##### Distortion Level
+
+The amount of distortion that is applied to the signal.
 
 <a id="usage-effects-filters"></a>
 
@@ -1110,7 +1203,7 @@ The maximum time by which the chorus voices are lagging behind the main voice.
 
 ##### LFO Frequency (FREQ)
 
-Controls how quickly the lag of each chorus voice varies.
+Control how quickly the lag of each chorus voice varies.
 
 ##### Depth (DPT)
 
@@ -1206,7 +1299,7 @@ amount, maybe with a tiny amount of randomization.
 
 ##### Distortion (DIST)
 
-Add some saturation or soft-clipping distortion to the delayed signal. This can
+Add some saturation or soft clipping distortion to the delayed signal. This can
 also come handy for simulating slightly overdriven analog tape delay effect
 units.
 
@@ -1302,7 +1395,12 @@ Select from various distributions and numbers of reflections, ranging from
 small rooms with just a handful of reflection points, to large cathedrals with
 many spread out reflections.
 
-##### Room Reflectivity (ROOM)
+##### Room Size (SIZE)
+
+Control the size of the room, ie. how long it takes for reflections to be
+audible.
+
+##### Room Reflectivity (REFL)
 
 Control how reflective the room is, in other words, how loud are the sounds
 that bounce off its walls. The higher this value, the longer it takes for the
@@ -1490,6 +1588,32 @@ The available options are:
    to the level where it should be according to the momentary state of the
    envelope settings.
 
+ * **LST**: same as **DYN**, but the envelope snapshot is updated only for the
+   voice which corresponds to the last pressed MIDI key that is still pressed
+   at a given moment.
+
+ * **OLD**: same as **DYN**, but the envelope snapshot is updated only for the
+   voice which corresponds to the MIDI key that was pressed first among the
+   keys which are pressed at a given moment.
+
+ * **LOW**: same as **DYN**, but the envelope snapshot is updated only for the
+   voice which corresponds to the lowest MIDI key among the keys which are
+   pressed at a given moment.
+
+ * **HI**: same as **DYN**, but the envelope snapshot is updated only for the
+   voice which corresponds to the highest MIDI key among the keys which are
+   pressed at a given moment.
+
+Note: the **LST**, **OLD**, **LOW**, and **HI** envelope updated modes make it
+possible to set up semi-polyphonic aftertouch effects, even if the MIDI
+keyboard does not have polyphonic aftertouch functionality: set all the levels
+of the envelope to 100%, and assign the Channel Aftertouch controller to the
+[amount](#usage-envelopes-amt) parameter of the envelope, and select the
+desired update mode. Any sound parameter that is controlled by such an envelope
+will become semi-polyphonic. (Of course, you can use other
+[controllers](#usage-controllers), MIDI CC, or [macro](#usage-macros) instead
+of aftertouch.)
+
 #### Tempo Synchronization (BPM)
 
 The time interval of each stage will be measured in terms of beats instead of
@@ -1591,9 +1715,9 @@ timeline for that parameter when a new note is triggered.
 Furthermore, if a parameter of an LFO which has an amount envelope is
 controlled by another LFO which also has an amount envelope, then each new note
 will have its own timeline for both of those LFOs and envelopes. (Up to 6
-timelines can be maintained by each parameter for each note. When that limit
+timelines can be maintained by each parameter for each voice. When that limit
 runs out, or when there's a dependency cycle between LFOs, then some of the
-LFOs will be run globally, as if there was no envelope assigned to them.)
+LFOs will be run paraphonically, as if there was no envelope assigned to them.)
 
 Note that when the LFO is assigned to a parameter which doesn't accept control
 from envelope generators, then the amount envelope has no effect.
@@ -1645,7 +1769,7 @@ Set the amplitude of the oscillation.
 
 #### Distortion (DIST)
 
-Distort the waveform with a soft-clipping distortion.
+Distort the waveform with a soft clipping distortion.
 
 #### Randomness (RAND)
 
@@ -2013,23 +2137,26 @@ current computer, I'm not going to invest in a new one.
 
 ### Parameters, Envelopes, LFOs, and polyphony: how do they work?
 
-By default, knobs and toggles act globally. This means that if you adjust a
-knob with your mouse, or if you assign a MIDI event (controller change, note
+By default, knobs and toggles act paraphonically. This means that if you adjust
+a knob with your mouse, or if you assign a MIDI event (controller change, note
 velocity, etc.), a [macro](#usage-macros), or an [LFO](#usage-lfos) to it and
 adjust the parameter via that, or if you use
 [automation in your plugin host application](#faq-automation), then that
-parameter will change for all sounding notes.
+parameter will be shared among all sounding voices.
 
 But if you assign an [envelope generator](#usage-envelopes) as a
 [controller](#usage-controllers) to a parameter, then each voice will use its
 own timeline for that parameter, and the parameter's value will change over
-time for each simultaneously sounding note independently from each other,
-according to the envelope's settings. By default, envelope generator settings
-are only evaluated once for each note, at the very beginning of the note, so if
-the parameters of the envelope generator are changed, then it will only affect
-the notes that start after the adjustment. This behaviour can be changed by
-setting a different [update mode](#usage-envelopes-update) for the envelope
-generator.
+time for each simultaneously sounding voice independently from the others,
+according to the envelope's settings.
+
+Furthermore, envelope generator settings are only evaluated once for each note
+by default, at the very beginning of the note. This means that if the
+parameters of the envelope generator are changed, then it will only affect the
+notes that start after the adjustment, but the already sounding notes will keep
+running with the envelope settings that were in effect when they were
+triggered. This behaviour can be changed by setting a different
+[update mode](#usage-envelopes-update) for the envelope generator.
 
 Similarly, if you assign an [LFO](#usage-lfos) to a parameter which can accept
 control from [envelope generators](#usage-envelopes), and the LFO is associated
