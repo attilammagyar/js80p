@@ -383,6 +383,7 @@ params = [
     "F9MIN",
     "F9RND",
     "FM",
+    "IN",
     "L1AEN",
     "L1AMT",
     "L1CEN",

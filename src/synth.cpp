@@ -82,7 +82,7 @@ Synth::ModeParam::ModeParam(std::string const& name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        7                           /* NH + MODE + MIX + PM + FM + AM + bus */
+        8                           /* NH + MODE + MIX + PM + FM + AM + INVOL + bus */
         + 43 * 2                    /* Modulator::Params + Carrier::Params  */
         + POLYPHONY * 2             /* modulators + carriers                */
         + 1                         /* effects                              */
@@ -133,6 +133,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     ),
     modulator_params("M", (Envelope* const*)&envelopes_rw),
     carrier_params("C", (Envelope* const*)&envelopes_rw),
+    input_volume("IN", 0.0, 1.0, 1.0),
     messages(MESSAGE_QUEUE_SIZE),
     bus(
         OUT_CHANNELS,
@@ -141,7 +142,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         carriers,
         carrier_params,
         POLYPHONY,
-        modulator_add_volume
+        modulator_add_volume,
+        input_volume
     ),
     samples_since_gc(0),
     samples_between_gc(samples_between_gc),
@@ -350,6 +352,7 @@ void Synth::register_main_params() noexcept
     register_param_as_child<FloatParamS>(ParamId::PM, phase_modulation_level);
     register_param_as_child<FloatParamS>(ParamId::FM, frequency_modulation_level);
     register_param_as_child<FloatParamS>(ParamId::AM, amplitude_modulation_level);
+    register_param_as_child<FloatParamS>(ParamId::INVOL, input_volume);
 }
 
 
@@ -2892,7 +2895,8 @@ Synth::Bus::Bus(
         Carrier* const* const carriers,
         Carrier::Params const& carrier_params,
         Integer const polyphony,
-        FloatParamS& modulator_add_volume
+        FloatParamS& modulator_add_volume,
+        FloatParamS& input_volume
 ) noexcept
     : SignalProducer(channels, 0),
     polyphony(polyphony),
@@ -2902,6 +2906,7 @@ Synth::Bus::Bus(
     carrier_params(carrier_params),
     input(NULL),
     modulator_add_volume(modulator_add_volume),
+    input_volume(input_volume),
     modulators_buffer(NULL),
     carriers_buffer(NULL)
 {
@@ -3002,6 +3007,9 @@ Sample const* const* Synth::Bus::initialize_rendering(
 
     modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
         modulator_add_volume, round, sample_count
+    );
+    input_volume_buffer = FloatParamS::produce_if_not_constant(
+        input_volume, round, sample_count
     );
 
     render_silence(round, 0, sample_count, modulators_buffer);
@@ -3108,14 +3116,37 @@ void Synth::Bus::render(
     mix_carriers(round, first_sample_index, last_sample_index);
 
     if (JS80P_LIKELY(input != NULL)) {
-        for (Integer c = 0; c != channels; ++c) {
-            Sample const* const in_channel = input[c];
-            Sample const* const mod_channel = modulators_buffer[c];
-            Sample const* const car_channel = carriers_buffer[c];
-            Sample* const out_channel = buffer[c];
+        if (input_volume_buffer == NULL) {
+            Sample const input_volume_value = input_volume.get_value();
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                out_channel[i] = in_channel[i] + mod_channel[i] + car_channel[i];
+            for (Integer c = 0; c != channels; ++c) {
+                Sample const* const in_channel = input[c];
+                Sample const* const mod_channel = modulators_buffer[c];
+                Sample const* const car_channel = carriers_buffer[c];
+                Sample* const out_channel = buffer[c];
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    out_channel[i] = (
+                        in_channel[i] * input_volume_value
+                        + mod_channel[i]
+                        + car_channel[i]
+                    );
+                }
+            }
+        } else {
+            for (Integer c = 0; c != channels; ++c) {
+                Sample const* const in_channel = input[c];
+                Sample const* const mod_channel = modulators_buffer[c];
+                Sample const* const car_channel = carriers_buffer[c];
+                Sample* const out_channel = buffer[c];
+
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    out_channel[i] = (
+                        in_channel[i] * input_volume_buffer[i]
+                        + mod_channel[i]
+                        + car_channel[i]
+                    );
+                }
             }
         }
     } else {

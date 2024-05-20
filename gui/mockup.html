@@ -88,6 +88,7 @@ html, body {
 
 #distortion-params,
 #overdrive-params,
+#input-params,
 #volume-1-params,
 #volume-2-params,
 #volume-3-params {
@@ -657,7 +658,7 @@ svg.icon {
 
 .effect {
   text-align: center;
-  margin: 1.5px 10px;
+  margin: 1.5px 3px;
   padding: 2px 6px;
 }
 
@@ -890,6 +891,10 @@ function make_tabs(active)
       <script type="text/javascript">make_tabs(1);</script>
     </div>
     <div class="border" id="effects">
+      <div id="input" class="effect main-block block">
+        <h1><span>Input</span></h1>
+        <div id="input-params" class="block"></div>
+      </div>
       <div id="volume-1" class="effect main-block block">
         <h1><span>Vol 1</span></h1>
         <div id="volume-1-params" class="block"></div>
@@ -1121,6 +1126,8 @@ window.onload = function ()
             create_knob("osc-" + String(o) + "-wave", String(i) + s + " %", String(i * 5));
         }
     }
+
+    create_knob("input-params", "VOL %", "1.0");
 
     create_knob("volume-1-params", "VOL %", "1.0");
 
