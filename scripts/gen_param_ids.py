@@ -151,6 +151,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$EWET", " ///< $ Echo Wet Volume", "effects.echo.wet"),
         ("$EDRY", " ///< $ Echo Dry Volume", "effects.echo.dry"),
 
+        ("$RRS", "  ///< $ Reverb Room Size", "effects.reverb.room_size"),
         ("$RRR", "  ///< $ Reverb Room Reflectivity", "effects.reverb.room_reflectivity"),
         ("$RDST", " ///< $ Reverb Distortion", "effects.reverb.distortion_level"),
         ("$RDF", "  ///< $ Reverb Dampening Frequency", "effects.reverb.damping_frequency"),

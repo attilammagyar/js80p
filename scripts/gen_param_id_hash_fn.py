@@ -135,6 +135,7 @@ params = [
     "ERLHQ",
     "ERLOG",
     "ERRS",
+    "ERRSZ",
     "ERTYP",
     "ERWET",
     "ERWID",

@@ -351,7 +351,7 @@ h1 span {
 }
 
 #reverb h1 label.freq {
-  left: 189px;
+  left: 247px;
 }
 
 #reverb h1 label.log-q {
@@ -659,6 +659,12 @@ svg.icon {
   text-align: center;
   margin: 1.5px 10px;
   padding: 2px 6px;
+}
+
+#reverb,
+#volume-3 {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .effect h1 {
@@ -1166,7 +1172,8 @@ window.onload = function ()
     create_knob("reverb-params", "HP F Hz", "100");
     create_knob("reverb-params", "HP Q", "1");
     create_knob("reverb-params", "TYPE", "0");
-    create_knob("reverb-params", "ROOM %", "90");
+    create_knob("reverb-params", "SIZE %", "90");
+    create_knob("reverb-params", "REFL %", "90");
     create_knob("reverb-params", "DIST %", "70");
     create_knob("reverb-params", "DF Hz", "6000");
     create_knob("reverb-params", "DG dB", "-6");

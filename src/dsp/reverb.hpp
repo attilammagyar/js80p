@@ -70,6 +70,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         virtual void reset() noexcept override;
 
         TypeParam type;
+        FloatParamS room_size;
         FloatParamS room_reflectivity;
         FloatParamS damping_frequency;
         FloatParamS damping_gain;
@@ -105,7 +106,8 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         static constexpr size_t COMB_FILTERS = 10;
 
-        static constexpr Seconds DELAY_TIME_MAX = 0.150;
+        static constexpr Number ROOM_SIZE_MAX = 3.0;
+        static constexpr Seconds DELAY_TIME_MAX = 0.150 * ROOM_SIZE_MAX;
 
         static constexpr Tuning TUNINGS[][COMB_FILTERS] = {
             /*

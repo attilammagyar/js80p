@@ -61,9 +61,11 @@ void Delay<InputSignalProducerClass>::initialize_instance() noexcept
     shared_buffer_owner = NULL;
 
     feedback_signal_producer = NULL;
+    time_scale_param = NULL;
     delay_buffer = NULL;
     gain_buffer = NULL;
     time_buffer = NULL;
+    time_scale_buffer = NULL;
     delay_buffer_size = 0;
     delay_buffer_size_float = 0.0;
 
@@ -249,9 +251,17 @@ void Delay<InputSignalProducerClass>::set_sample_rate(
 
 template<class InputSignalProducerClass>
 void Delay<InputSignalProducerClass>::set_feedback_signal_producer(
-        SignalProducer* feedback_signal_producer
+        SignalProducer& feedback_signal_producer
 ) noexcept {
-    this->feedback_signal_producer = feedback_signal_producer;
+    this->feedback_signal_producer = &feedback_signal_producer;
+}
+
+
+template<class InputSignalProducerClass>
+void Delay<InputSignalProducerClass>::set_time_scale_param(
+        FloatParamS& time_scale_param
+) noexcept {
+    this->time_scale_param = &time_scale_param;
 }
 
 
@@ -301,6 +311,16 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
             ) * this->sample_rate
             : this->sample_rate
     );
+
+    if (time_scale_param != NULL) {
+        time_scale_buffer = FloatParamS::produce_if_not_constant(
+            *time_scale_param, round, sample_count
+        );
+
+        if (time_scale_buffer == NULL) {
+            time_scale *= time_scale_param->get_value();
+        }
+    }
 
     previous_round = round;
 
@@ -500,15 +520,53 @@ void Delay<InputSignalProducerClass>::render(
 ) noexcept {
     if (need_gain) {
         if (gain_buffer == NULL) {
-            render<true, true>(
+            if (time_scale_buffer == NULL) {
+                render<true, true, true>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    this->gain.get_value()
+                );
+            } else {
+                render<true, true, false>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    this->gain.get_value()
+                );
+            }
+        } else {
+            if (time_scale_buffer == NULL) {
+                render<true, false, true>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            } else {
+                render<true, false, false>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            }
+        }
+    } else {
+        if (time_scale_buffer == NULL) {
+            render<false, true, true>(
                 round,
                 first_sample_index,
                 last_sample_index,
                 buffer,
-                this->gain.get_value()
+                1.0
             );
         } else {
-            render<true, false>(
+            render<false, true, false>(
                 round,
                 first_sample_index,
                 last_sample_index,
@@ -516,20 +574,12 @@ void Delay<InputSignalProducerClass>::render(
                 1.0
             );
         }
-    } else {
-        render<false, true>(
-            round,
-            first_sample_index,
-            last_sample_index,
-            buffer,
-            1.0
-        );
     }
 }
 
 
 template<class InputSignalProducerClass>
-template<bool need_gain, bool is_gain_constant>
+template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant>
 void Delay<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
@@ -550,61 +600,99 @@ void Delay<InputSignalProducerClass>::render(
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
-            Number read_index = read_index_float - time_value;
+            Sample* const out_channel = buffer[c];
+            Number processed_samples;
+            Number read_index;
 
-            if (read_index < 0.0) {
-                read_index += delay_buffer_size_float;
+            if constexpr (is_time_scale_constant) {
+                read_index = read_index_float - time_value;
+
+                if (read_index < 0.0) {
+                    read_index += delay_buffer_size_float;
+                }
+            } else {
+                processed_samples = 0.0;
             }
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                if constexpr (!is_time_scale_constant) {
+                    read_index = (
+                        read_index_float
+                        - time_value * time_scale_buffer[i]
+                        + processed_samples
+                    );
+
+                    if (read_index < 0.0) {
+                        read_index += delay_buffer_size_float;
+                    }
+                }
+
                 if constexpr (need_gain) {
                     if constexpr (is_gain_constant) {
-                        buffer[c][i] = gain * Math::lookup_periodic<true>(
+                        out_channel[i] = gain * Math::lookup_periodic<true>(
                             delay_channel, delay_buffer_size, read_index
                         );
                     } else {
-                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic<true>(
+                        out_channel[i] = gain_buffer[i] * Math::lookup_periodic<true>(
                             delay_channel, delay_buffer_size, read_index
                         );
                     }
                 } else {
-                    buffer[c][i] = Math::lookup_periodic<true>(
+                    out_channel[i] = Math::lookup_periodic<true>(
                         delay_channel, delay_buffer_size, read_index
                     );
                 }
 
-                read_index += 1.0;
+                if constexpr (is_time_scale_constant) {
+                    read_index += 1.0;
+                } else {
+                    processed_samples += 1.0;
+                }
             }
         }
     } else {
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
-            Number read_index = read_index_float;
+            Sample* const out_channel = buffer[c];
+            Number processed_samples = 0.0;
+            Number read_index;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                if constexpr (need_gain) {
-                    if constexpr (is_gain_constant) {
-                        buffer[c][i] = gain * Math::lookup_periodic<false>(
-                            delay_channel,
-                            delay_buffer_size,
-                            read_index - time_buffer[i] * time_scale
-                        );
-                    } else {
-                        buffer[c][i] = gain_buffer[i] * Math::lookup_periodic<false>(
-                            delay_channel,
-                            delay_buffer_size,
-                            read_index - time_buffer[i] * time_scale
-                        );
-                    }
+                if constexpr (is_time_scale_constant) {
+                    read_index = (
+                        read_index_float
+                        - time_buffer[i] * time_scale
+                        + processed_samples
+                    );
                 } else {
-                    buffer[c][i] = Math::lookup_periodic<false>(
-                        delay_channel,
-                        delay_buffer_size,
-                        read_index - time_buffer[i] * time_scale
+                    read_index = (
+                        read_index_float
+                        - time_buffer[i] * time_scale_buffer[i] * time_scale
+                        + processed_samples
                     );
                 }
 
-                read_index += 1.0;
+                if (read_index < 0.0) {
+                    read_index += delay_buffer_size_float;
+                }
+
+                if constexpr (need_gain) {
+                    if constexpr (is_gain_constant) {
+                        out_channel[i] = gain * Math::lookup_periodic<true>(
+                            delay_channel, delay_buffer_size, read_index
+                        );
+                    } else {
+                        out_channel[i] = gain_buffer[i] * Math::lookup_periodic<true>(
+                            delay_channel, delay_buffer_size, read_index
+                        );
+                    }
+                } else {
+                    out_channel[i] = Math::lookup_periodic<true>(
+                        delay_channel, delay_buffer_size, read_index
+                    );
+                }
+
+                processed_samples += 1.0;
             }
         }
     }

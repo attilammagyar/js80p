@@ -48,10 +48,20 @@ Reverb<InputSignalProducerClass>::Reverb(
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
-        15 + COMB_FILTERS,
+        16 + COMB_FILTERS,
         &mixer
     ),
     type(name+ "TYP"),
+    room_size(
+        name + "RSZ",
+        0.0,
+        ROOM_SIZE_MAX,
+        1.0
+    ),
+    /*
+    The room reflectivity parameter used to be called room size. Now they are
+    separate params, but the name string is kept for backward-compatibility.
+    */
     room_reflectivity(
         name + "RS",
         Constants::DELAY_FEEDBACK_MIN,
@@ -262,6 +272,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     this->register_child(mixer);
 
     this->register_child(type);
+    this->register_child(room_size);
     this->register_child(room_reflectivity);
     this->register_child(damping_frequency);
     this->register_child(damping_gain);
@@ -281,8 +292,9 @@ Reverb<InputSignalProducerClass>::Reverb(
 
     for (size_t i = 0; i != COMB_FILTERS; ++i) {
         comb_filters[i].delay.set_feedback_signal_producer(
-            &comb_filters[i].high_shelf_filter
+            comb_filters[i].high_shelf_filter
         );
+        comb_filters[i].delay.set_time_scale_param(room_size);
 
         mixer.add(comb_filters[i]);
         this->register_child(comb_filters[i]);

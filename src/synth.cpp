@@ -528,6 +528,7 @@ void Synth::register_effects_params() noexcept
     register_param<ToggleParam>(ParamId::EELHQ, effects.echo.log_scale_high_pass_q);
 
     register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
+    register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
     register_param<FloatParamS>(ParamId::ERRR, effects.reverb.room_reflectivity);
     register_param<FloatParamS>(ParamId::ERDST, effects.reverb.distortion_level);
     register_param<FloatParamS>(ParamId::ERDF, effects.reverb.damping_frequency);

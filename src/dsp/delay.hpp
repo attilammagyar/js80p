@@ -89,12 +89,14 @@ class Delay : public Filter<InputSignalProducerClass>
          *          feedback object).
          */
         void set_feedback_signal_producer(
-            SignalProducer* feedback_signal_producer
+            SignalProducer& feedback_signal_producer
         ) noexcept;
 
         void use_shared_delay_buffer(
             Delay<InputSignalProducerClass> const& shared_buffer_owner
         ) noexcept;
+
+        void set_time_scale_param(FloatParamS& time_scale_param) noexcept;
 
         ToggleParam const* const tempo_sync;
 
@@ -152,7 +154,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         bool is_delay_buffer_silent() const noexcept;
 
-        template<bool need_gain, bool is_gain_constant>
+        template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant>
         void render(
             Integer const round,
             Integer const first_sample_index,
@@ -167,9 +169,11 @@ class Delay : public Filter<InputSignalProducerClass>
         Delay<InputSignalProducerClass> const* shared_buffer_owner;
 
         SignalProducer* feedback_signal_producer;
+        FloatParamS* time_scale_param;
         Sample** delay_buffer;
         Sample const* gain_buffer;
         Sample const* time_buffer;
+        Sample const* time_scale_buffer;
         Sample time_scale;
         Number feedback_value;
         Integer write_index_input;

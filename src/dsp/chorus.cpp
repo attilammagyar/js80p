@@ -213,7 +213,7 @@ Chorus<InputSignalProducerClass>::Chorus(
     for (size_t i = 0; i != VOICES; ++i) {
         lfos[i].center.set_value(ToggleParam::ON);
         delay_times[i].set_lfo(&lfos[i]);
-        comb_filters[i].delay.set_feedback_signal_producer(&feedback_gain);
+        comb_filters[i].delay.set_feedback_signal_producer(feedback_gain);
 
         if (i > 0) {
             comb_filters[i].delay.use_shared_delay_buffer(comb_filters[0].delay);

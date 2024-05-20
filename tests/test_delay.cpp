@@ -155,6 +155,94 @@ TEST(repeats_input_samples_with_delay, {
 })
 
 
+void test_delay_with_time_scale_param(
+        Number const time_scale,
+        Number const bpm,
+        Byte const tempo_sync_state
+) {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 5;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+    constexpr Sample expected_output[CHANNELS][sample_count] = {
+        {
+            0.000, 0.000, 0.025, 0.075, 0.125,
+            0.175, 0.225, 0.150, 0.075, 0.125,
+            0.175, 0.225, 0.150, 0.075, 0.125,
+            0.175, 0.225, 0.150, 0.075, 0.125,
+            0.175, 0.225, 0.150, 0.075, 0.125,
+        },
+        {
+            0.000, 0.000, 0.050, 0.150, 0.250,
+            0.350, 0.450, 0.300, 0.150, 0.250,
+            0.350, 0.450, 0.300, 0.150, 0.250,
+            0.350, 0.450, 0.300, 0.150, 0.250,
+            0.350, 0.450, 0.300, 0.150, 0.250,
+        },
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Buffer output(sample_count, CHANNELS);
+    ToggleParam tempo_sync("SYN", tempo_sync_state);
+    FloatParamS delay_time_scale("SCL", 0.0, 2.0, 2.0);
+    Delay<FixedSignalProducer> delay(input, &tempo_sync);
+
+    delay.set_time_scale_param(delay_time_scale);
+
+    delay_time_scale.set_sample_rate(sample_rate);
+    delay_time_scale.set_block_size(block_size);
+    delay_time_scale.set_bpm(bpm);
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+    input.set_bpm(bpm);
+
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
+
+    delay.gain.set_value(0.5);
+    delay.time.set_value(0.125 * time_scale);
+    delay.time.schedule_value(0.2, 0.5 * time_scale);
+    delay.time.schedule_value(1.4, 0.499999 * time_scale);
+
+    delay_time_scale.schedule_value(0.2, 0.5);
+    delay_time_scale.schedule_value(0.8, 0.500001);
+
+    render_rounds< Delay<FixedSignalProducer> >(delay, output, rounds);
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay; channel=%d, bpm=%f, tempo_sync=%s",
+            (int)c,
+            bpm,
+            tempo_sync.get_value() == ToggleParam::ON ? "ON" : "OFF"
+        );
+    }
+}
+
+
+TEST(delay_time_may_be_scaled_by_float_param, {
+    test_delay_with_time_scale_param(1.0, 120.0, ToggleParam::OFF);
+    test_delay_with_time_scale_param(2.0, 120.0, ToggleParam::ON);
+})
+
+
 TEST(block_size_may_be_larger_than_max_delay_time, {
     constexpr Integer block_size = 7;
     constexpr Integer rounds = 2;
@@ -250,7 +338,7 @@ void test_delay_with_feedback(
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
     delay.set_bpm(bpm);
-    delay.set_feedback_signal_producer(&feedback);
+    delay.set_feedback_signal_producer(feedback);
     delay.gain.set_value(0.5);
     delay.time.set_value(0.2 * time_scale);
     delay.gain.schedule_value(0.7, 1.0);
@@ -319,7 +407,7 @@ TEST(feedback_signal_merging_is_independent_of_rendered_sample_count, {
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
-    delay.set_feedback_signal_producer(&feedback);
+    delay.set_feedback_signal_producer(feedback);
     delay.gain.set_value(1.0);
     delay.time.set_value(0.2);
 
@@ -381,7 +469,7 @@ TEST(reset_clears_the_delay_buffer, {
 
     delay.set_sample_rate(sample_rate);
     delay.set_block_size(block_size);
-    delay.set_feedback_signal_producer(&delay);
+    delay.set_feedback_signal_producer(delay);
     delay.gain.set_value(1.0);
     delay.time.set_value(0.2);
 
@@ -480,7 +568,7 @@ TEST(identical_delays_may_share_delay_buffer, {
 
     delay_1.set_sample_rate(sample_rate);
     delay_1.set_block_size(block_size);
-    delay_1.set_feedback_signal_producer(&feedback);
+    delay_1.set_feedback_signal_producer(feedback);
     delay_1.gain.set_value(0.25);
     delay_1.time.set_value(0.2);
     delay_1.gain.schedule_value(0.7, 0.5);

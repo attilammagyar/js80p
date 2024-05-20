@@ -406,6 +406,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EEWET] = "Echo Wet Volume (%)",
     [Synth::ParamId::EEDRY] = "Echo Dry Volume (%)",
 
+    [Synth::ParamId::ERRS] = "Reverb Room Size (%)",
     [Synth::ParamId::ERRR] = "Reverb Room Reflectivity (%)",
     [Synth::ParamId::ERDST] = "Reverb Distortion (%)",
     [Synth::ParamId::ERDF] = "Reverb Dampening Frequency (Hz)",
@@ -2600,24 +2601,25 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     TOGG(effects_body, 422, 285, 136, 24,  0, Synth::ParamId::EELOG);
     TOGG(effects_body, 836, 285,  90, 24, 66, Synth::ParamId::EESYN);
 
-    KNOB(effects_body,  33 + KNOB_W * 0,   453, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 1,   453, Synth::ParamId::ERHPQ,  MML__,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 2,   453, Synth::ParamId::ERTYP,  MM___,      rt, rtc, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 3,   453, Synth::ParamId::ERRR,   MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 4,   453, Synth::ParamId::ERDST,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 5,   453, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 6,   453, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 7,   453, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 8,   453, Synth::ParamId::ERCTH,  MM___,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 9,   453, Synth::ParamId::ERCAT,  MM___,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 10,  453, Synth::ParamId::ERCRL,  MM___,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 11,  453, Synth::ParamId::ERCR,   MM___,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 12,  453, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  33 + KNOB_W * 13,  453, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TOGG(effects_body, 110, 425,  50, 24,  0, Synth::ParamId::ERLHQ);
-    TOGG(effects_body, 342, 425, 136, 24,  0, Synth::ParamId::ERLOG);
+    KNOB(effects_body,  14 + KNOB_W * 0,   453, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 1,   453, Synth::ParamId::ERHPQ,  MML__,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 2,   453, Synth::ParamId::ERTYP,  MM___,      rt, rtc, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 3,   453, Synth::ParamId::ERRS,   MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 4,   453, Synth::ParamId::ERRR,   MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 5,   453, Synth::ParamId::ERDST,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 6,   453, Synth::ParamId::ERDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 7,   453, Synth::ParamId::ERDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 8,   453, Synth::ParamId::ERWID,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 9,   453, Synth::ParamId::ERCTH,  MM___,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 10,  453, Synth::ParamId::ERCAT,  MM___,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 11,  453, Synth::ParamId::ERCRL,  MM___,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 12,  453, Synth::ParamId::ERCR,   MM___,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 13,  453, Synth::ParamId::ERWET,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  14 + KNOB_W * 14,  453, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TOGG(effects_body,  91, 425,  50, 24,  0, Synth::ParamId::ERLHQ);
+    TOGG(effects_body, 381, 425, 136, 24,  0, Synth::ParamId::ERLOG);
 
-    KNOB(effects_body, 886 + KNOB_W * 0,   453, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 905 + KNOB_W * 0,   453, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
 
     effects_body->hide();
 }
