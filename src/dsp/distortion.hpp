@@ -188,6 +188,15 @@ class Distortion : public Filter<InputSignalProducerClass>
             SignalProducer* const buffer_owner = NULL
         ) noexcept;
 
+        Distortion(
+            std::string const& name,
+            TypeParam const& type,
+            InputSignalProducerClass& input,
+            FloatParamS& level_leader,
+            Byte const& voice_status,
+            SignalProducer* const buffer_owner = NULL
+        ) noexcept;
+
         ~Distortion();
 
         virtual void reset() noexcept override;

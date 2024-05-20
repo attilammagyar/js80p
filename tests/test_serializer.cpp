@@ -574,8 +574,9 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
 })
 
 
-void assert_note_handling_upgrade(
-        std::string const& old_serialized_note_handling,
+void assert_upgrade(
+        std::string const& old_serialized_param,
+        Synth::ParamId const param_id,
         Byte const expected_value
 ) {
     Synth synth;
@@ -583,28 +584,48 @@ void assert_note_handling_upgrade(
 
     patch += "[js80p]";
     patch += Serializer::LINE_END;
-    patch += old_serialized_note_handling;
+    patch += old_serialized_param;
     patch += Serializer::LINE_END;
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
     assert_eq(
         expected_value,
-        synth.note_handling.get_value(),
-        "old_serialized_note_handling=\"%s\"",
-        old_serialized_note_handling.c_str()
+        synth.get_param_value(param_id),
+        "old_serialized_param=\"%s\"",
+        old_serialized_param.c_str()
     );
 }
 
 
 TEST(old_note_handling_parameter_is_upgraded, {
-    assert_note_handling_upgrade("POLY = 0.0", Synth::NOTE_HANDLING_MONOPHONIC);
-    assert_note_handling_upgrade(
-        "POLY = 0.333333333333333", Synth::NOTE_HANDLING_MONOPHONIC_HOLD
+    assert_upgrade(
+        "POLY = 0.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_MONOPHONIC
     );
-    assert_note_handling_upgrade(
-        "POLY = 0.666666666666667", Synth::NOTE_HANDLING_POLYPHONIC_HOLD
+    assert_upgrade(
+        "POLY = 0.333333333333333",
+        Synth::ParamId::NH,
+        Synth::NOTE_HANDLING_MONOPHONIC_HOLD
     );
-    assert_note_handling_upgrade("POLY = 1.0", Synth::NOTE_HANDLING_POLYPHONIC);
-    assert_note_handling_upgrade("", Synth::NOTE_HANDLING_POLYPHONIC);
+    assert_upgrade(
+        "POLY = 0.666666666666667",
+        Synth::ParamId::NH,
+        Synth::NOTE_HANDLING_POLYPHONIC_HOLD
+    );
+    assert_upgrade(
+        "POLY = 1.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_POLYPHONIC
+    );
+})
+
+
+TEST(old_envelope_update_mode_parameter_is_upgraded, {
+    assert_upgrade(
+        "N1DYN = 0.0", Synth::ParamId::N1UPD, Envelope::UPDATE_MODE_STATIC
+    );
+    assert_upgrade(
+        "N10DYN = 0.50", Synth::ParamId::N10UPD, Envelope::UPDATE_MODE_END
+    );
+    assert_upgrade(
+        "N12DYN = 1.0", Synth::ParamId::N12UPD, Envelope::UPDATE_MODE_DYNAMIC
+    );
 })

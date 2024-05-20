@@ -334,6 +334,8 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     constexpr Frequency sample_rate = 22050.0;
     constexpr Integer block_size = 2048;
 
+    Byte const voice_status = Constants::VOICE_STATUS_NORMAL;
+
     SumOfSines expected_1(0.5, 440.0, -0.5, 440.0 * 2.0, 0.0, 440.0 * 9.0, 1, 0.0);
     SumOfSines expected_2(0.5, 440.0, 0.3, 440.0 * 2.0, 0.2, 440.0 * 9.0, 1, (Number)block_size / sample_rate);
 
@@ -362,7 +364,8 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
         harmonic_rest,
         harmonic_rest,
         harmonic_8,
-        harmonic_rest
+        harmonic_rest,
+        voice_status
     );
 
     Buffer actual_output(block_size);

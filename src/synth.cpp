@@ -984,7 +984,7 @@ void Synth::suspend() noexcept
     clear_midi_controllers();
     clear_midi_note_to_voice_assignments();
     clear_sustain();
-    note_stack.clear();
+    clear_note_stack();
 }
 
 
@@ -1005,7 +1005,7 @@ void Synth::resume() noexcept
     clear_midi_note_to_voice_assignments();
     start_lfos();
     clear_sustain();
-    note_stack.clear();
+    clear_note_stack();
 }
 
 
@@ -1123,6 +1123,7 @@ void Synth::note_on(
 ) noexcept {
     Number const velocity_float = midi_byte_to_float(velocity);
 
+    reset_voice_statuses();
     note_stack.push(channel, note, velocity_float);
 
     if (is_polyphonic()) {
@@ -1133,6 +1134,8 @@ void Synth::note_on(
     } else {
         note_on_monophonic(time_offset, channel, note, velocity_float, true);
     }
+
+    update_voice_statuses();
 }
 
 
@@ -1432,9 +1435,12 @@ void Synth::note_off(
     Integer const voice = midi_note_to_voice_assignments[channel][note];
     bool const was_note_stack_top = note_stack.is_top(channel, note);
 
+    reset_voice_statuses();
     note_stack.remove(channel, note);
 
     if (voice == INVALID_VOICE) {
+        update_voice_statuses();
+
         return;
     }
 
@@ -1447,6 +1453,8 @@ void Synth::note_off(
         if (is_monophonic || !is_retriggering()) {
             midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
         }
+
+        update_voice_statuses();
 
         Integer note_id;
 
@@ -1485,11 +1493,15 @@ void Synth::note_off(
 
         note_on_monophonic(time_offset, previous_channel, previous_note, previous_velocity, false);
 
+        update_voice_statuses();
+
         return;
     }
 
     modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
     carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
+
+    update_voice_statuses();
 }
 
 
@@ -1705,7 +1717,7 @@ void Synth::all_notes_off(
         }
     }
 
-    note_stack.clear();
+    clear_note_stack();
 }
 
 
@@ -1816,7 +1828,7 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 bool Synth::is_discrete_param(ParamId const param_id) const noexcept
 {
     return (
-        JS80P_LIKELY(param_id < ParamId::PARAM_ID_COUNT) && 
+        JS80P_LIKELY(param_id < ParamId::PARAM_ID_COUNT) &&
         byte_params[(size_t)param_id] != NULL
     );
 }
@@ -1842,6 +1854,30 @@ Number Synth::get_param_max_value(ParamId const param_id) const noexcept
             return 0.0;
     }
 }
+
+
+#ifdef JS80P_ASSERTIONS
+Number Synth::get_param_value(ParamId const param_id) const noexcept
+{
+    size_t const index = (size_t)param_id;
+    ParamType const type = find_param_type(param_id);
+
+    switch (type) {
+        case ParamType::SAMPLE_EVALUATED_FLOAT:
+            return sample_evaluated_float_params[index]->get_value();
+
+        case ParamType::BLOCK_EVALUATED_FLOAT:
+            return block_evaluated_float_params[index]->get_value();
+
+        case ParamType::BYTE:
+            return byte_params[index]->get_value();
+
+        default:
+            JS80P_ASSERT_NOT_REACHED();
+            return 0.0;
+    }
+}
+#endif
 
 
 Number Synth::float_param_ratio_to_display_value(
@@ -2659,6 +2695,92 @@ void Synth::clear_sustain() noexcept
 {
     is_sustain_pedal_on = false;
     deferred_note_offs.clear();
+}
+
+
+void Synth::clear_note_stack() noexcept
+{
+    note_stack.clear();
+
+    for (Integer v = 0; v != POLYPHONY; ++v) {
+        modulators[v]->clear_status();
+        carriers[v]->clear_status();
+    }
+}
+
+
+void Synth::reset_voice_statuses() noexcept
+{
+    if (note_stack.is_empty()) {
+        return;
+    }
+
+    Midi::Channel channel;
+    Midi::Note note;
+
+    note_stack.top(channel, note);
+    clear_voice_status(channel, note);
+
+    note_stack.oldest(channel, note);
+    clear_voice_status(channel, note);
+
+    note_stack.lowest(channel, note);
+    clear_voice_status(channel, note);
+
+    note_stack.highest(channel, note);
+    clear_voice_status(channel, note);
+}
+
+
+void Synth::clear_voice_status(
+        Midi::Channel const channel,
+        Midi::Note const note
+) noexcept
+{
+    Integer const voice = midi_note_to_voice_assignments[channel][note];
+
+    if (voice != INVALID_VOICE) {
+        modulators[voice]->clear_status();
+        carriers[voice]->clear_status();
+    }
+}
+
+
+void Synth::update_voice_statuses() noexcept
+{
+    if (note_stack.is_empty()) {
+        return;
+    }
+
+    Midi::Channel channel;
+    Midi::Note note;
+
+    note_stack.top(channel, note);
+    set_voice_status_flag(channel, note, Constants::VOICE_STATUS_LAST);
+
+    note_stack.oldest(channel, note);
+    set_voice_status_flag(channel, note, Constants::VOICE_STATUS_OLDEST);
+
+    note_stack.lowest(channel, note);
+    set_voice_status_flag(channel, note, Constants::VOICE_STATUS_LOWEST);
+
+    note_stack.highest(channel, note);
+    set_voice_status_flag(channel, note, Constants::VOICE_STATUS_HIGHEST);
+}
+
+
+void Synth::set_voice_status_flag(
+        Midi::Channel const channel,
+        Midi::Note const note,
+        Byte const flag
+) noexcept
+{
+    Integer const voice = midi_note_to_voice_assignments[channel][note];
+
+    if (voice != INVALID_VOICE) {
+        modulators[voice]->set_status_flag(flag);
+        carriers[voice]->set_status_flag(flag);
+    }
 }
 
 

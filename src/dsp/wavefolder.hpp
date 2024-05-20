@@ -51,6 +51,7 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         Wavefolder(
             InputSignalProducerClass& input,
             FloatParamS& folding_leader,
+            Byte const& voice_status,
             SignalProducer* const buffer_owner = NULL
         ) noexcept;
 

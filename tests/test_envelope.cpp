@@ -45,7 +45,7 @@ using namespace JS80P;
 TEST(an_envelope_is_a_collection_of_params, {
     Envelope envelope("N1");
 
-    assert_eq("N1DYN", envelope.update_mode.get_name());
+    assert_eq("N1UPD", envelope.update_mode.get_name());
     assert_eq("N1AMT", envelope.amount.get_name());
     assert_eq("N1INI", envelope.initial_value.get_name());
     assert_eq("N1DEL", envelope.delay_time.get_name());

@@ -131,7 +131,8 @@ class Oscillator : public SignalProducer
             FloatParamB& harmonic_6_leader,
             FloatParamB& harmonic_7_leader,
             FloatParamB& harmonic_8_leader,
-            FloatParamB& harmonic_9_leader
+            FloatParamB& harmonic_9_leader,
+            Byte const& voice_status
         ) noexcept;
 
         Oscillator(
@@ -150,6 +151,7 @@ class Oscillator : public SignalProducer
             FloatParamB& harmonic_7_leader,
             FloatParamB& harmonic_8_leader,
             FloatParamB& harmonic_9_leader,
+            Byte const& voice_status,
             ModulatorSignalProducerClass& modulator,
             FloatParamS& amplitude_modulation_level_leader,
             FloatParamS& frequency_modulation_level_leader,

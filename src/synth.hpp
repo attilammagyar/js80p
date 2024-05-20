@@ -1210,6 +1210,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Number& avg_collisions,
             Number& avg_bucket_size
         ) const noexcept;
+
+        Number get_param_value(ParamId const param_id) const noexcept;
 #endif
 
         Number float_param_ratio_to_display_value(
@@ -1665,6 +1667,22 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void clear_midi_note_to_voice_assignments() noexcept;
 
         void clear_sustain() noexcept;
+
+        void clear_note_stack() noexcept;
+
+        void reset_voice_statuses() noexcept;
+        void update_voice_statuses() noexcept;
+
+        void clear_voice_status(
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) noexcept;
+
+        void set_voice_status_flag(
+            Midi::Channel const channel,
+            Midi::Note const note,
+            Byte const flag
+        ) noexcept;
 
         bool should_sync_oscillator_inaccuracy() const noexcept;
         bool should_sync_oscillator_instability() const noexcept;

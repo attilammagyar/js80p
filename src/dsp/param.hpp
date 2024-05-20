@@ -339,6 +339,22 @@ class FloatParam : public Param<Number, evaluation>
             Number const number_of_children = 0
         ) noexcept;
 
+        explicit FloatParam(
+            Byte const& voice_status,
+            std::string const& name = "",
+            Number const min_value = -1.0,
+            Number const max_value = 1.0,
+            Number const default_value = 0.0,
+            Number const round_to = 0.0,
+            Envelope* const* const envelopes = NULL,
+            ToggleParam const* log_scale_toggle = NULL,
+            Number const* log_scale_table = NULL,
+            int const log_scale_table_max_index = 0,
+            Number const log_scale_table_index_scale = 0.0,
+            Number const log_scale_value_offset = 0.0,
+            Number const number_of_children = 0
+        ) noexcept;
+
         /**
          * \warning When the leader needs to be rendered, it will be rendered as
          *          a \c FloatParam<evaluation>, even if it's a descendant.
@@ -354,6 +370,8 @@ class FloatParam : public Param<Number, evaluation>
          *          or polyphonic LFOs.
          */
         FloatParam(FloatParam<evaluation>& leader) noexcept;
+
+        FloatParam(FloatParam<evaluation>& leader, Byte const& voice_status) noexcept;
 
         ~FloatParam() override;
 
@@ -438,6 +456,12 @@ class FloatParam : public Param<Number, evaluation>
         virtual void reset() noexcept override;
 
     protected:
+        template<class FloatParamClass>
+        static bool should_update_envelope(
+            FloatParamClass const& param,
+            Envelope const& envelope
+        ) noexcept;
+
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -451,6 +475,8 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         void handle_event(SignalProducer::Event const& event) noexcept;
+
+        bool should_update_envelope(Envelope const& envelope) const noexcept;
 
     private:
         class LinearRampState
@@ -536,13 +562,13 @@ class FloatParam : public Param<Number, evaluation>
         void handle_envelope_start_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_update_event(SignalProducer::Event const& event) noexcept;
 
-        void update_envelope_state_if_dynamic(
+        void update_envelope_state_if_required(
             Envelope& envelope,
             EnvelopeSnapshot& envelope_snapshot,
             Byte const envelope_index
         ) noexcept;
 
-        void update_envelope_state_if_dynamic(
+        void update_envelope_state_if_required(
             Envelope& envelope,
             EnvelopeSnapshot& envelope_snapshot,
             Seconds& time,
@@ -674,6 +700,7 @@ class FloatParam : public Param<Number, evaluation>
         Number const log_min_minus;
         Number const log_range_inv;
         int const log_scale_table_max_index;
+        Byte const& voice_status;
         bool const should_round;
         bool const is_ratio_same_as_value;
 
@@ -702,6 +729,17 @@ class ModulatableFloatParam : public FloatParamS
         ModulatableFloatParam(
             ModulatorSignalProducerClass& modulator,
             FloatParamS& modulation_level_leader,
+            std::string const& name = "",
+            Number const min_value = -1.0,
+            Number const max_value = 1.0,
+            Number const default_value = 0.0,
+            Envelope* const* const envelopes = NULL
+        ) noexcept;
+
+        ModulatableFloatParam(
+            ModulatorSignalProducerClass& modulator,
+            FloatParamS& modulation_level_leader,
+            Byte const& voice_status,
             std::string const& name = "",
             Number const min_value = -1.0,
             Number const max_value = 1.0,

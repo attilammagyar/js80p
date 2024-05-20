@@ -1911,6 +1911,92 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
 })
 
 
+void test_voice_status_dependent_envelope_update(
+        Byte const envelope_update_mode,
+        Byte const new_voice_status
+) {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples_before[block_size] = {
+        10.0, 5.0, 5.0, 5.0, 5.0,
+    };
+    constexpr Sample expected_samples_after[block_size] = {
+        5.0, 7.0, 7.0, 7.0, 7.0,
+    };
+    Envelope envelope("env");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", 0.0, 10.0, 0.0, 0.0, envelopes);
+    Byte voice_status = Constants::VOICE_STATUS_NORMAL;
+    FloatParamS follower(leader, voice_status);
+    Sample const* rendered_samples;
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_envelope(&envelope);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+
+    envelope.update_mode.set_value(envelope_update_mode);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(envelope.decay_time.get_min_value());
+    envelope.sustain_value.set_value(0.5);
+    envelope.release_time.set_value(0.0);
+    envelope.final_value.set_value(0.0);
+
+    follower.start_envelope(0.0, 0.0, 0.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+    assert_eq(expected_samples_before, rendered_samples, block_size, DOUBLE_DELTA);
+
+    voice_status = new_voice_status;
+    envelope.sustain_value.set_value(0.7);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 2, block_size
+    );
+    assert_eq(expected_samples_after, rendered_samples, block_size, DOUBLE_DELTA);
+}
+
+
+TEST(envelope_update_mode_may_depend_on_voice_status, {
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LAST
+    );
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_OLDEST
+    );
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_LOWEST
+    );
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_HIGHEST
+    );
+
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_LAST | Constants::VOICE_STATUS_LOWEST
+    );
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_LOWEST | Constants::VOICE_STATUS_HIGHEST
+    );
+    test_voice_status_dependent_envelope_update(
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_HIGHEST | Constants::VOICE_STATUS_LAST
+    );
+})
+
+
 TEST(when_a_midi_controller_is_assigned_to_a_block_evaluated_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
     FloatParamB float_param("float", -5.0, 5.0, 3.0, 0.5);

@@ -198,6 +198,34 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 
 
 template<class InputSignalProducerClass>
+BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+        InputSignalProducerClass& input,
+        TypeParam& type,
+        FloatParamS& frequency_leader,
+        FloatParamS& q_leader,
+        FloatParamS& gain_leader,
+        Byte const& voice_status,
+        BiquadFilterSharedBuffers* shared_buffers,
+        Number const inaccuracy_seed,
+        FloatParamB const* freq_inaccuracy_param,
+        FloatParamB const* q_inaccuracy_param,
+        SignalProducer* buffer_owner
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 3, 0, buffer_owner),
+    frequency(frequency_leader, voice_status),
+    q(q_leader, voice_status),
+    gain(gain_leader, voice_status),
+    type(type),
+    inaccuracy_seed(inaccuracy_seed),
+    freq_inaccuracy_param(freq_inaccuracy_param),
+    q_inaccuracy_param(q_inaccuracy_param),
+    shared_buffers(shared_buffers)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
 BiquadFilter<InputSignalProducerClass>::~BiquadFilter()
 {
     delete[] x_n_m1;

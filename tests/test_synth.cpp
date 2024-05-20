@@ -1814,3 +1814,82 @@ TEST(input_is_mixed_into_the_effects_chain, {
         );
     }
 })
+
+
+void test_semi_polyphonic_aftertouch(
+        Byte const envelope_update_mode,
+        Frequency const expected_note_frequency
+) {
+    constexpr Frequency sample_rate = 11025.0;
+    constexpr Integer block_size = 4096;
+
+    Synth synth;
+    SumOfSines expected(
+        0.5, expected_note_frequency,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.suspend();
+
+    synth.set_block_size(block_size);
+    expected.set_block_size(block_size);
+
+    synth.set_sample_rate(sample_rate);
+    expected.set_sample_rate(sample_rate);
+
+    synth.resume();
+
+    assign_controller(synth, Synth::ParamId::MVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth, Synth::ParamId::N1AMT, Synth::ControllerId::CHANNEL_PRESSURE);
+    synth.process_messages();
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.panning.set_value(-1.0);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.panning.set_value(1.0);
+
+    synth.envelopes[0]->update_mode.set_value(envelope_update_mode);
+    synth.envelopes[0]->initial_value.set_value(1.0);
+    synth.envelopes[0]->peak_value.set_value(1.0);
+    synth.envelopes[0]->sustain_value.set_value(1.0);
+    synth.envelopes[0]->final_value.set_value(1.0);
+
+    synth.note_on(0.0, 1, Midi::NOTE_A_2, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_1, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_4, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_5, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
+
+    synth.channel_pressure(0.0, 1, 63);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = synth.generate_samples(1, block_size);
+
+    for (Integer c = 0; c != synth.get_channels(); ++c) {
+        assert_close(
+            expected_samples[c],
+            rendered_samples[c],
+            block_size,
+            0.01,
+            "channel=%d, envelope_update_mode=%hhx, expected_note_frequency=%f",
+            (int)c,
+            envelope_update_mode,
+            expected_note_frequency
+        );
+    }
+}
+
+
+TEST(semi_polyphonic_aftertouch, {
+    test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_LAST, 220.0);
+    test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_OLDEST, 110.0);
+    test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_LOWEST, 55.0);
+    test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, 880.0);
+})

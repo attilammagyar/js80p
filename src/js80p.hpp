@@ -74,6 +74,12 @@ namespace Constants {
     constexpr char const* PLUGIN_VERSION_STR = JS80P_TO_STRING(JS80P_VERSION_STR);
     constexpr int PLUGIN_VERSION_INT = JS80P_VERSION_INT;
 
+    constexpr Byte VOICE_STATUS_NORMAL =    0b0000;
+    constexpr Byte VOICE_STATUS_LAST =      0b0001;
+    constexpr Byte VOICE_STATUS_OLDEST =    0b0010;
+    constexpr Byte VOICE_STATUS_LOWEST =    0b0100;
+    constexpr Byte VOICE_STATUS_HIGHEST =   0b1000;
+
     constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
     constexpr Byte PARAM_LFO_ENVELOPE_STATES = 6;
 

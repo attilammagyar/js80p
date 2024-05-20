@@ -798,6 +798,23 @@ Distortion<InputSignalProducerClass>::Distortion(
 
 
 template<class InputSignalProducerClass>
+Distortion<InputSignalProducerClass>::Distortion(
+        std::string const& name,
+        TypeParam const& type,
+        InputSignalProducerClass& input,
+        FloatParamS& level_leader,
+        Byte const& voice_status,
+        SignalProducer* const buffer_owner
+) noexcept
+    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
+    level(level_leader, voice_status),
+    type(type)
+{
+    initialize_instance();
+}
+
+
+template<class InputSignalProducerClass>
 void Distortion<InputSignalProducerClass>::initialize_instance() noexcept
 {
     this->register_child(level);

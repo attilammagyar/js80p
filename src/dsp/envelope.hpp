@@ -96,9 +96,13 @@ class Envelope
         static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEPER;
         static constexpr EnvelopeShape SHAPE_LINEAR = 12;
 
-        static constexpr Byte UPDATE_MODE_STATIC = 0;
-        static constexpr Byte UPDATE_MODE_END = 1;
-        static constexpr Byte UPDATE_MODE_DYNAMIC = 2;
+        static constexpr Byte UPDATE_MODE_DYNAMIC_LAST = 0;
+        static constexpr Byte UPDATE_MODE_DYNAMIC_OLDEST = 1;
+        static constexpr Byte UPDATE_MODE_DYNAMIC_LOWEST = 2;
+        static constexpr Byte UPDATE_MODE_DYNAMIC_HIGHEST = 3;
+        static constexpr Byte UPDATE_MODE_STATIC = 4;
+        static constexpr Byte UPDATE_MODE_END = 5;
+        static constexpr Byte UPDATE_MODE_DYNAMIC = 6;
 
         class ShapeParam : public ByteParam
         {

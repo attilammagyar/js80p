@@ -108,6 +108,20 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             SignalProducer* buffer_owner = NULL
         ) noexcept;
 
+        BiquadFilter(
+            InputSignalProducerClass& input,
+            TypeParam& type,
+            FloatParamS& frequency_leader,
+            FloatParamS& q_leader,
+            FloatParamS& gain_leader,
+            Byte const& voice_status,
+            BiquadFilterSharedBuffers* shared_buffers = NULL,
+            Number const inaccuracy_seed = 0.0,
+            FloatParamB const* freq_inaccuracy_param = NULL,
+            FloatParamB const* q_inaccuracy_param = NULL,
+            SignalProducer* buffer_owner = NULL
+        ) noexcept;
+
         virtual ~BiquadFilter();
 
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;

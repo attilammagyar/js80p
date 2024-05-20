@@ -43,6 +43,8 @@ class NoteStack
         bool is_top(Midi::Channel const channel, Midi::Note const note) const noexcept;
 
         void top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept;
+        void top(Midi::Channel& channel, Midi::Note& note) const noexcept;
+        void oldest(Midi::Channel& channel, Midi::Note& note) const noexcept;
         void lowest(Midi::Channel& channel, Midi::Note& note) const noexcept;
         void highest(Midi::Channel& channel, Midi::Note& note) const noexcept;
 
@@ -104,6 +106,7 @@ class NoteStack
         Midi::Word previous[ITEMS];
 
         Midi::Word head;
+        Midi::Word oldest_;
         Midi::Word lowest_;
         Midi::Word highest_;
 };

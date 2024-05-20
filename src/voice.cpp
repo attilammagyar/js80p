@@ -468,7 +468,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_6,
         param_leaders.harmonic_7,
         param_leaders.harmonic_8,
-        param_leaders.harmonic_9
+        param_leaders.harmonic_9,
+        status
     ),
     filter_1(
         oscillator,
@@ -476,19 +477,21 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
+        status,
         filter_1_shared_buffers,
         make_random_seed(0.289),
         &param_leaders.filter_1_freq_inaccuracy,
         &param_leaders.filter_1_q_inaccuracy,
         &oscillator
     ),
-    wavefolder(filter_1, param_leaders.folding, &oscillator),
+    wavefolder(filter_1, param_leaders.folding, status, &oscillator),
     filter_2(
         wavefolder,
         param_leaders.filter_2_type,
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
+        status,
         filter_2_shared_buffers,
         make_random_seed(0.629),
         &param_leaders.filter_2_freq_inaccuracy,
@@ -497,8 +500,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
-    panning(param_leaders.panning),
-    volume(param_leaders.volume),
+    panning(param_leaders.panning, status),
+    volume(param_leaders.volume, status),
     volume_applier(filter_2, note_velocity, volume, &oscillator),
     is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
@@ -543,6 +546,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_7,
         param_leaders.harmonic_8,
         param_leaders.harmonic_9,
+        status,
         modulator,
         amplitude_modulation_level_leader,
         frequency_modulation_level_leader,
@@ -554,18 +558,20 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
         param_leaders.filter_1_gain,
+        status,
         filter_1_shared_buffers,
         make_random_seed(0.327),
         &param_leaders.filter_1_freq_inaccuracy,
         &param_leaders.filter_1_q_inaccuracy,
         &oscillator
     ),
-    wavefolder(filter_1, param_leaders.folding, &oscillator),
+    wavefolder(filter_1, param_leaders.folding, status, &oscillator),
     distortion(
         "DIST",
         param_leaders.distortion_type,
         wavefolder,
         param_leaders.distortion,
+        status,
         &oscillator
     ),
     filter_2(
@@ -574,6 +580,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.filter_2_frequency,
         param_leaders.filter_2_q,
         param_leaders.filter_2_gain,
+        status,
         filter_2_shared_buffers,
         make_random_seed(0.796),
         &param_leaders.filter_2_freq_inaccuracy,
@@ -582,8 +589,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
     ),
     note_velocity("NV", 0.0, 1.0, 1.0),
     note_panning("NP", -1.0, 1.0, 0.0),
-    panning(param_leaders.panning),
-    volume(param_leaders.volume),
+    panning(param_leaders.panning, status),
+    volume(param_leaders.volume, status),
     volume_applier(filter_2, note_velocity, volume, &oscillator),
     is_drifting(false),
     modulation_out((ModulationOut&)volume_applier)
@@ -628,6 +635,7 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 
     state = State::OFF;
     note_id = 0;
+    status = Constants::VOICE_STATUS_NORMAL;
     note = 0;
     channel = 0;
 
@@ -1100,6 +1108,19 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     filter_2.frequency.end_envelope(time_offset);
     filter_2.q.end_envelope(time_offset);
     filter_2.gain.end_envelope(time_offset);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::clear_status() noexcept {
+    status = Constants::VOICE_STATUS_NORMAL;
+}
+
+
+template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::set_status_flag(Byte const flag) noexcept
+{
+    status |= flag;
 }
 
 

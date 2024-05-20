@@ -674,7 +674,7 @@ Envelope::Envelope(std::string const& name) noexcept
         turning on dynamic updates. The parameter's name is kept in order to be
         able to load old presets and host application saved states.
         */
-        name + "DYN", UPDATE_MODE_STATIC, UPDATE_MODE_DYNAMIC, UPDATE_MODE_STATIC
+        name + "UPD", UPDATE_MODE_DYNAMIC_LAST, UPDATE_MODE_DYNAMIC, UPDATE_MODE_STATIC
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     attack_shape(name + "ASH"),

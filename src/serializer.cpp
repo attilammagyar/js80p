@@ -422,19 +422,7 @@ void Serializer::process_line(
         return;
     }
 
-    if (
-            JS80P_UNLIKELY(
-                strncmp(param_name, "POLY", Constants::PARAM_NAME_MAX_LENGTH) == 0
-            )
-    ) {
-        std::string const& new_name(synth.note_handling.get_name());
-
-        std::fill_n(param_name, Constants::PARAM_NAME_MAX_LENGTH, '\x00');
-        strncpy(param_name, new_name.c_str(), new_name.length());
-        param_name[Constants::PARAM_NAME_MAX_LENGTH - 1] = '\x00';
-
-        number = upgrade_old_note_handling_param(synth, number);
-    }
+    upgrade_line(synth, param_name, number);
 
     param_id = synth.get_param_id(param_name);
     is_controller_assignment = CONTROLLER_SUFFIX == suffix;
@@ -463,6 +451,39 @@ void Serializer::process_line(
 }
 
 
+void Serializer::upgrade_line(
+        Synth const& synth,
+        char* param_name,
+        Number& number
+) noexcept {
+    if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "POLY", Constants::PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
+        strncpy(param_name, "NH", 3);
+        number = upgrade_old_note_handling_param(synth, number);
+    } else if (JS80P_UNLIKELY(param_name[0] == 'N' && is_digit(param_name[1]))) {
+        if (
+                JS80P_UNLIKELY(
+                    strncmp(&param_name[2], "DYN", Constants::PARAM_NAME_MAX_LENGTH - 2) == 0
+                )
+        ) {
+            strncpy(&param_name[2], "UPD", 4);
+            number = upgrade_old_envelope_update_mode(synth, number);
+        } else if (
+                JS80P_UNLIKELY(
+                    is_digit(param_name[2])
+                    && strncmp(&param_name[3], "DYN", Constants::PARAM_NAME_MAX_LENGTH - 3) == 0
+                )
+        ) {
+            strncpy(&param_name[3], "UPD", 4);
+            number = upgrade_old_envelope_update_mode(synth, number);
+        }
+    }
+}
+
+
 Number Serializer::upgrade_old_note_handling_param(
         Synth const& synth,
         Number const old_value
@@ -481,6 +502,26 @@ Number Serializer::upgrade_old_note_handling_param(
     }
 
     return synth.note_handling.value_to_ratio(NEW_VALUES[old_value_byte]);
+}
+
+
+Number Serializer::upgrade_old_envelope_update_mode(
+        Synth const& synth,
+        Number const old_value
+) noexcept {
+    constexpr Byte NEW_VALUES[] = {
+        Envelope::UPDATE_MODE_STATIC,
+        Envelope::UPDATE_MODE_END,
+        Envelope::UPDATE_MODE_DYNAMIC,
+    };
+
+    Byte const old_value_byte = std::round(old_value * 2.0);
+
+    if (JS80P_UNLIKELY(old_value_byte > 2)) {
+        return synth.envelopes[0]->update_mode.get_default_ratio();
+    }
+
+    return synth.envelopes[0]->update_mode.value_to_ratio(NEW_VALUES[old_value_byte]);
 }
 
 

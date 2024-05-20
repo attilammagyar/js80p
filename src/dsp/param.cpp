@@ -34,6 +34,9 @@
 namespace JS80P
 {
 
+constexpr Byte dummy_voice_status = Constants::VOICE_STATUS_NORMAL;
+
+
 template<typename NumberType, ParamEvaluation evaluation>
 Param<NumberType, evaluation>::Param(
         std::string const& name,
@@ -336,7 +339,10 @@ Sample const* const* FloatParam<evaluation>::produce(
 ) noexcept {
     Envelope* const envelope = float_param.get_envelope();
 
-    if (envelope != NULL && envelope->is_dynamic()) {
+    if (
+            envelope != NULL
+            && should_update_envelope<FloatParamClass>(float_param, *envelope)
+    ) {
         envelope->update();
     }
 
@@ -349,6 +355,37 @@ Sample const* const* FloatParam<evaluation>::produce(
     return SignalProducer::produce<FloatParamClass>(
         float_param, round, sample_count
     );
+}
+
+
+template<ParamEvaluation evaluation>
+template<class FloatParamClass>
+bool FloatParam<evaluation>::should_update_envelope(
+        FloatParamClass const& float_param,
+        Envelope const& envelope
+) noexcept {
+    constexpr Byte masks[] = {
+        [Envelope::UPDATE_MODE_DYNAMIC_LAST] = Constants::VOICE_STATUS_LAST,
+        [Envelope::UPDATE_MODE_DYNAMIC_OLDEST] = Constants::VOICE_STATUS_OLDEST,
+        [Envelope::UPDATE_MODE_DYNAMIC_LOWEST] = Constants::VOICE_STATUS_LOWEST,
+        [Envelope::UPDATE_MODE_DYNAMIC_HIGHEST] = Constants::VOICE_STATUS_HIGHEST,
+        [Envelope::UPDATE_MODE_STATIC] = 0,
+        [Envelope::UPDATE_MODE_END] = 0,
+        [Envelope::UPDATE_MODE_DYNAMIC] = 0,
+    };
+
+    return (
+        envelope.is_dynamic()
+        || (float_param.voice_status & masks[envelope.update_mode.get_value()]) != 0
+    );
+}
+
+
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::should_update_envelope(
+        Envelope const& envelope
+) const noexcept {
+    return should_update_envelope(*this, envelope);
 }
 
 
@@ -384,7 +421,47 @@ Sample const* FloatParam<evaluation>::produce_if_not_constant(
 
 
 template<ParamEvaluation evaluation>
+/*
+False positive, we're calling the other constructor which will initialize
+everything.
+*/
+// cppcheck-suppress uninitMemberVar
 FloatParam<evaluation>::FloatParam(
+        std::string const& name,
+        Number const min_value,
+        Number const max_value,
+        Number const default_value,
+        Number const round_to,
+        Envelope* const* const envelopes,
+        ToggleParam const* log_scale_toggle,
+        Number const* log_scale_table,
+        int const log_scale_table_max_index,
+        Number const log_scale_table_index_scale,
+        Number const log_scale_value_offset,
+        Number const number_of_children
+) noexcept
+    : FloatParam<evaluation>(
+        dummy_voice_status,
+        name,
+        min_value,
+        max_value,
+        default_value,
+        round_to,
+        envelopes,
+        log_scale_toggle,
+        log_scale_table,
+        log_scale_table_max_index,
+        log_scale_table_index_scale,
+        log_scale_value_offset,
+        number_of_children
+    )
+{
+}
+
+
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::FloatParam(
+        Byte const& voice_status,
         std::string const& name,
         Number const min_value,
         Number const max_value,
@@ -427,6 +504,7 @@ FloatParam<evaluation>::FloatParam(
             : 1.0
     ),
     log_scale_table_max_index(log_scale_table_max_index),
+    voice_status(voice_status),
     should_round(round_to > 0.0),
     is_ratio_same_as_value(
         log_scale_toggle == NULL
@@ -457,7 +535,24 @@ void FloatParam<evaluation>::initialize_instance() noexcept
 
 
 template<ParamEvaluation evaluation>
-FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
+/*
+False positive, we're calling the other constructor which will initialize
+everything.
+*/
+// cppcheck-suppress uninitMemberVar
+FloatParam<evaluation>::FloatParam(
+        FloatParam<evaluation>& leader
+) noexcept
+    : FloatParam<evaluation>(leader, dummy_voice_status)
+{
+}
+
+
+template<ParamEvaluation evaluation>
+FloatParam<evaluation>::FloatParam(
+        FloatParam<evaluation>& leader,
+        Byte const& voice_status
+) noexcept
     : Param<Number, evaluation>(
         leader.get_name(),
         leader.get_min_value(),
@@ -493,6 +588,7 @@ FloatParam<evaluation>::FloatParam(FloatParam<evaluation>& leader) noexcept
             : 1.0
     ),
     log_scale_table_max_index(leader.get_log_scale_table_max_index()),
+    voice_status(voice_status),
     should_round(false),
     is_ratio_same_as_value(
         leader.get_log_scale_toggle() == NULL
@@ -835,7 +931,7 @@ bool FloatParam<evaluation>::is_constant_until(
         JS80P_ASSERT(envelope_state != NULL);
 
         if (
-                envelope->is_dynamic()
+                should_update_envelope(*envelope)
                 && envelope_state->active_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID
                 && (
                     envelope_state->stage == EnvelopeStage::ENV_STG_SUSTAIN
@@ -1120,7 +1216,7 @@ void FloatParam<evaluation>::handle_envelope_start_event(
 
     EnvelopeSnapshot& snapshot = envelope_state->get_active_snapshot();
 
-    if (envelope->is_dynamic()) {
+    if (should_update_envelope(*envelope)) {
         envelope->update();
         envelope->make_snapshot(
             envelope_state->randoms, Constants::INVALID_ENVELOPE_INDEX, snapshot
@@ -1160,8 +1256,8 @@ void FloatParam<evaluation>::handle_envelope_update_event(
 
     EnvelopeSnapshot& snapshot = envelope_state->get_active_snapshot();
 
-    if (envelope->is_dynamic()) {
-        update_envelope_state_if_dynamic(
+    if (should_update_envelope(*envelope)) {
+        update_envelope_state_if_required(
             *envelope,
             snapshot,
             Constants::INVALID_ENVELOPE_INDEX
@@ -1176,12 +1272,12 @@ void FloatParam<evaluation>::handle_envelope_update_event(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_envelope_state_if_dynamic(
+void FloatParam<evaluation>::update_envelope_state_if_required(
         Envelope& envelope,
         EnvelopeSnapshot& envelope_snapshot,
         Byte const envelope_index
 ) noexcept {
-    update_envelope_state_if_dynamic(
+    update_envelope_state_if_required(
         envelope,
         envelope_snapshot,
         envelope_state->time,
@@ -1192,7 +1288,7 @@ void FloatParam<evaluation>::update_envelope_state_if_dynamic(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_envelope_state_if_dynamic(
+void FloatParam<evaluation>::update_envelope_state_if_required(
         Envelope& envelope,
         EnvelopeSnapshot& envelope_snapshot,
         Seconds& time,
@@ -1201,7 +1297,7 @@ void FloatParam<evaluation>::update_envelope_state_if_dynamic(
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
-    if (!envelope.is_dynamic()) {
+    if (!should_update_envelope(envelope)) {
         return;
     }
 
@@ -1344,7 +1440,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_start_event(
 
     Envelope& envelope = *envelopes[envelope_index];
 
-    if (envelope.is_dynamic()) {
+    if (should_update_envelope(envelope)) {
         envelope.update();
         envelope.make_snapshot(
             envelope_state->randoms, envelope_index, snapshot
@@ -1390,8 +1486,8 @@ void FloatParam<evaluation>::handle_lfo_envelope_update_event(
 
     Envelope& envelope = *envelopes[envelope_index];
 
-    if (envelope.is_dynamic()) {
-        update_envelope_state_if_dynamic(
+    if (should_update_envelope(envelope)) {
+        update_envelope_state_if_required(
             envelope,
             snapshot,
             lfo_envelope_state.time,
@@ -2104,7 +2200,7 @@ Sample const* const* FloatParam<evaluation>::process_lfo(
                 break;
             }
 
-            update_envelope_state_if_dynamic(
+            update_envelope_state_if_required(
                 *envelopes[envelope_index],
                 lfo_envelope_state.snapshot,
                 lfo_envelope_state.time,
@@ -2244,7 +2340,7 @@ void FloatParam<evaluation>::process_envelope(Envelope& envelope) noexcept
         return;
     }
 
-    update_envelope_state_if_dynamic(
+    update_envelope_state_if_required(
         envelope,
         envelope_state->get_active_snapshot(),
         Constants::INVALID_ENVELOPE_INDEX
@@ -2626,6 +2722,11 @@ EnvelopeSnapshot const& FloatParam<evaluation>::EnvelopeState::get_active_snapsh
 
 
 template<class ModulatorSignalProducerClass>
+/*
+False positive, we're calling the other constructor which will initialize
+everything.
+*/
+// cppcheck-suppress uninitMemberVar
 ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         ModulatorSignalProducerClass& modulator,
         FloatParamS& modulation_level_leader,
@@ -2635,7 +2736,33 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         Number const default_value,
         Envelope* const* envelopes
 ) noexcept
+    : ModulatableFloatParam<ModulatorSignalProducerClass>(
+        modulator,
+        modulation_level_leader,
+        dummy_voice_status,
+        name,
+        min_value,
+        max_value,
+        default_value,
+        envelopes
+    )
+{
+}
+
+
+template<class ModulatorSignalProducerClass>
+ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
+        ModulatorSignalProducerClass& modulator,
+        FloatParamS& modulation_level_leader,
+        Byte const& voice_status,
+        std::string const& name,
+        Number const min_value,
+        Number const max_value,
+        Number const default_value,
+        Envelope* const* envelopes
+) noexcept
     : FloatParamS(
+        voice_status,
         name,
         min_value,
         max_value,
@@ -2649,7 +2776,7 @@ ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         0.0,
         1
     ),
-    modulation_level(modulation_level_leader),
+    modulation_level(modulation_level_leader, voice_status),
     modulator(modulator)
 {
     register_child(modulation_level);

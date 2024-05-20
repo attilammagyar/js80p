@@ -138,6 +138,12 @@ class Serializer
             std::string const& line
         ) noexcept;
 
+        static void upgrade_line(
+            Synth const& synth,
+            char* param_name,
+            Number& number
+        ) noexcept;
+
         static bool parse_param_name(
             std::string::const_iterator& it,
             std::string::const_iterator const& end,
@@ -164,6 +170,11 @@ class Serializer
         static Number to_number(std::string const& text) noexcept;
 
         static Number upgrade_old_note_handling_param(
+            Synth const& synth,
+            Number const old_value
+        ) noexcept;
+
+        static Number upgrade_old_envelope_update_mode(
             Synth const& synth,
             Number const old_value
         ) noexcept;

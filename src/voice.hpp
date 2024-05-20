@@ -325,6 +325,9 @@ class Voice : public SignalProducer
             Number const velocity
         ) noexcept;
 
+        void clear_status() noexcept;
+        void set_status_flag(Byte const flag) noexcept;
+
         void cancel_note() noexcept;
 
         void cancel_note_smoothly(Seconds const time_offset) noexcept;
@@ -435,6 +438,7 @@ class Voice : public SignalProducer
         Number velocity;
         State state;
         Integer note_id;
+        Byte status;
         Midi::Note note;
         Midi::Channel channel;
         bool is_drifting;

@@ -64,6 +64,7 @@ void NoteStack::clear() noexcept
     std::fill_n(velocities, ITEMS, 0.0);
 
     head = INVALID_ITEM;
+    oldest_ = INVALID_ITEM;
     lowest_ = INVALID_ITEM;
     highest_ = INVALID_ITEM;
 }
@@ -83,8 +84,20 @@ bool NoteStack::is_top(Midi::Channel const channel, Midi::Note const note) const
 
 void NoteStack::top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept
 {
-    decode(head, channel, note);
+    top(channel, note);
     velocity = is_empty() ? 0.0 : velocities[head];
+}
+
+
+void NoteStack::top(Midi::Channel& channel, Midi::Note& note) const noexcept
+{
+    decode(head, channel, note);
+}
+
+
+void NoteStack::oldest(Midi::Channel& channel, Midi::Note& note) const noexcept
+{
+    decode(oldest_, channel, note);
 }
 
 
@@ -110,6 +123,10 @@ void NoteStack::push(
     }
 
     Midi::Word const item = encode(channel, note);
+
+    if (oldest_ == INVALID_ITEM) {
+        oldest_ = item;
+    }
 
     if (is_already_pushed(item)) {
         remove<false>(item);
@@ -228,6 +245,10 @@ void NoteStack::remove(Midi::Word const word) noexcept
 {
     Midi::Word const next_item = next[word];
     Midi::Word const previous_item = previous[word];
+
+    if (word == oldest_) {
+        oldest_ = previous_item;
+    }
 
     if (next_item != INVALID_ITEM) {
         previous[next_item] = previous_item;
