@@ -225,9 +225,11 @@ def main(argv):
     f = lambda x: f_pos(x) if x >= 0.0 else -f_pos(-x)
     F0 = lambda x: F0_pos(x) if x >= 0.0 else F0_pos(-x)
 
+    begin = -5.0
+    end = 5.0
+    range_ = end - begin
     N = 70000
-    width = 5.0
-    prev = -width
+    prev = begin
     F0_prev = F0(prev)
 
     xs = []
@@ -241,8 +243,7 @@ def main(argv):
     gM = 0.0
 
     for i in range(N):
-        x = (2.0 * (i / N)) - 1.0
-        x = width * x
+        x = begin + range_ * (i / N)
         delta = x - prev
 
         if x < INPUT_MIN:
