@@ -1,3 +1,26 @@
+v3.0.1 (2024-05-22)
+ * (Preview version for the upcoming v3.1.0.)
+ * New envelope update modes make it possible to turn non-polyphonic aftertouch
+   into semi-polyphonic, with either last key, oldest key, lowest key, or
+   highest key priority.
+ * New note handling modes allow retriggering sustained notes (rather than
+   stacking them), and ignoring the sustain pedal's original interpretation so
+   that it can be used as a 0% / 100% switch.
+ * Distortion: distortion effects now allow changing the type of distortion.
+   Also, several distortion types are available now: saturation, medium and
+   heavy soft clipping, harmonic distortions, and (band-limited) bit crushers.
+ * Reverb room size can now be adjusted besides reflectivity.
+ * JS80P can now mix external audio input into the effects chain as well, so
+   the plugin can also be used as an effect. (Though using a synth plugin as an
+   effect can be quirky in some host applications.)
+ * Changing sample-rate parameters via the GUI will now also be smoothed in
+   order to avoid sudden jumps when tweaking delay based effects. (MIDI CC
+   events and other momentary value based controllers were always smoothed.)
+ * New presets: Lo-fi Keys, Analog Brass AT last, and Analog Brass mod last.
+ * Bugfix: centered LFOs will not be clamped when MIN and MAX values are
+   inverted. (Clamping was a regression introduced in v3.0.0.)
+ * Bugfix: plugin latency is now correctly reported to the host.
+
 v3.0.0 (2024-05-01)
  * Oscillator fine detune range can now go from -4 octaves to +4 octaves.
  * LFO amount can now be controlled by an Envelope when the LFO is assigned to
