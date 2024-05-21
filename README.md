@@ -108,6 +108,8 @@ Table of Contents
     * [Analog Brass mod](#preset-analog-brass-mod)
     * [Bouncy](#preset-bouncy)
     * [Lo-fi Keys](#preset-lo-fi-keys)
+    * [Analog Brass AT last](#preset-analog-brass-at-last)
+    * [Analog Brass mod last](#preset-analog-brass-mod-last)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -199,7 +201,8 @@ Features
     * volume control 1 input,
     * volume control 2 input,
     * volume control 3 input.
- * Route external audio into the effects chain of JS80P.
+ * Route external audio into the effects chain of JS80P (in host applications
+   which support it).
 
 <a id="install" href="#toc">Table of Contents</a>
 
@@ -1034,6 +1037,15 @@ Same as the [distortions](#usage-effects-distortions) on the
 
 Control how loud external audio is mixed with the signal from the oscillators
 before entering the effects chain when JS80P is used as an audio effect.
+
+Note: using synthesizer plugins as audio effects is known to be quirky in some
+host applications, and the behaviour may vary between different plugin types as
+well. For example, some versions of REAPER will mix the dry signal with the
+processed output for VST 2 plugins by default (passthrough), and some versions
+of FL Studio don't allow sending both MIDI and audio input into the same plugin
+instance. If JS80P's input processing does not work in your environment the way
+you would expect it, you may have to experiment with the signal routing and
+plugin handling options of your host application.
 
 #### Volume Controls
 
@@ -2108,6 +2120,21 @@ down the tape delay and lower the pitch of the oscillators. Aftertouch adds a
 brief flute-like triangle pad sound to the mix. High velocity notes will have
 quick attack, low velocity notes will start slowly.
 
+<a id="preset-analog-brass-at-last"></a>
+
+### Analog Brass AT last
+
+A version of the Analog Brass AT preset, demonstrating last note
+semi-polyphonic aftertouch (channel pressure).
+
+<a id="preset-analog-brass-mod-last"></a>
+
+### Analog Brass mod last
+
+A version of the Analog Brass mod preset, demonstrating last note
+semi-polyphonic aftertouch (channel pressure) being applied to a polyphonic
+LFO.
+
 <a id="bugs" href="#toc">Table of Contents</a>
 
 Bugs
@@ -2330,7 +2357,7 @@ sustaining notes, like for example lengthening envelope release times.
 
 To make everything work, you have to assign the sustain pedal's MIDI CC events
 to the MIDI CC helper proxy parameter where JS80P expects them, and you have to
-turn off FL Studio's default behavior of handling the pedal on behalf of
+turn off FL Studio's default behaviour of handling the pedal on behalf of
 plugins.
 
   [midicc3]: https://midi.org/midi-1-0-control-change-messages
