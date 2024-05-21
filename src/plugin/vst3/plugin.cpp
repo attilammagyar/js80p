@@ -161,7 +161,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::setBusArrangements(
     int32 number_of_outputs
 ) {
     if (
-            number_of_inputs == 1 && inputs[1] == Vst::SpeakerArr::kStereo
+            number_of_inputs == 1 && inputs[0] == Vst::SpeakerArr::kStereo
             && number_of_outputs == 1 && outputs[0] == Vst::SpeakerArr::kStereo
     )
     {
