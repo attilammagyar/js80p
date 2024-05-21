@@ -87,18 +87,21 @@ class Synth : public Midi::EventHandler, public SignalProducer
             SET_PARAM = 1,          ///< Set the given parameter's ratio to
                                     ///< \c number_param.
 
-            ASSIGN_CONTROLLER = 2,  ///< Assign the controller identified by
+            SET_PARAM_SMOOTHLY = 2, ///< Set the given parameter's ratio to
+                                    ///< \c number_param smoothly.
+
+            ASSIGN_CONTROLLER = 3,  ///< Assign the controller identified by
                                     ///< \c byte_param to the given parameter.
 
-            REFRESH_PARAM = 3,      ///< Make sure that \c get_param_ratio_atomic()
+            REFRESH_PARAM = 4,      ///< Make sure that \c get_param_ratio_atomic()
                                     ///< will return the most recent value of
                                     ///< the given parameter.
 
-            CLEAR = 4,              ///< Clear all buffers, release all
+            CLEAR = 5,              ///< Clear all buffers, release all
                                     ///< controller assignments, and reset all
                                     ///< parameters to their default values.
 
-            CLEAR_DIRTY_FLAG = 5,   ///< Clear the dirty flag.
+            CLEAR_DIRTY_FLAG = 6,   ///< Clear the dirty flag.
 
             INVALID_MESSAGE_TYPE,
         };
@@ -1643,6 +1646,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void start_lfos() noexcept;
 
         void handle_set_param(
+            ParamId const param_id,
+            Number const ratio
+        ) noexcept;
+
+        void handle_set_param_smoothly(
             ParamId const param_id,
             Number const ratio
         ) noexcept;

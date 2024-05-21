@@ -2103,6 +2103,11 @@ void Synth::process_message(Message const& message) noexcept
             is_dirty_ = true;
             break;
 
+        case MessageType::SET_PARAM_SMOOTHLY:
+            handle_set_param_smoothly(message.param_id, message.number_param);
+            is_dirty_ = true;
+            break;
+
         case MessageType::ASSIGN_CONTROLLER:
             handle_assign_controller(message.param_id, message.byte_param);
             is_dirty_ = true;
@@ -2134,6 +2139,7 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
 
     switch (type) {
         case ParamType::SAMPLE_EVALUATED_FLOAT:
+            sample_evaluated_float_params[index]->cancel_events();
             sample_evaluated_float_params[index]->set_ratio(ratio);
             break;
 
@@ -2151,6 +2157,39 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
     }
 
     handle_refresh_param(param_id);
+}
+
+
+void Synth::handle_set_param_smoothly(ParamId const param_id, Number const ratio) noexcept
+{
+    size_t const index = (size_t)param_id;
+    ParamType const type = find_param_type(param_id);
+
+    switch (type) {
+        case ParamType::SAMPLE_EVALUATED_FLOAT: {
+            FloatParamS& param = *sample_evaluated_float_params[index];
+
+            param.cancel_events();
+            param.schedule_linear_ramp(0.0125, param.ratio_to_value(ratio));
+            param_ratios[param_id].store(ratio);
+
+            break;
+        }
+
+        case ParamType::BLOCK_EVALUATED_FLOAT:
+            block_evaluated_float_params[index]->set_ratio(ratio);
+            handle_refresh_param(param_id);
+            break;
+
+        case ParamType::BYTE:
+            byte_params[index]->set_ratio(ratio);
+            handle_refresh_param(param_id);
+            break;
+
+        default:
+            JS80P_ASSERT_NOT_REACHED();
+            break;
+    }
 }
 
 
