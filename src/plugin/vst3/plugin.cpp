@@ -147,7 +147,13 @@ tresult PLUGIN_API Vst3Plugin::Processor::initialize(FUnknown* context)
     }
 
     addEventInput(STR16("Event Input"), 1);
-    addAudioInput(STR16("AudioInput"), Vst::SpeakerArr::kStereo);
+
+    /*
+    Marking the input as side-chain so that the host won't mix the dry signal
+    with our output.
+    */
+    addAudioInput(STR16("AudioInput"), Vst::SpeakerArr::kStereo, Vst::BusTypes::kAux);
+
     addAudioOutput(STR16("AudioOutput"), Vst::SpeakerArr::kStereo);
 
     return kResultOk;
