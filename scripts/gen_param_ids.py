@@ -47,7 +47,7 @@ def print_main_params(param_id: int, param_objs: list) -> int:
         ("PM", "    ///< Phase Modulation", "phase_modulation_level"),
         ("FM", "    ///< Frequency Modulation", "frequency_modulation_level"),
         ("AM", "    ///< Amplitude Modulation", "amplitude_modulation_level"),
-        ("INVOL", " ///< External Input Volume", "input_volume"),
+        ("INVOL", " ///< Auxiliary Input Volume", "input_volume"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

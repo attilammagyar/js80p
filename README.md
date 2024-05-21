@@ -1033,21 +1033,23 @@ Same as the [distortions](#usage-effects-distortions) on the
 
 <a id="usage-effects-volume"></a>
 
-#### External Input Volume (Input)
+#### Volume Controls
 
-Control how loud external audio is mixed with the signal from the oscillators
-before entering the effects chain when JS80P is used as an audio effect.
+##### Auxiliary Input Volume (Aux In VOL)
+
+Turn this up to mix external audio signal with that from the oscillators before
+entering the effects chain, when JS80P is used as an audio effect.
 
 Note: using synthesizer plugins as audio effects is known to be quirky in some
 host applications, and the behaviour may vary between different plugin types as
 well. For example, some versions of REAPER will mix the dry signal with the
-processed output for VST 2 plugins by default (passthrough), and some versions
-of FL Studio don't allow sending both MIDI and audio input into the same plugin
-instance. If JS80P's input processing does not work in your environment the way
-you would expect it, you may have to experiment with the signal routing and
-plugin handling options of your host application.
+processed output for VST 2 plugins by default, and some versions of FL Studio
+don't allow sending both MIDI and audio input into the same plugin instance,
+etc. If JS80P's input processing does not work in your environment the way you
+want it, you may have to experiment with the tracks and bus layout, the signal
+routing, and the plugin settings of your host application.
 
-#### Volume Controls
+##### Vol 1, Vol 2, Vol3
 
 There are three volume controls placed at strategic points of the effects
 chain. Their purpose is twofold: they control the loudness of the signal, and

@@ -106,6 +106,8 @@ void test_varaible_size_rounds(RenderMode const mode)
 
     synth.carrier_params.volume.set_value(0.0);
 
+    synth.input_volume.set_value(1.0);
+
     synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
 
     for (Integer c = 0; c != channels; ++c) {

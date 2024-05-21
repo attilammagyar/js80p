@@ -133,7 +133,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     ),
     modulator_params("M", (Envelope* const*)&envelopes_rw),
     carrier_params("C", (Envelope* const*)&envelopes_rw),
-    input_volume("IN", 0.0, 1.0, 1.0),
+    input_volume("IN", 0.0, 1.0, 0.0),
     messages(MESSAGE_QUEUE_SIZE),
     bus(
         OUT_CHANNELS,

@@ -291,7 +291,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::PM] = "Phase Modulation (%)",
     [Synth::ParamId::FM] = "Frequency Modulation (%)",
     [Synth::ParamId::AM] = "Amplitude Modulation (%)",
-    [Synth::ParamId::INVOL] = "External Input Volume (%)",
+    [Synth::ParamId::INVOL] = "Auxiliary Input Volume (%)",
 
     [Synth::ParamId::MAMP] = "Modulator Amplitude (%)",
     [Synth::ParamId::MVS] = "Modulator Velocity Sensitivity (%)",

@@ -111,7 +111,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             PM = 1,          ///< Phase Modulation
             FM = 2,          ///< Frequency Modulation
             AM = 3,          ///< Amplitude Modulation
-            INVOL = 4,       ///< External Input Volume
+            INVOL = 4,       ///< Auxiliary Input Volume
 
             MAMP = 5,        ///< Modulator Amplitude
             MVS = 6,         ///< Modulator Velocity Sensitivity
