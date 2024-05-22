@@ -418,16 +418,6 @@ void test_decay_before_note_off(
         "test=\"%s\"",
         test_name
     );
-
-    if (envelope != NULL) {
-        envelope->final_value.set_value(0.5);
-        assert_eq(
-            expected_decay == NoteDecay::BEFORE_SUSTAIN,
-            voice.has_decayed_before_note_off(),
-            "test=\"%s (after envelope final value modification)\"",
-            test_name
-        );
-    }
 }
 
 

@@ -61,18 +61,109 @@ TEST(an_envelope_is_a_collection_of_params, {
 })
 
 
-TEST(can_tell_whether_envelope_is_dynamic, {
+TEST(can_tell_whether_envelope_is_dynamic_or_static, {
     Envelope envelope("E");
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
     assert_false(envelope.is_dynamic());
+    assert_true(envelope.is_static());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_END);
     assert_false(envelope.is_dynamic());
+    assert_false(envelope.is_static());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
     assert_true(envelope.is_dynamic());
+    assert_false(envelope.is_static());
 })
+
+
+void assert_needs_update(
+        bool const expected,
+        Byte const update_mode,
+        Byte const voice_status
+) {
+    Envelope envelope("E");
+
+    envelope.update_mode.set_value(update_mode);
+
+    assert_eq(
+        expected,
+        envelope.needs_update(voice_status),
+        "update_mode=%hhd, voice_status=%hhd",
+        update_mode,
+        voice_status
+    );
+}
+
+
+TEST(can_tell_if_snapshot_update_is_needed_for_a_given_voice_status, {
+    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC, Constants::VOICE_STATUS_NORMAL);
+    assert_needs_update(false, Envelope::UPDATE_MODE_STATIC, Constants::VOICE_STATUS_NORMAL);
+    assert_needs_update(false, Envelope::UPDATE_MODE_END, Constants::VOICE_STATUS_NORMAL);
+
+    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LAST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_OLDEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LOWEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_HIGHEST);
+
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_LAST);
+    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_OLDEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_LOWEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_HIGHEST);
+
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_LAST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_OLDEST);
+    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_LOWEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_HIGHEST);
+
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_LAST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_OLDEST);
+    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_LOWEST);
+    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_HIGHEST);
+
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_LAST | Constants::VOICE_STATUS_HIGHEST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_OLDEST | Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_LOWEST | Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_HIGHEST | Constants::VOICE_STATUS_LAST
+    );
+
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_LAST | Constants::VOICE_STATUS_HIGHEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_OLDEST | Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_LOWEST | Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_HIGHEST | Constants::VOICE_STATUS_LAST
+    );
+});
 
 
 TEST(when_a_param_of_an_envelope_changes_then_the_change_index_of_the_envelope_is_changed, {

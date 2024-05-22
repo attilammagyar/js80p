@@ -339,10 +339,7 @@ Sample const* const* FloatParam<evaluation>::produce(
 ) noexcept {
     Envelope* const envelope = float_param.get_envelope();
 
-    if (
-            envelope != NULL
-            && should_update_envelope<FloatParamClass>(float_param, *envelope)
-    ) {
+    if (envelope != NULL && float_param.should_update_envelope(*envelope)) {
         envelope->update();
     }
 
@@ -359,33 +356,10 @@ Sample const* const* FloatParam<evaluation>::produce(
 
 
 template<ParamEvaluation evaluation>
-template<class FloatParamClass>
-bool FloatParam<evaluation>::should_update_envelope(
-        FloatParamClass const& float_param,
-        Envelope const& envelope
-) noexcept {
-    constexpr Byte masks[] = {
-        [Envelope::UPDATE_MODE_DYNAMIC_LAST] = Constants::VOICE_STATUS_LAST,
-        [Envelope::UPDATE_MODE_DYNAMIC_OLDEST] = Constants::VOICE_STATUS_OLDEST,
-        [Envelope::UPDATE_MODE_DYNAMIC_LOWEST] = Constants::VOICE_STATUS_LOWEST,
-        [Envelope::UPDATE_MODE_DYNAMIC_HIGHEST] = Constants::VOICE_STATUS_HIGHEST,
-        [Envelope::UPDATE_MODE_STATIC] = 0,
-        [Envelope::UPDATE_MODE_END] = 0,
-        [Envelope::UPDATE_MODE_DYNAMIC] = 0,
-    };
-
-    return (
-        envelope.is_dynamic()
-        || (float_param.voice_status & masks[envelope.update_mode.get_value()]) != 0
-    );
-}
-
-
-template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::should_update_envelope(
         Envelope const& envelope
 ) const noexcept {
-    return should_update_envelope(*this, envelope);
+    return envelope.needs_update(voice_status);
 }
 
 
@@ -1939,7 +1913,7 @@ void FloatParam<evaluation>::update_envelope_release_if_not_static(
         Byte const envelope_index,
         EnvelopeSnapshot& snapshot
 ) noexcept {
-    if (envelope.update_mode.get_value() == Envelope::UPDATE_MODE_STATIC) {
+    if (envelope.is_static()) {
         return;
     }
 
@@ -2116,6 +2090,49 @@ void FloatParam<evaluation>::update_lfo_envelope(Seconds const time_offset) noex
 
         this->schedule(EVT_LFO_ENVELOPE_UPDATE, time_offset, snapshot_id, 0.0, 0.0, i);
     }
+}
+
+
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::has_envelope_decayed() const noexcept
+{
+    constexpr Number threshold = 0.000001;
+
+    if (this->has_events() || get_value() >= threshold) {
+        return false;
+    }
+
+    Envelope* const envelope = get_envelope();
+
+    if (envelope != NULL) {
+        JS80P_ASSERT(envelope_state != NULL);
+
+        if (envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED) {
+            return get_value() < threshold && is_constant_until(2);
+        }
+
+        if (
+                envelope_state->stage == EnvelopeStage::ENV_STG_SUSTAIN
+                || envelope_state->stage == EnvelopeStage::ENV_STG_RELEASE
+        ) {
+            EnvelopeSnapshot const& snapshot = envelope_state->get_active_snapshot();
+
+            return (
+                envelope->is_static()
+                && snapshot.sustain_value < threshold
+                && snapshot.final_value < threshold
+                && get_value() < threshold
+            );
+        }
+
+        return false;
+    }
+
+    return (
+        get_midi_controller() == NULL
+        && get_macro() == NULL
+        && get_lfo() == NULL
+    );
 }
 
 

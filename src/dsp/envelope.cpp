@@ -779,9 +779,31 @@ bool Envelope::is_dynamic() const noexcept
 }
 
 
+bool Envelope::is_static() const noexcept
+{
+    return update_mode.get_value() == UPDATE_MODE_STATIC;
+}
+
+
 bool Envelope::is_tempo_synced() const noexcept
 {
     return tempo_sync.get_value() == ToggleParam::ON;
+}
+
+
+bool Envelope::needs_update(Byte const voice_status) const noexcept
+{
+    constexpr Byte masks[] = {
+        [Envelope::UPDATE_MODE_DYNAMIC_LAST] = Constants::VOICE_STATUS_LAST,
+        [Envelope::UPDATE_MODE_DYNAMIC_OLDEST] = Constants::VOICE_STATUS_OLDEST,
+        [Envelope::UPDATE_MODE_DYNAMIC_LOWEST] = Constants::VOICE_STATUS_LOWEST,
+        [Envelope::UPDATE_MODE_DYNAMIC_HIGHEST] = Constants::VOICE_STATUS_HIGHEST,
+        [Envelope::UPDATE_MODE_STATIC] = 0,
+        [Envelope::UPDATE_MODE_END] = 0,
+        [Envelope::UPDATE_MODE_DYNAMIC] = 0,
+    };
+
+    return is_dynamic() || (voice_status & masks[update_mode.get_value()]) != 0;
 }
 
 

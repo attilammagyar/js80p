@@ -1221,46 +1221,22 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const no
         return (
             state == State::ON
             && (
-                has_decayed(volume)
+                volume.has_envelope_decayed()
                 || (
-                    has_decayed(oscillator.amplitude)
-                    && has_decayed(oscillator.subharmonic_amplitude)
+                    oscillator.amplitude.has_envelope_decayed()
+                    && oscillator.subharmonic_amplitude.has_envelope_decayed()
                 )
             )
         );
     } else {
         return (
             state == State::ON
-            && (has_decayed(volume) || has_decayed(oscillator.amplitude))
+            && (
+                volume.has_envelope_decayed()
+                || oscillator.amplitude.has_envelope_decayed()
+            )
         );
     }
-}
-
-
-template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::has_decayed(
-        FloatParamS const& param
-) const noexcept {
-    constexpr Number threshold = 0.000001;
-
-    if (param.has_events() || param.get_value() >= threshold) {
-        return false;
-    }
-
-    Envelope* const envelope = param.get_envelope();
-
-    if (envelope != NULL) {
-        return (
-            envelope->final_value.get_value() < threshold
-            && param.is_constant_until(2)
-        );
-    }
-
-    return (
-        param.get_midi_controller() == NULL
-        && param.get_macro() == NULL
-        && param.get_lfo() == NULL
-    );
 }
 
 

@@ -68,6 +68,7 @@ Table of Contents
     * [Macros (MC)](#usage-macros)
     * [Envelope Generators (ENV)](#usage-envelopes)
     * [Low-Frequency Oscillators (LFOs)](#usage-lfos)
+    * [Voice Management, Garbage Collector](#usage-gc)
  * [Presets](#presets)
     * [Blank](#preset-blank)
     * [Bright Organ](#preset-bright-organ)
@@ -656,8 +657,14 @@ handles note events. The available options are:
  * **M H IS**: same as **M HOLD**, but sustain pedal events are ignored while
    the corresponding [MIDI CC](#usage-controllers) controller is still
    maintained, allowing the pedal to be used as a 0% / 100% switch without
-   releasing the sustained note. (Since there's no way in this mode to stop
-   a note, it is a good idea to use volume envelopes which decay into silence.)
+   releasing the sustained note.
+
+   Note: there's no way in this mode to stop a note, unless there are
+   [envelope generators](#usage-envelopes) assigned to the amplitude
+   or volume parameters of the oscillators which decay into
+   silence during the DAHDS stages. If the envelope generators are
+   [static](#usage-envelopes-update), then the [garbage collector](#usage-gc)
+   will eventually stop the voice so that it will stop consuming CPU resources.
 
  * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
 
@@ -673,8 +680,14 @@ handles note events. The available options are:
  * **P H IS**: same as **P HOLD**, but sustain pedal events are ignored while
    the corresponding [MIDI CC](#usage-controllers) controller is still
    maintained, allowing the pedal to be used as a 0% / 100% switch without
-   releasing the sustained notes. (Since there's no way in this mode to stop
-   notes, it is a good idea to use volume envelopes which decay into silence.)
+   releasing the sustained notes.
+
+   Note: since there's no way in this mode to stop a note, it is a good idea to
+   use [static envelope generators](#usage-envelopes-update) for the amplitude
+   or volume parameters of the oscillators which decay into
+   silence during the [DAHDS stages](#usage-envelopes). This way the
+   [garbage collector](#usage-gc) can release the voices eventually, making
+   them available for newly triggered notes.
 
  * **P RET**: same as **POLY**, but when a Note Start event is received for a
    note that is already being held by the sustain pedal, then instead of
@@ -688,8 +701,14 @@ handles note events. The available options are:
  * **P H R IS**: same as **P H RET**, but sustain pedal events are ignored
    while the corresponding [MIDI CC](#usage-controllers) controller is still
    maintained, allowing the pedal to be used as a 0% / 100% switch without
-   releasing the sustained notes. (Since there's no way in this mode to stop
-   notes, it is a good idea to use volume envelopes which decay into silence.)
+   releasing the sustained notes.
+
+   Note: since there's no way in this mode to stop a note, it is a good idea to
+   use [static envelope generators](#usage-envelopes-update) for the amplitude
+   or volume parameters of the oscillators which decay into
+   silence during the [DAHDS stages](#usage-envelopes). This way the
+   [garbage collector](#usage-gc) can release the voices eventually, making
+   them available for newly triggered notes.
 
 <a id="usage-synth-main-mode"></a>
 
@@ -1788,6 +1807,45 @@ Distort the waveform with a soft clipping distortion.
 #### Randomness (RAND)
 
 Randomize the waveform.
+
+<a id="usage-gc" href="#toc">Table of Contents</a>
+
+### Voice Management, Garbage Collector
+
+When a new note is triggered on a synthesizer that is running out of available
+polyphonic voices, it can do one of two actions:
+
+ * ignore the new note completely,
+
+ * or "steal" a voice, which means that it picks one of the active voices and
+   makes it play the new note instead of the one that it was already playing.
+
+Due to the high number of available polyphonic voices, JS80P usually goes with
+the first option, except in two cases:
+
+ * a monophonic [note handling mode](#usage-synth-main-nh) is selected,
+
+ * or both oscillators within a voice go silent and it is unlikely that their
+   sound would come back, which means:
+
+    * it is not even triggered according to the
+      [split keyboard](#usage-synth-main-mode) configuration,
+
+    * or its amplitude (and in case of [Oscillator 1](#usage-synth-modulator),
+      its subharmonic amplitude) or its volume has no
+      [controller](#usage-controllers) and is configured to be 0%.
+
+    * or its amplitude (and its subharmonic amplitude) or its volume is controlled
+      by a [static envelope generator](#usage-envelopes-update), and it has
+      reached the [Sustain](#usage-envelopes) stage, and both the sustain level
+      and the final level of the envelope are 0%.
+
+In computing, "garbage collection" is a mechanism which automatically releases
+resources (e.g. chunks of memory) that are no longer used by a program,
+allowing the operating system to make them available for other processes. JS80P
+does something similar with voices and oscillators which go silent: such
+oscillators and voices are stopped, so that they can be allocated for newly
+triggered notes.
 
 <a id="presets" href="#toc">Table of Contents</a>
 

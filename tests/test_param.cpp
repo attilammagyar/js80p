@@ -3092,6 +3092,156 @@ TEST(a_float_param_may_use_logarithmic_scale, {
 });
 
 
+void assert_decay_status(
+        bool const expected,
+        FloatParamS& float_param,
+        Integer const sample_count = -1,
+        Number const tweak_envelope = false
+) {
+    Envelope* const envelope = float_param.get_envelope();
+    Integer const block_size = float_param.get_block_size();
+
+    float_param.set_sample_rate(10.0);
+    float_param.start_envelope(0.0, 0.0, 0.0);
+
+    if (sample_count > 9) {
+        float_param.end_envelope(0.9);
+    }
+
+    if (tweak_envelope) {
+        envelope->sustain_value.set_value(0.9);
+        envelope->final_value.set_value(0.9);
+    }
+
+    if (sample_count < 0) {
+        FloatParamS::produce_if_not_constant<FloatParamS>(
+            float_param, 1, block_size
+        );
+    } else if (sample_count > 0) {
+        FloatParamS::produce_if_not_constant<FloatParamS>(
+            float_param, 1, sample_count
+        );
+    }
+
+    if (tweak_envelope) {
+        envelope->sustain_value.set_value(0.0);
+        envelope->final_value.set_value(0.0);
+    }
+
+    assert_eq(
+        expected,
+        float_param.has_envelope_decayed(),
+        "sample_count=%d, param_name=%s, sustain=%f, final=%f, update=%d, current=%f, tweak=%s",
+        (int)sample_count,
+        float_param.get_name().c_str(),
+        envelope == NULL ? -1.0 : envelope->sustain_value.get_value(),
+        envelope == NULL ? -1.0 : envelope->final_value.get_value(),
+        envelope == NULL ? -1 : envelope->update_mode.get_value(),
+        float_param.get_value(),
+        tweak_envelope ? "true" : "false"
+    );
+
+    float_param.reset();
+}
+
+
+TEST(can_tell_if_envelope_has_decayed, {
+    LFO lfo("L");
+    MidiController midi_controller;
+    Macro macro("M");
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    ToggleParam log_scale("log", ToggleParam::OFF);
+    FloatParamS param_with_nothing("PN", 0.0, 1.0, 1.0, 0.0, envelopes);
+    FloatParamS param_with_lfo("PL", 0.0, 1.0, 1.0, 0.0, envelopes);
+    FloatParamS param_with_midi_controller("PMI", 0.0, 1.0, 1.0, 0.0, envelopes);
+    FloatParamS param_with_macro("PMA", 0.0, 1.0, 1.0, 0.0, envelopes);
+    FloatParamS param_with_envelope("PE", 0.0, 1.0, 1.0, 0.0, envelopes);
+
+    param_with_nothing.set_value(0.0);
+    assert_decay_status(true, param_with_nothing, 1);
+
+    param_with_nothing.set_value(1.0);
+    assert_decay_status(false, param_with_nothing, 1);
+
+    midi_controller.change(0.0, 0.0);
+    param_with_midi_controller.set_midi_controller(&midi_controller);
+    assert_decay_status(false, param_with_midi_controller);
+
+    macro.input.set_value(0.0);
+    param_with_macro.set_macro(&macro);
+    assert_decay_status(false, param_with_macro);
+
+    lfo.amount.set_value(0.0);
+    param_with_lfo.set_lfo(&lfo);
+    assert_decay_status(false, param_with_lfo);
+
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
+    envelope.amount.set_value(1.0);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.1);
+    envelope.peak_value.set_value(1.0);
+    envelope.attack_time.set_value(0.1);
+    envelope.hold_time.set_value(0.1);
+    envelope.sustain_value.set_value(0.5);
+    envelope.decay_time.set_value(0.3);
+    envelope.final_value.set_value(0.0);
+    envelope.release_time.set_value(0.1);
+
+    param_with_envelope.set_envelope(&envelope);
+    assert_decay_status(false, param_with_envelope, 0);
+    assert_decay_status(false, param_with_envelope, 1);
+    assert_decay_status(false, param_with_envelope, 2);
+    assert_decay_status(false, param_with_envelope, 5);
+    assert_decay_status(false, param_with_envelope, 6);
+    assert_decay_status(false, param_with_envelope, 7);
+    assert_decay_status(false, param_with_envelope, 8);
+    assert_decay_status(false, param_with_envelope, 9);
+    assert_decay_status(false, param_with_envelope, 10);
+    assert_decay_status(true, param_with_envelope, 11);
+    assert_decay_status(true, param_with_envelope, 12);
+
+    envelope.sustain_value.set_value(0.0);
+    assert_decay_status(false, param_with_envelope, 0, true);
+    assert_decay_status(false, param_with_envelope, 1, true);
+    assert_decay_status(false, param_with_envelope, 2, true);
+    assert_decay_status(false, param_with_envelope, 6, true);
+    assert_decay_status(true, param_with_envelope, 7, true);
+    assert_decay_status(true, param_with_envelope, 8, true);
+    assert_decay_status(true, param_with_envelope, 9, true);
+    assert_decay_status(true, param_with_envelope, 10, true);
+    assert_decay_status(true, param_with_envelope, 11, true);
+    assert_decay_status(true, param_with_envelope, 12, true);
+
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC_OLDEST);
+    assert_decay_status(false, param_with_envelope, 0);
+    assert_decay_status(false, param_with_envelope, 1);
+    assert_decay_status(false, param_with_envelope, 2);
+    assert_decay_status(false, param_with_envelope, 6);
+    assert_decay_status(false, param_with_envelope, 7);
+    assert_decay_status(false, param_with_envelope, 8);
+    assert_decay_status(false, param_with_envelope, 9);
+    assert_decay_status(false, param_with_envelope, 10);
+    assert_decay_status(true, param_with_envelope, 11);
+    assert_decay_status(true, param_with_envelope, 12);
+
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_END);
+    assert_decay_status(false, param_with_envelope, 0);
+    assert_decay_status(false, param_with_envelope, 1);
+    assert_decay_status(false, param_with_envelope, 2);
+    assert_decay_status(false, param_with_envelope, 6);
+    assert_decay_status(false, param_with_envelope, 7);
+    assert_decay_status(false, param_with_envelope, 8);
+    assert_decay_status(false, param_with_envelope, 9);
+    assert_decay_status(false, param_with_envelope, 10);
+    assert_decay_status(true, param_with_envelope, 11);
+    assert_decay_status(true, param_with_envelope, 12);
+})
+
+
 class Modulator : public SignalProducer
 {
     friend class SignalProducer;

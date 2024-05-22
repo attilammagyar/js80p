@@ -138,7 +138,10 @@ class Envelope
         Integer get_change_index() const noexcept;
 
         bool is_dynamic() const noexcept;
+        bool is_static() const noexcept;
         bool is_tempo_synced() const noexcept;
+
+        bool needs_update(Byte const voice_status) const noexcept;
 
         void make_snapshot(
             EnvelopeRandoms const& randoms,

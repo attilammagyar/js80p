@@ -450,18 +450,14 @@ class FloatParam : public Param<Number, evaluation>
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
         void update_envelope(Seconds const time_offset) noexcept;
 
+        bool has_envelope_decayed() const noexcept;
+
         void set_lfo(LFO* lfo) noexcept;
         LFO* get_lfo() const noexcept;
 
         virtual void reset() noexcept override;
 
     protected:
-        template<class FloatParamClass>
-        static bool should_update_envelope(
-            FloatParamClass const& param,
-            Envelope const& envelope
-        ) noexcept;
-
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
