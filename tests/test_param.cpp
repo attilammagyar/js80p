@@ -3221,10 +3221,10 @@ TEST(can_tell_if_envelope_has_decayed, {
     assert_decay_status(false, param_with_envelope, 1);
     assert_decay_status(false, param_with_envelope, 2);
     assert_decay_status(false, param_with_envelope, 6);
-    assert_decay_status(false, param_with_envelope, 7);
-    assert_decay_status(false, param_with_envelope, 8);
-    assert_decay_status(false, param_with_envelope, 9);
-    assert_decay_status(false, param_with_envelope, 10);
+    assert_decay_status(true, param_with_envelope, 7);
+    assert_decay_status(true, param_with_envelope, 8);
+    assert_decay_status(true, param_with_envelope, 9);
+    assert_decay_status(true, param_with_envelope, 10);
     assert_decay_status(true, param_with_envelope, 11);
     assert_decay_status(true, param_with_envelope, 12);
 
@@ -3233,10 +3233,10 @@ TEST(can_tell_if_envelope_has_decayed, {
     assert_decay_status(false, param_with_envelope, 1);
     assert_decay_status(false, param_with_envelope, 2);
     assert_decay_status(false, param_with_envelope, 6);
-    assert_decay_status(false, param_with_envelope, 7);
-    assert_decay_status(false, param_with_envelope, 8);
-    assert_decay_status(false, param_with_envelope, 9);
-    assert_decay_status(false, param_with_envelope, 10);
+    assert_decay_status(true, param_with_envelope, 7);
+    assert_decay_status(true, param_with_envelope, 8);
+    assert_decay_status(true, param_with_envelope, 9);
+    assert_decay_status(true, param_with_envelope, 10);
     assert_decay_status(true, param_with_envelope, 11);
     assert_decay_status(true, param_with_envelope, 12);
 })

@@ -659,12 +659,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained note.
 
-   Note: there's no way in this mode to stop a note, unless there are
-   [envelope generators](#usage-envelopes) assigned to the amplitude
-   or volume parameters of the oscillators which decay into
-   silence during the DAHDS stages. If the envelope generators are
-   [static](#usage-envelopes-update), then the [garbage collector](#usage-gc)
-   will eventually stop the voice so that it will stop consuming CPU resources.
+   Note: there's no way in this mode to stop a note except having it released
+   by the [garbage collector](#usage-gc). One way to achieve that is to assign
+   an [envelope generator](#usage-envelopes) to either the amplitude or the
+   volume parameters, and set it up so that it decays into silence before
+   reaching the sustain stage.
 
  * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
 
@@ -682,12 +681,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained notes.
 
-   Note: since there's no way in this mode to stop a note, it is a good idea to
-   use [static envelope generators](#usage-envelopes-update) for the amplitude
-   or volume parameters of the oscillators which decay into
-   silence during the [DAHDS stages](#usage-envelopes). This way the
-   [garbage collector](#usage-gc) can release the voices eventually, making
-   them available for newly triggered notes.
+   Note: there's no way in this mode to stop a note except having it released
+   by the [garbage collector](#usage-gc). One way to achieve that is to assign
+   an [envelope generator](#usage-envelopes) to either the amplitude or the
+   volume parameters, and set it up so that it decays into silence before
+   reaching the sustain stage.
 
  * **P RET**: same as **POLY**, but when a Note Start event is received for a
    note that is already being held by the sustain pedal, then instead of
@@ -703,12 +701,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained notes.
 
-   Note: since there's no way in this mode to stop a note, it is a good idea to
-   use [static envelope generators](#usage-envelopes-update) for the amplitude
-   or volume parameters of the oscillators which decay into
-   silence during the [DAHDS stages](#usage-envelopes). This way the
-   [garbage collector](#usage-gc) can release the voices eventually, making
-   them available for newly triggered notes.
+   Note: there's no way in this mode to stop a note except having it released
+   by the [garbage collector](#usage-gc). One way to achieve that is to assign
+   an [envelope generator](#usage-envelopes) to either the amplitude or the
+   volume parameters, and set it up so that it decays into silence before
+   reaching the sustain stage.
 
 <a id="usage-synth-main-mode"></a>
 
@@ -1828,24 +1825,24 @@ the first option, except in two cases:
  * or both oscillators within a voice go silent and it is unlikely that their
    sound would come back, which means:
 
-    * it is not even triggered according to the
+    * the oscillator is not even triggered according to the
       [split keyboard](#usage-synth-main-mode) configuration,
 
     * or its amplitude (and in case of [Oscillator 1](#usage-synth-modulator),
       its subharmonic amplitude) or its volume has no
       [controller](#usage-controllers) and is configured to be 0%.
 
-    * or its amplitude (and its subharmonic amplitude) or its volume is controlled
-      by a [static envelope generator](#usage-envelopes-update), and it has
-      reached the [Sustain](#usage-envelopes) stage, and both the sustain level
-      and the final level of the envelope are 0%.
+    * or its amplitude (and its subharmonic amplitude) or its volume is
+      controlled by an [envelope generator](#usage-envelopes), and it has
+      reached the sustain stage, and both the sustain level and the final level
+      of the envelope are 0%.
 
 In computing, "garbage collection" is a mechanism which automatically releases
 resources (e.g. chunks of memory) that are no longer used by a program,
 allowing the operating system to make them available for other processes. JS80P
 does something similar with voices and oscillators which go silent: such
-oscillators and voices are stopped, so that they can be allocated for newly
-triggered notes.
+oscillators and voices are stopped and released so that they can be allocated
+for newly triggered notes.
 
 <a id="presets" href="#toc">Table of Contents</a>
 

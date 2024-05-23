@@ -2107,22 +2107,22 @@ bool FloatParam<evaluation>::has_envelope_decayed() const noexcept
     if (envelope != NULL) {
         JS80P_ASSERT(envelope_state != NULL);
 
-        if (envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED) {
-            return get_value() < threshold && is_constant_until(2);
-        }
+        EnvelopeStage const stage = envelope_state->stage;
 
         if (
-                envelope_state->stage == EnvelopeStage::ENV_STG_SUSTAIN
-                || envelope_state->stage == EnvelopeStage::ENV_STG_RELEASE
+                stage == EnvelopeStage::ENV_STG_SUSTAIN
+                || stage == EnvelopeStage::ENV_STG_RELEASE
         ) {
             EnvelopeSnapshot const& snapshot = envelope_state->get_active_snapshot();
 
             return (
-                envelope->is_static()
-                && snapshot.sustain_value < threshold
+                snapshot.sustain_value < threshold
                 && snapshot.final_value < threshold
-                && get_value() < threshold
             );
+        }
+
+        if (stage == EnvelopeStage::ENV_STG_RELEASED) {
+            return is_constant_until(2);
         }
 
         return false;
