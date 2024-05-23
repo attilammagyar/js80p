@@ -555,9 +555,9 @@ class AboutText : public Widget
 class StatusLine : public TransparentWidget
 {
     public:
-        static constexpr int LEFT = 690;
+        static constexpr int LEFT = 654;
         static constexpr int TOP = 0;
-        static constexpr int WIDTH = 290;
+        static constexpr int WIDTH = 325;
         static constexpr int HEIGHT = 24;
 
         StatusLine();
