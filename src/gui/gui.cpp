@@ -1798,9 +1798,13 @@ GUI::GUI(
     lfos_body(NULL),
     synth_body(NULL),
     status_line(NULL),
+    active_voices_count(0),
     synth(synth),
     platform_data(platform_data)
 {
+    default_status_line[0] = '\x00';
+    update_active_voices_count();
+
     initialize();
 
     dummy_widget = new Widget("");
@@ -1996,7 +2000,7 @@ GUI::GUI(
 
 void GUI::build_about_body(char const* sdk_version)
 {
-    about_body = new TabBody("About");
+    about_body = new TabBody(*this, "About");
 
     background->own(about_body);
 
@@ -2013,7 +2017,7 @@ void GUI::build_macros_1_body(
         ParamStateImages const* macro_distortions,
         ParamStateImages const* macro_midpoint_states
 ) {
-    macros_1_body = new TabBody("Macros 1-10");
+    macros_1_body = new TabBody(*this, "Macros 1-10");
 
     background->own(macros_1_body);
 
@@ -2185,7 +2189,7 @@ void GUI::build_macros_2_body(
         ParamStateImages const* macro_distortions,
         ParamStateImages const* macro_midpoint_states
 ) {
-    macros_2_body = new TabBody("Macros 11-20");
+    macros_2_body = new TabBody(*this, "Macros 11-20");
 
     background->own(macros_2_body);
 
@@ -2357,7 +2361,7 @@ void GUI::build_macros_3_body(
         ParamStateImages const* macro_distortions,
         ParamStateImages const* macro_midpoint_states
 ) {
-    macros_3_body = new TabBody("Macros 21-30");
+    macros_3_body = new TabBody(*this, "Macros 21-30");
 
     background->own(macros_3_body);
 
@@ -2526,7 +2530,7 @@ void GUI::build_macros_3_body(
 
 void GUI::build_effects_body(ParamStateImages const* knob_states)
 {
-    effects_body = new TabBody("Effects");
+    effects_body = new TabBody(*this, "Effects");
 
     background->own(effects_body);
 
@@ -2634,7 +2638,7 @@ void GUI::build_envelopes_1_body(
         ParamStateImages const* envelope_shapes_01,
         ParamStateImages const* envelope_shapes_10
 ) {
-    envelopes_1_body = new TabBody("Envelopes");
+    envelopes_1_body = new TabBody(*this, "Envelopes");
 
     background->own(envelopes_1_body);
 
@@ -2813,7 +2817,7 @@ void GUI::build_envelopes_2_body(
         ParamStateImages const* envelope_shapes_01,
         ParamStateImages const* envelope_shapes_10
 ) {
-    envelopes_2_body = new TabBody("Envelopes");
+    envelopes_2_body = new TabBody(*this, "Envelopes");
 
     background->own(envelopes_2_body);
 
@@ -2988,7 +2992,7 @@ void GUI::build_envelopes_2_body(
 
 void GUI::build_lfos_body(ParamStateImages const* knob_states)
 {
-    lfos_body = new TabBody("LFOs");
+    lfos_body = new TabBody(*this, "LFOs");
 
     background->own(lfos_body);
 
@@ -3127,7 +3131,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     constexpr char const* const* nh = JS80P::GUI::NOTE_HANDLING_MODES;
     constexpr int nhc = JS80P::GUI::NOTE_HANDLING_MODES_COUNT;
 
-    synth_body = new TabBody("Synth");
+    synth_body = new TabBody(*this, "Synth");
 
     background->own(synth_body);
 
@@ -3288,9 +3292,43 @@ void GUI::show()
 }
 
 
+void GUI::update_active_voices_count()
+{
+    Integer const old_active_voices_count = active_voices_count;
+
+    active_voices_count = synth.get_active_voices_count();
+
+    if (active_voices_count == old_active_voices_count) {
+        return;
+    }
+
+    if (active_voices_count < 1) {
+        default_status_line[0] = '\x00';
+    } else {
+        snprintf(
+            default_status_line,
+            DEFAULT_STATUS_LINE_MAX_LENGTH,
+            "Voices: %d / %d",
+            (int)active_voices_count,
+            (int)Synth::POLYPHONY
+        );
+        default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
+    }
+
+    if (status_line != NULL) {
+        set_status_line(default_status_line);
+        redraw_status_line();
+    }
+}
+
+
 void GUI::set_status_line(char const* text)
 {
-    status_line->set_text(text);
+    if (text[0] == '\x00') {
+        status_line->set_text(default_status_line);
+    } else {
+        status_line->set_text(text);
+    }
 }
 
 

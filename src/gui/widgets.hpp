@@ -117,7 +117,7 @@ class TabBody : public TransparentWidget
         static constexpr int WIDTH = GUI::WIDTH;
         static constexpr int HEIGHT = GUI::HEIGHT - TOP;
 
-        explicit TabBody(char const* const text);
+        explicit TabBody(GUI& gui, char const* const text);
 
         using TransparentWidget::own;
 

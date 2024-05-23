@@ -201,6 +201,8 @@ class GUI
         void show();
         void idle();
 
+        void update_active_voices_count();
+
         void set_status_line(char const* text);
         void redraw_status_line();
 
@@ -209,6 +211,8 @@ class GUI
         PlatformData get_platform_data() const;
 
     private:
+        static constexpr size_t DEFAULT_STATUS_LINE_MAX_LENGTH = 32;
+
         static void initialize_controllers_by_id();
 
         static void param_ratio_to_str_float(
@@ -290,6 +294,8 @@ class GUI
 
         bool const show_vst_logo;
 
+        char default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH];
+
         Widget* dummy_widget;
 
         Image about_image;
@@ -321,6 +327,7 @@ class GUI
         TabBody* lfos_body;
         TabBody* synth_body;
         StatusLine* status_line;
+        Integer active_voices_count;
 
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;

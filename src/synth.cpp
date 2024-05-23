@@ -184,6 +184,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         byte_params[i] = NULL;
     }
 
+    active_voices_count.store(0);
+
     build_frequency_table();
     register_main_params();
     register_child(bus);
@@ -947,6 +949,8 @@ void Synth::reset() noexcept
     vol_1_peak_tracker.reset();
     vol_2_peak_tracker.reset();
     vol_3_peak_tracker.reset();
+
+    active_voices_count.store(0);
 }
 
 
@@ -965,6 +969,7 @@ bool Synth::is_lock_free() const noexcept
         is_lock_free
         && messages.is_lock_free()
         && is_mts_esp_connected_.is_lock_free()
+        && active_voices_count.is_lock_free()
     );
 }
 
@@ -1010,6 +1015,12 @@ void Synth::resume() noexcept
     start_lfos();
     clear_sustain();
     clear_note_stack();
+}
+
+
+Integer Synth::get_active_voices_count() const noexcept
+{
+    return active_voices_count.load();
 }
 
 
@@ -2891,6 +2902,8 @@ void Synth::finalize_rendering(
         vol_3_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
         vol_3_peak.change(0.0, std::min(1.0, vol_3_peak_tracker.get_peak()));
     }
+
+    active_voices_count.store((Integer)bus.get_active_voices_count());
 }
 
 
@@ -2944,6 +2957,7 @@ Synth::Bus::Bus(
     modulator_params(modulator_params),
     carrier_params(carrier_params),
     input(NULL),
+    active_voices_count(0),
     modulator_add_volume(modulator_add_volume),
     input_volume(input_volume),
     modulators_buffer(NULL),
@@ -3010,7 +3024,7 @@ void Synth::Bus::find_carriers_peak(
 void Synth::Bus::collect_active_notes(
         NoteTunings& note_tunings,
         Integer& note_tunings_count
-) noexcept {
+) const noexcept {
     Integer i = 0;
 
     for (Integer v = 0; v != polyphony; ++v) {
@@ -3028,6 +3042,12 @@ void Synth::Bus::collect_active_notes(
     }
 
     note_tunings_count = i;
+}
+
+
+size_t Synth::Bus::get_active_voices_count() const noexcept
+{
+    return active_voices_count;
 }
 
 
@@ -3091,16 +3111,25 @@ void Synth::Bus::collect_active_voices() noexcept
 {
     active_modulators_count = 0;
     active_carriers_count = 0;
+    active_voices_count = 0;
 
     for (Integer v = 0; v != polyphony; ++v) {
-        if (modulators[v]->is_on()) {
+        bool const is_modulator_on = modulators[v]->is_on();
+
+        if (is_modulator_on) {
             active_modulators[active_modulators_count] = modulators[v];
             ++active_modulators_count;
         }
 
-        if (carriers[v]->is_on()) {
+        bool const is_carrier_on = carriers[v]->is_on();
+
+        if (is_carrier_on) {
             active_carriers[active_carriers_count] = carriers[v];
             ++active_carriers_count;
+        }
+
+        if (is_modulator_on || is_carrier_on) {
+            ++active_voices_count;
         }
     }
 }

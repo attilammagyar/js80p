@@ -146,9 +146,10 @@ bool ExportPatchButton::mouse_leave(int const x, int const y)
 }
 
 
-TabBody::TabBody(char const* const text)
+TabBody::TabBody(GUI& gui, char const* const text)
     : TransparentWidget(text, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY)
 {
+    set_gui(gui);
 }
 
 
@@ -215,6 +216,8 @@ void TabBody::refresh_all_params()
     for (GUI::DiscreteParamEditors::iterator it = discrete_param_editors.begin(); it != discrete_param_editors.end(); ++it) {
         (*it)->refresh();
     }
+
+    gui->update_active_voices_count();
 }
 
 

@@ -1897,3 +1897,33 @@ TEST(semi_polyphonic_aftertouch, {
     test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_LOWEST, 55.0);
     test_semi_polyphonic_aftertouch(Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, 880.0);
 })
+
+
+TEST(keeps_track_of_number_of_active_voices, {
+    constexpr Frequency sample_rate = 1000.0;
+    constexpr Integer block_size = 1024;
+    Synth synth;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    synth.resume();
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_2, 127);
+    synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
+    synth.note_off(0.5, 1, Midi::NOTE_A_3, 127);
+
+    assert_eq(0, synth.get_active_voices_count());
+
+    SignalProducer::produce<Synth>(synth, 0);
+    assert_eq(2, synth.get_active_voices_count());
+
+    synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
+    SignalProducer::produce<Synth>(synth, 1);
+    assert_eq(1, synth.get_active_voices_count());
+
+    synth.note_off(0.0, 1, Midi::NOTE_A_2, 127);
+    SignalProducer::produce<Synth>(synth, 2);
+    assert_eq(0, synth.get_active_voices_count());
+})

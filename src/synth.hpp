@@ -1151,6 +1151,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void suspend() noexcept;
         void resume() noexcept;
 
+        Integer get_active_voices_count() const noexcept;
+
         bool has_mts_esp_tuning() const noexcept;
         bool has_continuous_mts_esp_tuning() const noexcept;
         bool is_mts_esp_connected() const noexcept;
@@ -1389,7 +1391,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 void collect_active_notes(
                     NoteTunings& note_tunings,
                     Integer& note_tunings_count
-                ) noexcept;
+                ) const noexcept;
+
+                size_t get_active_voices_count() const noexcept;
 
             protected:
                 Sample const* const* initialize_rendering(
@@ -1451,6 +1455,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Carrier* active_carriers[POLYPHONY];
                 size_t active_modulators_count;
                 size_t active_carriers_count;
+                size_t active_voices_count;
                 FloatParamS& modulator_add_volume;
                 FloatParamS& input_volume;
                 Sample const* modulator_add_volume_buffer;
@@ -1780,6 +1785,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Modulator* modulators[POLYPHONY];
         Carrier* carriers[POLYPHONY];
         NoteTunings active_note_tunings;
+        std::atomic<Integer> active_voices_count;
         Integer samples_since_gc;
         Integer samples_between_gc;
         Integer next_voice;
