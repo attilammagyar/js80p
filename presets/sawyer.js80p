@@ -5,8 +5,8 @@
 ; brightness while doing a huge vibrato when you turn up the mod wheel or apply
 ; aftertouch. (Note that this is not a split-keyboard patch, because both
 ; oscillators are required to make this sound good in stereo - instead, the
-; effect is achieved through trickery with the Note controller and the
-; Distortion knob of Macro 12 and 13.)
+; effect is achieved through trickery with the Triggered Note controller and
+; the Distortion knob of Macro 12 and 13.)
 [js80p]
 MAMP = 1.0
 MFLDctl = 0.531250

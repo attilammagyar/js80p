@@ -4,15 +4,15 @@ v3.1.0 (2024-05-2?)
    highest key priority.
  * New note handling modes allow retriggering sustained notes (rather than
    stacking them), and ignoring the sustain pedal's original interpretation so
-   that it can be used as a 0% / 100% switch.
- * Distortion: distortion effects now allow changing the type of distortion:
+   that it can be used as a 0% / 100% switch without affecting note lengths.
+ * Distortion: distortion effects now allow selecting the type of distortion:
     * tanh 3x, tanh 5x, tanh 10x for saturation, medium, and heavy soft
       clipping
     * harmonic distortions,
     * (band-limited) bit crushers.
  * Reverb room size can now be adjusted.
  * External audio input can now be mixed into the effects chain as well, so the
-   plugin can also be used now as an effect. (Though using a synth plugin as an
+   plugin can also be used as an effect. (Though using a synth plugin as an
    effect can be quirky in some host applications, and it may require some
    experimentation with track and bus layout, signal routing, plugin types, and
    plugin settings.)

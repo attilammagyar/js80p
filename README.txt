@@ -50,7 +50,7 @@ command:
 
     sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
 
-Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
+Note: if you want to run the 32 bit version of JS80P on a 64 bit system,
 then you will have to install the 32 bit version of the libraries, for example:
 
     sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
@@ -83,7 +83,7 @@ application doesn't recognize it, then try the 64 bit VST 3 single file
 version, then the 64 bit FST version, then the 32 bit VST 3 single file
 version, and so on.
 
-Note that all versions use the same high-precision sound synthesis engine
+Note: all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
 
 Packages
@@ -223,9 +223,11 @@ produced by JS80P can be adjusted via virtual knobs on the screen:
  * Click on the area below a knob to assign a controller to it, or to remove a
    previously assigned one. When a knob has a controller assigned to it, its
    value can no longer be changed manually, it's set and continuously adjusted
-   by the selected controller. (Note: if you accidentally open the controller
-   selector screen, and you want to close it without changing anything, then
-   just click on the "none" option or the controller that is already selected.)
+   by the selected controller.
+
+   Note: if you accidentally open the controller selector screen, and you want
+   to close it without changing anything, then just click on the "none" option
+   or the controller that is already selected.
 
    Controllers are various events and automations that can be used for setting
    the momentary value (on a relative scale between 0% and 100%) of a JS80P

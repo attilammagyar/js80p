@@ -185,13 +185,13 @@ Features
    polyphony.
  * Filter and envelope imperfection settings for analog-like feel.
  * MIDI controllers and macros.
- * Channel pressure (aftertouch), with optional semi-polyphonic
-   operation modes (even with MIDI keyboards that are only capable of
-   paraphonic aftertouch):
-    * last pressed key,
-    * oldest pressed key,
-    * lowest pressed key,
-    * or highest pressed key.
+ * Channel pressure (aftertouch).
+    * Optionally with semi-polyphonic aftertouch emulation (even with MIDI
+      keyboards that don't have polyphonic aftertouch):
+       * last pressed key,
+       * oldest pressed key,
+       * lowest pressed key,
+       * or highest pressed key.
  * MIDI learn.
  * Logarithmic or linear scale filter cutoff frequencies.
  * Tempo synchronization for envelopes, LFOs, and effects.
@@ -240,7 +240,7 @@ application doesn't recognize it, then try the 64 bit VST 3 single file
 edition, then the 64 bit FST version, then the 32 bit VST 3 single file
 edition, and so on.
 
-Note that all versions use the same high-precision sound synthesis engine
+**Note**: all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
 
 #### Packages
@@ -319,7 +319,7 @@ Tested with [REAPER](https://www.reaper.fm/) 7.14.
 A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
 gives good performance and low latency.
 
-Note: a RISC-V 64 port is available as a
+**Note**: a RISC-V 64 port is available as a
 [separate project](https://github.com/aimixsaka/js80p/) by
 [@aimixsaka](https://github.com/aimixsaka/).
 
@@ -347,7 +347,7 @@ command:
 
     sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
 
-Note that if you want to run the 32 bit version of JS80P on a 64 bit system,
+**Note**: if you want to run the 32 bit version of JS80P on a 64 bit system,
 then you will have to install the 32 bit version of the libraries, for example:
 
     sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
@@ -399,7 +399,7 @@ then you will have to install the 32 bit version of the libraries, for example:
    recommended to copy the `js80p.vstxml` file as well to the folder where
    you keep your VST 2.4 plugins.
 
-Note: VST 2.4 plugins are usually put in the `C:\Program Files\VstPlugins`
+**Note**: VST 2.4 plugins are usually put in the `C:\Program Files\VstPlugins`
 folder.
 
 <a id="fst-linux"></a>
@@ -414,7 +414,7 @@ folder.
    recommended to copy the `js80p.vstxml` file as well to the directory where
    you keep your VST 2.4 plugins.
 
-Note: VST 2.4 plugins are usually put in the `~/.vst` directory.
+**Note**: VST 2.4 plugins are usually put in the `~/.vst` directory.
 
 <a id="install-tuning"></a>
 
@@ -429,9 +429,9 @@ plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
 by [ODDSound](https://oddsound.com/). Follow the instructions on the website,
 where you can also find the User Guide documentation for each product.
 
-Note: it is possible to use a different tuning provider without installing any
-of the above plugins, but you may have to manually download the `LIBMTS.dll`
-library from the [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win),
+**Note**: it is possible to use a different tuning provider without installing
+any of the above plugins, but you may have to manually download the
+`LIBMTS.dll` library from the [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win),
 and put it in a folder where Windows can find it:
 
  * On 64 bit Windows:
@@ -509,19 +509,20 @@ produced by JS80P can be adjusted via virtual knobs on the screen:
  * Click on the area below a knob to assign a [controller](#usage-controllers)
    to it, or to remove a previously assigned one. When a knob has a controller
    assigned to it, its value can no longer be changed manually, it's set and
-   continuously adjusted by the selected controller. (Note: if you accidentally
-   open the controller selector screen, and you want to close it without
-   changing anything, then just click on the "none" option or the controller
-   that is already selected.)
+   continuously adjusted by the selected controller.
+
+   **Note**: if you accidentally open the controller selector screen, and you
+   want to close it without changing anything, then just click on the "none"
+   option or the controller that is already selected.
 
 By default, JS80P parameters are paraphonic, which means that when there are
 multiple voices playing different musical notes, all of them share the same
 value for each parameter. Many of the parameters on the
 [Synthesizer (Synth)](#usage-synth) tab can be changed to be polyphonic or
-optionally semi-polyphonic by associating them with
+to emulate semi-polyphonic behaviour by associating them with
 [envelope generators](#usage-envelopes) or
-[low-frequency oscillators](#usage-lfos) that have envelope generators assigned
-to them.
+[low-frequency oscillators](#usage-lfos) that have envelope generators
+associated with them.
 
 <a id="usage-controllers" href="#toc">Table of Contents</a>
 
@@ -659,11 +660,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained note.
 
-   Note: there's no way in this mode to stop a note except having it released
-   by the [garbage collector](#usage-gc). One way to achieve that is to assign
-   an [envelope generator](#usage-envelopes) to either the amplitude or the
-   volume parameters, and set it up so that it decays into silence before
-   reaching the sustain stage.
+   **Note**: there's no way in this mode to stop a note except having it
+   released by the [garbage collector](#usage-gc). One way to achieve that is
+   to assign an [envelope generator](#usage-envelopes) to either the amplitude
+   or the volume parameters, and set it up so that it decays into silence
+   before reaching the sustain stage.
 
  * **POLY**: polyphonic mode, 64 notes can be played simultaneously.
 
@@ -681,11 +682,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained notes.
 
-   Note: there's no way in this mode to stop a note except having it released
-   by the [garbage collector](#usage-gc). One way to achieve that is to assign
-   an [envelope generator](#usage-envelopes) to either the amplitude or the
-   volume parameters, and set it up so that it decays into silence before
-   reaching the sustain stage.
+   **Note**: there's no way in this mode to stop a note except having it
+   released by the [garbage collector](#usage-gc). One way to achieve that is
+   to assign an [envelope generator](#usage-envelopes) to either the amplitude
+   or the volume parameters, and set it up so that it decays into silence
+   before reaching the sustain stage.
 
  * **P RET**: same as **POLY**, but when a Note Start event is received for a
    note that is already being held by the sustain pedal, then instead of
@@ -701,11 +702,11 @@ handles note events. The available options are:
    maintained, allowing the pedal to be used as a 0% / 100% switch without
    releasing the sustained notes.
 
-   Note: there's no way in this mode to stop a note except having it released
-   by the [garbage collector](#usage-gc). One way to achieve that is to assign
-   an [envelope generator](#usage-envelopes) to either the amplitude or the
-   volume parameters, and set it up so that it decays into silence before
-   reaching the sustain stage.
+   **Note**: there's no way in this mode to stop a note except having it
+   released by the [garbage collector](#usage-gc). One way to achieve that is
+   to assign an [envelope generator](#usage-envelopes) to either the amplitude
+   or the volume parameters, and set it up so that it decays into silence
+   before reaching the sustain stage.
 
 <a id="usage-synth-main-mode"></a>
 
@@ -1056,14 +1057,14 @@ Same as the [distortions](#usage-effects-distortions) on the
 Turn this up to mix external audio signal with that from the oscillators before
 entering the effects chain, when JS80P is used as an audio effect.
 
-Note: using synthesizer plugins as audio effects is known to be quirky in some
-host applications, and the behaviour may vary between different plugin types as
-well. For example, some versions of REAPER will mix the dry signal with the
-processed output for VST 2 plugins by default, and some versions of FL Studio
-don't allow sending both MIDI and audio input into the same plugin instance,
-etc. If JS80P's input processing does not work in your environment the way you
-want it, you may have to experiment with the tracks and bus layout, the signal
-routing, and the plugin settings of your host application.
+**Note**: using synthesizer plugins as audio effects is known to be quirky in
+some host applications, and the behaviour may vary between different plugin
+types as well. For example, some versions of REAPER will mix the dry signal
+with the processed output for VST 2 plugins by default, and some versions of FL
+Studio don't allow sending both MIDI and audio input into the same plugin
+instance, etc. If JS80P's input processing does not work in your environment
+the way you want it, you may have to experiment with the tracks and bus layout,
+the signal routing, and the plugin settings of your host application.
 
 ##### Vol 1, Vol 2, Vol3
 
@@ -1072,7 +1073,7 @@ chain. Their purpose is twofold: they control the loudness of the signal, and
 they also measure the incoming peaks for the signal loudness based
 [controllers](#usage-controllers).
 
-Note that the first volume controller goes up to 200% so that you can boost the
+**Note**: the first volume controller goes up to 200% so that you can boost the
 signal which is going into the
 [distortion effects](#usage-effects-distortions).
 
@@ -1202,8 +1203,8 @@ in the effect, so that what they normally measure in terms of seconds will be
 measured in terms of beats instead. (This only works in hosts which provide
 tempo information to plugins.)
 
-Note: in order to prevent the memory that is allocated for delay buffers from
-growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+**Note**: in order to prevent the memory that is allocated for delay buffers
+from growing arbitrarily large, JS80P will not go below 30 BPM for tempo
 synchronization.
 
 ##### High-pass Filter Cutoff Frequency (HP F)
@@ -1296,8 +1297,8 @@ Turn on tempo synchronization for the delay lines in the effect, so that time
 will be measured in terms of beats instead of in terms of seconds. (This only
 works in hosts which provide tempo information to plugins.)
 
-Note: in order to prevent the memory that is allocated for delay buffers from
-growing arbitrarily large, JS80P will not go below 30 BPM for tempo
+**Note**: in order to prevent the memory that is allocated for delay buffers
+from growing arbitrarily large, JS80P will not go below 30 BPM for tempo
 synchronization.
 
 ##### Input Volume (IN V)
@@ -1321,9 +1322,9 @@ the signal chain of the effect.
 
 Set how long the echo signal will lag behind the original signal.
 
-Note: to simulate the feel of old tape delays, assign an [LFO](#usage-lfos) to
-the delay time parameter which is set to oscillate very slowly, by a really low
-amount, maybe with a tiny amount of randomization.
+**Note**: to simulate the feel of old tape delays, assign an [LFO](#usage-lfos)
+to the delay time parameter which is set to oscillate very slowly, with a
+really low amount, and maybe with a tiny bit of randomization.
 
 <a id="usage-effects-echo-dist"></a>
 
@@ -1551,8 +1552,8 @@ assigned parameters:
  * **Release**: once the note is stopped, the parameter will take this long to
    reach the final level.
 
-Note: when an envelope is assigned to an amplitude or volume parameter, it is
-recommended to have its initial and final level be set to 0%.
+**Note**: when an envelope is assigned to an amplitude or volume parameter, it
+is recommended to have its initial and final level be set to 0%.
 
 The transitions between values can take various different shapes:
 
@@ -1634,15 +1635,40 @@ The available options are:
    voice which corresponds to the highest MIDI key among the keys which are
    pressed at a given moment.
 
-Note: the **LST**, **OLD**, **LOW**, and **HI** envelope updated modes make it
-possible to set up semi-polyphonic aftertouch effects, even if the MIDI
-keyboard does not have polyphonic aftertouch functionality: set all the levels
-of the envelope to 100%, and assign the Channel Aftertouch controller to the
-[amount](#usage-envelopes-amt) parameter of the envelope, and select the
-desired update mode. Any sound parameter that is controlled by such an envelope
-will become semi-polyphonic. (Of course, you can use other
-[controllers](#usage-controllers), MIDI CC, or [macro](#usage-macros) instead
-of aftertouch.)
+##### Semi-polyphonic Aftertouch and Other Controllers
+
+The **LST**, **OLD**, **LOW**, and **HI** envelope update modes make it
+possible to emulate semi-polyphonic aftertouch, even if the MIDI keyboard does
+not have polyphonic aftertouch functionality:
+
+ * Set all the levels of the envelope to 100%.
+
+ * Assign the Channel Aftertouch controller to the
+   [amount](#usage-envelopes-amt) parameter of the envelope.
+
+ * Select the desired update mode.
+
+Any sound parameter that is controlled by such an envelope generator will
+become semi-polyphonic. Of course, you can use other
+[controllers](#usage-controllers), MIDI CC, or [macros](#usage-macros) instead
+of aftertouch.
+
+**Notes**:
+
+ * The semi-polyphonic envelope update modes above are based on the pressed
+   MIDI keys, not the currently sounding voices, which means that they don't
+   take into account notes that are only held by the sustain pedal or by the
+   [hold modes](#usage-synth-main-nh).
+
+ * In some scenarios, the semi-polyphonic envelope update modes above don't
+   behave exactly as one would expect from real polyphonic aftertouch. For
+   example, if the status of a voice changes because of a newly pressed key,
+   then that voice may continue sounding with the envelope settings stuck the
+   way they were when the new key was pressed. This happens when the newly
+   pressed key changes the status of an active voice in a way which no longer
+   allows updating the envelope settings for that voice. (E.g. the voice that
+   used to belong to the last pressed key is no longer the last when a new note
+   is triggered.)
 
 #### Tempo Synchronization (BPM)
 
@@ -1749,7 +1775,7 @@ timelines can be maintained by each parameter for each voice. When that limit
 runs out, or when there's a dependency cycle between LFOs, then some of the
 LFOs will be run paraphonically, as if there was no envelope assigned to them.)
 
-Note that when the LFO is assigned to a parameter which doesn't accept control
+**Note**: when the LFO is assigned to a parameter which doesn't accept control
 from envelope generators, then the amount envelope has no effect.
 
 <a id="usage-lfos-bpm"></a>
@@ -2138,8 +2164,8 @@ and notes above middle C will be bright, but will lose much of their
 brightness while doing a huge vibrato when you turn up the mod wheel or apply
 aftertouch. (Note that this is not a split-keyboard patch, because both
 oscillators are required to make this sound good in stereo - instead, the
-effect is achieved through trickery with the Note controller and the
-Distortion knob of Macro 12 and 13.)
+effect is achieved through trickery with the Triggered Note controller and
+the Distortion knob of Macro 12 and 13.)
 
 <a id="preset-analog-brass-at"></a>
 
@@ -2246,13 +2272,15 @@ Similarly, if you assign an [LFO](#usage-lfos) to a parameter which can accept
 control from [envelope generators](#usage-envelopes), and the LFO is associated
 with an [amount envelope](#usage-lfos-amtenv), then the LFO becomes polyphonic,
 and its amount will be controlled by the envelope generator for each polyphonic
-voice independently from the other voices. Note that this is transitive up to
-a limit: if a parameter of a polyphonic LFO is controlled by another LFO, then
-the second LFO will also become polyphonic if it has an amount envelope
-assigned to it. An LFO chain like this can contain up to 6 LFOs and envelopes.
-If a chain contains more than that, or has dependency cycles where LFOs control
-each other's parameters, then some of the LFOs in the chain will be treated as
-if there weren't any envelopes assigned to them.
+voice independently from the other voices.
+
+**Note**: the polyphonic behaviour of LFOs is transitive up to a limit. If a
+parameter of a polyphonic LFO is controlled by another LFO, and the second LFO
+is also associated with an envelope generator, then this second LFO will become
+polyphonic as well. An LFO chain like this can contain up to 6 LFOs and
+envelopes. If a chain contains more than that, or it has dependency cycles
+where LFOs control each other's parameters, then some of the LFOs in the chain
+will be treated as if there weren't any envelopes assigned to them.
 
 To have polyphonic voice parameters *sample and hold* a
 [MIDI value](#usage-controllers) or a [macro](#usage-macros)'s momentary value
@@ -2271,10 +2299,10 @@ envelope, and assign the envelope to control the parameter.
 To hear the effect of those knobs, you have to select the _Custom_
 [waveform](#usage-synth-common-wav) for the oscillator.
 
-(Note that these parameters are CPU-intensive to process, so they are not
-sample accurate, they are not smoothed, and they are processed only once for
-each rendering block. Due to this, if you change them while a note is playing,
-or assign a controller to them, then you might hear "steps" or even clicks.)
+**Note**: these parameters are CPU-intensive to process, so they are not sample
+accurate, they are not smoothed, and they are processed only once for each
+rendering block. Due to this, if you change them while a note is playing, or
+assign a controller to them, then you might hear "steps" or even clicks.
 
 <a id="faq-automation" href="#toc">Table of Contents</a>
 
@@ -2471,7 +2499,7 @@ The `lib/` directory contains code from the following projects:
  * [MTS-ESP](https://github.com/ODDSound/MTS-ESP)
  * [VST 3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
-Note that the `lib/` directory does not include the whole SDK packages, it only
+**Note**: the `lib/` directory does not include the whole SDK packages, it only
 contains what's required for compiling JS80P.
 
 #### Linux
