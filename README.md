@@ -204,6 +204,8 @@ Features
     * volume control 3 input.
  * Route external audio into the effects chain of JS80P (in host applications
    which support it).
+ * Override the primary function of the sustain pedal, and use it as a toggle
+   switch for various parameters and macros.
 
 <a id="install" href="#toc">Table of Contents</a>
 
@@ -467,18 +469,18 @@ Usage
 
                                                                (x64)
     Oscillator --> Filter --> Wavefolder --> Filter --> Volume ---------> Mixer
-                     ^                                       |            ^   |
-                     |                                       |            |   |
-    Sub-oscillator --+                                       |            |   |
-                                                             |            |   |
-     (Frequency, Phase, and Amplitude Modulation)            |            |   |
-     +-------------------------------------------------------+            |   |
-     |                                                                    |   |
-     v                                                                    |   |
-     Oscillator                                                           |   |
-     |                                                                    |   |
-     v                                                          (x64)     |   |
-     Filter --> Wavefolder --> Distortion --> Filter --> Volume ----------+   |
+                     ^                                       |            ^ ^ |
+                     |                                       |            | | |
+    Sub-oscillator --+                                       |   Aux      | | |
+                                                             |   Input ---+ | |
+     (Frequency, Phase, and Amplitude Modulation)            |              | |
+     +-------------------------------------------------------+              | |
+     |                                                                      | |
+     v                                                                      | |
+     Oscillator                                                             | |
+     |                                                                      | |
+     v                                                          (x64)       | |
+     Filter --> Wavefolder --> Distortion --> Filter --> Volume ------------+ |
                                                                               |
             +-----------------------------------------------------------------+
             |
