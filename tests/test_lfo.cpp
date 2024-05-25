@@ -366,3 +366,32 @@ TEST(min_and_max_values_may_be_inverted, {
     test_inverted_min_max_lfo(ToggleParam::ON, 0.7, 0.2, 0.6, 0.5, 0.3, 0.6);
     test_inverted_min_max_lfo(ToggleParam::OFF, 0.7, 0.2, 0.6, 0.5, 0.4, 0.7);
 })
+
+
+TEST(when_a_round_is_skipped_then_params_are_still_processed, {
+    constexpr Seconds duration = (Number)(BLOCK_SIZE - 1) / SAMPLE_RATE;
+
+    LFO lfo("L");
+
+    lfo.set_block_size(BLOCK_SIZE);
+    lfo.set_sample_rate(SAMPLE_RATE);
+    lfo.start(0.0);
+
+    lfo.frequency.schedule_linear_ramp(duration, 0.7);
+    lfo.phase.schedule_linear_ramp(duration, 0.6);
+    lfo.min.schedule_linear_ramp(duration, 0.5);
+    lfo.max.schedule_linear_ramp(duration, 0.4);
+    lfo.amount.schedule_linear_ramp(duration, 0.3);
+    lfo.distortion.schedule_linear_ramp(duration, 0.2);
+    lfo.randomness.schedule_linear_ramp(duration, 0.1);
+
+    lfo.skip_round(1, BLOCK_SIZE);
+
+    assert_eq(0.7, lfo.frequency.get_value(), DOUBLE_DELTA);
+    assert_eq(0.6, lfo.phase.get_value(), DOUBLE_DELTA);
+    assert_eq(0.5, lfo.min.get_value(), DOUBLE_DELTA);
+    assert_eq(0.4, lfo.max.get_value(), DOUBLE_DELTA);
+    assert_eq(0.3, lfo.amount.get_value(), DOUBLE_DELTA);
+    assert_eq(0.2, lfo.distortion.get_value(), DOUBLE_DELTA);
+    assert_eq(0.1, lfo.randomness.get_value(), DOUBLE_DELTA);
+})

@@ -651,15 +651,15 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
 
 void LFO::skip_round(Integer const round, Integer const sample_count) noexcept
 {
-    oscillator.skip_round(round, sample_count);
+    FloatParamS::produce_if_not_constant(frequency, round, sample_count);
+    FloatParamS::produce_if_not_constant(phase, round, sample_count);
+    FloatParamS::produce_if_not_constant(min, round, sample_count);
+    FloatParamS::produce_if_not_constant(max, round, sample_count);
+    FloatParamS::produce_if_not_constant(amount, round, sample_count);
+    FloatParamS::produce_if_not_constant(distortion, round, sample_count);
+    FloatParamS::produce_if_not_constant(randomness, round, sample_count);
 
-    frequency.skip_round(round, sample_count);
-    phase.skip_round(round, sample_count);
-    min.skip_round(round, sample_count);
-    max.skip_round(round, sample_count);
-    amount.skip_round(round, sample_count);
-    distortion.skip_round(round, sample_count);
-    randomness.skip_round(round, sample_count);
+    oscillator.skip_round(round, sample_count);
 }
 
 
