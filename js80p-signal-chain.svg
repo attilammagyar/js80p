@@ -143,12 +143,20 @@
       <text x="50%" y="50%">Mixer</text>
     </svg>
 
-    <path d="M620,140 L620,54"/>
-    <polygon points="615,54 625,54 620,44"/>
+    <path d="M643,140 L643,54"/>
+    <polygon points="638,54 648,54 643,44"/>
 
-    <svg x="597" y="110" width="80" height="24">
+    <svg x="620" y="110" width="80" height="24">
       <text x="50%" y="50%">(x64)</text>
     </svg>
+
+    <svg x="510" y="70" width="80" height="24">
+      <rect x="0" y="0" width="100%" height="100%" rx="5" />
+      <text x="50%" y="50%">Aux Input</text>
+    </svg>
+
+    <path d="M590,82 L620,82 L620,54"/>
+    <polygon points="615,54 625,54 620,44"/>
 
     <path d="M490,44 L490,120 L70,120 L70,130"/>
     <polygon points="65,130 75,130 70,140"/>
