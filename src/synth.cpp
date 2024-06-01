@@ -177,7 +177,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     for (int i = 0; i != (int)ParamId::PARAM_ID_COUNT; ++i) {
         param_ratios[i].store(0.0);
         controller_assignments[i].store(ControllerId::NONE);
-        param_names_by_id[i] = "";
 
         sample_evaluated_float_params[i] = NULL;
         block_evaluated_float_params[i] = NULL;
@@ -848,7 +847,10 @@ void Synth::register_param(ParamId const param_id, ParamClass& param) noexcept
     std::string const& name = param.get_name();
 
     param_id_hash_table.add(name, param_id);
-    param_names_by_id[param_id] = name;
+
+    if (param_names_by_id[param_id].length() == 0) {
+        param_names_by_id[param_id] = name;
+    }
 
     size_t const index = (size_t)param_id;
 
@@ -936,7 +938,6 @@ void Synth::set_block_size(Integer const new_block_size) noexcept
 
     reallocate_buffers();
 }
-
 
 
 void Synth::reset() noexcept
