@@ -1144,8 +1144,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         virtual void set_block_size(Integer const new_block_size) noexcept override;
         virtual void reset() noexcept override;
 
-        bool is_lock_free() const noexcept;
-
         bool is_dirty() const noexcept;
         void clear_dirty_flag() noexcept;
 
@@ -1213,6 +1211,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         ParamId get_param_id(std::string const& name) const noexcept;
 
 #ifdef JS80P_ASSERTIONS
+        bool is_lock_free() const noexcept;
+
         void get_param_id_hash_table_statistics(
             Integer& max_collisions,
             Number& avg_collisions,

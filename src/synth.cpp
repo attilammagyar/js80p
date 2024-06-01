@@ -956,6 +956,7 @@ void Synth::reset() noexcept
 }
 
 
+#ifdef JS80P_ASSERTIONS
 bool Synth::is_lock_free() const noexcept
 {
     bool is_lock_free = true;
@@ -974,6 +975,7 @@ bool Synth::is_lock_free() const noexcept
         && active_voices_count.is_lock_free()
     );
 }
+#endif
 
 
 bool Synth::is_dirty() const noexcept
