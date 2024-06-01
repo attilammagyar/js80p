@@ -288,12 +288,12 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_19] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_20] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_21] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_22] = true;
     supported_midi_controllers[ControllerId::FX_1] = true;
     supported_midi_controllers[ControllerId::FX_2] = true;
     supported_midi_controllers[ControllerId::FX_3] = true;
     supported_midi_controllers[ControllerId::FX_4] = true;
     supported_midi_controllers[ControllerId::FX_5] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_22] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_23] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_24] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_25] = true;
@@ -311,6 +311,7 @@ void Synth::initialize_supported_midi_controllers() noexcept
     supported_midi_controllers[ControllerId::UNDEFINED_37] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_38] = true;
     supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_40] = true;
 
     Synth::supported_midi_controllers = supported_midi_controllers;
 }
