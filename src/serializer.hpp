@@ -33,9 +33,13 @@ namespace JS80P
 class Serializer
 {
     public:
+        static constexpr size_t PARAM_NAME_MAX_LENGTH = 8;
         static constexpr size_t SUFFIX_MAX_LENGTH = 4;
+        static constexpr size_t SECTION_NAME_MAX_LENGTH = 8;
 
+        typedef char ParamName[PARAM_NAME_MAX_LENGTH];
         typedef char Suffix[SUFFIX_MAX_LENGTH];
+        typedef char SectionName[SECTION_NAME_MAX_LENGTH];
 
         static constexpr size_t MAX_SIZE = 256 * 1024;
 
@@ -46,13 +50,14 @@ class Serializer
         static Lines* parse_lines(std::string const& serialized) noexcept;
 
         static bool parse_section_name(
-            std::string const& line, char section_name[8]
+            std::string const& line,
+            SectionName& section_name
         ) noexcept;
 
         static bool parse_line_until_value(
             std::string::const_iterator& it,
             std::string::const_iterator const& end,
-            char param_name[Constants::PARAM_NAME_MAX_LENGTH],
+            ParamName& param_name,
             Suffix& suffix
         ) noexcept;
 
@@ -61,7 +66,7 @@ class Serializer
             std::string::const_iterator const& end
         ) noexcept;
 
-        static bool is_js80p_section_start(char const section_name[8]) noexcept;
+        static bool is_js80p_section_start(SectionName const& section_name) noexcept;
 
         static std::string serialize(Synth const& synth) noexcept;
 
@@ -140,14 +145,14 @@ class Serializer
 
         static void upgrade_line(
             Synth const& synth,
-            char* param_name,
+            ParamName& param_name,
             Number& number
         ) noexcept;
 
         static bool parse_param_name(
             std::string::const_iterator& it,
             std::string::const_iterator const& end,
-            char* param_name
+            ParamName& param_name
         ) noexcept;
 
         static bool parse_suffix(

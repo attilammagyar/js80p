@@ -80,7 +80,6 @@ namespace Constants {
     constexpr Byte VOICE_STATUS_LOWEST =    0b0100;
     constexpr Byte VOICE_STATUS_HIGHEST =   0b1000;
 
-    constexpr Integer PARAM_NAME_MAX_LENGTH = 8;
     constexpr Byte PARAM_LFO_ENVELOPE_STATES = 6;
 
     constexpr Byte ENVELOPES = 12;

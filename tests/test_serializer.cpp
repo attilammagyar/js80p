@@ -340,8 +340,8 @@ TEST(param_names_are_parsed_case_insensitively_and_converted_to_upper_case, {
     );
     std::string const line_with_ctl = "cVolctl = 0.1";
     std::string const line_without_ctl = "cVol = 0.1";
-    char param_name[Constants::PARAM_NAME_MAX_LENGTH];
-    char suffix[4];
+    Serializer::ParamName param_name;
+    Serializer::Suffix suffix;
     std::string::const_iterator line_with_ctl_it = line_with_ctl.begin();
     std::string::const_iterator line_without_ctl_it = line_without_ctl.begin();
 

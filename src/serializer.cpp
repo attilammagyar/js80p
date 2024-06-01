@@ -275,7 +275,7 @@ void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
     typedef std::vector<Synth::Message> Messages;
 
     Messages messages;
-    char section_name[8];
+    SectionName section_name;
     bool inside_js80p_section = false;
 
     messages.reserve(800);
@@ -332,21 +332,23 @@ void Serializer::send_message(Synth& synth, Synth::Message const& message) noexc
 }
 
 
-bool Serializer::is_js80p_section_start(char const section_name[8]) noexcept
+bool Serializer::is_js80p_section_start(SectionName const& section_name) noexcept
 {
-    return strncmp(section_name, JS80P_SECTION_NAME, 8) == 0;
+    return strncmp(section_name, JS80P_SECTION_NAME, SECTION_NAME_MAX_LENGTH) == 0;
 }
 
 
 bool Serializer::parse_section_name(
         std::string const& line,
-        char section_name[8]
+        SectionName& section_name
 ) noexcept {
+    constexpr size_t section_name_pos_limit = strlen(JS80P_SECTION_NAME) + 1;
+
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
     size_t pos = 0;
 
-    std::fill_n(section_name, 8, '\x00');
+    std::fill_n(section_name, SECTION_NAME_MAX_LENGTH, '\x00');
 
     if (skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)) {
         return false;
@@ -363,7 +365,7 @@ bool Serializer::parse_section_name(
     }
 
     while (it != end && is_section_name_char(*it)) {
-        if (pos != 6) {
+        if (pos != section_name_pos_limit) {
             section_name[pos++] = *it;
         }
 
@@ -387,7 +389,7 @@ bool Serializer::parse_section_name(
 bool Serializer::parse_line_until_value(
         std::string::const_iterator& it,
         std::string::const_iterator const& end,
-        char param_name[Constants::PARAM_NAME_MAX_LENGTH],
+        ParamName& param_name,
         Suffix& suffix
 ) noexcept {
     return (
@@ -409,7 +411,7 @@ void Serializer::process_line(
     std::string::const_iterator const end = line.end();
     Synth::ParamId param_id;
     Number number;
-    char param_name[Constants::PARAM_NAME_MAX_LENGTH];
+    ParamName param_name;
     Suffix suffix;
     bool is_controller_assignment;
 
@@ -453,12 +455,12 @@ void Serializer::process_line(
 
 void Serializer::upgrade_line(
         Synth const& synth,
-        char* param_name,
+        ParamName& param_name,
         Number& number
 ) noexcept {
     if (
             JS80P_UNLIKELY(
-                strncmp(param_name, "POLY", Constants::PARAM_NAME_MAX_LENGTH) == 0
+                strncmp(param_name, "POLY", PARAM_NAME_MAX_LENGTH) == 0
             )
     ) {
         strncpy(param_name, "NH", 3);
@@ -466,7 +468,7 @@ void Serializer::upgrade_line(
     } else if (JS80P_UNLIKELY(param_name[0] == 'N' && is_digit(param_name[1]))) {
         if (
                 JS80P_UNLIKELY(
-                    strncmp(&param_name[2], "DYN", Constants::PARAM_NAME_MAX_LENGTH - 2) == 0
+                    strncmp(&param_name[2], "DYN", PARAM_NAME_MAX_LENGTH - 2) == 0
                 )
         ) {
             strncpy(&param_name[2], "UPD", 4);
@@ -474,7 +476,7 @@ void Serializer::upgrade_line(
         } else if (
                 JS80P_UNLIKELY(
                     is_digit(param_name[2])
-                    && strncmp(&param_name[3], "DYN", Constants::PARAM_NAME_MAX_LENGTH - 3) == 0
+                    && strncmp(&param_name[3], "DYN", PARAM_NAME_MAX_LENGTH - 3) == 0
                 )
         ) {
             strncpy(&param_name[3], "UPD", 4);
@@ -556,12 +558,12 @@ bool Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
 bool Serializer::parse_param_name(
         std::string::const_iterator& it,
         std::string::const_iterator const& end,
-        char* param_name
+        ParamName& param_name
 ) noexcept {
-    constexpr size_t param_name_pos_max = Constants::PARAM_NAME_MAX_LENGTH - 1;
+    constexpr size_t param_name_pos_max = PARAM_NAME_MAX_LENGTH - 1;
     size_t param_name_pos = 0;
 
-    std::fill_n(param_name, Constants::PARAM_NAME_MAX_LENGTH, '\x00');
+    std::fill_n(param_name, PARAM_NAME_MAX_LENGTH, '\x00');
 
     while (is_capital_letter(*it) || is_digit(*it) || is_lowercase_letter(*it)) {
         if (strncmp(&(*it), CONTROLLER_SUFFIX.c_str(), CONTROLLER_SUFFIX.length()) == 0) {
