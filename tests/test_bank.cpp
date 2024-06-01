@@ -275,7 +275,7 @@ TEST(serialization, {
         "[js80p]\n"
         "[js80p]\n"
     );
-    std::string const expeced_serialized = (
+    std::string const expected_serialized = (
         "[js80p]\r\n"
         "NAME = preset 1\r\n"
         "MIX = 1.0\r\n"
@@ -344,8 +344,8 @@ TEST(serialization, {
     }
 
     assert_eq(
-        expeced_serialized,
-        bank.serialize().substr(0, expeced_serialized.length()).c_str()
+        expected_serialized,
+        bank.serialize().substr(0, expected_serialized.length()).c_str()
     );
 })
 
@@ -419,7 +419,7 @@ TEST(bank_can_import_program_names_without_patches, {
         "NAME = preset 3\n"
         "MIX = 3.0\n"
     );
-    std::string const expeced_serialized = (
+    std::string const expected_serialized = (
         "[js80p]\r\n"
         "NAME = preset 1\r\n"
         "\r\n"
@@ -450,7 +450,7 @@ TEST(bank_can_import_program_names_without_patches, {
     assert_eq("Prog006", bank[5].get_name());
 
     assert_eq(
-        expeced_serialized,
-        bank.serialize().substr(0, expeced_serialized.length()).c_str()
+        expected_serialized,
+        bank.serialize().substr(0, expected_serialized.length()).c_str()
     );
 })
