@@ -20,6 +20,7 @@
 #ifndef JS80P__BANK_CPP
 #define JS80P__BANK_CPP
 
+#include <cmath>
 #include <algorithm>
 #include <cstring>
 
