@@ -292,6 +292,7 @@ class Widget : public WidgetBase
             XcbPlatform* xcb,
             xcb_connection_t* xcb_connection
         );
+
         static void process_non_editing_events(
             XcbPlatform* xcb,
             xcb_connection_t* xcb_connection
@@ -307,34 +308,42 @@ class Widget : public WidgetBase
             XcbPlatform const* xcb,
             xcb_generic_error_t const* error
         );
+
         static void handle_expose_event(
             XcbPlatform const* xcb,
             xcb_expose_event_t const* event
         );
+
         static void handle_button_press_event(
             XcbPlatform const* xcb,
             xcb_button_press_event_t const* event
         );
+
         static void handle_button_release_event(
             XcbPlatform const* xcb,
             xcb_button_release_event_t const* event
         );
+
         static void handle_enter_notify_event(
             XcbPlatform const* xcb,
             xcb_enter_notify_event_t const* event
         );
+
         static void handle_motion_notify_event(
             XcbPlatform const* xcb,
             xcb_motion_notify_event_t const* event
         );
+
         static void handle_leave_notify_event(
             XcbPlatform const* xcb,
             xcb_leave_notify_event_t const* event
         );
+
         static void handle_client_message_event(
             XcbPlatform const* xcb,
             xcb_client_message_event_t const* event
         );
+
         static void handle_destroy_notify_event(
             XcbPlatform const* xcb,
             xcb_destroy_notify_event_t const* event
@@ -346,6 +355,7 @@ class Widget : public WidgetBase
             int const x,
             int const y
         );
+
         static bool is_modifier_active(uint16_t event_state);
 
         void initialize();
