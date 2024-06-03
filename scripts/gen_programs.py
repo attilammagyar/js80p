@@ -138,7 +138,7 @@ def main(argv):
                 template
                     .replace("/* WARNING */", WARNING)
                     .replace(
-                        "/* NUMBER_OF_BUILT_IN_PROGRAMS */", str(len(programs))
+                        "0 /* NUMBER_OF_BUILT_IN_PROGRAMS */", str(len(programs))
                     )
                     .replace("/* PROGRAMS */", "\n".join(programs))
             ),

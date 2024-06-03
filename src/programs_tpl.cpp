@@ -28,7 +28,7 @@
 namespace JS80P
 {
 
-size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = /* NUMBER_OF_BUILT_IN_PROGRAMS */;
+size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = 0 /* NUMBER_OF_BUILT_IN_PROGRAMS */;
 
 Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
