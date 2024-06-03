@@ -63,7 +63,7 @@
 namespace JS80P
 {
 
-std::vector<bool> Synth::supported_midi_controllers;
+std::vector<bool> Synth::supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
 
 bool Synth::supported_midi_controllers_initialized = false;
 
