@@ -131,7 +131,6 @@ class Bank
 
         Program programs[NUMBER_OF_PROGRAMS];
         size_t current_program_index;
-        size_t non_blank_programs;
 };
 
 }
