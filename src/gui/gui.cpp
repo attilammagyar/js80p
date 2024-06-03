@@ -1230,7 +1230,7 @@ GUI::Controller const GUI::CONTROLLERS[] = {
 };
 
 
-GUI::Controller const* GUI::controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT];
+GUI::Controller const* GUI::controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT] = { NULL };
 
 
 GUI::Controller const* GUI::get_controller(Synth::ControllerId const controller_id)
@@ -1245,17 +1245,11 @@ GUI::Controller const* GUI::get_controller(Synth::ControllerId const controller_
 
 void GUI::initialize_controllers_by_id()
 {
-    if (controllers_by_id_initialized) {
+    if (JS80P_LIKELY(controllers_by_id_initialized)) {
         return;
     }
 
-    int i;
-
-    for (i = 0; i != Synth::ControllerId::CONTROLLER_ID_COUNT; ++i) {
-        controllers_by_id[i] = NULL;
-    }
-
-    for (i = 0; i != CONTROLLERS_COUNT; ++i) {
+    for (int i = 0; i != CONTROLLERS_COUNT; ++i) {
         controllers_by_id[CONTROLLERS[i].id] = &CONTROLLERS[i];
     }
 

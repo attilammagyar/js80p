@@ -390,7 +390,10 @@ void ControllerSelector::select_controller(
         GUI::Controller const* const old_controller = GUI::get_controller(
             this->selected_controller_id
         );
-        controllers[old_controller->index]->unselect();
+
+        if (JS80P_LIKELY(old_controller != NULL)) {
+            controllers[old_controller->index]->unselect();
+        }
     }
 
     snprintf(
