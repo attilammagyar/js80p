@@ -71,7 +71,7 @@ class ImportPatchButton : public TransparentWidget
             int const width,
             int const height,
             Synth& synth,
-            TabBody* synth_gui_body
+            TabBody* const tab_body
         );
 
         void import_patch(char const* buffer, Integer const size) const;
@@ -82,8 +82,9 @@ class ImportPatchButton : public TransparentWidget
         virtual bool mouse_leave(int const x, int const y) override;
 
     private:
+        TabBody* const tab_body;
+
         Synth& synth;
-        TabBody* synth_gui_body;
 };
 
 

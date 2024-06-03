@@ -70,10 +70,10 @@ ImportPatchButton::ImportPatchButton(
         int const width,
         int const height,
         Synth& synth,
-        TabBody* synth_gui_body
+        TabBody* const tab_body
 ) : TransparentWidget("Import Patch", left, top, width, height, Type::IMPORT_PATCH_BUTTON),
-    synth(synth),
-    synth_gui_body(synth_gui_body)
+    tab_body(tab_body),
+    synth(synth)
 {
     set_gui(gui);
 }
@@ -91,8 +91,8 @@ void ImportPatchButton::import_patch(char const* buffer, Integer const size) con
 
     Serializer::import_patch_in_gui_thread(synth, patch);
 
-    synth_gui_body->stop_editing();
-    synth_gui_body->refresh_all_params();
+    tab_body->stop_editing();
+    tab_body->refresh_all_params();
 }
 
 
