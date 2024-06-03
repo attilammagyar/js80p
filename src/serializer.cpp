@@ -404,7 +404,7 @@ bool Serializer::parse_line_until_value(
 
 void Serializer::process_line(
         std::vector<Synth::Message>& messages,
-        Synth& synth,
+        Synth const& synth,
         std::string const& line
 ) noexcept {
     std::string::const_iterator it = line.begin();

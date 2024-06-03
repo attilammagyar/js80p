@@ -139,7 +139,7 @@ class Serializer
 
         static void process_line(
             std::vector<Synth::Message>& messages,
-            Synth& synth,
+            Synth const& synth,
             std::string const& line
         ) noexcept;
 
