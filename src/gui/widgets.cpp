@@ -280,14 +280,14 @@ void Background::refresh()
 
 TabSelector::TabSelector(
         Background* background,
-        GUI::Image image,
+        GUI::Image tab_image,
         TabBody* tab_body,
         char const* const text,
         int const left
 ) : TransparentWidget(text, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
     background(background),
     tab_body(tab_body),
-    image(image)
+    tab_image(tab_image)
 {
 }
 
@@ -296,7 +296,7 @@ void TabSelector::click()
 {
     TransparentWidget::click();
 
-    background->set_image(image);
+    background->set_image(tab_image);
     background->replace_body(tab_body);
 }
 

@@ -167,7 +167,7 @@ class TabSelector : public TransparentWidget
 
         TabSelector(
             Background* background,
-            GUI::Image image,
+            GUI::Image tab_image,
             TabBody* tab_body,
             char const* const text,
             int const left
@@ -180,7 +180,7 @@ class TabSelector : public TransparentWidget
         Background* background;
         TabBody* tab_body;
 
-        GUI::Image image;
+        GUI::Image tab_image;
 };
 
 
