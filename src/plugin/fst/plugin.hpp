@@ -75,7 +75,7 @@ class FstPlugin : public Midi::EventHandler
                 float value;
         };
 
-        static constexpr size_t NUMBER_OF_PARAMETERS = 73;
+        static constexpr size_t NUMBER_OF_PARAMETERS = 74;
 
         static constexpr size_t PATCH_CHANGED_PARAMETER_INDEX = 72;
         static constexpr char const* PATCH_CHANGED_PARAMETER_SHORT_NAME = "Changed";

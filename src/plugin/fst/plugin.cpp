@@ -415,8 +415,10 @@ void FstPlugin::populate_parameters(
         of the list of exported parameters, then it could break DAW projects
         that have automations for parameters which come after it. In order to
         avoid such backward-incompatibility, we need to put it at the end.
+
+        Similarly, CC 88 was erroneously missing, and it was added after v3.1.0.
         */
-        if (midi_controller == Midi::SUSTAIN_PEDAL) {
+        if (midi_controller == Midi::SUSTAIN_PEDAL || midi_controller == Midi::UNDEFINED_20) {
             continue;
         }
 
@@ -441,6 +443,12 @@ void FstPlugin::populate_parameters(
     patch_changed.set_value(0.0f);
 
     parameters[PATCH_CHANGED_PARAMETER_INDEX] = patch_changed;
+
+    parameters[PATCH_CHANGED_PARAMETER_INDEX + 1] = create_midi_ctl_param(
+        Synth::ControllerId::UNDEFINED_20,
+        synth.midi_controllers[Synth::ControllerId::UNDEFINED_20],
+        synth
+    );
 }
 
 

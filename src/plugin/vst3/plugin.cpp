@@ -765,12 +765,12 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
 
         /*
         VST3 parameters have order-independent identifiers, so the
-        backward-incompatibility problem which occurs with the sustain pedal in
-        FstPlugin is unlikely to occur here. However, for the sake of
-        consistency, let's put the sustain pedal at the end of the list here as
-        well.
+        backward-incompatibility problem which occurs with the sustain pedal
+        and CC 88 in FstPlugin is unlikely to occur here. However, for the sake
+        of consistency, let's put the helper params that belong to these
+        controllers at the end of the list here as well.
         */
-        if (midi_controller == Midi::SUSTAIN_PEDAL) {
+        if (midi_controller == Midi::SUSTAIN_PEDAL || midi_controller == Midi::UNDEFINED_20) {
             continue;
         }
 
@@ -787,6 +787,13 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     );
 
     parameters.addParameter(set_up_patch_changed_param());
+
+    parameters.addParameter(
+        create_midi_ctl_param(
+            Synth::ControllerId::UNDEFINED_20,
+            (Vst::ParamID)Synth::ControllerId::UNDEFINED_20
+        )
+    );
 
     return result;
 }
