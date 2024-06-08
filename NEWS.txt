@@ -1,3 +1,11 @@
+v3.1.1 (2024-06-08)
+ * Bugfix: make header texts on the Macro tab consistent with other UI
+   elements.
+ * Bugfix: export helper parameter for MIDI CC 88 and make it available as a
+   controller. (Backward-compatibility is kept for host and plugin combinations
+   where parameter order matters.)
+ * Bugfix: fix building with GCC versions up to 14.1.0.
+
 v3.1.0 (2024-05-27)
  * New envelope update modes make it possible to turn non-polyphonic aftertouch
    into semi-polyphonic, with either last key, oldest key, lowest key, or
