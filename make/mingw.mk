@@ -74,3 +74,11 @@ LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall -static
 
 LINK_FST = $(LINK_DLL)
 LINK_VST3 = $(LINK_DLL)
+
+show_versions:
+	@echo ___ Target platform compiler:
+	$(CPP_TARGET_PLATFORM) --version
+	@echo ___ Dev platform compiler:
+	$(CPP_DEV_PLATFORM) --version
+	@echo ___ Cppcheck:
+	$(CPPCHECK) --version

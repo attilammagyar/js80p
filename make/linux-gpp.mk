@@ -125,3 +125,11 @@ TARGET_PLATFORM_CXXFLAGS = \
 TARGET_PLATFORM_CXXINCS = -I/usr/include
 
 include make/linux.mk
+
+show_versions:
+	@echo ___ Target platform compiler:
+	$(CPP_TARGET_PLATFORM) --version
+	@echo ___ Dev platform compiler:
+	$(CPP_DEV_PLATFORM) --version
+	@echo ___ Cppcheck:
+	$(CPPCHECK) --version

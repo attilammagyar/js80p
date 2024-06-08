@@ -86,6 +86,7 @@ UPGRADE_PATCH = $(DEV_DIR)/upgrade-patch$(DEV_EXE)
 	log_tables_error_tsv \
 	perf \
 	show_fst_dir \
+	show_versions \
 	show_vst3_dir \
 	static_analysis \
 	test_example \
@@ -451,7 +452,14 @@ clean:
 		$(VSTXMLGEN_OBJS)
 	$(RM) $(API_DOC_DIR)/html/*.* $(API_DOC_DIR)/html/search/*.*
 
-check: perf $(CPPCHECK_DONE) upgrade_patch $(TEST_LIBS) $(TEST_BINS) | $(DEV_DIR)
+check: \
+	perf \
+	$(CPPCHECK_DONE) \
+	upgrade_patch \
+	$(TEST_LIBS) \
+	$(TEST_BINS) \
+	| $(DEV_DIR)
+
 check_basic: perf $(TEST_LIBS) $(TEST_BASIC_BINS) | $(DEV_DIR)
 check_dsp: perf $(TEST_LIBS) $(TEST_DSP_BINS) | $(DEV_DIR)
 check_param: perf $(TEST_LIBS) $(TEST_PARAM_BINS) | $(DEV_DIR)
@@ -459,7 +467,7 @@ check_synth: perf $(TEST_LIBS) $(TEST_SYNTH_BINS) | $(DEV_DIR)
 
 test_example: $(DEV_DIR)/test_example$(DEV_EXE) | $(DEV_DIR)
 
-perf: $(DEV_DIR) $(PERF_TEST_BINS)
+perf: $(PERF_TEST_BINS) | $(DEV_DIR)
 
 log_tables_error_tsv: $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE)
 
@@ -505,16 +513,16 @@ $(API_DOC_DIR)/html/index.html: \
 		| $(API_DOC_DIR)
 	$(DOXYGEN)
 
-$(FST): $(FST_EXTRA) $(FST_OBJS) | $(FST_DIR)
+$(FST): $(FST_EXTRA) $(FST_OBJS) | $(FST_DIR) show_versions
 	$(LINK_FST) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
-$(VST3): $(VST3_EXTRA) $(VST3_OBJS) | $(VST3_DIR)
+$(VST3): $(VST3_EXTRA) $(VST3_OBJS) | $(VST3_DIR) show_versions
 	$(LINK_VST3) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
 $(FST_DIR) $(VST3_DIR): | $(DIST_DIR_BASE)
 	$(MKDIR) $@
 
-$(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR)
+$(GUI_PLAYGROUND): $(GUI_PLAYGROUND_OBJS) | $(BUILD_DIR) show_versions
 	$(LINK_TARGET_EXE) $^ -o $@ $(TARGET_PLATFORM_LFLAGS)
 
 $(OBJ_TARGET_GUI_PLAYGROUND): \
@@ -523,7 +531,7 @@ $(OBJ_TARGET_GUI_PLAYGROUND): \
 		| $(BUILD_DIR)
 	$(COMPILE_TARGET) -c -o $@ $<
 
-$(UPGRADE_PATCH): $(UPGRADE_PATCH_OBJS) | $(DEV_DIR)
+$(UPGRADE_PATCH): $(UPGRADE_PATCH_OBJS) | $(DEV_DIR) show_versions
 	$(LINK_DEV_EXE) $^ -o $@
 
 $(OBJ_DEV_UPGRADE_PATCH): $(UPGRADE_PATCH_SOURCES) | $(DEV_DIR)
@@ -583,7 +591,7 @@ $(OBJ_TARGET_VST3_MAIN): $(VST3_MAIN_SOURCES) $(VST3_HEADERS) | $(BUILD_DIR)
 $(VSTXML): $(VSTXMLGEN) | $(DIST_DIR_BASE)
 	$(VSTXMLGEN) $(VSTXML)
 
-$(VSTXMLGEN): $(VSTXMLGEN_OBJS) | $(DEV_DIR)
+$(VSTXMLGEN): $(VSTXMLGEN_OBJS) | $(DEV_DIR) show_versions
 	$(LINK_DEV_EXE) $^ -o $@
 
 $(OBJ_DEV_VSTXMLGEN): $(VSTXMLGEN_SOURCES) $(FST_HEADERS) | $(DEV_DIR)
@@ -593,7 +601,8 @@ $(OBJ_DEV_VSTXMLGEN): $(VSTXMLGEN_SOURCES) $(FST_HEADERS) | $(DEV_DIR)
 
 $(DEV_DIR)/chord$(DEV_EXE): \
 		$(DEV_DIR)/chord.o \
-		$(OBJ_DEV_SYNTH) $(OBJ_DEV_SERIALIZER) $(OBJ_DEV_BANK) | $(DEV_DIR)
+		$(OBJ_DEV_SYNTH) $(OBJ_DEV_SERIALIZER) $(OBJ_DEV_BANK) \
+		| $(DEV_DIR) show_versions
 	$(LINK_DEV_EXE) $^ -o $@
 
 $(DEV_DIR)/chord.o: \
@@ -604,18 +613,18 @@ $(DEV_DIR)/perf_math$(DEV_EXE): \
 		tests/performance/perf_math.cpp \
 		src/dsp/math.hpp src/dsp/math.cpp \
 		src/js80p.hpp \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 
 $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE): \
 		scripts/log_tables_error_tsv.cpp \
 		src/dsp/math.cpp src/dsp/math.hpp \
 		src/js80p.hpp \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 
 $(DEV_DIR)/test_example$(DEV_EXE): \
-		tests/test_example.cpp $(TEST_LIBS) | $(DEV_DIR)
+		tests/test_example.cpp $(TEST_LIBS) | $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -624,7 +633,7 @@ $(DEV_DIR)/test_bank$(DEV_EXE): \
 		$(OBJ_DEV_SERIALIZER) \
 		$(OBJ_DEV_SYNTH) \
 		$(OBJ_DEV_TEST_BANK) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
 	$(RUN_WITH_VALGRIND) $@
@@ -633,7 +642,7 @@ $(OBJ_DEV_TEST_BANK): \
 		tests/test_bank.cpp \
 		$(BANK_HEADERS) $(SYNTH_HEADERS) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -c -o $@ $<
 
 $(DEV_DIR)/test_biquad_filter$(DEV_EXE): \
@@ -642,7 +651,7 @@ $(DEV_DIR)/test_biquad_filter$(DEV_EXE): \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -653,7 +662,7 @@ $(DEV_DIR)/test_biquad_filter_slow$(DEV_EXE): \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$@
@@ -665,7 +674,7 @@ $(DEV_DIR)/test_delay$(DEV_EXE): \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -Wno-maybe-uninitialized -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -676,7 +685,7 @@ $(DEV_DIR)/test_distortion$(DEV_EXE): \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -685,7 +694,7 @@ $(DEV_DIR)/test_envelope$(DEV_EXE): \
 		tests/test_envelope.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -695,7 +704,7 @@ $(DEV_DIR)/test_gain$(DEV_EXE): \
 		src/dsp/gain.cpp src/dsp/gain.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -705,7 +714,7 @@ $(DEV_DIR)/test_gui$(DEV_EXE): \
 		$(OBJ_DEV_SERIALIZER) \
 		$(OBJ_DEV_SYNTH) \
 		$(OBJ_DEV_TEST_GUI) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
 	$(RUN_WITH_VALGRIND) $@
@@ -719,7 +728,7 @@ $(DEV_DIR)/test_lfo$(DEV_EXE): \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -729,7 +738,7 @@ $(DEV_DIR)/test_lfo_envelope_list$(DEV_EXE): \
 		src/dsp/lfo_envelope_list.cpp src/dsp/lfo_envelope_list.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -737,7 +746,7 @@ $(DEV_DIR)/test_macro$(DEV_EXE): \
 		tests/test_macro.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -747,14 +756,14 @@ $(DEV_DIR)/test_math$(DEV_EXE): \
 		src/dsp/math.cpp src/dsp/math.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$@
 
 $(DEV_DIR)/test_midi$(DEV_EXE): \
 		tests/test_midi.cpp src/midi.hpp src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -764,7 +773,7 @@ $(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -775,7 +784,7 @@ $(DEV_DIR)/test_mixer$(DEV_EXE): \
 		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -786,7 +795,7 @@ $(DEV_DIR)/test_note_stack$(DEV_EXE): \
 		src/js80p.hpp \
 		src/midi.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -795,7 +804,7 @@ $(DEV_DIR)/test_oscillator$(DEV_EXE): \
 		src/dsp/wavetable.cpp src/dsp/wavetable.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -804,7 +813,7 @@ $(DEV_DIR)/test_param$(DEV_EXE): \
 		tests/test_param.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -813,7 +822,7 @@ $(DEV_DIR)/test_param_slow$(DEV_EXE): \
 		tests/test_param_slow.cpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$@
@@ -823,7 +832,7 @@ $(DEV_DIR)/test_peak_tracker$(DEV_EXE): \
 		src/dsp/peak_tracker.cpp src/dsp/peak_tracker.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -831,7 +840,7 @@ $(DEV_DIR)/test_queue$(DEV_EXE): \
 		tests/test_queue.cpp \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -841,7 +850,7 @@ $(DEV_DIR)/test_renderer$(DEV_EXE): \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -850,7 +859,7 @@ $(DEV_DIR)/test_serializer$(DEV_EXE): \
 		$(OBJ_DEV_SERIALIZER) \
 		$(OBJ_DEV_SYNTH) \
 		$(OBJ_DEV_TEST_SERIALIZER) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
 	$(RUN_WITH_VALGRIND) $@
@@ -859,7 +868,7 @@ $(OBJ_DEV_TEST_SERIALIZER): \
 		tests/test_serializer.cpp \
 		$(SERIALIZER_HEADERS) $(SYNTH_HEADERS) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -c -o $@ $<
 
 $(DEV_DIR)/test_signal_producer$(DEV_EXE): \
@@ -868,7 +877,7 @@ $(DEV_DIR)/test_signal_producer$(DEV_EXE): \
 		src/dsp/signal_producer.cpp src/dsp/signal_producer.hpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -877,7 +886,7 @@ $(DEV_DIR)/test_spscqueue$(DEV_EXE): \
 		src/spscqueue.hpp src/spscqueue.cpp \
 		src/js80p.hpp \
 		$(TEST_LIBS) \
-		| $(DEV_DIR)
+		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
@@ -886,7 +895,7 @@ $(DEV_DIR)/test_synth$(DEV_EXE): \
 		$(TEST_LIBS) \
 		$(SYNTH_HEADERS) \
 		$(SYNTH_SOURCES) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -901,7 +910,7 @@ $(DEV_DIR)/test_voice$(DEV_EXE): \
 		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
@@ -912,7 +921,7 @@ $(DEV_DIR)/test_wavefolder$(DEV_EXE): \
 		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
-		| $(DEV_DIR) \
+		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
