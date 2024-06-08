@@ -1914,16 +1914,16 @@ TEST(keeps_track_of_number_of_active_voices, {
     synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
     synth.note_off(0.5, 1, Midi::NOTE_A_3, 127);
 
-    assert_eq(0, synth.get_active_voices_count());
+    assert_eq(0, (int)synth.get_active_voices_count());
 
     SignalProducer::produce<Synth>(synth, 0);
-    assert_eq(2, synth.get_active_voices_count());
+    assert_eq(2, (int)synth.get_active_voices_count());
 
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
     SignalProducer::produce<Synth>(synth, 1);
-    assert_eq(1, synth.get_active_voices_count());
+    assert_eq(1, (int)synth.get_active_voices_count());
 
     synth.note_off(0.0, 1, Midi::NOTE_A_2, 127);
     SignalProducer::produce<Synth>(synth, 2);
-    assert_eq(0, synth.get_active_voices_count());
+    assert_eq(0, (int)synth.get_active_voices_count());
 })
