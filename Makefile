@@ -495,7 +495,7 @@ $(CPPCHECK_DONE): \
 		$(VSTXMLGEN_SOURCES) \
 		$(TEST_CPPS) \
 		$(TEST_LIBS) \
-		| $(BUILD_DIR)
+		| $(BUILD_DIR) show_versions
 	$(CPPCHECK) $(CPPCHECK_FLAGS) src/ tests/
 	echo > $@
 
