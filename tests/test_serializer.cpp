@@ -393,10 +393,10 @@ TEST(params_which_are_missing_from_the_patch_are_cleared_and_reset_to_default, {
         0.0,
         Synth::ControllerId::MODULATION_WHEEL
     );
-    SignalProducer::produce<Synth>(synth, 1);
+    synth.process_messages();
 
     synth.control_change(0.0, 0, Midi::MODULATION_WHEEL, 100);
-    SignalProducer::produce<Synth>(synth, 2);
+    synth.process_messages();
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
@@ -424,7 +424,7 @@ TEST(synth_message_queue_is_cleared_before_importing_patch_inside_audio_thread, 
         Synth::MessageType::SET_PARAM, Synth::ParamId::AM, 0.123, 0
     );
     Serializer::import_patch_in_audio_thread(synth, patch);
-    SignalProducer::produce<Synth>(synth, 1);
+    synth.process_messages();
 
     assert_eq(
         0.42, synth.get_param_ratio_atomic(Synth::ParamId::AM), DOUBLE_DELTA
@@ -443,7 +443,7 @@ TEST(can_import_patch_inside_the_gui_thread, {
         Synth::MessageType::SET_PARAM, Synth::ParamId::FM, 0.123, 0
     );
     Serializer::import_patch_in_gui_thread(synth, patch);
-    SignalProducer::produce<Synth>(synth, 1);
+    synth.process_messages();
 
     assert_eq(
         0.42, synth.get_param_ratio_atomic(Synth::ParamId::AM), DOUBLE_DELTA
