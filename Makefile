@@ -49,9 +49,11 @@ JS80P_CXXFLAGS = \
 	-D JS80P_INSTRUCTION_SET=$(INSTRUCTION_SET) \
 	-Wall \
 	-Werror \
+	-Wno-error=maybe-uninitialized \
 	-ffast-math \
 	-O3 \
 	-std=c++17
+# maybe-uninitialized: see PannedDelay(input, stereo_mode, tempo_sync) in src/dsp/delay.cpp
 
 ifneq ($(INSTRUCTION_SET),none)
 JS80P_CXXFLAGS += -m$(INSTRUCTION_SET)
@@ -676,7 +678,7 @@ $(DEV_DIR)/test_delay$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
-	$(COMPILE_DEV) -Wno-maybe-uninitialized -o $@ $<
+	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
 $(DEV_DIR)/test_distortion$(DEV_EXE): \
