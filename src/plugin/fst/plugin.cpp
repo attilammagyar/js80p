@@ -160,13 +160,15 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         void* pointer,
         float fvalue
 ) {
+    constexpr VstInt32 effIdle = 53; /* see the comment at the bottom */
+
     JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     // if (
             // true
             // && op_code != effEditIdle
             // && (op_code != effProcessEvents || fst_plugin->prev_logged_op_code != effProcessEvents)
-            // && op_code != 53
+            // && op_code != effIdle
             // && op_code != effGetProgram
             // && op_code != effGetProgramName
             // && op_code != effGetProductString
@@ -187,8 +189,6 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             // fvalue
         // );
     // }
-
-    constexpr VstInt32 effIdle = 53; /* see the comment at the bottom */
 
     switch (op_code) {
         case effProcessEvents:
