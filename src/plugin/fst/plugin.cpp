@@ -299,15 +299,20 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         case effCanDo:
             /*
             Though receiveVstMidiEvent should be enough, JUCE's implementation
-            of effCanDo checks the other two as well, probably for good reason,
+            of effCanDo checks the others as well, probably for good reason,
             e.g. compatibility with certain hosts.
             */
             if (
                     strcmp("receiveVstMidiEvent", (char const*)pointer) == 0
                     || strcmp("receiveVstMidiEvents", (char const*)pointer) == 0
                     || strcmp("receiveVstEvents", (char const*)pointer) == 0
+                    || strcmp("receiveVstTimeInfo", (char const*)pointer) == 0
             ) {
                 return 1;
+            }
+
+            if (strcmp("openCloseAnyThread", (char const*)pointer) == 0) {
+                return -1;
             }
 
             // JS80P_DEBUG(
