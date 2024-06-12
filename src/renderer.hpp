@@ -32,8 +32,7 @@ namespace JS80P
 class Renderer
 {
     public:
-        enum Operation
-        {
+        enum Operation {
             ADD = 0,
             OVERWRITE = 1,
         };

@@ -87,8 +87,7 @@ class Serializer
         ) noexcept;
 
     private:
-        enum Thread
-        {
+        enum Thread {
             AUDIO = 0,
             GUI = 1,
         };

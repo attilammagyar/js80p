@@ -43,8 +43,7 @@ class Macro;
 class LFO;
 
 
-enum ParamEvaluation
-{
+enum ParamEvaluation {
     BLOCK = 0,  ///< The parameter is evaluated once at the beginning of each rendering block
     SAMPLE = 1, ///< The parameter is evaluated for each rendered sample
 };

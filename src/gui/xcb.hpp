@@ -72,8 +72,7 @@ class XcbPlatform
         bool is_file_selector_dialog_open() const;
 
     private:
-        enum FileSelectorDialogType
-        {
+        enum FileSelectorDialogType {
             NONE = 0,
             EXPORT = 1,
             IMPORT = 2,

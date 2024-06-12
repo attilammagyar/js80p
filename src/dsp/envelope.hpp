@@ -73,8 +73,7 @@ namespace JS80P
 class Envelope
 {
     public:
-        enum RenderingMode
-        {
+        enum RenderingMode {
             OVERWRITE = 0,
             MULTIPLY = 1,
         };

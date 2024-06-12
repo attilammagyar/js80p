@@ -50,8 +50,7 @@ class Wavetable
     */
 
     public:
-        enum Interpolation
-        {
+        enum Interpolation {
             DYNAMIC = 0,
             LINEAR_ONLY = 1,
             LAGRANGE_ONLY = 2,
