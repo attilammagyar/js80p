@@ -1342,8 +1342,6 @@ void GUI::param_ratio_to_str(
     } else {
         param_ratio_to_str_int(synth, param_id, ratio, buffer, buffer_size);
     }
-
-    buffer[buffer_size - 1] = '\x00';
 }
 
 
@@ -1377,6 +1375,8 @@ void GUI::param_ratio_to_str_float(
     if (minus_zero) {
         snprintf(buffer, buffer_size, format, 0.0);
     }
+
+    buffer[buffer_size - 1] = '\x00';
 }
 
 
@@ -1400,6 +1400,7 @@ void GUI::param_ratio_to_str_options(
     }
 
     strncpy(buffer, options[value], buffer_size - 1);
+    buffer[buffer_size - 1] = '\x00';
 }
 
 
