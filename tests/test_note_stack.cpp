@@ -60,6 +60,9 @@ using namespace JS80P;
         assert_eq(expected_channel, channel);                                       \
         assert_eq(expected_note, note);                                             \
                                                                                     \
+        channel = Midi::INVALID_CHANNEL;                                            \
+        note = Midi::INVALID_NOTE;                                                  \
+                                                                                    \
         note_stack.top(channel, note, velocity);                                    \
         assert_eq(expected_channel, channel);                                       \
         assert_eq(expected_note, note);                                             \
