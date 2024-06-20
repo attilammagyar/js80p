@@ -134,7 +134,6 @@ class Envelope
         explicit Envelope(std::string const& name) noexcept;
 
         void update() noexcept;
-        Integer get_change_index() const noexcept;
 
         bool is_dynamic() const noexcept;
         bool is_static() const noexcept;
@@ -153,6 +152,9 @@ class Envelope
             Byte const envelope_index,
             EnvelopeSnapshot& snapshot
         ) const noexcept;
+
+        Number get_sustain_value(EnvelopeRandoms const& randoms) const noexcept;
+        Number get_final_value(EnvelopeRandoms const& randoms) const noexcept;
 
         ByteParam update_mode;
         ToggleParam tempo_sync;
@@ -281,9 +283,6 @@ class Envelope
 
         void update_bpm(Number const new_bpm) noexcept;
 
-        template<class ParamType>
-        bool update_change_index(ParamType const& param, Integer& change_index) noexcept;
-
         Number randomize_value(
             FloatParamB const& param,
             Number const random
@@ -296,25 +295,6 @@ class Envelope
 
         Number bpm;
         Number tempo_sync_time_scale;
-
-        Integer update_mode_change_index;
-        Integer tempo_sync_change_index;
-        Integer attack_shape_change_index;
-        Integer decay_shape_change_index;
-        Integer release_shape_change_index;
-        Integer scale_change_index;
-        Integer initial_value_change_index;
-        Integer delay_time_change_index;
-        Integer attack_time_change_index;
-        Integer peak_value_change_index;
-        Integer hold_time_change_index;
-        Integer decay_time_change_index;
-        Integer sustain_value_change_index;
-        Integer release_time_change_index;
-        Integer final_value_change_index;
-        Integer time_inaccuracy_change_index;
-        Integer value_inaccuracy_change_index;
-        Integer change_index;
 };
 
 }

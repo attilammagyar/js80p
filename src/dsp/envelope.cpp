@@ -41,7 +41,6 @@ EnvelopeSnapshot::EnvelopeSnapshot() noexcept
     hold_time(0.3),
     decay_time(0.6),
     release_time(0.1),
-    change_index(-1),
     attack_shape(Envelope::SHAPE_LINEAR),
     decay_shape(Envelope::SHAPE_LINEAR),
     release_shape(Envelope::SHAPE_LINEAR),
@@ -691,25 +690,7 @@ Envelope::Envelope(std::string const& name) noexcept
     release_time(name + "REL",      0.0,    6.0,  0.1),
     final_value(name + "FIN",       0.0,    1.0,  0.0),
     time_inaccuracy(name + "TIN",   0.0,    1.0,  0.0),
-    value_inaccuracy(name + "VIN",  0.0,    1.0,  0.0),
-    update_mode_change_index(-1),
-    tempo_sync_change_index(-1),
-    attack_shape_change_index(-1),
-    decay_shape_change_index(-1),
-    release_shape_change_index(-1),
-    scale_change_index(-1),
-    initial_value_change_index(-1),
-    delay_time_change_index(-1),
-    attack_time_change_index(-1),
-    peak_value_change_index(-1),
-    hold_time_change_index(-1),
-    decay_time_change_index(-1),
-    sustain_value_change_index(-1),
-    release_time_change_index(-1),
-    final_value_change_index(-1),
-    time_inaccuracy_change_index(-1),
-    value_inaccuracy_change_index(-1),
-    change_index(-1)
+    value_inaccuracy(name + "VIN",  0.0,    1.0,  0.0)
 {
     update_bpm(tempo_sync.get_bpm());
     update();
@@ -727,49 +708,13 @@ void Envelope::update_bpm(Number const new_bpm) noexcept
 
 void Envelope::update() noexcept
 {
-    bool is_dirty;
-
-    is_dirty = update_change_index(delay_time, delay_time_change_index);
-    is_dirty = update_change_index(attack_time, attack_time_change_index) || is_dirty;
-    is_dirty = update_change_index(hold_time, hold_time_change_index) || is_dirty;
-    is_dirty = update_change_index(decay_time, decay_time_change_index) || is_dirty;
-
-    is_dirty = update_change_index<ByteParam>(update_mode, update_mode_change_index) || is_dirty;
-    is_dirty = update_change_index<ToggleParam>(tempo_sync, tempo_sync_change_index) || is_dirty;
-
-    is_dirty = update_change_index<ShapeParam>(attack_shape, attack_shape_change_index) || is_dirty;
-    is_dirty = update_change_index<ShapeParam>(decay_shape, decay_shape_change_index) || is_dirty;
-    is_dirty = update_change_index<ShapeParam>(release_shape, release_shape_change_index) || is_dirty;
-
-    is_dirty = update_change_index(scale, scale_change_index) || is_dirty;
-    is_dirty = update_change_index(initial_value, initial_value_change_index) || is_dirty;
-    is_dirty = update_change_index(peak_value, peak_value_change_index) || is_dirty;
-    is_dirty = update_change_index(sustain_value, sustain_value_change_index) || is_dirty;
-    is_dirty = update_change_index(release_time, release_time_change_index) || is_dirty;
-    is_dirty = update_change_index(final_value, final_value_change_index) || is_dirty;
-
-    is_dirty = update_change_index(time_inaccuracy, time_inaccuracy_change_index) || is_dirty;
-    is_dirty = update_change_index(value_inaccuracy, value_inaccuracy_change_index) || is_dirty;
-
     if (is_tempo_synced()) {
         Number const new_bpm = tempo_sync.get_bpm();
 
         if (JS80P_UNLIKELY(!Math::is_close(bpm, new_bpm))) {
             update_bpm(new_bpm);
-            is_dirty = true;
         }
     }
-
-    if (is_dirty) {
-        ++change_index;
-        change_index &= 0x7fffffff;
-    }
-}
-
-
-Integer Envelope::get_change_index() const noexcept
-{
-    return change_index;
 }
 
 
@@ -807,28 +752,11 @@ bool Envelope::needs_update(Byte const voice_status) const noexcept
 }
 
 
-template<class ParamType = FloatParamB>
-bool Envelope::update_change_index(ParamType const& param, Integer& change_index) noexcept
-{
-    Integer const new_change_index = param.get_change_index();
-
-    if (new_change_index != change_index) {
-        change_index = new_change_index;
-
-        return true;
-    }
-
-    return false;
-}
-
-
 void Envelope::make_snapshot(
         EnvelopeRandoms const& randoms,
         Byte const envelope_index,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
-    snapshot.change_index = get_change_index();
-
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.initial_value = randomize_value(initial_value, randoms[0]);
         snapshot.peak_value = randomize_value(peak_value, randoms[1]);
@@ -873,13 +801,31 @@ void Envelope::make_snapshot(
 }
 
 
+Number Envelope::get_sustain_value(EnvelopeRandoms const& randoms) const noexcept
+{
+    if (value_inaccuracy.get_value() > 0.000001) {
+        return randomize_value(sustain_value, randoms[2]);
+    }
+
+    return sustain_value.get_value() * scale.get_value();
+}
+
+
+Number Envelope::get_final_value(EnvelopeRandoms const& randoms) const noexcept
+{
+    if (value_inaccuracy.get_value() > 0.000001) {
+        return randomize_value(final_value, randoms[3]);
+    }
+
+    return final_value.get_value() * scale.get_value();
+}
+
+
 void Envelope::make_end_snapshot(
         EnvelopeRandoms const& randoms,
         Byte const envelope_index,
         EnvelopeSnapshot& snapshot
 ) const noexcept {
-    snapshot.change_index = get_change_index();
-
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.final_value = randomize_value(final_value, randoms[3]);
     } else {
