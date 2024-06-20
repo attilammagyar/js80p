@@ -218,8 +218,6 @@ class EnvelopeSnapshot
         Seconds decay_time;
         Seconds release_time;
 
-        Integer change_index;
-
         EnvelopeShape attack_shape;
         EnvelopeShape decay_shape;
         EnvelopeShape release_shape;
