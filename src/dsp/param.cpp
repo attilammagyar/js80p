@@ -923,12 +923,13 @@ bool FloatParam<evaluation>::is_constant_until(
 
             envelope->update();
 
-            Integer const envelope_change_index = envelope->get_change_index();
-            Integer const snapshot_change_index = (
-                envelope_state->get_active_snapshot().change_index
+            return (
+                envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED
+                || Math::is_close(
+                    value_to_ratio(this->get_raw_value()),
+                    envelope->get_sustain_value(envelope_state->randoms)
+                )
             );
-
-            return snapshot_change_index == envelope_change_index;
         }
 
         return (
@@ -1282,10 +1283,6 @@ void FloatParam<evaluation>::update_envelope_state_if_required(
 
     envelope.update();
 
-    if (envelope_snapshot.change_index == envelope.get_change_index()) {
-        return;
-    }
-
     Seconds const old_release_time = envelope_snapshot.release_time;
 
     switch (stage) {
@@ -1518,7 +1515,6 @@ void FloatParam<evaluation>::handle_lfo_envelope_end_event(
             this->sampling_period
         );
 
-        snapshot.change_index = event.int_param;
         snapshot.final_value = event.number_param_1;
         snapshot.release_time = (Seconds)event.number_param_2;
     }
@@ -1971,7 +1967,7 @@ Seconds FloatParam<evaluation>::end_lfo_envelope(
             this->schedule(
                 event_type,
                 time_offset,
-                envelope.get_change_index(),
+                0,
                 snapshot.final_value,
                 std::min(snapshot.release_time, duration),
                 i
@@ -1981,7 +1977,7 @@ Seconds FloatParam<evaluation>::end_lfo_envelope(
             this->schedule(
                 event_type,
                 time_offset,
-                envelope.get_change_index(),
+                0,
                 snapshot.final_value,
                 snapshot.release_time,
                 i
