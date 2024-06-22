@@ -419,19 +419,19 @@ Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
 
 Number Math::shape_sharp_smooth(Number const x) noexcept
 {
-    return x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001));
+    return x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001));
 }
 
 
 Number Math::shape_sharp_smooth_steep(Number const x) noexcept
 {
-    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001)), 2.0 / 3.0);
+    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 2.0 / 3.0);
 }
 
 
 Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
 {
-    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - log(1.001)), 1.0 / 3.0);
+    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 1.0 / 3.0);
 }
 
 
