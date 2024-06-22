@@ -268,8 +268,8 @@ class Math
         ) noexcept;
 
         /**
-         * \brief Apply a steep, tanh() based distortion to the given value
-         *        between 0.0 and 1.0.
+         * \brief Apply the selected distortion to the given value between
+         *        0.0 and 1.0.
          */
         static Number distort(
             Number const level,
