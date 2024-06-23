@@ -1587,7 +1587,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer BIQUAD_FILTER_SHARED_BUFFERS = 6;
 
         static std::vector<bool> supported_midi_controllers;
-        static bool supported_midi_controllers_initialized;
 
         static ParamIdHashTable param_id_hash_table;
         static std::string param_names_by_id[ParamId::PARAM_ID_COUNT];
@@ -1602,7 +1601,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Carrier::Params const& carrier_params
         ) noexcept;
 
-        void initialize_supported_midi_controllers() noexcept;
+        static std::vector<bool> initialize_supported_midi_controllers() noexcept;
 
         void build_frequency_table() noexcept;
         void register_main_params() noexcept;
