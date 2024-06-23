@@ -306,7 +306,7 @@ void Vst3Plugin::Processor::collect_param_change_events(
 
     int32 numParamsChanged = data.inputParameterChanges->getParameterCount();
 
-    for (int32 i = 0; i != numParamsChanged; i++) {
+    for (int32 i = 0; i < numParamsChanged; i++) {
         Vst::IParamValueQueue* param_queue = (
             data.inputParameterChanges->getParameterData(i)
         );
@@ -358,7 +358,7 @@ void Vst3Plugin::Processor::collect_param_change_events_as(
     Vst::ParamValue value;
     int32 sample_offset;
 
-    for (int32 i = 0; i != number_of_points; ++i) {
+    for (int32 i = 0; i < number_of_points; ++i) {
         if (param_queue->getPoint(i, sample_offset, value) != kResultTrue) {
             continue;
         }
@@ -387,7 +387,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
     int32 count = input_events->getEventCount();
     Vst::Event event;
 
-    for (int32 i = 0; i != count; ++i) {
+    for (int32 i = 0; i < count; ++i) {
         if (input_events->getEvent(i, event) != kResultTrue) {
             continue;
         }
