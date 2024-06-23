@@ -35,6 +35,7 @@
 
 #include "bank.hpp"
 #include "js80p.hpp"
+#include "midi.hpp"
 #include "mtsesp.hpp"
 #include "renderer.hpp"
 #include "synth.hpp"
