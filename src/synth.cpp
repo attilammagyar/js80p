@@ -63,9 +63,86 @@
 namespace JS80P
 {
 
-std::vector<bool> Synth::supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
+std::vector<bool> Synth::initialize_supported_midi_controllers() noexcept
+{
+    std::vector<bool> supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
 
-bool Synth::supported_midi_controllers_initialized = false;
+    supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
+    supported_midi_controllers[ControllerId::BREATH] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_1] = true;
+    supported_midi_controllers[ControllerId::FOOT_PEDAL] = true;
+    supported_midi_controllers[ControllerId::PORTAMENTO_TIME] = true;
+    supported_midi_controllers[ControllerId::VOLUME] = true;
+    supported_midi_controllers[ControllerId::BALANCE] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_2] = true;
+    supported_midi_controllers[ControllerId::PAN] = true;
+    supported_midi_controllers[ControllerId::EXPRESSION_PEDAL] = true;
+    supported_midi_controllers[ControllerId::FX_CTL_1] = true;
+    supported_midi_controllers[ControllerId::FX_CTL_2] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_3] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_4] = true;
+    supported_midi_controllers[ControllerId::GENERAL_1] = true;
+    supported_midi_controllers[ControllerId::GENERAL_2] = true;
+    supported_midi_controllers[ControllerId::GENERAL_3] = true;
+    supported_midi_controllers[ControllerId::GENERAL_4] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_5] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_6] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_7] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_8] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_9] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_10] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_11] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_12] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_13] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_14] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_15] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_16] = true;
+    supported_midi_controllers[ControllerId::SUSTAIN_PEDAL] = true;
+    supported_midi_controllers[ControllerId::SOUND_1] = true;
+    supported_midi_controllers[ControllerId::SOUND_2] = true;
+    supported_midi_controllers[ControllerId::SOUND_3] = true;
+    supported_midi_controllers[ControllerId::SOUND_4] = true;
+    supported_midi_controllers[ControllerId::SOUND_5] = true;
+    supported_midi_controllers[ControllerId::SOUND_6] = true;
+    supported_midi_controllers[ControllerId::SOUND_7] = true;
+    supported_midi_controllers[ControllerId::SOUND_8] = true;
+    supported_midi_controllers[ControllerId::SOUND_9] = true;
+    supported_midi_controllers[ControllerId::SOUND_10] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_17] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_18] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_19] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_20] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_21] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_22] = true;
+    supported_midi_controllers[ControllerId::FX_1] = true;
+    supported_midi_controllers[ControllerId::FX_2] = true;
+    supported_midi_controllers[ControllerId::FX_3] = true;
+    supported_midi_controllers[ControllerId::FX_4] = true;
+    supported_midi_controllers[ControllerId::FX_5] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_23] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_24] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_25] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_26] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_27] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_28] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_29] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_30] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_31] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_32] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_33] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_34] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_35] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_36] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_37] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_38] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
+    supported_midi_controllers[ControllerId::UNDEFINED_40] = true;
+
+    return supported_midi_controllers;
+}
+
+
+std::vector<bool> Synth::supported_midi_controllers = Synth::initialize_supported_midi_controllers();
 
 
 Synth::ParamIdHashTable Synth::param_id_hash_table;
@@ -170,8 +247,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     deferred_note_offs.reserve(2 * POLYPHONY);
 
-    initialize_supported_midi_controllers();
-
     allocate_buffers();
 
     for (int i = 0; i != (int)ParamId::PARAM_ID_COUNT; ++i) {
@@ -228,91 +303,6 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     vol_3_peak.clear();
 
     update_param_states();
-}
-
-
-void Synth::initialize_supported_midi_controllers() noexcept
-{
-    if (supported_midi_controllers_initialized) {
-        return;
-    }
-
-    supported_midi_controllers_initialized = true;
-
-    std::vector<bool> supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
-
-    supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
-    supported_midi_controllers[ControllerId::BREATH] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_1] = true;
-    supported_midi_controllers[ControllerId::FOOT_PEDAL] = true;
-    supported_midi_controllers[ControllerId::PORTAMENTO_TIME] = true;
-    supported_midi_controllers[ControllerId::VOLUME] = true;
-    supported_midi_controllers[ControllerId::BALANCE] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_2] = true;
-    supported_midi_controllers[ControllerId::PAN] = true;
-    supported_midi_controllers[ControllerId::EXPRESSION_PEDAL] = true;
-    supported_midi_controllers[ControllerId::FX_CTL_1] = true;
-    supported_midi_controllers[ControllerId::FX_CTL_2] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_3] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_4] = true;
-    supported_midi_controllers[ControllerId::GENERAL_1] = true;
-    supported_midi_controllers[ControllerId::GENERAL_2] = true;
-    supported_midi_controllers[ControllerId::GENERAL_3] = true;
-    supported_midi_controllers[ControllerId::GENERAL_4] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_5] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_6] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_7] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_8] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_9] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_10] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_11] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_12] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_13] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_14] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_15] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_16] = true;
-    supported_midi_controllers[ControllerId::SUSTAIN_PEDAL] = true;
-    supported_midi_controllers[ControllerId::SOUND_1] = true;
-    supported_midi_controllers[ControllerId::SOUND_2] = true;
-    supported_midi_controllers[ControllerId::SOUND_3] = true;
-    supported_midi_controllers[ControllerId::SOUND_4] = true;
-    supported_midi_controllers[ControllerId::SOUND_5] = true;
-    supported_midi_controllers[ControllerId::SOUND_6] = true;
-    supported_midi_controllers[ControllerId::SOUND_7] = true;
-    supported_midi_controllers[ControllerId::SOUND_8] = true;
-    supported_midi_controllers[ControllerId::SOUND_9] = true;
-    supported_midi_controllers[ControllerId::SOUND_10] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_17] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_18] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_19] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_20] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_21] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_22] = true;
-    supported_midi_controllers[ControllerId::FX_1] = true;
-    supported_midi_controllers[ControllerId::FX_2] = true;
-    supported_midi_controllers[ControllerId::FX_3] = true;
-    supported_midi_controllers[ControllerId::FX_4] = true;
-    supported_midi_controllers[ControllerId::FX_5] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_23] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_24] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_25] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_26] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_27] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_28] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_29] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_30] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_31] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_32] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_33] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_34] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_35] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_36] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_37] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_38] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_39] = true;
-    supported_midi_controllers[ControllerId::UNDEFINED_40] = true;
-
-    Synth::supported_midi_controllers = supported_midi_controllers;
 }
 
 
