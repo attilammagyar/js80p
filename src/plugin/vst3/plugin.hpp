@@ -148,7 +148,7 @@ class Vst3Plugin
 
                 void collect_note_events(Vst::ProcessData& data) noexcept;
                 void process_events() noexcept;
-                void process_event(Event const event) noexcept;
+                void process_event(Event const& event) noexcept;
 
                 Midi::Byte float_to_midi_byte(Number const number) const noexcept;
                 Midi::Word float_to_midi_word(Number const number) const noexcept;

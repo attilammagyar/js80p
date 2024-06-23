@@ -447,7 +447,7 @@ void Vst3Plugin::Processor::process_events() noexcept
 }
 
 
-void Vst3Plugin::Processor::process_event(Event const event) noexcept
+void Vst3Plugin::Processor::process_event(Event const& event) noexcept
 {
     switch (event.type) {
         case Event::Type::NOTE_ON: {
