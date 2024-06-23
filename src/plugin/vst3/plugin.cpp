@@ -240,13 +240,10 @@ tresult PLUGIN_API Vst3Plugin::Processor::setupProcessing(Vst::ProcessSetup& set
 
 tresult PLUGIN_API Vst3Plugin::Processor::setActive(TBool state)
 {
-    if (state)
-    {
+    if (state) {
         synth.resume();
         renderer.reset();
-    }
-    else
-    {
+    } else {
         synth.suspend();
         renderer.reset();
     }
