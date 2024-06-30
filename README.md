@@ -114,6 +114,7 @@ Table of Contents
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
+    * [Why do you say FST instead of VST 2?](#faq-fst)
     * [Parameters, Envelopes, LFOs, and polyphony: how do they work?](#faq-params-polyphony)
     * [The knobs in the waveform harmonics section don't do anything, is this a bug?](#faq-custom-wave)
     * [How can parameters be automated? What parameters does the plugin export?](#faq-automation)
@@ -2244,6 +2245,20 @@ would be available (at a reasonable price) for installing it in a virtual
 machine that could be used for testing, I'd consider that. But as long as it
 cannot be obtained (legally) without also buying a Mac, and I'm happy with my
 current computer, I'm not going to invest in a new one.
+
+<a id="faq-fst" href="#toc">Table of Contents</a>
+
+### Why do you say FST instead of VST 2?
+
+> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
+> Europe and other countries.
+
+I'm not a lawyer, so I have no idea if it would count as trademark infringement
+if I claimed VST 2.4 compatibility for JS80P without obtaining a license
+from Steinberg Media Technologies GmbH, so I don't do it. Instead, I use the
+name of an open source programming library which makes it possible to build
+plugins that can be loaded into VST 2.4 hosts without that license:
+[FST](https://git.iem.at/zmoelnig/FST).
 
 <a id="faq-params-polyphony" href="#toc">Table of Contents</a>
 
