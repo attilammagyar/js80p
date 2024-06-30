@@ -2255,9 +2255,10 @@ current computer, I'm not going to invest in a new one.
 
 I'm not a lawyer, so I have no idea if it would count as trademark infringement
 if I claimed VST 2.4 compatibility for JS80P without obtaining a license
-from Steinberg Media Technologies GmbH, so I don't do it. Instead, I use the
-name of an open source programming library which makes it possible to build
-plugins that can be loaded into VST 2.4 hosts without that license:
+from Steinberg Media Technologies GmbH, so I don't do it, especially since they
+no longer issue new licenses for VST 2 to anybody. Instead, I use the name of
+an open source programming library which makes it possible to build plugins
+that can be loaded into VST 2.4 hosts without that license:
 [FST](https://git.iem.at/zmoelnig/FST).
 
 <a id="faq-params-polyphony" href="#toc">Table of Contents</a>
