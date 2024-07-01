@@ -208,7 +208,9 @@ Features
  * Override the primary function of the sustain pedal, and use it as a toggle
    switch for various parameters and macros.
 
-<a id="install" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="install"></a>
 
 Installation
 ------------
@@ -306,7 +308,9 @@ These are the file names that you will find on GitHub on the
       compile for any CPU architecture. (See the "[Development](#dev)" section
       for the details.)
 
-<a id="system-reqs" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="system-reqs"></a>
 
 ### System Requirements
 
@@ -459,7 +463,9 @@ and put it in the `/usr/local/lib` directory, if it is not already installed on
 your system.  As of November, 2023, `libMTS.so` is only available for `x86_64`
 Linux systems.
 
-<a id="usage" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage"></a>
 
 Usage
 -----
@@ -493,7 +499,9 @@ Usage
             v
             Volume --> Chorus --> Echo --> Reverb --> Volume --> Out
 
-<a id="usage-knobs" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-knobs"></a>
 
 ### Knobs
 
@@ -527,7 +535,9 @@ to emulate semi-polyphonic behaviour by associating them with
 [low-frequency oscillators](#usage-lfos) that have envelope generators
 associated with them.
 
-<a id="usage-controllers" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-controllers"></a>
 
 ### Controllers
 
@@ -612,7 +622,9 @@ momentary value (on a relative scale between 0% and 100%) of a
 
  * **Envelopes**: see [envelope generators](#usage-envelopes).
 
-<a id="usage-synth" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-synth"></a>
 
 ### Synthesizer (Synth)
 
@@ -751,7 +763,9 @@ Turn it up to have the first oscillator modulate the amplitude of the second
 oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
 position.
 
-<a id="usage-synth-common" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-synth-common"></a>
 
 #### Common Oscillator Settings
 
@@ -1029,7 +1043,9 @@ Selects the waveform of the oscillator. The available options are:
    10 knobs in the _Waveform & harmonics for the Custom waveform_ section.
    Useful for emulating tonewheel organ sounds.
 
-<a id="usage-synth-modulator" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-synth-modulator"></a>
 
 #### Oscillator 1 (Modulator)
 
@@ -1047,7 +1063,9 @@ plays a sine wave exactly one octave below the oscillator's main frequency.
 Same as the [distortions](#usage-effects-distortions) on the
 [Effects](#usage-effects) tab, but with polyphonic controller capabilities.
 
-<a id="usage-effects" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-effects"></a>
 
 ### Effects
 
@@ -1274,7 +1292,9 @@ Control the loudness of the chorused signal.
 
 Control the loudness of the original, unmodified input signal.
 
-<a id="usage-effects-echo" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-effects-echo"></a>
 
 #### Echo
 
@@ -1409,7 +1429,9 @@ Control the loudness of the echo signal.
 
 Control the loudness of the original, unmodified input signal.
 
-<a id="usage-effects-reverb" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-effects-reverb"></a>
 
 #### Reverb
 
@@ -1440,7 +1462,9 @@ Control how reflective the room is, in other words, how loud are the sounds
 that bounce off its walls. The higher this value, the longer it takes for the
 reverberation to decay into silence after the raw input signal goes quiet.
 
-<a id="usage-macros" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-macros"></a>
 
 ### Macros (MC)
 
@@ -1522,7 +1546,9 @@ Tell how far the macro should diverge from the linear path between its
 Set how much the macro's value should be randomized while still staying between
 the [minimum](#usage-macros-min) and [maximum](#usage-macros-max) values.
 
-<a id="usage-envelopes" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-envelopes"></a>
 
 ### Envelope Generators (ENV)
 
@@ -1734,7 +1760,9 @@ How long it will take to reach the sustain level from the peak level.
 How long it will take to reach the final level from the value where the
 parameter is at when the Note Stop event is received.
 
-<a id="usage-lfos" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-lfos"></a>
 
 ### Low-Frequency Oscillators (LFOs)
 
@@ -1834,7 +1862,9 @@ Distort the waveform with a soft clipping distortion.
 
 Randomize the waveform.
 
-<a id="usage-gc" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-gc"></a>
 
 ### Voice Management, Garbage Collector
 
@@ -1873,7 +1903,9 @@ does something similar with voices and oscillators which go silent: such
 oscillators and voices are stopped and released so that they can be allocated
 for newly triggered notes.
 
-<a id="presets" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="presets"></a>
 
 Presets
 -------
@@ -2221,7 +2253,9 @@ A version of the Analog Brass mod preset, demonstrating last note
 semi-polyphonic aftertouch (channel pressure) being applied to a polyphonic
 LFO.
 
-<a id="bugs" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="bugs"></a>
 
 Bugs
 ----
@@ -2229,7 +2263,9 @@ Bugs
 If you find bugs, please report them at
 [https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
 
-<a id="faq" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq"></a>
 
 Frequently Asked Questions
 --------------------------
@@ -2246,7 +2282,9 @@ machine that could be used for testing, I'd consider that. But as long as it
 cannot be obtained (legally) without also buying a Mac, and I'm happy with my
 current computer, I'm not going to invest in a new one.
 
-<a id="faq-fst" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-fst"></a>
 
 ### Why do you say FST instead of VST 2?
 
@@ -2261,7 +2299,9 @@ an open source programming library which makes it possible to build plugins
 that can be loaded into VST 2.4 hosts without that license:
 [FST](https://git.iem.at/zmoelnig/FST).
 
-<a id="faq-params-polyphony" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-params-polyphony"></a>
 
 ### Parameters, Envelopes, LFOs, and polyphony: how do they work?
 
@@ -2310,7 +2350,9 @@ envelope generator: turn up all the levels of the envelope to 100%, assign the
 MIDI value or the macro to the [amount](#usage-envelopes-amt) parameter of the
 envelope, and assign the envelope to control the parameter.
 
-<a id="faq-custom-wave" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-custom-wave"></a>
 
 ### The knobs in the waveform harmonics section don't do anything, is this a bug?
 
@@ -2322,7 +2364,9 @@ accurate, they are not smoothed, and they are processed only once for each
 rendering block. Due to this, if you change them while a note is playing, or
 assign a controller to them, then you might hear "steps" or even clicks.
 
-<a id="faq-automation" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-automation"></a>
 
 ### How can parameters be automated? What parameters does the plugin export?
 
@@ -2347,7 +2391,9 @@ to the `MIDI CC 1 (Modulation Wheel)` (VST 3) or `ModWh` (FST) parameter. JS80P
 will then interpret the changes of this parameter the same way as if you were
 turning the modulation wheel on a MIDI keyboard.
 
-<a id="faq-pm-fm" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-pm-fm"></a>
 
 ### Aren't Phase Modulation and Frequency Modulation equivalent? Why have both?
 
@@ -2357,7 +2403,9 @@ simple sinusoid. With each added harmonic to the modulator, PM and FM start to
 differ more and more. A detailed mathematical explanation of this is shown in
 [doc/pm-fm-equivalence.pdf](https://github.com/attilammagyar/js80p/blob/main/doc/pm-fm-equivalence.pdf).
 
-<a id="faq-name" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-name"></a>
 
 ### Where does the name come from?
 
@@ -2374,7 +2422,9 @@ and so JS80P was born.
   [cs80]: https://en.wikipedia.org/wiki/Yamaha_CS-80
   [js80]: https://attilammagyar.github.io/toys/js-80/
 
-<a id="faq-flstudio-midicc" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-flstudio-midicc"></a>
 
 ### FL Studio: How to assign a MIDI CC to a JS80P knob?
 
@@ -2409,7 +2459,9 @@ Modulation (PM)_ virtual knob in JS80P, you have to do the following steps:
 6. Select either the "_MIDI CC 7 (Volume)_" option, or the "_MIDI Learn_"
    option, and turn the physical knob on your MIDI keyboard again.
 
-<a id="faq-flstudio-aftertouch" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-flstudio-aftertouch"></a>
 
 ### FL Studio: How to assign Channel Pressure (Aftertouch) to a JS80P knob?
 
@@ -2442,7 +2494,9 @@ virtual knob in JS80P, you have to do the following steps:
 
 7. Select the "_Channel Aftertouch_" option.
 
-<a id="faq-flstudio-sustain" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="faq-flstudio-sustain"></a>
 
 ### FL Studio: How to set up the Sustain Pedal?
 
@@ -2481,7 +2535,9 @@ plugins.
 
 7. Press the pedal.
 
-<a id="dev" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="dev"></a>
 
 Development
 -----------
@@ -2571,7 +2627,9 @@ The following commands (on a 64 bit Linux environment) will compile JS80P for
     TARGET_PLATFORM=i686-gpp make all
     TARGET_PLATFORM=riscv64-gpp make all
 
-<a id="dev-theory" href="#toc">Table of Contents</a>
+<a href="#toc">Table of Contents</a>
+
+<a id="dev-theory"></a>
 
 ### Theory
 
