@@ -186,11 +186,11 @@ void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
     velocity = velocities[item];
     decode(item, channel, note);
 
-    update_extremes(item);
+    update_extremes_after_remove(item);
 }
 
 
-void NoteStack::update_extremes(Midi::Word const changed_item) noexcept
+void NoteStack::update_extremes_after_remove(Midi::Word const changed_item) noexcept
 {
     if (is_empty()) {
         lowest_ = INVALID_ITEM;
@@ -199,12 +199,20 @@ void NoteStack::update_extremes(Midi::Word const changed_item) noexcept
         return;
     }
 
+    bool can_skip = true;
+
     if (changed_item == lowest_) {
         lowest_ = INVALID_ITEM;
+        can_skip = false;
     }
 
     if (changed_item == highest_) {
         highest_ = INVALID_ITEM;
+        can_skip = false;
+    }
+
+    if (can_skip) {
+        return;
     }
 
     Midi::Word item = head;
@@ -266,7 +274,7 @@ void NoteStack::remove(Midi::Word const word) noexcept
     }
 
     if constexpr (should_update_extremes) {
-        update_extremes(word);
+        update_extremes_after_remove(word);
     }
 }
 
