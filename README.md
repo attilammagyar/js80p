@@ -6,7 +6,7 @@ JS80P is a MIDI driven, performance oriented, versatile, free and open source
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
-<img src="https://raw.githubusercontent.com/attilammagyar/js80p/master/js80p.png" alt="Screenshot of JS80P" />
+<img src="https://raw.githubusercontent.com/attilammagyar/js80p/main/js80p.png" alt="Screenshot of JS80P" />
 
 JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
 effects, envelopes, LFOs, and powerful macros to shape your sound with
