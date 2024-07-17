@@ -119,7 +119,7 @@ get_version()
 {
     local file_name="$1"
 
-    printf "v%s\n" "$file_name" \
+    printf "%s\n" "$file_name" \
         | cut -d "-" -f 2 \
         | sed "s/_/./g"
 }
