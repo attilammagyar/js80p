@@ -420,6 +420,8 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
 
         ("MFX4", "  ///< Modulator Fine Detune x4", "modulator_params.fine_detune_x4"),
         ("CFX4", "  ///< Carrier Fine Detune x4", "carrier_params.fine_detune_x4"),
+
+        ("MPEST", " ///< MPE Settings", "mpe_settings"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

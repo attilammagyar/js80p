@@ -863,8 +863,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30DSH = 699,    ///< Macro 30 Distortion Shape
             MFX4 = 700,      ///< Modulator Fine Detune x4
             CFX4 = 701,      ///< Carrier Fine Detune x4
+            MPEST = 702,     ///< MPE Settings
 
-            PARAM_ID_COUNT = 702,
+            PARAM_ID_COUNT = 703,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 
@@ -1050,6 +1051,38 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER            = 0b1000;
         static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD       = 0b1001;
         static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS = 0b1010;
+
+        static constexpr Byte MPE_OFF =  0;
+        static constexpr Byte MPE_L15 =  1;
+        static constexpr Byte MPE_L14 =  2;
+        static constexpr Byte MPE_L13 =  3;
+        static constexpr Byte MPE_L12 =  4;
+        static constexpr Byte MPE_L11 =  5;
+        static constexpr Byte MPE_L10 =  6;
+        static constexpr Byte MPE_L09 =  7;
+        static constexpr Byte MPE_L08 =  8;
+        static constexpr Byte MPE_L07 =  9;
+        static constexpr Byte MPE_L06 = 10;
+        static constexpr Byte MPE_L05 = 11;
+        static constexpr Byte MPE_L04 = 12;
+        static constexpr Byte MPE_L03 = 13;
+        static constexpr Byte MPE_L02 = 14;
+        static constexpr Byte MPE_L01 = 15;
+        static constexpr Byte MPE_U15 = 16;
+        static constexpr Byte MPE_U14 = 17;
+        static constexpr Byte MPE_U13 = 18;
+        static constexpr Byte MPE_U12 = 19;
+        static constexpr Byte MPE_U11 = 20;
+        static constexpr Byte MPE_U10 = 21;
+        static constexpr Byte MPE_U09 = 22;
+        static constexpr Byte MPE_U08 = 23;
+        static constexpr Byte MPE_U07 = 24;
+        static constexpr Byte MPE_U06 = 25;
+        static constexpr Byte MPE_U05 = 26;
+        static constexpr Byte MPE_U04 = 27;
+        static constexpr Byte MPE_U03 = 28;
+        static constexpr Byte MPE_U02 = 29;
+        static constexpr Byte MPE_U01 = 30;
 
     private:
         static constexpr Byte NOTE_HANDLING_MASK_HOLD                       = 0b0001;
@@ -1309,6 +1342,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         ByteParam note_handling;
         ModeParam mode;
+        ByteParam mpe_settings;
         FloatParamS modulator_add_volume;
         FloatParamS phase_modulation_level;
         FloatParamS frequency_modulation_level;
