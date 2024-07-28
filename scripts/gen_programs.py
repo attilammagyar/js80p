@@ -41,6 +41,8 @@ WARNING = """\
   #############################################
 */"""
 
+SKIP_LINE = re.compile(r"^\s*[MC]TUN *= *")
+
 
 Preset = collections.namedtuple(
     "Preset", ("basename", "path", "program_name", "lines", "comments")
@@ -220,16 +222,26 @@ def collect_presets(presets_dir, programs_cpp):
 
 
 def make_preset(basename, file_path, program_name):
+    raw_lines = read_lines(file_path)
     lines = []
     comments = []
+    needs_cleanup = False
 
-    for line in read_lines(file_path):
+    for line in raw_lines:
         s = line.strip()
 
         if not s or s.startswith(";"):
             comments.append(line.lstrip("; ").strip())
-        else:
+        elif should_include_line(line):
             lines.append(line)
+        else:
+            needs_cleanup = True
+
+    if needs_cleanup:
+        with open(file_path, "w") as f:
+            for line in raw_lines:
+                if should_include_line(line):
+                    f.write(line.strip() + "\r\n")
 
     return Preset(basename, file_path, program_name, lines, comments)
 
@@ -237,6 +249,10 @@ def make_preset(basename, file_path, program_name):
 def read_lines(file_path):
     with open(file_path, "r") as f:
         return [line for line in f]
+
+
+def should_include_line(line):
+    return not SKIP_LINE.match(line)
 
 
 def preset_file_name_to_program_name(file_name):
@@ -256,7 +272,7 @@ def preset_file_name_to_program_name(file_name):
 
 
 def preset_lines_to_cpp_lines(indentation, lines):
-    return [f"{indentation}\"{line.strip()}\\n\"" for line in lines]
+    return [f"{indentation}\"{line.strip()}\\n\"" for line in lines if should_include_line(line)]
 
 
 if __name__ == "__main__":
