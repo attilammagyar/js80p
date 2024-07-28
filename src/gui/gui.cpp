@@ -296,6 +296,43 @@ char const* const GUI::COMPRESSION_MODES[] = {
 int const GUI::COMPRESSION_MODES_COUNT = CompressionMode::COMPRESSION_MODES;
 
 
+char const* const GUI::MPE_SETTINGS[] = {
+    [Synth::MPE_OFF] = "OFF",
+    [Synth::MPE_L15] = "Lo 15",
+    [Synth::MPE_L14] = "Lo 14",
+    [Synth::MPE_L13] = "Lo 13",
+    [Synth::MPE_L12] = "Lo 12",
+    [Synth::MPE_L11] = "Lo 11",
+    [Synth::MPE_L10] = "Lo 10",
+    [Synth::MPE_L09] = "Lo 9",
+    [Synth::MPE_L08] = "Lo 8",
+    [Synth::MPE_L07] = "Lo 7",
+    [Synth::MPE_L06] = "Lo 6",
+    [Synth::MPE_L05] = "Lo 5",
+    [Synth::MPE_L04] = "Lo 4",
+    [Synth::MPE_L03] = "Lo 3",
+    [Synth::MPE_L02] = "Lo 2",
+    [Synth::MPE_L01] = "Lo 1",
+    [Synth::MPE_U15] = "Up 15",
+    [Synth::MPE_U14] = "Up 14",
+    [Synth::MPE_U13] = "Up 13",
+    [Synth::MPE_U12] = "Up 12",
+    [Synth::MPE_U11] = "Up 11",
+    [Synth::MPE_U10] = "Up 10",
+    [Synth::MPE_U09] = "Up 9",
+    [Synth::MPE_U08] = "Up 8",
+    [Synth::MPE_U07] = "Up 7",
+    [Synth::MPE_U06] = "Up 6",
+    [Synth::MPE_U05] = "Up 5",
+    [Synth::MPE_U04] = "Up 4",
+    [Synth::MPE_U03] = "Up 3",
+    [Synth::MPE_U02] = "Up 2",
+    [Synth::MPE_U01] = "Up 1",
+};
+
+int const GUI::MPE_SETTINGS_COUNT = 31;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -1126,6 +1163,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::ETEND] = "Tape Position at End of Chain",
     [Synth::ParamId::EECM] = "Echo Side-Chain Compression Mode",
     [Synth::ParamId::ERCM] = "Reverb Side-Chain Compression Mode",
+    [Synth::ParamId::MPEST] = "MPE Settings",
 };
 
 
@@ -3230,6 +3268,8 @@ void GUI::build_synth_body(
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
     constexpr char const* const* dt = JS80P::GUI::DISTORTION_TYPES;
     constexpr int dtc = JS80P::GUI::DISTORTION_TYPES_COUNT;
+    constexpr char const* const* mpe = JS80P::GUI::MPE_SETTINGS;
+    constexpr int mpec = JS80P::GUI::MPE_SETTINGS_COUNT;
 
     ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
@@ -3238,6 +3278,8 @@ void GUI::build_synth_body(
     SCREW(synth_body, 271, 8, Synth::ParamId::MOIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIA);
     SCREW(synth_body, 291, 8, Synth::ParamId::MOIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIS);
     SCREW(synth_body, 311, 8, Synth::ParamId::MN, "%.2f%%", 100.0, screw_states);
+
+    DPET(synth_body, 366, 7, 54, 23, 0, 54, Synth::ParamId::MPEST, mpe, mpec);
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 177, 287, synth, Synth::ParamId::CTUN));
     SCREW(synth_body, 271, 288, Synth::ParamId::COIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIA);

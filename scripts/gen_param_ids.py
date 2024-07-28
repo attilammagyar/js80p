@@ -438,6 +438,8 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
 
         ("EECM", "  ///< Effects Echo Side-Chain Compression Mode", "effects.echo.side_chain_compression_mode"),
         ("ERCM", "  ///< Effects Reverb Side-Chain Compression Mode", "effects.reverb.side_chain_compression_mode"),
+
+        ("MPEST", " ///< MPE Settings", "mpe_settings"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

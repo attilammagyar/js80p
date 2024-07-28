@@ -158,6 +158,27 @@ html, body {
   margin-bottom: 2px;
 }
 
+#mpe {
+  position: absolute;
+  top: 2px;
+  left: 259px;
+}
+
+#mpe > span {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 23px;
+  background: #000000;
+  border: inset 1px #9090b0;
+  width: 56px;
+  height: 23px;
+  left: 35px;
+  margin: 0;
+  padding: 0;
+  border-radius: 3px;
+  text-align: center;
+}
+
 #osc-1-tuning,
 #osc-2-tuning {
   font-size: 14px;
@@ -190,6 +211,7 @@ html, body {
   left: 336px;
 }
 
+#mpe label span,
 #osc-1-fin-x4 label span,
 #osc-2-fin-x4 label span,
 h1 span {
@@ -295,6 +317,7 @@ h1 span {
 }
 
 #main div label,
+#mpe label,
 #osc-1-fin-x4 label,
 #osc-2-fin-x4 label,
 .block h1 label {
@@ -304,6 +327,10 @@ h1 span {
   font-size: 12px;
   font-weight: normal;
   vertical-align: bottom;
+}
+
+#mpe label {
+  height: 20px;
 }
 
 .block h1.macro label,
@@ -549,6 +576,7 @@ h1 span {
   width: 46px;
 }
 
+#mpe label,
 #osc-1-fin-x4 label {
   line-height: 17px;
 }
@@ -557,6 +585,7 @@ h1 span {
   line-height: 18px;
 }
 
+#mpe label span,
 #osc-1-fin-x4 label span,
 #osc-2-fin-x4 label span {
   display: inline-block;
@@ -668,6 +697,10 @@ body.hide-objects .knob span:nth-child(4),
 body.hide-objects #osc-1-tuning span,
 body.hide-objects #osc-2-tuning span {
   opacity: 0.0;
+}
+
+body.hide-objects #mpe > span {
+  color: rgba(0, 0, 0, 0);
 }
 
 .tabs {
@@ -913,6 +946,9 @@ function make_tabs(active)
       <div id="osc-1" class="osc main-block block">
         <h1><span>Osc 1 <sub>(mod)</sub></span></h1>
         <div id="osc-1-tuning"><span>440 12TET</span></div>
+        <div id="mpe">
+          <label><span>MPE</span></label><span>L15</span>
+        </div>
         <div id="osc-1-fin-x4">
           <label><span>FIN x4</span><input type="text" /></label>
         </div>

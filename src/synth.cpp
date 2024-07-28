@@ -190,6 +190,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         NOTE_HANDLING_POLYPHONIC
     ),
     mode("MODE"),
+    mpe_settings("MPE", MPE_OFF, MPE_U01, MPE_OFF),
     modulator_add_volume(
         "MIX",
         0.0,
@@ -364,6 +365,7 @@ void Synth::register_main_params() noexcept
 {
     register_param_as_child<ByteParam>(ParamId::NH, note_handling);
     register_param_as_child<ModeParam>(ParamId::MODE, mode);
+    register_param_as_child<ByteParam>(ParamId::MPEST, mpe_settings);
     register_param_as_child<FloatParamS>(ParamId::MIX, modulator_add_volume);
     register_param_as_child<FloatParamS>(ParamId::PM, phase_modulation_level);
     register_param_as_child<FloatParamS>(ParamId::FM, frequency_modulation_level);
@@ -2414,7 +2416,11 @@ void Synth::handle_clear() noexcept
 
         handle_assign_controller(param_id, no_controller);
 
-        if (param_id != ParamId::MTUN && param_id != ParamId::CTUN) {
+        if (
+                param_id != ParamId::MTUN
+                && param_id != ParamId::CTUN
+                && param_id != ParamId::MPEST
+        ) {
             handle_set_param(param_id, get_param_default_ratio(param_id));
         }
     }

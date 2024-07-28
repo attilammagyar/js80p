@@ -574,6 +574,39 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
 })
 
 
+TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_otherwise_current_settings_are_kept, {
+    constexpr size_t serialized_mpe_settings_length = 64;
+
+    Synth synth;
+    char serialized_mpe_settings[serialized_mpe_settings_length];
+    std::string patch = "";
+
+    snprintf(
+        serialized_mpe_settings,
+        serialized_mpe_settings_length,
+        "MPE = %f",
+        (double)synth.mpe_settings.value_to_ratio(Synth::MPE_U10)
+    );
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += serialized_mpe_settings;
+    patch += Serializer::LINE_END;
+
+    synth.mpe_settings.set_value(Synth::MPE_L15);
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
+
+    assert_eq((int)Synth::MPE_U10, (int)synth.mpe_settings.get_value());
+
+    patch = "";
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
+
+    assert_eq((int)Synth::MPE_U10, (int)synth.mpe_settings.get_value());
+})
+
+
 void assert_upgrade(
         std::string const& old_serialized_param,
         Synth::ParamId const param_id,
