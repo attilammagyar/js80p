@@ -423,6 +423,8 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
 
         ("EER1", "  ///< Effects Echo Delay 1 Reversed", "effects.echo.reversed_1"),
         ("EER2", "  ///< Effects Echo Delay 2 Reversed", "effects.echo.reversed_2"),
+
+        ("MPEST", " ///< MPE Settings", "mpe_settings"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)
