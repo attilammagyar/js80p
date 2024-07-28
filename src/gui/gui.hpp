@@ -136,6 +136,9 @@ class GUI
         static char const* const COMPRESSION_MODES[];
         static int const COMPRESSION_MODES_COUNT;
 
+        static char const* const MPE_SETTINGS[];
+        static int const MPE_SETTINGS_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];
