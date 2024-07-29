@@ -1,3 +1,10 @@
+v3.1.2 (2024-07-29)
+ * Bugfix: built-in presets should never overwrite oscillator tuning settings.
+   (Depending on the plugin type and the host application's behavior, this
+   change may only take effect in newly created projects.)
+ * FST (VST 2.4): improve compatibility with hosts that use the
+   "receiveVstTimeInfo" and "openCloseAnyThread" can-do queries.
+
 v3.1.1 (2024-06-08)
  * Bugfix: make header texts on the Macro tab consistent with other UI
    elements.
