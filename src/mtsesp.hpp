@@ -29,6 +29,8 @@
 namespace JS80P
 {
 
+// TODO: when MPE is on, then replace note channel with management channel
+
 class MtsEsp
 {
     public:
