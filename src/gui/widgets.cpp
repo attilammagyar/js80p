@@ -970,7 +970,7 @@ void KnobParamEditor::update_controller_str()
     constexpr size_t last_index = TEXT_MAX_LENGTH - 1;
 
     strncpy(
-        controller_str, GUI::get_controller(controller_id)->short_name, last_index
+        controller_str, GUI::get_controller(controller_id)->name_8, last_index
     );
     controller_str[last_index] = '\x00';
 }
