@@ -49,7 +49,8 @@ class FstPlugin : public Midi::EventHandler
                 Parameter(
                     char const* const name,
                     MidiController* const midi_controller,
-                    Midi::Controller const controller_id
+                    Midi::Controller const controller_id,
+                    Midi::Channel const channel = Midi::INVALID_CHANNEL
                 );
                 Parameter(Parameter const& parameter) = default;
                 Parameter(Parameter&& parameter) = default;
@@ -60,6 +61,7 @@ class FstPlugin : public Midi::EventHandler
                 char const* get_name() const noexcept;
                 MidiController* get_midi_controller() const noexcept;
                 Midi::Controller get_controller_id() const noexcept;
+                Midi::Channel get_channel() const noexcept;
 
                 // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
 
@@ -69,13 +71,17 @@ class FstPlugin : public Midi::EventHandler
 
             private:
                 MidiController* midi_controller;
-                char const* name;
-                Midi::Controller controller_id;
+                std::string name;
                 // Integer change_index; /* See FstPlugin::generate_samples() */
                 float value;
+                Midi::Controller controller_id;
+                Midi::Channel channel;
         };
 
-        static constexpr size_t NUMBER_OF_PARAMETERS = 74;
+        static constexpr size_t NUMBER_OF_CTL_PARAMETERS = 72;
+
+        /* MIDI Controller parameters + Program + Patch Changed */
+        static constexpr size_t NUMBER_OF_PARAMETERS = NUMBER_OF_CTL_PARAMETERS * Midi::CHANNELS + 2;
 
         static constexpr size_t PATCH_CHANGED_PARAMETER_INDEX = 72;
         static constexpr char const* PATCH_CHANGED_PARAMETER_SHORT_NAME = "Changed";
@@ -277,7 +283,8 @@ class FstPlugin : public Midi::EventHandler
                 Message(
                     Midi::Controller const controller_id,
                     Number const new_value,
-                    MidiController* const midi_controller
+                    MidiController* const midi_controller,
+                    Midi::Channel const channel
                 );
 
                 Message(Message const& message) = default;
@@ -294,6 +301,7 @@ class FstPlugin : public Midi::EventHandler
                 Midi::Controller get_controller_id() const noexcept;
                 Number get_new_value() const noexcept;
                 MidiController* get_midi_controller() const noexcept;
+                Midi::Channel get_channel() const noexcept;
 
             private:
                 std::string serialized_data;
@@ -302,12 +310,14 @@ class FstPlugin : public Midi::EventHandler
                 size_t index;
                 MessageType type;
                 Midi::Controller controller_id;
+                Midi::Channel channel;
         };
 
         static Parameter create_midi_ctl_param(
             Synth::ControllerId const controller_id,
             MidiController* const midi_controller,
-            Synth& synth
+            Synth& synth,
+            Midi::Channel const channel
         ) noexcept;
 
         VstIntPtr host_callback(
@@ -339,7 +349,8 @@ class FstPlugin : public Midi::EventHandler
         void handle_change_param(
             Midi::Controller const controller_id,
             Number const new_value,
-            MidiController* const midi_controller
+            MidiController* const midi_controller,
+            Midi::Channel const channel
         ) noexcept;
 
         void handle_import_patch(std::string const& patch) noexcept;

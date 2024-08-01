@@ -882,7 +882,7 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
         0,
         Vst::ParameterInfo::kCanAutomate,
         Vst::kRootUnitId,
-        USTRING(controller->short_name)
+        USTRING(controller->name_5)
     );
     param->setPrecision(1);
 
