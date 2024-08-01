@@ -79,11 +79,13 @@ class GUI
                     ControllerCapability const required_capability,
                     Synth::ControllerId const id,
                     char const* const long_name,
-                    char const* const short_name
+                    char const* const name_8,
+                    char const* const name_5
                 );
 
                 char const* const long_name;
-                char const* const short_name;
+                char const* const name_8;
+                char const* const name_5;
                 ControllerCapability const required_capability;
                 int const index;
                 Synth::ControllerId const id;

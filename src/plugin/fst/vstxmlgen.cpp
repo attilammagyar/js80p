@@ -58,7 +58,8 @@ void write_param(
         std::ofstream& out_file,
         size_t const id,
         char const* const name,
-        char const* const short_name
+        char const* const short_name,
+        Midi::Channel const channel = Midi::INVALID_CHANNEL
 ) {
     constexpr size_t buffer_size = 256;
     constexpr char const* const format = (
@@ -67,9 +68,32 @@ void write_param(
 
     char buffer[buffer_size];
 
-    snprintf(
-        buffer, buffer_size, format, (long unsigned int)id, name, short_name
-    );
+    if (channel == Midi::INVALID_CHANNEL) {
+        snprintf(
+            buffer, buffer_size, format, (long unsigned int)id, name, short_name
+        );
+    } else {
+        constexpr size_t name_with_channel_size = 128;
+
+        char name_with_channel[name_with_channel_size];
+
+        snprintf(
+            name_with_channel,
+            name_with_channel_size,
+            "%s [%hhu]",
+            name,
+            channel + 1
+        );
+        snprintf(
+            buffer,
+            buffer_size,
+            format,
+            (long unsigned int)id,
+            name_with_channel,
+            short_name
+        );
+    }
+
     write_line(out_file, buffer);
 }
 
@@ -102,7 +126,11 @@ void generate_xml(std::ofstream& out_file)
             );
         } else {
             write_param(
-                out_file, i, controller.long_name, controller.short_name
+                out_file,
+                i,
+                controller.long_name,
+                parameter.get_name(),
+                parameter.get_channel()
             );
         }
     }
