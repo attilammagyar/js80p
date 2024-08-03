@@ -19,6 +19,7 @@
 #include "test.cpp"
 #include "utils.cpp"
 
+#include <cstdio>
 #include <cstring>
 #include <vector>
 
