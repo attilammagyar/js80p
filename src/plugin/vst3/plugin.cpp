@@ -411,7 +411,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
                         Event::Type::NOTE_OFF,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.noteOff.pitch,
-                        (Midi::Channel)(event.noteOn.channel & 0xff),
+                        (Midi::Channel)(event.noteOff.channel & 0xff),
                         (Number)event.noteOff.velocity
                     )
                 );
@@ -423,7 +423,7 @@ void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
                         Event::Type::NOTE_PRESSURE,
                         synth.sample_count_to_time_offset(event.sampleOffset),
                         (Midi::Byte)event.polyPressure.pitch,
-                        (Midi::Channel)(event.noteOn.channel & 0xff),
+                        (Midi::Channel)(event.polyPressure.channel & 0xff),
                         (Number)event.polyPressure.pressure
                     )
                 );
