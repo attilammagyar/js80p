@@ -332,33 +332,47 @@ void Vst3Plugin::Processor::collect_param_change_events(
         }
 
         Vst::ParamID const param_id = param_queue->getParameterId();
+        Midi::Channel const channel = (Midi::Channel)(
+            ((Integer)param_id >> PARAM_TYPE_BITS) & PARAM_CHANNEL_MASK
+        );
+        Vst::ParamID const param_type = param_id & PARAM_TYPE_MASK;
 
-        switch (param_id) {
+        switch (param_type) {
             case (Vst::ParamID)PROGRAM_LIST_ID:
                 collect_param_change_events_as(
-                    param_queue, Event::Type::PROGRAM_CHANGE, 0
+                    param_queue, Event::Type::PROGRAM_CHANGE, 0, channel
                 );
+
                 break;
 
             case (Vst::ParamID)Vst::ControllerNumbers::kPitchBend:
                 collect_param_change_events_as(
-                    param_queue, Event::Type::PITCH_WHEEL, 0
+                    param_queue, Event::Type::PITCH_WHEEL, 0, channel
                 );
+
                 break;
 
             case (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch:
                 collect_param_change_events_as(
-                    param_queue, Event::Type::CHANNEL_PRESSURE, 0
+                    param_queue, Event::Type::CHANNEL_PRESSURE, 0, channel
                 );
+
                 break;
 
-            default:
-                if (Synth::is_supported_midi_controller((Midi::Controller)param_id)) {
+            default: {
+                Midi::Byte const midi_controller = (Midi::Byte)param_type;
+
+                if (Synth::is_supported_midi_controller((Midi::Controller)midi_controller)) {
                     collect_param_change_events_as(
-                        param_queue, Event::Type::CONTROL_CHANGE, (Midi::Byte)param_id
+                        param_queue,
+                        Event::Type::CONTROL_CHANGE,
+                        midi_controller,
+                        channel
                     );
                 }
+
                 break;
+            }
         }
     }
 }
@@ -367,7 +381,8 @@ void Vst3Plugin::Processor::collect_param_change_events(
 void Vst3Plugin::Processor::collect_param_change_events_as(
         Vst::IParamValueQueue* const param_queue,
         Event::Type const event_type,
-        Midi::Byte const midi_controller
+        Midi::Byte const midi_controller,
+        Midi::Channel const channel
 ) noexcept {
     int32 const number_of_points = param_queue->getPointCount();
 
@@ -384,7 +399,7 @@ void Vst3Plugin::Processor::collect_param_change_events_as(
                 event_type,
                 synth.sample_count_to_time_offset(sample_offset),
                 midi_controller,
-                0,
+                channel,
                 (Number)value
             )
         );
@@ -497,7 +512,7 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
         case Event::Type::PITCH_WHEEL:
             synth.pitch_wheel_change(
                 event.time_offset,
-                0,
+                event.channel,
                 float_to_midi_word(event.velocity_or_value)
             );
             break;
@@ -505,7 +520,7 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
         case Event::Type::CONTROL_CHANGE:
             synth.control_change(
                 event.time_offset,
-                0,
+                event.channel,
                 event.note_or_ctl,
                 float_to_midi_byte(event.velocity_or_value)
             );
@@ -514,7 +529,7 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
         case Event::Type::CHANNEL_PRESSURE:
             synth.channel_pressure(
                 event.time_offset,
-                0,
+                event.channel,
                 float_to_midi_byte(event.velocity_or_value)
             );
             break;
@@ -770,7 +785,8 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::PITCH_WHEEL,
-            (Vst::ParamID)Vst::ControllerNumbers::kPitchBend,
+            (Integer)Vst::ControllerNumbers::kPitchBend,
+            0,
             0.5
         )
     );
@@ -778,7 +794,8 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::CHANNEL_PRESSURE,
-            (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch,
+            (Integer)Vst::ControllerNumbers::kAfterTouch,
+            0,
             0.0
         )
     );
@@ -802,14 +819,15 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         }
 
         parameters.addParameter(
-            create_midi_ctl_param((Synth::ControllerId)cc, (Vst::ParamID)cc, 0.5)
+            create_midi_ctl_param((Synth::ControllerId)cc, (Integer)cc, 0, 0.5)
         );
     }
 
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::SUSTAIN_PEDAL,
-            (Vst::ParamID)Synth::ControllerId::SUSTAIN_PEDAL,
+            (Integer)Synth::ControllerId::SUSTAIN_PEDAL,
+            0,
             0.0
         )
     );
@@ -819,10 +837,53 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::UNDEFINED_20,
-            (Vst::ParamID)Synth::ControllerId::UNDEFINED_20,
+            (Integer)Synth::ControllerId::UNDEFINED_20,
+            0,
             0.5
         )
     );
+
+    for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
+        parameters.addParameter(
+            create_midi_ctl_param(
+                Synth::ControllerId::PITCH_WHEEL,
+                (Integer)Vst::ControllerNumbers::kPitchBend,
+                channel,
+                0.5
+            )
+        );
+    }
+
+    for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
+        parameters.addParameter(
+            create_midi_ctl_param(
+                Synth::ControllerId::CHANNEL_PRESSURE,
+                (Integer)Vst::ControllerNumbers::kAfterTouch,
+                channel,
+                0.0
+            )
+        );
+    }
+
+    for (Integer cc = 0; cc != Synth::MIDI_CONTROLLERS; ++cc) {
+        Midi::Controller const midi_controller = (Midi::Controller)cc;
+
+        if (!Synth::is_supported_midi_controller(midi_controller)) {
+            continue;
+        }
+
+        double const default_value = (
+            cc == (Integer)Synth::ControllerId::SUSTAIN_PEDAL ? 0.0 : 0.5
+        );
+
+        for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
+            parameters.addParameter(
+                create_midi_ctl_param(
+                    (Synth::ControllerId)cc, cc, channel, default_value
+                )
+            );
+        }
+    }
 
     return result;
 }
@@ -868,12 +929,33 @@ tresult PLUGIN_API Vst3Plugin::Controller::setParamNormalized(
 
 Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
         Synth::ControllerId const controller_id,
-        Vst::ParamID const param_id,
+        Integer const vst_controller_id,
+        Midi::Channel const channel,
         double const default_value
 ) const {
+    constexpr size_t buffer_size = 128;
+
     JS80P::GUI::Controller const* const controller = JS80P::GUI::get_controller(controller_id);
+
+    char long_name[buffer_size];
+    char short_name[buffer_size];
+    Vst::ParamID const param_id = (
+        (((Vst::ParamID)channel) << PARAM_TYPE_BITS)
+        | (Vst::ParamID)(vst_controller_id & PARAM_TYPE_MASK)
+    );
+
+    snprintf(
+        long_name, buffer_size, "%s [%hhu]", controller->long_name, channel + 1
+    );
+    long_name[buffer_size - 1] = '\x00';
+
+    snprintf(
+        short_name, buffer_size, "%s/%hhu", controller->name_5, channel + 1
+    );
+    short_name[buffer_size - 1] = '\x00';
+
     Vst::RangeParameter* param = new Vst::RangeParameter(
-        USTRING(controller->long_name),
+        USTRING(long_name),
         param_id,
         USTRING("%"),
         0.0,
@@ -882,7 +964,7 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
         0,
         Vst::ParameterInfo::kCanAutomate,
         Vst::kRootUnitId,
-        USTRING(controller->name_5)
+        USTRING(short_name)
     );
     param->setPrecision(1);
 
@@ -916,16 +998,24 @@ tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
         Vst::CtrlNumber midi_controller_number,
         Vst::ParamID& id
 ) {
-    if (bus_index == 0 && midi_controller_number < Vst::kCountCtrlNumber) {
-        if (
+    if (
+            bus_index == 0
+            && midi_controller_number >= 0
+            && midi_controller_number < Vst::kCountCtrlNumber
+            && channel >= 0
+            && channel <= (int16)Midi::CHANNEL_MAX
+            && (
                 Synth::is_supported_midi_controller((Midi::Controller)midi_controller_number)
                 || midi_controller_number == Vst::ControllerNumbers::kPitchBend
                 || midi_controller_number == Vst::ControllerNumbers::kAfterTouch
-        ) {
-            id = midi_controller_number;
+            )
+    ) {
+        id = (
+            (((Vst::ParamID)channel) << PARAM_TYPE_BITS)
+            | (Vst::ParamID)midi_controller_number
+        );
 
-            return kResultTrue;
-        }
+        return kResultTrue;
     }
 
     return kResultFalse;
