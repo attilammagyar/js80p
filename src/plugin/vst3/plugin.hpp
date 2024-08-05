@@ -65,6 +65,10 @@ class Vst3Plugin
 
         static constexpr Vst::ParamID PATCH_CHANGED_PARAM_ID = 255;
 
+        static constexpr Integer PARAM_CHANNEL_MASK = 0xff;
+        static constexpr Integer PARAM_TYPE_BITS = 8;
+        static constexpr Vst::ParamID PARAM_TYPE_MASK = 0xff;
+
         static std::string read_stream(IBStream* stream);
 
         class Event
@@ -144,7 +148,8 @@ class Vst3Plugin
                 void collect_param_change_events_as(
                     Vst::IParamValueQueue* const param_queue,
                     Event::Type const event_type,
-                    Midi::Byte const midi_controller
+                    Midi::Byte const midi_controller,
+                    Midi::Channel const channel
                 ) noexcept;
 
                 void collect_note_events(Vst::ProcessData& data) noexcept;
@@ -245,7 +250,8 @@ class Vst3Plugin
 
                 Vst::RangeParameter* create_midi_ctl_param(
                     Synth::ControllerId const controller_id,
-                    Vst::ParamID const param_id,
+                    Integer const vst_controller_id,
+                    Midi::Channel const channel,
                     double const default_value
                 ) const;
 
