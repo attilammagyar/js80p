@@ -1263,7 +1263,7 @@ FstPlugin::Parameter::Parameter(
     name(name),
     controller_id(controller_id),
     // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(0.5f)
+    value(midi_controller != NULL ? (float)midi_controller->get_value() : 0.5f)
 {
 }
 

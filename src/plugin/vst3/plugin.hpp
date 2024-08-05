@@ -242,7 +242,8 @@ class Vst3Plugin
 
                 Vst::RangeParameter* create_midi_ctl_param(
                     Synth::ControllerId const controller_id,
-                    Vst::ParamID const param_id
+                    Vst::ParamID const param_id,
+                    double const default_value
                 ) const;
 
                 Vst::RangeParameter* set_up_patch_changed_param() const;

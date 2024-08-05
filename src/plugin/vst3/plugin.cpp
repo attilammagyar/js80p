@@ -750,14 +750,16 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::PITCH_WHEEL,
-            (Vst::ParamID)Vst::ControllerNumbers::kPitchBend
+            (Vst::ParamID)Vst::ControllerNumbers::kPitchBend,
+            0.5
         )
     );
 
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::CHANNEL_PRESSURE,
-            (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch
+            (Vst::ParamID)Vst::ControllerNumbers::kAfterTouch,
+            0.0
         )
     );
 
@@ -780,14 +782,15 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         }
 
         parameters.addParameter(
-            create_midi_ctl_param((Synth::ControllerId)cc, (Vst::ParamID)cc)
+            create_midi_ctl_param((Synth::ControllerId)cc, (Vst::ParamID)cc, 0.5)
         );
     }
 
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::SUSTAIN_PEDAL,
-            (Vst::ParamID)Synth::ControllerId::SUSTAIN_PEDAL
+            (Vst::ParamID)Synth::ControllerId::SUSTAIN_PEDAL,
+            0.0
         )
     );
 
@@ -796,7 +799,8 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
     parameters.addParameter(
         create_midi_ctl_param(
             Synth::ControllerId::UNDEFINED_20,
-            (Vst::ParamID)Synth::ControllerId::UNDEFINED_20
+            (Vst::ParamID)Synth::ControllerId::UNDEFINED_20,
+            0.5
         )
     );
 
@@ -844,7 +848,8 @@ tresult PLUGIN_API Vst3Plugin::Controller::setParamNormalized(
 
 Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
         Synth::ControllerId const controller_id,
-        Vst::ParamID const param_id
+        Vst::ParamID const param_id,
+        double const default_value
 ) const {
     JS80P::GUI::Controller const* const controller = JS80P::GUI::get_controller(controller_id);
     Vst::RangeParameter* param = new Vst::RangeParameter(
@@ -853,7 +858,7 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
         USTRING("%"),
         0.0,
         100.0,
-        0.0,
+        default_value * 100.0,
         0,
         Vst::ParameterInfo::kCanAutomate,
         Vst::kRootUnitId,
