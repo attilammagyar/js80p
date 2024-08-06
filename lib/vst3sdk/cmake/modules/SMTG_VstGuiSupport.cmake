@@ -93,6 +93,7 @@ function(smtg_enable_vstgui_support)
     target_link_libraries(vstgui_support 
         PUBLIC
             base
+            vstgui
             vstgui_uidescription
     )
 

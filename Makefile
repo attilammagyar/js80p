@@ -382,7 +382,8 @@ VST3_CXXFLAGS = \
 	-Wno-multichar \
 	-Wno-parentheses \
 	-Wno-pragmas \
-	-Wno-unknown-pragmas
+	-Wno-unknown-pragmas \
+	-Wno-unused-value
 
 COMPILE_TARGET = \
 	$(CPP_TARGET_PLATFORM) \

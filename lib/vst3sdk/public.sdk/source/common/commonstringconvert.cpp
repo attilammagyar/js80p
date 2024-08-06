@@ -3,9 +3,9 @@
 // Project     : VST SDK
 //
 // Category    : Helpers
-// Filename    : public.sdk/source/vst/utility/alignedalloc.h
-// Created by  : Steinberg, 05/2023
-// Description : aligned memory allocations
+// Filename    : public.sdk/source/common/commonstringconvert.cpp
+// Created by  : Steinberg, 07/2024
+// Description : c++11 unicode string convert functions
 //
 //-----------------------------------------------------------------------------
 // LICENSE
@@ -31,66 +31,91 @@
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 
-#pragma once
+#include "commonstringconvert.h"
 
-#include "pluginterfaces/base/ftypes.h"
+#include <codecvt>
+#include <istream>
+#include <locale>
 
-#include <cstdlib>
-
-#ifdef _MSC_VER
-#include <malloc.h>
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
 #endif
 
 //------------------------------------------------------------------------
 namespace Steinberg {
-namespace Vst {
+namespace StringConvert {
 
 //------------------------------------------------------------------------
-/** aligned allocation
- *
- *	note that you need to use aligned_free to free the block of memory
- *
- *	@param numBytes		number of bytes to allocate
- *	@param alignment	alignment of memory base address.
- *		must be a power of 2 and at least as large as sizeof (void*) or zero in which it uses malloc
- *		for allocation
- *
- *	@return 			allocated memory
- */
-inline void* aligned_alloc (size_t numBytes, uint32_t alignment)
-{
-	if (alignment == 0)
-		return malloc (numBytes);
-	void* data {nullptr};
-#if SMTG_OS_MACOS && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-	posix_memalign (&data, alignment, numBytes);
-#elif defined(_MSC_VER)
-	data = _aligned_malloc (numBytes, alignment);
+namespace {
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define USE_WCHAR_AS_UTF16TYPE
+using UTF16Type = wchar_t;
 #else
-	data = std::aligned_alloc (alignment, numBytes);
+using UTF16Type = char16_t;
 #endif
-	return data;
+
+using Converter = std::wstring_convert<std::codecvt_utf8_utf16<UTF16Type>, UTF16Type>;
+
+//------------------------------------------------------------------------
+Converter& converter ()
+{
+	static Converter conv;
+	return conv;
 }
 
 //------------------------------------------------------------------------
-inline void aligned_free (void* addr, uint32_t alignment)
+} // anonymous
+
+//------------------------------------------------------------------------
+std::u16string convert (const std::string& utf8Str)
 {
-	if (alignment == 0)
-		std::free (addr);
-	else
+#if defined(USE_WCHAR_AS_UTF16TYPE)
+	auto wstr = converter ().from_bytes (utf8Str);
+	return {wstr.data (), wstr.data () + wstr.size ()};
+#else
+	return converter ().from_bytes (utf8Str);
+#endif
+}
+
+//------------------------------------------------------------------------
+std::string convert (const std::u16string& str)
+{
+	return converter ().to_bytes (reinterpret_cast<const UTF16Type*> (str.data ()),
+	                              reinterpret_cast<const UTF16Type*> (str.data () + str.size ()));
+}
+
+//------------------------------------------------------------------------
+std::string convert (const char* str, uint32_t max)
+{
+	std::string result;
+	if (str)
 	{
-#if defined(_MSC_VER)
-		_aligned_free (addr);
-#else
-		std::free (addr);
-#endif
+		result.reserve (max);
+		for (uint32_t i = 0; i < max; ++i, ++str)
+		{
+			if (*str == 0)
+				break;
+			result += *str;
+		}
 	}
+	return result;
 }
 
 //------------------------------------------------------------------------
-} // Vst
+} // StringConvert
 } // Steinberg
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif

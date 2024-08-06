@@ -262,6 +262,7 @@ function(smtg_target_make_plugin_package target pkg_name extension)
             SMTG_PLUGIN_BINARY_DIR          ${SMTG_PLUGIN_BINARY_LOCATION}/${PLUGIN_EXTENSION_UPPER}
             SMTG_PLUGIN_EXTENSION           ${extension}
             SMTG_PLUGIN_PACKAGE_NAME        ${pkg_name}.${pkg_extension}
+            OUTPUT_NAME                     ${pkg_name}
             SMTG_PLUGIN_PACKAGE_CONTENTS    Contents
             SMTG_PLUGIN_PACKAGE_RESOURCES   Contents/Resources
             SMTG_PLUGIN_PACKAGE_SNAPSHOTS   Snapshots
@@ -386,6 +387,12 @@ function(smtg_target_make_plugin_package target pkg_name extension)
             if(EXISTS ${SMTG_PACKAGE_ICON_PATH})
                 smtg_target_add_folder_icon(${target} ${SMTG_PACKAGE_ICON_PATH})
             endif()
+        else()
+            # Do not create a "MyPlugin.vst3/Contents/Resources" folder when SMTG_CREATE_BUNDLE_FOR_WINDOWS is NOT set!
+            set_target_properties(${target}
+                PROPERTIES 
+                    SMTG_DISABLE_CREATE_RESOURCE_FOLDER	1
+            )
         endif(SMTG_CREATE_BUNDLE_FOR_WINDOWS)
         # Disable warning LNK4221: "This object file does not define any previously undefined public symbols...".
         # Enable "Generate Debug Information" in release config by setting "/Zi" and "/DEBUG" flags.

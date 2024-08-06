@@ -73,6 +73,8 @@
 #include <vst3sdk/public.sdk/source/vst/vstpresetfile.cpp>
 #include <vst3sdk/public.sdk/source/vst/vstpresetfile.h>
 #include <vst3sdk/public.sdk/source/common/commoniids.cpp>
+#include <vst3sdk/public.sdk/source/common/commonstringconvert.h>
+#include <vst3sdk/public.sdk/source/common/commonstringconvert.cpp>
 #include <vst3sdk/public.sdk/source/common/openurl.cpp>
 #include <vst3sdk/public.sdk/source/common/openurl.h>
 #include <vst3sdk/public.sdk/source/common/systemclipboard.h>
@@ -99,8 +101,9 @@
 #include <vst3sdk/public.sdk/source/vst/utility/stringconvert.h>
 #include <vst3sdk/public.sdk/source/vst/utility/testing.cpp>
 #include <vst3sdk/public.sdk/source/vst/utility/testing.h>
-#include <vst3sdk/public.sdk/source/vst/utility/vst2persistence.h>
+#include <vst3sdk/public.sdk/source/vst/utility/ump.h>
 #include <vst3sdk/public.sdk/source/vst/utility/vst2persistence.cpp>
+#include <vst3sdk/public.sdk/source/vst/utility/vst2persistence.h>
 #include <vst3sdk/public.sdk/source/vst/vstaudioeffect.cpp>
 #include <vst3sdk/public.sdk/source/vst/vstaudioeffect.h>
 #include <vst3sdk/public.sdk/source/vst/vstbus.cpp>

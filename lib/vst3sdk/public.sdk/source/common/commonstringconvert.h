@@ -2,10 +2,10 @@
 // Flags       : clang-format SMTGSequencer
 // Project     : VST SDK
 //
-// Category    : Helpers
-// Filename    : public.sdk/source/vst/utility/alignedalloc.h
-// Created by  : Steinberg, 05/2023
-// Description : aligned memory allocations
+// Category    : stringconvert
+// Filename    : public.sdk/source/common/commonstringconvert.h
+// Created by  : Steinberg, 07/2024
+// Description : read file routine
 //
 //-----------------------------------------------------------------------------
 // LICENSE
@@ -37,60 +37,58 @@
 
 #pragma once
 
-#include "pluginterfaces/base/ftypes.h"
+#include <cstdint>
+#include <string>
 
-#include <cstdlib>
-
-#ifdef _MSC_VER
-#include <malloc.h>
-#endif
-
-//------------------------------------------------------------------------
 namespace Steinberg {
-namespace Vst {
+namespace StringConvert {
 
 //------------------------------------------------------------------------
-/** aligned allocation
+/**
+ *  convert an UTF-8 string to an UTF-16 string
  *
- *	note that you need to use aligned_free to free the block of memory
+ *  @param utf8Str UTF-8 string
  *
- *	@param numBytes		number of bytes to allocate
- *	@param alignment	alignment of memory base address.
- *		must be a power of 2 and at least as large as sizeof (void*) or zero in which it uses malloc
- *		for allocation
- *
- *	@return 			allocated memory
+ *  @return UTF-16 string
  */
-inline void* aligned_alloc (size_t numBytes, uint32_t alignment)
+std::u16string convert (const std::string& utf8Str);
+
+//------------------------------------------------------------------------
+/**
+ *  convert an UTF-16 string to an UTF-8 string
+ *
+ *  @param str UTF-16 string
+ *
+ *  @return UTF-8 string
+ */
+std::string convert (const std::u16string& str);
+
+//------------------------------------------------------------------------
+/**
+ *  convert a ASCII string buffer to an UTF-8 string
+ *
+ *  @param str ASCII string buffer
+ *	@param max maximum characters in str
+ *
+ *  @return UTF-8 string
+ */
+std::string convert (const char* str, uint32_t max);
+
+//------------------------------------------------------------------------
+/**
+ *	convert a number to an UTF-16 string
+ *
+ *	@param value number
+ *
+ *	@return UTF-16 string
+ */
+template <typename NumberT>
+std::u16string toString (NumberT value)
 {
-	if (alignment == 0)
-		return malloc (numBytes);
-	void* data {nullptr};
-#if SMTG_OS_MACOS && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
-	posix_memalign (&data, alignment, numBytes);
-#elif defined(_MSC_VER)
-	data = _aligned_malloc (numBytes, alignment);
-#else
-	data = std::aligned_alloc (alignment, numBytes);
-#endif
-	return data;
+	auto u8str = std::to_string (value);
+	return StringConvert::convert (u8str);
 }
 
 //------------------------------------------------------------------------
-inline void aligned_free (void* addr, uint32_t alignment)
-{
-	if (alignment == 0)
-		std::free (addr);
-	else
-	{
-#if defined(_MSC_VER)
-		_aligned_free (addr);
-#else
-		std::free (addr);
-#endif
-	}
-}
-
-//------------------------------------------------------------------------
-} // Vst
-} // Steinberg
+} // namespace StringConvert
+} // namespace Steinberg

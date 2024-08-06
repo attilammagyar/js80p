@@ -8,18 +8,18 @@ if(SMTG_MAC)
     if(XCODE)
         set(SMTG_AUV3_FOLDER FOLDER "AudioUnit V3")
 
-        set(auv3wrappermacos_sources
+        set(auv3_wrapper_macos_sources
             ${public_sdk_SOURCE_DIR}/source/vst/auv3wrapper/AUv3WrappermacOS/main.mm
         )
 
-        set(auv3wrappermacosextension_sources
+        set(auv3_wrapper_macosextension_sources
             ${public_sdk_SOURCE_DIR}/source/vst/auv3wrapper/Shared/AUv3WrapperFactory.mm
         )
 
-        set(auv3wrapperios_sources
+        set(auv3_wrapper_ios_sources
         )
 
-        set(auv3wrapperiosextension_sources
+        set(auv3_wrapper_iosextension_sources
             ${public_sdk_SOURCE_DIR}/source/vst/auv3wrapper/Shared/AUv3WrapperFactory.mm
         )
 
@@ -59,9 +59,9 @@ if(SMTG_MAC)
                 )
                 set(app-extension-target ${target}_appextension_macos)
                 set(app-target ${target})
-                set(app-extension-sources ${auv3wrappermacosextension_sources})
-                set(auwrapper-sources ${auv3wrappermacos_sources} ${AppSources})
-                set(auwrapper-lib auv3wrappermacos)
+                set(app-extension-sources ${auv3_wrapper_macosextension_sources})
+                set(auwrapper-sources ${auv3_wrapper_macos_sources} ${AppSources})
+                set(auwrapper-lib auv3_wrapper_macos)
             else()
                 set(link_frameworks
                     "-framework UIKit" 
@@ -79,9 +79,9 @@ if(SMTG_MAC)
                 )
                 set(app-extension-target ${target}_appextension_ios)
                 set(app-target ${target})
-                set(app-extension-sources ${auv3wrapperiosextension_sources})
+                set(app-extension-sources ${auv3_wrapper_iosextension_sources})
                 set(auwrapper-sources ${AppSources})
-                set(auwrapper-lib auv3wrapperios)
+                set(auwrapper-lib auv3_wrapper_ios)
             endif(macOS)
 
             set(auwrapper-xib-resources ${AppUIResources})
