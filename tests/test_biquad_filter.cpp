@@ -53,7 +53,7 @@ constexpr Seconds ALMOST_IMMEDIATELY = 0.15 / (Seconds)SAMPLE_RATE;
 
 TEST(basic_properties, {
     SumOfSines input(0.5, 220.0, 0.5, 440.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.set_sample_rate(SAMPLE_RATE);
@@ -73,9 +73,12 @@ TEST(basic_properties, {
 })
 
 
-template<class InputSignalProducerClass = SumOfSines>
+template<
+    class InputSignalProducerClass = SumOfSines,
+    BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE
+>
 void test_filter(
-        BiquadFilter<InputSignalProducerClass>& filter,
+        BiquadFilter<InputSignalProducerClass, fixed_type>& filter,
         InputSignalProducerClass& input,
         SumOfSines& expected,
         Number const tolerance,
@@ -95,7 +98,7 @@ void test_filter(
 
     render_rounds<SumOfSines>(expected, expected_output, rounds);
     input.reset();
-    render_rounds< BiquadFilter<InputSignalProducerClass> >(
+    render_rounds< BiquadFilter<InputSignalProducerClass, fixed_type> >(
         filter, actual_output, rounds
     );
 
@@ -112,8 +115,9 @@ void test_filter(
 }
 
 
+template<BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE>
 void schedule_small_param_changes(
-        BiquadFilter<SumOfSines>& filter,
+        BiquadFilter<SumOfSines, fixed_type>& filter,
         Number const frequency,
         Number const q,
         Number const gain
@@ -153,8 +157,9 @@ void schedule_small_param_changes(
 }
 
 
+template<BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE>
 void assert_completed(
-        BiquadFilter<SumOfSines>& filter,
+        BiquadFilter<SumOfSines, fixed_type>& filter,
         Number const expected_frequency,
         Number const expected_q,
         Number const expected_gain
@@ -178,7 +183,7 @@ void test_silent_input_is_no_op(Byte const type)
     constexpr Number low_amplitude = 1e-9;
 
     SumOfSines input(low_amplitude, 440.0, low_amplitude, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(type);
@@ -204,7 +209,7 @@ TEST(when_input_is_silent_then_biquad_filter_is_no_op, {
 
 TEST(when_frequency_is_at_max_value_then_low_pass_filter_is_no_op, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
     Number const max_frequency = filter.frequency.get_max_value();
 
@@ -221,7 +226,7 @@ TEST(when_frequency_is_at_max_value_then_low_pass_filter_is_no_op, {
 
 TEST(when_frequency_is_above_the_nyquist_frequency_then_low_pass_filter_is_no_op, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
@@ -239,7 +244,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_low_pass_filter_is_no_op
 // TEST(when_frequency_is_at_minimum_then_low_pass_filter_is_silent, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
-    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilterTypeParam filter_type("");
     // BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     // filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
@@ -252,7 +257,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_low_pass_filter_is_no_op
 TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.5, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS, -0.0001875);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
@@ -270,7 +275,7 @@ TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
 /* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_min_value_then_high_pass_filter_is_no_op, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilterTypeParam filter_type("");
     // BiquadFilter<SumOfSines> filter("", input, filter_type);
     // Number const min_frequency = filter.frequency.get_min_value();
 
@@ -288,7 +293,7 @@ TEST(low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
 TEST(when_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_silent, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
@@ -305,7 +310,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_sile
 TEST(when_buffer_is_external_and_frequency_is_above_the_nyquist_frequency_then_high_pass_filter_is_silent, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type, NULL, 0.0, NULL, NULL, &input);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
@@ -322,7 +327,7 @@ TEST(when_buffer_is_external_and_frequency_is_above_the_nyquist_frequency_then_h
 TEST(high_pass_filter_attenuates_frequencies_below_the_given_frequency, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
@@ -337,10 +342,35 @@ TEST(high_pass_filter_attenuates_frequencies_below_the_given_frequency, {
 })
 
 
+TEST(fixed_type_high_pass_filter_attenuates_frequencies_below_the_given_frequency, {
+    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    SumOfSines expected(0.0, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    BiquadFilter<SumOfSines, BiquadFilterFixedType::BFFT_HIGH_PASS> filter(
+        "", input
+    );
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::LOW_PASS);
+    filter.frequency.set_value(1000.0);
+    filter.q.set_value(0.03);
+
+    schedule_small_param_changes<BiquadFilterFixedType::BFFT_HIGH_PASS>(
+        filter, 2000.0, 0.03, -6.0
+    );
+
+    test_filter<SumOfSines, BiquadFilterFixedType::BFFT_HIGH_PASS>(
+        filter, input, expected, 0.1
+    );
+
+    assert_completed<BiquadFilterFixedType::BFFT_HIGH_PASS>(
+        filter, 2000.0, 0.03, -6.0
+    );
+})
+
+
 TEST(when_q_is_zero_then_band_pass_is_no_op, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
@@ -358,7 +388,7 @@ TEST(when_q_is_zero_then_band_pass_is_no_op, {
 TEST(when_frequency_is_above_the_nyquist_frequency_then_band_pass_is_silent, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
@@ -376,7 +406,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_band_pass_is_silent, {
 TEST(band_pass_filter_attenuates_everything_outside_a_range_around_the_given_frequency, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
@@ -394,7 +424,7 @@ TEST(band_pass_filter_attenuates_everything_outside_a_range_around_the_given_fre
 TEST(when_q_is_zero_then_notch_filter_is_silent, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.0, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::NOTCH);
@@ -412,7 +442,7 @@ TEST(when_q_is_zero_then_notch_filter_is_silent, {
 TEST(when_frequency_is_above_the_nyquist_frequency_then_notch_filter_is_no_op, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::NOTCH);
@@ -430,7 +460,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_notch_filter_is_no_op, {
 TEST(notch_filter_attenuates_a_range_around_the_given_frequency, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.33, 440.0, 0.0, 3520.0, 0.33, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::NOTCH);
@@ -448,7 +478,7 @@ TEST(notch_filter_attenuates_a_range_around_the_given_frequency, {
 TEST(when_q_is_zero_then_peaking_filter_becomes_gain, {
     SumOfSines input(0.15, 440.0, 0.15, 3520.0, 0.15, 7040.0, CHANNELS);
     SumOfSines expected(0.30, 440.0, 0.30, 3520.0, 0.30, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::PEAKING);
@@ -467,7 +497,7 @@ TEST(when_q_is_zero_then_peaking_filter_becomes_gain, {
 TEST(when_frequency_is_above_the_nyquist_frequency_then_peaking_filter_is_no_op, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::PEAKING);
@@ -486,7 +516,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_peaking_filter_is_no_op,
 TEST(peaking_filter_can_boost_or_attenuate_a_range_around_the_given_frequency, {
     SumOfSines input(0.25, 440.0, 0.25, 3520.0, 0.25, 7040.0, CHANNELS);
     SumOfSines expected(0.25, 440.0, 0.5, 3520.0, 0.25, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::PEAKING);
@@ -505,7 +535,7 @@ TEST(peaking_filter_can_boost_or_attenuate_a_range_around_the_given_frequency, {
 /* JS80P doesn't let the frequency go below 1.0 Hz */
 // TEST(when_frequency_is_at_min_value_then_low_shelf_filter_is_no_op, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilterTypeParam filter_type("");
     // BiquadFilter<SumOfSines> filter("", input, filter_type);
     // Number const min_frequency = filter.frequency.get_min_value();
 
@@ -524,7 +554,7 @@ TEST(peaking_filter_can_boost_or_attenuate_a_range_around_the_given_frequency, {
 TEST(when_frequency_is_above_the_nyquist_frequency_then_low_shelf_filter_is_gain, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.25, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::LOW_SHELF);
@@ -542,7 +572,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_low_shelf_filter_is_gain
 TEST(low_shelf_filter_attenuates_or_boosts_frequencies_below_the_given_frequency, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.25, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::LOW_SHELF);
@@ -559,7 +589,7 @@ TEST(low_shelf_filter_attenuates_or_boosts_frequencies_below_the_given_frequency
 
 TEST(when_frequency_is_at_max_value_then_high_shelf_filter_is_no_op, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
     Number const max_frequency = filter.frequency.get_max_value();
 
@@ -577,7 +607,7 @@ TEST(when_frequency_is_at_max_value_then_high_shelf_filter_is_no_op, {
 
 TEST(when_frequency_is_above_the_nyquist_frequency_then_high_shelf_filter_is_no_op, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_SHELF);
@@ -596,7 +626,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_shelf_filter_is_no_
 // TEST(when_frequency_is_at_minimum_then_high_shelf_filter_is_gain, {
     // SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     // SumOfSines expected(0.25, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
-    // BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    // BiquadFilterTypeParam filter_type("");
     // BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     // filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_SHELF);
@@ -610,7 +640,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_high_shelf_filter_is_no_
 TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequency, {
     SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines expected(0.5, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter("", input, filter_type);
 
     filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_SHELF);
@@ -623,6 +653,32 @@ TEST(high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequenc
     test_filter(filter, input, expected, 0.1);
 
     assert_completed(filter, 2000.0, 0.03, -6.0);
+})
+
+
+TEST(fixed_type_high_shelf_filter_attenuates_or_boosts_frequencies_above_the_given_frequency, {
+    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    SumOfSines expected(0.5, 440.0, 0.25, 7040.0, 0.0, 0.0, CHANNELS);
+    BiquadFilter<SumOfSines, BiquadFilterFixedType::BFFT_HIGH_SHELF> filter(
+        "", input
+    );
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::LOW_SHELF);
+    filter.frequency.set_value(2000.0);
+    filter.q.set_value(0.03);
+    filter.gain.set_value(-6.0);
+
+    schedule_small_param_changes<BiquadFilterFixedType::BFFT_HIGH_SHELF>(
+        filter, 2000.0, 0.03, -6.0
+    );
+
+    test_filter<SumOfSines, BiquadFilterFixedType::BFFT_HIGH_SHELF>(
+        filter, input, expected, 0.1
+    );
+
+    assert_completed<BiquadFilterFixedType::BFFT_HIGH_SHELF>(
+        filter, 2000.0, 0.03, -6.0
+    );
 })
 
 
@@ -655,7 +711,7 @@ TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected_clones(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
     SumOfSines expected_unique(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter_clone_1(
         "", input, filter_type, &shared_buffers
     );
@@ -715,7 +771,7 @@ void test_fast_path_continuity(
     };
     Sample const* const* rendered = NULL;
     FixedSignalProducer input(input_channels);
-    BiquadFilter<FixedSignalProducer>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<FixedSignalProducer> filter_1("", input, filter_type, shared_buffers);
     BiquadFilter<FixedSignalProducer> filter_2("", input, filter_type, shared_buffers);
 
@@ -936,7 +992,7 @@ void assert_filter_rendering_is_independent_of_chunk_size(
 ) {
     SumOfSines input_1(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines input_2(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
-    BiquadFilter<SumOfSines>::TypeParam filter_type("");
+    BiquadFilterTypeParam filter_type("");
     BiquadFilter<SumOfSines> filter_1("", input_1, filter_type);
     BiquadFilter<SumOfSines> filter_2("", input_2, filter_type);
 

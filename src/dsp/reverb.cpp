@@ -48,7 +48,7 @@ Reverb<InputSignalProducerClass>::Reverb(
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
         name,
         input,
-        16 + COMB_FILTERS,
+        15 + COMB_FILTERS,
         &mixer
     ),
     type(name+ "TYP"),
@@ -111,7 +111,6 @@ Reverb<InputSignalProducerClass>::Reverb(
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
     mixer(input.get_channels()),
-    high_pass_filter_type(""),
     distortion_type("", Distortion::TYPE_DELAY_FEEDBACK),
     high_pass_filter_gain(
         "",
@@ -121,7 +120,6 @@ Reverb<InputSignalProducerClass>::Reverb(
     ),
     high_pass_filter(
         input,
-        high_pass_filter_type,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain
@@ -285,7 +283,6 @@ Reverb<InputSignalProducerClass>::Reverb(
 
     this->register_child(distortion_type);
 
-    this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_gain);
 
     this->register_child(high_pass_filter);
@@ -299,8 +296,6 @@ Reverb<InputSignalProducerClass>::Reverb(
         mixer.add(comb_filters[i]);
         this->register_child(comb_filters[i]);
     }
-
-    high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 }
 
 

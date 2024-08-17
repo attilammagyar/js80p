@@ -33,7 +33,7 @@ Echo<InputSignalProducerClass>::Echo(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
-        name, input, 19, &comb_filter_2
+        name, input, 18, &comb_filter_2
     ),
     delay_time(
         name + "DEL",
@@ -91,7 +91,6 @@ Echo<InputSignalProducerClass>::Echo(
     tempo_sync(name + "SYN", ToggleParam::OFF),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
-    high_pass_filter_type(""),
     distortion_type("", Distortion::TYPE_DELAY_FEEDBACK),
     high_pass_filter_gain(
         "",
@@ -102,7 +101,6 @@ Echo<InputSignalProducerClass>::Echo(
     gain(input, input_volume),
     high_pass_filter(
         gain,
-        high_pass_filter_type,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain,
@@ -156,15 +154,12 @@ Echo<InputSignalProducerClass>::Echo(
 
     this->register_child(distortion_type);
 
-    this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_gain);
 
     this->register_child(gain);
     this->register_child(high_pass_filter);
     this->register_child(comb_filter_1);
     this->register_child(comb_filter_2);
-
-    high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
 
     comb_filter_1.delay.set_feedback_signal_producer(comb_filter_2.high_shelf_filter);
 }

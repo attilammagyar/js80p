@@ -379,7 +379,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::MC9, modulator_params.harmonic_8);
     register_param_as_child<FloatParamB>(ParamId::MC10, modulator_params.harmonic_9);
 
-    register_param_as_child<Modulator::Filter1::TypeParam>(
+    register_param_as_child<BiquadFilterTypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_freq_log_scale);
@@ -390,7 +390,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::MF1FIA, modulator_params.filter_1_freq_inaccuracy);
     register_param_as_child<FloatParamB>(ParamId::MF1QIA, modulator_params.filter_1_q_inaccuracy);
 
-    register_param_as_child<Modulator::Filter2::TypeParam>(
+    register_param_as_child<BiquadFilterTypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
     register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_freq_log_scale);
@@ -436,9 +436,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::CC9, carrier_params.harmonic_8);
     register_param_as_child<FloatParamB>(ParamId::CC10, carrier_params.harmonic_9);
 
-    register_param_as_child<Carrier::Filter1::TypeParam>(
-        ParamId::CF1TYP, carrier_params.filter_1_type
-    );
+    register_param_as_child<BiquadFilterTypeParam>(ParamId::CF1TYP, carrier_params.filter_1_type);
     register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_freq_log_scale);
     register_param_as_child<ToggleParam>(ParamId::CF1QLG, carrier_params.filter_1_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
@@ -447,9 +445,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<FloatParamB>(ParamId::CF1FIA, carrier_params.filter_1_freq_inaccuracy);
     register_param_as_child<FloatParamB>(ParamId::CF1QIA, carrier_params.filter_1_q_inaccuracy);
 
-    register_param_as_child<Carrier::Filter2::TypeParam>(
-        ParamId::CF2TYP, carrier_params.filter_2_type
-    );
+    register_param_as_child<BiquadFilterTypeParam>(ParamId::CF2TYP, carrier_params.filter_2_type);
     register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_freq_log_scale);
     register_param_as_child<ToggleParam>(ParamId::CF2QLG, carrier_params.filter_2_q_log_scale);
     register_param_as_child<FloatParamS>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
@@ -470,14 +466,14 @@ void Synth::register_effects_params() noexcept
     register_param<Distortion::TypeParam>(ParamId::ED2TYP, effects.distortion_2_type);
     register_param<FloatParamS>(ParamId::ED2L, effects.distortion_2.level);
 
-    register_param<Effects::Filter1<Bus>::TypeParam>(ParamId::EF1TYP, effects.filter_1_type);
+    register_param<BiquadFilterTypeParam>(ParamId::EF1TYP, effects.filter_1_type);
     register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_freq_log_scale);
     register_param<ToggleParam>(ParamId::EF1QLG, effects.filter_1_q_log_scale);
     register_param<FloatParamS>(ParamId::EF1FRQ, effects.filter_1.frequency);
     register_param<FloatParamS>(ParamId::EF1Q, effects.filter_1.q);
     register_param<FloatParamS>(ParamId::EF1G, effects.filter_1.gain);
 
-    register_param<Effects::Filter2<Bus>::TypeParam>(ParamId::EF2TYP, effects.filter_2_type);
+    register_param<BiquadFilterTypeParam>(ParamId::EF2TYP, effects.filter_2_type);
     register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_freq_log_scale);
     register_param<ToggleParam>(ParamId::EF2QLG, effects.filter_2_q_log_scale);
     register_param<FloatParamS>(ParamId::EF2FRQ, effects.filter_2.frequency);

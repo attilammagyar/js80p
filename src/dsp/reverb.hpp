@@ -41,7 +41,11 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
+        typedef BiquadFilter<
+            InputSignalProducerClass,
+            BiquadFilterFixedType::BFFT_HIGH_PASS
+        > HighPassedInput;
+
         typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter;
 
         class TypeParam : public ByteParam
@@ -260,7 +264,6 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
 
         Mixer<CombFilter> mixer;
 
-        typename HighPassedInput::TypeParam high_pass_filter_type;
         Distortion::TypeParam distortion_type;
         FloatParamS high_pass_filter_gain;
 

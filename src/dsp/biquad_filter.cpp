@@ -29,6 +29,9 @@
 namespace JS80P
 {
 
+BiquadFilterTypeParam dummy_filter_type("dummy_filter_type");
+
+
 BiquadFilterSharedBuffers::BiquadFilterSharedBuffers()
     : round(-1),
     b0_buffer(NULL),
@@ -43,20 +46,22 @@ BiquadFilterSharedBuffers::BiquadFilterSharedBuffers()
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::TypeParam::TypeParam(
-        std::string const& name
-) noexcept
-    : ByteParam(name, LOW_PASS, HIGH_SHELF, LOW_PASS)
+BiquadFilterTypeParam::BiquadFilterTypeParam(std::string const& name) noexcept
+    : ByteParam(
+        name,
+        SimpleBiquadFilter::LOW_PASS,
+        SimpleBiquadFilter::HIGH_SHELF,
+        SimpleBiquadFilter::LOW_PASS
+    )
 {
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         std::string const& name,
         InputSignalProducerClass& input,
-        TypeParam& type,
+        BiquadFilterTypeParam& type,
         BiquadFilterSharedBuffers* shared_buffers,
         Number const inaccuracy_seed,
         FloatParamB const* freq_inaccuracy_param,
@@ -92,8 +97,28 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
+        std::string const& name,
+        InputSignalProducerClass& input,
+        SignalProducer* const buffer_owner
+) noexcept
+    : BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
+        name,
+        input,
+        dummy_filter_type,
+        NULL,
+        0.0,
+        NULL,
+        NULL,
+        buffer_owner
+    )
+{
+}
+
+
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_instance() noexcept
 {
     register_children();
 
@@ -104,13 +129,13 @@ void BiquadFilter<InputSignalProducerClass>::initialize_instance() noexcept
     y_n_m1 = new Sample[this->channels];
     y_n_m2 = new Sample[this->channels];
 
-    BiquadFilter<InputSignalProducerClass>::reset();
+    BiquadFilter<InputSignalProducerClass, fixed_type>::reset();
     update_helper_variables();
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::update_helper_variables() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::update_helper_variables() noexcept
 {
     w0_scale = (Sample)Math::PI_DOUBLE * (Sample)this->sampling_period;
     low_pass_no_op_frequency = std::min(
@@ -119,11 +144,11 @@ void BiquadFilter<InputSignalProducerClass>::update_helper_variables() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         std::string const& name,
         InputSignalProducerClass& input,
-        TypeParam& type,
+        BiquadFilterTypeParam& type,
         ToggleParam const& freq_log_scale_toggle,
         ToggleParam const& q_log_scale_toggle,
         SignalProducer* const buffer_owner
@@ -170,10 +195,10 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         InputSignalProducerClass& input,
-        TypeParam& type,
+        BiquadFilterTypeParam& type,
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
@@ -197,10 +222,38 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::BiquadFilter(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         InputSignalProducerClass& input,
-        TypeParam& type,
+        FloatParamS& frequency_leader,
+        FloatParamS& q_leader,
+        FloatParamS& gain_leader,
+        BiquadFilterSharedBuffers* shared_buffers,
+        Number const inaccuracy_seed,
+        FloatParamB const* freq_inaccuracy_param,
+        FloatParamB const* q_inaccuracy_param,
+        SignalProducer* buffer_owner
+) noexcept
+    : BiquadFilter<InputSignalProducerClass, fixed_type>(
+        input,
+        dummy_filter_type,
+        frequency_leader,
+        q_leader,
+        gain_leader,
+        shared_buffers,
+        inaccuracy_seed,
+        freq_inaccuracy_param,
+        q_inaccuracy_param,
+        buffer_owner
+    )
+{
+}
+
+
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
+        InputSignalProducerClass& input,
+        BiquadFilterTypeParam& type,
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
@@ -225,8 +278,8 @@ BiquadFilter<InputSignalProducerClass>::BiquadFilter(
 }
 
 
-template<class InputSignalProducerClass>
-BiquadFilter<InputSignalProducerClass>::~BiquadFilter()
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+BiquadFilter<InputSignalProducerClass, fixed_type>::~BiquadFilter()
 {
     delete[] x_n_m1;
     delete[] x_n_m2;
@@ -237,16 +290,16 @@ BiquadFilter<InputSignalProducerClass>::~BiquadFilter()
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::reallocate_buffers() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::reallocate_buffers() noexcept
 {
     free_buffers();
     allocate_buffers();
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::free_buffers() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::free_buffers() noexcept
 {
     if (shared_buffers != NULL) {
         return;
@@ -266,8 +319,8 @@ void BiquadFilter<InputSignalProducerClass>::free_buffers() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::allocate_buffers() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::allocate_buffers() noexcept
 {
     if (shared_buffers != NULL) {
         return;
@@ -281,8 +334,8 @@ void BiquadFilter<InputSignalProducerClass>::allocate_buffers() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::register_children() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::register_children() noexcept
 {
     this->register_child(frequency);
     this->register_child(q);
@@ -290,8 +343,8 @@ void BiquadFilter<InputSignalProducerClass>::register_children() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::set_sample_rate(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::set_sample_rate(
         Frequency const new_sample_rate
 ) noexcept {
     Filter<InputSignalProducerClass>::set_sample_rate(new_sample_rate);
@@ -300,8 +353,8 @@ void BiquadFilter<InputSignalProducerClass>::set_sample_rate(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::set_block_size(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     if (new_block_size != this->block_size) {
@@ -312,8 +365,8 @@ void BiquadFilter<InputSignalProducerClass>::set_block_size(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::reset() noexcept
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::reset() noexcept
 {
     Filter<InputSignalProducerClass>::reset();
 
@@ -323,8 +376,8 @@ void BiquadFilter<InputSignalProducerClass>::reset() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::update_inaccuracy(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::update_inaccuracy(
         Number const random_1,
         Number const random_2
 ) noexcept {
@@ -361,8 +414,8 @@ void BiquadFilter<InputSignalProducerClass>::update_inaccuracy(
     } while (false)
 
 
-template<class InputSignalProducerClass>
-Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+Sample const* const* BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -407,38 +460,47 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 
     is_silent_ = false;
 
-    switch (type.get_value()) {
-        case LOW_PASS:
-            JS80P_BF_CALL_INIT_FQ(initialize_low_pass_rendering);
-            break;
+    if constexpr (fixed_type == BiquadFilterFixedType::BFFT_CUSTOMIZABLE) {
+        switch (type.get_value()) {
+            case LOW_PASS:
+                JS80P_BF_CALL_INIT_FQ(initialize_low_pass_rendering);
+                break;
 
-        case HIGH_PASS:
-            JS80P_BF_CALL_INIT_FQ(initialize_high_pass_rendering);
-            break;
+            case HIGH_PASS:
+                JS80P_BF_CALL_INIT_FQ(initialize_high_pass_rendering);
+                break;
 
-        case BAND_PASS:
-            JS80P_BF_CALL_INIT_FQ(initialize_band_pass_rendering);
-            break;
+            case BAND_PASS:
+                JS80P_BF_CALL_INIT_FQ(initialize_band_pass_rendering);
+                break;
 
-        case NOTCH:
-            JS80P_BF_CALL_INIT_FQ(initialize_notch_rendering);
-            break;
+            case NOTCH:
+                JS80P_BF_CALL_INIT_FQ(initialize_notch_rendering);
+                break;
 
-        case PEAKING:
-            JS80P_BF_CALL_INIT_FQ(initialize_peaking_rendering);
-            break;
+            case PEAKING:
+                JS80P_BF_CALL_INIT_FQ(initialize_peaking_rendering);
+                break;
 
-        case LOW_SHELF:
-            JS80P_BF_CALL_INIT_F(initialize_low_shelf_rendering);
-            break;
+            case LOW_SHELF:
+                JS80P_BF_CALL_INIT_F(initialize_low_shelf_rendering);
+                break;
 
-        case HIGH_SHELF:
-            JS80P_BF_CALL_INIT_F(initialize_high_shelf_rendering);
-            break;
+            case HIGH_SHELF:
+                JS80P_BF_CALL_INIT_F(initialize_high_shelf_rendering);
+                break;
 
-        default:
-            is_no_op = true;
-            break;
+            default:
+                is_no_op = true;
+                break;
+        }
+    } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_HIGH_PASS) {
+        JS80P_BF_CALL_INIT_FQ(initialize_high_pass_rendering);
+    } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_HIGH_SHELF) {
+        JS80P_BF_CALL_INIT_F(initialize_high_shelf_rendering);
+    } else {
+        JS80P_ASSERT_NOT_REACHED();
+        is_no_op = true;
     }
 
     if (can_use_shared_coefficients) {
@@ -454,16 +516,22 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         return initialize_rendering_no_op(round, sample_count);
     }
 
-    if (JS80P_UNLIKELY(is_silent_)) {
-        update_state_for_silent_round(round, sample_count);
+    if constexpr (fixed_type != BiquadFilterFixedType::BFFT_HIGH_SHELF) {
+        /*
+        Cppcheck seems to ignore the constexpr if statement.
+        */
+        // cppcheck-suppress knownConditionTrueFalse
+        if (JS80P_UNLIKELY(is_silent_)) {
+            update_state_for_silent_round(round, sample_count);
+        }
     }
 
     return NULL;
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering_no_op(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+Sample const* const* BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_rendering_no_op(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -477,8 +545,8 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
 }
 
 
-template <class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::update_state_for_no_op_round(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::update_state_for_no_op_round(
         Integer const sample_count
 ) noexcept {
     if (JS80P_UNLIKELY(sample_count < 1)) {
@@ -508,8 +576,8 @@ void BiquadFilter<InputSignalProducerClass>::update_state_for_no_op_round(
 }
 
 
-template <class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::update_state_for_silent_round(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -540,8 +608,8 @@ void BiquadFilter<InputSignalProducerClass>::update_state_for_silent_round(
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_rendering_with_shared_coefficients(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+Sample const* const* BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_rendering_with_shared_coefficients(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -554,17 +622,19 @@ Sample const* const* BiquadFilter<InputSignalProducerClass>::initialize_renderin
         shared_buffers->are_coefficients_constant
     );
 
-    if (JS80P_UNLIKELY(is_silent_)) {
-        update_state_for_silent_round(round, sample_count);
+    if constexpr (fixed_type != BiquadFilterFixedType::BFFT_HIGH_SHELF) {
+        if (JS80P_UNLIKELY(is_silent_)) {
+            update_state_for_silent_round(round, sample_count);
+        }
     }
 
     return NULL;
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate>
-Number BiquadFilter<InputSignalProducerClass>::apply_freq_inaccuracy(
+Number BiquadFilter<InputSignalProducerClass, fixed_type>::apply_freq_inaccuracy(
         Number const frequency_value
 ) const noexcept {
     if constexpr (is_freq_inaccurate) {
@@ -581,9 +651,9 @@ Number BiquadFilter<InputSignalProducerClass>::apply_freq_inaccuracy(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_q_inaccurate>
-Number BiquadFilter<InputSignalProducerClass>::apply_q_inaccuracy(
+Number BiquadFilter<InputSignalProducerClass, fixed_type>::apply_q_inaccuracy(
         Number const q_value
 ) const noexcept {
     if constexpr (is_q_inaccurate) {
@@ -594,9 +664,9 @@ Number BiquadFilter<InputSignalProducerClass>::apply_q_inaccuracy(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_pass_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -630,7 +700,6 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
         q.skip_round(round, sample_count);
 
         /* JS80P doesn't let the frequency go below 1.0 Hz */
-        is_silent_ = false;
         // is_silent_ = frequency_value <= low_pass_silent_frequency;
 
         // if (JS80P_UNLIKELY(is_silent_)) {
@@ -675,9 +744,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_pass_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
@@ -704,9 +773,9 @@ void BiquadFilter<InputSignalProducerClass>::store_low_pass_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_pass_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -783,9 +852,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_pass_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
@@ -812,9 +881,9 @@ void BiquadFilter<InputSignalProducerClass>::store_high_pass_coefficient_samples
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_band_pass_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -887,9 +956,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_band_pass_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_band_pass_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
@@ -917,9 +986,9 @@ void BiquadFilter<InputSignalProducerClass>::store_band_pass_coefficient_samples
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_notch_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -992,9 +1061,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_notch_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_notch_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value
@@ -1024,9 +1093,9 @@ void BiquadFilter<InputSignalProducerClass>::store_notch_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_peaking_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1109,9 +1178,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_peaking_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate, bool is_q_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_peaking_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const q_value,
@@ -1155,9 +1224,9 @@ void BiquadFilter<InputSignalProducerClass>::store_peaking_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_shelf_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1236,9 +1305,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_low_shelf_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_shelf_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const gain_value
@@ -1280,9 +1349,9 @@ void BiquadFilter<InputSignalProducerClass>::store_low_shelf_coefficient_samples
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate>
-bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
+bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_shelf_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1361,9 +1430,9 @@ bool BiquadFilter<InputSignalProducerClass>::initialize_high_shelf_rendering(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 template<bool is_freq_inaccurate>
-void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_samples(
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_shelf_coefficient_samples(
         Integer const index,
         Number const frequency_value,
         Number const gain_value
@@ -1407,8 +1476,8 @@ void BiquadFilter<InputSignalProducerClass>::store_high_shelf_coefficient_sample
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_gain_coefficient_samples(
         Integer const index,
         Number const gain_value
 ) noexcept {
@@ -1424,8 +1493,8 @@ void BiquadFilter<InputSignalProducerClass>::store_gain_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::store_normalized_coefficient_samples(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_normalized_coefficient_samples(
         Integer const index,
         Sample const b0,
         Sample const b1,
@@ -1444,8 +1513,8 @@ void BiquadFilter<InputSignalProducerClass>::store_normalized_coefficient_sample
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::store_no_op_coefficient_samples(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_no_op_coefficient_samples(
         Integer const index
 ) noexcept {
     b0_buffer[index] = 1.0;
@@ -1456,8 +1525,8 @@ void BiquadFilter<InputSignalProducerClass>::store_no_op_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::store_silent_coefficient_samples(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::store_silent_coefficient_samples(
         Integer const index
 ) noexcept {
     b0_buffer[index] =
@@ -1468,19 +1537,21 @@ void BiquadFilter<InputSignalProducerClass>::store_silent_coefficient_samples(
 }
 
 
-template<class InputSignalProducerClass>
-void BiquadFilter<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (JS80P_UNLIKELY(is_silent_)) {
-        this->render_silence(
-            round, first_sample_index, last_sample_index, buffer
-        );
+    if constexpr (fixed_type != BiquadFilterFixedType::BFFT_HIGH_SHELF) {
+        if (JS80P_UNLIKELY(is_silent_)) {
+            this->render_silence(
+                round, first_sample_index, last_sample_index, buffer
+            );
 
-        return;
+            return;
+        }
     }
 
     Integer const channels = this->channels;

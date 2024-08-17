@@ -1052,7 +1052,6 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
 ) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
     ),
-    high_shelf_filter_type(""),
     high_shelf_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -1066,16 +1065,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
         distortion_level_leader,
         &this->delay
     ),
-    high_shelf_filter(
-        "",
-        this->distortion,
-        high_shelf_filter_type,
-        NULL,
-        0.0,
-        NULL,
-        NULL,
-        &this->delay
-    )
+    high_shelf_filter("", this->distortion, &this->delay)
 {
     initialize_instance();
 
@@ -1108,7 +1098,6 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
         tempo_sync,
         NUMBER_OF_CHILDREN
     ),
-    high_shelf_filter_type(""),
     high_shelf_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -1124,7 +1113,6 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     ),
     high_shelf_filter(
         this->distortion,
-        high_shelf_filter_type,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,
@@ -1164,7 +1152,6 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
         tempo_sync,
         NUMBER_OF_CHILDREN
     ),
-    high_shelf_filter_type(""),
     high_shelf_filter_q(
         "",
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -1180,7 +1167,6 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     ),
     high_shelf_filter(
         this->distortion,
-        high_shelf_filter_type,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,
@@ -1198,14 +1184,9 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
 template<class InputSignalProducerClass>
 void DistortedHighShelfPannedDelay<InputSignalProducerClass>::initialize_instance() noexcept
 {
-    this->register_child(high_shelf_filter_type);
     this->register_child(high_shelf_filter_q);
     this->register_child(distortion);
     this->register_child(high_shelf_filter);
-
-    high_shelf_filter_type.set_value(
-        DistortedHighShelfDelay<InputSignalProducerClass>::HIGH_SHELF
-    );
 }
 
 }

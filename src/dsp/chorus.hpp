@@ -58,9 +58,17 @@ class Chorus : public Effect<InputSignalProducerClass>
         static constexpr Byte CHORUS_14 = 13;
         static constexpr Byte CHORUS_15 = 14;
 
-        typedef BiquadFilter<InputSignalProducerClass> HighPassedInput;
+        typedef BiquadFilter<
+            InputSignalProducerClass,
+            BiquadFilterFixedType::BFFT_HIGH_PASS
+        > HighPassedInput;
+
         typedef PannedDelay<HighPassedInput> CombFilter;
-        typedef BiquadFilter< Mixer<CombFilter> > HighShelfFilter;
+
+        typedef BiquadFilter<
+            Mixer<CombFilter>,
+            BiquadFilterFixedType::BFFT_HIGH_SHELF
+        > HighShelfFilter;
 
         class TypeParam : public ByteParam
         {
@@ -312,14 +320,12 @@ class Chorus : public Effect<InputSignalProducerClass>
         void update_tunings(Byte const type) noexcept;
 
         FloatParamS biquad_filter_q;
-        typename HighPassedInput::TypeParam high_pass_filter_type;
         FloatParamS high_pass_filter_gain;
         HighPassedInput high_pass_filter;
         LFO lfos[VOICES];
         FloatParamS delay_times[VOICES];
         CombFilter comb_filters[VOICES];
         Mixer<CombFilter> mixer;
-        typename HighShelfFilter::TypeParam high_shelf_filter_type;
         HighShelfFilter high_shelf_filter;
         Gain<HighShelfFilter> feedback_gain;
         Sample const* const* chorused;

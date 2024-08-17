@@ -31,7 +31,14 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
+enum BiquadFilterFixedType {
+    BFFT_CUSTOMIZABLE = 0,
+    BFFT_HIGH_PASS = 1,
+    BFFT_HIGH_SHELF = 2,
+};
+
+
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE>
 class BiquadFilter;
 
 
@@ -55,7 +62,14 @@ class BiquadFilterSharedBuffers
 };
 
 
-template<class InputSignalProducerClass>
+class BiquadFilterTypeParam : public ByteParam
+{
+    public:
+        explicit BiquadFilterTypeParam(std::string const& name) noexcept;
+};
+
+
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 class BiquadFilter : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -69,16 +83,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         static constexpr Byte LOW_SHELF = 5;
         static constexpr Byte HIGH_SHELF = 6;
 
-        class TypeParam : public ByteParam
-        {
-            public:
-                explicit TypeParam(std::string const& name) noexcept;
-        };
-
         BiquadFilter(
             std::string const& name,
             InputSignalProducerClass& input,
-            TypeParam& type,
+            BiquadFilterTypeParam& type,
             BiquadFilterSharedBuffers* shared_buffers = NULL,
             Number const inaccuracy_seed = 0.0,
             FloatParamB const* freq_inaccuracy_param = NULL,
@@ -89,7 +97,13 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         BiquadFilter(
             std::string const& name,
             InputSignalProducerClass& input,
-            TypeParam& type,
+            SignalProducer* const buffer_owner = NULL
+        ) noexcept;
+
+        BiquadFilter(
+            std::string const& name,
+            InputSignalProducerClass& input,
+            BiquadFilterTypeParam& type,
             ToggleParam const& freq_log_scale_toggle,
             ToggleParam const& q_log_scale_toggle,
             SignalProducer* const buffer_owner = NULL
@@ -97,7 +111,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         BiquadFilter(
             InputSignalProducerClass& input,
-            TypeParam& type,
+            BiquadFilterTypeParam& type,
             FloatParamS& frequency_leader,
             FloatParamS& q_leader,
             FloatParamS& gain_leader,
@@ -110,7 +124,19 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         BiquadFilter(
             InputSignalProducerClass& input,
-            TypeParam& type,
+            FloatParamS& frequency_leader,
+            FloatParamS& q_leader,
+            FloatParamS& gain_leader,
+            BiquadFilterSharedBuffers* shared_buffers = NULL,
+            Number const inaccuracy_seed = 0.0,
+            FloatParamB const* freq_inaccuracy_param = NULL,
+            FloatParamB const* q_inaccuracy_param = NULL,
+            SignalProducer* buffer_owner = NULL
+        ) noexcept;
+
+        BiquadFilter(
+            InputSignalProducerClass& input,
+            BiquadFilterTypeParam& type,
             FloatParamS& frequency_leader,
             FloatParamS& q_leader,
             FloatParamS& gain_leader,
@@ -138,7 +164,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         FloatParamS frequency;
         FloatParamS q;
         FloatParamS gain;
-        TypeParam& type;
+        BiquadFilterTypeParam& type;
 
     protected:
         Sample const* const* initialize_rendering(

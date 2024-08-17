@@ -43,7 +43,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 21 + VOICES * 3, &mixer),
+) : Effect<InputSignalProducerClass>(name, input, 19 + VOICES * 3, &mixer),
     type(name+ "TYP"),
     delay_time(
         name + "DEL",
@@ -124,7 +124,6 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
-    high_pass_filter_type(""),
     high_pass_filter_gain(
         "",
         Constants::BIQUAD_FILTER_GAIN_MIN,
@@ -133,7 +132,6 @@ Chorus<InputSignalProducerClass>::Chorus(
     ),
     high_pass_filter(
         input,
-        high_pass_filter_type,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain
@@ -166,10 +164,8 @@ Chorus<InputSignalProducerClass>::Chorus(
         {high_pass_filter, PannedDelayStereoMode::NORMAL, width, delay_times[6], &tempo_sync},
     },
     mixer(input.get_channels()),
-    high_shelf_filter_type(""),
     high_shelf_filter(
         mixer,
-        high_shelf_filter_type,
         damping_frequency,
         biquad_filter_q,
         damping_gain,
@@ -199,13 +195,11 @@ Chorus<InputSignalProducerClass>::Chorus(
 
     this->register_child(biquad_filter_q);
 
-    this->register_child(high_pass_filter_type);
     this->register_child(high_pass_filter_gain);
     this->register_child(high_pass_filter);
 
     this->register_child(mixer);
 
-    this->register_child(high_shelf_filter_type);
     this->register_child(high_shelf_filter);
 
     this->register_child(feedback_gain);
@@ -225,10 +219,6 @@ Chorus<InputSignalProducerClass>::Chorus(
         this->register_child(delay_times[i]);
         this->register_child(comb_filters[i]);
     }
-
-    high_pass_filter_type.set_value(HighPassedInput::HIGH_PASS);
-
-    high_shelf_filter_type.set_value(HighShelfFilter::HIGH_SHELF);
 }
 
 

@@ -80,7 +80,7 @@ void test_inaccurate_filter_with_random(
         CHANNELS,
         phase_offset
     );
-    BiquadFilter<SumOfSines>::TypeParam filter_type_param("");
+    BiquadFilterTypeParam filter_type_param("");
     FloatParamB inaccuracy("IA", 0.0, 1.0, 0.2);
     BiquadFilter<SumOfSines> filter(
         "", input, filter_type_param, NULL, 1.0, &inaccuracy, &inaccuracy

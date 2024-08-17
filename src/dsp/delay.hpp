@@ -327,7 +327,10 @@ using DistortedDelay = Distortion::Distortion< Delay<InputSignalProducerClass> >
 
 
 template<class InputSignalProducerClass>
-using DistortedHighShelfDelay = BiquadFilter< DistortedDelay<InputSignalProducerClass> >;
+using DistortedHighShelfDelay = BiquadFilter<
+    DistortedDelay<InputSignalProducerClass>,
+    BiquadFilterFixedType::BFFT_HIGH_SHELF
+>;
 
 
 template<class InputSignalProducerClass>
@@ -380,11 +383,10 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
         );
 
     private:
-        static constexpr Integer NUMBER_OF_CHILDREN = 4;
+        static constexpr Integer NUMBER_OF_CHILDREN = 3;
 
         void initialize_instance() noexcept;
 
-        typename DistortedHighShelfDelay<InputSignalProducerClass>::TypeParam high_shelf_filter_type;
         FloatParamS high_shelf_filter_q;
         DistortedDelay<InputSignalProducerClass> distortion;
 

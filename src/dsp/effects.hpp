@@ -87,8 +87,8 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
         Volume1<InputSignalProducerClass> volume_1;
         Distortion1<InputSignalProducerClass> distortion_1;
         Distortion2<InputSignalProducerClass> distortion_2;
-        typename Filter1<InputSignalProducerClass>::TypeParam filter_1_type;
-        typename Filter2<InputSignalProducerClass>::TypeParam filter_2_type;
+        BiquadFilterTypeParam filter_1_type;
+        BiquadFilterTypeParam filter_2_type;
         ToggleParam filter_1_freq_log_scale;
         ToggleParam filter_1_q_log_scale;
         ToggleParam filter_2_freq_log_scale;
