@@ -439,6 +439,8 @@ class FloatParam : public Param<Number, evaluation>
 
         bool has_lfo_with_envelope() const noexcept;
 
+        bool is_polyphonic() const noexcept;
+
         void start_envelope(
             Seconds const time_offset,
             Number const random_1,

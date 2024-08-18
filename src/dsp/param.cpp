@@ -636,19 +636,24 @@ Number FloatParam<evaluation>::get_value() const noexcept
 
 
 template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_polyphonic() const noexcept
+{
+    if (leader != NULL) {
+        return leader->is_polyphonic();
+    }
+
+    return envelope != NULL || has_lfo_with_envelope();
+}
+
+
+template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::is_following_leader() const noexcept
 {
     if (leader == NULL) {
         return false;
     }
 
-    if (leader->get_envelope() != NULL) {
-        return false;
-    }
-
-    LFO* const lfo = leader->get_lfo();
-
-    return lfo == NULL || !lfo->has_envelope();
+    return !leader->is_polyphonic();
 }
 
 
@@ -1650,7 +1655,7 @@ bool FloatParam<evaluation>::has_lfo_with_envelope() const noexcept
         return leader->has_lfo_with_envelope();
     }
 
-    return lfo != NULL && lfo->has_envelope();
+    return envelope_state != NULL && lfo != NULL && lfo->has_envelope();
 }
 
 

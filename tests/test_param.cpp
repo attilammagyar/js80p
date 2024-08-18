@@ -3242,6 +3242,44 @@ TEST(can_tell_if_envelope_has_decayed, {
 })
 
 
+TEST(envelopes_and_lfo_envelopes_make_a_float_param_polyphonic, {
+    Envelope envelope("E");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("L");
+    FloatParamS leader("F", 0.0, 1.0, 0.5, 0.0, envelopes);
+    FloatParamS follower(leader);
+    FloatParamS non_poly_float_param("N", 0.0, 1.0, 0.5);
+
+    assert_false(leader.is_polyphonic(), "no controller");
+    assert_false(follower.is_polyphonic(), "no controller");
+    assert_false(non_poly_float_param.is_polyphonic(), "no controller");
+
+    leader.set_envelope(&envelope);
+    non_poly_float_param.set_envelope(&envelope);
+    assert_true(leader.is_polyphonic(), "envelope");
+    assert_true(follower.is_polyphonic(), "envelope");
+    assert_false(non_poly_float_param.is_polyphonic(), "envelope");
+    leader.set_envelope(NULL);
+    non_poly_float_param.set_envelope(NULL);
+
+    leader.set_lfo(&lfo);
+    non_poly_float_param.set_lfo(&lfo);
+    assert_false(leader.is_polyphonic(), "LFO without amount envelope");
+    assert_false(follower.is_polyphonic(), "LFO without amount envelope");
+    assert_false(non_poly_float_param.is_polyphonic(), "LFO without amount envelope");
+
+    lfo.amount_envelope.set_value(0);
+    assert_true(leader.is_polyphonic(), "LFO with amount envelope");
+    assert_true(follower.is_polyphonic(), "LFO with amount envelope");
+    assert_false(non_poly_float_param.is_polyphonic(), "LFO with amount envelope");
+    leader.set_lfo(NULL);
+    non_poly_float_param.set_lfo(NULL);
+})
+
+
 class Modulator : public SignalProducer
 {
     friend class SignalProducer;

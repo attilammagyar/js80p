@@ -706,7 +706,7 @@ class OtherSumOfSines : public SumOfSines
 };
 
 
-TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
+TEST(when_no_params_are_polyphonic_then_uses_cached_coefficients, {
     BiquadFilterSharedBuffers shared_buffers;
     SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected_clones(0.0, 440.0, 0.33, 3520.0, 0.0, 7040.0, CHANNELS);
@@ -746,6 +746,93 @@ TEST(when_no_params_have_envelopes_then_uses_cached_coefficients, {
     test_filter(filter_clone_2, input, expected_clones, 0.12, 1, BLOCK_SIZE);
 
     test_filter(filter_unique, input, expected_unique, 0.12, 1, BLOCK_SIZE);
+
+    delete[] shared_buffers.b0_buffer;
+    delete[] shared_buffers.b1_buffer;
+    delete[] shared_buffers.b2_buffer;
+    delete[] shared_buffers.a1_buffer;
+    delete[] shared_buffers.a2_buffer;
+})
+
+
+TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
+    /* Compensate for the headroom of the bandwidth-limited LFO square wave. */
+    constexpr Number headroom = 1.1;
+
+    BiquadFilterSharedBuffers shared_buffers;
+    SumOfSines input(0.33, 440.0, 0.33, 3520.0, 0.33, 7040.0, CHANNELS);
+    SumOfSines expected_1(0.0, 440.0, 0.0, 3520.0, 0.33, 7040.0, CHANNELS);
+    SumOfSines expected_2(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
+    Envelope envelope("ENV");
+    Envelope* envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    BiquadFilterTypeParam filter_type("TYP");
+    FloatParamS frequency(
+        "FRQ",
+        Constants::BIQUAD_FILTER_FREQUENCY_MIN,
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX,
+        Constants::BIQUAD_FILTER_FREQUENCY_DEFAULT,
+        0.0,
+        envelopes
+    );
+    FloatParamS q(
+        "Q",
+        Constants::BIQUAD_FILTER_Q_MIN,
+        Constants::BIQUAD_FILTER_Q_MAX,
+        Constants::BIQUAD_FILTER_Q_DEFAULT,
+        0.0,
+        envelopes
+    );
+    FloatParamS gain(
+        "G",
+        Constants::BIQUAD_FILTER_GAIN_MIN,
+        Constants::BIQUAD_FILTER_GAIN_MAX,
+        Constants::BIQUAD_FILTER_GAIN_DEFAULT,
+        0.0,
+        envelopes
+    );
+    LFO lfo("LFO", true);
+    BiquadFilter<SumOfSines> filter_1(
+        input, filter_type, frequency, q, gain, &shared_buffers
+    );
+    BiquadFilter<SumOfSines> filter_2(
+        input, filter_type, frequency, q, gain, &shared_buffers
+    );
+
+    lfo.waveform.set_value(LFO::Oscillator_::SQUARE);
+    lfo.frequency.set_value(Constants::LFO_FREQUENCY_MIN);
+    lfo.phase.set_value(0.1);
+    lfo.min.set_value(0.0);
+    lfo.max.set_value(1.0);
+    lfo.amount.set_value(1.0);
+    lfo.amount_envelope.set_value(0.0);
+    lfo.start(0.0);
+
+    envelope.initial_value.set_value(1.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.sustain_value.set_value(1.0);
+    envelope.final_value.set_value(1.0);
+
+    filter_type.set_value(BiquadFilter<SumOfSines>::BAND_PASS);
+    frequency.set_lfo(&lfo);
+    q.set_value(5.0);
+
+    shared_buffers.b0_buffer = new Sample[BLOCK_SIZE];
+    shared_buffers.b1_buffer = new Sample[BLOCK_SIZE];
+    shared_buffers.b2_buffer = new Sample[BLOCK_SIZE];
+    shared_buffers.a1_buffer = new Sample[BLOCK_SIZE];
+    shared_buffers.a2_buffer = new Sample[BLOCK_SIZE];
+
+    envelope.amount.set_value(filter_1.frequency.value_to_ratio(7040.0) * headroom);
+    filter_1.frequency.start_envelope(0.0, 0.0, 0.0);
+
+    envelope.amount.set_value(filter_2.frequency.value_to_ratio(440.0) * headroom);
+    filter_2.frequency.start_envelope(0.0, 0.0, 0.0);
+
+    test_filter(filter_1, input, expected_1, 0.11, 1, BLOCK_SIZE);
+    test_filter(filter_2, input, expected_2, 0.11, 1, BLOCK_SIZE);
 
     delete[] shared_buffers.b0_buffer;
     delete[] shared_buffers.b1_buffer;

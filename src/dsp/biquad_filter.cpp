@@ -681,8 +681,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_pass_ren
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && q.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !q.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(gain, round, sample_count);
@@ -789,8 +789,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_pass_re
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && q.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !q.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(gain, round, sample_count);
@@ -895,8 +895,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_band_pass_re
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && q.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !q.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(gain, round, sample_count);
@@ -1000,8 +1000,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_notch_render
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && q.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !q.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(gain, round, sample_count);
@@ -1108,9 +1108,9 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_peaking_rend
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && q.get_envelope() == NULL
-        && gain.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !q.is_polyphonic()
+        && !gain.is_polyphonic()
     );
 
     if (are_coefficients_constant) {
@@ -1240,8 +1240,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_shelf_re
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && gain.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !gain.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(q, round, sample_count);
@@ -1365,8 +1365,8 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_shelf_r
     );
     can_use_shared_coefficients = (
         can_use_shared_coefficients
-        && frequency.get_envelope() == NULL
-        && gain.get_envelope() == NULL
+        && !frequency.is_polyphonic()
+        && !gain.is_polyphonic()
     );
 
     FloatParamS::produce_if_not_constant(q, round, sample_count);
