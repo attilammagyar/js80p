@@ -46,6 +46,12 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_HIGH_PASS
         > HighPassedInput;
 
+        /*
+        Number of times I have tried to reduce computational complexity by
+        moving the shelving filter in front of the delay lines and then realized
+        that their feedback lines need to be independent from each other and
+        therefore cannot all go through the same filter instance: 2.
+        */
         typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter;
 
         class TypeParam : public ByteParam
