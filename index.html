@@ -396,10 +396,10 @@ small {
       <div class="section">
         <h3>What's New in v3.1.3</h3>
         <ul>
-          <li><p>Bugfix: oscillator filters will now correctly handle polyphony when one or
+          <li><p><strong>Bugfix</strong>: oscillator filters will now correctly handle polyphony when one or
           more of their parameters are controlled by LFOs with amplitude envelopes
           (<a href="https://github.com/attilammagyar/js80p/issues/31">#31</a>).</p></li>
-          <li><p>Bugfix: MIDI CC helper parameters are now registered with the correct
+          <li><p><strong>Bugfix</strong>: MIDI CC helper parameters are now registered with the correct
           default values in both the FST and the VST3 plugin.</p></li>
           <li><p>VST3: turn off MPE to note expression conversion during plugin
           initialization in hosts which do it by default, in order to be able to
@@ -409,7 +409,7 @@ small {
 
         <h3>What's New in v3.1.2</h3>
         <ul>
-          <li><p>Bugfix: built-in presets should never overwrite oscillator tuning settings.
+          <li><p><strong>Bugfix</strong>: built-in presets should never overwrite oscillator tuning settings.
           (Depending on the plugin type and the host application's behavior, this
           change may only take effect in newly created projects.)</p></li>
           <li><p>FST (VST 2.4): improve compatibility with hosts that use the
@@ -418,12 +418,12 @@ small {
 
         <h3>What's New in v3.1.1</h3>
         <ul>
-          <li><p>Bugfix: make header texts on the Macro tab consistent with
+          <li><p><strong>Bugfix</strong>: make header texts on the Macro tab consistent with
           other UI elements.</p></li>
-          <li><p>Bugfix: export helper parameter for MIDI CC 88 and make it
+          <li><p><strong>Bugfix</strong>: export helper parameter for MIDI CC 88 and make it
           available as a controller. (Backward-compatibility is kept for host
           and plugin combinations where parameter order matters.)</p></li>
-          <li><p>Bugfix: fix building with GCC versions up to 14.1.0.</p></li>
+          <li><p><strong>Bugfix</strong>: fix building with GCC versions up to 14.1.0.</p></li>
         </ul>
 
         <h3>What's New in v3.1.0</h3>
@@ -458,10 +458,10 @@ small {
           <li><p>New presets: Lo-fi Keys, Analog Brass AT last, and Analog
           Brass mod last, the latter two demonstrating the usage of
           semi-polyphonic aftertouch.</p></li>
-          <li><p>Bugfix: centered LFOs will not be clamped when MIN and MAX
+          <li><p><strong>Bugfix</strong>: centered LFOs will not be clamped when MIN and MAX
           values are inverted. (Clamping was a regression introduced in
           v3.0.0.)</p></li>
-          <li><p>Bugfix: plugin latency is now correctly reported to the
+          <li><p><strong>Bugfix</strong>: plugin latency is now correctly reported to the
           host.</p></li>
         </ul>
 
