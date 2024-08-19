@@ -1,3 +1,14 @@
+v3.1.3 (2024-08-19)
+ * Bugfix: oscillator filters will now correctly handle polyphony when one or
+   more of their parameters are controlled by LFOs with amplitude envelopes
+   (https://github.com/attilammagyar/js80p/issues/31).
+ * Bugfix: MIDI CC helper parameters are now registered with the correct
+   default values in both the FST and the VST3 plugin.
+ * VST3: turn off MPE to note expression conversion during plugin
+   initialization in hosts which do it by default, in order to be able to
+   receive MIDI events unmodified.
+ * VST3: update the SDK to 3.7.12 (build 20).
+
 v3.1.2 (2024-07-29)
  * Bugfix: built-in presets should never overwrite oscillator tuning settings.
    (Depending on the plugin type and the host application's behavior, this
