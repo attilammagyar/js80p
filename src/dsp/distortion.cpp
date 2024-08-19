@@ -891,7 +891,7 @@ Sample const* const* Distortion<InputSignalProducerClass>::initialize_rendering(
 
     current_type = type.get_value();
 
-    if (current_type != previous_type) {
+    if (JS80P_UNLIKELY(current_type != previous_type)) {
         previous_type = current_type;
 
         Table const& F0_table = tables.get_F0_table(current_type);
