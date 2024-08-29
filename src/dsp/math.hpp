@@ -164,9 +164,12 @@ class Math
 
         static constexpr int ENVELOPE_SHAPE_TABLE_SIZE = 0x0400;
 
-        static bool is_abs_small(Number const x, Number const threshold = 0.000001) noexcept;
+        static constexpr bool is_abs_small(
+            Number const x,
+            Number const threshold = 0.000001
+        ) noexcept;
 
-        static bool is_close(
+        static constexpr bool is_close(
             Number const a,
             Number const b,
             Number const threshold = 0.000001
@@ -190,11 +193,11 @@ class Math
          */
         static void sincos(Number const x, Number& sin, Number& cos) noexcept;
 
-        static Number exp(Number const x) noexcept;
-        static Number pow_10(Number const x) noexcept;
-        static Number pow_10_inv(Number const x) noexcept;
+        static constexpr Number exp(Number const x) noexcept;
+        static constexpr Number pow_10(Number const x) noexcept;
+        static constexpr Number pow_10_inv(Number const x) noexcept;
 
-        static Number db_to_linear(Number const db) noexcept;
+        static constexpr Number db_to_linear(Number const db) noexcept;
         static Number linear_to_db(Number const linear) noexcept;
 
         static Number const* log_chorus_lfo_freq_table() noexcept;
@@ -207,28 +210,36 @@ class Math
          *        effect using a logarithmic scale for a given ratio between
          *        0.0 and 1.0. Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_chorus_lfo_frequency(Number const ratio) noexcept;
+        static constexpr Number ratio_to_exact_log_chorus_lfo_frequency(
+            Number const ratio
+        ) noexcept;
 
         /**
          * \brief Calcualte the exact LFO frequency value using a
          *        logarithmic scale for a given ratio between 0.0 and 1.0.
          *        Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_lfo_frequency(Number const ratio) noexcept;
+        static constexpr Number ratio_to_exact_log_lfo_frequency(
+            Number const ratio
+        ) noexcept;
 
         /**
          * \brief Calcualte the exact biquad filter frequency value using a
          *        logarithmic scale for a given ratio between 0.0 and 1.0.
          *        Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_biquad_filter_frequency(Number const ratio) noexcept;
+        static constexpr Number ratio_to_exact_log_biquad_filter_frequency(
+            Number const ratio
+        ) noexcept;
 
         /**
          * \brief Calcualte the exact biquad filter Q value using a
          *        logarithmic scale for a given ratio between 0.0 and 1.0.
          *        Intended for testing purposes.
          */
-        static Number ratio_to_exact_log_biquad_filter_q(Number const ratio) noexcept;
+        static constexpr Number ratio_to_exact_log_biquad_filter_q(
+            Number const ratio
+        ) noexcept;
 
         /**
          * \brief Initialize a lookup table for a logarithmic scale param.
@@ -256,12 +267,15 @@ class Math
             Number(*ratio_to_exact_value)(Number const ratio)
         ) noexcept;
 
-        static Frequency detune(Frequency const frequency, Number const cents) noexcept;
+        static constexpr Frequency detune(
+            Frequency const frequency,
+            Number const cents
+        ) noexcept;
 
         /**
          * \brief Compute a_weight * a + (1.0 - a_weight) * b
          */
-        static Number combine(
+        static constexpr Number combine(
             Number const a_weight,
             Number const a,
             Number const b
@@ -281,7 +295,10 @@ class Math
          * \brief Same as \c Math::distort(), but input and output are between
          *        -0.5 and 0.5, and only smooth-smooth distortion is supported.
          */
-        static Number distort_centered_lfo(Number const level, Number const number) noexcept;
+        static Number distort_centered_lfo(
+            Number const level,
+            Number const number
+        ) noexcept;
 
         /**
          * \brief Return a pseudo random number between 0.0 and 1.0, based on
@@ -295,12 +312,18 @@ class Math
          * \brief Same as \c Math::randomize(), but input and output are between
          *        -0.5 and 0.5.
          */
-        static Number randomize_centered_lfo(Number const level, Number const number) noexcept;
+        static Number randomize_centered_lfo(
+            Number const level,
+            Number const number
+        ) noexcept;
 
         /**
          * \brief Apply the given shaping function to an envelope value.
          */
-        static Number apply_envelope_shape(EnvelopeShape const shape, Number const value) noexcept;
+        static Number apply_envelope_shape(
+            EnvelopeShape const shape,
+            Number const value
+        ) noexcept;
 
         /**
          * \brief Look up the given floating point, non-negative \c index in the
@@ -390,9 +413,12 @@ class Math
 
         static Math const math;
 
-        static Number iterate_exp(Number const x, Number const scale) noexcept;
+        static constexpr Number iterate_exp(
+            Number const x,
+            Number const scale
+        ) noexcept;
 
-        static Number ratio_to_exact_log_value(
+        static constexpr Number ratio_to_exact_log_value(
             Number const ratio,
             Number const min,
             Number const max,
@@ -411,18 +437,18 @@ class Math
         void init_linear_to_db() noexcept;
         void init_envelope_shapes() noexcept;
 
-        Number shape_smooth_smooth(Number const x) noexcept;
-        Number shape_smooth_smooth_steep(Number const x) noexcept;
-        Number shape_smooth_smooth_steeper(Number const x) noexcept;
-        Number shape_smooth_sharp(Number const x) noexcept;
-        Number shape_smooth_sharp_steep(Number const x) noexcept;
-        Number shape_smooth_sharp_steeper(Number const x) noexcept;
-        Number shape_sharp_smooth(Number const x) noexcept;
-        Number shape_sharp_smooth_steep(Number const x) noexcept;
-        Number shape_sharp_smooth_steeper(Number const x) noexcept;
-        Number shape_sharp_sharp(Number const x) noexcept;
-        Number shape_sharp_sharp_steep(Number const x) noexcept;
-        Number shape_sharp_sharp_steeper(Number const x) noexcept;
+        static constexpr Number shape_smooth_smooth(Number const x) noexcept;
+        static constexpr Number shape_smooth_smooth_steep(Number const x) noexcept;
+        static constexpr Number shape_smooth_smooth_steeper(Number const x) noexcept;
+        static constexpr Number shape_smooth_sharp(Number const x) noexcept;
+        static constexpr Number shape_smooth_sharp_steep(Number const x) noexcept;
+        static constexpr Number shape_smooth_sharp_steeper(Number const x) noexcept;
+        static constexpr Number shape_sharp_smooth(Number const x) noexcept;
+        static constexpr Number shape_sharp_smooth_steep(Number const x) noexcept;
+        static constexpr Number shape_sharp_smooth_steeper(Number const x) noexcept;
+        static constexpr Number shape_sharp_sharp(Number const x) noexcept;
+        static constexpr Number shape_sharp_sharp_steep(Number const x) noexcept;
+        static constexpr Number shape_sharp_sharp_steeper(Number const x) noexcept;
 
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;

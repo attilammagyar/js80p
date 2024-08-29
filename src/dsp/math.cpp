@@ -192,8 +192,9 @@ void Math::init_log_biquad_filter_freq() noexcept
 }
 
 
-Number Math::ratio_to_exact_log_chorus_lfo_frequency(Number const ratio) noexcept
-{
+constexpr Number Math::ratio_to_exact_log_chorus_lfo_frequency(
+        Number const ratio
+) noexcept {
     return ratio_to_exact_log_value(
         ratio,
         Constants::CHORUS_LFO_FREQUENCY_MIN,
@@ -202,15 +203,16 @@ Number Math::ratio_to_exact_log_chorus_lfo_frequency(Number const ratio) noexcep
 }
 
 
-Number Math::ratio_to_exact_log_lfo_frequency(Number const ratio) noexcept
-{
+constexpr Number Math::ratio_to_exact_log_lfo_frequency(
+        Number const ratio
+) noexcept {
     return ratio_to_exact_log_value(
         ratio, Constants::LFO_FREQUENCY_MIN, Constants::LFO_FREQUENCY_MAX
     );
 }
 
 
-Number Math::ratio_to_exact_log_biquad_filter_frequency(
+constexpr Number Math::ratio_to_exact_log_biquad_filter_frequency(
         Number const ratio
 ) noexcept {
     return ratio_to_exact_log_value(
@@ -286,7 +288,7 @@ void Math::init_envelope_shapes() noexcept
 }
 
 
-Number Math::shape_smooth_smooth(Number const x) noexcept
+constexpr Number Math::shape_smooth_smooth(Number const x) noexcept
 {
     /*
     Antiderivative of 6 * (x - x ^ 2).
@@ -322,7 +324,7 @@ Number Math::shape_smooth_smooth(Number const x) noexcept
 }
 
 
-Number Math::shape_smooth_smooth_steep(Number const x) noexcept
+constexpr Number Math::shape_smooth_smooth_steep(Number const x) noexcept
 {
     /*
     Antiderivative of 30 * ((x - x ^ 2) ^ 2).
@@ -333,7 +335,7 @@ Number Math::shape_smooth_smooth_steep(Number const x) noexcept
 }
 
 
-Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
+constexpr Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of 2772 * ((x - x ^ 2) ^ 5).
@@ -353,7 +355,7 @@ Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
 }
 
 
-Number Math::shape_sharp_sharp(Number const x) noexcept
+constexpr Number Math::shape_sharp_sharp(Number const x) noexcept
 {
     /*
     Antiderivative of (2 * x - 1) ^ 2.
@@ -365,7 +367,7 @@ Number Math::shape_sharp_sharp(Number const x) noexcept
 }
 
 
-Number Math::shape_sharp_sharp_steep(Number const x) noexcept
+constexpr Number Math::shape_sharp_sharp_steep(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 2.
@@ -376,7 +378,7 @@ Number Math::shape_sharp_sharp_steep(Number const x) noexcept
 }
 
 
-Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
+constexpr Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 5.
@@ -399,44 +401,45 @@ Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 }
 
 
-Number Math::shape_smooth_sharp(Number const x) noexcept
+constexpr Number Math::shape_smooth_sharp(Number const x) noexcept
 {
     return std::pow(x, 2.0);
 }
 
 
-Number Math::shape_smooth_sharp_steep(Number const x) noexcept
+constexpr Number Math::shape_smooth_sharp_steep(Number const x) noexcept
 {
     return std::pow(x, 3.0);
 }
 
 
-Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
+constexpr Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
 {
     return std::pow(x, 5.0);
 }
 
 
-Number Math::shape_sharp_smooth(Number const x) noexcept
+constexpr Number Math::shape_sharp_smooth(Number const x) noexcept
 {
     return x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001));
 }
 
 
-Number Math::shape_sharp_smooth_steep(Number const x) noexcept
+constexpr Number Math::shape_sharp_smooth_steep(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 2.0 / 3.0);
 }
 
 
-Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
+constexpr Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 1.0 / 3.0);
 }
 
 
-Number Math::ratio_to_exact_log_biquad_filter_q(Number const ratio) noexcept
-{
+constexpr Number Math::ratio_to_exact_log_biquad_filter_q(
+        Number const ratio
+) noexcept {
     return ratio_to_exact_log_value(
         ratio,
         Constants::BIQUAD_FILTER_Q_MIN,
@@ -446,7 +449,7 @@ Number Math::ratio_to_exact_log_biquad_filter_q(Number const ratio) noexcept
 }
 
 
-Number Math::ratio_to_exact_log_value(
+constexpr Number Math::ratio_to_exact_log_value(
         Number const ratio,
         Number const min,
         Number const max,
@@ -472,14 +475,17 @@ void Math::init_linear_to_db() noexcept
 }
 
 
-bool Math::is_abs_small(Number const x, Number const threshold) noexcept
+constexpr bool Math::is_abs_small(Number const x, Number const threshold) noexcept
 {
     return std::fabs(x) < threshold;
 }
 
 
-bool Math::is_close(Number const a, Number const b, Number const threshold) noexcept
-{
+constexpr bool Math::is_close(
+        Number const a,
+        Number const b,
+        Number const threshold
+) noexcept {
     return is_abs_small(a - b, threshold);
 }
 
@@ -537,13 +543,13 @@ void Math::sincos_impl(Number const x, Number& sin, Number& cos) const noexcept
 }
 
 
-Number Math::exp(Number const x) noexcept
+constexpr Number Math::exp(Number const x) noexcept
 {
     return iterate_exp(x, EXP_SCALE);
 }
 
 
-Number Math::iterate_exp(Number const x, Number const scale) noexcept
+constexpr Number Math::iterate_exp(Number const x, Number const scale) noexcept
 {
     /* \exp(x) = \lim_{n \to \infty} ( 1 + \frac{x}{n} ) ^ n */
 
@@ -565,19 +571,19 @@ Number Math::iterate_exp(Number const x, Number const scale) noexcept
 }
 
 
-Number Math::pow_10(Number const x) noexcept
+constexpr Number Math::pow_10(Number const x) noexcept
 {
     return iterate_exp(x, POW_10_SCALE);
 }
 
 
-Number Math::pow_10_inv(Number const x) noexcept
+constexpr Number Math::pow_10_inv(Number const x) noexcept
 {
     return iterate_exp(x, POW_10_INV_SCALE);
 }
 
 
-Number Math::db_to_linear(Number const db) noexcept
+constexpr Number Math::db_to_linear(Number const db) noexcept
 {
     return pow_10(db * DB_TO_LINEAR_GAIN_SCALE);
 }
@@ -622,8 +628,10 @@ Number const* Math::log_biquad_filter_q_table() noexcept
 }
 
 
-Frequency Math::detune(Frequency const frequency, Number const cents) noexcept
-{
+constexpr Frequency Math::detune(
+        Frequency const frequency,
+        Number const cents
+) noexcept {
     /*
     The approximation errors in exp() would keep piling up in oscillators (even
     with more iterations) until the oscillators go so much out of phase that it
@@ -698,7 +706,7 @@ void Math::compute_statistics(
 }
 
 
-Number Math::combine(
+constexpr Number Math::combine(
         Number const a_weight,
         Number const a,
         Number const b
@@ -733,8 +741,10 @@ Number Math::distort(
 }
 
 
-Number Math::distort_centered_lfo(Number const level, Number const number) noexcept
-{
+Number Math::distort_centered_lfo(
+        Number const level,
+        Number const number
+) noexcept {
     if (level < 0.0001) {
         return number;
     }
@@ -742,7 +752,9 @@ Number Math::distort_centered_lfo(Number const level, Number const number) noexc
     return combine(
         level,
         lookup(
-            math.distortion_centered_lfo, DISTORTION_TABLE_MAX_INDEX, (number + 0.5) * DISTORTION_SCALE
+            math.distortion_centered_lfo,
+            DISTORTION_TABLE_MAX_INDEX,
+            (number + 0.5) * DISTORTION_SCALE
         ),
         number
     );
@@ -763,22 +775,28 @@ Number Math::randomize(Number const level, Number const number) noexcept
 }
 
 
-Number Math::randomize_centered_lfo(Number const level, Number const number) noexcept
-{
+Number Math::randomize_centered_lfo(
+        Number const level,
+        Number const number
+) noexcept {
     if (level < 0.000001) {
         return number;
     }
 
     Number const random = lookup(
-        math.randoms_centered_lfo, RANDOMS_MAX_INDEX, (number + 0.5) * RANDOM_SCALE
+        math.randoms_centered_lfo,
+        RANDOMS_MAX_INDEX,
+        (number + 0.5) * RANDOM_SCALE
     );
 
     return combine(level, random, number);
 }
 
 
-Number Math::apply_envelope_shape(EnvelopeShape const shape, Number const value) noexcept
-{
+Number Math::apply_envelope_shape(
+        EnvelopeShape const shape,
+        Number const value
+) noexcept {
     return lookup(
         math.envelope_shapes[(int)shape],
         ENVELOPE_SHAPE_TABLE_MAX_INDEX,
