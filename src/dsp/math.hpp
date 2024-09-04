@@ -164,12 +164,12 @@ class Math
 
         static constexpr int ENVELOPE_SHAPE_TABLE_SIZE = 0x0400;
 
-        static constexpr bool is_abs_small(
+        static bool is_abs_small(
             Number const x,
             Number const threshold = 0.000001
         ) noexcept;
 
-        static constexpr bool is_close(
+        static bool is_close(
             Number const a,
             Number const b,
             Number const threshold = 0.000001

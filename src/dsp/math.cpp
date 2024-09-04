@@ -475,13 +475,13 @@ void Math::init_linear_to_db() noexcept
 }
 
 
-constexpr bool Math::is_abs_small(Number const x, Number const threshold) noexcept
+bool Math::is_abs_small(Number const x, Number const threshold) noexcept
 {
     return std::fabs(x) < threshold;
 }
 
 
-constexpr bool Math::is_close(
+bool Math::is_close(
         Number const a,
         Number const b,
         Number const threshold
