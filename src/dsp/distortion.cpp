@@ -374,7 +374,7 @@ void Tables::initialize_spline_tables(
         g : [1, 3] --> R
 
                 { g(x)  if 1 <= x <= 3
-        s(x) := { f(x)  if gamma <= x
+        s(x) := { f(x)  if gamma <= x < 1
                 { h(x)  if 0 <= x < gamma
 
     Let F and G denote some antiderivatives, and let f' and g' denote the
