@@ -24,7 +24,7 @@ set -e
 set -u
 set -o pipefail
 
-TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2 riscv64-gpp:none"
+TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2 riscv64-gpp:none rloongarch64-gpp:none"
 PLUGIN_TYPES="fst vst3"
 TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
 DIST_DIR_BASE="dist"
@@ -264,8 +264,9 @@ call_make_for_build_platform()
     shift
 
     case "$build_platform" in
-        "x86_64")   call_make "x86_64-w64-mingw32" "avx" "$@" ;;
-        "riscv64")  call_make "riscv64-gpp" "none" "$@" ;;
+        "x86_64")       call_make "x86_64-w64-mingw32" "avx" "$@" ;;
+        "riscv64")      call_make "riscv64-gpp" "none" "$@" ;;
+        "loongarch64")  call_make "loong64-gpp" "none" "$@" ;;
         *) error "Unsupported build platform: $uname" ;;
     esac
 }
@@ -431,6 +432,10 @@ package_vst3_bundle()
             copy_vst3 "$version_as_file_name" "linux-x86_64-avx" "$vst3_base_dir" "x86_64-linux" "js80p.so"
             copy_vst3 "$version_as_file_name" "windows-x86_64-avx" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
             ;;
+        "none")
+            copy_vst3 "$version_as_file_name" "linux-loong64-lsx" "$vst3_base_dir" "loong64-linux" "js80p.so"
+            ;;
+
         "none")
             copy_vst3 "$version_as_file_name" "linux-riscv64-none" "$vst3_base_dir" "riscv64-linux" "js80p.so"
             ;;
