@@ -17,13 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
-INSTRUCTION_SET = none
+INSTRUCTION_SET = lsx
 
 LIB_PATH ?= $(BUILD_DIR)/lib64
 SYS_LIB_PATH ?= /usr/lib/loong64-linux-gnu
 SUFFIX = loong64
-OBJ_GUI_BFDNAME = elf64-loongarch64
-OBJ_GUI_BFDARCH = loong
+OBJ_GUI_BFDNAME = elf64-loongarch
+OBJ_GUI_BFDARCH = loongarch64
 ARCH_CXXFLAGS = -march=loongarch64 -mabi=lp64d
 ARCH_LFLAGS = -L$(LIB_PATH)
 
