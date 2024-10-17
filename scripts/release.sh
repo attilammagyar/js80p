@@ -200,7 +200,7 @@ main()
     if [[ "$target_platforms" =~ loong64-gpp:lsx ]]
     then
         log "Bulding VST 3 bundle for loongarch64"
-        package_vst3_bundle "$version_as_file_name" "none"
+        package_vst3_bundle "$version_as_file_name" "lsx"
     else
         log "Skipping VST 3 bundle for loongarch64"
     fi
