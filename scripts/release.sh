@@ -440,7 +440,7 @@ package_vst3_bundle()
             copy_vst3 "$version_as_file_name" "linux-x86_64-avx" "$vst3_base_dir" "x86_64-linux" "js80p.so"
             copy_vst3 "$version_as_file_name" "windows-x86_64-avx" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
             ;;
-        "none")
+        "lsx")
             copy_vst3 "$version_as_file_name" "linux-loong64-lsx" "$vst3_base_dir" "loong64-linux" "js80p.so"
             ;;
 
