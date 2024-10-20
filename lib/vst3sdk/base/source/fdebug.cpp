@@ -230,7 +230,7 @@ void FDebugBreak (const char* format, ...)
 #elif SMTG_OS_MACOS && __arm64__
 			raise (SIGSTOP);
 
-#elif __ppc64__ || __ppc__ || __arm__
+#elif __ppc64__ || __ppc__ || __arm__ || __loongarch_lp64
 			kill (getpid (), SIGINT);
 #elif __i386__ || __x86_64__
 			{

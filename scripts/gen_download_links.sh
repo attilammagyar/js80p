@@ -86,6 +86,12 @@ get_arch()
         return
     fi
 
+    if [[ "$file_name" =~ loongarch64 ]]
+    then
+        echo "64"
+        return
+    fi
+
     echo "32"
 }
 

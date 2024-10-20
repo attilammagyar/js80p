@@ -111,7 +111,7 @@
 #define VSTCALLBACK
 
  /* t_fstPtrInt: pointer sized int */
-#if defined(_WIN32) && (defined(__x86_64__) || defined (_M_X64))
+#if defined(_WIN32) && (defined(__x86_64__) || defined (_M_X64) || defined(__loongarch_lp64))
 typedef long long t_fstPtrInt;
 #else
 typedef long t_fstPtrInt;
