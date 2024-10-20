@@ -26,8 +26,11 @@ System Requirements
     * separate packages are available for AVX capable 64 bit processors
  * RAM: 200-300 MB per instance, depending on buffer sizes, sample rate, etc.
 
-Note: a RISC-V 64 port is available as a separate project by @aimixsaka at
-https://github.com/aimixsaka/js80p/
+Note: the source code can be compiled for various other platforms as well,
+thanks to the following contributors:
+
+ * RISC-V 64 by @aimixsaka (https://github.com/aimixsaka)
+ * LoongArch by @YHStar (https://github.com/YHStar)
 
 Dependencies on Windows
 -----------------------

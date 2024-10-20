@@ -326,9 +326,13 @@ Tested with [REAPER](https://www.reaper.fm/) 7.14.
 A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
 gives good performance and low latency.
 
-**Note**: a RISC-V 64 port is available as a
-[separate project](https://github.com/aimixsaka/js80p/) by
-[@aimixsaka](https://github.com/aimixsaka/).
+**Note**: the source code can be compiled for various other platforms as well,
+thanks to the following contributors:
+
+ * [RISC-V 64](https://github.com/aimixsaka/js80p/) by
+   [@aimixsaka](https://github.com/aimixsaka/)
+ * [LoongArch ](https://github.com/YHStar/js80p) by
+   [@YHStar](https://github.com/YHStar)
 
 <a id="windows-deps"></a>
 
@@ -2619,14 +2623,15 @@ following commands to run tests and compile JS80P for Windows:
 Run `make check` for running tests.
 
 The following commands (on a 64 bit Linux environment) will compile JS80P for
-64 bit Windows, 32 bit Windows, `x86_64` Linux, `x86` Linux, and
-`RISC-V 64` Linux respectively:
+64 bit Windows, 32 bit Windows, `x86_64` Linux, `x86` Linux, `RISC-V 64` Linux,
+and `LoongArch` Linux respectively:
 
     TARGET_PLATFORM=x86_64-w64-mingw32 make all
     TARGET_PLATFORM=i686-w64-mingw32 make all
     TARGET_PLATFORM=x86_64-gpp make all
     TARGET_PLATFORM=i686-gpp make all
     TARGET_PLATFORM=riscv64-gpp make all
+    TARGET_PLATFORM=loong64-gpp make all
 
 <a href="#toc">Table of Contents</a>
 
