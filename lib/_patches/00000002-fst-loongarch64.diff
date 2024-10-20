@@ -1,0 +1,19 @@
+commit e00da6f7cfe2a9577cf321b15256e55b11561a56
+Author: YHStar
+Date:   Thu Oct 17 05:58:57 2024 +0800
+
+    modify lib to arch:loongarch64
+
+diff --git a/lib/fst/fst.h b/lib/fst/fst.h
+index 7571e6d..0b09daf 100644
+--- a/lib/fst/fst.h
++++ b/lib/fst/fst.h
+@@ -111,7 +111,7 @@
+ #define VSTCALLBACK
+ 
+  /* t_fstPtrInt: pointer sized int */
+-#if defined(_WIN32) && (defined(__x86_64__) || defined (_M_X64))
++#if defined(_WIN32) && (defined(__x86_64__) || defined (_M_X64) || defined(__loongarch_lp64))
+ typedef long long t_fstPtrInt;
+ #else
+ typedef long t_fstPtrInt;

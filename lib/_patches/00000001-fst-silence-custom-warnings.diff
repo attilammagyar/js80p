@@ -1,0 +1,33 @@
+commit 65b95e626802c92d4efaa783d50c89b1d2641b94
+Author: Attila M. Magyar
+Date:   Mon Jun 5 21:09:34 2023 +0200
+
+    FstPlugin: compile with FST 0.123.0
+
+diff --git a/lib/fst/fst.h b/lib/fst/fst.h
+index 314b14f..7571e6d 100644
+--- a/lib/fst/fst.h
++++ b/lib/fst/fst.h
+@@ -36,13 +36,15 @@
+ #define _FST_STRING2(x) #x
+ #define _FST_STRING(x) _FST_STRING2(x)
+ #define _FST_PRAGMA(x) _Pragma(#x)
+-#if defined(__GNUC__) || defined(__clang__)
+-# define FST_WARNING(x) _FST_PRAGMA(GCC warning x)
+-#elif defined _MSC_VER
+-# define FST_WARNING(x) __pragma(message(__FILE__ ":" _FST_STRING(__LINE__) ": warning: " x))
+-#else
+-# define FST_WARNING(x)
+-#endif
++/* warnings silenced for -Werror */
++#define FST_WARNING(x)
++// #if defined(__GNUC__) || defined(__clang__)
++// # define FST_WARNING(x) _FST_PRAGMA(GCC warning x)
++// #elif defined _MSC_VER
++// # define FST_WARNING(x) __pragma(message(__FILE__ ":" _FST_STRING(__LINE__) ": warning: " x))
++// #else
++// # define FST_WARNING(x)
++// #endif
+ 
+ 
+ /* helper macros for marking values as compatible with the original SDK */

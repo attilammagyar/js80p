@@ -1,0 +1,20 @@
+commit e00da6f7cfe2a9577cf321b15256e55b11561a56
+Author: YHStar
+Date:   Thu Oct 17 05:58:57 2024 +0800
+
+    modify lib to arch:loongarch64
+
+diff --git a/lib/vst3sdk/base/source/fdebug.cpp b/lib/vst3sdk/base/source/fdebug.cpp
+index 18fa1c9..5d2c792 100644
+--- a/lib/vst3sdk/base/source/fdebug.cpp
++++ b/lib/vst3sdk/base/source/fdebug.cpp
+@@ -230,7 +230,7 @@ void FDebugBreak (const char* format, ...)
+ #elif SMTG_OS_MACOS && __arm64__
+ 			raise (SIGSTOP);
+ 
+-#elif __ppc64__ || __ppc__ || __arm__
++#elif __ppc64__ || __ppc__ || __arm__ || __loongarch_lp64
+ 			kill (getpid (), SIGINT);
+ #elif __i386__ || __x86_64__
+ 			{
+
