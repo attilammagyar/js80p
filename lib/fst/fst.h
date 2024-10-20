@@ -454,6 +454,9 @@ enum {
   FST_FLAG_UNKNOWN(PinIsActive),
   FST_FLAG_UNKNOWN(PinUseSpeaker),
   FST_FLAG_UNKNOWN(PinIsStereo),
+
+  /* REAPER: used with effVendorSpecific to indicate that parameter values are enums */
+  FST_CONSTANT_UNKNOWN(ParameterUsesIntStep),
 };
 
 typedef enum {
