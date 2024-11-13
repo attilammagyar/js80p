@@ -63,7 +63,7 @@ main()
     case "$arch" in
         "x86") target_platform="i686" ;;
         "x86_64"|"riscv64") target_platform="$arch" ;;
-        "loongarch64") target_platform="loong64"
+        "loongarch64") target_platform="loong64" ;;
         *)
             echo "Unknown architecture: \"$arch\" - should be either \"x86\" or \"x86_64\" or \"riscv64\" or \"loongarch64\"" >&2
             return 1
