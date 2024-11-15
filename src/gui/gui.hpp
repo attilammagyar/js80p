@@ -269,7 +269,10 @@ class GUI
             ParamStateImages const* macro_midpoint_states
         );
 
-        void build_effects_body(ParamStateImages const* knob_states);
+        void build_effects_body(
+            ParamStateImages const* knob_states,
+            ParamStateImages const* reversed_toggle_states
+        );
 
         void build_envelopes_1_body(
             ParamStateImages const* knob_states,
@@ -315,6 +318,7 @@ class GUI
         ParamStateImages const* envelope_shapes_10;
         ParamStateImages const* macro_distortions;
         ParamStateImages const* macro_midpoint_states;
+        ParamStateImages const* reversed_toggle_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;

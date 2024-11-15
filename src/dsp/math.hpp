@@ -361,6 +361,110 @@ class Math
             Number const index
         ) noexcept;
 
+        /**
+         * \brief Smooth-smooth shaping function for values between 0.0 and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_smooth(Number const x) noexcept;
+
+        /**
+         * \brief Steep smooth-smooth shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_smooth_steep(Number const x) noexcept;
+
+        /**
+         * \brief Steeper smooth-smooth shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_smooth_steeper(Number const x) noexcept;
+
+        /**
+         * \brief Smooth-sharp shaping function for values between 0.0 and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_sharp(Number const x) noexcept;
+
+        /**
+         * \brief Steep smooth-sharp shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_sharp_steep(Number const x) noexcept;
+
+        /**
+         * \brief Steeper smooth-sharp shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_smooth_sharp_steeper(Number const x) noexcept;
+
+        /**
+         * \brief Sharp-smooth shaping function for values between 0.0 and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_smooth(Number const x) noexcept;
+
+        /**
+         * \brief Steep sharp-smooth shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_smooth_steep(Number const x) noexcept;
+
+        /**
+         * \brief Steeper sharp-smooth shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_smooth_steeper(Number const x) noexcept;
+
+        /**
+         * \brief Sharp-sharp shaping function for values between 0.0 and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_sharp(Number const x) noexcept;
+
+        /**
+         * \brief Steep sharp-sharp shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_sharp_steep(Number const x) noexcept;
+
+        /**
+         * \brief Steeper sharp-sharp shaping function for values between 0.0
+         *        and 1.0.
+         *
+         * \warning The calculation is slow, use it only for initializing lookup
+         *          tables!
+         */
+        static constexpr Number shape_sharp_sharp_steeper(Number const x) noexcept;
+
         class Statistics;
 
         static void compute_statistics(
@@ -436,19 +540,6 @@ class Math
         void init_log_biquad_filter_q() noexcept;
         void init_linear_to_db() noexcept;
         void init_envelope_shapes() noexcept;
-
-        static constexpr Number shape_smooth_smooth(Number const x) noexcept;
-        static constexpr Number shape_smooth_smooth_steep(Number const x) noexcept;
-        static constexpr Number shape_smooth_smooth_steeper(Number const x) noexcept;
-        static constexpr Number shape_smooth_sharp(Number const x) noexcept;
-        static constexpr Number shape_smooth_sharp_steep(Number const x) noexcept;
-        static constexpr Number shape_smooth_sharp_steeper(Number const x) noexcept;
-        static constexpr Number shape_sharp_smooth(Number const x) noexcept;
-        static constexpr Number shape_sharp_smooth_steep(Number const x) noexcept;
-        static constexpr Number shape_sharp_smooth_steeper(Number const x) noexcept;
-        static constexpr Number shape_sharp_sharp(Number const x) noexcept;
-        static constexpr Number shape_sharp_sharp_steep(Number const x) noexcept;
-        static constexpr Number shape_sharp_sharp_steeper(Number const x) noexcept;
 
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;

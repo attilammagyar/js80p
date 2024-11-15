@@ -34,7 +34,14 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
+enum DelayCapabilities {
+    DC_BASIC = 0,
+    DC_SCALABLE = 1,
+    DC_REVERSIBLE = 2,
+};
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
 class Delay : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -46,6 +53,10 @@ class Delay : public Filter<InputSignalProducerClass>
         static constexpr Number BPM_MIN = (
             Math::SECONDS_IN_ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
         );
+
+#ifdef JS80P_ASSERTIONS
+        static constexpr Number TEST_REVERSE_ENVELOPE = 0.7;
+#endif
 
         explicit Delay(
             InputSignalProducerClass& input,
@@ -93,10 +104,17 @@ class Delay : public Filter<InputSignalProducerClass>
         ) noexcept;
 
         void use_shared_delay_buffer(
-            Delay<InputSignalProducerClass> const& shared_buffer_owner
+            Delay<InputSignalProducerClass, capabilities> const& shared_buffer_owner
         ) noexcept;
 
         void set_time_scale_param(FloatParamS& time_scale_param) noexcept;
+
+        void set_reverse_toggle_param(ToggleParam& reverse_toggle_param) noexcept;
+
+#ifdef JS80P_ASSERTIONS
+        void begin_reverse_delay_test() noexcept;
+        void end_reverse_delay_test() noexcept;
+#endif
 
         ToggleParam const* const tempo_sync;
 
@@ -154,22 +172,62 @@ class Delay : public Filter<InputSignalProducerClass>
 
         bool is_delay_buffer_silent() const noexcept;
 
-        template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant>
+        template<
+            bool need_gain,
+            bool is_gain_constant,
+            bool is_time_scale_constant,
+            bool is_reversed
+        >
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer,
+            Sample** const buffer,
             Sample const gain
         ) noexcept;
+
+        void initialize_reverse_rendering(
+            Number& read_index,
+            Number& reverse_done_samples,
+            Number const& delay_buffer_size_float
+        ) const noexcept;
+
+        void adjust_reverse_target_delay_time(
+            Number& reverse_target_delay_time_in_samples,
+            Number& reverse_target_delay_time_in_samples_inv,
+            Number const& reverse_done_samples,
+            Number const& time_value_in_samples
+        ) const noexcept;
+
+        Number calculate_reverse_delta_samples(
+            Number const& time_value_in_samples,
+            Number const& reverse_target_delay_time_in_samples
+        ) const noexcept;
+
+        void apply_reverse_delay_envelope(
+            Sample& sample,
+            Number const reverse_done_samples,
+            Number const reverse_target_delay_time_in_samples_inv
+        ) const noexcept;
+
+        void advance_reverse_rendering(
+            Number& read_index,
+            Number& reverse_delta_samples,
+            Number& reverse_done_samples,
+            Number& reverse_target_delay_time_in_samples,
+            Number& reverse_target_delay_time_in_samples_inv,
+            Number const& time_value_in_samples,
+            Number const& delay_buffer_size_float
+        ) const noexcept;
 
         Integer const delay_buffer_oversize;
         bool const is_gain_constant_1;
 
-        Delay<InputSignalProducerClass> const* shared_buffer_owner;
+        Delay<InputSignalProducerClass, capabilities> const* shared_buffer_owner;
 
         SignalProducer* feedback_signal_producer;
         FloatParamS* time_scale_param;
+        ToggleParam* reverse_toggle_param;
         Sample** delay_buffer;
         Sample const* gain_buffer;
         Sample const* time_buffer;
@@ -185,9 +243,17 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer delay_buffer_size;
         Integer previous_round;
         Number delay_buffer_size_float;
+
+        Number reverse_next_start_index;
+        Number reverse_read_index;
+        Number reverse_done_samples;
+        Number reverse_target_delay_time_in_samples;
+        Number reverse_target_delay_time_in_samples_inv;
+
         bool is_starting;
         bool need_gain;
         bool need_to_render_silence;
+        bool is_reversed;
 };
 
 
@@ -197,7 +263,11 @@ enum PannedDelayStereoMode {
 };
 
 
-template<class InputSignalProducerClass, class FilterInputClass = Delay<InputSignalProducerClass> >
+template<
+    class InputSignalProducerClass,
+    class FilterInputClass = Delay<InputSignalProducerClass>,
+    DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
 class PannedDelay : public Filter<FilterInputClass>
 {
     friend class SignalProducer;
@@ -318,29 +388,31 @@ class PannedDelay : public Filter<FilterInputClass>
     public:
         FloatParamS panning;
 
-        Delay<InputSignalProducerClass> delay;
+        Delay<InputSignalProducerClass, capabilities> delay;
 };
 
 
-template<class InputSignalProducerClass>
-using DistortedDelay = Distortion::Distortion< Delay<InputSignalProducerClass> >;
+template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
+using DistortedDelay = Distortion::Distortion< Delay<InputSignalProducerClass, capabilities> >;
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
 using DistortedHighShelfDelay = BiquadFilter<
-    DistortedDelay<InputSignalProducerClass>,
+    DistortedDelay<InputSignalProducerClass, capabilities>,
     BiquadFilterFixedType::BFFT_HIGH_SHELF
 >;
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
 using DistortedHighShelfPannedDelayBase = PannedDelay<
-    InputSignalProducerClass, DistortedHighShelfDelay<InputSignalProducerClass>
+    InputSignalProducerClass,
+    DistortedHighShelfDelay<InputSignalProducerClass, capabilities>,
+    capabilities
 >;
 
 
-template<class InputSignalProducerClass>
-class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
+class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>
 {
     friend class SignalProducer;
 
@@ -388,10 +460,10 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
         void initialize_instance() noexcept;
 
         FloatParamS high_shelf_filter_q;
-        DistortedDelay<InputSignalProducerClass> distortion;
+        DistortedDelay<InputSignalProducerClass, capabilities> distortion;
 
     public:
-        DistortedHighShelfDelay<InputSignalProducerClass> high_shelf_filter;
+        DistortedHighShelfDelay<InputSignalProducerClass, capabilities> high_shelf_filter;
 };
 
 }

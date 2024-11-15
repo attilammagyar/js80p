@@ -33,7 +33,7 @@ Echo<InputSignalProducerClass>::Echo(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
-        name, input, 18, &comb_filter_2
+        name, input, 20, &comb_filter_2
     ),
     delay_time(
         name + "DEL",
@@ -91,6 +91,8 @@ Echo<InputSignalProducerClass>::Echo(
     tempo_sync(name + "SYN", ToggleParam::OFF),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
+    reversed_1(name + "R1", ToggleParam::OFF),
+    reversed_2(name + "R2", ToggleParam::OFF),
     distortion_type("", Distortion::TYPE_DELAY_FEEDBACK),
     high_pass_filter_gain(
         "",
@@ -151,6 +153,8 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(tempo_sync);
     this->register_child(log_scale_frequencies);
     this->register_child(log_scale_high_pass_q);
+    this->register_child(reversed_1);
+    this->register_child(reversed_2);
 
     this->register_child(distortion_type);
 
@@ -162,6 +166,9 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(comb_filter_2);
 
     comb_filter_1.delay.set_feedback_signal_producer(comb_filter_2.high_shelf_filter);
+
+    comb_filter_1.delay.set_reverse_toggle_param(reversed_1);
+    comb_filter_2.delay.set_reverse_toggle_param(reversed_2);
 }
 
 

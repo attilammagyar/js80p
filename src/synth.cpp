@@ -517,6 +517,8 @@ void Synth::register_effects_params() noexcept
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
     register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
     register_param<ToggleParam>(ParamId::EELHQ, effects.echo.log_scale_high_pass_q);
+    register_param<ToggleParam>(ParamId::EER1, effects.echo.reversed_1);
+    register_param<ToggleParam>(ParamId::EER2, effects.echo.reversed_2);
 
     register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
     register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);

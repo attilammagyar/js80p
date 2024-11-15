@@ -1084,6 +1084,8 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M30DSH] = "Macro 30 Distortion Shape",
     [Synth::ParamId::MFX4] = "Modulator Fine Detune x4",
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
+    [Synth::ParamId::EER1] = "Echo Delay 1 Reversed",
+    [Synth::ParamId::EER2] = "Echo Delay 2 Reversed",
 };
 
 
@@ -1872,6 +1874,17 @@ GUI::GUI(
         21
     );
 
+    reversed_toggle_states = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "REVERSED"),
+        NULL,
+        NULL,
+        NULL,
+        2,
+        18,
+        18
+    );
+
     about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
     macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
     macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
@@ -1899,7 +1912,7 @@ GUI::GUI(
     build_macros_1_body(knob_states, macro_distortions, macro_midpoint_states);
     build_macros_2_body(knob_states, macro_distortions, macro_midpoint_states);
     build_macros_3_body(knob_states, macro_distortions, macro_midpoint_states);
-    build_effects_body(knob_states);
+    build_effects_body(knob_states, reversed_toggle_states);
     build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_lfos_body(knob_states);
@@ -2525,8 +2538,10 @@ void GUI::build_macros_3_body(
 }
 
 
-void GUI::build_effects_body(ParamStateImages const* knob_states)
-{
+void GUI::build_effects_body(
+        ParamStateImages const* knob_states,
+        ParamStateImages const* reversed_toggle_states
+) {
     effects_body = new TabBody(*this, "Effects");
 
     background->own(effects_body);
@@ -2604,6 +2619,8 @@ void GUI::build_effects_body(ParamStateImages const* knob_states)
     TOGG(effects_body, 190, 285,  50, 24,  0, Synth::ParamId::EELHQ);
     TOGG(effects_body, 422, 285, 136, 24,  0, Synth::ParamId::EELOG);
     TOGG(effects_body, 836, 285,  90, 24, 66, Synth::ParamId::EESYN);
+    DPEI(effects_body, 109, 289,  18, 18, 0, 18, Synth::ParamId::EER1, reversed_toggle_states);
+    DPEI(effects_body, 127, 289,  18, 18, 0, 18, Synth::ParamId::EER2, reversed_toggle_states);
 
     KNOB(effects_body,  14 + KNOB_W * 0,   453, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body,  14 + KNOB_W * 1,   453, Synth::ParamId::ERHPQ,  MML__,      "%.3f", 1.0, knob_states);
@@ -3263,6 +3280,7 @@ GUI::~GUI()
     delete envelope_shapes_10;
     delete macro_distortions;
     delete macro_midpoint_states;
+    delete reversed_toggle_states;
 
     dummy_widget->delete_image(about_image);
     dummy_widget->delete_image(macros_1_image);

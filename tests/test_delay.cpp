@@ -192,7 +192,9 @@ void test_delay_with_time_scale_param(
     Buffer output(sample_count, CHANNELS);
     ToggleParam tempo_sync("SYN", tempo_sync_state);
     FloatParamS delay_time_scale("SCL", 0.0, 2.0, 2.0);
-    Delay<FixedSignalProducer> delay(input, &tempo_sync);
+    Delay<FixedSignalProducer, DelayCapabilities::DC_SCALABLE> delay(
+        input, &tempo_sync
+    );
 
     delay.set_time_scale_param(delay_time_scale);
 
@@ -220,7 +222,9 @@ void test_delay_with_time_scale_param(
     delay_time_scale.schedule_value(0.2, 0.5);
     delay_time_scale.schedule_value(0.8, 0.500001);
 
-    render_rounds< Delay<FixedSignalProducer> >(delay, output, rounds);
+    render_rounds< Delay<FixedSignalProducer, DelayCapabilities::DC_SCALABLE> >(
+        delay, output, rounds
+    );
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_eq(
@@ -604,6 +608,248 @@ TEST(identical_delays_may_share_delay_buffer, {
             (int)c
         );
     }
+})
+
+
+TEST(delay_may_be_reversed, {
+    constexpr Number bpm = 120.0;
+    constexpr Number gain = 0.5;
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 3;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Number envelope = (
+        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>::TEST_REVERSE_ENVELOPE
+    );
+
+    /*
+    Let S denote the index of the last written sample within the delay buffer
+    when we start observing a normal forward delay. If T denotes the delay time
+    expressed as sample count (let's assume it's constant), then the I-th
+    output sample of the delay will be the (S+I-T)-th sample from the delay
+    buffer. During a period of T samples (let's truncate it to integers and
+    let's assume that it's constant), a delay and a reversed delay should
+    produce the following samples:
+
+        Index   Output sample (forward)     Output sample (reversed)
+        0       B[S + 0 - T]                B[S + T - T]
+        1       B[S + 1 - T]                B[S + (T - 1) - T]
+        2       B[S + 2 - T]                B[S + (T - 2) - T]
+        ...     ...                         ...
+        T - 2   B[S + (T - 2) - T]          B[S + 2 - T]
+        T - 1   B[S + (T - 1) - T]          B[S + 1 - T]
+        T       B[S + T - T]                B[S + 0 - T]
+
+    Once the reversed delay hits the (S + 0 - T)-th sample, it should restart
+    from S.
+
+    If the delay time (expressed in samples) is not an integer, then the
+    repeated section is supposed to be longer by a fraction of a sample. Let T
+    denote the integer part of the delay time (measured in samples), and let
+    the fraction be denoted by F. When we notice that we went further back in
+    the buffer than (T + F), e.g. by D samples (D will equal to (1.0 - F) on the
+    first restart), then the next output sample should come exactly from D
+    samples before S:
+
+        Buffer:       2      1      0
+               |---+--|------|------|------|------|------|------|------|------|
+                  -F -T             S
+        Output:                     0      1      2  0      1      2  0      1
+    */
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+    constexpr Sample expected_output[CHANNELS][sample_count] = {
+        {
+            envelope * gain * 0.1,
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * (0.7 * 0.1 + 0.3 * 0.0),
+
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * (0.4 * 0.1 + 0.6 * 0.5),
+            envelope * gain * (0.4 * 0.5 + 0.6 * 0.4),
+            envelope * gain * (0.4 * 0.4 + 0.6 * 0.3),
+
+            envelope * gain * (0.1 * 0.1 + 0.9 * 0.5),
+            envelope * gain * (0.1 * 0.5 + 0.9 * 0.4),
+            envelope * gain * (0.1 * 0.4 + 0.9 * 0.3),
+            envelope * gain * (0.1 * 0.3 + 0.9 * 0.2),
+            envelope * gain * (0.8 * 0.1 + 0.2 * 0.5),
+        },
+        {
+            envelope * gain * 0.2,
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * (0.7 * 0.2 + 0.3 * 0.0),
+
+            envelope * gain * 0.0,
+            envelope * gain * 0.0,
+            envelope * gain * (0.4 * 0.2 + 0.6 * 1.0),
+            envelope * gain * (0.4 * 1.0 + 0.6 * 0.8),
+            envelope * gain * (0.4 * 0.8 + 0.6 * 0.6),
+
+            envelope * gain * (0.1 * 0.2 + 0.9 * 1.0),
+            envelope * gain * (0.1 * 1.0 + 0.9 * 0.8),
+            envelope * gain * (0.1 * 0.8 + 0.9 * 0.6),
+            envelope * gain * (0.1 * 0.6 + 0.9 * 0.4),
+            envelope * gain * (0.8 * 0.2 + 0.2 * 1.0),
+        }
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Buffer output(sample_count, CHANNELS);
+    ToggleParam tempo_sync("SYN", ToggleParam::ON);
+    ToggleParam reverse("REV", ToggleParam::ON);
+    Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> delay(
+        input, &tempo_sync
+    );
+
+    delay.begin_reverse_delay_test();
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
+
+    reverse.set_sample_rate(sample_rate);
+    reverse.set_block_size(block_size);
+    reverse.set_bpm(bpm);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+    input.set_bpm(bpm);
+
+    delay.set_reverse_toggle_param(reverse);
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
+    delay.gain.set_value(gain);
+    delay.time.set_value(0.66);
+    delay.time.schedule_value(0.71, 0.65999);
+
+    render_rounds< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+        delay, output, rounds
+    );
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay; channel=%d, bpm=%f, tempo_sync=%s",
+            (int)c,
+            bpm,
+            tempo_sync.get_value() == ToggleParam::ON ? "ON" : "OFF"
+        );
+    }
+
+    delay.end_reverse_delay_test();
+})
+
+
+TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part_of_the_delay_segment, {
+    constexpr Number bpm = 120.0;
+    constexpr Integer block_size = 10;
+    constexpr Integer rounds = 1;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Number envelope = (
+        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>::TEST_REVERSE_ENVELOPE
+    );
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
+        {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
+    };
+    constexpr Sample expected_output[CHANNELS][sample_count] = {
+        {
+            envelope * 0.00,
+            envelope * 1.00,
+            envelope * 0.90,
+            envelope * 0.80,
+            envelope * 0.70,
+            envelope * 0.60,
+            envelope * 0.50,
+            envelope * 0.45,
+            envelope * 0.40,
+            envelope * 0.35,
+        },
+        {
+            envelope * 0.00,
+            envelope * 1.00,
+            envelope * 0.90,
+            envelope * 0.80,
+            envelope * 0.70,
+            envelope * 0.60,
+            envelope * 0.50,
+            envelope * 0.45,
+            envelope * 0.40,
+            envelope * 0.35,
+        }
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Buffer output(sample_count, CHANNELS);
+    ToggleParam tempo_sync("SYN", ToggleParam::OFF);
+    ToggleParam reverse("REV", ToggleParam::ON);
+    Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> delay(
+        input, &tempo_sync
+    );
+
+    delay.begin_reverse_delay_test();
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
+
+    reverse.set_sample_rate(sample_rate);
+    reverse.set_block_size(block_size);
+    reverse.set_bpm(bpm);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+    input.set_bpm(bpm);
+
+    delay.set_reverse_toggle_param(reverse);
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
+    delay.gain.set_value(1.0);
+    delay.time.set_value(1.0);
+
+    SignalProducer::produce< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+        delay, 123
+    );
+
+    delay.time.schedule_value(0.51, 2.0);
+    render_rounds< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+        delay, output, rounds
+    );
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay; channel=%d, bpm=%f, tempo_sync=%s",
+            (int)c,
+            bpm,
+            tempo_sync.get_value() == ToggleParam::ON ? "ON" : "OFF"
+        );
+    }
+
+    delay.end_reverse_delay_test();
 })
 
 

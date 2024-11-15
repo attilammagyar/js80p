@@ -27,8 +27,88 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(
+class ReverseDelayEnvelope
+{
+    public:
+        static constexpr int TABLE_SIZE = 1024;
+        static constexpr int TABLE_MAX_INDEX = TABLE_SIZE - 1;
+        static constexpr Number TABLE_MAX_INDEX_FLOAT = (Number)TABLE_MAX_INDEX;
+
+        ReverseDelayEnvelope();
+
+#ifdef JS80P_ASSERTIONS
+        void begin_test(Number const value) noexcept;
+        void end_test() noexcept;
+#endif
+
+        Number const* const table;
+
+    private:
+
+        void reset() noexcept;
+
+        Number table_rw[TABLE_SIZE];
+};
+
+
+#ifndef JS80P_ASSERTIONS
+ReverseDelayEnvelope const reverse_delay_envelope;
+#else
+ReverseDelayEnvelope reverse_delay_envelope;
+#endif
+
+
+ReverseDelayEnvelope::ReverseDelayEnvelope()
+    : table(table_rw)
+{
+    reset();
+}
+
+
+void ReverseDelayEnvelope::reset() noexcept
+{
+    constexpr int attack = (int)((Number)TABLE_SIZE * 0.07) + 1;
+    constexpr int release = (int)((Number)TABLE_SIZE * 0.14) + 1;
+    constexpr int hold_end = TABLE_MAX_INDEX - release;
+    constexpr Number attack_float = (Number)attack;
+    constexpr Number release_float = (Number)release;
+
+    int i = 0;
+
+    for (; i != attack; ++i) {
+        Number const x = (Number)i / attack_float;
+
+        table_rw[i] = Math::shape_smooth_smooth_steep(x);
+    }
+
+    for (; i != hold_end; ++i) {
+        table_rw[i] = 1.0;
+    }
+
+    for (; i != TABLE_SIZE; ++i) {
+        Number const x = (Number)(TABLE_MAX_INDEX - i) / release_float;
+
+        table_rw[i] = Math::shape_smooth_smooth(x);
+    }
+}
+
+
+#ifdef JS80P_ASSERTIONS
+void ReverseDelayEnvelope::begin_test(Number const value) noexcept
+{
+    std::fill_n(table_rw, TABLE_SIZE, value);
+}
+
+
+void ReverseDelayEnvelope::end_test() noexcept
+{
+    reset();
+}
+#endif
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         ToggleParam const* tempo_sync
 ) noexcept
@@ -55,30 +135,32 @@ Delay<InputSignalProducerClass>::Delay(
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::initialize_instance() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
 {
     shared_buffer_owner = NULL;
 
     feedback_signal_producer = NULL;
     time_scale_param = NULL;
+    reverse_toggle_param = NULL;
     delay_buffer = NULL;
     gain_buffer = NULL;
     time_buffer = NULL;
     time_scale_buffer = NULL;
     delay_buffer_size = 0;
     delay_buffer_size_float = 0.0;
+    is_reversed = false;
 
     reallocate_delay_buffer_if_needed();
-    Delay<InputSignalProducerClass>::reset();
+    Delay<InputSignalProducerClass, capabilities>::reset();
 
     this->register_child(gain);
     this->register_child(time);
 }
 
 
-template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& time_leader,
         ToggleParam const* tempo_sync
@@ -96,8 +178,8 @@ Delay<InputSignalProducerClass>::Delay(
 }
 
 
-template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& gain_leader,
         FloatParamS& time_leader,
@@ -116,8 +198,8 @@ Delay<InputSignalProducerClass>::Delay(
 }
 
 
-template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::Delay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& gain_leader,
         Seconds const time,
@@ -137,8 +219,8 @@ Delay<InputSignalProducerClass>::Delay(
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::reallocate_delay_buffer_if_needed() noexcept
 {
     Integer const new_delay_buffer_size = this->block_size * 2 + std::max(
         (Integer)(this->sample_rate * time.get_max_value()) + 1,
@@ -155,8 +237,8 @@ void Delay<InputSignalProducerClass>::reallocate_delay_buffer_if_needed() noexce
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::free_delay_buffer() noexcept
 {
     if (delay_buffer == NULL || shared_buffer_owner != NULL) {
         return;
@@ -174,11 +256,11 @@ void Delay<InputSignalProducerClass>::free_delay_buffer() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::allocate_delay_buffer() noexcept
 {
     if (this->channels <= 0 || shared_buffer_owner != NULL) {
-        Delay<InputSignalProducerClass>::reset();
+        Delay<InputSignalProducerClass, capabilities>::reset();
         return;
     }
 
@@ -188,13 +270,13 @@ void Delay<InputSignalProducerClass>::allocate_delay_buffer() noexcept
         delay_buffer[c] = new Sample[delay_buffer_size];
     }
 
-    Delay<InputSignalProducerClass>::reset();
+    Delay<InputSignalProducerClass, capabilities>::reset();
     reset();
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::reset() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::reset() noexcept
 {
     Filter<InputSignalProducerClass>::reset();
 
@@ -215,18 +297,40 @@ void Delay<InputSignalProducerClass>::reset() noexcept
     clear_index = this->block_size;
     is_starting = true;
     previous_round = -1;
+
+    reverse_next_start_index = 0.0;
+    reverse_read_index = 0.0;
+    reverse_done_samples = 0.0;
+    reverse_target_delay_time_in_samples = 0.0;
+    reverse_target_delay_time_in_samples_inv = 1.0;
 }
 
 
-template<class InputSignalProducerClass>
-Delay<InputSignalProducerClass>::~Delay()
+#ifdef JS80P_ASSERTIONS
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::begin_reverse_delay_test() noexcept
+{
+    reverse_delay_envelope.begin_test(TEST_REVERSE_ENVELOPE);
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::end_reverse_delay_test() noexcept
+{
+    reverse_delay_envelope.end_test();
+}
+#endif
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Delay<InputSignalProducerClass, capabilities>::~Delay()
 {
     free_delay_buffer();
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::set_block_size(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     if (new_block_size == this->get_block_size()) {
@@ -239,8 +343,8 @@ void Delay<InputSignalProducerClass>::set_block_size(
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::set_sample_rate(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_sample_rate(
         Frequency const new_sample_rate
 ) noexcept {
     SignalProducer::set_sample_rate(new_sample_rate);
@@ -249,25 +353,33 @@ void Delay<InputSignalProducerClass>::set_sample_rate(
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::set_feedback_signal_producer(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_feedback_signal_producer(
         SignalProducer& feedback_signal_producer
 ) noexcept {
     this->feedback_signal_producer = &feedback_signal_producer;
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::set_time_scale_param(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_time_scale_param(
         FloatParamS& time_scale_param
 ) noexcept {
     this->time_scale_param = &time_scale_param;
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::use_shared_delay_buffer(
-    Delay<InputSignalProducerClass> const& shared_buffer_owner
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_reverse_toggle_param(
+        ToggleParam& reverse_toggle_param
+) noexcept {
+    this->reverse_toggle_param = &reverse_toggle_param;
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::use_shared_delay_buffer(
+    Delay<InputSignalProducerClass, capabilities> const& shared_buffer_owner
 ) noexcept {
     free_delay_buffer();
 
@@ -275,14 +387,31 @@ void Delay<InputSignalProducerClass>::use_shared_delay_buffer(
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_rendering(
     Integer const round,
     Integer const sample_count
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
     read_index = write_index_input;
+
+    if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+        if (JS80P_LIKELY(reverse_toggle_param != NULL)) {
+            is_reversed = reverse_toggle_param->get_value() == ToggleParam::ON;
+            reverse_next_start_index = (Number)read_index;
+
+            if (JS80P_UNLIKELY(is_starting) || !is_reversed) {
+                reverse_read_index = reverse_next_start_index;
+                reverse_done_samples = 0.0;
+            }
+        } else {
+            JS80P_ASSERT_NOT_REACHED();
+            is_reversed = false;
+            reverse_read_index = reverse_next_start_index;
+            reverse_done_samples = 0.0;
+        }
+    }
 
     if (JS80P_UNLIKELY(shared_buffer_owner != NULL)) {
         clear_delay_buffer<true>(sample_count);
@@ -312,13 +441,15 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
             : this->sample_rate
     );
 
-    if (time_scale_param != NULL) {
-        time_scale_buffer = FloatParamS::produce_if_not_constant(
-            *time_scale_param, round, sample_count
-        );
+    if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
+        if (JS80P_LIKELY(time_scale_param != NULL)) {
+            time_scale_buffer = FloatParamS::produce_if_not_constant(
+                *time_scale_param, round, sample_count
+            );
 
-        if (time_scale_buffer == NULL) {
-            time_scale *= time_scale_param->get_value();
+            if (time_scale_buffer == NULL) {
+                time_scale *= time_scale_param->get_value();
+            }
         }
     }
 
@@ -327,6 +458,12 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
     if (is_delay_buffer_silent()) {
         if (JS80P_UNLIKELY(need_to_render_silence)) {
             need_to_render_silence = false;
+
+            if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+                reverse_done_samples = 0.0;
+                reverse_read_index = reverse_next_start_index;
+            }
+
             this->render_silence(round, 0, this->block_size, this->buffer);
         }
 
@@ -341,8 +478,8 @@ Sample const* const* Delay<InputSignalProducerClass>::initialize_rendering(
 }
 
 
-template<class InputSignalProducerClass>
-Integer Delay<InputSignalProducerClass>::advance_delay_buffer_index(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Integer Delay<InputSignalProducerClass, capabilities>::advance_delay_buffer_index(
         Integer const position,
         Integer const increment
 ) const noexcept {
@@ -356,9 +493,9 @@ Integer Delay<InputSignalProducerClass>::advance_delay_buffer_index(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<bool is_delay_buffer_shared>
-void Delay<InputSignalProducerClass>::clear_delay_buffer(
+void Delay<InputSignalProducerClass, capabilities>::clear_delay_buffer(
         Integer const sample_count
 ) noexcept {
     if constexpr (!is_delay_buffer_shared) {
@@ -369,12 +506,13 @@ void Delay<InputSignalProducerClass>::clear_delay_buffer(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<bool is_delay_buffer_shared>
-void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
+void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
     if (JS80P_UNLIKELY(feedback_signal_producer == NULL)) {
+        is_starting = false;
         return;
     }
 
@@ -423,9 +561,9 @@ void Delay<InputSignalProducerClass>::mix_feedback_into_delay_buffer(
 }
 
 
-template<class InputSignalProducerClass>
-template<typename Delay<InputSignalProducerClass>::DelayBufferWritingMode mode>
-Integer Delay<InputSignalProducerClass>::write_delay_buffer(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+template<typename Delay<InputSignalProducerClass, capabilities>::DelayBufferWritingMode mode>
+Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
         Sample const* const* source_buffer,
         Integer const delay_buffer_index,
         Integer const sample_count
@@ -469,9 +607,9 @@ Integer Delay<InputSignalProducerClass>::write_delay_buffer(
 }
 
 
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<bool is_delay_buffer_shared>
-void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
+void Delay<InputSignalProducerClass, capabilities>::mix_input_into_delay_buffer(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -501,8 +639,8 @@ void Delay<InputSignalProducerClass>::mix_input_into_delay_buffer(
 }
 
 
-template<class InputSignalProducerClass>
-bool Delay<InputSignalProducerClass>::is_delay_buffer_silent() const noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+bool Delay<InputSignalProducerClass, capabilities>::is_delay_buffer_silent() const noexcept
 {
     return (
         silent_input_samples >= delay_buffer_size
@@ -511,8 +649,8 @@ bool Delay<InputSignalProducerClass>::is_delay_buffer_silent() const noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void Delay<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -520,16 +658,44 @@ void Delay<InputSignalProducerClass>::render(
 ) noexcept {
     if (need_gain) {
         if (gain_buffer == NULL) {
-            if (time_scale_buffer == NULL) {
-                render<true, true, true>(
-                    round,
-                    first_sample_index,
-                    last_sample_index,
-                    buffer,
-                    this->gain.get_value()
-                );
+            if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
+                if (time_scale_buffer == NULL) {
+                    render<true, true, true, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        this->gain.get_value()
+                    );
+                } else {
+                    render<true, true, false, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        this->gain.get_value()
+                    );
+                }
+            } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+                if (is_reversed) {
+                    render<true, true, true, true>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        this->gain.get_value()
+                    );
+                } else {
+                    render<true, true, true, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        this->gain.get_value()
+                    );
+                }
             } else {
-                render<true, true, false>(
+                render<true, true, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -538,16 +704,44 @@ void Delay<InputSignalProducerClass>::render(
                 );
             }
         } else {
-            if (time_scale_buffer == NULL) {
-                render<true, false, true>(
-                    round,
-                    first_sample_index,
-                    last_sample_index,
-                    buffer,
-                    1.0
-                );
+            if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
+                if (time_scale_buffer == NULL) {
+                    render<true, false, true, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        1.0
+                    );
+                } else {
+                    render<true, false, false, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        1.0
+                    );
+                }
+            } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+                if (is_reversed) {
+                    render<true, false, true, true>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        1.0
+                    );
+                } else {
+                    render<true, false, true, false>(
+                        round,
+                        first_sample_index,
+                        last_sample_index,
+                        buffer,
+                        1.0
+                    );
+                }
             } else {
-                render<true, false, false>(
+                render<true, false, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -557,16 +751,44 @@ void Delay<InputSignalProducerClass>::render(
             }
         }
     } else {
-        if (time_scale_buffer == NULL) {
-            render<false, true, true>(
-                round,
-                first_sample_index,
-                last_sample_index,
-                buffer,
-                1.0
-            );
+        if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
+            if (time_scale_buffer == NULL) {
+                render<false, true, true, false>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            } else {
+                render<false, true, false, false>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            }
+        } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+            if (is_reversed) {
+                render<false, true, true, true>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            } else {
+                render<false, true, true, false>(
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    buffer,
+                    1.0
+                );
+            }
         } else {
-            render<false, true, false>(
+            render<false, true, true, false>(
                 round,
                 first_sample_index,
                 last_sample_index,
@@ -578,37 +800,67 @@ void Delay<InputSignalProducerClass>::render(
 }
 
 
-template<class InputSignalProducerClass>
-template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant>
-void Delay<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant, bool is_reversed>
+void Delay<InputSignalProducerClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer,
+        Sample** const buffer,
         Sample const gain
 ) noexcept {
+    JS80P_ASSERT(is_time_scale_constant || !is_reversed);
+
     Integer const channels = this->channels;
-    Number const read_index_float = (Number)this->read_index;
+    Number const read_index_orig = (Number)this->read_index;
     Sample const* const* delay_buffer = (
         shared_buffer_owner != NULL
             ? shared_buffer_owner->delay_buffer
             : this->delay_buffer
     );
+    Number const delay_buffer_size_float = this->delay_buffer_size_float;
+
+    Number reverse_delta_samples;
+    Number read_index;
+    Number reverse_done_samples;
+    Number reverse_target_delay_time_in_samples;
+    Number reverse_target_delay_time_in_samples_inv;
+
+    if constexpr (is_reversed) {
+        reverse_target_delay_time_in_samples = this->reverse_target_delay_time_in_samples;
+        reverse_target_delay_time_in_samples_inv = this->reverse_target_delay_time_in_samples_inv;
+    }
 
     if (time_buffer == NULL) {
-        Number const time_value = time.get_value() * time_scale;
+        Number const time_value_in_samples = time.get_value() * time_scale;
 
         for (Integer c = 0; c != channels; ++c) {
             Sample const* const delay_channel = delay_buffer[c];
             Sample* const out_channel = buffer[c];
             Number processed_samples;
-            Number read_index;
 
             if constexpr (is_time_scale_constant) {
-                read_index = read_index_float - time_value;
+                if constexpr (is_reversed) {
+                    initialize_reverse_rendering(
+                        read_index,
+                        reverse_done_samples,
+                        delay_buffer_size_float
+                    );
+                    adjust_reverse_target_delay_time(
+                        reverse_target_delay_time_in_samples,
+                        reverse_target_delay_time_in_samples_inv,
+                        reverse_done_samples,
+                        time_value_in_samples
+                    );
+                    reverse_delta_samples = calculate_reverse_delta_samples(
+                        time_value_in_samples, reverse_target_delay_time_in_samples
+                    );
+                } else {
+                    read_index = read_index_orig - time_value_in_samples;
 
-                if (read_index < 0.0) {
-                    read_index += delay_buffer_size_float;
+                    if (JS80P_UNLIKELY(read_index < 0.0)) {
+                        read_index += delay_buffer_size_float;
+                    }
                 }
             } else {
                 processed_samples = 0.0;
@@ -617,12 +869,12 @@ void Delay<InputSignalProducerClass>::render(
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (!is_time_scale_constant) {
                     read_index = (
-                        read_index_float
-                        - time_value * time_scale_buffer[i]
+                        read_index_orig
+                        - time_value_in_samples * time_scale_buffer[i]
                         + processed_samples
                     );
 
-                    if (read_index < 0.0) {
+                    if (JS80P_UNLIKELY(read_index < 0.0)) {
                         read_index += delay_buffer_size_float;
                     }
                 }
@@ -644,7 +896,29 @@ void Delay<InputSignalProducerClass>::render(
                 }
 
                 if constexpr (is_time_scale_constant) {
-                    read_index += 1.0;
+                    if constexpr (is_reversed) {
+                        apply_reverse_delay_envelope(
+                            out_channel[i],
+                            reverse_done_samples,
+                            reverse_target_delay_time_in_samples_inv
+                        );
+
+                        advance_reverse_rendering(
+                            read_index,
+                            reverse_delta_samples,
+                            reverse_done_samples,
+                            reverse_target_delay_time_in_samples,
+                            reverse_target_delay_time_in_samples_inv,
+                            time_value_in_samples,
+                            delay_buffer_size_float
+                        );
+
+                        if (JS80P_UNLIKELY(read_index < 0.0)) {
+                            read_index += delay_buffer_size_float;
+                        }
+                    } else {
+                        read_index += 1.0;
+                    }
                 } else {
                     processed_samples += 1.0;
                 }
@@ -655,18 +929,27 @@ void Delay<InputSignalProducerClass>::render(
             Sample const* const delay_channel = delay_buffer[c];
             Sample* const out_channel = buffer[c];
             Number processed_samples = 0.0;
-            Number read_index;
+
+            if constexpr (is_reversed) {
+                initialize_reverse_rendering(
+                    read_index,
+                    reverse_done_samples,
+                    delay_buffer_size_float
+                );
+            }
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (is_time_scale_constant) {
-                    read_index = (
-                        read_index_float
-                        - time_buffer[i] * time_scale
-                        + processed_samples
-                    );
+                    if constexpr (!is_reversed) {
+                        read_index = (
+                            read_index_orig
+                            - time_buffer[i] * time_scale
+                            + processed_samples
+                        );
+                    }
                 } else {
                     read_index = (
-                        read_index_float
+                        read_index_orig
                         - time_buffer[i] * time_scale_buffer[i] * time_scale
                         + processed_samples
                     );
@@ -692,14 +975,147 @@ void Delay<InputSignalProducerClass>::render(
                     );
                 }
 
-                processed_samples += 1.0;
+                if constexpr (is_reversed) {
+                    apply_reverse_delay_envelope(
+                        out_channel[i],
+                        reverse_done_samples,
+                        reverse_target_delay_time_in_samples_inv
+                    );
+
+                    Number const time_value_in_samples = time_buffer[i] * time_scale;
+
+                    adjust_reverse_target_delay_time(
+                        reverse_target_delay_time_in_samples,
+                        reverse_target_delay_time_in_samples_inv,
+                        reverse_done_samples,
+                        time_value_in_samples
+                    );
+                    reverse_delta_samples = calculate_reverse_delta_samples(
+                        time_value_in_samples, reverse_target_delay_time_in_samples
+                    );
+                    advance_reverse_rendering(
+                        read_index,
+                        reverse_delta_samples,
+                        reverse_done_samples,
+                        reverse_target_delay_time_in_samples,
+                        reverse_target_delay_time_in_samples_inv,
+                        time_value_in_samples,
+                        delay_buffer_size_float
+                    );
+                } else {
+                    processed_samples += 1.0;
+                }
             }
+        }
+    }
+
+    if constexpr (is_reversed) {
+        this->reverse_read_index = read_index;
+        this->reverse_done_samples = reverse_done_samples;
+        this->reverse_target_delay_time_in_samples = reverse_target_delay_time_in_samples;
+        this->reverse_target_delay_time_in_samples_inv = reverse_target_delay_time_in_samples_inv;
+    }
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::initialize_reverse_rendering(
+        Number& read_index,
+        Number& reverse_done_samples,
+        Number const& delay_buffer_size_float
+) const noexcept {
+    read_index = this->reverse_read_index;
+    reverse_done_samples = this->reverse_done_samples;
+
+    if (JS80P_UNLIKELY(read_index < 0.0)) {
+        read_index += delay_buffer_size_float;
+    }
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::adjust_reverse_target_delay_time(
+        Number& reverse_target_delay_time_in_samples,
+        Number& reverse_target_delay_time_in_samples_inv,
+        Number const& reverse_done_samples,
+        Number const& time_value_in_samples
+) const noexcept {
+    if (reverse_done_samples < 0.000001) {
+        reverse_target_delay_time_in_samples = time_value_in_samples;
+        reverse_target_delay_time_in_samples_inv = (
+            (time_value_in_samples > 0.1) ? 1.0 / time_value_in_samples : 1.0
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Number Delay<InputSignalProducerClass, capabilities>::calculate_reverse_delta_samples(
+        Number const& time_value_in_samples,
+        Number const& reverse_target_delay_time_in_samples
+) const noexcept {
+    return std::max(
+        std::min(
+            (time_value_in_samples > 0.01)
+                ? reverse_target_delay_time_in_samples / time_value_in_samples
+                : 1.0,
+            32.0
+        ),
+        0.125
+    );
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::apply_reverse_delay_envelope(
+        Sample& sample,
+        Number const reverse_done_samples,
+        Number const reverse_target_delay_time_in_samples_inv
+) const noexcept {
+    sample *= Math::lookup(
+        reverse_delay_envelope.table,
+        ReverseDelayEnvelope::TABLE_MAX_INDEX,
+        ReverseDelayEnvelope::TABLE_MAX_INDEX_FLOAT * reverse_done_samples * reverse_target_delay_time_in_samples_inv
+    );
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::advance_reverse_rendering(
+        Number& read_index,
+        Number& reverse_delta_samples,
+        Number& reverse_done_samples,
+        Number& reverse_target_delay_time_in_samples,
+        Number& reverse_target_delay_time_in_samples_inv,
+        Number const& time_value_in_samples,
+        Number const& delay_buffer_size_float
+) const noexcept {
+    read_index -= reverse_delta_samples;
+    reverse_done_samples += reverse_delta_samples;
+
+    if (reverse_done_samples > reverse_target_delay_time_in_samples) {
+        reverse_done_samples = reverse_done_samples - reverse_target_delay_time_in_samples;
+
+        if (reverse_done_samples >= 1.0) {
+            reverse_done_samples = 0.0;
+        }
+
+        reverse_target_delay_time_in_samples = time_value_in_samples;
+        reverse_target_delay_time_in_samples_inv = (
+            (time_value_in_samples > 0.1) ? 1.0 / time_value_in_samples : 1.0
+        );
+        reverse_delta_samples = 1.0;
+
+        read_index = reverse_next_start_index - 1.0 + reverse_done_samples;
+
+        if (read_index > delay_buffer_size_float) {
+            read_index -= delay_buffer_size_float;
         }
     }
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 /*
 Let Valgrind catch if we actually use uninitialized data. Not even GCC gets this
 right: the constructors which pass the yet uninitialized Delay object to
@@ -708,7 +1124,7 @@ number of channels of the Delay's input, so the uninitialized Delay's
 get_channels() method never actually gets called.
 */
 // cppcheck-suppress uninitMemberVar
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
         ToggleParam const* tempo_sync
@@ -719,8 +1135,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
         FloatParamS& delay_time_leader,
@@ -736,10 +1152,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 /* See above, PannedDelay(input, stereo_mode, tempo_sync). */
 // cppcheck-suppress uninitMemberVar
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
         FloatParamS& panning_leader,
@@ -759,8 +1175,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
@@ -780,8 +1196,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
@@ -803,8 +1219,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
@@ -827,8 +1243,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         PannedDelayStereoMode const stereo_mode,
@@ -852,8 +1268,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::PannedDelay(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::initialize_instance() noexcept
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_instance() noexcept
 {
     panning_buffer = NULL;
     stereo_gain_buffer = SignalProducer::allocate_buffer();
@@ -864,8 +1280,8 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::initialize_instanc
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-PannedDelay<InputSignalProducerClass, FilterInputClass>::~PannedDelay()
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~PannedDelay()
 {
     SignalProducer::free_buffer(stereo_gain_buffer);
     SignalProducer::free_buffer(panning_buffer_scaled);
@@ -873,8 +1289,8 @@ PannedDelay<InputSignalProducerClass, FilterInputClass>::~PannedDelay()
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_block_size(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     SignalProducer::set_block_size(new_block_size);
@@ -885,16 +1301,16 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_block_size(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::set_panning_scale(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_panning_scale(
         Number const scale
 ) noexcept {
     panning_scale = scale;
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::initialize_rendering(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -950,8 +1366,8 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass>::in
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::render(
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -979,9 +1395,9 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::render(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 template<int channel_1, int channel_2>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_constant_panning(
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_constant_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1004,9 +1420,9 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_consta
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass>
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 template<int channel_1, int channel_2>
-void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_changing_panning(
+void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_changing_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1042,14 +1458,14 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass>::render_with_changi
 }
 
 
-template<class InputSignalProducerClass>
-DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPannedDelay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
+) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
     ),
     high_shelf_filter_q(
@@ -1075,8 +1491,8 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
 }
 
 
-template<class InputSignalProducerClass>
-DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPannedDelay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
     FloatParamS& panning_leader,
@@ -1088,7 +1504,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
+) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1127,8 +1543,8 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
 }
 
 
-template<class InputSignalProducerClass>
-DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPannedDelay(
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
     InputSignalProducerClass& input,
     PannedDelayStereoMode const stereo_mode,
     FloatParamS& panning_leader,
@@ -1141,7 +1557,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass>(
+) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1181,8 +1597,8 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass>::DistortedHighShelfPanne
 }
 
 
-template<class InputSignalProducerClass>
-void DistortedHighShelfPannedDelay<InputSignalProducerClass>::initialize_instance() noexcept
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
 {
     this->register_child(high_shelf_filter_q);
     this->register_child(distortion);

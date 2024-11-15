@@ -41,8 +41,15 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
     public:
         typedef Gain<InputSignalProducerClass> BoostedInput;
         typedef BiquadFilter<BoostedInput, BiquadFilterFixedType::BFFT_HIGH_PASS> HighPassedInput;
-        typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter1;
-        typedef DistortedHighShelfPannedDelay< DistortedHighShelfDelay<HighPassedInput> > CombFilter2;
+
+        typedef DistortedHighShelfPannedDelay<
+            HighPassedInput, DelayCapabilities::DC_REVERSIBLE
+        > CombFilter1;
+
+        typedef DistortedHighShelfPannedDelay<
+            DistortedHighShelfDelay<HighPassedInput, DelayCapabilities::DC_REVERSIBLE>,
+            DelayCapabilities::DC_REVERSIBLE
+        > CombFilter2;
 
         Echo(
             std::string const& name,
@@ -62,6 +69,8 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         ToggleParam tempo_sync;
         ToggleParam log_scale_frequencies;
         ToggleParam log_scale_high_pass_q;
+        ToggleParam reversed_1;
+        ToggleParam reversed_2;
 
     protected:
         Sample const* const* initialize_rendering(

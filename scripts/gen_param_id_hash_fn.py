@@ -105,6 +105,8 @@ params = [
     "EEINV",
     "EELHQ",
     "EELOG",
+    "EER1",
+    "EER2",
     "EESYN",
     "EEWET",
     "EEWID",

@@ -52,7 +52,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         that their feedback lines need to be independent from each other and
         therefore cannot all go through the same filter instance: 2.
         */
-        typedef DistortedHighShelfPannedDelay<HighPassedInput> CombFilter;
+        typedef DistortedHighShelfPannedDelay<HighPassedInput, DelayCapabilities::DC_SCALABLE> CombFilter;
 
         class TypeParam : public ByteParam
         {

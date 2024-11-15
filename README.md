@@ -178,7 +178,7 @@ Features
     * various distortions,
     * 2 more filters,
     * chorus,
-    * stereo echo (with distortion and side-chaining),
+    * stereo echo (with distortion, side-chaining, and reversible delay lines),
     * stereo reverb (with distortion and side-chaining),
     * volume controls at various points of the signal chain.
  * 12 envelopes with customizable shapes.
@@ -1302,8 +1302,27 @@ Control the loudness of the original, unmodified input signal.
 
 #### Echo
 
-The Echo effect repeats the input signal with a delay, optionally with various
-levels of filtering and distortion, and with side-chain compression.
+The Echo effect repeats the input signal with a delay, optionally reversed,
+with various levels of filtering and distortion, and with side-chain
+compression.
+
+The effect is built around two sequentially connected delay lines; the output
+of the second second one is fed back into the first one.
+
+##### Delay 1 Reversed
+
+Reverse the first delay line. In reverse mode, a delay line collects a length
+of sound from its input corresponding to the
+[Delay Time](#usage-effects-echo-time) setting, then plays it backwards while
+collecting the next chunk from the input. To avoid unpleasant artifacts, a
+short attack and release envelope is applied to each segment. Changing the
+delay time will not interrupt the currently played chunk, but will affect its
+playback speed, and thus, its pitch.
+
+##### Delay 2 Reversed
+
+Reverse the second delay line. Various combinations of reversed and normal
+delay lines can result in interesting rhythmic effects.
 
 ##### Logarithmic High-pass Filter Q Factor (LG Q)
 
@@ -1344,6 +1363,8 @@ too muddy.
 
 Set the resonance for the high-pass filter that is at the beginning of
 the signal chain of the effect.
+
+<a id="usage-effects-echo-time"></a>
 
 ##### Delay Time (DEL)
 

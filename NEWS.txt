@@ -1,7 +1,10 @@
-v3.?.? (2024-1?-??)
- * Small performance improvements in the distortion effects.
+v3.2.0 (2024-11-??)
+ * The delay lines of the Echo effect can now be reversed. Various combinations
+   of reversed and normal delay lines can result in interesting rhythmic
+   effects.
  * The source distribution can now be compiled for LoongArch systems thanks to
    @YHStar.
+ * Small performance improvements in the distortion effects.
 
 v3.1.3 (2024-08-19)
  * Bugfix: oscillator filters will now correctly handle polyphony when one or

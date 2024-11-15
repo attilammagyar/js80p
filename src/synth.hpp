@@ -863,8 +863,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30DSH = 699,    ///< Macro 30 Distortion Shape
             MFX4 = 700,      ///< Modulator Fine Detune x4
             CFX4 = 701,      ///< Carrier Fine Detune x4
+            EER1 = 702,      ///< Effects Echo Reversed 1
+            EER2 = 703,      ///< Effects Echo Reversed 2
 
-            PARAM_ID_COUNT = 702,
+            PARAM_ID_COUNT = 704,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 

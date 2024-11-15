@@ -70,6 +70,7 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(BUILD_DIR)/img_macros1.o \
 	$(BUILD_DIR)/img_macros2.o \
 	$(BUILD_DIR)/img_macros3.o \
+	$(BUILD_DIR)/img_reversed.o \
 	$(BUILD_DIR)/img_screw_states.o \
 	$(BUILD_DIR)/img_screw_states_synced.o \
 	$(BUILD_DIR)/img_synth.o \

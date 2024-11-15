@@ -317,6 +317,19 @@ h1 span {
   width: 56px;
 }
 
+.block h1 label.rev {
+  position: relative;
+  left: -50px;
+}
+
+.block h1 label.rev input {
+  top: 0;
+  margin-top: 0;
+  height: 18px;
+  border: inset 1px #9090b0;
+  width: 40px;
+}
+
 .block h1 label.log-q,
 .block h1 label.freq {
   position: relative;
@@ -344,7 +357,7 @@ h1 span {
 }
 
 #echo h1 label.freq {
-  left: 266px;
+  left: 219px;
 }
 
 #echo h1 label.log-q {
@@ -358,8 +371,6 @@ h1 span {
 #reverb h1 label.log-q {
   left: 18px;
 }
-
-
 
 #osc-2-dist-type label.dist-type,
 #dist-1-type,
@@ -941,6 +952,7 @@ function make_tabs(active)
         <h1>
           <span>Echo</span>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
+          <label class="rev"><input type="text" /></label>
           <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
