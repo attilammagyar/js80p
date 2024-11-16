@@ -1,4 +1,4 @@
-v3.2.0 (2024-11-??)
+v3.2.0 (2024-11-16)
  * The delay lines of the Echo effect can now be reversed. Various combinations
    of reversed and normal delay lines can result in interesting rhythmic
    effects.
