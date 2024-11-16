@@ -111,6 +111,7 @@ Table of Contents
     * [Lo-fi Keys](#preset-lo-fi-keys)
     * [Analog Brass AT last](#preset-analog-brass-at-last)
     * [Analog Brass mod last](#preset-analog-brass-mod-last)
+    * [Dystopiano](#preset-dystopiano)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2277,6 +2278,18 @@ semi-polyphonic aftertouch (channel pressure).
 A version of the Analog Brass mod preset, demonstrating last note
 semi-polyphonic aftertouch (channel pressure) being applied to a polyphonic
 LFO.
+
+<a id="preset-dystopiano"></a>
+
+### Dystopiano
+
+A soft electric piano bathed in lo-fi reverb and tempo-synced echo, with one
+of the delay lines going backwards, creating weird and eerie sounds,
+especially with slow tempos and short, staccato notes. The mod wheel increases
+the width and the intensity of the echos, aftertouch boosts them even more.
+The pitch wheel, rather than changing the pitch of the oscillators, tweaks the
+delay time and the modulation of the effects, resulting in various chirps and
+sweeps.
 
 <a href="#toc">Table of Contents</a>
 
