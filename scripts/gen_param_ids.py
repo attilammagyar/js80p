@@ -179,7 +179,7 @@ def print_macros(param_id: int, param_objs: list) -> int:
         ("$#IN", "  ///< $ # Input", ""),
         ("$#MIN", " ///< $ # Minimum Value", ""),
         ("$#MAX", " ///< $ # Maximum Value", ""),
-        ("$#AMT", " ///< $ # Amount", ""),
+        ("$#SCL", " ///< $ # Scale", ""),
         ("$#DST", " ///< $ # Distortion", ""),
         ("$#RND", " ///< $ # Randomness", ""),
     ]
@@ -189,7 +189,7 @@ def print_macros(param_id: int, param_objs: list) -> int:
 
 def print_envelopes_params(param_id: int, param_objs: list) -> int:
     params = [
-        ("$#AMT", " ///< $ # Amount", ""),
+        ("$#SCL", " ///< $ # Scale", ""),
         ("$#INI", " ///< $ # Initial Level", ""),
         ("$#DEL", " ///< $ # Delay Time", ""),
         ("$#ATK", " ///< $ # Attack Time", ""),
@@ -212,7 +212,7 @@ def print_lfo_params(param_id: int, param_objs: list) -> int:
         ("$#PHS", " ///< $ # Phase", ""),
         ("$#MIN", " ///< $ # Minimum Value", ""),
         ("$#MAX", " ///< $ # Maximum Value", ""),
-        ("$#AMT", " ///< $ # Amount", ""),
+        ("$#AMP", " ///< $ # Amplitude", ""),
         ("$#DST", " ///< $ # Distortion", ""),
         ("$#RND", " ///< $ # Randomness", ""),
     ]
@@ -326,14 +326,14 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("EF1QLG", "///< Effects Filter 1 Logarithmic Q Factor", "effects.filter_1_q_log_scale"),
         ("EF2QLG", "///< Effects Filter 2 Logarithmic Q Factor", "effects.filter_2_q_log_scale"),
 
-        ("L1AEN", " ///< LFO 1 Amount Envelope", "lfos_rw[0]->amount_envelope"),
-        ("L2AEN", " ///< LFO 2 Amount Envelope", "lfos_rw[1]->amount_envelope"),
-        ("L3AEN", " ///< LFO 3 Amount Envelope", "lfos_rw[2]->amount_envelope"),
-        ("L4AEN", " ///< LFO 4 Amount Envelope", "lfos_rw[3]->amount_envelope"),
-        ("L5AEN", " ///< LFO 5 Amount Envelope", "lfos_rw[4]->amount_envelope"),
-        ("L6AEN", " ///< LFO 6 Amount Envelope", "lfos_rw[5]->amount_envelope"),
-        ("L7AEN", " ///< LFO 7 Amount Envelope", "lfos_rw[6]->amount_envelope"),
-        ("L8AEN", " ///< LFO 8 Amount Envelope", "lfos_rw[7]->amount_envelope"),
+        ("L1AEN", " ///< LFO 1 Amplitude Envelope", "lfos_rw[0]->amplitude_envelope"),
+        ("L2AEN", " ///< LFO 2 Amplitude Envelope", "lfos_rw[1]->amplitude_envelope"),
+        ("L3AEN", " ///< LFO 3 Amplitude Envelope", "lfos_rw[2]->amplitude_envelope"),
+        ("L4AEN", " ///< LFO 4 Amplitude Envelope", "lfos_rw[3]->amplitude_envelope"),
+        ("L5AEN", " ///< LFO 5 Amplitude Envelope", "lfos_rw[4]->amplitude_envelope"),
+        ("L6AEN", " ///< LFO 6 Amplitude Envelope", "lfos_rw[5]->amplitude_envelope"),
+        ("L7AEN", " ///< LFO 7 Amplitude Envelope", "lfos_rw[6]->amplitude_envelope"),
+        ("L8AEN", " ///< LFO 8 Amplitude Envelope", "lfos_rw[7]->amplitude_envelope"),
 
         ("N1SYN", " ///< Envelope 1 Tempo Synchronization", "envelopes_rw[0]->tempo_sync"),
         ("N2SYN", " ///< Envelope 2 Tempo Synchronization", "envelopes_rw[1]->tempo_sync"),

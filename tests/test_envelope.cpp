@@ -47,7 +47,7 @@ TEST(an_envelope_is_a_collection_of_params, {
     Envelope envelope("N1");
 
     assert_eq("N1UPD", envelope.update_mode.get_name());
-    assert_eq("N1AMT", envelope.amount.get_name());
+    assert_eq("N1AMT", envelope.scale.get_name());
     assert_eq("N1INI", envelope.initial_value.get_name());
     assert_eq("N1DEL", envelope.delay_time.get_name());
     assert_eq("N1ATK", envelope.attack_time.get_name());
@@ -172,7 +172,7 @@ TEST(when_a_param_of_an_envelope_changes_then_the_change_index_of_the_envelope_i
     Integer old_change_index;
 
     old_change_index = envelope.get_change_index();
-    envelope.amount.set_value(0.99);
+    envelope.scale.set_value(0.99);
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
     envelope.update();
     assert_neq((int)old_change_index, (int)envelope.get_change_index());
@@ -287,7 +287,7 @@ TEST(too_small_bpm_is_ignored_when_considering_tempo_sync, {
 
 
 TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
-    constexpr Number amount = 0.1;
+    constexpr Number scale = 0.1;
     constexpr Number initial_value = 0.3;
     constexpr Number peak_value = 0.5;
     constexpr Number sustain_value = 0.7;
@@ -311,13 +311,13 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
         Envelope::TIME_INACCURACY_MAX * time_inaccuracy * random
     );
     constexpr Number value_scale = (
-        ((random - 0.5) * value_inaccuracy + 1.0) * amount
+        ((random - 0.5) * value_inaccuracy + 1.0) * scale
     );
 
     Envelope envelope("E");
     EnvelopeSnapshot snapshot;
 
-    envelope.amount.set_value(amount);
+    envelope.scale.set_value(scale);
     envelope.initial_value.set_value(initial_value);
     envelope.delay_time.set_value(delay_time);
     envelope.attack_time.set_value(attack_time);

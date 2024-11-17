@@ -680,7 +680,7 @@ Envelope::Envelope(std::string const& name) noexcept
     attack_shape(name + "ASH"),
     decay_shape(name + "DSH"),
     release_shape(name + "RSH"),
-    amount(name + "AMT",            0.0,    1.0,  1.0),
+    scale(name + "AMT",             0.0,    1.0,  1.0),
     initial_value(name + "INI",     0.0,    1.0,  0.0),
     delay_time(name + "DEL",        0.0,    6.0,  0.0),
     attack_time(name + "ATK",       0.0,    6.0,  0.02),
@@ -697,7 +697,7 @@ Envelope::Envelope(std::string const& name) noexcept
     attack_shape_change_index(-1),
     decay_shape_change_index(-1),
     release_shape_change_index(-1),
-    amount_change_index(-1),
+    scale_change_index(-1),
     initial_value_change_index(-1),
     delay_time_change_index(-1),
     attack_time_change_index(-1),
@@ -741,7 +741,7 @@ void Envelope::update() noexcept
     is_dirty = update_change_index<ShapeParam>(decay_shape, decay_shape_change_index) || is_dirty;
     is_dirty = update_change_index<ShapeParam>(release_shape, release_shape_change_index) || is_dirty;
 
-    is_dirty = update_change_index(amount, amount_change_index) || is_dirty;
+    is_dirty = update_change_index(scale, scale_change_index) || is_dirty;
     is_dirty = update_change_index(initial_value, initial_value_change_index) || is_dirty;
     is_dirty = update_change_index(peak_value, peak_value_change_index) || is_dirty;
     is_dirty = update_change_index(sustain_value, sustain_value_change_index) || is_dirty;
@@ -835,12 +835,12 @@ void Envelope::make_snapshot(
         snapshot.sustain_value = randomize_value(sustain_value, randoms[2]);
         snapshot.final_value = randomize_value(final_value, randoms[3]);
     } else {
-        Number const amount = this->amount.get_value();
+        Number const scale = this->scale.get_value();
 
-        snapshot.initial_value = initial_value.get_value() * amount;
-        snapshot.peak_value = peak_value.get_value() * amount;
-        snapshot.sustain_value = sustain_value.get_value() * amount;
-        snapshot.final_value = final_value.get_value() * amount;
+        snapshot.initial_value = initial_value.get_value() * scale;
+        snapshot.peak_value = peak_value.get_value() * scale;
+        snapshot.sustain_value = sustain_value.get_value() * scale;
+        snapshot.final_value = final_value.get_value() * scale;
     }
 
     if (time_inaccuracy.get_value() > 0.000001) {
@@ -883,7 +883,7 @@ void Envelope::make_end_snapshot(
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.final_value = randomize_value(final_value, randoms[3]);
     } else {
-        snapshot.final_value = final_value.get_value() * amount.get_value();
+        snapshot.final_value = final_value.get_value() * scale.get_value();
     }
 
     if (time_inaccuracy.get_value() > 0.000001) {
@@ -908,7 +908,7 @@ Number Envelope::randomize_value(
 ) const noexcept {
     Number const scale = ((random - 0.5) * value_inaccuracy.get_value() + 1.0);
 
-    return std::min(1.0, scale * amount.get_value() * param.get_value());
+    return std::min(1.0, scale * this->scale.get_value() * param.get_value());
 }
 
 

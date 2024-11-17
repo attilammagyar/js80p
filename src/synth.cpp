@@ -609,7 +609,7 @@ void Synth::create_macros() noexcept
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->input);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->min);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->max);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->amount);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->scale);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->distortion);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->randomness);
     }
@@ -626,13 +626,13 @@ void Synth::create_macros() noexcept
 
 void Synth::create_envelopes() noexcept
 {
-    Integer next_id = ParamId::N1AMT;
+    Integer next_id = ParamId::N1SCL;
 
     for (Byte i = 0; i != Constants::ENVELOPES; ++i) {
         Envelope* envelope = new Envelope(std::string("N") + to_string((Integer)(i + 1)));
         envelopes_rw[i] = envelope;
 
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->amount);
+        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->scale);
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->initial_value);
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->delay_time);
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->attack_time);
@@ -726,7 +726,7 @@ void Synth::create_lfos() noexcept
         register_param<FloatParamS>((ParamId)next_id++, lfo->phase);
         register_param<FloatParamS>((ParamId)next_id++, lfo->min);
         register_param<FloatParamS>((ParamId)next_id++, lfo->max);
-        register_param<FloatParamS>((ParamId)next_id++, lfo->amount);
+        register_param<FloatParamS>((ParamId)next_id++, lfo->amplitude);
         register_param<FloatParamS>((ParamId)next_id++, lfo->distortion);
         register_param<FloatParamS>((ParamId)next_id++, lfo->randomness);
     }
@@ -767,14 +767,14 @@ void Synth::create_lfos() noexcept
     register_param<ToggleParam>(ParamId::L7CEN, lfos_rw[6]->center);
     register_param<ToggleParam>(ParamId::L8CEN, lfos_rw[7]->center);
 
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L1AEN, lfos_rw[0]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L2AEN, lfos_rw[1]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L3AEN, lfos_rw[2]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L4AEN, lfos_rw[3]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L5AEN, lfos_rw[4]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L6AEN, lfos_rw[5]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L7AEN, lfos_rw[6]->amount_envelope);
-    register_param<LFO::AmountEnvelopeParam>(ParamId::L8AEN, lfos_rw[7]->amount_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L1AEN, lfos_rw[0]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L2AEN, lfos_rw[1]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L3AEN, lfos_rw[2]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L4AEN, lfos_rw[3]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L5AEN, lfos_rw[4]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L6AEN, lfos_rw[5]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L7AEN, lfos_rw[6]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L8AEN, lfos_rw[7]->amplitude_envelope);
 }
 
 

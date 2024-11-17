@@ -44,7 +44,7 @@ Macro::Macro(std::string const& name) noexcept
     input(name + "IN", 0.0, 1.0, 0.5),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(name + "MAX", 0.0, 1.0, 1.0),
-    amount(name + "AMT", 0.0, 1.0, 1.0),
+    scale(name + "AMT", 0.0, 1.0, 1.0),
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     distortion_shape(name + "DSH"),
@@ -52,7 +52,7 @@ Macro::Macro(std::string const& name) noexcept
     input_change_index(0),
     min_change_index(0),
     max_change_index(0),
-    amount_change_index(0),
+    scale_change_index(0),
     distortion_change_index(0),
     randomness_change_index(0),
     distortion_shape_change_index(0),
@@ -94,7 +94,7 @@ void Macro::update() noexcept
 
     MidiController::change(
         min_value
-        + computed_value * amount.get_value() * (max.get_value() - min_value)
+        + computed_value * scale.get_value() * (max.get_value() - min_value)
     );
 
     is_updating = false;
@@ -109,7 +109,7 @@ bool Macro::update_change_indices() noexcept
     is_dirty = update_change_index<FloatParamB>(input, input_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(min, min_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(max, max_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(amount, amount_change_index) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(scale, scale_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(distortion, distortion_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(randomness, randomness_change_index) || is_dirty;
     is_dirty = update_change_index<DistortionShapeParam>(distortion_shape, distortion_shape_change_index) || is_dirty;

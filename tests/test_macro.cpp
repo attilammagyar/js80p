@@ -48,7 +48,7 @@ TEST(macro_stores_control_change_events_adjusted_according_to_params, {
     midi_controller.change(1.0, 0.2);
     macro.min.set_value(0.8);
     macro.max.set_value(0.3);
-    macro.amount.set_value(0.5);
+    macro.scale.set_value(0.5);
     macro.distortion.set_value(0.0);
     macro.randomness.set_value(0.0);
     macro.update();
@@ -64,8 +64,8 @@ TEST(cyclic_dependencies_are_broken_up, {
     macro_1.max.set_value(0.5);
     macro_2.max.set_value(0.5);
 
-    macro_1.amount.set_macro(&macro_2);
-    macro_2.amount.set_macro(&macro_1);
+    macro_1.scale.set_macro(&macro_2);
+    macro_2.scale.set_macro(&macro_1);
 
     macro_1.input.set_value(1.0);
     macro_2.input.set_value(1.0);
@@ -94,7 +94,7 @@ TEST(change_index_is_updated_only_when_there_is_an_actual_change, {
     macro.input.set_value(0.2);
     macro.min.set_value(0.8);
     macro.max.set_value(0.3);
-    macro.amount.set_value(0.5);
+    macro.scale.set_value(0.5);
     macro.distortion.set_value(0.0);
     macro.randomness.set_value(0.0);
 
@@ -133,13 +133,13 @@ void assert_macro_value(
 TEST(can_distort_the_value, {
     constexpr Number min = 0.1;
     constexpr Number max = 0.8;
-    constexpr Number amount = 0.7;
-    constexpr Number adjusted_max = (max - min) * amount;
+    constexpr Number scale = 0.7;
+    constexpr Number adjusted_max = (max - min) * scale;
     Macro macro;
 
     macro.min.set_value(min);
     macro.max.set_value(max);
-    macro.amount.set_value(amount);
+    macro.scale.set_value(scale);
     macro.distortion.set_value(1.0);
     macro.randomness.set_value(0.0);
 
@@ -185,15 +185,15 @@ TEST(can_randomize_the_value, {
     constexpr Integer probes = 500;
     constexpr Number min = 0.1;
     constexpr Number max = 0.8;
-    constexpr Number amount = 0.7;
-    constexpr Number mean = (min + max * amount) / 2.0;
+    constexpr Number scale = 0.7;
+    constexpr Number mean = (min + max * scale) / 2.0;
     std::vector<Number> numbers(probes);
     Macro macro;
     Math::Statistics statistics;
 
     macro.min.set_value(min);
     macro.max.set_value(max);
-    macro.amount.set_value(amount);
+    macro.scale.set_value(scale);
     macro.distortion.set_value(0.0);
     macro.randomness.set_value(1.0);
 
@@ -206,7 +206,7 @@ TEST(can_randomize_the_value, {
     Math::compute_statistics(numbers, statistics);
 
     assert_statistics(
-        true, min, mean, amount * max, mean, (mean - min) / 2.0, statistics, 0.025
+        true, min, mean, scale * max, mean, (mean - min) / 2.0, statistics, 0.025
     );
 })
 

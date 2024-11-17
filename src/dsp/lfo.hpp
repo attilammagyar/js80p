@@ -35,10 +35,10 @@ namespace JS80P
 {
 
 /**
- * \note The \c amount parameter goes from 0.0 to 0.5 because the oscillator's
- *       range goes from -1.0 to +1.0, which we want to transform to go from
- *       0.0 to 1.0, for which we need to halve its output. This halving is
- *       what's built into the \c amount parameter.
+ * \note The \c amplitude parameter goes from 0.0 to 0.5 because the
+ *       oscillator's range goes from -1.0 to +1.0, which we want to transform
+ *       to go from 0.0 to 1.0, for which we need to halve its output. This
+ *       halving is what's built into the \c amplitude parameter.
  */
 class LFO : public SignalProducer
 {
@@ -47,7 +47,7 @@ class LFO : public SignalProducer
     public:
         typedef Oscillator<SignalProducer, true> Oscillator_;
 
-        typedef ByteParam AmountEnvelopeParam;
+        typedef ByteParam AmplitudeEnvelopeParam;
 
         explicit LFO(
             std::string const& name,
@@ -60,7 +60,7 @@ class LFO : public SignalProducer
             std::string const& name,
             FloatParamS& frequency_leader,
             FloatParamS& max_leader,
-            FloatParamS& amount_leader,
+            FloatParamS& amplitude_leader,
             ToggleParam& tempo_sync_,
             Number const phase_offset
         ) noexcept;
@@ -94,12 +94,12 @@ class LFO : public SignalProducer
         FloatParamS phase;
         FloatParamS min;
         FloatParamS max;
-        FloatParamS amount;
+        FloatParamS amplitude;
         FloatParamS distortion;
         FloatParamS randomness;
         ToggleParam tempo_sync;
         ToggleParam center;
-        AmountEnvelopeParam amount_envelope;
+        AmplitudeEnvelopeParam amplitude_envelope;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -127,10 +127,10 @@ class LFO : public SignalProducer
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
 
-                void visit_amount_param(
+                void visit_amplitude_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& amount
+                    FloatParamS& amplitude
                 ) noexcept;
 
                 void visit_frequency_param(
@@ -208,10 +208,10 @@ class LFO : public SignalProducer
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
 
-                void visit_amount_param(
+                void visit_amplitude_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& amount
+                    FloatParamS& amplitude
                 ) noexcept;
 
                 void visit_frequency_param(

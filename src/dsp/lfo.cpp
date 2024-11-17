@@ -46,14 +46,16 @@ LFO::LFO(std::string const& name, bool const can_have_envelope) noexcept
     phase(name + "PHS", 0.0, 1.0, 0.0),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(name + "MAX", 0.0, 1.0, 1.0),
-    amount(name + "AMT", 0.0, 0.5, 0.5),
+    amplitude(name + "AMT", 0.0, 0.5, 0.5),
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
-    amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
+    amplitude_envelope(
+        name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
+    ),
     can_have_envelope(can_have_envelope),
-    oscillator(waveform, amount, frequency, phase, tempo_sync, center),
+    oscillator(waveform, amplitude, frequency, phase, tempo_sync, center),
     is_being_visited(false)
 {
     initialize_instance();
@@ -67,13 +69,13 @@ void LFO::initialize_instance() noexcept
     register_child(phase);
     register_child(min);
     register_child(max);
-    register_child(amount);
+    register_child(amplitude);
     register_child(distortion);
     register_child(randomness);
     register_child(freq_log_scale);
     register_child(tempo_sync);
     register_child(center);
-    register_child(amount_envelope);
+    register_child(amplitude_envelope);
     register_child(oscillator);
 
     if (can_have_envelope) {
@@ -102,7 +104,7 @@ LFO::LFO(
         std::string const& name,
         FloatParamS& frequency_leader,
         FloatParamS& max_leader,
-        FloatParamS& amount_leader,
+        FloatParamS& amplitude_leader,
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
@@ -113,14 +115,16 @@ LFO::LFO(
     phase(name + "PHS", 0.0, 1.0, phase_offset),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(max_leader),
-    amount(amount_leader),
+    amplitude(amplitude_leader),
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     center(name + "CEN", ToggleParam::OFF),
-    amount_envelope(name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES),
+    amplitude_envelope(
+        name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
+    ),
     can_have_envelope(false),
-    oscillator(waveform, amount, frequency, phase, tempo_sync_, center),
+    oscillator(waveform, amplitude, frequency, phase, tempo_sync_, center),
     is_being_visited(false)
 {
     initialize_instance();
@@ -157,7 +161,7 @@ void LFO::stop(Seconds const time_offset) noexcept
     phase.cancel_events_at(time_offset);
     min.cancel_events_at(time_offset);
     max.cancel_events_at(time_offset);
-    amount.cancel_events_at(time_offset);
+    amplitude.cancel_events_at(time_offset);
     distortion.cancel_events_at(time_offset);
     randomness.cancel_events_at(time_offset);
 }
@@ -171,7 +175,7 @@ bool LFO::is_on() const noexcept
 
 bool LFO::has_envelope() const noexcept
 {
-    return amount_envelope.get_value() != Constants::INVALID_ENVELOPE_INDEX;
+    return amplitude_envelope.get_value() != Constants::INVALID_ENVELOPE_INDEX;
 }
 
 
@@ -202,8 +206,8 @@ void LFO::traverse_lfo_graph(
 
     visitor.visit_lfo_as_polyphonic(lfo, lfo_depth);
 
-    visit_param_lfo<VisitorClass>(lfo.amount.get_lfo(), depth, visitor);
-    visitor.visit_amount_param(lfo, lfo_depth, lfo.amount);
+    visit_param_lfo<VisitorClass>(lfo.amplitude.get_lfo(), depth, visitor);
+    visitor.visit_amplitude_param(lfo, lfo_depth, lfo.amplitude);
 
     visit_param_lfo<VisitorClass>(lfo.frequency.get_lfo(), depth, visitor);
     visitor.visit_frequency_param(lfo, lfo_depth, lfo.frequency);
@@ -282,10 +286,10 @@ void LFO::Visitor::visit_lfo_as_global(LFO& lfo) noexcept
 }
 
 
-void LFO::Visitor::visit_amount_param(
+void LFO::Visitor::visit_amplitude_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& amount
+        FloatParamS& amplitude
 ) noexcept {
 }
 
@@ -356,7 +360,7 @@ void LFO::EnvelopeCollector::visit_lfo_as_polyphonic(
         LFO& lfo,
         Byte const depth
 ) noexcept {
-    (*envelope_list)[depth] = lfo.amount_envelope.get_value();
+    (*envelope_list)[depth] = lfo.amplitude_envelope.get_value();
 }
 
 
@@ -423,17 +427,17 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
 }
 
 
-void LFO::LFOWithEnvelopeRenderer::visit_amount_param(
+void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& amount
+        FloatParamS& amplitude
 ) noexcept {
-    if (amount.get_lfo() == NULL) {
+    if (amplitude.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
-            amount, round, sample_count
+            amplitude, round, sample_count
         );
     } else {
-        amount.ratios_to_values(
+        amplitude.ratios_to_values(
             buffer, lfo.env_buffer_1, first_sample_index, last_sample_index
         );
         param_buffer_1 = lfo.env_buffer_1;
@@ -655,7 +659,7 @@ void LFO::skip_round(Integer const round, Integer const sample_count) noexcept
     FloatParamS::produce_if_not_constant(phase, round, sample_count);
     FloatParamS::produce_if_not_constant(min, round, sample_count);
     FloatParamS::produce_if_not_constant(max, round, sample_count);
-    FloatParamS::produce_if_not_constant(amount, round, sample_count);
+    FloatParamS::produce_if_not_constant(amplitude, round, sample_count);
     FloatParamS::produce_if_not_constant(distortion, round, sample_count);
     FloatParamS::produce_if_not_constant(randomness, round, sample_count);
 

@@ -201,7 +201,7 @@ void set_up_envelope(
         Integer const block_size,
         Frequency const sample_rate
 ) {
-    envelope.amount.set_block_size(block_size);
+    envelope.scale.set_block_size(block_size);
     envelope.initial_value.set_block_size(block_size);
     envelope.delay_time.set_block_size(block_size);
     envelope.attack_time.set_block_size(block_size);
@@ -212,7 +212,7 @@ void set_up_envelope(
     envelope.release_time.set_block_size(block_size);
     envelope.final_value.set_block_size(block_size);
 
-    envelope.amount.set_sample_rate(sample_rate);
+    envelope.scale.set_sample_rate(sample_rate);
     envelope.initial_value.set_sample_rate(sample_rate);
     envelope.delay_time.set_sample_rate(sample_rate);
     envelope.attack_time.set_sample_rate(sample_rate);
@@ -383,7 +383,7 @@ void test_decay_before_note_off(
 
     if (envelope != NULL) {
         envelope->update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
-        envelope->amount.set_value(1.0);
+        envelope->scale.set_value(1.0);
         envelope->initial_value.set_value(0.0);
         envelope->delay_time.set_value(delay_time);
         envelope->attack_time.set_value(attack_time);
@@ -645,7 +645,7 @@ TEST(can_glide_smoothly_to_a_new_note, {
 
     params_ref.volume.set_envelope(&envelope);
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.5);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(glide_duration);

@@ -60,15 +60,15 @@ void test_lfo(
     constexpr Number phase = 0.3333;
     constexpr Number min = 0.1;
     constexpr Number max = 0.7;
-    constexpr Number amount = 0.75 * 0.5;
+    constexpr Number amplitude = 0.75 * 0.5;
     constexpr Number range = max - min;
-    constexpr Sample expected_sample_offset = min + amount * range;
+    constexpr Sample expected_sample_offset = min + amplitude * range;
 
     Seconds const phase_seconds = phase / expected_frequency;
 
     LFO lfo("L1");
     SumOfSines expected(
-        amount * range,
+        amplitude * range,
         expected_frequency,
         0.0,
         0.0,
@@ -96,8 +96,8 @@ void test_lfo(
     lfo.min.schedule_value(0.4, min);
     lfo.max.set_value(max - 0.000001);
     lfo.max.schedule_value(0.6, max);
-    lfo.amount.set_value(amount - 0.000001);
-    lfo.amount.schedule_value(0.8, amount);
+    lfo.amplitude.set_value(amplitude - 0.000001);
+    lfo.amplitude.schedule_value(0.8, amplitude);
     lfo.tempo_sync.set_value(tempo_sync);
     lfo.center.set_value(OFF);
     lfo.start(0.0);
@@ -120,7 +120,7 @@ void test_lfo(
 }
 
 
-TEST(lfo_oscillates_between_min_and_max_times_amount, {
+TEST(lfo_oscillates_between_min_and_max_times_amplitude, {
     test_lfo(OFF, 180.0, 20.0, 20.0);
     test_lfo(ON, 180.0, 20.0, 60.0);
 })
@@ -131,7 +131,7 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
     constexpr Integer sample_count = BLOCK_SIZE * rounds;
     constexpr Number min = 0.1;
     constexpr Number max = 0.5;
-    constexpr Number amount = 0.25;
+    constexpr Number amplitude = 0.25;
     constexpr Frequency frequency = 30.0;
 
     LFO lfo("L1");
@@ -156,8 +156,8 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
     lfo.min.schedule_value(0.4, min);
     lfo.max.set_value(max - 0.000001);
     lfo.max.schedule_value(0.6, max);
-    lfo.amount.set_value(amount - 0.000001);
-    lfo.amount.schedule_value(0.8, amount);
+    lfo.amplitude.set_value(amplitude - 0.000001);
+    lfo.amplitude.schedule_value(0.8, amplitude);
     lfo.center.set_value(ON);
     lfo.start(0.0);
 
@@ -206,8 +206,8 @@ TEST(lfo_performance, {
 
     lfo.set_block_size(BLOCK_SIZE);
     lfo.set_sample_rate(SAMPLE_RATE);
-    lfo.amount.set_value(0.99);
-    lfo.amount.schedule_linear_ramp(5.0, 1.0);
+    lfo.amplitude.set_value(0.99);
+    lfo.amplitude.schedule_linear_ramp(5.0, 1.0);
 
     Number const total_sample_count = (Number)(BLOCK_SIZE * rounds);
 
@@ -303,9 +303,9 @@ TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_dependency_cycle_betwee
     assert_false(lfo_2.has_envelope());
     assert_false(lfo_3.has_envelope());
 
-    lfo_1.amount_envelope.set_value(3);
-    lfo_2.amount_envelope.set_value(5);
-    lfo_3.amount_envelope.set_value(9);
+    lfo_1.amplitude_envelope.set_value(3);
+    lfo_2.amplitude_envelope.set_value(5);
+    lfo_3.amplitude_envelope.set_value(9);
 
     assert_true(lfo_1.has_envelope());
     assert_true(lfo_2.has_envelope());
@@ -326,7 +326,7 @@ void test_inverted_min_max_lfo(
         Byte const centering,
         Number const min,
         Number const max,
-        Number const amount,
+        Number const amplitude,
         Number const exp_phase,
         Number const exp_min,
         Number const exp_max
@@ -349,7 +349,7 @@ void test_inverted_min_max_lfo(
 
     lfo.min.set_ratio(min);
     lfo.max.set_ratio(max);
-    lfo.amount.set_ratio(amount);
+    lfo.amplitude.set_ratio(amplitude);
     lfo.center.set_ratio(centering);
     lfo.frequency.set_value(20.0);
 
@@ -382,7 +382,7 @@ TEST(when_a_round_is_skipped_then_params_are_still_processed, {
     lfo.phase.schedule_linear_ramp(duration, 0.6);
     lfo.min.schedule_linear_ramp(duration, 0.5);
     lfo.max.schedule_linear_ramp(duration, 0.4);
-    lfo.amount.schedule_linear_ramp(duration, 0.3);
+    lfo.amplitude.schedule_linear_ramp(duration, 0.3);
     lfo.distortion.schedule_linear_ramp(duration, 0.2);
     lfo.randomness.schedule_linear_ramp(duration, 0.1);
 
@@ -392,7 +392,7 @@ TEST(when_a_round_is_skipped_then_params_are_still_processed, {
     assert_eq(0.6, lfo.phase.get_value(), DOUBLE_DELTA);
     assert_eq(0.5, lfo.min.get_value(), DOUBLE_DELTA);
     assert_eq(0.4, lfo.max.get_value(), DOUBLE_DELTA);
-    assert_eq(0.3, lfo.amount.get_value(), DOUBLE_DELTA);
+    assert_eq(0.3, lfo.amplitude.get_value(), DOUBLE_DELTA);
     assert_eq(0.2, lfo.distortion.get_value(), DOUBLE_DELTA);
     assert_eq(0.1, lfo.randomness.get_value(), DOUBLE_DELTA);
 })

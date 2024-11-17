@@ -1,5 +1,5 @@
 ; The sound of a ping-pong ball dropping on a glockenspiel, showcasing a use of
-; LFO amount envelopes.
+; LFO amplitude envelopes.
 [js80p]
 MAMPctl = 0.589843750
 MVOLctl = 0.550781250

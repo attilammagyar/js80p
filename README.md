@@ -163,13 +163,12 @@ Features
  * Sub-harmonic sine wave for oscillator 1, distortion for oscillator 2.
  * Adjustable oscillator pitch inaccuracy and instability, for analog-like
    liveliness and warmth.
-    * Set the same inaccuracy or instability level for the two oscillators to
-      synchronize their imperfections within a single polyphonic voice, so that
-      the effect will only occur between multiple voices, but not between the
-      oscillators within a single voice.
+    * Optional synchronization of inaccuracy and instability between the
+      oscillators within each polyphonic voice.
  * Microtuning support via the MTS-ESP tuning protocol by
    [ODDSound](https://oddsound.com/).
  * Portamento.
+    * Glide from the last note or a set amount.
  * Wavefolder.
  * Split keyboard.
  * Amplitude modulation.
@@ -182,11 +181,14 @@ Features
     * stereo echo (with distortion, side-chaining, and reversible delay lines),
     * stereo reverb (with distortion and side-chaining),
     * volume controls at various points of the signal chain.
- * 12 envelopes with customizable shapes.
- * 8 low-frequency oscillators (LFO) with optional amount envelope and
+ * 12 DAHDSR envelopes with customizable shapes, freely assignable to most of
+   the oscillator parameters.
+ * 8 low-frequency oscillators (LFO) with optional amplitude envelope and
    polyphony.
  * Filter and envelope imperfection settings for analog-like feel.
- * MIDI controllers and macros.
+ * Freely assignable MIDI controllers and powerful macros.
+    * Ability to override the primary function of the sustain pedal, and use it
+      as a toggle switch for various parameters and macros.
  * Channel pressure (aftertouch).
     * Optionally with semi-polyphonic aftertouch emulation (even with MIDI
       keyboards that don't have polyphonic aftertouch):
@@ -206,8 +208,6 @@ Features
     * volume control 3 input.
  * Route external audio into the effects chain of JS80P (in host applications
    which support it).
- * Override the primary function of the sustain pedal, and use it as a toggle
-   switch for various parameters and macros.
 
 <a href="#toc">Table of Contents</a>
 
@@ -1373,7 +1373,7 @@ Set how long the echo signal will lag behind the original signal.
 
 **Note**: to simulate the feel of old tape delays, assign an [LFO](#usage-lfos)
 to the delay time parameter which is set to oscillate very slowly, with a
-really low amount, and maybe with a tiny bit of randomization.
+really low amplitude, and maybe with a tiny bit of randomization.
 
 <a id="usage-effects-echo-dist"></a>
 
@@ -1545,18 +1545,18 @@ parameter.
 #### Minimum Value (MIN)
 
 The macro will output this value when either its [input](#usage-macros-in) or
-its [amount](#usage-macros-amt) parameter is at the 0% position.
+its [scale](#usage-macros-scl) parameter is at the 0% position.
 
 <a id="usage-macros-max"></a>
 
 #### Maximum Value (MAX)
 
 The macro will output this value when both its [input](#usage-macros-in) and
-its [amount](#usage-macros-amt) parameters are at the 100% position.
+its [scale](#usage-macros-scl) parameters are at the 100% position.
 
-<a id="usage-macros-amt"></a>
+<a id="usage-macros-scl"></a>
 
-#### Amount (AMT)
+#### Scale (SCL)
 
 Scale the [input](#usage-macros-in) by this amount.
 
@@ -1699,7 +1699,7 @@ not have polyphonic aftertouch functionality:
  * Set all the levels of the envelope to 100%.
 
  * Assign the Channel Aftertouch controller to the
-   [amount](#usage-envelopes-amt) parameter of the envelope.
+   [scale](#usage-envelopes-scl) parameter of the envelope.
 
  * Select the desired update mode.
 
@@ -1742,9 +1742,9 @@ The second little screw in the top right corner of envelope settings adds
 randomization to envelope levels. Useful for simulating imperfectness of analog
 hardware.
 
-<a id="usage-envelopes-amt"></a>
+<a id="usage-envelopes-scl"></a>
 
-#### Amount (AMT)
+#### Scale (SCL)
 
 Scales all four levels of the envelope.
 
@@ -1806,34 +1806,34 @@ logarithmic and a linear scale.
 
 Make the LFO oscillate around the midpoint of the [minimum](#usage-lfos-min)
 and [maximum](#usage-lfos-max) values instead of between the two extremes.
-This makes a difference when the [amount](#usage-lfos-amt) parameter of the LFO
-is set to a value below 100%: by default, the LFO will oscillate above the
+This makes a difference when the [amplitude](#usage-lfos-amp) parameter of the
+LFO is set to a value below 100%: by default, the LFO will oscillate above the
 minimum value, and it won't reach the maximum, but when the LFO is centered, it
 will not reach either extremes, it will stay within a radius of the midpoint
-which is half the value of the amount parameter. (This is similar to the
+which is half the value of the amplitude parameter. (This is similar to the
 unipolar/bipolar LFO modes in other synthesizers.)
 
-<a id="usage-lfos-amtenv"></a>
+<a id="usage-lfos-ampenv"></a>
 
-#### Amount Envelope (AMT ENV)
+#### Amplitude Envelope (AMP ENV)
 
 Click on the black box next to the [centering](#usage-lfos-center) switch in
 the header row of an LFO, or use the mouse wheel while holding the cursor above
 it to associate an [envelope generator](#usage-envelopes) with the LFO. When an
-LFO with an amount envelope is assigned to a
+LFO with an amplitude envelope is assigned to a
 [synthesis parameter](#usage-synth) that can accept control from envelope
 generators as well, then each voice will run their own envelope and LFO
 timeline for that parameter when a new note is triggered.
 
-Furthermore, if a parameter of an LFO which has an amount envelope is
-controlled by another LFO which also has an amount envelope, then each new note
-will have its own timeline for both of those LFOs and envelopes. (Up to 6
+Furthermore, if a parameter of an LFO which has an amplitude envelope is
+controlled by another LFO which also has an amplitude envelope, then each new
+note will have its own timeline for both of those LFOs and envelopes. (Up to 6
 timelines can be maintained by each parameter for each voice. When that limit
 runs out, or when there's a dependency cycle between LFOs, then some of the
 LFOs will be run paraphonically, as if there was no envelope assigned to them.)
 
 **Note**: when the LFO is assigned to a parameter which doesn't accept control
-from envelope generators, then the amount envelope has no effect.
+from envelope generators, then the amplitude envelope has no effect.
 
 <a id="usage-lfos-bpm"></a>
 
@@ -1874,9 +1874,9 @@ Set the lowest value of the oscillation. When it is greater than the
 Set the highest value of the oscillation. When it is less than the
 [minimum](#usage-lfos-min) value, then the waveform is flipped upside down.
 
-<a id="usage-lfos-amt"></a>
+<a id="usage-lfos-amp"></a>
 
-#### Amount (AMT)
+#### Amplitude (AMP)
 
 Set the amplitude of the oscillation.
 
@@ -2250,7 +2250,7 @@ swells. Aftertouch adds vibrato, and the pitch wheel goes from -3 octaves to
 ### Bouncy
 
 The sound of a ping-pong ball dropping on a glockenspiel, showcasing a use of
-LFO amount envelopes.
+LFO amplitude envelopes.
 
 <a id="preset-lo-fi-keys"></a>
 
@@ -2367,9 +2367,9 @@ triggered. This behaviour can be changed by setting a different
 
 Similarly, if you assign an [LFO](#usage-lfos) to a parameter which can accept
 control from [envelope generators](#usage-envelopes), and the LFO is associated
-with an [amount envelope](#usage-lfos-amtenv), then the LFO becomes polyphonic,
-and its amount will be controlled by the envelope generator for each polyphonic
-voice independently from the other voices.
+with an [amplitude envelope](#usage-lfos-ampenv), then the LFO becomes
+polyphonic, and its amplitude will be controlled by the envelope generator for
+each polyphonic voice independently from the other voices.
 
 **Note**: the polyphonic behaviour of LFOs is transitive up to a limit. If a
 parameter of a polyphonic LFO is controlled by another LFO, and the second LFO
@@ -2386,7 +2386,7 @@ changes of the value (e.g. to use lower
 [filter cutoff frequency](#usage-synth-common-freq) for
 low-velocity notes so that they sound softer), then you have to use an
 envelope generator: turn up all the levels of the envelope to 100%, assign the
-MIDI value or the macro to the [amount](#usage-envelopes-amt) parameter of the
+MIDI value or the macro to the [scale](#usage-envelopes-scl) parameter of the
 envelope, and assign the envelope to control the parameter.
 
 <a href="#toc">Table of Contents</a>

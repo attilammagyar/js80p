@@ -1165,7 +1165,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
 
     assert_eq((void*)&envelope, (void*)float_param.get_envelope());
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1207,7 +1207,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     float_param.set_sample_rate(1.0);
     float_param.set_envelope(&envelope);
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1250,7 +1250,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     float_param.set_value(5.0);
     float_param.set_envelope(&envelope);
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.5);
     envelope.attack_time.set_value(3.0);
@@ -1291,7 +1291,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     float_param.set_sample_rate(1.0);
     float_param.set_envelope(&envelope);
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1305,7 +1305,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     float_param.start_envelope(0.3, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.final_value.set_value(1.0);
 
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
@@ -1337,7 +1337,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
     float_param.set_sample_rate(1.0);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1385,7 +1385,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
 
     assert_eq((void*)&envelope, (void*)follower.get_envelope());
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1435,7 +1435,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
 
     assert_eq((void*)&envelope, (void*)follower.get_envelope());
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1479,7 +1479,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
     param.set_sample_rate(1.0);
     param.set_envelope(&envelope);
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(2.0);
@@ -1520,7 +1520,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     param.set_envelope(&envelope);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(1.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(0.0);
@@ -1577,7 +1577,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     assert_eq((void*)&envelope, (void*)follower.get_envelope());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(0.1);
+    envelope.scale.set_value(0.1);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(0.1);
@@ -1596,7 +1596,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
 
     FloatParamS::produce<FloatParamS>(follower, 1, 5);
 
-    envelope.amount.set_value(0.8);
+    envelope.scale.set_value(0.8);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(3.0);
@@ -1653,7 +1653,7 @@ TEST(when_the_update_mode_of_the_envelope_is_end_only_then_the_param_updates_rel
     follower.set_sample_rate(1.0);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_END);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.7);
     envelope.attack_time.set_value(3.0);
@@ -1687,8 +1687,8 @@ TEST(when_the_update_mode_of_the_envelope_is_end_only_then_the_param_updates_rel
 
 void test_envelope_manual_update_dahds(
         Byte const is_dynamic,
-        Number const amount_before_update,
-        Number const amount_before_handling_events
+        Number const scale_before_update,
+        Number const scale_before_handling_events
 ) {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {
@@ -1719,7 +1719,7 @@ void test_envelope_manual_update_dahds(
     assert_eq((void*)&envelope, (void*)follower.get_envelope());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
-    envelope.amount.set_value(0.1);
+    envelope.scale.set_value(0.1);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(0.1);
@@ -1744,7 +1744,7 @@ void test_envelope_manual_update_dahds(
     envelope.update_mode.set_value(
         is_dynamic ? Envelope::UPDATE_MODE_DYNAMIC : Envelope::UPDATE_MODE_STATIC
     );
-    envelope.amount.set_value(amount_before_update);
+    envelope.scale.set_value(scale_before_update);
     envelope.initial_value.set_value(0.625);
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(3.0);
@@ -1754,7 +1754,7 @@ void test_envelope_manual_update_dahds(
     envelope.sustain_value.set_value(0.75);
 
     follower.update_envelope(0.0);
-    envelope.amount.set_value(amount_before_handling_events);
+    envelope.scale.set_value(scale_before_handling_events);
 
     FloatParamS::produce<FloatParamS>(follower, 2, 2);
 
@@ -1810,7 +1810,7 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
     Sample const* rendered_samples;
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(1.0);
@@ -1871,7 +1871,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     follower.set_sample_rate(6.0 / Envelope::DYNAMIC_ENVELOPE_RAMP_TIME);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(0.0);
@@ -1940,7 +1940,7 @@ void test_voice_status_dependent_envelope_update(
     follower.set_sample_rate(1.0);
 
     envelope.update_mode.set_value(envelope_update_mode);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(0.0);
@@ -2218,7 +2218,7 @@ TEST(when_a_macro_is_assigned_to_a_float_param_then_float_param_value_follows_th
 
     float_param.set_block_size(block_size);
     macro.input.set_block_size(block_size);
-    macro.amount.set_block_size(block_size);
+    macro.scale.set_block_size(block_size);
     macro.min.set_block_size(block_size);
     macro.max.set_block_size(block_size);
     macro.distortion.set_block_size(block_size);
@@ -2226,14 +2226,14 @@ TEST(when_a_macro_is_assigned_to_a_float_param_then_float_param_value_follows_th
 
     float_param.set_sample_rate(sample_rate);
     macro.input.set_sample_rate(sample_rate);
-    macro.amount.set_sample_rate(sample_rate);
+    macro.scale.set_sample_rate(sample_rate);
     macro.min.set_sample_rate(sample_rate);
     macro.max.set_sample_rate(sample_rate);
     macro.distortion.set_sample_rate(sample_rate);
     macro.randomness.set_sample_rate(sample_rate);
 
     macro.input.set_value(0.2);
-    macro.amount.set_value(0.5);
+    macro.scale.set_value(0.5);
 
     float_param.set_macro(&macro);
 
@@ -2351,7 +2351,7 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 })
 
 
-TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo, {
+TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_lfo, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
@@ -2380,7 +2380,7 @@ TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo,
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
     lfo.frequency.set_value(sample_rate * 0.25);
-    lfo.amount_envelope.set_value(1);
+    lfo.amplitude_envelope.set_value(1);
     lfo.start(0.0);
 
     leader.set_block_size(block_size);
@@ -2393,7 +2393,7 @@ TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo,
     assert_true(leader.has_lfo_with_envelope());
     assert_true(follower.has_lfo_with_envelope());
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2428,7 +2428,7 @@ TEST(when_an_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo,
 })
 
 
-TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_the_lfo, {
+TEST(when_a_centered_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_lfo, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
@@ -2467,7 +2467,7 @@ TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
     lfo.frequency.set_value(sample_rate * 0.25);
-    lfo.amount_envelope.set_value(1);
+    lfo.amplitude_envelope.set_value(1);
     lfo.min.set_value(0.3);
     lfo.max.set_value(0.9);
     lfo.center.set_value(ToggleParam::ON);
@@ -2483,7 +2483,7 @@ TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_
     assert_true(leader.has_lfo_with_envelope());
     assert_true(follower.has_lfo_with_envelope());
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2513,7 +2513,7 @@ TEST(when_a_centered_lfo_has_an_amount_envelope_then_the_envelope_is_applied_to_
 })
 
 
-TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_during_rendering, {
+TEST(when_an_lfo_has_a_dynamic_amplitude_envelope_then_the_envelope_is_updated_during_rendering, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
@@ -2542,7 +2542,7 @@ TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_duri
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
     lfo.frequency.set_value(sample_rate * 0.25);
-    lfo.amount_envelope.set_value(1);
+    lfo.amplitude_envelope.set_value(1);
     lfo.start(0.0);
 
     leader.set_block_size(block_size);
@@ -2556,7 +2556,7 @@ TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_duri
     assert_true(follower.has_lfo_with_envelope());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2600,7 +2600,7 @@ TEST(when_an_lfo_has_a_dynamic_amount_envelope_then_the_envelope_is_updated_duri
 })
 
 
-TEST(when_an_lfo_has_an_amount_envelope_with_end_updates_then_the_envelope_is_updated_for_envelope_end, {
+TEST(when_an_lfo_has_an_amplitude_envelope_with_end_updates_then_the_envelope_is_updated_for_envelope_end, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
@@ -2629,7 +2629,7 @@ TEST(when_an_lfo_has_an_amount_envelope_with_end_updates_then_the_envelope_is_up
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
     lfo.frequency.set_value(sample_rate * 0.25);
-    lfo.amount_envelope.set_value(1);
+    lfo.amplitude_envelope.set_value(1);
     lfo.start(0.0);
 
     leader.set_block_size(block_size);
@@ -2643,7 +2643,7 @@ TEST(when_an_lfo_has_an_amount_envelope_with_end_updates_then_the_envelope_is_up
     assert_true(follower.has_lfo_with_envelope());
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_END);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2722,7 +2722,7 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
 
     lfo_2.set_block_size(block_size);
     lfo_2.set_sample_rate(sample_rate);
-    lfo_2.amount_envelope.set_value(1);
+    lfo_2.amplitude_envelope.set_value(1);
     lfo_2.frequency.set_value(sample_rate * 0.25);
     lfo_2.start(0.0);
 
@@ -2736,7 +2736,7 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
     assert_false(leader.has_lfo_with_envelope());
     assert_false(follower.has_lfo_with_envelope());
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2807,15 +2807,15 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
     lfo_1.set_block_size(block_size);
     lfo_1.set_sample_rate(sample_rate);
     lfo_1.frequency.set_value(sample_rate * 0.25);
-    lfo_1.amount_envelope.set_value(0);
-    lfo_1.amount.set_lfo(&lfo_2);
+    lfo_1.amplitude_envelope.set_value(0);
+    lfo_1.amplitude.set_lfo(&lfo_2);
     lfo_1.start(0.0);
 
     lfo_2.set_block_size(block_size);
     lfo_2.set_sample_rate(sample_rate);
     lfo_2.frequency.set_value(sample_rate * 0.25);
     lfo_2.phase.set_value(0.25);
-    lfo_2.amount_envelope.set_value(1);
+    lfo_2.amplitude_envelope.set_value(1);
     lfo_2.start(0.0);
 
     leader.set_block_size(block_size);
@@ -2828,7 +2828,7 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
     assert_true(leader.has_lfo_with_envelope());
     assert_true(follower.has_lfo_with_envelope());
 
-    envelope_1.amount.set_value(1.0);
+    envelope_1.scale.set_value(1.0);
     envelope_1.initial_value.set_value(0.1);
     envelope_1.delay_time.set_value(1.0);
     envelope_1.attack_time.set_value(1.5);
@@ -2839,7 +2839,7 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
     envelope_1.release_time.set_value(2.0);
     envelope_1.final_value.set_value(0.2);
 
-    envelope_2.amount.set_value(0.5);
+    envelope_2.scale.set_value(0.5);
     envelope_2.initial_value.set_value(0.1);
     envelope_2.delay_time.set_value(1.0);
     envelope_2.attack_time.set_value(1.5);
@@ -2902,8 +2902,8 @@ TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the
     lfo.set_block_size(block_size);
     lfo.set_sample_rate(sample_rate);
     lfo.frequency.set_value(sample_rate * 0.25);
-    lfo.amount_envelope.set_value(0);
-    lfo.amount.set_lfo(&lfo);
+    lfo.amplitude_envelope.set_value(0);
+    lfo.amplitude.set_lfo(&lfo);
     lfo.start(0.0);
 
     leader.set_block_size(block_size);
@@ -2916,7 +2916,7 @@ TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the
     assert_true(leader.has_lfo_with_envelope());
     assert_true(follower.has_lfo_with_envelope());
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.1);
     envelope.delay_time.set_value(1.0);
     envelope.attack_time.set_value(1.5);
@@ -2962,7 +2962,7 @@ TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_v
     leader.set_block_size(block_size);
     follower.set_block_size(block_size);
     macro.input.set_block_size(block_size);
-    macro.amount.set_block_size(block_size);
+    macro.scale.set_block_size(block_size);
     macro.min.set_block_size(block_size);
     macro.max.set_block_size(block_size);
     macro.distortion.set_block_size(block_size);
@@ -2971,14 +2971,14 @@ TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_v
     leader.set_sample_rate(sample_rate);
     follower.set_sample_rate(sample_rate);
     macro.input.set_sample_rate(sample_rate);
-    macro.amount.set_sample_rate(sample_rate);
+    macro.scale.set_sample_rate(sample_rate);
     macro.min.set_sample_rate(sample_rate);
     macro.max.set_sample_rate(sample_rate);
     macro.distortion.set_sample_rate(sample_rate);
     macro.randomness.set_sample_rate(sample_rate);
 
     macro.input.set_value(0.2);
-    macro.amount.set_value(0.5);
+    macro.scale.set_value(0.5);
 
     leader.set_macro(&macro);
 
@@ -3046,7 +3046,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     follower.set_sample_rate(sample_rate);
     follower.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MIN);
 
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.0);
     envelope.attack_time.set_value(1.0);
@@ -3175,12 +3175,12 @@ TEST(can_tell_if_envelope_has_decayed, {
     param_with_macro.set_macro(&macro);
     assert_decay_status(false, param_with_macro);
 
-    lfo.amount.set_value(0.0);
+    lfo.amplitude.set_value(0.0);
     param_with_lfo.set_lfo(&lfo);
     assert_decay_status(false, param_with_lfo);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_STATIC);
-    envelope.amount.set_value(1.0);
+    envelope.scale.set_value(1.0);
     envelope.initial_value.set_value(0.0);
     envelope.delay_time.set_value(0.1);
     envelope.peak_value.set_value(1.0);
@@ -3267,14 +3267,14 @@ TEST(envelopes_and_lfo_envelopes_make_a_float_param_polyphonic, {
 
     leader.set_lfo(&lfo);
     non_poly_float_param.set_lfo(&lfo);
-    assert_false(leader.is_polyphonic(), "LFO without amount envelope");
-    assert_false(follower.is_polyphonic(), "LFO without amount envelope");
-    assert_false(non_poly_float_param.is_polyphonic(), "LFO without amount envelope");
+    assert_false(leader.is_polyphonic(), "LFO without amplitude envelope");
+    assert_false(follower.is_polyphonic(), "LFO without amplitude envelope");
+    assert_false(non_poly_float_param.is_polyphonic(), "LFO without amplitude envelope");
 
-    lfo.amount_envelope.set_value(0);
-    assert_true(leader.is_polyphonic(), "LFO with amount envelope");
-    assert_true(follower.is_polyphonic(), "LFO with amount envelope");
-    assert_false(non_poly_float_param.is_polyphonic(), "LFO with amount envelope");
+    lfo.amplitude_envelope.set_value(0);
+    assert_true(leader.is_polyphonic(), "LFO with amplitude envelope");
+    assert_true(follower.is_polyphonic(), "LFO with amplitude envelope");
+    assert_false(non_poly_float_param.is_polyphonic(), "LFO with amplitude envelope");
     leader.set_lfo(NULL);
     non_poly_float_param.set_lfo(NULL);
 })
@@ -3477,7 +3477,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     );
     Sample const* const* rendered_samples;
 
-    envelope.amount.set_block_size(block_size);
+    envelope.scale.set_block_size(block_size);
     envelope.initial_value.set_block_size(block_size);
     envelope.delay_time.set_block_size(block_size);
     envelope.attack_time.set_block_size(block_size);
@@ -3488,7 +3488,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     envelope.release_time.set_block_size(block_size);
     envelope.final_value.set_block_size(block_size);
 
-    envelope.amount.set_sample_rate(sample_rate);
+    envelope.scale.set_sample_rate(sample_rate);
     envelope.initial_value.set_sample_rate(sample_rate);
     envelope.delay_time.set_sample_rate(sample_rate);
     envelope.attack_time.set_sample_rate(sample_rate);

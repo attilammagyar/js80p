@@ -58,7 +58,7 @@ class Macro : public MidiController
         FloatParamB input;
         FloatParamB min;
         FloatParamB max;
-        FloatParamB amount;
+        FloatParamB scale;
         FloatParamB distortion;
         FloatParamB randomness;
         DistortionShapeParam distortion_shape;
@@ -76,7 +76,7 @@ class Macro : public MidiController
         Integer input_change_index;
         Integer min_change_index;
         Integer max_change_index;
-        Integer amount_change_index;
+        Integer scale_change_index;
         Integer distortion_change_index;
         Integer randomness_change_index;
         Integer distortion_shape_change_index;

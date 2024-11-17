@@ -159,7 +159,7 @@ class Envelope
         ShapeParam attack_shape;
         ShapeParam decay_shape;
         ShapeParam release_shape;
-        FloatParamB amount;
+        FloatParamB scale;
         FloatParamB initial_value;
         FloatParamB delay_time;
         FloatParamB attack_time;
@@ -302,7 +302,7 @@ class Envelope
         Integer attack_shape_change_index;
         Integer decay_shape_change_index;
         Integer release_shape_change_index;
-        Integer amount_change_index;
+        Integer scale_change_index;
         Integer initial_value_change_index;
         Integer delay_time_change_index;
         Integer attack_time_change_index;

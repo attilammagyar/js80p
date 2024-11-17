@@ -806,8 +806,8 @@ TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
     lfo.phase.set_value(0.1);
     lfo.min.set_value(0.0);
     lfo.max.set_value(1.0);
-    lfo.amount.set_value(1.0);
-    lfo.amount_envelope.set_value(0.0);
+    lfo.amplitude.set_value(1.0);
+    lfo.amplitude_envelope.set_value(0.0);
     lfo.start(0.0);
 
     envelope.initial_value.set_value(1.0);
@@ -825,10 +825,10 @@ TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
     shared_buffers.a1_buffer = new Sample[BLOCK_SIZE];
     shared_buffers.a2_buffer = new Sample[BLOCK_SIZE];
 
-    envelope.amount.set_value(filter_1.frequency.value_to_ratio(7040.0) * headroom);
+    envelope.scale.set_value(filter_1.frequency.value_to_ratio(7040.0) * headroom);
     filter_1.frequency.start_envelope(0.0, 0.0, 0.0);
 
-    envelope.amount.set_value(filter_2.frequency.value_to_ratio(440.0) * headroom);
+    envelope.scale.set_value(filter_2.frequency.value_to_ratio(440.0) * headroom);
     filter_2.frequency.start_envelope(0.0, 0.0, 0.0);
 
     test_filter(filter_1, input, expected_1, 0.11, 1, BLOCK_SIZE);

@@ -233,7 +233,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M1IN = 119,      ///< Macro 1 Input
             M1MIN = 120,     ///< Macro 1 Minimum Value
             M1MAX = 121,     ///< Macro 1 Maximum Value
-            M1AMT = 122,     ///< Macro 1 Amount
+            M1SCL = 122,     ///< Macro 1 Scale
             M1DST = 123,     ///< Macro 1 Distortion
             M1RND = 124,     ///< Macro 1 Randomness
 
@@ -241,7 +241,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M2IN = 126,      ///< Macro 2 Input
             M2MIN = 127,     ///< Macro 2 Minimum Value
             M2MAX = 128,     ///< Macro 2 Maximum Value
-            M2AMT = 129,     ///< Macro 2 Amount
+            M2SCL = 129,     ///< Macro 2 Scale
             M2DST = 130,     ///< Macro 2 Distortion
             M2RND = 131,     ///< Macro 2 Randomness
 
@@ -249,7 +249,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M3IN = 133,      ///< Macro 3 Input
             M3MIN = 134,     ///< Macro 3 Minimum Value
             M3MAX = 135,     ///< Macro 3 Maximum Value
-            M3AMT = 136,     ///< Macro 3 Amount
+            M3SCL = 136,     ///< Macro 3 Scale
             M3DST = 137,     ///< Macro 3 Distortion
             M3RND = 138,     ///< Macro 3 Randomness
 
@@ -257,7 +257,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M4IN = 140,      ///< Macro 4 Input
             M4MIN = 141,     ///< Macro 4 Minimum Value
             M4MAX = 142,     ///< Macro 4 Maximum Value
-            M4AMT = 143,     ///< Macro 4 Amount
+            M4SCL = 143,     ///< Macro 4 Scale
             M4DST = 144,     ///< Macro 4 Distortion
             M4RND = 145,     ///< Macro 4 Randomness
 
@@ -265,7 +265,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M5IN = 147,      ///< Macro 5 Input
             M5MIN = 148,     ///< Macro 5 Minimum Value
             M5MAX = 149,     ///< Macro 5 Maximum Value
-            M5AMT = 150,     ///< Macro 5 Amount
+            M5SCL = 150,     ///< Macro 5 Scale
             M5DST = 151,     ///< Macro 5 Distortion
             M5RND = 152,     ///< Macro 5 Randomness
 
@@ -273,7 +273,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M6IN = 154,      ///< Macro 6 Input
             M6MIN = 155,     ///< Macro 6 Minimum Value
             M6MAX = 156,     ///< Macro 6 Maximum Value
-            M6AMT = 157,     ///< Macro 6 Amount
+            M6SCL = 157,     ///< Macro 6 Scale
             M6DST = 158,     ///< Macro 6 Distortion
             M6RND = 159,     ///< Macro 6 Randomness
 
@@ -281,7 +281,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M7IN = 161,      ///< Macro 7 Input
             M7MIN = 162,     ///< Macro 7 Minimum Value
             M7MAX = 163,     ///< Macro 7 Maximum Value
-            M7AMT = 164,     ///< Macro 7 Amount
+            M7SCL = 164,     ///< Macro 7 Scale
             M7DST = 165,     ///< Macro 7 Distortion
             M7RND = 166,     ///< Macro 7 Randomness
 
@@ -289,7 +289,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M8IN = 168,      ///< Macro 8 Input
             M8MIN = 169,     ///< Macro 8 Minimum Value
             M8MAX = 170,     ///< Macro 8 Maximum Value
-            M8AMT = 171,     ///< Macro 8 Amount
+            M8SCL = 171,     ///< Macro 8 Scale
             M8DST = 172,     ///< Macro 8 Distortion
             M8RND = 173,     ///< Macro 8 Randomness
 
@@ -297,7 +297,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M9IN = 175,      ///< Macro 9 Input
             M9MIN = 176,     ///< Macro 9 Minimum Value
             M9MAX = 177,     ///< Macro 9 Maximum Value
-            M9AMT = 178,     ///< Macro 9 Amount
+            M9SCL = 178,     ///< Macro 9 Scale
             M9DST = 179,     ///< Macro 9 Distortion
             M9RND = 180,     ///< Macro 9 Randomness
 
@@ -305,7 +305,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M10IN = 182,     ///< Macro 10 Input
             M10MIN = 183,    ///< Macro 10 Minimum Value
             M10MAX = 184,    ///< Macro 10 Maximum Value
-            M10AMT = 185,    ///< Macro 10 Amount
+            M10SCL = 185,    ///< Macro 10 Scale
             M10DST = 186,    ///< Macro 10 Distortion
             M10RND = 187,    ///< Macro 10 Randomness
 
@@ -313,7 +313,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M11IN = 189,     ///< Macro 11 Input
             M11MIN = 190,    ///< Macro 11 Minimum Value
             M11MAX = 191,    ///< Macro 11 Maximum Value
-            M11AMT = 192,    ///< Macro 11 Amount
+            M11SCL = 192,    ///< Macro 11 Scale
             M11DST = 193,    ///< Macro 11 Distortion
             M11RND = 194,    ///< Macro 11 Randomness
 
@@ -321,7 +321,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M12IN = 196,     ///< Macro 12 Input
             M12MIN = 197,    ///< Macro 12 Minimum Value
             M12MAX = 198,    ///< Macro 12 Maximum Value
-            M12AMT = 199,    ///< Macro 12 Amount
+            M12SCL = 199,    ///< Macro 12 Scale
             M12DST = 200,    ///< Macro 12 Distortion
             M12RND = 201,    ///< Macro 12 Randomness
 
@@ -329,7 +329,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M13IN = 203,     ///< Macro 13 Input
             M13MIN = 204,    ///< Macro 13 Minimum Value
             M13MAX = 205,    ///< Macro 13 Maximum Value
-            M13AMT = 206,    ///< Macro 13 Amount
+            M13SCL = 206,    ///< Macro 13 Scale
             M13DST = 207,    ///< Macro 13 Distortion
             M13RND = 208,    ///< Macro 13 Randomness
 
@@ -337,7 +337,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M14IN = 210,     ///< Macro 14 Input
             M14MIN = 211,    ///< Macro 14 Minimum Value
             M14MAX = 212,    ///< Macro 14 Maximum Value
-            M14AMT = 213,    ///< Macro 14 Amount
+            M14SCL = 213,    ///< Macro 14 Scale
             M14DST = 214,    ///< Macro 14 Distortion
             M14RND = 215,    ///< Macro 14 Randomness
 
@@ -345,7 +345,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M15IN = 217,     ///< Macro 15 Input
             M15MIN = 218,    ///< Macro 15 Minimum Value
             M15MAX = 219,    ///< Macro 15 Maximum Value
-            M15AMT = 220,    ///< Macro 15 Amount
+            M15SCL = 220,    ///< Macro 15 Scale
             M15DST = 221,    ///< Macro 15 Distortion
             M15RND = 222,    ///< Macro 15 Randomness
 
@@ -353,7 +353,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M16IN = 224,     ///< Macro 16 Input
             M16MIN = 225,    ///< Macro 16 Minimum Value
             M16MAX = 226,    ///< Macro 16 Maximum Value
-            M16AMT = 227,    ///< Macro 16 Amount
+            M16SCL = 227,    ///< Macro 16 Scale
             M16DST = 228,    ///< Macro 16 Distortion
             M16RND = 229,    ///< Macro 16 Randomness
 
@@ -361,7 +361,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M17IN = 231,     ///< Macro 17 Input
             M17MIN = 232,    ///< Macro 17 Minimum Value
             M17MAX = 233,    ///< Macro 17 Maximum Value
-            M17AMT = 234,    ///< Macro 17 Amount
+            M17SCL = 234,    ///< Macro 17 Scale
             M17DST = 235,    ///< Macro 17 Distortion
             M17RND = 236,    ///< Macro 17 Randomness
 
@@ -369,7 +369,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M18IN = 238,     ///< Macro 18 Input
             M18MIN = 239,    ///< Macro 18 Minimum Value
             M18MAX = 240,    ///< Macro 18 Maximum Value
-            M18AMT = 241,    ///< Macro 18 Amount
+            M18SCL = 241,    ///< Macro 18 Scale
             M18DST = 242,    ///< Macro 18 Distortion
             M18RND = 243,    ///< Macro 18 Randomness
 
@@ -377,7 +377,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M19IN = 245,     ///< Macro 19 Input
             M19MIN = 246,    ///< Macro 19 Minimum Value
             M19MAX = 247,    ///< Macro 19 Maximum Value
-            M19AMT = 248,    ///< Macro 19 Amount
+            M19SCL = 248,    ///< Macro 19 Scale
             M19DST = 249,    ///< Macro 19 Distortion
             M19RND = 250,    ///< Macro 19 Randomness
 
@@ -385,7 +385,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M20IN = 252,     ///< Macro 20 Input
             M20MIN = 253,    ///< Macro 20 Minimum Value
             M20MAX = 254,    ///< Macro 20 Maximum Value
-            M20AMT = 255,    ///< Macro 20 Amount
+            M20SCL = 255,    ///< Macro 20 Scale
             M20DST = 256,    ///< Macro 20 Distortion
             M20RND = 257,    ///< Macro 20 Randomness
 
@@ -393,7 +393,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M21IN = 259,     ///< Macro 21 Input
             M21MIN = 260,    ///< Macro 21 Minimum Value
             M21MAX = 261,    ///< Macro 21 Maximum Value
-            M21AMT = 262,    ///< Macro 21 Amount
+            M21SCL = 262,    ///< Macro 21 Scale
             M21DST = 263,    ///< Macro 21 Distortion
             M21RND = 264,    ///< Macro 21 Randomness
 
@@ -401,7 +401,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M22IN = 266,     ///< Macro 22 Input
             M22MIN = 267,    ///< Macro 22 Minimum Value
             M22MAX = 268,    ///< Macro 22 Maximum Value
-            M22AMT = 269,    ///< Macro 22 Amount
+            M22SCL = 269,    ///< Macro 22 Scale
             M22DST = 270,    ///< Macro 22 Distortion
             M22RND = 271,    ///< Macro 22 Randomness
 
@@ -409,7 +409,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M23IN = 273,     ///< Macro 23 Input
             M23MIN = 274,    ///< Macro 23 Minimum Value
             M23MAX = 275,    ///< Macro 23 Maximum Value
-            M23AMT = 276,    ///< Macro 23 Amount
+            M23SCL = 276,    ///< Macro 23 Scale
             M23DST = 277,    ///< Macro 23 Distortion
             M23RND = 278,    ///< Macro 23 Randomness
 
@@ -417,7 +417,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M24IN = 280,     ///< Macro 24 Input
             M24MIN = 281,    ///< Macro 24 Minimum Value
             M24MAX = 282,    ///< Macro 24 Maximum Value
-            M24AMT = 283,    ///< Macro 24 Amount
+            M24SCL = 283,    ///< Macro 24 Scale
             M24DST = 284,    ///< Macro 24 Distortion
             M24RND = 285,    ///< Macro 24 Randomness
 
@@ -425,7 +425,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M25IN = 287,     ///< Macro 25 Input
             M25MIN = 288,    ///< Macro 25 Minimum Value
             M25MAX = 289,    ///< Macro 25 Maximum Value
-            M25AMT = 290,    ///< Macro 25 Amount
+            M25SCL = 290,    ///< Macro 25 Scale
             M25DST = 291,    ///< Macro 25 Distortion
             M25RND = 292,    ///< Macro 25 Randomness
 
@@ -433,7 +433,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M26IN = 294,     ///< Macro 26 Input
             M26MIN = 295,    ///< Macro 26 Minimum Value
             M26MAX = 296,    ///< Macro 26 Maximum Value
-            M26AMT = 297,    ///< Macro 26 Amount
+            M26SCL = 297,    ///< Macro 26 Scale
             M26DST = 298,    ///< Macro 26 Distortion
             M26RND = 299,    ///< Macro 26 Randomness
 
@@ -441,7 +441,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M27IN = 301,     ///< Macro 27 Input
             M27MIN = 302,    ///< Macro 27 Minimum Value
             M27MAX = 303,    ///< Macro 27 Maximum Value
-            M27AMT = 304,    ///< Macro 27 Amount
+            M27SCL = 304,    ///< Macro 27 Scale
             M27DST = 305,    ///< Macro 27 Distortion
             M27RND = 306,    ///< Macro 27 Randomness
 
@@ -449,7 +449,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M28IN = 308,     ///< Macro 28 Input
             M28MIN = 309,    ///< Macro 28 Minimum Value
             M28MAX = 310,    ///< Macro 28 Maximum Value
-            M28AMT = 311,    ///< Macro 28 Amount
+            M28SCL = 311,    ///< Macro 28 Scale
             M28DST = 312,    ///< Macro 28 Distortion
             M28RND = 313,    ///< Macro 28 Randomness
 
@@ -457,7 +457,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M29IN = 315,     ///< Macro 29 Input
             M29MIN = 316,    ///< Macro 29 Minimum Value
             M29MAX = 317,    ///< Macro 29 Maximum Value
-            M29AMT = 318,    ///< Macro 29 Amount
+            M29SCL = 318,    ///< Macro 29 Scale
             M29DST = 319,    ///< Macro 29 Distortion
             M29RND = 320,    ///< Macro 29 Randomness
 
@@ -465,11 +465,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30IN = 322,     ///< Macro 30 Input
             M30MIN = 323,    ///< Macro 30 Minimum Value
             M30MAX = 324,    ///< Macro 30 Maximum Value
-            M30AMT = 325,    ///< Macro 30 Amount
+            M30SCL = 325,    ///< Macro 30 Scale
             M30DST = 326,    ///< Macro 30 Distortion
             M30RND = 327,    ///< Macro 30 Randomness
 
-            N1AMT = 328,     ///< Envelope 1 Amount
+            N1SCL = 328,     ///< Envelope 1 Scale
             N1INI = 329,     ///< Envelope 1 Initial Level
             N1DEL = 330,     ///< Envelope 1 Delay Time
             N1ATK = 331,     ///< Envelope 1 Attack Time
@@ -482,7 +482,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N1TIN = 338,     ///< Envelope 1 Time Inaccuracy
             N1VIN = 339,     ///< Envelope 1 Level Inaccuracy
 
-            N2AMT = 340,     ///< Envelope 2 Amount
+            N2SCL = 340,     ///< Envelope 2 Scale
             N2INI = 341,     ///< Envelope 2 Initial Level
             N2DEL = 342,     ///< Envelope 2 Delay Time
             N2ATK = 343,     ///< Envelope 2 Attack Time
@@ -495,7 +495,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N2TIN = 350,     ///< Envelope 2 Time Inaccuracy
             N2VIN = 351,     ///< Envelope 2 Level Inaccuracy
 
-            N3AMT = 352,     ///< Envelope 3 Amount
+            N3SCL = 352,     ///< Envelope 3 Scale
             N3INI = 353,     ///< Envelope 3 Initial Level
             N3DEL = 354,     ///< Envelope 3 Delay Time
             N3ATK = 355,     ///< Envelope 3 Attack Time
@@ -508,7 +508,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N3TIN = 362,     ///< Envelope 3 Time Inaccuracy
             N3VIN = 363,     ///< Envelope 3 Level Inaccuracy
 
-            N4AMT = 364,     ///< Envelope 4 Amount
+            N4SCL = 364,     ///< Envelope 4 Scale
             N4INI = 365,     ///< Envelope 4 Initial Level
             N4DEL = 366,     ///< Envelope 4 Delay Time
             N4ATK = 367,     ///< Envelope 4 Attack Time
@@ -521,7 +521,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N4TIN = 374,     ///< Envelope 4 Time Inaccuracy
             N4VIN = 375,     ///< Envelope 4 Level Inaccuracy
 
-            N5AMT = 376,     ///< Envelope 5 Amount
+            N5SCL = 376,     ///< Envelope 5 Scale
             N5INI = 377,     ///< Envelope 5 Initial Level
             N5DEL = 378,     ///< Envelope 5 Delay Time
             N5ATK = 379,     ///< Envelope 5 Attack Time
@@ -534,7 +534,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N5TIN = 386,     ///< Envelope 5 Time Inaccuracy
             N5VIN = 387,     ///< Envelope 5 Level Inaccuracy
 
-            N6AMT = 388,     ///< Envelope 6 Amount
+            N6SCL = 388,     ///< Envelope 6 Scale
             N6INI = 389,     ///< Envelope 6 Initial Level
             N6DEL = 390,     ///< Envelope 6 Delay Time
             N6ATK = 391,     ///< Envelope 6 Attack Time
@@ -547,7 +547,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N6TIN = 398,     ///< Envelope 6 Time Inaccuracy
             N6VIN = 399,     ///< Envelope 6 Level Inaccuracy
 
-            N7AMT = 400,     ///< Envelope 7 Amount
+            N7SCL = 400,     ///< Envelope 7 Scale
             N7INI = 401,     ///< Envelope 7 Initial Level
             N7DEL = 402,     ///< Envelope 7 Delay Time
             N7ATK = 403,     ///< Envelope 7 Attack Time
@@ -560,7 +560,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N7TIN = 410,     ///< Envelope 7 Time Inaccuracy
             N7VIN = 411,     ///< Envelope 7 Level Inaccuracy
 
-            N8AMT = 412,     ///< Envelope 8 Amount
+            N8SCL = 412,     ///< Envelope 8 Scale
             N8INI = 413,     ///< Envelope 8 Initial Level
             N8DEL = 414,     ///< Envelope 8 Delay Time
             N8ATK = 415,     ///< Envelope 8 Attack Time
@@ -573,7 +573,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N8TIN = 422,     ///< Envelope 8 Time Inaccuracy
             N8VIN = 423,     ///< Envelope 8 Level Inaccuracy
 
-            N9AMT = 424,     ///< Envelope 9 Amount
+            N9SCL = 424,     ///< Envelope 9 Scale
             N9INI = 425,     ///< Envelope 9 Initial Level
             N9DEL = 426,     ///< Envelope 9 Delay Time
             N9ATK = 427,     ///< Envelope 9 Attack Time
@@ -586,7 +586,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N9TIN = 434,     ///< Envelope 9 Time Inaccuracy
             N9VIN = 435,     ///< Envelope 9 Level Inaccuracy
 
-            N10AMT = 436,    ///< Envelope 10 Amount
+            N10SCL = 436,    ///< Envelope 10 Scale
             N10INI = 437,    ///< Envelope 10 Initial Level
             N10DEL = 438,    ///< Envelope 10 Delay Time
             N10ATK = 439,    ///< Envelope 10 Attack Time
@@ -599,7 +599,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N10TIN = 446,    ///< Envelope 10 Time Inaccuracy
             N10VIN = 447,    ///< Envelope 10 Level Inaccuracy
 
-            N11AMT = 448,    ///< Envelope 11 Amount
+            N11SCL = 448,    ///< Envelope 11 Scale
             N11INI = 449,    ///< Envelope 11 Initial Level
             N11DEL = 450,    ///< Envelope 11 Delay Time
             N11ATK = 451,    ///< Envelope 11 Attack Time
@@ -612,7 +612,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N11TIN = 458,    ///< Envelope 11 Time Inaccuracy
             N11VIN = 459,    ///< Envelope 11 Level Inaccuracy
 
-            N12AMT = 460,    ///< Envelope 12 Amount
+            N12SCL = 460,    ///< Envelope 12 Scale
             N12INI = 461,    ///< Envelope 12 Initial Level
             N12DEL = 462,    ///< Envelope 12 Delay Time
             N12ATK = 463,    ///< Envelope 12 Attack Time
@@ -629,7 +629,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L1PHS = 473,     ///< LFO 1 Phase
             L1MIN = 474,     ///< LFO 1 Minimum Value
             L1MAX = 475,     ///< LFO 1 Maximum Value
-            L1AMT = 476,     ///< LFO 1 Amount
+            L1AMP = 476,     ///< LFO 1 Amplitude
             L1DST = 477,     ///< LFO 1 Distortion
             L1RND = 478,     ///< LFO 1 Randomness
 
@@ -637,7 +637,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L2PHS = 480,     ///< LFO 2 Phase
             L2MIN = 481,     ///< LFO 2 Minimum Value
             L2MAX = 482,     ///< LFO 2 Maximum Value
-            L2AMT = 483,     ///< LFO 2 Amount
+            L2AMP = 483,     ///< LFO 2 Amplitude
             L2DST = 484,     ///< LFO 2 Distortion
             L2RND = 485,     ///< LFO 2 Randomness
 
@@ -645,7 +645,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L3PHS = 487,     ///< LFO 3 Phase
             L3MIN = 488,     ///< LFO 3 Minimum Value
             L3MAX = 489,     ///< LFO 3 Maximum Value
-            L3AMT = 490,     ///< LFO 3 Amount
+            L3AMP = 490,     ///< LFO 3 Amplitude
             L3DST = 491,     ///< LFO 3 Distortion
             L3RND = 492,     ///< LFO 3 Randomness
 
@@ -653,7 +653,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L4PHS = 494,     ///< LFO 4 Phase
             L4MIN = 495,     ///< LFO 4 Minimum Value
             L4MAX = 496,     ///< LFO 4 Maximum Value
-            L4AMT = 497,     ///< LFO 4 Amount
+            L4AMP = 497,     ///< LFO 4 Amplitude
             L4DST = 498,     ///< LFO 4 Distortion
             L4RND = 499,     ///< LFO 4 Randomness
 
@@ -661,7 +661,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L5PHS = 501,     ///< LFO 5 Phase
             L5MIN = 502,     ///< LFO 5 Minimum Value
             L5MAX = 503,     ///< LFO 5 Maximum Value
-            L5AMT = 504,     ///< LFO 5 Amount
+            L5AMP = 504,     ///< LFO 5 Amplitude
             L5DST = 505,     ///< LFO 5 Distortion
             L5RND = 506,     ///< LFO 5 Randomness
 
@@ -669,7 +669,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6PHS = 508,     ///< LFO 6 Phase
             L6MIN = 509,     ///< LFO 6 Minimum Value
             L6MAX = 510,     ///< LFO 6 Maximum Value
-            L6AMT = 511,     ///< LFO 6 Amount
+            L6AMP = 511,     ///< LFO 6 Amplitude
             L6DST = 512,     ///< LFO 6 Distortion
             L6RND = 513,     ///< LFO 6 Randomness
 
@@ -677,7 +677,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L7PHS = 515,     ///< LFO 7 Phase
             L7MIN = 516,     ///< LFO 7 Minimum Value
             L7MAX = 517,     ///< LFO 7 Maximum Value
-            L7AMT = 518,     ///< LFO 7 Amount
+            L7AMP = 518,     ///< LFO 7 Amplitude
             L7DST = 519,     ///< LFO 7 Distortion
             L7RND = 520,     ///< LFO 7 Randomness
 
@@ -685,7 +685,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L8PHS = 522,     ///< LFO 8 Phase
             L8MIN = 523,     ///< LFO 8 Minimum Value
             L8MAX = 524,     ///< LFO 8 Maximum Value
-            L8AMT = 525,     ///< LFO 8 Amount
+            L8AMP = 525,     ///< LFO 8 Amplitude
             L8DST = 526,     ///< LFO 8 Distortion
             L8RND = 527,     ///< LFO 8 Randomness
 
@@ -775,14 +775,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CF2QLG = 611,    ///< Carrier Filter 2 Logarithmic Q Factor
             EF1QLG = 612,    ///< Effects Filter 1 Logarithmic Q Factor
             EF2QLG = 613,    ///< Effects Filter 2 Logarithmic Q Factor
-            L1AEN = 614,     ///< LFO 1 Amount Envelope
-            L2AEN = 615,     ///< LFO 2 Amount Envelope
-            L3AEN = 616,     ///< LFO 3 Amount Envelope
-            L4AEN = 617,     ///< LFO 4 Amount Envelope
-            L5AEN = 618,     ///< LFO 5 Amount Envelope
-            L6AEN = 619,     ///< LFO 6 Amount Envelope
-            L7AEN = 620,     ///< LFO 7 Amount Envelope
-            L8AEN = 621,     ///< LFO 8 Amount Envelope
+            L1AEN = 614,     ///< LFO 1 Amplitude Envelope
+            L2AEN = 615,     ///< LFO 2 Amplitude Envelope
+            L3AEN = 616,     ///< LFO 3 Amplitude Envelope
+            L4AEN = 617,     ///< LFO 4 Amplitude Envelope
+            L5AEN = 618,     ///< LFO 5 Amplitude Envelope
+            L6AEN = 619,     ///< LFO 6 Amplitude Envelope
+            L7AEN = 620,     ///< LFO 7 Amplitude Envelope
+            L8AEN = 621,     ///< LFO 8 Amplitude Envelope
             N1SYN = 622,     ///< Envelope 1 Tempo Synchronization
             N2SYN = 623,     ///< Envelope 2 Tempo Synchronization
             N3SYN = 624,     ///< Envelope 3 Tempo Synchronization

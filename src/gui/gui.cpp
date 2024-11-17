@@ -194,7 +194,7 @@ char const* const GUI::REVERB_TYPES[] = {
 int const GUI::REVERB_TYPES_COUNT = 10;
 
 
-char const* const GUI::LFO_AMOUNT_ENVELOPES[] = {
+char const* const GUI::LFO_AMPLITUDE_ENVELOPES[] = {
     "1",
     "2",
     "3",
@@ -210,7 +210,7 @@ char const* const GUI::LFO_AMOUNT_ENVELOPES[] = {
     "",
 };
 
-int const GUI::LFO_AMOUNT_ENVELOPES_COUNT = 13;
+int const GUI::LFO_AMPLITUDE_ENVELOPES_COUNT = 13;
 
 
 char const* const GUI::ENVELOPE_UPDATE_TYPES[] = {
@@ -429,7 +429,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M1IN] = "Macro 1 Input (%)",
     [Synth::ParamId::M1MIN] = "Macro 1 Minimum Value (%)",
     [Synth::ParamId::M1MAX] = "Macro 1 Maximum Value (%)",
-    [Synth::ParamId::M1AMT] = "Macro 1 Amount (%)",
+    [Synth::ParamId::M1SCL] = "Macro 1 Scale (%)",
     [Synth::ParamId::M1DST] = "Macro 1 Distortion (%)",
     [Synth::ParamId::M1RND] = "Macro 1 Randomness (%)",
 
@@ -437,7 +437,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M2IN] = "Macro 2 Input (%)",
     [Synth::ParamId::M2MIN] = "Macro 2 Minimum Value (%)",
     [Synth::ParamId::M2MAX] = "Macro 2 Maximum Value (%)",
-    [Synth::ParamId::M2AMT] = "Macro 2 Amount (%)",
+    [Synth::ParamId::M2SCL] = "Macro 2 Scale (%)",
     [Synth::ParamId::M2DST] = "Macro 2 Distortion (%)",
     [Synth::ParamId::M2RND] = "Macro 2 Randomness (%)",
 
@@ -445,7 +445,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M3IN] = "Macro 3 Input (%)",
     [Synth::ParamId::M3MIN] = "Macro 3 Minimum Value (%)",
     [Synth::ParamId::M3MAX] = "Macro 3 Maximum Value (%)",
-    [Synth::ParamId::M3AMT] = "Macro 3 Amount (%)",
+    [Synth::ParamId::M3SCL] = "Macro 3 Scale (%)",
     [Synth::ParamId::M3DST] = "Macro 3 Distortion (%)",
     [Synth::ParamId::M3RND] = "Macro 3 Randomness (%)",
 
@@ -453,7 +453,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M4IN] = "Macro 4 Input (%)",
     [Synth::ParamId::M4MIN] = "Macro 4 Minimum Value (%)",
     [Synth::ParamId::M4MAX] = "Macro 4 Maximum Value (%)",
-    [Synth::ParamId::M4AMT] = "Macro 4 Amount (%)",
+    [Synth::ParamId::M4SCL] = "Macro 4 Scale (%)",
     [Synth::ParamId::M4DST] = "Macro 4 Distortion (%)",
     [Synth::ParamId::M4RND] = "Macro 4 Randomness (%)",
 
@@ -461,7 +461,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M5IN] = "Macro 5 Input (%)",
     [Synth::ParamId::M5MIN] = "Macro 5 Minimum Value (%)",
     [Synth::ParamId::M5MAX] = "Macro 5 Maximum Value (%)",
-    [Synth::ParamId::M5AMT] = "Macro 5 Amount (%)",
+    [Synth::ParamId::M5SCL] = "Macro 5 Scale (%)",
     [Synth::ParamId::M5DST] = "Macro 5 Distortion (%)",
     [Synth::ParamId::M5RND] = "Macro 5 Randomness (%)",
 
@@ -469,7 +469,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M6IN] = "Macro 6 Input (%)",
     [Synth::ParamId::M6MIN] = "Macro 6 Minimum Value (%)",
     [Synth::ParamId::M6MAX] = "Macro 6 Maximum Value (%)",
-    [Synth::ParamId::M6AMT] = "Macro 6 Amount (%)",
+    [Synth::ParamId::M6SCL] = "Macro 6 Scale (%)",
     [Synth::ParamId::M6DST] = "Macro 6 Distortion (%)",
     [Synth::ParamId::M6RND] = "Macro 6 Randomness (%)",
 
@@ -477,7 +477,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M7IN] = "Macro 7 Input (%)",
     [Synth::ParamId::M7MIN] = "Macro 7 Minimum Value (%)",
     [Synth::ParamId::M7MAX] = "Macro 7 Maximum Value (%)",
-    [Synth::ParamId::M7AMT] = "Macro 7 Amount (%)",
+    [Synth::ParamId::M7SCL] = "Macro 7 Scale (%)",
     [Synth::ParamId::M7DST] = "Macro 7 Distortion (%)",
     [Synth::ParamId::M7RND] = "Macro 7 Randomness (%)",
 
@@ -485,7 +485,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M8IN] = "Macro 8 Input (%)",
     [Synth::ParamId::M8MIN] = "Macro 8 Minimum Value (%)",
     [Synth::ParamId::M8MAX] = "Macro 8 Maximum Value (%)",
-    [Synth::ParamId::M8AMT] = "Macro 8 Amount (%)",
+    [Synth::ParamId::M8SCL] = "Macro 8 Scale (%)",
     [Synth::ParamId::M8DST] = "Macro 8 Distortion (%)",
     [Synth::ParamId::M8RND] = "Macro 8 Randomness (%)",
 
@@ -493,7 +493,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M9IN] = "Macro 9 Input (%)",
     [Synth::ParamId::M9MIN] = "Macro 9 Minimum Value (%)",
     [Synth::ParamId::M9MAX] = "Macro 9 Maximum Value (%)",
-    [Synth::ParamId::M9AMT] = "Macro 9 Amount (%)",
+    [Synth::ParamId::M9SCL] = "Macro 9 Scale (%)",
     [Synth::ParamId::M9DST] = "Macro 9 Distortion (%)",
     [Synth::ParamId::M9RND] = "Macro 9 Randomness (%)",
 
@@ -501,7 +501,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M10IN] = "Macro 10 Input (%)",
     [Synth::ParamId::M10MIN] = "Macro 10 Minimum Value (%)",
     [Synth::ParamId::M10MAX] = "Macro 10 Maximum Value (%)",
-    [Synth::ParamId::M10AMT] = "Macro 10 Amount (%)",
+    [Synth::ParamId::M10SCL] = "Macro 10 Scale (%)",
     [Synth::ParamId::M10DST] = "Macro 10 Distortion (%)",
     [Synth::ParamId::M10RND] = "Macro 10 Randomness (%)",
 
@@ -509,7 +509,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M11IN] = "Macro 11 Input (%)",
     [Synth::ParamId::M11MIN] = "Macro 11 Minimum Value (%)",
     [Synth::ParamId::M11MAX] = "Macro 11 Maximum Value (%)",
-    [Synth::ParamId::M11AMT] = "Macro 11 Amount (%)",
+    [Synth::ParamId::M11SCL] = "Macro 11 Scale (%)",
     [Synth::ParamId::M11DST] = "Macro 11 Distortion (%)",
     [Synth::ParamId::M11RND] = "Macro 11 Randomness (%)",
 
@@ -517,7 +517,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M12IN] = "Macro 12 Input (%)",
     [Synth::ParamId::M12MIN] = "Macro 12 Minimum Value (%)",
     [Synth::ParamId::M12MAX] = "Macro 12 Maximum Value (%)",
-    [Synth::ParamId::M12AMT] = "Macro 12 Amount (%)",
+    [Synth::ParamId::M12SCL] = "Macro 12 Scale (%)",
     [Synth::ParamId::M12DST] = "Macro 12 Distortion (%)",
     [Synth::ParamId::M12RND] = "Macro 12 Randomness (%)",
 
@@ -525,7 +525,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M13IN] = "Macro 13 Input (%)",
     [Synth::ParamId::M13MIN] = "Macro 13 Minimum Value (%)",
     [Synth::ParamId::M13MAX] = "Macro 13 Maximum Value (%)",
-    [Synth::ParamId::M13AMT] = "Macro 13 Amount (%)",
+    [Synth::ParamId::M13SCL] = "Macro 13 Scale (%)",
     [Synth::ParamId::M13DST] = "Macro 13 Distortion (%)",
     [Synth::ParamId::M13RND] = "Macro 13 Randomness (%)",
 
@@ -533,7 +533,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M14IN] = "Macro 14 Input (%)",
     [Synth::ParamId::M14MIN] = "Macro 14 Minimum Value (%)",
     [Synth::ParamId::M14MAX] = "Macro 14 Maximum Value (%)",
-    [Synth::ParamId::M14AMT] = "Macro 14 Amount (%)",
+    [Synth::ParamId::M14SCL] = "Macro 14 Scale (%)",
     [Synth::ParamId::M14DST] = "Macro 14 Distortion (%)",
     [Synth::ParamId::M14RND] = "Macro 14 Randomness (%)",
 
@@ -541,7 +541,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M15IN] = "Macro 15 Input (%)",
     [Synth::ParamId::M15MIN] = "Macro 15 Minimum Value (%)",
     [Synth::ParamId::M15MAX] = "Macro 15 Maximum Value (%)",
-    [Synth::ParamId::M15AMT] = "Macro 15 Amount (%)",
+    [Synth::ParamId::M15SCL] = "Macro 15 Scale (%)",
     [Synth::ParamId::M15DST] = "Macro 15 Distortion (%)",
     [Synth::ParamId::M15RND] = "Macro 15 Randomness (%)",
 
@@ -549,7 +549,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M16IN] = "Macro 16 Input (%)",
     [Synth::ParamId::M16MIN] = "Macro 16 Minimum Value (%)",
     [Synth::ParamId::M16MAX] = "Macro 16 Maximum Value (%)",
-    [Synth::ParamId::M16AMT] = "Macro 16 Amount (%)",
+    [Synth::ParamId::M16SCL] = "Macro 16 Scale (%)",
     [Synth::ParamId::M16DST] = "Macro 16 Distortion (%)",
     [Synth::ParamId::M16RND] = "Macro 16 Randomness (%)",
 
@@ -557,7 +557,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M17IN] = "Macro 17 Input (%)",
     [Synth::ParamId::M17MIN] = "Macro 17 Minimum Value (%)",
     [Synth::ParamId::M17MAX] = "Macro 17 Maximum Value (%)",
-    [Synth::ParamId::M17AMT] = "Macro 17 Amount (%)",
+    [Synth::ParamId::M17SCL] = "Macro 17 Scale (%)",
     [Synth::ParamId::M17DST] = "Macro 17 Distortion (%)",
     [Synth::ParamId::M17RND] = "Macro 17 Randomness (%)",
 
@@ -565,7 +565,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M18IN] = "Macro 18 Input (%)",
     [Synth::ParamId::M18MIN] = "Macro 18 Minimum Value (%)",
     [Synth::ParamId::M18MAX] = "Macro 18 Maximum Value (%)",
-    [Synth::ParamId::M18AMT] = "Macro 18 Amount (%)",
+    [Synth::ParamId::M18SCL] = "Macro 18 Scale (%)",
     [Synth::ParamId::M18DST] = "Macro 18 Distortion (%)",
     [Synth::ParamId::M18RND] = "Macro 18 Randomness (%)",
 
@@ -573,7 +573,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M19IN] = "Macro 19 Input (%)",
     [Synth::ParamId::M19MIN] = "Macro 19 Minimum Value (%)",
     [Synth::ParamId::M19MAX] = "Macro 19 Maximum Value (%)",
-    [Synth::ParamId::M19AMT] = "Macro 19 Amount (%)",
+    [Synth::ParamId::M19SCL] = "Macro 19 Scale (%)",
     [Synth::ParamId::M19DST] = "Macro 19 Distortion (%)",
     [Synth::ParamId::M19RND] = "Macro 19 Randomness (%)",
 
@@ -581,7 +581,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M20IN] = "Macro 20 Input (%)",
     [Synth::ParamId::M20MIN] = "Macro 20 Minimum Value (%)",
     [Synth::ParamId::M20MAX] = "Macro 20 Maximum Value (%)",
-    [Synth::ParamId::M20AMT] = "Macro 20 Amount (%)",
+    [Synth::ParamId::M20SCL] = "Macro 20 Scale (%)",
     [Synth::ParamId::M20DST] = "Macro 20 Distortion (%)",
     [Synth::ParamId::M20RND] = "Macro 20 Randomness (%)",
 
@@ -589,7 +589,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M21IN] = "Macro 21 Input (%)",
     [Synth::ParamId::M21MIN] = "Macro 21 Minimum Value (%)",
     [Synth::ParamId::M21MAX] = "Macro 21 Maximum Value (%)",
-    [Synth::ParamId::M21AMT] = "Macro 21 Amount (%)",
+    [Synth::ParamId::M21SCL] = "Macro 21 Scale (%)",
     [Synth::ParamId::M21DST] = "Macro 21 Distortion (%)",
     [Synth::ParamId::M21RND] = "Macro 21 Randomness (%)",
 
@@ -597,7 +597,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M22IN] = "Macro 22 Input (%)",
     [Synth::ParamId::M22MIN] = "Macro 22 Minimum Value (%)",
     [Synth::ParamId::M22MAX] = "Macro 22 Maximum Value (%)",
-    [Synth::ParamId::M22AMT] = "Macro 22 Amount (%)",
+    [Synth::ParamId::M22SCL] = "Macro 22 Scale (%)",
     [Synth::ParamId::M22DST] = "Macro 22 Distortion (%)",
     [Synth::ParamId::M22RND] = "Macro 22 Randomness (%)",
 
@@ -605,7 +605,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M23IN] = "Macro 23 Input (%)",
     [Synth::ParamId::M23MIN] = "Macro 23 Minimum Value (%)",
     [Synth::ParamId::M23MAX] = "Macro 23 Maximum Value (%)",
-    [Synth::ParamId::M23AMT] = "Macro 23 Amount (%)",
+    [Synth::ParamId::M23SCL] = "Macro 23 Scale (%)",
     [Synth::ParamId::M23DST] = "Macro 23 Distortion (%)",
     [Synth::ParamId::M23RND] = "Macro 23 Randomness (%)",
 
@@ -613,7 +613,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M24IN] = "Macro 24 Input (%)",
     [Synth::ParamId::M24MIN] = "Macro 24 Minimum Value (%)",
     [Synth::ParamId::M24MAX] = "Macro 24 Maximum Value (%)",
-    [Synth::ParamId::M24AMT] = "Macro 24 Amount (%)",
+    [Synth::ParamId::M24SCL] = "Macro 24 Scale (%)",
     [Synth::ParamId::M24DST] = "Macro 24 Distortion (%)",
     [Synth::ParamId::M24RND] = "Macro 24 Randomness (%)",
 
@@ -621,7 +621,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M25IN] = "Macro 25 Input (%)",
     [Synth::ParamId::M25MIN] = "Macro 25 Minimum Value (%)",
     [Synth::ParamId::M25MAX] = "Macro 25 Maximum Value (%)",
-    [Synth::ParamId::M25AMT] = "Macro 25 Amount (%)",
+    [Synth::ParamId::M25SCL] = "Macro 25 Scale (%)",
     [Synth::ParamId::M25DST] = "Macro 25 Distortion (%)",
     [Synth::ParamId::M25RND] = "Macro 25 Randomness (%)",
 
@@ -629,7 +629,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M26IN] = "Macro 26 Input (%)",
     [Synth::ParamId::M26MIN] = "Macro 26 Minimum Value (%)",
     [Synth::ParamId::M26MAX] = "Macro 26 Maximum Value (%)",
-    [Synth::ParamId::M26AMT] = "Macro 26 Amount (%)",
+    [Synth::ParamId::M26SCL] = "Macro 26 Scale (%)",
     [Synth::ParamId::M26DST] = "Macro 26 Distortion (%)",
     [Synth::ParamId::M26RND] = "Macro 26 Randomness (%)",
 
@@ -637,7 +637,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M27IN] = "Macro 27 Input (%)",
     [Synth::ParamId::M27MIN] = "Macro 27 Minimum Value (%)",
     [Synth::ParamId::M27MAX] = "Macro 27 Maximum Value (%)",
-    [Synth::ParamId::M27AMT] = "Macro 27 Amount (%)",
+    [Synth::ParamId::M27SCL] = "Macro 27 Scale (%)",
     [Synth::ParamId::M27DST] = "Macro 27 Distortion (%)",
     [Synth::ParamId::M27RND] = "Macro 27 Randomness (%)",
 
@@ -645,7 +645,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M28IN] = "Macro 28 Input (%)",
     [Synth::ParamId::M28MIN] = "Macro 28 Minimum Value (%)",
     [Synth::ParamId::M28MAX] = "Macro 28 Maximum Value (%)",
-    [Synth::ParamId::M28AMT] = "Macro 28 Amount (%)",
+    [Synth::ParamId::M28SCL] = "Macro 28 Scale (%)",
     [Synth::ParamId::M28DST] = "Macro 28 Distortion (%)",
     [Synth::ParamId::M28RND] = "Macro 28 Randomness (%)",
 
@@ -653,7 +653,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M29IN] = "Macro 29 Input (%)",
     [Synth::ParamId::M29MIN] = "Macro 29 Minimum Value (%)",
     [Synth::ParamId::M29MAX] = "Macro 29 Maximum Value (%)",
-    [Synth::ParamId::M29AMT] = "Macro 29 Amount (%)",
+    [Synth::ParamId::M29SCL] = "Macro 29 Scale (%)",
     [Synth::ParamId::M29DST] = "Macro 29 Distortion (%)",
     [Synth::ParamId::M29RND] = "Macro 29 Randomness (%)",
 
@@ -661,11 +661,11 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::M30IN] = "Macro 30 Input (%)",
     [Synth::ParamId::M30MIN] = "Macro 30 Minimum Value (%)",
     [Synth::ParamId::M30MAX] = "Macro 30 Maximum Value (%)",
-    [Synth::ParamId::M30AMT] = "Macro 30 Amount (%)",
+    [Synth::ParamId::M30SCL] = "Macro 30 Scale (%)",
     [Synth::ParamId::M30DST] = "Macro 30 Distortion (%)",
     [Synth::ParamId::M30RND] = "Macro 30 Randomness (%)",
 
-    [Synth::ParamId::N1AMT] = "Envelope 1 Amount (%)",
+    [Synth::ParamId::N1SCL] = "Envelope 1 Scale (%)",
     [Synth::ParamId::N1INI] = "Envelope 1 Initial Level (%)",
     [Synth::ParamId::N1DEL] = "Envelope 1 Delay Time (s)",
     [Synth::ParamId::N1ATK] = "Envelope 1 Attack Time (s)",
@@ -678,7 +678,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N1TIN] = "Envelope 1 Time Inaccuracy",
     [Synth::ParamId::N1VIN] = "Envelope 1 Level Inaccuracy",
 
-    [Synth::ParamId::N2AMT] = "Envelope 2 Amount (%)",
+    [Synth::ParamId::N2SCL] = "Envelope 2 Scale (%)",
     [Synth::ParamId::N2INI] = "Envelope 2 Initial Level (%)",
     [Synth::ParamId::N2DEL] = "Envelope 2 Delay Time (s)",
     [Synth::ParamId::N2ATK] = "Envelope 2 Attack Time (s)",
@@ -691,7 +691,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N2TIN] = "Envelope 2 Time Inaccuracy",
     [Synth::ParamId::N2VIN] = "Envelope 2 Level Inaccuracy",
 
-    [Synth::ParamId::N3AMT] = "Envelope 3 Amount (%)",
+    [Synth::ParamId::N3SCL] = "Envelope 3 Scale (%)",
     [Synth::ParamId::N3INI] = "Envelope 3 Initial Level (%)",
     [Synth::ParamId::N3DEL] = "Envelope 3 Delay Time (s)",
     [Synth::ParamId::N3ATK] = "Envelope 3 Attack Time (s)",
@@ -704,7 +704,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N3TIN] = "Envelope 3 Time Inaccuracy",
     [Synth::ParamId::N3VIN] = "Envelope 3 Level Inaccuracy",
 
-    [Synth::ParamId::N4AMT] = "Envelope 4 Amount (%)",
+    [Synth::ParamId::N4SCL] = "Envelope 4 Scale (%)",
     [Synth::ParamId::N4INI] = "Envelope 4 Initial Level (%)",
     [Synth::ParamId::N4DEL] = "Envelope 4 Delay Time (s)",
     [Synth::ParamId::N4ATK] = "Envelope 4 Attack Time (s)",
@@ -717,7 +717,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N4TIN] = "Envelope 4 Time Inaccuracy",
     [Synth::ParamId::N4VIN] = "Envelope 4 Level Inaccuracy",
 
-    [Synth::ParamId::N5AMT] = "Envelope 5 Amount (%)",
+    [Synth::ParamId::N5SCL] = "Envelope 5 Scale (%)",
     [Synth::ParamId::N5INI] = "Envelope 5 Initial Level (%)",
     [Synth::ParamId::N5DEL] = "Envelope 5 Delay Time (s)",
     [Synth::ParamId::N5ATK] = "Envelope 5 Attack Time (s)",
@@ -730,7 +730,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N5TIN] = "Envelope 5 Time Inaccuracy",
     [Synth::ParamId::N5VIN] = "Envelope 5 Level Inaccuracy",
 
-    [Synth::ParamId::N6AMT] = "Envelope 6 Amount (%)",
+    [Synth::ParamId::N6SCL] = "Envelope 6 Scale (%)",
     [Synth::ParamId::N6INI] = "Envelope 6 Initial Level (%)",
     [Synth::ParamId::N6DEL] = "Envelope 6 Delay Time (s)",
     [Synth::ParamId::N6ATK] = "Envelope 6 Attack Time (s)",
@@ -743,7 +743,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N6TIN] = "Envelope 6 Time Inaccuracy",
     [Synth::ParamId::N6VIN] = "Envelope 6 Level Inaccuracy",
 
-    [Synth::ParamId::N7AMT] = "Envelope 7 Amount (%)",
+    [Synth::ParamId::N7SCL] = "Envelope 7 Scale (%)",
     [Synth::ParamId::N7INI] = "Envelope 7 Initial Level (%)",
     [Synth::ParamId::N7DEL] = "Envelope 7 Delay Time (s)",
     [Synth::ParamId::N7ATK] = "Envelope 7 Attack Time (s)",
@@ -756,7 +756,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N7TIN] = "Envelope 7 Time Inaccuracy",
     [Synth::ParamId::N7VIN] = "Envelope 7 Level Inaccuracy",
 
-    [Synth::ParamId::N8AMT] = "Envelope 8 Amount (%)",
+    [Synth::ParamId::N8SCL] = "Envelope 8 Scale (%)",
     [Synth::ParamId::N8INI] = "Envelope 8 Initial Level (%)",
     [Synth::ParamId::N8DEL] = "Envelope 8 Delay Time (s)",
     [Synth::ParamId::N8ATK] = "Envelope 8 Attack Time (s)",
@@ -769,7 +769,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N8TIN] = "Envelope 8 Time Inaccuracy",
     [Synth::ParamId::N8VIN] = "Envelope 8 Level Inaccuracy",
 
-    [Synth::ParamId::N9AMT] = "Envelope 9 Amount (%)",
+    [Synth::ParamId::N9SCL] = "Envelope 9 Scale (%)",
     [Synth::ParamId::N9INI] = "Envelope 9 Initial Level (%)",
     [Synth::ParamId::N9DEL] = "Envelope 9 Delay Time (s)",
     [Synth::ParamId::N9ATK] = "Envelope 9 Attack Time (s)",
@@ -782,7 +782,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N9TIN] = "Envelope 9 Time Inaccuracy",
     [Synth::ParamId::N9VIN] = "Envelope 9 Level Inaccuracy",
 
-    [Synth::ParamId::N10AMT] = "Envelope 10 Amount (%)",
+    [Synth::ParamId::N10SCL] = "Envelope 10 Scale (%)",
     [Synth::ParamId::N10INI] = "Envelope 10 Initial Level (%)",
     [Synth::ParamId::N10DEL] = "Envelope 10 Delay Time (s)",
     [Synth::ParamId::N10ATK] = "Envelope 10 Attack Time (s)",
@@ -795,7 +795,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N10TIN] = "Envelope 10 Time Inaccuracy",
     [Synth::ParamId::N10VIN] = "Envelope 10 Level Inaccuracy",
 
-    [Synth::ParamId::N11AMT] = "Envelope 11 Amount (%)",
+    [Synth::ParamId::N11SCL] = "Envelope 11 Scale (%)",
     [Synth::ParamId::N11INI] = "Envelope 11 Initial Level (%)",
     [Synth::ParamId::N11DEL] = "Envelope 11 Delay Time (s)",
     [Synth::ParamId::N11ATK] = "Envelope 11 Attack Time (s)",
@@ -808,7 +808,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::N11TIN] = "Envelope 11 Time Inaccuracy",
     [Synth::ParamId::N11VIN] = "Envelope 11 Level Inaccuracy",
 
-    [Synth::ParamId::N12AMT] = "Envelope 12 Amount (%)",
+    [Synth::ParamId::N12SCL] = "Envelope 12 Scale (%)",
     [Synth::ParamId::N12INI] = "Envelope 12 Initial Level (%)",
     [Synth::ParamId::N12DEL] = "Envelope 12 Delay Time (s)",
     [Synth::ParamId::N12ATK] = "Envelope 12 Attack Time (s)",
@@ -825,7 +825,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L1PHS] = "LFO 1 Phase (degree)",
     [Synth::ParamId::L1MIN] = "LFO 1 Minimum Value (%)",
     [Synth::ParamId::L1MAX] = "LFO 1 Maximum Value (%)",
-    [Synth::ParamId::L1AMT] = "LFO 1 Amount (%)",
+    [Synth::ParamId::L1AMP] = "LFO 1 Amplitude (%)",
     [Synth::ParamId::L1DST] = "LFO 1 Distortion (%)",
     [Synth::ParamId::L1RND] = "LFO 1 Randomness (%)",
 
@@ -833,7 +833,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L2PHS] = "LFO 2 Phase (degree)",
     [Synth::ParamId::L2MIN] = "LFO 2 Minimum Value (%)",
     [Synth::ParamId::L2MAX] = "LFO 2 Maximum Value (%)",
-    [Synth::ParamId::L2AMT] = "LFO 2 Amount (%)",
+    [Synth::ParamId::L2AMP] = "LFO 2 Amplitude (%)",
     [Synth::ParamId::L2DST] = "LFO 2 Distortion (%)",
     [Synth::ParamId::L2RND] = "LFO 2 Randomness (%)",
 
@@ -841,7 +841,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L3PHS] = "LFO 3 Phase (degree)",
     [Synth::ParamId::L3MIN] = "LFO 3 Minimum Value (%)",
     [Synth::ParamId::L3MAX] = "LFO 3 Maximum Value (%)",
-    [Synth::ParamId::L3AMT] = "LFO 3 Amount (%)",
+    [Synth::ParamId::L3AMP] = "LFO 3 Amplitude (%)",
     [Synth::ParamId::L3DST] = "LFO 3 Distortion (%)",
     [Synth::ParamId::L3RND] = "LFO 3 Randomness (%)",
 
@@ -849,7 +849,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L4PHS] = "LFO 4 Phase (degree)",
     [Synth::ParamId::L4MIN] = "LFO 4 Minimum Value (%)",
     [Synth::ParamId::L4MAX] = "LFO 4 Maximum Value (%)",
-    [Synth::ParamId::L4AMT] = "LFO 4 Amount (%)",
+    [Synth::ParamId::L4AMP] = "LFO 4 Amplitude (%)",
     [Synth::ParamId::L4DST] = "LFO 4 Distortion (%)",
     [Synth::ParamId::L4RND] = "LFO 4 Randomness (%)",
 
@@ -857,7 +857,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L5PHS] = "LFO 5 Phase (degree)",
     [Synth::ParamId::L5MIN] = "LFO 5 Minimum Value (%)",
     [Synth::ParamId::L5MAX] = "LFO 5 Maximum Value (%)",
-    [Synth::ParamId::L5AMT] = "LFO 5 Amount (%)",
+    [Synth::ParamId::L5AMP] = "LFO 5 Amplitude (%)",
     [Synth::ParamId::L5DST] = "LFO 5 Distortion (%)",
     [Synth::ParamId::L5RND] = "LFO 5 Randomness (%)",
 
@@ -865,7 +865,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L6PHS] = "LFO 6 Phase (degree)",
     [Synth::ParamId::L6MIN] = "LFO 6 Minimum Value (%)",
     [Synth::ParamId::L6MAX] = "LFO 6 Maximum Value (%)",
-    [Synth::ParamId::L6AMT] = "LFO 6 Amount (%)",
+    [Synth::ParamId::L6AMP] = "LFO 6 Amplitude (%)",
     [Synth::ParamId::L6DST] = "LFO 6 Distortion (%)",
     [Synth::ParamId::L6RND] = "LFO 6 Randomness (%)",
 
@@ -873,7 +873,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L7PHS] = "LFO 7 Phase (degree)",
     [Synth::ParamId::L7MIN] = "LFO 7 Minimum Value (%)",
     [Synth::ParamId::L7MAX] = "LFO 7 Maximum Value (%)",
-    [Synth::ParamId::L7AMT] = "LFO 7 Amount (%)",
+    [Synth::ParamId::L7AMP] = "LFO 7 Amplitude (%)",
     [Synth::ParamId::L7DST] = "LFO 7 Distortion (%)",
     [Synth::ParamId::L7RND] = "LFO 7 Randomness (%)",
 
@@ -881,7 +881,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::L8PHS] = "LFO 8 Phase (degree)",
     [Synth::ParamId::L8MIN] = "LFO 8 Minimum Value (%)",
     [Synth::ParamId::L8MAX] = "LFO 8 Maximum Value (%)",
-    [Synth::ParamId::L8AMT] = "LFO 8 Amount (%)",
+    [Synth::ParamId::L8AMP] = "LFO 8 Amplitude (%)",
     [Synth::ParamId::L8DST] = "LFO 8 Distortion (%)",
     [Synth::ParamId::L8RND] = "LFO 8 Randomness (%)",
 
@@ -991,14 +991,14 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EF1QLG] = "Filter 1 Logarithmic Q Factor",
     [Synth::ParamId::EF2QLG] = "Filter 2 Logarithmic Q Factor",
 
-    [Synth::ParamId::L1AEN] = "LFO 1 Amount Envelope",
-    [Synth::ParamId::L2AEN] = "LFO 2 Amount Envelope",
-    [Synth::ParamId::L3AEN] = "LFO 3 Amount Envelope",
-    [Synth::ParamId::L4AEN] = "LFO 4 Amount Envelope",
-    [Synth::ParamId::L5AEN] = "LFO 5 Amount Envelope",
-    [Synth::ParamId::L6AEN] = "LFO 6 Amount Envelope",
-    [Synth::ParamId::L7AEN] = "LFO 7 Amount Envelope",
-    [Synth::ParamId::L8AEN] = "LFO 8 Amount Envelope",
+    [Synth::ParamId::L1AEN] = "LFO 1 Amplitude Envelope",
+    [Synth::ParamId::L2AEN] = "LFO 2 Amplitude Envelope",
+    [Synth::ParamId::L3AEN] = "LFO 3 Amplitude Envelope",
+    [Synth::ParamId::L4AEN] = "LFO 4 Amplitude Envelope",
+    [Synth::ParamId::L5AEN] = "LFO 5 Amplitude Envelope",
+    [Synth::ParamId::L6AEN] = "LFO 6 Amplitude Envelope",
+    [Synth::ParamId::L7AEN] = "LFO 7 Amplitude Envelope",
+    [Synth::ParamId::L8AEN] = "LFO 8 Amplitude Envelope",
 
     [Synth::ParamId::N1SYN] = "Envelope 1 Tempo Synchronization",
     [Synth::ParamId::N2SYN] = "Envelope 2 Tempo Synchronization",
@@ -2037,7 +2037,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M1MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M1MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M1AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M1SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M1DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M1RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2053,7 +2053,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M2MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M2MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M2AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M2SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M2DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M2RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2069,7 +2069,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M3MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M3MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M3AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M3SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M3DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M3RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2085,7 +2085,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M4MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M4MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M4AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M4SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M4DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M4RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2101,7 +2101,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M5MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M5MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M5AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M5SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M5DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M5RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2117,7 +2117,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M6MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M6MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M6AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M6SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M6DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M6RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2133,7 +2133,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M7MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M7MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M7AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M7SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M7DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M7RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2149,7 +2149,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M8MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M8MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M8AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M8SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M8DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M8RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2165,7 +2165,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M9MIN,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M9MAX,  MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M9AMT,  MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M9SCL,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M9DST,  MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M9RND,  MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2181,7 +2181,7 @@ void GUI::build_macros_1_body(
     KNOB(macros_1_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M10MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M10MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M10AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_1_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M10SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M10DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_1_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M10RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2209,7 +2209,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M11MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M11MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M11AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M11SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M11DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M11RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2225,7 +2225,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M12MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M12MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M12AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M12SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M12DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M12RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2241,7 +2241,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M13MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M13MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M13AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M13SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M13DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M13RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2257,7 +2257,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M14MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M14MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M14AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M14SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M14DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M14RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2273,7 +2273,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M15MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M15MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M15AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M15SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M15DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M15RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2289,7 +2289,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M16MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M16MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M16AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M16SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M16DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M16RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2305,7 +2305,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M17MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M17MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M17AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M17SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M17DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M17RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2321,7 +2321,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M18MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M18MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M18AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M18SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M18DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M18RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2337,7 +2337,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M19MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M19MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M19AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M19SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M19DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M19RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2353,7 +2353,7 @@ void GUI::build_macros_2_body(
     KNOB(macros_2_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M20MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M20MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M20AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_2_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M20SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M20DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_2_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M20RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2381,7 +2381,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M21MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M21MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M21AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M21SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M21DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M21RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2397,7 +2397,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M22MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M22MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M22AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M22SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M22DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M22RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2413,7 +2413,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M23MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M23MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M23AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M23SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M23DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M23RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2429,7 +2429,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M24MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M24MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M24AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M24SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M24DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M24RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2445,7 +2445,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M25MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M25MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M25AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M25SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M25DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M25RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2461,7 +2461,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M26MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M26MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M26AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M26SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M26DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M26RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2477,7 +2477,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M27MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M27MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M27AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M27SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M27DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M27RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2493,7 +2493,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M28MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M28MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M28AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M28SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M28DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M28RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2509,7 +2509,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M29MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M29MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M29AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M29SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M29DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M29RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2525,7 +2525,7 @@ void GUI::build_macros_3_body(
     KNOB(macros_3_body,   4 + KNOB_W * 1,  30, Synth::ParamId::M30MIN, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2,  30, Synth::ParamId::M30MAX, MM__C,  "%.2f", 100.0, knob_states);
 
-    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M30AMT, MM__C,  "%.2f", 100.0, knob_states);
+    KNOB(macros_3_body,   4 + KNOB_W * 0, 150, Synth::ParamId::M30SCL, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 1, 150, Synth::ParamId::M30DST, MM__C,  "%.2f", 100.0, knob_states);
     KNOB(macros_3_body,   4 + KNOB_W * 2, 150, Synth::ParamId::M30RND, MM__C,  "%.2f", 100.0, knob_states);
 
@@ -2662,7 +2662,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(33, 13);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N1AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N1SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N1INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N1PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N1SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2689,7 +2689,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(339, 13);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N2AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N2SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N2INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N2PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N2SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2716,7 +2716,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(645, 13);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N3AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N3SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N3INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N3PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N3SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2743,7 +2743,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(33, 293);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N4AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N4SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N4INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N4PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N4SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2770,7 +2770,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(339, 293);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N5AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N5SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N5INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N5PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N5SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2797,7 +2797,7 @@ void GUI::build_envelopes_1_body(
 
     POSITION_RELATIVE_BEGIN(645, 293);
 
-    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N6AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_1_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N6SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N6INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N6PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_1_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N6SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2841,7 +2841,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(33, 13);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N7AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N7SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N7INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N7PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N7SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2868,7 +2868,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(339, 13);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N8AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N8SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N8INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N8PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N8SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2895,7 +2895,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(645, 13);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N9AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N9SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N9INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N9PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N9SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2922,7 +2922,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(33, 293);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N10AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N10SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N10INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N10PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N10SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2949,7 +2949,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(339, 293);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N11AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N11SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N11INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N11PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N11SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -2976,7 +2976,7 @@ void GUI::build_envelopes_2_body(
 
     POSITION_RELATIVE_BEGIN(645, 293);
 
-    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N12AMT,  MM__C,     "%.2f", 100.0, knob_states);
+    KNOB(envelopes_2_body,   4 + KNOB_W * 0,  32, Synth::ParamId::N12SCL,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 1,  32, Synth::ParamId::N12INI,  MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 2,  32, Synth::ParamId::N12PK,   MM__C,     "%.2f", 100.0, knob_states);
     KNOB(envelopes_2_body,   4 + KNOB_W * 3,  32, Synth::ParamId::N12SUS,  MM__C,     "%.2f", 100.0, knob_states);
@@ -3013,8 +3013,8 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
 
-    constexpr char const* const* ae = JS80P::GUI::LFO_AMOUNT_ENVELOPES;
-    constexpr int aec = JS80P::GUI::LFO_AMOUNT_ENVELOPES_COUNT;
+    constexpr char const* const* ae = JS80P::GUI::LFO_AMPLITUDE_ENVELOPES;
+    constexpr int aec = JS80P::GUI::LFO_AMPLITUDE_ENVELOPES_COUNT;
 
     POSITION_RELATIVE_BEGIN(12, 4);
     KNOB(lfos_body,   4 + KNOB_W * 0,  28, Synth::ParamId::L1WAV,  MM___,    wf, wfc, knob_states);
@@ -3022,7 +3022,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L1PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L1MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L1MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L1AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L1AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L1DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L1RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L1LOG);
@@ -3037,7 +3037,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L2PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L2MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L2MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L2AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L2AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L2DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L2RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L2LOG);
@@ -3052,7 +3052,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L3PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L3MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L3MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L3AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L3AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L3DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L3RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L3LOG);
@@ -3067,7 +3067,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L4PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L4MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L4MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L4AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L4AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L4DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L4RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L4LOG);
@@ -3082,7 +3082,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L5PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L5MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L5MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L5AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L5AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L5DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L5RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L5LOG);
@@ -3097,7 +3097,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L6PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L6MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L6MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L6AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L6AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L6DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L6RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L6LOG);
@@ -3112,7 +3112,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L7PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L7MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L7MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L7AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L7AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L7DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L7RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L7LOG);
@@ -3127,7 +3127,7 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
     KNOB(lfos_body,   4 + KNOB_W * 2,  28, Synth::ParamId::L8PHS,  MML_C,    "%.1f", 360.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 3,  28, Synth::ParamId::L8MIN,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 4,  28, Synth::ParamId::L8MAX,  MML_C,    "%.2f", 100.0, knob_states);
-    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L8AMT,  MML_C,    "%.2f", 200.0, knob_states);
+    KNOB(lfos_body,   4 + KNOB_W * 5,  28, Synth::ParamId::L8AMP,  MML_C,    "%.2f", 200.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 6,  28, Synth::ParamId::L8DST,  MML_C,    "%.2f", 100.0, knob_states);
     KNOB(lfos_body,   4 + KNOB_W * 7,  28, Synth::ParamId::L8RND,  MML_C,    "%.2f", 100.0, knob_states);
     TOGG(lfos_body,  66, 2, 76, 24,  0, Synth::ParamId::L8LOG);
