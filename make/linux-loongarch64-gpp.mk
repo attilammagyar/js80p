@@ -19,8 +19,8 @@
 INSTRUCTION_SET = lsx
 
 LIB_PATH ?= $(BUILD_DIR)/lib64
-SYS_LIB_PATH ?= /usr/lib/loong64-linux-gnu
-SUFFIX = loong64
+SYS_LIB_PATH ?= /usr/lib/loongarch64-linux-gnu
+SUFFIX = loongarch64
 OBJ_GUI_BFDNAME = elf64-loongarch
 OBJ_GUI_BFDARCH = loongarch64
 ARCH_CXXFLAGS = -march=loongarch64 -mabi=lp64d
