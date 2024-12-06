@@ -224,6 +224,10 @@ If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
 Otherwise, you should go with a VST 3 bundle on both Windows and Linux.
 
+The source code distribution can be compiled for various CPU architectures.
+Ready-to-use binary distributions are available for `x86_64` and `x86`
+compatible systems, like most desktop PCs and laptops.
+
 If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
 and you use a 64 bit plugin host application (also known as "`x86_64`"), then
 you should download a JS80P package that is optimized for AVX compatible
