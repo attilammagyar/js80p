@@ -887,6 +887,10 @@ which support it).</li>
 VST 2.4, then you have to download and install the FST version of JS80P.
 Otherwise, you should go with a VST 3 bundle on both Windows and Linux.</p>
 
+<p>The source code distribution can be compiled for various CPU architectures.
+Ready-to-use binary distributions are available for <code>x86_64</code> and <code>x86</code>
+compatible systems, like most desktop PCs and laptops.</p>
+
 <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
 and you use a 64 bit plugin host application (also known as "<code>x86_64</code>"), then
 you should download a JS80P package that is optimized for AVX compatible
@@ -3266,7 +3270,7 @@ TARGET_PLATFORM=i686-w64-mingw32 make all
 TARGET_PLATFORM=x86_64-gpp make all
 TARGET_PLATFORM=i686-gpp make all
 TARGET_PLATFORM=riscv64-gpp make all
-TARGET_PLATFORM=loong64-gpp make all
+TARGET_PLATFORM=loongarch64-gpp make all
 </code></pre>
 
 <p><a href="#toc">Table of Contents</a></p>
