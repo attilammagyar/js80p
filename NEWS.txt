@@ -1,3 +1,6 @@
+v3.?.? (202?-??-??)
+ * Bugfix: LoongArch VST3 packaging has been fixed in the source distribution.
+
 v3.2.1 (2024-11-17)
  * The meaning of the Macro and Envelope scale parameters, and the LFO
    amplitude parameter have been clarified on the user interface and in the
