@@ -225,7 +225,7 @@ VST 2.4, then you have to download and install the FST version of JS80P.
 Otherwise, you should go with a VST 3 bundle on both Windows and Linux.
 
 The source code distribution can be compiled for various CPU architectures.
-Ready-to-use binary distributions are available for `x86_64` and `x86`
+Ready-to-use binary distributions are available for "`x86_64`" and "`x86`"
 compatible systems, like most desktop PCs and laptops.
 
 If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
