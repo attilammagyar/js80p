@@ -198,7 +198,7 @@ main()
         log "Skipping VST 3 bundle for RISC-V 64"
     fi
 
-    if [[ "$target_platforms" =~ loong64-gpp:lsx ]]
+    if [[ "$target_platforms" =~ loongarch64-gpp:lsx ]]
     then
         log "Bulding VST 3 bundle for loongarch64"
         package_vst3_bundle "$version_as_file_name" "lsx"
@@ -275,7 +275,7 @@ call_make_for_build_platform()
     case "$build_platform" in
         "x86_64")       call_make "x86_64-w64-mingw32" "avx" "$@" ;;
         "riscv64")      call_make "riscv64-gpp" "none" "$@" ;;
-        "loongarch64")  call_make "loong64-gpp" "lsx" "$@" ;;
+        "loongarch64")  call_make "loongarch64-gpp" "lsx" "$@" ;;
         *) error "Unsupported build platform: $uname" ;;
     esac
 }
@@ -442,7 +442,7 @@ package_vst3_bundle()
             copy_vst3 "$version_as_file_name" "windows-x86_64-avx" "$vst3_base_dir" "x86_64-win" "js80p.vst3"
             ;;
         "lsx")
-            copy_vst3 "$version_as_file_name" "linux-loong64-lsx" "$vst3_base_dir" "loong64-linux" "js80p.so"
+            copy_vst3 "$version_as_file_name" "linux-loongarch64-lsx" "$vst3_base_dir" "loongarch64-linux" "js80p.so"
             ;;
 
         "none")

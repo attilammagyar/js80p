@@ -2665,7 +2665,7 @@ and `LoongArch` Linux respectively:
     TARGET_PLATFORM=x86_64-gpp make all
     TARGET_PLATFORM=i686-gpp make all
     TARGET_PLATFORM=riscv64-gpp make all
-    TARGET_PLATFORM=loong64-gpp make all
+    TARGET_PLATFORM=loongarch64-gpp make all
 
 <a href="#toc">Table of Contents</a>
 
