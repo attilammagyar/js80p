@@ -112,6 +112,7 @@ Table of Contents
     * [Analog Brass AT last](#preset-analog-brass-at-last)
     * [Analog Brass mod last](#preset-analog-brass-mod-last)
     * [Dystopiano](#preset-dystopiano)
+    * [Expressive Saw](#preset-expressive-saw)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2296,6 +2297,20 @@ the width and the intensity of the echos, aftertouch boosts them even more.
 The pitch wheel, rather than changing the pitch of the oscillators, tweaks the
 delay time and the modulation of the effects, resulting in various chirps and
 sweeps.
+
+<a id="preset-expressive-saw"></a>
+
+### Expressive Saw
+
+An analog sawtooth lead sound where low velocity, pianissimo notes have slow
+attack and release, and high velocity, fortissimo notes have an extremely
+quick attack and a quick release. On top of that, note velocity also controls
+the filter envelope, so the harder you play, the brighter the sound gets. The
+mod wheel first opens up a global filter, then starts brightening the sound
+and adds a tremolo effect. The pitch wheel, besides note pitch, also affects
+the Echo and Reverb effects, so you can play with the pitch long after all
+notes have been released. Aftertouch adds a vibrato effect to the note
+belonging to the highest pressed key.
 
 <a href="#toc">Table of Contents</a>
 
