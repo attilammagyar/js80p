@@ -1,4 +1,6 @@
 v3.?.? (202?-??-??)
+ * New preset: Expressive Saw, a preset where your playing style can have
+   dramatic effects on the sound.
  * Bugfix: LoongArch VST3 packaging has been fixed in the source distribution.
 
 v3.2.1 (2024-11-17)
