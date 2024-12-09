@@ -749,10 +749,12 @@ one oscillator, and higher notes to the other. The available options are:
 
 ##### Modulator Additive Volume (MIX)
 
-When the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, this
-knob controls how loud the first oscillator can be heard in the output. Turn it
-down to 0% in order to make the first oscillator contribute to the final sound
-only via modulation.
+This is an additional volume control for the first oscillator that is applied
+after its signal is sent into the second oscillator as a modulator. The main
+purpose of this knob is to be able to control the oscillator's volume without
+affecting the modulation when the [MODE](#usage-synth-main-mode) knob is in the
+Mix&Mod position. Turn it down to 0% for making the first oscillator contribute
+to the final sound only via modulation.
 
 ##### Phase Modulation (PM)
 
