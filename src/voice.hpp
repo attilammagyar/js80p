@@ -109,7 +109,7 @@ class Voice : public SignalProducer
 
         static constexpr bool IS_CARRIER = !IS_MODULATOR;
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 10;
+        static constexpr Integer NUMBER_OF_CHILDREN = 11;
 
     public:
         enum State {
@@ -262,6 +262,7 @@ class Voice : public SignalProducer
             OscillatorInaccuracy& synced_oscillator_inaccuracy,
             Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
+            FloatParamS& additive_volume_leader,
             BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
             BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
         ) noexcept;
@@ -348,6 +349,8 @@ class Voice : public SignalProducer
 
         void render_oscillator(Integer const round, Integer const sample_count) noexcept;
 
+        typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type additive_volume;
+
     protected:
         Sample const* const* initialize_rendering(
             Integer const round,
@@ -425,12 +428,14 @@ class Voice : public SignalProducer
         FloatParamS panning;
         FloatParamS volume;
         VolumeApplier volume_applier;
+        Sample const* additive_volume_buffer;
         Sample const* volume_applier_buffer;
         Sample const* panning_buffer;
         Sample const* note_panning_buffer;
         Number oscillator_inaccuracy;
         Number panning_value;
         Number note_panning_value;
+        Number additive_volume_value;
         Frequency nominal_frequency;
         Frequency note_frequency;
         Number velocity;
@@ -440,6 +445,7 @@ class Voice : public SignalProducer
         Midi::Note note;
         Midi::Channel channel;
         bool is_drifting;
+        bool is_additive_volume_polyphonic;
 
     public:
         ModulationOut& modulation_out;

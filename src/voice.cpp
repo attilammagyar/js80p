@@ -443,10 +443,12 @@ Voice<ModulatorSignalProducerClass>::Voice(
         OscillatorInaccuracy& synced_oscillator_inaccuracy,
         Number const oscillator_inaccuracy_seed,
         Params& param_leaders,
+        FloatParamS& additive_volume_leader,
         BiquadFilterSharedBuffers* filter_1_shared_buffers,
         BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
+    additive_volume(additive_volume_leader, status),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
     param_leaders(param_leaders),
     frequencies(frequencies),
@@ -525,6 +527,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
         BiquadFilterSharedBuffers* filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
+    additive_volume(),
     oscillator_inaccuracy_seed(oscillator_inaccuracy_seed),
     param_leaders(param_leaders),
     frequencies(frequencies),
@@ -605,6 +608,10 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 ) noexcept {
     this->oscillator_inaccuracy = oscillator_inaccuracy_seed;
 
+    if constexpr (IS_MODULATOR) {
+        additive_volume.set_random_seed(make_random_seed(0.168));
+    }
+
     wavefolder.folding.set_random_seed(make_random_seed(0.583));
 
     if constexpr (IS_CARRIER) {
@@ -638,6 +645,10 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
     status = Constants::VOICE_STATUS_NORMAL;
     note = 0;
     channel = 0;
+
+    if constexpr (IS_MODULATOR) {
+        register_child(additive_volume);
+    }
 
     register_child(note_velocity);
     register_child(note_panning);
@@ -739,6 +750,10 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     note_panning.schedule_value(time_offset, calculate_note_panning(note));
 
     oscillator.cancel_events_at(time_offset);
+
+    if constexpr (IS_MODULATOR) {
+        additive_volume.start_envelope(time_offset, random_1, random_2);
+    }
 
     wavefolder.folding.start_envelope(time_offset, random_1, random_2);
 
@@ -989,6 +1004,10 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     save_note_info(note_id, note, channel, velocity);
 
+    if constexpr (IS_MODULATOR) {
+        additive_volume.update_envelope(time_offset);
+    }
+
     wavefolder.folding.update_envelope(time_offset);
 
     if constexpr (IS_CARRIER) {
@@ -1077,6 +1096,7 @@ void Voice<ModulatorSignalProducerClass>::note_off(
                 oscillator.amplitude.end_envelope(time_offset),
                 oscillator.subharmonic_amplitude.end_envelope(time_offset),
                 volume.end_envelope(time_offset),
+                additive_volume.end_envelope(time_offset),
             }
         );
     } else {
@@ -1137,6 +1157,10 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
 
     state = State::OFF;
 
+    if constexpr (IS_MODULATOR) {
+        additive_volume.cancel_events();
+    }
+
     oscillator.amplitude.cancel_events();
 
     if constexpr (IS_MODULATOR) {
@@ -1176,6 +1200,10 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
         Seconds const time_offset
 ) noexcept {
     state = State::OFF;
+
+    if constexpr (IS_MODULATOR) {
+        additive_volume.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    }
 
     wavefolder.folding.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
@@ -1218,6 +1246,11 @@ template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const noexcept
 {
     if constexpr (IS_MODULATOR) {
+        /*
+        Not taking additive volume into account, because even if that decays,
+        we might still be modulating.
+        */
+
         return (
             state == State::ON
             && (
@@ -1394,6 +1427,22 @@ Sample const* const* Voice<ModulatorSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    if constexpr (IS_MODULATOR) {
+        is_additive_volume_polyphonic = additive_volume.is_polyphonic();
+
+        if (is_additive_volume_polyphonic) {
+            additive_volume_buffer = (
+                FloatParamS::produce_if_not_constant<FloatParamS>(
+                    additive_volume, round, sample_count
+                )
+            );
+
+            if (additive_volume_buffer == NULL) {
+                additive_volume_value = additive_volume.get_value();
+            }
+        }
+    }
+
     volume_applier_buffer = SignalProducer::produce<VolumeApplier>(
         volume_applier, round, sample_count
     )[0];
@@ -1491,6 +1540,28 @@ void Voice<ModulatorSignalProducerClass>::render(
 
             buffer[0][i] = left_gain * volume_applier_buffer[i];
             buffer[1][i] = right_gain * volume_applier_buffer[i];
+        }
+    }
+
+    if constexpr (IS_MODULATOR) {
+        if (is_additive_volume_polyphonic) {
+            if (additive_volume_buffer == NULL) {
+                for (Integer c = 0; c != 2; ++c) {
+                    Sample* const channel = buffer[c];
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        channel[i] *= additive_volume_value;
+                    }
+                }
+            } else {
+                for (Integer c = 0; c != 2; ++c) {
+                    Sample* const channel = buffer[c];
+
+                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                        channel[i] *= additive_volume_buffer[i];
+                    }
+                }
+            }
         }
     }
 }

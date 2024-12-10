@@ -1412,6 +1412,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ) noexcept;
 
             private:
+                static constexpr Sample MODULATOR_VOLUME_THRESHOLD = 0.000001;
+
                 void allocate_buffers() noexcept;
                 void free_buffers() noexcept;
                 void reallocate_buffers() noexcept;
@@ -1427,19 +1429,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const sample_count
                 ) noexcept;
 
-                void mix_modulators(
+                void mix_modulators_with_additive_volume(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index
                 ) noexcept;
 
-                template<bool is_additive_volume_constant>
                 void mix_modulators(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index,
-                    Sample const add_volume_value,
-                    Sample const* add_volume_buffer
+                    Integer const last_sample_index
                 ) noexcept;
 
                 void mix_carriers(

@@ -1927,3 +1927,62 @@ TEST(keeps_track_of_number_of_active_voices, {
     SignalProducer::produce<Synth>(synth, 2);
     assert_eq(0, (int)synth.get_active_voices_count());
 })
+
+
+TEST(modulator_additive_volume_can_be_polyphonic, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth;
+    Integer const channels = synth.get_channels();
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL * 0.5, 220.0,
+        OUT_VOLUME_PER_CHANNEL * 1.0, 880.0,
+        0.0, 0.0,
+        channels
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.detune.set_value(2400.0);
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+
+    set_param(synth, Synth::ParamId::N1SCL, 0.5);
+    set_param(synth, Synth::ParamId::N1INI, 1.0);
+    set_param(synth, Synth::ParamId::N1PK, 1.0);
+    set_param(synth, Synth::ParamId::N1SUS, 1.0);
+    set_param(synth, Synth::ParamId::N1FIN, 1.0);
+
+    assign_controller(synth, Synth::ParamId::MIX, Synth::ControllerId::ENVELOPE_1);
+    synth.process_messages();
+
+    synth.note_on(0.0, 0, Midi::NOTE_A_3, 127);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    for (Integer i = 0; i != channels; ++i) {
+        assert_close(
+            expected_samples[i],
+            rendered_samples[i],
+            block_size,
+            0.001,
+            "channel=%d",
+            (int)i
+        );
+    }
+})

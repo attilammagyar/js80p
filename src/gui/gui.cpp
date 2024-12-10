@@ -3174,7 +3174,7 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     DPET(synth_body, 13, 32, 58, 19, 0, 58, Synth::ParamId::NH, nh, nhc);
 
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 0, Synth::ParamId::MODE,   MM___,      md, mdc, knob_states);
-    KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 1, Synth::ParamId::MIX,    MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 1, Synth::ParamId::MIX,    MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 2, Synth::ParamId::PM,     MMLEC,      "%.2f", 100.0 / Constants::PM_MAX, knob_states);
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 3, Synth::ParamId::FM,     MMLEC,      "%.2f", 100.0 / Constants::FM_MAX, knob_states);
     KNOB(synth_body, 14, 51 + (KNOB_H + 1) * 4, Synth::ParamId::AM,     MMLEC,      "%.2f", 100.0 / Constants::AM_MAX, knob_states);

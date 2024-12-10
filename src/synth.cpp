@@ -555,6 +555,7 @@ void Synth::create_voices() noexcept
             *synced_oscillator_inaccuracies[i],
             calculate_inaccuracy_seed((i + 23) % POLYPHONY),
             modulator_params,
+            modulator_add_volume,
             &biquad_filter_shared_buffers[0],
             &biquad_filter_shared_buffers[1]
         );
@@ -3056,9 +3057,14 @@ Sample const* const* Synth::Bus::initialize_rendering(
 ) noexcept {
     collect_active_voices();
 
-    modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
-        modulator_add_volume, round, sample_count
-    );
+    if (modulator_add_volume.is_polyphonic()) {
+        modulator_add_volume_buffer = NULL;
+    } else {
+        modulator_add_volume_buffer = FloatParamS::produce_if_not_constant(
+            modulator_add_volume, round, sample_count
+        );
+    }
+
     input_volume_buffer = FloatParamS::produce_if_not_constant(
         input_volume, round, sample_count
     );
@@ -3172,7 +3178,7 @@ void Synth::Bus::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    mix_modulators(round, first_sample_index, last_sample_index);
+    mix_modulators_with_additive_volume(round, first_sample_index, last_sample_index);
     mix_carriers(round, first_sample_index, last_sample_index);
 
     if (JS80P_LIKELY(input != NULL)) {
@@ -3223,50 +3229,47 @@ void Synth::Bus::render(
 }
 
 
-void Synth::Bus::mix_modulators(
+void Synth::Bus::mix_modulators_with_additive_volume(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index
 ) noexcept {
-    Sample const* const modulator_add_volume_buffer = (
-        this->modulator_add_volume_buffer
-    );
+    if (modulator_add_volume.is_polyphonic()) {
+        mix_modulators(round, first_sample_index, last_sample_index);
+
+        return;
+    }
 
     if (modulator_add_volume_buffer == NULL) {
         Sample const modulator_add_volume_value = (
             modulator_add_volume.get_value()
         );
 
-        if (modulator_add_volume_value <= 0.000001) {
+        if (modulator_add_volume_value <= MODULATOR_VOLUME_THRESHOLD) {
             return;
         }
 
-        mix_modulators<true>(
-            round,
-            first_sample_index,
-            last_sample_index,
-            modulator_add_volume_value,
-            NULL
-        );
+        mix_modulators(round, first_sample_index, last_sample_index);
+
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                modulators_buffer[c][i] *= modulator_add_volume_value;
+            }
+        }
     } else {
-        mix_modulators<false>(
-            round,
-            first_sample_index,
-            last_sample_index,
-            1.0,
-            modulator_add_volume_buffer
-        );
+        for (Integer c = 0; c != channels; ++c) {
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                modulators_buffer[c][i] *= modulator_add_volume_buffer[i];
+            }
+        }
     }
 }
 
 
-template<bool is_additive_volume_constant>
 void Synth::Bus::mix_modulators(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample const add_volume_value,
-        Sample const* add_volume_buffer
+        Integer const last_sample_index
 ) noexcept {
     for (size_t v = 0; v != active_modulators_count; ++v) {
         /*
@@ -3279,11 +3282,7 @@ void Synth::Bus::mix_modulators(
 
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                if constexpr (is_additive_volume_constant) {
-                    modulators_buffer[c][i] += add_volume_value * modulator_output[c][i];
-                } else {
-                    modulators_buffer[c][i] += add_volume_buffer[i] * modulator_output[c][i];
-                }
+                modulators_buffer[c][i] += modulator_output[c][i];
             }
         }
     }
