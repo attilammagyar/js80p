@@ -113,6 +113,7 @@ Table of Contents
     * [Analog Brass mod last](#preset-analog-brass-mod-last)
     * [Dystopiano](#preset-dystopiano)
     * [Expressive Saw](#preset-expressive-saw)
+    * [Flute Mono](#preset-flute-mono)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2311,6 +2312,15 @@ and adds a tremolo effect. The pitch wheel, besides note pitch, also affects
 the room size of the Reverb effect, so you can play with the pitch long after
 all notes have been released. Aftertouch adds a vibrato effect to the note
 belonging to the highest pressed key.
+
+<a id="preset-flute-mono"></a>
+
+### Flute Mono
+
+A monophonic version of the Flute preset: a synth flute sound with a couple of
+tricks: the pitch of the notes decreases slightly when they end, and the mod
+wheel adds a little embellishment to the beginning of each note. Aftertouch
+adds more emphasis to the note.
 
 <a href="#toc">Table of Contents</a>
 
