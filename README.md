@@ -2308,8 +2308,8 @@ quick attack and a quick release. On top of that, note velocity also controls
 the filter envelope, so the harder you play, the brighter the sound gets. The
 mod wheel first opens up a global filter, then starts brightening the sound
 and adds a tremolo effect. The pitch wheel, besides note pitch, also affects
-the Echo and Reverb effects, so you can play with the pitch long after all
-notes have been released. Aftertouch adds a vibrato effect to the note
+the room size of the Reverb effect, so you can play with the pitch long after
+all notes have been released. Aftertouch adds a vibrato effect to the note
 belonging to the highest pressed key.
 
 <a href="#toc">Table of Contents</a>
