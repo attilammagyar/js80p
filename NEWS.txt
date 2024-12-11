@@ -1,10 +1,11 @@
-v3.?.? (202?-??-??)
+v3.3.0 (2024-12-11)
  * The MIX (modulator additive volume) parameter can now be controlled with
    envelopes and polyphonic LFOs.
  * New presets: Expressive Saw, a preset where your playing style can
    dramatically change the sound, and Flute Mono, a monophonic version of the
    Flute preset.
- * Bugfix: LoongArch VST3 packaging has been fixed in the source distribution.
+ * Bugfix: LoongArch VST3 packaging has been fixed in the source distribution
+   thanks to @YHStar.
 
 v3.2.1 (2024-11-17)
  * The meaning of the Macro and Envelope scale parameters, and the LFO
