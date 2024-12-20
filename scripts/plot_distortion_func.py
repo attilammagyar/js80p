@@ -127,6 +127,7 @@ def harmonics(type_const, alpha, gamma, w1, w3, w5, norm=1.0):
     w3 *= norm
     w5 *= norm
 
+    # Chebyshev polynomials and their derivatives and integrals
     t1 = lambda x: x
     t3 = lambda x: 4.0 * x ** 3.0 - 3.0 * x
     t5 = lambda x: 16.0 * x ** 5.0 - 20.0 * x ** 3.0 + 5.0 * x
