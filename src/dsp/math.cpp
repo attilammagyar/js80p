@@ -30,6 +30,27 @@ namespace JS80P
 Math const Math::math;
 
 
+Math::RNG::RNG(unsigned int const seed) noexcept
+    : x(seed),
+    c((((~seed) >> 3) ^ 0x3cf5) & 0xffff)
+{
+}
+
+
+Number Math::RNG::random() noexcept
+{
+    /*
+    https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
+    */
+
+    x = 32718 * x + c;
+    c = x >> 16;
+    x = x & 0xffff;
+
+    return (Number)x * SCALE;
+}
+
+
 Math::Math() noexcept
 {
     init_sines();
@@ -58,22 +79,10 @@ void Math::init_sines() noexcept
 
 void Math::init_randoms() noexcept
 {
-    /*
-    https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
-    */
-
-    constexpr unsigned int seed = 0x1705;
-    constexpr Number scale = 1.0 / 65536.0;
-
-    unsigned int x = seed;
-    unsigned int c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
+    RNG rng(0x1705);
 
     for (int i = 0; i != RANDOMS; ++i) {
-        x = 32718 * x + c;
-        c = x >> 16;
-        x = x & 0xffff;
-
-        randoms[i] = (Number)x * scale;
+        randoms[i] = rng.random();
         randoms_centered_lfo[i] = randoms[i] - 0.5;
     }
 }

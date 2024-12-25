@@ -397,6 +397,24 @@ TEST(distort, {
 })
 
 
+TEST(rng, {
+    constexpr Integer probes = 500;
+    std::vector<Number> numbers(probes);
+    Math::RNG rng(0x2345);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        Number const number = rng.random();
+        numbers[i] = number;
+        assert_gte(number, 0.0);
+        assert_lte(number, 1.0);
+    }
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.036);
+})
+
+
 TEST(randomize, {
     constexpr Integer last_probe = 500;
     std::vector<Number> numbers(last_probe + 1);

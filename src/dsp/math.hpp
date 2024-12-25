@@ -58,6 +58,20 @@ class Math
             DIST_SHAPE_SHARP_SHARP = 3,
         };
 
+        class RNG
+        {
+            public:
+                explicit RNG(unsigned int const seed) noexcept;
+
+                Number random() noexcept;
+
+            private:
+                static constexpr Number SCALE = 1.0 / 65536.0;
+
+                unsigned int x;
+                unsigned int c;
+        };
+
         static constexpr int DISTORTIONS = 4;
 
         static constexpr Number PI = 3.14159265358979323846264338327950288419716939937510;
@@ -472,7 +486,8 @@ class Math
             Statistics& statistics
         ) noexcept;
 
-        class Statistics {
+        class Statistics
+        {
             public:
                 Number min;
                 Number max;
