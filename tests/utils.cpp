@@ -343,7 +343,7 @@ void assert_rendering_is_independent_from_chunk_size(
 
 
 void assert_statistics(
-        Number const expected_validity,
+        bool const expected_validity,
         Number const expected_min,
         Number const expected_median,
         Number const expected_max,
