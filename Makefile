@@ -680,9 +680,9 @@ $(DEV_DIR)/test_biquad_filter_slow$(DEV_EXE): \
 
 $(DEV_DIR)/test_delay$(DEV_EXE): \
 		tests/test_delay.cpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/delay.cpp src/dsp/delay.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
-		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions \
