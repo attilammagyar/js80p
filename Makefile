@@ -412,7 +412,11 @@ COMPILE_DEV = \
 		$(TEST_CXXFLAGS) \
 		$(DEBUG_LOG_CXXFLAGS)
 
+ifeq ($(VALGRIND),)
+RUN_WITH_VALGRIND =
+else
 RUN_WITH_VALGRIND = $(VALGRIND) $(VALGRIND_FLAGS)
+endif
 
 show_fst_dir:
 	@echo $(FST_DIR)
