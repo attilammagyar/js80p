@@ -20,6 +20,7 @@
 #define JS80P__DSP__CHORUS_HPP
 
 #include <cstddef>
+#include <string>
 
 #include "js80p.hpp"
 
