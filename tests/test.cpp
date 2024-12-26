@@ -444,11 +444,11 @@ _TEST_CONCAT_ID(_TestClass_ ## name, __LINE__)                              \
 
 int _test_result = 0;
 int _test_started = 0;
-int _test_assertions = 0;
 int _test_failed = 0;
+int _test_line = -1;
+unsigned long long int _test_assertions = 0;
 char const* _test_name = NULL;
 char const* _test_file = NULL;
-int _test_line = -1;
 
 std::vector<std::string> TEST_ARGV;
 
@@ -606,7 +606,7 @@ int main(int argc, char const* argv[])
 
     fprintf(
         stderr,
-        "\nSummary for %s: %d passed, %d failed, %d assertion%s\n\n",
+        "\nSummary for %s: %d passed, %d failed, %llu assertion%s\n\n",
         _TEST_STR_OR(_test_file, argv[0]),
         _test_started - _test_failed,
         _test_failed,
