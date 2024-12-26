@@ -976,6 +976,9 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_band_pass_coeffic
         q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
     } else {
         q = q_value;
+
+        /* The caller should have handled low Q values. */
+        JS80P_ASSERT(q >= THRESHOLD);
     }
 
     Sample const alpha_q = 0.5 * sin_w0 / q;
@@ -1081,6 +1084,9 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_notch_coefficient
         q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
     } else {
         q = q_value;
+
+        /* The caller should have handled low Q values. */
+        JS80P_ASSERT(q >= THRESHOLD);
     }
 
     Sample const alpha_q = 0.5 * sin_w0 / q;
@@ -1201,6 +1207,9 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_peaking_coefficie
         q = std::max(THRESHOLD, apply_q_inaccuracy<true>(q_value));
     } else {
         q = q_value;
+
+        /* The caller should have handled low Q values. */
+        JS80P_ASSERT(q >= THRESHOLD);
     }
 
     Sample const alpha_q = 0.5 * sin_w0 / q;
