@@ -74,10 +74,10 @@ class Chorus : public Effect<InputSignalProducerClass>
         class TypeParam : public ByteParam
         {
             public:
-                explicit TypeParam(std::string const name) noexcept;
+                explicit TypeParam(std::string const& name) noexcept;
         };
 
-        Chorus(std::string const name, InputSignalProducerClass& input);
+        Chorus(std::string const& name, InputSignalProducerClass& input);
 
         void start_lfos(Seconds const time_offset) noexcept;
         void stop_lfos(Seconds const time_offset) noexcept;

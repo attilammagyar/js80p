@@ -33,7 +33,7 @@ constexpr typename Chorus<InputSignalProducerClass>::Tuning Chorus<InputSignalPr
 
 template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::TypeParam::TypeParam(
-        std::string const name
+        std::string const& name
 ) noexcept
     : ByteParam(name, CHORUS_1, CHORUS_15, CHORUS_1)
 {
@@ -41,10 +41,10 @@ Chorus<InputSignalProducerClass>::TypeParam::TypeParam(
 
 template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
-        std::string const name,
+        std::string const& name,
         InputSignalProducerClass& input
 ) : Effect<InputSignalProducerClass>(name, input, 19 + VOICES * 3, &mixer),
-    type(name+ "TYP"),
+    type(name + "TYP"),
     delay_time(
         name + "DEL",
         0.0,
