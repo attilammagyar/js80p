@@ -103,19 +103,19 @@ void Math::init_distortions() noexcept
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[0][i] = distortion_centered_lfo[i] + 0.5;
+        distortions[DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH][i] = distortion_centered_lfo[i] + 0.5;
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[1][i] = shape_smooth_sharp_steeper(xs[i]);
+        distortions[DistortionShape::DIST_SHAPE_SMOOTH_SHARP][i] = shape_smooth_sharp_steeper(xs[i]);
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[2][i] = shape_sharp_smooth_steeper(xs[i]);
+        distortions[DistortionShape::DIST_SHAPE_SHARP_SMOOTH][i] = shape_sharp_smooth_steeper(xs[i]);
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[3][i] = shape_sharp_sharp_steeper(xs[i]);
+        distortions[DistortionShape::DIST_SHAPE_SHARP_SHARP][i] = shape_sharp_sharp_steeper(xs[i]);
     }
 }
 
