@@ -767,8 +767,12 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_pass_coeffici
     Sample const b1 = 1.0 - cos_w0;
     Sample const b0_b2 = 0.5 * b1;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
-        index, b0_b2, b1, b0_b2, 1.0 + alpha_qdb, -2.0 * cos_w0, 1.0 - alpha_qdb
+        index, b0_b2, b1, b0_b2, 1.0 + alpha_qdb, 2.0 * cos_w0, alpha_qdb - 1.0
     );
 }
 
@@ -875,8 +879,12 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_pass_coeffic
     Sample const b1 = -1.0 - cos_w0;
     Sample const b0_b2 = -0.5 * b1;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
-        index, b0_b2, b1, b0_b2, 1.0 + alpha_qdb, -2.0 * cos_w0, 1.0 - alpha_qdb
+        index, b0_b2, b1, b0_b2, 1.0 + alpha_qdb, 2.0 * cos_w0, alpha_qdb - 1.0
     );
 }
 
@@ -983,8 +991,12 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_band_pass_coeffic
 
     Sample const alpha_q = 0.5 * sin_w0 / q;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
-        index, alpha_q, 0.0, -alpha_q, 1.0 + alpha_q, -2.0 * cos_w0, 1.0 - alpha_q
+        index, alpha_q, 0.0, -alpha_q, 1.0 + alpha_q, 2.0 * cos_w0, alpha_q - 1.0
     );
 }
 
@@ -1093,8 +1105,12 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_notch_coefficient
 
     Sample const b1_a1 = -2.0 * cos_w0;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
-        index, 1.0, b1_a1, 1.0, 1.0 + alpha_q, b1_a1, 1.0 - alpha_q
+        index, 1.0, b1_a1, 1.0, 1.0 + alpha_q, - b1_a1, alpha_q - 1.0
     );
 }
 
@@ -1221,14 +1237,18 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_peaking_coefficie
     Sample const alpha_q_times_a = alpha_q * a;
     Sample const alpha_q_over_a = alpha_q / a;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
         index,
         1.0 + alpha_q_times_a,
         b1_a1,
         1.0 - alpha_q_times_a,
         1.0 + alpha_q_over_a,
-        b1_a1,
-        1.0 - alpha_q_over_a
+        - b1_a1,
+        alpha_q_over_a - 1.0
     );
 }
 
@@ -1346,14 +1366,18 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_shelf_coeffic
     */
     Sample const alpha_s_double_a_sqrt = sin_w0 * FREQUENCY_SINE_SCALE * a_sqrt;
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
         index,
         a * (a_p_1 - a_m_1_cos_w0 + alpha_s_double_a_sqrt),
         2.0 * a * (a_m_1 - a_p_1_cos_w0),
         a * (a_p_1 - a_m_1_cos_w0 - alpha_s_double_a_sqrt),
         a_p_1 + a_m_1_cos_w0 + alpha_s_double_a_sqrt,
-        -2.0 * (a_m_1 + a_p_1_cos_w0),
-        a_p_1 + a_m_1_cos_w0 - alpha_s_double_a_sqrt
+        2.0 * (a_m_1 + a_p_1_cos_w0),
+        alpha_s_double_a_sqrt - a_p_1 - a_m_1_cos_w0
     );
 }
 
@@ -1473,14 +1497,18 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_shelf_coeffi
         sin_w0 * FREQUENCY_SINE_SCALE * a_sqrt
     );
 
+    /*
+    The a1 and a2 coefficients are multiplied by -1 here so that rendering can
+    be done with additions and multiplications only.
+    */
     store_normalized_coefficient_samples(
         index,
         a * (a_p_1 + a_m_1_cos_w0 + alpha_s_double_a_sqrt),
         -2.0 * a * (a_m_1 + a_p_1_cos_w0),
         a * (a_p_1 + a_m_1_cos_w0 - alpha_s_double_a_sqrt),
         a_p_1 - a_m_1_cos_w0 + alpha_s_double_a_sqrt,
-        2.0 * (a_m_1 - a_p_1_cos_w0),
-        a_p_1 - a_m_1_cos_w0 - alpha_s_double_a_sqrt
+        -2.0 * (a_m_1 - a_p_1_cos_w0),
+        a_m_1_cos_w0 + alpha_s_double_a_sqrt - a_p_1
     );
 }
 
@@ -1593,7 +1621,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
                 Sample const x_n = input_buffer[c][i];
                 Sample const y_n = (
                     b0 * x_n + b1 * x_n_m1 + b2 * x_n_m2
-                    - a1 * y_n_m1 - a2 * y_n_m2
+                    + a1 * y_n_m1 + a2 * y_n_m2
                 );
 
                 buffer[c][i] = y_n;
@@ -1643,7 +1671,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
             Sample const x_n = input_buffer[c][i];
             Sample const y_n = (
                 b0[i] * x_n + b1[i] * x_n_m1 + b2[i] * x_n_m2
-                - a1[i] * y_n_m1 - a2[i] * y_n_m2
+                + a1[i] * y_n_m1 + a2[i] * y_n_m2
             );
 
             buffer[c][i] = y_n;
