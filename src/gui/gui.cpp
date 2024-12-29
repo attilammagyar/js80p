@@ -2563,10 +2563,10 @@ void GUI::build_effects_body(
     KNOB(effects_body, 118 + KNOB_W * 0,    34, Synth::ParamId::EV1V,   MML_C,      "%.2f", 100.0, knob_states);
 
     KNOB(effects_body, 205 + KNOB_W * 0,    34, Synth::ParamId::ED1L,   MML_C,      "%.2f", 100.0, knob_states);
-    DPET(effects_body, 204, 6, 60, 21, 0, 60, Synth::ParamId::ED1TYP, dt, dtc);
+    DPET(effects_body, 204, 7, 60, 21, 0, 60, Synth::ParamId::ED1TYP, dt, dtc);
 
     KNOB(effects_body, 293 + KNOB_W * 0,    34, Synth::ParamId::ED2L,   MML_C,      "%.2f", 100.0, knob_states);
-    DPET(effects_body, 292, 6, 60, 21, 0, 60, Synth::ParamId::ED2TYP, dt, dtc);
+    DPET(effects_body, 292, 7, 60, 21, 0, 60, Synth::ParamId::ED2TYP, dt, dtc);
 
     KNOB(effects_body, 378 + KNOB_W * 0,    34, Synth::ParamId::EF1TYP, MM___,      ft, ftc, knob_states);
     KNOB(effects_body, 378 + KNOB_W * 1,    34, Synth::ParamId::EF1FRQ, MML_C,      "%.1f", 1.0, knob_states);
