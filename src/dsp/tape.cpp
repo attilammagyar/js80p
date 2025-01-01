@@ -59,7 +59,8 @@ TapeParams::TapeParams(
     offset_below_midpoint(name + "OB"),
     offset_above_midpoint(name + "OA"),
     distance_from_midpoint(name + "D"),
-    low_pass_filter_frequency_macro(name + "LPF")
+    low_pass_filter_frequency_macro(name + "LPF"),
+    low_shelf_filter_gain_macro(name + "LSG")
 {
     wnf_amp_smooth_sharp_macro.distortion.set_value(0.3);
     wnf_amp_smooth_sharp_macro.distortion_shape.set_value(
@@ -147,6 +148,18 @@ TapeParams::TapeParams(
     );
     low_pass_filter_frequency_macro.input.set_macro(&distance_from_midpoint);
 
+    low_shelf_filter_gain_macro.min.set_value(
+        (0.0 - filter_gain_min) / filter_gain_range
+    );
+    low_shelf_filter_gain_macro.max.set_value(
+        (3.5 - filter_gain_min) / filter_gain_range
+    );
+    low_shelf_filter_gain_macro.distortion.set_value(0.3);
+    low_shelf_filter_gain_macro.distortion_shape.set_value(
+        Macro::DIST_SHAPE_SMOOTH_SHARP
+    );
+    low_shelf_filter_gain_macro.input.set_macro(&distance_from_midpoint);
+
     size_t i = 0;
 
     signal_producers[i++] = &stop_start;
@@ -172,6 +185,7 @@ TapeParams::TapeParams(
     store_signal_producers_from_macro(offset_above_midpoint, i);
     store_signal_producers_from_macro(distance_from_midpoint, i);
     store_signal_producers_from_macro(low_pass_filter_frequency_macro, i);
+    store_signal_producers_from_macro(low_shelf_filter_gain_macro, i);
 
     JS80P_ASSERT(i == (size_t)SIGNAL_PRODUCERS);
 }
@@ -422,7 +436,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         TapeParams& params,
         InputSignalProducerClass& input
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 5, 0, &delay),
+    : Filter<InputSignalProducerClass>(input, 6, 0, &delay),
     params(params),
     distortion(
         name + "DIST",
@@ -431,7 +445,12 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         params.distortion_level,
         input.get_buffer_owner()
     ),
-    hiss_generator(distortion, params.hiss_level),
+    low_shelf_filter(
+        name + "LS",
+        distortion,
+        distortion.get_buffer_owner()
+    ),
+    hiss_generator(low_shelf_filter, params.hiss_level),
     high_shelf_filter(
         name + "HS",
         hiss_generator,
@@ -448,13 +467,16 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     previous_bypass_toggle_value(params.bypass_toggle.get_value())
 {
     this->register_child(distortion);
+    this->register_child(low_shelf_filter);
     this->register_child(hiss_generator);
     this->register_child(high_shelf_filter);
     this->register_child(low_pass_filter);
     this->register_child(delay);
 
-    delay.time.set_lfo(&params.delay_time_lfo);
-    delay.gain.set_value(1.0);
+    low_shelf_filter.type.set_value(HighShelfFilter::LOW_SHELF);
+    low_shelf_filter.q.set_value(0.0);
+    low_shelf_filter.gain.set_macro(&params.low_shelf_filter_gain_macro);
+    low_shelf_filter.frequency.set_value(110.0);
 
     high_shelf_filter.type.set_value(HighShelfFilter::HIGH_SHELF);
     high_shelf_filter.q.set_value(0.0);
@@ -466,6 +488,9 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     low_pass_filter.type.set_value(LowPassFilter::LOW_PASS);
     low_pass_filter.q.set_value(0.0);
     low_pass_filter.frequency.set_macro(&params.low_pass_filter_frequency_macro);
+
+    delay.time.set_lfo(&params.delay_time_lfo);
+    delay.gain.set_value(1.0);
 }
 
 
