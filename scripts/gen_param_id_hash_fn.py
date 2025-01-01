@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -141,6 +141,14 @@ params = [
     "ERTYP",
     "ERWET",
     "ERWID",
+    "ETCIN",
+    "ETDST",
+    "ETDTYP",
+    "ETEND",
+    "ETHSS",
+    "ETSTP",
+    "ETAIN",
+    "ETSIN",
     "EV1V",
     "EV2V",
     "EV3V",

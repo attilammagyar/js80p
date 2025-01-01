@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2022, 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2022, 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,16 @@ Math const Math::math;
 
 
 Math::RNG::RNG(unsigned int const seed) noexcept
-    : x(seed),
-    c((((~seed) >> 3) ^ 0x3cf5) & 0xffff)
+    : seed(seed)
 {
+    reset();
+}
+
+
+void Math::RNG::reset() noexcept
+{
+    x = seed;
+    c = (((~seed) >> 3) ^ 0x3cf5) & 0xffff;
 }
 
 

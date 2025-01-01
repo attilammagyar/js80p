@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 #include "js80p.hpp"
 
+#include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/signal_producer.hpp"
 #include "dsp/queue.hpp"
@@ -268,15 +269,16 @@ class FloatParam : public Param<Number, evaluation>
         static constexpr SignalProducer::Event::Type EVT_SET_VALUE = 1;
         static constexpr SignalProducer::Event::Type EVT_LINEAR_RAMP = 2;
         static constexpr SignalProducer::Event::Type EVT_LOG_RAMP = 3;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_START = 4;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_UPDATE = 5;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_END = 6;
-        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_CANCEL = 7;
-        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_RESET = 8;
-        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_START = 9;
-        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_UPDATE = 10;
-        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_END = 11;
-        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_CANCEL = 12;
+        static constexpr SignalProducer::Event::Type EVT_CURVED_RAMP = 4;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_START = 5;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_UPDATE = 6;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_END = 7;
+        static constexpr SignalProducer::Event::Type EVT_ENVELOPE_CANCEL = 8;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_RESET = 9;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_START = 10;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_UPDATE = 11;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_END = 12;
+        static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_CANCEL = 13;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -423,6 +425,12 @@ class FloatParam : public Param<Number, evaluation>
             Number const target_value
         ) noexcept;
 
+        void schedule_curved_ramp(
+            Seconds const duration,
+            Number const target_value,
+            Math::EnvelopeShape const shape
+        ) noexcept;
+
         bool is_ramping() const noexcept;
         Seconds get_remaining_time_from_linear_ramp() const noexcept;
 
@@ -479,6 +487,12 @@ class FloatParam : public Param<Number, evaluation>
         class LinearRampState
         {
             public:
+                enum Type {
+                    RAMP_LINEAR = 0,
+                    RAMP_LOGARITHMIC = 1,
+                    RAMP_CURVED = 2,
+                };
+
                 LinearRampState() noexcept;
 
                 void init(
@@ -488,7 +502,10 @@ class FloatParam : public Param<Number, evaluation>
                     Number const target_value,
                     Number const duration_in_samples,
                     Seconds const duration,
-                    bool const is_logarithmic
+                    Type const type,
+                    Math::EnvelopeShape const curve_shape = Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH,
+                    Number const curved_initial_value = 0.0,
+                    Number const curved_delta = 0.0
                 ) noexcept;
 
                 Number advance() noexcept;
@@ -503,7 +520,10 @@ class FloatParam : public Param<Number, evaluation>
                 Seconds duration;
                 Number delta;
                 Number speed;
-                bool is_logarithmic;
+                Number curved_initial_value;
+                Number curved_delta;
+                Math::EnvelopeShape curve_shape;
+                Type type;
                 bool is_done;
         };
 
@@ -551,13 +571,21 @@ class FloatParam : public Param<Number, evaluation>
         Number round_value(Number const value) const noexcept;
         Number ratio_to_value_log(Number const ratio) const noexcept;
         Number ratio_to_value_raw(Number const ratio) const noexcept;
+        Number value_to_ratio_raw(Number const value) const noexcept;
 
         void handle_cancel_event(SignalProducer::Event const& event) noexcept;
         void handle_set_value_event(SignalProducer::Event const& event) noexcept;
         void handle_linear_ramp_event(SignalProducer::Event const& event) noexcept;
         void handle_log_ramp_event(SignalProducer::Event const& event) noexcept;
+        void handle_curved_ramp_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_start_event(SignalProducer::Event const& event) noexcept;
         void handle_envelope_update_event(SignalProducer::Event const& event) noexcept;
+
+        Number prepare_linear_ramp(
+            SignalProducer::Event const& event,
+            Seconds& duration,
+            Number& target_value
+        ) const noexcept;
 
         void update_envelope_state_if_required(
             Envelope& envelope,

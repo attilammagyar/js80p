@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ Macro::DistortionShapeParam::DistortionShapeParam(
 }
 
 
-Macro::Macro(std::string const& name) noexcept
+Macro::Macro(std::string const& name, Number const input_default_value) noexcept
     : MidiController(),
     midpoint(name + "MID", 0.0, 1.0, 0.5),
-    input(name + "IN", 0.0, 1.0, 0.5),
+    input(name + "IN", 0.0, 1.0, input_default_value),
     min(name + "MIN", 0.0, 1.0, 0.0),
     max(name + "MAX", 0.0, 1.0, 1.0),
     scale(name + "AMT", 0.0, 1.0, 1.0),

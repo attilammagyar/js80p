@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2022, 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2022, 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,10 +63,14 @@ class Math
             public:
                 explicit RNG(unsigned int const seed) noexcept;
 
+                void reset() noexcept;
+
                 Number random() noexcept;
 
             private:
                 static constexpr Number SCALE = 1.0 / 65536.0;
+
+                unsigned int const seed;
 
                 unsigned int x;
                 unsigned int c;

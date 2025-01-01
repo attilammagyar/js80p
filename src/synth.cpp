@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@
 #include "dsp/peak_tracker.cpp"
 #include "dsp/side_chain_compressable_effect.cpp"
 #include "dsp/signal_producer.cpp"
+#include "dsp/tape.cpp"
 #include "dsp/wavefolder.cpp"
 #include "dsp/wavetable.cpp"
 
@@ -163,7 +164,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         + 43 * 2                    /* Modulator::Params + Carrier::Params  */
         + POLYPHONY * 2             /* modulators + carriers                */
         + 1                         /* effects                              */
-        + MACROS * MACRO_PARAMS
+        + MACROS * Macro::PARAMS
         + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
         + (Integer)Constants::LFOS
     ),
@@ -481,6 +482,15 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EF2G, effects.filter_2.gain);
 
     register_param<FloatParamS>(ParamId::EV2V, effects.volume_2_gain);
+
+    register_param<ToggleParam>(ParamId::ETEND, effects.tape_at_end);
+    register_param<FloatParamB>(ParamId::ETSTP, effects.tape_params.stop_start);
+    register_param<FloatParamB>(ParamId::ETWFA, effects.tape_params.wnf_amp);
+    register_param<FloatParamS>(ParamId::ETDST, effects.tape_params.distortion_level);
+    register_param<FloatParamB>(ParamId::ETCLR, effects.tape_params.color);
+    register_param<FloatParamB>(ParamId::ETHSS, effects.tape_params.hiss_level);
+    register_param<FloatParamB>(ParamId::ETWFS, effects.tape_params.wnf_speed);
+    register_param<Distortion::TypeParam>(ParamId::ETDTYP, effects.tape_params.distortion_type);
 
     register_param<Effects::Chorus<Bus>::TypeParam>(ParamId::ECTYP, effects.chorus.type);
     register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
@@ -1119,6 +1129,7 @@ void Synth::start_lfos() noexcept
         lfos_rw[i]->start(0.0);
     }
 
+    effects.tape_params.start_lfos(0.0);
     effects.chorus.start_lfos(0.0);
 }
 
@@ -1975,6 +1986,7 @@ Sample const* const* Synth::initialize_rendering(
         lfos_rw[i]->skip_round(round, sample_count);
     }
 
+    effects.tape_params.skip_round_for_lfos(round, sample_count);
     effects.chorus.skip_round_for_lfos(round, sample_count);
 
     clear_midi_controllers();

@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,8 @@ void ReverseDelayEnvelope::end_test() noexcept
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
-        ToggleParam const* tempo_sync
+        ToggleParam const* tempo_sync,
+        Seconds const time_max
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
@@ -123,7 +124,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
     time(
         "",
         Constants::DELAY_TIME_MIN,
-        Constants::DELAY_TIME_MAX,
+        time_max,
         Constants::DELAY_TIME_DEFAULT
     ),
     delay_buffer_oversize(

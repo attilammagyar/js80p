@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 #include "dsp/param.hpp"
 
 #include "dsp/lfo_envelope_list.hpp"
-#include "dsp/math.hpp"
 
 // #include "debug.hpp"
 
@@ -798,6 +797,13 @@ Number FloatParam<evaluation>::ratio_to_value_raw(Number const ratio) const noex
 
 
 template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::value_to_ratio_raw(Number const value) const noexcept
+{
+    return Param<Number, evaluation>::value_to_ratio(value);
+}
+
+
+template<ParamEvaluation evaluation>
 Number FloatParam<evaluation>::value_to_ratio(Number const value) const noexcept
 {
     if (is_logarithmic()) {
@@ -1010,6 +1016,30 @@ void FloatParam<evaluation>::schedule_linear_ramp(
 
 
 template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::schedule_curved_ramp(
+        Seconds const duration,
+        Number const target_value,
+        Math::EnvelopeShape const shape
+) noexcept {
+    JS80P_ASSERT(!is_logarithmic());
+
+    Seconds const last_event_time_offset = this->get_last_event_time_offset();
+
+    this->schedule(
+        EVT_CURVED_RAMP,
+        last_event_time_offset,
+        (int)shape,
+        duration,
+        target_value
+    );
+
+    this->schedule(
+        EVT_SET_VALUE, last_event_time_offset + duration, 0, 0.0, target_value
+    );
+}
+
+
+template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::is_ramping() const noexcept
 {
     return latest_event_type == EVT_LINEAR_RAMP;
@@ -1048,6 +1078,10 @@ void FloatParam<evaluation>::handle_event(
 
         case EVT_LOG_RAMP:
             handle_log_ramp_event(event);
+            break;
+
+        case EVT_CURVED_RAMP:
+            handle_curved_ramp_event(event);
             break;
 
         case EVT_ENVELOPE_START:
@@ -1104,12 +1138,40 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_linear_ramp_event(
         SignalProducer::Event const& event
 ) noexcept {
+    Seconds duration;
+    Number target_value;
+    Number const done_samples = prepare_linear_ramp(
+        event,
+        duration,
+        target_value
+    );
+
+    latest_event_type = EVT_LINEAR_RAMP;
+    linear_ramp_state.init(
+        event.time_offset,
+        done_samples,
+        this->get_raw_value(),
+        target_value,
+        (Number)duration * (Number)this->sample_rate,
+        duration,
+        LinearRampState::Type::RAMP_LINEAR
+    );
+}
+
+
+template<ParamEvaluation evaluation>
+Number FloatParam<evaluation>::prepare_linear_ramp(
+        SignalProducer::Event const& event,
+        Seconds& duration,
+        Number& target_value
+) const noexcept {
     Number const value = this->get_raw_value();
     Number const done_samples = (
         (Number)(this->current_time - event.time_offset) * (Number)this->sample_rate
     );
-    Seconds duration = (Seconds)event.number_param_1;
-    Number target_value = event.number_param_2;
+
+    duration = (Seconds)event.number_param_1;
+    target_value = event.number_param_2;
 
     if (target_value < this->min_value) {
         Number const min_diff = this->min_value - value;
@@ -1125,16 +1187,7 @@ void FloatParam<evaluation>::handle_linear_ramp_event(
         target_value = this->max_value;
     }
 
-    latest_event_type = EVT_LINEAR_RAMP;
-    linear_ramp_state.init(
-        event.time_offset,
-        done_samples,
-        value,
-        target_value,
-        (Number)duration * (Number)this->sample_rate,
-        duration,
-        false
-    );
+    return done_samples;
 }
 
 
@@ -1171,7 +1224,38 @@ void FloatParam<evaluation>::handle_log_ramp_event(
         target_value,
         (Number)duration * (Number)this->sample_rate,
         duration,
-        true
+        LinearRampState::Type::RAMP_LOGARITHMIC
+    );
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_curved_ramp_event(
+        SignalProducer::Event const& event
+) noexcept {
+    JS80P_ASSERT(!is_logarithmic());
+
+    Seconds duration;
+    Number target_value;
+    Number const done_samples = prepare_linear_ramp(
+        event,
+        duration,
+        target_value
+    );
+    Number const value = this->get_raw_value();
+
+    latest_event_type = EVT_LINEAR_RAMP;
+    linear_ramp_state.init(
+        event.time_offset,
+        done_samples,
+        0.0,
+        1.0,
+        (Number)duration * (Number)this->sample_rate,
+        duration,
+        LinearRampState::Type::RAMP_CURVED,
+        (Math::EnvelopeShape)event.int_param,
+        value,
+        target_value - value
     );
 }
 
@@ -1537,10 +1621,27 @@ void FloatParam<evaluation>::handle_cancel_event(
             event.time_offset - linear_ramp_state.start_time_offset
         );
 
-        if (linear_ramp_state.is_logarithmic) {
-            this->store_new_value(ratio_to_value_log(stop_value));
-        } else {
-            this->store_new_value(stop_value);
+        switch (linear_ramp_state.type) {
+            case LinearRampState::Type::RAMP_LINEAR:
+                this->store_new_value(stop_value);
+                break;
+
+            case LinearRampState::Type::RAMP_LOGARITHMIC:
+                this->store_new_value(ratio_to_value_log(stop_value));
+                break;
+
+            case LinearRampState::Type::RAMP_CURVED:
+                this->store_new_value(
+                    linear_ramp_state.curved_initial_value
+                    + Math::apply_envelope_shape(
+                        linear_ramp_state.curve_shape, stop_value
+                    ) * linear_ramp_state.curved_delta
+                );
+                break;
+
+            default:
+                JS80P_ASSERT_NOT_REACHED();
+                break;
         }
     } else {
         Envelope* const envelope = get_envelope();
@@ -2494,16 +2595,42 @@ void FloatParam<evaluation>::render_linear_ramp(
 ) noexcept {
     Sample sample;
 
-    if (linear_ramp_state.is_logarithmic) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = sample = (
-                (Sample)ratio_to_value_log(linear_ramp_state.advance())
-            );
-        }
-    } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
-        }
+    switch (linear_ramp_state.type) {
+        case LinearRampState::Type::RAMP_LINEAR:
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
+            }
+
+            break;
+
+        case LinearRampState::Type::RAMP_LOGARITHMIC:
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (
+                    (Sample)ratio_to_value_log(linear_ramp_state.advance())
+                );
+            }
+
+            break;
+
+        case LinearRampState::Type::RAMP_CURVED:
+            JS80P_ASSERT(!is_logarithmic());
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                buffer[0][i] = sample = (Sample)(
+                    linear_ramp_state.curved_initial_value
+                    + Math::apply_envelope_shape(
+                        linear_ramp_state.curve_shape,
+                        linear_ramp_state.advance()
+                    ) * linear_ramp_state.curved_delta
+                );
+            }
+
+            break;
+
+        default:
+            JS80P_ASSERT_NOT_REACHED();
+            sample = 0.0;
+            break;
     }
 
     if (last_sample_index != first_sample_index) {
@@ -2573,7 +2700,10 @@ FloatParam<evaluation>::LinearRampState::LinearRampState() noexcept
     duration(0.0),
     delta(0.0),
     speed(0.0),
-    is_logarithmic(false),
+    curved_initial_value(0.0),
+    curved_delta(0.0),
+    curve_shape(Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH),
+    type(Type::RAMP_LINEAR),
     is_done(false)
 {
 }
@@ -2587,9 +2717,12 @@ void FloatParam<evaluation>::LinearRampState::init(
         Number const target_value,
         Number const duration_in_samples,
         Seconds const duration,
-        bool const is_logarithmic
+        Type const type,
+        Math::EnvelopeShape const curve_shape,
+        Number const curved_initial_value,
+        Number const curved_delta
 ) noexcept {
-    this->is_logarithmic = is_logarithmic;
+    this->type = type;
 
     if (duration_in_samples > 0.0) {
         is_done = false;
@@ -2609,6 +2742,10 @@ void FloatParam<evaluation>::LinearRampState::init(
         this->target_value = target_value;
         this->duration_in_samples = 0.0;
     }
+
+    this->curved_initial_value = curved_initial_value;
+    this->curved_delta = curved_delta;
+    this->curve_shape = curve_shape;
 }
 
 

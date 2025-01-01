@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,7 +51,8 @@ class LFO : public SignalProducer
 
         explicit LFO(
             std::string const& name,
-            bool const can_have_envelope = false
+            bool const can_have_envelope = false,
+            Number const default_frequency = Constants::LFO_FREQUENCY_DEFAULT
         ) noexcept;
 
         /* No, this is not a macro. */

@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,11 @@ Effects<InputSignalProducerClass>::Effects(
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& echo_filter_shared_buffers,
         BiquadFilterSharedBuffers& reverb_filter_shared_buffers
-) : Filter< Volume3<InputSignalProducerClass> >(volume_3, 21, input.get_channels()),
+) : Filter< Volume3<InputSignalProducerClass> >(
+        volume_3,
+        24 + (Integer)TapeParams::SIGNAL_PRODUCERS,
+        input.get_channels()
+    ),
     volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
     volume_3_gain(name + "V3V", 0.0, 1.0, 1.0),
@@ -43,6 +47,8 @@ Effects<InputSignalProducerClass>::Effects(
     */
     distortion_1_type(name + "OT", Distortion::TYPE_TANH_3),
     distortion_2_type(name + "DT", Distortion::TYPE_TANH_10),
+    tape_at_end(name + "TEND", ToggleParam::ON),
+    tape_params(name + "T", tape_at_end),
     volume_1(input, volume_1_gain),
     distortion_1(name + "O", distortion_1_type, volume_1, &volume_1),
     distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1),
@@ -69,16 +75,27 @@ Effects<InputSignalProducerClass>::Effects(
         &volume_1
     ),
     volume_2(filter_2, volume_2_gain),
-    chorus(name + "C", volume_2),
+    tape_1(name + "T1", tape_params, volume_2),
+    chorus(name + "C", tape_1),
     echo(name + "E", chorus, echo_filter_shared_buffers),
     reverb(name + "R", echo, reverb_filter_shared_buffers),
-    volume_3(reverb, volume_3_gain)
+    tape_2(name + "T2", tape_params, reverb),
+    volume_3(tape_2, volume_3_gain)
 {
+    size_t i = 0;
+    SignalProducer* sp = tape_params.get_signal_producer(i++);
+
+    while (sp != NULL) {
+        this->register_child(*sp);
+        sp = tape_params.get_signal_producer(i++);
+    }
+
     this->register_child(volume_1_gain);
     this->register_child(volume_2_gain);
     this->register_child(volume_3_gain);
     this->register_child(distortion_1_type);
     this->register_child(distortion_2_type);
+    this->register_child(tape_at_end);
     this->register_child(volume_1);
     this->register_child(distortion_1);
     this->register_child(distortion_2);
@@ -91,9 +108,11 @@ Effects<InputSignalProducerClass>::Effects(
     this->register_child(filter_1);
     this->register_child(filter_2);
     this->register_child(volume_2);
+    this->register_child(tape_1);
     this->register_child(chorus);
     this->register_child(echo);
     this->register_child(reverb);
+    this->register_child(tape_2);
     this->register_child(volume_3);
 }
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <!--
 This file is part of JS80P, a synthesizer plugin.
-Copyright (C) 2023, 2024  Attila M. Magyar
+Copyright (C) 2023, 2024, 2025  Attila M. Magyar
 
 JS80P is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -341,6 +341,35 @@ h1 span {
   left: 2px;
 }
 
+#chorus,
+#tape {
+  margin: 1.5px 1px;
+}
+
+#tape h1 {
+  margin-top: -4px;
+  height: 25px;
+}
+
+#tape h1 label.end {
+  position: relative;
+  left: 15px;
+  width: 53px;
+  top: -1px;
+}
+
+#tape h1 label.screws input {
+  width: 46px;
+  height: 20px;
+}
+
+#tape h1 label.screws {
+  position: relative;
+  left: 19px;
+  margin-top: 2px;
+  height: 24px;
+}
+
 #chorus h1 label.lfo-freq {
   position: relative;
   left: 115px;
@@ -378,19 +407,32 @@ h1 span {
   margin-left: 1px;
 }
 
+#tape .dist-type {
+  position: relative;
+  left: 15px;
+  margin-left: 0;
+}
+
 .block h1 label.update {
   margin-left: 3px;
 }
 
 #dist-1-type,
-#dist-2-type {
+#dist-2-type,
+#tape .dist-type {
   top: 0;
   height: 24px;
   margin-top: -3px;
 }
 
+#tape .dist-type {
+  top: -1px;
+  margin-top: 0;
+}
+
 #dist-1-type input,
-#dist-2-type input {
+#dist-2-type input,
+#tape .dist-type input {
   top: 0;
   margin-top: 0;
   height: 23px;
@@ -407,7 +449,8 @@ h1 span {
 
 #osc-2-dist-type label.dist-type input,
 #dist-1-type input,
-#dist-2-type input {
+#dist-2-type input,
+#tape .dist-type input {
   width: 62px;
 }
 
@@ -938,6 +981,15 @@ function make_tabs(active)
         <h1><span>Vol 2</span></h1>
         <div id="volume-2-params" class="block"></div>
       </div>
+      <div id="tape" class="effect main-block block">
+        <h1>
+          <span>Tape</span>
+          <label class="screws"><input type="text" /></label>
+          <label class="dist-type"><input type="text" /></label>
+          <label class="end"><span>END </span><input type="text" /></label>
+        </h1>
+        <div id="tape-params" class="block"></div>
+      </div>
       <div id="chorus" class="effect main-block block">
         <h1>
           <span>Chorus</span>
@@ -1171,6 +1223,11 @@ window.onload = function ()
     create_knob("chorus-params", "WID %", "-100");
     create_knob("chorus-params", "WET %", "50");
     create_knob("chorus-params", "DRY %", "60");
+
+    create_knob("tape-params", "STOP s", "2");
+    create_knob("tape-params", "W&amp;F %", "60");
+    create_knob("tape-params", "DST %", "100");
+    create_knob("tape-params", "CLR %", "50");
 
     create_knob("echo-params", "IN V %", "70");
     create_knob("echo-params", "HP F Hz", "100");

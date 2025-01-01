@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -379,6 +379,13 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::EF2G] = "Filter 2 Gain (dB)",
 
     [Synth::ParamId::EV2V] = "Volume 2 (%)",
+
+    [Synth::ParamId::ETSTP] = "Tape Stop / Start",
+    [Synth::ParamId::ETWFA] = "Tape Wow and Flutter Amplitude",
+    [Synth::ParamId::ETDST] = "Tape Distortion",
+    [Synth::ParamId::ETCLR] = "Tape Color",
+    [Synth::ParamId::ETHSS] = "Tape Hiss Level",
+    [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed",
 
     [Synth::ParamId::ECDEL] = "Chorus Delay Time (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",
@@ -1086,6 +1093,8 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
     [Synth::ParamId::EER1] = "Echo Delay 1 Reversed",
     [Synth::ParamId::EER2] = "Echo Delay 2 Reversed",
+    [Synth::ParamId::ETDTYP] = "Effects Tape Distortion Type",
+    [Synth::ParamId::ETEND] = "Effects Tape Move to End of Chain",
 };
 
 
@@ -2584,22 +2593,31 @@ void GUI::build_effects_body(
 
     KNOB(effects_body, 892 + KNOB_W * 0,    34, Synth::ParamId::EV2V,   MML_C,      "%.2f", 100.0, knob_states);
 
-    KNOB(effects_body, 142 + KNOB_W * 0,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 1,   173, Synth::ParamId::ECHPQ,  MML__,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 2,   173, Synth::ParamId::ECTYP,  MM___,      ct, ctc, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 3,   173, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 4,   173, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 5,   173, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 6,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 7,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 8,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 9,   173, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 10,  173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 142 + KNOB_W * 11,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TOGG(effects_body, 219, 145,  50, 24,  0, Synth::ParamId::ECLHQ);
-    TOGG(effects_body, 393, 145, 114, 24,  0, Synth::ParamId::ECLLG);
-    TOGG(effects_body, 567, 145, 136, 24,  0, Synth::ParamId::ECLOG);
-    TOGG(effects_body, 749, 145,  90, 24, 66, Synth::ParamId::ECSYN);
+    KNOB(effects_body,  16 + KNOB_W * 0,   173, Synth::ParamId::ETSTP,  MM__C,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  16 + KNOB_W * 1,   173, Synth::ParamId::ETWFA,  MM__C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  16 + KNOB_W * 2,   173, Synth::ParamId::ETDST,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  16 + KNOB_W * 3,   173, Synth::ParamId::ETCLR,  MM__C,      "%.2f", 200.0, knob_states);
+    DPET(effects_body, 130, 146, 60, 21, 0, 60, Synth::ParamId::ETDTYP, dt, dtc);
+    TOGG(effects_body, 199, 145, 50, 24, 28, Synth::ParamId::ETEND);
+    SCREW(effects_body,  82, 146, Synth::ParamId::ETWFS, "%.2f%%", 100.0, screw_states);
+    SCREW(effects_body, 102, 146, Synth::ParamId::ETHSS, "%.2f%%", 800.0, screw_states);
+
+    KNOB(effects_body, 268 + KNOB_W * 0,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 1,   173, Synth::ParamId::ECHPQ,  MML__,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 2,   173, Synth::ParamId::ECTYP,  MM___,      ct, ctc, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 3,   173, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 4,   173, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 5,   173, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 6,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 7,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 8,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 9,   173, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 10,  173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 268 + KNOB_W * 11,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TOGG(effects_body, 345, 145,  50, 24,  0, Synth::ParamId::ECLHQ);
+    TOGG(effects_body, 518, 145, 114, 24,  0, Synth::ParamId::ECLLG);
+    TOGG(effects_body, 693, 145, 136, 24,  0, Synth::ParamId::ECLOG);
+    TOGG(effects_body, 875, 145,  90, 24, 66, Synth::ParamId::ECSYN);
 
     KNOB(effects_body,  55 + KNOB_W * 0,   313, Synth::ParamId::EEINV,  MML__,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 1,   313, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);

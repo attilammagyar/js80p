@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,11 @@
 namespace JS80P
 {
 
-LFO::LFO(std::string const& name, bool const can_have_envelope) noexcept
+LFO::LFO(
+        std::string const& name,
+        bool const can_have_envelope,
+        Number const default_frequency
+) noexcept
     : SignalProducer(1, 13, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     freq_log_scale(name + "LOG", ToggleParam::OFF),
@@ -35,7 +39,7 @@ LFO::LFO(std::string const& name, bool const can_have_envelope) noexcept
         name + "FRQ",
         Constants::LFO_FREQUENCY_MIN,
         Constants::LFO_FREQUENCY_MAX,
-        Constants::LFO_FREQUENCY_DEFAULT,
+        default_frequency,
         0.0,
         NULL,
         &freq_log_scale,

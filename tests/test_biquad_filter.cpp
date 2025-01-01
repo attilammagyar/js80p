@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -678,6 +678,31 @@ TEST(fixed_type_high_shelf_filter_attenuates_or_boosts_frequencies_above_the_giv
 
     assert_completed<BiquadFilterFixedType::BFFT_HIGH_SHELF>(
         filter, 2000.0, 0.03, -6.0
+    );
+})
+
+
+TEST(fixed_type_low_pass_filter_attenuates_frequencies_above_the_given_frequency, {
+    SumOfSines input(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
+    SumOfSines expected(0.5, 440.0, 0.0, 7040.0, 0.0, 0.0, CHANNELS);
+    BiquadFilter<SumOfSines, BiquadFilterFixedType::BFFT_LOW_PASS> filter(
+        "", input
+    );
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::HIGH_PASS);
+    filter.frequency.set_value(1500.0);
+    filter.q.set_value(0.01);
+
+    schedule_small_param_changes<BiquadFilterFixedType::BFFT_LOW_PASS>(
+        filter, 3000.0, 0.01, -6.0
+    );
+
+    test_filter<SumOfSines, BiquadFilterFixedType::BFFT_LOW_PASS>(
+        filter, input, expected, 0.1
+    );
+
+    assert_completed<BiquadFilterFixedType::BFFT_LOW_PASS>(
+        filter, 3000.0, 0.01, -6.0
     );
 })
 

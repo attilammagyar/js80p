@@ -2741,4 +2741,8 @@ and `LoongArch` Linux respectively:
 
  * [Chebyshev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials)
 
+ * [Low-pass filter](https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization)
+
+ * [High-pass filter](https://en.wikipedia.org/wiki/High-pass_filter#Discrete-time_realization)
+
 <a href="#toc">Table of Contents</a>

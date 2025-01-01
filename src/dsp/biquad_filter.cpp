@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -498,6 +498,8 @@ Sample const* const* BiquadFilter<InputSignalProducerClass, fixed_type>::initial
         JS80P_BF_CALL_INIT_FQ(initialize_high_pass_rendering);
     } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_HIGH_SHELF) {
         JS80P_BF_CALL_INIT_F(initialize_high_shelf_rendering);
+    } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_LOW_PASS) {
+        JS80P_BF_CALL_INIT_FQ(initialize_low_pass_rendering);
     } else {
         JS80P_ASSERT_NOT_REACHED();
         is_no_op = true;

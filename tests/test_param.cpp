@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -790,6 +791,169 @@ TEST(when_float_param_linear_ramp_goes_out_of_bounds_between_samples_then_it_is_
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
 
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
+std::string compare_sample_arrays(
+        Sample const* const a,
+        Sample const* const b,
+        Integer const length
+) {
+    std::string comparison("");
+
+    for (Integer i = 0; i != length; ++i) {
+        if (Math::is_close(a[i], b[i])) {
+            comparison += '=';
+        } else if (a[i] < b[i]) {
+            comparison += '<';
+        } else {
+            comparison += '>';
+        }
+    }
+
+    return comparison;
+}
+
+
+std::string sample_array_to_string(
+        Sample const* const samples,
+        Integer const length
+) {
+    constexpr Integer max_length = 256;
+    char buffer[max_length];
+    Integer pos = 0;
+
+    std::fill_n(buffer, max_length, '\x00');
+
+    for (Integer i = 0; i != length && pos < max_length; ++i) {
+        int const written = snprintf(
+            &buffer[pos], (size_t)max_length, "%.5f ", samples[i]
+        );
+
+        if (written <= 0) {
+            break;
+        }
+
+        pos += written;
+    }
+
+    return std::string(buffer);
+}
+
+
+TEST(float_param_can_schedule_curved_ramping_clamped_to_max_value, {
+    constexpr Integer block_size = 10;
+    FloatParamS linear_param("linear", 0.0, 10.0, 0.0);
+    FloatParamS curved_param("curved", 0.0, 10.0, 0.0);
+    Sample const* linear_samples;
+    Sample const* curved_samples;
+
+    linear_param.set_sample_rate(1.0);
+    linear_param.set_value(2.0);
+    linear_param.schedule_value(2.0, 5.0);
+    linear_param.schedule_linear_ramp(7.0, 12.0);
+
+    curved_param.set_sample_rate(1.0);
+    curved_param.set_value(2.0);
+    curved_param.schedule_value(2.0, 5.0);
+    curved_param.schedule_curved_ramp(
+        7.0, 12.0, Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+    );
+
+    linear_samples = FloatParamS::produce_if_not_constant(
+        linear_param, 1, block_size
+    );
+
+    assert_true(curved_param.is_constant_until(2));
+    assert_false(curved_param.is_constant_until(3));
+    assert_float_param_changes_during_rendering(
+        curved_param, 1, block_size, &curved_samples
+    );
+    assert_eq(
+        std::string("===>><<===", block_size),
+        compare_sample_arrays(linear_samples, curved_samples, block_size),
+        "\n    linear=%s\n    curved=%s",
+        sample_array_to_string(linear_samples, block_size).c_str(),
+        sample_array_to_string(curved_samples, block_size).c_str()
+    );
+})
+
+
+TEST(float_param_can_schedule_curved_ramping_clamped_to_min_value, {
+    constexpr Integer block_size = 10;
+    FloatParamS linear_param("linear", 0.0, 10.0, 0.0);
+    FloatParamS curved_param("curved", 0.0, 10.0, 0.0);
+    Sample const* linear_samples;
+    Sample const* curved_samples;
+
+    linear_param.set_sample_rate(1.0);
+    linear_param.set_value(8.0);
+    linear_param.schedule_value(2.0, 5.0);
+    linear_param.schedule_linear_ramp(7.0, -2.0);
+
+    curved_param.set_sample_rate(1.0);
+    curved_param.set_value(8.0);
+    curved_param.schedule_value(2.0, 5.0);
+    curved_param.schedule_curved_ramp(
+        7.0, -2.0, Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+    );
+
+    linear_samples = FloatParamS::produce_if_not_constant(
+        linear_param, 1, block_size
+    );
+
+    assert_true(curved_param.is_constant_until(2));
+    assert_false(curved_param.is_constant_until(3));
+    assert_float_param_changes_during_rendering(
+        curved_param, 1, block_size, &curved_samples
+    );
+    assert_eq(
+        std::string("===<<>>===", block_size),
+        compare_sample_arrays(linear_samples, curved_samples, block_size),
+        "\n    linear=%s\n    curved=%s",
+        sample_array_to_string(linear_samples, block_size).c_str(),
+        sample_array_to_string(curved_samples, block_size).c_str()
+    );
+})
+
+
+TEST(float_param_can_cancel_curved_ramping, {
+    constexpr Integer block_size = 10;
+    FloatParamS linear_param("linear", 0.0, 10.0, 0.0);
+    FloatParamS curved_param("curved", 0.0, 10.0, 0.0);
+    Sample const* linear_samples;
+    Sample const* curved_samples;
+
+    linear_param.set_sample_rate(1.0);
+    linear_param.set_value(2.0);
+    linear_param.schedule_value(2.0, 5.0);
+    linear_param.schedule_linear_ramp(7.0, 12.0);
+    linear_param.cancel_events_at(4.0);
+
+    curved_param.set_sample_rate(1.0);
+    curved_param.set_value(2.0);
+    curved_param.schedule_value(2.0, 5.0);
+    curved_param.schedule_curved_ramp(
+        7.0, 12.0, Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+    );
+    curved_param.cancel_events_at(4.0);
+
+    linear_samples = FloatParamS::produce_if_not_constant(
+        linear_param, 1, block_size
+    );
+
+    assert_true(curved_param.is_constant_until(2));
+    assert_false(curved_param.is_constant_until(3));
+    assert_float_param_changes_during_rendering(
+        curved_param, 1, block_size, &curved_samples
+    );
+    assert_eq(
+        std::string("===>>>>>>>", block_size),
+        compare_sample_arrays(linear_samples, curved_samples, block_size),
+        "\n    linear=%s\n    curved=%s",
+        sample_array_to_string(linear_samples, block_size).c_str(),
+        sample_array_to_string(curved_samples, block_size).c_str()
+    );
 })
 
 

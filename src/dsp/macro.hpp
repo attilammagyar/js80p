@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,13 +44,18 @@ class Macro : public MidiController
         static constexpr Byte DIST_SHAPE_SHARP_SMOOTH = Math::DistortionShape::DIST_SHAPE_SHARP_SMOOTH;
         static constexpr Byte DIST_SHAPE_SHARP_SHARP = Math::DistortionShape::DIST_SHAPE_SHARP_SHARP;
 
+        static constexpr Integer PARAMS = 8;
+
         class DistortionShapeParam : public ByteParam
         {
             public:
                 explicit DistortionShapeParam(std::string const& name) noexcept;
         };
 
-        explicit Macro(std::string const& name = "") noexcept;
+        explicit Macro(
+            std::string const& name = "",
+            Number const input_default_value = 0.5
+        ) noexcept;
 
         void update() noexcept;
 

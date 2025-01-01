@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 #
 # JS80P is free software: you can redistribute it and/or modify
@@ -205,6 +205,7 @@ SYNTH_COMPONENTS = \
 	dsp/peak_tracker \
 	dsp/reverb \
 	dsp/side_chain_compressable_effect \
+	dsp/tape \
 	dsp/wavefolder \
 	dsp/wavetable
 
@@ -231,6 +232,7 @@ TESTS_DSP = \
 	test_mixer \
 	test_param_slow \
 	test_peak_tracker \
+	test_tape \
 	test_wavefolder
 
 TESTS_SYNTH = \
@@ -908,6 +910,20 @@ $(DEV_DIR)/test_synth$(DEV_EXE): \
 		$(SYNTH_SOURCES) \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
+	$(COMPILE_DEV) -o $@ $<
+	$(RUN_WITH_VALGRIND) $@
+
+$(DEV_DIR)/test_tape$(DEV_EXE): \
+		tests/test_tape.cpp \
+		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
+		src/dsp/delay.cpp src/dsp/delay.hpp \
+		src/dsp/distortion.cpp src/dsp/distortion.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/tape.cpp src/dsp/tape.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(DEV_DIR) show_versions \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 

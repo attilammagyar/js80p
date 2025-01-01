@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -123,6 +123,13 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$F2G", "  ///< $ Filter 2 Gain", "effects.filter_2.gain"),
 
         ("$V2V", "  ///< $ Volume 2", "effects.volume_2_gain"),
+
+        ("$TSTP", " ///< $ Tape Stop / Start", "effects.tape.stop_start"),
+        ("$TWFA", " ///< $ Tape Wow and Flutter Amplitude", "effects.tape.wnf_amp"),
+        ("$TDST", " ///< $ Tape Distortion", "effects.tape.distortion_level"),
+        ("$TCLR", " ///< $ Tape Color", "effects.tape.color"),
+        ("$THSS", " ///< $ Tape Hiss Level", "effects.tape.hiss_level"),
+        ("$TWFS", " ///< $ Tape Wow and Flutter Speed", "effects.tape.wnf_speed"),
 
         ("$CDEL", " ///< $ Chorus Delay Time", "effects.chorus.delay_time"),
         ("$CFRQ", " ///< $ Chorus LFO Frequency", "effects.chorus.frequency"),
@@ -423,6 +430,9 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
 
         ("EER1", "  ///< Effects Echo Delay 1 Reversed", "effects.echo.reversed_1"),
         ("EER2", "  ///< Effects Echo Delay 2 Reversed", "effects.echo.reversed_2"),
+
+        ("ETDTYP", "///< Effects Tape Distortion Type", "effects.tape.distortion_type"),
+        ("ETEND", " ///< Effects Tape Move to End of Chain", "effects.tape_at_end"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

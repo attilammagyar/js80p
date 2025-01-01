@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "dsp/gain.hpp"
 #include "dsp/param.hpp"
 #include "dsp/reverb.hpp"
+#include "dsp/tape.hpp"
 
 
 namespace JS80P { namespace Effects
@@ -54,7 +55,10 @@ template<class InputSignalProducerClass>
 using Volume2 = Gain< Filter2<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Chorus = JS80P::Chorus< Volume2<InputSignalProducerClass> >;
+using Tape1 = Tape< Volume2<InputSignalProducerClass>, ToggleParam::OFF >;
+
+template<class InputSignalProducerClass>
+using Chorus = JS80P::Chorus< Tape1<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
 using Echo = JS80P::Echo< Chorus<InputSignalProducerClass> >;
@@ -63,7 +67,10 @@ template<class InputSignalProducerClass>
 using Reverb = JS80P::Reverb< Echo<InputSignalProducerClass> >;
 
 template<class InputSignalProducerClass>
-using Volume3 = Gain< Reverb<InputSignalProducerClass> >;
+using Tape2 = Tape< Reverb<InputSignalProducerClass>, ToggleParam::ON >;
+
+template<class InputSignalProducerClass>
+using Volume3 = Gain< Tape2<InputSignalProducerClass> >;
 
 
 template<class InputSignalProducerClass>
@@ -84,6 +91,9 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
         Distortion::TypeParam distortion_1_type;
         Distortion::TypeParam distortion_2_type;
 
+        ToggleParam tape_at_end;
+        TapeParams tape_params;
+
         Volume1<InputSignalProducerClass> volume_1;
         Distortion1<InputSignalProducerClass> distortion_1;
         Distortion2<InputSignalProducerClass> distortion_2;
@@ -96,9 +106,11 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
         Filter1<InputSignalProducerClass> filter_1;
         Filter2<InputSignalProducerClass> filter_2;
         Volume2<InputSignalProducerClass> volume_2;
+        Tape1<InputSignalProducerClass> tape_1;
         Chorus<InputSignalProducerClass> chorus;
         Echo<InputSignalProducerClass> echo;
         Reverb<InputSignalProducerClass> reverb;
+        Tape2<InputSignalProducerClass> tape_2;
         Volume3<InputSignalProducerClass> volume_3;
 };
 
