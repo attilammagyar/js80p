@@ -837,21 +837,21 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::schedule_stop
         1.0, delay_time_lfo_min_target + TapeParams::DELAY_TIME_LFO_RANGE
     );
 
-    params.delay_time_lfo.min.cancel_events_at(START_STOP_DELAY);
+    params.delay_time_lfo.min.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.min.schedule_curved_ramp(
         duration,
         delay_time_lfo_min_target,
         Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP
     );
 
-    params.delay_time_lfo.max.cancel_events_at(START_STOP_DELAY);
+    params.delay_time_lfo.max.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.max.schedule_curved_ramp(
         duration,
         delay_time_lfo_max_target,
         Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP
     );
 
-    params.volume.cancel_events_at(START_STOP_DELAY);
+    params.volume.cancel_events_at(STOP_START_DELAY);
     params.volume.schedule_curved_ramp(
         duration,
         0.0,
@@ -868,16 +868,16 @@ void Tape<
     transition_duration = 0.0;
     state = TapeParams::State::TAPE_STATE_STARTING;
 
-    params.delay_time_lfo.min.cancel_events_at(START_STOP_DELAY);
-    params.delay_time_lfo.min.schedule_value(START_STOP_DELAY, 0.0);
+    params.delay_time_lfo.min.cancel_events_at(STOP_START_DELAY);
+    params.delay_time_lfo.min.schedule_value(STOP_START_DELAY, 0.0);
 
-    params.delay_time_lfo.max.cancel_events_at(START_STOP_DELAY);
+    params.delay_time_lfo.max.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.max.schedule_value(
-        START_STOP_DELAY,
+        STOP_START_DELAY,
         TapeParams::DELAY_TIME_LFO_RANGE
     );
 
-    params.volume.cancel_events_at(START_STOP_DELAY);
+    params.volume.cancel_events_at(STOP_START_DELAY);
     params.volume.schedule_curved_ramp(
         START_TIME_MIN,
         1.0,
@@ -896,21 +896,21 @@ void Tape<
     transition_duration = duration;
     state = TapeParams::State::TAPE_STATE_FF_STARTING;
 
-    params.delay_time_lfo.min.cancel_events_at(START_STOP_DELAY);
+    params.delay_time_lfo.min.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.min.schedule_curved_ramp(
         duration,
         0.0,
         Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH
     );
 
-    params.delay_time_lfo.max.cancel_events_at(START_STOP_DELAY);
+    params.delay_time_lfo.max.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.max.schedule_curved_ramp(
         duration,
         TapeParams::DELAY_TIME_LFO_RANGE,
         Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH
     );
 
-    params.volume.cancel_events_at(START_STOP_DELAY);
+    params.volume.cancel_events_at(STOP_START_DELAY);
     params.volume.schedule_curved_ramp(
         duration,
         1.0,
