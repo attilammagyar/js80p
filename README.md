@@ -114,6 +114,7 @@ Table of Contents
     * [Dystopiano](#preset-dystopiano)
     * [Expressive Saw](#preset-expressive-saw)
     * [Flute Mono](#preset-flute-mono)
+    * [FX Master Enhancer](#preset-fx-master-enhancer)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2321,6 +2322,17 @@ A monophonic version of the Flute preset: a synth flute sound with a couple of
 tricks: the pitch of the notes decreases slightly when they end, and the mod
 wheel adds a little embellishment to the beginning of each note. Aftertouch
 adds more emphasis to the note.
+
+<a id="preset-fx-master-enhancer"></a>
+
+### FX Master Enhancer
+
+This preset mutes the synthesizer and turns the Effects section into a
+master mix enhancer by applying tape-like saturation and coloring, and a
+hint of reverb. Depending on how much headroom you have in your mix, you may
+need to adjust the settings; it is recommended to start with the
+[Vol 1](#usage-effects-volume) knob. (The preset has been developed with mixes
+that have around 3-6 dB headroom.)
 
 <a href="#toc">Table of Contents</a>
 

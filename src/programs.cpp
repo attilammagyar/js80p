@@ -35,7 +35,7 @@
 namespace JS80P
 {
 
-size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = 44;
+size_t const Bank::NUMBER_OF_BUILT_IN_PROGRAMS = 45;
 
 Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
 
@@ -5917,6 +5917,36 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "EF2LOG = 1.0\n"
             "N2UPD = 1.0\n"
             "NH = 0.0\n"
+        )
+    ),
+
+    Program(
+        "FX Master Enhancer",
+        "Prog045",
+        (
+            "[js80p]\n"
+            "IN = 1.0\n"
+            "MVOL = 0.0\n"
+            "CVOL = 0.0\n"
+            "EV1V = 0.550\n"
+            "ETDST = 1.0\n"
+            "ETCIN = 0.6350\n"
+            "ERRSZ = 0.503333333333333\n"
+            "ERRS = 0.800950750750751\n"
+            "ERDST = 0.30\n"
+            "ERDF = 0.894999784781834\n"
+            "ERDG = 0.748564879133092\n"
+            "ERWID = 0.10\n"
+            "ERHPF = 0.527024446430278\n"
+            "ERHPQ = 0.0\n"
+            "ERCTH = 0.90\n"
+            "ERCR = 0.00420\n"
+            "ERWET = 0.0050\n"
+            "EV3V = 0.90\n"
+            "ERLOG = 1.0\n"
+            "ERTYP = 0.666666666666667\n"
+            "ETDTYP = 0.0\n"
+            "ETEND = 0.0\n"
         )
     ),
 

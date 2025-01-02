@@ -1,0 +1,28 @@
+; This preset mutes the synthesizer and turns the Effects section into a
+; master mix enhancer by applying tape-like saturation and coloring, and a
+; hint of reverb. Depending on how much headroom you have in your mix, you may
+; need to adjust the settings; it is recommended to start with the Vol 1 knob.
+; (The preset has been developed with mixes that have around 3-6 dB headroom.)
+[js80p]
+IN = 1.0
+MVOL = 0.0
+CVOL = 0.0
+EV1V = 0.550
+ETDST = 1.0
+ETCIN = 0.6350
+ERRSZ = 0.503333333333333
+ERRS = 0.800950750750751
+ERDST = 0.30
+ERDF = 0.894999784781834
+ERDG = 0.748564879133092
+ERWID = 0.10
+ERHPF = 0.527024446430278
+ERHPQ = 0.0
+ERCTH = 0.90
+ERCR = 0.00420
+ERWET = 0.0050
+EV3V = 0.90
+ERLOG = 1.0
+ERTYP = 0.666666666666667
+ETDTYP = 0.0
+ETEND = 0.0
