@@ -116,14 +116,14 @@ TapeParams::TapeParams(
     constexpr Number filter_gain_max = Constants::BIQUAD_FILTER_GAIN_MAX;
     constexpr Number filter_gain_range = filter_gain_max - filter_gain_min;
 
-    high_shelf_filter_gain_macro.midpoint.set_value(0.7702);
+    high_shelf_filter_gain_macro.midpoint.set_value(0.672);
     high_shelf_filter_gain_macro.min.set_value(
         (-30.0 - filter_gain_min) / filter_gain_range
     );
     high_shelf_filter_gain_macro.max.set_value(
-        (6.0 - filter_gain_min) / filter_gain_range
+        (9.0 - filter_gain_min) / filter_gain_range
     );
-    high_shelf_filter_gain_macro.distortion.set_value(0.275);
+    high_shelf_filter_gain_macro.distortion.set_value(0.3);
     high_shelf_filter_gain_macro.distortion_shape.set_value(
         Macro::DIST_SHAPE_SMOOTH_SMOOTH
     );
