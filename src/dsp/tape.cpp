@@ -141,7 +141,7 @@ TapeParams::TapeParams(
     distance_from_midpoint.min.set_macro(&offset_above_midpoint);
 
     low_pass_filter_frequency_macro.min.set_value(1.0);
-    low_pass_filter_frequency_macro.max.set_value(0.46);
+    low_pass_filter_frequency_macro.max.set_value(0.59);
     low_pass_filter_frequency_macro.distortion.set_value(0.5);
     low_pass_filter_frequency_macro.distortion_shape.set_value(
         Macro::DIST_SHAPE_SHARP_SMOOTH
