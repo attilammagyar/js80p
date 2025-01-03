@@ -1233,15 +1233,15 @@ Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 /*
-Let Valgrind catch if we actually use uninitialized data. Not even GCC gets this
-right: the constructors which pass the yet uninitialized Delay object to
-Filter's constructor also explicitly set the number of channels based on the
+Sometimes GCC and CppCheck detect a false-positive uninitialized member variable
+here, but Valgrind would detect such problems in the tests if it was really the
+case. Actually, the constructors which pass the yet uninitialized Delay object
+to Filter's constructor also explicitly set the number of channels based on the
 number of channels of the Delay's input, so the uninitialized Delay's
-get_channels() method never actually gets called.
+get_channels() method never really gets called.
 */
-// cppcheck-suppress uninitMemberVar
+template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
@@ -1270,9 +1270,15 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 
+/*
+Sometimes GCC and CppCheck detect a false-positive uninitialized member variable
+here, but Valgrind would detect such problems in the tests if it was really the
+case. Actually, the constructors which pass the yet uninitialized Delay object
+to Filter's constructor also explicitly set the number of channels based on the
+number of channels of the Delay's input, so the uninitialized Delay's
+get_channels() method never really gets called.
+*/
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-/* See above, PannedDelay(input, stereo_mode, tempo_sync). */
-// cppcheck-suppress uninitMemberVar
 PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
         PannedDelayStereoMode const stereo_mode,
