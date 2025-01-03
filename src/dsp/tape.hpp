@@ -56,7 +56,7 @@ class TapeParams
 
         static constexpr Number DELAY_TIME_MAX = 30.0;
         static constexpr Number DELAY_TIME_LFO_RANGE = DELAY_TIME_MAX / 310000.0;
-        static constexpr size_t SIGNAL_PRODUCERS = 8 + 15 * Macro::PARAMS;
+        static constexpr size_t SIGNAL_PRODUCERS = 11 + 17 * Macro::PARAMS;
 
         explicit TapeParams(
             std::string const& name,
@@ -79,6 +79,7 @@ class TapeParams
         FloatParamS distortion_level;
         FloatParamB& color;
         FloatParamB hiss_level;
+        FloatParamS stereo_separation;
         Distortion::TypeParam distortion_type;
         ToggleParam& bypass_toggle;
 
@@ -87,6 +88,8 @@ class TapeParams
         LFO delay_time_lfo;
         LFO wow_lfo;
         LFO flutter_lfo;
+        LFO delay_channel_lfo_1;
+        LFO delay_channel_lfo_2;
         Macro wnf_amp_macro;
         Macro wnf_amp_sharp_smooth_macro;
         Macro wnf_amp_smooth_sharp_macro;
@@ -94,6 +97,8 @@ class TapeParams
         Macro wnf_speed_delay_time_lfo_macro;
         Macro wnf_speed_wow_lfo_macro;
         Macro wnf_speed_flutter_lfo_macro;
+        Macro delay_channel_lfo_1_frequency_macro;
+        Macro delay_channel_lfo_2_frequency_macro;
         Macro color_macro;
         Macro high_shelf_filter_frequency_macro;
         Macro high_shelf_filter_gain_macro;
@@ -181,7 +186,7 @@ class Tape : public Filter<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_LOW_PASS
         > LowPassFilter;
 
-        typedef Delay<LowPassFilter> Delay_;
+        typedef Delay<LowPassFilter, DelayCapabilities::DC_CHANNEL_LFO> Delay_;
 
         Tape(
             std::string const& name,

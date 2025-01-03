@@ -382,10 +382,11 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::ETSTP] = "Tape Stop / Start",
     [Synth::ParamId::ETWFA] = "Tape Wow and Flutter Amplitude",
+    [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed",
     [Synth::ParamId::ETDST] = "Tape Distortion",
     [Synth::ParamId::ETCLR] = "Tape Color",
     [Synth::ParamId::ETHSS] = "Tape Hiss Level",
-    [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed",
+    [Synth::ParamId::ETSTR] = "Tape Stereo Separation",
 
     [Synth::ParamId::ECDEL] = "Chorus Delay Time (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",
@@ -2597,10 +2598,11 @@ void GUI::build_effects_body(
     KNOB(effects_body,  16 + KNOB_W * 1,   173, Synth::ParamId::ETWFA,  MM__C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 2,   173, Synth::ParamId::ETDST,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 3,   173, Synth::ParamId::ETCLR,  MM__C,      "%.2f", 200.0, knob_states);
-    DPET(effects_body, 130, 146, 60, 21, 0, 60, Synth::ParamId::ETDTYP, dt, dtc);
-    TOGG(effects_body, 199, 145, 50, 24, 28, Synth::ParamId::ETEND);
-    SCREW(effects_body,  82, 146, Synth::ParamId::ETWFS, "%.2f%%", 100.0, screw_states);
-    SCREW(effects_body, 102, 146, Synth::ParamId::ETHSS, "%.2f%%", 800.0, screw_states);
+    DPET(effects_body, 132, 146, 60, 21, 0, 60, Synth::ParamId::ETDTYP, dt, dtc);
+    TOGG(effects_body, 202, 145, 50, 24, 28, Synth::ParamId::ETEND);
+    SCREW(effects_body,  61, 146, Synth::ParamId::ETWFS, "%.2f%%", 100.0, screw_states);
+    SCREW(effects_body,  81, 146, Synth::ParamId::ETSTR, "%.2f%%", 200.0, screw_states);
+    SCREW(effects_body, 101, 146, Synth::ParamId::ETHSS, "%.2f%%", 800.0, screw_states);
 
     KNOB(effects_body, 268 + KNOB_W * 0,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body, 268 + KNOB_W * 1,   173, Synth::ParamId::ECHPQ,  MML__,      "%.3f", 1.0, knob_states);

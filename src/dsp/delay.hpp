@@ -27,6 +27,7 @@
 #include "dsp/biquad_filter.hpp"
 #include "dsp/distortion.hpp"
 #include "dsp/math.hpp"
+#include "dsp/lfo.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
@@ -38,6 +39,7 @@ enum DelayCapabilities {
     DC_BASIC = 0,
     DC_SCALABLE = 1,
     DC_REVERSIBLE = 2,
+    DC_CHANNEL_LFO = 3,
 };
 
 
@@ -111,6 +113,12 @@ class Delay : public Filter<InputSignalProducerClass>
         void set_time_scale_param(FloatParamS& time_scale_param) noexcept;
 
         void set_reverse_toggle_param(ToggleParam& reverse_toggle_param) noexcept;
+
+        void set_channel_lfo(
+            Integer const channel,
+            LFO& lfo,
+            Sample const scale
+        ) noexcept;
 
 #ifdef JS80P_ASSERTIONS
         void begin_reverse_delay_test() noexcept;
@@ -221,6 +229,14 @@ class Delay : public Filter<InputSignalProducerClass>
             Number const& delay_buffer_size_float
         ) const noexcept;
 
+        Sample lookup_sample(
+            Sample const* const delay_channel,
+            Number const read_index,
+            Integer const i,
+            Sample const* const channel_lfo_buffer,
+            Sample const channel_lfo_scale
+        ) const noexcept;
+
         Integer const delay_buffer_oversize;
         bool const is_gain_constant_1;
 
@@ -230,6 +246,9 @@ class Delay : public Filter<InputSignalProducerClass>
         FloatParamS* time_scale_param;
         ToggleParam* reverse_toggle_param;
         Sample** delay_buffer;
+        LFO** channel_lfos;
+        Sample const** channel_lfo_buffers;
+        Sample* channel_lfo_scales;
         Sample const* gain_buffer;
         Sample const* time_buffer;
         Sample const* time_scale_buffer;

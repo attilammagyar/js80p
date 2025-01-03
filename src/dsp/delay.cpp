@@ -155,6 +155,22 @@ void Delay<InputSignalProducerClass, capabilities>::initialize_instance() noexce
     reallocate_delay_buffer_if_needed();
     Delay<InputSignalProducerClass, capabilities>::reset();
 
+    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+        channel_lfos = new LFO*[this->channels];
+        channel_lfo_scales = new Sample[this->channels];
+        channel_lfo_buffers = new Sample const*[this->channels];
+
+        for (Integer i = 0; i != this->channels; ++i) {
+            channel_lfos[i] = NULL;
+            channel_lfo_buffers[i] = NULL;
+            channel_lfo_scales[i] = 0.0;
+        }
+    } else {
+        channel_lfos = NULL;
+        channel_lfo_buffers = NULL;
+        channel_lfo_scales = NULL;
+    }
+
     this->register_child(gain);
     this->register_child(time);
 }
@@ -327,6 +343,16 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Delay<InputSignalProducerClass, capabilities>::~Delay()
 {
     free_delay_buffer();
+
+    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+        delete[] channel_lfos;
+        delete[] channel_lfo_buffers;
+        delete[] channel_lfo_scales;
+
+        channel_lfos = NULL;
+        channel_lfo_buffers = NULL;
+        channel_lfo_scales = NULL;
+    }
 }
 
 
@@ -375,6 +401,26 @@ void Delay<InputSignalProducerClass, capabilities>::set_reverse_toggle_param(
         ToggleParam& reverse_toggle_param
 ) noexcept {
     this->reverse_toggle_param = &reverse_toggle_param;
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+void Delay<InputSignalProducerClass, capabilities>::set_channel_lfo(
+        Integer const channel,
+        LFO& lfo,
+        Sample const scale
+) noexcept {
+    if constexpr (capabilities != DelayCapabilities::DC_CHANNEL_LFO) {
+        JS80P_ASSERT_NOT_REACHED();
+
+        return;
+    }
+
+    JS80P_ASSERT(0 <= channel && channel < this->channels);
+    JS80P_ASSERT(scale <= time.get_max_value());
+
+    channel_lfos[channel] = &lfo;
+    channel_lfo_scales[channel] = - std::min((Sample)time.get_max_value(), scale);
 }
 
 
@@ -471,6 +517,14 @@ Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_r
         this->mark_round_as_silent(round);
 
         return this->buffer;
+    }
+
+    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+        for (Integer c = 0; c != this->channels; ++c) {
+            channel_lfo_buffers[c] = SignalProducer::produce<LFO>(
+                *channel_lfos[c], round, sample_count
+            )[0];
+        }
     }
 
     need_to_render_silence = true;
@@ -812,6 +866,11 @@ void Delay<InputSignalProducerClass, capabilities>::render(
 ) noexcept {
     JS80P_ASSERT(is_time_scale_constant || !is_reversed);
 
+    JS80P_ASSERT(
+        capabilities != DelayCapabilities::DC_CHANNEL_LFO
+        || (is_time_scale_constant && !is_reversed)
+    );
+
     Integer const channels = this->channels;
     Number const read_index_orig = (Number)this->read_index;
     Sample const* const* delay_buffer = (
@@ -839,6 +898,8 @@ void Delay<InputSignalProducerClass, capabilities>::render(
             Sample const* const delay_channel = delay_buffer[c];
             Sample* const out_channel = buffer[c];
             Number processed_samples;
+            Sample const* channel_lfo_buffer = NULL;
+            Sample channel_lfo_scale = 0.0;
 
             if constexpr (is_time_scale_constant) {
                 if constexpr (is_reversed) {
@@ -857,6 +918,11 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         time_value_in_samples, reverse_target_delay_time_in_samples
                     );
                 } else {
+                    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+                        channel_lfo_buffer = channel_lfo_buffers[c];
+                        channel_lfo_scale = channel_lfo_scales[c] * this->sample_rate;
+                    }
+
                     read_index = read_index_orig - time_value_in_samples;
 
                     if (JS80P_UNLIKELY(read_index < 0.0)) {
@@ -882,17 +948,29 @@ void Delay<InputSignalProducerClass, capabilities>::render(
 
                 if constexpr (need_gain) {
                     if constexpr (is_gain_constant) {
-                        out_channel[i] = gain * Math::lookup_periodic<true>(
-                            delay_channel, delay_buffer_size, read_index
+                        out_channel[i] = gain * lookup_sample(
+                            delay_channel,
+                            read_index,
+                            i,
+                            channel_lfo_buffer,
+                            channel_lfo_scale
                         );
                     } else {
-                        out_channel[i] = gain_buffer[i] * Math::lookup_periodic<true>(
-                            delay_channel, delay_buffer_size, read_index
+                        out_channel[i] = gain_buffer[i] * lookup_sample(
+                            delay_channel,
+                            read_index,
+                            i,
+                            channel_lfo_buffer,
+                            channel_lfo_scale
                         );
                     }
                 } else {
-                    out_channel[i] = Math::lookup_periodic<true>(
-                        delay_channel, delay_buffer_size, read_index
+                    out_channel[i] = lookup_sample(
+                        delay_channel,
+                        read_index,
+                        i,
+                        channel_lfo_buffer,
+                        channel_lfo_scale
                     );
                 }
 
@@ -930,6 +1008,8 @@ void Delay<InputSignalProducerClass, capabilities>::render(
             Sample const* const delay_channel = delay_buffer[c];
             Sample* const out_channel = buffer[c];
             Number processed_samples = 0.0;
+            Sample const* channel_lfo_buffer = NULL;
+            Sample channel_lfo_scale = 0.0;
 
             if constexpr (is_reversed) {
                 initialize_reverse_rendering(
@@ -937,6 +1017,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     reverse_done_samples,
                     delay_buffer_size_float
                 );
+            } else if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+                channel_lfo_buffer = channel_lfo_buffers[c];
+                channel_lfo_scale = channel_lfo_scales[c] * this->sample_rate;
             }
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -956,23 +1039,35 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     );
                 }
 
-                if (read_index < 0.0) {
+                if (JS80P_UNLIKELY(read_index < 0.0)) {
                     read_index += delay_buffer_size_float;
                 }
 
                 if constexpr (need_gain) {
                     if constexpr (is_gain_constant) {
-                        out_channel[i] = gain * Math::lookup_periodic<true>(
-                            delay_channel, delay_buffer_size, read_index
+                        out_channel[i] = gain * lookup_sample(
+                            delay_channel,
+                            read_index,
+                            i,
+                            channel_lfo_buffer,
+                            channel_lfo_scale
                         );
                     } else {
-                        out_channel[i] = gain_buffer[i] * Math::lookup_periodic<true>(
-                            delay_channel, delay_buffer_size, read_index
+                        out_channel[i] = gain_buffer[i] * lookup_sample(
+                            delay_channel,
+                            read_index,
+                            i,
+                            channel_lfo_buffer,
+                            channel_lfo_scale
                         );
                     }
                 } else {
-                    out_channel[i] = Math::lookup_periodic<true>(
-                        delay_channel, delay_buffer_size, read_index
+                    out_channel[i] = lookup_sample(
+                        delay_channel,
+                        read_index,
+                        i,
+                        channel_lfo_buffer,
+                        channel_lfo_scale
                     );
                 }
 
@@ -1112,6 +1207,28 @@ void Delay<InputSignalProducerClass, capabilities>::advance_reverse_rendering(
         if (read_index > delay_buffer_size_float) {
             read_index -= delay_buffer_size_float;
         }
+    }
+}
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
+        Sample const* const delay_channel,
+        Number const read_index,
+        Integer const i,
+        Sample const* const channel_lfo_buffer,
+        Sample const channel_lfo_scale
+) const noexcept {
+    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+        return Math::lookup_periodic<false>(
+            delay_channel,
+            delay_buffer_size,
+            read_index + channel_lfo_scale * channel_lfo_buffer[i]
+        );
+    } else {
+        return Math::lookup_periodic<true>(
+            delay_channel, delay_buffer_size, read_index
+        );
     }
 }
 

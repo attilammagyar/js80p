@@ -147,6 +147,7 @@ params = [
     "ETEND",
     "ETHSS",
     "ETSTP",
+    "ETSTR",
     "ETAIN",
     "ETSIN",
     "EV1V",

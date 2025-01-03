@@ -126,10 +126,11 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
 
         ("$TSTP", " ///< $ Tape Stop / Start", "effects.tape.stop_start"),
         ("$TWFA", " ///< $ Tape Wow and Flutter Amplitude", "effects.tape.wnf_amp"),
+        ("$TWFS", " ///< $ Tape Wow and Flutter Speed", "effects.tape.wnf_speed"),
         ("$TDST", " ///< $ Tape Distortion", "effects.tape.distortion_level"),
         ("$TCLR", " ///< $ Tape Color", "effects.tape.color"),
         ("$THSS", " ///< $ Tape Hiss Level", "effects.tape.hiss_level"),
-        ("$TWFS", " ///< $ Tape Wow and Flutter Speed", "effects.tape.wnf_speed"),
+        ("$TSTR", " ///< $ Tape Stereo Separation", "effects.tape.stereo_separation"),
 
         ("$CDEL", " ///< $ Chorus Delay Time", "effects.chorus.delay_time"),
         ("$CFRQ", " ///< $ Chorus LFO Frequency", "effects.chorus.frequency"),

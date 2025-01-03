@@ -55,6 +55,11 @@ class LFO : public SignalProducer
             Number const default_frequency = Constants::LFO_FREQUENCY_DEFAULT
         ) noexcept;
 
+        LFO(
+            std::string const& name,
+            FloatParamS& amplitude_leader
+        ) noexcept;
+
         /* No, this is not a macro. */
         // cppcheck-suppress unknownMacro
         LFO(

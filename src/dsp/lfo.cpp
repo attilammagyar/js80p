@@ -66,6 +66,44 @@ LFO::LFO(
 }
 
 
+LFO::LFO(
+        std::string const& name,
+        FloatParamS& amplitude_leader
+) noexcept
+    : SignalProducer(1, 13, 0, &oscillator),
+    waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    freq_log_scale(name + "LOG", ToggleParam::OFF),
+    frequency(
+        name + "FRQ",
+        Constants::LFO_FREQUENCY_MIN,
+        Constants::LFO_FREQUENCY_MAX,
+        Constants::LFO_FREQUENCY_DEFAULT,
+        0.0,
+        NULL,
+        &freq_log_scale,
+        Math::log_lfo_freq_table(),
+        Math::LOG_LFO_FREQ_TABLE_MAX_INDEX,
+        Math::LOG_LFO_FREQ_TABLE_INDEX_SCALE
+    ),
+    phase(name + "PHS", 0.0, 1.0, 0.0),
+    min(name + "MIN", 0.0, 1.0, 0.0),
+    max(name + "MAX", 0.0, 1.0, 1.0),
+    amplitude(amplitude_leader),
+    distortion(name + "DST", 0.0, 1.0, 0.0),
+    randomness(name + "RND", 0.0, 1.0, 0.0),
+    tempo_sync(name + "SYN", ToggleParam::OFF),
+    center(name + "CEN", ToggleParam::OFF),
+    amplitude_envelope(
+        name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
+    ),
+    can_have_envelope(false),
+    oscillator(waveform, amplitude, frequency, phase, tempo_sync, center),
+    is_being_visited(false)
+{
+    initialize_instance();
+}
+
+
 void LFO::initialize_instance() noexcept
 {
     register_child(waveform);

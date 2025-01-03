@@ -155,6 +155,86 @@ TEST(repeats_input_samples_with_delay, {
 })
 
 
+TEST(channels_may_be_adjusted_with_separate_lfos, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Frequency sample_rate = 10.0;
+    constexpr Number bpm = 120.0;
+    constexpr Sample input_samples[CHANNELS][block_size] = {
+        {0.10, 0.20, 0.30, 0.40, 0.50},
+        {0.20, 0.40, 0.60, 0.80, 1.00},
+    };
+    constexpr Sample expected_output[CHANNELS][sample_count] = {
+        {0.000, 0.000, 0.000, 0.025, 0.075, 0.125, 0.175, 0.225, 0.200, 0.250},
+        {0.000, 0.000, 0.000, 0.000, 0.050, 0.150, 0.250, 0.350, 0.300, 0.400},
+    };
+    Sample const* input_buffer[CHANNELS] = {
+        (Sample const*)&input_samples[0],
+        (Sample const*)&input_samples[1]
+    };
+    FixedSignalProducer input(input_buffer);
+    Buffer output(sample_count, CHANNELS);
+    ToggleParam tempo_sync("SYN", ToggleParam::ON);
+    LFO lfo_1("LFO1");
+    LFO lfo_2("LFO2");
+    Delay<FixedSignalProducer, DelayCapabilities::DC_CHANNEL_LFO> delay(
+        input, &tempo_sync
+    );
+
+    tempo_sync.set_sample_rate(sample_rate);
+    tempo_sync.set_block_size(block_size);
+    tempo_sync.set_bpm(bpm);
+
+    /* Stereo separation should not react to BPM changes. */
+    tempo_sync.set_value(ToggleParam::ON);
+
+    input.set_sample_rate(sample_rate);
+    input.set_block_size(block_size);
+    input.set_bpm(bpm);
+
+    lfo_1.set_sample_rate(sample_rate);
+    lfo_1.set_block_size(block_size);
+    lfo_1.set_bpm(bpm);
+    lfo_1.min.set_value(0.05);
+    lfo_1.amplitude.set_value(0.0);
+    lfo_1.start(0.0);
+
+    lfo_2.set_sample_rate(sample_rate);
+    lfo_2.set_block_size(block_size);
+    lfo_2.set_bpm(bpm);
+    lfo_2.min.set_value(0.4);
+    lfo_2.amplitude.set_value(0.0);
+    lfo_2.start(0.0);
+
+    delay.set_sample_rate(sample_rate);
+    delay.set_block_size(block_size);
+    delay.set_bpm(bpm);
+    delay.set_channel_lfo(0, lfo_1, 2.0);
+    delay.set_channel_lfo(1, lfo_2, 0.5);
+    delay.gain.set_value(0.5);
+    delay.time.set_value(0.5);
+    delay.time.schedule_value(0.71, 0.8);
+
+    render_rounds<
+        Delay<FixedSignalProducer, DelayCapabilities::DC_CHANNEL_LFO>
+    >(delay, output, rounds);
+
+    for (Integer c = 0; c != CHANNELS; ++c) {
+        assert_eq(
+            expected_output[c],
+            output.samples[c],
+            sample_count,
+            0.001,
+            "unexpected delay; channel=%d",
+            (int)c
+        );
+    }
+
+    assert_eq(0.8, delay.time.get_value(), DOUBLE_DELTA);
+})
+
+
 void test_delay_with_time_scale_param(
         Number const time_scale,
         Number const bpm,

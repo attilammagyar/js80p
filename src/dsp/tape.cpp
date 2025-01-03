@@ -40,12 +40,15 @@ TapeParams::TapeParams(
     distortion_level(name + "DST", 0.0, 1.0, 0.0),
     color(color_macro.input),
     hiss_level(name + "HSS", 0.0, 0.125, 0.0),
+    stereo_separation(name + "STR", 0.0, 0.5, 0.0),
     distortion_type(name + "DTYP", Distortion::TYPE_TANH_5),
     bypass_toggle(bypass_toggle),
     volume(name + "VOL", 0.0, 1.0, 1.0),
     delay_time_lfo(name + "LD"),
     wow_lfo(name + "LW"),
     flutter_lfo(name + "LF"),
+    delay_channel_lfo_1(name + "DCL1", stereo_separation),
+    delay_channel_lfo_2(name + "DCL2", stereo_separation),
     wnf_amp_macro(name + "A", 0.0),
     wnf_amp_sharp_smooth_macro(name + "WFAHM"),
     wnf_amp_smooth_sharp_macro(name + "WFAMH"),
@@ -53,6 +56,8 @@ TapeParams::TapeParams(
     wnf_speed_delay_time_lfo_macro(name + "WFSLD"),
     wnf_speed_wow_lfo_macro(name + "WFSLW"),
     wnf_speed_flutter_lfo_macro(name + "WFSLF"),
+    delay_channel_lfo_1_frequency_macro(name + "ST1"),
+    delay_channel_lfo_2_frequency_macro(name + "ST2"),
     color_macro(name + "C", 0.5),
     high_shelf_filter_frequency_macro(name + "HSF"),
     high_shelf_filter_gain_macro(name + "HSG"),
@@ -86,6 +91,22 @@ TapeParams::TapeParams(
     wnf_speed_flutter_lfo_macro.max.set_value(0.93);
     wnf_speed_flutter_lfo_macro.input.set_macro(&wnf_speed_macro);
 
+    delay_channel_lfo_1_frequency_macro.min.set_value(0.0212);
+    delay_channel_lfo_1_frequency_macro.max.set_value(0.1612);
+    delay_channel_lfo_1_frequency_macro.distortion.set_value(0.8);
+    delay_channel_lfo_1_frequency_macro.distortion_shape.set_value(
+        Macro::DIST_SHAPE_SMOOTH_SHARP
+    );
+    delay_channel_lfo_1_frequency_macro.input.set_macro(&wnf_speed_macro);
+
+    delay_channel_lfo_2_frequency_macro.min.set_value(0.0325);
+    delay_channel_lfo_2_frequency_macro.max.set_value(0.1725);
+    delay_channel_lfo_2_frequency_macro.distortion.set_value(0.8);
+    delay_channel_lfo_2_frequency_macro.distortion_shape.set_value(
+        Macro::DIST_SHAPE_SMOOTH_SHARP
+    );
+    delay_channel_lfo_2_frequency_macro.input.set_macro(&wnf_speed_macro);
+
     delay_time_lfo.freq_log_scale.set_value(ToggleParam::ON);
     delay_time_lfo.phase.set_lfo(&wow_lfo);
     delay_time_lfo.max.set_value(DELAY_TIME_LFO_RANGE);
@@ -102,6 +123,14 @@ TapeParams::TapeParams(
     flutter_lfo.max.set_value(0.5);
     flutter_lfo.frequency.set_macro(&wnf_speed_flutter_lfo_macro);
     flutter_lfo.amplitude.set_macro(&wnf_amp_sharp_smooth_macro);
+
+    delay_channel_lfo_1.phase.set_value(0.3);
+    delay_channel_lfo_1.distortion.set_value(0.15);
+    delay_channel_lfo_1.waveform.set_value(LFO::Oscillator_::SOFT_TRIANGLE);
+    delay_channel_lfo_1.frequency.set_macro(&delay_channel_lfo_1_frequency_macro);
+
+    delay_channel_lfo_2.distortion.set_value(0.05);
+    delay_channel_lfo_2.frequency.set_macro(&delay_channel_lfo_2_frequency_macro);
 
     high_shelf_filter_frequency_macro.midpoint.set_value(0.82);
     high_shelf_filter_frequency_macro.min.set_value(0.015);
@@ -165,11 +194,14 @@ TapeParams::TapeParams(
     signal_producers[i++] = &stop_start;
     signal_producers[i++] = &distortion_level;
     signal_producers[i++] = &hiss_level;
+    signal_producers[i++] = &stereo_separation;
     signal_producers[i++] = &distortion_type;
     signal_producers[i++] = &volume;
     signal_producers[i++] = &delay_time_lfo;
     signal_producers[i++] = &wow_lfo;
     signal_producers[i++] = &flutter_lfo;
+    signal_producers[i++] = &delay_channel_lfo_1;
+    signal_producers[i++] = &delay_channel_lfo_2;
 
     store_signal_producers_from_macro(wnf_amp_macro, i);
     store_signal_producers_from_macro(wnf_amp_sharp_smooth_macro, i);
@@ -178,6 +210,8 @@ TapeParams::TapeParams(
     store_signal_producers_from_macro(wnf_speed_delay_time_lfo_macro, i);
     store_signal_producers_from_macro(wnf_speed_wow_lfo_macro, i);
     store_signal_producers_from_macro(wnf_speed_flutter_lfo_macro, i);
+    store_signal_producers_from_macro(delay_channel_lfo_1_frequency_macro, i);
+    store_signal_producers_from_macro(delay_channel_lfo_2_frequency_macro, i);
     store_signal_producers_from_macro(color_macro, i);
     store_signal_producers_from_macro(high_shelf_filter_frequency_macro, i);
     store_signal_producers_from_macro(high_shelf_filter_gain_macro, i);
@@ -215,6 +249,8 @@ void TapeParams::start_lfos(Seconds const time_offset) noexcept
     delay_time_lfo.start(time_offset);
     wow_lfo.start(time_offset);
     flutter_lfo.start(time_offset);
+    delay_channel_lfo_1.start(time_offset);
+    delay_channel_lfo_2.start(time_offset);
 }
 
 
@@ -223,6 +259,8 @@ void TapeParams::stop_lfos(Seconds const time_offset) noexcept
     delay_time_lfo.stop(time_offset);
     wow_lfo.stop(time_offset);
     flutter_lfo.stop(time_offset);
+    delay_channel_lfo_1.stop(time_offset);
+    delay_channel_lfo_2.stop(time_offset);
 }
 
 
@@ -233,6 +271,8 @@ void TapeParams::skip_round_for_lfos(
     delay_time_lfo.skip_round(round, sample_count);
     wow_lfo.skip_round(round, sample_count);
     flutter_lfo.skip_round(round, sample_count);
+    delay_channel_lfo_1.skip_round(round, sample_count);
+    delay_channel_lfo_2.skip_round(round, sample_count);
 }
 
 
@@ -491,6 +531,8 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
 
     delay.time.set_lfo(&params.delay_time_lfo);
     delay.gain.set_value(1.0);
+    delay.set_channel_lfo(0, params.delay_channel_lfo_1, 0.0037);
+    delay.set_channel_lfo(1, params.delay_channel_lfo_2, 0.0043);
 }
 
 
@@ -660,6 +702,7 @@ bool Tape<
         && params.distortion_level.get_value() < 0.000001
         && Math::is_close(params.color.get_value(), 0.5, 0.005)
         && params.hiss_level.get_value() < 0.000001
+        && params.stereo_separation.get_value() < 0.000001
     );
 }
 
