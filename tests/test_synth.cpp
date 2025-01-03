@@ -1929,6 +1929,27 @@ TEST(keeps_track_of_number_of_active_voices, {
 })
 
 
+TEST(keeps_track_of_tape_state, {
+    Synth synth;
+
+    synth.set_block_size(1024);
+    synth.set_sample_rate(1000.0);
+    synth.resume();
+
+    assert_eq(
+        (int)TapeParams::State::TAPE_STATE_INIT,
+        (int)synth.get_tape_state()
+    );
+
+    SignalProducer::produce<Synth>(synth, 0);
+
+    assert_eq(
+        (int)TapeParams::State::TAPE_STATE_NORMAL,
+        (int)synth.get_tape_state()
+    );
+})
+
+
 TEST(modulator_additive_volume_can_be_polyphonic, {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;

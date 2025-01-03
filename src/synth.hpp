@@ -1163,6 +1163,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         Integer get_active_voices_count() const noexcept;
 
+        TapeParams::State get_tape_state() const noexcept;
+
         bool has_mts_esp_tuning() const noexcept;
         bool has_continuous_mts_esp_tuning() const noexcept;
         bool is_mts_esp_connected() const noexcept;
@@ -1796,6 +1798,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Carrier* carriers[POLYPHONY];
         NoteTunings active_note_tunings;
         std::atomic<Integer> active_voices_count;
+        std::atomic<TapeParams::State> tape_state;
         Integer samples_since_gc;
         Integer samples_between_gc;
         Integer next_voice;

@@ -218,7 +218,7 @@ void TabBody::refresh_all_params()
         (*it)->refresh();
     }
 
-    gui->update_active_voices_count();
+    gui->update_synth_state();
 }
 
 

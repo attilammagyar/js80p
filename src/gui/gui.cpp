@@ -1808,11 +1808,12 @@ GUI::GUI(
     synth_body(NULL),
     status_line(NULL),
     active_voices_count(0),
+    tape_state(TapeParams::State::TAPE_STATE_INIT),
     synth(synth),
     platform_data(platform_data)
 {
     default_status_line[0] = '\x00';
-    update_active_voices_count();
+    update_synth_state();
 
     initialize();
 
@@ -3327,19 +3328,27 @@ void GUI::show()
 }
 
 
-void GUI::update_active_voices_count()
+void GUI::update_synth_state()
 {
     Integer const old_active_voices_count = active_voices_count;
+    TapeParams::State const old_tape_state = tape_state;
 
     active_voices_count = synth.get_active_voices_count();
+    tape_state = synth.get_tape_state();
 
-    if (active_voices_count == old_active_voices_count) {
+    if (
+            active_voices_count == old_active_voices_count
+            && old_tape_state == tape_state
+    ) {
         return;
     }
 
-    if (active_voices_count < 1) {
-        default_status_line[0] = '\x00';
-    } else {
+    if (tape_state == TapeParams::State::TAPE_STATE_STOPPED) {
+        strncpy(
+            default_status_line, "Tape: STOPPED", DEFAULT_STATUS_LINE_MAX_LENGTH
+        );
+        default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
+    } else if (active_voices_count != 0) {
         snprintf(
             default_status_line,
             DEFAULT_STATUS_LINE_MAX_LENGTH,
@@ -3348,6 +3357,8 @@ void GUI::update_active_voices_count()
             (int)Synth::POLYPHONY
         );
         default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
+    } else {
+        default_status_line[0] = '\x00';
     }
 
     if (status_line != NULL) {

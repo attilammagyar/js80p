@@ -201,7 +201,7 @@ class GUI
         void show();
         void idle();
 
-        void update_active_voices_count();
+        void update_synth_state();
 
         void set_status_line(char const* text);
         void redraw_status_line();
@@ -332,6 +332,7 @@ class GUI
         TabBody* synth_body;
         StatusLine* status_line;
         Integer active_voices_count;
+        TapeParams::State tape_state;
 
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;

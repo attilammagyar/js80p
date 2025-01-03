@@ -261,6 +261,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
 
     active_voices_count.store(0);
 
+    tape_state.store(effects.tape_params.state);
+
     build_frequency_table();
     register_main_params();
     register_child(bus);
@@ -953,6 +955,8 @@ void Synth::reset() noexcept
     vol_3_peak_tracker.reset();
 
     active_voices_count.store(0);
+
+    tape_state.store(effects.tape_params.state);
 }
 
 
@@ -973,6 +977,7 @@ bool Synth::is_lock_free() const noexcept
         && messages.is_lock_free()
         && is_mts_esp_connected_.is_lock_free()
         && active_voices_count.is_lock_free()
+        && tape_state.is_lock_free()
     );
 }
 #endif
@@ -1025,6 +1030,12 @@ void Synth::resume() noexcept
 Integer Synth::get_active_voices_count() const noexcept
 {
     return active_voices_count.load();
+}
+
+
+TapeParams::State Synth::get_tape_state() const noexcept
+{
+    return tape_state.load();
 }
 
 
@@ -2910,6 +2921,8 @@ void Synth::finalize_rendering(
     }
 
     active_voices_count.store((Integer)bus.get_active_voices_count());
+
+    tape_state.store(effects.tape_params.state);
 }
 
 
