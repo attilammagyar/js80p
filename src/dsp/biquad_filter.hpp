@@ -37,6 +37,7 @@ enum BiquadFilterFixedType {
     BFFT_HIGH_SHELF = 2,
     BFFT_LOW_PASS = 3,
     BFFT_LOW_SHELF = 4,
+    BFFT_PEAKING = 5,
 };
 
 

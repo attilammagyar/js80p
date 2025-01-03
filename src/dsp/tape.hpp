@@ -56,7 +56,7 @@ class TapeParams
 
         static constexpr Number DELAY_TIME_MAX = 30.0;
         static constexpr Number DELAY_TIME_LFO_RANGE = DELAY_TIME_MAX / 310000.0;
-        static constexpr size_t SIGNAL_PRODUCERS = 11 + 17 * Macro::PARAMS;
+        static constexpr size_t SIGNAL_PRODUCERS = 11 + 18 * Macro::PARAMS;
 
         explicit TapeParams(
             std::string const& name,
@@ -107,6 +107,7 @@ class TapeParams
         Macro distance_from_midpoint;
         Macro low_pass_filter_frequency_macro;
         Macro low_shelf_filter_gain_macro;
+        Macro peaking_filter_gain_macro;
 
         TapeParams::State state;
 
@@ -185,6 +186,11 @@ class Tape : public Filter<InputSignalProducerClass>
 
         typedef BiquadFilter<
             HighShelfFilter,
+            BiquadFilterFixedType::BFFT_PEAKING
+        > PeakingFilter;
+
+        typedef BiquadFilter<
+            PeakingFilter,
             BiquadFilterFixedType::BFFT_LOW_PASS
         > LowPassFilter;
 
@@ -283,6 +289,7 @@ class Tape : public Filter<InputSignalProducerClass>
         LowShelfFilter low_shelf_filter;
         HissGenerator_ hiss_generator;
         HighShelfFilter high_shelf_filter;
+        PeakingFilter peaking_filter;
         LowPassFilter low_pass_filter;
         Delay_ delay;
         Sample const* volume_buffer;

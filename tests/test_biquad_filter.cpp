@@ -727,6 +727,27 @@ TEST(fixed_type_low_shelf_filter_attenuates_or_boosts_frequencies_below_the_give
 })
 
 
+TEST(fixed_type_peaking_filter_boosts_or_attenuates_a_range_around_the_given_frequency, {
+    SumOfSines input(0.25, 440.0, 0.25, 3520.0, 0.25, 7040.0, CHANNELS);
+    SumOfSines expected(0.25, 440.0, 0.5, 3520.0, 0.25, 7040.0, CHANNELS);
+    BiquadFilterTypeParam filter_type("");
+    BiquadFilter<SumOfSines, BiquadFilterFixedType::BFFT_PEAKING> filter(
+        "", input, filter_type
+    );
+
+    filter.type.set_value(BiquadFilter<SumOfSines>::NOTCH);
+    filter.frequency.set_value(3520.0);
+    filter.q.set_value(1.0);
+    filter.gain.set_value(6.0);
+
+    schedule_small_param_changes(filter, 3520.0, 1.0, 6.0);
+
+    test_filter(filter, input, expected, 0.1);
+
+    assert_completed(filter, 3520.0, 1.0, 6.0);
+})
+
+
 class OtherSumOfSines : public SumOfSines
 {
     public:

@@ -502,6 +502,8 @@ Sample const* const* BiquadFilter<InputSignalProducerClass, fixed_type>::initial
         JS80P_BF_CALL_INIT_FQ(initialize_low_pass_rendering);
     } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_LOW_SHELF) {
         JS80P_BF_CALL_INIT_F(initialize_low_shelf_rendering);
+    } else if constexpr (fixed_type == BiquadFilterFixedType::BFFT_PEAKING) {
+        JS80P_BF_CALL_INIT_FQ(initialize_peaking_rendering);
     } else {
         JS80P_ASSERT_NOT_REACHED();
         is_no_op = true;
