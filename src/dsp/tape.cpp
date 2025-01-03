@@ -65,7 +65,8 @@ TapeParams::TapeParams(
     offset_above_midpoint(name + "OA"),
     distance_from_midpoint(name + "D"),
     low_pass_filter_frequency_macro(name + "LPF"),
-    low_shelf_filter_gain_macro(name + "LSG")
+    low_shelf_filter_gain_macro(name + "LSG"),
+    state(State::TAPE_STATE_INIT)
 {
     wnf_amp_smooth_sharp_macro.distortion.set_value(0.3);
     wnf_amp_smooth_sharp_macro.distortion_shape.set_value(
@@ -503,8 +504,8 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     ),
     delay(low_pass_filter, NULL, TapeParams::DELAY_TIME_MAX),
     transition_duration(0.0),
-    state(TapeParams::State::TAPE_STATE_INIT),
-    previous_bypass_toggle_value(params.bypass_toggle.get_value())
+    previous_bypass_toggle_value(params.bypass_toggle.get_value()),
+    needs_ff_rescheduling(true)
 {
     this->register_child(distortion);
     this->register_child(low_shelf_filter);
@@ -545,7 +546,9 @@ void Tape<
     Filter<InputSignalProducerClass>::reset();
 
     transition_duration = 0.0;
-    state = TapeParams::State::TAPE_STATE_INIT;
+    needs_ff_rescheduling = true;
+
+    params.state = TapeParams::State::TAPE_STATE_INIT;
 
     params.volume.cancel_events();
     params.volume.set_value(1.0);
@@ -586,7 +589,7 @@ Sample const* const* Tape<
 
     Sample const* const* result = NULL;
 
-    switch (state) {
+    switch (params.state) {
         case TapeParams::State::TAPE_STATE_INIT:
             result = initialize_init_rendering(round, sample_count);
             break;
@@ -655,7 +658,7 @@ Sample const* const* Tape<
 ) noexcept {
     if (params.stop_start.get_value() < 0.000001) {
         transition_duration = 0.0;
-        state = TapeParams::State::TAPE_STATE_NORMAL;
+        params.state = TapeParams::State::TAPE_STATE_NORMAL;
     }
 
     if (is_bypassable()) {
@@ -723,8 +726,11 @@ Sample const* const* Tape<
     if (Math::is_close(new_transition_duration, transition_duration)) {
         if (params.volume.get_value() < 0.000001) {
             params.volume.set_value(0.0);
-            state = TapeParams::State::TAPE_STATE_STOPPED;
+            params.state = TapeParams::State::TAPE_STATE_STOPPED;
         }
+    } else if (new_transition_duration < transition_duration) {
+        schedule_fast_forward_start(0.1);
+        needs_ff_rescheduling = false;
     } else {
         schedule_stop(new_transition_duration);
     }
@@ -745,9 +751,9 @@ Sample const* const* Tape<
 
     if (new_stop_start_value < 0.000001) {
         transition_duration = 0.0;
-        state = TapeParams::State::TAPE_STATE_FF_STARTABLE;
+        params.state = TapeParams::State::TAPE_STATE_FF_STARTABLE;
     } else if (new_stop_start_value > transition_duration) {
-        state = TapeParams::State::TAPE_STATE_STARTABLE;
+        params.state = TapeParams::State::TAPE_STATE_STARTABLE;
     } else {
         transition_duration = new_stop_start_value;
     }
@@ -779,9 +785,10 @@ Sample const* const* Tape<
         Integer const sample_count
 ) noexcept {
     if (params.volume.get_value() >= 0.999999) {
-        params.volume.set_value(1.0);
         transition_duration = 0.0;
-        state = TapeParams::State::TAPE_STATE_STARTED;
+
+        params.volume.set_value(1.0);
+        params.state = TapeParams::State::TAPE_STATE_STARTED;
     }
 
     return NULL;
@@ -802,7 +809,7 @@ Sample const* const* Tape<
 
     if (new_transition_duration < 0.000001) {
         transition_duration = 0.0;
-        state = TapeParams::State::TAPE_STATE_NORMAL;
+        params.state = TapeParams::State::TAPE_STATE_NORMAL;
     }
 
     if (is_bypassable()) {
@@ -829,6 +836,8 @@ Sample const* const* Tape<
         );
     }
 
+    needs_ff_rescheduling = true;
+
     return NULL;
 }
 
@@ -845,14 +854,16 @@ Sample const* const* Tape<
         START_TIME_MIN, (Seconds)params.stop_start.get_value()
     );
 
-    if (Math::is_close(new_transition_duration, transition_duration)) {
-        if (params.volume.get_value() >= 0.999999) {
-            params.volume.set_value(1.0);
-            transition_duration = 0.0;
-            state = TapeParams::State::TAPE_STATE_FF_STARTED;
-        }
-    } else {
+    if (
+            needs_ff_rescheduling
+            && !Math::is_close(new_transition_duration, transition_duration)
+    ) {
         schedule_fast_forward_start(new_transition_duration);
+    } else if (params.volume.get_value() >= 0.999999) {
+        transition_duration = 0.0;
+
+        params.volume.set_value(1.0);
+        params.state = TapeParams::State::TAPE_STATE_FF_STARTED;
     }
 
     return NULL;
@@ -873,7 +884,7 @@ Sample const* const* Tape<
 
     if (new_transition_duration < 0.000001) {
         transition_duration = 0.0;
-        state = TapeParams::State::TAPE_STATE_NORMAL;
+        params.state = TapeParams::State::TAPE_STATE_NORMAL;
     }
 
     if (is_bypassable()) {
@@ -891,7 +902,7 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::schedule_stop
     constexpr Number delay_time_min_max = 1.0 - TapeParams::DELAY_TIME_LFO_RANGE;
 
     transition_duration = duration;
-    state = TapeParams::State::TAPE_STATE_STOPPING;
+    params.state = TapeParams::State::TAPE_STATE_STOPPING;
 
     Number const delay_time_increase_as_ratio = (
         delay.time.value_to_ratio(duration * 0.5)
@@ -934,7 +945,8 @@ void Tape<
         required_bypass_toggle_value
 >::schedule_start() noexcept {
     transition_duration = 0.0;
-    state = TapeParams::State::TAPE_STATE_STARTING;
+
+    params.state = TapeParams::State::TAPE_STATE_STARTING;
 
     params.delay_time_lfo.min.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.min.schedule_value(STOP_START_DELAY, 0.0);
@@ -962,7 +974,8 @@ void Tape<
         Seconds const duration
 ) noexcept {
     transition_duration = duration;
-    state = TapeParams::State::TAPE_STATE_FF_STARTING;
+
+    params.state = TapeParams::State::TAPE_STATE_FF_STARTING;
 
     params.delay_time_lfo.min.cancel_events_at(STOP_START_DELAY);
     params.delay_time_lfo.min.schedule_curved_ramp(
@@ -994,7 +1007,7 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
         Integer const last_sample_index,
         Sample** buffer
 ) noexcept {
-    if (state == TapeParams::State::TAPE_STATE_STOPPED) {
+    if (params.state == TapeParams::State::TAPE_STATE_STOPPED) {
         this->render_silence(
             round, first_sample_index, last_sample_index, buffer
         );

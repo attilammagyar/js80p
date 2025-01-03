@@ -108,6 +108,8 @@ class TapeParams
         Macro low_pass_filter_frequency_macro;
         Macro low_shelf_filter_gain_macro;
 
+        TapeParams::State state;
+
     private:
         void store_signal_producers_from_macro(Macro& macro, size_t& i) noexcept;
 
@@ -286,8 +288,8 @@ class Tape : public Filter<InputSignalProducerClass>
         Sample const* volume_buffer;
         Sample const* const* delay_output;
         Seconds transition_duration;
-        TapeParams::State state;
         Byte previous_bypass_toggle_value;
+        bool needs_ff_rescheduling;
 };
 
 }
