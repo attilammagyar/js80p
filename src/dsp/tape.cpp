@@ -30,6 +30,182 @@
 namespace JS80P
 {
 
+/*
+
+The controls of this effect utilize a little bit of macro trickery, but the
+patch below can help visualizing how it works.
+
+The signal of the second oscillator goes through the same filter chain that is
+used by the effect. By default, this oscillator produces a sawtooth wave which
+can be turned into a harmonically rich noise (almost white noise) by turning up
+the volume of the first oscillator.
+
+    Macro 1     color_macro
+    Macro 2     offset_below_midpoint
+    Macro 3     offset_above_midpoint
+    Macro 4     distance_from_midpoint
+    Macro 5     -
+    Macro 6     low_pass_filter_frequency_macro
+    Macro 7     low_shelf_filter_gain_macro
+    Macro 8     high_shelf_filter_gain_macro
+    Macro 9     high_shelf_filter_frequency_macro
+    Macro 10    peaking_filter_gain_macro
+    Macro 11    wnf_amp_macro
+    Macro 12    wnf_amp_smooth_sharp_macro
+    Macro 13    wnf_amp_sharp_smooth_macro
+    Macro 14    delay_channel_lfo_1_frequency_macro
+    Macro 15    delay_channel_lfo_2_frequency_macro
+    Macro 16    wnf_speed_macro
+    Macro 17    wnf_speed_delay_time_lfo_macro
+    Macro 18    wnf_speed_wow_lfo_macro
+    Macro 19    wnf_speed_flutter_lfo_macro
+    Macro 20    stereo_wnf
+    LFO 1       delay_time_lfo
+    LFO 2       wow_lfo
+    LFO 3       flutter_lfo
+    LFO 4       delay_channel_lfo_1
+    LFO 5       delay_channel_lfo_2
+
+The patch:
+
+[js80p]
+MIX = 0.0
+PM = 1.0
+FM = 1.0
+AM = 1.0
+IN = 1.0
+MAMP = 1.0
+MVS = 0.0
+MFLD = 1.0
+MDTN = 0.614583333333333
+MVOL = 0.0
+MC1 = 1.0
+MC2 = 0.0
+MC3 = 1.0
+MC4 = 0.0
+MC5 = 1.0
+MC6 = 0.0
+MC7 = 1.0
+MC8 = 0.0
+MC9 = 1.0
+MC10 = 0.0
+CAMP = 0.10
+CVS = 0.0
+CVOL = 1.0
+CC1 = 0.750
+CC2 = 0.249999999999999
+CC3 = 0.750
+CC4 = 0.249999999999999
+CC5 = 0.750
+CC6 = 0.249999999999999
+CC7 = 0.750
+CC8 = 0.249999999999999
+CC9 = 0.750
+CC10 = 0.249999999999999
+CF1FRQ = 0.004544218933457
+CF1Gctl = 0.535156250
+CF2FRQctl = 0.542968750
+CF2Gctl = 0.53906250
+EF1FRQ = 0.18750
+EF1Q = 0.053333333333333
+EF1Gctl = 0.5468750
+EF2FRQctl = 0.531250
+EF2Q = 0.0
+F2MID = 1.0
+F2INctl = 0.511718750
+F2MIN = 1.0
+F2MAX = 0.0
+F3MID = 0.0
+F3INctl = 0.511718750
+F4INctl = 0.5156250
+F4MINctl = 0.519531250
+F6INctl = 0.52343750
+F6MIN = 1.0
+F6MAX = 0.590
+F6DST = 0.50
+F7INctl = 0.52343750
+F7MIN = 0.66670
+F7MAX = 0.71530
+F7DST = 0.30
+F8MID = 0.6720
+F8INctl = 0.511718750
+F8MIN = 0.250
+F8MAX = 0.79170
+F8DST = 0.30
+F9MID = 0.820
+F9INctl = 0.511718750
+F9MIN = 0.0150
+F9MAX = 0.30
+F9DST = 0.30
+F10INctl = 0.519531250
+F10MIN = 0.66670
+F10MAX = 0.583299999999999
+F10DST = 0.90
+F11IN = 0.0
+F12INctl = 0.613281250
+F12DST = 0.30
+F13INctl = 0.613281250
+F13DST = 0.20
+F14INctl = 0.63281250
+F14MIN = 0.02120
+F14MAX = 0.16120
+F14DST = 0.80
+F15INctl = 0.63281250
+F15MIN = 0.03250
+F15MAX = 0.17250
+F15DST = 0.80
+F17INctl = 0.63281250
+F17MIN = 0.370
+F17MAX = 0.90
+F18INctl = 0.63281250
+F18MAX = 0.60
+F19INctl = 0.63281250
+F19MIN = 0.720
+F19MAX = 0.930
+F20IN = 0.0
+N1ATK = 0.00090
+N1SUS = 1.0
+N1REL = 0.00170
+L1FRQctl = 0.636718750
+L1PHSctl = 0.55468750
+L1MAX = 0.00010
+L1AMTctl = 0.61718750
+L2FRQctl = 0.6406250
+L2PHSctl = 0.558593750
+L2MAX = 0.50
+L2AMTctl = 0.621093750
+L3FRQctl = 0.644531250
+L3MAX = 0.50
+L3AMTctl = 0.621093750
+L4FRQctl = 0.6250
+L4PHS = 0.299999999999999
+L4AMTctl = 0.64843750
+L4DST = 0.150
+L5FRQctl = 0.628906250
+L5AMTctl = 0.64843750
+L5DST = 0.050
+MWAV = 1.0
+CWAV = 0.111111111111111
+CF1TYP = 0.833333333333333
+CF2TYP = 1.0
+EF1TYP = 0.666666666666667
+L4WAV = 0.750
+L1LOG = 1.0
+L2LOG = 1.0
+L3LOG = 1.0
+MOIA = 1.0
+MOIS = 1.0
+F6DSH = 0.666666666666667
+F7DSH = 0.333333333333333
+F9DSH = 0.333333333333333
+F10DSH = 1.0
+F12DSH = 0.333333333333333
+F13DSH = 0.666666666666667
+F14DSH = 0.333333333333333
+F15DSH = 0.333333333333333
+
+*/
+
 TapeParams::TapeParams(
         std::string const& name,
         ToggleParam& bypass_toggle
