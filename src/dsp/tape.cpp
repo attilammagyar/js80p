@@ -107,7 +107,7 @@ CF1Gctl = 0.535156250
 CF2FRQctl = 0.542968750
 CF2Gctl = 0.53906250
 EF1FRQ = 0.18750
-EF1Q = 0.053333333333333
+EF1Q = 0.036733333333333
 EF1Gctl = 0.5468750
 EF2FRQctl = 0.531250
 EF2Q = 0.0
@@ -722,7 +722,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
 
     peaking_filter.type.set_value(HighShelfFilter::PEAKING);
     peaking_filter.frequency.set_value(4500.0);
-    peaking_filter.q.set_value(1.6);
+    peaking_filter.q.set_value(1.1);
     peaking_filter.gain.set_macro(&params.peaking_filter_gain_macro);
 
     low_pass_filter.type.set_value(LowPassFilter::LOW_PASS);
