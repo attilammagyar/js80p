@@ -402,7 +402,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::ETDST] = "Tape Distortion",
     [Synth::ParamId::ETCLR] = "Tape Color",
     [Synth::ParamId::ETHSS] = "Tape Hiss Level",
-    [Synth::ParamId::ETSTR] = "Tape Stereo Separation",
+    [Synth::ParamId::ETSTR] = "Tape Stereo Wow and Flutter",
 
     [Synth::ParamId::ECDEL] = "Chorus Delay Time (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",

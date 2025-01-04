@@ -40,15 +40,15 @@ TapeParams::TapeParams(
     distortion_level(name + "DST", 0.0, 1.0, 0.0),
     color(color_macro.input),
     hiss_level(name + "HSS", 0.0, 0.125, 0.0),
-    stereo_separation(name + "STR", 0.0, 0.5, 0.0),
+    stereo_wnf(name + "STR", 0.0, 0.5, 0.0),
     distortion_type(name + "DTYP", Distortion::TYPE_TANH_5),
     bypass_toggle(bypass_toggle),
     volume(name + "VOL", 0.0, 1.0, 1.0),
     delay_time_lfo(name + "LD"),
     wow_lfo(name + "LW"),
     flutter_lfo(name + "LF"),
-    delay_channel_lfo_1(name + "DCL1", stereo_separation),
-    delay_channel_lfo_2(name + "DCL2", stereo_separation),
+    delay_channel_lfo_1(name + "DCL1", stereo_wnf),
+    delay_channel_lfo_2(name + "DCL2", stereo_wnf),
     wnf_amp_macro(name + "A", 0.0),
     wnf_amp_sharp_smooth_macro(name + "WFAHM"),
     wnf_amp_smooth_sharp_macro(name + "WFAMH"),
@@ -208,7 +208,7 @@ TapeParams::TapeParams(
     signal_producers[i++] = &stop_start;
     signal_producers[i++] = &distortion_level;
     signal_producers[i++] = &hiss_level;
-    signal_producers[i++] = &stereo_separation;
+    signal_producers[i++] = &stereo_wnf;
     signal_producers[i++] = &distortion_type;
     signal_producers[i++] = &volume;
     signal_producers[i++] = &delay_time_lfo;
@@ -729,7 +729,7 @@ bool Tape<
         && params.distortion_level.get_value() < 0.000001
         && Math::is_close(params.color.get_value(), 0.5, 0.005)
         && params.hiss_level.get_value() < 0.000001
-        && params.stereo_separation.get_value() < 0.000001
+        && params.stereo_wnf.get_value() < 0.000001
     );
 }
 

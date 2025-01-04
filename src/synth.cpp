@@ -492,7 +492,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::ETDST, effects.tape_params.distortion_level);
     register_param<FloatParamB>(ParamId::ETCLR, effects.tape_params.color);
     register_param<FloatParamB>(ParamId::ETHSS, effects.tape_params.hiss_level);
-    register_param<FloatParamS>(ParamId::ETSTR, effects.tape_params.stereo_separation);
+    register_param<FloatParamS>(ParamId::ETSTR, effects.tape_params.stereo_wnf);
     register_param<Distortion::TypeParam>(ParamId::ETDTYP, effects.tape_params.distortion_type);
 
     register_param<Effects::Chorus<Bus>::TypeParam>(ParamId::ECTYP, effects.chorus.type);

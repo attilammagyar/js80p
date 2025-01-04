@@ -80,7 +80,7 @@ class TapeParams
         FloatParamS distortion_level;
         FloatParamB& color;
         FloatParamB hiss_level;
-        FloatParamS stereo_separation;
+        FloatParamS stereo_wnf;
         Distortion::TypeParam distortion_type;
         ToggleParam& bypass_toggle;
 

@@ -193,7 +193,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ETDST = 80,      ///< Effects Tape Distortion
             ETCLR = 81,      ///< Effects Tape Color
             ETHSS = 82,      ///< Effects Tape Hiss Level
-            ETSTR = 83,      ///< Effects Tape Stereo Separation
+            ETSTR = 83,      ///< Effects Tape Stereo Wow and Flutter
             ECDEL = 84,      ///< Effects Chorus Delay Time
             ECFRQ = 85,      ///< Effects Chorus LFO Frequency
             ECDPT = 86,      ///< Effects Chorus Depth
