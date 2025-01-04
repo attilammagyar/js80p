@@ -272,6 +272,22 @@ char const* const GUI::DISTORTION_TYPES[] = {
 int const GUI::DISTORTION_TYPES_COUNT = Distortion::TYPES;
 
 
+char const* const GUI::TAPE_STATES[] = {
+    [TapeParams::State::TAPE_STATE_INIT] = "waiting for reset",
+    [TapeParams::State::TAPE_STATE_NORMAL] = NULL,
+    [TapeParams::State::TAPE_STATE_STOPPING] = "stopping",
+    [TapeParams::State::TAPE_STATE_STOPPED] = "STOPPED",
+    [TapeParams::State::TAPE_STATE_STARTABLE] = "STOPPED",
+    [TapeParams::State::TAPE_STATE_STARTING] = "starting",
+    [TapeParams::State::TAPE_STATE_STARTED] = "waiting for reset",
+    [TapeParams::State::TAPE_STATE_FF_STARTABLE] = "STOPPED",
+    [TapeParams::State::TAPE_STATE_FF_STARTING] = "fast-forwarding",
+    [TapeParams::State::TAPE_STATE_FF_STARTED] = "waiting for reset",
+};
+
+int const GUI::TAPE_STATES_COUNT = TapeParams::State::TAPE_STATES;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -3343,9 +3359,12 @@ void GUI::update_synth_state()
         return;
     }
 
-    if (tape_state == TapeParams::State::TAPE_STATE_STOPPED) {
-        strncpy(
-            default_status_line, "Tape: STOPPED", DEFAULT_STATUS_LINE_MAX_LENGTH
+    if ((int)tape_state < TAPE_STATES_COUNT && TAPE_STATES[tape_state] != NULL) {
+        snprintf(
+            default_status_line,
+            DEFAULT_STATUS_LINE_MAX_LENGTH,
+            "Tape: %s",
+            TAPE_STATES[tape_state]
         );
         default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
     } else if (active_voices_count != 0) {

@@ -52,6 +52,7 @@ class TapeParams
             TAPE_STATE_FF_STARTABLE = 7,
             TAPE_STATE_FF_STARTING = 8,
             TAPE_STATE_FF_STARTED = 9,
+            TAPE_STATES = 10,
         };
 
         static constexpr Number DELAY_TIME_MAX = 30.0;

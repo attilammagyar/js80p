@@ -654,6 +654,7 @@ Sample const* const* Tape<
             break;
 
         default:
+            JS80P_ASSERT_NOT_REACHED();
             return input_buffer;
     }
 

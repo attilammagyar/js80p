@@ -130,6 +130,9 @@ class GUI
         static char const* const DISTORTION_TYPES[];
         static int const DISTORTION_TYPES_COUNT;
 
+        static char const* const TAPE_STATES[];
+        static int const TAPE_STATES_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];
