@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -519,7 +519,7 @@ class AboutText : public Widget
 
         static constexpr char const* TEXT = (
             "A MIDI driven, performance oriented, versatile synthesizer\n"
-            "Copyright (C) 2023, 2024 Attila M. Magyar and contributors\n"
+            "Copyright (C) 2025 Attila M. Magyar and contributors\n"
             "https://attilammagyar.github.io/js80p\n"
             "\n"
             "License: GNU General Public License Version 3\n"
