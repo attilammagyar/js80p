@@ -546,7 +546,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
 
     peaking_filter.type.set_value(HighShelfFilter::PEAKING);
     peaking_filter.frequency.set_value(4500.0);
-    peaking_filter.q.set_value(0.4);
+    peaking_filter.q.set_value(1.6);
     peaking_filter.gain.set_macro(&params.peaking_filter_gain_macro);
 
     low_pass_filter.type.set_value(LowPassFilter::LOW_PASS);
