@@ -715,7 +715,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     compressor.threshold.set_value(-6.0);
     compressor.ratio.set_value(1.5);
     compressor.attack_time.set_value(0.015);
-    compressor.release_time.set_value(0.12);
+    compressor.release_time.set_value(0.120);
     compressor.dry.set_value(0.0);
     compressor.wet.set_value(1.0);
 
