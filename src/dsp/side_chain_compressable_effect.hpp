@@ -90,6 +90,11 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 
         void release() noexcept;
 
+        void schedule_gain_ramp(
+            Number const target_gain,
+            FloatParamB const& time_param
+        ) noexcept;
+
         FloatParamS gain;
         PeakTracker peak_tracker;
         Sample const* gain_buffer;

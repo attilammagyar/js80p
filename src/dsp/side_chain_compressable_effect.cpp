@@ -151,35 +151,21 @@ void SideChainCompressableEffect<InputSignalProducerClass, curve>::compress(
         Number const diff_db,
         Number const ratio_value
 ) noexcept {
-    Number const new_peak = (
-        Math::db_to_linear(threshold_db + diff_db / ratio_value)
-    );
+    Number const new_peak = Math::db_to_linear(threshold_db + diff_db / ratio_value);
     Number const new_target_gain = (
         peak > 0.000001 ? std::min(BYPASS_GAIN, new_peak / peak) : BYPASS_GAIN
     );
 
     if constexpr (curve == CompressionCurve::COMPRESSION_CURVE_SMOOTH) {
-        if (
-                !gain.is_ramping()
-                || !Math::is_close(target_gain, new_target_gain, 0.01)
-        ) {
-            gain.cancel_events_at(0.0);
-            gain.schedule_curved_ramp(
-                side_chain_compression_attack_time.get_value(),
-                new_target_gain,
-                Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
-            );
-            target_gain = new_target_gain;
+        if (!gain.is_ramping() || !Math::is_close(target_gain, new_target_gain, 0.01)) {
+            schedule_gain_ramp(new_target_gain, side_chain_compression_attack_time);
         }
     } else {
-        gain.cancel_events_at(0.0);
-
-        if (!Math::is_close(gain.get_value(), new_target_gain, 0.005)) {
-            gain.schedule_linear_ramp(
-                side_chain_compression_attack_time.get_value(),
-                new_target_gain
-            );
+        if (Math::is_close(gain.get_value(), new_target_gain, 0.005)) {
+            gain.cancel_events_at(0.0);
             target_gain = new_target_gain;
+        } else {
+            schedule_gain_ramp(new_target_gain, side_chain_compression_attack_time);
         }
     }
 
@@ -188,23 +174,30 @@ void SideChainCompressableEffect<InputSignalProducerClass, curve>::compress(
 
 
 template<class InputSignalProducerClass, CompressionCurve curve>
-void SideChainCompressableEffect<InputSignalProducerClass, curve>::release() noexcept
-{
-    Seconds const release_time = side_chain_compression_release_time.get_value();
-
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::schedule_gain_ramp(
+        Number const target_gain,
+        FloatParamB const& time_param
+) noexcept {
     gain.cancel_events_at(0.0);
 
     if constexpr (curve == CompressionCurve::COMPRESSION_CURVE_SMOOTH) {
         gain.schedule_curved_ramp(
-            release_time,
-            BYPASS_GAIN,
+            (Seconds)time_param.get_value(),
+            target_gain,
             Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
         );
     } else {
-        gain.schedule_linear_ramp(release_time, BYPASS_GAIN);
+        gain.schedule_linear_ramp((Seconds)time_param.get_value(), target_gain);
     }
 
-    target_gain = BYPASS_GAIN;
+    this->target_gain = target_gain;
+}
+
+
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::release() noexcept
+{
+    schedule_gain_ramp(BYPASS_GAIN, side_chain_compression_release_time);
     previous_action = Action::BYPASS_OR_RELEASE;
 }
 
