@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,13 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
+enum CompressionCurve {
+    COMPRESSION_CURVE_LINEAR = 0,
+    COMPRESSION_CURVE_SMOOTH = 1,
+};
+
+
+template<class InputSignalProducerClass, CompressionCurve curve = CompressionCurve::COMPRESSION_CURVE_LINEAR>
 class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -42,7 +48,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             std::string const& name,
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const wet_buffer_owner = NULL
         );
 
         FloatParamB side_chain_compression_threshold;
@@ -73,6 +79,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         static constexpr Number BYPASS_GAIN = 1.0;
 
         void fast_bypass() noexcept;
+        void copy_input(Integer const sample_count) noexcept;
 
         void compress(
             Sample const peak,
@@ -86,6 +93,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         FloatParamS gain;
         PeakTracker peak_tracker;
         Sample const* gain_buffer;
+        Number target_gain;
         Action previous_action;
         bool is_bypassing;
 };

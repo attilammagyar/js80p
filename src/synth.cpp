@@ -31,6 +31,7 @@
 
 #include "dsp/biquad_filter.cpp"
 #include "dsp/chorus.cpp"
+#include "dsp/compressor.cpp"
 #include "dsp/delay.cpp"
 #include "dsp/distortion.cpp"
 #include "dsp/echo.cpp"

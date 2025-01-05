@@ -667,14 +667,15 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         TapeParams& params,
         InputSignalProducerClass& input
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 7, 0, &delay),
+    : Filter<InputSignalProducerClass>(input, 8, 0, &delay),
     params(params),
+    compressor(name + "COMP", input, NULL),
     distortion(
         name + "DIST",
         params.distortion_type,
-        input,
+        compressor,
         params.distortion_level,
-        input.get_buffer_owner()
+        compressor.get_buffer_owner()
     ),
     low_shelf_filter(
         name + "LS",
@@ -702,6 +703,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     previous_bypass_toggle_value(params.bypass_toggle.get_value()),
     needs_ff_rescheduling(true)
 {
+    this->register_child(compressor);
     this->register_child(distortion);
     this->register_child(low_shelf_filter);
     this->register_child(hiss_generator);
@@ -709,6 +711,13 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     this->register_child(peaking_filter);
     this->register_child(low_pass_filter);
     this->register_child(delay);
+
+    compressor.threshold.set_value(-6.0);
+    compressor.ratio.set_value(1.5);
+    compressor.attack_time.set_value(0.015);
+    compressor.release_time.set_value(0.12);
+    compressor.dry.set_value(0.0);
+    compressor.wet.set_value(1.0);
 
     low_shelf_filter.type.set_value(HighShelfFilter::LOW_SHELF);
     low_shelf_filter.gain.set_macro(&params.low_shelf_filter_gain_macro);

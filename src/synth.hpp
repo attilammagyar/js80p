@@ -33,6 +33,7 @@
 #include "dsp/envelope.hpp"
 #include "dsp/biquad_filter.hpp"
 #include "dsp/chorus.hpp"
+#include "dsp/compressor.hpp"
 #include "dsp/delay.hpp"
 #include "dsp/distortion.hpp"
 #include "dsp/echo.hpp"

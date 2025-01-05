@@ -226,6 +226,7 @@ TESTS_PARAM = \
 TESTS_DSP = \
 	test_biquad_filter \
 	test_biquad_filter_slow \
+	test_compressor \
 	test_delay \
 	test_distortion \
 	test_gain \
@@ -679,6 +680,21 @@ $(DEV_DIR)/test_biquad_filter_slow$(DEV_EXE): \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
 	$@
+
+$(DEV_DIR)/test_compressor$(DEV_EXE): \
+		tests/test_compressor.cpp \
+		src/dsp/compressor.cpp src/dsp/compressor.hpp \
+		src/dsp/effect.cpp src/dsp/effect.hpp \
+		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/peak_tracker.cpp src/dsp/peak_tracker.hpp \
+		src/dsp/side_chain_compressable_effect.cpp \
+		src/dsp/side_chain_compressable_effect.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(DEV_DIR) show_versions \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
+	$(COMPILE_DEV) -o $@ $<
+	$(RUN_WITH_VALGRIND) $@
 
 $(DEV_DIR)/test_delay$(DEV_EXE): \
 		tests/test_delay.cpp \

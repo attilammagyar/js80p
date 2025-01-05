@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,23 +28,24 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
-SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffect(
+template<class InputSignalProducerClass, CompressionCurve curve>
+SideChainCompressableEffect<InputSignalProducerClass, curve>::SideChainCompressableEffect(
         std::string const& name,
         InputSignalProducerClass& input,
         Integer const number_of_children,
-        SignalProducer* const buffer_owner
+        SignalProducer* const wet_buffer_owner
 ) : Effect<InputSignalProducerClass>(
         name,
         input,
         number_of_children + 5,
-        buffer_owner
+        wet_buffer_owner
     ),
     side_chain_compression_threshold(name + "CTH", -120.0, 0.0, -18.0),
     side_chain_compression_attack_time(name + "CAT", 0.001, 3.0, 0.02),
     side_chain_compression_release_time(name + "CRL", 0.001, 3.0, 0.20),
     side_chain_compression_ratio(name + "CR", 1.0, 120.0, NO_OP_RATIO),
     gain(name + "G", 0.0, 1.0, BYPASS_GAIN),
+    target_gain(BYPASS_GAIN),
     previous_action(Action::BYPASS_OR_RELEASE)
 {
     this->register_child(side_chain_compression_threshold);
@@ -55,8 +56,8 @@ SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffe
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+template<class InputSignalProducerClass, CompressionCurve curve>
+Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -72,6 +73,8 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
         return buffer;
     }
+
+    copy_input(sample_count);
 
     Number const ratio_value = side_chain_compression_ratio.get_value();
 
@@ -108,18 +111,41 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 }
 
 
-template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::fast_bypass() noexcept
-{
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::fast_bypass() noexcept {
     gain.cancel_events_at(0.0);
     gain.set_value(BYPASS_GAIN);
+    target_gain = BYPASS_GAIN;
     previous_action = Action::BYPASS_OR_RELEASE;
     is_bypassing = true;
 }
 
 
-template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::compress(
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::copy_input(
+        Integer const sample_count
+) noexcept {
+    if (
+            (void*)this->buffer == (void*)this->input_buffer
+            || this->input_buffer == NULL
+            || (void*)this->get_buffer_owner() != (void*)this
+    ) {
+        return;
+    }
+
+    for (Integer c = 0; c != this->channels; ++c) {
+        Sample const* const in_channel = this->input_buffer[c];
+        Sample* const out_channel = this->buffer[c];
+
+        for (Integer i = 0; i != sample_count; ++i) {
+            out_channel[i] = in_channel[i];
+        }
+    }
+}
+
+
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::compress(
         Sample const peak,
         Number const threshold_db,
         Number const diff_db,
@@ -128,35 +154,63 @@ void SideChainCompressableEffect<InputSignalProducerClass>::compress(
     Number const new_peak = (
         Math::db_to_linear(threshold_db + diff_db / ratio_value)
     );
-    Number const target_gain = (
+    Number const new_target_gain = (
         peak > 0.000001 ? std::min(BYPASS_GAIN, new_peak / peak) : BYPASS_GAIN
     );
 
-    gain.cancel_events_at(0.0);
+    if constexpr (curve == CompressionCurve::COMPRESSION_CURVE_SMOOTH) {
+        if (
+                !gain.is_ramping()
+                || !Math::is_close(target_gain, new_target_gain, 0.01)
+        ) {
+            gain.cancel_events_at(0.0);
+            gain.schedule_curved_ramp(
+                side_chain_compression_attack_time.get_value(),
+                new_target_gain,
+                Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+            );
+            target_gain = new_target_gain;
+        }
+    } else {
+        gain.cancel_events_at(0.0);
 
-    if (!Math::is_close(gain.get_value(), target_gain, 0.005)) {
-        Seconds const attack_time = side_chain_compression_attack_time.get_value();
-
-        gain.schedule_linear_ramp(attack_time, target_gain);
+        if (!Math::is_close(gain.get_value(), new_target_gain, 0.005)) {
+            gain.schedule_linear_ramp(
+                side_chain_compression_attack_time.get_value(),
+                new_target_gain
+            );
+            target_gain = new_target_gain;
+        }
     }
 
     previous_action = Action::COMPRESS;
 }
 
 
-template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::release() noexcept
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::release() noexcept
 {
     Seconds const release_time = side_chain_compression_release_time.get_value();
 
     gain.cancel_events_at(0.0);
-    gain.schedule_linear_ramp(release_time, BYPASS_GAIN);
+
+    if constexpr (curve == CompressionCurve::COMPRESSION_CURVE_SMOOTH) {
+        gain.schedule_curved_ramp(
+            release_time,
+            BYPASS_GAIN,
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+        );
+    } else {
+        gain.schedule_linear_ramp(release_time, BYPASS_GAIN);
+    }
+
+    target_gain = BYPASS_GAIN;
     previous_action = Action::BYPASS_OR_RELEASE;
 }
 
 
-template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, CompressionCurve curve>
+void SideChainCompressableEffect<InputSignalProducerClass, curve>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
