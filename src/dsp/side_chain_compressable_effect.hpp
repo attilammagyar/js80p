@@ -48,7 +48,7 @@ enum CompressionMode {
 class CompressionModeParam : public ByteParam
 {
     public:
-        CompressionModeParam(std::string const& name) noexcept;
+        explicit CompressionModeParam(std::string const& name) noexcept;
 };
 
 
