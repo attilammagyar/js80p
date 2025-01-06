@@ -922,7 +922,7 @@ bool Tape<
     return (
         params.wnf_amp.get_value() < 0.000001
         && params.distortion_level.get_value() < 0.000001
-        && Math::is_close(params.color.get_value(), 0.5, 0.005)
+        && Math::is_close(params.color.get_value(), 0.5, 0.0005)
         && params.hiss_level.get_value() < 0.000001
         && params.stereo_wnf.get_value() < 0.000001
     );
