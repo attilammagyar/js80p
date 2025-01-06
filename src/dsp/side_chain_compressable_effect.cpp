@@ -149,6 +149,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
 
         case CompressionMode::COMPRESSION_MODE_EXPANDER:
             if (diff_db < 0.0) {
+                /* Gate closes, hence using the release time. */
                 compress(
                     peak,
                     threshold_db + diff_db * ratio_value,
@@ -156,6 +157,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
                     side_chain_compression_release_time
                 );
             } else if (previous_action == Action::COMPRESS) {
+                /* Gate opens, hence using the attack time. */
                 release(side_chain_compression_attack_time);
             } else if (no_makeup && Math::is_close(gain.get_value(), BYPASS_GAIN)) {
                 fast_bypass();
