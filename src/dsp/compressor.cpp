@@ -29,12 +29,14 @@ template<class InputSignalProducerClass, CompressionCurve curve>
 Compressor<InputSignalProducerClass, curve>::Compressor(
         std::string const& name,
         InputSignalProducerClass& input,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Number const makeup_gain
 ) : SideChainCompressableEffect<InputSignalProducerClass, curve>(
         name,
         input,
         0,
-        buffer_owner
+        buffer_owner,
+        makeup_gain
     ),
     threshold(this->side_chain_compression_threshold),
     attack_time(this->side_chain_compression_attack_time),

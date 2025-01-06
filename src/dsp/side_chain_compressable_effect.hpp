@@ -62,7 +62,8 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             std::string const& name,
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
-            SignalProducer* const wet_buffer_owner = NULL
+            SignalProducer* const wet_buffer_owner = NULL,
+            Number const makeup_gain = 1.0
         );
 
         FloatParamB side_chain_compression_threshold;
@@ -110,6 +111,9 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             Number const target_gain,
             FloatParamB const& time_param
         ) noexcept;
+
+        Number const makeup_gain;
+        bool const no_makeup;
 
         FloatParamS gain;
         PeakTracker peak_tracker;

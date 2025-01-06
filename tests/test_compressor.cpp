@@ -66,6 +66,7 @@ void test_compressor(
         Number const input_level,
         Number const threshold,
         Number const ratio,
+        Number const makeup_gain,
         Number const wet,
         Number const dry,
         Number const expected_output_level
@@ -76,7 +77,7 @@ void test_compressor(
     SumOfSines expected_output_generator(
         expected_output_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS
     );
-    Compressor_ compressor("C", input);
+    Compressor_ compressor("C", input, NULL, makeup_gain);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
     Buffer actual_output(SAMPLE_COUNT, CHANNELS);
 
@@ -107,13 +108,15 @@ void test_compressor(
             0.02,
             (
                 "curve=%d, mode=%d, input_level=%f, threshold=%f, ratio=%f,"
-                " wet=%f, dry=%f, expected_output_level=%f, channel=%d"
+                " makeup_gain=%f, wet=%f, dry=%f, expected_output_level=%f,"
+                " channel=%d"
             ),
             (int)curve,
             (int)mode,
             input_level,
             threshold,
             ratio,
+            makeup_gain,
             wet,
             dry,
             expected_output_level,
@@ -131,25 +134,28 @@ void test_compressor()
     adding 6 dB is the same as multiplying by 2.
     */
 
-    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 1.00, 0.00, 1.00);
-    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 0.99, 0.01, 1.00);
-    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 0.00, 1.00, 1.00);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 1.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 1.0, 0.00, 1.00, 1.00);
 
-    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 1.00, 0.00, 0.50);
-    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 0.99, 0.01, 0.50);
-    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 0.00, 1.00, 0.50);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 1.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 1.0, 0.00, 1.00, 0.50);
 
-    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 1.00, 0.00, 0.50);
-    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 1.0, 0.99, 0.01, 0.50);
 
-    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 1.00, 0.00, 0.25);
-    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 0.99, 0.01, 0.25);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 1.0, 1.00, 0.00, 0.25);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 1.0, 0.99, 0.01, 0.25);
 
-    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 1.00, 0.00, 0.30);
-    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 0.99, 0.01, 0.30);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 2.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 2.0, 0.99, 0.01, 0.50);
 
-    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 1.00, 0.00, 0.00);
-    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 0.99, 0.01, 0.00);
+    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 1.0, 1.00, 0.00, 0.30);
+    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 1.0, 0.99, 0.01, 0.30);
+
+    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 1.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 1.0, 0.99, 0.01, 0.00);
 }
 
 
@@ -167,25 +173,29 @@ void test_expand()
     adding 6 dB is the same as multiplying by 2.
     */
 
-    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 1.00, 0.00, 1.00);
-    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 0.99, 0.01, 1.00);
-    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 0.00, 1.00, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 1.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 1.0, 0.00, 1.00, 1.00);
 
-    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 1.00, 0.00, 0.50);
-    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 0.99, 0.01, 0.50);
-    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 0.00, 1.00, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 1.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 1.0, 0.00, 1.00, 0.50);
 
-    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 1.00, 0.00, 1.00);
-    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 1.0, 0.99, 0.01, 1.00);
 
-    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 1.00, 0.00, 0.00);
-    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 0.99, 0.01, 0.00);
+    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 1.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 1.0, 0.99, 0.01, 0.00);
 
-    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 1.00, 0.00, 0.25);
-    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 0.99, 0.01, 0.25);
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 1.0, 1.00, 0.00, 0.25);
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 1.0, 0.99, 0.01, 0.25);
 
-    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 1.00, 0.00, 0.00);
-    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 0.99, 0.01, 0.00);
+    /* Expansion does not require make-up gain though. */
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 2.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 2.0, 0.99, 0.01, 0.50);
+
+    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 1.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 1.0, 0.99, 0.01, 0.00);
 }
 
 

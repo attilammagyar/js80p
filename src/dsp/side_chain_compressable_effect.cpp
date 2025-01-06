@@ -46,7 +46,8 @@ SideChainCompressableEffect<InputSignalProducerClass, curve>::SideChainCompressa
         std::string const& name,
         InputSignalProducerClass& input,
         Integer const number_of_children,
-        SignalProducer* const wet_buffer_owner
+        SignalProducer* const wet_buffer_owner,
+        Number const makeup_gain
 ) : Effect<InputSignalProducerClass>(
         name,
         input,
@@ -58,8 +59,10 @@ SideChainCompressableEffect<InputSignalProducerClass, curve>::SideChainCompressa
     side_chain_compression_release_time(name + "CRL", 0.001, 3.0, 0.20),
     side_chain_compression_ratio(name + "CR", 1.0, 120.0, NO_OP_RATIO),
     side_chain_compression_mode(name + "CM"),
-    gain(name + "G", 0.0, 1.0, BYPASS_GAIN),
-    target_gain(BYPASS_GAIN),
+    makeup_gain(makeup_gain),
+    no_makeup(Math::is_close(makeup_gain, 1.0)),
+    gain(name + "G", 0.0, makeup_gain, makeup_gain),
+    target_gain(makeup_gain),
     previous_action(Action::BYPASS_OR_RELEASE),
     previous_mode(CompressionMode::COMPRESSION_MODE_COMPRESSOR)
 {
@@ -94,7 +97,9 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
 
     Number const ratio_value = side_chain_compression_ratio.get_value();
 
-    is_bypassing = this->is_dry || Math::is_close(ratio_value, NO_OP_RATIO);
+    is_bypassing = (
+        this->is_dry || (no_makeup && Math::is_close(ratio_value, NO_OP_RATIO))
+    );
 
     if (is_bypassing) {
         fast_bypass();
@@ -127,12 +132,12 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
             compress(
                 peak,
                 threshold_db + diff_db / ratio_value,
-                BYPASS_GAIN,
+                makeup_gain,
                 side_chain_compression_attack_time
             );
         } else if (previous_action == Action::COMPRESS) {
             release(side_chain_compression_release_time);
-        } else if (Math::is_close(gain.get_value(), BYPASS_GAIN)) {
+        } else if (no_makeup && Math::is_close(gain.get_value(), BYPASS_GAIN)) {
             fast_bypass();
         }
     } else {
@@ -145,7 +150,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
             );
         } else if (previous_action == Action::COMPRESS) {
             release(side_chain_compression_attack_time);
-        } else if (Math::is_close(gain.get_value(), BYPASS_GAIN)) {
+        } else if (no_makeup && Math::is_close(gain.get_value(), BYPASS_GAIN)) {
             fast_bypass();
         }
     }
@@ -160,8 +165,8 @@ template<class InputSignalProducerClass, CompressionCurve curve>
 void SideChainCompressableEffect<InputSignalProducerClass, curve>::clear_state() noexcept
 {
     gain.cancel_events_at(0.0);
-    gain.set_value(BYPASS_GAIN);
-    target_gain = BYPASS_GAIN;
+    gain.set_value(makeup_gain);
+    target_gain = makeup_gain;
     previous_action = Action::BYPASS_OR_RELEASE;
 }
 
@@ -207,7 +212,7 @@ void SideChainCompressableEffect<InputSignalProducerClass, curve>::compress(
     Sample const target_peak = Math::db_to_linear(target_peak_db);
     Number const new_target_gain = (
         peak > 0.000001
-            ? std::min(BYPASS_GAIN, (Number)(target_peak / peak))
+            ? std::min(BYPASS_GAIN, (Number)(target_peak / peak)) * makeup_gain
             : zero_peak_target
     );
 
@@ -253,7 +258,7 @@ template<class InputSignalProducerClass, CompressionCurve curve>
 void SideChainCompressableEffect<InputSignalProducerClass, curve>::release(
         FloatParamB const& time_param
 ) noexcept {
-    schedule_gain_ramp(BYPASS_GAIN, time_param);
+    schedule_gain_ramp(makeup_gain, time_param);
     previous_action = Action::BYPASS_OR_RELEASE;
 }
 

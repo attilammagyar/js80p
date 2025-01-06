@@ -40,7 +40,8 @@ class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, 
         Compressor(
             std::string const& name,
             InputSignalProducerClass& input,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Number const makeup_gain = 1.0
         );
 
         FloatParamB& threshold;
