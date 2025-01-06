@@ -67,7 +67,8 @@ SideChainCompressableEffect<InputSignalProducerClass, curve, allow_upward_mode>:
     ),
     target_gain(makeup_gain),
     previous_action(Action::BYPASS_OR_RELEASE),
-    previous_mode(CompressionMode::COMPRESSION_MODE_COMPRESSOR)
+    previous_mode(CompressionMode::COMPRESSION_MODE_COMPRESSOR),
+    is_bypassing(false)
 {
     this->register_child(side_chain_compression_threshold);
     this->register_child(side_chain_compression_attack_time);
@@ -75,6 +76,24 @@ SideChainCompressableEffect<InputSignalProducerClass, curve, allow_upward_mode>:
     this->register_child(side_chain_compression_ratio);
     this->register_child(side_chain_compression_mode);
     this->register_child(gain);
+}
+
+
+template<class InputSignalProducerClass, CompressionCurve curve, bool allow_upward_mode>
+void SideChainCompressableEffect<InputSignalProducerClass, curve, allow_upward_mode>::reset() noexcept
+{
+    Effect<InputSignalProducerClass>::reset();
+    clear_state();
+}
+
+
+template<class InputSignalProducerClass, CompressionCurve curve, bool allow_upward_mode>
+void SideChainCompressableEffect<InputSignalProducerClass, curve, allow_upward_mode>::clear_state() noexcept
+{
+    gain.cancel_events_at(0.0);
+    gain.set_value(makeup_gain);
+    target_gain = makeup_gain;
+    previous_action = Action::BYPASS_OR_RELEASE;
 }
 
 
@@ -192,16 +211,6 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
     gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
     return NULL;
-}
-
-
-template<class InputSignalProducerClass, CompressionCurve curve, bool allow_upward_mode>
-void SideChainCompressableEffect<InputSignalProducerClass, curve, allow_upward_mode>::clear_state() noexcept
-{
-    gain.cancel_events_at(0.0);
-    gain.set_value(makeup_gain);
-    target_gain = makeup_gain;
-    previous_action = Action::BYPASS_OR_RELEASE;
 }
 
 

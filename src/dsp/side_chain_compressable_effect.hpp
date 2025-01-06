@@ -64,6 +64,8 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             Number const makeup_gain = 1.0
         );
 
+        virtual void reset() noexcept override;
+
         FloatParamB side_chain_compression_threshold;
         FloatParamB side_chain_compression_attack_time;
         FloatParamB side_chain_compression_release_time;
