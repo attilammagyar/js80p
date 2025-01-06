@@ -170,7 +170,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
                 /* Gate closes, hence using the release time. */
                 compress(
                     peak,
-                    threshold_db + diff_db * ratio_value,
+                    std::max(Math::DB_MIN, threshold_db + diff_db * ratio_value),
                     0.0,
                     side_chain_compression_release_time
                 );
@@ -188,7 +188,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
                 if (peak > 0.000001) {
                     compress(
                         peak,
-                        threshold_db + diff_db / ratio_value,
+                        std::max(Math::DB_MIN, threshold_db + diff_db / ratio_value),
                         makeup_gain,
                         side_chain_compression_attack_time
                     );
