@@ -526,7 +526,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamB>(ParamId::EECAT, effects.echo.side_chain_compression_attack_time);
     register_param<FloatParamB>(ParamId::EECRL, effects.echo.side_chain_compression_release_time);
     register_param<FloatParamB>(ParamId::EECR, effects.echo.side_chain_compression_ratio);
-    register_param<ByteParam>(ParamId::EECM, effects.echo.side_chain_compression_mode);
+    register_param<CompressionModeParam>(ParamId::EECM, effects.echo.side_chain_compression_mode);
     register_param<FloatParamS>(ParamId::EEWET, effects.echo.wet);
     register_param<FloatParamS>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
@@ -548,7 +548,7 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamB>(ParamId::ERCAT, effects.reverb.side_chain_compression_attack_time);
     register_param<FloatParamB>(ParamId::ERCRL, effects.reverb.side_chain_compression_release_time);
     register_param<FloatParamB>(ParamId::ERCR, effects.reverb.side_chain_compression_ratio);
-    register_param<ByteParam>(ParamId::ERCM, effects.reverb.side_chain_compression_mode);
+    register_param<CompressionModeParam>(ParamId::ERCM, effects.reverb.side_chain_compression_mode);
     register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
     register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
     register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);

@@ -31,7 +31,7 @@ Compressor<InputSignalProducerClass, curve>::Compressor(
         InputSignalProducerClass& input,
         SignalProducer* const buffer_owner,
         Number const makeup_gain
-) : SideChainCompressableEffect<InputSignalProducerClass, curve, true>(
+) : SideChainCompressableEffect<InputSignalProducerClass, curve>(
         name,
         input,
         0,
