@@ -109,7 +109,6 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass, curve
     );
 
     if (buffer != NULL) {
-        FloatParamS::produce_if_not_constant(gain, round, sample_count);
         fast_bypass();
 
         return buffer;
