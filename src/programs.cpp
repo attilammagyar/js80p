@@ -5929,7 +5929,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "MVOL = 0.0\n"
             "CVOL = 0.0\n"
             "EV1V = 0.60\n"
-            "ETDST = 1.0\n"
+            "ETSAT = 1.0\n"
             "ETCIN = 0.750\n"
             "ERRSZ = 0.503333333333333\n"
             "ERRS = 0.800950750750751\n"
@@ -5945,7 +5945,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "EV3V = 0.90\n"
             "ERLOG = 1.0\n"
             "ERTYP = 0.666666666666667\n"
-            "ETDTYP = 0.0\n"
+            "ETSTYP = 0.0\n"
             "ETEND = 0.0\n"
         )
     ),

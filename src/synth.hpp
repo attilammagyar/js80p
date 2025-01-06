@@ -191,7 +191,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ETSTP = 77,      ///< Effects Tape Stop / Start
             ETWFA = 78,      ///< Effects Tape Wow and Flutter Amplitude
             ETWFS = 79,      ///< Effects Tape Wow and Flutter Speed
-            ETDST = 80,      ///< Effects Tape Distortion
+            ETSAT = 80,      ///< Effects Tape Saturation
             ETCLR = 81,      ///< Effects Tape Color
             ETHSS = 82,      ///< Effects Tape Hiss Level
             ETSTR = 83,      ///< Effects Tape Stereo Wow and Flutter
@@ -873,7 +873,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CFX4 = 708,      ///< Carrier Fine Detune x4
             EER1 = 709,      ///< Effects Echo Delay 1 Reversed
             EER2 = 710,      ///< Effects Echo Delay 2 Reversed
-            ETDTYP = 711,    ///< Effects Tape Distortion Type
+            ETSTYP = 711,    ///< Effects Tape Saturation Type
             ETEND = 712,     ///< Effects Tape Position at End of Chain
             EECM = 713,      ///< Effects Echo Side-Chain Compression Mode
             ERCM = 714,      ///< Effects Reverb Side-Chain Compression Mode

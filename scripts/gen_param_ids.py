@@ -127,7 +127,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$TSTP", " ///< $ Tape Stop / Start", "effects.tape.stop_start"),
         ("$TWFA", " ///< $ Tape Wow and Flutter Amplitude", "effects.tape.wnf_amp"),
         ("$TWFS", " ///< $ Tape Wow and Flutter Speed", "effects.tape.wnf_speed"),
-        ("$TDST", " ///< $ Tape Distortion", "effects.tape.distortion_level"),
+        ("$TSAT", " ///< $ Tape Saturation", "effects.tape.distortion_level"),
         ("$TCLR", " ///< $ Tape Color", "effects.tape.color"),
         ("$THSS", " ///< $ Tape Hiss Level", "effects.tape.hiss_level"),
         ("$TSTR", " ///< $ Tape Stereo Wow and Flutter", "effects.tape.stereo_wnf"),
@@ -432,7 +432,7 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("EER1", "  ///< Effects Echo Delay 1 Reversed", "effects.echo.reversed_1"),
         ("EER2", "  ///< Effects Echo Delay 2 Reversed", "effects.echo.reversed_2"),
 
-        ("ETDTYP", "///< Effects Tape Distortion Type", "effects.tape.distortion_type"),
+        ("ETSTYP", "///< Effects Tape Saturation Type", "effects.tape.distortion_type"),
         ("ETEND", " ///< Effects Tape Position at End of Chain", "effects.tape_at_end"),
 
         ("EECM", "  ///< Effects Echo Side-Chain Compression Mode", "effects.echo.side_chain_compression_mode"),

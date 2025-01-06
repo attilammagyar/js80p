@@ -407,7 +407,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::ETSTP] = "Tape Stop / Start",
     [Synth::ParamId::ETWFA] = "Tape Wow and Flutter Amplitude",
     [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed",
-    [Synth::ParamId::ETDST] = "Tape Distortion",
+    [Synth::ParamId::ETSAT] = "Tape Saturation",
     [Synth::ParamId::ETCLR] = "Tape Color",
     [Synth::ParamId::ETHSS] = "Tape Hiss Level",
     [Synth::ParamId::ETSTR] = "Tape Stereo Wow and Flutter",
@@ -1118,7 +1118,7 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
     [Synth::ParamId::EER1] = "Echo Delay 1 Reversed",
     [Synth::ParamId::EER2] = "Echo Delay 2 Reversed",
-    [Synth::ParamId::ETDTYP] = "Tape Distortion Type",
+    [Synth::ParamId::ETSTYP] = "Tape Saturation Type",
     [Synth::ParamId::ETEND] = "Tape Position at End of Chain",
     [Synth::ParamId::EECM] = "Echo Side-Chain Compression Mode",
     [Synth::ParamId::ERCM] = "Reverb Side-Chain Compression Mode",
@@ -2626,9 +2626,9 @@ void GUI::build_effects_body(
 
     KNOB(effects_body,  16 + KNOB_W * 0,   173, Synth::ParamId::ETSTP,  MM__C,      "%.3f", 1.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 1,   173, Synth::ParamId::ETWFA,  MM__C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body,  16 + KNOB_W * 2,   173, Synth::ParamId::ETDST,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body,  16 + KNOB_W * 2,   173, Synth::ParamId::ETSAT,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 3,   173, Synth::ParamId::ETCLR,  MM__C,      "%.2f", 200.0, knob_states);
-    DPET(effects_body, 132, 146, 60, 21, 0, 60, Synth::ParamId::ETDTYP, dt, dtc);
+    DPET(effects_body, 132, 146, 60, 21, 0, 60, Synth::ParamId::ETSTYP, dt, dtc);
     TOGG(effects_body, 202, 145, 50, 24, 28, Synth::ParamId::ETEND);
     SCREW(effects_body,  61, 146, Synth::ParamId::ETWFS, "%.2f%%", 100.0, screw_states);
     SCREW(effects_body,  81, 146, Synth::ParamId::ETSTR, "%.2f%%", 200.0, screw_states);
