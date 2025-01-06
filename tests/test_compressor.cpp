@@ -53,9 +53,16 @@ constexpr Number BLOCK_LENGTH = (Number)BLOCK_SIZE / SAMPLE_RATE;
 constexpr Integer ROUNDS = 20;
 constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
+constexpr CompressionCurve CC_LINEAR = CompressionCurve::COMPRESSION_CURVE_LINEAR;
+constexpr CompressionCurve CC_SMOOTH = CompressionCurve::COMPRESSION_CURVE_SMOOTH;
+
+constexpr CompressionMode CM_COMP = CompressionMode::COMPRESSION_MODE_COMPRESSOR;
+constexpr CompressionMode CM_EXPAND = CompressionMode::COMPRESSION_MODE_EXPANDER;
+
 
 template<CompressionCurve curve>
 void test_compressor(
+        CompressionMode const mode,
         Number const input_level,
         Number const threshold,
         Number const ratio,
@@ -81,8 +88,11 @@ void test_compressor(
     input.set_sample_rate(SAMPLE_RATE);
     expected_output_generator.set_sample_rate(SAMPLE_RATE);
 
-    compressor.ratio.set_value(ratio);
+    compressor.mode.set_value((Byte)mode);
     compressor.threshold.set_value(threshold);
+    compressor.attack_time.set_value(0.001);
+    compressor.release_time.set_value(0.001);
+    compressor.ratio.set_value(ratio);
     compressor.dry.set_value(dry);
     compressor.wet.set_value(wet);
 
@@ -96,10 +106,11 @@ void test_compressor(
             SAMPLE_COUNT,
             0.02,
             (
-                "curve=%d, input_level=%f, threshold=%f, ratio=%f,"
+                "curve=%d, mode=%d, input_level=%f, threshold=%f, ratio=%f,"
                 " wet=%f, dry=%f, expected_output_level=%f, channel=%d"
             ),
             (int)curve,
+            (int)mode,
             input_level,
             threshold,
             ratio,
@@ -112,26 +123,73 @@ void test_compressor(
 }
 
 
-TEST(signals_above_the_threshold_are_compressed, {
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(1.0, -6.0,   1.0, 1.00, 0.00, 1.0);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(1.0, -6.0,   1.0, 0.99, 0.01, 1.0);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(1.0, -6.0,   1.0, 0.00, 1.00, 1.0);
+template<CompressionCurve curve>
+void test_compressor()
+{
+    /*
+    Rule of thumb: subtracting 6 dB is the same as multiplying by 0.5, and
+    adding 6 dB is the same as multiplying by 2.
+    */
 
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(0.5, -6.0, 120.0, 1.00, 0.00, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(0.5, -6.0, 120.0, 0.99, 0.01, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(0.5, -6.0, 120.0, 0.00, 1.00, 0.5);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0,   1.0, 0.00, 1.00, 1.00);
 
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(1.0, -6.0, 120.0, 1.00, 0.00, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_LINEAR>(1.0, -6.0, 120.0, 0.99, 0.01, 0.5);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_COMP, 0.50,  -6.0, 120.0, 0.00, 1.00, 0.50);
 
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(1.0, -6.0,   1.0, 1.00, 0.00, 1.0);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(1.0, -6.0,   1.0, 0.99, 0.01, 1.0);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(1.0, -6.0,   1.0, 0.00, 1.00, 1.0);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_COMP, 1.00,  -6.0, 120.0, 0.99, 0.01, 0.50);
 
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(0.5, -6.0, 120.0, 1.00, 0.00, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(0.5, -6.0, 120.0, 0.99, 0.01, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(0.5, -6.0, 120.0, 0.00, 1.00, 0.5);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 1.00, 0.00, 0.25);
+    test_compressor<curve>(CM_COMP, 1.00, -18.0,   3.0, 0.99, 0.01, 0.25);
 
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(1.0, -6.0, 120.0, 1.00, 0.00, 0.5);
-    test_compressor<CompressionCurve::COMPRESSION_CURVE_SMOOTH>(1.0, -6.0, 120.0, 0.99, 0.01, 0.5);
+    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 1.00, 0.00, 0.30);
+    test_compressor<curve>(CM_COMP, 0.30,  -6.0, 120.0, 0.99, 0.01, 0.30);
+
+    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_COMP, 0.00,  -6.0, 120.0, 0.99, 0.01, 0.00);
+}
+
+
+TEST(when_compressor_mode_is_selected_then_signals_above_the_threshold_are_compressed, {
+    test_compressor<CC_LINEAR>();
+    test_compressor<CC_SMOOTH>();
+})
+
+
+template<CompressionCurve curve>
+void test_expand()
+{
+    /*
+    Rule of thumb: subtracting 6 dB is the same as multiplying by 0.5, and
+    adding 6 dB is the same as multiplying by 2.
+    */
+
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0,   1.0, 0.00, 1.00, 1.00);
+
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_EXPAND, 0.50, -6.1, 120.0, 0.00, 1.00, 0.50);
+
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_EXPAND, 1.00, -6.0, 120.0, 0.99, 0.01, 1.00);
+
+    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_EXPAND, 0.30, -6.0, 120.0, 0.99, 0.01, 0.00);
+
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 1.00, 0.00, 0.25);
+    test_compressor<curve>(CM_EXPAND, 0.50, -3.0,   3.0, 0.99, 0.01, 0.25);
+
+    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_EXPAND, 0.00, -6.0, 120.0, 0.99, 0.01, 0.00);
+}
+
+
+TEST(when_expand_mode_is_selected_then_signals_below_the_threshold_are_compressed, {
+    test_expand<CC_LINEAR>();
+    test_expand<CC_SMOOTH>();
 })

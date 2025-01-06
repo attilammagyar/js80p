@@ -38,6 +38,20 @@ enum CompressionCurve {
 };
 
 
+enum CompressionMode {
+    COMPRESSION_MODE_COMPRESSOR = 0,
+    COMPRESSION_MODE_EXPANDER = 1,
+    COMPRESSION_MODES = 2,
+};
+
+
+class CompressionModeParam : public ByteParam
+{
+    public:
+        CompressionModeParam(std::string const& name) noexcept;
+};
+
+
 template<class InputSignalProducerClass, CompressionCurve curve = CompressionCurve::COMPRESSION_CURVE_LINEAR>
 class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
@@ -55,6 +69,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         FloatParamB side_chain_compression_attack_time;
         FloatParamB side_chain_compression_release_time;
         FloatParamB side_chain_compression_ratio;
+        CompressionModeParam side_chain_compression_mode;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -78,17 +93,18 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         static constexpr Number NO_OP_RATIO = 1.0;
         static constexpr Number BYPASS_GAIN = 1.0;
 
+        void clear_state() noexcept;
         void fast_bypass() noexcept;
         void copy_input(Integer const sample_count) noexcept;
 
         void compress(
             Sample const peak,
-            Number const threshold_db,
-            Number const diff_db,
-            Number const ratio_value
+            Number const target_peak_db,
+            Number const zero_peak_target,
+            FloatParamB const& time_param
         ) noexcept;
 
-        void release() noexcept;
+        void release(FloatParamB const& time_param) noexcept;
 
         void schedule_gain_ramp(
             Number const target_gain,
@@ -100,6 +116,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         Sample const* gain_buffer;
         Number target_gain;
         Action previous_action;
+        Byte previous_mode;
         bool is_bypassing;
 };
 

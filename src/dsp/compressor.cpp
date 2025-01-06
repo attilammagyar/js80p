@@ -39,7 +39,8 @@ Compressor<InputSignalProducerClass, curve>::Compressor(
     threshold(this->side_chain_compression_threshold),
     attack_time(this->side_chain_compression_attack_time),
     release_time(this->side_chain_compression_release_time),
-    ratio(this->side_chain_compression_ratio)
+    ratio(this->side_chain_compression_ratio),
+    mode(this->side_chain_compression_mode)
 {
 }
 

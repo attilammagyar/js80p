@@ -874,9 +874,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             EER1 = 709,      ///< Effects Echo Delay 1 Reversed
             EER2 = 710,      ///< Effects Echo Delay 2 Reversed
             ETDTYP = 711,    ///< Effects Tape Distortion Type
-            ETEND = 712,     ///< Effects Tape Move to End of Chain
+            ETEND = 712,     ///< Effects Tape Position at End of Chain
+            EECM = 713,      ///< Effects Echo Side-Chain Compression Mode
+            ERCM = 714,      ///< Effects Reverb Side-Chain Compression Mode
 
-            PARAM_ID_COUNT = 713,
+            PARAM_ID_COUNT = 715,
             INVALID_PARAM_ID = PARAM_ID_COUNT,
         };
 

@@ -47,6 +47,7 @@ class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, 
         FloatParamB& attack_time;
         FloatParamB& release_time;
         FloatParamB& ratio;
+        ByteParam& mode;
 };
 
 }

@@ -419,7 +419,9 @@ h1 span {
 
 #dist-1-type,
 #dist-2-type,
-#tape .dist-type {
+#tape .dist-type,
+#echo .comp-mode,
+#reverb .comp-mode {
   top: 0;
   height: 24px;
   margin-top: -3px;
@@ -430,9 +432,21 @@ h1 span {
   margin-top: 0;
 }
 
+#echo .comp-mode {
+  position: relative;
+  left: 317px;
+}
+
+#reverb .comp-mode {
+  position: relative;
+  left: 347px;
+}
+
 #dist-1-type input,
 #dist-2-type input,
-#tape .dist-type input {
+#tape .dist-type input,
+#echo .comp-mode input,
+#reverb .comp-mode input {
   top: 0;
   margin-top: 0;
   height: 23px;
@@ -450,7 +464,9 @@ h1 span {
 #osc-2-dist-type label.dist-type input,
 #dist-1-type input,
 #dist-2-type input,
-#tape .dist-type input {
+#tape .dist-type input,
+#echo .comp-mode input,
+#reverb .comp-mode input {
   width: 62px;
 }
 
@@ -1006,6 +1022,7 @@ function make_tabs(active)
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="rev"><input type="text" /></label>
           <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
+          <label class="comp-mode"><input type="text" /></label>
           <label class="sync"><span>BPM SYNC </span><input type="text" /></label>
         </h1>
         <div id="echo-params" class="block"></div>
@@ -1015,6 +1032,7 @@ function make_tabs(active)
           <span>Reverb</span>
           <label class="log-q"><input type="text" /><span> LG Q</span></label>
           <label class="freq"><input type="text" /><span> LG FILTER FREQS</span></label>
+          <label class="comp-mode"><input type="text" /></label>
         </h1>
         <div id="reverb-params" class="block"></div>
       </div>

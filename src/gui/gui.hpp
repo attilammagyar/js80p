@@ -133,6 +133,9 @@ class GUI
         static char const* const TAPE_STATES[];
         static int const TAPE_STATES_COUNT;
 
+        static char const* const COMPRESSION_MODES[];
+        static int const COMPRESSION_MODES_COUNT;
+
         static char const* const PARAMS[Synth::ParamId::PARAM_ID_COUNT];
 
         static Controller const CONTROLLERS[];

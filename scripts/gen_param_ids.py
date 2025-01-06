@@ -433,7 +433,10 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("EER2", "  ///< Effects Echo Delay 2 Reversed", "effects.echo.reversed_2"),
 
         ("ETDTYP", "///< Effects Tape Distortion Type", "effects.tape.distortion_type"),
-        ("ETEND", " ///< Effects Tape Move to End of Chain", "effects.tape_at_end"),
+        ("ETEND", " ///< Effects Tape Position at End of Chain", "effects.tape_at_end"),
+
+        ("EECM", "  ///< Effects Echo Side-Chain Compression Mode", "effects.echo.side_chain_compression_mode"),
+        ("ERCM", "  ///< Effects Reverb Side-Chain Compression Mode", "effects.reverb.side_chain_compression_mode"),
     ]
 
     return print_params(param_id, param_objs, "", "", 1, params)

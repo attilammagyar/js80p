@@ -288,6 +288,14 @@ char const* const GUI::TAPE_STATES[] = {
 int const GUI::TAPE_STATES_COUNT = TapeParams::State::TAPE_STATES;
 
 
+char const* const GUI::COMPRESSION_MODES[] = {
+    [CompressionMode::COMPRESSION_MODE_COMPRESSOR] = "COMP",
+    [CompressionMode::COMPRESSION_MODE_EXPANDER] = "EXPD",
+};
+
+int const GUI::COMPRESSION_MODES_COUNT = CompressionMode::COMPRESSION_MODES;
+
+
 GUI::Controller::Controller(
         int const index,
         ControllerCapability const required_capability,
@@ -1110,8 +1118,10 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::CFX4] = "Carrier Fine Detune x4",
     [Synth::ParamId::EER1] = "Echo Delay 1 Reversed",
     [Synth::ParamId::EER2] = "Echo Delay 2 Reversed",
-    [Synth::ParamId::ETDTYP] = "Effects Tape Distortion Type",
-    [Synth::ParamId::ETEND] = "Effects Tape Move to End of Chain",
+    [Synth::ParamId::ETDTYP] = "Tape Distortion Type",
+    [Synth::ParamId::ETEND] = "Tape Position at End of Chain",
+    [Synth::ParamId::EECM] = "Echo Side-Chain Compression Mode",
+    [Synth::ParamId::ERCM] = "Reverb Side-Chain Compression Mode",
 };
 
 
@@ -2585,6 +2595,9 @@ void GUI::build_effects_body(
     constexpr char const* const* dt = JS80P::GUI::DISTORTION_TYPES;
     constexpr int dtc = JS80P::GUI::DISTORTION_TYPES_COUNT;
 
+    constexpr char const* const* cm = JS80P::GUI::COMPRESSION_MODES;
+    constexpr int cmc = JS80P::GUI::COMPRESSION_MODES_COUNT;
+
     KNOB(effects_body,  30 + KNOB_W * 0,    34, Synth::ParamId::INVOL,  MML_C,      "%.2f", 100.0, knob_states);
 
     KNOB(effects_body, 118 + KNOB_W * 0,    34, Synth::ParamId::EV1V,   MML_C,      "%.2f", 100.0, knob_states);
@@ -2658,6 +2671,7 @@ void GUI::build_effects_body(
     TOGG(effects_body, 836, 285,  90, 24, 66, Synth::ParamId::EESYN);
     DPEI(effects_body, 109, 289,  18, 18, 0, 18, Synth::ParamId::EER1, reversed_toggle_states);
     DPEI(effects_body, 127, 289,  18, 18, 0, 18, Synth::ParamId::EER2, reversed_toggle_states);
+    DPET(effects_body, 659, 286, 60, 21, 0, 60, Synth::ParamId::EECM, cm, cmc);
 
     KNOB(effects_body,  14 + KNOB_W * 0,   453, Synth::ParamId::ERHPF,  MML__,      "%.1f", 1.0, knob_states);
     KNOB(effects_body,  14 + KNOB_W * 1,   453, Synth::ParamId::ERHPQ,  MML__,      "%.3f", 1.0, knob_states);
@@ -2676,6 +2690,7 @@ void GUI::build_effects_body(
     KNOB(effects_body,  14 + KNOB_W * 14,  453, Synth::ParamId::ERDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TOGG(effects_body,  91, 425,  50, 24,  0, Synth::ParamId::ERLHQ);
     TOGG(effects_body, 381, 425, 136, 24,  0, Synth::ParamId::ERLOG);
+    DPET(effects_body, 619, 426, 60, 21, 0, 60, Synth::ParamId::ERCM, cm, cmc);
 
     KNOB(effects_body, 905 + KNOB_W * 0,   453, Synth::ParamId::EV3V,   MML_C,      "%.2f", 100.0, knob_states);
 
