@@ -58,6 +58,7 @@ constexpr CompressionCurve CC_SMOOTH = CompressionCurve::COMPRESSION_CURVE_SMOOT
 
 constexpr CompressionMode CM_COMP = CompressionMode::COMPRESSION_MODE_COMPRESSOR;
 constexpr CompressionMode CM_EXPAND = CompressionMode::COMPRESSION_MODE_EXPANDER;
+constexpr CompressionMode CM_LIFT = CompressionMode::COMPRESSION_MODE_UPWARD_COMPRESSOR;
 
 
 template<CompressionCurve curve>
@@ -159,14 +160,14 @@ void test_compressor()
 }
 
 
-TEST(when_compressor_mode_is_selected_then_signals_above_the_threshold_are_compressed, {
+TEST(when_in_compressor_mode_then_signals_above_the_threshold_are_compressed, {
     test_compressor<CC_LINEAR>();
     test_compressor<CC_SMOOTH>();
 })
 
 
 template<CompressionCurve curve>
-void test_expand()
+void test_expander()
 {
     /*
     Rule of thumb: subtracting 6 dB is the same as multiplying by 0.5, and
@@ -199,7 +200,47 @@ void test_expand()
 }
 
 
-TEST(when_expand_mode_is_selected_then_signals_below_the_threshold_are_compressed, {
-    test_expand<CC_LINEAR>();
-    test_expand<CC_SMOOTH>();
+TEST(when_in_expand_mode_then_signals_below_the_threshold_are_compressed, {
+    test_expander<CC_LINEAR>();
+    test_expander<CC_SMOOTH>();
+})
+
+
+template<CompressionCurve curve>
+void test_lifter()
+{
+    /*
+    Rule of thumb: subtracting 6 dB is the same as multiplying by 0.5, and
+    adding 6 dB is the same as multiplying by 2.
+    */
+
+    test_compressor<curve>(CM_LIFT, 1.00, -6.0,   1.0, 1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_LIFT, 1.00, -6.0,   1.0, 1.0, 0.99, 0.01, 1.00);
+    test_compressor<curve>(CM_LIFT, 1.00, -6.0,   1.0, 1.0, 0.00, 1.00, 1.00);
+
+    test_compressor<curve>(CM_LIFT, 0.50, -6.1, 120.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_LIFT, 0.50, -6.1, 120.0, 1.0, 0.99, 0.01, 0.50);
+    test_compressor<curve>(CM_LIFT, 0.50, -6.1, 120.0, 1.0, 0.00, 1.00, 0.50);
+
+    test_compressor<curve>(CM_LIFT, 1.00, -6.0, 120.0, 1.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_LIFT, 1.00, -6.0, 120.0, 1.0, 0.99, 0.01, 1.00);
+
+    test_compressor<curve>(CM_LIFT, 0.25, -6.0, 120.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_LIFT, 0.25, -6.0, 120.0, 1.0, 0.99, 0.01, 0.50);
+
+    test_compressor<curve>(CM_LIFT, 0.25, -3.0,   3.0, 1.0, 1.00, 0.00, 0.50);
+    test_compressor<curve>(CM_LIFT, 0.25, -3.0,   3.0, 1.0, 0.99, 0.01, 0.50);
+
+    /* Upward compression does not require make-up gain though. */
+    test_compressor<curve>(CM_LIFT, 0.25, -3.0,   3.0, 2.0, 1.00, 0.00, 1.00);
+    test_compressor<curve>(CM_LIFT, 0.25, -3.0,   3.0, 2.0, 0.99, 0.01, 1.00);
+
+    test_compressor<curve>(CM_LIFT, 0.00, -6.0, 120.0, 1.0, 1.00, 0.00, 0.00);
+    test_compressor<curve>(CM_LIFT, 0.00, -6.0, 120.0, 1.0, 0.99, 0.01, 0.00);
+}
+
+
+TEST(when_in_upward_compression_mode_then_signals_below_the_threshold_are_raised, {
+    test_lifter<CC_LINEAR>();
+    test_lifter<CC_SMOOTH>();
 })

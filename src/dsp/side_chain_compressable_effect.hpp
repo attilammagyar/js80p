@@ -41,18 +41,16 @@ enum CompressionCurve {
 enum CompressionMode {
     COMPRESSION_MODE_COMPRESSOR = 0,
     COMPRESSION_MODE_EXPANDER = 1,
-    COMPRESSION_MODES = 2,
+    COMPRESSION_MODE_UPWARD_COMPRESSOR = 2,
+    COMPRESSION_MODES = 3,
 };
 
 
-class CompressionModeParam : public ByteParam
-{
-    public:
-        CompressionModeParam(std::string const& name) noexcept;
-};
-
-
-template<class InputSignalProducerClass, CompressionCurve curve = CompressionCurve::COMPRESSION_CURVE_LINEAR>
+template<
+    class InputSignalProducerClass,
+    CompressionCurve curve = CompressionCurve::COMPRESSION_CURVE_LINEAR,
+    bool allow_upward_mode = false
+>
 class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -70,7 +68,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         FloatParamB side_chain_compression_attack_time;
         FloatParamB side_chain_compression_release_time;
         FloatParamB side_chain_compression_ratio;
-        CompressionModeParam side_chain_compression_mode;
+        ByteParam side_chain_compression_mode;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -93,6 +91,8 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 
         static constexpr Number NO_OP_RATIO = 1.0;
         static constexpr Number BYPASS_GAIN = 1.0;
+
+        static constexpr Number UPWARD_GAIN_INCREASE_MAX_DB = 30.0;
 
         void clear_state() noexcept;
         void fast_bypass() noexcept;

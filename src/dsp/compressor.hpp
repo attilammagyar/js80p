@@ -32,7 +32,7 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass, CompressionCurve curve>
-class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, curve>
+class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, curve, true>
 {
     friend class SignalProducer;
 

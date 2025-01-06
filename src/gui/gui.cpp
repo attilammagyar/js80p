@@ -293,7 +293,7 @@ char const* const GUI::COMPRESSION_MODES[] = {
     [CompressionMode::COMPRESSION_MODE_EXPANDER] = "EXPD",
 };
 
-int const GUI::COMPRESSION_MODES_COUNT = CompressionMode::COMPRESSION_MODES;
+int const GUI::COMPRESSION_MODES_COUNT = 2;
 
 
 GUI::Controller::Controller(
