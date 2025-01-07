@@ -5947,7 +5947,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "ERLOG = 1.0\n"
             "ERTYP = 0.666666666666667\n"
             "ETSTYP = 0.0\n"
-            "ETEND = 0.0\n"
             "ERCM = 1.0\n"
         )
     ),

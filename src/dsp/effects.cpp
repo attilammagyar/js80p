@@ -47,7 +47,7 @@ Effects<InputSignalProducerClass>::Effects(
     */
     distortion_1_type(name + "OT", Distortion::TYPE_TANH_3),
     distortion_2_type(name + "DT", Distortion::TYPE_TANH_10),
-    tape_at_end(name + "TEND", ToggleParam::ON),
+    tape_at_end(name + "TEND", ToggleParam::OFF),
     tape_params(name + "T", tape_at_end),
     volume_1(input, volume_1_gain),
     distortion_1(name + "O", distortion_1_type, volume_1, &volume_1),
