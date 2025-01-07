@@ -46,6 +46,10 @@ class CompressionModeParam : public ByteParam
 };
 
 
+/**
+ * \brief An effect which compresses the signal of \c wet_buffer_owner based on
+ *        the signal of \c input.
+ */
 template<class InputSignalProducerClass>
 class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
@@ -55,8 +59,8 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         SideChainCompressableEffect(
             std::string const& name,
             InputSignalProducerClass& input,
-            Integer const number_of_children = 0,
-            SignalProducer* const wet_buffer_owner = NULL
+            Integer const number_of_children,
+            SignalProducer* const wet_buffer_owner
         );
 
         virtual void reset() noexcept override;
