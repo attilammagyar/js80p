@@ -25,18 +25,13 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass, CompressionCurve curve>
-Compressor<InputSignalProducerClass, curve>::Compressor(
+template<class InputSignalProducerClass>
+Compressor<InputSignalProducerClass>::Compressor(
         std::string const& name,
         InputSignalProducerClass& input,
-        SignalProducer* const buffer_owner,
-        Number const makeup_gain
-) : SideChainCompressableEffect<InputSignalProducerClass, curve>(
-        name,
-        input,
-        0,
-        buffer_owner,
-        makeup_gain
+        SignalProducer* const buffer_owner
+) : SideChainCompressableEffect<InputSignalProducerClass>(
+        name, input, 0, buffer_owner
     ),
     threshold(this->side_chain_compression_threshold),
     attack_time(this->side_chain_compression_attack_time),

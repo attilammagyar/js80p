@@ -25,7 +25,6 @@
 #include "js80p.hpp"
 
 #include "dsp/biquad_filter.hpp"
-#include "dsp/compressor.hpp"
 #include "dsp/delay.hpp"
 #include "dsp/distortion.hpp"
 #include "dsp/filter.hpp"
@@ -172,12 +171,7 @@ class Tape : public Filter<InputSignalProducerClass>
                 Sample w2;
         };
 
-        typedef Compressor<
-            InputSignalProducerClass,
-            CompressionCurve::COMPRESSION_CURVE_SMOOTH
-        > Compressor_;
-
-        typedef Distortion::Distortion<Compressor_> Distortion_;
+        typedef Distortion::Distortion<InputSignalProducerClass> Distortion_;
 
         typedef BiquadFilter<
             Distortion_,
@@ -292,7 +286,6 @@ class Tape : public Filter<InputSignalProducerClass>
         void schedule_fast_forward_start(Seconds const duration) noexcept;
 
         TapeParams& params;
-        Compressor_ compressor;
         Distortion_ distortion;
         LowShelfFilter low_shelf_filter;
         HissGenerator_ hiss_generator;

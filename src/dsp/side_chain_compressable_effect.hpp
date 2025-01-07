@@ -32,12 +32,6 @@
 namespace JS80P
 {
 
-enum CompressionCurve {
-    COMPRESSION_CURVE_LINEAR = 0,
-    COMPRESSION_CURVE_SMOOTH = 1,
-};
-
-
 enum CompressionMode {
     COMPRESSION_MODE_COMPRESSOR = 0,
     COMPRESSION_MODE_EXPANDER = 1,
@@ -52,10 +46,7 @@ class CompressionModeParam : public ByteParam
 };
 
 
-template<
-    class InputSignalProducerClass,
-    CompressionCurve curve = CompressionCurve::COMPRESSION_CURVE_LINEAR
->
+template<class InputSignalProducerClass>
 class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -65,8 +56,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             std::string const& name,
             InputSignalProducerClass& input,
             Integer const number_of_children = 0,
-            SignalProducer* const wet_buffer_owner = NULL,
-            Number const makeup_gain = 1.0
+            SignalProducer* const wet_buffer_owner = NULL
         );
 
         virtual void reset() noexcept override;
@@ -117,13 +107,9 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             FloatParamB const& time_param
         ) noexcept;
 
-        Number const makeup_gain;
-        bool const no_makeup;
-
         FloatParamS gain;
         PeakTracker peak_tracker;
         Sample const* gain_buffer;
-        Number target_gain;
         Action previous_action;
         Byte previous_mode;
         bool is_bypassing;

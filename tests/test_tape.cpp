@@ -25,7 +25,6 @@
 #include "js80p.hpp"
 
 #include "dsp/biquad_filter.cpp"
-#include "dsp/compressor.cpp"
 #include "dsp/delay.cpp"
 #include "dsp/distortion.cpp"
 #include "dsp/effect.cpp"
@@ -38,9 +37,7 @@
 #include "dsp/midi_controller.cpp"
 #include "dsp/oscillator.cpp"
 #include "dsp/param.cpp"
-#include "dsp/peak_tracker.cpp"
 #include "dsp/queue.cpp"
-#include "dsp/side_chain_compressable_effect.cpp"
 #include "dsp/signal_producer.cpp"
 #include "dsp/tape.cpp"
 #include "dsp/wavetable.cpp"

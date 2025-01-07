@@ -31,8 +31,8 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass, CompressionCurve curve>
-class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, curve>
+template<class InputSignalProducerClass>
+class Compressor : public SideChainCompressableEffect<InputSignalProducerClass>
 {
     friend class SignalProducer;
 
@@ -40,8 +40,7 @@ class Compressor : public SideChainCompressableEffect<InputSignalProducerClass, 
         Compressor(
             std::string const& name,
             InputSignalProducerClass& input,
-            SignalProducer* const buffer_owner = NULL,
-            Number const makeup_gain = 1.0
+            SignalProducer* const buffer_owner = NULL
         );
 
         FloatParamB& threshold;
