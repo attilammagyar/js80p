@@ -615,7 +615,7 @@ TEST(when_synth_state_is_cleared_then_tuning_is_restored, {
 })
 
 
-TEST(effects, {
+TEST(effects_simple, {
     constexpr Frequency sample_rate = 22050.0;
     constexpr Integer block_size = 2048;
     constexpr Integer rounds = 10;
@@ -641,13 +641,94 @@ TEST(effects, {
     set_param(synth, Synth::ParamId::ED2L, 0.2);
     set_param(synth, Synth::ParamId::EF1FRQ, 0.75);
     set_param(synth, Synth::ParamId::EF2FRQ, 0.75);
-    set_param(synth, Synth::ParamId::ECDPT, 1.0);
+    set_param(synth, Synth::ParamId::ETHSS, 0.2);
     set_param(synth, Synth::ParamId::ECWET, 0.5);
     set_param(synth, Synth::ParamId::ECDRY, 0.5);
     set_param(synth, Synth::ParamId::EEWET, 0.5);
     set_param(synth, Synth::ParamId::EEDRY, 0.5);
     set_param(synth, Synth::ParamId::ERWET, 0.5);
     set_param(synth, Synth::ParamId::ERDRY, 0.5);
+
+    synth.note_on(0.0, 1, Midi::NOTE_A_4, 114);
+
+    synth.process_messages();
+
+    render_rounds<Synth>(synth, buffer, rounds, block_size);
+})
+
+
+TEST(effects_complex, {
+    constexpr Frequency sample_rate = 22050.0;
+    constexpr Integer block_size = 2048;
+    constexpr Integer rounds = 10;
+    constexpr Integer buffer_size = rounds * block_size;
+
+    Synth synth;
+    Buffer buffer(buffer_size, synth.get_channels());
+
+    Number const inv_saw_as_ratio = (
+        synth.modulator_params.waveform.value_to_ratio(
+            SimpleOscillator::INVERSE_SAWTOOTH
+        )
+    );
+
+    synth.set_sample_rate(sample_rate);
+    synth.set_block_size(block_size);
+
+    synth.resume();
+
+    set_param(synth, Synth::ParamId::MWAV, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::CWAV, inv_saw_as_ratio);
+
+    set_param(synth, Synth::ParamId::EV1V, 0.6);
+
+    set_param(synth, Synth::ParamId::ED1L, 0.2);
+    set_param(synth, Synth::ParamId::ED2L, 0.2);
+    set_param(synth, Synth::ParamId::EF1FRQ, 0.75);
+    set_param(synth, Synth::ParamId::EF2LOG, 1.0);
+    set_param(synth, Synth::ParamId::EF2FRQ, 0.9);
+
+    set_param(synth, Synth::ParamId::EV2V, 0.8);
+
+    set_param(synth, Synth::ParamId::ETSAT, 0.5);
+    set_param(synth, Synth::ParamId::ETWFA, 0.3);
+    set_param(synth, Synth::ParamId::ETWFS, 0.2);
+    set_param(synth, Synth::ParamId::ETCLR, 0.6);
+    set_param(synth, Synth::ParamId::ETHSS, 0.2);
+    set_param(synth, Synth::ParamId::ETSTR, 0.1);
+
+    set_param(synth, Synth::ParamId::ECDPT, 1.0);
+    set_param(synth, Synth::ParamId::ECFB, 0.1);
+    set_param(synth, Synth::ParamId::ECDF, 0.8);
+    set_param(synth, Synth::ParamId::ECWID, 0.9);
+    set_param(synth, Synth::ParamId::ECHPF, 0.1);
+    set_param(synth, Synth::ParamId::ECDRY, 0.5);
+    set_param(synth, Synth::ParamId::ECWET, 0.5);
+    set_param(synth, Synth::ParamId::ECDRY, 0.5);
+
+    set_param(synth, Synth::ParamId::EELOG, 1.0);
+    set_param(synth, Synth::ParamId::EEINV, 0.6);
+    set_param(synth, Synth::ParamId::EEFB, 0.2);
+    set_param(synth, Synth::ParamId::EEDST, 0.5);
+    set_param(synth, Synth::ParamId::EEDF, 0.8);
+    set_param(synth, Synth::ParamId::EEWID, 0.8);
+    set_param(synth, Synth::ParamId::EEHPF, 0.2);
+    set_param(synth, Synth::ParamId::EECR, 0.1);
+    set_param(synth, Synth::ParamId::EEWET, 0.5);
+    set_param(synth, Synth::ParamId::EEDRY, 0.5);
+
+    set_param(synth, Synth::ParamId::ERLOG, 1.0);
+    set_param(synth, Synth::ParamId::ERRS, 0.5);
+    set_param(synth, Synth::ParamId::ERDST, 0.1);
+    set_param(synth, Synth::ParamId::ERDF, 0.8);
+    set_param(synth, Synth::ParamId::ERWET, 0.3);
+    set_param(synth, Synth::ParamId::ERHPF, 0.2);
+    set_param(synth, Synth::ParamId::ERCR, 0.2);
+    set_param(synth, Synth::ParamId::ERWET, 0.5);
+    set_param(synth, Synth::ParamId::ERDRY, 0.5);
+
+    set_param(synth, Synth::ParamId::EV3V, 0.8);
+
     set_param(synth, Synth::ParamId::L1CEN, 1.0);
 
     assign_controller(synth, Synth::ParamId::EF1Q, Synth::ControllerId::LFO_1);
