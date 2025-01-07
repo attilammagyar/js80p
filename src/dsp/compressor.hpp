@@ -37,17 +37,22 @@ class Compressor : public SideChainCompressableEffect<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        Compressor(
-            std::string const& name,
-            InputSignalProducerClass& input,
-            SignalProducer* const buffer_owner = NULL
-        );
+        Compressor(std::string const& name, InputSignalProducerClass& input);
 
         FloatParamB& threshold;
         FloatParamB& attack_time;
         FloatParamB& release_time;
         FloatParamB& ratio;
         CompressionModeParam& mode;
+
+    protected:
+        Sample const* const* initialize_rendering(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
+
+    private:
+        void copy_input(Integer const sample_count) noexcept;
 };
 
 }

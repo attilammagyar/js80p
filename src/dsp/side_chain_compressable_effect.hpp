@@ -95,7 +95,6 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
 
         void clear_state() noexcept;
         void fast_bypass() noexcept;
-        void copy_input(Integer const sample_count) noexcept;
 
         void compress(
             Sample const peak,
@@ -117,6 +116,7 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         Action previous_action;
         Byte previous_mode;
         bool is_bypassing;
+        bool is_silent_;
 };
 
 }

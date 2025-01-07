@@ -28,10 +28,9 @@ namespace JS80P
 template<class InputSignalProducerClass>
 Compressor<InputSignalProducerClass>::Compressor(
         std::string const& name,
-        InputSignalProducerClass& input,
-        SignalProducer* const buffer_owner
+        InputSignalProducerClass& input
 ) : SideChainCompressableEffect<InputSignalProducerClass>(
-        name, input, 0, buffer_owner
+        name, input, 0, NULL
     ),
     threshold(this->side_chain_compression_threshold),
     attack_time(this->side_chain_compression_attack_time),
@@ -41,7 +40,40 @@ Compressor<InputSignalProducerClass>::Compressor(
 {
 }
 
+
+template<class InputSignalProducerClass>
+Sample const* const* Compressor<InputSignalProducerClass>::initialize_rendering(
+        Integer const round,
+        Integer const sample_count
+) noexcept {
+    Sample const* const* buffer = (
+        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
+    );
+
+    if (buffer == NULL) {
+        copy_input(sample_count);
+    }
+
+    return buffer;
+}
+
+
+template<class InputSignalProducerClass>
+void Compressor<InputSignalProducerClass>::copy_input(
+        Integer const sample_count
+) noexcept {
+    for (Integer c = 0; c != this->channels; ++c) {
+        Sample const* const in_channel = this->input_buffer[c];
+        Sample* const out_channel = this->buffer[c];
+
+        for (Integer i = 0; i != sample_count; ++i) {
+            out_channel[i] = in_channel[i];
+        }
+    }
+}
+
 }
 
 #endif
-

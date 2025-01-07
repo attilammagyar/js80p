@@ -61,7 +61,8 @@ SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffe
     gain(name + "G", 0.0, BYPASS_GAIN, BYPASS_GAIN),
     previous_action(Action::BYPASS_OR_RELEASE),
     previous_mode(CompressionMode::COMPRESSION_MODE_COMPRESSOR),
-    is_bypassing(false)
+    is_bypassing(false),
+    is_silent_(false)
 {
     this->register_child(side_chain_compression_threshold);
     this->register_child(side_chain_compression_attack_time);
@@ -86,6 +87,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::clear_state() noexce
     gain.cancel_events_at(0.0);
     gain.set_value(BYPASS_GAIN);
     previous_action = Action::BYPASS_OR_RELEASE;
+    is_silent_ = false;
 }
 
 
@@ -105,8 +107,6 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
         return buffer;
     }
-
-    copy_input(sample_count);
 
     Number const ratio_value = side_chain_compression_ratio.get_value();
 
@@ -170,6 +170,8 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
     gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
+    is_silent_ = gain_buffer == NULL && gain.get_value() < 0.000001;
+
     return NULL;
 }
 
@@ -179,29 +181,6 @@ void SideChainCompressableEffect<InputSignalProducerClass>::fast_bypass() noexce
 {
     clear_state();
     is_bypassing = true;
-}
-
-
-template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::copy_input(
-        Integer const sample_count
-) noexcept {
-    if (
-            (void*)this->buffer == (void*)this->input_buffer
-            || this->input_buffer == NULL
-            || (void*)this->get_buffer_owner() != (void*)this
-    ) {
-        return;
-    }
-
-    for (Integer c = 0; c != this->channels; ++c) {
-        Sample const* const in_channel = this->input_buffer[c];
-        Sample* const out_channel = this->buffer[c];
-
-        for (Integer i = 0; i != sample_count; ++i) {
-            out_channel[i] = in_channel[i];
-        }
-    }
 }
 
 
@@ -257,6 +236,14 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
 ) noexcept {
     if (is_bypassing) {
         Effect<InputSignalProducerClass>::render(
+            round, first_sample_index, last_sample_index, buffer
+        );
+
+        return;
+    }
+
+    if (is_silent_) {
+        this->render_silence(
             round, first_sample_index, last_sample_index, buffer
         );
 
