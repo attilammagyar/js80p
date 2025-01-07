@@ -487,12 +487,6 @@ class FloatParam : public Param<Number, evaluation>
         class LinearRampState
         {
             public:
-                enum Type {
-                    RAMP_LINEAR = 0,
-                    RAMP_LOGARITHMIC = 1,
-                    RAMP_CURVED = 2,
-                };
-
                 LinearRampState() noexcept;
 
                 void init(
@@ -502,10 +496,11 @@ class FloatParam : public Param<Number, evaluation>
                     Number const target_value,
                     Number const duration_in_samples,
                     Seconds const duration,
-                    Type const type,
+                    bool const is_logarithmic,
+                    bool const is_curved,
                     Math::EnvelopeShape const curve_shape = Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH,
-                    Number const curved_initial_value = 0.0,
-                    Number const curved_delta = 0.0
+                    Number const curve_initial_value = 0.0,
+                    Number const curve_delta = 0.0
                 ) noexcept;
 
                 Number advance() noexcept;
@@ -520,10 +515,11 @@ class FloatParam : public Param<Number, evaluation>
                 Seconds duration;
                 Number delta;
                 Number speed;
-                Number curved_initial_value;
-                Number curved_delta;
+                Number curve_initial_value;
+                Number curve_delta;
                 Math::EnvelopeShape curve_shape;
-                Type type;
+                bool is_logarithmic;
+                bool is_curved;
                 bool is_done;
         };
 

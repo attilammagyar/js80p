@@ -1154,7 +1154,8 @@ void FloatParam<evaluation>::handle_linear_ramp_event(
         target_value,
         (Number)duration * (Number)this->sample_rate,
         duration,
-        LinearRampState::Type::RAMP_LINEAR
+        false,
+        false
     );
 }
 
@@ -1224,7 +1225,8 @@ void FloatParam<evaluation>::handle_log_ramp_event(
         target_value,
         (Number)duration * (Number)this->sample_rate,
         duration,
-        LinearRampState::Type::RAMP_LOGARITHMIC
+        true,
+        false
     );
 }
 
@@ -1252,7 +1254,8 @@ void FloatParam<evaluation>::handle_curved_ramp_event(
         1.0,
         (Number)duration * (Number)this->sample_rate,
         duration,
-        LinearRampState::Type::RAMP_CURVED,
+        false,
+        true,
         (Math::EnvelopeShape)event.int_param,
         value,
         target_value - value
@@ -1621,27 +1624,19 @@ void FloatParam<evaluation>::handle_cancel_event(
             event.time_offset - linear_ramp_state.start_time_offset
         );
 
-        switch (linear_ramp_state.type) {
-            case LinearRampState::Type::RAMP_LINEAR:
-                this->store_new_value(stop_value);
-                break;
+        if (linear_ramp_state.is_logarithmic) {
+            this->store_new_value(ratio_to_value_log(stop_value));
+        } else if (JS80P_UNLIKELY(linear_ramp_state.is_curved)) {
+            JS80P_ASSERT(!is_logarithmic());
 
-            case LinearRampState::Type::RAMP_LOGARITHMIC:
-                this->store_new_value(ratio_to_value_log(stop_value));
-                break;
-
-            case LinearRampState::Type::RAMP_CURVED:
-                this->store_new_value(
-                    linear_ramp_state.curved_initial_value
-                    + Math::apply_envelope_shape(
-                        linear_ramp_state.curve_shape, stop_value
-                    ) * linear_ramp_state.curved_delta
-                );
-                break;
-
-            default:
-                JS80P_ASSERT_NOT_REACHED();
-                break;
+            this->store_new_value(
+                linear_ramp_state.curve_initial_value
+                + Math::apply_envelope_shape(
+                    linear_ramp_state.curve_shape, stop_value
+                ) * linear_ramp_state.curve_delta
+            );
+        } else {
+            this->store_new_value(stop_value);
         }
     } else {
         Envelope* const envelope = get_envelope();
@@ -2594,47 +2589,33 @@ void FloatParam<evaluation>::render_linear_ramp(
         Sample** buffer
 ) noexcept {
     Sample sample;
+    Sample* channel = buffer[0];
 
-    switch (linear_ramp_state.type) {
-        case LinearRampState::Type::RAMP_LINEAR:
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)linear_ramp_state.advance();
-            }
+    if (linear_ramp_state.is_logarithmic) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            channel[i] = sample = ratio_to_value_log(linear_ramp_state.advance());
+        }
 
-            break;
+    } else if (JS80P_UNLIKELY(linear_ramp_state.is_curved)) {
+        Number const init_value = linear_ramp_state.curve_initial_value;
+        Number const delta = linear_ramp_state.curve_delta;
+        Math::EnvelopeShape shape = linear_ramp_state.curve_shape;
 
-        case LinearRampState::Type::RAMP_LOGARITHMIC:
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (
-                    (Sample)ratio_to_value_log(linear_ramp_state.advance())
-                );
-            }
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            channel[i] = sample = (
+                init_value
+                + delta * Math::apply_envelope_shape(shape, linear_ramp_state.advance())
+            );
+        }
 
-            break;
-
-        case LinearRampState::Type::RAMP_CURVED:
-            JS80P_ASSERT(!is_logarithmic());
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[0][i] = sample = (Sample)(
-                    linear_ramp_state.curved_initial_value
-                    + Math::apply_envelope_shape(
-                        linear_ramp_state.curve_shape,
-                        linear_ramp_state.advance()
-                    ) * linear_ramp_state.curved_delta
-                );
-            }
-
-            break;
-
-        default:
-            JS80P_ASSERT_NOT_REACHED();
-            sample = 0.0;
-            break;
+    } else {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            channel[i] = sample = linear_ramp_state.advance();
+        }
     }
 
     if (last_sample_index != first_sample_index) {
-        this->store_new_value((Number)sample);
+        this->store_new_value(sample);
     }
 }
 
@@ -2700,10 +2681,11 @@ FloatParam<evaluation>::LinearRampState::LinearRampState() noexcept
     duration(0.0),
     delta(0.0),
     speed(0.0),
-    curved_initial_value(0.0),
-    curved_delta(0.0),
+    curve_initial_value(0.0),
+    curve_delta(0.0),
     curve_shape(Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH),
-    type(Type::RAMP_LINEAR),
+    is_logarithmic(false),
+    is_curved(false),
     is_done(false)
 {
 }
@@ -2717,12 +2699,14 @@ void FloatParam<evaluation>::LinearRampState::init(
         Number const target_value,
         Number const duration_in_samples,
         Seconds const duration,
-        Type const type,
+        bool const is_logarithmic,
+        bool const is_curved,
         Math::EnvelopeShape const curve_shape,
-        Number const curved_initial_value,
-        Number const curved_delta
+        Number const curve_initial_value,
+        Number const curve_delta
 ) noexcept {
-    this->type = type;
+    this->is_logarithmic = is_logarithmic;
+    this->is_curved = is_curved;
 
     if (duration_in_samples > 0.0) {
         is_done = false;
@@ -2743,8 +2727,8 @@ void FloatParam<evaluation>::LinearRampState::init(
         this->duration_in_samples = 0.0;
     }
 
-    this->curved_initial_value = curved_initial_value;
-    this->curved_delta = curved_delta;
+    this->curve_initial_value = curve_initial_value;
+    this->curve_delta = curve_delta;
     this->curve_shape = curve_shape;
 }
 
