@@ -57,7 +57,7 @@ class TapeParams
 
         static constexpr Number DELAY_TIME_MAX = 30.0;
         static constexpr Number DELAY_TIME_LFO_RANGE = DELAY_TIME_MAX / 310000.0;
-        static constexpr size_t SIGNAL_PRODUCERS = 11 + 18 * Macro::PARAMS;
+        static constexpr size_t SIGNAL_PRODUCERS = 11 + 19 * Macro::PARAMS;
 
         explicit TapeParams(
             std::string const& name,
@@ -101,11 +101,12 @@ class TapeParams
         Macro delay_channel_lfo_1_frequency_macro;
         Macro delay_channel_lfo_2_frequency_macro;
         Macro color_macro;
+        Macro pre_dist_high_shelf_filter_gain_macro;
         Macro high_shelf_filter_frequency_macro;
         Macro high_shelf_filter_gain_macro;
-        Macro offset_below_midpoint;
-        Macro offset_above_midpoint;
-        Macro distance_from_midpoint;
+        Macro color_offset_below_midpoint;
+        Macro color_offset_above_midpoint;
+        Macro color_distance_from_midpoint;
         Macro low_pass_filter_frequency_macro;
         Macro low_shelf_filter_gain_macro;
         Macro peaking_filter_gain_macro;
@@ -171,7 +172,12 @@ class Tape : public Filter<InputSignalProducerClass>
                 Sample w2;
         };
 
-        typedef Distortion::Distortion<InputSignalProducerClass> Distortion_;
+        typedef BiquadFilter<
+            InputSignalProducerClass,
+            BiquadFilterFixedType::BFFT_HIGH_SHELF
+        > PreDistHighShelfFilter;
+
+        typedef Distortion::Distortion<PreDistHighShelfFilter> Distortion_;
 
         typedef BiquadFilter<
             Distortion_,
@@ -286,6 +292,7 @@ class Tape : public Filter<InputSignalProducerClass>
         void schedule_fast_forward_start(Seconds const duration) noexcept;
 
         TapeParams& params;
+        PreDistHighShelfFilter pre_dist_high_shelf_filter;
         Distortion_ distortion;
         LowShelfFilter low_shelf_filter;
         HissGenerator_ hiss_generator;

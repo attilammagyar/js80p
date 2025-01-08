@@ -41,10 +41,10 @@ can be turned into a harmonically rich noise (almost white noise) by turning up
 the volume of the first oscillator.
 
     Macro 1     color_macro
-    Macro 2     offset_below_midpoint
-    Macro 3     offset_above_midpoint
-    Macro 4     distance_from_midpoint
-    Macro 5     -
+    Macro 2     color_offset_below_midpoint
+    Macro 3     color_offset_above_midpoint
+    Macro 4     color_distance_from_midpoint
+    Macro 5     pre_dist_high_shelf_filter_gain_macro
     Macro 6     low_pass_filter_frequency_macro
     Macro 7     low_shelf_filter_gain_macro
     Macro 8     high_shelf_filter_gain_macro
@@ -89,6 +89,8 @@ MC7 = 1.0
 MC8 = 0.0
 MC9 = 1.0
 MC10 = 0.0
+MF2FRQ = 0.250000018215631
+MF2Gctl = 0.527343750
 CAMP = 0.10
 CVS = 0.0
 CVOL = 1.0
@@ -119,6 +121,11 @@ F3MID = 0.0
 F3INctl = 0.511718750
 F4INctl = 0.5156250
 F4MINctl = 0.519531250
+F5MID = 0.0
+F5INctl = 0.511718750
+F5MIN = 0.66670
+F5MAX = 0.69450
+F5DST = 0.20
 F6INctl = 0.52343750
 F6MIN = 1.0
 F6MAX = 0.590
@@ -127,10 +134,10 @@ F7INctl = 0.52343750
 F7MIN = 0.66670
 F7MAX = 0.71530
 F7DST = 0.30
-F8MID = 0.6720
+F8MID = 0.76210
 F8INctl = 0.511718750
 F8MIN = 0.250
-F8MAX = 0.79170
+F8MAX = 0.750
 F8DST = 0.30
 F9MID = 0.820
 F9INctl = 0.511718750
@@ -186,6 +193,7 @@ L5AMTctl = 0.64843750
 L5DST = 0.050
 MWAV = 1.0
 CWAV = 0.111111111111111
+MF2TYP = 1.0
 CF1TYP = 0.833333333333333
 CF2TYP = 1.0
 EF1TYP = 0.666666666666667
@@ -195,6 +203,7 @@ L2LOG = 1.0
 L3LOG = 1.0
 MOIA = 1.0
 MOIS = 1.0
+F5DSH = 0.666666666666667
 F6DSH = 0.666666666666667
 F7DSH = 0.333333333333333
 F9DSH = 0.333333333333333
@@ -235,11 +244,12 @@ TapeParams::TapeParams(
     delay_channel_lfo_1_frequency_macro(name + "ST1"),
     delay_channel_lfo_2_frequency_macro(name + "ST2"),
     color_macro(name + "C", 0.5),
+    pre_dist_high_shelf_filter_gain_macro(name + "PHSG"),
     high_shelf_filter_frequency_macro(name + "HSF"),
     high_shelf_filter_gain_macro(name + "HSG"),
-    offset_below_midpoint(name + "OB"),
-    offset_above_midpoint(name + "OA"),
-    distance_from_midpoint(name + "D"),
+    color_offset_below_midpoint(name + "OB"),
+    color_offset_above_midpoint(name + "OA"),
+    color_distance_from_midpoint(name + "D"),
     low_pass_filter_frequency_macro(name + "LPF"),
     low_shelf_filter_gain_macro(name + "LSG"),
     peaking_filter_gain_macro(name + "PG"),
@@ -310,6 +320,23 @@ TapeParams::TapeParams(
     delay_channel_lfo_2.distortion.set_value(0.05);
     delay_channel_lfo_2.frequency.set_macro(&delay_channel_lfo_2_frequency_macro);
 
+    constexpr Number filter_gain_min = Constants::BIQUAD_FILTER_GAIN_MIN;
+    constexpr Number filter_gain_max = Constants::BIQUAD_FILTER_GAIN_MAX;
+    constexpr Number filter_gain_range = filter_gain_max - filter_gain_min;
+
+    pre_dist_high_shelf_filter_gain_macro.midpoint.set_value(0.00);
+    pre_dist_high_shelf_filter_gain_macro.min.set_value(
+        (0.0 - filter_gain_min) / filter_gain_range
+    );
+    pre_dist_high_shelf_filter_gain_macro.max.set_value(
+        (2.0 - filter_gain_min) / filter_gain_range
+    );
+    pre_dist_high_shelf_filter_gain_macro.distortion.set_value(0.2);
+    pre_dist_high_shelf_filter_gain_macro.distortion_shape.set_value(
+        Macro::DIST_SHAPE_SHARP_SMOOTH
+    );
+    pre_dist_high_shelf_filter_gain_macro.input.set_macro(&color_macro);
+
     high_shelf_filter_frequency_macro.midpoint.set_value(0.82);
     high_shelf_filter_frequency_macro.min.set_value(0.015);
     high_shelf_filter_frequency_macro.max.set_value(0.30);
@@ -319,16 +346,12 @@ TapeParams::TapeParams(
     );
     high_shelf_filter_frequency_macro.input.set_macro(&color_macro);
 
-    constexpr Number filter_gain_min = Constants::BIQUAD_FILTER_GAIN_MIN;
-    constexpr Number filter_gain_max = Constants::BIQUAD_FILTER_GAIN_MAX;
-    constexpr Number filter_gain_range = filter_gain_max - filter_gain_min;
-
-    high_shelf_filter_gain_macro.midpoint.set_value(0.672);
+    high_shelf_filter_gain_macro.midpoint.set_value(0.7621);
     high_shelf_filter_gain_macro.min.set_value(
         (-30.0 - filter_gain_min) / filter_gain_range
     );
     high_shelf_filter_gain_macro.max.set_value(
-        (9.0 - filter_gain_min) / filter_gain_range
+        (6.0 - filter_gain_min) / filter_gain_range
     );
     high_shelf_filter_gain_macro.distortion.set_value(0.3);
     high_shelf_filter_gain_macro.distortion_shape.set_value(
@@ -336,16 +359,16 @@ TapeParams::TapeParams(
     );
     high_shelf_filter_gain_macro.input.set_macro(&color_macro);
 
-    offset_below_midpoint.midpoint.set_value(1.0);
-    offset_below_midpoint.min.set_value(1.0);
-    offset_below_midpoint.max.set_value(0.0);
-    offset_below_midpoint.input.set_macro(&color_macro);
+    color_offset_below_midpoint.midpoint.set_value(1.0);
+    color_offset_below_midpoint.min.set_value(1.0);
+    color_offset_below_midpoint.max.set_value(0.0);
+    color_offset_below_midpoint.input.set_macro(&color_macro);
 
-    offset_above_midpoint.midpoint.set_value(0.0);
-    offset_above_midpoint.input.set_macro(&color_macro);
+    color_offset_above_midpoint.midpoint.set_value(0.0);
+    color_offset_above_midpoint.input.set_macro(&color_macro);
 
-    distance_from_midpoint.input.set_macro(&offset_below_midpoint);
-    distance_from_midpoint.min.set_macro(&offset_above_midpoint);
+    color_distance_from_midpoint.input.set_macro(&color_offset_below_midpoint);
+    color_distance_from_midpoint.min.set_macro(&color_offset_above_midpoint);
 
     low_pass_filter_frequency_macro.min.set_value(1.0);
     low_pass_filter_frequency_macro.max.set_value(0.59);
@@ -353,7 +376,7 @@ TapeParams::TapeParams(
     low_pass_filter_frequency_macro.distortion_shape.set_value(
         Macro::DIST_SHAPE_SHARP_SMOOTH
     );
-    low_pass_filter_frequency_macro.input.set_macro(&distance_from_midpoint);
+    low_pass_filter_frequency_macro.input.set_macro(&color_distance_from_midpoint);
 
     low_shelf_filter_gain_macro.min.set_value(
         (0.0 - filter_gain_min) / filter_gain_range
@@ -365,7 +388,7 @@ TapeParams::TapeParams(
     low_shelf_filter_gain_macro.distortion_shape.set_value(
         Macro::DIST_SHAPE_SMOOTH_SHARP
     );
-    low_shelf_filter_gain_macro.input.set_macro(&distance_from_midpoint);
+    low_shelf_filter_gain_macro.input.set_macro(&color_distance_from_midpoint);
 
     peaking_filter_gain_macro.min.set_value(
         (0.0 - filter_gain_min) / filter_gain_range
@@ -377,7 +400,7 @@ TapeParams::TapeParams(
     peaking_filter_gain_macro.distortion_shape.set_value(
         Macro::DIST_SHAPE_SHARP_SHARP
     );
-    peaking_filter_gain_macro.input.set_macro(&offset_above_midpoint);
+    peaking_filter_gain_macro.input.set_macro(&color_offset_above_midpoint);
 
     size_t i = 0;
 
@@ -403,11 +426,12 @@ TapeParams::TapeParams(
     store_signal_producers_from_macro(delay_channel_lfo_1_frequency_macro, i);
     store_signal_producers_from_macro(delay_channel_lfo_2_frequency_macro, i);
     store_signal_producers_from_macro(color_macro, i);
+    store_signal_producers_from_macro(pre_dist_high_shelf_filter_gain_macro, i);
     store_signal_producers_from_macro(high_shelf_filter_frequency_macro, i);
     store_signal_producers_from_macro(high_shelf_filter_gain_macro, i);
-    store_signal_producers_from_macro(offset_below_midpoint, i);
-    store_signal_producers_from_macro(offset_above_midpoint, i);
-    store_signal_producers_from_macro(distance_from_midpoint, i);
+    store_signal_producers_from_macro(color_offset_below_midpoint, i);
+    store_signal_producers_from_macro(color_offset_above_midpoint, i);
+    store_signal_producers_from_macro(color_distance_from_midpoint, i);
     store_signal_producers_from_macro(low_pass_filter_frequency_macro, i);
     store_signal_producers_from_macro(low_shelf_filter_gain_macro, i);
     store_signal_producers_from_macro(peaking_filter_gain_macro, i);
@@ -667,13 +691,15 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         TapeParams& params,
         InputSignalProducerClass& input
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 7, 0, &delay),
+    : Filter<InputSignalProducerClass>(input, 8, 0, &delay),
     params(params),
+    pre_dist_high_shelf_filter(name + "PHS", input),
     distortion(
         name + "DIST",
         params.distortion_type,
-        input,
-        params.distortion_level
+        pre_dist_high_shelf_filter,
+        params.distortion_level,
+        &pre_dist_high_shelf_filter
     ),
     low_shelf_filter(name + "LS", distortion, distortion.get_buffer_owner()),
     hiss_generator(low_shelf_filter, params.hiss_level),
@@ -697,6 +723,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     previous_bypass_toggle_value(params.bypass_toggle.get_value()),
     needs_ff_rescheduling(true)
 {
+    this->register_child(pre_dist_high_shelf_filter);
     this->register_child(distortion);
     this->register_child(low_shelf_filter);
     this->register_child(hiss_generator);
@@ -704,6 +731,12 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     this->register_child(peaking_filter);
     this->register_child(low_pass_filter);
     this->register_child(delay);
+
+    pre_dist_high_shelf_filter.type.set_value(HighShelfFilter::HIGH_SHELF);
+    pre_dist_high_shelf_filter.gain.set_macro(
+        &params.pre_dist_high_shelf_filter_gain_macro
+    );
+    pre_dist_high_shelf_filter.frequency.set_value(6000.0);
 
     low_shelf_filter.type.set_value(HighShelfFilter::LOW_SHELF);
     low_shelf_filter.gain.set_macro(&params.low_shelf_filter_gain_macro);
