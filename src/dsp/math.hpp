@@ -51,11 +51,11 @@ class Math
             ENV_SHAPE_SHARP_SHARP_STEEPER = 11,
         };
 
-        enum DistortionShape {
-            DIST_SHAPE_SMOOTH_SMOOTH = 0,
-            DIST_SHAPE_SMOOTH_SHARP = 1,
-            DIST_SHAPE_SHARP_SMOOTH = 2,
-            DIST_SHAPE_SHARP_SHARP = 3,
+        enum DistortionCurve {
+            DIST_CURVE_SMOOTH_SMOOTH = 0,
+            DIST_CURVE_SMOOTH_SHARP = 1,
+            DIST_CURVE_SHARP_SMOOTH = 2,
+            DIST_CURVE_SHARP_SHARP = 3,
         };
 
         class RNG
@@ -306,7 +306,7 @@ class Math
         static Number distort(
             Number const level,
             Number const number,
-            DistortionShape const shape = DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH
+            DistortionCurve const curve = DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH
         ) noexcept;
 
         /**

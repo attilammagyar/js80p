@@ -110,19 +110,19 @@ void Math::init_distortions() noexcept
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH][i] = distortion_centered_lfo[i] + 0.5;
+        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH][i] = distortion_centered_lfo[i] + 0.5;
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionShape::DIST_SHAPE_SMOOTH_SHARP][i] = shape_smooth_sharp_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SHARP][i] = shape_smooth_sharp_steeper(xs[i]);
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionShape::DIST_SHAPE_SHARP_SMOOTH][i] = shape_sharp_smooth_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SHARP_SMOOTH][i] = shape_sharp_smooth_steeper(xs[i]);
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionShape::DIST_SHAPE_SHARP_SHARP][i] = shape_sharp_sharp_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SHARP_SHARP][i] = shape_sharp_sharp_steeper(xs[i]);
     }
 }
 
@@ -739,7 +739,7 @@ constexpr Number Math::combine(
 Number Math::distort(
         Number const level,
         Number const number,
-        DistortionShape const shape
+        DistortionCurve const curve
 ) noexcept {
     if (level < 0.0001) {
         return number;
@@ -748,7 +748,7 @@ Number Math::distort(
     return combine(
         level,
         lookup(
-            math.distortions[(int)shape],
+            math.distortions[(int)curve],
             DISTORTION_TABLE_MAX_INDEX,
             number * DISTORTION_SCALE
         ),

@@ -256,14 +256,14 @@ TapeParams::TapeParams(
     state(State::TAPE_STATE_INIT)
 {
     wnf_amp_smooth_sharp_macro.distortion.set_value(0.3);
-    wnf_amp_smooth_sharp_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SHARP
+    wnf_amp_smooth_sharp_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SHARP
     );
     wnf_amp_smooth_sharp_macro.input.set_macro(&wnf_amp_macro);
 
     wnf_amp_sharp_smooth_macro.distortion.set_value(0.2);
-    wnf_amp_sharp_smooth_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SHARP_SMOOTH
+    wnf_amp_sharp_smooth_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SHARP_SMOOTH
     );
     wnf_amp_sharp_smooth_macro.input.set_macro(&wnf_amp_macro);
 
@@ -282,16 +282,16 @@ TapeParams::TapeParams(
     delay_channel_lfo_1_frequency_macro.min.set_value(0.0212);
     delay_channel_lfo_1_frequency_macro.max.set_value(0.1612);
     delay_channel_lfo_1_frequency_macro.distortion.set_value(0.8);
-    delay_channel_lfo_1_frequency_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SHARP
+    delay_channel_lfo_1_frequency_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SHARP
     );
     delay_channel_lfo_1_frequency_macro.input.set_macro(&wnf_speed_macro);
 
     delay_channel_lfo_2_frequency_macro.min.set_value(0.0325);
     delay_channel_lfo_2_frequency_macro.max.set_value(0.1725);
     delay_channel_lfo_2_frequency_macro.distortion.set_value(0.8);
-    delay_channel_lfo_2_frequency_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SHARP
+    delay_channel_lfo_2_frequency_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SHARP
     );
     delay_channel_lfo_2_frequency_macro.input.set_macro(&wnf_speed_macro);
 
@@ -332,8 +332,8 @@ TapeParams::TapeParams(
         (2.0 - filter_gain_min) / filter_gain_range
     );
     pre_dist_high_shelf_filter_gain_macro.distortion.set_value(0.2);
-    pre_dist_high_shelf_filter_gain_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SHARP_SMOOTH
+    pre_dist_high_shelf_filter_gain_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SHARP_SMOOTH
     );
     pre_dist_high_shelf_filter_gain_macro.input.set_macro(&color_macro);
 
@@ -341,8 +341,8 @@ TapeParams::TapeParams(
     high_shelf_filter_frequency_macro.min.set_value(0.015);
     high_shelf_filter_frequency_macro.max.set_value(0.30);
     high_shelf_filter_frequency_macro.distortion.set_value(0.3);
-    high_shelf_filter_frequency_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SHARP
+    high_shelf_filter_frequency_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SHARP
     );
     high_shelf_filter_frequency_macro.input.set_macro(&color_macro);
 
@@ -354,8 +354,8 @@ TapeParams::TapeParams(
         (6.0 - filter_gain_min) / filter_gain_range
     );
     high_shelf_filter_gain_macro.distortion.set_value(0.3);
-    high_shelf_filter_gain_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SMOOTH
+    high_shelf_filter_gain_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SMOOTH
     );
     high_shelf_filter_gain_macro.input.set_macro(&color_macro);
 
@@ -373,8 +373,8 @@ TapeParams::TapeParams(
     low_pass_filter_frequency_macro.min.set_value(1.0);
     low_pass_filter_frequency_macro.max.set_value(0.59);
     low_pass_filter_frequency_macro.distortion.set_value(0.5);
-    low_pass_filter_frequency_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SHARP_SMOOTH
+    low_pass_filter_frequency_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SHARP_SMOOTH
     );
     low_pass_filter_frequency_macro.input.set_macro(&color_distance_from_midpoint);
 
@@ -385,8 +385,8 @@ TapeParams::TapeParams(
         (3.5 - filter_gain_min) / filter_gain_range
     );
     low_shelf_filter_gain_macro.distortion.set_value(0.3);
-    low_shelf_filter_gain_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SMOOTH_SHARP
+    low_shelf_filter_gain_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SMOOTH_SHARP
     );
     low_shelf_filter_gain_macro.input.set_macro(&color_distance_from_midpoint);
 
@@ -397,8 +397,8 @@ TapeParams::TapeParams(
         (-6.0 - filter_gain_min) / filter_gain_range
     );
     peaking_filter_gain_macro.distortion.set_value(0.9);
-    peaking_filter_gain_macro.distortion_shape.set_value(
-        Macro::DIST_SHAPE_SHARP_SHARP
+    peaking_filter_gain_macro.distortion_curve.set_value(
+        Macro::DIST_CURVE_SHARP_SHARP
     );
     peaking_filter_gain_macro.input.set_macro(&color_offset_above_midpoint);
 
@@ -449,7 +449,7 @@ void TapeParams::store_signal_producers_from_macro(Macro& macro, size_t& i) noex
     signal_producers[i++] = &macro.scale;
     signal_producers[i++] = &macro.distortion;
     signal_producers[i++] = &macro.randomness;
-    signal_producers[i++] = &macro.distortion_shape;
+    signal_producers[i++] = &macro.distortion_curve;
 }
 
 

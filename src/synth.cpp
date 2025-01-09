@@ -631,11 +631,11 @@ void Synth::create_macros() noexcept
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->randomness);
     }
 
-    next_id = ParamId::M1DSH;
+    next_id = ParamId::M1DCV;
 
     for (Integer i = 0; i != MACROS; ++i) {
-        register_param_as_child<Macro::DistortionShapeParam>(
-            (ParamId)next_id++, macros_rw[i]->distortion_shape
+        register_param_as_child<Macro::DistortionCurveParam>(
+            (ParamId)next_id++, macros_rw[i]->distortion_curve
         );
     }
 }

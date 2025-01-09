@@ -153,26 +153,26 @@ TEST(can_distort_the_value, {
 })
 
 
-TEST(distortion_shape_can_be_changed, {
+TEST(distortion_curve_can_be_changed, {
     Macro macro;
 
     macro.distortion.set_value(0.5);
 
-    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SMOOTH_SHARP);
+    macro.distortion_curve.set_value(Macro::DIST_CURVE_SMOOTH_SHARP);
     assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "smooth-sharp");
     assert_gt(0.25, apply_macro(macro, 0.25), "smooth-sharp");
     assert_gt(0.50, apply_macro(macro, 0.50), "smooth-sharp");
     assert_gt(0.75, apply_macro(macro, 0.75), "smooth-sharp");
     assert_eq(1.00, apply_macro(macro, 1.00), DOUBLE_DELTA, "smooth-sharp");
 
-    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SHARP_SMOOTH);
+    macro.distortion_curve.set_value(Macro::DIST_CURVE_SHARP_SMOOTH);
     assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "sharp-smooth");
     assert_lt(0.25, apply_macro(macro, 0.25), "sharp-smooth");
     assert_lt(0.50, apply_macro(macro, 0.50), "sharp-smooth");
     assert_lt(0.75, apply_macro(macro, 0.75), "sharp-smooth");
     assert_eq(1.00, apply_macro(macro, 1.00), DOUBLE_DELTA, "sharp-smooth");
 
-    macro.distortion_shape.set_value(Macro::DIST_SHAPE_SHARP_SHARP);
+    macro.distortion_curve.set_value(Macro::DIST_CURVE_SHARP_SHARP);
     assert_eq(0.00, apply_macro(macro, 0.00), DOUBLE_DELTA, "sharp-sharp");
     assert_lt(0.25, apply_macro(macro, 0.25), "sharp-sharp");
     assert_eq(0.50, apply_macro(macro, 0.50), DOUBLE_DELTA, "sharp-sharp");

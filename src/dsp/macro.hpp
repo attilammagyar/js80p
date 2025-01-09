@@ -39,17 +39,17 @@ namespace JS80P
 class Macro : public MidiController
 {
     public:
-        static constexpr Byte DIST_SHAPE_SMOOTH_SMOOTH = Math::DistortionShape::DIST_SHAPE_SMOOTH_SMOOTH;
-        static constexpr Byte DIST_SHAPE_SMOOTH_SHARP = Math::DistortionShape::DIST_SHAPE_SMOOTH_SHARP;
-        static constexpr Byte DIST_SHAPE_SHARP_SMOOTH = Math::DistortionShape::DIST_SHAPE_SHARP_SMOOTH;
-        static constexpr Byte DIST_SHAPE_SHARP_SHARP = Math::DistortionShape::DIST_SHAPE_SHARP_SHARP;
+        static constexpr Byte DIST_CURVE_SMOOTH_SMOOTH = Math::DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH;
+        static constexpr Byte DIST_CURVE_SMOOTH_SHARP = Math::DistortionCurve::DIST_CURVE_SMOOTH_SHARP;
+        static constexpr Byte DIST_CURVE_SHARP_SMOOTH = Math::DistortionCurve::DIST_CURVE_SHARP_SMOOTH;
+        static constexpr Byte DIST_CURVE_SHARP_SHARP = Math::DistortionCurve::DIST_CURVE_SHARP_SHARP;
 
         static constexpr Integer PARAMS = 8;
 
-        class DistortionShapeParam : public ByteParam
+        class DistortionCurveParam : public ByteParam
         {
             public:
-                explicit DistortionShapeParam(std::string const& name) noexcept;
+                explicit DistortionCurveParam(std::string const& name) noexcept;
         };
 
         explicit Macro(
@@ -66,7 +66,7 @@ class Macro : public MidiController
         FloatParamB scale;
         FloatParamB distortion;
         FloatParamB randomness;
-        DistortionShapeParam distortion_shape;
+        DistortionCurveParam distortion_curve;
 
     private:
         bool update_change_indices() noexcept;
@@ -84,7 +84,7 @@ class Macro : public MidiController
         Integer scale_change_index;
         Integer distortion_change_index;
         Integer randomness_change_index;
-        Integer distortion_shape_change_index;
+        Integer distortion_curve_change_index;
         bool is_updating;
 };
 

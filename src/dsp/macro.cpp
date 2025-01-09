@@ -25,14 +25,14 @@
 namespace JS80P
 {
 
-Macro::DistortionShapeParam::DistortionShapeParam(
+Macro::DistortionCurveParam::DistortionCurveParam(
         std::string const& name
 ) noexcept
     : ByteParam(
         name,
-        DIST_SHAPE_SMOOTH_SMOOTH,
-        DIST_SHAPE_SHARP_SHARP,
-        DIST_SHAPE_SMOOTH_SMOOTH
+        DIST_CURVE_SMOOTH_SMOOTH,
+        DIST_CURVE_SHARP_SHARP,
+        DIST_CURVE_SMOOTH_SMOOTH
     )
 {
 }
@@ -47,7 +47,7 @@ Macro::Macro(std::string const& name, Number const input_default_value) noexcept
     scale(name + "AMT", 0.0, 1.0, 1.0),
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
-    distortion_shape(name + "DSH"),
+    distortion_curve(name + "DSH"),
     midpoint_change_index(0),
     input_change_index(0),
     min_change_index(0),
@@ -55,7 +55,7 @@ Macro::Macro(std::string const& name, Number const input_default_value) noexcept
     scale_change_index(0),
     distortion_change_index(0),
     randomness_change_index(0),
-    distortion_shape_change_index(0),
+    distortion_curve_change_index(0),
     is_updating(false)
 {
 }
@@ -88,7 +88,7 @@ void Macro::update() noexcept
         Math::distort(
             distortion.get_value(),
             shifted_input_value,
-            (Math::DistortionShape)distortion_shape.get_value()
+            (Math::DistortionCurve)distortion_curve.get_value()
         )
     );
 
@@ -112,7 +112,7 @@ bool Macro::update_change_indices() noexcept
     is_dirty = update_change_index<FloatParamB>(scale, scale_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(distortion, distortion_change_index) || is_dirty;
     is_dirty = update_change_index<FloatParamB>(randomness, randomness_change_index) || is_dirty;
-    is_dirty = update_change_index<DistortionShapeParam>(distortion_shape, distortion_shape_change_index) || is_dirty;
+    is_dirty = update_change_index<DistortionCurveParam>(distortion_curve, distortion_curve_change_index) || is_dirty;
 
     return is_dirty;
 }
