@@ -170,7 +170,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
     gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
 
-    is_silent_ = gain_buffer == NULL && gain.get_value() < 0.000001;
+    is_silent_ = gain_buffer == NULL && gain.get_value() < 0.000003;
 
     return NULL;
 }
