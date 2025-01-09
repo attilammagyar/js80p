@@ -1,3 +1,13 @@
+v3.4.0 (2025-01-??)
+ * The Echo and Reverb effects can now be gated by switching their side-chain
+   compression into expansion mode.
+ * Add a basic Tape simulation effect for slow-down stops, lo-fi wow and
+   flutter, saturation and tone coloring, etc.
+ * New preset: FX Master Enhancer, a preset for using JS80P as a master bus
+   effect rather than a synthesizer.
+ * Bugfix: fixed the positioning of the distortion type selectors on the user
+   interface.
+
 v3.3.0 (2024-12-11)
  * The MIX (modulator additive volume) parameter can now be controlled with
    envelopes and polyphonic LFOs.
