@@ -62,6 +62,7 @@ Table of Contents
        * [Volume Controls](#usage-effects-volume)
        * [Distortions](#usage-effects-distortions)
        * [Filters](#usage-effects-filters)
+       * [Tape](#usage-effects-tape)
        * [Chorus](#usage-effects-chorus)
        * [Echo](#usage-effects-echo)
        * [Reverb](#usage-effects-reverb)
@@ -180,12 +181,15 @@ Features
  * Built-in effects:
     * various distortions,
     * 2 more filters,
+    * tape (saturation, tone coloring, noise, wow and flutter, slow-down stop,
+      fast-forward)
     * chorus,
-    * stereo echo (with distortion, side-chaining, and reversible delay lines),
-    * stereo reverb (with distortion and side-chaining),
+    * stereo echo (with distortion, side-chain compression or gate, and
+      reversible delay lines),
+    * stereo reverb (with distortion and side-chain compression or gate),
     * volume controls at various points of the signal chain.
  * 12 DAHDSR envelopes with customizable shapes, freely assignable to most of
-   the oscillator parameters.
+   the oscillator, filter, and modulation parameters.
  * 8 low-frequency oscillators (LFO) with optional amplitude envelope and
    polyphony.
  * Filter and envelope imperfection settings for analog-like feel.
@@ -509,7 +513,14 @@ Usage
             +-----------------------------------------------------------+
             |
             v
-            Volume --> Chorus --> Echo --> Reverb --> Volume --> Out
+            Volume --> Tape (1) --> Chorus --> Echo --> Reverb --> Tape (2) --+
+                                                                              |
+            +-----------------------------------------------------------------+
+            |
+            v
+            Volume --> Out
+
+Note: the tape effect can optionally be moved after the reverb in the chain.
 
 <a href="#toc">Table of Contents</a>
 
@@ -1193,7 +1204,7 @@ distortion:
    to make sure that the signal will decay eventually, even with high
    distortion levels.)
 
-##### Distortion Level
+##### Distortion Level (DIST)
 
 The amount of distortion that is applied to the signal.
 
@@ -1202,6 +1213,115 @@ The amount of distortion that is applied to the signal.
 #### Filters
 
 See [oscillator filters](#usage-synth-common-filter).
+
+<a id="usage-effects-tape"></a>
+
+#### Tape
+
+Though this effect is not a proper physical simulation of a tape machine and
+magnetic tape with bias, hysteresis and whatnot, it can help achieve certain
+effects that are usually associated with analog media, like lo-fi wow and
+flutter, slow-down and stop, and tone coloring and saturation.
+
+##### Stop / Start (STOP)
+
+This parameter can trigger a slow-down and eventually a complete stop: a few
+milliseconds after it is set to a non-zero value, the virtual tape will
+gradually slow down (thus, the pitch of the sound will drop more and more) and
+eventually stop, exactly after the set amount of time which can range from a
+few milliseconds up to 15 seconds. (Since this is quite a wide range, using
+[macros](#usage-macros) with an appropriate range and distortion curve can
+improve the controllability and the customization of this parameter.)
+
+Once the tape is stopped, it can be started again in two ways:
+
+ * increasing the value of the Stop / Start parameter will immediately start
+   the virtual tape again which will immediately catch up with reality,
+
+ * or setting the value of Stop / Start to zero and then setting it to a
+   non-zero value again will make the tape fast-forward, and eventually catch
+   up with reality after the set amount of time.
+
+Once the tape has started slowing down, the stopping process can be canceled
+by decreasing the Stop / Start parameter, which will immediately result in a
+short fast-forward. On the other hand, if the Stop / Start parameter is
+increased while the tape is slowing down, it will trigger a completely new
+slow-down and stop process.
+
+Changing the Stop / Start parameter during fast-forwarding will trigger a new
+fast-forward process.
+
+After a stop-start sequence is completed, the tape will no longer react to
+changes of the Stop / Start parameter until its value is set to zero.
+
+The tape stop and start effect can also be [automated](#faq-automation): assign
+a MIDI controller (CC) (optionally through a [macro](#usage-macros)) to the
+Stop / Start parameter, and automate that in the host application.
+
+<a id="usage-effects-tape-wnf"></a>
+
+##### Wow and Flutter Amplitude (W&amp;F)
+
+Even the most precise analog tape machines have some amount of fluctuation in
+their tape speed due to various physical limitations. Slow variations are
+called wow, faster variations are called flutter, but they usually appear
+together. A small amount of this is usually not noticeable, but e.g. if the
+machine is set up incorrectly or the tape is breaking down, then the variation
+of playback speed can produce audible pitch and tempo variations which have a
+certain vibe to them that might be used artistically.
+
+This parameter controls how much wow and flutter is simulated by JS80P.
+
+##### Wow and Flutter Speed
+
+The first little screw in the header section of the Tape effect controls the
+speed of the [wow and flutter](#usage-effects-tape-wnf).
+
+##### Stereo Wow and Flutter Speed
+
+The second little screw in the header section of the Tape effect controls the
+variation of the [wow and flutter](#usage-effects-tape-wnf) between the two
+stereo channels.
+
+##### Saturation Type
+
+The black box in the header section of the Tape effect can be used for
+selecting the type of distortion applied by the tape simulation. See the
+documentation of the [distortion effect](#usage-effects-distortions) for the
+details.
+
+##### Saturation Level (SAT)
+
+The amount of distortion that is applied to the signal.
+
+##### Color (CLR)
+
+Physical tape machines rarely have a flat frequency response; the actual curve
+depends on the type and speed of the tape, and several other factors. This
+parameter mimics some of the frequency response irregularities of tape: when
+set to values below 100%, the sound gets darker, while above 100%, it gets
+brighter.
+
+##### Hiss Level
+
+The second little screw in the header section of the Tape effect controls how
+much noise should be produced by the virtual tape.
+
+##### Position at End of Chain (END)
+
+When this toggle is turned off, then the tape simulation is placed between the
+second [volume control](#usage-effects-volume) and the
+[Chorus](#usage-effects-chorus) effect. This setup mimics the scenario of
+recording an instrument to tape, and then adding various effects to it later
+during the mixing process. This way, subsequent effects can react to tape stops
+as well.
+
+When this toggle is turned on, then the tape simulation is moved to the end of
+the effects signal chain, right between the [Reverb](#usage-effects-reverb)
+and the last [volume control](#usage-effects-volume). With this setup, a tape
+stop will also include the echo and reverb tails.
+
+<a href="#toc">Table of Contents</a>
 
 <a id="usage-effects-chorus"></a>
 
@@ -1314,7 +1434,7 @@ Control the loudness of the original, unmodified input signal.
 
 The Echo effect repeats the input signal with a delay, optionally reversed,
 with various levels of filtering and distortion, and with side-chain
-compression.
+compression or expansion (gate).
 
 The effect is built around two sequentially connected delay lines; the output
 of the second second one is fed back into the first one.
@@ -1414,39 +1534,62 @@ Set the stereo spread of the echos. The further away this value is from 0%, the
 further from the center the echos will be, bouncing back and forth between the
 right and left speaker.
 
+<a id="usage-effects-echo-cm"></a>
+
+##### Side-chain Compression Mode
+
+Click on the black box in the header section of the Echo effect above the
+[compression parameters](#usage-effects-echo-cth) or use the mouse wheel while
+holding the cursor above it to select the operating mode of the compressor:
+
+ * **COMP**: compression, the volume of the echo is reduced while the dry
+   signal is above the [threshold](#usage-effects-echo-cth), so that the sound
+   can be crystal clear while also letting the echo tail be loud and long once
+   the dry signal stops.
+
+ * **EXPD**: expansion, the volume of the echo is reduced when the dry signal
+   goes below the [threshold](#usage-effects-echo-cth), so the sound can be
+   very atmospheric while allowing precise control over the echo tail length
+   and drop-off.
+
 <a id="usage-effects-echo-cth"></a>
 
-##### Side-chain Compression Threshold (CTH)
+##### Side-chain Compression
+
+The following information applies when the
+[side-chain compression mode](#usage-effects-echo-cm) is set to **COMP**.
+
+###### Side-chain Compression Threshold (CTH)
 
 Threshold for the side-chain compression: when the input signal goes above this
 level, the effect will reduce the volume of the echos in order to keep them
-from stealing the spotlight from the original signal in the mix. Once the input
-signal goes below the threshold, the echos will be brought up to their intended
-level.
+from stealing the spotlight from the original signal in the mix.  Once the
+input signal goes below the threshold, the echos will be brought up to their
+intended level.
 
-##### Side-chain Compression Attack Time (CATK)
+###### Side-chain Compression Attack Time (CATK)
 
 Set how fast or how slow the compression should kick in when the raw signal
 goes above the threshold.
 
-##### Side-chain Compression Release Time (CREL)
+###### Side-chain Compression Release Time (CREL)
 
 Set how fast or how slow the compression should bring back the echo signal to
 its normal level once the raw input signal goes below the threshold.
 
-##### Side-chain Compression Ratio (CR)
+###### Side-chain Compression Ratio (CR)
 
 Control the amount of compression that is applied to the echo signal based on
 the loudness of the raw input signal.
 
-For example, if the [compression threshold](#usage-effects-echo-cth) is -11 dB,
-and the input signal is -5 dB, then the input is 6 dB louder than the
-threshold, because `-11 + 6 = -5`. A compression ratio of 3 will turn this 6 dB
-difference into `6 / 3 = 2` dB, so the target gain will be `-11 + 2 = -9` dB,
-which means a -4 dB signal reduction. The trick with side-chaining is that the
-necessary loudness reduction is calculated for one signal, but applied to
-another; in this case, the echo signal is the one which gets the -4 dB
-reduction, in order to let the raw sound shine.
+For example, if the threshold is -11 dB, and the input signal is -5 dB, then
+the input is 6 dB louder than the threshold, because `-11 + 6 = -5`. A
+compression ratio of 3 will turn this 6 dB difference into `6 / 3 = 2` dB, so
+the target gain will be `-11 + 2 = -9` dB, which means a -4 dB signal
+reduction. The trick with side-chaining is that the necessary loudness
+reduction is calculated for one signal, but applied to another; in this case,
+the echo signal is the one which gets the -4 dB reduction, in order to let the
+raw sound shine.
 
 Later, if the input signal reaches -2 dB, then the difference from the -11 dB
 threshold will be 9 dB. Since `9 / 3 = 3`, and `-11 + 3 = -8`, the -2 dB signal
@@ -1455,6 +1598,50 @@ a reduction of -6 dB will be applied to the echo signal.
 
 Then when the input signal goes below -11 dB, no more loudness reduction will
 be applied to the echo signal.
+
+##### Side-chain Expansion (Gate)
+
+The following information applies when the
+[side-chain compression mode](#usage-effects-echo-cm) is set to **EXPD**.
+
+###### Side-chain Expansion Threshold (CTH)
+
+Threshold for the side-chain expansion: when the input signal goes below this
+level, the effect will reduce the volume of the echos in order to control the
+echo tail. Once the input signal goes above the threshold, the echos will be
+brought up to their intended level together with it to make the sound more
+atmospheric.
+
+###### Side-chain Expansion Attack Time (CATK)
+
+Set how fast or slow the echos reach their maximum volume when the raw signal
+goes above the threshold. Longer attack values can help clean up the transients
+of the dry signal.
+
+<a id="usage-effects-echo-erel"></a>
+
+###### Side-chain Expansion Release Time (CREL)
+
+Set how fast or slow the echo tail decays when the dry signal goes below the
+threshold.
+
+###### Side-chain Expansion Ratio (CR)
+
+Control the amount of volume reduction that is applied to the echo signal based
+on the loudness of the raw input signal.
+
+For example, if the threshold is -11 dB, and the input signal is -16 dB, then
+the input is 5 dB below the threshold, because `-11 - 5 = -16`. An expansion
+ratio of 2 will turn this 5 dB difference into a `5 * 2 = 15` dB difference,
+so the target gain will be `-11 - 10 = -21` dB, which means a -7 dB signal
+reduction. The trick with side-chaining is that the necessary loudness
+reduction is calculated for one signal, but applied to another; in this case,
+the echo signal is the one which gets the -7 dB reduction.
+
+When the dry signal goes completely silent, then its volume will be infinitely
+lower than the threshold, therefore the echo effect also goes silent. The speed
+of its decay will be determined by the [release](#usage-effects-echo-erel)
+parameter.
 
 ##### Wet Volume (WET)
 
@@ -1472,7 +1659,7 @@ Control the loudness of the original, unmodified input signal.
 
 The Reverb effect combines multiple delay lines to simulate sound reflections
 that can be heard in various rooms, optionally with various levels of filtering
-and distortion, and with side-chain compression.
+and distortion, and with side-chain compression or expansion (gate).
 
 The signal chain is similar to the one in the
 [Echo effect](#usage-effects-echo), so many of the parameters work the same way
@@ -1535,11 +1722,11 @@ pitch wheel from 50% to 0% will make the knob move from 75% to 0%, and the
 pitch wheel's movement between 50% and 100% will move the knob from between 75%
 and 100%.
 
-#### Distortion Shape
+#### Distortion Curve
 
 Click on the second function graph icon at the top right corner of a macro, or
 use the mouse wheel while holding the mouse cursor over it to select the
-non-linearity shape that the macro will use when its
+non-linearity curve that the macro will use when its
 [distortion (DIST)](#usage-macros-dist) parameter is set to a value above 0%.
 
 <a id="usage-macros-in"></a>
