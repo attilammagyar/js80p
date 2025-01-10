@@ -30,7 +30,8 @@ Effects<InputSignalProducerClass>::Effects(
         std::string const& name,
         InputSignalProducerClass& input,
         BiquadFilterSharedBuffers& echo_filter_shared_buffers,
-        BiquadFilterSharedBuffers& reverb_filter_shared_buffers
+        BiquadFilterSharedBuffers& reverb_filter_shared_buffers,
+        Math::RNG& rng
 ) : Filter< Volume3<InputSignalProducerClass> >(
         volume_3,
         24 + (Integer)TapeParams::SIGNAL_PRODUCERS,
@@ -75,11 +76,11 @@ Effects<InputSignalProducerClass>::Effects(
         &volume_1
     ),
     volume_2(filter_2, volume_2_gain),
-    tape_1(name + "T1", tape_params, volume_2),
+    tape_1(name + "T1", tape_params, volume_2, rng),
     chorus(name + "C", tape_1),
     echo(name + "E", chorus, echo_filter_shared_buffers),
     reverb(name + "R", echo, reverb_filter_shared_buffers),
-    tape_2(name + "T2", tape_params, reverb),
+    tape_2(name + "T2", tape_params, reverb, rng),
     volume_3(tape_2, volume_3_gain)
 {
     size_t i = 0;

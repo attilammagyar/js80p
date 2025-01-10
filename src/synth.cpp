@@ -46,6 +46,7 @@
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
 #include "dsp/mixer.cpp"
+#include "dsp/noise_generator.cpp"
 #include "dsp/oscillator.cpp"
 #include "dsp/param.cpp"
 #include "dsp/reverb.cpp"
@@ -147,6 +148,19 @@ std::vector<bool> Synth::initialize_supported_midi_controllers() noexcept
 std::vector<bool> Synth::supported_midi_controllers = Synth::initialize_supported_midi_controllers();
 
 
+unsigned int Synth::make_rng_seed(void const* const ptr) noexcept
+{
+    Integer x = (Integer)ptr;
+    unsigned int seed = 12345;
+
+    for (int i = 0; i != 4; ++i) {
+        seed += (unsigned int)((x >> (i * 16)) & 0xffff);
+    }
+
+    return seed % 63949;
+}
+
+
 Synth::ParamIdHashTable Synth::param_id_hash_table;
 
 std::string Synth::param_names_by_id[ParamId::PARAM_ID_COUNT];
@@ -224,6 +238,11 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         modulator_add_volume,
         input_volume
     ),
+    /*
+    Different Synth instances should produce different noise patterns, so we're
+    using an instance-dependent random seed.
+    */
+    rng(make_rng_seed((void const*)this)),
     samples_since_gc(0),
     samples_between_gc(samples_between_gc),
     next_voice(0),
@@ -238,7 +257,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         "E",
         bus,
         biquad_filter_shared_buffers[4],
-        biquad_filter_shared_buffers[5]
+        biquad_filter_shared_buffers[5],
+        rng
     ),
     midi_controllers((MidiController* const*)midi_controllers_rw),
     macros((Macro* const*)macros_rw),
@@ -960,6 +980,11 @@ void Synth::reset() noexcept
     active_voices_count.store(0);
 
     tape_state.store(effects.tape_params.state);
+
+    /*
+    Not resetting the RNG, since we don't want to keep the random noise
+    deterministic.
+    */
 }
 
 

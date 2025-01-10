@@ -24,8 +24,6 @@
 
 #include "dsp/tape.hpp"
 
-#include "dsp/math.hpp"
-
 
 namespace JS80P
 {
@@ -492,204 +490,11 @@ void TapeParams::skip_round_for_lfos(
 
 
 template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::HissGenerator(
-        HissInputSignalProducerClass& input,
-        FloatParamB& level
-) noexcept
-    : Filter<HissInputSignalProducerClass>(input),
-    level(level),
-    rng(0x1c99)
-{
-    r_n_m1 = new Sample[this->channels];
-    x_n_m1 = new Sample[this->channels];
-    y_n_m1 = new Sample[this->channels];
-
-    update_filter_coefficients();
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::~HissGenerator()
-{
-    delete[] r_n_m1;
-    delete[] x_n_m1;
-    delete[] y_n_m1;
-
-    r_n_m1 = NULL;
-    x_n_m1 = NULL;
-    y_n_m1 = NULL;
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-void Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::set_sample_rate(Frequency const sample_rate) noexcept
-{
-    Filter<HissInputSignalProducerClass>::set_sample_rate(sample_rate);
-
-    update_filter_coefficients();
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-void Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::reset() noexcept
-{
-    Filter<HissInputSignalProducerClass>::reset();
-
-    rng.reset();
-
-    for (Integer c = 0; c != this->channels; ++c) {
-        r_n_m1[c] = x_n_m1[c] = y_n_m1[c] = 0.0;
-    }
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-void Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::update_filter_coefficients() noexcept
-{
-    /*
-    Simple low-pass and high-pass filters. See:
-     - https://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
-     - https://en.wikipedia.org/wiki/High-pass_filter#Discrete-time_realization
-
-    The two filters are combined using the following notation:
-
-     - High-pass:
-
-           S := sampling period length
-           H := high-pass cut-off frequency
-           r[n] := n-th raw sample (random noise)
-
-           v := 2 * pi * S * H
-           a := 1 / (v + 1)
-           x[n] := a * (x[n - 1] + r[n] - r[n - 1])
-
-     - Low-pass:
-
-           L := low-pass cut-off frequency
-           t := 2 * pi * S * L
-           w1 := t / (t + 1)
-           w2 := 1 - w1
-           y[n] := w1 * x[n] + (1 - w2) * y[n - 1]
-
-    */
-
-    Frequency const H = std::min(30.0, this->sample_rate * 0.0625);
-    Frequency const L = std::min(600.0, this->sample_rate * 0.125);
-    Sample const PI_2_S = Math::PI_DOUBLE * this->sampling_period;
-    Sample const v = PI_2_S * H;
-    Sample const t = PI_2_S * L;
-
-    this->a = 1.0 / (v + 1.0);
-    this->w1 = t / (t + 1.0);
-    this->w2 = 1.0 - this->w1;
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-Sample const* const* Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::initialize_rendering(
-        Integer const round,
-        Integer const sample_count
-) noexcept {
-    Sample const* const* buffer = (
-        Filter<HissInputSignalProducerClass>::initialize_rendering(
-            round,
-            sample_count
-        )
-    );
-
-    if (level.get_value() < 0.000001) {
-        return buffer;
-    }
-
-    return NULL;
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-template<class HissInputSignalProducerClass>
-void Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::HissGenerator<
-        HissInputSignalProducerClass
->::render(
-        Integer const round,
-        Integer const first_sample_index,
-        Integer const last_sample_index,
-        Sample** buffer
-) noexcept {
-    Sample const level = this->level.get_value();
-    Sample const a = this->a;
-    Sample const w1 = this->w1;
-    Sample const w2 = this->w2;
-
-    for (Integer c = 0; c != this->channels; ++c) {
-        Sample* const out_channel = buffer[c];
-        Sample const* const in_channel = this->input_buffer[c];
-        Sample r_n_m1 = this->r_n_m1[c];
-        Sample x_n_m1 = this->x_n_m1[c];
-        Sample y_n_m1 = this->y_n_m1[c];
-
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Sample const r_n = rng.random();
-            Sample const x_n = a * (x_n_m1 + r_n - r_n_m1);
-            Sample const y_n = w1 * x_n + w2 * y_n_m1;
-
-            out_channel[i] = in_channel[i] + level * y_n;
-
-            r_n_m1 = r_n;
-            x_n_m1 = x_n;
-            y_n_m1 = y_n;
-        }
-
-        this->r_n_m1[c] = r_n_m1;
-        this->x_n_m1[c] = x_n_m1;
-        this->y_n_m1[c] = y_n_m1;
-    }
-}
-
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
 Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         std::string const& name,
         TapeParams& params,
-        InputSignalProducerClass& input
+        InputSignalProducerClass& input,
+        Math::RNG& rng
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 8, 0, &delay),
     params(params),
@@ -702,7 +507,7 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         &pre_dist_high_shelf_filter
     ),
     low_shelf_filter(name + "LS", distortion, distortion.get_buffer_owner()),
-    hiss_generator(low_shelf_filter, params.hiss_level),
+    hiss_generator(low_shelf_filter, params.hiss_level, 20.0, 600.0, rng),
     high_shelf_filter(
         name + "HS",
         hiss_generator,

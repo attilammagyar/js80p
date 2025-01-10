@@ -47,6 +47,7 @@
 #include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
 #include "dsp/mixer.hpp"
+#include "dsp/noise_generator.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/peak_tracker.hpp"
@@ -1618,6 +1619,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
         static std::vector<bool> initialize_supported_midi_controllers() noexcept;
 
+        static unsigned int make_rng_seed(void const* const ptr) noexcept;
+
         void build_frequency_table() noexcept;
         void register_main_params() noexcept;
         void register_modulator_params() noexcept;
@@ -1782,6 +1785,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         PeakTracker vol_1_peak_tracker;
         PeakTracker vol_2_peak_tracker;
         PeakTracker vol_3_peak_tracker;
+        Math::RNG rng;
 
         Sample const* const* raw_output;
         MidiControllerMessage previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];

@@ -28,6 +28,7 @@
 #include "dsp/echo.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/gain.hpp"
+#include "dsp/math.hpp"
 #include "dsp/param.hpp"
 #include "dsp/reverb.hpp"
 #include "dsp/tape.hpp"
@@ -81,7 +82,8 @@ class Effects : public Filter< Volume3<InputSignalProducerClass> >
             std::string const& name,
             InputSignalProducerClass& input,
             BiquadFilterSharedBuffers& echo_filter_shared_buffers,
-            BiquadFilterSharedBuffers& reverb_filter_shared_buffers
+            BiquadFilterSharedBuffers& reverb_filter_shared_buffers,
+            Math::RNG& rng
         );
 
         FloatParamS volume_1_gain;

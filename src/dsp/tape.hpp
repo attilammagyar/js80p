@@ -31,6 +31,7 @@
 #include "dsp/lfo.hpp"
 #include "dsp/macro.hpp"
 #include "dsp/math.hpp"
+#include "dsp/noise_generator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
@@ -126,52 +127,6 @@ class Tape : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
-        template<class HissInputSignalProducerClass>
-        class HissGenerator : public Filter<HissInputSignalProducerClass>
-        {
-            friend class SignalProducer;
-
-            public:
-                HissGenerator(
-                    HissInputSignalProducerClass& input,
-                    FloatParamB& level
-                ) noexcept;
-
-                virtual ~HissGenerator();
-
-                virtual void set_sample_rate(
-                    Frequency const new_sample_rate
-                ) noexcept override;
-
-                virtual void reset() noexcept override;
-
-                FloatParamB& level;
-
-            protected:
-                Sample const* const* initialize_rendering(
-                    Integer const round,
-                    Integer const sample_count
-                ) noexcept;
-
-                void render(
-                    Integer const round,
-                    Integer const first_sample_index,
-                    Integer const last_sample_index,
-                    Sample** buffer
-                ) noexcept;
-
-            private:
-                void update_filter_coefficients() noexcept;
-
-                Math::RNG rng;
-                Sample* r_n_m1;
-                Sample* x_n_m1;
-                Sample* y_n_m1;
-                Sample a;
-                Sample w1;
-                Sample w2;
-        };
-
         typedef BiquadFilter<
             InputSignalProducerClass,
             BiquadFilterFixedType::BFFT_HIGH_SHELF
@@ -184,7 +139,7 @@ class Tape : public Filter<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_LOW_SHELF
         > LowShelfFilter;
 
-        typedef HissGenerator<LowShelfFilter> HissGenerator_;
+        typedef NoiseGenerator<LowShelfFilter> HissGenerator_;
 
         typedef BiquadFilter<
             HissGenerator_,
@@ -206,7 +161,8 @@ class Tape : public Filter<InputSignalProducerClass>
         Tape(
             std::string const& name,
             TapeParams& params,
-            InputSignalProducerClass& input
+            InputSignalProducerClass& input,
+            Math::RNG& rng
         ) noexcept;
 
         virtual void reset() noexcept override;
@@ -310,4 +266,3 @@ class Tape : public Filter<InputSignalProducerClass>
 }
 
 #endif
-

@@ -202,6 +202,7 @@ SYNTH_COMPONENTS = \
 	dsp/filter \
 	dsp/gain \
 	dsp/mixer \
+	dsp/noise_generator \
 	dsp/peak_tracker \
 	dsp/reverb \
 	dsp/side_chain_compressable_effect \
@@ -231,6 +232,7 @@ TESTS_DSP = \
 	test_distortion \
 	test_gain \
 	test_mixer \
+	test_noise_generator \
 	test_param_slow \
 	test_peak_tracker \
 	test_tape \
@@ -818,6 +820,16 @@ $(DEV_DIR)/test_mixer$(DEV_EXE): \
 	$(COMPILE_DEV) -o $@ $<
 	$(RUN_WITH_VALGRIND) $@
 
+$(DEV_DIR)/test_noise_generator$(DEV_EXE): \
+		tests/test_noise_generator.cpp \
+		src/dsp/noise_generator.cpp src/dsp/noise_generator.hpp \
+		$(PARAM_HEADERS) $(PARAM_SOURCES) \
+		$(TEST_LIBS) \
+		| $(DEV_DIR) show_versions \
+		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
+	$(COMPILE_DEV) -o $@ $<
+	$(RUN_WITH_VALGRIND) $@
+
 $(DEV_DIR)/test_note_stack$(DEV_EXE): \
 		tests/test_note_stack.cpp \
 		src/note_stack.hpp src/note_stack.cpp \
@@ -935,6 +947,7 @@ $(DEV_DIR)/test_tape$(DEV_EXE): \
 		src/dsp/delay.cpp src/dsp/delay.hpp \
 		src/dsp/distortion.cpp src/dsp/distortion.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/noise_generator.cpp src/dsp/noise_generator.hpp \
 		src/dsp/tape.cpp src/dsp/tape.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \

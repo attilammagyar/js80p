@@ -37,6 +37,7 @@
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
+#include "dsp/noise_generator.cpp"
 #include "dsp/oscillator.cpp"
 #include "dsp/param.cpp"
 #include "dsp/queue.cpp"
@@ -71,6 +72,9 @@ constexpr TapeStopTestStepParamRampingExpectation EXPECT_RAMPING = true;
 constexpr TapeStopTestStepParamRampingExpectation EXPECT_CONST = false;
 
 
+Math::RNG rng(123);
+
+
 TEST(when_bypass_toggle_value_is_matched_then_tape_is_engaged_otherwise_bypassed, {
     Sample input_channel[BLOCK_SIZE] = {
         0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9,
@@ -84,8 +88,8 @@ TEST(when_bypass_toggle_value_is_matched_then_tape_is_engaged_otherwise_bypassed
     FixedSignalProducer input(input_channels);
     ToggleParam toggle("B", ToggleParam::OFF);
     TapeParams params("T", toggle);
-    Tape<FixedSignalProducer, ToggleParam::OFF> tape_off("F", params, input);
-    Tape<FixedSignalProducer, ToggleParam::ON> tape_on("N", params, input);
+    Tape<FixedSignalProducer, ToggleParam::OFF> tape_off("F", params, input, rng);
+    Tape<FixedSignalProducer, ToggleParam::ON> tape_on("N", params, input, rng);
     Sample const* const* rendered = NULL;
 
     toggle.set_value(ToggleParam::ON);
@@ -209,7 +213,9 @@ void test_tape_stop(std::array<TapeStopTestStep, step_count> const& steps)
     FixedSignalProducer input(input_channels);
     ToggleParam toggle_param("toggle", ToggleParam::ON);
     TapeParams tape_params("tape_params", toggle_param);
-    Tape<FixedSignalProducer, ToggleParam::ON> tape("tape", tape_params, input);
+    Tape<FixedSignalProducer, ToggleParam::ON> tape(
+        "tape", tape_params, input, rng
+    );
     Sample const* const* rendered = NULL;
     size_t i = 0;
     SignalProducer* sp = tape_params.get_signal_producer(i++);
