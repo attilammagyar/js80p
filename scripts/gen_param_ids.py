@@ -57,6 +57,7 @@ def print_oscillator_params(param_id: int, param_objs: list, group: str, prefix:
     osc_name = "modulator" if prefix == "M" else "carrier"
 
     params = [
+        ("$N", "    ///< $ Noise Level", osc_name + "_params.noise_level"),
         ("$AMP", "  ///< $ Amplitude", osc_name + "_params.amplitude"),
         ("$VS", "   ///< $ Velocity Sensitivity", osc_name + "_params.velocity_sensitivity"),
         ("$FLD", "  ///< $ Folding", osc_name + "_params.folding"),

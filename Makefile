@@ -963,6 +963,7 @@ $(DEV_DIR)/test_voice$(DEV_EXE): \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/distortion.cpp src/dsp/distortion.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
+		src/dsp/noise_generator.cpp src/dsp/noise_generator.hpp \
 		src/dsp/wavefolder.cpp src/dsp/wavefolder.hpp \
 		$(PARAM_HEADERS) $(PARAM_SOURCES) \
 		$(TEST_LIBS) \

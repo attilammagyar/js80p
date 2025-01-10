@@ -30,6 +30,7 @@
 #include "dsp/envelope.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/math.hpp"
+#include "dsp/noise_generator.hpp"
 #include "dsp/oscillator.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
@@ -109,7 +110,7 @@ class Voice : public SignalProducer
 
         static constexpr bool IS_CARRIER = !IS_MODULATOR;
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 11;
+        static constexpr Integer NUMBER_OF_CHILDREN = 12;
 
     public:
         enum State {
@@ -118,7 +119,8 @@ class Voice : public SignalProducer
         };
 
         typedef Oscillator<ModulatorSignalProducerClass> Oscillator_;
-        typedef BiquadFilter<Oscillator_> Filter1;
+        typedef NoiseGenerator<Oscillator_> NoiseGenerator_;
+        typedef BiquadFilter<NoiseGenerator_> Filter1;
         typedef Wavefolder<Filter1> Wavefolder_;
         typedef Distortion::Distortion<Wavefolder_> Distortion_;
 
@@ -164,6 +166,8 @@ class Voice : public SignalProducer
                 TuningParam tuning;
                 OscillatorInaccuracyParam oscillator_inaccuracy;
                 OscillatorInaccuracyParam oscillator_instability;
+
+                FloatParamB noise_level;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;
@@ -254,9 +258,13 @@ class Voice : public SignalProducer
         static constexpr Byte TUNING_MTS_ESP_CONTINUOUS = 2;
         static constexpr Byte TUNING_MTS_ESP_NOTE_ON = 3;
 
+        static constexpr Frequency NOISE_FREQ_MIN = 20.0;
+        static constexpr Frequency NOISE_FREQ_MAX = 15000.0;
+
         static constexpr Seconds ENVELOPE_CANCEL_DURATION = 0.01;
 
         Voice(
+            Math::RNG& rng,
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
             OscillatorInaccuracy& synced_oscillator_inaccuracy,
@@ -268,6 +276,7 @@ class Voice : public SignalProducer
         ) noexcept;
 
         Voice(
+            Math::RNG& rng,
             FrequencyTable const& frequencies,
             PerChannelFrequencyTable const& per_channel_frequencies,
             OscillatorInaccuracy& synced_oscillator_inaccuracy,
@@ -419,6 +428,7 @@ class Voice : public SignalProducer
         PerChannelFrequencyTable const& per_channel_frequencies;
         OscillatorInaccuracy& synced_oscillator_inaccuracy;
         Oscillator_ oscillator;
+        NoiseGenerator_ noise_generator;
         Filter1 filter_1;
         Wavefolder_ wavefolder;
         DistortionInstance distortion;

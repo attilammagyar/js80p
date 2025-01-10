@@ -318,6 +318,8 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::AM] = "Amplitude Modulation (%)",
     [Synth::ParamId::INVOL] = "Auxiliary Input Volume (%)",
 
+    [Synth::ParamId::MN] = "Modulator Noise Level (%)",
+
     [Synth::ParamId::MAMP] = "Modulator Amplitude (%)",
     [Synth::ParamId::MVS] = "Modulator Velocity Sensitivity (%)",
     [Synth::ParamId::MFLD] = "Modulator Folding (%)",
@@ -352,6 +354,8 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
     [Synth::ParamId::MF2G] = "Modulator Filter 2 Gain (dB)",
     [Synth::ParamId::MF2FIA] = "Modulator Filter 2 Freq. Inaccuracy",
     [Synth::ParamId::MF2QIA] = "Modulator Filter 2 Q Inaccuracy",
+
+    [Synth::ParamId::CN] = "Carrier Noise Level (%)",
 
     [Synth::ParamId::CAMP] = "Carrier Amplitude (%)",
     [Synth::ParamId::CVS] = "Carrier Velocity Sensitivity (%)",
@@ -2634,22 +2638,22 @@ void GUI::build_effects_body(
     SCREW(effects_body,  81, 146, Synth::ParamId::ETSTR, "%.2f%%", 200.0, screw_states);
     SCREW(effects_body, 101, 146, Synth::ParamId::ETHSS, "%.2f%%", 800.0, screw_states);
 
-    KNOB(effects_body, 268 + KNOB_W * 0,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 1,   173, Synth::ParamId::ECHPQ,  MML__,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 2,   173, Synth::ParamId::ECTYP,  MM___,      ct, ctc, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 3,   173, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 4,   173, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 5,   173, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 6,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 7,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 8,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 9,   173, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 10,  173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
-    KNOB(effects_body, 268 + KNOB_W * 11,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
-    TOGG(effects_body, 345, 145,  50, 24,  0, Synth::ParamId::ECLHQ);
-    TOGG(effects_body, 518, 145, 114, 24,  0, Synth::ParamId::ECLLG);
-    TOGG(effects_body, 693, 145, 136, 24,  0, Synth::ParamId::ECLOG);
-    TOGG(effects_body, 875, 145,  90, 24, 66, Synth::ParamId::ECSYN);
+    KNOB(effects_body, 270 + KNOB_W * 0,   173, Synth::ParamId::ECHPF,  MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 1,   173, Synth::ParamId::ECHPQ,  MML__,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 2,   173, Synth::ParamId::ECTYP,  MM___,      ct, ctc, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 3,   173, Synth::ParamId::ECDEL,  MML__,      "%.4f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 4,   173, Synth::ParamId::ECFRQ,  MML_C,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 5,   173, Synth::ParamId::ECDPT,  MML_C,      "%.2f", 200.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 6,   173, Synth::ParamId::ECDF,   MML__,      "%.1f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 7,   173, Synth::ParamId::ECDG,   MML_C,      "%.2f", 1.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 8,   173, Synth::ParamId::ECFB,   MML_C,      "%.2f", 100.0 * (Number)Constants::CHORUS_FEEDBACK_SCALE, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 9,   173, Synth::ParamId::ECWID,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 10,  173, Synth::ParamId::ECWET,  MML_C,      "%.2f", 100.0, knob_states);
+    KNOB(effects_body, 270 + KNOB_W * 11,  173, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
+    TOGG(effects_body, 347, 145,  50, 24,  0, Synth::ParamId::ECLHQ);
+    TOGG(effects_body, 521, 145, 114, 24,  0, Synth::ParamId::ECLLG);
+    TOGG(effects_body, 696, 145, 136, 24,  0, Synth::ParamId::ECLOG);
+    TOGG(effects_body, 877, 145,  90, 24, 66, Synth::ParamId::ECSYN);
 
     KNOB(effects_body,  55 + KNOB_W * 0,   313, Synth::ParamId::EEINV,  MML__,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  55 + KNOB_W * 1,   313, Synth::ParamId::EEHPF,  MML__,      "%.1f", 1.0, knob_states);
@@ -3215,13 +3219,15 @@ void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages
     ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
     ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
-    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 230,   7, synth, Synth::ParamId::MTUN));
-    SCREW(synth_body, 324, 8, Synth::ParamId::MOIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIA);
-    SCREW(synth_body, 344, 8, Synth::ParamId::MOIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIS);
+    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 177,   7, synth, Synth::ParamId::MTUN));
+    SCREW(synth_body, 271, 8, Synth::ParamId::MOIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIA);
+    SCREW(synth_body, 291, 8, Synth::ParamId::MOIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIS);
+    SCREW(synth_body, 311, 8, Synth::ParamId::MN, "%.2f%%", 100.0, screw_states);
 
-    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 230, 287, synth, Synth::ParamId::CTUN));
-    SCREW(synth_body, 324, 288, Synth::ParamId::COIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIA);
-    SCREW(synth_body, 344, 288, Synth::ParamId::COIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIS);
+    synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::CTUN], 177, 287, synth, Synth::ParamId::CTUN));
+    SCREW(synth_body, 271, 288, Synth::ParamId::COIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIA);
+    SCREW(synth_body, 291, 288, Synth::ParamId::COIS, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::MOIS);
+    SCREW(synth_body, 311, 288, Synth::ParamId::CN, "%.2f%%", 100.0, screw_states);
 
     DPET(synth_body, 13, 32, 58, 19, 0, 58, Synth::ParamId::NH, nh, nhc);
 

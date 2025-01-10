@@ -146,6 +146,10 @@ html, body {
   height: 268px;
 }
 
+.osc h1 span sub {
+  vertical-align: baseline;
+}
+
 #osc-2 {
   margin-top: -4px;
 }
@@ -160,13 +164,13 @@ html, body {
   line-height: 23px;
   background: #000000;
   border: inset 1px #9090b0;
-  width: 136px;
+  width: 156px;
   height: 23px;
   margin: 0;
   padding: 0;
   position: absolute;
   top: 2px;
-  left: 148px;
+  left: 95px;
   border-radius: 3px;
 }
 
@@ -903,7 +907,7 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-1" class="osc main-block block">
-        <h1><span>Osc 1 (modulator)</span></h1>
+        <h1><span>Osc 1 <sub>(mod)</sub></span></h1>
         <div id="osc-1-tuning"><span>440 12TET</span></div>
         <div id="osc-1-fin-x4">
           <label><span>FIN x4</span><input type="text" /></label>
@@ -928,7 +932,7 @@ function make_tabs(active)
         </div>
       </div>
       <div id="osc-2" class="osc main-block block">
-        <h1><span>Osc 2 (carrier)</span></h1>
+        <h1><span>Osc 2 <sub>(carr)</sub></span></h1>
         <div id="osc-2-tuning"><span>C MTS-ESP on</span></div>
         <div id="osc-2-dist-type"><label class="dist-type"><input type="text" /></label></div>
         <div id="osc-2-fin-x4">

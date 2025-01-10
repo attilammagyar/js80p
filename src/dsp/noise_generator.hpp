@@ -53,8 +53,17 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
             FloatParamB& level,
             Frequency const high_pass_frequency,
             Frequency const low_pass_frequency,
-            Math::RNG& rng
+            Math::RNG& rng,
+            SignalProducer* const buffer_owner = NULL
         ) noexcept;
+
+        NoiseGenerator(
+            NoiseGenerator<InputSignalProducerClass> const& other
+        ) = delete;
+
+        NoiseGenerator<InputSignalProducerClass>& operator=(
+            NoiseGenerator<InputSignalProducerClass> const& other
+        ) = delete;
 
         virtual ~NoiseGenerator();
 

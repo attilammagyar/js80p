@@ -22,8 +22,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include "dsp/math.hpp"
-
 #include "voice.hpp"
 
 
@@ -211,6 +209,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
+    noise_level(name + "N", 0.0, 1.0, 0.0),
     waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
@@ -438,6 +437,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
+        Math::RNG& rng,
         FrequencyTable const& frequencies,
         PerChannelFrequencyTable const& per_channel_frequencies,
         OscillatorInaccuracy& synced_oscillator_inaccuracy,
@@ -473,8 +473,16 @@ Voice<ModulatorSignalProducerClass>::Voice(
         param_leaders.harmonic_9,
         status
     ),
-    filter_1(
+    noise_generator(
         oscillator,
+        param_leaders.noise_level,
+        NOISE_FREQ_MIN,
+        NOISE_FREQ_MAX,
+        rng,
+        &oscillator
+    ),
+    filter_1(
+        noise_generator,
         param_leaders.filter_1_type,
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
@@ -514,6 +522,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
 
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Voice(
+        Math::RNG& rng,
         FrequencyTable const& frequencies,
         PerChannelFrequencyTable const& per_channel_frequencies,
         OscillatorInaccuracy& synced_oscillator_inaccuracy,
@@ -555,8 +564,16 @@ Voice<ModulatorSignalProducerClass>::Voice(
         frequency_modulation_level_leader,
         phase_modulation_level_leader
     ),
-    filter_1(
+    noise_generator(
         oscillator,
+        param_leaders.noise_level,
+        NOISE_FREQ_MIN,
+        NOISE_FREQ_MAX,
+        rng,
+        &oscillator
+    ),
+    filter_1(
+        noise_generator,
         param_leaders.filter_1_type,
         param_leaders.filter_1_frequency,
         param_leaders.filter_1_q,
@@ -656,6 +673,7 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
     register_child(volume);
 
     register_child(oscillator);
+    register_child(noise_generator);
     register_child(filter_1);
     register_child(wavefolder);
 
@@ -1258,6 +1276,7 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const no
                 || (
                     oscillator.amplitude.has_envelope_decayed()
                     && oscillator.subharmonic_amplitude.has_envelope_decayed()
+                    && noise_generator.level.has_envelope_decayed()
                 )
             )
         );
@@ -1266,7 +1285,10 @@ bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const no
             state == State::ON
             && (
                 volume.has_envelope_decayed()
-                || oscillator.amplitude.has_envelope_decayed()
+                || (
+                    oscillator.amplitude.has_envelope_decayed()
+                    && noise_generator.level.has_envelope_decayed()
+                )
             )
         );
     }

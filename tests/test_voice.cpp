@@ -34,6 +34,7 @@
 #include "dsp/macro.cpp"
 #include "dsp/math.cpp"
 #include "dsp/midi_controller.cpp"
+#include "dsp/noise_generator.cpp"
 #include "dsp/oscillator.cpp"
 #include "dsp/param.cpp"
 #include "dsp/queue.cpp"
@@ -60,12 +61,15 @@ constexpr PerChannelFrequencyTable PER_CHANNEL_FREQUENCIES = {
     {75.0, 150.0, 300.0, 600.0, 1200.0},
 };
 
+Math::RNG rng(123);
+
 
 TEST(turning_off_with_wrong_note_or_note_id_keeps_the_voice_on, {
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -94,6 +98,7 @@ TEST(rendering_is_independent_of_chunk_size, {
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice_1(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -102,6 +107,7 @@ TEST(rendering_is_independent_of_chunk_size, {
         additive_volume_leader
     );
     SimpleVoice voice_2(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -260,6 +266,7 @@ TEST(portamento, {
     SimpleVoice::Params params("", envelopes);
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -313,6 +320,7 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -443,7 +451,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     FloatParamS additive_volume_leader;
 
     SimpleVoice::Params params("V", envelopes);
-    SimpleVoice::Params params_with_envelope("VE", envelopes);
+    SimpleVoice::Params params_with_amplitude_envelopes("VE", envelopes);
     SimpleVoice::Params params_with_zero_amplitudes("VAS", envelopes);
     SimpleVoice::Params params_with_zero_volume("VV", envelopes);
     SimpleVoice::Params params_with_zero_subharmonic_amplitude("VS", envelopes);
@@ -453,6 +461,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     SimpleVoice::Params params_with_lfo("VL", envelopes);
 
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -461,16 +470,18 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         additive_volume_leader
     );
 
-    SimpleVoice voice_with_envelope(
+    SimpleVoice voice_with_amplitude_envelopes(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
         0.0,
-        params_with_envelope,
+        params_with_amplitude_envelopes,
         additive_volume_leader
     );
 
     SimpleVoice voice_with_zero_amplitudes(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -480,6 +491,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_zero_volume(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -489,6 +501,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_zero_amplitude(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -498,6 +511,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_zero_subharmonic_amplitude(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -507,6 +521,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_midi_controller(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -516,6 +531,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_macro(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -525,6 +541,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
 
     SimpleVoice voice_with_lfo(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -533,11 +550,11 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         additive_volume_leader
     );
 
-    params_with_envelope.amplitude.set_value(1.0);
-    params_with_envelope.volume.set_value(1.0);
+    params_with_amplitude_envelopes.amplitude.set_value(1.0);
+    params_with_amplitude_envelopes.volume.set_value(1.0);
 
-    params_with_envelope.amplitude.set_envelope(&envelope);
-    params_with_envelope.subharmonic_amplitude.set_envelope(&envelope);
+    params_with_amplitude_envelopes.amplitude.set_envelope(&envelope);
+    params_with_amplitude_envelopes.subharmonic_amplitude.set_envelope(&envelope);
 
     params_with_zero_amplitudes.amplitude.set_value(0.0);
     params_with_zero_amplitudes.subharmonic_amplitude.set_value(0.0);
@@ -563,15 +580,40 @@ TEST(can_tell_if_note_decayed_before_note_off, {
 
     params_with_lfo.volume.set_lfo(&lfo);
 
+    params_with_amplitude_envelopes.noise_level.set_value(0.0);
     envelope.peak_value.set_value(1.0);
     envelope.sustain_value.set_value(0.0);
     test_decay_before_note_off(
-        voice_with_envelope,
+        voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::AT_BEGINNING_OF_SUSTAIN,
         "when sustain value is 0.0, then the note should decay when starting sustaining"
     );
 
+    params_with_amplitude_envelopes.noise_level.set_value(0.5);
+    envelope.peak_value.set_value(1.0);
+    envelope.sustain_value.set_value(0.0);
+    test_decay_before_note_off(
+        voice_with_amplitude_envelopes,
+        &envelope,
+        NoteDecay::NEVER,
+        "when sustain value is 0.0 but the noise level is non-zero, then the note should never decay"
+    );
+
+    params_with_amplitude_envelopes.noise_level.set_value(0.5);
+    params_with_amplitude_envelopes.volume.set_envelope(&envelope);
+    envelope.peak_value.set_value(1.0);
+    envelope.sustain_value.set_value(0.0);
+    test_decay_before_note_off(
+        voice_with_amplitude_envelopes,
+        &envelope,
+        NoteDecay::AT_BEGINNING_OF_SUSTAIN,
+        "when sustain value is 0.0 for the volume envelope, then the note should decay even if the noise level is non-zero"
+    );
+    params_with_amplitude_envelopes.volume.set_envelope(NULL);
+    params_with_amplitude_envelopes.volume.set_value(1.0);
+
+    params_with_amplitude_envelopes.noise_level.set_value(0.0);
     envelope.peak_value.set_value(1.0);
     envelope.sustain_value.set_value(0.0);
     additive_volume_leader.set_envelope(&envelope);
@@ -583,10 +625,11 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     );
     additive_volume_leader.set_envelope(NULL);
 
+    params_with_amplitude_envelopes.noise_level.set_value(0.0);
     envelope.peak_value.set_value(0.0);
     envelope.sustain_value.set_value(0.5);
     test_decay_before_note_off(
-        voice_with_envelope,
+        voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::NEVER,
         "when sustain value is greater than 0.0, then the note should never decay"
@@ -665,6 +708,7 @@ TEST(can_glide_smoothly_to_a_new_note, {
     SimpleVoice::Params params("P", envelopes);
     FloatParamS additive_volume_leader;
     SimpleVoice reference(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -673,6 +717,7 @@ TEST(can_glide_smoothly_to_a_new_note, {
         additive_volume_leader
     );
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -746,6 +791,7 @@ TEST(tuning_can_be_changed, {
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -794,6 +840,7 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -842,6 +889,7 @@ TEST(when_using_continuous_mts_esp_tuning_then_frequency_can_be_updated_before_e
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         per_channel_frequencies,
         synced_oscillator_inaccuracy,
@@ -922,6 +970,7 @@ TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, 
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,
@@ -958,6 +1007,7 @@ TEST(when_voice_is_reset_then_synced_inaccuracy_is_also_reset, {
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
     SimpleVoice voice(
+        rng,
         FREQUENCIES,
         PER_CHANNEL_FREQUENCIES,
         synced_oscillator_inaccuracy,

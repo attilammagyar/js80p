@@ -176,7 +176,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         8                           /* NH + MODE + MIX + PM + FM + AM + INVOL + bus */
-        + 43 * 2                    /* Modulator::Params + Carrier::Params  */
+        + 44 * 2                    /* Modulator::Params + Carrier::Params  */
         + POLYPHONY * 2             /* modulators + carriers                */
         + 1                         /* effects                              */
         + MACROS * Macro::PARAMS
@@ -378,6 +378,8 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIA, modulator_params.oscillator_inaccuracy);
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIS, modulator_params.oscillator_instability);
 
+    register_param_as_child<FloatParamB>(ParamId::MN, modulator_params.noise_level);
+
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
@@ -432,6 +434,8 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<Carrier::TuningParam>(ParamId::CTUN, carrier_params.tuning);
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIA, carrier_params.oscillator_inaccuracy);
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIS, carrier_params.oscillator_instability);
+
+    register_param_as_child<FloatParamB>(ParamId::CN, carrier_params.noise_level);
 
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
@@ -586,6 +590,7 @@ void Synth::create_voices() noexcept
         );
 
         modulators[i] = new Modulator(
+            rng,
             frequencies,
             per_channel_frequencies,
             *synced_oscillator_inaccuracies[i],
@@ -598,6 +603,7 @@ void Synth::create_voices() noexcept
         register_child(*modulators[i]);
 
         carriers[i] = new Carrier(
+            rng,
             frequencies,
             per_channel_frequencies,
             *synced_oscillator_inaccuracies[i],

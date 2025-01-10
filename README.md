@@ -116,6 +116,7 @@ Table of Contents
     * [Expressive Saw](#preset-expressive-saw)
     * [Flute Mono](#preset-flute-mono)
     * [FX Master Enhancer](#preset-fx-master-enhancer)
+    * [Creepy Wind](#preset-creepy-wind)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -145,7 +146,7 @@ Features
       depending on the portamento length setting.
  * Polyphonic and monophonic hold modes to keep notes ringing without a sustain
    pedal.
- * 2 oscillators with 10 waveforms:
+ * 2 oscillators with 10 waveforms and an additional noise generator:
     * sine,
     * sawtooth,
     * soft sawtooth,
@@ -181,8 +182,8 @@ Features
  * Built-in effects:
     * various distortions,
     * 2 more filters,
-    * tape (saturation, tone coloring, noise, wow and flutter, slow-down stop,
-      fast-forward)
+    * tape simulation (saturation, tone coloring, noise, wow and flutter,
+      slow-down stop, fast-forward)
     * chorus,
     * stereo echo (with distortion, side-chain compression or gate, and
       reversible delay lines),
@@ -850,6 +851,12 @@ oscillators will synchronize their random divergence: each note will be off
 from the correct pitch by a random amount, but within a single voice, the two
 oscillators will always be off by the same amount, and will always diverge by
 the same amount in the same direction.
+
+##### Noise Level
+
+The third screw icon next to the [tuning selector](#usage-synth-common-tuning)
+mixes white noise into the output of the oscillator, independently from the
+oscillator's amplitude.
 
 ##### Fine Detune x4 (FIN x4)
 
@@ -2520,6 +2527,15 @@ hint of reverb. Depending on how much headroom you have in your mix, you may
 need to adjust the settings; it is recommended to start with the
 [Vol 1](#usage-effects-volume) knob. (The preset has been developed with mixes
 that have around 3-6 dB headroom.)
+
+<a id="preset-creepy-wind"></a>
+
+### Creepy Wind
+
+A non-musical Foley effect which uses noise and filter resonance to create
+eerie wind sounds. The keyboard and the pitch wheel control the pitch, the
+modulation wheel increases the variation of the sound, and aftertouch
+makes the wind angrier and scarier.
 
 <a href="#toc">Table of Contents</a>
 
