@@ -411,7 +411,9 @@ TEST(rng, {
     }
 
     Math::compute_statistics(numbers, statistics);
-    assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.036);
+    assert_statistics(
+        true, 0.0, 0.5, 1.0, 0.5, std::pow(1.0 / 12.0, 0.5), statistics, 0.015
+    );
 })
 
 
@@ -429,7 +431,9 @@ TEST(randomize, {
     numbers[last_probe] = Math::randomize(1.0, 1.0);
 
     Math::compute_statistics(numbers, statistics);
-    assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 0.25, statistics, 0.02);
+    assert_statistics(
+        true, 0.0, 0.5, 1.0, 0.5, std::pow(1.0 / 12.0, 0.5), statistics, 0.06
+    );
     assert_eq(Math::randomize(1.0, 1.0), Math::randomize(1.0, 99999.0));
 })
 
@@ -448,7 +452,9 @@ TEST(randomize_centered_lfo, {
     numbers[last_probe] = Math::randomize_centered_lfo(1.0, 0.5);
 
     Math::compute_statistics(numbers, statistics);
-    assert_statistics(true, -0.5, 0.0, 0.5, 0.0, 0.25, statistics, 0.02);
+    assert_statistics(
+        true, -0.5, 0.0, 0.5, 0.0, std::pow(1.0 / 12.0, 0.5), statistics, 0.06
+    );
     assert_eq(
         Math::randomize_centered_lfo(1.0, 0.5),
         Math::randomize_centered_lfo(1.0, 99999.0)
