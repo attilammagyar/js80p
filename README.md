@@ -117,6 +117,7 @@ Table of Contents
     * [Flute Mono](#preset-flute-mono)
     * [FX Master Enhancer](#preset-fx-master-enhancer)
     * [Creepy Wind](#preset-creepy-wind)
+    * [Stalacpipe Organ](#preset-stalacpipe-organ)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2536,6 +2537,18 @@ A non-musical Foley effect which uses noise and filter resonance to create
 eerie wind sounds. The keyboard and the pitch wheel control the pitch, the
 modulation wheel increases the variation of the sound, and aftertouch
 makes the wind angrier and scarier.
+
+<a id="preset-stalacpipe-organ"></a>
+
+### Stalacpipe Organ
+
+The largest musical instrument in the world is the Great Stalacpipe Organ
+located in Luray Caverns, Virginia, USA. It is a keyboard instrument which
+makes its tones by using rubber mallets to tap ancient stalactites of varying
+sizes, distributed over several acres in the cavern. This patch is a
+recreation of its sound, based on various samples, complete with occasional
+random water droplets (that can be turned off by turning down the mod wheel
+to zero).
 
 <a href="#toc">Table of Contents</a>
 

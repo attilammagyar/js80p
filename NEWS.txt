@@ -8,6 +8,8 @@ v3.4.0 (2025-01-??)
     * FX Master Enhancer, a preset for using JS80P as a master bus effect
       rather than a synthesizer.
     * Creepy Wind for making eerie wind sound Foley effects.
+    * Stalacpipe Organ, the sound of the largest musical instrument in the
+      world.
  * Bugfix: fixed the positioning of the distortion type selectors on the user
    interface.
 
