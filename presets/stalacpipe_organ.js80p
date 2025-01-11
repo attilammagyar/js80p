@@ -3,11 +3,12 @@
 ; makes its tones by using rubber mallets to tap ancient stalactites of varying
 ; sizes, distributed over several acres in the cavern. This patch is a
 ; recreation of its sound, based on various samples, complete with occasional
-; random water droplets (that can be turned off by turning down the mod wheel
-; to zero).
+; random water droplets. The louder you play the more probable that you will
+; cause a droplet to fall, unless you turn them off completely by turning the
+; mod wheel down to zero.
 [js80p]
 MAMPctl = 0.589843750
-MVS = 0.40
+MVS = 0.550
 MFLD = 0.099999999999999
 MPRTctl = 0.64843750
 MPRD = 1.0
@@ -124,9 +125,9 @@ F21MIN = 0.630
 F21MAX = 0.930
 F21DST = 0.20
 F22INctl = 0.50781250
-F22MIN = 0.0050
+F22MIN = 0.01360
 F22MAX = 0.00050
-F22DST = 0.800000000000001
+F22DST = 0.900000000000001
 N1AMTctl = 0.61718750
 N1DELctl = 0.5468750
 N1ATK = 0.00050
@@ -144,7 +145,7 @@ N3DECctl = 0.636718750
 N3SUS = 0.0
 N3REL = 0.101666666666667
 N4AMTctl = 0.6250
-N4ATK = 0.020
+N4ATK = 0.0250
 N4HLD = 0.0050
 N4DECctl = 0.6406250
 N4SUS = 0.0

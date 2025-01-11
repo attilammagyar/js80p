@@ -2547,8 +2547,9 @@ located in Luray Caverns, Virginia, USA. It is a keyboard instrument which
 makes its tones by using rubber mallets to tap ancient stalactites of varying
 sizes, distributed over several acres in the cavern. This patch is a
 recreation of its sound, based on various samples, complete with occasional
-random water droplets (that can be turned off by turning down the mod wheel
-to zero).
+random water droplets. The louder you play the more probable that you will
+cause a droplet to fall, unless you turn them off completely by turning the
+mod wheel down to zero.
 
 <a href="#toc">Table of Contents</a>
 
