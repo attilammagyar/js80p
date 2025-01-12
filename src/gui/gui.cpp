@@ -273,16 +273,16 @@ int const GUI::DISTORTION_TYPES_COUNT = Distortion::TYPES;
 
 
 char const* const GUI::TAPE_STATES[] = {
-    [TapeParams::State::TAPE_STATE_INIT] = "waiting for reset",
+    [TapeParams::State::TAPE_STATE_INIT] = "waiting for Stop / Start zero",
     [TapeParams::State::TAPE_STATE_NORMAL] = NULL,
     [TapeParams::State::TAPE_STATE_STOPPING] = "stopping",
     [TapeParams::State::TAPE_STATE_STOPPED] = "STOPPED",
     [TapeParams::State::TAPE_STATE_STARTABLE] = "STOPPED",
     [TapeParams::State::TAPE_STATE_STARTING] = "starting",
-    [TapeParams::State::TAPE_STATE_STARTED] = "waiting for reset",
+    [TapeParams::State::TAPE_STATE_STARTED] = "waiting for Stop / Start zero",
     [TapeParams::State::TAPE_STATE_FF_STARTABLE] = "STOPPED",
     [TapeParams::State::TAPE_STATE_FF_STARTING] = "fast-forwarding",
-    [TapeParams::State::TAPE_STATE_FF_STARTED] = "waiting for reset",
+    [TapeParams::State::TAPE_STATE_FF_STARTED] = "waiting for Stop / Start zero",
 };
 
 int const GUI::TAPE_STATES_COUNT = TapeParams::State::TAPE_STATES;
@@ -408,13 +408,13 @@ char const* const GUI::PARAMS[Synth::ParamId::PARAM_ID_COUNT] = {
 
     [Synth::ParamId::EV2V] = "Volume 2 (%)",
 
-    [Synth::ParamId::ETSTP] = "Tape Stop / Start",
-    [Synth::ParamId::ETWFA] = "Tape Wow and Flutter Amplitude",
-    [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed",
-    [Synth::ParamId::ETSAT] = "Tape Saturation",
-    [Synth::ParamId::ETCLR] = "Tape Color",
-    [Synth::ParamId::ETHSS] = "Tape Hiss Level",
-    [Synth::ParamId::ETSTR] = "Tape Stereo Wow and Flutter",
+    [Synth::ParamId::ETSTP] = "Tape Stop / Start (s)",
+    [Synth::ParamId::ETWFA] = "Tape Wow and Flutter Amplitude (%)",
+    [Synth::ParamId::ETWFS] = "Tape Wow and Flutter Speed (%)",
+    [Synth::ParamId::ETSAT] = "Tape Saturation (%)",
+    [Synth::ParamId::ETCLR] = "Tape Color (%)",
+    [Synth::ParamId::ETHSS] = "Tape Hiss Level (%)",
+    [Synth::ParamId::ETSTR] = "Tape Stereo Wow and Flutter (%)",
 
     [Synth::ParamId::ECDEL] = "Chorus Delay Time (s)",
     [Synth::ParamId::ECFRQ] = "Chorus LFO Frequency (Hz)",

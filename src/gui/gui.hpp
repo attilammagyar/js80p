@@ -217,7 +217,7 @@ class GUI
         PlatformData get_platform_data() const;
 
     private:
-        static constexpr size_t DEFAULT_STATUS_LINE_MAX_LENGTH = 32;
+        static constexpr size_t DEFAULT_STATUS_LINE_MAX_LENGTH = 48;
 
         static void initialize_controllers_by_id();
 
