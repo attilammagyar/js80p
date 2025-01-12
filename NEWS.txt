@@ -1,4 +1,4 @@
-v3.4.0 (2025-01-??)
+v3.4.0 (2025-01-12)
  * Oscillators can now be mixed with noise.
  * The Echo and Reverb effects can now be gated by switching their side-chain
    compression into expansion mode.
