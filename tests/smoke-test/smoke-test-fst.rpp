@@ -2020,7 +2020,7 @@
         HASDATA 1 960 QN
         CCINTERP 32
         POOLEDEVTS {6E4F814B-E605-45B0-A12E-600B0B6E89F3}
-        e 960 b0 01 00
+        E 960 b0 01 00
         E 1349 9f 50 75
         E 312 8f 50 40
         E 1006 9f 4b 76
@@ -2034,13 +2034,14 @@
         E 768 9f 3c 65
         E 434 8f 3c 40
         E 1151 9f 33 79
-        E 235 b0 01 61
+        E 235 b0 01 12
         E 230 8f 33 40
         E 961 9f 38 79
         E 465 8f 38 40
         E 893 9f 30 61
         E 2475 8f 30 40
-        E 15096 b0 7b 00
+        e 2056 b0 01 34
+        E 13040 b0 7b 00
         CCINTERP 32
         CHASE_CC_TAKEOFFS 1
         GUID {5FA88BA8-C42B-4A2E-99AD-231E2E86B02B}
