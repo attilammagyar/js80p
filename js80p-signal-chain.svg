@@ -1,6 +1,6 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 700 340"
+  viewBox="0 0 700 400"
   stroke="#c0c0c0"
   stroke-width="3"
   style="background: #0b0b0b"
@@ -166,7 +166,7 @@
     <path d="M670,32 L690,32 L690,210 L90,210 L90,220"/>
     <polygon points="85,220 95,220 90,230"/>
 
-    <svg x="50" y="230" width="520" height="24">
+    <svg x="50" y="230" width="620" height="24">
       <svg x="0" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Volume</text>
@@ -203,15 +203,23 @@
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Filter</text>
       </svg>
+
+      <path d="M520,12 L530,12"/>
+      <polygon points="530,7 530,17 540,12"/>
+
+      <svg x="540" y="0" width="80" height="24">
+        <rect x="0" y="0" width="100%" height="100%" rx="5" />
+        <text x="50%" y="50%">Volume</text>
+      </svg>
     </svg>
 
-    <path d="M570,242 L590,242 L590,280 L95,280 L95,290"/>
+    <path d="M670,242 L680,242 L680,280 L95,280 L95,290"/>
     <polygon points="90,290 100,290 95,300"/>
 
     <svg x="50" y="300" width="740" height="24">
       <svg x="0" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
-        <text x="50%" y="50%">Volume</text>
+        <text x="50%" y="50%">Tape (1)</text>
       </svg>
 
       <path d="M80,12 L100,12"/>
@@ -243,12 +251,22 @@
 
       <svg x="440" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
-        <text x="50%" y="50%">Volume</text>
+        <text x="50%" y="50%">Tape (2)</text>
       </svg>
 
       <path d="M520,12 L540,12"/>
       <polygon points="540,7 540,17 550,12"/>
 
+      <svg x="550" y="0" width="80" height="24">
+        <rect x="0" y="0" width="100%" height="100%" rx="5" />
+        <text x="50%" y="50%">Volume</text>
+      </svg>
+    </svg>
+
+    <path d="M640,324 L640,324 L640,340"/>
+    <polygon points="635,340 645,340 640,350"/>
+
+    <svg x="50" y="350" width="740" height="24">
       <svg x="550" y="0" width="80" height="24">
         <rect x="0" y="0" width="100%" height="100%" rx="5" />
         <text x="50%" y="50%">Out</text>
