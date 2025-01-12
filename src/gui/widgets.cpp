@@ -961,7 +961,6 @@ void KnobParamEditor::update_value_str()
 
     if (knob->is_editing()) {
         gui->set_status_line(title);
-        gui->redraw_status_line();
     }
 }
 
@@ -1533,7 +1532,6 @@ void ToggleSwitchParamEditor::update_title()
 
     if (is_editing()) {
         gui->set_status_line(title);
-        gui->redraw_status_line();
     }
 }
 
@@ -1713,7 +1711,6 @@ void DiscreteParamEditor::update_title()
 
     if (is_editing()) {
         gui->set_status_line(title);
-        gui->redraw_status_line();
     }
 }
 

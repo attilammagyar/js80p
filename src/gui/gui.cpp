@@ -3415,6 +3415,8 @@ void GUI::set_status_line(char const* text)
     } else {
         status_line->set_text(text);
     }
+
+    redraw_status_line();
 }
 
 
