@@ -118,8 +118,8 @@ main()
     cp --verbose --recursive \
         doc/pm-fm-equivalence.pdf \
         doc/pm-fm-equivalence.tex \
-        distortions.html \
-        distortions.ipynb \
+        doc/distortions.html \
+        doc/distortions.ipynb \
         "$DIST_DIR_BASE/$source_dir/doc/"
 
     find "$DIST_DIR_BASE/$source_dir/" -name ".*.swp" -delete
