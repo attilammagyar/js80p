@@ -183,7 +183,7 @@ Features
  * Built-in effects:
     * various distortions,
     * 2 more filters,
-    * tape simulation (saturation, tone coloring, noise, wow and flutter,
+    * basic tape simulation (saturation, tone coloring, noise, wow and flutter,
       slow-down stop, fast-forward)
     * chorus,
     * stereo echo (with distortion, side-chain compression or gate, and
@@ -1226,8 +1226,8 @@ See [oscillator filters](#usage-synth-common-filter).
 
 #### Tape
 
-Though this effect is not a proper physical simulation of a tape machine and
-magnetic tape with bias, hysteresis and whatnot, it can help achieve certain
+Though this effect is not a proper physical simulation of a tape machine and a
+magnetic tape with bias, hysteresis, and whatnot, it can help achieve certain
 effects that are usually associated with analog media, like lo-fi wow and
 flutter, slow-down and stop, and tone coloring and saturation.
 
