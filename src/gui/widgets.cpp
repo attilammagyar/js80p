@@ -1114,7 +1114,7 @@ void KnobParamEditor::Knob::update(Number const ratio)
 
 void KnobParamEditor::Knob::update()
 {
-    if (is_controller_polyphonic) {
+    if (is_controller_polyphonic && knob_states->none_image != NULL) {
         set_image(knob_states->none_image);
 
         return;
@@ -1122,9 +1122,9 @@ void KnobParamEditor::Knob::update()
 
     size_t const index = knob_states->ratio_to_index(this->ratio);
 
-    if (is_controlled) {
+    if (is_controlled && knob_states->controlled_images != NULL) {
         set_image(knob_states->controlled_images[index]);
-    } else if (is_synced) {
+    } else if (is_synced && knob_states->synced_images != NULL) {
         set_image(knob_states->synced_images[index]);
     } else {
         set_image(knob_states->free_images[index]);
@@ -1372,7 +1372,8 @@ bool AboutText::paint()
 
 
 StatusLine::StatusLine()
-    : TransparentWidget("", LEFT, TOP, WIDTH, HEIGHT, Type::STATUS_LINE)
+    : TransparentWidget("", LEFT, TOP, WIDTH, HEIGHT, Type::STATUS_LINE),
+    text_color(GUI::TEXT_COLOR)
 {
 }
 
@@ -1393,6 +1394,12 @@ void StatusLine::set_text(char const* text)
 }
 
 
+void StatusLine::set_text_color(GUI::Color const color)
+{
+    text_color = color;
+}
+
+
 bool StatusLine::paint()
 {
     TransparentWidget::paint();
@@ -1406,7 +1413,7 @@ bool StatusLine::paint()
             3,
             WIDTH,
             20,
-            GUI::TEXT_COLOR,
+            text_color,
             GUI::STATUS_LINE_BACKGROUND,
             FontWeight::NORMAL,
             5,

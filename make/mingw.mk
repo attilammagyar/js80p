@@ -49,6 +49,7 @@ GUI_IMAGES = \
 	gui/img/knob_states-controlled.bmp \
 	gui/img/knob_states-free.bmp \
 	gui/img/knob_states-none.bmp \
+	gui/img/knob_states-red.bmp \
 	gui/img/lfos.bmp \
 	gui/img/macro_distortions.bmp \
 	gui/img/macro_midpoint_states.bmp \

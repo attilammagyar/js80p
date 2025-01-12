@@ -277,6 +277,7 @@ class GUI
 
         void build_effects_body(
             ParamStateImages const* knob_states,
+            ParamStateImages const* knob_states_red,
             ParamStateImages const* reversed_toggle_states
         );
 
@@ -319,6 +320,7 @@ class GUI
         Image vst_logo_image;
 
         ParamStateImages const* knob_states;
+        ParamStateImages const* knob_states_red;
         ParamStateImages const* screw_states;
         ParamStateImages const* envelope_shapes_01;
         ParamStateImages const* envelope_shapes_10;
@@ -339,6 +341,7 @@ class GUI
         StatusLine* status_line;
         Integer active_voices_count;
         TapeParams::State tape_state;
+        Color default_status_line_color;
 
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;

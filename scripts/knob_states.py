@@ -34,6 +34,7 @@ except ImportError as error:
 
 def main(argv):
     knob_bg = Image.open(os.path.join(os.path.dirname(argv[0]), "../gui/knob.png"))
+    knob_red_bg = Image.open(os.path.join(os.path.dirname(argv[0]), "../gui/knob-red.png"))
     screw_bg = Image.open(os.path.join(os.path.dirname(argv[0]), "../gui/screw.png"))
 
     knob_ticks_color = (144, 144, 150)
@@ -76,6 +77,15 @@ def main(argv):
         line_color=None,
         out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-none.png"),
         stages=1
+    )
+    generate_knob_states(
+        knob_bg=knob_red_bg,
+        glow_color_1=(72, 10, 0),
+        glow_color_2=(220, 80, 12),
+        glow_color_3=(255, 180, 36),
+        ticks_color=(255, 184, 96),
+        line_color=(255, 230, 210),
+        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-red.png")
     )
 
     generate_screw_states(

@@ -647,6 +647,10 @@ h1 span {
   height: 14px;
 }
 
+.knob.red span {
+  color: #ffb860;
+}
+
 .knob span:nth-child(4) {
   display: block;
   font-size: 11px;
@@ -1114,7 +1118,7 @@ function $(obj)
     return (typeof(obj) === "string") ? document.getElementById(obj) : obj;
 }
 
-function create_knob(container, label_text, value_text, controller_text, without_ctl)
+function create_knob(container, label_text, value_text, controller_text, without_ctl, cls)
 {
     var knob_container = document.createElement("div"),
         knob = document.createElement("div"),
@@ -1130,11 +1134,13 @@ function create_knob(container, label_text, value_text, controller_text, without
     knob_container.appendChild(label);
     knob_container.appendChild(knob);
 
+    cls = cls ? " " + String(cls) : "";
+
     if (without_ctl) {
-        knob_container.setAttribute("class", "knob without_ctl");
+        knob_container.setAttribute("class", "knob without_ctl" + cls);
         controller = document.createElement("span");
     } else {
-        knob_container.setAttribute("class", "knob");
+        knob_container.setAttribute("class", "knob" + cls);
 
         option = document.createElement("option");
         option.textContent = controller_text || "modwheel";
@@ -1246,7 +1252,7 @@ window.onload = function ()
     create_knob("chorus-params", "WET %", "50");
     create_knob("chorus-params", "DRY %", "60");
 
-    create_knob("tape-params", "STOP s", "2");
+    create_knob("tape-params", "STOP s", "2", "", false, "red");
     create_knob("tape-params", "W&amp;F %", "60");
     create_knob("tape-params", "SAT %", "100");
     create_knob("tape-params", "CLR %", "50");

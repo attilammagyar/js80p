@@ -64,6 +64,7 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(BUILD_DIR)/img_knob_states-controlled.o \
 	$(BUILD_DIR)/img_knob_states-free.o \
 	$(BUILD_DIR)/img_knob_states-none.o \
+	$(BUILD_DIR)/img_knob_states-red.o \
 	$(BUILD_DIR)/img_lfos.o \
 	$(BUILD_DIR)/img_macro_distortions.o \
 	$(BUILD_DIR)/img_macro_midpoint_states.o \

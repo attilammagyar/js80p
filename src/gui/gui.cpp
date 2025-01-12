@@ -1839,6 +1839,7 @@ GUI::GUI(
     status_line(NULL),
     active_voices_count(0),
     tape_state(TapeParams::State::TAPE_STATE_INIT),
+    default_status_line_color(TEXT_COLOR),
     synth(synth),
     platform_data(platform_data)
 {
@@ -1855,6 +1856,17 @@ GUI::GUI(
         dummy_widget->load_image(this->platform_data, "KNOBSTATESCONTROLLED"),
         NULL,
         dummy_widget->load_image(this->platform_data, "KNOBSTATESNONE"),
+        128,
+        48,
+        48
+    );
+
+    knob_states_red = new ParamStateImages(
+        dummy_widget,
+        dummy_widget->load_image(this->platform_data, "KNOBSTATESRED"),
+        NULL,
+        NULL,
+        NULL,
         128,
         48,
         48
@@ -1953,7 +1965,7 @@ GUI::GUI(
     build_macros_1_body(knob_states, macro_distortions, macro_midpoint_states);
     build_macros_2_body(knob_states, macro_distortions, macro_midpoint_states);
     build_macros_3_body(knob_states, macro_distortions, macro_midpoint_states);
-    build_effects_body(knob_states, reversed_toggle_states);
+    build_effects_body(knob_states, knob_states_red, reversed_toggle_states);
     build_envelopes_1_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_envelopes_2_body(knob_states, screw_states, envelope_shapes_01, envelope_shapes_10);
     build_lfos_body(knob_states);
@@ -2581,6 +2593,7 @@ void GUI::build_macros_3_body(
 
 void GUI::build_effects_body(
         ParamStateImages const* knob_states,
+        ParamStateImages const* knob_states_red,
         ParamStateImages const* reversed_toggle_states
 ) {
     effects_body = new TabBody(*this, "Effects");
@@ -2628,7 +2641,7 @@ void GUI::build_effects_body(
 
     KNOB(effects_body, 892 + KNOB_W * 0,    34, Synth::ParamId::EV2V,   MML_C,      "%.2f", 100.0, knob_states);
 
-    KNOB(effects_body,  16 + KNOB_W * 0,   173, Synth::ParamId::ETSTP,  MM__C,      "%.3f", 1.0, knob_states);
+    KNOB(effects_body,  16 + KNOB_W * 0,   173, Synth::ParamId::ETSTP,  MM__C,      "%.3f", 1.0, knob_states_red);
     KNOB(effects_body,  16 + KNOB_W * 1,   173, Synth::ParamId::ETWFA,  MM__C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 2,   173, Synth::ParamId::ETSAT,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  16 + KNOB_W * 3,   173, Synth::ParamId::ETCLR,  MM__C,      "%.2f", 200.0, knob_states);
@@ -3333,6 +3346,7 @@ GUI::~GUI()
     delete parent_window;
 
     delete knob_states;
+    delete knob_states_red;
     delete screw_states;
     delete envelope_shapes_01;
     delete envelope_shapes_10;
@@ -3367,6 +3381,8 @@ void GUI::show()
 
 void GUI::update_synth_state()
 {
+    constexpr Color tape_status_color = GUI::rgb(255, 184, 96);
+
     Integer const old_active_voices_count = active_voices_count;
     TapeParams::State const old_tape_state = tape_state;
 
@@ -3388,6 +3404,7 @@ void GUI::update_synth_state()
             TAPE_STATES[tape_state]
         );
         default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
+        default_status_line_color = tape_status_color;
     } else if (active_voices_count != 0) {
         snprintf(
             default_status_line,
@@ -3397,12 +3414,15 @@ void GUI::update_synth_state()
             (int)Synth::POLYPHONY
         );
         default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH - 1] = '\x00';
+        default_status_line_color = TEXT_COLOR;
     } else {
         default_status_line[0] = '\x00';
+        default_status_line_color = TEXT_COLOR;
     }
 
     if (status_line != NULL) {
-        set_status_line(default_status_line);
+        status_line->set_text(default_status_line);
+        status_line->set_text_color(default_status_line_color);
         redraw_status_line();
     }
 }
@@ -3412,8 +3432,10 @@ void GUI::set_status_line(char const* text)
 {
     if (text[0] == '\x00') {
         status_line->set_text(default_status_line);
+        status_line->set_text_color(default_status_line_color);
     } else {
         status_line->set_text(text);
+        status_line->set_text_color(TEXT_COLOR);
     }
 
     redraw_status_line();

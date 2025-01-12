@@ -565,8 +565,13 @@ class StatusLine : public TransparentWidget
 
         virtual void set_text(char const* text) override;
 
+        void set_text_color(GUI::Color const color);
+
     protected:
         virtual bool paint() override;
+
+    private:
+        GUI::Color text_color;
 };
 
 
