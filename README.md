@@ -522,7 +522,8 @@ Usage
             v
             Volume --> Out
 
-Note: the tape effect can optionally be moved after the reverb in the chain.
+Note: the tape effect can be placed either before the chorus or after the
+reverb in the chain.
 
 <a href="#toc">Table of Contents</a>
 
