@@ -3317,6 +3317,8 @@ void Synth::Bus::mix_modulators_with_additive_volume(
             }
         }
     } else {
+        mix_modulators(round, first_sample_index, last_sample_index);
+
         for (Integer c = 0; c != channels; ++c) {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 modulators_buffer[c][i] *= modulator_add_volume_buffer[i];

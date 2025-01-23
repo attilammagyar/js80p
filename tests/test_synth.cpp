@@ -2031,6 +2031,86 @@ TEST(keeps_track_of_tape_state, {
 })
 
 
+TEST(modulator_additive_volume_can_be_monophonic, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth;
+    Integer const channels = synth.get_channels();
+    SumOfSines expected(
+        OUT_VOLUME_PER_CHANNEL * 0.7, 220.0,
+        OUT_VOLUME_PER_CHANNEL * 0.3, 880.0,
+        0.0, 0.0,
+        channels
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.modulator_params.amplitude.set_value(1.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+
+    synth.carrier_params.amplitude.set_value(1.0);
+    synth.carrier_params.detune.set_value(2400.0);
+    synth.carrier_params.volume.set_value(0.3);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+
+    set_param(synth, Synth::ParamId::MIX, 0.7);
+    synth.process_messages();
+
+    synth.note_on(0.0, 0, Midi::NOTE_A_3, 127);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    for (Integer i = 0; i != channels; ++i) {
+        assert_close(
+            expected_samples[i],
+            rendered_samples[i],
+            block_size,
+            0.001,
+            "(MIX is const) channel=%d",
+            (int)i
+        );
+    }
+
+    synth.suspend();
+    synth.resume();
+    expected.reset();
+
+    set_param(synth, Synth::ParamId::MIX, 1.0);
+    set_param(synth, Synth::ParamId::L1MIN, 0.699);
+    set_param(synth, Synth::ParamId::L1MAX, 0.701);
+
+    assign_controller(synth, Synth::ParamId::MIX, Synth::ControllerId::LFO_1);
+    synth.process_messages();
+
+    synth.note_on(0.0, 0, Midi::NOTE_A_3, 127);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 2);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 2);
+
+    for (Integer i = 0; i != channels; ++i) {
+        assert_close(
+            expected_samples[i],
+            rendered_samples[i],
+            block_size,
+            0.001,
+            "(MIX controlled by LFO) channel=%d",
+            (int)i
+        );
+    }
+})
+
+
 TEST(modulator_additive_volume_can_be_polyphonic, {
     constexpr Integer block_size = 2048;
     constexpr Frequency sample_rate = 22050.0;
