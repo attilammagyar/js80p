@@ -126,6 +126,7 @@ class Vst3Plugin
 
                 tresult PLUGIN_API canProcessSampleSize(int32 symbolic_sample_size) SMTG_OVERRIDE;
                 tresult PLUGIN_API setupProcessing(Vst::ProcessSetup& setup) SMTG_OVERRIDE;
+                tresult PLUGIN_API setProcessing(TBool state) SMTG_OVERRIDE;
                 tresult PLUGIN_API setActive(TBool state) SMTG_OVERRIDE;
                 tresult PLUGIN_API process(Vst::ProcessData& data) SMTG_OVERRIDE;
 
@@ -158,6 +159,8 @@ class Vst3Plugin
                 void generate_samples(Vst::ProcessData& data) noexcept;
 
                 void import_patch(std::string const& serialized) noexcept;
+
+                void reset_for_state_change(TBool const new_state) noexcept;
 
                 Synth synth;
                 Renderer renderer;
