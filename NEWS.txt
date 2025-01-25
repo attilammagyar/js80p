@@ -1,3 +1,16 @@
+v3.4.1 (2025-01-25)
+ * Bugfix: since v3.3.0, oscillator 1 went silent whenever the modulator
+   additive volume parameter was being changed or controlled by an LFO. This
+   has been fixed (https://github.com/attilammagyar/js80p/issues/35).
+ * Bugfix: in the Stalacpipe Organ preset, subsequent notes could affect the
+   pitch of already scheduled water droplet sounds which could lead to
+   unnatural sounds when very high and very low notes were alternating. Now
+   once scheduled, water droplets will maintain their pitch regardless of
+   subsequent notes.
+ * Bugfix: the VST 3 plugin used to ignore certain requests by the host to
+   clear its state and echo and reverb buffers
+   (https://github.com/attilammagyar/js80p/issues/34).
+
 v3.4.0 (2025-01-12)
  * Oscillators can now be mixed with noise.
  * The Echo and Reverb effects can now be gated by switching their side-chain
