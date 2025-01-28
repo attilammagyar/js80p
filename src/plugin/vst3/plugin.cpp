@@ -293,7 +293,7 @@ tresult PLUGIN_API Vst3Plugin::Processor::process(Vst::ProcessData& data)
         synth.clear_dirty_flag();
     }
 
-    if (data.numOutputs == 0 || data.numSamples < 1) {
+    if (data.numOutputs <= 0 || data.numSamples < 1) {
         return kResultOk;
     }
 
@@ -566,16 +566,22 @@ void Vst3Plugin::Processor::update_bpm(Vst::ProcessData& data) noexcept
 
 void Vst3Plugin::Processor::generate_samples(Vst::ProcessData& data) noexcept
 {
+    void** input = (
+        (data.numInputs > 0 && data.inputs != NULL)
+            ? getChannelBuffersPointer(processSetup, data.inputs[0])
+            : NULL
+    );
+
     if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64) {
         renderer.render<double>(
             (Integer)data.numSamples,
-            (double**)getChannelBuffersPointer(processSetup, data.inputs[0]),
+            (double**)input,
             (double**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32) {
         renderer.render<float>(
             (Integer)data.numSamples,
-            (float**)getChannelBuffersPointer(processSetup, data.inputs[0]),
+            (float**)input,
             (float**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
     } else {

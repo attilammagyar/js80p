@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,14 +106,24 @@ class Renderer
                 );
 
                 if (JS80P_LIKELY(input != NULL)) {
-                    for (Integer c = 0; c != Synth::IN_CHANNELS; ++c) {
-                        NumberType const* const src_channel = in_samples[c];
-                        Sample* const dst_channel = input[c];
+                    if (JS80P_LIKELY(in_samples != NULL)) {
+                        for (Integer c = 0; c != Synth::IN_CHANNELS; ++c) {
+                            NumberType const* const src_channel = in_samples[c];
+                            Sample* const dst_channel = input[c];
 
-                        for (Integer i = 0; i != batch_size; ++i) {
-                            dst_channel[next_synth_sample_index + i] = (
-                                (Sample)src_channel[next_host_sample_index + i]
-                            );
+                            for (Integer i = 0; i != batch_size; ++i) {
+                                dst_channel[next_synth_sample_index + i] = (
+                                    (Sample)src_channel[next_host_sample_index + i]
+                                );
+                            }
+                        }
+                    } else {
+                        for (Integer c = 0; c != Synth::IN_CHANNELS; ++c) {
+                            Sample* const dst_channel = input[c];
+
+                            for (Integer i = 0; i != batch_size; ++i) {
+                                dst_channel[next_synth_sample_index + i] = 0.0;
+                            }
                         }
                     }
                 }

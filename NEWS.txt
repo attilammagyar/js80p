@@ -1,3 +1,7 @@
+v3.?.? (2025-??-??)
+ * Bugfix: avoid potential crash in hosts which fail to provide the requested
+   auxiliary input.
+
 v3.4.1 (2025-01-25)
  * Bugfix: since v3.3.0, oscillator 1 went silent whenever the modulator
    additive volume parameter was being changed or controlled by an LFO. This
