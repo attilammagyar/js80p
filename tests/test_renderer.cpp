@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ enum RenderMode {
 };
 
 
-void test_varaible_size_rounds(RenderMode const mode)
+void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
 {
     constexpr Integer buffer_size = 4096;
     constexpr Frequency sample_rate = 11025.0;
@@ -62,7 +62,7 @@ void test_varaible_size_rounds(RenderMode const mode)
     Renderer renderer(synth);
     Integer const latency = renderer.get_latency_samples();
     SumOfSines input(
-        0.5, 110.0,
+        input_volume, 110.0,
         0.0, 0.0,
         0.0, 0.0,
         channels,
@@ -76,7 +76,7 @@ void test_varaible_size_rounds(RenderMode const mode)
     );
     SumOfSines reference(
         volume_per_channel, 220.0,
-        0.5, 110.0,
+        input_volume, 110.0,
         0.0, 0.0,
         channels,
         0.005079
@@ -116,7 +116,11 @@ void test_varaible_size_rounds(RenderMode const mode)
         std::fill_n(buffer[c], buffer_size, 0.0);
     }
 
-    in_samples = SignalProducer::produce<SumOfSines>(input, 999, latency);
+    in_samples = (
+        input_volume > 0.000001
+            ? SignalProducer::produce<SumOfSines>(input, 999, latency)
+            : NULL
+    );
     renderer.render<double>(latency, in_samples, batch);
     expected_samples = SignalProducer::produce<SumOfSines>(
         intro_reference, 999, latency
@@ -140,7 +144,11 @@ void test_varaible_size_rounds(RenderMode const mode)
     for (Integer i = 0; round_sizes[i] >= 0; ++i) {
         Integer const sample_count = round_sizes[i];
 
-        in_samples = SignalProducer::produce<SumOfSines>(input, i, sample_count);
+        in_samples = (
+            input_volume > 0.000001
+                ? SignalProducer::produce<SumOfSines>(input, i, sample_count)
+                : NULL
+        );
 
         for (Integer c = 0; c != channels; ++c) {
             batch[c] = &buffer[c][next_round_start];
@@ -168,6 +176,8 @@ void test_varaible_size_rounds(RenderMode const mode)
 
 
 TEST(number_of_samples_to_render_may_vary_between_rounds, {
-    test_varaible_size_rounds(OVERWRITE);
-    test_varaible_size_rounds(ADD);
+    test_varaible_size_rounds(OVERWRITE, 0.0);
+    test_varaible_size_rounds(ADD, 0.0);
+    test_varaible_size_rounds(OVERWRITE, 0.5);
+    test_varaible_size_rounds(ADD, 0.5);
 })
