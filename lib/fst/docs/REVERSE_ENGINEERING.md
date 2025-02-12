@@ -27,6 +27,7 @@ all VST-related software was accessed on 2019-02-16 unless otherwise indicated.
 - JUCE-5.4.1: https://d30pueezughrda.cloudfront.net/juce/juce-5.4.1-linux.zip
 - JUCE-6.0.7: https://github.com/juce-framework/JUCE/releases/download/6.0.7/juce-6.0.7-linux.zip (accessed 2021-02-03)
 - JUCE-7.0.2: https://github.com/juce-framework/JUCE/releases/download/7.0.2/juce-7.0.2-linux.zip (accessed 2022-08-17)
+- REAPER-SDK: https://github.com/justinfrankel/reaper-sdk (accessed 2022-12-01)
 
 
 ### Plugins
@@ -47,7 +48,7 @@ all VST-related software was accessed on 2019-02-16 unless otherwise indicated.
 
 ### Hosts
 
-- Reaper: https://www.reaper.fm/download.php (reaper5965_linux_x86_64.tar.xz)
+- Reaper: https://www.reaper.fm/download.php (reaper5965_linux_x86_64.tar.xz, ...)
 - MrsWatson: http://teragonaudio.com/MrsWatson.html (MrsWatson-0.9.7)
 
 # Part1: unknown symbols
@@ -216,27 +217,8 @@ typedef struct VstEvents_ {
 
 
 ### VstSpeakerArrangement
-Since `VstSpeakerArrangement` is supposed to be a type, let's naively set it to `int`.
-This will yield errors about not being able to access members in a non-class type.
 
-~~~bash
-make -C JUCE/extras/AudioPluginHost/Builds/LinuxMakefile 2>&1 \
-| grep VstSpeakerArrangement | grep "error:"                  \
-| sed -e 's|.* error: request for member ||' -e 's| in .*||'  \
-| sort -u
-~~~
-
-Gives us three members, `type`, `speakers`, `numChannels`.
-To get the types of these members, let's set it experimentally to something stupid, like `void*`.
-That reveleals that we need to be able to convert `type` to `int32` (but more likely some enumeration),
-`numChannels` to `int`, and that `speakers` really is an array to `VstSpeakerProperties`.
-
-Somewhere in `modules/juce_audio_processors/format_types/juce_VSTCommon.h`, we can see that
-the `type` is populated by `int channelSetToVstArrangementType()` which really returns values like
-`kSpeakerArrStereo`.
-
-I'd rather assign the `kSpeakerArr*` enumeration a name `t_fstSpeakerArrangementType` and use that for `type`,
-but alas, C++ does not allow use to implicitly cast `int` to `enum`, so we need to use `int` instead.
+See [here](speaker-arrangment.md#VstSpeakerArrangment).
 
 ~~~C
 typedef struct VstSpeakerArrangement_ {
@@ -245,16 +227,6 @@ typedef struct VstSpeakerArrangement_ {
   VstSpeakerProperties speakers[];
 } VstSpeakerArrangement;
 ~~~
-
-#### sidenote: varsized arrays
-The `VstSpeakerArrangement.speakers` could be a pointer (`VstSpeakerProperties*`) or an array (`VstSpeakerProperties[]`).
-Because they are often used almost synonymously, my first attempt used a pointer.
-Much later, i tried compiling and *running* JUCE's AudioPluginHost and it would spectacularily segfault
-when allocating memory for `VstSpeakerArrangement` and assigning values to it.
-It turned out, that using a var-sized array instead of the pointer fixes this issue.
-
-the `type var[]` syntax is C99, for older C-implementations use `type var[0]` instead.
-
 
 ### VstSpeakerProperties
 Resolving `VstSpeakerArrangement`, leaves us with a new type `VstSpeakerProperties`.
@@ -1211,10 +1183,10 @@ Things we know from looking at the source code of JUCE-5.4.1
 
 Comparing this with our binary flag values, we can conclude:
 
-| flag              | value  |
-|-------------------|--------|
-| effFlagsHasEditor | `1<<0` |
-| effFlagsIsSynth   | `1<<8` |
+| flag                | value  |
+|---------------------|--------|
+| `effFlagsHasEditor` | `1<<0` |
+| `effFlagsIsSynth`   | `1<<8` |
 
 
 It's a it strange that we have `processReplacing` and `processDoubleReplacing` functions
@@ -1362,114 +1334,114 @@ to find out which parameters are used (and how) for a given opcode, and how valu
 
 ### JUCE effect Opcodes
 
-| effect opcode               |     | IN                 | OUT                     | return                | notes                       |
-|-----------------------------|-----|--------------------|-------------------------|-----------------------|-----------------------------|
-| effCanBeAutomated           | 26  | index              |                         | 0/1                   | can param#idx be automated? |
-| effCanDo                    | 51  | ptr(char[])        |                         | 0/1/-1                |                             |
-| effOpen                     | 0?  | -                  | -                       | 0                     |                             |
-| effClose                    | 1?  | -                  | -                       | 0                     |                             |
-| effEditClose                | 15  | -                  |                         | 0                     |                             |
-| effEditGetRect              | 13  | -                  | ptr(&ERect)             | ptr                   |                             |
-| effEditDraw                 |     | ptr(&ERect)        |                         |                       | JUCE-ignored                |
-| effEditIdle                 |     |                    |                         |                       | JUCE-ignored                |
-| effEditMouse                |     |                    |                         |                       | JUCE-ignored                |
-| effEditOpen                 | 14  | ptr(Window)        |                         |                       |                             |
-| effEditSleep                |     |                    |                         |                       | JUCE-ignored                |
-| effEditTop                  |     |                    |                         |                       | JUCE-ignored                |
-| effGetChunk                 | 23  | index              | ptr(void[])             | size                  |                             |
-| effSetChunk                 | 24  | index, ivalue, ptr |                         | 0                     | ivalue=size                 |
-| effGetCurrentMidiProgram    | 63? | -                  | -                       | -1                    |                             |
-| effGetEffectName            | 45  | -                  | ptr(char[64])           | 1                     |                             |
-| effGetInputProperties       | 33  | index              | ptr(VstPinProperties[]) | 1/0                   |                             |
-| effGetOutputProperties      | 34  | index              | ptr(VstPinProperties[]) | 1/0                   |                             |
-| effGetNumMidiInputChannels  |     | -                  |                         | 16/0                  | 16 if plugin handles MIDI   |
-| effGetNumMidiOutputChannels |     | -                  |                         | 16/0                  | 16 if plugin handles MIDI   |
-| effGetParamDisplay          | 7   | index              | ptr(char[8])            | 0                     |                             |
-| effGetParamLabel            | 6   | index              | ptr(char[8])            | 0                     |                             |
-| effGetParamName             | 8   | index              | ptr(char[8])            | 0                     |                             |
-| effGetPlugCategory          | 35  | -                  |                         | category              |                             |
-| effGetProductString         | 48  | -                  | ptr(char[64])           | 1                     |                             |
-| effGetProgramNameIndexed    | 29  | index              | ptr(char[24])           | hasProgram#index      |                             |
-| effGetProgramName           | 5   | -                  | ptr(char[24])           | 0                     |                             |
-| effGetProgram               | 3   | -                  | -                       | current_program       |                             |
-| effGetSpeakerArrangement    | 69  | -                  | ivalue([]), ptr([])     | (!(hasAUX or isMidi)) | in:(SpeakerArrangement[])   |
-| effSetSpeakerArrangement    | 42  | ivalue(ptr), ptr   | -                       | 0/1                   |                             |
-| effGetTailSize              |     | -                  | -                       | audiotailInSamples    |                             |
-| effGetVendorString          | 47  | -                  | ptr(char[64])           | 1                     |                             |
-| effGetVendorVersion         | 49  | -                  | -                       | version               |                             |
-| effGetVstVersion            | 58  | -                  | -                       | kVstVersion           |                             |
-| effIdentify                 | 22  | -                  | -                       | bigEndianInt("NvEf")  | 1316373862=0x4e764566       |
-| effKeysRequired             |     | -                  | -                       | isKbdFocusRequired    |                             |
-| effMainsChanged             | 12? | ivalue             | -                       | 0                     | ivalue?resume():suspend()   |
-| effProcessEvents            | 25  | ptr(&VstEvents)    | -                       | isMidiProcessed       |                             |
-| effSetBlockSize             | 11  | ivalue             | -                       | 0                     |                             |
-| effSetBypass                |     | ivalue             | -                       | 0                     |                             |
-| effSetProcessPrecision      | 77  | ivalue             | -                       | !isProcessing         |                             |
-| effSetProgram               | 2   | ivalue             | -                       | 0                     |                             |
-| effSetProgramName           | 4   | ptr(char[])        | -                       | 0                     |                             |
-| effSetSampleRate            | 10  | fvalue             | -                       | 0                     |                             |
-| effSetTotalSampleToProcess  | 73? | ivalue             | -                       | ivalue                |                             |
-| effString2Parameter         | 27  | index, ptr(char[]) | -                       | !isLegacy(param[i])   |                             |
-| effConnectInput             |     |                    |                         |                       | JUCE-ignored                |
-| effConnectOutput            |     |                    |                         |                       | JUCE-ignored                |
-| effIdle                     |     |                    |                         |                       | JUCE-ignored                |
-| effVendorSpecific           | 50  | ???                | ???                     | ???                   |                             |
-| effShellGetNextPlugin       | 70  |                    |                         |                       | JUCE-ignored                |
-| effStartProcess             | 71  |                    |                         |                       | JUCE-ignored                |
-| effStopProcess              | 72  |                    |                         |                       | JUCE-ignored                |
+| effect opcode                 |     | IN                 | OUT                     | return                | notes                       |
+|-------------------------------|-----|--------------------|-------------------------|-----------------------|-----------------------------|
+| `effCanBeAutomated`           | 26  | index              |                         | 0/1                   | can param#idx be automated? |
+| `effCanDo`                    | 51  | ptr(char[])        |                         | 0/1/-1                |                             |
+| `effOpen`                     | 0?  | -                  | -                       | 0                     |                             |
+| `effClose`                    | 1?  | -                  | -                       | 0                     |                             |
+| `effEditClose`                | 15  | -                  |                         | 0                     |                             |
+| `effEditGetRect`              | 13  | -                  | ptr(&ERect)             | ptr                   |                             |
+| `effEditDraw`                 |     | ptr(&ERect)        |                         |                       | JUCE-ignored                |
+| `effEditIdle`                 |     |                    |                         |                       | JUCE-ignored                |
+| `effEditMouse`                |     |                    |                         |                       | JUCE-ignored                |
+| `effEditOpen`                 | 14  | ptr(Window)        |                         |                       |                             |
+| `effEditSleep`                |     |                    |                         |                       | JUCE-ignored                |
+| `effEditTop`                  |     |                    |                         |                       | JUCE-ignored                |
+| `effGetChunk`                 | 23  | index              | ptr(void[])             | size                  |                             |
+| `effSetChunk`                 | 24  | index, ivalue, ptr |                         | 0                     | ivalue=size                 |
+| `effGetCurrentMidiProgram`    | 63? | -                  | -                       | -1                    |                             |
+| `effGetEffectName`            | 45  | -                  | ptr(char[64])           | 1                     |                             |
+| `effGetInputProperties`       | 33  | index              | ptr(VstPinProperties[]) | 1/0                   |                             |
+| `effGetOutputProperties`      | 34  | index              | ptr(VstPinProperties[]) | 1/0                   |                             |
+| `effGetNumMidiInputChannels`  |     | -                  |                         | 16/0                  | 16 if plugin handles MIDI   |
+| `effGetNumMidiOutputChannels` |     | -                  |                         | 16/0                  | 16 if plugin handles MIDI   |
+| `effGetParamDisplay`          | 7   | index              | ptr(char[8])            | 0                     |                             |
+| `effGetParamLabel`            | 6   | index              | ptr(char[8])            | 0                     |                             |
+| `effGetParamName`             | 8   | index              | ptr(char[8])            | 0                     |                             |
+| `effGetPlugCategory`          | 35  | -                  |                         | category              |                             |
+| `effGetProductString`         | 48  | -                  | ptr(char[64])           | 1                     |                             |
+| `effGetProgramNameIndexed`    | 29  | index              | ptr(char[24])           | hasProgram#index      |                             |
+| `effGetProgramName`           | 5   | -                  | ptr(char[24])           | 0                     |                             |
+| `effGetProgram`               | 3   | -                  | -                       | current_program       |                             |
+| `effGetSpeakerArrangement`    | 69  | -                  | ivalue([]), ptr([])     | (!(hasAUX or isMidi)) | in:(SpeakerArrangement[])   |
+| `effSetSpeakerArrangement`    | 42  | ivalue(ptr), ptr   | -                       | 0/1                   |                             |
+| `effGetTailSize`              |     | -                  | -                       | audiotailInSamples    |                             |
+| `effGetVendorString`          | 47  | -                  | ptr(char[64])           | 1                     |                             |
+| `effGetVendorVersion`         | 49  | -                  | -                       | version               |                             |
+| `effGetVstVersion`            | 58  | -                  | -                       | kVstVersion           |                             |
+| `effIdentify`                 | 22  | -                  | -                       | bigEndianInt("NvEf")  | 1316373862=0x4e764566       |
+| `effKeysRequired`             |     | -                  | -                       | isKbdFocusRequired    |                             |
+| `effMainsChanged`             | 12? | ivalue             | -                       | 0                     | ivalue?resume():suspend()   |
+| `effProcessEvents`            | 25  | ptr(&VstEvents)    | -                       | isMidiProcessed       |                             |
+| `effSetBlockSize`             | 11  | ivalue             | -                       | 0                     |                             |
+| `effSetBypass`                |     | ivalue             | -                       | 0                     |                             |
+| `effSetProcessPrecision`      | 77  | ivalue             | -                       | !isProcessing         |                             |
+| `effSetProgram`               | 2   | ivalue             | -                       | 0                     |                             |
+| `effSetProgramName`           | 4   | ptr(char[])        | -                       | 0                     |                             |
+| `effSetSampleRate`            | 10  | fvalue             | -                       | 0                     |                             |
+| `effSetTotalSampleToProcess`  | 73? | ivalue             | -                       | ivalue                |                             |
+| `effString2Parameter`         | 27  | index, ptr(char[]) | -                       | !isLegacy(param[i])   |                             |
+| `effConnectInput`             |     |                    |                         |                       | JUCE-ignored                |
+| `effConnectOutput`            |     |                    |                         |                       | JUCE-ignored                |
+| `effIdle`                     |     |                    |                         |                       | JUCE-ignored                |
+| `effVendorSpecific`           | 50  | ???                | ???                     | ???                   |                             |
+| `effShellGetNextPlugin`       | 70  |                    |                         |                       | JUCE-ignored                |
+| `effStartProcess`             | 71  |                    |                         |                       | JUCE-ignored                |
+| `effStopProcess`              | 72  |                    |                         |                       | JUCE-ignored                |
 
 ### JUCE host Opcodes
 
 for host opcodes (`audioMaster*`) check out *juce_VSTPluginFormat.cpp*:
 
-| host opcode                            |    | IN            | OUT         | return            | notes                                                           |
-|----------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
-| audioMasterAutomate                    | 0  | index, fvalue | -           | 0                 |                                                                 |
-| audioMasterProcessEvents               | 8  | ptr           | -           | 0                 | ptr=VstEvents[]                                                 |
-| audioMasterGetTime                     | 7  | -             | -           | &vsttime          |                                                                 |
-| audioMasterIdle                        |    | -             | -           | 0                 |                                                                 |
-| audioMasterSizeWindow                  | 15 | index, value  |             | 1                 | setWindowSize(index,value)                                      |
-| audioMasterUpdateDisplay               |    | -             | -           | 0                 | triggerAsyncUpdate()                                            |
-| audioMasterIOChanged                   |    | -             | -           | 0                 | setLatencyDelay                                                 |
-| audioMasterNeedIdle                    |    | -             | -           | 0                 | startTimer(50)                                                  |
-| audioMasterGetSampleRate               | 16 | -             | -           | samplerate        |                                                                 |
-| audioMasterGetBlockSize                | 17 | -             | -           | blocksize         |                                                                 |
-| audioMasterWantMidi                    | 6  | -             | -           | 0                 | wantsMidi=true                                                  |
-| audioMasterGetDirectory                |    | -             | -           | (char[])directory |                                                                 |
-| audioMasterTempoAt                     | 10 | -             | -           | 10000*bpm         |                                                                 |
-| audioMasterGetAutomationState          |    | -             | -           | 0/1/2/3/4         | 0 = not supported, 1 = off, 2 = read, 3 = write, 4 = read/write |
-| audioMasterBeginEdit                   | 43 | index         | -           | 0                 | gesture                                                         |
-| audioMasterEndEdit                     | 44 | index         | -           | 0                 | gesture                                                         |
-| audioMasterPinConnected                |    | index,value   | -           | 0/1               | 0=true; value=direction                                         |
-| audioMasterGetCurrentProcessLevel      | 23 | -             | -           | 4/0               | 4 if not realtime                                               |
-|----------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
-| audioMasterCanDo                       | 37 | ptr(char[])   | -           | 1/0               | 1 if we can handle feature                                      |
-| audioMasterVersion                     | 1  | -             | -           | 2400              |                                                                 |
-| audioMasterCurrentId                   | 2? | -             | -           | shellUIDToCreate  | ?                                                               |
-| audioMasterGetNumAutomatableParameters |    | -             | -           | 0                 |                                                                 |
-| audioMasterGetVendorVersion            | 34 | -             | -           | 0x0101            |                                                                 |
-| audioMasterGetVendorString             | 32 | -             | ptr(char[]) | ptr               | getHostName()                                                   |
-| audioMasterGetProductString            | 33 | -             | ptr(char[]) | ptr               | getHostName()                                                   |
-| audioMasterSetOutputSampleRate         |    | -             | -           | 0                 |                                                                 |
-|----------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
-| audioMasterGetLanguage                 |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetOutputSpeakerArrangement |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetParameterQuantization    |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetPreviousPlug             |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetNextPlug                 |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterSetTime                     |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterWillReplaceOrAccumulate     |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetInputLatency             |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterGetOutputLatency            |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOpenWindow                  |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterCloseWindow                 |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterSetIcon                     |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOfflineGetCurrentMetaPass   |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOfflineGetCurrentPass       |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOfflineRead                 |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOfflineStart                |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterOfflineWrite                |    |               |             |                   | JUCE-ignored                                                    |
-| audioMasterVendorSpecific              |    |               |             |                   | JUCE-ignored                                                    |
+| host opcode                              |    | IN            | OUT         | return            | notes                                                           |
+|------------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
+| `audioMasterAutomate`                    | 0  | index, fvalue | -           | 0                 |                                                                 |
+| `audioMasterProcessEvents`               | 8  | ptr           | -           | 0                 | ptr=VstEvents[]                                                 |
+| `audioMasterGetTime`                     | 7  | -             | -           | &vsttime          |                                                                 |
+| `audioMasterIdle`                        |    | -             | -           | 0                 |                                                                 |
+| `audioMasterSizeWindow`                  | 15 | index, value  |             | 1                 | setWindowSize(index,value)                                      |
+| `audioMasterUpdateDisplay`               |    | -             | -           | 0                 | triggerAsyncUpdate()                                            |
+| `audioMasterIOChanged`                   |    | -             | -           | 0                 | setLatencyDelay                                                 |
+| `audioMasterNeedIdle`                    |    | -             | -           | 0                 | startTimer(50)                                                  |
+| `audioMasterGetSampleRate`               | 16 | -             | -           | samplerate        |                                                                 |
+| `audioMasterGetBlockSize`                | 17 | -             | -           | blocksize         |                                                                 |
+| `audioMasterWantMidi`                    | 6  | -             | -           | 0                 | wantsMidi=true                                                  |
+| `audioMasterGetDirectory`                |    | -             | -           | (char[])directory |                                                                 |
+| `audioMasterTempoAt`                     | 10 | -             | -           | 10000*bpm         |                                                                 |
+| `audioMasterGetAutomationState`          |    | -             | -           | 0/1/2/3/4         | 0 = not supported, 1 = off, 2 = read, 3 = write, 4 = read/write |
+| `audioMasterBeginEdit`                   | 43 | index         | -           | 0                 | gesture                                                         |
+| `audioMasterEndEdit`                     | 44 | index         | -           | 0                 | gesture                                                         |
+| `audioMasterPinConnected`                |    | index,value   | -           | 0/1               | 0=true; value=direction                                         |
+| `audioMasterGetCurrentProcessLevel`      | 23 | -             | -           | 4/0               | 4 if not realtime                                               |
+|------------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
+| `audioMasterCanDo`                       | 37 | ptr(char[])   | -           | 1/0               | 1 if we can handle feature                                      |
+| `audioMasterVersion`                     | 1  | -             | -           | 2400              |                                                                 |
+| `audioMasterCurrentId`                   | 2? | -             | -           | shellUIDToCreate  | ?                                                               |
+| `audioMasterGetNumAutomatableParameters` |    | -             | -           | 0                 |                                                                 |
+| `audioMasterGetVendorVersion`            | 34 | -             | -           | 0x0101            |                                                                 |
+| `audioMasterGetVendorString`             | 32 | -             | ptr(char[]) | ptr               | getHostName()                                                   |
+| `audioMasterGetProductString`            | 33 | -             | ptr(char[]) | ptr               | getHostName()                                                   |
+| `audioMasterSetOutputSampleRate`         |    | -             | -           | 0                 |                                                                 |
+|------------------------------------------|----|---------------|-------------|-------------------|-----------------------------------------------------------------|
+| `audioMasterGetLanguage`                 |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetOutputSpeakerArrangement` |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetParameterQuantization`    |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetPreviousPlug`             |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetNextPlug`                 |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterSetTime`                     |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterWillReplaceOrAccumulate`     |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetInputLatency`             |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterGetOutputLatency`            |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOpenWindow`                  |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterCloseWindow`                 |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterSetIcon`                     |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOfflineGetCurrentMetaPass`   |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOfflineGetCurrentPass`       |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOfflineRead`                 |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOfflineStart`                |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterOfflineWrite`                |    |               |             |                   | JUCE-ignored                                                    |
+| `audioMasterVendorSpecific`              |    |               |             |                   | JUCE-ignored                                                    |
 
 
 
@@ -1575,14 +1547,12 @@ file rather than a directory.
 More importantly, JUCE will `return` the string address
 in the `return` value, whereas REAPER writes the string into `ptr`.
 
-Opcode `10` is a weirdo number, obviously for humans (rather than computers).
+Opcode `10` returns a weirdo number, obviously for humans (rather than computers).
 Reading up a bit on what JUCE does for the various audioMaster-opcodes,
 I stumbled upong the `audioMasterTempoAt`, which - according to the comments
 in the JUCE code - is meant to be the tempo in "BMP * 10000".
 So the universal default of *120bpm* would be 1200000 which is exactly what
 we have here.
-
-TODO: 11
 
 ## process functions
 We can also test our process functions, by adding some printout to them.
@@ -1602,10 +1572,10 @@ Which is probably logical, as we haven't set either of the
 If we set the various bits of `AEffect.flags` one by one (carefully leaving out #0 (editor) and #8 (synth))
 and watch which of the `processReplacing` functions are being called, we soon learn new flags:
 
-| flag                       | value   |
-|----------------------------|---------|
-| effFlagsCanReplacing       | `1<< 4` |
-| effFlagsCanDoubleReplacing | `1<<12` |
+| flag                         | value   |
+|------------------------------|---------|
+| `effFlagsCanReplacing`       | `1<< 4` |
+| `effFlagsCanDoubleReplacing` | `1<<12` |
 
 Again, by printing out the first sample of the first channel (either as `float` or as `double`)
 we learn that we already have the order correct (`processReplacing` comes before `processDoubleReplacing`
@@ -1896,7 +1866,12 @@ E.g. if we compare the values to the ones we assumed to be `AEffect.version`:
 | hypercyclic | 150             | 150              |
 | tonespace   | 250             | 250              |
 
-So we assign `effGetVendorVersion` the value of `49`
+So we assign:
+
+| opcode                 | value |
+|------------------------|-------|
+| `effGetVendorVersion`  | 49    |
+
 
 ## effGetVstVersion
 
@@ -1904,8 +1879,15 @@ Opcode `58` returns `2400` for all plugins I've tested so far.
 This is the same value that JUCE pluginhosts return (hardcoded) to the
 `audioMasterVersion` opcode.
 So it's probably save to assume that `58` is the opcode
-that allows the host to query the plugin for it's VST version.
+that allows the host to query the plugin for its VST version.
 Which would make it the `effGetVstVersion`.
+
+So we assign:
+
+| opcode              | value |
+|---------------------|-------|
+| `effGetVstVersion`  | 58    |
+
 
 ## Chunks
 In the [C-snippet above](#effgetprogramnameindexed), we also get an interesting result for opcode `23`:
@@ -1948,7 +1930,7 @@ the `AEffect.flags` structure set to `0` - hinting that
 `effFlagsProgramChunks = (1<<5)` (which would explain that this
 flag has something to do with the ability to get/set chunks).
 
-Of the `effFlags*`, the only reamining unknown flags is `effFlagsNoSoundInStop`.
+Of the `effFlags*`, the only remaining unknown flags is `effFlagsNoSoundInStop`.
 Our [test plugins](#flags) have the flags `1<<0`, `1<<4`, `1<<5`, `1<<8` and `1<<9` set,
 of which we haven't used `1<<9` yet.
 Most likely this is the `effFlagsNoSoundInStop`.
@@ -2690,65 +2672,14 @@ whenever we send a MIDI message {0x90, 0x41, 0x7f, 0} (via a *valid* `VstEvents`
 to `opcode:8`: Q.E.D!
 
 ## effMainsChanged, audioMasterWantMidi and audioMasterGetCurrentProcessLevel
-REAPER calls `effcode:12` twice (with varying `ivalue`) whenever playback gets started:
 
-~~~
-FstClient::dispatcher(0x39166c0, 12, 0, 0, (nil), 0.000000);
-FstClient::dispatcher(0x39166c0, 12, 0, 1, (nil), 0.000000);
-~~~
+See [here](effMainsChanged.md).
 
-Looking up [JUCE's effect opcodes](#juce-effect-opcodes), the following opcodes could be called:
-- `effMainsChanged`
-- `effSetBypass`
-- `effSetProcessPrecision`
-
-The `effSetBypass` can probably be ruled out, as the host wouldn't *enable* bypassing just before starting playback.
-
-
-If we use play back this sequence with effcode:12 to our test plugins,
-most of them respond immediately by calling the host callback:
-
-
-| plugin                | response to 12 |
-|-----------------------|----------------|
-| Digits                | 6              |
-| BowEcho/Danaides      | 23+6           |
-| hypercyclic/tonespace | 23+7+6         |
-
-We already know that the `hostcode:7` (as called by hypercyclic/tonespace) is `audioMasterGetTime`.
-
-When looking at how JUCE actually handles the two remaining effect opcodes, we see that `effSetProcessPrecision`
-only sets some internal state, leaving little chance to call back to the host.
-
-That leaves us with `effMainsChanged`: and indeed, JUCE potentially does callbacks to the host
-when `resume()`ing operation, which is done when handling this opcode with `ivalue=1`
-- it calls `audioMasterGetCurrentProcessLevel` without arguments (indirectly, via the `isProcessLevelOffline()` method)
-- if the plugin somehow handles MIDI, it will also issue an `audioMasterWantMidi` call (with `ivalue=1`)
-
-Checking how *BowEcho* actually calls the opcodes 23+6, we can log:
-
-~~~
-FstHost::dispatcher(23, 0, 0, (nil), 0.000000);
-FstHost::dispatcher(7, 0, 1, (nil), 0.000000);
-~~~
-
-And *hypercyclic*:
-
-~~~
-FstHost::dispatcher(23, 0, 0, (nil), 0.000000);
-FstHost::dispatcher(audioMasterGetTime, 0, 65024, (nil), 0.000000);
-FstHost::dispatcher(7, 0, 1, (nil), 0.000000);
-~~~
-
-So the calling conventions kind of match the expectations we have for `audioMasterGetCurrentProcessLevel` and `audioMasterWantMidi`,
-giving us three new opcodes:
-
-| opcode                            | value |
-|-----------------------------------|-------|
-| effMainsChanged                   | 12    |
-| audioMasterWantMidi               | 6     |
-| audioMasterGetCurrentProcessLevel | 23    |
-
+| opcode                              | value |
+|-------------------------------------|-------|
+| `effMainsChanged`                   | 12    |
+| `audioMasterWantMidi`               | 6     |
+| `audioMasterGetCurrentProcessLevel` | 23    |
 
 ## audioMasterCanDo
 We already know that we can use `effCanDo` to query a plugin whether it supports a
@@ -2767,178 +2698,16 @@ the same result *except* for `opcode:37`, our likely candidate for `audioMasterC
 
 ## Speaker Arrangements
 
-Running our test plugin in REAPER, we can also calls to `effcode:42` in the startup phase.
+See [here](speaker-arrangment.md#effGetSpeakerArrangement).
 
-~~~
-FstClient::dispatcher(0x1ec2080, 42, 0,  32252624, 0x1ec2740, 0.000000);
-~~~
-
-in another run this is:
-~~~
-FstClient::dispatcher(0x9e36510, 42, 0, 172519840, 0xa487610, 0.000000);
-~~~
-
-The `ivalue` is a bit strange, unless it is printed in hex (`0x1ec22d0` resp . `0xa4871a0`),
-where it becomes apparent that this is really another address (just compare the hex representation
-with the `ptr` value; there difference is 1136, which is practically nothing in address space)!
-
-According to [JUCE](#juce-effect-opcodes), there are only very few opcodes
-where both `ivalue` and `ptr` point both to addresses:
-- `effGetSpeakerArrangement`
-- `effSetSpeakerArrangement`
-
-Both opcodes get pointers to `VstSpeakerArrangement`.
-
-Here is a dump of the first 96 bytes of the data found at those addresses
-(the data is the same on both addresses,
-at least if our plugin is configured with 2 IN and 2 OUT channels):
-~~~
-01 00 00 00 02 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00
-~~~
-
-The int32 at position @4-7 is the `numChannels`,
-the int32 at position @0-3 is most likely the `type`.
-I have no explanation for the value at position @58,
-it's probably just uninitialized data.
-
-By setting the `numChannels` of the plugin, REAPER responds
-with following types
-
-| numChannels  | type | type(hex)  |
-|--------------|------|------------|
-| 1            | 0    | 0x0        |
-| 2            | 1    | 0x1        |
-| 3            | 11   | 0xb        |
-| 4            | 11   | 0xb        |
-| 5            | 15   | 0xf        |
-| 6            | 15   | 0xf        |
-| 7            | 23   | 0x17       |
-| 8            | 23   | 0x17       |
-| 12           | 28   | 0x1C       |
-| all the rest | -2   | 0xFFFFFFFE |
-
-Since the values are filled in by REAPER, it's likely that `effcode:42` is `effSetSpeakerArrangement`.
-This is somewhat confirmed by *Protoverb*, that prints out
-
->     resulting in SpeakerArrangement $numIns - $numOuts
-
-with $numIns and $numOuts replaced by 0, 1 or 2, depending on the chosen speaker arrangement.
-It seems that *Protoverb* doesn't support more than 2 channels.
-
-
-`effGetSeakerArrangement` is most likely close by (`41` or `43`),
-A simple test would first set the speaker-arrangement, and then try to query it back.
-According to JUCE, the plugin should return `1` in case of success.
-The calling convention is slightly different from `effSetSpeakerArrangement`, as `ptr` and `ivalue`
-hold addresses of pointer-sized memory regions, where the plugin is supposed to write
-the addresses of the `VstSpeakerArrangement` structs to (cf. JUCE code).
-
-~~~C
-for(size_t opcode=40; opcode<45; opcode++) {
-  VstSpeakerArrangement *arrptr[2] = {0,0};
-  if(42 == opcode)continue;
-  dispatch_v(effect, opcode, 0, (VstIntPtr)(arrptr+0), (arrptr+1), 0.f);
-  print_hex(arrptr[0], 32);
-  print_hex(arrptr[1], 32);
-}
-~~~
-
-Unfortunately, this is not very successful.
-Only `opcode:44` returns 1 for *some* plugins, but none write data into our `VstSpeakerArrangement` struct.
-
-| plugin    | opcode | result |
-|-----------|--------|--------|
-|Danaides   | 44     | 1      |
-|BowEcho    | 44     | 1      |
-|hypercyclic| 44     | 1      |
-|tonespace  | 44     | 1      |
-|Protoverb  | *      | 0      |
-|Digits     | *      | 0      |
-|InstaLooper| *      | 0      |
-
-
-If we try a bigger range of opcodes (e.g. 0..80), we need to skip the opcodes 45, 47 and 48 (`effGet*String`)
-to prevent crashes.
-
-Interestingly, *Protoverb* will now react to `opcode:69`, returning the same data we just set via opcode:42.
-So we probably have just found `effGetSeakerArrangement` as well.
+| opcode                     | value |
+|----------------------------|-------|
+| `effSetSpeakerArrangment`  | 42    |
+| `effGetSpeakerArrangment`  | 69    |
 
 ### Speaker Arrangement Types
 
-So what do we know about the `VstSpeakerArrangement.type` field?
-In [VstSpeakerArrangement](#vstspeakerarrangement), we found out that this
-member is really of type `t_fstSpeakerArrangementType`, that has (so far) symbolic names starting with `kSpeakerArr*`.
-JUCE uses the following names matching this pattern (in a regex notation):
-
-| VST name                             | JUCE name    |
-|--------------------------------------|--------------|
-| `kSpeakerArrEmpty`                   | disabled     |
-| `kSpeakerArrMono`                    | mono         |
-| `kSpeakerArrStereo`                  | stereo       |
-| `kSpeakerArrStereoCLfe`              |              |
-| `kSpeakerArrStereoCenter`            |              |
-| `kSpeakerArrStereoSide`              |              |
-| `kSpeakerArrStereoSurround`          |              |
-| `kSpeakerArrUserDefined`             |              |
-| `kSpeakerArr[34678][01](Cine,Music)` |              |
-| `kSpeakerArr30Cine`                  | LCR          |
-| `kSpeakerArr30Music`                 | LRS          |
-| `kSpeakerArr40Cine`                  | LCRS         |
-| `kSpeakerArr60Cine`                  | 6.0          |
-| `kSpeakerArr61Cine`                  | 6.1          |
-| `kSpeakerArr60Music`                 | 6.0Music     |
-| `kSpeakerArr61Music`                 | 6.1Music     |
-| `kSpeakerArr70Music`                 | 7.0          |
-| `kSpeakerArr70Cine`                  | 7.0SDDS      |
-| `kSpeakerArr71Music`                 | 7.1          |
-| `kSpeakerArr71Cine`                  | 7.1SDDS      |
-| `kSpeakerArr40Music`                 | quadraphonic |
-| `kSpeakerArr50`                      | 5.0          |
-| `kSpeakerArr51`                      | 5.1          |
-| `kSpeakerArr102`                     |              |
-
-
-Comparing these names to [what REAPER fills in for various channel counts](#speaker-arrangements),
-we can at least make some simple guesses.
-We repeat the table from above:
-
-| numChannels  | type |
-|--------------|------|
-| 1            | 0    |
-| 2            | 1    |
-| 3            | 11   |
-| 4            | 11   |
-| 5            | 15   |
-| 6            | 15   |
-| 7            | 23   |
-| 8            | 23   |
-| 12           | 28   |
-| all the rest | -2   |
-
-Mono is a single channel, Stereo needs two channels, for which REAPER fills in `0` and `1` (`kSpeakerArrMono` resp `kSpeakerArrStereo`).
-That's a bit unconventional: personally I would have used `0` for `kSpeakerArrEmpty`, and `1` and `2` for Mono and Stereo.
-
-Unfortunately, REAPER doesn't report anything for 0 channels, so we don't know that value of `kSpeakerArrEmpty`.
-I also don't really understand why we always get pairwise assignments for the next 6 number of channels.
-E.g. assigning `11` to both 3 and 4 channels would make sense
-if there was a speaker-arrangement for 4 channels (e.g. quadrophony aka `kSpeakerArr40Music`),
-but none for 3 channels (so REAPER just assumes some "degraded" arrangement).
-But we do have `kSpeakerArr30Music`, which should serve 3 channels just fine.
-It's probably safe to assume that REAPER does the "degraded" arrangement thing nevertheless.
-It's tricky to get the correct assignment though, since we have so many variants with the same
-number of channels.
-E.g. 6 channels could be `kSpeakerArr51`, `kSpeakerArr60Music` and `kSpeakerArr60Cine`.
-
-There's also the catch-all type *-2*. Given the `kSpeakerArr*` names we know so far, `kSpeakerArrUserDefined` might be this catch-all.
-The value for `kSpeakerArrEmpty` might be "special" as well (and therefore not be assigned some ordered value like, say, *7*) -
-it could well be *-1*, but we don't have any evidence of that yet.
-
-Here's some possible assignments (the names for 3, 5 & 7 channels are in parentheses, as the type has the same value as arrangement with one more channel):
+See [here](speaker-arrangment.md#speaker-arrangement-types).
 
 | numChannels  | type (value) | type (name)                                                                            |
 |--------------|--------------|----------------------------------------------------------------------------------------|
@@ -2955,13 +2724,6 @@ Here's some possible assignments (the names for 3, 5 & 7 channels are in parenth
 
 So we can at least be pretty confident of the values of `kSpeakerArrMono`, `kSpeakerArrStereo`,
 `kSpeakerArr102` & `kSpeakerArrUserDefined`.
-
-
-### Amendment: wantsChannelCountNotifications
-
-REAPER doesn't *always* call the `effSetSpeakerArrangement`.
-It seems the plugin must return `1` for the `effCanDo` opcode with a value of `wantsChannelCountNotifications`
-in order to receive this opcode (which kind of makes sense).
 
 
 # Part: AudioPluginHost
@@ -3000,11 +2762,11 @@ is changed in the plugin's GUI: `hostCode:43` is issued when a fader/... is "tou
 In the [JUCE host opcode table](#juce-host-opcodes), there's the `audioMasterBeginEdit` and `audioMasterEndEdit`
 pair that fits nicely.
 
-| opcode                |    |
-|-----------------------|----|
-| audioMasterSizeWindow | 15 |
-| audioMasterBeginEdit  | 43 |
-| audioMasterEndEdit    | 44 |
+| opcode                  |    |
+|-------------------------|----|
+| `audioMasterSizeWindow` | 15 |
+| `audioMasterBeginEdit`  | 43 |
+| `audioMasterEndEdit`    | 44 |
 
 ## effStartProcess/effStopProcess
 *AudioPluginHost* calls `effStartProcess` right after the plugin has been initialised
@@ -3018,10 +2780,10 @@ we notice that there are the opcodes `71` and `72` that are used in a similar wa
 
 Most likely these two numbers are indeed the `eff*Process` opcodes:
 
-| opcode          |    |
-|-----------------|----|
-| effStartProcess | 71 |
-| effStopProcess  | 72 |
+| opcode            |    |
+|-------------------|----|
+| `effStartProcess` | 71 |
+| `effStopProcess`  | 72 |
 
 
 # Part: more enums
@@ -3195,12 +2957,12 @@ and uses `ivalue:1`, so that is most likely the value of  `kVstProcessPrecision6
 The value of `kVstProcessPrecision32` can only be guessed. Intuitively, I would suggest `0`
 (so the opcode could be used as a boolean-like on/off switch for double precision rendering)
 
-| opcode                 | value |
-|------------------------|-------|
-| effSetProcessPrecision | 77    |
-|------------------------|-------|
-| kVstProcessPrecision32 | 0 (?) |
-| kVstProcessPrecision64 | 1     |
+| opcode                   | value |
+|--------------------------|-------|
+| `effSetProcessPrecision` | 77    |
+|--------------------------|-------|
+| `kVstProcessPrecision32` | 0 (?) |
+| `kVstProcessPrecision64` | 1     |
 
 ## effGetPlugCategory
 
@@ -3573,282 +3335,21 @@ If we make it return `2400` as well, REAPER starts asking with `effCanBeAutomate
 So it seems that this opcode was only introduced later, and requires the plugin to support a minimum version of the API.
 
 
-# Speaker Arrangement revisited
-We still haven't found out the details of the speaker arrangement structs.
-
-So far, we know the `effGetSpeakerArrangement` and `effSetSpeakerArrangement` opcodes, which return (resp. take)
-pointers to the `VstSpeakerArrangement`, which in turn includes an array of type `VstSpeakerProperties`.
-
-We currently only know of a single member (`type`) of the `VstSpeakerProperties` struct, which is certainly wrong
-(a struct only makes sense if there are more members. creating an array of this struct requires it to have a
-fixed size, so the struct cannot be extended "later".)
-
-We already know the positions of `VstSpeakerArrangement.type` resp. `.numChannels`, but don't really know whether
-there are more members in this struct (so we don't know the exact position of the `.speakers` member).
-However, we do now that the `.speakers` member contains `.numChannels` instances of `VstSpeakerProperties`.
-
-~~~C
-typedef struct VstSpeakerProperties_ {
-  /* misses members; order undefined */
-  int type;
-} VstSpeakerProperties;
-
-typedef struct VstSpeakerArrangement_ {
-  int type;
-  int numChannels;
-  /* missing members? */
-  VstSpeakerProperties speakers[];
-} VstSpeakerArrangement;
-~~~
-
-When we [first discovered](#speaker-arrangement) some details of the Speaker Arrangement,
-we noticed non-null values a position @58, which we concluded might be uninitialized data.
-
-We can easily test this assumption: since `VstSpeakerProperties` is at least 4 bytes large
-(assuming that it's `type` member is a 32bit `int` like all other types we have seen so far),
-and REAPER can handle up to 64 channels, we can force the full size of `speakers[]` to 256 bytes
-(64 * 4), which is way beyond the 88 bytes of position @58.
-
-Printing the first 512 bytes a 64channel plugin receives with the `effSetSpeakerArrangement` opcode, gives:
-
-~~~
-0000	  FE FF FF FF 40 00 00 00  00 00 00 00 00 00 00 00
-0010	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0020	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0030	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0040	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0050	  00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00
-0060	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0070	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0080	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0090	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00a0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00b0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00c0	  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00
-00d0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00e0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00f0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0100	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0110	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0120	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0130	  00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00
-0140	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0150	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0160	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0170	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0180	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0190	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01a0	  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00
-01b0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01c0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01d0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01e0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01f0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-~~~
-
-This is interesting as we still have a value (`01`) at position @58 -
-which according to the math we did above cannot be "uninitialized memory".
-
-If we set the number of channels our plugin can process to *2*, we get the following instead:
-
-~~~
-0000	  01 00 00 00 02 00 00 00  00 00 00 00 00 00 00 00
-0010	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0020	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0030	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0040	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0050	  00 00 00 00 00 00 00 00  01 00 00 00 00 00 00 00
-0060	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0070	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0080	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0090	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00a0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00b0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00c0	  00 00 00 00 00 00 00 00  02 00 00 00 00 00 00 00
-00d0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00e0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-00f0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0100	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0110	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0120	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0130	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0140	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0150	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0160	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0170	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0180	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-0190	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01a0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01b0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01c0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01d0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01e0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-01f0	  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
-~~~
-
-Apart from the differing first 8 bytes (that's the `.type` and `.numChannels`
-members, which we already established to be differing), we can *also* see some
-pattern:
-
-The 2-channel plugin gets values `01` and `02` at the positions @58 resp @c8 and after that only zeros,
-whereas the 64-channel version has alternating `01` and `02` values until the printout ends.
-Could it be that we are actually seeing `VstSpeakerProperties` that are not occupying only 4 bytes but rather
-112 bytes in length (112 being the difference between @c8 and @58)?
-
-So printing 8192 bytes (which should cover 64 channels if each really takes 112 bytes), we observe:
-
-| channels | 112-bytes pattern                                         | garbage     |
-|----------|-----------------------------------------------------------|-------------|
-| 2        | `01`@58, `02`@c8                                          | after @468  |
-| 64       | alternating `01`/`02` from @58 to @1be8, every 0x70 bytes | after @1f88 |
-| 3        | `01`@58, `02`@c8, `03`@138                                | after @4da  |
-
-After a certain point the data is densely filled with non-null bytes, which probably really is "uninitialized memory" (aka "garbage").
-
-The important part to notice is that the position difference between the first lonely byte @58 and the last one (@c8, @138, @1be8)
-is always `112 * (numChannels-1)`.
-So we can conclude, that the `VstSpeakerProperties` has a size of 112 bytes (of which we know that 4 bytes contain the `type` member).
-If we assume that the `VstSpeakerArrangment.speakers` array starts immediately after the first 8 bytes,
-the `VstSpeakerProperties.type` cannot be at the beginning or the end of the `VstSpeakerProperties`,
-but is located at some 80 bytes offset.
-There's no real evidence for *any* position of the `type` field.
-Since the surrounding bytes don't carry information (at least when filled in by REAPER), we just pick one randomly.
-There's also no real evidence whether the stray non-null bytes actually *are* the `type` member,
-but since this is the only member of which we know and the only bytes that carry some information, the guess is probably correct.
 
 
-~~~C
-typedef struct VstSpeakerProperties_ {
-  /* misses members; order undefined */
-  char _padding1[80];
-  int type;
-  char _padding2[28];
-} VstSpeakerProperties;
-
-typedef struct VstSpeakerArrangement_ {
-  int type;
-  int numChannels;
-  /* missing members? */
-  VstSpeakerProperties speakers[];
-} VstSpeakerArrangement;
-~~~
-
-Creating 65 plugins with varying channel count (from 0 to 64) and printing the `VstSpeakerProperties.type` for each channel,
-we get:
-
-| `VstSpeakerArrangement.numChannels` | `VstSpeakerArrangement.type` | `VstSpeakerProperties.type` |
-|-------------------------------------|------------------------------|-----------------------------|
-| 00                                  | -1                           | -                           |
-| 01                                  | 0                            | 0                           |
-| 02                                  | 1                            | 1,2                         |
-| 03                                  | 11                           | 1,2,3                       |
-| 04                                  | 11                           | 1,2,1,2                     |
-| 05                                  | 15                           | 1,2,1,2,3                   |
-| 06                                  | 15                           | 1,2,1,2,1,2                 |
-| 07                                  | 23                           | 1,2,1,2,1,2,3               |
-| 08                                  | 23                           | 1,2,1,2,1,2,1,2             |
-| 09                                  | -2                           | 1,2,1,2,1,2,1,2,3           |
-| 10                                  | -2                           | 1,2,1,2,1,2,1,2,1,2         |
-| 11                                  | -2                           | 1,2,1,2,1,2,1,2,1,2,3       |
-| 12                                  | 28                           | 1,2,1,2,1,2,1,2,1,2,1,2     |
-| odd                                 | -2                           | 1,2,...,1,2,3               |
-| even                                | -2                           | 1,2,...,1,2,1,2             |
-
-The 108 unknown bytes in each `VstSpeakerProperties` struct are always `0x00`.
-So the `VstSpeakerProperties.type` is always pairs of `1` and `2`,
-and if the number of speakers is odd, the leftover (last) speaker has a type `3`.
-
-JUCE (juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp) assigns values like
-`kSpeakerL`, `kSpeakerR` or `kSpeakerLfe` to the `VstSpeakerProperties.type` member.
-Obviously, REAPER doesn't make full use of these values (at least not in my configuration).
-The values `1` and `2` are probably `kSpeakerL` resp. `kSpeakerR`.
-The value `3` could be `kSpeakerC`, `kSpeakerLfe` or `kSpeakerS`, but it's hard to say.
-The value `0` (only seen with the mono setup, tentatively `kSpeakerArrMono`) would be some mono channel,
-either `kSpeakerC`, `kSpeakerUndefined` or - following the naming pattern of the Left/Right channels and
-[confirmed to exist by some random googling](http://convolver.sourceforge.net/vst.html) -
-`kSpeakerM`.
-
-As a sidenote, we also see now that a plugin without channels has a `VstSpeakerArrangement.type` of *-1*,
-which is most likely `kSpeakerArrEmpty` (something we already guessed above, but had no backing yet).
-
-| name               | value |
-|--------------------|-------|
-| `kSpeakerArrEmpty` | -1    |
-| `kSpeakerL`        | 1     |
-| `kSpeakerR`        | 2     |
-
-## enter MrsWatson
-After trying to [compile MrsWatson](#compiling-mrswatson), it becomes a bit clearer, why there's quite an offset
-at the beginning of `VstSpeakerProperties`, as there are some additional members.
-
-*MrsWatson* assigns to the properties like so:
-
-~~~C
-speakerArrangement->speakers[i].azimuth = 0.0f;
-speakerArrangement->speakers[i].elevation = 0.0f;
-speakerArrangement->speakers[i].radius = 0.0f;
-speakerArrangement->speakers[i].reserved = 0.0f;
-speakerArrangement->speakers[i].name[0] = '\0';
-speakerArrangement->speakers[i].type = kSpeakerUndefined;
-~~~
-
-Assuming that the order of members follows the struct definition,
-and that the first four values are indeed single-precision (since the only
-reason why *MrsWatson* would use the `f` specifier is to avoid compiler warnings),
-we get something like:
-
-~~~C
-typedef struct VstSpeakerProperties_ {
-  float azimuth;
-  float elevation;
-  float radius;
-  float reserved;
-  char name[64];
-  int type;
-  char _padding2[28];
-} VstSpeakerProperties;
-~~~
+# audioMaster Process Levels
 
 
-# audioMasterGetCurrentProcessLevel
-So far we know that there is a host opcode `audioMasterGetCurrentProcessLevel`, which returns `kVstProcessLevelUnknown` in MrsWatson.
-The presence of the host opcode and the generic name of the value returned by MrsWatson, suggest that there are other, more specific values to return.
+See [here](process-levels.md).
 
-After another round of googling for terms `vst` and `processlevel`, I eventually stumbled upon a [post in the "Deprecated REAPER issue tracker"](https://forums.cockos.com/project.php?issueid=3382) (accessed 2020-01-20):
-
-> Offline Render causes glitching with some plugs (Reaper 3.76 sending kVstProcessLevelRealtime to AudioEffectX during Offline Render)
->
-> First encountered using EW Spaces convolution reverb. The verb always glitches in offline render, and runs much faster than would be expected (i.e. 60x)
-> In further investigation it seems that when Reaper is in offline render mode, for any plug-in that calls AudioEffectX::getCurrentProcessLevel Reaper 3.76 returns kVstProcessLevelRealtime instead of kVstProcessLevelOffline.
-
-and further on:
-
-> Just discovered this isn't a bug. There is a setting in Reaper to enable the sending of this report variable.
-> In the Reaper Preferences under Plug-ins > VST there is a check-box for "inform plug-ins of offline rendering state" ... that fixes the problem.
-
-This post tells us that there are at least two more process levels, named `kVstProcessLevelRealtime` and `kVstProcessLevelOffline`.
-And that REAPER would report the former during offline rendering, but can be made into reporting the latter (by checking some option in the preferences).
-
-Nice. Now we only need to ask the host for the current processLevel (calling `audioMasterGetCurrentProcessLevel` e.g. in the `processReplacing` callback) while telling REAPER to "Render to disk", and we get
-
-| "Inform plug-ins of offline rendering..." | value | name                       |
-|-------------------------------------------|-------|----------------------------|
-| unchecked (OFF)                           | 2     | `kVstProcessLevelRealtime` |
-| checked (ON)                              | 4     | `kVstProcessLevelOffline`  |
-
-REAPER also reports a process-level of `1`, but only at the beginning (e.g. while the host calls the plugin with `effMainsChanged`).
-
-| name                       | value | note                                        |
-|----------------------------|-------|---------------------------------------------|
-| ??                         | 0     | returned by JUCE is in realtime mode        |
-| ??                         | 1     | returned by REAPER during `effMainsChanged` |
-| `kVstProcessLevelRealtime` | 2     | returned by REAPER during normal rendering  |
-| ??                         | 3     | (in between)                                 |
-| `kVstProcessLevelOffline`  | 4     | returned by REAPER when offline-rendering; returned by JUCE if NOT in realtime mode |
-| `kVstProcessLevelUnknown`  | ??    | used by MrsWatson                           |
-
-The value of `kVstProcessLevelUnknown` is most likely something special, like *-1*, or (if we follow the schema used for `kPlugCategUnknown`) *0*.
-I'm not sure, why JUCE would return `kPlugCategUnknown` for the realtime-case though.
+| name                       | value |
+|----------------------------|-------|
+| ??                         | 0     |
+| ??                         | 1     |
+| `kVstProcessLevelRealtime` | 2     |
+| ??                         | 3     |
+| `kVstProcessLevelOffline`  | 4     |
+| `kVstProcessLevelUnknown`  | ??    |
 
 
 # JUCE-6.0.7
@@ -3992,107 +3493,234 @@ JUCE-7.0.2 now explicitly uses the [`AEffect` struct tag](#the-aeffect-struct-ta
 
 
 ## effEditIdle
-JUCE-7.0.2 now issues `effEditIdle` in the host's `VSTPluginInstance::handleIdle()`
-(at least if the plugin is currently being shown).
-On Linux, JUCE-7.0.2 plugins react on the `effEditIdle` by processing any pending events.
+See [here](effEditIdle.md).
 
-These pending events appear to be responsible for updating the GUI,
-at least the GUI now shows nothing if I compile a JUCE-plugin (e.g. the
-*ArpeggiatorTutorial* plugin from the JUCE Plugin examples)
-and load it into REAPER:
-"nothing" being a rectangle that is not being updated at all.
-I'm sure it did show something in older versions of JUCE.
+| opcode        | code   |
+|---------------|--------|
+| `effEditIdle` | 19(?)  |
 
-As we want our GUI to be updated continuously, we need to check for a (yet unknown) opcode
-that is sent periodically to our plugin.
-With REAPER, this gives us two potential candidates: `opcode:19` and `opcode:53`.
-Both are called about every 50ms with only `0` as arguments.
+# REAPER-SDK
 
-We also notice that both are only called when we open the *FX* window in REAPER.
-However, while `opcode:53` is always polled as soon as the *FX* window is open,
-`opcode:19` is only polled if we enable the built-in GUI.
-As soon as we switch to the generic GUI, only `opcode:53` remains.
+The reaper VST extensions (https://www.reaper.fm/sdk/vst/vst_ext.php) (Accessed 2022-12-01)
+mentions a few more opcodes and how they are used in REAPER:
 
-It's hard to tell which one we should pick, but
-*19* is close to the range of already known `effEdit*` opcodes (e.g. `effEditClose` is 15),
-whereas *53* is somewhere near `effCanDo`.
+| opcode                       | known value |
+|------------------------------|-------------|
+| `effFlagsCanDoubleReplacing` | 12          |
+| `effFlagsCanReplacing`       | 4           |
+| `effEditOpen`                | 14          |
+| `effVendorSpecific`          | 50          |
+| `effGetParamName`            | 8           |
+| `effGetParamLabel`           | 6           |
+| `effGetParamDisplay`         | 7           |
+| `effString2Parameter`        | 27          |
+| `kVstParameterUsesIntStep`   | **???**     |
+| `effGetEffectName`           | 45          |
+| `effCanBeAutomated`          | 26          |
+| 0xdeadbef0                   |             |
 
-So let's go for:
+This page also links to the [REAPER-SDK](https://github.com/justinfrankel/reaper-sdk), which mentions
+| opcode              | known value |
+|---------------------|-------------|
+| `effVendorSpecific` | 50          |
+| `effEditDraw`       | **???**     |
 
-| opcode      |    |
-|-------------|----|
-| effEditIdle | 19 |
+## effEditDraw
 
-Maybe `opcode:53` is for `effIdle` (as it also gets continuously called),
-but why does it only get polled if the *FX* window is open?
-
-NOTE: while this makes the *ArpeggiatorTutorial* and friends work,
-they still crash when opening a second JUCE plugin. hmmm...
-
+See [here](effEditDraw.md).
 
 ## audioMasterUpdateDisplay
-Sometimes later (2023-06-01) somebody complained that `audioMasterUpdateDisplay` is not implemented by FST,
-and therefore some DAWs (like REAPER) do not update the display of any parameters that change "under the hood".
 
-Checking the JUCE source code ("modules/juce_audio_plugin_client/VST/juce_VST_Wrapper.cpp"),
-we see that the `audioMasterUpdateDisplay` opcode is used whenever
-- a "parameter info" changes
-- a "program change" occurs
-(we also see that if there is a "latency change", JUCE is going to call the `audioMasterIOChanged` opcode).
-
-So we need to find a host-opcode, that in turn triggers a re-query of the plugin's program and parameter info.
-
-In JUCE, the `audioMasterUpdateDisplay` opcode is called with all parameters set to `0`:
-```
-constexpr FlagPair pairs[] { { Vst2::audioMasterUpdateDisplay, audioMasterUpdateDisplayBit },
-                             { Vst2::audioMasterIOChanged,     audioMasterIOChangedBit } };
-
-for (const auto& pair : pairs)
-    if ((callbacksToFire & pair.bit) != 0)
-    callback (&owner.vstEffect, pair.opcode, 0, 0, nullptr, 0);
-```
-
-So we hook something like the following in a callback (e.g. to `effEditClose`),
-assuming that the opcode has an ID lower than 256 (which seems to be a safe assumption,
-given that the highest audioMaster opcode we've seen so far is 44...):
-
-
-```C
-for(size_t opcode=0; opcode<256; opcode++) {
-    int res;
-    if(hostKnown(opcode))
-      continue;
-    printf("test opcode(%d)", opcode);
-    res =  dispatch_v(eff, opcode, 0, 0, NULL, 0.0);
-    printf("test opcode(%d) -> %d\n", opcode, res);
-}
-```
-
-Only two opcodes have any interesting results:
-
-| opcode | return | side-effect                                   |
-|--------|--------|-----------------------------------------------|
-| 11     | 3      |                                               |
-| 12     | 1      |                                               |
-| 13     | 1      |                                               |
-| 19     | 0x600  |                                               |
-| 42     | 1      | calls `effGetProgram` and `effGetProgramName` |
-| other  | 0      |                                               |
-
-So, opcode `42` rescans the the current program and retrieces its name,
-which closely matches our expectation of what `audioMasterUpdateDisplay`
-is supposed to do ("triggers a re-query of the plugin's program [...] info.").
-
-So for now, we assume that we have found a new audioMaster opcode:
+See [here](audioMasterUpdateDisplay.md).
 
 | opcode                            | value |
 |-----------------------------------|-------|
-| audioMasterUpdateDisplay          | 42    |
+| `audioMasterUpdateDisplay`        | 42    |
 
+# `effIdle` and `audioMasterIdle`
+
+Attila Magyar was annoyed by the constant stream of `effCode:53` REAPER was sending to their plugin.
+So they decided to find out which opcode this really was.
+
+You can read up their full adventure in the [here](effIdle.md).
+Suffice to say that they found the value of an effect opcode and a host opcode:
+
+| opcode                | value |
+|-----------------------|-------|
+| `effIdle`             | 53    |
+| `audioMasterNeedIdle` | 14    |
+
+
+
+# effGetMidiKeyName
+
+See [here](effGetMidiKeyName.md).
+
+| opcode              | value     |
+|---------------------|-----------|
+| `effGetMidiKeyName` | 66        |
+| `kVstMaxNameLen`    | ?? (<192) |
+
+
+# pluginval - a JUCE based audio plugin validator
+
+[Tracktion](https://tracktion.com) publishes a [Plugin Validator](https://www.tracktion.com/develop/pluginval),
+that can be used to validate audio plugins.
+The validator is built with JUCE.
+What's more, their prebuilt binaries comes with support for validating VST2 plugins!
+
+As we know how JUCE handles VST2 (or at least, we can look it up),
+this should allow us to discover a bit more.
+
+
+So let's test our dummy plugin with `pluginval`, and see whether we can learn something...
+
+Printing out all opcodes that the validator sends to the plugin we get:
+
+| opcode                      | value |
+|-----------------------------|-------|
+| `effOpen`                   |   0   |
+| `effClose`                  |   1   |
+| `effSetProgram`             |   2   |
+| `effGetProgram`             |   3   |
+| `effGetProgramName`         |   5   |
+| `effGetParamLabel`          |   6   |
+| `effGetParamDisplay`        |   7   |
+| `effGetParamName`           |   8   |
+| `effSetSampleRate`          |  10   |
+| `effSetBlockSize`           |  11   |
+| `effMainsChanged`           |  12   |
+| `effIdentify`               |  22   |
+| `effProcessEvents`          |  25   |
+| `effCanBeAutomated`         |  26   |
+| `effGetProgramNameIndexed`  |  29   |
+|                             |  31   |
+|                             |  32   |
+| `effGetInputProperties`     |  33   |
+| `effGetOutputProperties`    |  34   |
+| `effGetPlugCategory`        |  35   |
+| `effSetSpeakerArrangement`  |  42   |
+| `effGetEffectName`          |  45   |
+| `effGetVendorString`        |  47   |
+| `effGetProductString`       |  48   |
+| `effGetVendorVersion`       |  49   |
+| `effCanDo`                  |  51   |
+|                             |  52   |
+| `effGetSpeakerArrangement`  |  69   |
+| `effStartProcess`           |  71   |
+| `effStopProcess`            |  72   |
+| `effSetProcessPrecision`    |  77   |
+
+So there's 3 unknown opcodes left:: 31, 32 and 52
+
+## effConnectInput & effConnectOutput
+
+See [here](effConnectInput.md).
+
+| opcode             | value |
+|--------------------|-------|
+| `effConnectInput`  | 31    |
+| `effConnectOutput` | 32    |
+
+## effGetNumMidiInputChannels & effGetNumMidiOutputChannels
+
+See [here](effGetNumMidiInputChannels).
+
+| opcode                        | value |
+|-------------------------------|-------|
+| `effGetNumMidiInputChannels`  | 78    |
+| `effGetNumMidiOutputChannels` | 79    |
+
+## effGetTailSize
+
+See [here](effGetTailSize.md).
+
+| opcode           | value |
+|------------------|-------|
+| `effGetTailSite` | 52    |
+
+
+## speaker arrangement
+See [here](speaker-arrangement.md#speaker-arrangement-part3).
+
+
+| speaker        | code |
+|----------------|------|
+| `kSpeakerL`    | 1    |
+| `kSpeakerR`    | 2    |
+| `kSpeakerC`    | 3    |
+| `kSpeakerLfe`  | 4    |
+| `kSpeakerLs`   | 5    |
+| `kSpeakerRs`   | 6    |
+| `kSpeakerLc`   | 7 ?  |
+| `kSpeakerRc`   | 8 ?  |
+| `kSpeakerS`    | 9 ?  |
+| `kSpeakerSl`   | 10 ? |
+| `kSpeakerSr`   | 11 ? |
+| `kSpeakerTm`   | 12 ? |
+| `kSpeakerTfl`  | 13 ? |
+| `kSpeakerTfc`  | 14 ? |
+| `kSpeakerTfr`  | 15 ? |
+| `kSpeakerTrl`  | 16 ? |
+| `kSpeakerTrc`  | 17 ? |
+| `kSpeakerTrr`  | 18 ? |
+| `kSpeakerLfe2` | 19 ? |
+
+
+| layout                      | code |
+|-----------------------------|------|
+| `kSpeakerArrUserDefined`    | -2   |
+| `kSpeakerArrEmpty`          | -1   |
+| `kSpeakerArrMono`           | 0    |
+| `kSpeakerArrStereo`         | 1    |
+| `kSpeakerArrStereoSurround` | 2 ?  |
+| `kSpeakerArrStereoCenter`   | 3 ?  |
+| `kSpeakerArrStereoSide`     | 4 ?  |
+| `kSpeakerArrStereoCLfe`     | 5 ?  |
+| `kSpeakerArr30Cine`         | 6    |
+| `kSpeakerArr30Music`        | 7 ?  |
+| `kSpeakerArr31Cine`         | 8 ?  |
+| `kSpeakerArr31Music`        | 9 ?  |
+| `kSpeakerArr40Cine`         | 10 ? |
+| `kSpeakerArr40Music`        | 11   |
+| `kSpeakerArr41Cine`         | 12 ? |
+| `kSpeakerArr41Music`        | 13 ? |
+| `kSpeakerArr50`             | 14   |
+| `kSpeakerArr51`             | 15   |
+| `kSpeakerArr60Cine`         | 16 ? |
+| `kSpeakerArr60Music`        | 17 ? |
+| `kSpeakerArr61Cine`         | 18 ? |
+| `kSpeakerArr61Music`        | 19 ? |
+| `kSpeakerArr70Cine`         | 20 ? |
+| `kSpeakerArr70Music`        | 21 ? |
+| `kSpeakerArr71Cine`         | 22 ? |
+| `kSpeakerArr71Music`        | 23 ? |
+| `kSpeakerArr80Cine`         | 24 ? |
+| `kSpeakerArr80Music`        | 25 ? |
+| `kSpeakerArr81Cine`         | 26 ? |
+| `kSpeakerArr81Music`        | 27 ? |
+
+## audioMasterGetDirectory
+
+See [here](audioMasterGetDirectory.md).
+
+| opcode                    | value |
+|---------------------------|-------|
+| `audioMasterGetDirectory` | 41    |
+
+
+
+## effKeysRequired
+
+See [here](effKeysRequired.md).
+
+| opcode            | code |
+|-------------------|------|
+| `effKeysRequired` | 57   |
 
 # Summary
 
-So far we have discovered quite a few opcodes (and constants):
+So far we have discovered quite a few opcodes (and constants).
 
 
 Trying to compile JUCE plugins or plugin-hosts, we still miss a considerable number
@@ -4101,19 +3729,13 @@ Trying to compile JUCE plugins or plugin-hosts, we still miss a considerable num
 | names used by JUCE                       |
 |------------------------------------------|
 | `audioMasterGetAutomationState`          |
-| `audioMasterGetDirectory`                |
 | `audioMasterGetNumAutomatableParameters` |
 | `audioMasterIOChanged`                   |
 | `audioMasterIdle`                        |
-| `audioMasterNeedIdle`                    |
 | `audioMasterPinConnected`                |
 | `audioMasterSetOutputSampleRate`         |
 |------------------------------------------|
-| `effConnect(In,Out)put`                  |
 | `effEdit(Draw,Mouse,Sleep,Top)`          |
-| `effGetNumMidi(In,Out)putChannels`       |
-| `effGetTailSize`                         |
-| `effIdle`                                |
 | `effKeysRequired`                        |
 | `effSetBypass`                           |
 |------------------------------------------|
@@ -4122,8 +3744,6 @@ Trying to compile JUCE plugins or plugin-hosts, we still miss a considerable num
 | `kVstPinIsActive`                        |
 | `kVstPinIsStereo`                        |
 | `kVstPinUseSpeaker`                      |
-| `kSpeakerArr*`                           |
-| `kSpeaker*`                              |
 | `kVstSmpte*`                             |
 
 
@@ -4131,16 +3751,13 @@ On the other hand, running using a self-compiled plugin in a commercial DAW (lik
 or using commercial plugins in a self-compiled plugin host, we only encounter very few opcodes
 that we don't know yet:
 
-| name       | value |
-|------------|-------|
-| audioHost* | 3     |
-| audioHost* | 13    |
-| audioHost* | 14    |
-|------------|-------|
-| eff*       | 53    |
-| eff*       | 56    |
-| eff*       | 62    |
-| eff*       | 66    |
+| name         | value |
+|--------------|-------|
+| `audioHost*` | 3     |
+| `audioHost*` | 13    |
+|--------------|-------|
+| `eff*`       | 56    |
+| `eff*`       | 62    |
 
 
 
@@ -4151,17 +3768,26 @@ LATER move this to proper sections
 
 
 ## hostCode:3
+## hostCode:11
+Playing around with different numbers of parameters (`Aeffect->numParams`),
+I noticed that REAPER returns the number of parameters when queried with hostCode:11.
+OTOH, *pluginval* always returns 0, so it seems to be one of those opcodes that JUCE currently does not handle.
+
+
 ## hostCode:13
 ## hostCode:14
 
-## effCode:53
+## hostCode:48
+
+*REAPER* returns `1` and writes the full path to the currently opened session file to the position at `ptr`.
+*pluginval* returns `0` (and doesn't write anything (?))
 
 
 ## effCode:56
 
 ~~gets called with automation, whenever the window gets focus?~~
 
-gets called, when a parameter has an automation track, and the window gains/loses focus:
+gets called for each parameter, when a parameter has an automation track, and the window gains/loses focus:
 
     FstClient::dispatcher(0x2a4c8b0, 56, 2, 0, 0x7fff4a83fb40, 0.000000)...
 
@@ -4175,71 +3801,60 @@ It is triggered as soon as a non-NULL value is written at `(char*)ptr)[0x98]`.
 (This doesn't mean much, apart from the fact that we are writing out-of-bounds.
 esp. it doesn't tell us anything about the valid size of the buffer.)
 
+#### 2023-06-06
+
+also gets called when switching to the generic UI (where it gets called twice for reach parameter).
+
+
 ## effCode:62
 This is called when the MIDI-dialog gets opened (right before effCode:66; but only once)
 
 5*16 (80) bytes == 0x00
 
-## effCode:66
-adding a MIDI-item in REAPER and pressing some keys
-will send plenty of messages with effect opcode `66` to a plugin.
-There's also the occasional opcode `62`:
+### 2023-06-06
+hmm, with REAPER i now get this opcode much more often, namely 102 times, during startup.
+effCode:66 is never called in this case.
 
-~~~
-FstClient::dispatcher(0x19b9250, 66, 0, 0, 0xeae040, 0.000000);
-FstClient::dispatcher(0x19b9250, 62, 0, 0, 0x7ffe232a7660, 0.000000);
-FstClient::dispatcher(0x19b9250, 66, 0, 0, 0xeae040, 0.000000);
-FstClient::dispatcher(0x19b9250, 66, 0, 0, 0xeae040, 0.000000);
-~~~
+The project has a number of MIDI-objects.
+Also, the first time it is called with some address (0x7fff149ae910), the remaining 101 times
+with another address (0x7fff149ae940).
+Since the two addresses are only 48 bytes apart, the data size is most likely at max. 48 bytes.
 
-the index is the MIDI channel number (zero-based).
+On the other hand, seems that the byte @+0x44 (68) is incremented by each call...
 
-the pointer is an address to a memory region,
-where the first 4 bytes are 0,
-and the 2nd 4 bytes are an int32 between 34 and 72.
+It seems that this repeated call only happens, if we write something to the memory at ptr.
+We also return '100'.
+If instead we return '10', the opcode is called 10(+2) times instead of 100(+2).
 
-i have no idea what the first number is (it is always 0),
-but the second number is a MIDI-note number.
-Writing a string into the buffer right after the first 8 bytes (that hold the two numbers),
-will make REAPER show this string as labels for the given MIDI-note on the
-virtual MIDI keyboard.
+#### walk-through
+- all calls happen at startup
+- first REAPER calls effGetParamName&effGetParamDisplay, immediately afterwards
+- a first call to effCode:62 is issued
+  - address `ptr` is X
+  - `((char*)ptr)[0x44]` == 0 (that is `((int*)ptr)[17]`)
+  - we write something (an address to a string) to the memory and return N
+- after this REAPER calls effVendorSpecific/effGetEffectName (once)
+- after this we get get N+1 calls to effCode:62
+  - address `ptr` is (always) Y=X+0x30
+  - `((char*)ptr)[0x44]` == n (with n=0..N)
+  - we write something (an address to a string) to the memory and return N
+- finally we get *two* effVendorSpecific/effGetEffectName calls
 
-Unfortunately we do not now the opcode name for this.
-Given that there's a `effGetCurrentMidiProgram` opcode,
-my guess would be something along the lines of `effGetMidiNoteName`.
+#### notes
+- if we don't write anything to the ptr, effCode:62 is only called once
+- if we return `0` in the *1st* call, effCode:62 is only called once
+- if we return `0` in the *2nd* call, effCode:62 is only called twice (so it stops after it received 0).
+  also the call the `effGetProgramNameIndexed` that follows now has some weird value
+- if we decrement the return value (10,9,...) by 1, we only get 5 calls (that is: 1+N/2 in the 2nd round; 1 in the 1st)
+- if we decrement the return value (10,8,...) by 2, we only get 5 calls (that is: 1+N/3 in the 2nd round; 1 in the 1st)
+- if we set the return value to  `((char*)ptr)[0x44]+1`, we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we return 200 (always), we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we return `10` in the *1st* round and `((char*)ptr)[0x44]+1` in the 2nd round, we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we change the `((char*)ptr)[0x44]` value, this seems to have no affect (presumably because the host uses a for-loop and just sets that value before calling from it's internal variable)
 
-## effEditDraw
+so it seems that effCode:62 is called at mst 129 times (1 in the 1st round, 128 in the 2nd round), but it only continues to be called if the returned value is larger than `((char*)ptr)[0x44]`
 
-The `reaper_plugin_fx_embed.h` shipped with JUCE says, about REAPER
+it also seems that **only** `((char*)ptr[0x04])` must be non-0, in order to keep running (that is: if this byte is non-0 we keep running even if the rest is 0; if the rest is non-0 but this byte is 0, running stops).
+Which bits at the bytes are set, seems to be irrelevant.
 
-```md
-* to support via VST2: canDo("hasCockosEmbeddedUI") should return 0xbeef0000
-* dispatcher will be called with opcode=effVendorSpecific, index=effEditDraw, value=parm2, ptr=(void*)(INT_PTR)parm3, opt=message (REAPER_FXEMBED_WM_*)
-```
-
-This should give us a good guess on `effEditDraw`.
-Arming our dummy plugin to output `0xBEEF0000` when it is asked whether it can do "hasCockosEmbeddedUI", should make REAPER send it an `effVendorSpecific` opcode with the index being some meaningful opcode.
-
-Unfortunately, a quick check shows, that REAPER will send exactly the same to `index` values with the `effVendorSpecific` opcodes as when we answer the "hasCockosEmbeddedUI" with `0x0`:
-
-| opcode            | index      | value      | ptr            | opt |
-|-------------------|------------|------------|----------------|-----|
-| effVendorSpecific | 0x73744341 | 0x46554944 | 0x7ffc4fd12ea0 | 0.0 |
-```
-Fst::host2plugin(FstPlugin, effVendorSpecific[50], 1936999233=0x73744341, 1179994436=0x46554944, 0x7ffc4fd12ea0, 0.000000)
-Fst::host2plugin(FstPlugin, effVendorSpecific[50], 45=0x2D, 80=0x50, 0x7ffc4fd133a0, 0.000000)
-```
-
-
-## even more symbols
-
-|                | symbol                         | project    |
-|----------------|--------------------------------|------------|
-| opcode         | effBeginSetProgram             | vstplugin~ |
-| opcode         | effEndSetProgram               | vstplugin~ |
-|----------------|--------------------------------|------------|
-| constant       | kSpeakerM                      | vstplugin~ |
-|----------------|--------------------------------|------------|
-| member         | VstTimeInfo.samplesToNextClock | vstplugin~ |
-|----------------|--------------------------------|------------|
-| type           | VstAEffectFlags                | vstplugin~ |
+Opening the MIDI editor (double-clicking on the MIDI object), re-issues the full `effCode:62` call (1+(N+1) times)
