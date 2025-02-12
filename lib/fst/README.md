@@ -47,7 +47,7 @@ explicitly or implicitly (e.g. by obtaining a version of the VST-SDKs
 - even if it happens to be bundled with some 3rd party project).
 
 We only use Closed Source binaries from commercial entities under the assumption
-that whowever makes their living from (also) selling plugins, will have a right
+that whoever makes their living from (also) selling plugins, will have a right
 to do so (e.g. they are actually allowed to use the SDKs they are using, most
 likely by coming to an agreement with the SDK vendors).
 Conversely, we do not use binaries from independent Open Source developers
