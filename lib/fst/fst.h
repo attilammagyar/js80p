@@ -25,7 +25,7 @@
 #define FST_fst_h_
 
 #define FST_MAJOR_VERSION 0
-#define FST_MINOR_VERSION 123
+#define FST_MINOR_VERSION 127
 #define FST_MICRO_VERSION 0
 
 #define FST_VERSIONNUM(X, Y, Z)                                         \
@@ -134,7 +134,7 @@ typedef enum {
 
 
   /* 13: sending latency?? */
-
+  FST_HOST_OPCODE(NeedIdle, 14), /* return 0 */
   FST_HOST_OPCODE(SizeWindow, 15), /* IN:index(width), IN:value(height), return 1 */
   FST_HOST_OPCODE(GetSampleRate, 16), /* return sampleRate */
   FST_HOST_OPCODE(GetBlockSize, 17), /* return blockSize */
@@ -194,7 +194,6 @@ typedef enum {
   FST_HOST_OPCODE_UNKNOWN(GetPreviousPlug), /* ?, return 0 */
 
   FST_HOST_OPCODE_UNKNOWN(Idle), /* return 0 */
-  FST_HOST_OPCODE_UNKNOWN(NeedIdle), /* return 0 */
 
   FST_HOST_OPCODE_UNKNOWN(IOChanged), /* return 0 */
   FST_HOST_OPCODE_UNKNOWN(PinConnected), /* IN:index, IN:ivalue(isOutput), return isValidChannel */
@@ -272,7 +271,7 @@ typedef enum {
   FST_EFFECT_OPCODE(VendorSpecific, 50), /* behaviour defined by vendor... */
   FST_EFFECT_OPCODE(CanDo, 51), /* IN:ptr(char*), returns 0|1|-1 */
 
-
+  FST_EFFECT_OPCODE(Idle, 53),
 
 
 
@@ -284,8 +283,8 @@ typedef enum {
 
   FST_EFFECT_OPCODE_EXPERIMENTAL(GetCurrentMidiProgram, 63), /* return -1 */
 
-  /* we know what this does, but we don't know its name */
-  FST_DEPRECATE_UNKNOWN(fst_effGetMidiNoteName) = 66, /* IN:index=MIDIchannel, IN:ptr({int unknown, int midinote, char*buffer}), OUT:ptr.buffer) */
+
+  FST_EFFECT_OPCODE(GetMidiKeyName, 66), /* IN:index=MIDIchannel, IN:ptr({int unknown, int midinote, char*buffer}), OUT:ptr.buffer), return 0|1 */
 
 
   FST_EFFECT_OPCODE(GetSpeakerArrangement, 69), /* OUT:ivalue(fstSpeakerArrangement*in) OUT:ptr(fstSpeakerArrangement*out), return (!(hasAUX || isMidi)) */
@@ -315,8 +314,6 @@ typedef enum {
 
   FST_EFFECT_OPCODE_UNKNOWN(ConnectInput),
   FST_EFFECT_OPCODE_UNKNOWN(ConnectOutput),
-
-  FST_EFFECT_OPCODE_UNKNOWN(Idle),
 
 FST_WARNING("document origin of eff*SetProgram")
   FST_EFFECT_OPCODE_UNKNOWN(BeginSetProgram),
@@ -443,6 +440,7 @@ enum {
   FST_CONSTANT_EXPERIMENTAL(MaxLabelLen, 64),
   FST_CONSTANT_EXPERIMENTAL(MaxShortLabelLen, 8),
   FST_CONSTANT(MaxProgNameLen, 25), // effGetProgramName
+  FST_CONSTANT_EXPERIMENTAL(MaxNameLen, 64),
 
   /* JUCE says that MaxParamStrLen is 8, but hosts allow a bit more (24) */
   FST_CONSTANT(MaxParamStrLen, 8),
@@ -647,6 +645,12 @@ typedef struct _fstRectangle {
   short right;
 } t_fstRectangle;
 
+typedef struct _fstMidiKeyName {
+  t_fstInt32 unknown; /* always 0 ??? */
+  t_fstInt32 thisKeyNumber;
+  char keyName[]; /* length: kVstMaxNameLen */
+} t_fstMidiKeyName;
+
 
 typedef t_fstHostOpcode AudioMasterOpcodesX;
 
@@ -663,11 +667,12 @@ typedef t_fstEffectCategories FST_TYPE(PlugCategory);
 typedef t_fstEffectFlags FST_TYPE(AEffectFlags);
 typedef t_fstEffect AEffect;
 typedef t_fstRectangle ERect;
+typedef t_fstMidiKeyName MidiKeyName;
 
 typedef t_fstPtrInt VstIntPtr;
 typedef t_fstInt32 VstInt32;
 
-const int FST_CONST(EffectMagic, 0x56737450);
+const int FST_CONST(EffectMagic, 0x56737450); /* 'VstP' */
 
 /* see https://github.com/steinbergmedia/vst3_pluginterfaces/blob/efcfbf8019a2f1803b7be9936a81124abb583507/base/futils.h#L91-L95
  * for a GPL-v3 definition of CCONST

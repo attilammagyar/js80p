@@ -4089,6 +4089,26 @@ So for now, we assume that we have found a new audioMaster opcode:
 |-----------------------------------|-------|
 | audioMasterUpdateDisplay          | 42    |
 
+# `effIdle` and `audioMasterIdle`
+
+Attila Magyar was annoyed by the constant stream of `effCode:53` REAPER was sending to their plugin.
+So they decided to find out which opcode this really was.
+
+You can read up their full adventure in the [here](effIdle.md).
+Suffice to say that they found the value of an effect opcode and a host opcode:
+
+| opcode                | value |
+|-----------------------|-------|
+| `effIdle`             | 53    |
+| `audioMasterNeedIdle` | 14    |
+
+
+# hostCode:11
+
+Playing around with different numbers of parameters (`Aeffect->numParams`),
+I noticed that the host returns the number of parameters when queried with hostCode:11
+
+
 
 # Summary
 
@@ -4155,6 +4175,9 @@ LATER move this to proper sections
 ## hostCode:14
 
 ## effCode:53
+An `effEditIdle` opcode is always followed by an `effCode:53`,
+but the reverse is not true: the `effCode:53` comes
+- right from the start during the `effCanDo` cycle (after the `sendVstEvents`?)
 
 
 ## effCode:56
@@ -4175,12 +4198,64 @@ It is triggered as soon as a non-NULL value is written at `(char*)ptr)[0x98]`.
 (This doesn't mean much, apart from the fact that we are writing out-of-bounds.
 esp. it doesn't tell us anything about the valid size of the buffer.)
 
+#### 2023-06-06
+
+also gets called when switching to the generic UI (where it gets called twice for reach parameter).
+
 ## effCode:62
 This is called when the MIDI-dialog gets opened (right before effCode:66; but only once)
 
 5*16 (80) bytes == 0x00
 
-## effCode:66
+### 2023-06-06
+hmm, with REAPER i know get this opcode much more often, namely 102 times, during startup.
+effCode:66 is never called in this case.
+
+The project has a number of MIDI-objects.
+Also, the first time it is called with some address (0x7fff149ae910), the remaining 101 times
+with another address (0x7fff149ae940).
+Since the two addresses are only 48 bytes apart, the data size is most likely at max. 48 bytes.
+
+On the other hand, seems that the byte @+0x44 (68) is incremented by each call...
+
+It seems that this repeated call only happens, if we write something to the memory at ptr.
+We also return '100'.
+If instead we return '10', the opcode is called 10(+2) times instead of 100(+2).
+
+#### walk-through
+- all calls happen at startup
+- first REAPER calls effGetParamName+effGetParamDisplay, immediately afterwards
+- a first call to effCode:62 is issued
+  - address `ptr` is X
+  - `((char*)ptr)[0x44]` == 0 (that is `((int*)ptr)[17]`)
+  - we write something (an adress to a string) to the memory and return N
+- after this REAPER calls effVendorSpecific/effGetEffectName (once)
+- after this we get get N+1 calls to effCode:62
+  - address `ptr` is (always) Y=X+0x30
+  - `((char*)ptr)[0x44]` == n (with n=0..N)
+  - we write something (an address to a string) to the memory and return N
+- finally we get *two* effVendorSpecific/effGetEffectName calls
+
+#### notes
+- if we don't write anything to the ptr, effCode:62 is only called once
+- if we return `0` in the *1st* call, effCode:62 is only called once
+- if we return `0` in the *2nd* call, effCode:62 is only called twice (so it stops after it received 0).
+  also the call the effGetProgramNameIndexed that follows now has some weird value
+- if we decrement the return value (10,9,...) by 1, we only get 5 calls (that is: 1+N/2 in the 2nd round; 1 in the 1st)
+- if we decrement the return value (10,8,...) by 2, we only get 5 calls (that is: 1+N/3 in the 2nd round; 1 in the 1st)
+- if we set the return value to  `((char*)ptr)[0x44]+1`, we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we return 200 (always), we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we return `10` in the *1st* round and `((char*)ptr)[0x44]+1` in the 2nd round, we get 127 calls (that is: 1+127 in the 2nd round; 1 in 1st)
+- if we change the `((char*)ptr)[0x44]` value, this seems to have no affect (presumably because the host uses a for-loop and just sets that value before calling from it's internal variable)
+
+so it seems that effCode:62 is called at mst 129 times (1 in the 1st round, 128 in the 2nd round), but it only continues to be called if the returned value is larger than `((char*)ptr)[0x44]`
+
+it also seems that **only** `((char*)ptr[0x04])` must be non-0, in order to keep running (that is: if this byte is non-0 we keep running even if the rest is 0; if the rest is non-0 but this byte is 0, running stops).
+Which bits at the bytes are set, seems to be irrelevant.
+
+Opening the MIDI editor (double-clicking on the MIDI object), re-issues the full `effCode:62` call (1+(N+1) times)
+
+## effGetMidiKeyName
 adding a MIDI-item in REAPER and pressing some keys
 will send plenty of messages with effect opcode `66` to a plugin.
 There's also the occasional opcode `62`:
@@ -4207,6 +4282,43 @@ virtual MIDI keyboard.
 Unfortunately we do not now the opcode name for this.
 Given that there's a `effGetCurrentMidiProgram` opcode,
 my guess would be something along the lines of `effGetMidiNoteName`.
+
+
+#### 2025-02-11
+
+trying to compile a VST2 plugin that uses JUCE-8.0.6 now starts throwing errors, due to a couple of
+unknown VST2 related symbols:
+
+- `effGetMidiKeyName` - an eff-opcode
+- `MidiKeyName` - a type
+- `kVstMaxNameLen` - a constant
+
+These new symbols were introduced in [JUCE@96e4ba06](https://github.com/juce-framework/JUCE/commit/96e4ba06afa466227023bab075d7b696b2aa9bd0), leading up to JUCE-8.0.5.
+
+This looks suspiciously like the opcode we just discovered, so we got a name:
+
+| opcode              | value |
+|---------------------|-------|
+| `effGetMidiKeyName` | 66    |
+
+JUCE's handler casts the pointer to `MidiKeyName*`, which has (at least two members): `thisKeyNumber` and `keyName`.
+The latter is a string of size `kVstMaxNameLen` (where the key name should be written into).
+The former is an integer, which is passed along as MIDI note number) along with the *index* (as MIDI channel number)
+to JUCE's `AudioProcessor::getNameForMidiNoteNumber`.
+
+So the `MidiKeyName` struct most likely looks like:
+~~~C
+typedef struct MidiKeyName_ {
+  int unknown;
+  int thisKeyNumber;
+  char keyName[kVstMaxNameLen];
+} MidiKeyName;
+~~~
+
+We do not know the value of `kVstMaxNameLen`, it's probably in the range of 8 .. 128.
+(Writing in a string of 512 chars makes REAPER crash; with 192 chars, valgrind shows an additional error (but cannot locate it)).
+It's probably smaller though.
+In any case, the string must be NULL-terminated (REAPER will happily display all characters).
 
 ## effEditDraw
 
