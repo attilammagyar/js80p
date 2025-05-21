@@ -538,7 +538,7 @@ TEST(repeated_start_and_stop_calls_are_ignored, {
 })
 
 
-TEST(harmonics_above_the_nyquist_frequency_disappear, {
+TEST(harmonics_above_the_nyquist_frequency_vanish, {
     test_basic_waveform<ReferenceSine>(
         SimpleOscillator::SAWTOOTH,
         0.09,
@@ -926,7 +926,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_oscillator_is_silent, {
 })
 
 
-TEST(while_frequency_goes_close_to_the_nyquist_frequency_harmonics_disappear_gradually, {
+TEST(while_frequency_goes_close_to_the_nyquist_frequency_harmonics_vanish_gradually, {
     test_basic_waveform<ReferenceSawtoothWithDisappearingPartial>(
         SimpleOscillator::SAWTOOTH,
         0.12,

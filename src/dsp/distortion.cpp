@@ -533,7 +533,7 @@ void Tables::initialize_harmonic_tables(
     Chebyshev polynomials. The w1, w3, and w5 parameters are the weights of the
     fundamental, the third, and the fifth harmonic. The reason for only using
     the odd harmonics is that the implementation of the Distortion class
-    requires the shaping function to be odd and to disappear at 0, and
+    requires the shaping function to be odd and to vanish at 0, and
     unfortunately, the even degree Chebyshev polynomials are even functions.
     */
 
