@@ -114,7 +114,7 @@ Echo<InputSignalProducerClass>::Echo(
     ),
     comb_filter_1(
         high_pass_filter,
-        PannedDelayStereoMode::NORMAL,
+        StereoPannedDelayMode::NORMAL,
         width,
         feedback,
         delay_time,
@@ -127,7 +127,7 @@ Echo<InputSignalProducerClass>::Echo(
     ),
     comb_filter_2(
         comb_filter_1.high_shelf_filter,
-        PannedDelayStereoMode::FLIPPED,
+        StereoPannedDelayMode::FLIPPED,
         width,
         feedback,
         delay_time,

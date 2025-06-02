@@ -64,7 +64,7 @@ class Chorus : public Effect<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_HIGH_PASS
         > HighPassedInput;
 
-        typedef PannedDelay<HighPassedInput> CombFilter;
+        typedef StereoPannedDelay<HighPassedInput> CombFilter;
 
         typedef BiquadFilter<
             Mixer<CombFilter>,
