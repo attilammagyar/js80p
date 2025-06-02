@@ -336,6 +336,13 @@ void Delay<InputSignalProducerClass, capabilities>::end_reverse_delay_test() noe
 {
     reverse_delay_envelope.end_test();
 }
+
+
+template<class InputSignalProducerClass, DelayCapabilities capabilities>
+Integer Delay<InputSignalProducerClass, capabilities>::get_input_channels() const noexcept
+{
+    return this->input.get_channels();
+}
 #endif
 
 
@@ -880,11 +887,11 @@ void Delay<InputSignalProducerClass, capabilities>::render(
     );
     Number const delay_buffer_size_float = this->delay_buffer_size_float;
 
-    Number reverse_delta_samples;
-    Number read_index;
-    Number reverse_done_samples;
-    Number reverse_target_delay_time_in_samples;
-    Number reverse_target_delay_time_in_samples_inv;
+    Number reverse_delta_samples = 0;
+    Number read_index = 0;
+    Number reverse_done_samples = 0;
+    Number reverse_target_delay_time_in_samples = 0;
+    Number reverse_target_delay_time_in_samples_inv = 0;
 
     if constexpr (is_reversed) {
         reverse_target_delay_time_in_samples = this->reverse_target_delay_time_in_samples;
@@ -1233,14 +1240,6 @@ Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
 }
 
 
-/*
-Sometimes GCC and CppCheck detect a false-positive uninitialized member variable
-here, but Valgrind would detect such problems in the tests if it was really the
-case. Actually, the constructors which pass the yet uninitialized Delay object
-to Filter's constructor also explicitly set the number of channels based on the
-number of channels of the Delay's input, so the uninitialized Delay's
-get_channels() method never really gets called.
-*/
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
@@ -1259,7 +1258,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
         PannedDelayStereoMode const stereo_mode,
         FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync
-) :  Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, input.get_channels()),
+) : Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, CHANNELS),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning_scale(1.0),
     panning("", -1.0, 1.0, 0.0),
@@ -1269,15 +1268,6 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 }
 
 
-
-/*
-Sometimes GCC and CppCheck detect a false-positive uninitialized member variable
-here, but Valgrind would detect such problems in the tests if it was really the
-case. Actually, the constructors which pass the yet uninitialized Delay object
-to Filter's constructor also explicitly set the number of channels based on the
-number of channels of the Delay's input, so the uninitialized Delay's
-get_channels() method never really gets called.
-*/
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
         InputSignalProducerClass& input,
@@ -1309,7 +1299,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 ) : Filter<FilterInputClass>(
         filter_input,
         number_of_children + NUMBER_OF_CHILDREN,
-        delay_input.get_channels()
+        CHANNELS
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning_scale(1.0),
@@ -1332,7 +1322,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 ) : Filter<FilterInputClass>(
         filter_input,
         number_of_children + NUMBER_OF_CHILDREN,
-        delay_input.get_channels()
+        CHANNELS
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning_scale(1.0),
@@ -1356,7 +1346,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 ) : Filter<FilterInputClass>(
         filter_input,
         number_of_children + NUMBER_OF_CHILDREN,
-        delay_input.get_channels()
+        CHANNELS
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning_scale(1.0),
@@ -1381,7 +1371,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 ) : Filter<FilterInputClass>(
         filter_input,
         number_of_children + NUMBER_OF_CHILDREN,
-        delay_input.get_channels()
+        CHANNELS
     ),
     is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
     panning_scale(1.0),
@@ -1438,6 +1428,10 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass, cap
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    JS80P_ASSERT(this->input.get_channels() == CHANNELS);
+    JS80P_ASSERT(this->delay.get_input_channels() == CHANNELS);
+    JS80P_ASSERT(this->get_channels() == CHANNELS);
+
     Filter<FilterInputClass>::initialize_rendering(round, sample_count);
 
     panning_buffer = FloatParamS::produce_if_not_constant(panning, round, sample_count);

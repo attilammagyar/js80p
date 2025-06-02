@@ -123,6 +123,8 @@ class Delay : public Filter<InputSignalProducerClass>
 #ifdef JS80P_ASSERTIONS
         void begin_reverse_delay_test() noexcept;
         void end_reverse_delay_test() noexcept;
+
+        Integer get_input_channels() const noexcept;
 #endif
 
         ToggleParam const* const tempo_sync;
@@ -293,6 +295,8 @@ class PannedDelay : public Filter<FilterInputClass>
     friend class SignalProducer;
 
     public:
+        static constexpr Integer CHANNELS = 2;
+
         PannedDelay(
             InputSignalProducerClass& input,
             PannedDelayStereoMode const stereo_mode,
