@@ -1241,11 +1241,11 @@ Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         ToggleParam const* tempo_sync
-) : PannedDelay<InputSignalProducerClass, FilterInputClass>(
+) : StereoPannedDelay<InputSignalProducerClass, FilterInputClass>(
         input, delay, stereo_mode, tempo_sync
     )
 {
@@ -1253,13 +1253,13 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync
 ) : Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, CHANNELS),
-    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning("", -1.0, 1.0, 0.0),
     delay(input, delay_time_leader, tempo_sync)
@@ -1269,14 +1269,14 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
-) : PannedDelay<InputSignalProducerClass, FilterInputClass>(
+) : StereoPannedDelay<InputSignalProducerClass, FilterInputClass>(
         input,
         delay,
         stereo_mode,
@@ -1290,10 +1290,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         ToggleParam const* tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
@@ -1301,7 +1301,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
         number_of_children + NUMBER_OF_CHILDREN,
         CHANNELS
     ),
-    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning("", -1.0, 1.0, 0.0),
     delay(delay_input, tempo_sync)
@@ -1311,10 +1311,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_time_leader,
         ToggleParam const* tempo_sync,
@@ -1324,7 +1324,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
         number_of_children + NUMBER_OF_CHILDREN,
         CHANNELS
     ),
-    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_time_leader, tempo_sync)
@@ -1334,10 +1334,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_gain_leader,
         FloatParamS& delay_time_leader,
@@ -1348,7 +1348,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
         number_of_children + NUMBER_OF_CHILDREN,
         CHANNELS
     ),
-    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_gain_leader, delay_time_leader, tempo_sync)
@@ -1358,10 +1358,10 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDelay(
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
-        PannedDelayStereoMode const stereo_mode,
+        StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_gain_leader,
         Seconds const delay_time,
@@ -1373,7 +1373,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
         number_of_children + NUMBER_OF_CHILDREN,
         CHANNELS
     ),
-    is_flipped(stereo_mode == PannedDelayStereoMode::FLIPPED),
+    is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning(panning_leader),
     delay(delay_input, delay_gain_leader, delay_time, delay_time_max, tempo_sync)
@@ -1383,7 +1383,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::PannedDel
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_instance() noexcept
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_instance() noexcept
 {
     panning_buffer = NULL;
     stereo_gain_buffer = SignalProducer::allocate_buffer();
@@ -1395,7 +1395,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::init
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~PannedDelay()
+StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~StereoPannedDelay()
 {
     SignalProducer::free_buffer(stereo_gain_buffer);
     SignalProducer::free_buffer(panning_buffer_scaled);
@@ -1404,7 +1404,7 @@ PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~PannedDe
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_block_size(
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     SignalProducer::set_block_size(new_block_size);
@@ -1416,7 +1416,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_panning_scale(
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_panning_scale(
         Number const scale
 ) noexcept {
     panning_scale = scale;
@@ -1424,7 +1424,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_rendering(
+Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1485,7 +1485,7 @@ Sample const* const* PannedDelay<InputSignalProducerClass, FilterInputClass, cap
 
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render(
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1515,7 +1515,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::rend
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 template<int channel_1, int channel_2>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_constant_panning(
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_constant_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1540,7 +1540,7 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::rend
 
 template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
 template<int channel_1, int channel_2>
-void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_changing_panning(
+void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_changing_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1577,13 +1577,13 @@ void PannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::rend
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
+DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
     InputSignalProducerClass& input,
-    PannedDelayStereoMode const stereo_mode,
+    StereoPannedDelayMode const stereo_mode,
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
+) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
     ),
     high_shelf_filter_q(
@@ -1610,9 +1610,9 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::Distorted
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
+DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
     InputSignalProducerClass& input,
-    PannedDelayStereoMode const stereo_mode,
+    StereoPannedDelayMode const stereo_mode,
     FloatParamS& panning_leader,
     FloatParamS& delay_gain_leader,
     FloatParamS& delay_time_leader,
@@ -1622,7 +1622,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::Distorted
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
+) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1662,9 +1662,9 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::Distorted
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfPannedDelay(
+DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
     InputSignalProducerClass& input,
-    PannedDelayStereoMode const stereo_mode,
+    StereoPannedDelayMode const stereo_mode,
     FloatParamS& panning_leader,
     FloatParamS& delay_gain_leader,
     Seconds const delay_time,
@@ -1675,7 +1675,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::Distorted
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
     ToggleParam const* tempo_sync
-) : DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>(
+) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1716,7 +1716,7 @@ DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::Distorted
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void DistortedHighShelfPannedDelay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
+void DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
 {
     this->register_child(high_shelf_filter_q);
     this->register_child(distortion);

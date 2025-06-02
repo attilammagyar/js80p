@@ -933,9 +933,9 @@ TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part_of_the_de
 })
 
 
-template<class PannedDelayClass>
-void test_panned_delay(
-        PannedDelayClass& panned_delay,
+template<class StereoPannedDelayClass>
+void test_stereo_panned_delay(
+        StereoPannedDelayClass& stereo_panned_delay,
         FixedSignalProducer& input,
         char const* class_name,
         Integer const block_size,
@@ -954,19 +954,19 @@ void test_panned_delay(
     input.set_sample_rate(sample_rate);
     input.set_block_size(block_size);
 
-    panned_delay.reset();
+    stereo_panned_delay.reset();
 
-    panned_delay.set_sample_rate(sample_rate);
-    panned_delay.set_block_size(block_size);
-    panned_delay.delay.gain.set_value(0.75);
-    panned_delay.delay.time.set_value(0.2);
-    panned_delay.panning.set_value(0.0);
-    panned_delay.panning.schedule_value(0.45, -1.0);
-    panned_delay.set_panning_scale(panning_scale);
+    stereo_panned_delay.set_sample_rate(sample_rate);
+    stereo_panned_delay.set_block_size(block_size);
+    stereo_panned_delay.delay.gain.set_value(0.75);
+    stereo_panned_delay.delay.time.set_value(0.2);
+    stereo_panned_delay.panning.set_value(0.0);
+    stereo_panned_delay.panning.schedule_value(0.45, -1.0);
+    stereo_panned_delay.set_panning_scale(panning_scale);
 
-    assert_eq((int)input.get_channels(), (int)panned_delay.get_channels());
+    assert_eq((int)input.get_channels(), (int)stereo_panned_delay.get_channels());
 
-    render_rounds<PannedDelayClass>(panned_delay, output, rounds);
+    render_rounds<StereoPannedDelayClass>(stereo_panned_delay, output, rounds);
 
     for (Integer c = 0; c != FixedSignalProducer::CHANNELS; ++c) {
         assert_eq(
@@ -981,13 +981,13 @@ void test_panned_delay(
         );
     }
 
-    assert_eq(-1.0, panned_delay.panning.get_value(), DOUBLE_DELTA);
+    assert_eq(-1.0, stereo_panned_delay.panning.get_value(), DOUBLE_DELTA);
 }
 
 
-template<class PannedDelayClass>
-void test_panned_delay(
-        PannedDelayClass& panned_delay,
+template<class StereoPannedDelayClass>
+void test_stereo_panned_delay(
+        StereoPannedDelayClass& stereo_panned_delay,
         FixedSignalProducer& input,
         char const* class_name
 ) {
@@ -1035,14 +1035,35 @@ void test_panned_delay(
         (Sample const*)&expected_output_no_panning_samples[1],
     };
 
-    test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, 1.0, input_buffer, expected_output_full_panning
+    test_stereo_panned_delay<StereoPannedDelayClass>(
+        stereo_panned_delay,
+        input,
+        class_name,
+        block_size,
+        rounds,
+        1.0,
+        input_buffer,
+        expected_output_full_panning
     );
-    test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, -1.0, input_buffer, expected_output_opposite_panning
+    test_stereo_panned_delay<StereoPannedDelayClass>(
+        stereo_panned_delay,
+        input,
+        class_name,
+        block_size,
+        rounds,
+        -1.0,
+        input_buffer,
+        expected_output_opposite_panning
     );
-    test_panned_delay<PannedDelayClass>(
-        panned_delay, input, class_name, block_size, rounds, 0.000001, input_buffer, expected_output_no_panning
+    test_stereo_panned_delay<StereoPannedDelayClass>(
+        stereo_panned_delay,
+        input,
+        class_name,
+        block_size,
+        rounds,
+        0.000001,
+        input_buffer,
+        expected_output_no_panning
     );
 }
 
@@ -1050,19 +1071,19 @@ void test_panned_delay(
 TEST(output_may_be_panned, {
     FloatParamS distortion("DST", 0.0, 1.0, 0.00001);
     FixedSignalProducer input(NULL);
-    PannedDelay<FixedSignalProducer> panned_delay(
-        input, PannedDelayStereoMode::FLIPPED
+    StereoPannedDelay<FixedSignalProducer> stereo_panned_delay(
+        input, StereoPannedDelayMode::FLIPPED
     );
     Distortion::TypeParam distortion_type("DSTTYP", Distortion::TYPE_DELAY_FEEDBACK);
-    DistortedHighShelfPannedDelay<FixedSignalProducer> distorted_delay(
-        input, PannedDelayStereoMode::FLIPPED, distortion, distortion_type
+    DistortedHighShelfStereoPannedDelay<FixedSignalProducer> distorted_delay(
+        input, StereoPannedDelayMode::FLIPPED, distortion, distortion_type
     );
 
 
-    test_panned_delay< PannedDelay<FixedSignalProducer> >(
-        panned_delay, input, "PannedDelay"
+    test_stereo_panned_delay< StereoPannedDelay<FixedSignalProducer> >(
+        stereo_panned_delay, input, "StereoPannedDelay"
     );
-    test_panned_delay< DistortedHighShelfPannedDelay<FixedSignalProducer> >(
-        distorted_delay, input, "DistortedHighShelfPannedDelay"
+    test_stereo_panned_delay< DistortedHighShelfStereoPannedDelay<FixedSignalProducer> >(
+        distorted_delay, input, "DistortedHighShelfStereoPannedDelay"
     );
 })

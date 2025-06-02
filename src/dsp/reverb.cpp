@@ -127,7 +127,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     comb_filters{
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][0].delay_time,
@@ -140,7 +140,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][1].delay_time,
@@ -154,7 +154,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][2].delay_time,
@@ -168,7 +168,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][3].delay_time,
@@ -182,7 +182,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][4].delay_time,
@@ -196,7 +196,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][5].delay_time,
@@ -210,7 +210,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][6].delay_time,
@@ -224,7 +224,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][7].delay_time,
@@ -238,7 +238,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][8].delay_time,
@@ -252,7 +252,7 @@ Reverb<InputSignalProducerClass>::Reverb(
         },
         {
             high_pass_filter,
-            PannedDelayStereoMode::NORMAL,
+            StereoPannedDelayMode::NORMAL,
             width,
             room_reflectivity,
             TUNINGS[0][9].delay_time,

@@ -42,11 +42,11 @@ class Echo : public SideChainCompressableEffect<InputSignalProducerClass>
         typedef Gain<InputSignalProducerClass> BoostedInput;
         typedef BiquadFilter<BoostedInput, BiquadFilterFixedType::BFFT_HIGH_PASS> HighPassedInput;
 
-        typedef DistortedHighShelfPannedDelay<
+        typedef DistortedHighShelfStereoPannedDelay<
             HighPassedInput, DelayCapabilities::DC_REVERSIBLE
         > CombFilter1;
 
-        typedef DistortedHighShelfPannedDelay<
+        typedef DistortedHighShelfStereoPannedDelay<
             DistortedHighShelfDelay<HighPassedInput, DelayCapabilities::DC_REVERSIBLE>,
             DelayCapabilities::DC_REVERSIBLE
         > CombFilter2;

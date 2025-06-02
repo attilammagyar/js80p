@@ -279,7 +279,7 @@ class Delay : public Filter<InputSignalProducerClass>
 };
 
 
-enum PannedDelayStereoMode {
+enum StereoPannedDelayMode {
     NORMAL = 0,
     FLIPPED = 1
 };
@@ -290,64 +290,64 @@ template<
     class FilterInputClass = Delay<InputSignalProducerClass>,
     DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
 >
-class PannedDelay : public Filter<FilterInputClass>
+class StereoPannedDelay : public Filter<FilterInputClass>
 {
     friend class SignalProducer;
 
     public:
         static constexpr Integer CHANNELS = 2;
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             ToggleParam const* tempo_sync = NULL
         );
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& delay_time_leader,
             ToggleParam const* tempo_sync = NULL
         );
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_time_leader,
             ToggleParam const* tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
-        virtual ~PannedDelay();
+        virtual ~StereoPannedDelay();
 
         virtual void set_block_size(Integer const new_block_size) noexcept override;
 
         void set_panning_scale(Number const scale) noexcept;
 
     protected:
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             ToggleParam const* tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_time_leader,
             ToggleParam const* tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             FloatParamS& delay_time_leader,
@@ -355,10 +355,10 @@ class PannedDelay : public Filter<FilterInputClass>
             Integer const number_of_children = 0
         );
 
-        PannedDelay(
+        StereoPannedDelay(
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
@@ -428,7 +428,7 @@ using DistortedHighShelfDelay = BiquadFilter<
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
-using DistortedHighShelfPannedDelayBase = PannedDelay<
+using DistortedHighShelfStereoPannedDelayBase = StereoPannedDelay<
     InputSignalProducerClass,
     DistortedHighShelfDelay<InputSignalProducerClass, capabilities>,
     capabilities
@@ -436,22 +436,22 @@ using DistortedHighShelfPannedDelayBase = PannedDelay<
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
-class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<InputSignalProducerClass, capabilities>
+class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>
 {
     friend class SignalProducer;
 
     public:
-        DistortedHighShelfPannedDelay(
+        DistortedHighShelfStereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& distortion_level_leader,
             Distortion::TypeParam const& distortion_type,
             ToggleParam const* tempo_sync = NULL
         );
 
-        DistortedHighShelfPannedDelay(
+        DistortedHighShelfStereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             FloatParamS& delay_time_leader,
@@ -463,9 +463,9 @@ class DistortedHighShelfPannedDelay : public DistortedHighShelfPannedDelayBase<I
             ToggleParam const* tempo_sync = NULL
         );
 
-        DistortedHighShelfPannedDelay(
+        DistortedHighShelfStereoPannedDelay(
             InputSignalProducerClass& input,
-            PannedDelayStereoMode const stereo_mode,
+            StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
