@@ -53,7 +53,7 @@ JS80P_CXXFLAGS = \
 	-ffast-math \
 	-O3 \
 	-std=c++17
-# maybe-uninitialized: see PannedDelay(input, stereo_mode, tempo_sync) in src/dsp/delay.cpp
+# maybe-uninitialized: too many false positives while Valgrind has this covered
 
 ifneq ($(INSTRUCTION_SET),none)
 JS80P_CXXFLAGS += -m$(INSTRUCTION_SET)
