@@ -78,6 +78,8 @@ template<class InputSignalProducerClass>
 class Effects : public Filter< Volume3<InputSignalProducerClass> >
 {
     public:
+        static constexpr Integer CHANNELS = 2;
+
         Effects(
             std::string const& name,
             InputSignalProducerClass& input,

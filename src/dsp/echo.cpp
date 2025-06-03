@@ -100,9 +100,10 @@ Echo<InputSignalProducerClass>::Echo(
         Constants::BIQUAD_FILTER_GAIN_MAX,
         0.0
     ),
-    gain(input, input_volume),
+    gain(input, input_volume, NULL, CombFilter1::CHANNELS),
     high_pass_filter(
         gain,
+        CombFilter1::CHANNELS,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain,

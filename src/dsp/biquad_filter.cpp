@@ -66,9 +66,10 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         Number const inaccuracy_seed,
         FloatParamB const* freq_inaccuracy_param,
         FloatParamB const* q_inaccuracy_param,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 3, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 3, channels, buffer_owner),
     frequency(
         name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
@@ -101,7 +102,8 @@ template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         std::string const& name,
         InputSignalProducerClass& input,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
     : BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         name,
@@ -111,7 +113,8 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         0.0,
         NULL,
         NULL,
-        buffer_owner
+        buffer_owner,
+        channels
     )
 {
 }
@@ -151,9 +154,10 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         BiquadFilterTypeParam& type,
         ToggleParam const& freq_log_scale_toggle,
         ToggleParam const& q_log_scale_toggle,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 3, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 3, channels, buffer_owner),
     frequency(
         name + "FRQ",
         Constants::BIQUAD_FILTER_FREQUENCY_MIN,
@@ -206,9 +210,10 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         Number const inaccuracy_seed,
         FloatParamB const* freq_inaccuracy_param,
         FloatParamB const* q_inaccuracy_param,
-        SignalProducer* buffer_owner
+        SignalProducer* buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 3, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 3, channels, buffer_owner),
     frequency(frequency_leader),
     q(q_leader),
     gain(gain_leader),
@@ -225,6 +230,7 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
 template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         InputSignalProducerClass& input,
+        Integer const channels,
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
@@ -244,7 +250,8 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         inaccuracy_seed,
         freq_inaccuracy_param,
         q_inaccuracy_param,
-        buffer_owner
+        buffer_owner,
+        channels
     )
 {
 }

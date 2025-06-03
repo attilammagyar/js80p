@@ -110,7 +110,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     distortion_level(name + "DST", 0.0, 1.0, 0.0),
     log_scale_frequencies(name + "LOG", ToggleParam::OFF),
     log_scale_high_pass_q(name + "LHQ", ToggleParam::OFF),
-    mixer(input.get_channels()),
+    mixer(CombFilter::CHANNELS),
     distortion_type("", Distortion::TYPE_DELAY_FEEDBACK),
     high_pass_filter_gain(
         "",
@@ -120,6 +120,7 @@ Reverb<InputSignalProducerClass>::Reverb(
     ),
     high_pass_filter(
         input,
+        CombFilter::CHANNELS,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain

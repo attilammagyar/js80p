@@ -172,12 +172,12 @@ class Distortion : public Filter<InputSignalProducerClass>
     friend class JS80P::SignalProducer;
 
     public:
-
         Distortion(
             std::string const& name,
             TypeParam const& type,
             InputSignalProducerClass& input,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         Distortion(
@@ -185,7 +185,8 @@ class Distortion : public Filter<InputSignalProducerClass>
             TypeParam const& type,
             InputSignalProducerClass& input,
             FloatParamS& level_leader,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         Distortion(

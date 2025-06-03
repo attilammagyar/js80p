@@ -771,9 +771,10 @@ Distortion<InputSignalProducerClass>::Distortion(
         std::string const& name,
         TypeParam const& type,
         InputSignalProducerClass& input,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 1, channels, buffer_owner),
     level(name + "G", 0.0, 1.0, 0.0),
     type(type)
 {
@@ -787,9 +788,10 @@ Distortion<InputSignalProducerClass>::Distortion(
         TypeParam const& type,
         InputSignalProducerClass& input,
         FloatParamS& level_leader,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 1, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 1, channels, buffer_owner),
     level(level_leader),
     type(type)
 {

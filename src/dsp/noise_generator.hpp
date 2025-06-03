@@ -54,7 +54,8 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
             Frequency const high_pass_frequency,
             Frequency const low_pass_frequency,
             Math::RNG& rng,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         NoiseGenerator(

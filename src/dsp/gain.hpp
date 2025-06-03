@@ -37,7 +37,8 @@ class Gain : public Filter<InputSignalProducerClass>
         Gain(
             InputSignalProducerClass& input,
             FloatParamS& gain,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         void find_input_peak(

@@ -31,9 +31,10 @@ template<class InputSignalProducerClass>
 Gain<InputSignalProducerClass>::Gain(
         InputSignalProducerClass& input,
         FloatParamS& gain,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 0, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 0, channels, buffer_owner),
     gain_buffer(NULL),
     gain(gain)
 {

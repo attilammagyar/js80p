@@ -127,6 +127,8 @@ class Tape : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
+        static constexpr Integer CHANNELS = 2;
+
         typedef BiquadFilter<
             InputSignalProducerClass,
             BiquadFilterFixedType::BFFT_HIGH_SHELF

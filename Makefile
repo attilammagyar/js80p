@@ -49,11 +49,9 @@ JS80P_CXXFLAGS = \
 	-D JS80P_INSTRUCTION_SET=$(INSTRUCTION_SET) \
 	-Wall \
 	-Werror \
-	-Wno-error=maybe-uninitialized \
 	-ffast-math \
 	-O3 \
 	-std=c++17
-# maybe-uninitialized: too many false positives while Valgrind has this covered
 
 ifneq ($(INSTRUCTION_SET),none)
 JS80P_CXXFLAGS += -m$(INSTRUCTION_SET)

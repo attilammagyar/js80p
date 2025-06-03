@@ -132,6 +132,7 @@ Chorus<InputSignalProducerClass>::Chorus(
     ),
     high_pass_filter(
         input,
+        CombFilter::CHANNELS,
         high_pass_frequency,
         high_pass_q,
         high_pass_filter_gain
@@ -163,9 +164,10 @@ Chorus<InputSignalProducerClass>::Chorus(
         {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[5], &tempo_sync},
         {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[6], &tempo_sync},
     },
-    mixer(input.get_channels()),
+    mixer(CombFilter::CHANNELS),
     high_shelf_filter(
         mixer,
+        CombFilter::CHANNELS,
         damping_frequency,
         biquad_filter_q,
         damping_gain,
@@ -175,7 +177,7 @@ Chorus<InputSignalProducerClass>::Chorus(
         NULL,
         &mixer
     ),
-    feedback_gain(high_shelf_filter, feedback),
+    feedback_gain(high_shelf_filter, feedback, NULL, CombFilter::CHANNELS),
     previous_type(255),
     should_start_lfos(true)
 {

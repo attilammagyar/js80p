@@ -49,6 +49,8 @@ Sample const* const* Filter<InputSignalProducerClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
+    JS80P_ASSERT(input.get_channels() == this->get_channels());
+
     input_buffer = SignalProducer::produce<InputSignalProducerClass>(
         input, round, sample_count
     );
