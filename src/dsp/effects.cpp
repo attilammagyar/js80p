@@ -35,7 +35,7 @@ Effects<InputSignalProducerClass>::Effects(
 ) : Filter< Volume3<InputSignalProducerClass> >(
         volume_3,
         24 + (Integer)TapeParams::SIGNAL_PRODUCERS,
-        input.get_channels()
+        CHANNELS
     ),
     volume_1_gain(name + "V1V", 0.0, 2.0, 1.0),
     volume_2_gain(name + "V2V", 0.0, 1.0, 1.0),
@@ -50,9 +50,9 @@ Effects<InputSignalProducerClass>::Effects(
     distortion_2_type(name + "DT", Distortion::TYPE_TANH_10),
     tape_at_end(name + "TEND", ToggleParam::OFF),
     tape_params(name + "T", tape_at_end),
-    volume_1(input, volume_1_gain),
-    distortion_1(name + "O", distortion_1_type, volume_1, &volume_1),
-    distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1),
+    volume_1(input, volume_1_gain, NULL, CHANNELS),
+    distortion_1(name + "O", distortion_1_type, volume_1, &volume_1, CHANNELS),
+    distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1, CHANNELS),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
     filter_1_freq_log_scale(name + "F1LOG", ToggleParam::OFF),
@@ -65,7 +65,8 @@ Effects<InputSignalProducerClass>::Effects(
         filter_1_type,
         filter_1_freq_log_scale,
         filter_1_q_log_scale,
-        &volume_1
+        &volume_1,
+        CHANNELS
     ),
     filter_2(
         name + "F2",
@@ -73,15 +74,16 @@ Effects<InputSignalProducerClass>::Effects(
         filter_2_type,
         filter_2_freq_log_scale,
         filter_2_q_log_scale,
-        &volume_1
+        &volume_1,
+        CHANNELS
     ),
-    volume_2(filter_2, volume_2_gain),
+    volume_2(filter_2, volume_2_gain, NULL, CHANNELS),
     tape_1(name + "T1", tape_params, volume_2, rng),
     chorus(name + "C", tape_1),
     echo(name + "E", chorus, echo_filter_shared_buffers),
     reverb(name + "R", echo, reverb_filter_shared_buffers),
     tape_2(name + "T2", tape_params, reverb, rng),
-    volume_3(tape_2, volume_3_gain)
+    volume_3(tape_2, volume_3_gain, NULL, CHANNELS)
 {
     size_t i = 0;
     SignalProducer* sp = tape_params.get_signal_producer(i++);

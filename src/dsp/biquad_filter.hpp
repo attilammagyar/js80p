@@ -94,13 +94,15 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Number const inaccuracy_seed = 0.0,
             FloatParamB const* freq_inaccuracy_param = NULL,
             FloatParamB const* q_inaccuracy_param = NULL,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         BiquadFilter(
             std::string const& name,
             InputSignalProducerClass& input,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         BiquadFilter(
@@ -109,7 +111,8 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             BiquadFilterTypeParam& type,
             ToggleParam const& freq_log_scale_toggle,
             ToggleParam const& q_log_scale_toggle,
-            SignalProducer* const buffer_owner = NULL
+            SignalProducer* const buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         BiquadFilter(
@@ -122,11 +125,13 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Number const inaccuracy_seed = 0.0,
             FloatParamB const* freq_inaccuracy_param = NULL,
             FloatParamB const* q_inaccuracy_param = NULL,
-            SignalProducer* buffer_owner = NULL
+            SignalProducer* buffer_owner = NULL,
+            Integer const channels = 0
         ) noexcept;
 
         BiquadFilter(
             InputSignalProducerClass& input,
+            Integer const channels,
             FloatParamS& frequency_leader,
             FloatParamS& q_leader,
             FloatParamS& gain_leader,
