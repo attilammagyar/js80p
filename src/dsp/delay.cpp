@@ -111,9 +111,10 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         ToggleParam const* tempo_sync,
-        Seconds const time_max
+        Seconds const time_max,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 2),
+    : Filter<InputSignalProducerClass>(input, 2, channels),
     tempo_sync(tempo_sync),
     gain(
         "",
@@ -1597,9 +1598,10 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
         distortion_type,
         this->delay,
         distortion_level_leader,
-        &this->delay
+        &this->delay,
+        CHANNELS
     ),
-    high_shelf_filter("", this->distortion, &this->delay)
+    high_shelf_filter("", this->distortion, &this->delay, CHANNELS)
 {
     initialize_instance();
 
@@ -1643,10 +1645,12 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
         distortion_type,
         this->delay,
         distortion_level_leader,
-        &this->delay
+        &this->delay,
+        CHANNELS
     ),
     high_shelf_filter(
         this->distortion,
+        CHANNELS,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,
@@ -1697,10 +1701,12 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
         distortion_type,
         this->delay,
         distortion_level_leader,
-        &this->delay
+        &this->delay,
+        CHANNELS
     ),
     high_shelf_filter(
         this->distortion,
+        CHANNELS,
         high_shelf_filter_frequency_leader,
         high_shelf_filter_q,
         high_shelf_filter_gain_leader,

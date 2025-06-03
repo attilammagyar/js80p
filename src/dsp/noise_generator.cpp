@@ -35,9 +35,10 @@ NoiseGenerator<InputSignalProducerClass>::NoiseGenerator(
         Frequency const high_pass_frequency,
         Frequency const low_pass_frequency,
         Math::RNG& rng,
-        SignalProducer* const buffer_owner
+        SignalProducer* const buffer_owner,
+        Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 0, 0, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 0, channels, buffer_owner),
     high_pass_frequency(high_pass_frequency),
     low_pass_frequency(low_pass_frequency),
     level(level),

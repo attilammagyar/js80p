@@ -496,34 +496,51 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
         InputSignalProducerClass& input,
         Math::RNG& rng
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 8, 0, &delay),
+    : Filter<InputSignalProducerClass>(input, 8, CHANNELS, &delay),
     params(params),
-    pre_dist_high_shelf_filter(name + "PHS", input),
+    pre_dist_high_shelf_filter(name + "PHS", input, NULL, CHANNELS),
     distortion(
         name + "DIST",
         params.distortion_type,
         pre_dist_high_shelf_filter,
         params.distortion_level,
-        &pre_dist_high_shelf_filter
+        &pre_dist_high_shelf_filter,
+        CHANNELS
     ),
-    low_shelf_filter(name + "LS", distortion, distortion.get_buffer_owner()),
-    hiss_generator(low_shelf_filter, params.hiss_level, 20.0, 600.0, rng),
+    low_shelf_filter(
+        name + "LS",
+        distortion,
+        distortion.get_buffer_owner(),
+        CHANNELS
+    ),
+    hiss_generator(
+        low_shelf_filter,
+        params.hiss_level,
+        20.0,
+        600.0,
+        rng,
+        NULL,
+        CHANNELS
+    ),
     high_shelf_filter(
         name + "HS",
         hiss_generator,
-        hiss_generator.get_buffer_owner()
+        hiss_generator.get_buffer_owner(),
+        CHANNELS
     ),
     peaking_filter(
         name + "P",
         high_shelf_filter,
-        high_shelf_filter.get_buffer_owner()
+        high_shelf_filter.get_buffer_owner(),
+        CHANNELS
     ),
     low_pass_filter(
         name + "LP",
         peaking_filter,
-        peaking_filter.get_buffer_owner()
+        peaking_filter.get_buffer_owner(),
+        CHANNELS
     ),
-    delay(low_pass_filter, NULL, TapeParams::DELAY_TIME_MAX),
+    delay(low_pass_filter, NULL, TapeParams::DELAY_TIME_MAX, CHANNELS),
     transition_duration(0.0),
     previous_bypass_toggle_value(params.bypass_toggle.get_value()),
     needs_ff_rescheduling(true)

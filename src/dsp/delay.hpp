@@ -63,7 +63,8 @@ class Delay : public Filter<InputSignalProducerClass>
         explicit Delay(
             InputSignalProducerClass& input,
             ToggleParam const* tempo_sync = NULL,
-            Seconds const time_max = Constants::DELAY_TIME_MAX
+            Seconds const time_max = Constants::DELAY_TIME_MAX,
+            Integer const channels = 0
         ) noexcept;
 
         Delay(
@@ -441,6 +442,8 @@ class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPanne
     friend class SignalProducer;
 
     public:
+        static constexpr Integer CHANNELS = DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>::CHANNELS;
+
         DistortedHighShelfStereoPannedDelay(
             InputSignalProducerClass& input,
             StereoPannedDelayMode const stereo_mode,
