@@ -57,16 +57,16 @@ class XcbPlatform
         xcb_visualtype_t* get_screen_root_visual() const;
 
         cairo_font_face_t* get_font_face(
-            cairo_t* cairo,
+            cairo_t* const cairo,
             WidgetBase::FontWeight const weight
         );
 
-        void register_widget(xcb_window_t window_id, Widget* widget);
+        void register_widget(xcb_window_t window_id, Widget* const widget);
         Widget* find_widget(xcb_window_t window_id) const;
         void unregister_widget(xcb_window_t window_id);
 
         void export_patch(std::string const& patch);
-        void import_patch(ImportPatchButton* import_patch_button);
+        void import_patch(ImportPatchButton* const import_patch_button);
         void handle_file_selector_dialog();
         void cancel_file_selector_dialog();
         bool is_file_selector_dialog_open() const;
@@ -109,22 +109,22 @@ class XcbPlatform
         xcb_visualtype_t* find_screen_root_visual() const;
 
         cairo_font_face_t* find_narrowest_font(
-            cairo_t* cairo,
+            cairo_t* const cairo,
             cairo_font_weight_t weight
         );
 
-        char const* find_executable(char const* const* alternatives) const;
+        char const* find_executable(char const* const* const alternatives) const;
 
         void start_file_selector_dialog(
-            char const* executable,
-            char const* const* arguments
+            char const* const executable,
+            char const* const* const arguments
         );
 
         void clear_active_file_selector_dialog_data();
 
         void build_file_selector_argv(
-            char const* executable,
-            char const* const* arguments,
+            char const* const executable,
+            char const* const* const arguments,
             std::vector<char*>& argv
         ) const;
 
@@ -133,11 +133,11 @@ class XcbPlatform
         void run_file_selector_child_process(
             std::vector<char*> const& argv,
             std::vector<char*> const& env,
-            Pipe* pipe
+            Pipe* const pipe
         ) const;
 
         void read_file_selector_output();
-        bool has_file_selector_exited(int* exit_code) const;
+        bool has_file_selector_exited(int* const exit_code) const;
         void finish_exporting_patch();
         void finish_importing_patch();
 
@@ -160,14 +160,14 @@ class XcbPlatform
 class Widget : public WidgetBase
 {
     public:
-        static void process_events(XcbPlatform* xcb);
+        static void process_events(XcbPlatform* const xcb);
 
         explicit Widget(char const* const text);
         virtual ~Widget();
 
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
-            char const* name
+            char const* const name
         ) override;
 
         virtual void delete_image(GUI::Image image) override;
@@ -198,7 +198,7 @@ class Widget : public WidgetBase
 
         virtual void set_up(
             GUI::PlatformData platform_data,
-            WidgetBase* parent
+            WidgetBase* const parent
         ) override;
 
         virtual bool paint() override;
@@ -268,7 +268,7 @@ class Widget : public WidgetBase
         class Resource
         {
             public:
-                Resource(unsigned char* start, unsigned char* end);
+                Resource(unsigned char* const start, unsigned char* const end);
 
                 /*
                 These should be unsigned char const* const, but
@@ -281,75 +281,78 @@ class Widget : public WidgetBase
         class PNGStreamState
         {
             public:
-                PNGStreamState(unsigned char* start, unsigned char* end);
+                PNGStreamState(
+                    unsigned char* const start,
+                    unsigned char* const end
+                );
 
+                unsigned char* const end;
                 unsigned char* data;
-                unsigned char* end;
         };
 
         static void process_all_events(
-            XcbPlatform* xcb,
-            xcb_connection_t* xcb_connection
+            XcbPlatform* const xcb,
+            xcb_connection_t* const xcb_connection
         );
 
         static void process_non_editing_events(
-            XcbPlatform* xcb,
-            xcb_connection_t* xcb_connection
+            XcbPlatform* const xcb,
+            xcb_connection_t* const xcb_connection
         );
 
         static cairo_status_t read_png_stream_from_array(
             void *closure,
-            unsigned char* data,
+            unsigned char* const data,
             unsigned int length
         );
 
         static void handle_error_event(
-            XcbPlatform const* xcb,
-            xcb_generic_error_t const* error
+            XcbPlatform const* const xcb,
+            xcb_generic_error_t const* const error
         );
 
         static void handle_expose_event(
-            XcbPlatform const* xcb,
-            xcb_expose_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_expose_event_t const* const event
         );
 
         static void handle_button_press_event(
-            XcbPlatform const* xcb,
-            xcb_button_press_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_button_press_event_t const* const event
         );
 
         static void handle_button_release_event(
-            XcbPlatform const* xcb,
-            xcb_button_release_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_button_release_event_t const* const event
         );
 
         static void handle_enter_notify_event(
-            XcbPlatform const* xcb,
-            xcb_enter_notify_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_enter_notify_event_t const* const event
         );
 
         static void handle_motion_notify_event(
-            XcbPlatform const* xcb,
-            xcb_motion_notify_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_motion_notify_event_t const* const event
         );
 
         static void handle_leave_notify_event(
-            XcbPlatform const* xcb,
-            xcb_leave_notify_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_leave_notify_event_t const* const event
         );
 
         static void handle_client_message_event(
-            XcbPlatform const* xcb,
-            xcb_client_message_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_client_message_event_t const* const event
         );
 
         static void handle_destroy_notify_event(
-            XcbPlatform const* xcb,
-            xcb_destroy_notify_event_t const* event
+            XcbPlatform const* const xcb,
+            xcb_destroy_notify_event_t const* const event
         );
 
         static bool is_double_click(
-            Widget const* widget,
+            Widget const* const widget,
             xcb_timestamp_t const time,
             int const x,
             int const y

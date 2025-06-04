@@ -47,8 +47,8 @@ class FstPlugin : public Midi::EventHandler
             public:
                 Parameter();
                 Parameter(
-                    char const* name,
-                    MidiController* midi_controller,
+                    char const* const name,
+                    MidiController* const midi_controller,
                     Midi::Controller const controller_id
                 );
                 Parameter(Parameter const& parameter) = default;
@@ -217,17 +217,17 @@ class FstPlugin : public Midi::EventHandler
         VstIntPtr get_program() noexcept;
         void set_program(size_t index) noexcept;
 
-        VstIntPtr get_program_name(char* name, size_t index) noexcept;
-        void get_program_name(char* name) noexcept;
-        void set_program_name(const char* name);
+        VstIntPtr get_program_name(char* const name, size_t index) noexcept;
+        void get_program_name(char* const name) noexcept;
+        void set_program_name(char const* const name);
 
         float get_parameter(size_t index) noexcept;
         void set_parameter(size_t index, float value) noexcept;
         bool is_automatable(size_t index) noexcept;
 
-        void get_param_label(size_t index, char* buffer) noexcept;
-        void get_param_display(size_t index, char* buffer) noexcept;
-        void get_param_name(size_t index, char* buffer) noexcept;
+        void get_param_label(size_t index, char* const buffer) noexcept;
+        void get_param_display(size_t index, char* const buffer) noexcept;
+        void get_param_name(size_t index, char* const buffer) noexcept;
 
         void open_gui(GUI::PlatformWidget parent_window);
         void gui_idle();
@@ -306,16 +306,16 @@ class FstPlugin : public Midi::EventHandler
 
         static Parameter create_midi_ctl_param(
             Synth::ControllerId const controller_id,
-            MidiController* midi_controller,
+            MidiController* const midi_controller,
             Synth& synth
         ) noexcept;
 
         VstIntPtr host_callback(
-            VstInt32 op_code,
-            VstInt32 index = 0,
-            VstIntPtr ivalue = 0,
-            void* pointer = NULL,
-            float fvalue = 0.0f
+            VstInt32 const op_code,
+            VstInt32 const index = 0,
+            VstIntPtr const ivalue = 0,
+            void* const pointer = NULL,
+            float const fvalue = 0.0f
         ) const noexcept;
 
         void clear_received_midi_cc() noexcept;

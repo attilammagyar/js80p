@@ -81,7 +81,7 @@ class Buffer
             }
         }
 
-        void append(Sample const* const* samples, Integer const sample_count)
+        void append(Sample const* const* const samples, Integer const sample_count)
         {
             for (Integer channel = 0; channel != channels; ++channel) {
                 for (Integer i = 0; i != sample_count; ++i) {
@@ -121,7 +121,7 @@ class Constant : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             Integer const channels = get_channels();
 
@@ -225,7 +225,7 @@ class SumOfSines : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             Integer const channels = get_channels();
 
@@ -291,7 +291,7 @@ void render_rounds(
     buffer.reset();
 
     for (Integer i = 0; i != rounds; ++i) {
-        Sample const* const* block = (
+        Sample const* const* const block = (
             SignalProducer::produce<SignalProducerClass>(
                 signal_producer, i + first_round, size
             )
@@ -318,7 +318,7 @@ void assert_rendering_is_independent_from_chunk_size(
         SignalProducerClass& signal_producer_1,
         SignalProducerClass& signal_producer_2,
         Number const tolerance = 0.001,
-        char const* message = NULL
+        char const* const message = NULL
 ) {
     constexpr Integer block_size = 500;
     constexpr Integer rounds_1 = 360;
@@ -351,7 +351,7 @@ void assert_statistics(
         Number const expected_standard_deviation,
         Math::Statistics const& statistics,
         Number const tolerance = DOUBLE_DELTA,
-        char const* message = ""
+        char const* const message = ""
 ) {
     if (!expected_validity) {
         assert_false(statistics.is_valid);

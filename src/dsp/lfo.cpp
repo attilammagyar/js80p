@@ -292,7 +292,7 @@ bool LFO::should_visit_lfo_as_polyphonic(
 
 template<class VisitorClass>
 void LFO::visit_param_lfo(
-        LFO* lfo,
+        LFO* const lfo,
         Byte& depth,
         VisitorClass& visitor
 ) noexcept {
@@ -412,7 +412,7 @@ LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
         Integer const sample_count,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept
     : lfo_envelope_states(lfo_envelope_states),
     buffer(buffer),
@@ -733,7 +733,7 @@ void LFO::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (center.get_value() == ToggleParam::OFF) {
         apply_distortions(
@@ -783,7 +783,7 @@ void LFO::produce_with_envelope(
         Integer const sample_count,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     LFOWithEnvelopeRenderer renderer(
         lfo_envelope_states,

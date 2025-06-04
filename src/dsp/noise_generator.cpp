@@ -142,7 +142,7 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass>::initialize_render
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Sample const* const* buffer = (
+    Sample const* const* const buffer = (
         Filter<InputSignalProducerClass>::initialize_rendering(
             round,
             sample_count
@@ -157,17 +157,12 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass>::initialize_render
 }
 
 
-/*
-I'm not sure why this particular render() method triggers the Cppcheck warning,
-but the missing const for the buffer parameter should be added to all
-incarnations.
-*/
 template<class InputSignalProducerClass>
 void NoiseGenerator<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer // cppcheck-suppress constParameter
+        Sample** const buffer
 ) noexcept {
     Sample const level = this->level.get_value();
     Sample const a = this->a;

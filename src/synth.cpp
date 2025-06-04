@@ -644,7 +644,7 @@ void Synth::create_macros() noexcept
         Macros used to be called Flexible Controllers, hence the F for
         backward-compatibility.
         */
-        Macro* macro = new Macro(std::string("F") + to_string(i + 1));
+        Macro* const macro = new Macro(std::string("F") + to_string(i + 1));
 
         macros_rw[i] = macro;
 
@@ -672,7 +672,7 @@ void Synth::create_envelopes() noexcept
     Integer next_id = ParamId::N1SCL;
 
     for (Byte i = 0; i != Constants::ENVELOPES; ++i) {
-        Envelope* envelope = new Envelope(std::string("N") + to_string((Integer)(i + 1)));
+        Envelope* const envelope = new Envelope(std::string("N") + to_string((Integer)(i + 1)));
         envelopes_rw[i] = envelope;
 
         register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->scale);
@@ -761,7 +761,7 @@ void Synth::create_lfos() noexcept
     Integer next_id = ParamId::L1FRQ;
 
     for (Byte i = 0; i != Constants::LFOS; ++i) {
-        LFO* lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), true);
+        LFO* const lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), true);
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
@@ -2893,7 +2893,7 @@ void Synth::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     for (Integer c = 0; c != channels; ++c) {
         Sample* const out = buffer[c];
@@ -3195,7 +3195,7 @@ void Synth::Bus::collect_active_voices() noexcept
 
 template<class VoiceClass, bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
 void Synth::Bus::render_voices(
-        VoiceClass* (&voices)[POLYPHONY],
+        VoiceClass* const (&voices)[POLYPHONY],
         size_t const voices_count,
         typename VoiceClass::Params const& params,
         Integer const round,
@@ -3236,7 +3236,7 @@ void Synth::Bus::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     mix_modulators_with_additive_volume(round, first_sample_index, last_sample_index);
     mix_carriers(round, first_sample_index, last_sample_index);
@@ -3553,7 +3553,7 @@ Synth::ParamIdHashTable::Entry::Entry() noexcept : next(NULL)
 
 
 Synth::ParamIdHashTable::Entry::Entry(
-        const char* name,
+        char const* const name,
         ParamId const param_id
 ) noexcept
     : next(NULL)
@@ -3573,7 +3573,7 @@ Synth::ParamIdHashTable::Entry::~Entry()
 
 
 void Synth::ParamIdHashTable::Entry::set(
-        const char* name,
+        char const* const name,
         ParamId const param_id
 ) noexcept {
     std::fill_n(this->name, NAME_SIZE, '\x00');

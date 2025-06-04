@@ -80,7 +80,7 @@ void assert_channel_statsistics(
 TEST(noise_generator_adds_white_noise_to_its_input, {
     Sample input_channel_1[BLOCK_SIZE];
     Sample input_channel_2[BLOCK_SIZE];
-    Sample* input_channels[FixedSignalProducer::CHANNELS] = {
+    Sample* const input_channels[FixedSignalProducer::CHANNELS] = {
         input_channel_1, input_channel_2
     };
     FixedSignalProducer input(input_channels);

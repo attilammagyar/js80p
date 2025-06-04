@@ -42,13 +42,13 @@ XML schema as parsed by JUCE in
 using namespace JS80P;
 
 
-void usage(char const* name)
+void usage(char const* const name)
 {
     fprintf(stderr, "Usage: %s out_dir/js80p.vstxml\n", name);
 }
 
 
-void write_line(std::ofstream& out_file, char const* line)
+void write_line(std::ofstream& out_file, char const* const line)
 {
     out_file << line << "\r\n";
 }
@@ -57,11 +57,11 @@ void write_line(std::ofstream& out_file, char const* line)
 void write_param(
         std::ofstream& out_file,
         size_t const id,
-        char const* name,
-        char const* short_name
+        char const* const name,
+        char const* const short_name
 ) {
     constexpr size_t buffer_size = 256;
-    constexpr char const* format = (
+    constexpr char const* const format = (
         "  <Param id=\"%lu\" name=\"%s\" shortName=\"%s\" />"
     );
 
@@ -128,7 +128,7 @@ int main(int const argc, char const* argv[])
     std::ofstream out_file(out_file_name, std::ios::out | std::ios::binary);
 
     if (!out_file.is_open()) {
-        char const* error_msg = strerror(errno);
+        char const* const error_msg = strerror(errno);
 
         fprintf(
             stderr,

@@ -80,7 +80,7 @@ void Mixer<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (has_weights) {
         render<true>(round, first_sample_index, last_sample_index, buffer);
@@ -96,7 +96,7 @@ void Mixer<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Integer const channels = get_channels();
 
@@ -121,7 +121,7 @@ void Mixer<InputSignalProducerClass>::render(
 
 
 template<class InputSignalProducerClass>
-Mixer<InputSignalProducerClass>::Input::Input(InputSignalProducerClass* input)
+Mixer<InputSignalProducerClass>::Input::Input(InputSignalProducerClass* const input)
     : input(input),
     buffer(NULL),
     weight(1.0)

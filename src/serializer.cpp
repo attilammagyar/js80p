@@ -95,7 +95,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
 
 
 void Serializer::trim_excess_zeros_from_end_after_snprintf(
-        char* number,
+        char* const number,
         int const length,
         size_t const max_length
 ) noexcept {
@@ -175,7 +175,7 @@ void Serializer::import_patch_in_audio_thread(
 template<Serializer::Thread thread>
 void Serializer::import_patch(Synth& synth, std::string const& serialized) noexcept
 {
-    Lines* lines = parse_lines(serialized);
+    Lines const* const lines = parse_lines(serialized);
     process_lines<thread>(synth, lines);
 
     delete lines;
@@ -185,8 +185,8 @@ void Serializer::import_patch(Synth& synth, std::string const& serialized) noexc
 Serializer::Lines* Serializer::parse_lines(std::string const& serialized) noexcept
 {
     constexpr size_t max_line_pos = MAX_SIZE - 1;
-    Lines* lines = new Lines();
-    char* line = new char[MAX_SIZE];
+    Lines* const lines = new Lines();
+    char* const line = new char[MAX_SIZE];
     std::string::const_iterator const end = serialized.end();
     size_t line_pos = 0;
     bool truncating = false;
@@ -271,7 +271,7 @@ bool Serializer::is_section_name_char(char const c) noexcept
 
 
 template<Serializer::Thread thread>
-void Serializer::process_lines(Synth& synth, Lines* lines) noexcept
+void Serializer::process_lines(Synth& synth, Lines const* const lines) noexcept
 {
     typedef std::vector<Synth::Message> Messages;
 

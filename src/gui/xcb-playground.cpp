@@ -39,14 +39,14 @@ xcb_generic_event_t* const JS80P_XCB_TIMEOUT = (xcb_generic_event_t*)-1;
 
 
 xcb_generic_event_t* xcb_wait_for_event_with_timeout(
-        JS80P::XcbPlatform* xcb,
+        JS80P::XcbPlatform* const xcb,
         double const timeout
 )
 {
     constexpr double NANOSEC_SCALE = 1000000000.0;
 
     fd_set fds;
-    xcb_connection_t* xcb_connection = xcb->get_connection();
+    xcb_connection_t* const xcb_connection = xcb->get_connection();
     int xcb_fd = xcb->get_fd();
 
     double timeout_int = std::floor(timeout);
@@ -99,33 +99,30 @@ int main(int const argc, char const* argv[])
         | XCB_EVENT_MASK_PROPERTY_CHANGE
     );
 
-    JS80P::XcbPlatform* xcb = new JS80P::XcbPlatform();
-    JS80P::XcbPlatform* gui_xcb = new JS80P::XcbPlatform();
+    JS80P::XcbPlatform* const xcb = new JS80P::XcbPlatform();
+    JS80P::XcbPlatform* const gui_xcb = new JS80P::XcbPlatform();
     JS80P::Integer rendering_round = 0;
 
-    xcb_connection_t* xcb_connection = xcb->get_connection();
-    xcb_screen_t* screen = xcb->get_screen();
+    xcb_connection_t* const xcb_connection = xcb->get_connection();
+    xcb_screen_t* const screen = xcb->get_screen();
 
     xcb_intern_atom_cookie_t wm_protocols_cookie = xcb_intern_atom(
         xcb_connection, 0, WM_PROTOCOLS.size(), WM_PROTOCOLS.c_str()
     );
-    xcb_intern_atom_reply_t* wm_protocols_reply = xcb_intern_atom_reply(
+    xcb_intern_atom_reply_t* const wm_protocols_reply = xcb_intern_atom_reply(
         xcb_connection, wm_protocols_cookie, NULL
     );
 
     xcb_intern_atom_cookie_t wm_delete_window_cookie = xcb_intern_atom(
         xcb_connection, 0, WM_DELETE_WINDOW.size(), WM_DELETE_WINDOW.c_str()
     );
-    xcb_intern_atom_reply_t* wm_delete_window_reply = xcb_intern_atom_reply(
+    xcb_intern_atom_reply_t* const wm_delete_window_reply = xcb_intern_atom_reply(
         xcb_connection, wm_delete_window_cookie, NULL
     );
 
     xcb_generic_event_t* event;
 
     xcb_window_t window_id;
-
-    cairo_surface_t* cairo_surface;
-    cairo_t* cairo;
 
     window_id = xcb_generate_id(xcb_connection);
 
@@ -158,16 +155,16 @@ int main(int const argc, char const* argv[])
 
     xcb_map_window(xcb_connection, window_id);
 
-    cairo_surface = cairo_xcb_surface_create(
+    cairo_surface_t* const cairo_surface = cairo_xcb_surface_create(
         xcb_connection, window_id, xcb->get_screen_root_visual(), WIDTH, HEIGHT
     );
-    cairo = cairo_create(cairo_surface);
+    cairo_t* const cairo = cairo_create(cairo_surface);
 
     xcb_flush(xcb_connection);
 
     JS80P::Synth synth;
 
-    JS80P::GUI* gui = new JS80P::GUI(
+    JS80P::GUI* const gui = new JS80P::GUI(
         NULL,
         (JS80P::GUI::PlatformData)gui_xcb,
         (JS80P::GUI::PlatformWidget)window_id,
@@ -195,7 +192,7 @@ int main(int const argc, char const* argv[])
             }
 
             case XCB_CLIENT_MESSAGE: {
-                xcb_client_message_event_t* client_msg = (xcb_client_message_event_t*)event;
+                xcb_client_message_event_t* const client_msg = (xcb_client_message_event_t*)event;
 
                 if (client_msg->data.data32[0] == wm_delete_window_reply->atom) {
                     is_running = false;
