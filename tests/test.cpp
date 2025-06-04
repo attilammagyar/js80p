@@ -485,7 +485,7 @@ class _Test
             _tests.push_back(this);
         }
 
-        void run(int const argc, char const* const* argv)
+        void run(int const argc, char const* const* const argv)
         {
             initialize(argc, argv);
 
@@ -517,7 +517,7 @@ class _Test
         }
 
     private:
-        void initialize(int const argc, char const* const* argv)
+        void initialize(int const argc, char const* const* const argv)
         {
             _test_name = name;
             _test_file = file;
@@ -580,7 +580,7 @@ int main(int argc, char const* argv[])
         bool found = false;
 
         for (_Tests::const_iterator it = _tests.begin(); it != _tests.end(); ++it) {
-            _Test* test = *it;
+            _Test* const test = *it;
             std::string const name(test->name);
 
             if (name == argv[1]) {
@@ -599,7 +599,7 @@ int main(int argc, char const* argv[])
         }
     } else {
         for (_Tests::const_iterator it = _tests.begin(); it != _tests.end(); ++it) {
-            _Test* test = *it;
+            _Test* const test = *it;
             test->run(argc, argv);
         }
     }
@@ -694,7 +694,7 @@ class _TestAssert
     public:
         static void true_(
                 _TEST_ARGS,
-                char const* condition_str,
+                char const* const condition_str,
                 bool const condition,
                 _TEST_VARGS
         ) {
@@ -713,7 +713,7 @@ class _TestAssert
 
         static void false_(
                 _TEST_ARGS,
-                char const* condition_str,
+                char const* const condition_str,
                 bool const condition,
                 _TEST_VARGS
         ) {
@@ -740,8 +740,8 @@ class _TestAssert
 #define _ASSERT_A_OP_B_METHOD(_name, _op, _type, _type_f, _conv)            \
 static void _name(                                                          \
         _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
+        char const* const a_src,                                            \
+        char const* const b_src,                                            \
         _type const a,                                                      \
         _type const b,                                                      \
         _TEST_VARGS                                                         \
@@ -802,8 +802,8 @@ static void _name(                                                          \
 #define _ASSERT_A_OP_B_WITH_TOLERANCE_METHOD(_name, _cmp, _op, _type, _zero)  \
 static void _name(                                                            \
         _TEST_ARGS,                                                           \
-        char const* a_src,                                                    \
-        char const* b_src,                                                    \
+        char const* const a_src,                                              \
+        char const* const b_src,                                              \
         _type const a,                                                        \
         _type const b,                                                        \
         _type const tolerance = _zero,                                        \
@@ -839,8 +839,8 @@ static void _name(                                                            \
 #define _ASSERT_ARRAY_OP_METHOD(_name, _op, _type, _type_f, _abs_fn)        \
 static void _name(                                                          \
         _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
+        char const* const a_src,                                            \
+        char const* const b_src,                                            \
         _type const* const a,                                               \
         _type const* const b,                                               \
         int const length,                                                   \
@@ -921,8 +921,8 @@ static void _name(                                                          \
 #define _ASSERT_FLOAT_ARRAY_OP_METHOD(_name, _op, _type)                    \
 static void _name(                                                          \
         _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
+        char const* const a_src,                                            \
+        char const* const b_src,                                            \
         _type const* const a,                                               \
         _type const* const b,                                               \
         int const length,                                                   \
@@ -983,8 +983,8 @@ static void _name(                                                          \
 #define _ASSERT_FLOAT_ARRAY_CLOSE_METHOD(_type, _zero)                      \
 static void close(                                                          \
         _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
+        char const* const a_src,                                            \
+        char const* const b_src,                                            \
         _type const* const a,                                               \
         _type const* const b,                                               \
         int const length,                                                   \
@@ -1040,10 +1040,10 @@ static void close(                                                          \
 #define _ASSERT_CSTR_A_OP_B_METHOD(_name, _op)                              \
 static void _name(                                                          \
         _TEST_ARGS,                                                         \
-        char const* a_src,                                                  \
-        char const* b_src,                                                  \
-        char const* a,                                                      \
-        char const* b,                                                      \
+        char const* const a_src,                                            \
+        char const* const b_src,                                            \
+        char const* const a,                                                \
+        char const* const b,                                                \
         _TEST_VARGS                                                         \
 ) {                                                                         \
     if (                                                                    \

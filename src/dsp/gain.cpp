@@ -79,7 +79,7 @@ void Gain<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Integer const channels = this->get_channels();
     Sample const* const* const input_buffer = this->input_buffer;

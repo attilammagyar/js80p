@@ -91,7 +91,7 @@ class LFO : public SignalProducer
             Integer const sample_count,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
@@ -119,7 +119,7 @@ class LFO : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:
@@ -204,7 +204,7 @@ class LFO : public SignalProducer
                     Integer const sample_count,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
-                    Sample* buffer
+                    Sample* const buffer
                 ) noexcept;
 
                 bool should_visit_lfo_as_polyphonic(
@@ -336,7 +336,7 @@ class LFO : public SignalProducer
 
         template<class VisitorClass>
         void visit_param_lfo(
-            LFO* lfo,
+            LFO* const lfo,
             Byte& depth,
             VisitorClass& visitor
         ) noexcept;

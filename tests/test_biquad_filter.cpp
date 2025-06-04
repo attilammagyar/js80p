@@ -164,7 +164,7 @@ void assert_completed(
         Number const expected_q,
         Number const expected_gain
 ) {
-    char const* message = (
+    char const* const message = (
         "BiquadFilter failed to complete the timeline of its parameters"
     );
 
@@ -830,7 +830,7 @@ TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
     SumOfSines expected_1(0.0, 440.0, 0.0, 3520.0, 0.33, 7040.0, CHANNELS);
     SumOfSines expected_2(0.33, 440.0, 0.0, 3520.0, 0.0, 7040.0, CHANNELS);
     Envelope envelope("ENV");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -919,7 +919,7 @@ void test_fast_path_continuity(
     constexpr Number tolerance = 0.0065;
 
     Sample input_channel[block_size];
-    Sample* input_channels[FixedSignalProducer::CHANNELS] = {
+    Sample* const input_channels[FixedSignalProducer::CHANNELS] = {
         input_channel, input_channel
     };
     Sample const* const* rendered = NULL;
@@ -1141,7 +1141,7 @@ void set_up_chunk_size_independent_test(
 
 void assert_filter_rendering_is_independent_of_chunk_size(
         Byte const type,
-        char const* message
+        char const* const message
 ) {
     SumOfSines input_1(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);
     SumOfSines input_2(0.5, 440.0, 0.5, 7040.0, 0.0, 0.0, CHANNELS);

@@ -62,7 +62,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         explicit Delay(
             InputSignalProducerClass& input,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Seconds const time_max = Constants::DELAY_TIME_MAX,
             Integer const channels = 0
         ) noexcept;
@@ -70,14 +70,14 @@ class Delay : public Filter<InputSignalProducerClass>
         Delay(
             InputSignalProducerClass& input,
             FloatParamS& time_leader,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         ) noexcept;
 
         Delay(
             InputSignalProducerClass& input,
             FloatParamS& gain_leader,
             FloatParamS& time_leader,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         ) noexcept;
 
         Delay(
@@ -85,7 +85,7 @@ class Delay : public Filter<InputSignalProducerClass>
             FloatParamS& gain_leader,
             Seconds const time,
             Seconds const time_max,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         ) noexcept;
 
         virtual ~Delay();
@@ -143,7 +143,7 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:
@@ -166,7 +166,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         template<DelayBufferWritingMode mode>
         Integer write_delay_buffer(
-            Sample const* const* source_buffer,
+            Sample const* const* const source_buffer,
             Integer const delay_buffer_index,
             Integer const sample_count
         ) noexcept;
@@ -301,14 +301,14 @@ class StereoPannedDelay : public Filter<FilterInputClass>
         StereoPannedDelay(
             InputSignalProducerClass& input,
             StereoPannedDelayMode const stereo_mode,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         );
 
         StereoPannedDelay(
             InputSignalProducerClass& input,
             StereoPannedDelayMode const stereo_mode,
             FloatParamS& delay_time_leader,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         );
 
         StereoPannedDelay(
@@ -316,7 +316,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_time_leader,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
@@ -331,7 +331,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             InputSignalProducerClass& delay_input,
             FilterInputClass& filter_input,
             StereoPannedDelayMode const stereo_mode,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
@@ -341,7 +341,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             StereoPannedDelayMode const stereo_mode,
             FloatParamS& panning_leader,
             FloatParamS& delay_time_leader,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
@@ -352,7 +352,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             FloatParamS& panning_leader,
             FloatParamS& delay_gain_leader,
             FloatParamS& delay_time_leader,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
@@ -364,7 +364,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             FloatParamS& delay_gain_leader,
             Seconds const delay_time,
             Seconds const delay_time_max,
-            ToggleParam const* tempo_sync = NULL,
+            ToggleParam const* const tempo_sync = NULL,
             Integer const number_of_children = 0
         );
 
@@ -377,7 +377,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:
@@ -390,7 +390,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         template<int channel_1, int channel_2>
@@ -398,7 +398,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         bool const is_flipped;
@@ -449,7 +449,7 @@ class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPanne
             StereoPannedDelayMode const stereo_mode,
             FloatParamS& distortion_level_leader,
             Distortion::TypeParam const& distortion_type,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         );
 
         DistortedHighShelfStereoPannedDelay(
@@ -463,7 +463,7 @@ class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPanne
             FloatParamS& high_shelf_filter_gain_leader,
             FloatParamS& distortion_level_leader,
             Distortion::TypeParam const& distortion_type,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         );
 
         DistortedHighShelfStereoPannedDelay(
@@ -478,7 +478,7 @@ class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPanne
             FloatParamS& high_shelf_filter_gain_leader,
             FloatParamS& distortion_level_leader,
             Distortion::TypeParam const& distortion_type,
-            ToggleParam const* tempo_sync = NULL
+            ToggleParam const* const tempo_sync = NULL
         );
 
     private:

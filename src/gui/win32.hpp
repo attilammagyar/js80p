@@ -48,11 +48,11 @@ class Widget : public WidgetBase
         explicit Widget(char const* const text);
         virtual ~Widget();
 
-        virtual void set_text(char const* text) override;
+        virtual void set_text(char const* const text) override;
 
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
-            char const* name
+            char const* const name
         ) override;
 
         virtual void delete_image(GUI::Image image) override;
@@ -106,7 +106,7 @@ class Widget : public WidgetBase
 
         virtual void set_up(
             GUI::PlatformData platform_data,
-            WidgetBase* parent
+            WidgetBase* const parent
         ) override;
 
         virtual void fill_rectangle(

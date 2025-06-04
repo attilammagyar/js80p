@@ -213,7 +213,7 @@ Number Param<NumberType, evaluation>::value_to_ratio(NumberType const value) con
 
 template<typename NumberType, ParamEvaluation evaluation>
 void Param<NumberType, evaluation>::set_midi_controller(
-        MidiController* midi_controller
+        MidiController* const midi_controller
 ) noexcept {
     set_midi_controller< Param<NumberType, evaluation> >(*this, midi_controller);
 }
@@ -223,7 +223,7 @@ template<typename NumberType, ParamEvaluation evaluation>
 template<class ParamClass>
 void Param<NumberType, evaluation>::set_midi_controller(
         ParamClass& param,
-        MidiController* midi_controller
+        MidiController* const midi_controller
 ) noexcept {
     MidiController* const old_midi_controller = param.midi_controller;
 
@@ -254,7 +254,7 @@ MidiController* Param<NumberType, evaluation>::get_midi_controller() const noexc
 
 
 template<typename NumberType, ParamEvaluation evaluation>
-void Param<NumberType, evaluation>::set_macro(Macro* macro) noexcept
+void Param<NumberType, evaluation>::set_macro(Macro* const macro) noexcept
 {
     set_macro< Param<NumberType, evaluation> >(*this, macro);
 }
@@ -264,7 +264,7 @@ template<typename NumberType, ParamEvaluation evaluation>
 template<class ParamClass>
 void Param<NumberType, evaluation>::set_macro(
         ParamClass& param,
-        Macro* macro
+        Macro* const macro
 ) noexcept {
     Macro* const old_macro = param.macro;
 
@@ -300,7 +300,7 @@ void Param<NumberType, evaluation>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Sample const value = (Sample)this->value;
 
@@ -406,8 +406,8 @@ FloatParam<evaluation>::FloatParam(
         Number const default_value,
         Number const round_to,
         Envelope* const* const envelopes,
-        ToggleParam const* log_scale_toggle,
-        Number const* log_scale_table,
+        ToggleParam const* const log_scale_toggle,
+        Number const* const log_scale_table,
         int const log_scale_table_max_index,
         Number const log_scale_table_index_scale,
         Number const log_scale_value_offset,
@@ -441,8 +441,8 @@ FloatParam<evaluation>::FloatParam(
         Number const default_value,
         Number const round_to,
         Envelope* const* const envelopes,
-        ToggleParam const* log_scale_toggle,
-        Number const* log_scale_table,
+        ToggleParam const* const log_scale_toggle,
+        Number const* const log_scale_table,
         int const log_scale_table_max_index,
         Number const log_scale_table_index_scale,
         Number const log_scale_value_offset,
@@ -585,7 +585,7 @@ FloatParam<evaluation>::~FloatParam()
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::check_leaked_envelope_snapshots(char const* event) const noexcept
+void FloatParam<evaluation>::check_leaked_envelope_snapshots(char const* const event) const noexcept
 {
     // JS80P_DEBUG(
         // (
@@ -1658,7 +1658,7 @@ void FloatParam<evaluation>::handle_cancel_event(
 
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::set_midi_controller(
-        MidiController* midi_controller
+        MidiController* const midi_controller
 ) noexcept {
     Param<Number, evaluation>::template set_midi_controller< FloatParam<evaluation> >(
         *this, midi_controller
@@ -1678,7 +1678,7 @@ MidiController* FloatParam<evaluation>::get_midi_controller() const noexcept
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::set_macro(Macro* macro) noexcept
+void FloatParam<evaluation>::set_macro(Macro* const macro) noexcept
 {
     Param<Number, evaluation>::template set_macro< FloatParam<evaluation> >(
         *this, macro
@@ -2238,7 +2238,7 @@ bool FloatParam<evaluation>::has_envelope_decayed() const noexcept
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::set_lfo(LFO* lfo) noexcept
+void FloatParam<evaluation>::set_lfo(LFO* const lfo) noexcept
 {
     this->lfo = lfo;
     this->cancel_events();
@@ -2494,7 +2494,7 @@ void FloatParam<evaluation>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if constexpr (evaluation != ParamEvaluation::SAMPLE) {
         return;
@@ -2528,7 +2528,7 @@ void FloatParam<evaluation>::render_with_lfo_envelope(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
@@ -2554,7 +2554,7 @@ void FloatParam<evaluation>::render_with_lfo(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(lfo_buffer == NULL)) {
         /*
@@ -2586,10 +2586,10 @@ void FloatParam<evaluation>::render_linear_ramp(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Sample sample;
-    Sample* channel = buffer[0];
+    Sample* const channel = buffer[0];
 
     if (linear_ramp_state.is_logarithmic) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -2625,7 +2625,7 @@ void FloatParam<evaluation>::render_with_envelope(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
@@ -2637,7 +2637,7 @@ void FloatParam<evaluation>::render_with_envelope(
         return;
     }
 
-    Sample* buffer_ = buffer[0];
+    Sample* const buffer_ = buffer[0];
     Sample ratio = value_to_ratio(this->get_raw_value());
 
     Envelope::render<Envelope::RenderingMode::OVERWRITE>(
@@ -2974,7 +2974,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     FloatParamS::render(round, first_sample_index, last_sample_index, buffer);
 
@@ -2982,8 +2982,8 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
         return;
     }
 
-    Sample const* mod = modulator_buffer;
-    Sample const* mod_level = modulation_level_buffer;
+    Sample const* const mod = modulator_buffer;
+    Sample const* const mod_level = modulation_level_buffer;
 
     if (mod_level == NULL) {
         Number const mod_level_value = modulation_level.get_value();

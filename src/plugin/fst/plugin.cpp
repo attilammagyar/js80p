@@ -118,9 +118,9 @@ AEffect* FstPlugin::create_instance(
         audioMasterCallback const host_callback_ptr,
         GUI::PlatformData const platform_data
 ) noexcept {
-    AEffect* effect = new AEffect();
+    AEffect* const effect = new AEffect();
 
-    FstPlugin* fst_plugin = new FstPlugin(
+    FstPlugin* const fst_plugin = new FstPlugin(
         effect, host_callback_ptr, platform_data
     );
 
@@ -161,7 +161,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         void* pointer,
         float fvalue
 ) {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     // if (
             // true
@@ -210,7 +210,7 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return fst_plugin->get_program();
 
         case effSetProgramName:
-            fst_plugin->set_program_name((const char*)pointer);
+            fst_plugin->set_program_name((char const*)pointer);
             return 0;
 
         case effGetProgramName:
@@ -342,7 +342,7 @@ void VSTCALLBACK FstPlugin::process_accumulating(
         float** outdata,
         VstInt32 frames
 ) {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     fst_plugin->generate_and_add_samples(frames, indata, outdata);
 }
@@ -354,7 +354,7 @@ void VSTCALLBACK FstPlugin::process_replacing(
         float** outdata,
         VstInt32 frames
 ) {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     fst_plugin->generate_samples<float>(frames, indata, outdata);
 }
@@ -366,7 +366,7 @@ void VSTCALLBACK FstPlugin::process_double_replacing(
         double** outdata,
         VstInt32 frames
 ) {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     fst_plugin->generate_samples<double>(frames, indata, outdata);
 }
@@ -374,7 +374,7 @@ void VSTCALLBACK FstPlugin::process_double_replacing(
 
 float VSTCALLBACK FstPlugin::get_parameter(AEffect* effect, VstInt32 index)
 {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     return fst_plugin->get_parameter((size_t)index);
 }
@@ -385,7 +385,7 @@ void VSTCALLBACK FstPlugin::set_parameter(
         VstInt32 index,
         float fvalue
 ) {
-    JS80P::FstPlugin* fst_plugin = (JS80P::FstPlugin*)effect->object;
+    JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
     fst_plugin->set_parameter((size_t)index, fvalue);
 }
@@ -458,7 +458,7 @@ void FstPlugin::populate_parameters(
 
 FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
         Synth::ControllerId const controller_id,
-        MidiController* midi_controller,
+        MidiController* const midi_controller,
         Synth& synth
 ) noexcept {
     return Parameter(
@@ -833,7 +833,7 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
     clear_received_midi_cc();
 
     for (VstInt32 i = 0; i < events->numEvents; ++i) {
-        VstEvent* event = events->events[i];
+        VstEvent* const event = events->events[i];
 
         if (event->type == kVstMidiType) {
             process_vst_midi_event((VstMidiEvent*)event);
@@ -849,11 +849,11 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
 
 
 VstIntPtr FstPlugin::host_callback(
-        VstInt32 op_code,
-        VstInt32 index,
-        VstIntPtr ivalue,
-        void* pointer,
-        float fvalue
+        VstInt32 const op_code,
+        VstInt32 const index,
+        VstIntPtr const ivalue,
+        void* const pointer,
+        float const fvalue
 ) const noexcept {
     if (host_callback_ptr == NULL) {
         return 0;
@@ -991,7 +991,7 @@ Midi::Byte FstPlugin::float_to_midi_byte(float const value) const noexcept
 
 void FstPlugin::update_bpm() noexcept
 {
-    VstTimeInfo const* time_info = (
+    VstTimeInfo const* const time_info = (
         (VstTimeInfo const*)host_callback(audioMasterGetTime, 0, kVstTempoValid)
     );
 
@@ -1052,7 +1052,7 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 }
 
 
-void FstPlugin::set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept
+void FstPlugin::set_chunk(void const* const chunk, VstIntPtr const size, bool is_preset) noexcept
 {
     process_internal_messages_in_gui_thread();
 
@@ -1155,7 +1155,7 @@ void FstPlugin::set_program(size_t index) noexcept
 }
 
 
-VstIntPtr FstPlugin::get_program_name(char* name, size_t index) noexcept
+VstIntPtr FstPlugin::get_program_name(char* const name, size_t index) noexcept
 {
     process_internal_messages_in_gui_thread();
 
@@ -1174,7 +1174,7 @@ VstIntPtr FstPlugin::get_program_name(char* name, size_t index) noexcept
 }
 
 
-void FstPlugin::get_program_name(char* name) noexcept
+void FstPlugin::get_program_name(char* const name) noexcept
 {
     process_internal_messages_in_gui_thread();
 
@@ -1187,7 +1187,7 @@ void FstPlugin::get_program_name(char* name) noexcept
 }
 
 
-void FstPlugin::set_program_name(const char* name)
+void FstPlugin::set_program_name(char const* const name)
 {
     process_internal_messages_in_gui_thread();
 
@@ -1251,8 +1251,8 @@ FstPlugin::Parameter::Parameter()
 
 
 FstPlugin::Parameter::Parameter(
-        char const* name,
-        MidiController* midi_controller,
+        char const* const name,
+        MidiController* const midi_controller,
         Midi::Controller const controller_id
 ) : midi_controller(midi_controller),
     name(name),
@@ -1362,7 +1362,7 @@ bool FstPlugin::is_automatable(size_t index) noexcept
 }
 
 
-void FstPlugin::get_param_label(size_t index, char* buffer) noexcept
+void FstPlugin::get_param_label(size_t index, char* const buffer) noexcept
 {
     process_internal_messages_in_gui_thread();
 
@@ -1371,7 +1371,7 @@ void FstPlugin::get_param_label(size_t index, char* buffer) noexcept
 }
 
 
-void FstPlugin::get_param_display(size_t index, char* buffer) noexcept
+void FstPlugin::get_param_display(size_t index, char* const buffer) noexcept
 {
     process_internal_messages_in_gui_thread();
 
@@ -1401,7 +1401,7 @@ void FstPlugin::get_param_display(size_t index, char* buffer) noexcept
 }
 
 
-void FstPlugin::get_param_name(size_t index, char* buffer) noexcept
+void FstPlugin::get_param_name(size_t index, char* const buffer) noexcept
 {
     process_internal_messages_in_gui_thread();
 

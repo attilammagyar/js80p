@@ -214,7 +214,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void handle_event(Event const& event) noexcept;
@@ -276,7 +276,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         template<
@@ -289,7 +289,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         template<bool single_partial, bool has_subharmonic>
@@ -298,7 +298,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         template<

@@ -1360,7 +1360,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void finalize_rendering(
@@ -1425,7 +1425,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
-                    Sample** buffer
+                    Sample** const buffer
                 ) noexcept;
 
             private:
@@ -1439,7 +1439,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 template<class VoiceClass, bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
                 void render_voices(
-                    VoiceClass* (&voices)[POLYPHONY],
+                    VoiceClass* const (&voices)[POLYPHONY],
                     size_t const voices_count,
                     typename VoiceClass::Params const& params,
                     Integer const round,
@@ -1508,10 +1508,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
                         static constexpr Integer NAME_MAX_INDEX = NAME_SIZE - 1;
 
                         Entry() noexcept;
-                        Entry(const char* name, ParamId const param_id) noexcept;
+                        Entry(char const* const name, ParamId const param_id) noexcept;
                         ~Entry();
 
-                        void set(const char* name, ParamId const param_id) noexcept;
+                        void set(char const* const name, ParamId const param_id) noexcept;
 
                         Entry *next;
                         char name[NAME_SIZE];

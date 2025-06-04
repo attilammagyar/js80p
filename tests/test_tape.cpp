@@ -82,7 +82,7 @@ TEST(when_bypass_toggle_value_is_matched_then_tape_is_engaged_otherwise_bypassed
     Sample distorted[BLOCK_SIZE] = {
         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
     };
-    Sample* input_channels[FixedSignalProducer::CHANNELS] = {
+    Sample* const input_channels[FixedSignalProducer::CHANNELS] = {
         input_channel, input_channel
     };
     FixedSignalProducer input(input_channels);
@@ -207,7 +207,7 @@ void test_tape_stop(std::array<TapeStopTestStep, step_count> const& steps)
     Sample silence[BLOCK_SIZE] = {
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
     };
-    Sample* input_channels[FixedSignalProducer::CHANNELS] = {
+    Sample* const input_channels[FixedSignalProducer::CHANNELS] = {
         input_channel, input_channel
     };
     FixedSignalProducer input(input_channels);

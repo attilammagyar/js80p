@@ -636,7 +636,7 @@ void schedule_100hz_tuning(
 
 void assert_completed(SimpleOscillator& oscillator)
 {
-    char const* message = (
+    char const* const message = (
         "Oscillator failed to complete the timeline of its parameters"
     );
 

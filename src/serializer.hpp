@@ -81,7 +81,7 @@ class Serializer
         ) noexcept;
 
         static void trim_excess_zeros_from_end_after_snprintf(
-            char* number,
+            char* const number,
             int const length,
             size_t const max_length
         ) noexcept;
@@ -120,7 +120,7 @@ class Serializer
         ) noexcept;
 
         template<Thread thread>
-        static void process_lines(Synth& synth, Lines* lines) noexcept;
+        static void process_lines(Synth& synth, Lines const* const lines) noexcept;
 
         template<Thread thread>
         static void send_message(

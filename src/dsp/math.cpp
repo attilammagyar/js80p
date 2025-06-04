@@ -841,7 +841,7 @@ Number Math::lookup(
 
 template<bool is_index_positive>
 Number Math::lookup_periodic(
-        Number const* table,
+        Number const* const table,
         int const table_size,
         Number const index
 ) noexcept {
@@ -870,7 +870,7 @@ Number Math::lookup_periodic(
 
 
 Number Math::lookup_periodic_2(
-        Number const* table,
+        Number const* const table,
         int const table_size,
         int const table_index_mask,
         Number const index

@@ -185,7 +185,7 @@ void Bank::Program::import(std::string const& serialized)
 
 void Bank::Program::import_without_update(std::string const& serialized)
 {
-    Serializer::Lines* lines = Serializer::parse_lines(serialized);
+    Serializer::Lines* const lines = Serializer::parse_lines(serialized);
     Serializer::Lines::const_iterator it = lines->begin();
 
     import_without_update(it, lines->end());
@@ -217,8 +217,8 @@ void Bank::Program::import_without_update(
 
     for (; it != end; ++it) {
         std::string const& line = *it;
+        std::string::const_iterator const line_end = line.end();
         std::string::const_iterator line_it = line.begin();
-        std::string::const_iterator line_end = line.end();
 
         if (Serializer::parse_section_name(line, section_name)) {
             if (is_js80p_section) {
@@ -350,9 +350,9 @@ void Bank::set_current_program_index(size_t const new_index)
 
 void Bank::import(std::string const& serialized_bank)
 {
-    Serializer::Lines* lines = Serializer::parse_lines(serialized_bank);
+    Serializer::Lines* const lines = Serializer::parse_lines(serialized_bank);
     Serializer::Lines::const_iterator it = lines->begin();
-    Serializer::Lines::const_iterator end = lines->end();
+    Serializer::Lines::const_iterator const end = lines->end();
     size_t next_program_index = 0;
 
     while (it != end && next_program_index < NUMBER_OF_PROGRAMS) {
@@ -367,9 +367,9 @@ void Bank::import(std::string const& serialized_bank)
 
 void Bank::import_names(std::string const& serialized_bank)
 {
-    Serializer::Lines* lines = Serializer::parse_lines(serialized_bank);
+    Serializer::Lines* const lines = Serializer::parse_lines(serialized_bank);
     Serializer::Lines::const_iterator it = lines->begin();
-    Serializer::Lines::const_iterator end = lines->end();
+    Serializer::Lines::const_iterator const end = lines->end();
     size_t next_program_index = 0;
     Program dummy_program;
 

@@ -1818,7 +1818,7 @@ constexpr int pos_rel_offset_top = 0;
 
 
 GUI::GUI(
-        char const* sdk_version,
+        char const* const sdk_version,
         PlatformData platform_data,
         PlatformWidget parent_window,
         Synth& synth,
@@ -2061,7 +2061,7 @@ GUI::GUI(
 }
 
 
-void GUI::build_about_body(char const* sdk_version)
+void GUI::build_about_body(char const* const sdk_version)
 {
     about_body = new TabBody(*this, "About");
 
@@ -2076,9 +2076,9 @@ void GUI::build_about_body(char const* sdk_version)
 
 
 void GUI::build_macros_1_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions,
-        ParamStateImages const* macro_midpoint_states
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const macro_distortions,
+        ParamStateImages const* const macro_midpoint_states
 ) {
     macros_1_body = new TabBody(*this, "Macros 1-10");
 
@@ -2248,9 +2248,9 @@ void GUI::build_macros_1_body(
 
 
 void GUI::build_macros_2_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions,
-        ParamStateImages const* macro_midpoint_states
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const macro_distortions,
+        ParamStateImages const* const macro_midpoint_states
 ) {
     macros_2_body = new TabBody(*this, "Macros 11-20");
 
@@ -2420,9 +2420,9 @@ void GUI::build_macros_2_body(
 
 
 void GUI::build_macros_3_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* macro_distortions,
-        ParamStateImages const* macro_midpoint_states
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const macro_distortions,
+        ParamStateImages const* const macro_midpoint_states
 ) {
     macros_3_body = new TabBody(*this, "Macros 21-30");
 
@@ -2592,9 +2592,9 @@ void GUI::build_macros_3_body(
 
 
 void GUI::build_effects_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* knob_states_red,
-        ParamStateImages const* reversed_toggle_states
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const knob_states_red,
+        ParamStateImages const* const reversed_toggle_states
 ) {
     effects_body = new TabBody(*this, "Effects");
 
@@ -2716,10 +2716,10 @@ void GUI::build_effects_body(
 
 
 void GUI::build_envelopes_1_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* screw_states,
-        ParamStateImages const* envelope_shapes_01,
-        ParamStateImages const* envelope_shapes_10
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const screw_states,
+        ParamStateImages const* const envelope_shapes_01,
+        ParamStateImages const* const envelope_shapes_10
 ) {
     envelopes_1_body = new TabBody(*this, "Envelopes");
 
@@ -2895,10 +2895,10 @@ void GUI::build_envelopes_1_body(
 
 
 void GUI::build_envelopes_2_body(
-        ParamStateImages const* knob_states,
-        ParamStateImages const* screw_states,
-        ParamStateImages const* envelope_shapes_01,
-        ParamStateImages const* envelope_shapes_10
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const screw_states,
+        ParamStateImages const* const envelope_shapes_01,
+        ParamStateImages const* const envelope_shapes_10
 ) {
     envelopes_2_body = new TabBody(*this, "Envelopes");
 
@@ -3073,7 +3073,7 @@ void GUI::build_envelopes_2_body(
 }
 
 
-void GUI::build_lfos_body(ParamStateImages const* knob_states)
+void GUI::build_lfos_body(ParamStateImages const* const knob_states)
 {
     lfos_body = new TabBody(*this, "LFOs");
 
@@ -3209,8 +3209,10 @@ void GUI::build_lfos_body(ParamStateImages const* knob_states)
 }
 
 
-void GUI::build_synth_body(ParamStateImages const* knob_states, ParamStateImages const* screw_states)
-{
+void GUI::build_synth_body(
+        ParamStateImages const* const knob_states,
+        ParamStateImages const* const screw_states
+) {
     constexpr char const* const* nh = JS80P::GUI::NOTE_HANDLING_MODES;
     constexpr int nhc = JS80P::GUI::NOTE_HANDLING_MODES_COUNT;
 
@@ -3428,7 +3430,7 @@ void GUI::update_synth_state()
 }
 
 
-void GUI::set_status_line(char const* text)
+void GUI::set_status_line(char const* const text)
 {
     if (text[0] == '\x00') {
         status_line->set_text(default_status_line);
@@ -3557,7 +3559,7 @@ int WidgetBase::get_height() const
 }
 
 
-void WidgetBase::set_text(char const* text)
+void WidgetBase::set_text(char const* const text)
 {
     this->text = text;
 }
@@ -3577,7 +3579,7 @@ WidgetBase* WidgetBase::get_parent() const
 
 GUI::Image WidgetBase::load_image(
     GUI::PlatformData platform_data,
-    char const* name
+    char const* const name
 ) {
     return NULL;
 }
@@ -3650,8 +3652,10 @@ void WidgetBase::click()
 }
 
 
-void WidgetBase::set_up(GUI::PlatformData platform_data, WidgetBase* parent)
-{
+void WidgetBase::set_up(
+        GUI::PlatformData platform_data,
+        WidgetBase* const parent
+) {
     this->platform_data = platform_data;
     this->parent = parent;
 }

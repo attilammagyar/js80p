@@ -89,7 +89,7 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:

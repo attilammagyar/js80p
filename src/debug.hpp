@@ -57,7 +57,7 @@
     bool const _js80p_use_stderr = (                                        \
         strncmp("STDERR", JS80P_TO_STRING(JS80P_DEBUG_LOG), 7) == 0         \
     );                                                                      \
-    FILE* _js80p_f = (                                                      \
+    FILE* const _js80p_f = (                                                      \
         _js80p_use_stderr                                                   \
             ? stderr                                                        \
             : fopen(JS80P_TO_STRING(JS80P_DEBUG_LOG), "a+")                 \

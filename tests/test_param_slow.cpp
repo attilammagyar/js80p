@@ -38,7 +38,7 @@ using namespace JS80P;
 
 
 void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
-        Number const* table,
+        Number const* const table,
         int const max_index,
         Number const index_scale,
         Number const min,

@@ -50,15 +50,15 @@ TEST(renders_and_sums_positive_weight_input_signals, {
         {0.11, 0.22, 0.33, 0.44, 0.55},
         {0.22, 0.44, 0.66, 0.88, 1.10},
     };
-    Sample const* input_buffer_1[CHANNELS] = {
+    Sample const* const input_buffer_1[CHANNELS] = {
         (Sample const*)&input_samples_1[0],
         (Sample const*)&input_samples_1[1]
     };
-    Sample const* input_buffer_2[CHANNELS] = {
+    Sample const* const input_buffer_2[CHANNELS] = {
         (Sample const*)&input_samples_2[0],
         (Sample const*)&input_samples_2[1]
     };
-    Sample const* input_buffer_3[CHANNELS] = {
+    Sample const* const input_buffer_3[CHANNELS] = {
         (Sample const*)&input_samples_3[0],
         (Sample const*)&input_samples_3[1]
     };

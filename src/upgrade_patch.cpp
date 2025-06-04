@@ -28,7 +28,7 @@
 #include "synth.hpp"
 
 
-bool read_patch(char const* file_path, std::string& result)
+bool read_patch(char const* const file_path, std::string& result)
 {
     std::ifstream patch_file(file_path, std::ios::in | std::ios::binary);
 
@@ -36,7 +36,7 @@ bool read_patch(char const* file_path, std::string& result)
         return false;
     }
 
-    char* buffer = new char[JS80P::Serializer::MAX_SIZE];
+    char* const buffer = new char[JS80P::Serializer::MAX_SIZE];
 
     std::fill_n(buffer, JS80P::Serializer::MAX_SIZE, '\x00');
     patch_file.read(buffer, JS80P::Serializer::MAX_SIZE);
@@ -61,7 +61,7 @@ bool is_whole_line_comment_or_white_space(std::string const& line)
 
 void collect_comments(std::string const& patch, JS80P::Serializer::Lines& comments)
 {
-    JS80P::Serializer::Lines* lines = JS80P::Serializer::parse_lines(patch);
+    JS80P::Serializer::Lines* const lines = JS80P::Serializer::parse_lines(patch);
 
     for (JS80P::Serializer::Lines::const_iterator it = lines->begin(); it != lines->end(); ++it) {
         std::string const& line = *it;
@@ -74,7 +74,7 @@ void collect_comments(std::string const& patch, JS80P::Serializer::Lines& commen
 
 
 bool write_patch(
-        char const* file_path,
+        char const* const file_path,
         std::string const& patch,
         JS80P::Serializer::Lines const& comments
 ) {
@@ -100,7 +100,7 @@ bool write_patch(
 }
 
 
-int error(char const* message, char const* file_path)
+int error(char const* const message, char const* const file_path)
 {
     std::cerr
         << "ERROR: "
