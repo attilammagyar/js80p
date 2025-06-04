@@ -237,7 +237,7 @@ DEFINE_FUNC(
 );
 
 
-void usage(char const* name)
+void usage(char const* const name)
 {
     char const** next_func_name = &(func_names[0]);
 

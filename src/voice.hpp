@@ -151,7 +151,7 @@ class Voice : public SignalProducer
                     Number const c,
                     Number const d,
                     Number const e,
-                    Envelope* const* envelopes
+                    Envelope* const* const envelopes
                 ) noexcept;
         };
 
@@ -160,7 +160,7 @@ class Voice : public SignalProducer
             public:
                 explicit Params(
                     std::string const& name,
-                    Envelope* const* envelopes = NULL
+                    Envelope* const* const envelopes = NULL
                 ) noexcept;
 
                 TuningParam tuning;
@@ -238,7 +238,7 @@ class Voice : public SignalProducer
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
-                    Sample** buffer
+                    Sample** const buffer
                 ) noexcept;
 
             private:
@@ -271,8 +271,8 @@ class Voice : public SignalProducer
             Number const oscillator_inaccuracy_seed,
             Params& param_leaders,
             FloatParamS& additive_volume_leader,
-            BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
+            BiquadFilterSharedBuffers* const filter_1_shared_buffers = NULL,
+            BiquadFilterSharedBuffers* const filter_2_shared_buffers = NULL
         ) noexcept;
 
         Voice(
@@ -286,8 +286,8 @@ class Voice : public SignalProducer
             FloatParamS& amplitude_modulation_level_leader,
             FloatParamS& frequency_modulation_level_leader,
             FloatParamS& phase_modulation_level_leader,
-            BiquadFilterSharedBuffers* filter_1_shared_buffers = NULL,
-            BiquadFilterSharedBuffers* filter_2_shared_buffers = NULL
+            BiquadFilterSharedBuffers* const filter_1_shared_buffers = NULL,
+            BiquadFilterSharedBuffers* const filter_2_shared_buffers = NULL
         ) noexcept;
 
         virtual void reset() noexcept override;
@@ -370,7 +370,7 @@ class Voice : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:

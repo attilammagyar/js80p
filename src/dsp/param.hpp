@@ -85,10 +85,10 @@ class Param : public SignalProducer
         NumberType ratio_to_value(Number const ratio) const noexcept;
         Number value_to_ratio(NumberType const value) const noexcept;
 
-        void set_midi_controller(MidiController* midi_controller) noexcept;
+        void set_midi_controller(MidiController* const midi_controller) noexcept;
         MidiController* get_midi_controller() const noexcept;
 
-        void set_macro(Macro* macro) noexcept;
+        void set_macro(Macro* const macro) noexcept;
         Macro* get_macro() const noexcept;
 
         /**
@@ -103,11 +103,11 @@ class Param : public SignalProducer
         template<class ParamClass>
         static void set_midi_controller(
             ParamClass& param,
-            MidiController* midi_controller
+            MidiController* const midi_controller
         ) noexcept;
 
         template<class ParamClass>
-        static void set_macro(ParamClass& param, Macro* macro) noexcept;
+        static void set_macro(ParamClass& param, Macro* const macro) noexcept;
 
         NumberType get_raw_value() const noexcept;
 
@@ -115,7 +115,7 @@ class Param : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         NumberType clamp(NumberType const value) const noexcept;
@@ -332,8 +332,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const default_value = 0.0,
             Number const round_to = 0.0,
             Envelope* const* const envelopes = NULL,
-            ToggleParam const* log_scale_toggle = NULL,
-            Number const* log_scale_table = NULL,
+            ToggleParam const* const log_scale_toggle = NULL,
+            Number const* const log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
             Number const log_scale_table_index_scale = 0.0,
             Number const log_scale_value_offset = 0.0,
@@ -348,8 +348,8 @@ class FloatParam : public Param<Number, evaluation>
             Number const default_value = 0.0,
             Number const round_to = 0.0,
             Envelope* const* const envelopes = NULL,
-            ToggleParam const* log_scale_toggle = NULL,
-            Number const* log_scale_table = NULL,
+            ToggleParam const* const log_scale_toggle = NULL,
+            Number const* const log_scale_table = NULL,
             int const log_scale_table_max_index = 0,
             Number const log_scale_table_index_scale = 0.0,
             Number const log_scale_value_offset = 0.0,
@@ -437,7 +437,7 @@ class FloatParam : public Param<Number, evaluation>
         void set_midi_controller(MidiController* midi_controller) noexcept;
         MidiController* get_midi_controller() const noexcept;
 
-        void set_macro(Macro* macro) noexcept;
+        void set_macro(Macro* const macro) noexcept;
         Macro* get_macro() const noexcept;
 
         void set_random_seed(Number const seed) noexcept;
@@ -461,7 +461,7 @@ class FloatParam : public Param<Number, evaluation>
 
         bool has_envelope_decayed() const noexcept;
 
-        void set_lfo(LFO* lfo) noexcept;
+        void set_lfo(LFO* const lfo) noexcept;
         LFO* get_lfo() const noexcept;
 
         virtual void reset() noexcept override;
@@ -476,7 +476,7 @@ class FloatParam : public Param<Number, evaluation>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void handle_event(SignalProducer::Event const& event) noexcept;
@@ -646,7 +646,7 @@ class FloatParam : public Param<Number, evaluation>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void render_with_lfo_envelope(
@@ -654,21 +654,21 @@ class FloatParam : public Param<Number, evaluation>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         void render_linear_ramp(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void render_with_envelope(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         void start_envelope(
@@ -707,7 +707,7 @@ class FloatParam : public Param<Number, evaluation>
             EnvelopeSnapshot& snapshot
         ) noexcept;
 
-        void check_leaked_envelope_snapshots(char const* event) const noexcept;
+        void check_leaked_envelope_snapshots(char const* const event) const noexcept;
 
         FloatParam<evaluation>* const leader;
         Envelope* const* const envelopes;
@@ -796,7 +796,7 @@ class ModulatableFloatParam : public FloatParamS
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:

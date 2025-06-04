@@ -58,7 +58,7 @@ TEST(when_delay_time_is_zero_then_copies_input_samples_unchanged, {
         {0.10, 0.20, 0.30, 0.40, 0.50, 0.10, 0.20, 0.30, 0.40, 0.50},
         {0.20, 0.40, 0.60, 0.80, 1.00, 0.20, 0.40, 0.60, 0.80, 1.00},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -106,7 +106,7 @@ void test_basic_delay(
         {0.000, 0.000, 0.025, 0.075, 0.125, 0.175, 0.225, 0.150, 0.250, 0.050},
         {0.000, 0.000, 0.050, 0.150, 0.250, 0.350, 0.450, 0.300, 0.500, 0.100},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -169,7 +169,7 @@ TEST(channels_may_be_adjusted_with_separate_lfos, {
         {0.000, 0.000, 0.000, 0.025, 0.075, 0.125, 0.175, 0.225, 0.200, 0.250},
         {0.000, 0.000, 0.000, 0.000, 0.050, 0.150, 0.250, 0.350, 0.300, 0.400},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -264,7 +264,7 @@ void test_delay_with_time_scale_param(
             0.350, 0.450, 0.300, 0.150, 0.250,
         },
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -340,7 +340,7 @@ TEST(block_size_may_be_larger_than_max_delay_time, {
         {0.0, 0.0, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3, 0.1, 0.1, 0.1, 0.1},
         {0.0, 0.0, 0.0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.6, 0.2, 0.2, 0.2, 0.2},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -393,11 +393,11 @@ void test_delay_with_feedback(
         {0.00, 0.00, 0.05, 0.10, 0.15, 0.06, 0.12, 0.36, 0.12, 0.24, 0.36, 0.12},
         {0.00, 0.00, 0.10, 0.20, 0.30, 0.12, 0.24, 0.72, 0.24, 0.48, 0.72, 0.24},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
-    Sample const* feedback_buffer[CHANNELS] = {
+    Sample const* const feedback_buffer[CHANNELS] = {
         (Sample const*)&feedback_samples[0],
         (Sample const*)&feedback_samples[1]
     };
@@ -470,11 +470,11 @@ TEST(feedback_signal_merging_is_independent_of_rendered_sample_count, {
         {0.00, 0.00, 0.10, 0.20, 0.30, 0.11, 0.12, 0.23, 0.31, 0.11, 0.22, 0.13, 0.11, 0.22, 0.11},
         {0.00, 0.00, 0.20, 0.40, 0.60, 0.22, 0.24, 0.46, 0.62, 0.22, 0.44, 0.26, 0.22, 0.44, 0.22},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
-    Sample const* feedback_buffer[CHANNELS] = {
+    Sample const* const feedback_buffer[CHANNELS] = {
         (Sample const*)&feedback_samples[0],
         (Sample const*)&feedback_samples[1]
     };
@@ -540,7 +540,7 @@ TEST(reset_clears_the_delay_buffer, {
         {0.0, 0.0, 0.10, 0.20, 0.30},
         {0.0, 0.0, 0.20, 0.40, 0.60},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -623,11 +623,11 @@ TEST(identical_delays_may_share_delay_buffer, {
         {0.00, 0.00, 0.05, 0.10, 0.15, 0.06},
         {0.00, 0.00, 0.10, 0.20, 0.30, 0.12},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
-    Sample const* feedback_buffer[CHANNELS] = {
+    Sample const* const feedback_buffer[CHANNELS] = {
         (Sample const*)&feedback_samples[0],
         (Sample const*)&feedback_samples[1]
     };
@@ -780,7 +780,7 @@ TEST(delay_may_be_reversed, {
             envelope * gain * (0.8 * 0.2 + 0.2 * 1.0),
         }
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -874,7 +874,7 @@ TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part_of_the_de
             envelope * 0.35,
         }
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -937,12 +937,12 @@ template<class StereoPannedDelayClass>
 void test_stereo_panned_delay(
         StereoPannedDelayClass& stereo_panned_delay,
         FixedSignalProducer& input,
-        char const* class_name,
+        char const* const class_name,
         Integer const block_size,
         Integer const rounds,
         Number const panning_scale,
-        Sample const* const* input_buffer,
-        Sample const* const* expected_output
+        Sample const* const* const input_buffer,
+        Sample const* const* const expected_output
 ) {
     constexpr Frequency sample_rate = 10.0;
 
@@ -989,7 +989,7 @@ template<class StereoPannedDelayClass>
 void test_stereo_panned_delay(
         StereoPannedDelayClass& stereo_panned_delay,
         FixedSignalProducer& input,
-        char const* class_name
+        char const* const class_name
 ) {
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
@@ -1015,22 +1015,22 @@ void test_stereo_panned_delay(
         {0.000, 0.000, 0.150, 0.300, 0.450, 0.600, 0.750, 0.150, 0.300, 0.450},
     };
 
-    Sample const* input_buffer[FixedSignalProducer::CHANNELS] = {
+    Sample const* const input_buffer[FixedSignalProducer::CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
 
-    Sample const* expected_output_full_panning[] = {
+    Sample const* const expected_output_full_panning[] = {
         (Sample const*)&expected_output_full_panning_samples[0],
         (Sample const*)&expected_output_full_panning_samples[1],
     };
 
-    Sample const* expected_output_opposite_panning[] = {
+    Sample const* const expected_output_opposite_panning[] = {
         (Sample const*)&expected_output_opposite_panning_samples[0],
         (Sample const*)&expected_output_opposite_panning_samples[1],
     };
 
-    Sample const* expected_output_no_panning[] = {
+    Sample const* const expected_output_no_panning[] = {
         (Sample const*)&expected_output_no_panning_samples[0],
         (Sample const*)&expected_output_no_panning_samples[1],
     };

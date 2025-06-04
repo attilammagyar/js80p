@@ -51,13 +51,13 @@ class Mixer : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
     private:
         class Input {
             public:
-                explicit Input(InputSignalProducerClass* input);
+                explicit Input(InputSignalProducerClass* const input);
 
                 Input(Input const& input) = default;
                 Input(Input&& input) = default;
@@ -65,7 +65,7 @@ class Mixer : public SignalProducer
                 Input& operator=(Input const& input) = default;
                 Input& operator=(Input&& input) = default;
 
-                InputSignalProducerClass* input;
+                InputSignalProducerClass* const input;
                 Sample const* const* buffer;
                 Number weight;
         };
@@ -77,7 +77,7 @@ class Mixer : public SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         std::vector<Input> inputs;

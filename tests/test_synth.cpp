@@ -383,7 +383,7 @@ TEST(all_notes_off_message_turns_off_all_notes_at_the_specified_time, {
     );
     Sample const* const* rendered_samples;
     Sample const* const* sines;
-    Sample* expected_samples = new Sample[block_size];
+    Sample* const expected_samples = new Sample[block_size];
 
     synth.set_block_size(block_size);
     synth.set_sample_rate(sample_rate);
@@ -425,7 +425,7 @@ TEST(all_notes_off_message_clears_note_stack, {
 
     Synth synth;
     Sample const* const* rendered_samples;
-    Sample* expected_samples = new Sample[block_size];
+    Sample* const expected_samples = new Sample[block_size];
 
     synth.set_block_size(block_size);
     synth.set_sample_rate(sample_rate);
@@ -926,7 +926,7 @@ void test_gc_decayed_vs_new_note_while_sustaining(
 
     Synth synth(0);
     Sample const* const* rendered_samples = SignalProducer::produce<Synth>(synth, 3);
-    Sample* expected_samples;
+    Sample* const expected_samples = new Sample[block_size];
 
     synth.set_block_size(block_size);
     synth.set_sample_rate(22050.0);
@@ -954,7 +954,6 @@ void test_gc_decayed_vs_new_note_while_sustaining(
 
     rendered_samples = SignalProducer::produce<Synth>(synth, 3);
 
-    expected_samples = new Sample[block_size];
     std::fill_n(expected_samples, block_size, 0.0);
 
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA, sustain_type);

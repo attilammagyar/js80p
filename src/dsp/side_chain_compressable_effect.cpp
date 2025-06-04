@@ -96,7 +96,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Sample const* const* buffer = (
+    Sample const* const* const buffer = (
         Effect<InputSignalProducerClass>::initialize_rendering(
             round, sample_count
         )
@@ -232,7 +232,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (is_bypassing) {
         Effect<InputSignalProducerClass>::render(
@@ -250,9 +250,9 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
         return;
     }
 
-    Sample const* dry_buffer = this->dry_buffer;
-    Sample const* wet_buffer = this->wet_buffer;
-    Sample const* gain_buffer = this->gain_buffer;
+    Sample const* const dry_buffer = this->dry_buffer;
+    Sample const* const wet_buffer = this->wet_buffer;
+    Sample const* const gain_buffer = this->gain_buffer;
 
     Integer const channels = this->channels;
 

@@ -138,7 +138,7 @@ class WavBuffer
 };
 
 
-void usage(char const* name)
+void usage(char const* const name)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "\n");
@@ -321,7 +321,7 @@ int main(int const argc, char const* argv[])
     std::ofstream out_file(out_file_name, std::ios::out | std::ios::binary);
 
     if (!out_file.is_open()) {
-        char const* error_msg = strerror(errno);
+        char const* const error_msg = strerror(errno);
 
         fprintf(
             stderr,

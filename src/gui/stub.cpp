@@ -58,7 +58,7 @@ class Widget : public WidgetBase
 
         virtual GUI::Image load_image(
                 GUI::PlatformData platform_data,
-                char const* name
+                char const* const name
         ) override {
             return (GUI::Image)new DummyObject();
         }

@@ -196,7 +196,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
         Number const c,
         Number const d,
         Number const e,
-        Envelope* const* envelopes
+        Envelope* const* const envelopes
 ) noexcept {
 }
 
@@ -204,7 +204,7 @@ Voice<ModulatorSignalProducerClass>::Dummy::Dummy(
 template<class ModulatorSignalProducerClass>
 Voice<ModulatorSignalProducerClass>::Params::Params(
         std::string const& name,
-        Envelope* const* envelopes
+        Envelope* const* const envelopes
 ) noexcept
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
@@ -385,11 +385,11 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
-    Sample const* volume_buffer = this->volume_buffer;
-    Sample const* velocity_buffer = this->velocity_buffer;
+    Sample const* const volume_buffer = this->volume_buffer;
+    Sample const* const velocity_buffer = this->velocity_buffer;
 
     if (volume_buffer == NULL) {
         Sample const volume_value = this->volume_value;
@@ -444,8 +444,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         Number const oscillator_inaccuracy_seed,
         Params& param_leaders,
         FloatParamS& additive_volume_leader,
-        BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers
+        BiquadFilterSharedBuffers* const filter_1_shared_buffers,
+        BiquadFilterSharedBuffers* const filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     additive_volume(additive_volume_leader, status),
@@ -532,8 +532,8 @@ Voice<ModulatorSignalProducerClass>::Voice(
         FloatParamS& amplitude_modulation_level_leader,
         FloatParamS& frequency_modulation_level_leader,
         FloatParamS& phase_modulation_level_leader,
-        BiquadFilterSharedBuffers* filter_1_shared_buffers,
-        BiquadFilterSharedBuffers* filter_2_shared_buffers
+        BiquadFilterSharedBuffers* const filter_1_shared_buffers,
+        BiquadFilterSharedBuffers* const filter_2_shared_buffers
 ) noexcept
     : SignalProducer(CHANNELS, NUMBER_OF_CHILDREN),
     additive_volume(),
@@ -1494,7 +1494,7 @@ void Voice<ModulatorSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 

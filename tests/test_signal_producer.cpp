@@ -116,7 +116,7 @@ class CompositeSignalProducer : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             for (Integer c = 0; c != this->channels; ++c) {
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -286,7 +286,7 @@ class CachingTestSignalProducer : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             buffer[0][0] += 1.0;
         }
@@ -315,7 +315,7 @@ class DelegatingSignalProducer : public SignalProducer
     public:
         explicit DelegatingSignalProducer(
                 Sample const value,
-                DelegatingSignalProducer* delegate = NULL
+                DelegatingSignalProducer* const delegate = NULL
         ) noexcept
             : SignalProducer(1),
             delegate(delegate),
@@ -326,7 +326,7 @@ class DelegatingSignalProducer : public SignalProducer
         {
         }
 
-        DelegatingSignalProducer* delegate;
+        DelegatingSignalProducer* const delegate;
         Integer initialize_rendering_calls;
         Integer render_calls;
         Integer finalize_rendering_calls;
@@ -352,7 +352,7 @@ class DelegatingSignalProducer : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             ++render_calls;
 
@@ -477,9 +477,9 @@ class RendererWithCircularDependecy : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
-            Sample const* const* other_buffer = (
+            Sample const* const* const other_buffer = (
                 SignalProducer::produce<RendererWithCircularDependecy>(*dependency, round)
             );
 
@@ -657,7 +657,7 @@ class EventTestSignalProducer : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             ++render_calls;
 
@@ -1135,7 +1135,7 @@ TEST(latest_peak_is_capped_at_60db, {
     constexpr Integer channels = 1;
     constexpr Sample samples[block_size] = {1.0, 10.0, 100.0, 1000.0, 10000.0};
 
-    Sample const* buffer[channels] = {samples};
+    Sample const* const buffer[channels] = {samples};
     Sample peak;
     Integer peak_index;
 

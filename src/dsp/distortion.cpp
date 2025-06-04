@@ -912,7 +912,7 @@ void Distortion<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
     Sample const* const level_buffer = this->level_buffer;
@@ -920,8 +920,8 @@ void Distortion<InputSignalProducerClass>::render(
     Table const& f_table = tables.get_f_table(current_type);
     Table const& F0_table = tables.get_F0_table(current_type);
 
-    Sample* previous_input_sample = this->previous_input_sample;
-    Sample* F0_previous_input_sample = this->F0_previous_input_sample;
+    Sample* const previous_input_sample = this->previous_input_sample;
+    Sample* const F0_previous_input_sample = this->F0_previous_input_sample;
 
     if (level_buffer == NULL) {
         for (Integer c = 0; c != channels; ++c) {

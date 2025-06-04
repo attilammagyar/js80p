@@ -936,7 +936,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (!is_on_) {
         render_silence(round, first_sample_index, last_sample_index, buffer);
@@ -969,7 +969,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     if (computed_frequency_is_constant) {
         Wavetable::Interpolation const interpolation = (
@@ -1038,7 +1038,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_constant_freq
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(is_starting)) {
         initialize_first_round(computed_frequency_value);
@@ -1211,7 +1211,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render_with_changing_freq
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(is_starting)) {
         initialize_first_round(computed_frequency_buffer[first_sample_index]);

@@ -50,20 +50,20 @@
 using namespace Steinberg;
 
 
-#define JS80P_VST3_SEND_MSG(msg_id, attr_setter, attr_name, attr_value)     \
-    do {                                                                    \
-        IPtr<Vst::IMessage> message = owned(allocateMessage());             \
-                                                                            \
-        if (message) {                                                      \
-            message->setMessageID(msg_id);                                  \
-                                                                            \
-            Vst::IAttributeList* attributes = message->getAttributes();     \
-                                                                            \
-            if (attributes) {                                               \
-                attributes->attr_setter((attr_name), (attr_value));         \
-                sendMessage(message);                                       \
-            }                                                               \
-        }                                                                   \
+#define JS80P_VST3_SEND_MSG(msg_id, attr_setter, attr_name, attr_value)         \
+    do {                                                                        \
+        IPtr<Vst::IMessage> message = owned(allocateMessage());                 \
+                                                                                \
+        if (message) {                                                          \
+            message->setMessageID(msg_id);                                      \
+                                                                                \
+            Vst::IAttributeList* const attributes = message->getAttributes();   \
+                                                                                \
+            if (attributes) {                                                   \
+                attributes->attr_setter((attr_name), (attr_value));             \
+                sendMessage(message);                                           \
+            }                                                                   \
+        }                                                                       \
     } while (false)
 
 
@@ -323,7 +323,7 @@ void Vst3Plugin::Processor::collect_param_change_events(
     int32 numParamsChanged = data.inputParameterChanges->getParameterCount();
 
     for (int32 i = 0; i < numParamsChanged; i++) {
-        Vst::IParamValueQueue* param_queue = (
+        Vst::IParamValueQueue* const param_queue = (
             data.inputParameterChanges->getParameterData(i)
         );
 
@@ -394,7 +394,7 @@ void Vst3Plugin::Processor::collect_param_change_events_as(
 
 void Vst3Plugin::Processor::collect_note_events(Vst::ProcessData& data) noexcept
 {
-    Vst::IEventList* input_events = data.inputEvents;
+    Vst::IEventList* const input_events = data.inputEvents;
 
     if (!input_events) {
         return;
@@ -627,7 +627,7 @@ std::string Vst3Plugin::read_stream(IBStream* stream)
     and that method stops at line breaks.
     */
 
-    char* buffer = new char[Serializer::MAX_SIZE];
+    char* const buffer = new char[Serializer::MAX_SIZE];
     size_t i;
     int32 bytes_read;
     char8 c;
@@ -980,9 +980,7 @@ IPlugView* PLUGIN_API Vst3Plugin::Controller::createView(FIDString name)
             return NULL;
         }
 
-        GUI* gui = new GUI(*synth);
-
-        return gui;
+        return new GUI(*synth);
     }
 
     return NULL;

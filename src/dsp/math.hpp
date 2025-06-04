@@ -363,7 +363,7 @@ class Math
          */
         template<bool is_index_positive = false>
         static Number lookup_periodic(
-            Number const* table,
+            Number const* const table,
             int const table_size,
             Number const index
         ) noexcept;
@@ -373,7 +373,7 @@ class Math
          *        that is a power of 2.
          */
         static Number lookup_periodic_2(
-            Number const* table,
+            Number const* const table,
             int const table_size,
             int const table_index_mask,
             Number const index

@@ -55,7 +55,7 @@ TEST(multiplies_input_signals_by_the_value_of_the_gain_parameter, {
         {0.10, 0.20, 0.30, 0.40, 0.50, 0.02, 0.04, 0.06, 0.08, 0.10},
         {0.20, 0.40, 0.60, 0.80, 1.00, 0.04, 0.08, 0.12, 0.16, 0.20},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
@@ -93,7 +93,7 @@ TEST(can_find_latest_peak_in_the_input_signal, {
         { 0.70,  0.10,  0.20, -0.05,  0.10},
         {-0.10, -0.70,  0.30,  0.90, -0.30},
     };
-    Sample const* input_buffer[CHANNELS] = {
+    Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };

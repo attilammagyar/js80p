@@ -81,7 +81,7 @@ void Vst3Plugin::GUI::initialize()
     /*
     Must be destroyed by the platform-specific implementation of JS80P::GUI::destroy().
     */
-    XcbPlatform* xcb = new XcbPlatform();
+    XcbPlatform* const xcb = new XcbPlatform();
 
     xcb->get_connection();
 
@@ -91,8 +91,8 @@ void Vst3Plugin::GUI::initialize()
         (Linux::TimerInterval)std::ceil(JS80P::GUI::REFRESH_RATE_SECONDS)
     );
 
-    GUIEventHandler* event_handler = new GUIEventHandler();
-    GUITimerHandler* timer_handler = new GUITimerHandler();
+    GUIEventHandler* const event_handler = new GUIEventHandler();
+    GUITimerHandler* const timer_handler = new GUITimerHandler();
 
     plugFrame->queryInterface(Steinberg::Linux::IRunLoop::iid, (void**)&run_loop);
 

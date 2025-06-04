@@ -118,7 +118,7 @@ class SignalProducer
         ) noexcept;
 
         static void find_peak(
-            Sample const* const* samples,
+            Sample const* const* const samples,
             Integer const channels,
             Integer const size,
             Sample& peak,
@@ -203,7 +203,7 @@ class SignalProducer
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         /**
@@ -219,15 +219,15 @@ class SignalProducer
          */
         void handle_event(Event const& event) noexcept;
 
-        Sample** reallocate_buffer(Sample** old_buffer) const noexcept;
+        Sample** reallocate_buffer(Sample** const old_buffer) const noexcept;
         Sample** allocate_buffer() const noexcept;
-        Sample** free_buffer(Sample** old_buffer) const noexcept;
+        Sample** free_buffer(Sample** const old_buffer) const noexcept;
 
         void render_silence(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** buffer
+            Sample** const buffer
         ) noexcept;
 
         bool is_silent(

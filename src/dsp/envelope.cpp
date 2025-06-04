@@ -237,7 +237,7 @@ void Envelope::render(
         Seconds const sampling_period,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
         becomes_constant = true;
@@ -344,7 +344,7 @@ void Envelope::render(
         Integer const first_sample_index,
         Integer const last_sample_index,
         EnvelopeShape const shape,
-        Sample* buffer,
+        Sample* const buffer,
         Integer& next_sample_index
 ) noexcept {
     Number const duration_inv = 1.0 / duration;
@@ -422,7 +422,7 @@ void Envelope::render_constant(
         Number const value,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample* buffer
+        Sample* const buffer
 ) noexcept {
     time = 0.0;
 

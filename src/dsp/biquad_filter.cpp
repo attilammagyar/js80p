@@ -62,10 +62,10 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         std::string const& name,
         InputSignalProducerClass& input,
         BiquadFilterTypeParam& type,
-        BiquadFilterSharedBuffers* shared_buffers,
+        BiquadFilterSharedBuffers* const shared_buffers,
         Number const inaccuracy_seed,
-        FloatParamB const* freq_inaccuracy_param,
-        FloatParamB const* q_inaccuracy_param,
+        FloatParamB const* const freq_inaccuracy_param,
+        FloatParamB const* const q_inaccuracy_param,
         SignalProducer* const buffer_owner,
         Integer const channels
 ) noexcept
@@ -206,11 +206,11 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
-        BiquadFilterSharedBuffers* shared_buffers,
+        BiquadFilterSharedBuffers* const shared_buffers,
         Number const inaccuracy_seed,
-        FloatParamB const* freq_inaccuracy_param,
-        FloatParamB const* q_inaccuracy_param,
-        SignalProducer* buffer_owner,
+        FloatParamB const* const freq_inaccuracy_param,
+        FloatParamB const* const q_inaccuracy_param,
+        SignalProducer* const buffer_owner,
         Integer const channels
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3, channels, buffer_owner),
@@ -234,11 +234,11 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         FloatParamS& frequency_leader,
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
-        BiquadFilterSharedBuffers* shared_buffers,
+        BiquadFilterSharedBuffers* const shared_buffers,
         Number const inaccuracy_seed,
-        FloatParamB const* freq_inaccuracy_param,
-        FloatParamB const* q_inaccuracy_param,
-        SignalProducer* buffer_owner
+        FloatParamB const* const freq_inaccuracy_param,
+        FloatParamB const* const q_inaccuracy_param,
+        SignalProducer* const buffer_owner
 ) noexcept
     : BiquadFilter<InputSignalProducerClass, fixed_type>(
         input,
@@ -265,11 +265,11 @@ BiquadFilter<InputSignalProducerClass, fixed_type>::BiquadFilter(
         FloatParamS& q_leader,
         FloatParamS& gain_leader,
         Byte const& voice_status,
-        BiquadFilterSharedBuffers* shared_buffers,
+        BiquadFilterSharedBuffers* const shared_buffers,
         Number const inaccuracy_seed,
-        FloatParamB const* freq_inaccuracy_param,
-        FloatParamB const* q_inaccuracy_param,
-        SignalProducer* buffer_owner
+        FloatParamB const* const freq_inaccuracy_param,
+        FloatParamB const* const q_inaccuracy_param,
+        SignalProducer* const buffer_owner
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 3, 0, buffer_owner),
     frequency(frequency_leader, voice_status),
@@ -724,10 +724,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_pass_ren
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* q_buffer = (
+        Sample const* const q_buffer = (
             FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
@@ -836,10 +836,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_pass_re
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* q_buffer = (
+        Sample const* const q_buffer = (
             FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
@@ -944,10 +944,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_band_pass_re
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* q_buffer = (
+        Sample const* const q_buffer = (
             FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
@@ -1056,10 +1056,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_notch_render
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* q_buffer = (
+        Sample const* const q_buffer = (
             FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
 
@@ -1174,13 +1174,13 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_peaking_rend
         }
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* q_buffer = (
+        Sample const* const q_buffer = (
             FloatParamS::produce<FloatParamS>(q, round, sample_count)[0]
         );
-        Sample const* gain_buffer = (
+        Sample const* const gain_buffer = (
             FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
@@ -1312,10 +1312,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_low_shelf_re
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* gain_buffer = (
+        Sample const* const gain_buffer = (
             FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
@@ -1441,10 +1441,10 @@ bool BiquadFilter<InputSignalProducerClass, fixed_type>::initialize_high_shelf_r
         );
 
     } else {
-        Sample const* frequency_buffer = (
+        Sample const* const frequency_buffer = (
             FloatParamS::produce<FloatParamS>(frequency, round, sample_count)[0]
         );
-        Sample const* gain_buffer = (
+        Sample const* const gain_buffer = (
             FloatParamS::produce<FloatParamS>(gain, round, sample_count)[0]
         );
 
@@ -1592,7 +1592,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if constexpr (fixed_type != BiquadFilterFixedType::BFFT_HIGH_SHELF) {
         if (JS80P_UNLIKELY(is_silent_)) {

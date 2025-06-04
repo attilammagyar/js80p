@@ -618,7 +618,7 @@ Sample const* const* Tape<
         Integer const round,
         Integer const sample_count
 ) noexcept {
-    Sample const* const* input_buffer = (
+    Sample const* const* const input_buffer = (
         Filter<InputSignalProducerClass>::initialize_rendering(
             round,
             sample_count
@@ -1055,7 +1055,7 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (params.state == TapeParams::State::TAPE_STATE_STOPPED) {
         this->render_silence(

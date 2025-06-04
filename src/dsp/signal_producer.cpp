@@ -48,7 +48,7 @@ Sample const* const* SignalProducer::produce(
         return signal_producer.cached_buffer;
     }
 
-    Sample** buffer = signal_producer.get_buffer();
+    Sample** const buffer = signal_producer.get_buffer();
 
     signal_producer.cached_buffer = buffer;
 
@@ -87,7 +87,7 @@ Sample const* const* SignalProducer::produce(
 
 
 void SignalProducer::find_peak(
-        Sample const* const* samples,
+        Sample const* const* const samples,
         Integer const channels,
         Integer const size,
         Sample& peak,
@@ -162,7 +162,7 @@ void SignalProducer::set_block_size(Integer const new_block_size) noexcept
 }
 
 
-Sample** SignalProducer::reallocate_buffer(Sample** old_buffer) const noexcept
+Sample** SignalProducer::reallocate_buffer(Sample** const old_buffer) const noexcept
 {
     free_buffer(old_buffer);
 
@@ -176,7 +176,7 @@ Sample** SignalProducer::allocate_buffer() const noexcept
         return NULL;
     }
 
-    Sample** new_buffer = new Sample*[channels];
+    Sample** const new_buffer = new Sample*[channels];
 
     for (Integer c = 0; c != channels; ++c) {
         new_buffer[c] = new Sample[block_size];
@@ -205,7 +205,7 @@ SignalProducer::~SignalProducer() noexcept
 }
 
 
-Sample** SignalProducer::free_buffer(Sample** old_buffer) const noexcept
+Sample** SignalProducer::free_buffer(Sample** const old_buffer) const noexcept
 {
     if (old_buffer == NULL) {
         return NULL;
@@ -453,7 +453,7 @@ void SignalProducer::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
 }
 
@@ -469,7 +469,7 @@ void SignalProducer::render_silence(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     for (Integer c = 0; c != channels; ++c) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {

@@ -195,7 +195,7 @@ class GUI
         static Color controller_id_to_bg_color(Synth::ControllerId const controller_id);
 
         GUI(
-            char const* sdk_version,
+            char const* const sdk_version,
             PlatformData platform_data,
             PlatformWidget parent_window,
             Synth& synth,
@@ -209,7 +209,7 @@ class GUI
 
         void update_synth_state();
 
-        void set_status_line(char const* text);
+        void set_status_line(char const* const text);
         void redraw_status_line();
 
         bool is_mts_esp_connected() const;
@@ -255,51 +255,51 @@ class GUI
         void initialize();
         void destroy();
 
-        void build_about_body(char const* sdk_version);
+        void build_about_body(char const* const sdk_version);
 
         void build_macros_1_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions,
-            ParamStateImages const* macro_midpoint_states
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const macro_distortions,
+            ParamStateImages const* const macro_midpoint_states
         );
 
         void build_macros_2_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions,
-            ParamStateImages const* macro_midpoint_states
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const macro_distortions,
+            ParamStateImages const* const macro_midpoint_states
         );
 
         void build_macros_3_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* macro_distortions,
-            ParamStateImages const* macro_midpoint_states
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const macro_distortions,
+            ParamStateImages const* const macro_midpoint_states
         );
 
         void build_effects_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* knob_states_red,
-            ParamStateImages const* reversed_toggle_states
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const knob_states_red,
+            ParamStateImages const* const reversed_toggle_states
         );
 
         void build_envelopes_1_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* screw_states,
-            ParamStateImages const* envelope_shapes_01,
-            ParamStateImages const* envelope_shapes_10
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const screw_states,
+            ParamStateImages const* const envelope_shapes_01,
+            ParamStateImages const* const envelope_shapes_10
         );
 
         void build_envelopes_2_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* screw_states,
-            ParamStateImages const* envelope_shapes_01,
-            ParamStateImages const* envelope_shapes_10
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const screw_states,
+            ParamStateImages const* const envelope_shapes_01,
+            ParamStateImages const* const envelope_shapes_10
         );
 
-        void build_lfos_body(ParamStateImages const* knob_states);
+        void build_lfos_body(ParamStateImages const* const knob_states);
 
         void build_synth_body(
-            ParamStateImages const* knob_states,
-            ParamStateImages const* screw_states
+            ParamStateImages const* const knob_states,
+            ParamStateImages const* const screw_states
         );
 
         bool const show_vst_logo;
@@ -392,12 +392,12 @@ class WidgetBase
         virtual int get_height() const;
         virtual WidgetBase* get_parent() const;
 
-        virtual void set_text(char const* text);
+        virtual void set_text(char const* const text);
         virtual char const* get_text() const;
 
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
-            char const* name
+            char const* const name
         );
 
         virtual GUI::Image copy_image_region(
@@ -442,7 +442,10 @@ class WidgetBase
 
         virtual void destroy_children();
 
-        virtual void set_up(GUI::PlatformData platform_data, WidgetBase* parent);
+        virtual void set_up(
+            GUI::PlatformData platform_data,
+            WidgetBase* const parent
+        );
 
         virtual void set_gui(GUI& gui);
 

@@ -259,7 +259,7 @@ TEST(portamento, {
     );
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
     Envelope envelope("");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -440,7 +440,7 @@ void test_decay_before_note_off(
 
 TEST(can_tell_if_note_decayed_before_note_off, {
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -700,7 +700,7 @@ TEST(can_glide_smoothly_to_a_new_note, {
     Buffer actual_output(sample_count, SimpleVoice::CHANNELS);
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.5);
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };

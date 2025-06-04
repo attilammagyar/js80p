@@ -454,7 +454,7 @@ TEST(can_import_patch_inside_the_gui_thread, {
 })
 
 
-void assert_trimmed(char const* expected, char const* raw_number)
+void assert_trimmed(char const* const expected, char const* const raw_number)
 {
     constexpr size_t buffer_size = 16;
 

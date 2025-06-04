@@ -110,7 +110,7 @@ void ReverseDelayEnvelope::end_test() noexcept
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Seconds const time_max,
         Integer const channels
 ) noexcept
@@ -181,7 +181,7 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& time_leader,
-        ToggleParam const* tempo_sync
+        ToggleParam const* const tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
@@ -201,7 +201,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         InputSignalProducerClass& input,
         FloatParamS& gain_leader,
         FloatParamS& time_leader,
-        ToggleParam const* tempo_sync
+        ToggleParam const* const tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
@@ -222,7 +222,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         FloatParamS& gain_leader,
         Seconds const time,
         Seconds const time_max,
-        ToggleParam const* tempo_sync
+        ToggleParam const* const tempo_sync
 ) noexcept
     : Filter<InputSignalProducerClass>(input, 2),
     tempo_sync(tempo_sync),
@@ -594,7 +594,7 @@ void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buff
 
     Integer feedback_sample_count = 0;
 
-    Sample const* const* feedback_signal_producer_buffer = (
+    Sample const* const* const feedback_signal_producer_buffer = (
         feedback_signal_producer->get_last_rendered_block(
             feedback_sample_count
         )
@@ -627,7 +627,7 @@ void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buff
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<typename Delay<InputSignalProducerClass, capabilities>::DelayBufferWritingMode mode>
 Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
-        Sample const* const* source_buffer,
+        Sample const* const* const source_buffer,
         Integer const delay_buffer_index,
         Integer const sample_count
 ) noexcept {
@@ -717,7 +717,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (need_gain) {
         if (gain_buffer == NULL) {
@@ -881,7 +881,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
 
     Integer const channels = this->channels;
     Number const read_index_orig = (Number)this->read_index;
-    Sample const* const* delay_buffer = (
+    Sample const* const* const delay_buffer = (
         shared_buffer_owner != NULL
             ? shared_buffer_owner->delay_buffer
             : this->delay_buffer
@@ -1245,7 +1245,7 @@ template<class InputSignalProducerClass, class FilterInputClass, DelayCapabiliti
 StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
         InputSignalProducerClass& input,
         StereoPannedDelayMode const stereo_mode,
-        ToggleParam const* tempo_sync
+        ToggleParam const* const tempo_sync
 ) : StereoPannedDelay<InputSignalProducerClass, FilterInputClass>(
         input, delay, stereo_mode, tempo_sync
     )
@@ -1258,7 +1258,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         InputSignalProducerClass& input,
         StereoPannedDelayMode const stereo_mode,
         FloatParamS& delay_time_leader,
-        ToggleParam const* tempo_sync
+        ToggleParam const* const tempo_sync
 ) : Filter<FilterInputClass>(delay, NUMBER_OF_CHILDREN, CHANNELS),
     is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
@@ -1275,7 +1275,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_time_leader,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Integer const number_of_children
 ) : StereoPannedDelay<InputSignalProducerClass, FilterInputClass>(
         input,
@@ -1295,7 +1295,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         StereoPannedDelayMode const stereo_mode,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
         filter_input,
@@ -1318,7 +1318,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
         FloatParamS& delay_time_leader,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
         filter_input,
@@ -1342,7 +1342,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         FloatParamS& panning_leader,
         FloatParamS& delay_gain_leader,
         FloatParamS& delay_time_leader,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
         filter_input,
@@ -1367,7 +1367,7 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
         FloatParamS& delay_gain_leader,
         Seconds const delay_time,
         Seconds const delay_time_max,
-        ToggleParam const* tempo_sync,
+        ToggleParam const* const tempo_sync,
         Integer const number_of_children
 ) : Filter<FilterInputClass>(
         filter_input,
@@ -1490,7 +1490,7 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     if (panning_buffer == NULL) {
         if (panning_value > 0.0) {
@@ -1520,7 +1520,7 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Sample const* const* const input_buffer = this->input_buffer;
 
@@ -1545,7 +1545,7 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Sample const* const* const input_buffer = this->input_buffer;
 
@@ -1583,7 +1583,7 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
     StereoPannedDelayMode const stereo_mode,
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
-    ToggleParam const* tempo_sync
+    ToggleParam const* const tempo_sync
 ) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
     ),
@@ -1623,7 +1623,7 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
     FloatParamS& high_shelf_filter_gain_leader,
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
-    ToggleParam const* tempo_sync
+    ToggleParam const* const tempo_sync
 ) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,
@@ -1678,7 +1678,7 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
     FloatParamS& high_shelf_filter_gain_leader,
     FloatParamS& distortion_level_leader,
     Distortion::TypeParam const& distortion_type,
-    ToggleParam const* tempo_sync
+    ToggleParam const* const tempo_sync
 ) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
         input,
         high_shelf_filter,

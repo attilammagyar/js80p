@@ -174,14 +174,14 @@ void Wavefolder<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** buffer
+        Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
     Sample const* const folding_buffer = this->folding_buffer;
     Sample const* const* const input_buffer = this->input_buffer;
 
-    Sample* previous_input_sample = this->previous_input_sample;
-    Sample* F0_previous_input_sample = this->F0_previous_input_sample;
+    Sample* const previous_input_sample = this->previous_input_sample;
+    Sample* const F0_previous_input_sample = this->F0_previous_input_sample;
 
     if (folding_buffer == NULL) {
         if (folding_value <= Constants::FOLD_TRANSITION) {

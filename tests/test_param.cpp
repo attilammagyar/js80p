@@ -1288,7 +1288,7 @@ TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_o
         1.0, 1.0, 1.0, 1.0, 1.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1316,7 +1316,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
         3.0, 2.0, 1.0, 1.0, 1.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1360,7 +1360,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1401,7 +1401,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
         -2.0, -2.0, -2.0, -2.0, -2.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1444,7 +1444,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1490,7 +1490,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1531,7 +1531,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1581,7 +1581,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
         1.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1632,7 +1632,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
         10.0, 8.0, 6.0, 3.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1672,7 +1672,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
         3.0, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1722,7 +1722,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1800,7 +1800,7 @@ TEST(when_the_update_mode_of_the_envelope_is_end_only_then_the_param_updates_rel
         1.5, 1.0, 1.0, 1.0, 1.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1864,7 +1864,7 @@ void test_envelope_manual_update_dahds(
         0.5, 0.0, 0.0, 0.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -1966,7 +1966,7 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
         5.0, 5.0, 3.0, 1.0, 1.0,
     };
     Envelope envelope("envelope");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2018,7 +2018,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
         5.75, 5.50, 5.50, 5.50, 5.50,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2087,7 +2087,7 @@ void test_voice_status_dependent_envelope_update(
         5.0, 7.0, 7.0, 7.0, 7.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2519,7 +2519,7 @@ TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_l
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2596,7 +2596,7 @@ TEST(when_a_centered_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2681,7 +2681,7 @@ TEST(when_an_lfo_has_a_dynamic_amplitude_envelope_then_the_envelope_is_updated_d
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2768,7 +2768,7 @@ TEST(when_an_lfo_has_an_amplitude_envelope_with_end_updates_then_the_envelope_is
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2855,7 +2855,7 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -2935,7 +2935,7 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope_1("E1");
     Envelope envelope_2("E2");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope_1, &envelope_2, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -3038,7 +3038,7 @@ TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -3182,7 +3182,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 6.0, 0.0,
     };
     Envelope envelope("env");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -3314,7 +3314,7 @@ TEST(can_tell_if_envelope_has_decayed, {
     MidiController midi_controller;
     Macro macro("M");
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -3408,7 +3408,7 @@ TEST(can_tell_if_envelope_has_decayed, {
 
 TEST(envelopes_and_lfo_envelopes_make_a_float_param_polyphonic, {
     Envelope envelope("E");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
@@ -3462,7 +3462,7 @@ class Modulator : public SignalProducer
                 Integer const round,
                 Integer const first_sample_index,
                 Integer const last_sample_index,
-                Sample** buffer
+                Sample** const buffer
         ) noexcept {
             ++render_called;
 
@@ -3629,7 +3629,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
         (Sample)(param_value + Modulator::VALUE * 3.0),
     };
     Envelope envelope("ENV");
-    Envelope* envelopes[Constants::ENVELOPES] = {
+    Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };

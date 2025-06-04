@@ -128,7 +128,7 @@ class Envelope
             Seconds const sampling_period,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         explicit Envelope(std::string const& name) noexcept;
@@ -258,7 +258,7 @@ class Envelope
             Number const value,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample* buffer
+            Sample* const buffer
         ) noexcept;
 
         template<RenderingMode rendering_mode, bool need_shaping>
@@ -275,7 +275,7 @@ class Envelope
             Integer const first_sample_index,
             Integer const last_sample_index,
             EnvelopeShape const shape,
-            Sample* buffer,
+            Sample* const buffer,
             Integer& i
         ) noexcept;
 
