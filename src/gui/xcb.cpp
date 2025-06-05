@@ -312,7 +312,18 @@ char const* const XcbPlatform::ZENITY_OPEN_ARGUMENTS[] = {
 xcb_window_t XcbPlatform::gui_platform_widget_to_xcb_window(
         GUI::PlatformWidget platform_widget
 ) {
-    return *((xcb_window_t*)&platform_widget);
+    uintptr_t x = reinterpret_cast<uintptr_t>(platform_widget);
+
+    return static_cast<xcb_window_t>(x);
+}
+
+
+GUI::PlatformWidget XcbPlatform::xcb_window_to_gui_platform_widget(
+        xcb_window_t window_id
+) {
+    uintptr_t x = static_cast<uintptr_t>(window_id);
+
+    return reinterpret_cast<GUI::PlatformWidget>(x);
 }
 
 
@@ -1405,7 +1416,9 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
     xcb_window_t window_id = xcb_generate_id(xcb_connection);
     need_to_destroy_window = true;
     xcb->register_widget(window_id, this);
-    platform_widget = (GUI::PlatformWidget)window_id;
+
+    platform_widget = XcbPlatform::xcb_window_to_gui_platform_widget(window_id);
+
     GUI::PlatformWidget parent_platform_widget = parent->get_platform_widget();
     xcb_window_t parent_id = (
         XcbPlatform::gui_platform_widget_to_xcb_window(parent_platform_widget)
@@ -1708,7 +1721,7 @@ xcb_connection_t* Widget::xcb_connection() const
 
 xcb_window_t Widget::window_id() const
 {
-    return *(xcb_window_t*)&platform_widget;
+    return XcbPlatform::gui_platform_widget_to_xcb_window(platform_widget);
 }
 
 
