@@ -47,6 +47,10 @@ class XcbPlatform
             GUI::PlatformWidget platform_widget
         );
 
+        static GUI::PlatformWidget xcb_window_to_gui_platform_widget(
+            xcb_window_t window_id
+        );
+
         XcbPlatform();
         ~XcbPlatform();
 
