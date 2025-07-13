@@ -2874,7 +2874,7 @@ The `lib/` directory contains code from the following projects:
  * [VST 3 SDK](https://github.com/steinbergmedia/vst3sdk)
 
 **Note**: the `lib/` directory does not include the whole SDK packages, it only
-contains what's required for compiling JS80P.
+contains what is required for compiling JS80P.
 
 #### Linux
 
@@ -2884,6 +2884,7 @@ following packages need to be installed:
     apt-get install \
         binutils \
         build-essential \
+        cppcheck \
         g++ \
         gcc-multilib \
         g++-multilib \
@@ -2901,6 +2902,10 @@ following packages need to be installed:
 
 ### Compiling
 
+Successfully compiled plugin files are placed in the platform-specific
+subdirectories inside the `dist` directory; copy them to the appropriate plugin
+directories, as described in the [Installation](#install) section.
+
 #### Windows
 
 Assuming that you have installed MinGW-w64 to `C:\mingw64`, you can use the
@@ -2915,8 +2920,6 @@ following commands to run tests and compile JS80P for Windows:
 
 #### Linux
 
-Run `make check` for running tests.
-
 The following commands (on a 64 bit Linux environment) will compile JS80P for
 64 bit Windows, 32 bit Windows, `x86_64` Linux, `x86` Linux, `RISC-V 64` Linux,
 and `LoongArch` Linux respectively:
@@ -2927,6 +2930,8 @@ and `LoongArch` Linux respectively:
     TARGET_PLATFORM=i686-gpp make all
     TARGET_PLATFORM=riscv64-gpp make all
     TARGET_PLATFORM=loongarch64-gpp make all
+
+Run `make check` in a similar fashion to run unit tests.
 
 <a href="#toc">Table of Contents</a>
 
