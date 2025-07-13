@@ -111,7 +111,8 @@ TARGET_PLATFORM_LFLAGS = \
 	$(ARCH_LFLAGS) \
 	-lcairo \
 	-lxcb \
-	-lxcb-render
+	-lxcb-render \
+	-z noexecstack
 
 LINK_FST = $(LINK_SO)
 LINK_VST3 = $(LINK_SO)
