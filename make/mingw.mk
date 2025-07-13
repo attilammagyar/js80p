@@ -69,7 +69,14 @@ $(OBJ_TARGET_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
 
 MINGW_CXXFLAGS = -D OEMRESOURCE
 
-TARGET_PLATFORM_LFLAGS = -lgdi32 -luser32 -lkernel32 -municode -lcomdlg32 -lole32
+TARGET_PLATFORM_LFLAGS = \
+	-lgdi32 \
+	-luser32 \
+	-lkernel32 \
+	-municode \
+	-lcomdlg32 \
+	-lole32 \
+	-z noexecstack
 
 LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static
 LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall -static
