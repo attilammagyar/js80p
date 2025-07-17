@@ -27,7 +27,7 @@ set -o pipefail
 
 TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2 riscv64-gpp:none loongarch64-gpp:lsx"
 PLUGIN_TYPES="fst vst3"
-TEXT_FILES="LICENSE.txt README.txt NEWS.txt"
+TEXT_FILES="CONTRIBUTING.txt LICENSE.txt NEWS.txt README.txt"
 DIST_DIR_BASE="dist"
 README_HTML="$DIST_DIR_BASE/README.html"
 
@@ -98,6 +98,7 @@ main()
         build.bat \
         build.ps1 \
         build.sh \
+        CONTRIBUTING.txt \
         Doxyfile \
         gui \
         js80p.png \

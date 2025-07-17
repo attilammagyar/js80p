@@ -2562,6 +2562,14 @@ Bugs
 If you find bugs, please report them at
 [https://github.com/attilammagyar/js80p/issues](https://github.com/attilammagyar/js80p/issues).
 
+When reporting an issue, please provide at least the following information:
+
+ * What JS80P version are you using?
+ * What host application or DAW are you using?
+ * What operating system are you using?
+ * How is JS80P set up?
+ * How can the bug be reproduced, what steps can trigger it?
+
 <a href="#toc">Table of Contents</a>
 
 <a id="faq"></a>
