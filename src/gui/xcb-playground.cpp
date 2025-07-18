@@ -167,7 +167,7 @@ int main(int const argc, char const* argv[])
     JS80P::GUI* const gui = new JS80P::GUI(
         NULL,
         (JS80P::GUI::PlatformData)gui_xcb,
-        (JS80P::GUI::PlatformWidget)window_id,
+        xcb->xcb_window_to_gui_platform_widget(window_id),
         synth,
         true
     );
