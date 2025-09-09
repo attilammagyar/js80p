@@ -50,6 +50,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
     private:
         static constexpr Integer OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC = 2;
+        static constexpr Integer NUMBER_OF_CHILDREN = 2;
 
     public:
         static constexpr Number BPM_MIN = (

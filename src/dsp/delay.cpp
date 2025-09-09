@@ -114,7 +114,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         Seconds const time_max,
         Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 2, channels),
+    : Filter<InputSignalProducerClass>(input, NUMBER_OF_CHILDREN, channels),
     tempo_sync(tempo_sync),
     gain(
         "",
@@ -183,7 +183,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         FloatParamS& time_leader,
         ToggleParam const* const tempo_sync
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 2),
+    : Filter<InputSignalProducerClass>(input, NUMBER_OF_CHILDREN),
     tempo_sync(tempo_sync),
     gain("", 0.0, 1.0, 1.0),
     time(time_leader),
@@ -203,7 +203,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         FloatParamS& time_leader,
         ToggleParam const* const tempo_sync
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 2),
+    : Filter<InputSignalProducerClass>(input, NUMBER_OF_CHILDREN),
     tempo_sync(tempo_sync),
     gain(gain_leader),
     time(time_leader),
@@ -224,7 +224,7 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
         Seconds const time_max,
         ToggleParam const* const tempo_sync
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 2),
+    : Filter<InputSignalProducerClass>(input, NUMBER_OF_CHILDREN),
     tempo_sync(tempo_sync),
     gain(gain_leader),
     time("", Constants::DELAY_TIME_MIN, time_max, time),
