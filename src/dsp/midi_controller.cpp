@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 #ifndef JS80P__DSP__MIDI_CONTROLLER_CPP
 #define JS80P__DSP__MIDI_CONTROLLER_CPP
 
+#include <algorithm>
+
 #include "dsp/midi_controller.hpp"
 
 
@@ -26,49 +28,82 @@ namespace JS80P
 {
 
 MidiController::MidiController() noexcept
-    : events_rw(32),
-    change_index(0),
+    : event_queues_rw{
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+        Queue<SignalProducer::Event>{32},
+    },
+    change_indices{},
     assignments(0),
-    value(0.5),
-    events(events_rw)
+    event_queues(event_queues_rw)
 {
+    std::fill_n(values, Midi::CHANNELS, 0.5);
 }
 
 
 void MidiController::change(
+        Midi::Channel const channel,
         Seconds const time_offset,
         Number const new_value
 ) noexcept {
     SignalProducer::Event event(EVT_CHANGE, time_offset, 0, new_value, 0.0);
 
-    events_rw.push(event);
-    change(new_value);
+    event_queues_rw[channel].push(event);
+    change(channel, new_value);
 }
 
 
-Integer MidiController::get_change_index() const noexcept
-{
-    return change_index;
+void MidiController::change_all_channels(
+        Seconds const time_offset,
+        Number const new_value
+) noexcept {
+    SignalProducer::Event event(EVT_CHANGE, time_offset, 0, new_value, 0.0);
+
+    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
+        event_queues_rw[channel].push(event);
+        change(channel, new_value);
+    }
 }
 
 
-void MidiController::change(Number const new_value) noexcept
+Integer MidiController::get_change_index(Midi::Channel const channel) const noexcept
 {
-    value = new_value;
-    ++change_index;
-    change_index &= 0x7fffffff;
+    return change_indices[channel];
 }
 
 
-Number MidiController::get_value() const noexcept
+void MidiController::change(Midi::Channel const channel, Number const new_value) noexcept
 {
-    return value;
+    values[channel] = new_value;
+    ++change_indices[channel];
+    change_indices[channel] &= 0x7fffffff;
+}
+
+
+Number MidiController::get_value(Midi::Channel const channel) const noexcept
+{
+    return values[channel];
 }
 
 
 void MidiController::clear() noexcept
 {
-    events_rw.drop(0);
+    for (Midi::Channel channel = 0; channel != Midi::CHANNELS; ++channel) {
+        event_queues_rw[channel].drop(0);
+    }
 }
 
 

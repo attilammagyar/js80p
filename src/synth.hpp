@@ -1597,6 +1597,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 DeferredNoteOff(
                     Integer const note_id,
                     Midi::Channel const channel,
+                    Midi::Channel const mpe_channel,
                     Midi::Note const note,
                     Midi::Byte const velocity,
                     Integer const voice
@@ -1607,6 +1608,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 Integer get_note_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;
+                Midi::Channel get_mpe_channel() const noexcept;
                 Midi::Note get_note() const noexcept;
                 Midi::Byte get_velocity() const noexcept;
                 Integer get_voice() const noexcept;
@@ -1615,8 +1617,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Integer voice;
                 Integer note_id;
                 Midi::Channel channel;
+                Midi::Channel mpe_channel;
                 Midi::Note note;
                 Midi::Byte velocity;
+        };
+
+        struct MPEZoneDescriptor
+        {
+            Midi::Channel manager_channel;
+            Midi::Channel min_channel;
+            Midi::Channel max_channel;
         };
 
         enum ParamType {
@@ -1625,6 +1635,40 @@ class Synth : public Midi::EventHandler, public SignalProducer
             BLOCK_EVALUATED_FLOAT = 2,
             BYTE = 3,
             INVALID_PARAM_TYPE = 4,
+        };
+
+        static constexpr MPEZoneDescriptor MPE_ZONES[31] = {
+            [MPE_OFF] = { 0,  0,  0},
+            [MPE_L15] = { 0,  1, 15},
+            [MPE_L14] = { 0,  1, 14},
+            [MPE_L13] = { 0,  1, 13},
+            [MPE_L12] = { 0,  1, 12},
+            [MPE_L11] = { 0,  1, 11},
+            [MPE_L10] = { 0,  1, 10},
+            [MPE_L09] = { 0,  1,  9},
+            [MPE_L08] = { 0,  1,  8},
+            [MPE_L07] = { 0,  1,  7},
+            [MPE_L06] = { 0,  1,  6},
+            [MPE_L05] = { 0,  1,  5},
+            [MPE_L04] = { 0,  1,  4},
+            [MPE_L03] = { 0,  1,  3},
+            [MPE_L02] = { 0,  1,  2},
+            [MPE_L01] = { 0,  1,  1},
+            [MPE_U15] = {15,  0, 14},
+            [MPE_U14] = {15,  1, 14},
+            [MPE_U13] = {15,  2, 14},
+            [MPE_U12] = {15,  3, 14},
+            [MPE_U11] = {15,  4, 14},
+            [MPE_U10] = {15,  5, 14},
+            [MPE_U09] = {15,  6, 14},
+            [MPE_U08] = {15,  7, 14},
+            [MPE_U07] = {15,  8, 14},
+            [MPE_U06] = {15,  9, 14},
+            [MPE_U05] = {15, 10, 14},
+            [MPE_U04] = {15, 11, 14},
+            [MPE_U03] = {15, 12, 14},
+            [MPE_U02] = {15, 13, 14},
+            [MPE_U01] = {15, 14, 14},
         };
 
         static constexpr SPSCQueue<Message>::SizeType MESSAGE_QUEUE_SIZE = 8192;
@@ -1688,8 +1732,16 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamType const type
         ) const noexcept;
 
+        Midi::Channel map_mpe_channel(Midi::Channel const channel) const noexcept;
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
+
+        void change_midi_controller(
+            MidiController& midi_controller,
+            Midi::Channel const mpe_channel,
+            Seconds const time_offset,
+            Number const new_value
+        ) const noexcept;
 
         void sustain_on(Seconds const time_offset) noexcept;
         void sustain_off(Seconds const time_offset) noexcept;
@@ -1764,6 +1816,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void note_on_polyphonic(
             Seconds const time_offset,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Midi::Note const note,
             Number const velocity
         ) noexcept;
@@ -1771,6 +1824,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void note_on_monophonic(
             Seconds const time_offset,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Midi::Note const note,
             Number const velocity,
             bool const trigger_if_off
@@ -1781,6 +1835,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Integer const voice,
             Seconds const time_offset,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Midi::Note const note,
             Number const velocity
         ) noexcept;
@@ -1791,6 +1846,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             bool const is_off,
             Seconds const time_offset,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Midi::Note const note,
             Number const velocity,
             bool const should_sync_oscillator_inaccuracy

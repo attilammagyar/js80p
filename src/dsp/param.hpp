@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "js80p.hpp"
+#include "midi.hpp"
 
 #include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
@@ -48,6 +49,10 @@ enum ParamEvaluation {
     BLOCK = 0,  ///< The parameter is evaluated once at the beginning of each rendering block
     SAMPLE = 1, ///< The parameter is evaluated for each rendered sample
 };
+
+
+constexpr Midi::Channel PARAM_GLOBAL_MPE_CHANNEL = 0;
+constexpr Midi::Channel PARAM_DEFAULT_MPE_CHANNEL = PARAM_GLOBAL_MPE_CHANNEL;
 
 
 /**
@@ -87,6 +92,12 @@ class Param : public SignalProducer
 
         void set_midi_controller(MidiController* const midi_controller) noexcept;
         MidiController* get_midi_controller() const noexcept;
+
+        /**
+         * \brief Set which MIDI channel to use for querying MidiController
+         *        and Macro values.
+         */
+        void set_midi_channel(Midi::Channel const midi_channel) noexcept;
 
         void set_macro(Macro* const macro) noexcept;
         Macro* get_macro() const noexcept;
@@ -138,6 +149,10 @@ class Param : public SignalProducer
 
         Integer change_index;
         NumberType value;
+        Midi::Channel midi_channel_rw;
+
+    protected:
+        Midi::Channel const& midi_channel;
 };
 
 
@@ -607,6 +622,7 @@ class FloatParam : public Param<Number, evaluation>
 
         void store_envelope_value_at_event(Seconds const latency) noexcept;
 
+        bool is_affected_by_different_midi_channel_than_leader() const noexcept;
         bool is_following_leader() const noexcept;
 
         Sample const* const* process_lfo(
@@ -616,9 +632,14 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         template<bool is_logarithmic_>
-        void process_midi_controller_events() noexcept;
+        void process_midi_controller_events(
+            MidiController const& midi_controller
+        ) noexcept;
 
-        void process_macro(Integer const sample_count) noexcept;
+        void process_macro(
+            Macro& macro,
+            Integer const sample_count
+        ) noexcept;
 
         void process_envelope(Envelope& envelope) noexcept;
 
@@ -636,7 +657,7 @@ class FloatParam : public Param<Number, evaluation>
         ) noexcept;
 
         Integer make_envelope_snapshot(
-            Envelope const& envelope,
+            Envelope& envelope,
             Byte const envelope_index
         ) noexcept;
 
@@ -783,6 +804,8 @@ class ModulatableFloatParam : public FloatParamS
         Seconds end_envelope(Seconds const time_offset) noexcept;
         void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
         void update_envelope(Seconds const time_offset) noexcept;
+
+        void set_midi_channel(Midi::Channel const midi_channel) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(

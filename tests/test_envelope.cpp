@@ -21,7 +21,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
+#include <exception>
 #include <string>
+#include <vector>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -186,7 +188,7 @@ void test_tempo_synced_snapshot_creation(
     envelope.time_inaccuracy.set_value(time_inaccuracy);
 
     envelope.update();
-    envelope.make_snapshot(randoms, 1, snapshot);
+    envelope.make_snapshot(randoms, 1, PARAM_DEFAULT_MPE_CHANNEL, snapshot);
 
     assert_eq(snapshot.delay_time, 1.0 * time_scale, DOUBLE_DELTA);
     assert_eq(snapshot.attack_time, 2.0 * time_scale, DOUBLE_DELTA);
@@ -198,7 +200,7 @@ void test_tempo_synced_snapshot_creation(
     envelope.release_time.set_value(6.0);
     envelope.update();
 
-    envelope.make_end_snapshot(randoms, 2, snapshot);
+    envelope.make_end_snapshot(randoms, 2, PARAM_DEFAULT_MPE_CHANNEL, snapshot);
 
     assert_eq(snapshot.release_time, 6.0 * time_scale, DOUBLE_DELTA);
     assert_eq(2, snapshot.envelope_index);
@@ -270,7 +272,7 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     envelope.value_inaccuracy.set_value(value_inaccuracy);
 
     envelope.update();
-    envelope.make_snapshot(randoms, 0, snapshot);
+    envelope.make_snapshot(randoms, 0, PARAM_DEFAULT_MPE_CHANNEL, snapshot);
 
     assert_eq(value_scale * initial_value, snapshot.initial_value, DOUBLE_DELTA);
     assert_eq(value_scale * peak_value, snapshot.peak_value, DOUBLE_DELTA);
@@ -282,6 +284,102 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     assert_eq(time_offset + hold_time, snapshot.hold_time, DOUBLE_DELTA);
     assert_eq(time_offset + decay_time, snapshot.decay_time, DOUBLE_DELTA);
     assert_eq(time_offset + release_time, snapshot.release_time, DOUBLE_DELTA);
+})
+
+
+void set_env_param_via_midi_ctl(
+        std::vector<MidiController*>& midi_controllers,
+        Midi::Channel const midi_channel,
+        FloatParamB& param,
+        Number const value
+) {
+    MidiController* midi_controller = new MidiController();
+
+    midi_controller->change_all_channels(0.0, 0.0);
+    midi_controller->change(midi_channel, 0.0, param.value_to_ratio(value));
+    midi_controller->clear();
+
+    param.set_midi_controller(midi_controller);
+
+    midi_controllers.push_back(midi_controller);
+}
+
+
+void free_midi_controllers(std::vector<MidiController*>& midi_controllers)
+{
+    for (std::vector<MidiController*>::const_iterator it = midi_controllers.begin(); it != midi_controllers.end(); ++it) {
+        delete *it;
+    }
+
+    midi_controllers.clear();
+}
+
+
+TEST(envelope_snapshot_creation_respects_midi_channel, {
+    constexpr Number scale = 0.8;
+    constexpr Number initial_value = 0.2;
+    constexpr Number peak_value = 0.3;
+    constexpr Number sustain_value = 0.4;
+    constexpr Number final_value_1 = 0.5;
+    constexpr Number final_value_2 = 0.6;
+    constexpr Seconds delay_time = 1.0;
+    constexpr Seconds attack_time = 2.0;
+    constexpr Seconds hold_time = 3.0;
+    constexpr Seconds decay_time = 4.0;
+    constexpr Seconds release_time_1 = 5.0;
+    constexpr Seconds release_time_2 = 5.0;
+    constexpr EnvelopeRandoms randoms = {
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    };
+    constexpr Midi::Channel midi_channel = 5;
+
+    Envelope envelope("E");
+    EnvelopeSnapshot snapshot;
+    std::vector<MidiController*> midi_controllers;
+
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.scale, scale);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.initial_value, initial_value);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.peak_value, peak_value);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.sustain_value, sustain_value);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.final_value, final_value_1);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.delay_time, delay_time);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.attack_time, attack_time);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.hold_time, hold_time);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.decay_time, decay_time);
+    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.release_time, release_time_1);
+
+    envelope.update();
+    envelope.make_snapshot(randoms, 1, midi_channel, snapshot);
+
+    try {
+        assert_eq(scale * initial_value, snapshot.initial_value, DOUBLE_DELTA);
+        assert_eq(scale * peak_value, snapshot.peak_value, DOUBLE_DELTA);
+        assert_eq(scale * sustain_value, snapshot.sustain_value, DOUBLE_DELTA);
+        assert_eq(scale * final_value_1, snapshot.final_value, DOUBLE_DELTA);
+        assert_eq(delay_time, snapshot.delay_time, DOUBLE_DELTA);
+        assert_eq(attack_time, snapshot.attack_time, DOUBLE_DELTA);
+        assert_eq(hold_time, snapshot.hold_time, DOUBLE_DELTA);
+        assert_eq(decay_time, snapshot.decay_time, DOUBLE_DELTA);
+        assert_eq(release_time_1, snapshot.release_time, DOUBLE_DELTA);
+        assert_eq(1, snapshot.envelope_index);
+
+        set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.final_value, final_value_2);
+        set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.release_time, release_time_2);
+        envelope.update();
+
+        envelope.make_end_snapshot(randoms, 2, midi_channel, snapshot);
+
+        assert_eq(scale * final_value_2, snapshot.final_value, DOUBLE_DELTA);
+        assert_eq(release_time_2, snapshot.release_time, DOUBLE_DELTA);
+        assert_eq(2, snapshot.envelope_index);
+
+    } catch (std::exception const& ex) {
+        free_midi_controllers(midi_controllers);
+
+        throw;
+    }
+
+    free_midi_controllers(midi_controllers);
 })
 
 
@@ -897,7 +995,7 @@ void test_envelope_shape(
     envelope.attack_time.set_value((sample_rate - 1.0) / sample_rate);
     envelope.hold_time.set_value(1.0);
 
-    envelope.make_snapshot(randoms, 0, snapshot);
+    envelope.make_snapshot(randoms, 0, PARAM_DEFAULT_MPE_CHANNEL, snapshot);
 
     Envelope::render<Envelope::RenderingMode::OVERWRITE>(
         snapshot,

@@ -306,25 +306,25 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     effects.filter_1_freq_log_scale.set_value(ToggleParam::ON);
     effects.filter_2_freq_log_scale.set_value(ToggleParam::ON);
 
-    channel_pressure_ctl.change(0.0, 0.0);
+    channel_pressure_ctl.change_all_channels(0.0, 0.0);
     channel_pressure_ctl.clear();
 
-    midi_controllers_rw[Midi::SUSTAIN_PEDAL]->change(0.0, 0.0);
+    midi_controllers_rw[Midi::SUSTAIN_PEDAL]->change_all_channels(0.0, 0.0);
     midi_controllers_rw[Midi::SUSTAIN_PEDAL]->clear();
 
-    osc_1_peak.change(0.0, 0.0);
+    osc_1_peak.change_all_channels(0.0, 0.0);
     osc_1_peak.clear();
 
-    osc_2_peak.change(0.0, 0.0);
+    osc_2_peak.change_all_channels(0.0, 0.0);
     osc_2_peak.clear();
 
-    vol_1_peak.change(0.0, 0.0);
+    vol_1_peak.change_all_channels(0.0, 0.0);
     vol_1_peak.clear();
 
-    vol_2_peak.change(0.0, 0.0);
+    vol_2_peak.change_all_channels(0.0, 0.0);
     vol_2_peak.clear();
 
-    vol_3_peak.change(0.0, 0.0);
+    vol_3_peak.change_all_channels(0.0, 0.0);
     vol_3_peak.clear();
 
     update_param_states();
@@ -1188,18 +1188,28 @@ void Synth::note_on(
         Midi::Note const note,
         Midi::Byte const velocity
 ) noexcept {
+    Midi::Channel const mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        return;
+    }
+
     Number const velocity_float = midi_byte_to_float(velocity);
 
     reset_voice_statuses();
     note_stack.push(channel, note, velocity_float);
 
     if (is_polyphonic()) {
-        this->triggered_velocity.change(time_offset, velocity_float);
-        this->triggered_note.change(time_offset, midi_byte_to_float(note));
+        change_midi_controller(
+            this->triggered_velocity, mpe_channel, time_offset, velocity_float
+        );
+        change_midi_controller(
+            this->triggered_note, mpe_channel, time_offset, midi_byte_to_float(note)
+        );
 
-        note_on_polyphonic(time_offset, channel, note, velocity_float);
+        note_on_polyphonic(time_offset, channel, mpe_channel, note, velocity_float);
     } else {
-        note_on_monophonic(time_offset, channel, note, velocity_float, true);
+        note_on_monophonic(time_offset, channel, mpe_channel, note, velocity_float, true);
     }
 
     update_voice_statuses();
@@ -1237,6 +1247,7 @@ bool Synth::should_sync_oscillator_instability(
 void Synth::note_on_polyphonic(
         Seconds const time_offset,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Midi::Note const note,
         Number const velocity
 ) noexcept {
@@ -1247,7 +1258,9 @@ void Synth::note_on_polyphonic(
             return;
         }
 
-        trigger_note_on_voice<true>(voice, time_offset, channel, note, velocity);
+        trigger_note_on_voice<true>(
+            voice, time_offset, channel, mpe_channel, note, velocity
+        );
 
         return;
     }
@@ -1263,7 +1276,9 @@ void Synth::note_on_polyphonic(
             continue;
         }
 
-        trigger_note_on_voice<false>(next_voice, time_offset, channel, note, velocity);
+        trigger_note_on_voice<false>(
+            next_voice, time_offset, channel, mpe_channel, note, velocity
+        );
 
         break;
     }
@@ -1275,6 +1290,7 @@ void Synth::trigger_note_on_voice(
         Integer const voice,
         Seconds const time_offset,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Midi::Note const note,
         Number const velocity
 ) noexcept {
@@ -1283,44 +1299,98 @@ void Synth::trigger_note_on_voice(
     Byte const mode = this->mode.get_value();
     bool const should_sync_oscillator_inaccuracy = this->should_sync_oscillator_inaccuracy();
 
-    modulators[voice]->update_inaccuracy(cached_round);
-    carriers[voice]->update_inaccuracy(cached_round);
+    Modulator& modulator = *modulators[voice];
+    Carrier& carrier = *carriers[voice];
+
+    modulator.update_inaccuracy(cached_round);
+    carrier.update_inaccuracy(cached_round);
+
+    modulator.set_mpe_channel(mpe_channel);
+    carrier.set_mpe_channel(mpe_channel);
 
     if (mode == MODE_MIX_AND_MOD) {
         if constexpr (retrigger) {
-            modulators[voice]->retrigger(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            modulator.retrigger(
+                time_offset,
+                next_note_id,
+                note,
+                channel,
+                velocity,
+                previous_note,
+                should_sync_oscillator_inaccuracy
             );
-            carriers[voice]->retrigger(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            carrier.retrigger(
+                time_offset,
+                next_note_id,
+                note,
+                channel,
+                velocity,
+                previous_note,
+                should_sync_oscillator_inaccuracy
             );
         } else {
-            modulators[voice]->note_on(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            modulator.note_on(
+                time_offset,
+                next_note_id,
+                note,
+                channel,
+                velocity,
+                previous_note,
+                should_sync_oscillator_inaccuracy
             );
-            carriers[voice]->note_on(
-                time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            carrier.note_on(
+                time_offset,
+                next_note_id,
+                note,
+                channel,
+                velocity,
+                previous_note,
+                should_sync_oscillator_inaccuracy
             );
         }
     } else {
         if (note < mode + Midi::NOTE_B_2) {
             if constexpr (retrigger) {
-                modulators[voice]->retrigger(
-                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                modulator.retrigger(
+                    time_offset,
+                    next_note_id,
+                    note,
+                    channel,
+                    velocity,
+                    previous_note,
+                    should_sync_oscillator_inaccuracy
                 );
             } else {
-                modulators[voice]->note_on(
-                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                modulator.note_on(
+                    time_offset,
+                    next_note_id,
+                    note,
+                    channel,
+                    velocity,
+                    previous_note,
+                    should_sync_oscillator_inaccuracy
                 );
             }
         } else {
             if constexpr (retrigger) {
-                carriers[voice]->retrigger(
-                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                carrier.retrigger(
+                    time_offset,
+                    next_note_id,
+                    note,
+                    channel,
+                    velocity,
+                    previous_note,
+                    should_sync_oscillator_inaccuracy
                 );
             } else {
-                carriers[voice]->note_on(
-                    time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+                carrier.note_on(
+                    time_offset,
+                    next_note_id,
+                    note,
+                    channel,
+                    velocity,
+                    previous_note,
+                    should_sync_oscillator_inaccuracy
                 );
             }
         }
@@ -1347,12 +1417,17 @@ void Synth::assign_voice_and_note_id(
 void Synth::note_on_monophonic(
         Seconds const time_offset,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Midi::Note const note,
         Number const velocity,
         bool const trigger_if_off
 ) noexcept {
-    this->triggered_velocity.change(time_offset, velocity);
-    this->triggered_note.change(time_offset, midi_byte_to_float(note));
+    change_midi_controller(
+        this->triggered_velocity, mpe_channel, time_offset, velocity
+    );
+    change_midi_controller(
+        this->triggered_note, mpe_channel, time_offset, midi_byte_to_float(note)
+    );
 
     Modulator* const modulator = modulators[0];
     Carrier* const carrier = carriers[0];
@@ -1362,7 +1437,9 @@ void Synth::note_on_monophonic(
 
     if (modulator_off && carrier_off) {
         if (trigger_if_off) {
-            trigger_note_on_voice<false>(0, time_offset, channel, note, velocity);
+            trigger_note_on_voice<false>(
+                0, time_offset, channel, mpe_channel, note, velocity
+            );
         }
 
         return;
@@ -1378,21 +1455,49 @@ void Synth::note_on_monophonic(
 
     if (mode == MODE_MIX_AND_MOD) {
         trigger_note_on_voice_monophonic<Modulator>(
-            *modulator, modulator_off, time_offset, channel, note, velocity, should_sync_oscillator_inaccuracy
+            *modulator,
+            modulator_off,
+            time_offset,
+            channel,
+            mpe_channel,
+            note,
+            velocity,
+            should_sync_oscillator_inaccuracy
         );
         trigger_note_on_voice_monophonic<Carrier>(
-            *carrier, carrier_off, time_offset, channel, note, velocity, should_sync_oscillator_inaccuracy
+            *carrier,
+            carrier_off,
+            time_offset,
+            channel,
+            mpe_channel,
+            note,
+            velocity,
+            should_sync_oscillator_inaccuracy
         );
     } else {
         if (note < mode + Midi::NOTE_B_2) {
             trigger_note_on_voice_monophonic<Modulator>(
-                *modulator, modulator_off, time_offset, channel, note, velocity, should_sync_oscillator_inaccuracy
+                *modulator,
+                modulator_off,
+                time_offset,
+                channel,
+                mpe_channel,
+                note,
+                velocity,
+                should_sync_oscillator_inaccuracy
             );
             carrier->cancel_note_smoothly(time_offset);
         } else {
             modulator->cancel_note_smoothly(time_offset);
             trigger_note_on_voice_monophonic<Carrier>(
-                *carrier, carrier_off, time_offset, channel, note, velocity, should_sync_oscillator_inaccuracy
+                *carrier,
+                carrier_off,
+                time_offset,
+                channel,
+                mpe_channel,
+                note,
+                velocity,
+                should_sync_oscillator_inaccuracy
             );
         }
     }
@@ -1407,10 +1512,13 @@ void Synth::trigger_note_on_voice_monophonic(
         bool const is_off,
         Seconds const time_offset,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Midi::Note const note,
         Number const velocity,
         bool const should_sync_oscillator_inaccuracy
 ) noexcept {
+    voice.set_mpe_channel(mpe_channel);
+
     if (is_off) {
         voice.note_on(
             time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
@@ -1423,6 +1531,46 @@ void Synth::trigger_note_on_voice_monophonic(
         voice.glide_to(
             time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
+    }
+}
+
+
+Midi::Channel Synth::map_mpe_channel(Midi::Channel const channel) const noexcept
+{
+    Byte const mpe = this->mpe_settings.get_value();
+
+    if (mpe == MPE_OFF) {
+        return PARAM_GLOBAL_MPE_CHANNEL;
+    }
+
+    MPEZoneDescriptor const& zone = MPE_ZONES[mpe];
+
+    if (channel == zone.manager_channel) {
+        return PARAM_GLOBAL_MPE_CHANNEL;
+    }
+
+    if (channel < zone.min_channel || channel > zone.max_channel) {
+        return Midi::INVALID_CHANNEL;
+    }
+
+    if (mpe >= MPE_U15) {
+        return channel + 1;
+    }
+
+    return channel;
+}
+
+
+void Synth::change_midi_controller(
+    MidiController& midi_controller,
+    Midi::Channel const mpe_channel,
+    Seconds const time_offset,
+    Number const new_value
+) const noexcept {
+    if (mpe_channel == PARAM_GLOBAL_MPE_CHANNEL) {
+        midi_controller.change_all_channels(time_offset, new_value);
+    } else {
+        midi_controller.change(mpe_channel, time_offset, new_value);
     }
 }
 
@@ -1466,7 +1614,15 @@ void Synth::channel_pressure(
         return;
     }
 
-    channel_pressure_ctl.change(time_offset, midi_byte_to_float(pressure));
+    Midi::Channel const mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        return;
+    }
+
+    change_midi_controller(
+        channel_pressure_ctl, mpe_channel, time_offset, midi_byte_to_float(pressure)
+    );
 }
 
 
@@ -1481,6 +1637,11 @@ bool Synth::is_repeated_midi_controller_message(
     separately on all channels, but it's enough for JS80P to handle only one of
     those.
     */
+
+    if (mpe_settings.get_value() != MPE_OFF) {
+        return false;
+    }
+
     MidiControllerMessage const message(time_offset, value);
 
     if (previous_controller_message[controller_id] == message) {
@@ -1499,6 +1660,12 @@ void Synth::note_off(
         Midi::Note const note,
         Midi::Byte const velocity
 ) noexcept {
+    Midi::Channel const mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        return;
+    }
+
     Integer const voice = midi_note_to_voice_assignments[channel][note];
     bool const was_note_stack_top = note_stack.is_top(channel, note);
 
@@ -1532,12 +1699,12 @@ void Synth::note_off(
                 return;
             }
 
-            note_id = carriers[voice]->get_note_id();
+            note_id = carrier->get_note_id();
         }
 
         if (is_polyphonic() || was_note_stack_top) {
             deferred_note_offs.push_back(
-                DeferredNoteOff(note_id, channel, note, velocity, voice)
+                DeferredNoteOff(note_id, channel, mpe_channel, note, velocity, voice)
             );
         }
 
@@ -1548,8 +1715,12 @@ void Synth::note_off(
 
     Number const velocity_float = midi_byte_to_float(velocity);
 
-    this->released_velocity.change(time_offset, velocity_float);
-    this->released_note.change(time_offset, midi_byte_to_float(note));
+    change_midi_controller(
+        this->released_velocity, mpe_channel, time_offset, velocity_float
+    );
+    change_midi_controller(
+        this->released_note, mpe_channel, time_offset, midi_byte_to_float(note)
+    );
 
     if (is_monophonic && was_note_stack_top && !note_stack.is_empty()) {
         Number previous_velocity;
@@ -1558,7 +1729,21 @@ void Synth::note_off(
 
         note_stack.top(previous_channel, previous_note, previous_velocity);
 
-        note_on_monophonic(time_offset, previous_channel, previous_note, previous_velocity, false);
+        Midi::Channel const previous_mpe_channel = map_mpe_channel(previous_channel);
+
+        if (JS80P_UNLIKELY(previous_mpe_channel == Midi::INVALID_CHANNEL)) {
+            JS80P_ASSERT_NOT_REACHED();
+            return;
+        }
+
+        note_on_monophonic(
+            time_offset,
+            previous_channel,
+            previous_mpe_channel,
+            previous_note,
+            previous_velocity,
+            false
+        );
 
         update_voice_statuses();
 
@@ -1590,6 +1775,12 @@ void Synth::control_change(
         return;
     }
 
+    Midi::Channel const mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        return;
+    }
+
     if (is_learning) {
         for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
             if (controller_assignments[i].load() == ControllerId::MIDI_LEARN) {
@@ -1600,7 +1791,12 @@ void Synth::control_change(
         is_learning = false;
     }
 
-    midi_controllers_rw[controller]->change(time_offset, midi_byte_to_float(new_value));
+    change_midi_controller(
+        *midi_controllers_rw[controller],
+        mpe_channel,
+        time_offset,
+        midi_byte_to_float(new_value)
+    );
 
     if (controller == Midi::SUSTAIN_PEDAL) {
         if (new_value < 64) {
@@ -1650,10 +1846,15 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
 
             Integer const note_id = deferred_note_off.get_note_id();
             Midi::Note const note = deferred_note_off.get_note();
+            Midi::Channel const mpe_channel = deferred_note_off.get_mpe_channel();
             Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
 
-            this->released_velocity.change(time_offset, velocity);
-            this->released_note.change(time_offset, midi_byte_to_float(note));
+            change_midi_controller(
+                this->released_velocity, mpe_channel, time_offset, velocity
+            );
+            change_midi_controller(
+                this->released_note, mpe_channel, time_offset, midi_byte_to_float(note)
+            );
 
             modulators[voice]->note_off(time_offset, note_id, note, velocity);
             carriers[voice]->note_off(time_offset, note_id, note, velocity);
@@ -1662,6 +1863,7 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
         for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const note_id = deferred_note_off.get_note_id();
+            Midi::Channel const mpe_channel = deferred_note_off.get_mpe_channel();
 
             bool const modulator_playing = modulators[0]->get_note_id() == note_id;
             bool const carrier_playing = carriers[0]->get_note_id() == note_id;
@@ -1681,12 +1883,30 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
                     note = carriers[0]->get_note();
                 }
 
-                this->released_velocity.change(time_offset, velocity);
-                this->released_note.change(time_offset, midi_byte_to_float(note));
+                change_midi_controller(
+                    this->released_velocity, mpe_channel, time_offset, velocity
+                );
+                change_midi_controller(
+                    this->released_note, mpe_channel, time_offset, midi_byte_to_float(note)
+                );
 
                 note_stack.top(previous_channel, previous_note, previous_velocity);
 
-                note_on_monophonic(time_offset, previous_channel, previous_note, previous_velocity, false);
+                Midi::Channel const previous_mpe_channel = map_mpe_channel(previous_channel);
+
+                if (JS80P_UNLIKELY(previous_mpe_channel == Midi::INVALID_CHANNEL)) {
+                    JS80P_ASSERT_NOT_REACHED();
+                    continue;
+                }
+
+                note_on_monophonic(
+                    time_offset,
+                    previous_channel,
+                    previous_mpe_channel,
+                    previous_note,
+                    previous_velocity,
+                    false
+                );
             }
         }
     }
@@ -1736,7 +1956,15 @@ void Synth::pitch_wheel_change(
         return;
     }
 
-    pitch_wheel.change(time_offset, midi_word_to_float(new_value));
+    Midi::Channel const mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        return;
+    }
+
+    change_midi_controller(
+        pitch_wheel, mpe_channel, time_offset, midi_word_to_float(new_value)
+    );
 }
 
 
@@ -2884,8 +3112,7 @@ void Synth::set_voice_status_flag(
         Midi::Channel const channel,
         Midi::Note const note,
         Byte const flag
-) noexcept
-{
+) noexcept {
     Integer const voice = midi_note_to_voice_assignments[channel][note];
 
     if (voice != INVALID_VOICE) {
@@ -2933,31 +3160,31 @@ void Synth::finalize_rendering(
     if (osc_1_peak.is_assigned()) {
         bus.find_modulators_peak(sample_count, peak, peak_index);
         osc_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        osc_1_peak.change(0.0, std::min(1.0, osc_1_peak_tracker.get_peak()));
+        osc_1_peak.change_all_channels(0.0, std::min(1.0, osc_1_peak_tracker.get_peak()));
     }
 
     if (osc_2_peak.is_assigned()) {
         bus.find_carriers_peak(sample_count, peak, peak_index);
         osc_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        osc_2_peak.change(0.0, std::min(1.0, osc_2_peak_tracker.get_peak()));
+        osc_2_peak.change_all_channels(0.0, std::min(1.0, osc_2_peak_tracker.get_peak()));
     }
 
     if (vol_1_peak.is_assigned()) {
         effects.volume_1.find_input_peak(round, sample_count, peak, peak_index);
         vol_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_1_peak.change(0.0, std::min(1.0, vol_1_peak_tracker.get_peak()));
+        vol_1_peak.change_all_channels(0.0, std::min(1.0, vol_1_peak_tracker.get_peak()));
     }
 
     if (vol_2_peak.is_assigned()) {
         effects.volume_2.find_input_peak(round, sample_count, peak, peak_index);
         vol_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_2_peak.change(0.0, std::min(1.0, vol_2_peak_tracker.get_peak()));
+        vol_2_peak.change_all_channels(0.0, std::min(1.0, vol_2_peak_tracker.get_peak()));
     }
 
     if (vol_3_peak.is_assigned()) {
         effects.volume_3.find_input_peak(round, sample_count, peak, peak_index);
         vol_3_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_3_peak.change(0.0, std::min(1.0, vol_3_peak_tracker.get_peak()));
+        vol_3_peak.change_all_channels(0.0, std::min(1.0, vol_3_peak_tracker.get_peak()));
     }
 
     active_voices_count.store((Integer)bus.get_active_voices_count());
@@ -3613,6 +3840,7 @@ Synth::DeferredNoteOff::DeferredNoteOff()
     : voice(INVALID_VOICE),
     note_id(0),
     channel(0),
+    mpe_channel(PARAM_GLOBAL_MPE_CHANNEL),
     note(0),
     velocity(0)
 {
@@ -3622,10 +3850,16 @@ Synth::DeferredNoteOff::DeferredNoteOff()
 Synth::DeferredNoteOff::DeferredNoteOff(
         Integer const note_id,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Midi::Note const note,
         Midi::Byte const velocity,
         Integer const voice
-) : voice(voice), note_id(note_id), channel(channel), note(note), velocity(velocity)
+) : voice(voice),
+    note_id(note_id),
+    channel(channel),
+    mpe_channel(mpe_channel),
+    note(note),
+    velocity(velocity)
 {
 }
 
@@ -3639,6 +3873,12 @@ Integer Synth::DeferredNoteOff::get_note_id() const noexcept
 Midi::Channel Synth::DeferredNoteOff::get_channel() const noexcept
 {
     return channel;
+}
+
+
+Midi::Channel Synth::DeferredNoteOff::get_mpe_channel() const noexcept
+{
+    return mpe_channel;
 }
 
 

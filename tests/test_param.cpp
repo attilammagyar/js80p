@@ -24,6 +24,7 @@
 #include "utils.cpp"
 
 #include "js80p.hpp"
+#include "midi.hpp"
 
 #include "dsp/envelope.cpp"
 #include "dsp/lfo.cpp"
@@ -193,18 +194,20 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
     constexpr Sample expected_samples[] = {
         2, 2, 2, 2, 2,
     };
+
     Param<int> param("int", -10, 10, 0);
     MidiController midi_controller;
     Sample const* const* rendered_samples;
     Integer change_index_1;
     Integer change_index_2;
 
-    midi_controller.change(0.0, 0.6);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.6);
     midi_controller.clear();
 
     param.set_block_size(block_size);
     param.set_sample_rate(1.0);
     param.set_midi_controller(&midi_controller);
+    param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     assert_eq((void*)&midi_controller, (void*)param.get_midi_controller());
     assert_eq(2, param.get_value());
@@ -215,7 +218,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
     assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
 
     change_index_1 = param.get_change_index();
-    midi_controller.change(0.0, 0.2514);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.2514);
     change_index_2 = param.get_change_index();
 
     assert_eq(-5, param.get_value());
@@ -223,7 +226,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_then_the_params_value_follows
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
-    midi_controller.change(0.0, 0.35);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.35);
     param.set_midi_controller(NULL);
 
     assert_eq(-3, param.get_value());
@@ -1279,6 +1282,191 @@ TEST(when_a_float_param_is_following_another_then_their_controllers_are_the_same
 })
 
 
+TEST(when_a_float_param_uses_a_different_midi_channel_than_its_leader_then_their_values_are_independent, {
+    constexpr Midi::Channel midi_channel_1 = 1;
+    constexpr Midi::Channel midi_channel_2 = 2;
+
+    MidiController midi_controller;
+    Macro macro("M");
+
+    FloatParamB leader("float", 0.0, 10.0, 0.0);
+    FloatParamB follower(leader);
+
+    midi_controller.change(midi_channel_1, 0.0, 0.3);
+    midi_controller.change(midi_channel_2, 0.0, 0.9);
+
+    macro.min.set_value(1.0);
+    macro.max.set_value(0.0);
+    macro.input.set_midi_controller(&midi_controller);
+
+    leader.set_midi_channel(midi_channel_1);
+    follower.set_midi_channel(midi_channel_1);
+
+    leader.set_value(10.0);
+
+    leader.set_midi_controller(NULL);
+    leader.set_macro(NULL);
+    assert_false(follower.is_polyphonic(), "same channel, no controller");
+    assert_eq(10.0, leader.get_value(), DOUBLE_DELTA, "same channel, no controller");
+    assert_eq(10.0, follower.get_value(), DOUBLE_DELTA, "same channel, no controller");
+    assert_eq(1.0, leader.get_ratio(), DOUBLE_DELTA, "same channel, no controller");
+    assert_eq(1.0, follower.get_ratio(), DOUBLE_DELTA, "same channel, no controller");
+
+    leader.set_midi_controller(&midi_controller);
+    leader.set_macro(NULL);
+    assert_false(follower.is_polyphonic(), "same channel, MIDI controller");
+    assert_eq(3.0, leader.get_value(), DOUBLE_DELTA, "same channel, MIDI controller");
+    assert_eq(3.0, follower.get_value(), DOUBLE_DELTA, "same channel, MIDI controller");
+    assert_eq(0.3, leader.get_ratio(), DOUBLE_DELTA, "same channel, MIDI controller");
+    assert_eq(0.3, follower.get_ratio(), DOUBLE_DELTA, "same channel, MIDI controller");
+
+    leader.set_midi_controller(NULL);
+    leader.set_macro(&macro);
+    assert_false(follower.is_polyphonic(), "same channel, Macro");
+    assert_eq(7.0, leader.get_value(), DOUBLE_DELTA, "same channel, Macro");
+    assert_eq(7.0, follower.get_value(), DOUBLE_DELTA, "same channel, Macro");
+    assert_eq(0.7, leader.get_ratio(), DOUBLE_DELTA, "same channel, Macro");
+    assert_eq(0.7, follower.get_ratio(), DOUBLE_DELTA, "same channel, Macro");
+
+    leader.set_midi_controller(NULL);
+    leader.set_macro(NULL);
+    leader.set_value(10.0);
+    follower.set_midi_channel(midi_channel_2);
+    assert_false(follower.is_polyphonic(), "different channels, no controller");
+    assert_eq(10.0, leader.get_value(), DOUBLE_DELTA, "different channels, no controller");
+    assert_eq(10.0, follower.get_value(), DOUBLE_DELTA, "different channels, no controller");
+    assert_eq(1.0, leader.get_ratio(), DOUBLE_DELTA, "different channels, no controller");
+    assert_eq(1.0, follower.get_ratio(), DOUBLE_DELTA, "different channels, no controller");
+
+    leader.set_midi_controller(&midi_controller);
+    leader.set_macro(NULL);
+    assert_true(follower.is_polyphonic(), "different channels, MIDI controller");
+    assert_eq(3.0, leader.get_value(), DOUBLE_DELTA, "different channels, MIDI controller");
+    assert_eq(9.0, follower.get_value(), DOUBLE_DELTA, "different channels, MIDI controller");
+    assert_eq(0.3, leader.get_ratio(), DOUBLE_DELTA, "different channels, MIDI controller");
+    assert_eq(0.9, follower.get_ratio(), DOUBLE_DELTA, "different channels, MIDI controller");
+
+    leader.set_midi_controller(NULL);
+    leader.set_macro(&macro);
+    assert_true(follower.is_polyphonic(), "different channels, Macro");
+    assert_eq(7.0, leader.get_value(), DOUBLE_DELTA, "different channels, Macro");
+    assert_eq(1.0, follower.get_value(), DOUBLE_DELTA, "different channels, Macro");
+    assert_eq(0.7, leader.get_ratio(), DOUBLE_DELTA, "different channels, Macro");
+    assert_eq(0.1, follower.get_ratio(), DOUBLE_DELTA, "different channels, Macro");
+})
+
+
+TEST(when_a_float_param_uses_a_different_midi_channel_for_a_midi_controller_than_its_leader_then_they_are_rendered_independently, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 0.0, 10.0, 10.0, 10.0,
+    };
+    constexpr Midi::Channel midi_channel_leader = 1;
+    constexpr Midi::Channel midi_channel_follower = 2;
+
+    FloatParamS leader("L", 0.0, 10.0, 0.0);
+    FloatParamS follower(leader);
+    MidiController midi_controller;
+    Sample const* rendered_samples;
+    int change_index_before;
+    int change_index_after;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.clear();
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_midi_controller(&midi_controller);
+    leader.set_midi_channel(midi_channel_leader);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+    follower.set_midi_channel(midi_channel_follower);
+
+    change_index_before = (int)follower.get_change_index();
+    midi_controller.change(midi_channel_follower, 1.0, 1.0);
+    change_index_after = (int)follower.get_change_index();
+
+    assert_true(leader.is_constant_until(block_size));
+    assert_false(follower.is_constant_until(block_size));
+    assert_neq(change_index_before, change_index_after);
+    assert_neq(change_index_after, (int)leader.get_change_index());
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        leader, 1, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+    assert_eq(expected_samples, rendered_samples, block_size, DOUBLE_DELTA);
+
+    assert_eq(0.0, leader.get_value(), DOUBLE_DELTA);
+    assert_eq(10.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
+TEST(when_a_float_param_uses_a_different_midi_channel_for_a_macro_than_its_leader_then_they_are_rendered_independently, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[block_size] = {
+        10.0, 7.5, 5.0, 2.5, 0.0,  /* smoothing */
+    };
+    constexpr Midi::Channel midi_channel_leader = 1;
+    constexpr Midi::Channel midi_channel_follower = 2;
+
+    FloatParamS leader("L", 0.0, 10.0, 0.0);
+    FloatParamS follower(leader);
+    MidiController midi_controller;
+    Macro macro("M");
+    Sample const* rendered_samples;
+    int change_index_before;
+    int change_index_after;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.clear();
+
+    macro.input.set_midi_controller(&midi_controller);
+    macro.min.set_value(1.0);
+    macro.max.set_value(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_macro(&macro);
+    leader.set_midi_channel(midi_channel_leader);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(1.0);
+    follower.set_midi_channel(midi_channel_follower);
+
+    FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    change_index_before = (int)follower.get_change_index();
+    midi_controller.change(midi_channel_follower, 1.0, 1.0);
+    change_index_after = (int)follower.get_change_index();
+
+    assert_true(leader.is_constant_until(block_size));
+    assert_false(follower.is_constant_until(block_size));
+    assert_neq(change_index_before, change_index_after);
+    assert_neq(change_index_after, (int)leader.get_change_index());
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        leader, 2, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 2, block_size
+    );
+    assert_eq(expected_samples, rendered_samples, block_size, DOUBLE_DELTA);
+
+    assert_eq(10.0, leader.get_value(), DOUBLE_DELTA);
+    assert_eq(0.0, follower.get_value(), DOUBLE_DELTA);
+})
+
+
 TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_op, {
     constexpr Integer block_size = 10;
     constexpr Integer rounds = 1;
@@ -2161,24 +2349,77 @@ TEST(envelope_update_mode_may_depend_on_voice_status, {
 })
 
 
+TEST(float_param_envelope_settings_respect_midi_channel, {
+    constexpr Integer block_size = 10;
+    constexpr Sample expected_samples[block_size] = {
+        0.0, 0.0, 0.0, 0.5, 1.0,
+        1.0, 1.0, 1.0, 0.5, 0.0,
+    };
+    constexpr Midi::Channel midi_channel = 2;
+
+    Envelope envelope("env");
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS float_param("float", 0.0, 1.0, 0.0, 0.0, envelopes);
+    MidiController midi_controller;
+    Sample const* const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.change(midi_channel, 0.0, 1.0);
+    midi_controller.clear();
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(1.0);
+    float_param.set_envelope(&envelope);
+
+    envelope.scale.set_midi_controller(&midi_controller);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(1.0);
+    envelope.attack_time.set_value(2.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(0.0);
+    envelope.sustain_value.set_value(1.0);
+    envelope.release_time.set_value(2.0);
+    envelope.final_value.set_value(0.0);
+
+    float_param.set_midi_channel(midi_channel);
+    float_param.start_envelope(1.0, 0.0, 0.0);
+    float_param.end_envelope(7.0);
+
+    assert_true(float_param.is_constant_until(1));
+    assert_false(float_param.is_constant_until(2));
+
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
+    rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
+    assert_false(float_param.is_constant_in_next_round(1, block_size));
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
 TEST(when_a_midi_controller_is_assigned_to_a_block_evaluated_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
+
     FloatParamB float_param("float", -5.0, 5.0, 3.0, 0.5);
     MidiController midi_controller;
     Integer change_index_1;
     Integer change_index_2;
 
-    midi_controller.change(0.0, 0.8);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.8);
     midi_controller.clear();
 
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(1.0);
     float_param.set_midi_controller(&midi_controller);
+    float_param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     assert_eq((void*)&midi_controller, (void*)float_param.get_midi_controller());
 
     change_index_1 = float_param.get_change_index();
-    midi_controller.change(1.5, 0.2514);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 1.5, 0.2514);
     change_index_2 = float_param.get_change_index();
 
     assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
@@ -2186,7 +2427,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_block_evaluated_float_param_then_fl
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
-    midi_controller.change(0.0, 0.35);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.35);
     float_param.set_midi_controller(NULL);
     assert_eq(-1.5, float_param.get_value(), DOUBLE_DELTA);
 })
@@ -2197,23 +2438,25 @@ TEST(when_a_midi_controller_is_assigned_to_a_sample_evaluated_float_param_then_f
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, -2.5, -2.5, -2.5,
     };
+
     FloatParamS float_param("float", -5.0, 5.0, 3.0, 0.5);
     MidiController midi_controller;
     Integer change_index_1;
     Integer change_index_2;
     Sample const* const* rendered_samples;
 
-    midi_controller.change(0.0, 0.8);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.8);
     midi_controller.clear();
 
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(1.0);
     float_param.set_midi_controller(&midi_controller);
+    float_param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     assert_eq((void*)&midi_controller, (void*)float_param.get_midi_controller());
 
     change_index_1 = float_param.get_change_index();
-    midi_controller.change(1.5, 0.2514);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 1.5, 0.2514);
     change_index_2 = float_param.get_change_index();
 
     assert_eq(3.0, float_param.get_value(), DOUBLE_DELTA);
@@ -2232,7 +2475,7 @@ TEST(when_a_midi_controller_is_assigned_to_a_sample_evaluated_float_param_then_f
     assert_eq(-2.5, float_param.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, float_param.get_ratio(), DOUBLE_DELTA);
 
-    midi_controller.change(0.0, 0.35);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.35);
     float_param.set_midi_controller(NULL);
     assert_eq(-1.5, float_param.get_value(), DOUBLE_DELTA);
 })
@@ -2250,25 +2493,26 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
     Sample const* expected_samples;
     Sample const* rendered_samples;
 
-    midi_controller.change(0.0, 0.0);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     midi_controller.clear();
 
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(sample_rate);
     float_param.set_midi_controller(&midi_controller);
+    float_param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
-    midi_controller.change(0.01, 0.001);
-    midi_controller.change(0.02, 0.005);
-    midi_controller.change(0.03, 0.010);
-    midi_controller.change(0.31, 0.025);
-    midi_controller.change(0.31, 0.325);
-    midi_controller.change(0.31, 0.325);
-    midi_controller.change(0.31, 0.325);
-    midi_controller.change(0.32, 0.325);
-    midi_controller.change(0.33, 0.325);
-    midi_controller.change(0.33, 0.325);
-    midi_controller.change(0.33, 0.330);
-    midi_controller.change(0.41, 0.960);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.01, 0.001);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.02, 0.005);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.03, 0.010);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.31, 0.025);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.31, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.31, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.31, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.32, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.33, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.33, 0.325);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.33, 0.330);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.41, 0.960);
 
     reference_float_param.set_block_size(block_size);
     reference_float_param.set_sample_rate(sample_rate);
@@ -2289,31 +2533,34 @@ TEST(float_param_follows_midi_controller_changes_gradually, {
 
 TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_block_evaluated_float_param_then_the_follower_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
+
     FloatParamB leader("float", -5.0, 5.0, 3.0, 0.5);
     FloatParamB follower(leader);
     MidiController midi_controller;
     Integer change_index_1;
     Integer change_index_2;
 
-    midi_controller.change(0.0, 0.8);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.8);
     midi_controller.clear();
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
     leader.set_midi_controller(&midi_controller);
+    leader.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.set_block_size(block_size);
     follower.set_sample_rate(1.0);
+    follower.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     change_index_1 = follower.get_change_index();
-    midi_controller.change(1.5, 0.2514);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 1.5, 0.2514);
     change_index_2 = follower.get_change_index();
     assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
 
     assert_neq((int)change_index_1, (int)change_index_2);
 
-    midi_controller.change(0.0, 0.35);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.35);
     leader.set_midi_controller(NULL);
     assert_eq(-1.5, follower.get_value(), DOUBLE_DELTA);
 })
@@ -2324,6 +2571,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_floa
     constexpr Sample expected_samples[block_size] = {
         3.0, 3.0, -2.5, -2.5, -2.5,
     };
+
     FloatParamS leader("float", -5.0, 5.0, 3.0, 0.5);
     FloatParamS follower(leader);
     MidiController midi_controller;
@@ -2332,18 +2580,20 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_floa
     Sample const* const* leader_samples;
     Sample const* const* follower_samples;
 
-    midi_controller.change(0.0, 0.8);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.8);
     midi_controller.clear();
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
     leader.set_midi_controller(&midi_controller);
+    leader.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.set_block_size(block_size);
     follower.set_sample_rate(1.0);
+    follower.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
 
     change_index_1 = follower.get_change_index();
-    midi_controller.change(1.5, 0.2514);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 1.5, 0.2514);
     change_index_2 = follower.get_change_index();
     assert_eq(3.0, follower.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
@@ -2363,7 +2613,7 @@ TEST(when_a_midi_controller_is_assigned_to_the_leader_of_a_sample_evaluated_floa
     assert_eq(-2.5, follower.get_value(), DOUBLE_DELTA);
     assert_eq(0.2514, follower.get_ratio(), DOUBLE_DELTA);
 
-    midi_controller.change(0.0, 0.35);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.35);
     leader.set_midi_controller(NULL);
     assert_eq(-1.5, follower.get_value(), DOUBLE_DELTA);
 })
@@ -3331,8 +3581,9 @@ TEST(can_tell_if_envelope_has_decayed, {
     param_with_nothing.set_value(1.0);
     assert_decay_status(false, param_with_nothing, 1);
 
-    midi_controller.change(0.0, 0.0);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     param_with_midi_controller.set_midi_controller(&midi_controller);
+    param_with_midi_controller.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
     assert_decay_status(false, param_with_midi_controller);
 
     macro.input.set_value(0.0);
@@ -3576,6 +3827,54 @@ TEST(when_modulation_level_is_positive_then_modulated_float_param_is_not_constan
 })
 
 
+TEST(modulation_level_uses_the_same_midi_channel_as_the_modulatable_param, {
+    constexpr Integer block_size = 3;
+    constexpr Frequency sample_rate = 1.0;
+    constexpr Number param_value = 1.0;
+    constexpr Sample expected_samples[] = {
+        (Sample)(param_value + Modulator::VALUE),
+        (Sample)(param_value + Modulator::VALUE),
+        (Sample)(param_value + Modulator::VALUE),
+    };
+    constexpr Midi::Channel midi_channel = 1;
+
+    Modulator modulator;
+    FloatParamS modulation_level_leader("MOD", 0.0, 1.0, 0.0);
+    ModulatableFloatParam<Modulator> modulatable_float_param(
+        modulator, modulation_level_leader, "", 0.0, 10.0, 0.0
+    );
+    MidiController midi_controller;
+    Sample const* const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.change(midi_channel, 0.0, 1.0);
+
+    modulation_level_leader.set_block_size(block_size);
+    modulation_level_leader.set_sample_rate(sample_rate);
+    modulation_level_leader.set_midi_controller(&midi_controller);
+    modulation_level_leader.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
+
+    modulatable_float_param.set_block_size(block_size);
+    modulatable_float_param.set_sample_rate(sample_rate);
+    modulatable_float_param.set_value(param_value);
+    modulatable_float_param.set_midi_channel(midi_channel);
+
+    /* Do away with MIDI controller smoothing. */
+    FloatParamS::produce< ModulatableFloatParam<Modulator> >(
+        modulatable_float_param, 1
+    );
+
+    assert_false(modulatable_float_param.is_constant_in_next_round(2, block_size));
+    rendered_samples = FloatParamS::produce< ModulatableFloatParam<Modulator> >(
+        modulatable_float_param, 2
+    );
+    assert_false(modulatable_float_param.is_constant_in_next_round(2, block_size));
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(2, modulator.render_called);
+})
+
+
 TEST(when_modulation_level_is_changing_then_modulated_float_param_is_not_constant_and_does_invoke_modulator, {
     constexpr Integer block_size = 5;
     constexpr Frequency sample_rate = 1.0;
@@ -3756,10 +4055,11 @@ TEST(modulated_param_might_have_a_midi_controller_assigned, {
     modulatable_float_param.set_sample_rate(sample_rate);
 
     modulatable_float_param.set_midi_controller(&midi_controller);
+    modulatable_float_param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
     modulatable_float_param.set_value(0.25);
     modulation_level_leader.set_value(0.0);
     modulation_level_leader.schedule_value(2.0, modulation_level_value);
-    midi_controller.change(0.1, 0.5);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.1, 0.5);
 
     assert_false(modulatable_float_param.is_constant_in_next_round(1, block_size));
     rendered_samples = FloatParamS::produce< ModulatableFloatParam<Modulator> >(
@@ -3842,6 +4142,7 @@ TEST(float_param_is_constant_after_assigning_midi_controller, {
         1.23, 1.23, 1.23, 1.23, 1.23,
         1.23, 1.23, 1.23, 1.23, 1.23,
     };
+
     MidiController midi_controller;
     FloatParamS float_param("F", 0.0, 10.0, 1.0);
     Sample const* const* samples;
@@ -3851,10 +4152,11 @@ TEST(float_param_is_constant_after_assigning_midi_controller, {
 
     float_param.schedule_linear_ramp(1.0, 5.0);
     FloatParamS::produce(float_param, 1, 1);
-    midi_controller.change(0.0, 0.123);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.123);
     midi_controller.clear();
 
     float_param.set_midi_controller(&midi_controller);
+    float_param.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
     assert_true(float_param.is_constant_in_next_round(2, sample_count));
 
     samples = FloatParamS::produce(float_param, 2, sample_count);

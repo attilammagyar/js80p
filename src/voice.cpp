@@ -846,6 +846,47 @@ void Voice<ModulatorSignalProducerClass>::update_inaccuracy(Integer const round)
 
 
 template<class ModulatorSignalProducerClass>
+void Voice<ModulatorSignalProducerClass>::set_mpe_channel(
+        Midi::Channel const mpe_channel
+) noexcept {
+    oscillator.detune.set_midi_channel(mpe_channel);
+
+    if constexpr (IS_MODULATOR) {
+        additive_volume.set_midi_channel(mpe_channel);
+    }
+
+    wavefolder.folding.set_midi_channel(mpe_channel);
+
+    if constexpr (IS_CARRIER) {
+        distortion.level.set_midi_channel(mpe_channel);
+    }
+
+    panning.set_midi_channel(mpe_channel);
+    volume.set_midi_channel(mpe_channel);
+
+    oscillator.modulated_amplitude.set_midi_channel(mpe_channel);
+    oscillator.amplitude.set_midi_channel(mpe_channel);
+
+    if constexpr (IS_MODULATOR) {
+        oscillator.subharmonic_amplitude.set_midi_channel(mpe_channel);
+    }
+
+    oscillator.frequency.set_midi_channel(mpe_channel);
+    oscillator.phase.set_midi_channel(mpe_channel);
+
+    oscillator.fine_detune.set_midi_channel(mpe_channel);
+
+    filter_1.frequency.set_midi_channel(mpe_channel);
+    filter_1.q.set_midi_channel(mpe_channel);
+    filter_1.gain.set_midi_channel(mpe_channel);
+
+    filter_2.frequency.set_midi_channel(mpe_channel);
+    filter_2.q.set_midi_channel(mpe_channel);
+    filter_2.gain.set_midi_channel(mpe_channel);
+}
+
+
+template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::calculate_note_velocity(
         Number const raw_velocity
 ) const noexcept {

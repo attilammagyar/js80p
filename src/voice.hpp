@@ -298,6 +298,8 @@ class Voice : public SignalProducer
 
         void update_inaccuracy(Integer const round) noexcept;
 
+        void set_mpe_channel(Midi::Channel const mpe_channel) noexcept;
+
         void note_on(
             Seconds const time_offset,
             Integer const note_id,

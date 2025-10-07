@@ -48,20 +48,20 @@ Macro::Macro(std::string const& name, Number const input_default_value) noexcept
     distortion(name + "DST", 0.0, 1.0, 0.0),
     randomness(name + "RND", 0.0, 1.0, 0.0),
     distortion_curve(name + "DSH"),
-    midpoint_change_index(0),
-    input_change_index(0),
-    min_change_index(0),
-    max_change_index(0),
-    scale_change_index(0),
-    distortion_change_index(0),
-    randomness_change_index(0),
-    distortion_curve_change_index(0),
+    midpoint_change_indices{},
+    input_change_indices{},
+    min_change_indices{},
+    max_change_indices{},
+    scale_change_indices{},
+    distortion_change_indices{},
+    randomness_change_indices{},
+    distortion_curve_change_indices{},
     is_updating(false)
 {
 }
 
 
-void Macro::update() noexcept
+void Macro::update(Midi::Channel const midi_channel) noexcept
 {
     if (is_updating) {
         return;
@@ -69,7 +69,7 @@ void Macro::update() noexcept
 
     is_updating = true;
 
-    if (!update_change_indices()) {
+    if (!update_change_indices(midi_channel)) {
         is_updating = false;
 
         return;
@@ -77,6 +77,7 @@ void Macro::update() noexcept
 
     Number const midpoint_value = midpoint.get_value();
     Number const input_value = input.get_value();
+
     Number const shifted_input_value = (
         input_value < 0.5
             ? 2.0 * input_value * midpoint_value
@@ -93,6 +94,7 @@ void Macro::update() noexcept
     );
 
     MidiController::change(
+        midi_channel,
         min_value
         + computed_value * scale.get_value() * (max.get_value() - min_value)
     );
@@ -101,18 +103,18 @@ void Macro::update() noexcept
 }
 
 
-bool Macro::update_change_indices() noexcept
+bool Macro::update_change_indices(Midi::Channel const midi_channel) noexcept
 {
     bool is_dirty;
 
-    is_dirty = update_change_index<FloatParamB>(midpoint, midpoint_change_index);
-    is_dirty = update_change_index<FloatParamB>(input, input_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(min, min_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(max, max_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(scale, scale_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(distortion, distortion_change_index) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(randomness, randomness_change_index) || is_dirty;
-    is_dirty = update_change_index<DistortionCurveParam>(distortion_curve, distortion_curve_change_index) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, midpoint, midpoint_change_indices);
+    is_dirty = update_change_index<FloatParamB>(midi_channel, input, input_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, min, min_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, max, max_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, scale, scale_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, distortion, distortion_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(midi_channel, randomness, randomness_change_indices) || is_dirty;
+    is_dirty = update_change_index<DistortionCurveParam>(midi_channel, distortion_curve, distortion_curve_change_indices) || is_dirty;
 
     return is_dirty;
 }
@@ -120,16 +122,19 @@ bool Macro::update_change_indices() noexcept
 
 template<class ParamClass>
 bool Macro::update_change_index(
+        Midi::Channel const midi_channel,
         ParamClass& param,
-        Integer& change_index
+        Integer* change_indices
 ) const noexcept {
+    param.set_midi_channel(midi_channel);
+
     Integer const new_change_index = param.get_change_index();
 
-    if (new_change_index == change_index) {
+    if (new_change_index == change_indices[midi_channel]) {
         return false;
     }
 
-    change_index = new_change_index;
+    change_indices[midi_channel] = new_change_index;
 
     return true;
 }

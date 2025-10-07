@@ -216,10 +216,10 @@ TEST(midi_controller_changes_can_affect_parameters, {
         synth, Synth::ParamId::CWAV, Synth::ControllerId::MODULATION_WHEEL
     );
 
-    synth.push_message(REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0.0);
-    synth.push_message(REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0.0);
-    synth.push_message(REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0.0);
-    synth.push_message(REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0.0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0);
 
     synth.control_change(0.0, 1, Midi::VOLUME, 53);
     synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 127);
@@ -575,9 +575,12 @@ TEST(when_the_same_controller_message_is_received_over_multiple_channels_then_on
     synth.channel_pressure(0.1, 2, 100);
     synth.channel_pressure(0.1, 3, 100);
 
-    assert_eq(1, synth.midi_controllers[Midi::VOLUME]->events.length());
-    assert_eq(1, synth.pitch_wheel.events.length());
-    assert_eq(1, synth.channel_pressure_ctl.events.length());
+    assert_eq(
+        1,
+        synth.midi_controllers[Midi::VOLUME]->event_queues[PARAM_DEFAULT_MPE_CHANNEL].length()
+    );
+    assert_eq(1, synth.pitch_wheel.event_queues[PARAM_DEFAULT_MPE_CHANNEL].length());
+    assert_eq(1, synth.channel_pressure_ctl.event_queues[PARAM_DEFAULT_MPE_CHANNEL].length());
 })
 
 
@@ -1294,11 +1297,11 @@ TEST(peak_controllers_are_not_updated_when_they_are_not_assigned_to_any_paramete
 
     synth.generate_samples(1, PEAK_CTL_TEST_BLOCK_SIZE);
 
-    assert_eq(0.0, synth.osc_1_peak.get_value());
-    assert_eq(0.0, synth.osc_2_peak.get_value());
-    assert_eq(0.0, synth.vol_1_peak.get_value());
-    assert_eq(0.0, synth.vol_2_peak.get_value());
-    assert_eq(0.0, synth.vol_3_peak.get_value());
+    assert_eq(0.0, synth.osc_1_peak.get_value(PARAM_DEFAULT_MPE_CHANNEL));
+    assert_eq(0.0, synth.osc_2_peak.get_value(PARAM_DEFAULT_MPE_CHANNEL));
+    assert_eq(0.0, synth.vol_1_peak.get_value(PARAM_DEFAULT_MPE_CHANNEL));
+    assert_eq(0.0, synth.vol_2_peak.get_value(PARAM_DEFAULT_MPE_CHANNEL));
+    assert_eq(0.0, synth.vol_3_peak.get_value(PARAM_DEFAULT_MPE_CHANNEL));
 })
 
 
@@ -1323,7 +1326,7 @@ void test_peak_controller(
         default: break;
     }
 
-    assert_eq(expected_value, controller->get_value(), 0.006);
+    assert_eq(expected_value, controller->get_value(PARAM_DEFAULT_MPE_CHANNEL), 0.006);
 }
 
 
@@ -1633,66 +1636,66 @@ TEST(triggered_and_released_note_and_velocity_controllers_are_maintained, {
 
     Synth synth;
 
-    synth.triggered_note.change(0.0, 0.0);
-    synth.triggered_velocity.change(0.0, 0.0);
-    synth.released_note.change(0.0, 0.0);
-    synth.released_velocity.change(0.0, 0.0);
+    synth.triggered_note.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
+    synth.triggered_velocity.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
+    synth.released_note.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
+    synth.released_velocity.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);
 
-    assert_eq(A_5, synth.triggered_note.get_value(), tolerance);
-    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(0.0, synth.released_note.get_value(), tolerance);
-    assert_eq(0.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_5, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(0.0, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(0.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.note_off(0.0, 1, Midi::NOTE_A_5, 108);
     synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
 
-    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
-    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_5, synth.released_note.get_value(), tolerance);
-    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
     synth.note_off(0.0, 1, Midi::NOTE_A_2, 48);
 
-    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
-    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_5, synth.released_note.get_value(), tolerance);
-    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
 
-    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
-    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_2, synth.released_note.get_value(), tolerance);
-    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.note_handling.set_value(Synth::NOTE_HANDLING_MONOPHONIC);
 
     synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
     synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);
 
-    assert_eq(A_5, synth.triggered_note.get_value(), tolerance);
-    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_2, synth.released_note.get_value(), tolerance);
-    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_5, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(96.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.note_off(0.0, 1, Midi::NOTE_A_5, 108);
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 127);
     synth.note_off(0.0, 1, Midi::NOTE_A_2, 48);
 
-    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
-    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_5, synth.released_note.get_value(), tolerance);
-    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_5, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(108.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
     synth.control_change(0.0, 1, Midi::SUSTAIN_PEDAL, 0);
 
-    assert_eq(A_2, synth.triggered_note.get_value(), tolerance);
-    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(), tolerance);
-    assert_eq(A_2, synth.released_note.get_value(), tolerance);
-    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(), tolerance);
+    assert_eq(A_2, synth.triggered_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(36.0 / 127.0, synth.triggered_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(A_2, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
+    assert_eq(48.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 })
 
 
@@ -1788,11 +1791,17 @@ void test_ignore_sustain_pedal(
     synth_2.note_handling.set_value(note_handling);
     synth_2.note_on(0.0, 1, Midi::NOTE_A_0, 100);
     synth_2.control_change(0.2, 1, Midi::SUSTAIN_PEDAL, 127);
-    assert_eq(1.0, synth_2.midi_controllers[Midi::SUSTAIN_PEDAL]->get_value());
+    assert_eq(
+        1.0,
+        synth_2.midi_controllers[Midi::SUSTAIN_PEDAL]->get_value(PARAM_DEFAULT_MPE_CHANNEL)
+    );
 
     synth_2.note_off(0.5, 1, Midi::NOTE_A_0, 100);
     synth_2.control_change(0.7, 1, Midi::SUSTAIN_PEDAL, 0);
-    assert_eq(0.0, synth_2.midi_controllers[Midi::SUSTAIN_PEDAL]->get_value());
+    assert_eq(
+        0.0,
+        synth_2.midi_controllers[Midi::SUSTAIN_PEDAL]->get_value(PARAM_DEFAULT_MPE_CHANNEL)
+    );
 
     synth_1_samples = SignalProducer::produce<Synth>(synth_1, 1);
     synth_2_samples = SignalProducer::produce<Synth>(synth_2, 1);
@@ -2166,4 +2175,110 @@ TEST(modulator_additive_volume_can_be_polyphonic, {
             (int)i
         );
     }
+})
+
+
+TEST(when_mpe_is_turned_on_then_manager_channel_cc_is_global_and_member_channel_cc_is_polyphonic, {
+    constexpr Frequency sample_rate = 44100.0;
+    constexpr Integer block_size = 2048;
+    constexpr Byte mpe_mode = Synth::MPE_U02;
+    constexpr Midi::Channel manager_channel = 15;
+    constexpr Midi::Channel member_channel = 14;
+    constexpr Midi::Channel invalid_channel = 1;
+    constexpr Midi::Channel global_mpe_channel = PARAM_GLOBAL_MPE_CHANNEL;
+    constexpr Midi::Channel mapped_member_channel = member_channel + 1;
+    constexpr Midi::Channel mapped_invalid_channel = invalid_channel + 1;
+
+    Synth synth;
+    SumOfSines expected(
+        32.0 / 127.0, 220.0,
+        32.0 / 127.0, 440.0,
+        64.0 / 127.0, 880.0,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    synth.resume();
+    synth.control_change(0.0, 0, Synth::ControllerId::MODULATION_WHEEL, 30);
+
+    assign_controller(
+        synth, Synth::ParamId::MVOL, Synth::ControllerId::MODULATION_WHEEL
+    );
+    assign_controller(
+        synth, Synth::ParamId::CVOL, Synth::ControllerId::MODULATION_WHEEL
+    );
+
+    set_param(synth, Synth::ParamId::MPEST, synth.mpe_settings.value_to_ratio(mpe_mode));
+    set_param(synth, Synth::ParamId::MAMP, 1.0);
+    set_param(synth, Synth::ParamId::MPAN, 0.0);
+    set_param(synth, Synth::ParamId::CAMP, 1.0);
+    set_param(synth, Synth::ParamId::CPAN, 1.0);
+
+    synth.process_messages();
+
+    synth.note_on(0.0, manager_channel, Midi::NOTE_A_3, 127);
+    synth.note_on(0.0, manager_channel, Midi::NOTE_A_4, 127);
+    synth.note_on(0.0, member_channel, Midi::NOTE_A_5, 127);
+    synth.note_on(0.0, invalid_channel, Midi::NOTE_A_6, 127);
+    synth.control_change(0.0, manager_channel, Midi::MODULATION_WHEEL, 32);
+    synth.control_change(0.0, member_channel, Midi::MODULATION_WHEEL, 64);
+    synth.control_change(0.0, invalid_channel, Midi::MODULATION_WHEEL, 127);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    assert_eq(
+        32.0 / 127.0,
+        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(mapped_invalid_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        32.0 / 127.0,
+        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(global_mpe_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        64.0 / 127.0,
+        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(mapped_member_channel),
+        DOUBLE_DELTA
+    );
+    assert_close(
+        expected_samples[0],
+        rendered_samples[0],
+        block_size,
+        0.1, /* MIDI controller smoothing in FloatParamS */
+        "channel=0"
+    );
+    assert_close(
+        expected_samples[1],
+        rendered_samples[1],
+        block_size,
+        0.1, /* MIDI controller smoothing in FloatParamS */
+        "channel=1"
+    );
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 2);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 2);
+
+    assert_close(
+        expected_samples[0],
+        rendered_samples[0],
+        block_size,
+        0.02, /* MIDI controller smoothing in FloatParamS */
+        "channel=0"
+    );
+    assert_close(
+        expected_samples[1],
+        rendered_samples[1],
+        block_size,
+        0.02, /* MIDI controller smoothing in FloatParamS */
+        "channel=1"
+    );
 })

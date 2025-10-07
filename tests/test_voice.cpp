@@ -572,7 +572,7 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     params_with_zero_amplitude.subharmonic_amplitude.set_value(1.0);
     params_with_zero_amplitude.volume.set_value(1.0);
 
-    midi_controller.change(0.0, 0.0);
+    midi_controller.change(PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     params_with_midi_controller.volume.set_midi_controller(&midi_controller);
 
     macro.input.set_value(0.0);

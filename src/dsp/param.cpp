@@ -63,7 +63,9 @@ Param<NumberType, evaluation>::Param(
     range_as_float_number((Number)range),
     range_inv(1.0 / range_as_float_number),
     change_index(0),
-    value(default_value)
+    value(default_value),
+    midi_channel_rw(PARAM_DEFAULT_MPE_CHANNEL),
+    midi_channel(midi_channel_rw)
 {
 }
 
@@ -93,11 +95,13 @@ template<typename NumberType, ParamEvaluation evaluation>
 NumberType Param<NumberType, evaluation>::get_value() const noexcept
 {
     if (midi_controller != NULL) {
-        return ratio_to_value(midi_controller->get_value());
+        return ratio_to_value(midi_controller->get_value(this->midi_channel));
     } else if (this->macro != NULL) {
-        this->macro->update();
+        Midi::Channel const midi_channel = this->midi_channel;
 
-        return ratio_to_value(this->macro->get_value());
+        this->macro->update(midi_channel);
+
+        return ratio_to_value(this->macro->get_value(midi_channel));
     }
 
     return value;
@@ -152,11 +156,13 @@ template<typename NumberType, ParamEvaluation evaluation>
 Number Param<NumberType, evaluation>::get_ratio() const noexcept
 {
     if (midi_controller != NULL) {
-        return midi_controller->get_value();
+        return midi_controller->get_value(this->midi_channel);
     } else if (this->macro != NULL) {
-        this->macro->update();
+        Midi::Channel const midi_channel = this->midi_channel;
 
-        return this->macro->get_value();
+        this->macro->update(midi_channel);
+
+        return this->macro->get_value(midi_channel);
     }
 
     return std::min(1.0, std::max(0.0, value_to_ratio(value)));
@@ -181,11 +187,13 @@ template<typename NumberType, ParamEvaluation evaluation>
 Integer Param<NumberType, evaluation>::get_change_index() const noexcept
 {
     if (midi_controller != NULL) {
-        return midi_controller->get_change_index();
+        return midi_controller->get_change_index(this->midi_channel);
     } else if (this->macro != NULL) {
-        this->macro->update();
+        Midi::Channel const midi_channel = this->midi_channel;
 
-        return this->macro->get_change_index();
+        this->macro->update(midi_channel);
+
+        return this->macro->get_change_index(midi_channel);
     }
 
     return change_index;
@@ -226,20 +234,21 @@ void Param<NumberType, evaluation>::set_midi_controller(
         MidiController* const midi_controller
 ) noexcept {
     MidiController* const old_midi_controller = param.midi_controller;
+    Midi::Channel const midi_channel = param.midi_channel;
 
     if (old_midi_controller != NULL) {
         old_midi_controller->released();
 
         if (midi_controller == NULL) {
             param.set_value(
-                param.ratio_to_value(old_midi_controller->get_value())
+                param.ratio_to_value(old_midi_controller->get_value(midi_channel))
             );
         }
     }
 
     if (midi_controller != NULL) {
         midi_controller->assigned();
-        param.set_value(param.ratio_to_value(midi_controller->get_value()));
+        param.set_value(param.ratio_to_value(midi_controller->get_value(midi_channel)));
     }
 
     param.midi_controller = midi_controller;
@@ -250,6 +259,13 @@ template<typename NumberType, ParamEvaluation evaluation>
 MidiController* Param<NumberType, evaluation>::get_midi_controller() const noexcept
 {
     return midi_controller;
+}
+
+
+template<typename NumberType, ParamEvaluation evaluation>
+void Param<NumberType, evaluation>::set_midi_channel(Midi::Channel const midi_channel) noexcept
+{
+    midi_channel_rw = midi_channel;
 }
 
 
@@ -267,11 +283,12 @@ void Param<NumberType, evaluation>::set_macro(
         Macro* const macro
 ) noexcept {
     Macro* const old_macro = param.macro;
+    Midi::Channel const midi_channel = param.midi_channel;
 
     if (old_macro != NULL) {
         if (macro == NULL) {
-            old_macro->update();
-            param.set_value(param.ratio_to_value(old_macro->get_value()));
+            old_macro->update(midi_channel);
+            param.set_value(param.ratio_to_value(old_macro->get_value(midi_channel)));
         }
 
         old_macro->released();
@@ -279,9 +296,9 @@ void Param<NumberType, evaluation>::set_macro(
 
     if (macro != NULL) {
         macro->assigned();
-        macro->update();
-        param.set_value(param.ratio_to_value(macro->get_value()));
-        param.macro_change_index = macro->get_change_index();
+        macro->update(midi_channel);
+        param.set_value(param.ratio_to_value(macro->get_value(midi_channel)));
+        param.macro_change_index = macro->get_change_index(midi_channel);
     }
 
     param.macro = macro;
@@ -619,15 +636,23 @@ Number FloatParam<evaluation>::get_value() const noexcept
     }
 
     if constexpr (evaluation == ParamEvaluation::BLOCK) {
-        if (this->midi_controller != NULL) {
-            return round_value(ratio_to_value(this->midi_controller->get_value()));
+        MidiController const* const midi_controller = get_midi_controller();
+
+        if (midi_controller != NULL) {
+            return round_value(
+                ratio_to_value(midi_controller->get_value(this->midi_channel))
+            );
         }
     }
 
-    if (this->macro != NULL) {
-        this->macro->update();
+    Macro* const macro = get_macro();
 
-        return round_value(ratio_to_value(this->macro->get_value()));
+    if (macro != NULL) {
+        Midi::Channel const midi_channel = this->midi_channel;
+
+        macro->update(midi_channel);
+
+        return round_value(ratio_to_value(macro->get_value(midi_channel)));
     }
 
     return this->get_raw_value();
@@ -638,10 +663,26 @@ template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::is_polyphonic() const noexcept
 {
     if (leader != NULL) {
-        return leader->is_polyphonic();
+        return (
+            leader->is_polyphonic()
+            || is_affected_by_different_midi_channel_than_leader()
+        );
     }
 
     return envelope != NULL || has_lfo_with_envelope();
+}
+
+
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_affected_by_different_midi_channel_than_leader() const noexcept
+{
+    return (
+        this->midi_channel != leader->midi_channel
+        && (
+            leader->get_midi_controller() != NULL
+            || leader->get_macro() != NULL
+        )
+    );
 }
 
 
@@ -652,7 +693,11 @@ bool FloatParam<evaluation>::is_following_leader() const noexcept
         return false;
     }
 
-    return !leader->is_polyphonic();
+    if (leader->is_polyphonic()) {
+        return false;
+    }
+
+    return !is_affected_by_different_midi_channel_than_leader();
 }
 
 
@@ -700,17 +745,23 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
         return leader->get_ratio();
     }
 
-    if (this->midi_controller != NULL) {
+    MidiController const* const midi_controller = get_midi_controller();
+
+    if (midi_controller != NULL) {
         /*
         This can get out of sync with the actual value for a few moments, and it
         doesn't take rounding into account, but in practice, this does not
         affect the sound and event handling in any way.
         */
-        return this->midi_controller->get_value();
+        return midi_controller->get_value(this->midi_channel);
     }
 
-    if (this->macro != NULL) {
-        this->macro->update();
+    Macro* const macro = get_macro();
+
+    if (macro != NULL) {
+        Midi::Channel const midi_channel = this->midi_channel;
+
+        macro->update(midi_channel);
 
         /*
         This can get out of sync with the actual value for a few moments, and it
@@ -718,7 +769,7 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
         affect the sound and event handling in any way.
         */
 
-        return this->macro->get_value();
+        return macro->get_value(midi_channel);
     }
 
     return std::min(1.0, std::max(0.0, value_to_ratio(this->get_raw_value())));
@@ -866,13 +917,25 @@ Integer FloatParam<evaluation>::get_change_index() const noexcept
 {
     if (is_following_leader()) {
         return leader->get_change_index();
-    } else if (this->macro != NULL) {
-        this->macro->update();
-
-        return this->macro->get_change_index();
-    } else {
-        return Param<Number, evaluation>::get_change_index();
     }
+
+    Macro* const macro = get_macro();
+
+    if (macro != NULL) {
+        Midi::Channel const midi_channel = this->midi_channel;
+
+        macro->update(midi_channel);
+
+        return macro->get_change_index(midi_channel);
+    }
+
+    MidiController const* const midi_controller = get_midi_controller();
+
+    if (midi_controller != NULL) {
+        return midi_controller->get_change_index(this->midi_channel);
+    }
+
+    return Param<Number, evaluation>::get_change_index();
 }
 
 
@@ -944,14 +1007,20 @@ bool FloatParam<evaluation>::is_constant_until(
         );
     }
 
-    if (this->midi_controller != NULL) {
-        return this->midi_controller->events.is_empty();
+    MidiController const* const midi_controller = get_midi_controller();
+
+    if (midi_controller != NULL) {
+        return midi_controller->event_queues[this->midi_channel].is_empty();
     }
 
-    if (this->macro != NULL) {
-        this->macro->update();
+    Macro* const macro = get_macro();
 
-        return this->macro->get_change_index() == this->macro_change_index;
+    if (macro != NULL) {
+        Midi::Channel const midi_channel= this->midi_channel;
+
+        macro->update(midi_channel);
+
+        return macro->get_change_index(midi_channel) == this->macro_change_index;
     }
 
     return true;
@@ -1286,7 +1355,10 @@ void FloatParam<evaluation>::handle_envelope_start_event(
     if (should_update_envelope(*envelope)) {
         envelope->update();
         envelope->make_snapshot(
-            envelope_state->randoms, Constants::INVALID_ENVELOPE_INDEX, snapshot
+            envelope_state->randoms,
+            Constants::INVALID_ENVELOPE_INDEX,
+            this->midi_channel,
+            snapshot
         );
     }
 
@@ -1375,27 +1447,39 @@ void FloatParam<evaluation>::update_envelope_state_if_required(
     switch (stage) {
         case EnvelopeStage::ENV_STG_SUSTAIN:
             envelope.make_snapshot(
-                envelope_state->randoms, envelope_index, envelope_snapshot
+                envelope_state->randoms,
+                envelope_index,
+                this->midi_channel,
+                envelope_snapshot
             );
             time = 0.0;
             break;
 
         case EnvelopeStage::ENV_STG_RELEASE:
             envelope.make_end_snapshot(
-                envelope_state->randoms, envelope_index, envelope_snapshot
+                envelope_state->randoms,
+                envelope_index,
+                this->midi_channel,
+                envelope_snapshot
             );
             break;
 
         case EnvelopeStage::ENV_STG_RELEASED:
             envelope.make_end_snapshot(
-                envelope_state->randoms, envelope_index, envelope_snapshot
+                envelope_state->randoms,
+                envelope_index,
+                this->midi_channel,
+                envelope_snapshot
             );
             time = 0.0;
             break;
 
         default:
             envelope.make_snapshot(
-                envelope_state->randoms, envelope_index, envelope_snapshot
+                envelope_state->randoms,
+                envelope_index,
+                this->midi_channel,
+                envelope_snapshot
             );
             break;
     }
@@ -1506,7 +1590,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_start_event(
     if (should_update_envelope(envelope)) {
         envelope.update();
         envelope.make_snapshot(
-            envelope_state->randoms, envelope_index, snapshot
+            envelope_state->randoms, envelope_index, this->midi_channel, snapshot
         );
     }
 
@@ -1892,14 +1976,19 @@ void FloatParam<evaluation>::start_lfo_envelope(
 
 template<ParamEvaluation evaluation>
 Integer FloatParam<evaluation>::make_envelope_snapshot(
-        Envelope const& envelope,
+        Envelope& envelope,
         Byte const envelope_index
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
     EnvelopeSnapshot snapshot;
 
-    envelope.make_snapshot(envelope_state->randoms, envelope_index, snapshot);
+    envelope.make_snapshot(
+        envelope_state->randoms,
+        envelope_index,
+        this->midi_channel,
+        snapshot
+    );
 
     std::vector<EnvelopeSnapshot>::size_type snapshot_id;
 
@@ -2022,7 +2111,7 @@ void FloatParam<evaluation>::update_envelope_release_if_not_static(
     */
     envelope.update();
     envelope.make_end_snapshot(
-        envelope_state->randoms, envelope_index, snapshot
+        envelope_state->randoms, envelope_index, this->midi_channel, snapshot
     );
 }
 
@@ -2273,20 +2362,32 @@ Sample const* const* FloatParam<evaluation>::initialize_rendering(
 
     if (lfo != NULL) {
         return process_lfo(*lfo, round, sample_count);
-    } else if (this->midi_controller != NULL) {
-        if (is_logarithmic()) {
-            process_midi_controller_events<true>();
-        } else {
-            process_midi_controller_events<false>();
-        }
-    } else if (this->macro != NULL) {
-        process_macro(sample_count);
-    } else {
-        Envelope* const envelope = get_envelope();
+    }
 
-        if (envelope != NULL) {
-            process_envelope(*envelope);
+    MidiController const* const midi_controller = get_midi_controller();
+
+    if (midi_controller != NULL) {
+        if (is_logarithmic()) {
+            process_midi_controller_events<true>(*midi_controller);
+        } else {
+            process_midi_controller_events<false>(*midi_controller);
         }
+
+        return NULL;
+    }
+
+    Macro* const macro = get_macro();
+
+    if (macro != NULL) {
+        process_macro(*macro, sample_count);
+
+        return NULL;
+    }
+
+    Envelope* const envelope = get_envelope();
+
+    if (envelope != NULL) {
+        process_envelope(*envelope);
     }
 
     return NULL;
@@ -2342,22 +2443,26 @@ Sample const* const* FloatParam<evaluation>::process_lfo(
 
 template<ParamEvaluation evaluation>
 template<bool is_logarithmic_>
-void FloatParam<evaluation>::process_midi_controller_events() noexcept
-{
+void FloatParam<evaluation>::process_midi_controller_events(
+        MidiController const& midi_controller
+) noexcept {
+    Queue<SignalProducer::Event> const& ctl_events = (
+        midi_controller.event_queues[this->midi_channel]
+    );
     Queue<SignalProducer::Event>::SizeType const number_of_ctl_events = (
-        this->midi_controller->events.length()
+        ctl_events.length()
     );
 
     if (number_of_ctl_events == 0) {
         return;
     }
 
-    this->cancel_events_at(this->midi_controller->events[0].time_offset);
+    this->cancel_events_at(ctl_events[0].time_offset);
 
     if (should_round) {
         for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
-            Seconds const time_offset = this->midi_controller->events[i].time_offset;
-            Number const controller_value = this->midi_controller->events[i].number_param_1;
+            Seconds const time_offset = ctl_events[i].time_offset;
+            Number const controller_value = ctl_events[i].number_param_1;
 
             if constexpr (is_logarithmic_) {
                 schedule_value(time_offset, ratio_to_value_log(controller_value));
@@ -2377,14 +2482,12 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
     Number previous_ratio = value_to_ratio(this->get_raw_value());
 
     for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
-        Seconds time_offset = this->midi_controller->events[i].time_offset;
+        Seconds time_offset = ctl_events[i].time_offset;
 
         while (i != last_ctl_event_index) {
             ++i;
 
-            Seconds const delta = std::fabs(
-                this->midi_controller->events[i].time_offset - time_offset
-            );
+            Seconds const delta = std::fabs(ctl_events[i].time_offset - time_offset);
 
             if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
                 --i;
@@ -2392,11 +2495,9 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
             }
         }
 
-        time_offset = this->midi_controller->events[i].time_offset;
+        time_offset = ctl_events[i].time_offset;
 
-        Number const controller_value = (
-            this->midi_controller->events[i].number_param_1
-        );
+        Number const controller_value = ctl_events[i].number_param_1;
         Seconds const duration = smooth_change_duration(
             previous_ratio,
             controller_value,
@@ -2416,11 +2517,15 @@ void FloatParam<evaluation>::process_midi_controller_events() noexcept
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
-{
-    this->macro->update();
+void FloatParam<evaluation>::process_macro(
+        Macro& macro,
+        Integer const sample_count
+) noexcept {
+    Midi::Channel const midi_channel = this->midi_channel;
 
-    Integer const new_change_index = this->macro->get_change_index();
+    macro.update(midi_channel);
+
+    Integer const new_change_index = macro.get_change_index(midi_channel);
 
     if (new_change_index == this->macro_change_index) {
         return;
@@ -2430,7 +2535,7 @@ void FloatParam<evaluation>::process_macro(Integer const sample_count) noexcept
 
     this->cancel_events_at(0.0);
 
-    Number const macro_value = this->macro->get_value();
+    Number const macro_value = macro.get_value(midi_channel);
 
     if (should_round) {
         set_value(ratio_to_value(macro_value));
@@ -3060,6 +3165,16 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::skip_round(
     FloatParamS::skip_round(round, sample_count);
 
     modulation_level.skip_round(round, sample_count);
+}
+
+
+template<class ModulatorSignalProducerClass>
+void ModulatableFloatParam<ModulatorSignalProducerClass>::set_midi_channel(
+        Midi::Channel const midi_channel
+) noexcept {
+    FloatParamS::set_midi_channel(midi_channel);
+
+    modulation_level.set_midi_channel(midi_channel);
 }
 
 }

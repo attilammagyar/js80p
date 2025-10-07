@@ -22,6 +22,7 @@
 #include <string>
 
 #include "js80p.hpp"
+#include "midi.hpp"
 
 #include "dsp/math.hpp"
 #include "dsp/midi_controller.hpp"
@@ -57,7 +58,7 @@ class Macro : public MidiController
             Number const input_default_value = 0.5
         ) noexcept;
 
-        void update() noexcept;
+        void update(Midi::Channel const midi_channel) noexcept;
 
         FloatParamB midpoint;
         FloatParamB input;
@@ -69,22 +70,23 @@ class Macro : public MidiController
         DistortionCurveParam distortion_curve;
 
     private:
-        bool update_change_indices() noexcept;
+        bool update_change_indices(Midi::Channel const midi_channel) noexcept;
 
         template<class ParamClass>
         bool update_change_index(
+            Midi::Channel const midi_channel,
             ParamClass& param,
-            Integer& change_index
+            Integer* change_indices
         ) const noexcept;
 
-        Integer midpoint_change_index;
-        Integer input_change_index;
-        Integer min_change_index;
-        Integer max_change_index;
-        Integer scale_change_index;
-        Integer distortion_change_index;
-        Integer randomness_change_index;
-        Integer distortion_curve_change_index;
+        Integer midpoint_change_indices[Midi::CHANNELS];
+        Integer input_change_indices[Midi::CHANNELS];
+        Integer min_change_indices[Midi::CHANNELS];
+        Integer max_change_indices[Midi::CHANNELS];
+        Integer scale_change_indices[Midi::CHANNELS];
+        Integer distortion_change_indices[Midi::CHANNELS];
+        Integer randomness_change_indices[Midi::CHANNELS];
+        Integer distortion_curve_change_indices[Midi::CHANNELS];
         bool is_updating;
 };
 

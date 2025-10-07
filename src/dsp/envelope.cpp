@@ -755,8 +755,20 @@ bool Envelope::needs_update(Byte const voice_status) const noexcept
 void Envelope::make_snapshot(
         EnvelopeRandoms const& randoms,
         Byte const envelope_index,
+        Midi::Channel const midi_channel,
         EnvelopeSnapshot& snapshot
-) const noexcept {
+) noexcept {
+    scale.set_midi_channel(midi_channel);
+    initial_value.set_midi_channel(midi_channel);
+    delay_time.set_midi_channel(midi_channel);
+    attack_time.set_midi_channel(midi_channel);
+    peak_value.set_midi_channel(midi_channel);
+    hold_time.set_midi_channel(midi_channel);
+    decay_time.set_midi_channel(midi_channel);
+    sustain_value.set_midi_channel(midi_channel);
+    release_time.set_midi_channel(midi_channel);
+    final_value.set_midi_channel(midi_channel);
+
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.initial_value = randomize_value(initial_value, randoms[0]);
         snapshot.peak_value = randomize_value(peak_value, randoms[1]);
@@ -824,8 +836,12 @@ Number Envelope::get_final_value(EnvelopeRandoms const& randoms) const noexcept
 void Envelope::make_end_snapshot(
         EnvelopeRandoms const& randoms,
         Byte const envelope_index,
+        Midi::Channel const midi_channel,
         EnvelopeSnapshot& snapshot
-) const noexcept {
+) noexcept {
+    release_time.set_midi_channel(midi_channel);
+    final_value.set_midi_channel(midi_channel);
+
     if (value_inaccuracy.get_value() > 0.000001) {
         snapshot.final_value = randomize_value(final_value, randoms[3]);
     } else {

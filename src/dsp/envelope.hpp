@@ -23,6 +23,7 @@
 #include <string>
 
 #include "js80p.hpp"
+#include "midi.hpp"
 
 #include "dsp/math.hpp"
 #include "dsp/param.hpp"
@@ -144,14 +145,16 @@ class Envelope
         void make_snapshot(
             EnvelopeRandoms const& randoms,
             Byte const envelope_index,
+            Midi::Channel const midi_channel,
             EnvelopeSnapshot& snapshot
-        ) const noexcept;
+        ) noexcept;
 
         void make_end_snapshot(
             EnvelopeRandoms const& randoms,
             Byte const envelope_index,
+            Midi::Channel const midi_channel,
             EnvelopeSnapshot& snapshot
-        ) const noexcept;
+        ) noexcept;
 
         Number get_sustain_value(EnvelopeRandoms const& randoms) const noexcept;
         Number get_final_value(EnvelopeRandoms const& randoms) const noexcept;

@@ -259,6 +259,7 @@ PERF_TESTS = \
 
 PARAM_HEADERS = \
 	src/js80p.hpp \
+	src/midi.hpp \
 	$(foreach COMPONENT,$(PARAM_COMPONENTS),src/$(COMPONENT).hpp)
 
 PARAM_SOURCES = \
@@ -266,8 +267,6 @@ PARAM_SOURCES = \
 
 SYNTH_HEADERS = \
 	src/debug.hpp \
-	src/js80p.hpp \
-	src/midi.hpp \
 	$(foreach COMPONENT,$(SYNTH_COMPONENTS),src/$(COMPONENT).hpp)
 
 SYNTH_SOURCES = \
@@ -801,6 +800,7 @@ $(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		src/dsp/midi_controller.cpp src/dsp/midi_controller.hpp \
 		src/dsp/queue.cpp src/dsp/queue.hpp \
 		src/js80p.hpp \
+		src/midi.hpp \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
@@ -957,7 +957,6 @@ $(DEV_DIR)/test_tape$(DEV_EXE): \
 $(DEV_DIR)/test_voice$(DEV_EXE): \
 		tests/test_voice.cpp \
 		src/voice.cpp src/voice.hpp \
-		src/midi.hpp \
 		src/dsp/biquad_filter.cpp src/dsp/biquad_filter.hpp \
 		src/dsp/distortion.cpp src/dsp/distortion.hpp \
 		src/dsp/filter.cpp src/dsp/filter.hpp \
