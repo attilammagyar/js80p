@@ -669,8 +669,9 @@ void FstPlugin::handle_change_param(
             0.0, channel, controller_id, float_to_midi_byte(new_value)
         );
     } else if (JS80P_LIKELY(midi_controller != NULL)) {
-// TODO: pass channel (pitch wheel, aftertouch)
-        midi_controller->change(0.0, new_value);
+        // TODO: pass channel (pitch wheel, aftertouch) properly and resolve
+        //       Parameter::channel vs. Synth::map_mpe_channel()
+        midi_controller->change(0, 0.0, new_value);
     }
 }
 
@@ -1306,7 +1307,10 @@ FstPlugin::Parameter::Parameter(
 ) : midi_controller(midi_controller),
     name(name),
     // change_index(-1), /* See FstPlugin::generate_samples() */
-    value(midi_controller != NULL ? (float)midi_controller->get_value() : 0.5f),
+
+    // TODO: match up Parameter::channel and the MidiController's channel number
+    //       which is remapped by Synth::map_mpe_channel()
+    value(midi_controller != NULL ? (float)midi_controller->get_value(0) : 0.5f),
     controller_id(controller_id),
     channel(channel)
 {
@@ -1354,7 +1358,9 @@ float FstPlugin::Parameter::get_value() noexcept
         return get_last_set_value();
     }
 
-    float const value = (float)midi_controller->get_value();
+    // TODO: match up Parameter::channel and the MidiController's channel number
+    //       which is remapped by Synth::map_mpe_channel()
+    float const value = (float)midi_controller->get_value(0);
 
     /* See FstPlugin::generate_samples() */
     // change_index = midi_controller->get_change_index();
