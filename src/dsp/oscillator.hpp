@@ -224,7 +224,7 @@ class Oscillator : public SignalProducer
             1.0 / Math::SECONDS_IN_ONE_MINUTE
         );
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 8;
+        static constexpr Integer NUMBER_OF_CHILDREN = 7;
         static constexpr Integer NUMBER_OF_EVENTS = 4;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;

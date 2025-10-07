@@ -119,7 +119,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::initialize_instance() noe
     subharmonic_amplitude_buffer = NULL;
     subharmonic_amplitude_value = 0.0;
 
-    register_child(waveform);
     register_child(modulated_amplitude);
     register_child(amplitude);
     register_child(subharmonic_amplitude);
