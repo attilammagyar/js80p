@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,9 +57,10 @@ def main(argv):
     if cols is None or cols < 2:
         raise Exception(f"Nothing to plot")
 
-    for col in tsv[1:]:
-        plt.plot(tsv[0], col)
+    for i, col in enumerate(tsv[1:]):
+        plt.plot(tsv[0], col, label=f"col {i + 1}")
 
+    plt.legend()
     plt.show()
 
     return 0
