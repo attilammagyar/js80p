@@ -674,7 +674,7 @@ size_t EventDispatcher<EventHandlerClass>::dispatch_event(
     }
 
     Command msg_type = status & MESSAGE_TYPE_MASK;
-    Channel channel = status & CHANNEL_MAX;
+    Channel channel = status & CHANNEL_MASK;
 
     switch (msg_type) {
         case NOTE_OFF:
