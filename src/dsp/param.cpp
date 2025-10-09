@@ -1604,7 +1604,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_start_event(
     lfo_envelope_state.value = snapshot.initial_value;
     lfo_envelope_state.stage = EnvelopeStage::ENV_STG_DAHD;
     lfo_envelope_state.active_snapshot_envelope_index = envelope_index;
-    lfo_envelope_state.is_wavetable_initialized = false;
+    lfo_envelope_state.is_initialized = false;
 }
 
 
@@ -2357,6 +2357,13 @@ void FloatParam<evaluation>::reset() noexcept
 
 
 template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::reset_value() noexcept
+{
+    this->store_new_value(get_value());
+}
+
+
+template<ParamEvaluation evaluation>
 Sample const* const* FloatParam<evaluation>::initialize_rendering(
         Integer const round,
         Integer const sample_count
@@ -2640,6 +2647,7 @@ void FloatParam<evaluation>::render_with_lfo_envelope(
 
     lfo.produce_with_envelope(
         envelope_state->lfo_states,
+        this->midi_channel,
         round,
         envelope_state->lfo_envelope_sample_count,
         first_sample_index,
@@ -2920,7 +2928,7 @@ void FloatParam<evaluation>::EnvelopeState::clear() noexcept
         lfo_envelope_state.stage = EnvelopeStage::ENV_STG_NONE;
         lfo_envelope_state.active_snapshot_envelope_index = Constants::INVALID_ENVELOPE_INDEX;
         lfo_envelope_state.scheduled_snapshot_envelope_index = Constants::INVALID_ENVELOPE_INDEX;
-        lfo_envelope_state.is_wavetable_initialized = false;
+        lfo_envelope_state.is_initialized = false;
     }
 }
 

@@ -3284,6 +3284,128 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
 })
 
 
+TEST(lfos_with_envelopes_respect_midi_channel, {
+    constexpr Integer block_size = 20;
+    constexpr Frequency sample_rate = 2.0;
+    constexpr Midi::Channel midi_channel = 1;
+
+    Envelope envelope_1("E1");
+    Envelope envelope_2("E2");
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        &envelope_1, &envelope_2, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo_1("lfo1", true);
+    LFO lfo_2("lfo2", true);
+    FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    MidiController midi_controller_const;
+    MidiController midi_controller_changing;
+    Sample const* rendered_samples;
+
+    /* 10 * Envelope-1 sample * LFO-1 sample * Envelope-2 sample * LFO-2 sample */
+    Sample expected_samples[block_size - 2] = {
+        /* the param's own LFO-envelope timeline starts at 1.0s */
+        10.00 * 0.10 * 0.50 * 0.05 * 1.00,
+        10.00 * 0.10 * 1.00 * 0.05 * 0.50,      /* 1.0s -  2.0s delay    */
+        10.00 * 0.10 * 0.50 * 0.05 * 0.00,
+        10.00 * 0.40 * 0.00 * 0.20 * 0.50,      /* 2.0s -  3.5s attack   */
+        10.00 * 0.70 * 0.50 * 0.35 * 1.00,
+        10.00 * 1.00 * 1.00 * 0.50 * 0.50,      /* 3.5s -  4.0s hold     */
+        10.00 * 1.00 * 0.50 * 0.50 * 0.00,
+        10.00 * 0.90 * 0.00 * 0.45 * 0.50,      /* 4.0s -  5.5s decay    */
+        10.00 * 0.80 * 0.50 * 0.40 * 1.00,
+        10.00 * 0.70 * 1.00 * 0.35 * 0.50,
+        10.00 * 0.70 * 0.50 * 0.35 * 0.00,      /* 5.5s -  7.0s sustain  */
+        10.00 * 0.70 * 0.00 * 0.35 * 0.50,
+        10.00 * 0.70 * 0.50 * 0.35 * 1.00,
+        10.00 * 0.60 * 1.00 * 0.30 * 0.50,      /* 7.0s         update   */
+        10.00 * 0.60 * 0.50 * 0.30 * 0.00,
+        10.00 * 0.50 * 0.00 * 0.25 * 0.50,      /* 8.0s - 10.0s release  */
+        10.00 * 0.40 * 0.50 * 0.20 * 1.00,
+        10.00 * 0.20 * 1.00 * 0.10 * 0.50,      /* 9.0s         cancel   */
+    };
+
+    midi_controller_const.change_all_channels(0.0, 0.0);
+    midi_controller_const.change(midi_channel, 0.0, 1.0);
+    midi_controller_const.clear();
+
+    midi_controller_changing.change_all_channels(0.0, 0.0);
+    midi_controller_changing.clear();
+
+    lfo_1.set_block_size(block_size);
+    lfo_1.set_sample_rate(sample_rate);
+    lfo_1.frequency.set_value(sample_rate * 0.25);
+    lfo_1.amplitude_envelope.set_value(0);
+    lfo_1.amplitude.set_lfo(&lfo_2);
+    lfo_1.max.set_midi_controller(&midi_controller_changing);
+    lfo_1.start(0.0);
+
+    lfo_2.set_block_size(block_size);
+    lfo_2.set_sample_rate(sample_rate);
+    lfo_2.frequency.set_value(sample_rate * 0.25);
+    lfo_2.phase.set_value(0.25);
+    lfo_2.amplitude_envelope.set_value(1);
+    lfo_2.amplitude.set_midi_controller(&midi_controller_const);
+    lfo_2.start(0.0);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_lfo(&lfo_1);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+
+    assert_true(leader.has_lfo_with_envelope());
+    assert_true(follower.has_lfo_with_envelope());
+
+    envelope_1.scale.set_midi_controller(&midi_controller_const);
+    envelope_1.scale.set_value(1.0);
+    envelope_1.initial_value.set_value(0.1);
+    envelope_1.delay_time.set_value(1.0);
+    envelope_1.attack_time.set_value(1.5);
+    envelope_1.peak_value.set_value(1.0);
+    envelope_1.hold_time.set_value(0.5);
+    envelope_1.decay_time.set_value(1.5);
+    envelope_1.sustain_value.set_value(0.7);
+    envelope_1.release_time.set_value(2.0);
+    envelope_1.final_value.set_value(0.2);
+
+    envelope_2.scale.set_value(0.5);
+    envelope_2.initial_value.set_value(0.1);
+    envelope_2.delay_time.set_value(1.0);
+    envelope_2.attack_time.set_value(1.5);
+    envelope_2.peak_value.set_midi_controller(&midi_controller_changing);
+    envelope_2.peak_value.set_value(1.0);
+    envelope_2.hold_time.set_value(0.5);
+    envelope_2.decay_time.set_value(1.5);
+    envelope_2.sustain_value.set_value(0.7);
+    envelope_2.release_time.set_value(2.0);
+    envelope_2.final_value.set_value(0.2);
+
+    midi_controller_changing.change(midi_channel, 1.0, 1.0);
+
+    follower.set_midi_channel(midi_channel);
+    follower.start_envelope(1.0, 0.0, 0.0);
+
+    envelope_1.sustain_value.set_value(0.6);
+    envelope_2.sustain_value.set_value(0.6);
+    follower.update_envelope(7.0);
+
+    follower.end_envelope(8.0);
+    follower.cancel_envelope(9.0, 0.5);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 1, block_size
+    );
+
+    assert_false(std::isnan(rendered_samples[0]));
+    assert_false(std::isnan(rendered_samples[1]));
+    assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
+    assert_eq(0.1, follower.get_value(), DOUBLE_DELTA);
+})
+
+
 TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the_first_one_is_rendered_with_envelope, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;

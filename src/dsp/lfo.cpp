@@ -32,7 +32,7 @@ LFO::LFO(
         bool const can_have_envelope,
         Number const default_frequency
 ) noexcept
-    : SignalProducer(1, 13, 0, &oscillator),
+    : SignalProducer(1, 13 + (can_have_envelope ? Midi::CHANNELS * 7 : 0), 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
     freq_log_scale(name + "LOG", ToggleParam::OFF),
     frequency(
@@ -123,9 +123,45 @@ void LFO::initialize_instance() noexcept
     if (can_have_envelope) {
         env_buffer_1 = new Sample[block_size];
         env_buffer_2 = new Sample[block_size];
+
+        for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            frequency_mpe[c] = new FloatParamS(frequency);
+            phase_mpe[c] = new FloatParamS(phase);
+            min_mpe[c] = new FloatParamS(min);
+            max_mpe[c] = new FloatParamS(max);
+            amplitude_mpe[c] = new FloatParamS(amplitude);
+            distortion_mpe[c] = new FloatParamS(distortion);
+            randomness_mpe[c] = new FloatParamS(randomness);
+
+            frequency_mpe[c]->set_midi_channel(c);
+            phase_mpe[c]->set_midi_channel(c);
+            min_mpe[c]->set_midi_channel(c);
+            max_mpe[c]->set_midi_channel(c);
+            amplitude_mpe[c]->set_midi_channel(c);
+            distortion_mpe[c]->set_midi_channel(c);
+            randomness_mpe[c]->set_midi_channel(c);
+
+            register_child(*frequency_mpe[c]);
+            register_child(*phase_mpe[c]);
+            register_child(*min_mpe[c]);
+            register_child(*max_mpe[c]);
+            register_child(*amplitude_mpe[c]);
+            register_child(*distortion_mpe[c]);
+            register_child(*randomness_mpe[c]);
+        }
     } else {
         env_buffer_1 = NULL;
         env_buffer_2 = NULL;
+
+        for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            frequency_mpe[c] = NULL;
+            phase_mpe[c] = NULL;
+            min_mpe[c] = NULL;
+            max_mpe[c] = NULL;
+            amplitude_mpe[c] = NULL;
+            distortion_mpe[c] = NULL;
+            randomness_mpe[c] = NULL;
+        }
     }
 }
 
@@ -138,6 +174,24 @@ LFO::~LFO()
 
         env_buffer_1 = NULL;
         env_buffer_2 = NULL;
+
+        for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            delete frequency_mpe[c];
+            delete phase_mpe[c];
+            delete min_mpe[c];
+            delete max_mpe[c];
+            delete amplitude_mpe[c];
+            delete distortion_mpe[c];
+            delete randomness_mpe[c];
+
+            frequency_mpe[c] = NULL;
+            phase_mpe[c] = NULL;
+            min_mpe[c] = NULL;
+            max_mpe[c] = NULL;
+            amplitude_mpe[c] = NULL;
+            distortion_mpe[c] = NULL;
+            randomness_mpe[c] = NULL;
+        }
     }
 }
 
@@ -408,6 +462,7 @@ void LFO::EnvelopeCollector::visit_lfo_as_polyphonic(
 
 LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
         LFOEnvelopeStates& lfo_envelope_states,
+        Midi::Channel const midi_channel,
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
@@ -422,7 +477,8 @@ LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
     round(round),
     sample_count(sample_count),
     first_sample_index(first_sample_index),
-    last_sample_index(last_sample_index)
+    last_sample_index(last_sample_index),
+    midi_channel(midi_channel)
 {
 }
 
@@ -476,7 +532,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
 ) noexcept {
     if (amplitude.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
-            amplitude, round, sample_count
+            *lfo.amplitude_mpe[midi_channel], round, sample_count
         );
     } else {
         amplitude.ratios_to_values(
@@ -494,7 +550,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_frequency_param(
 ) noexcept {
     if (frequency.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
-            frequency, round, sample_count
+            *lfo.frequency_mpe[midi_channel], round, sample_count
         );
     } else {
         frequency.ratios_to_values(
@@ -512,7 +568,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_phase_param(
 ) noexcept {
     if (phase.get_lfo() == NULL) {
         param_buffer_3 = FloatParamS::produce_if_not_constant(
-            phase, round, sample_count
+            *lfo.phase_mpe[midi_channel], round, sample_count
         );
     } else {
         phase.ratios_to_values(
@@ -530,8 +586,8 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
 ) noexcept {
     LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[depth];
 
-    if (JS80P_UNLIKELY(!lfo_envelope_state.is_wavetable_initialized)) {
-        lfo_envelope_state.is_wavetable_initialized = true;
+    if (JS80P_UNLIKELY(!lfo_envelope_state.is_initialized)) {
+        lfo_envelope_state.is_initialized = true;
 
         Sample const frequency_value = (
             param_buffer_2 == NULL
@@ -546,6 +602,14 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
             frequency_value,
             lfo_envelope_state.time
         );
+
+        lfo.frequency_mpe[midi_channel]->reset_value();
+        lfo.phase_mpe[midi_channel]->reset_value();
+        lfo.min_mpe[midi_channel]->reset_value();
+        lfo.max_mpe[midi_channel]->reset_value();
+        lfo.amplitude_mpe[midi_channel]->reset_value();
+        lfo.distortion_mpe[midi_channel]->reset_value();
+        lfo.randomness_mpe[midi_channel]->reset_value();
     }
 
     oscillator.produce_for_lfo_with_envelope(
@@ -557,7 +621,10 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         lfo.env_buffer_1,
         param_buffer_1,
         param_buffer_2,
-        param_buffer_3
+        param_buffer_3,
+        (Sample)lfo.amplitude_mpe[midi_channel]->get_value(),
+        (Sample)lfo.frequency_mpe[midi_channel]->get_value(),
+        (Sample)lfo.phase_mpe[midi_channel]->get_value()
     );
 
     bool envelope_is_constant = false;
@@ -588,7 +655,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_distortion_param(
 ) noexcept {
     if (distortion.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
-            distortion, round, sample_count
+            *lfo.distortion_mpe[midi_channel], round, sample_count
         );
     } else {
         distortion.ratios_to_values(
@@ -606,7 +673,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
 ) noexcept {
     if (randomness.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
-            randomness, round, sample_count
+            *lfo.randomness_mpe[midi_channel], round, sample_count
         );
     } else {
         randomness.ratios_to_values(
@@ -615,10 +682,15 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
         param_buffer_2 = buffer;
     }
 
+    Sample const distortion_value = (Sample)lfo.distortion_mpe[midi_channel]->get_value();
+    Sample const randomness_value = (Sample)lfo.randomness_mpe[midi_channel]->get_value();
+
     if (lfo.center.get_value() == ToggleParam::OFF) {
         lfo.apply_distortions(
             param_buffer_1,
             param_buffer_2,
+            distortion_value,
+            randomness_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -629,6 +701,8 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
         lfo.apply_distortions_centered(
             param_buffer_1,
             param_buffer_2,
+            distortion_value,
+            randomness_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -646,7 +720,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_min_param(
 ) noexcept {
     if (min.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
-            min, round, sample_count
+            *lfo.min_mpe[midi_channel], round, sample_count
         );
     } else {
         min.ratios_to_values(
@@ -664,17 +738,22 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
 ) noexcept {
     if (max.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
-            max, round, sample_count
+            *lfo.max_mpe[midi_channel], round, sample_count
         );
     } else {
         max.ratios_to_values(buffer, first_sample_index, last_sample_index);
         param_buffer_2 = buffer;
     }
 
+    Sample const min_value = (Sample)lfo.min_mpe[midi_channel]->get_value();
+    Sample const max_value = (Sample)lfo.max_mpe[midi_channel]->get_value();
+
     if (lfo.center.get_value() == ToggleParam::OFF) {
         lfo.apply_range(
             param_buffer_1,
             param_buffer_2,
+            min_value,
+            max_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -685,6 +764,8 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
         lfo.apply_range_centered(
             param_buffer_1,
             param_buffer_2,
+            min_value,
+            max_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -735,10 +816,17 @@ void LFO::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    Sample const distortion_value = (Sample)distortion.get_value();
+    Sample const randomness_value = (Sample)randomness.get_value();
+    Sample const min_value = (Sample)min.get_value();
+    Sample const max_value = (Sample)max.get_value();
+
     if (center.get_value() == ToggleParam::OFF) {
         apply_distortions(
             distortion_buffer,
             randomness_buffer,
+            distortion_value,
+            randomness_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -748,6 +836,8 @@ void LFO::render(
         apply_range(
             min_buffer,
             max_buffer,
+            min_value,
+            max_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -758,6 +848,8 @@ void LFO::render(
         apply_distortions_centered(
             distortion_buffer,
             randomness_buffer,
+            distortion_value,
+            randomness_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -767,6 +859,8 @@ void LFO::render(
         apply_range_centered(
             min_buffer,
             max_buffer,
+            min_value,
+            max_value,
             round,
             first_sample_index,
             last_sample_index,
@@ -779,6 +873,7 @@ void LFO::render(
 
 void LFO::produce_with_envelope(
         LFOEnvelopeStates& lfo_envelope_states,
+        Midi::Channel const midi_channel,
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
@@ -787,6 +882,7 @@ void LFO::produce_with_envelope(
 ) noexcept {
     LFOWithEnvelopeRenderer renderer(
         lfo_envelope_states,
+        midi_channel,
         round,
         sample_count,
         first_sample_index,
@@ -808,6 +904,8 @@ void LFO::produce_with_envelope(
 void LFO::apply_distortions(
         Sample const* const distortion_buffer,
         Sample const* const randomness_buffer,
+        Sample const distortion_value,
+        Sample const randomness_value,
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -882,6 +980,8 @@ void LFO::apply_distortions(
 void LFO::apply_range(
         Sample const* const min_buffer,
         Sample const* const max_buffer,
+        Sample const min_value,
+        Sample const max_value,
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -889,11 +989,7 @@ void LFO::apply_range(
         Sample* const target_buffer
 ) {
     if (min_buffer == NULL) {
-        Sample const min_value = (Sample)min.get_value();
-
         if (max_buffer == NULL) {
-            Sample const max_value = (Sample)max.get_value();
-
             if (
                     min_value <= ALMOST_ZERO
                     && Math::is_close(max_value, max.get_max_value(), ALMOST_ZERO)
@@ -916,35 +1012,33 @@ void LFO::apply_range(
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value = max_buffer[i];
-                Sample const range = max_value - min_value;
+                Sample const max_value_buf = max_buffer[i];
+                Sample const range = max_value_buf - min_value;
 
                 target_buffer[i] = min_value + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value_buf);
             }
         }
     } else {
         if (max_buffer == NULL) {
-            Sample const max_value = (Sample)max.get_value();
-
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value = min_buffer[i];
-                Sample const range = max_value - min_value;
+                Sample const min_value_buf = min_buffer[i];
+                Sample const range = max_value - min_value_buf;
 
                 target_buffer[i] = min_buffer[i] + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value = max_buffer[i];
-                Sample const min_value = min_buffer[i];
-                Sample const range = max_value - min_value;
+                Sample const max_value_buf = max_buffer[i];
+                Sample const min_value_buf = min_buffer[i];
+                Sample const range = max_value_buf - min_value_buf;
 
                 target_buffer[i] = min_buffer[i] + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value_buf);
             }
         }
     }
@@ -954,6 +1048,8 @@ void LFO::apply_range(
 void LFO::apply_distortions_centered(
         Sample const* const distortion_buffer,
         Sample const* const randomness_buffer,
+        Sample const distortion_value,
+        Sample const randomness_value,
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -961,12 +1057,8 @@ void LFO::apply_distortions_centered(
         Sample* const target_buffer
 ) {
     if (distortion_buffer == NULL) {
-        Number const distortion = this->distortion.get_value();
-
         if (randomness_buffer == NULL) {
-            Number const randomness = this->randomness.get_value();
-
-            if (randomness < ALMOST_ZERO && distortion < ALMOST_ZERO) {
+            if (randomness_value < ALMOST_ZERO && distortion_value < ALMOST_ZERO) {
                 if ((void*)target_buffer != (void*)source_buffer) {
                     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                         target_buffer[i] = source_buffer[i];
@@ -975,8 +1067,8 @@ void LFO::apply_distortions_centered(
             } else {
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                     target_buffer[i] = Math::randomize_centered_lfo(
-                        randomness,
-                        Math::distort_centered_lfo(distortion, source_buffer[i])
+                        randomness_value,
+                        Math::distort_centered_lfo(distortion_value, source_buffer[i])
                     );
                 }
             }
@@ -984,17 +1076,15 @@ void LFO::apply_distortions_centered(
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 target_buffer[i] = Math::randomize_centered_lfo(
                     randomness_buffer[i],
-                    Math::distort_centered_lfo(distortion, source_buffer[i])
+                    Math::distort_centered_lfo(distortion_value, source_buffer[i])
                 );
             }
         }
     } else {
         if (randomness_buffer == NULL) {
-            Number const randomness = this->randomness.get_value();
-
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 target_buffer[i] = Math::randomize_centered_lfo(
-                    randomness,
+                    randomness_value,
                     Math::distort_centered_lfo(distortion_buffer[i], source_buffer[i])
                 );
             }
@@ -1013,6 +1103,8 @@ void LFO::apply_distortions_centered(
 void LFO::apply_range_centered(
         Sample const* const min_buffer,
         Sample const* const max_buffer,
+        Sample const min_value,
+        Sample const max_value,
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
@@ -1020,10 +1112,7 @@ void LFO::apply_range_centered(
         Sample* const target_buffer
 ) {
     if (min_buffer == NULL) {
-        Sample const min_value = (Sample)min.get_value();
-
         if (max_buffer == NULL) {
-            Sample const max_value = (Sample)max.get_value();
             Sample const center = (min_value + max_value) * 0.5;
             Sample const range = max_value - min_value;
 
@@ -1034,38 +1123,36 @@ void LFO::apply_range_centered(
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value = max_buffer[i];
-                Sample const center = (min_value + max_value) * 0.5;
-                Sample const range = max_value - min_value;
+                Sample const max_value_buf = max_buffer[i];
+                Sample const center = (min_value + max_value_buf) * 0.5;
+                Sample const range = max_value_buf - min_value;
 
                 target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value_buf);
             }
         }
     } else {
         if (max_buffer == NULL) {
-            Sample const max_value = (Sample)max.get_value();
-
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value = min_buffer[i];
-                Sample const center = (min_value + max_value) * 0.5;
-                Sample const range = max_value - min_value;
+                Sample const min_value_buf = min_buffer[i];
+                Sample const center = (min_value_buf + max_value) * 0.5;
+                Sample const range = max_value - min_value_buf;
 
                 target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value);
             }
         } else {
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value = min_buffer[i];
-                Sample const max_value = max_buffer[i];
-                Sample const center = (min_value + max_value) * 0.5;
-                Sample const range = max_value - min_value;
+                Sample const min_value_buf = min_buffer[i];
+                Sample const max_value_buf = max_buffer[i];
+                Sample const center = (min_value_buf + max_value_buf) * 0.5;
+                Sample const range = max_value_buf - min_value_buf;
 
                 target_buffer[i] = center + range * source_buffer[i];
 
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
+                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value_buf);
             }
         }
     }

@@ -535,18 +535,21 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::produce_for_lfo_with_enve
         Sample* const buffer,
         Sample const* const amplitude_buffer,
         Sample const* const frequency_buffer,
-        Sample const* const phase_buffer
+        Sample const* const phase_buffer,
+        Sample const amplitude_value,
+        Sample const frequency_value,
+        Sample const phase_value
 ) noexcept {
     wavetable = wavetables[waveform.get_value()];
 
     compute_amplitude_buffer(
-        amplitude_buffer, round, sample_count, first_sample_index, last_sample_index
+        amplitude_buffer, amplitude_value, round, sample_count, first_sample_index, last_sample_index
     );
     compute_frequency_buffer(
-        frequency_buffer, round, sample_count, first_sample_index, last_sample_index
+        frequency_buffer, frequency_value, round, sample_count, first_sample_index, last_sample_index
     );
     compute_phase_buffer(
-        phase_buffer, round, sample_count, first_sample_index, last_sample_index
+        phase_buffer, phase_value, round, sample_count, first_sample_index, last_sample_index
     );
 
     apply_toggle_params(bpm);
@@ -616,9 +619,15 @@ Sample const* const* Oscillator<ModulatorSignalProducerClass, is_lfo>::initializ
         )
     );
 
-    compute_amplitude_buffer(amplitude_buffer, round, sample_count, 0, sample_count);
-    compute_frequency_buffer(frequency_buffer, round, sample_count, 0, sample_count);
-    compute_phase_buffer(phase_buffer, round, sample_count, 0, sample_count);
+    compute_amplitude_buffer(
+        amplitude_buffer, (Sample)amplitude.get_value(), round, sample_count, 0, sample_count
+    );
+    compute_frequency_buffer(
+        frequency_buffer, (Sample)frequency.get_value(), round, sample_count, 0, sample_count
+    );
+    compute_phase_buffer(
+        phase_buffer, (Sample)phase.get_value(), round, sample_count, 0, sample_count
+    );
 
     return NULL;
 }
@@ -641,6 +650,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::apply_toggle_params(
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         Sample const* const amplitude_buffer,
+        Sample const amplitude_value,
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
@@ -668,11 +678,10 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         if (modulated_amplitude_buffer == NULL) {
             computed_amplitude_is_constant = true;
             computed_amplitude_value = (
-                amplitude.get_value() * modulated_amplitude.get_value()
+                amplitude_value * modulated_amplitude.get_value()
             );
         } else {
             computed_amplitude_is_constant = false;
-            Sample const amplitude_value = (Sample)amplitude.get_value();
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 computed_amplitude_buffer[i] = (
@@ -707,6 +716,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         Sample const* const frequency_buffer,
+        Sample const frequency_value,
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
@@ -721,7 +731,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
     if constexpr (is_lfo) {
         if (frequency_buffer == NULL) {
-            Number const frequency_value = frequency.get_value();
             Number const detune_value = detune.get_value();
             Number const fine_detune_value = fine_detune.get_value();
 
@@ -776,8 +785,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             }
 
             case FREQUENCY: {
-                Number const frequency_value = frequency.get_value();
-
                 computed_frequency_is_constant = false;
 
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -808,7 +815,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             }
 
             case FREQUENCY | DETUNE: {
-                Number const frequency_value = frequency.get_value();
                 Number const detune_value = detune.get_value();
 
                 computed_frequency_is_constant = false;
@@ -843,7 +849,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             }
 
             case FREQUENCY | FINE_DETUNE: {
-                Number const frequency_value = frequency.get_value();
                 Number const fine_detune_value = (
                     fine_detune_scale * fine_detune.get_value()
                 );
@@ -882,7 +887,6 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
             default:
             case ALL: {
-                Number const frequency_value = frequency.get_value();
                 Number const detune_value = detune.get_value();
                 Number const fine_detune_value = (
                     fine_detune_scale * fine_detune.get_value()
@@ -913,6 +917,7 @@ Frequency Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency(
 template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
         Sample const* const phase_buffer,
+        Sample const phase_value,
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
@@ -921,7 +926,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
     phase_is_constant = phase_buffer == NULL;
 
     if (phase_is_constant) {
-        phase_value = Wavetable::scale_phase_offset(phase.get_value());
+        this->phase_value = (Number)Wavetable::scale_phase_offset(phase_value);
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             this->phase_buffer[i] = Wavetable::scale_phase_offset(phase_buffer[i]);

@@ -256,7 +256,7 @@ class LFOEnvelopeState
         EnvelopeStage stage;
         Byte active_snapshot_envelope_index;
         Byte scheduled_snapshot_envelope_index;
-        bool is_wavetable_initialized;
+        bool is_initialized;
 };
 
 
@@ -478,6 +478,8 @@ class FloatParam : public Param<Number, evaluation>
         LFO* get_lfo() const noexcept;
 
         virtual void reset() noexcept override;
+
+        void reset_value() noexcept;
 
     protected:
         Sample const* const* initialize_rendering(

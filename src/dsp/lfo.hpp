@@ -22,6 +22,7 @@
 #include <string>
 
 #include "js80p.hpp"
+#include "midi.hpp"
 
 #include "dsp/envelope.hpp"
 #include "dsp/lfo_envelope_list.hpp"
@@ -87,6 +88,7 @@ class LFO : public SignalProducer
 
         void produce_with_envelope(
             LFOEnvelopeStates& lfo_envelope_states,
+            Midi::Channel const midi_channel,
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
@@ -200,6 +202,7 @@ class LFO : public SignalProducer
             public:
                 LFOWithEnvelopeRenderer(
                     LFOEnvelopeStates& lfo_envelope_states,
+                    Midi::Channel const midi_channel,
                     Integer const round,
                     Integer const sample_count,
                     Integer const first_sample_index,
@@ -274,6 +277,7 @@ class LFO : public SignalProducer
                 Integer const sample_count;
                 Integer const first_sample_index;
                 Integer const last_sample_index;
+                Midi::Channel const midi_channel;
         };
 
         static constexpr Number ALMOST_ZERO = 0.000001;
@@ -283,6 +287,8 @@ class LFO : public SignalProducer
         void apply_distortions(
             Sample const* const distortion_buffer,
             Sample const* const randomness_buffer,
+            Sample const distortion_value,
+            Sample const randomness_value,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
@@ -293,6 +299,8 @@ class LFO : public SignalProducer
         void apply_range(
             Sample const* const min_buffer,
             Sample const* const max_buffer,
+            Sample const min_value,
+            Sample const max_value,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
@@ -303,6 +311,8 @@ class LFO : public SignalProducer
         void apply_distortions_centered(
             Sample const* const distortion_buffer,
             Sample const* const randomness_buffer,
+            Sample const distortion_value,
+            Sample const randomness_value,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
@@ -313,6 +323,8 @@ class LFO : public SignalProducer
         void apply_range_centered(
             Sample const* const min_buffer,
             Sample const* const max_buffer,
+            Sample const min_value,
+            Sample const max_value,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
@@ -344,6 +356,13 @@ class LFO : public SignalProducer
         bool const can_have_envelope;
 
         Oscillator_ oscillator;
+        FloatParamS* frequency_mpe[Midi::CHANNELS];
+        FloatParamS* phase_mpe[Midi::CHANNELS];
+        FloatParamS* min_mpe[Midi::CHANNELS];
+        FloatParamS* max_mpe[Midi::CHANNELS];
+        FloatParamS* amplitude_mpe[Midi::CHANNELS];
+        FloatParamS* distortion_mpe[Midi::CHANNELS];
+        FloatParamS* randomness_mpe[Midi::CHANNELS];
 
         Sample* env_buffer_1;
         Sample* env_buffer_2;

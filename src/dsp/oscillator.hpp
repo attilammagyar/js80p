@@ -176,7 +176,10 @@ class Oscillator : public SignalProducer
             Sample* const buffer,
             Sample const* const amplitude_buffer,
             Sample const* const frequency_buffer,
-            Sample const* const phase_buffer
+            Sample const* const phase_buffer,
+            Sample const amplitude_value,
+            Sample const frequency_value,
+            Sample const phase_value
         ) noexcept;
 
         void skip_round(Integer const round, Integer const sample_count) noexcept;
@@ -237,6 +240,7 @@ class Oscillator : public SignalProducer
 
         void compute_amplitude_buffer(
             Sample const* const amplitude_buffer,
+            Sample const amplitude_value,
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
@@ -245,6 +249,7 @@ class Oscillator : public SignalProducer
 
         void compute_frequency_buffer(
             Sample const* const frequency_buffer,
+            Sample const frequency_value,
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
@@ -259,6 +264,7 @@ class Oscillator : public SignalProducer
 
         void compute_phase_buffer(
             Sample const* const phase_buffer,
+            Sample const phase_value,
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
