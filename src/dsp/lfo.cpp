@@ -530,7 +530,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
 ) noexcept {
     LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[depth];
 
-    if (!JS80P_UNLIKELY(lfo_envelope_state.is_wavetable_initialized)) {
+    if (JS80P_UNLIKELY(!lfo_envelope_state.is_wavetable_initialized)) {
         lfo_envelope_state.is_wavetable_initialized = true;
 
         Sample const frequency_value = (
