@@ -362,13 +362,13 @@ class FloatParam : public Param<Number, evaluation>
          *          Practically, this means that only \c FloatParam objects can
          *          be leaders.
          *
-         * \warning When a polyphonic \c FloatParam has a leader, then its
-         *          rendered buffer must be immediately used (or copied) for
-         *          each polyphonic voice after rendering it, in order to avoid
-         *          getting overwritten by other polyphonic voices. All
-         *          \c FloatParam instances with the same leader use the
-         *          leader's buffer, even when they are running with envelopes
-         *          or polyphonic LFOs.
+         * \warning When a \c FloatParam which belongs to a polyphonic voice has
+         *          a leader, then its rendered buffer must be used (or copied)
+         *          immediately for each polyphonic voice after rendering, in
+         *          order to avoid getting overwritten by other polyphonic
+         *          voices. All \c FloatParam instances with the same leader use
+         *          the leader's buffer, even when they are running with
+         *          envelopes or polyphonic LFOs.
          */
         FloatParam(FloatParam<evaluation>& leader) noexcept;
 
