@@ -2441,6 +2441,11 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
 
         case ParamType::BYTE:
             byte_params[index]->set_ratio(ratio);
+
+            if (param_id == ParamId::MPEST) {
+                all_notes_off(0.0, 0);
+            }
+
             break;
 
         default:
@@ -2475,6 +2480,11 @@ void Synth::handle_set_param_smoothly(ParamId const param_id, Number const ratio
 
         case ParamType::BYTE:
             byte_params[index]->set_ratio(ratio);
+
+            if (param_id == ParamId::MPEST) {
+                all_notes_off(0.0, 0);
+            }
+
             handle_refresh_param(param_id);
             break;
 
