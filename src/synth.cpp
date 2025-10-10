@@ -1570,6 +1570,7 @@ void Synth::change_midi_controller(
     if (mpe_channel == PARAM_GLOBAL_MPE_CHANNEL) {
         midi_controller.change_all_channels(time_offset, new_value);
     } else {
+        midi_controller.change(PARAM_GLOBAL_MPE_CHANNEL, time_offset, new_value);
         midi_controller.change(mpe_channel, time_offset, new_value);
     }
 }

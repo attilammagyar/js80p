@@ -1113,9 +1113,9 @@ Same as the [distortions](#usage-effects-distortions) on the
 
 [MPE](https://en.wikipedia.org/wiki/MIDI#MIDI_Polyphonic_Expression) is an
 extension of the [MIDI standard](https://en.wikipedia.org/wiki/MIDI) which
-allows various expressions like pitch bend, channel pressure, timbre (CC 74),
-etc. to be applied differently to individual polyphonic notes by assigning
-separate MIDI channels for each note.
+allows various expressions like pitch bend, channel pressure, timbre control
+(CC 74), etc. to be applied differently to individual polyphonic notes by
+assigning separate MIDI channels for each note.
 
 To use MPE, you need an MPE-capable MIDI input device, or alternatively, you
 can use the [MPE Emulator](https://github.com/attilammagyar/mpe-emulator)
@@ -1142,12 +1142,26 @@ wheel over the black box next to the MPE label in the header section of
    accept [envelope generators](#usage-envelopes) (including the settings of
    the envelope generators themselves), as well as the settings of
    [low-frequency oscillators](#usage-lfos) which have an amplitude envelope
-   assigned to them, will not be affected by controller events that come from
-   any other member channel than their respective one. (Only their own member
-   channel and the manager channel will affect them.)
+   assigned to them, will not be affected by [controller](#usage-controllers)
+   events that originate from any other member channel than their respective
+   one. (Only their own member channel and the manager channel will affect
+   them.)
 
  * **Up 15** - **Up 1**: same as above, but the manager channel is the 16th
    one, and the member channels are allocated from the upper region.
+
+**Notes**:
+
+ * It is not recommended to send `Note On` MIDI messages to JS80P over
+   the MPE management channel, because JS80P copies control messages from the
+   member channels to the manager channel as well (without affecting the other
+   member channels) in order to keep the associated
+   [controllers](#usage-controllers) usable for paraphonic and global
+   parameters as well. (Though this may violate MPE specifications, in practice,
+   it makes it easier to utilize JS80P's capabilities.)
+
+ * MPE Configuration Messages (MCM) are ignored, JS80P's MPE settings can only
+   be changed via the user interface.
 
 <a href="#toc">Table of Contents</a>
 

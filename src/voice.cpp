@@ -849,8 +849,6 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::set_mpe_channel(
         Midi::Channel const mpe_channel
 ) noexcept {
-    oscillator.detune.set_midi_channel(mpe_channel);
-
     if constexpr (IS_MODULATOR) {
         additive_volume.set_midi_channel(mpe_channel);
     }
