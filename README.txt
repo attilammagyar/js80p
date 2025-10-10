@@ -7,8 +7,8 @@ synthesizer VST® plugin for Linux and Windows.
 JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
 effects, envelopes, LFOs, and powerful macros to shape your sound with
 subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
-monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
-imperfection emulation.
+monophonic, and split keyboard modes, MPE support, MTS-ESP tuning support, and
+analog imperfection emulation.
 
 To download JS80P, visit its website at https://attilammagyar.github.io/js80p ,
 or look for the "Releases" section at its GitHub page at

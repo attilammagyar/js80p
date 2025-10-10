@@ -11,8 +11,8 @@ JS80P is a MIDI driven, performance oriented, versatile, free and open source
 JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
 effects, envelopes, LFOs, and powerful macros to shape your sound with
 subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
-monophonic, and split keyboard modes, MTS-ESP tuning support, and analog
-imperfection emulation.
+monophonic, and split keyboard modes, MPE support, MTS-ESP tuning support, and
+analog imperfection emulation.
 
 To download JS80P, visit its website at
 [https://attilammagyar.github.io/js80p](https://attilammagyar.github.io/js80p),
@@ -51,12 +51,14 @@ Table of Contents
  * [Usage](#usage)
     * [Signal Chain (Simplified)](#usage-signal)
     * [Knobs](#usage-knobs)
+       * [Polyphony](#usage-polyphony)
     * [Controllers](#usage-controllers)
     * [Synthesizer (Synth)](#usage-synth)
        * [Main Panel](#usage-synth-main)
        * [Common Oscillator Settings](#usage-synth-common)
        * [Oscillator 1 (Modulator)](#usage-synth-modulator)
        * [Oscillator 2 (Carrier)](#usage-synth-carrier)
+       * [MIDI Polyphonic Expression (MPE)](#usage-synth-mpe)
     * [Effects](#usage-effects)
        * [Volume Controls](#usage-effects-volume)
        * [Distortions](#usage-effects-distortions)
@@ -141,6 +143,7 @@ Features
 --------
 
  * 64 notes polyphony.
+    * MIDI Polyphonic Expression (MPE).
  * Last-note priority monophonic mode.
     * Legato playing will either retrigger or smoothly glide to the next note,
       depending on the portamento length setting.
@@ -550,6 +553,12 @@ produced by JS80P can be adjusted via virtual knobs on the screen:
    **Note**: if you accidentally open the controller selector screen, and you
    want to close it without changing anything, then just click on the "none"
    option or the controller that is already selected.
+
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-polyphony"></a>
+
+#### Polyphony
 
 By default, JS80P parameters are paraphonic, which means that when there are
 multiple voices playing different musical notes, all of them share the same
@@ -1095,6 +1104,50 @@ plays a sine wave exactly one octave below the oscillator's main frequency.
 
 Same as the [distortions](#usage-effects-distortions) on the
 [Effects](#usage-effects) tab, but with polyphonic controller capabilities.
+
+<a href="#toc">Table of Contents</a>
+
+<a id="usage-synth-mpe"></a>
+
+#### MIDI Polyphonic Expression (MPE)
+
+[MPE](https://en.wikipedia.org/wiki/MIDI#MIDI_Polyphonic_Expression) is an
+extension of the [MIDI standard](https://en.wikipedia.org/wiki/MIDI) which
+allows various expressions like pitch bend, channel pressure, timbre (CC 74),
+etc. to be applied differently to individual polyphonic notes by assigning
+separate MIDI channels for each note.
+
+To use MPE, you need an MPE-capable MIDI input device, or alternatively, you
+can use the [MPE Emulator](https://github.com/attilammagyar/mpe-emulator)
+plugin to enhance the functionality of a non-MPE device.
+
+The MPE protocol dedicates one of the 16 MIDI channels to global messages which
+affect all sounding notes (manager channel), so the remaining up to 15
+channels can be used for the individual notes (member channels). The manager
+channel can be either the 1st channel (lower zone) or the 16th channel (upper
+zone). This flexibility allows sharing a single MIDI connection between two MPE
+input devices and two synthesizers.
+
+The MPE configuration of JS80P can be set by clicking on or using the mouse
+wheel over the black box next to the MPE label in the header section of
+[Oscillator 1](#usage-synth-modulator). The available options are:
+
+ * **OFF**: MPE is not used, all [macros](#usage-macros), expressions,
+   controllers, and MIDI CC are [paraphonic](#usage-polyphony) except when
+   used in [envelope generator](#usage-envelopes) settings.
+
+ * **Lo 15** - **Lo 1**: turn on MPE, use channel 1 as the manager channel,
+   and allocate the respective number of lower channels for polyphonic notes.
+   Ignore all messages from the rest of the channels. Voice parameters which
+   accept [envelope generators](#usage-envelopes) (including the settings of
+   the envelope generators themselves), as well as the settings of
+   [low-frequency oscillators](#usage-lfos) which have an amplitude envelope
+   assigned to them, will not be affected by controller events that come from
+   any other member channel than their respective one. (Only their own member
+   channel and the manager channel will affect them.)
+
+ * **Up 15** - **Up 1**: same as above, but the manager channel is the 16th
+   one, and the member channels are allocated from the upper region.
 
 <a href="#toc">Table of Contents</a>
 

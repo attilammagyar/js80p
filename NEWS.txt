@@ -1,4 +1,5 @@
-v3.?.? (2025-??-??)
+v3.5.0 (2025-??-??)
+ * MIDI Polyphonic Expression (MPE) is now supported.
  * Bugfix: avoid potential crash in hosts which fail to provide the requested
    auxiliary input.
 
