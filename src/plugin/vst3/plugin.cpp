@@ -560,7 +560,7 @@ Midi::Word Vst3Plugin::Processor::float_to_midi_word(
         Number const number
 ) const noexcept {
     return std::min(
-        (Midi::Word)16384,
+        (Midi::Word)16384, /* outside the 14-bit range, but more accurate */
         std::max((Midi::Word)0, (Midi::Word)std::round(number * 16384.0))
     );
 }
