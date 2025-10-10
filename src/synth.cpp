@@ -2038,6 +2038,35 @@ void Synth::mono_mode_off(
 }
 
 
+Number Synth::get_midi_controller_value(
+        ControllerId const controller_id,
+        Midi::Channel const channel
+) const noexcept {
+    Midi::Channel mpe_channel = map_mpe_channel(channel);
+
+    if (mpe_channel == Midi::INVALID_CHANNEL) {
+        mpe_channel = PARAM_GLOBAL_MPE_CHANNEL;
+    }
+
+    switch (controller_id) {
+        case ControllerId::PITCH_WHEEL:
+            return pitch_wheel.get_value(mpe_channel);
+
+        case ControllerId::CHANNEL_PRESSURE:
+            return channel_pressure_ctl.get_value(mpe_channel);
+
+        default:
+            if (is_supported_midi_controller((Midi::Controller)controller_id)) {
+                return midi_controllers_rw[controller_id]->get_value(mpe_channel);
+            }
+
+            break;
+    }
+
+    return 0.0;
+}
+
+
 Sample const* const* Synth::generate_samples(
         Integer const round,
         Integer const sample_count,

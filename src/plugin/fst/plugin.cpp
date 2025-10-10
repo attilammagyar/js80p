@@ -393,15 +393,12 @@ void VSTCALLBACK FstPlugin::set_parameter(
 
 void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexcept
 {
-    parameters[0] = Parameter("Program", NULL, Synth::ControllerId::NONE);
+    parameters[0] = Parameter("Program", Synth::ControllerId::NONE, 0.0f);
     parameters[1] = create_midi_ctl_param(
-        Synth::ControllerId::PITCH_WHEEL, &synth.pitch_wheel, synth, 0
+        Synth::ControllerId::PITCH_WHEEL, synth, 0
     );
     parameters[2] = create_midi_ctl_param(
-        Synth::ControllerId::CHANNEL_PRESSURE,
-        &synth.channel_pressure_ctl,
-        synth,
-        0
+        Synth::ControllerId::CHANNEL_PRESSURE, synth, 0
     );
 
     size_t index = 3;
@@ -426,44 +423,35 @@ void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexce
         }
 
         parameters[index++] = create_midi_ctl_param(
-            (Synth::ControllerId)cc, synth.midi_controllers[cc], synth, 0
+            (Synth::ControllerId)cc, synth, 0
         );
     }
 
     parameters[index++] = create_midi_ctl_param(
-        Synth::ControllerId::SUSTAIN_PEDAL,
-        synth.midi_controllers[Synth::ControllerId::SUSTAIN_PEDAL],
-        synth,
-        0
+        Synth::ControllerId::SUSTAIN_PEDAL, synth, 0
     );
 
     JS80P_ASSERT(index == PATCH_CHANGED_PARAMETER_INDEX);
 
     Parameter patch_changed = Parameter(
-        PATCH_CHANGED_PARAMETER_SHORT_NAME, NULL, Synth::ControllerId::NONE
+        PATCH_CHANGED_PARAMETER_SHORT_NAME, Synth::ControllerId::NONE, 0.0f
     );
     patch_changed.set_value(0.0f);
     parameters[index++] = patch_changed;
 
     parameters[index++] = create_midi_ctl_param(
-        Synth::ControllerId::UNDEFINED_20,
-        synth.midi_controllers[Synth::ControllerId::UNDEFINED_20],
-        synth,
-        0
+        Synth::ControllerId::UNDEFINED_20, synth, 0
     );
 
     for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
         parameters[index++] = create_midi_ctl_param(
-            Synth::ControllerId::PITCH_WHEEL, &synth.pitch_wheel, synth, channel
+            Synth::ControllerId::PITCH_WHEEL, synth, channel
         );
     }
 
     for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
         parameters[index++] = create_midi_ctl_param(
-            Synth::ControllerId::CHANNEL_PRESSURE,
-            &synth.channel_pressure_ctl,
-            synth,
-            channel
+            Synth::ControllerId::CHANNEL_PRESSURE, synth, channel
         );
     }
 
@@ -476,10 +464,7 @@ void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexce
 
         for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
             parameters[index++] = create_midi_ctl_param(
-                (Synth::ControllerId)cc,
-                synth.midi_controllers[cc],
-                synth,
-                channel
+                (Synth::ControllerId)cc, synth, channel
             );
         }
     }
@@ -488,11 +473,27 @@ void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexce
 
 FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
         Synth::ControllerId const controller_id,
-        MidiController* const midi_controller,
         Synth& synth,
         Midi::Channel const channel
 ) noexcept {
+    float value = 0.5f;
     char name[kVstMaxParamStrLen];
+
+    switch (controller_id) {
+        case Synth::ControllerId::PITCH_WHEEL:
+            value = synth.pitch_wheel.get_value(0);
+            break;
+
+        case Synth::ControllerId::CHANNEL_PRESSURE:
+            value = synth.channel_pressure_ctl.get_value(0);
+            break;
+
+        default:
+            if (Synth::is_supported_midi_controller((Midi::Controller)controller_id)) {
+                value = (float)synth.midi_controllers[controller_id]->get_value(0);
+            }
+            break;
+    }
 
     snprintf(
         name,
@@ -504,14 +505,7 @@ FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
 
     name[kVstMaxParamStrLen - 1] = '\x00';
 
-    return Parameter(
-        name,
-        midi_controller != NULL
-            ? midi_controller
-            : synth.midi_controllers[controller_id],
-        (Midi::Controller)controller_id,
-        channel
-    );
+    return Parameter(name, (Midi::Controller)controller_id, value, channel);
 }
 
 
@@ -589,7 +583,6 @@ void FstPlugin::process_internal_messages_in_audio_thread(
                 handle_change_param(
                     message.get_controller_id(),
                     message.get_new_value(),
-                    message.get_midi_controller(),
                     message.get_channel()
                 );
                 break;
@@ -648,7 +641,6 @@ void FstPlugin::handle_rename_program(std::string const& name) noexcept
 void FstPlugin::handle_change_param(
         Midi::Controller const controller_id,
         Number const new_value,
-        MidiController* const midi_controller,
         Midi::Channel const channel
 ) noexcept {
     if (Synth::is_supported_midi_controller(controller_id)) {
@@ -668,10 +660,22 @@ void FstPlugin::handle_change_param(
         synth.control_change(
             0.0, channel, controller_id, float_to_midi_byte(new_value)
         );
-    } else if (JS80P_LIKELY(midi_controller != NULL)) {
-        // TODO: pass channel (pitch wheel, aftertouch) properly and resolve
-        //       Parameter::channel vs. Synth::map_mpe_channel()
-        midi_controller->change(0, 0.0, new_value);
+
+        return;
+    }
+
+    switch ((Synth::ControllerId)controller_id) {
+        case Synth::ControllerId::PITCH_WHEEL:
+            synth.pitch_wheel_change(0.0, channel, float_to_midi_word(new_value));
+            break;
+
+        case Synth::ControllerId::CHANNEL_PRESSURE:
+            synth.channel_pressure(0.0, channel, float_to_midi_byte(new_value));
+            break;
+
+        default:
+            JS80P_ASSERT_NOT_REACHED();
+            break;
     }
 }
 
@@ -781,7 +785,7 @@ void FstPlugin::handle_synth_was_dirty() noexcept
 {
     Parameter& dirty = parameters[PATCH_CHANGED_PARAMETER_INDEX];
 
-    float const new_value = dirty.get_value() + 0.01f;
+    float const new_value = dirty.get_value(synth) + 0.01f;
 
     dirty.set_value(new_value < 1.0f ? new_value : 0.0f);
     need_host_update = true;
@@ -1033,6 +1037,15 @@ Midi::Byte FstPlugin::float_to_midi_byte(float const value) const noexcept
     return std::min(
         (Midi::Byte)127,
         std::max((Midi::Byte)0, (Midi::Byte)std::round(value * 127.0f))
+    );
+}
+
+
+Midi::Word FstPlugin::float_to_midi_word(float const value) const noexcept
+{
+    return std::min(
+        (Midi::Word)16383,
+        std::max((Midi::Word)0, (Midi::Word)std::round(value * 16384.0f))
     );
 }
 
@@ -1289,8 +1302,7 @@ void FstPlugin::close_gui()
 
 
 FstPlugin::Parameter::Parameter()
-    : midi_controller(NULL),
-    name("unknown"),
+    : name("unknown"),
     // change_index(-1), /* See FstPlugin::generate_samples() */
     value(0.5f),
     controller_id(0),
@@ -1301,16 +1313,12 @@ FstPlugin::Parameter::Parameter()
 
 FstPlugin::Parameter::Parameter(
         char const* const name,
-        MidiController* const midi_controller,
         Midi::Controller const controller_id,
+        float const value,
         Midi::Channel const channel
-) : midi_controller(midi_controller),
-    name(name),
+) : name(name),
     // change_index(-1), /* See FstPlugin::generate_samples() */
-
-    // TODO: match up Parameter::channel and the MidiController's channel number
-    //       which is remapped by Synth::map_mpe_channel()
-    value(midi_controller != NULL ? (float)midi_controller->get_value(0) : 0.5f),
+    value(value),
     controller_id(controller_id),
     channel(channel)
 {
@@ -1320,12 +1328,6 @@ FstPlugin::Parameter::Parameter(
 char const* FstPlugin::Parameter::get_name() const noexcept
 {
     return name.c_str();
-}
-
-
-MidiController* FstPlugin::Parameter::get_midi_controller() const noexcept
-{
-    return midi_controller;
 }
 
 
@@ -1342,28 +1344,21 @@ Midi::Controller FstPlugin::Parameter::get_channel() const noexcept
 
 
 /* See FstPlugin::generate_samples() */
-// bool FstPlugin::Parameter::needs_host_update() const noexcept
-// {
-    // if (JS80P_UNLIKELY(midi_controller == NULL)) {
-        // return false;
-    // }
-
-    // return change_index != midi_controller->get_change_index();
-// }
+// bool FstPlugin::Parameter::needs_host_update() const noexcept {}
 
 
-float FstPlugin::Parameter::get_value() noexcept
+float FstPlugin::Parameter::get_value(Synth const& synth) noexcept
 {
-    if (JS80P_UNLIKELY(midi_controller == NULL)) {
+    if (JS80P_UNLIKELY(controller_id == Synth::ControllerId::NONE)) {
         return get_last_set_value();
     }
 
-    // TODO: match up Parameter::channel and the MidiController's channel number
-    //       which is remapped by Synth::map_mpe_channel()
-    float const value = (float)midi_controller->get_value(0);
+    float const value = (float)synth.get_midi_controller_value(
+        (Synth::ControllerId)controller_id, channel
+    );
 
     /* See FstPlugin::generate_samples() */
-    // change_index = midi_controller->get_change_index();
+    // change_index = ...
 
     return value;
 }
@@ -1383,7 +1378,7 @@ void FstPlugin::Parameter::set_value(float const value) noexcept
 
 float FstPlugin::get_parameter(size_t index) noexcept
 {
-    return parameters[index].get_value();
+    return parameters[index].get_value(synth);
 }
 
 
@@ -1407,10 +1402,7 @@ void FstPlugin::set_parameter(size_t index, float value) noexcept
     } else {
         to_audio_messages.push(
             Message(
-                param.get_controller_id(),
-                (Number)value,
-                param.get_midi_controller(),
-                param.get_channel()
+                param.get_controller_id(), (Number)value, param.get_channel()
             )
         );
     }
@@ -1483,7 +1475,6 @@ FstPlugin::Message::Message(
         size_t const index,
         std::string const& serialized_data
 ) : serialized_data(serialized_data),
-    midi_controller(NULL),
     new_value(0.0),
     index(index),
     type(type),
@@ -1496,10 +1487,8 @@ FstPlugin::Message::Message(
 FstPlugin::Message::Message(
         Midi::Controller const controller_id,
         Number const new_value,
-        MidiController* const midi_controller,
         Midi::Channel const channel
 ) : serialized_data(""),
-    midi_controller(midi_controller),
     new_value(new_value),
     index(0),
     type(MessageType::CHANGE_PARAM),
@@ -1536,12 +1525,6 @@ Midi::Controller FstPlugin::Message::get_controller_id() const noexcept
 Number FstPlugin::Message::get_new_value() const noexcept
 {
     return new_value;
-}
-
-
-MidiController* FstPlugin::Message::get_midi_controller() const noexcept
-{
-    return midi_controller;
 }
 
 

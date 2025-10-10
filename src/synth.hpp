@@ -1359,6 +1359,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel
         ) noexcept;
 
+        Number get_midi_controller_value(
+            ControllerId const controller_id,
+            Midi::Channel const channel
+        ) const noexcept;
+
         ByteParam note_handling;
         ModeParam mode;
         ByteParam mpe_settings;

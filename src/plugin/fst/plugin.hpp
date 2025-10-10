@@ -48,8 +48,8 @@ class FstPlugin : public Midi::EventHandler
                 Parameter();
                 Parameter(
                     char const* const name,
-                    MidiController* const midi_controller,
                     Midi::Controller const controller_id,
+                    float const value,
                     Midi::Channel const channel = Midi::INVALID_CHANNEL
                 );
                 Parameter(Parameter const& parameter) = default;
@@ -59,18 +59,16 @@ class FstPlugin : public Midi::EventHandler
                 Parameter& operator=(Parameter&& parameter) noexcept = default;
 
                 char const* get_name() const noexcept;
-                MidiController* get_midi_controller() const noexcept;
                 Midi::Controller get_controller_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;
 
                 // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
 
-                float get_value() noexcept;
+                float get_value(Synth const& synth) noexcept;
                 float get_last_set_value() const noexcept;
                 void set_value(float const value) noexcept;
 
             private:
-                MidiController* midi_controller;
                 std::string name;
                 // Integer change_index; /* See FstPlugin::generate_samples() */
                 float value;
@@ -283,7 +281,6 @@ class FstPlugin : public Midi::EventHandler
                 Message(
                     Midi::Controller const controller_id,
                     Number const new_value,
-                    MidiController* const midi_controller,
                     Midi::Channel const channel
                 );
 
@@ -300,12 +297,10 @@ class FstPlugin : public Midi::EventHandler
 
                 Midi::Controller get_controller_id() const noexcept;
                 Number get_new_value() const noexcept;
-                MidiController* get_midi_controller() const noexcept;
                 Midi::Channel get_channel() const noexcept;
 
             private:
                 std::string serialized_data;
-                MidiController* midi_controller;
                 Number new_value;
                 size_t index;
                 MessageType type;
@@ -315,7 +310,6 @@ class FstPlugin : public Midi::EventHandler
 
         static Parameter create_midi_ctl_param(
             Synth::ControllerId const controller_id,
-            MidiController* const midi_controller,
             Synth& synth,
             Midi::Channel const channel
         ) noexcept;
@@ -349,7 +343,6 @@ class FstPlugin : public Midi::EventHandler
         void handle_change_param(
             Midi::Controller const controller_id,
             Number const new_value,
-            MidiController* const midi_controller,
             Midi::Channel const channel
         ) noexcept;
 
@@ -366,6 +359,7 @@ class FstPlugin : public Midi::EventHandler
         void handle_synth_was_dirty() noexcept;
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
+        Midi::Word float_to_midi_word(float const value) const noexcept;
 
         Parameters parameters;
 

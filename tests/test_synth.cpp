@@ -2185,9 +2185,6 @@ TEST(when_mpe_is_turned_on_then_manager_channel_cc_is_global_and_member_channel_
     constexpr Midi::Channel manager_channel = 15;
     constexpr Midi::Channel member_channel = 14;
     constexpr Midi::Channel invalid_channel = 1;
-    constexpr Midi::Channel global_mpe_channel = PARAM_GLOBAL_MPE_CHANNEL;
-    constexpr Midi::Channel mapped_member_channel = member_channel + 1;
-    constexpr Midi::Channel mapped_invalid_channel = invalid_channel + 1;
 
     Synth synth;
     SumOfSines expected(
@@ -2236,17 +2233,17 @@ TEST(when_mpe_is_turned_on_then_manager_channel_cc_is_global_and_member_channel_
 
     assert_eq(
         32.0 / 127.0,
-        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(mapped_invalid_channel),
-        DOUBLE_DELTA
-    );
-    assert_eq(
-        32.0 / 127.0,
-        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(global_mpe_channel),
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, manager_channel),
         DOUBLE_DELTA
     );
     assert_eq(
         64.0 / 127.0,
-        synth.midi_controllers[Midi::MODULATION_WHEEL]->get_value(mapped_member_channel),
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, member_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        32.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, invalid_channel),
         DOUBLE_DELTA
     );
     assert_close(
@@ -2280,5 +2277,85 @@ TEST(when_mpe_is_turned_on_then_manager_channel_cc_is_global_and_member_channel_
         block_size,
         0.02, /* MIDI controller smoothing in FloatParamS */
         "channel=1"
+    );
+})
+
+
+TEST(can_query_midi_controllers_from_any_mpe_channel, {
+    constexpr Byte mpe_mode = Synth::MPE_U02;
+    constexpr Midi::Channel manager_channel = 15;
+    constexpr Midi::Channel member_channel = 14;
+    constexpr Midi::Channel invalid_channel = 1;
+
+    Synth synth;
+
+    synth.resume();
+    synth.control_change(0.0, 0, Synth::ControllerId::MODULATION_WHEEL, 0);
+    synth.pitch_wheel_change(0.0, 0, 0);
+    synth.channel_pressure(0.0, 0, 0);
+
+    set_param(synth, Synth::ParamId::MPEST, synth.mpe_settings.value_to_ratio(mpe_mode));
+    synth.process_messages();
+
+    synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, member_channel),
+
+    synth.control_change(0.0, manager_channel, Midi::MODULATION_WHEEL, 10);
+    synth.control_change(0.0, member_channel, Midi::MODULATION_WHEEL, 20);
+    synth.control_change(0.0, invalid_channel, Midi::MODULATION_WHEEL, 30);
+
+    synth.pitch_wheel_change(0.0, manager_channel, 70);
+    synth.pitch_wheel_change(0.0, member_channel, 80);
+    synth.pitch_wheel_change(0.0, invalid_channel, 90);
+
+    synth.channel_pressure(0.0, manager_channel, 40);
+    synth.channel_pressure(0.0, member_channel, 50);
+    synth.channel_pressure(0.0, invalid_channel, 60);
+
+    assert_eq(
+        10.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, manager_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        20.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, member_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        10.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::MODULATION_WHEEL, invalid_channel),
+        DOUBLE_DELTA
+    );
+
+    assert_eq(
+        70.0 / 16384.0,
+        synth.get_midi_controller_value(Synth::ControllerId::PITCH_WHEEL, manager_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        80.0 / 16384.0,
+        synth.get_midi_controller_value(Synth::ControllerId::PITCH_WHEEL, member_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        70.0 / 16384.0,
+        synth.get_midi_controller_value(Synth::ControllerId::PITCH_WHEEL, invalid_channel),
+        DOUBLE_DELTA
+    );
+
+    assert_eq(
+        40.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::CHANNEL_PRESSURE, manager_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        50.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::CHANNEL_PRESSURE, member_channel),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        40.0 / 127.0,
+        synth.get_midi_controller_value(Synth::ControllerId::CHANNEL_PRESSURE, invalid_channel),
+        DOUBLE_DELTA
     );
 })
