@@ -497,6 +497,19 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_polyphonic(
         LFO& lfo,
         Byte const depth
 ) noexcept {
+    LFOEnvelopeState const& lfo_envelope_state = lfo_envelope_states[depth];
+
+    if (JS80P_UNLIKELY(!lfo_envelope_state.is_initialized)) {
+        /* The flag will be set to true in visit_oscillator(). */
+
+        lfo.frequency_mpe[midi_channel]->sync_ctl_value();
+        lfo.phase_mpe[midi_channel]->sync_ctl_value();
+        lfo.min_mpe[midi_channel]->sync_ctl_value();
+        lfo.max_mpe[midi_channel]->sync_ctl_value();
+        lfo.amplitude_mpe[midi_channel]->sync_ctl_value();
+        lfo.distortion_mpe[midi_channel]->sync_ctl_value();
+        lfo.randomness_mpe[midi_channel]->sync_ctl_value();
+    }
 }
 
 
@@ -602,14 +615,6 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
             frequency_value,
             lfo_envelope_state.time
         );
-
-        lfo.frequency_mpe[midi_channel]->reset_value();
-        lfo.phase_mpe[midi_channel]->reset_value();
-        lfo.min_mpe[midi_channel]->reset_value();
-        lfo.max_mpe[midi_channel]->reset_value();
-        lfo.amplitude_mpe[midi_channel]->reset_value();
-        lfo.distortion_mpe[midi_channel]->reset_value();
-        lfo.randomness_mpe[midi_channel]->reset_value();
     }
 
     oscillator.produce_for_lfo_with_envelope(

@@ -1195,6 +1195,10 @@ void FloatParam<evaluation>::handle_event(
             handle_lfo_envelope_end_event<EVT_LFO_ENVELOPE_CANCEL>(event);
             break;
 
+        case EVT_SYNC_CTL_VALUE:
+            handle_sync_ctl_value_event();
+            break;
+
         default:
             break;
     }
@@ -1701,6 +1705,14 @@ void FloatParam<evaluation>::handle_lfo_envelope_end_event(
 
 
 template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::handle_sync_ctl_value_event() noexcept
+{
+    sync_ctl_value();
+    latest_event_type = EVT_SET_VALUE;
+}
+
+
+template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::handle_cancel_event(
         SignalProducer::Event const& event
 ) noexcept {
@@ -1871,6 +1883,11 @@ void FloatParam<evaluation>::start_envelope(
         start_lfo_envelope(*lfo, time_offset, random_1, random_2);
     } else {
         envelope_state->lfo_has_envelope = false;
+
+        if (get_midi_controller() != NULL || get_macro() != NULL) {
+            this->cancel_events_after(time_offset);
+            this->schedule(EVT_SYNC_CTL_VALUE, time_offset, 0, 0.0, 0.0);
+        }
     }
 }
 
@@ -2357,9 +2374,29 @@ void FloatParam<evaluation>::reset() noexcept
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::reset_value() noexcept
+void FloatParam<evaluation>::sync_ctl_value() noexcept
 {
-    this->store_new_value(get_value());
+    Number value = this->get_raw_value();
+
+    MidiController const* const midi_controller = get_midi_controller();
+
+    if (midi_controller != NULL) {
+        value = round_value(
+            ratio_to_value(midi_controller->get_value(this->midi_channel))
+        );
+    } else {
+        Macro* const macro = get_macro();
+
+        if (macro != NULL) {
+            Midi::Channel const midi_channel = this->midi_channel;
+
+            macro->update(midi_channel);
+
+            value = round_value(ratio_to_value(macro->get_value(midi_channel)));
+        }
+    }
+
+    this->store_new_value(value);
 }
 
 
@@ -2469,7 +2506,13 @@ void FloatParam<evaluation>::process_midi_controller_events(
         return;
     }
 
+    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled();
+
     this->cancel_events_at(ctl_events[0].time_offset);
+
+    if (needs_sync_ctl_value_event) {
+        this->schedule(EVT_SYNC_CTL_VALUE, ctl_events[0].time_offset, 0, 0.0, 0.0);
+    }
 
     if (should_round) {
         for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
@@ -2529,6 +2572,19 @@ void FloatParam<evaluation>::process_midi_controller_events(
 
 
 template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_sync_ctl_value_event_scheduled() const noexcept
+{
+    for (Queue<SignalProducer::Event>::SizeType i = 0; i != this->events.length(); ++i) {
+        if (this->events[i].type == EVT_SYNC_CTL_VALUE) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::process_macro(
         Macro& macro,
         Integer const sample_count
@@ -2545,20 +2601,29 @@ void FloatParam<evaluation>::process_macro(
 
     this->macro_change_index = new_change_index;
 
-    this->cancel_events_at(0.0);
-
     Number const macro_value = macro.get_value(midi_channel);
 
     if (should_round) {
+        this->cancel_events_at(0.0);
         set_value(ratio_to_value(macro_value));
-    } else {
-        Seconds const duration = smooth_change_duration(
-            value_to_ratio(this->get_raw_value()),
-            macro_value,
-            (Seconds)std::max((Integer)0, sample_count - 1) * this->sampling_period
-        );
-        schedule_linear_ramp(duration, ratio_to_value(macro_value));
+
+        return;
     }
+
+    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled();
+
+    this->cancel_events_at(0.0);
+
+    if (needs_sync_ctl_value_event) {
+        this->schedule(EVT_SYNC_CTL_VALUE, 0.0, 0, 0.0, 0.0);
+    }
+
+    Seconds const duration = smooth_change_duration(
+        value_to_ratio(this->get_raw_value()),
+        macro_value,
+        (Seconds)std::max((Integer)0, sample_count - 1) * this->sampling_period
+    );
+    schedule_linear_ramp(duration, ratio_to_value(macro_value));
 }
 
 

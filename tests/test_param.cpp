@@ -2400,6 +2400,89 @@ TEST(float_param_envelope_settings_respect_midi_channel, {
 })
 
 
+TEST(when_a_float_param_has_a_midi_controller_then_attempting_to_start_an_envelope_synchronizes_the_value_to_the_controller, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[block_size] = {
+        6.0, 6.0, 1.0, 1.0, 1.0,
+    };
+    constexpr Frequency sample_rate = 10000.0;
+    constexpr Midi::Channel midi_channel = 2;
+
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+
+    FloatParamS leader("float", 0.0, 10.0, 6.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    MidiController midi_controller;
+    Sample const* const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.8);
+    midi_controller.clear();
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_midi_controller(&midi_controller);
+    leader.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+    follower.set_midi_channel(midi_channel);
+
+    follower.start_envelope(0.00020, 0.0, 0.0);
+    follower.schedule_value(0.00029, 1.0);
+    midi_controller.change(midi_channel, 0.00019, 0.1);
+
+    rendered_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
+TEST(when_a_float_param_has_a_macro_then_attempting_to_start_an_envelope_synchronizes_the_value_to_the_macro, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples[block_size] = {
+        1.0, 1.0, 1.0, 1.0, 1.0,
+    };
+    constexpr Frequency sample_rate = 10000.0;
+    constexpr Midi::Channel midi_channel = 2;
+
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        NULL, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+
+    FloatParamS leader("float", 0.0, 10.0, 6.0, 0.0, envelopes);
+    FloatParamS follower(leader);
+    MidiController midi_controller;
+    Macro macro("M");
+    Sample const* const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.8);
+    midi_controller.clear();
+
+    macro.input.set_midi_controller(&midi_controller);
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(sample_rate);
+    leader.set_macro(&macro);
+    leader.set_midi_channel(PARAM_DEFAULT_MPE_CHANNEL);
+
+    follower.set_block_size(block_size);
+    follower.set_sample_rate(sample_rate);
+    follower.set_midi_channel(midi_channel);
+
+    follower.start_envelope(0.00020, 0.0, 0.0);
+    follower.schedule_value(0.00029, 1.0);
+    midi_controller.change(midi_channel, 0.00019, 0.1);
+
+    rendered_samples = FloatParamS::produce<FloatParamS>(follower, 1, block_size);
+
+    assert_eq(expected_samples, rendered_samples[0], block_size, DOUBLE_DELTA);
+})
+
+
 TEST(when_a_midi_controller_is_assigned_to_a_block_evaluated_float_param_then_float_param_value_follows_the_changes_of_the_midi_controller, {
     constexpr Integer block_size = 5;
 

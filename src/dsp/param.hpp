@@ -292,6 +292,7 @@ class FloatParam : public Param<Number, evaluation>
         static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_UPDATE = 11;
         static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_END = 12;
         static constexpr SignalProducer::Event::Type EVT_LFO_ENVELOPE_CANCEL = 13;
+        static constexpr SignalProducer::Event::Type EVT_SYNC_CTL_VALUE = 14;
 
         /*
         Some MIDI controllers seem to send multiple changes of the same value with
@@ -479,7 +480,7 @@ class FloatParam : public Param<Number, evaluation>
 
         virtual void reset() noexcept override;
 
-        void reset_value() noexcept;
+        void sync_ctl_value() noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -624,6 +625,8 @@ class FloatParam : public Param<Number, evaluation>
 
         void store_envelope_value_at_event(Seconds const latency) noexcept;
 
+        void handle_sync_ctl_value_event() noexcept;
+
         bool is_affected_by_different_midi_channel_than_leader() const noexcept;
         bool is_following_leader() const noexcept;
 
@@ -637,6 +640,8 @@ class FloatParam : public Param<Number, evaluation>
         void process_midi_controller_events(
             MidiController const& midi_controller
         ) noexcept;
+
+        bool is_sync_ctl_value_event_scheduled() const noexcept;
 
         void process_macro(
             Macro& macro,
