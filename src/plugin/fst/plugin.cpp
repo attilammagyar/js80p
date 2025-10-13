@@ -1044,7 +1044,7 @@ Midi::Byte FstPlugin::float_to_midi_byte(float const value) const noexcept
 Midi::Word FstPlugin::float_to_midi_word(float const value) const noexcept
 {
     return std::min(
-        (Midi::Word)16383,
+        (Midi::Word)16384, /* outside the 14-bit range, but more accurate */
         std::max((Midi::Word)0, (Midi::Word)std::round(value * 16384.0f))
     );
 }
