@@ -41,7 +41,7 @@ WARNING = """\
   #############################################
 */"""
 
-SKIP_LINE = re.compile(r"^\s*(MPE|[MC]TUN) *= *")
+SKIP_LINE = re.compile(r"^\s*[MC]TUN *= *")
 
 
 Preset = collections.namedtuple(
