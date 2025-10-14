@@ -119,6 +119,11 @@ Table of Contents
     * [FX Master Enhancer](#preset-fx-master-enhancer)
     * [Creepy Wind](#preset-creepy-wind)
     * [Stalacpipe Organ](#preset-stalacpipe-organ)
+    * [Analog Brass AT MPE](#preset-analog-brass-at-mpe)
+    * [Analog Brass mod MPE](#preset-analog-brass-mod-mpe)
+    * [Crystal Bowl](#preset-crystal-bowl)
+    * [Metal Bowl](#preset-metal-bowl)
+    * [Metal Bowl Bright](#preset-metal-bowl-bright)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2617,6 +2622,50 @@ recreation of its sound, based on various samples, complete with occasional
 random water droplets. The louder you play the more probable that you will
 cause a droplet to fall, unless you turn them off completely by turning the
 mod wheel down to zero.
+
+<a id="preset-analog-brass-at-mpe"></a>
+
+### Analog Brass AT MPE
+
+A version of the Analog Brass AT preset that is set up for MIDI Polyphonic
+Expression (MPE). Uses the lower MPE zone with 15 channels by default.
+
+<a id="preset-analog-brass-mod-mpe"></a>
+
+### Analog Brass mod MPE
+
+A version of the Analog Brass mod preset that is set up for MIDI Polyphonic
+Expression (MPE). Uses the lower MPE zone with 15 channels by default.
+
+<a id="preset-crystal-bowl"></a>
+
+### Crystal Bowl
+
+Singing bowls (standing bells) made of crystal. High velocity notes
+emulate a struck bowl which rings out and fades naturally, while low velocity
+notes evoke a bowl that slowly begins to resonate while the mallet is circling
+its rim. The mod wheel and aftertouch introduce different kinds of subtle
+instabilities to the sound.
+
+<a id="preset-metal-bowl"></a>
+
+### Metal Bowl
+
+Metallic sounding singing bowls (standing bells). High velocity notes
+emulate a struck bowl which rings out and fades naturally, while low velocity
+notes evoke a bowl that slowly begins to resonate while the mallet is circling
+its rim. The mod wheel and aftertouch introduce different kinds of subtle
+instabilities to the sound.
+
+<a id="preset-metal-bowl-bright"></a>
+
+### Metal Bowl Bright
+
+Bright, metallic sounding singing bowls (standing bells). High velocity notes
+emulate a struck bowl which rings out and fades naturally, while low velocity
+notes evoke a bowl that slowly begins to resonate while the mallet is circling
+its rim. The mod wheel and aftertouch introduce different kinds of subtle
+instabilities to the sound.
 
 <a href="#toc">Table of Contents</a>
 
