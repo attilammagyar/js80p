@@ -269,6 +269,7 @@ def preset_file_name_to_program_name(file_name):
             .replace("Lo-Fi ", "Lo-fi ")
             .replace(" Mod Last", " mod last")
             .replace(" Mod", " mod")
+            .replace(" Mpe", " MPE")
     )
 
 
