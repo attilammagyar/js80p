@@ -1,7 +1,6 @@
 v3.5.0 (2025-??-??)
  * MIDI Polyphonic Expression (MPE) is now supported.
- * Bugfix: avoid potential crash in hosts which fail to provide the requested
-   auxiliary input.
+ * Improved abbreviated program names.
  * New presets:
     * Analog Brass AT MPE, Analog Brass mod MPE, Expressive Saw MPE:
       MPE-friendly versions of the respective presets,
@@ -9,6 +8,8 @@ v3.5.0 (2025-??-??)
       sounds where note velocity selects between a struck bowl that rings out
       and fades, and one that keeps resonating continuously as if a mallet was
       circling its rim.
+ * Bugfix: avoid potential crash in hosts which fail to provide the requested
+   auxiliary input.
 
 v3.4.1 (2025-01-25)
  * Bugfix: since v3.3.0, oscillator 1 went silent whenever the modulator

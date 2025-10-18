@@ -35,8 +35,8 @@ using namespace JS80P;
 
 TEST(long_program_names_are_trimmed_and_truncated, {
     constexpr char const* long_name = "a long program name, way over the limit";
-    constexpr char const* truncated = "a long program name,..t";
-    constexpr char const* truncated_short = "a lo..t";
+    constexpr char const* truncated = "a long prog.. the limit";
+    constexpr char const* truncated_short = "a l..it";
     constexpr char const* just_below_the_limit = "   just below length limit   ";
     constexpr char const* just_below_the_limit_trimmed = "just below length limit";
     constexpr char const* becomes_empty = "    [\\]   ";
@@ -56,7 +56,7 @@ TEST(long_program_names_are_trimmed_and_truncated, {
 
     program.set_name(becomes_empty);
     assert_eq("Default Name", program.get_name());
-    assert_eq("Defa..e", program.get_short_name());
+    assert_eq("Def..me", program.get_short_name());
 
     assert_eq("", empty_default.get_name());
     assert_eq("", empty_default.get_short_name());
@@ -71,7 +71,7 @@ TEST(only_latin_printable_characters_are_allowed_in_program_names, {
     assert_eq("_rvztr-Tkrfrgp,;:. (#1)", program.get_name());
 
     program.set_name("[long name with disallowed characters]");
-    assert_eq("long name with disal..s", program.get_name());
+    assert_eq("long name w..characters", program.get_name());
 })
 
 
@@ -84,19 +84,19 @@ TEST(program_copy_and_move, {
     op_copy = orig;
 
     assert_eq("Some Program Name", ctor_copy.get_name());
-    assert_eq("Some..e", ctor_copy.get_short_name());
+    assert_eq("Som..me", ctor_copy.get_short_name());
 
     assert_eq("Some Program Name", op_copy.get_name());
-    assert_eq("Some..e", op_copy.get_short_name());
+    assert_eq("Som..me", op_copy.get_short_name());
 
     Bank::Program ctor_move(std::move(ctor_copy));
     op_move = std::move(op_copy);
 
     assert_eq("Some Program Name", ctor_move.get_name());
-    assert_eq("Some..e", ctor_move.get_short_name());
+    assert_eq("Som..me", ctor_move.get_short_name());
 
     assert_eq("Some Program Name", op_move.get_name());
-    assert_eq("Some..e", op_move.get_short_name());
+    assert_eq("Som..me", op_move.get_short_name());
 })
 
 
@@ -120,11 +120,11 @@ TEST(program_can_be_imported, {
         "\n"
     );
 
-    assert_eq("this is the name tha..r", program.get_name());
+    assert_eq("this is the..ooking for", program.get_name());
     assert_eq(
         (
             "[js80p]\r\n"
-            "NAME = this is the name tha..r\r\n"
+            "NAME = this is the..ooking for\r\n"
             "NAMENOT = not the program name again\r\n"
             "NAMEctl = also not the program name\r\n"
             "MIX = 1.0\r\n"

@@ -106,19 +106,24 @@ std::string Bank::Program::truncate(
         return "";
     }
 
-    std::string truncated(text.c_str(), max_length);
+    if (JS80P_LIKELY(max_length >= 6)) {
+        /* 2 dots and a terminating zero */
+        constexpr std::string::size_type fixed_part_length = 3;
 
-    if (max_length >= 6) {
-        char const last_char = text[length - 1];
+        std::string::size_type const prefix_length = std::max(
+            (std::string::size_type)3, (max_length - fixed_part_length + 1) / 2
+        );
 
-        truncated.erase(max_length - 4);
-        truncated += "..";
-        truncated += last_char;
-    } else {
-        truncated.erase(max_length);
+        std::string::size_type const suffix_length = (
+            max_length - prefix_length - fixed_part_length
+        );
+        std::string const prefix = text.substr(0, prefix_length);
+        std::string const suffix = text.substr(length - suffix_length, suffix_length);
+
+        return prefix + ".." + suffix;
     }
 
-    return truncated;
+    return std::string(text.c_str(), max_length);
 }
 
 
