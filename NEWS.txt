@@ -3,8 +3,8 @@ v3.5.0 (2025-??-??)
  * Bugfix: avoid potential crash in hosts which fail to provide the requested
    auxiliary input.
  * New presets:
-    * Analog Brass AT MPE and Analog Brass mod MPE: MPE-friendly versions of
-      the respective presets
+    * Analog Brass AT MPE, Analog Brass mod MPE, Expressive Saw MPE:
+      MPE-friendly versions of the respective presets,
     * Crystal Bowl, Metal Bowl, and Metal Bowl Bright: relaxing singing bowl
       sounds where note velocity selects between a struck bowl that rings out
       and fades, and one that keeps resonating continuously as if a mallet was
