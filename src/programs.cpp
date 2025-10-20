@@ -7086,7 +7086,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "F16DSH = 0.333333333333333\n"
             "MFX4 = 1.0\n"
             "CFX4 = 1.0\n"
-            "MPE = 0.033333333333333\n"
         )
     ),
 
@@ -7327,7 +7326,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "F16DSH = 0.333333333333333\n"
             "MFX4 = 1.0\n"
             "CFX4 = 1.0\n"
-            "MPE = 0.033333333333333\n"
         )
     ),
 
@@ -7584,7 +7582,6 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
             "F24DSH = 0.666666666666667\n"
             "MFX4 = 1.0\n"
             "CFX4 = 1.0\n"
-            "MPE = 0.033333333333333\n"
         )
     ),
 

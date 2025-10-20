@@ -1,5 +1,5 @@
-; A version of the Expressive Saw preset that is set up for MIDI Polyphonic
-; Expression (MPE). Uses the lower MPE zone with 15 channels by default.
+; A version of the Expressive Saw preset that is optimized for MIDI Polyphonic
+; Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 [js80p]
 MAMPctl = 0.582031250
 MVS = 0.450
@@ -249,4 +249,3 @@ F22DSH = 0.666666666666667
 F24DSH = 0.666666666666667
 MFX4 = 1.0
 CFX4 = 1.0
-MPE = 0.033333333333333

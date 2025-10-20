@@ -2658,24 +2658,22 @@ instabilities to the sound.
 
 ### Analog Brass AT MPE
 
-A version of the Analog Brass AT preset that is set up for MIDI Polyphonic
-Expression (MPE). Uses the lower MPE zone with 15 channels by default.
+A version of the Analog Brass AT preset that is optimized for MIDI Polyphonic
+Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 
 <a id="preset-analog-brass-mod-mpe"></a>
 
 ### Analog Brass mod MPE
 
-A version of the Analog Brass mod preset that is set up for MIDI Polyphonic
-Expression (MPE). Uses the lower MPE zone with 15 channels by default.
+A version of the Analog Brass mod preset that is optimized for MIDI Polyphonic
+Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 
 <a id="preset-expressive-saw-mpe"></a>
 
 ### Expressive Saw MPE
 
-A version of the Expressive Saw preset that is set up for MIDI Polyphonic
-Expression (MPE). Uses the lower MPE zone with 15 channels by default.
-
-<a href="#toc">Table of Contents</a>
+A version of the Expressive Saw preset that is optimized for MIDI Polyphonic
+Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 
 <a id="bugs"></a>
 
