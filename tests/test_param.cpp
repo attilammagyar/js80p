@@ -1467,6 +1467,89 @@ TEST(when_a_float_param_uses_a_different_midi_channel_for_a_macro_than_its_leade
 })
 
 
+TEST(smooth_midi_controller_change_takes_priority_over_controller_synchronization, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = block_size * rounds;
+    constexpr Frequency sample_rate = (
+        (Number)sample_count / FloatParamS::MIDI_CTL_BIG_CHANGE_DURATION
+    );
+    constexpr Sample expected_samples[sample_count] = {
+        0.0, 0.1, 0.2, 0.3, 0.4,
+        0.5, 0.6, 0.7, 0.8, 0.9,
+    };
+
+    FloatParamS float_param("F", 0.0, 1.0, 0.0);
+    MidiController midi_controller;
+    Buffer buffer(sample_count);
+    Sample const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.clear();
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_midi_controller(&midi_controller);
+
+    midi_controller.change_all_channels(0.0, 1.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    float_param.sync_ctl_value();
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    assert_eq(expected_samples, buffer.samples[0], block_size, DOUBLE_DELTA);
+})
+
+
+TEST(smooth_macro_change_takes_priority_over_controller_synchronization, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = block_size * rounds;
+    constexpr Frequency sample_rate = (
+        (Number)sample_count / FloatParamS::MIDI_CTL_BIG_CHANGE_DURATION
+    );
+    constexpr Sample expected_samples[sample_count] = {
+        0.0, 0.1, 0.2, 0.3, 0.4,
+        0.5, 0.6, 0.7, 0.8, 0.9,
+    };
+
+    FloatParamS float_param("F", 0.0, 1.0, 0.0);
+    Macro macro("M");
+    Buffer buffer(sample_count);
+    Sample const* rendered_samples;
+
+    macro.input.set_value(0.0);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_macro(&macro);
+
+    macro.input.set_value(1.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    float_param.sync_ctl_value();
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    assert_eq(expected_samples, buffer.samples[0], block_size, DOUBLE_DELTA);
+})
+
+
 TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_op, {
     constexpr Integer block_size = 10;
     constexpr Integer rounds = 1;
