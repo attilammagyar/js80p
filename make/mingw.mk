@@ -75,8 +75,7 @@ TARGET_PLATFORM_LFLAGS = \
 	-lkernel32 \
 	-municode \
 	-lcomdlg32 \
-	-lole32 \
-	-z noexecstack
+	-lole32
 
 LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static
 LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall -static

@@ -82,6 +82,7 @@ $(BUILD_DIR)/img_%.o: gui/img/%.png | $(BUILD_DIR)
 		--input binary \
 		--output $(OBJ_GUI_BFDNAME) \
 		--binary-architecture $(OBJ_GUI_BFDARCH) \
+		--add-section .note.GNU-stack=/dev/null \
 		$< $@
 
 $(LIB_PATH): | $(BUILD_DIR)
@@ -111,8 +112,7 @@ TARGET_PLATFORM_LFLAGS = \
 	$(ARCH_LFLAGS) \
 	-lcairo \
 	-lxcb \
-	-lxcb-render \
-	-z noexecstack
+	-lxcb-render
 
 LINK_FST = $(LINK_SO)
 LINK_VST3 = $(LINK_SO)
