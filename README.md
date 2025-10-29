@@ -183,7 +183,7 @@ Features
     * various distortions,
     * 2 more filters,
     * basic tape simulation (saturation, tone coloring, noise, wow and flutter,
-      slow-down stop, fast-forward)
+      slow-down stop, fast-forward),
     * chorus,
     * stereo echo (with distortion, side-chain compression or gate, and
       reversible delay lines),
