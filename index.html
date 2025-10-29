@@ -283,7 +283,7 @@ small {
       <h1 class="center">JS80P</h1>
       <div class="center" id="tagline">
         A MIDI driven, performance oriented, versatile, free and open source
-        synthesizer VST plugin for Linux and Windows
+        synthesizer VST&reg; plugin for Linux and Windows
       </div>
       <div class="center">
         <img id="js80p-img" src="js80p.png" alt="JS80P screenshot" />
@@ -298,8 +298,12 @@ small {
       </div>
 
       <div class="center">
-        <img id="vst-img" src="vst_compatible.png" alt="JS80P is VST compatible - VST&reg; is a trademark of Steinberg Media Technologies GmbH, registered in Europe and other countries." />
+        <img id="vst-img" src="vst_compatible.png" alt="JS80P is VST compatible - VST is a registered trademark of Steinberg Media Technologies GmbH." />
       </div>
+
+      <p class="center">
+        VST is a registered trademark of Steinberg Media Technologies GmbH.
+      </p>
     </div>
 
     <div id="download">
@@ -3219,6 +3223,16 @@ mod wheel down to zero.</p>
 <p>If you find bugs, please report them at
 <a href="https://github.com/attilammagyar/js80p/issues">https://github.com/attilammagyar/js80p/issues</a>.</p>
 
+<p>When reporting an issue, please provide at least the following information:</p>
+
+<ul>
+<li>What JS80P version are you using?</li>
+<li>What host application or DAW are you using?</li>
+<li>What operating system are you using?</li>
+<li>How is JS80P set up?</li>
+<li>How can the bug be reproduced, what steps can trigger it?</li>
+</ul>
+
 <p><a href="#toc">Table of Contents</a></p>
 
 <p><a id="faq"></a></p>
@@ -3244,8 +3258,7 @@ current computer, I'm not going to invest in a new one.</p>
 <h3>Why do you say FST instead of VST 2?</h3>
 
 <blockquote>
-  <p>VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-Europe and other countries.</p>
+  <p>VST is a registered trademark of Steinberg Media Technologies GmbH.</p>
 </blockquote>
 
 <p>I'm not a lawyer, so I have no idea if it would be trademark infringement for
@@ -3516,7 +3529,7 @@ JS80P and want to compile it themselves.</p>
 </ul>
 
 <p><strong>Note</strong>: the <code>lib/</code> directory does not include the whole SDK packages, it only
-contains what's required for compiling JS80P.</p>
+contains what is required for compiling JS80P.</p>
 
 <h4>Linux</h4>
 
@@ -3526,6 +3539,7 @@ following packages need to be installed:</p>
 <pre><code>apt-get install \
     binutils \
     build-essential \
+    cppcheck \
     g++ \
     gcc-multilib \
     g++-multilib \
@@ -3544,6 +3558,10 @@ following packages need to be installed:</p>
 
 <h3>Compiling</h3>
 
+<p>Successfully compiled plugin files are placed in the platform-specific
+subdirectories inside the <code>dist</code> directory; copy them to the appropriate plugin
+directories, as described in the <a href="#install">Installation</a> section.</p>
+
 <h4>Windows</h4>
 
 <p>Assuming that you have installed MinGW-w64 to <code>C:\mingw64</code>, you can use the
@@ -3559,8 +3577,6 @@ mingw32-make.exe all
 
 <h4>Linux</h4>
 
-<p>Run <code>make check</code> for running tests.</p>
-
 <p>The following commands (on a 64 bit Linux environment) will compile JS80P for
 64 bit Windows, 32 bit Windows, <code>x86_64</code> Linux, <code>x86</code> Linux, <code>RISC-V 64</code> Linux,
 and <code>LoongArch</code> Linux respectively:</p>
@@ -3572,6 +3588,8 @@ TARGET_PLATFORM=i686-gpp make all
 TARGET_PLATFORM=riscv64-gpp make all
 TARGET_PLATFORM=loongarch64-gpp make all
 </code></pre>
+
+<p>Run <code>make check</code> in a similar fashion to run unit tests.</p>
 
 <p><a href="#toc">Table of Contents</a></p>
 
