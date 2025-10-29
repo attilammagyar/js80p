@@ -2,7 +2,7 @@ JS80P
 =====
 
 JS80P is a MIDI driven, performance oriented, versatile, free and open source
-[synthesizer VST plugin][plugin] for Linux and Windows.
+[synthesizer VST® plugin][plugin] for Linux and Windows.
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
@@ -25,8 +25,7 @@ Public License Version 3.)
 See the "[Before Installing: Choosing a Distribution](#install-dist)" section
 below to find out which package you need.
 
-> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-> Europe and other countries.
+> VST is a registered trademark of Steinberg Media Technologies GmbH.
 
 <a id="toc"></a>
 
@@ -2595,8 +2594,7 @@ current computer, I'm not going to invest in a new one.
 
 ### Why do you say FST instead of VST 2?
 
-> VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-> Europe and other countries.
+> VST is a registered trademark of Steinberg Media Technologies GmbH.
 
 I'm not a lawyer, so I have no idea if it would be trademark infringement for
 me to claim VST 2.4 compatibility for JS80P without obtaining a license from

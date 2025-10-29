@@ -2,7 +2,7 @@ JS80P
 =====
 
 JS80P is a MIDI driven, performance oriented, versatile, free and open source
-synthesizer VST plugin for Linux and Windows.
+synthesizer VST® plugin for Linux and Windows.
 
 JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
 effects, envelopes, LFOs, and powerful macros to shape your sound with
@@ -15,8 +15,7 @@ or look for the "Releases" section at its GitHub page at
 https://github.com/attilammagyar/js80p . (The source code is also available on
 GitHub under the terms of the GNU General Public License Version 3.)
 
-VST® is a trademark of Steinberg Media Technologies GmbH, registered in
-Europe and other countries.
+> VST is a registered trademark of Steinberg Media Technologies GmbH.
 
 System Requirements
 -------------------
