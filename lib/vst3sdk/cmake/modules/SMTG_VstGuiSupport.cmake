@@ -79,15 +79,16 @@ function(smtg_enable_vstgui_support)
 
     smtg_add_vstgui_subdirectory(${vstgui_source_dir})
 
-    add_library(vstgui_support STATIC 
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3groupcontroller.cpp
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3groupcontroller.h
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3padcontroller.cpp
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3padcontroller.h
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3editor.cpp
-        ${vstgui_source_dir}/vstgui/plugin-bindings/vst3editor.h
+    add_library(vstgui_support
+        STATIC 
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3groupcontroller.cpp
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3groupcontroller.h
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3padcontroller.cpp
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3padcontroller.h
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3editor.cpp
+            ${vstgui_source_dir}/vstgui/plugin-bindings/vst3editor.h
 
-        ${public_sdk_SOURCE_DIR}/source/vst/vstguieditor.cpp
+            ${public_sdk_SOURCE_DIR}/source/vst/vstguieditor.cpp
     )
 
     target_link_libraries(vstgui_support 
@@ -115,5 +116,12 @@ function(smtg_enable_vstgui_support)
 
     if(SMTG_WIN AND SMTG_CREATE_BUNDLE_FOR_WINDOWS)
         smtg_target_prepare_bundle(vstgui_support)
+    endif()
+    if(SMTG_LINUX)
+        target_sources(vstgui_support
+            PRIVATE
+                ${public_sdk_SOURCE_DIR}/source/vst/vstgui_linux_runloop_support.cpp
+                ${public_sdk_SOURCE_DIR}/source/vst/vstgui_linux_runloop_support.h
+        )
     endif()
 endfunction()

@@ -7,31 +7,11 @@
 // Description : VST 3 hostclasses, example impl. for IHostApplication, IAttributeList and IMessage
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
-//-----------------------------------------------------------------------------
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-//   * Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this
-//     software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
+// This file is part of a Steinberg SDK. It is subject to the license terms
+// in the LICENSE file found in the top-level directory of this distribution
+// and at www.steinberg.net/sdklicenses.
+// No part of the SDK, including this file, may be copied, modified, propagated,
+// or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
 
 #include "hostclasses.h"
@@ -53,8 +33,7 @@ HostApplication::HostApplication ()
 //-----------------------------------------------------------------------------
 tresult PLUGIN_API HostApplication::getName (String128 name)
 {
-	return StringConvert::convert ("My VST3 HostApplication", name) ? kResultTrue :
-	                                                                        kInternalError;
+	return StringConvert::convert ("My VST3 HostApplication", name) ? kResultTrue : kInternalError;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,7 +65,7 @@ tresult PLUGIN_API HostApplication::queryInterface (const char* _iid, void** obj
 	QUERY_INTERFACE (_iid, obj, FUnknown::iid, IHostApplication)
 	QUERY_INTERFACE (_iid, obj, IHostApplication::iid, IHostApplication)
 
-	if (mPlugInterfaceSupport && mPlugInterfaceSupport->queryInterface (iid, obj) == kResultTrue)
+	if (mPlugInterfaceSupport && mPlugInterfaceSupport->queryInterface (_iid, obj) == kResultTrue)
 		return kResultOk;
 
 	*obj = nullptr;
@@ -176,8 +155,8 @@ struct HostAttributeList::Attribute
 		v.binaryValue = new char[sizeInBytes];
 		memcpy (v.binaryValue, value, sizeInBytes);
 	}
-	Attribute (Attribute&& o) { *this = std::move (o); }
-	Attribute& operator= (Attribute&& o)
+	Attribute (Attribute&& o) SMTG_NOEXCEPT { *this = std::move (o); }
+	Attribute& operator= (Attribute&& o) SMTG_NOEXCEPT
 	{
 		v = o.v;
 		size = o.size;
@@ -216,7 +195,7 @@ private:
 		double floatValue;
 		TChar* stringValue;
 		char* binaryValue;
-	} v;
+	} v {};
 	uint32 size {0};
 	Type type {Type::kUninitialized};
 };
@@ -236,10 +215,7 @@ IPtr<IAttributeList> HostAttributeList::make ()
 HostAttributeList::HostAttributeList () {FUNKNOWN_CTOR}
 
 //-----------------------------------------------------------------------------
-HostAttributeList::~HostAttributeList () noexcept
-{
-	FUNKNOWN_DTOR
-}
+HostAttributeList::~HostAttributeList () noexcept {FUNKNOWN_DTOR}
 
 //-----------------------------------------------------------------------------
 tresult PLUGIN_API HostAttributeList::setInt (AttrID aid, int64 value)
@@ -338,5 +314,6 @@ tresult PLUGIN_API HostAttributeList::getBinary (AttrID aid, const void*& data, 
 	return kResultFalse;
 }
 
-} // Vst
-} // Steinberg
+//------------------------------------------------------------------------
+} // namespace Vst
+} // namespace Steinberg

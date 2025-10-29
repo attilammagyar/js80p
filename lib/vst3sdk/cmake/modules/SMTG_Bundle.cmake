@@ -155,8 +155,9 @@ function(smtg_target_configure_version_file target)
 
     configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../templates/projectversion.h.in projectversion.h)
 
-    target_include_directories(${target} PUBLIC
-        "${PROJECT_BINARY_DIR}"
+    target_include_directories(${target}
+        PUBLIC
+            "${PROJECT_BINARY_DIR}"
     )
 endfunction()
 

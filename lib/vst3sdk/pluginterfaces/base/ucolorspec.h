@@ -21,12 +21,15 @@
 namespace Steinberg {
 
 //------------------------------------------------------------------------
-// Colors		
+/** Colors
+ * \ingroup smtgtypedef */
+/**@{*/
 typedef uint32			ColorSpec;
 typedef uint8			ColorComponent;
 
 typedef ColorSpec		UColorSpec;			// legacy support
 typedef ColorComponent	UColorComponent;	// legacy support
+/**@}*/
 
 /** Create color specifier with RGB values (alpha is opaque) */
 inline SMTG_CONSTEXPR ColorSpec MakeColorSpec (ColorComponent r, ColorComponent g, ColorComponent b)

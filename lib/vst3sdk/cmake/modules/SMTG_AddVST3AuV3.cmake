@@ -93,6 +93,10 @@ if(SMTG_MAC)
 
             # app-extension
             add_executable(${app-extension-target} ${app-extension-sources})
+            target_compile_features(${app-extension-target}
+                PUBLIC
+                    cxx_std_17
+            )
             target_link_libraries(${app-extension-target}
                 PRIVATE
                     ${auwrapper-lib} 
@@ -115,6 +119,10 @@ if(SMTG_MAC)
             
             # application
             add_executable(${app-target} ${auwrapper-sources} ${auwrapper-xib-resources})
+            target_compile_features(${app-target}
+                PUBLIC
+                    cxx_std_17
+            )
             target_link_libraries(${app-target}
                 PRIVATE
                     ${auwrapper-lib}
@@ -133,7 +141,6 @@ if(SMTG_MAC)
                     ${SMTG_AUV3_FOLDER}
             )
             smtg_target_set_bundle(${app-target} INFOPLIST "${AppInfoPlist}" PREPROCESS)
-
             get_target_property(PLUGIN_PACKAGE_PATH ${vst3_plugin_target} SMTG_PLUGIN_PACKAGE_PATH)
 
             if(macOS)

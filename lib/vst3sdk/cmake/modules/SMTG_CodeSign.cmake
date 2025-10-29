@@ -43,7 +43,10 @@ function(smtg_target_codesign target)
             # make sure that the executable is signed before cmake post build commands are run as the
             # Xcode code-sign step is run after the post build commands are run which would prevent
             # using the target output on system where everything needs to be code-signed.
-            target_link_options(${target} PRIVATE LINKER:-adhoc_codesign)
+            target_link_options(${target}
+                PRIVATE
+                    LINKER:-adhoc_codesign
+            )
         endif()
     endif(XCODE AND (NOT SMTG_DISABLE_CODE_SIGNING))
 endfunction(smtg_target_codesign)

@@ -7,36 +7,22 @@
 // Description : VSTGUI Editor
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
-//-----------------------------------------------------------------------------
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-//   * Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this
-//     software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
+// This file is part of a Steinberg SDK. It is subject to the license terms
+// in the LICENSE file found in the top-level directory of this distribution
+// and at www.steinberg.net/sdklicenses.
+// No part of the SDK, including this file, may be copied, modified, propagated,
+// or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
 
 #include "vstguieditor.h"
 #include "public.sdk/source/main/moduleinit.h"
 #include "pluginterfaces/base/keycodes.h"
+
+#if SMTG_OS_LINUX
+#include "public.sdk/source/main/pluginfactory.h"
+#include "public.sdk/source/vst/vstgui_linux_runloop_support.h"
+#include "pluginterfaces/base/funknownimpl.h"
+#endif
 
 #if SMTG_OS_WINDOWS && SMTG_MODULE_IS_BUNDLE
 #include "vstgui_win32_bundle_support.h"
@@ -53,12 +39,25 @@
 
 #if VSTGUI_NEEDS_INIT_LIB
 #include "vstgui/lib/vstguiinit.h"
+
 static Steinberg::ModuleInitializer InitVSTGUI ([] () {
 	using namespace Steinberg;
 	VSTGUI::init (getPlatformModuleHandle ());
 #if SMTG_MODULE_IS_BUNDLE
 	Vst::setupVSTGUIBundleSupport (getPlatformModuleHandle ());
 #endif // SMTG_MODULE_IS_BUNDLE
+#if SMTG_OS_LINUX
+	static auto pluginFactory = Steinberg::owned (GetPluginFactory ());
+	if (pluginFactory)
+	{
+		if (auto pf = U::cast<IPluginFactoryInternal> (pluginFactory))
+		{
+			pf->addHostContextCallback ([] (auto hostContext) {
+				Steinberg::Linux::setupVSTGUIRunloop (hostContext);
+			});
+		}
+	}
+#endif
 });
 static Steinberg::ModuleTerminator TermVSTGUI ([] () { VSTGUI::exit (); });
 #else
@@ -139,8 +138,10 @@ tresult PLUGIN_API VSTGUIEditor::isPlatformTypeSupported (FIDString type)
 #elif SMTG_OS_LINUX
 	if (strcmp (type, kPlatformTypeX11EmbedWindowID) == 0)
 		return kResultTrue;
-#endif
 
+	if (strcmp (type, kPlatformTypeWaylandSurfaceID) == 0)
+		return kResultTrue;
+#endif
 	return kInvalidArgument;
 }
 
@@ -160,6 +161,11 @@ tresult PLUGIN_API VSTGUIEditor::attached (void* parent, FIDString type)
 		platformType = PlatformType::kNSView;
 #endif // TARGET_OS_IPHONE
 #endif // SMTG_OS_MACOS
+#if SMTG_OS_LINUX
+	if (strcmp (type, kPlatformTypeWaylandSurfaceID) == 0)
+		platformType = PlatformType::kWaylandSurfaceID;
+#endif
+
 	if (open (parent, platformType) == true)
 	{
 		ViewRect vr (0, 0, (int32)frame->getWidth (), (int32)frame->getHeight ());

@@ -37,7 +37,11 @@
 namespace Steinberg
 {
 //-----------------------------------------------------------------
-// Integral Types
+/** Integral Types
+ * \defgroup smtgtypedef Steinberg Data Types
+ * Data Types defined by Steinberg SDK
+ * @{ 
+ */
 	typedef char int8;
 	typedef uint8_t uint8;
 	typedef unsigned char uchar;
@@ -117,6 +121,9 @@ namespace Steinberg
 	typedef int32 UCoord;
 	static const UCoord kMaxCoord = ((UCoord)0x7FFFFFFF);
 	static const UCoord kMinCoord = ((UCoord)-0x7FFFFFFF);
+
+/**@}*/
+//----------------------------------------------------------------------------
 } // namespace Steinberg
 
 
@@ -153,7 +160,7 @@ namespace Steinberg
 
 // always inline macros (only when RELEASE is 1)
 //----------------------------------------------------------------------------
-#if RELEASE
+#if defined(RELEASE) && RELEASE
     #if SMTG_OS_MACOS || SMTG_OS_LINUX || defined(__MINGW32__)
 		#define SMTG_ALWAYS_INLINE	__inline__ __attribute__((__always_inline__))
 		#define SMTG_NEVER_INLINE __attribute__((noinline))

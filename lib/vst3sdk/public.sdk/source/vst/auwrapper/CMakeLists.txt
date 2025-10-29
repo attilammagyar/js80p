@@ -1,5 +1,11 @@
+
 if(SMTG_MAC)
     if (XCODE AND SMTG_ENABLE_AUV2_BUILDS)
+
+		option(SMTG_AUWRAPPER_ACTIVATE_ONLY_DEFAULT_ACTIVE_BUSES 
+			"Activate only the buses that have the kDefaultActive flag set in the AUWrapper. This may not work on some hosts because they never activate a bus later." 
+			OFF
+		)
 
 		string(RANDOM LENGTH 20 CocoaId)
 		file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/au/aucocoaclassprefix.h"
@@ -31,6 +37,13 @@ if(SMTG_MAC)
 				cxx_std_17
 		)
 
+		if(SMTG_AUWRAPPER_ACTIVATE_ONLY_DEFAULT_ACTIVE_BUSES)
+			target_compile_definitions(${target}
+                PRIVATE
+                    SMTG_AUWRAPPER_ACTIVATE_ONLY_DEFAULT_ACTIVE_BUSES
+            )
+		endif()
+
         target_link_libraries(${target} 
             PRIVATE 
                 sdk_hosting 
@@ -55,7 +68,10 @@ if(SMTG_MAC)
 					"${SMTG_COREAUDIO_SDK_PATH}/**"
 			)
 		elseif(NOT ${SMTG_AUDIOUNIT_SDK_PATH} STREQUAL "")
-            target_compile_definitions(${target} PRIVATE SMTG_AUWRAPPER_USES_AUSDK)
+            target_compile_definitions(${target}
+                PRIVATE
+                    SMTG_AUWRAPPER_USES_AUSDK
+            )
 ## Adding the xcodeproj will crash Xcode when closing and reopening the cmake generated project
 #			target_sources(${target} PRIVATE
 #	            "${SMTG_AUDIOUNIT_SDK_PATH}/AudioUnitSDK.xcodeproj"

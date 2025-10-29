@@ -72,7 +72,7 @@ function(setupCoreAudioSupport)
         set(SMTG_IOS_DEVELOPMENT_TEAM "" CACHE STRING "Needed for building the InterAppAudio and AUv3 examples for iOS")
 
 		smtg_private_setup_audiounit_sdk()
-		if (NOT SMTG_ENABLE_AUV2_BUILDS)
+		if(NOT SMTG_ENABLE_AUV2_BUILDS)
 			smtg_private_setup_coreaudio_sdk()
 		endif()
         if("${SMTG_AUDIOUNIT_SDK_PATH}" STREQUAL "" AND "${SMTG_COREAUDIO_SDK_PATH}" STREQUAL "")

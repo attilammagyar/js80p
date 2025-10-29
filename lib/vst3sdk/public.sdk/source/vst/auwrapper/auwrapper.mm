@@ -7,33 +7,12 @@
 // Description : VST 3 -> AU Wrapper
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
+// This file is part of a Steinberg SDK. It is subject to the license terms
+// in the LICENSE file found in the top-level directory of this distribution
+// and at www.steinberg.net/sdklicenses.
+// No part of the SDK, including this file, may be copied, modified, propagated,
+// or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-// 
-//   * Redistributions of source code must retain the above copyright notice, 
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation 
-//     and/or other materials provided with the distribution.
-//   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this 
-//     software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
-//-----------------------------------------------------------------------------
-
 /// \cond ignore
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -196,6 +175,35 @@ protected:
 VST3DynLibrary* VST3DynLibrary::gInstance = nullptr;
 
 namespace Vst {
+
+//------------------------------------------------------------------------
+struct AUWrapper::MIDIOutputCallbackHelper
+{
+	MIDIOutputCallbackHelper ();
+	~MIDIOutputCallbackHelper ();
+
+	void setCallbackInfo (AUMIDIOutputCallback callback, void* userData);
+	void addEvent (UInt8 status, UInt8 channel, UInt8 data1, UInt8 data2, UInt32 inStartFrame);
+	void fireAtTimeStamp (const AudioTimeStamp& inTimeStamp);
+
+private:
+	struct MIDIMessageInfoStruct
+	{
+		UInt8 status;
+		UInt8 channel;
+		UInt8 data1;
+		UInt8 data2;
+		UInt32 startFrame;
+	};
+
+	using MIDIMessageList = std::vector<MIDIMessageInfoStruct> ;
+
+	MIDIPacketList* PacketList () { return (MIDIPacketList*)mBuffersAllocated.data (); }
+
+	std::array<Byte, 1024> mBuffersAllocated;
+	AUMIDIOutputCallbackStruct mMIDICallbackStruct;
+	MIDIMessageList mMIDIMessageList;
+};
 
 #ifdef SMTG_AUWRAPPER_USES_AUSDK
 using namespace ausdk;
@@ -542,7 +550,12 @@ AUWrapper::AUWrapper (ComponentInstanceRecord* ci)
 					element->SetName (busNameString);
 					CFRelease (busNameString);
 				}
-				component->activateBus (kAudio, kInput, inputNo, true);
+#ifdef SMTG_AUWRAPPER_ACTIVATE_ONLY_DEFAULT_ACTIVE_BUSES
+				if (info.flags & BusInfo::BusFlags::kDefaultActive)
+#endif
+				{
+					component->activateBus (kAudio, kInput, inputNo, true);
+				}
 			}
 			for (int32 outputNo = 0; outputNo < outputBusCount; outputNo++)
 			{
@@ -564,7 +577,12 @@ AUWrapper::AUWrapper (ComponentInstanceRecord* ci)
 					element->SetName (busNameString);
 					CFRelease (busNameString);
 				}
-				component->activateBus (kAudio, kOutput, outputNo, true);
+#ifdef SMTG_AUWRAPPER_ACTIVATE_ONLY_DEFAULT_ACTIVE_BUSES
+				if (info.flags & BusInfo::BusFlags::kDefaultActive)
+#endif
+				{
+					component->activateBus (kAudio, kOutput, outputNo, true);
+				}
 			}
 			processData.prepare (*component, 0, kSample32);
 
@@ -573,6 +591,8 @@ AUWrapper::AUWrapper (ComponentInstanceRecord* ci)
 			cacheParameterValues ();
 
 			midiOutCount = component->getBusCount (kEvent, kOutput);
+			if (midiOutCount > 0)
+				mCallbackHelper = std::make_unique<MIDIOutputCallbackHelper> ();
 
 			transferParamChanges.setMaxParameters (500);
 			outputParamTransfer.setMaxParameters (500);
@@ -828,8 +848,9 @@ ComponentResult AUWrapper::Initialize ()
 
 		if (paramListenerRef == nullptr)
 		{
+			static constexpr auto interval = 1. / 60.; // 60 times a second
 			OSStatus status = AUListenerCreateWithDispatchQueue (
-			    &paramListenerRef, 0.2, dispatch_get_main_queue (),
+			    &paramListenerRef, interval, dispatch_get_main_queue (),
 			    ^(void* _Nullable inObject, const AudioUnitParameter* _Nonnull inParameter,
 			      AudioUnitParameterValue inValue) {
 				  setControllerParameter (inParameter->mParameterID, inValue);
@@ -1529,10 +1550,8 @@ inline void AUWrapper::processOutputEvents (const AudioTimeStamp& inTimeStamp)
 						UInt8 data2 =
 						    (UInt8) ((int32) (e.noteOn.velocity * 127.f + 0.4999999f) & kDataMask);
 						UInt8 channel = e.noteOn.channel;
-						if (data2 == 0) // zero velocity => note off
-							status = (char)(kNoteOff | (e.noteOn.channel & kChannelMask));
 
-						mCallbackHelper.AddEvent (status, channel, data1, data2, e.sampleOffset);
+						mCallbackHelper->addEvent (status, channel, data1, data2, e.sampleOffset);
 					}
 					break;
 					//--- -----------------------
@@ -1544,7 +1563,7 @@ inline void AUWrapper::processOutputEvents (const AudioTimeStamp& inTimeStamp)
 						    (UInt8) ((int32) (e.noteOff.velocity * 127.f + 0.4999999f) & kDataMask);
 						UInt8 channel = e.noteOff.channel;
 
-						mCallbackHelper.AddEvent (status, channel, data1, data2, e.sampleOffset);
+						mCallbackHelper->addEvent (status, channel, data1, data2, e.sampleOffset);
 					}
 					break;
 				}
@@ -1552,7 +1571,7 @@ inline void AUWrapper::processOutputEvents (const AudioTimeStamp& inTimeStamp)
 		}
 
 		outputEvents.clear ();
-		mCallbackHelper.FireAtTimeStamp (inTimeStamp);
+		mCallbackHelper->fireAtTimeStamp (inTimeStamp);
 	}
 }
 
@@ -1732,8 +1751,8 @@ ComponentResult AUWrapper::SetProperty (AudioUnitPropertyID inID, AudioUnitScope
 					return kAudioUnitErr_InvalidPropertyValue;
 
 				AUMIDIOutputCallbackStruct* callbackStruct = (AUMIDIOutputCallbackStruct*)inData;
-				mCallbackHelper.SetCallbackInfo (callbackStruct->midiOutputCallback,
-				                                 callbackStruct->userData);
+				mCallbackHelper->setCallbackInfo (callbackStruct->midiOutputCallback,
+				                                  callbackStruct->userData);
 				return noErr;
 			}
 			break;
@@ -2204,7 +2223,7 @@ OSStatus AUWrapper::HandleNonNoteEvent (UInt8 status, UInt8 channel, UInt8 data1
 	}
 	if (prgChange || cn >= 0)
 	{
-		if (pid != kNoParamId && channel < midiMappingCache.busList[0].size ())
+		if (pid == kNoParamId && channel < midiMappingCache.busList[0].size ())
 		{
 			auto it = midiMappingCache.busList[0][channel].find (cn);
 			if (it != midiMappingCache.busList[0][channel].end ())
@@ -2859,6 +2878,72 @@ bool AUWrapper::getProgramListAndUnit (int32 midiChannel, UnitID& unitId,
 		unitInfo->release ();
 	}
 	return false;
+}
+
+//------------------------------------------------------------------------
+AUWrapper::MIDIOutputCallbackHelper::MIDIOutputCallbackHelper ()
+{
+	mMIDIMessageList.reserve (16);
+	mMIDICallbackStruct.midiOutputCallback = NULL;
+}
+
+//------------------------------------------------------------------------
+AUWrapper::MIDIOutputCallbackHelper::~MIDIOutputCallbackHelper () = default;
+
+//------------------------------------------------------------------------
+void AUWrapper::MIDIOutputCallbackHelper::setCallbackInfo (AUMIDIOutputCallback callback,
+                                                           void* userData)
+{
+	mMIDICallbackStruct.midiOutputCallback = callback;
+	mMIDICallbackStruct.userData = userData;
+}
+
+//------------------------------------------------------------------------
+void AUWrapper::MIDIOutputCallbackHelper::addEvent (UInt8 status, UInt8 channel, UInt8 data1,
+                                                    UInt8 data2, UInt32 inStartFrame)
+{
+	MIDIMessageInfoStruct info = {status, channel, data1, data2, inStartFrame};
+	mMIDIMessageList.push_back (info);
+}
+
+//------------------------------------------------------------------------
+void AUWrapper::MIDIOutputCallbackHelper::fireAtTimeStamp (const AudioTimeStamp& inTimeStamp)
+{
+	if (!mMIDIMessageList.empty () && mMIDICallbackStruct.midiOutputCallback != nullptr)
+	{
+		auto callMidiOutputCallback = [&] (MIDIPacketList* pktlist) {
+			auto result = mMIDICallbackStruct.midiOutputCallback (mMIDICallbackStruct.userData,
+			                                                      &inTimeStamp, 0, pktlist);
+			if (result != noErr)
+				NSLog (@"error calling midiOutputCallback: %d", result);
+		};
+
+		// synthesize the packet list and call the MIDIOutputCallback
+		// iterate through the vector and get each item
+		MIDIPacketList* pktlist = PacketList ();
+		MIDIPacket* pkt = MIDIPacketListInit (pktlist);
+		for (auto it = mMIDIMessageList.begin (); it != mMIDIMessageList.end (); it++)
+		{
+			auto& item = *it;
+
+			static_assert (sizeof (Byte) == 1, "the following code expects this");
+			std::array<Byte, 3> data = {item.status, item.data1, item.data2};
+			pkt = MIDIPacketListAdd (pktlist, mBuffersAllocated.size (), pkt, item.startFrame,
+			                         data.size (), data.data ());
+			if (pkt == nullptr)
+			{
+				// send what we have and then clear the buffer and send again
+				// issue the callback with what we got
+				callMidiOutputCallback (pktlist);
+				// clear stuff we've already processed, and fire again
+				mMIDIMessageList.erase (mMIDIMessageList.begin (), it);
+				fireAtTimeStamp (inTimeStamp);
+				return;
+			}
+		}
+		callMidiOutputCallback (pktlist);
+	}
+	mMIDIMessageList.clear ();
 }
 
 #if !CA_USE_AUDIO_PLUGIN_ONLY && !defined(SMTG_AUWRAPPER_USES_AUSDK)

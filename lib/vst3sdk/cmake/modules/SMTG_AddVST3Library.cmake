@@ -23,7 +23,7 @@ function(smtg_target_run_vst_validator target)
     if(TARGET validator)
         message(STATUS "[SMTG] Setup running validator for ${target}")
         add_dependencies(${target} validator)
-        if(SMTG_WIN)
+        if(SMTG_WIN AND NOT SMTG_CREATE_BUNDLE_FOR_WINDOWS)
             set(TARGET_PATH $<TARGET_FILE:${target}>)
             add_custom_command(
                 TARGET ${target} POST_BUILD
@@ -38,13 +38,15 @@ function(smtg_target_run_vst_validator target)
             get_target_property(PLUGIN_PACKAGE_PATH ${target} SMTG_PLUGIN_PACKAGE_PATH)
             add_custom_command(
                 TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo [SMTG] Validator started...
                 COMMAND 
                     $<TARGET_FILE:validator> 
                     $<$<CONFIG:Debug>:${PLUGIN_PACKAGE_PATH}>
                     $<$<CONFIG:Release>:${PLUGIN_PACKAGE_PATH}> 
                     WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                COMMAND ${CMAKE_COMMAND} -E echo [SMTG] Validator finished.
             )
-        endif(SMTG_WIN)
+        endif()
     endif(TARGET validator)
 endfunction(smtg_target_run_vst_validator)
 
@@ -159,7 +161,7 @@ function(smtg_add_vst3plugin_with_pkgname target pkg_name)
     endif()
     #message(STATUS "[SMTG] SMTG_PACKAGE_ICON_PATH is ${SMTG_PACKAGE_ICON_PATH}")
 
-    if(DEFINED PARAMS_MODULEINFO_COMPATIBILITY)
+    if(DEFINED PARAMS_SOURCES_LIST)
         set(SOURCES "${PARAMS_SOURCES_LIST}")
     else()
         set(SOURCES "${PARAMS_UNPARSED_ARGUMENTS}")

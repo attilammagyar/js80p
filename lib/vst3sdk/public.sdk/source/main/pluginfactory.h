@@ -7,45 +7,38 @@
 // Description : Standard Plug-In Factory
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
-//-----------------------------------------------------------------------------
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-// 
-//   * Redistributions of source code must retain the above copyright notice, 
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation 
-//     and/or other materials provided with the distribution.
-//   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this 
-//     software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
+// This file is part of a Steinberg SDK. It is subject to the license terms
+// in the LICENSE file found in the top-level directory of this distribution
+// and at www.steinberg.net/sdklicenses. 
+// No part of the SDK, including this file, may be copied, modified, propagated,
+// or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
 
 #pragma once
 
 #include "pluginterfaces/base/ipluginbase.h"
+#include <vector>
 
 namespace Steinberg {
+
+//------------------------------------------------------------------------
+class IPluginFactoryInternal : public FUnknown
+{
+public:
+	using HostContextCallbackFunc = void (*) (FUnknown*);
+	virtual void PLUGIN_API addHostContextCallback (HostContextCallbackFunc func) = 0;
+
+//------------------------------------------------------------------------
+	static const FUID iid;
+};
+DECLARE_CLASS_IID (IPluginFactoryInternal, 0x5A6AD11A, 0x22AF40F3, 0xBCA1C147, 0x506C88D9)
 
 //------------------------------------------------------------------------
 /** Default Class Factory implementation.
 \ingroup sdkBase
 \see classFactoryMacros 
 */
-class CPluginFactory : public IPluginFactory3
+class CPluginFactory : public IPluginFactory3, public IPluginFactoryInternal
 {
 public:
 //------------------------------------------------------------------------
@@ -87,6 +80,9 @@ public:
 	tresult PLUGIN_API getClassInfoUnicode (int32 index, PClassInfoW* info) SMTG_OVERRIDE;
 	tresult PLUGIN_API setHostContext (FUnknown* context) SMTG_OVERRIDE;
 
+	//---from IPluginFactoryInternal
+	void PLUGIN_API addHostContextCallback (HostContextCallbackFunc func) SMTG_OVERRIDE;
+
 //------------------------------------------------------------------------
 protected:
 	/// @cond
@@ -107,6 +103,8 @@ protected:
 	PClassEntry* classes;
 	int32 classCount;
 	int32 maxClassCount;
+
+	std::vector<HostContextCallbackFunc> hostContextCallbacks;
 
 	bool growClasses ();
 };
@@ -157,11 +155,11 @@ END_FACTORY
 	gPluginFactory->registerClass (&componentClass,createMethod); }
 
 #define DEF_CLASS2(cid,cardinality,category,name,classFlags,subCategories,version,sdkVersion,createMethod) \
-	{ TUID lcid = cid; static PClassInfo2 componentClass (lcid,cardinality,category,name,classFlags,subCategories,0,version,sdkVersion);\
+	{ TUID lcid = cid; static PClassInfo2 componentClass (lcid,cardinality,category,name,classFlags,subCategories,nullptr,version,sdkVersion);\
 	gPluginFactory->registerClass (&componentClass,createMethod); }
 
 #define DEF_CLASS_W(cid,cardinality,category,name,classFlags,subCategories,version,sdkVersion,createMethod) \
-	{ TUID lcid = cid; static PClassInfoW componentClass (lcid,cardinality,category,name,classFlags,subCategories,0,version,sdkVersion);\
+	{ TUID lcid = cid; static PClassInfoW componentClass (lcid,cardinality,category,name,classFlags,subCategories,nullptr,version,sdkVersion);\
 	gPluginFactory->registerClass (&componentClass,createMethod); }
 
 #define DEF_CLASS_W2(cid,cardinality,category,name,classFlags,subCategories,vendor,version,sdkVersion,createMethod) \

@@ -30,11 +30,12 @@ macro(smtg_enable_vst3_sdk)
     smtg_configure_cmake_generator()
     smtg_setup_platform_toolset()
     smtg_setup_symbol_visibility()
-    
+
     # Needs to bet set for 'smtg_add_library_main' function.
     if(DEFINED vst3sdk_SOURCE_DIR)
-        set(public_sdk_SOURCE_DIR ${vst3sdk_SOURCE_DIR}/public.sdk)   
+        set(public_sdk_SOURCE_DIR ${vst3sdk_SOURCE_DIR}/public.sdk)
     else ()
         get_target_property(public_sdk_SOURCE_DIR sdk SOURCE_DIR)
+        set(public_sdk_SOURCE_DIR ${public_sdk_SOURCE_DIR}/public.sdk)
     endif()
 endmacro(smtg_enable_vst3_sdk)

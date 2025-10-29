@@ -29,32 +29,38 @@ class ITestResult;
 
 /** ------------------------------------------------------------------------
 ITest interface declaration
+
+\defgroup TestClass Test Class: Interface for unit testing
+
+The SDK provides already some tests which can be executed by the validator.
+A plug-in has the possibility to add its own tests:
+(check public.sdk/source/vst/utility/testing.h)
 */
 class ITest : public FUnknown
 {
 public:
 	//--- ---------------------------------------------------------------------
 	/** called immediately before the test is actually run.
-	    Usually this will be used to setup the test environment.
-	    \return true upon success	*/
+	 * Usually this will be used to setup the test environment.
+	 * \return true upon success */
 	virtual bool PLUGIN_API setup () = 0;
 
 	/** execute the test.
-	    \param testResult : points to a test result where the test can
-	                        (optionally) add an error message.
-	    \return true upon success
-	    \sa ITestResult */
+	 * \param testResult : points to a test result where the test can
+	 *                     (optionally) add an error message.
+	 * \return true upon success
+	 * \sa ITestResult */
 	virtual bool PLUGIN_API run (ITestResult* testResult) = 0;
 
 	/** called after the test has run. This method shall be used to
-	    deconstruct a test environment that has been setup with ITest::setup ().
-	\return true upon success */
+	 * deconstruct a test environment that has been setup with ITest::setup ().
+	 * \return true upon success */
 	virtual bool PLUGIN_API teardown () = 0;
 
 	/** This function is used to provide information about the performed
-	    testcase. What is done, what is validated and what has to be prepared
-	    before executing the test (in case of half-automated tests).
-	\return null terminated string upon success, zero otherwise */
+	 * testcase. What is done, what is validated and what has to be prepared
+	 * before executing the test (in case of half-automated tests).
+	 * \return null terminated string upon success, zero otherwise */
 	virtual const tchar* PLUGIN_API getDescription () { return nullptr; }
 	//--- ---------------------------------------------------------------------
 	static const FUID iid;
@@ -71,7 +77,7 @@ DECLARE_CLASS_IID (ITest, 0x9E2E608B, 0x64C64CF8, 0x839059BD, 0xA194032D)
 //------------------------------------------------------------------------
 /** Test Result message logger
 [host imp]
-when a test is called, a pointer to an ITestResult is passed in, so the 
+When a test is called, a pointer to an ITestResult is passed in, so the 
 test class can output error messages
 */
 class ITestResult : public FUnknown
@@ -80,6 +86,7 @@ public:
 	//--- ---------------------------------------------------------------------
 	/** add an error message */
 	virtual void PLUGIN_API addErrorMessage (const tchar* msg) = 0;
+	/** add a message */
 	virtual void PLUGIN_API addMessage (const tchar* msg) = 0;
 	//--- ---------------------------------------------------------------------
 	static const FUID iid;
@@ -132,9 +139,9 @@ class ITestFactory : public FUnknown
 public:
 	//--- ---------------------------------------------------------------------
 	/** create the tests that this module provides.
-		\param context :
-		\param parentSuite : the test suite that the newly created tests
-							shall register with. */
+	 * \param context :
+	 * \param parentSuite : the test suite that the newly created tests
+	 *                      shall register with. */
 	virtual tresult PLUGIN_API createTests (FUnknown* context, ITestSuite* parentSuite) = 0;
 	//--- ---------------------------------------------------------------------
 	static const FUID iid;

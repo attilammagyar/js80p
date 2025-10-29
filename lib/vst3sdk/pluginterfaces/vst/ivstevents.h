@@ -155,7 +155,7 @@ struct Event
 		kUserReserved2 = 1 << 15	///< reserved for user (for internal use)
 	};
 
-	/**  Event Types - used for Event::type */
+	/** Event Types - used for Event::type */
 	enum EventTypes
 	{
 		kNoteOnEvent       = 0,			///< is \ref NoteOnEvent
@@ -166,6 +166,7 @@ struct Event
 		kNoteExpressionTextEvent  = 5,	///< is \ref NoteExpressionTextEvent
 		kChordEvent        = 6,			///< is \ref ChordEvent
 		kScaleEvent        = 7,			///< is \ref ScaleEvent
+		kNoteExpressionIntValueEvent = 8,///< is \ref NoteExpressionIntValueEvent
 		kLegacyMIDICCOutEvent = 65535	///< is \ref LegacyMIDICCOutEvent
 	};
 
@@ -178,6 +179,7 @@ struct Event
 		PolyPressureEvent polyPressure;					///< type == kPolyPressureEvent
 		NoteExpressionValueEvent noteExpressionValue;	///< type == kNoteExpressionValueEvent
 		NoteExpressionTextEvent noteExpressionText;		///< type == kNoteExpressionTextEvent
+		NoteExpressionIntValueEvent noteExpressionIntValue;	///< type == kNoteExpressionIntValueEvent
 		ChordEvent chord;								///< type == kChordEvent
 		ScaleEvent scale;								///< type == kScaleEvent
 		LegacyMIDICCOutEvent midiCCOut;					///< type == kLegacyMIDICCOutEvent
@@ -201,7 +203,7 @@ public:
 	virtual int32 PLUGIN_API getEventCount () = 0;
 
 	/** Gets parameter by index. */
-	virtual tresult PLUGIN_API getEvent (int32 index, Event& e /*out*/) = 0;
+	virtual tresult PLUGIN_API getEvent (int32 index /*in*/, Event& e /*out*/) = 0;
 
 	/** Adds a new event. */
 	virtual tresult PLUGIN_API addEvent (Event& e /*in*/) = 0;

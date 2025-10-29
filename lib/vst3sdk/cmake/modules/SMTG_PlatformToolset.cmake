@@ -50,12 +50,11 @@ macro(smtg_setup_platform_toolset)
             endif(SMTG_ENABLE_ADDRESS_SANITIZER)
         else()
             set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
-            if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
                 add_compile_options(-Wsuggest-override)     # Suggest override when missing
             endif()
             if(SMTG_MAC)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-                link_libraries(c++)
             else()
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-multichar")
                 if(ANDROID)
@@ -77,6 +76,7 @@ macro(smtg_setup_platform_toolset)
             add_definitions(-D_UNICODE)
             add_definitions(-D_CRT_SECURE_NO_WARNINGS)      # Eliminate deprecation warnings for less secure functions (strcpy...)
             add_compile_options(/W3)                        # Baseline reasonable warnings
+            add_compile_options(/Zc:__cplusplus)            # __cplusplus should denote the c++ standard
             add_compile_options(/fp:fast)                   # Floating Point Model
             add_compile_options($<$<CONFIG:Release>:/Oi>)   # Enable Intrinsic Functions (Yes)
             add_compile_options($<$<CONFIG:Release>:/Ot>)   # Favor Size Or Speed (Favor fast code)

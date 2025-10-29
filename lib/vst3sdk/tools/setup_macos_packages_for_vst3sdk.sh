@@ -469,33 +469,44 @@ macos_marketing_string(){
 		12.*) marketing_name="Monterey" ;;
 		13.*) marketing_name="Ventura" ;;
 		14.*) marketing_name="Sonoma" ;;
+		15.*) marketing_name="Sequoia" ;;
 		*) marketing_name="Unknown" ;;
 	esac
 	printf "%s" "${marketing_name}"
 }
 # -------------------------------------------------------------------
-macos_xcode_download_url(){
+macos_xcode_download_url()
+{
 	local version="$1"
 	local download_url
 	case "${version}" in
-		10.0*) download_url=null ;;
-		10.10*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_7.2.1/Xcode_7.2.1.dmg" ;;
-		10.11*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_8.2.1/Xcode_8.2.1.xip" ;;
-		10.12*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_9.2/Xcode_9.2.xip" ;;
-		10.13*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip" ;;
-		10.14*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_11.3.1/Xcode_11.3.1.xip" ;;
-		10.15*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_12.4/Xcode_12.4.xip" ;;
-		10.3*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_v1.5/xcode_tools_1.5_cd.dmg.bin" ;;
-		10.4*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_2.5_developer_tools/xcode25_8m2558_developerdvd.dmg" ;;
-		10.5*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_3.1.4_developer_tools/xcode314_2809_developerdvd.dmg" ;;
-		10.6*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_4.2_for_snow_leopard/xcode_4.2_for_snow_leopard.dmg" ;;
-		10.7*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_4.6.3/xcode4630916281a.dmg" ;;
-		10.8*) download_url="https://download.developer.apple.com/Developer_Tools/xcode_5.1.1/xcode_5.1.1.dmg" ;;
-		10.9*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_6.2/Xcode_6.2.dmg" ;;
-		11.*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_13.2.1/Xcode_13.2.1.xip" ;;
-		12.*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip" ;;
-		13.*) download_url="https://download.developer.apple.com/Developer_Tools/Xcode_14.3.1/Xcode_14.3.1.xip" ;;
-		14.*) download_url=null ;;
+		10.3*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_v1.5/xcode_tools_1.5_cd.dmg.bin" ;;
+		10.4*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_2.5_developer_tools/xcode25_8m2558_developerdvd.dmg" ;;
+		10.5*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_3.1.4_developer_tools/xcode314_2809_developerdvd.dmg" ;;
+		10.6*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_4.2_for_snow_leopard/xcode_4.2_for_snow_leopard.dmg" ;;
+		10.7*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_4.6.3/xcode4630916281a.dmg" ;;
+		10.8*)			download_url="https://download.developer.apple.com/Developer_Tools/xcode_5.1.1/xcode_5.1.1.dmg" ;;
+		10.9*)			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_6.2/Xcode_6.2.dmg" ;;		
+		10.10*)			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_7.2.1/Xcode_7.2.1.dmg" ;;
+		10.11*)			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_8.2.1/Xcode_8.2.1.xip" ;;
+		10.12*)			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_9.2/Xcode_9.2.xip" ;;
+		10.13*)			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip" ;;
+		10.14.[0-3]*) 	download_url="https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip" ;;
+		10.14.[4-9]*) 	download_url="https://download.developer.apple.com/Developer_Tools/Xcode_11.3.1/Xcode_11.3.1.xip" ;;
+		10.14*) 		download_url="https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip" ;;
+		10.15.[2-3]*) 	download_url="https://download.developer.apple.com/Developer_Tools/Xcode_11.7/Xcode_11.7.xip" ;;
+		10.15.[4-9]*) 	download_url="https://download.developer.apple.com/Developer_Tools/Xcode_12.4/Xcode_12.4.xip" ;;
+		10*) 			download_url=null ;;
+		11.[3-9]*) 		download_url="https://download.developer.apple.com/Developer_Tools/Xcode_13.2.1/Xcode_13.2.1.xip" ;;
+		11*) 			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_12.5.1/Xcode_12.5.1.xip" ;;
+		12.[5-9]*)		download_url="https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip" ;;
+		12*) 			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip" ;;
+		13.[5-9]*) 		download_url="https://download.developer.apple.com/Developer_Tools/Xcode_15.2/Xcode_15.2.xip" ;;
+		13*) 			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_14.3.1/Xcode_14.3.1.xip" ;;
+		14.[5-9]*) 		download_url="https://download.developer.apple.com/Developer_Tools/Xcode_16.1/Xcode_16.1.xip" ;;
+		14*) 			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_15.4/Xcode_15.4.xip" ;;
+		15*) 			download_url="https://download.developer.apple.com/Developer_Tools/Xcode_16.1/Xcode_16.1.xip" ;;
+		16.*) 			download_url=null ;;
 	esac
 	printf "%s" "${download_url}"
 }
@@ -610,7 +621,7 @@ print_state_of_all_components(){
 }
 # -------------------------------------------------------------------
 get_latest_cmake_release(){
-	local url="https://cmake.org/download"
+	local url="https://cmake.org/download/"
 	local line=""
 	local latest_release=""
 	line=$(curl -s "$url" | grep -i "Latest Release")

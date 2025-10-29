@@ -119,7 +119,8 @@ public:																			        \
 
 //------------------------------------------------------------------------
 #define FUNKNOWN_CTOR	{ __funknownRefCount = 1; }
-#if SMTG_FUNKNOWN_DTOR_ASSERT
+
+#if defined(SMTG_FUNKNOWN_DTOR_ASSERT) && SMTG_FUNKNOWN_DTOR_ASSERT
 #include <cassert>
 #define FUNKNOWN_DTOR { assert (__funknownRefCount == 0); }
 #else
@@ -200,6 +201,8 @@ enum
 };
 #endif
 
+/** \ingroup smtgtypedef */
+/**@{*/
 //------------------------------------------------------------------------
 typedef int64 LARGE_INT; // obsolete
 
@@ -207,6 +210,8 @@ typedef int64 LARGE_INT; // obsolete
 //	FUID class declaration
 //------------------------------------------------------------------------
 typedef char TUID[16]; ///< plain UID type
+
+/**@}*/
 
 #if SMTG_CPP14
 //------------------------------------------------------------------------

@@ -32,8 +32,9 @@ class IErrorContext : public FUnknown
 public:
 //------------------------------------------------------------------------
 	/** Tells the plug-in to not show any UI elements on errors. */
-	virtual void PLUGIN_API disableErrorUI (bool state) = 0;    
-	/** If an error happens and disableErrorUI was not set this should return kResultTrue if the plug-in already showed a message to the user what happened. */
+	virtual void PLUGIN_API disableErrorUI (bool state) = 0;
+	/** If an error happens and disableErrorUI was not set this should return kResultTrue if the
+	 * plug-in already showed a message to the user what happened. */
 	virtual tresult PLUGIN_API errorMessageShown () = 0;
 	/** Fill message with error string. The host may show this to the user. */
 	virtual tresult PLUGIN_API getErrorMessage (IString* message) = 0;

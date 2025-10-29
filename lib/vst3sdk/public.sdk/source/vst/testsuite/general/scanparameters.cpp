@@ -8,38 +8,21 @@
 // Description : VST Test Suite
 //
 //-----------------------------------------------------------------------------
-// LICENSE
-// (c) 2024, Steinberg Media Technologies GmbH, All Rights Reserved
-//-----------------------------------------------------------------------------
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-//   * Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//   * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//   * Neither the name of the Steinberg Media Technologies nor the names of its
-//     contributors may be used to endorse or promote products derived from this
-//     software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-// BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-// OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  OF THIS SOFTWARE, EVEN IF ADVISED
-// OF THE POSSIBILITY OF SUCH DAMAGE.
+// This file is part of a Steinberg SDK. It is subject to the license terms
+// in the LICENSE file found in the top-level directory of this distribution
+// and at www.steinberg.net/sdklicenses.
+// No part of the SDK, including this file, may be copied, modified, propagated,
+// or distributed except according to the terms contained in the LICENSE file.
 //-----------------------------------------------------------------------------
 
 #include "public.sdk/source/vst/testsuite/general/scanparameters.h"
 #include "public.sdk/source/vst/utility/stringconvert.h"
 #include "pluginterfaces/base/funknownimpl.h"
 #include "pluginterfaces/vst/ivstunits.h"
+#include <algorithm>
+#include <map>
 #include <unordered_map>
+#include <vector>
 
 //------------------------------------------------------------------------
 namespace Steinberg {
@@ -126,6 +109,7 @@ bool PLUGIN_API ScanParametersTest::run (ITestResult* testResult)
 
 	// used for ID check
 	std::unordered_map<int32, int32> paramIds;
+	std::map<int32, std::vector<std::string>> listTitleUnitMap;
 
 	bool foundBypass = false;
 	for (int32 i = 0; i < numParameters; ++i)
@@ -158,7 +142,7 @@ bool PLUGIN_API ScanParametersTest::run (ITestResult* testResult)
 		}
 		paramIds[paramId] = i;
 
-		const tchar* paramType = kEmptyString;
+		const char8* paramType = kEmptyString8;
 		if (paramInfo.stepCount < 0)
 		{
 			addErrorMessage (
@@ -167,11 +151,11 @@ bool PLUGIN_API ScanParametersTest::run (ITestResult* testResult)
 			return false;
 		}
 		if (paramInfo.stepCount == 0)
-			paramType = STR ("Float");
+			paramType = "Float";
 		else if (paramInfo.stepCount == 1)
-			paramType = STR ("Toggle");
+			paramType = "Toggle";
 		else
-			paramType = STR ("Discrete");
+			paramType = "Discrete";
 
 		auto paramTitle = StringConvert::convert (paramInfo.title);
 		auto paramUnits = StringConvert::convert (paramInfo.units);
@@ -179,7 +163,7 @@ bool PLUGIN_API ScanParametersTest::run (ITestResult* testResult)
 		addMessage (
 		    testResult,
 		    printf (
-		        "   Parameter %03d (id=%d): [title=\"%s\"] [unit=\"%s\"] [type = %s, default = %lf, unit = %d]",
+		        R"(   Parameter %03d (id=%d): [title="%s"] [unit="%s"] [type = %s, default = %lf, unit = %d])",
 		        i, paramId, paramTitle.data (), paramUnits.data (), paramType,
 		        paramInfo.defaultNormalizedValue, paramInfo.unitId));
 
@@ -190,12 +174,31 @@ bool PLUGIN_API ScanParametersTest::run (ITestResult* testResult)
 			return false;
 		}
 
+		// check if the same title is present in the same unit
+		auto it = listTitleUnitMap.find (paramInfo.unitId);
+		if (it != listTitleUnitMap.end ())
+		{
+			const std::vector<std::string>& list = it->second;
+			auto found = std::find (list.begin (), list.end (), paramTitle);
+			if (found != list.end ())
+			{
+				addMessage (
+				    testResult,
+				    printf (
+				        "=>Parameter %03d (id=%d): [title=\"%s\"] has the same title as another parameter in this unit = %d!",
+				        i, paramId, paramTitle.c_str (), paramInfo.unitId));
+			}
+		}
+		listTitleUnitMap[paramInfo.unitId].push_back (paramTitle);
+
 		if (paramInfo.defaultNormalizedValue != -1.f &&
 		    (paramInfo.defaultNormalizedValue < 0. || paramInfo.defaultNormalizedValue > 1.))
 		{
 			addErrorMessage (
 			    testResult,
-			    printf ("=>Parameter %03d (id=%d): defaultValue is not normalized!!!", i, paramId));
+			    printf (
+			        "=>Parameter %03d (id=%d): paramInfo.defaultNormalizedValue is not normalized!!!",
+			        i, paramId));
 			return false;
 		}
 		int32 unitId = paramInfo.unitId;

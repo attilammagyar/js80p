@@ -3,7 +3,7 @@ include(SMTG_Bundle)
 include(SMTG_UniversalBinary)
 include(SMTG_CodeSign)
 
-if (XCODE AND SMTG_ENABLE_AUV2_BUILDS)
+if(XCODE AND SMTG_ENABLE_AUV2_BUILDS)
 
     set(SMTG_AUV2_FOLDER FOLDER "AudioUnit V2")
 
@@ -52,15 +52,15 @@ if (XCODE AND SMTG_ENABLE_AUV2_BUILDS)
             ${public_sdk_SOURCE_DIR}/source/vst/auwrapper/NSDataIBStream.mm
             ${public_sdk_SOURCE_DIR}/source/vst/auwrapper/NSDataIBStream.h
         )
-        
+
         smtg_target_setup_universal_binary(${target})
         smtg_target_codesign(${target} ${SMTG_IOS_DEVELOPMENT_TEAM} "${SMTG_CODE_SIGN_IDENTITY_MAC}")
-        
+      
         target_compile_features(${target}
             PUBLIC
                 cxx_std_17
         )
-        
+
         target_compile_definitions(${target}
             PRIVATE
                 SMTG_AUCocoaUIBase_CLASS_NAME=${SMTG_AUCocoaUIBase_CLASS_NAME}
@@ -79,19 +79,21 @@ if (XCODE AND SMTG_ENABLE_AUV2_BUILDS)
                 "-framework CoreAudio"
         )
         if(NOT ${SMTG_COREAUDIO_SDK_PATH} STREQUAL "")
-            target_sources(${target} PRIVATE
-                "${public_sdk_SOURCE_DIR}/source/vst/auwrapper/ausdk.mm"
+            target_sources(${target}
+                PRIVATE
+                    "${public_sdk_SOURCE_DIR}/source/vst/auwrapper/ausdk.mm"
             )
             target_include_directories(${target}
                 PRIVATE 
                     "${SMTG_COREAUDIO_SDK_PATH}/**"
             )
         elseif(NOT ${SMTG_AUDIOUNIT_SDK_PATH} STREQUAL "")
-            target_compile_definitions(${target} PRIVATE SMTG_AUWRAPPER_USES_AUSDK)
+            target_compile_definitions(${target}
+                PRIVATE
+                    SMTG_AUWRAPPER_USES_AUSDK
+            )
 ## Adding the xcodeproj will crash Xcode when closing and reopening the cmake generated project
-#            target_sources(${target} PRIVATE
-#                "${SMTG_AUDIOUNIT_SDK_PATH}/AudioUnitSDK.xcodeproj"
-#            )
+#           target_sources(${target} PRIVATE "${SMTG_AUDIOUNIT_SDK_PATH}/AudioUnitSDK.xcodeproj")
             target_include_directories(${target}
                 PRIVATE 
                     "${SMTG_AUDIOUNIT_SDK_PATH}/include/**"
@@ -121,7 +123,7 @@ if (XCODE AND SMTG_ENABLE_AUV2_BUILDS)
                 LIBRARY_OUTPUT_DIRECTORY ${VST3_OUTPUT_DIR}
                 ${SMTG_AUV2_FOLDER}
         )
-        
+
         add_dependencies(${target} ${ARG_VST3_PLUGIN_TARGET})
 
         add_custom_command(TARGET ${target} POST_BUILD 

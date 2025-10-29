@@ -25,12 +25,12 @@ class IPlugFrame;
 
 //------------------------------------------------------------------------
 /*! \defgroup pluginGUI Graphical User Interface
-*/
+ */
 
 //------------------------------------------------------------------------
-/**  Graphical rectangle structure. Used with IPlugView.
-\ingroup pluginGUI
-*/
+/** Graphical rectangle structure. Used with IPlugView.
+ * \ingroup pluginGUI
+ */
 struct ViewRect
 {
 	ViewRect (int32 l = 0, int32 t = 0, int32 r = 0, int32 b = 0)
@@ -51,18 +51,18 @@ struct ViewRect
 SMTG_TYPE_SIZE_CHECK (ViewRect, 16, 16, 16, 16)
 
 //------------------------------------------------------------------------
-/**  \defgroup platformUIType Platform UI Types
-\ingroup pluginGUI
-List of Platform UI types for IPlugView. This list is used to match the GUI-System between
-the host and a plug-in in case that an OS provides multiple GUI-APIs.
-*/
-/*@{*/
+/** \defgroup platformUIType Platform UI Types
+ * \ingroup pluginGUI
+ * List of Platform UI types for IPlugView. This list is used to match the GUI-System between
+ * the host and a plug-in in case that an OS provides multiple GUI-APIs.
+ */
+/**@{*/
 /** The parent parameter in IPlugView::attached() is a HWND handle.
- *	You should attach a child window to it. */
+ * You should attach a child window to it. */
 const FIDString kPlatformTypeHWND = "HWND"; ///< HWND handle. (Microsoft Windows)
 
 /** The parent parameter in IPlugView::attached() is a WindowRef.
- *	You should attach a HIViewRef to the content view of the window. */
+ * You should attach a HIViewRef to the content view of the window. */
 const FIDString kPlatformTypeHIView = "HIView"; ///< HIViewRef. (Mac OS X)
 
 /** The parent parameter in IPlugView::attached() is a NSView pointer.
@@ -78,14 +78,26 @@ const FIDString kPlatformTypeUIView = "UIView"; ///< UIView pointer. (iOS)
  * See https://standards.freedesktop.org/xembed-spec/xembed-spec-latest.html */
 const FIDString kPlatformTypeX11EmbedWindowID = "X11EmbedWindowID"; ///< X11 Window ID. (X11)
 
-/*@}*/
+/** The parent parameter in IPlugView::attached() is a wl_surface pointer.
+ * The plug-in should create a wl_surface and attach it to the parent surface as a wl_subsurface.
+ * The plug-in should not connect to the system compositor to do so, but use
+ * IWaylandHost::openWaylandConnection().
+ * See https://wayland.freedesktop.org/docs/html */
+const FIDString kPlatformTypeWaylandSurfaceID = "WaylandSurfaceID"; ///< Wayland Surface ID.
+/**@}*/
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-/**  Plug-in definition of a view.
+/** Plug-in definition of a view.
 \ingroup pluginGUI vstIPlug vst300
 - [plug imp]
 - [released: 3.0.0]
+
+\par Coordinates
+The coordinates utilized within the ViewRect are native to the view system of the parent type.
+This implies that on macOS (kPlatformTypeNSView), the coordinates are expressed in logical 
+units (independent of the screen scale factor), whereas on Windows (kPlatformTypeHWND) and 
+Linux (kPlatformTypeX11EmbedWindowID), the coordinates are expressed in physical units (pixels).
 
 \par Sizing of a view
 Usually, the size of a plug-in view is fixed. But both the host and the plug-in can cause
@@ -198,7 +210,7 @@ class IPlugFrame : public FUnknown
 public:
 //------------------------------------------------------------------------
 	/** Called to inform the host about the resize of a given view.
-	 *	Afterwards the host has to call IPlugView::onSize (). */
+	 * Afterwards the host has to call IPlugView::onSize (). */
 	virtual tresult PLUGIN_API resizeView (IPlugView* view, ViewRect* newSize) = 0;
 //------------------------------------------------------------------------
 	static const FUID iid;
@@ -206,7 +218,6 @@ public:
 
 DECLARE_CLASS_IID (IPlugFrame, 0x367FAF01, 0xAFA94693, 0x8D4DA2A0, 0xED0882A3)
 
-#if SMTG_OS_LINUX
 //------------------------------------------------------------------------
 namespace Linux {
 
@@ -280,8 +291,4 @@ DECLARE_CLASS_IID (IRunLoop, 0x18C35366, 0x97764F1A, 0x9C5B8385, 0x7A871389)
 
 //------------------------------------------------------------------------
 } // namespace Linux
-
-#endif
-
-//------------------------------------------------------------------------
 } // namespace Steinberg

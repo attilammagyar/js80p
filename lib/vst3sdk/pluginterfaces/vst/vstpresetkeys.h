@@ -27,8 +27,9 @@ namespace Vst {
 namespace PresetAttributes
 {
 /**
-\defgroup presetAttributes Predefined Preset Attributes*/
-/*@{*/
+ * \defgroup presetAttributes Predefined Preset Attributes
+ */
+/**@{*/
 const CString kPlugInName	  = "PlugInName";		///< plug-in name
 const CString kPlugInCategory = "PlugInCategory";	///< eg. "Fx|Dynamics", "Instrument", "Instrument|Synth"
 
@@ -40,7 +41,7 @@ const CString kStateType	  = "StateType";		///< Type of the given state see \ref
 const CString kFilePathStringType = "FilePathString";	///< Full file path string (if available) where the preset comes from (be sure to use a bigger string when asking for it (with 1024 characters))
 const CString kName			  = "Name";				///< name of the preset
 const CString kFileName		  = "FileName";			///< filename of the preset (including extension)
-/*@}*/
+/**@}*/
 };
 
 //------------------------------------------------------------------------
@@ -48,14 +49,22 @@ const CString kFileName		  = "FileName";			///< filename of the preset (includin
 //------------------------------------------------------------------------
 namespace StateType {
 /**
-\defgroup stateType Context of State Restoration */
-/*@{*/
-//------------------------------------------------------------------------
-const CString kProject = "Project";		///< the state is restored from a project loading or it is saved in a project
-const CString kDefault = "Default";		///< the state is restored from a preset (marked as default) or the host wants to store a default state of the plug-in
+ * \defgroup stateType Context of State Restoration 
+ * used for PresetAttributes::kStateType in IStreamAttributes
+ */
+/**@{*/
+/** the state is restored from a project loading or it is saved in a project */
+const CString kProject = "Project";
+
+/** the state is restored from a preset (marked as default) or the host wants to store a default
+ * state of the plug-in */
+const CString kDefault = "Default";
+
+/** the state is restored from a track preset */
+const CString kTrackPreset = "TrackPreset";
 
 //------------------------------------------------------------------------
-/*@}*/
+/**@}*/
 }
 
 //------------------------------------------------------------------------
@@ -64,8 +73,9 @@ const CString kDefault = "Default";		///< the state is restored from a preset (m
 namespace MusicalInstrument
 {
 /**
-\defgroup musicalInstrument Predefined Musical Instrument */
-/*@{*/
+ * \defgroup musicalInstrument Predefined Musical Instrument
+ */
+/**@{*/
 const CString kAccordion			= "Accordion";
 const CString kAccordionAccordion	= "Accordion|Accordion";
 const CString kAccordionHarmonica	= "Accordion|Harmonica";
@@ -198,7 +208,7 @@ const CString kWoodwindsClarinet	= "Woodwinds|Clarinet";
 const CString kWoodwindsSaxophone	= "Woodwinds|Saxophone";
 const CString kWoodwindsBassoon		= "Woodwinds|Bassoon";
 const CString kWoodwindsOther		= "Woodwinds|Other";
-/*@}*/
+/**@}*/
 };
 
 //------------------------------------------------------------------------
@@ -206,8 +216,9 @@ const CString kWoodwindsOther		= "Woodwinds|Other";
 namespace MusicalStyle
 {
 /**
-\defgroup musicalStyle Predefined Musical Style */
-/*@{*/
+ * \defgroup musicalStyle Predefined Musical Style 
+ */
+/**@{*/
 const CString kAlternativeIndie					= "Alternative/Indie";
 const CString kAlternativeIndieGothRock			= "Alternative/Indie|Goth Rock";
 const CString kAlternativeIndieGrunge			= "Alternative/Indie|Grunge";
@@ -328,7 +339,7 @@ const CString kWorldEthnicIndiaOriental			= "World/Ethnic|India/Oriental";
 const CString kWorldEthnicNorthAmerica			= "World/Ethnic|North America";
 const CString kWorldEthnicSouthAmerica			= "World/Ethnic|South America";
 const CString kWorldEthnicAustralia				= "World/Ethnic|Australia";
-/*@}*/
+/**@}*/
 };
 
 //------------------------------------------------------------------------
@@ -337,7 +348,7 @@ namespace MusicalCharacter
 {
 /**
 \defgroup musicalCharacter Predefined Musical Character */
-/*@{*/
+/**@{*/
 //----TYPE------------------------------------
 const CString kMono			= "Mono";
 const CString kPoly			= "Poly";
@@ -421,7 +432,7 @@ const CString kMoving		= "Moving";
 
 const CString kLoop			= "Loop";
 const CString kOneShot		= "One Shot";
-/*@}*/
+/**@}*/
 };
 
 //------------------------------------------------------------------------
