@@ -2278,14 +2278,14 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
 
 
 TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_sustaining, {
-    constexpr Integer block_size_1 = 5;
-    constexpr Integer block_size_2 = 10;
-    constexpr Integer block_size_max = std::max(block_size_1, block_size_2);
-    constexpr Sample expected_samples_1[block_size_1] = {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples_1[block_size] = {
         9.00, 8.50, 8.00, 7.50, 7.00,
     };
-    constexpr Sample expected_samples_2[block_size_2] = {
+    constexpr Sample expected_samples_2[block_size] = {
         7.00, 6.75, 6.50, 6.25, 6.00,
+    };
+    constexpr Sample expected_samples_3[block_size] = {
         5.75, 5.50, 5.50, 5.50, 5.50,
     };
     Envelope envelope("env");
@@ -2297,12 +2297,12 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     FloatParamS follower(leader);
     Sample const* rendered_samples;
 
-    leader.set_block_size(block_size_max);
+    leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
     leader.set_envelope(&envelope);
     leader.set_value(0.2);
 
-    follower.set_block_size(block_size_max);
+    follower.set_block_size(block_size);
     follower.set_sample_rate(6.0 / Envelope::DYNAMIC_ENVELOPE_RAMP_TIME);
 
     envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
@@ -2319,27 +2319,32 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
 
     follower.start_envelope(0.0, 0.0, 0.0);
 
-    FloatParamS::produce<FloatParamS>(follower, 1, block_size_1);
+    FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 2, block_size_1
+        follower, 2, block_size
     );
     assert_eq(NULL, rendered_samples);
 
     envelope.sustain_value.set_value(0.6);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 3, block_size_1
+        follower, 3, block_size
     );
-    assert_eq(expected_samples_1, rendered_samples, block_size_1, DOUBLE_DELTA);
-    assert_false(follower.is_constant_until(block_size_1));
+    assert_eq(expected_samples_1, rendered_samples, block_size, DOUBLE_DELTA);
+    assert_false(follower.is_constant_until(block_size));
 
     envelope.sustain_value.set_value(0.55);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 4, block_size_2
+        follower, 4, block_size
     );
-    assert_eq(expected_samples_2, rendered_samples, block_size_2, DOUBLE_DELTA);
+    assert_eq(expected_samples_2, rendered_samples, block_size, DOUBLE_DELTA);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
-        follower, 5, block_size_2
+        follower, 5, block_size
+    );
+    assert_eq(expected_samples_3, rendered_samples, block_size, DOUBLE_DELTA);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower, 6, block_size
     );
     assert_eq(NULL, rendered_samples);
     assert_eq(5.5, follower.get_value(), DOUBLE_DELTA);

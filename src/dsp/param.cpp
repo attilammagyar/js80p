@@ -1454,15 +1454,22 @@ void FloatParam<evaluation>::update_envelope_state_if_required(
     Seconds const old_release_time = envelope_snapshot.release_time;
 
     switch (stage) {
-        case EnvelopeStage::ENV_STG_SUSTAIN:
+        case EnvelopeStage::ENV_STG_SUSTAIN: {
+            Number const old_sustain_value = envelope_snapshot.sustain_value;
+
             envelope.make_snapshot(
                 envelope_state->randoms,
                 envelope_index,
                 this->midi_channel,
                 envelope_snapshot
             );
-            time = 0.0;
+
+            if (!Math::is_close(envelope_snapshot.sustain_value, old_sustain_value)) {
+                time = 0.0;
+            }
+
             break;
+        }
 
         case EnvelopeStage::ENV_STG_RELEASE:
             envelope.make_end_snapshot(
@@ -1473,15 +1480,28 @@ void FloatParam<evaluation>::update_envelope_state_if_required(
             );
             break;
 
-        case EnvelopeStage::ENV_STG_RELEASED:
+        case EnvelopeStage::ENV_STG_RELEASED: {
+            /*
+            For the sake of consistency, we follow the same behaviour as in the
+            sustain case, but in practice, this code shouldn't have observable
+            effects.
+            */
+
+            Number const old_final_value = envelope_snapshot.final_value;
+
             envelope.make_end_snapshot(
                 envelope_state->randoms,
                 envelope_index,
                 this->midi_channel,
                 envelope_snapshot
             );
-            time = 0.0;
+
+            if (!Math::is_close(envelope_snapshot.final_value, old_final_value)) {
+                time = 0.0;
+            }
+
             break;
+        }
 
         default:
             envelope.make_snapshot(
