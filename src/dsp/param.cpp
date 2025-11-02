@@ -265,10 +265,12 @@ MidiController* Param<NumberType, evaluation>::get_midi_controller() const noexc
 template<typename NumberType, ParamEvaluation evaluation>
 void Param<NumberType, evaluation>::set_midi_channel(Midi::Channel const midi_channel) noexcept
 {
-    if (midi_channel_rw != midi_channel) {
-        this->cached_round = -1;
-        this->cached_buffer = NULL;
+    if (midi_channel_rw == midi_channel) {
+        return;
     }
+
+    this->cached_round = -1;
+    this->cached_buffer = NULL;
 
     midi_channel_rw = midi_channel;
 }
