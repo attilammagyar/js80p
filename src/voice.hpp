@@ -298,13 +298,12 @@ class Voice : public SignalProducer
 
         void update_inaccuracy(Integer const round) noexcept;
 
-        void set_mpe_channel(Midi::Channel const mpe_channel) noexcept;
-
         void note_on(
             Seconds const time_offset,
             Integer const note_id,
             Midi::Note const note,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Number const velocity,
             Midi::Note const previous_note,
             bool const should_sync_oscillator_inaccuracy
@@ -315,6 +314,7 @@ class Voice : public SignalProducer
             Integer const note_id,
             Midi::Note const note,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Number const velocity,
             Midi::Note const previous_note,
             bool const should_sync_oscillator_inaccuracy
@@ -325,6 +325,7 @@ class Voice : public SignalProducer
             Integer const note_id,
             Midi::Note const note,
             Midi::Channel const channel,
+            Midi::Channel const mpe_channel,
             Number const velocity,
             Midi::Note const previous_note,
             bool const should_sync_oscillator_inaccuracy

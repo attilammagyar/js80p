@@ -892,10 +892,10 @@ TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
     shared_buffers.a2_buffer = new Sample[BLOCK_SIZE];
 
     envelope.scale.set_value(filter_1.frequency.value_to_ratio(7040.0) * headroom);
-    filter_1.frequency.start_envelope(0.0, 0.0, 0.0);
+    filter_1.frequency.start_envelope(0.0, 0, 0.0, 0.0);
 
     envelope.scale.set_value(filter_2.frequency.value_to_ratio(440.0) * headroom);
-    filter_2.frequency.start_envelope(0.0, 0.0, 0.0);
+    filter_2.frequency.start_envelope(0.0, 0, 0.0, 0.0);
 
     test_filter(filter_1, input, expected_1, 0.11, 1, BLOCK_SIZE);
     test_filter(filter_2, input, expected_2, 0.11, 1, BLOCK_SIZE);

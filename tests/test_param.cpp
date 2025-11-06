@@ -1302,6 +1302,9 @@ TEST(when_a_float_param_uses_a_different_midi_channel_than_its_leader_then_their
     leader.set_midi_channel(midi_channel_1);
     follower.set_midi_channel(midi_channel_1);
 
+    assert_eq(midi_channel_1, leader.get_midi_channel());
+    assert_eq(midi_channel_1, follower.get_midi_channel());
+
     leader.set_value(10.0);
 
     leader.set_midi_controller(NULL);
@@ -1337,6 +1340,8 @@ TEST(when_a_float_param_uses_a_different_midi_channel_than_its_leader_then_their
     assert_eq(10.0, follower.get_value(), DOUBLE_DELTA, "different channels, no controller");
     assert_eq(1.0, leader.get_ratio(), DOUBLE_DELTA, "different channels, no controller");
     assert_eq(1.0, follower.get_ratio(), DOUBLE_DELTA, "different channels, no controller");
+    assert_eq(midi_channel_1, leader.get_midi_channel());
+    assert_eq(midi_channel_2, follower.get_midi_channel());
 
     leader.set_midi_controller(&midi_controller);
     leader.set_macro(NULL);
@@ -1498,6 +1503,7 @@ TEST(smooth_midi_controller_change_takes_priority_over_controller_synchronizatio
     );
     buffer.append(&rendered_samples, block_size);
 
+    midi_controller.clear();
     float_param.sync_ctl_value();
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -1505,7 +1511,57 @@ TEST(smooth_midi_controller_change_takes_priority_over_controller_synchronizatio
     );
     buffer.append(&rendered_samples, block_size);
 
-    assert_eq(expected_samples, buffer.samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, buffer.samples[0], sample_count, DOUBLE_DELTA);
+})
+
+
+TEST(midi_controller_value_synchronization_may_be_scheduled, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = block_size * rounds;
+    constexpr Midi::Channel midi_channel = 5;
+    constexpr Frequency sample_rate = (
+        (Number)sample_count / FloatParamS::MIDI_CTL_BIG_CHANGE_DURATION
+    );
+    constexpr Sample expected_samples[sample_count] = {
+        0.0, 0.1, 0.2, 0.3, 0.4,
+        0.5, 0.6, 0.7, 1.0, 1.0,
+    };
+
+    FloatParamS float_param("F", 0.0, 1.0, 0.0);
+    MidiController midi_controller;
+    Buffer buffer(sample_count);
+    Sample const* rendered_samples;
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.clear();
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_midi_controller(&midi_controller);
+
+    midi_controller.change_all_channels(0.0, 1.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    midi_controller.clear();
+
+    Seconds const sync_time_offset = 2.0 / sample_rate;
+
+    float_param.cancel_events_at(sync_time_offset);
+    float_param.schedule_ctl_value_sync(sync_time_offset, midi_channel);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    assert_eq(expected_samples, buffer.samples[0], sample_count, DOUBLE_DELTA);
+    assert_true(float_param.is_constant_in_next_round(3, block_size));
+    assert_eq(midi_channel, float_param.get_midi_channel());
 })
 
 
@@ -1546,7 +1602,54 @@ TEST(smooth_macro_change_takes_priority_over_controller_synchronization, {
     );
     buffer.append(&rendered_samples, block_size);
 
-    assert_eq(expected_samples, buffer.samples[0], block_size, DOUBLE_DELTA);
+    assert_eq(expected_samples, buffer.samples[0], sample_count, DOUBLE_DELTA);
+})
+
+
+TEST(macro_value_synchronization_may_be_scheduled, {
+    constexpr Integer block_size = 5;
+    constexpr Integer rounds = 2;
+    constexpr Integer sample_count = block_size * rounds;
+    constexpr Frequency sample_rate = (
+        (Number)sample_count / FloatParamS::MIDI_CTL_BIG_CHANGE_DURATION
+    );
+    constexpr Sample expected_samples[sample_count] = {
+        0.0, 0.1, 0.2, 0.3, 0.4,
+        0.5, 0.6, 0.7, 1.0, 1.0,
+    };
+
+    FloatParamS float_param("F", 0.0, 1.0, 0.0);
+    Macro macro("M");
+    Buffer buffer(sample_count);
+    Sample const* rendered_samples;
+
+    macro.input.set_value(0.0);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_macro(&macro);
+
+    macro.input.set_value(1.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    Seconds const sync_time_offset = 2.0 / sample_rate;
+
+    float_param.cancel_events_at(sync_time_offset);
+    float_param.schedule_ctl_value_sync(
+        sync_time_offset, PARAM_DEFAULT_MPE_CHANNEL
+    );
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, block_size
+    );
+    buffer.append(&rendered_samples, block_size);
+
+    assert_eq(expected_samples, buffer.samples[0], sample_count, DOUBLE_DELTA);
+    assert_true(float_param.is_constant_in_next_round(3, block_size));
 })
 
 
@@ -1568,7 +1671,7 @@ TEST(when_a_float_param_does_not_have_an_envelope_then_applying_envelope_is_no_o
 
     float_param.set_sample_rate(1.0);
     float_param.set_value(1.0);
-    float_param.start_envelope(3.0, 0.0, 0.0);
+    float_param.start_envelope(3.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     assert_eq(0.0, float_param.end_envelope(6.0), DOUBLE_DELTA);
     assert_eq(NULL, float_param.get_envelope());
 
@@ -1611,7 +1714,7 @@ TEST(when_a_float_param_does_have_an_envelope_then_dahds_can_be_applied, {
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     assert_true(float_param.is_constant_until(1));
     assert_false(float_param.is_constant_until(2));
@@ -1653,7 +1756,7 @@ TEST(a_float_param_envelope_may_be_released_before_dahds_is_completed, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(4.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1696,7 +1799,7 @@ TEST(a_float_param_envelope_may_be_released_immediately, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.375);
 
-    float_param.start_envelope(1.0, 0.0, 0.0);
+    float_param.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     assert_eq(2.0, float_param.end_envelope(1.0), DOUBLE_DELTA);
 
     assert_true(float_param.is_constant_until(1));
@@ -1737,7 +1840,7 @@ TEST(envelope_release_params_are_saved_when_the_envelope_is_started, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
     envelope.scale.set_value(1.0);
@@ -1787,7 +1890,7 @@ TEST(cancelling_an_envelope_releases_it_in_a_given_amount_of_time, {
 
     envelope.release_time.set_value(6.0);
 
-    float_param.start_envelope(0.3, 0.0, 0.0);
+    float_param.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     float_param.cancel_envelope(4.0, 2.0);
 
     rendered_samples = FloatParamS::produce<FloatParamS>(float_param, 1, block_size);
@@ -1831,7 +1934,7 @@ TEST(follower_float_param_follows_the_leaders_envelope, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.release_time.set_value(0.123);
 
@@ -1881,7 +1984,7 @@ TEST(canceling_follower_float_param_envelope_releases_it_in_the_given_amount_of_
     envelope.release_time.set_value(3.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.release_time.set_value(6.0);
 
@@ -1925,7 +2028,7 @@ TEST(cancelling_envelope_during_long_release_ends_it_in_the_specified_amount_of_
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0);
+    param.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     param.end_envelope(5.0);
     param.cancel_envelope(7.0, 2.0);
 
@@ -1966,7 +2069,7 @@ TEST(when_dynamic_envelope_is_changed_during_long_release_then_param_is_still_re
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.0);
 
-    param.start_envelope(0.0, 0.0, 0.0);
+    param.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     FloatParamS::produce<FloatParamS>(param, 1, block_size);
 
     param.end_envelope(0.0);
@@ -2023,7 +2126,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_da
     envelope.release_time.set_value(0.123);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.release_time.set_value(2.0);
 
@@ -2099,7 +2202,7 @@ TEST(when_the_update_mode_of_the_envelope_is_end_only_then_the_param_updates_rel
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(1.0);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    follower.start_envelope(0.3, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.sustain_value.set_value(0.9);
     envelope.release_time.set_value(2.0);
@@ -2121,9 +2224,11 @@ TEST(when_the_update_mode_of_the_envelope_is_end_only_then_the_param_updates_rel
 
 
 void test_envelope_manual_update_dahds(
-        Byte const is_dynamic,
+        bool const is_dynamic,
         Number const scale_before_update,
-        Number const scale_before_handling_events
+        Number const scale_before_handling_events,
+        Midi::Channel const midi_channel_start = PARAM_DEFAULT_MPE_CHANNEL,
+        Midi::Channel const midi_channel_update = PARAM_DEFAULT_MPE_CHANNEL
 ) {
     constexpr Integer block_size = 10;
     constexpr Sample expected_dahd_samples[block_size] = {
@@ -2141,7 +2246,15 @@ void test_envelope_manual_update_dahds(
     };
     FloatParamS leader("follow", -5.0, 5.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
+    MidiController hold_time_midi_controller;
+    MidiController release_time_midi_controller;
     Sample const* rendered_samples;
+
+    hold_time_midi_controller.change_all_channels(midi_channel_start, 0.0);
+    release_time_midi_controller.change_all_channels(midi_channel_start, 0.0);
+
+    envelope.hold_time.set_midi_controller(&hold_time_midi_controller);
+    envelope.release_time.set_midi_controller(&release_time_midi_controller);
 
     leader.set_block_size(block_size);
     leader.set_sample_rate(1.0);
@@ -2159,22 +2272,38 @@ void test_envelope_manual_update_dahds(
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(0.1);
     envelope.peak_value.set_value(0.1);
-    envelope.hold_time.set_value(0.1);
     envelope.decay_time.set_value(0.1);
     envelope.sustain_value.set_value(0.1);
-    envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.625);
 
-    follower.start_envelope(0.3, 0.0, 0.0);
+    hold_time_midi_controller.change(
+        midi_channel_start, 0.0, envelope.hold_time.value_to_ratio(0.1)
+    );
+    hold_time_midi_controller.clear();
+
+    release_time_midi_controller.change(
+        midi_channel_start, 0.0, envelope.release_time.value_to_ratio(5.0)
+    );
+    release_time_midi_controller.clear();
+
+    follower.start_envelope(0.3, midi_channel_start, 0.0, 0.0);
     FloatParamS::produce<FloatParamS>(follower, 0, 2);
 
-    envelope.release_time.set_value(2.0);
-    follower.update_envelope(1.0);
+    assert_eq(midi_channel_start, follower.get_midi_channel());
+
+    release_time_midi_controller.change(
+        midi_channel_update, 0.0, envelope.release_time.value_to_ratio(2.0)
+    );
+    release_time_midi_controller.clear();
+
+    follower.update_envelope(1.0, midi_channel_update);
 
     assert_eq(2.0, follower.end_envelope(28.0), DOUBLE_DELTA);
     follower.cancel_events();
 
     FloatParamS::produce<FloatParamS>(follower, 1, 2);
+
+    assert_eq(midi_channel_start, follower.get_midi_channel());
 
     envelope.update_mode.set_value(
         is_dynamic ? Envelope::UPDATE_MODE_DYNAMIC : Envelope::UPDATE_MODE_STATIC
@@ -2184,16 +2313,21 @@ void test_envelope_manual_update_dahds(
     envelope.delay_time.set_value(5.7);
     envelope.attack_time.set_value(3.0);
     envelope.peak_value.set_value(1.0);
-    envelope.hold_time.set_value(2.0);
     envelope.decay_time.set_value(4.0);
     envelope.sustain_value.set_value(0.75);
 
-    follower.update_envelope(0.0);
+    hold_time_midi_controller.change(
+        midi_channel_update, 0.0, envelope.hold_time.value_to_ratio(2.0)
+    );
+    hold_time_midi_controller.clear();
+
+    follower.update_envelope(0.0, midi_channel_update);
     envelope.scale.set_value(scale_before_handling_events);
 
     FloatParamS::produce<FloatParamS>(follower, 2, 2);
 
     assert_false(follower.is_constant_until(2));
+    assert_eq(midi_channel_update, follower.get_midi_channel());
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 3, block_size
@@ -2216,12 +2350,18 @@ void test_envelope_manual_update_dahds(
 
 
 TEST(when_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
-    test_envelope_manual_update_dahds(ToggleParam::OFF, 0.8, 0.3);
+    test_envelope_manual_update_dahds(false, 0.8, 0.3);
 })
 
 
 TEST(when_dynamic_envelope_is_updated_manually_then_the_param_reacts_to_its_changes_during_dahds, {
-    test_envelope_manual_update_dahds(ToggleParam::ON, 0.3, 0.8);
+    test_envelope_manual_update_dahds(true, 0.3, 0.8);
+})
+
+
+TEST(starting_or_updating_the_envelope_also_sets_the_midi_channel, {
+    test_envelope_manual_update_dahds(false, 0.8, 0.3, 10, 11);
+    test_envelope_manual_update_dahds(true, 0.3, 0.8, 10, 11);
 })
 
 
@@ -2259,9 +2399,9 @@ TEST(when_multiple_envelope_events_are_scheduled_for_a_param_that_is_controlled_
     float_param.set_block_size(block_size);
     float_param.set_sample_rate(sample_rate);
     float_param.set_envelope(&envelope);
-    float_param.start_envelope(0.0, 0.0, 0.0);
+    float_param.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     float_param.end_envelope(3.0);
-    float_param.start_envelope(5.0, 0.0, 0.0);
+    float_param.start_envelope(5.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     float_param.end_envelope(8.0);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -2317,7 +2457,7 @@ TEST(when_the_envelope_is_dynamic_then_the_param_reacts_to_its_changes_during_su
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    follower.start_envelope(0.0, 0.0, 0.0);
+    follower.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     FloatParamS::produce<FloatParamS>(follower, 1, block_size);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
@@ -2391,7 +2531,7 @@ void test_voice_status_dependent_envelope_update(
     envelope.release_time.set_value(0.0);
     envelope.final_value.set_value(0.0);
 
-    follower.start_envelope(0.0, 0.0, 0.0);
+    follower.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 1, block_size
@@ -2473,8 +2613,7 @@ TEST(float_param_envelope_settings_respect_midi_channel, {
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.0);
 
-    float_param.set_midi_channel(midi_channel);
-    float_param.start_envelope(1.0, 0.0, 0.0);
+    float_param.start_envelope(1.0, midi_channel, 0.0, 0.0);
     float_param.end_envelope(7.0);
 
     assert_true(float_param.is_constant_until(1));
@@ -2488,7 +2627,7 @@ TEST(float_param_envelope_settings_respect_midi_channel, {
 })
 
 
-TEST(when_a_float_param_has_a_midi_controller_then_attempting_to_start_an_envelope_synchronizes_the_value_to_the_controller, {
+TEST(when_a_float_param_has_a_midi_controller_then_envelope_start_sets_the_channel_and_synchronizes_the_value_to_the_controller, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
         6.0, 6.0, 1.0, 1.0, 1.0,
@@ -2516,9 +2655,8 @@ TEST(when_a_float_param_has_a_midi_controller_then_attempting_to_start_an_envelo
 
     follower.set_block_size(block_size);
     follower.set_sample_rate(sample_rate);
-    follower.set_midi_channel(midi_channel);
 
-    follower.start_envelope(0.00020, 0.0, 0.0);
+    follower.start_envelope(0.00020, midi_channel, 0.0, 0.0);
     follower.schedule_value(0.00029, 1.0);
     midi_controller.change(midi_channel, 0.00019, 0.1);
 
@@ -2528,10 +2666,10 @@ TEST(when_a_float_param_has_a_midi_controller_then_attempting_to_start_an_envelo
 })
 
 
-TEST(when_a_float_param_has_a_macro_then_attempting_to_start_an_envelope_synchronizes_the_value_to_the_macro, {
+TEST(when_a_float_param_has_a_macro_then_envelope_start_sets_the_channel_and_synchronizes_the_value_to_the_macro, {
     constexpr Integer block_size = 5;
     constexpr Sample expected_samples[block_size] = {
-        1.0, 1.0, 1.0, 1.0, 1.0,
+        6.0, 6.0, 1.0, 1.0, 1.0,
     };
     constexpr Frequency sample_rate = 10000.0;
     constexpr Midi::Channel midi_channel = 2;
@@ -2559,9 +2697,8 @@ TEST(when_a_float_param_has_a_macro_then_attempting_to_start_an_envelope_synchro
 
     follower.set_block_size(block_size);
     follower.set_sample_rate(sample_rate);
-    follower.set_midi_channel(midi_channel);
 
-    follower.start_envelope(0.00020, 0.0, 0.0);
+    follower.start_envelope(0.00020, midi_channel, 0.0, 0.0);
     follower.schedule_value(0.00029, 1.0);
     midi_controller.change(midi_channel, 0.00019, 0.1);
 
@@ -2936,9 +3073,11 @@ TEST(when_an_lfo_is_assigned_to_the_leader_of_a_float_param_then_the_follower_va
 })
 
 
-TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_lfo, {
+TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_lfo_with_respect_to_the_midi_channel, {
     constexpr Integer block_size = 20;
     constexpr Frequency sample_rate = 2.0;
+    constexpr Midi::Channel midi_channel_start = 10;
+    constexpr Midi::Channel midi_channel_update = 11;
     Envelope envelope("E");
     Envelope* const envelopes[Constants::ENVELOPES] = {
         NULL, &envelope, NULL, NULL, NULL, NULL,
@@ -2947,6 +3086,7 @@ TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_l
     LFO lfo("lfo", true);
     FloatParamS leader("leader", 0.0, 10.0, 0.0, 0.0, envelopes);
     FloatParamS follower(leader);
+    MidiController midi_controller;
     Sample const* rendered_samples;
 
     /* 10 * Envelope sample * LFO sample */
@@ -2985,14 +3125,25 @@ TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_l
     envelope.peak_value.set_value(1.0);
     envelope.hold_time.set_value(0.5);
     envelope.decay_time.set_value(1.5);
-    envelope.sustain_value.set_value(0.7);
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.2);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.change(
+        midi_channel_start, 0.0, envelope.sustain_value.value_to_ratio(0.7)
+    );
+    midi_controller.clear();
 
-    envelope.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    envelope.sustain_value.set_midi_controller(&midi_controller);
+
+    follower.start_envelope(1.0, midi_channel_start, 0.0, 0.0);
+
+    midi_controller.change(
+        midi_channel_update, 0.0, envelope.sustain_value.value_to_ratio(0.6)
+    );
+    midi_controller.clear();
+
+    follower.update_envelope(7.0, midi_channel_update);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3005,11 +3156,80 @@ TEST(when_an_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_to_the_l
     assert_false(std::isnan(rendered_samples[1]));
     assert_eq(expected_samples, &rendered_samples[2], block_size - 2, DOUBLE_DELTA);
     assert_eq(2.0, follower.get_value(), DOUBLE_DELTA);
+    assert_eq(midi_channel_update, follower.get_midi_channel());
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 2, block_size
     );
+    assert_eq(PARAM_DEFAULT_MPE_CHANNEL, follower.get_midi_channel());
+})
+
+
+TEST(when_an_lfo_has_an_amplitude_envelope_and_midi_controllers_then_the_envelope_start_triggers_value_synchronization, {
+    constexpr Integer block_size = 10;
+    constexpr Frequency sample_rate = 25.0;
+    constexpr Midi::Channel midi_channel = 10;
+    Envelope envelope("E");
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        NULL, &envelope, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    LFO lfo("lfo", true);
+    FloatParamS float_param("F", 0.0, 2.0, 0.0, 0.0, envelopes);
+    MidiController midi_controller;
+    Sample const* rendered_samples;
+
+    Sample expected_samples[block_size] = {
+        1.0, 1.0, 2.0, 2.0, 2.0,
+        2.0, 2.0, 2.0, 2.0, 2.0,
+    };
+
+    envelope.scale.set_value(1.0);
+    envelope.initial_value.set_value(1.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(0.001);
+    envelope.sustain_value.set_value(1.0);
+    envelope.release_time.set_value(0.0);
+    envelope.final_value.set_value(1.0);
+
+    midi_controller.change_all_channels(0.0, 0.0);
+    midi_controller.change(midi_channel, 0.0, 0.5);
+    midi_controller.clear();
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.frequency.set_value(sample_rate * 0.25);
+    lfo.amplitude_envelope.set_value(1);
+    lfo.min.set_midi_controller(&midi_controller);
+    lfo.max.set_midi_controller(&midi_controller);
+    lfo.start(0.0);
+
+    float_param.set_block_size(block_size);
+    float_param.set_sample_rate(sample_rate);
+    float_param.set_lfo(&lfo);
+
+    float_param.start_envelope(0.0, midi_channel, 0.0, 0.0);
+    float_param.end_envelope((Number)block_size / (2.0 * sample_rate));
+    FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 1, block_size
+    );
+
+    midi_controller.change(midi_channel, 0.0, 1.0);
+    midi_controller.clear();
+
+    float_param.start_envelope(2.0 / sample_rate, midi_channel, 0.0, 0.0);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        float_param, 2, block_size
+    );
+
+    assert_eq(expected_samples, rendered_samples, block_size, DOUBLE_DELTA);
+    assert_eq(2.0, float_param.get_value(), DOUBLE_DELTA);
+    assert_eq(midi_channel, float_param.get_midi_channel());
 })
 
 
@@ -3079,10 +3299,10 @@ TEST(when_a_centered_lfo_has_an_amplitude_envelope_then_the_envelope_is_applied_
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.2);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    follower.update_envelope(7.0, PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3152,7 +3372,7 @@ TEST(when_an_lfo_has_a_dynamic_amplitude_envelope_then_the_envelope_is_updated_d
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.567);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 1, 7
     );
@@ -3239,7 +3459,7 @@ TEST(when_an_lfo_has_an_amplitude_envelope_with_end_updates_then_the_envelope_is
     envelope.release_time.set_value(5.0);
     envelope.final_value.set_value(0.567);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
         follower, 1, 7
     );
@@ -3332,10 +3552,10 @@ TEST(when_the_first_one_in_a_chain_of_lfos_has_no_envelope_then_lfos_are_rendere
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.2);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    follower.update_envelope(7.0, PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3435,11 +3655,11 @@ TEST(when_lfos_with_envelopes_are_chained_then_they_are_rendered_with_envelopes,
     envelope_2.release_time.set_value(2.0);
     envelope_2.final_value.set_value(0.2);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope_1.sustain_value.set_value(0.6);
     envelope_2.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    follower.update_envelope(7.0, PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3556,12 +3776,11 @@ TEST(lfos_with_envelopes_respect_midi_channel, {
 
     midi_controller_changing.change(midi_channel, 1.0, 1.0);
 
-    follower.set_midi_channel(midi_channel);
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, midi_channel, 0.0, 0.0);
 
     envelope_1.sustain_value.set_value(0.6);
     envelope_2.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    follower.update_envelope(7.0, midi_channel);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3634,10 +3853,10 @@ TEST(when_lfos_with_envelopes_are_chained_with_cyclical_dependency_then_only_the
     envelope.release_time.set_value(2.0);
     envelope.final_value.set_value(0.2);
 
-    follower.start_envelope(1.0, 0.0, 0.0);
+    follower.start_envelope(1.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     envelope.sustain_value.set_value(0.6);
-    follower.update_envelope(7.0);
+    follower.update_envelope(7.0, PARAM_DEFAULT_MPE_CHANNEL);
 
     follower.end_envelope(8.0);
     follower.cancel_envelope(9.0, 0.5);
@@ -3784,7 +4003,7 @@ TEST(a_float_param_may_use_logarithmic_scale, {
     );
     assert_eq(max, follower.ratio_to_value(1.0), DOUBLE_DELTA);
 
-    follower.start_envelope(0.0, 0.0, 0.0);
+    follower.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     follower.end_envelope(12.0 / sample_rate);
 
     assert_float_param_changes_during_rendering(
@@ -3809,7 +4028,7 @@ void assert_decay_status(
     Integer const block_size = float_param.get_block_size();
 
     float_param.set_sample_rate(10.0);
-    float_param.start_envelope(0.0, 0.0, 0.0);
+    float_param.start_envelope(0.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
 
     if (sample_count > 9) {
         float_param.end_envelope(0.9);
@@ -4267,7 +4486,7 @@ TEST(modulation_level_may_be_automated_with_envelope, {
     modulatable_float_param.set_sample_rate(sample_rate);
 
     modulatable_float_param.set_value(param_value);
-    modulatable_float_param.start_envelope(6.0, 0.0, 0.0);
+    modulatable_float_param.start_envelope(6.0, PARAM_DEFAULT_MPE_CHANNEL, 0.0, 0.0);
     assert_eq(3.0, modulatable_float_param.end_envelope(12.0), DOUBLE_DELTA);
 
     assert_eq(

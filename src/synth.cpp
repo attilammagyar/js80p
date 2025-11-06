@@ -1305,9 +1305,6 @@ void Synth::trigger_note_on_voice(
     modulator.update_inaccuracy(cached_round);
     carrier.update_inaccuracy(cached_round);
 
-    modulator.set_mpe_channel(mpe_channel);
-    carrier.set_mpe_channel(mpe_channel);
-
     if (mode == MODE_MIX_AND_MOD) {
         if constexpr (retrigger) {
             modulator.retrigger(
@@ -1315,6 +1312,7 @@ void Synth::trigger_note_on_voice(
                 next_note_id,
                 note,
                 channel,
+                mpe_channel,
                 velocity,
                 previous_note,
                 should_sync_oscillator_inaccuracy
@@ -1324,6 +1322,7 @@ void Synth::trigger_note_on_voice(
                 next_note_id,
                 note,
                 channel,
+                mpe_channel,
                 velocity,
                 previous_note,
                 should_sync_oscillator_inaccuracy
@@ -1334,6 +1333,7 @@ void Synth::trigger_note_on_voice(
                 next_note_id,
                 note,
                 channel,
+                mpe_channel,
                 velocity,
                 previous_note,
                 should_sync_oscillator_inaccuracy
@@ -1343,6 +1343,7 @@ void Synth::trigger_note_on_voice(
                 next_note_id,
                 note,
                 channel,
+                mpe_channel,
                 velocity,
                 previous_note,
                 should_sync_oscillator_inaccuracy
@@ -1356,6 +1357,7 @@ void Synth::trigger_note_on_voice(
                     next_note_id,
                     note,
                     channel,
+                    mpe_channel,
                     velocity,
                     previous_note,
                     should_sync_oscillator_inaccuracy
@@ -1366,6 +1368,7 @@ void Synth::trigger_note_on_voice(
                     next_note_id,
                     note,
                     channel,
+                    mpe_channel,
                     velocity,
                     previous_note,
                     should_sync_oscillator_inaccuracy
@@ -1378,6 +1381,7 @@ void Synth::trigger_note_on_voice(
                     next_note_id,
                     note,
                     channel,
+                    mpe_channel,
                     velocity,
                     previous_note,
                     should_sync_oscillator_inaccuracy
@@ -1388,6 +1392,7 @@ void Synth::trigger_note_on_voice(
                     next_note_id,
                     note,
                     channel,
+                    mpe_channel,
                     velocity,
                     previous_note,
                     should_sync_oscillator_inaccuracy
@@ -1517,19 +1522,17 @@ void Synth::trigger_note_on_voice_monophonic(
         Number const velocity,
         bool const should_sync_oscillator_inaccuracy
 ) noexcept {
-    voice.set_mpe_channel(mpe_channel);
-
     if (is_off) {
         voice.note_on(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     } else if (voice.is_released()) {
         voice.retrigger(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     } else {
         voice.glide_to(
-            time_offset, next_note_id, note, channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
         );
     }
 }

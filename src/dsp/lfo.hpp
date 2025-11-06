@@ -86,6 +86,11 @@ class LFO : public SignalProducer
 
         void collect_envelopes(LFOEnvelopeList& envelope_list) noexcept;
 
+        void schedule_params_mpe_ctl_sync(
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
+
         void produce_with_envelope(
             LFOEnvelopeStates& lfo_envelope_states,
             Midi::Channel const midi_channel,
@@ -195,6 +200,26 @@ class LFO : public SignalProducer
 
             private:
                 LFOEnvelopeList* envelope_list;
+        };
+
+        class ParamCtlSyncScheduler : public Visitor
+        {
+            public:
+                ParamCtlSyncScheduler(
+                    Seconds const time_offset,
+                    Midi::Channel const midi_channel
+                ) noexcept;
+
+                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+
+            private:
+                void schedule_ctl_value_sync(
+                    FloatParamS& param,
+                    Midi::Channel const midi_channel
+                ) const noexcept;
+
+                Seconds const time_offset;
+                Midi::Channel const midi_channel;
         };
 
         class LFOWithEnvelopeRenderer : public Visitor

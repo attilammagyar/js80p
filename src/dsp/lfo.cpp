@@ -290,6 +290,22 @@ void LFO::collect_envelopes(LFOEnvelopeList& envelope_list) noexcept
 }
 
 
+void LFO::schedule_params_mpe_ctl_sync(
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
+) noexcept {
+    ParamCtlSyncScheduler scheduler(time_offset, midi_channel);
+    Byte depth = 0;
+
+    if (!should_visit_lfo_as_polyphonic<ParamCtlSyncScheduler>(*this, depth, scheduler)) {
+        return;
+    }
+
+    traverse_lfo_graph<ParamCtlSyncScheduler>(*this, depth, scheduler);
+}
+
+
+
 template<class VisitorClass>
 void LFO::traverse_lfo_graph(
         LFO& lfo,
@@ -457,6 +473,39 @@ void LFO::EnvelopeCollector::visit_lfo_as_polyphonic(
         Byte const depth
 ) noexcept {
     (*envelope_list)[depth] = lfo.amplitude_envelope.get_value();
+}
+
+
+LFO::ParamCtlSyncScheduler::ParamCtlSyncScheduler(
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
+) noexcept
+    : time_offset(time_offset),
+    midi_channel(midi_channel)
+{
+}
+
+
+void LFO::ParamCtlSyncScheduler::visit_lfo_as_polyphonic(
+        LFO& lfo,
+        Byte const depth
+) noexcept {
+    schedule_ctl_value_sync(*lfo.frequency_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.phase_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.min_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.max_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.amplitude_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.distortion_mpe[midi_channel], midi_channel);
+    schedule_ctl_value_sync(*lfo.randomness_mpe[midi_channel], midi_channel);
+}
+
+
+void LFO::ParamCtlSyncScheduler::schedule_ctl_value_sync(
+        FloatParamS& param,
+        Midi::Channel const midi_channel
+) const noexcept {
+    param.cancel_events_at(time_offset);
+    param.schedule_ctl_value_sync(time_offset, midi_channel);
 }
 
 

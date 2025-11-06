@@ -99,6 +99,10 @@ class Param : public SignalProducer
          */
         void set_midi_channel(Midi::Channel const midi_channel) noexcept;
 
+#ifdef JS80P_ASSERTIONS
+        Midi::Channel get_midi_channel() const noexcept;
+#endif
+
         void set_macro(Macro* const macro) noexcept;
         Macro* get_macro() const noexcept;
 
@@ -465,13 +469,22 @@ class FloatParam : public Param<Number, evaluation>
 
         void start_envelope(
             Seconds const time_offset,
+            Midi::Channel const midi_channel,
             Number const random_1,
             Number const random_2
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;
-        void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
-        void update_envelope(Seconds const time_offset) noexcept;
+
+        void cancel_envelope(
+            Seconds const time_offset,
+            Seconds const duration
+        ) noexcept;
+
+        void update_envelope(
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
 
         bool has_envelope_decayed() const noexcept;
 
@@ -481,6 +494,11 @@ class FloatParam : public Param<Number, evaluation>
         virtual void reset() noexcept override;
 
         void sync_ctl_value() noexcept;
+
+        void schedule_ctl_value_sync(
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -625,7 +643,9 @@ class FloatParam : public Param<Number, evaluation>
 
         void store_envelope_value_at_event(Seconds const latency) noexcept;
 
-        void handle_sync_ctl_value_event() noexcept;
+        void handle_sync_ctl_value_event(
+            SignalProducer::Event const& event
+        ) noexcept;
 
         bool is_affected_by_different_midi_channel_than_leader() const noexcept;
         bool is_following_leader() const noexcept;
@@ -641,7 +661,10 @@ class FloatParam : public Param<Number, evaluation>
             MidiController const& midi_controller
         ) noexcept;
 
-        bool is_sync_ctl_value_event_scheduled() const noexcept;
+        bool is_sync_ctl_value_event_scheduled(
+            Seconds& time_offset,
+            Midi::Channel& midi_channel
+        ) const noexcept;
 
         void process_macro(
             Macro& macro,
@@ -665,7 +688,8 @@ class FloatParam : public Param<Number, evaluation>
 
         Integer make_envelope_snapshot(
             Envelope& envelope,
-            Byte const envelope_index
+            Byte const envelope_index,
+            Midi::Channel const midi_channel
         ) noexcept;
 
         void render_with_lfo(
@@ -700,6 +724,7 @@ class FloatParam : public Param<Number, evaluation>
         void start_envelope(
             Envelope& envelope,
             Seconds const time_offset,
+            Midi::Channel const midi_channel,
             Number const random_1,
             Number const random_2
         ) noexcept;
@@ -707,6 +732,7 @@ class FloatParam : public Param<Number, evaluation>
         void start_lfo_envelope(
             LFO& lfo,
             Seconds const time_offset,
+            Midi::Channel const midi_channel,
             Number const random_1,
             Number const random_2
         ) noexcept;
@@ -724,8 +750,16 @@ class FloatParam : public Param<Number, evaluation>
             Seconds const duration = 0.0
         ) noexcept;
 
-        void update_envelope(Envelope& envelope, Seconds const time_offset) noexcept;
-        void update_lfo_envelope(Seconds const time_offset) noexcept;
+        void update_envelope(
+            Envelope& envelope,
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
+
+        void update_lfo_envelope(
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
 
         void update_envelope_release_if_not_static(
             Envelope& envelope,
@@ -798,19 +832,31 @@ class ModulatableFloatParam : public FloatParamS
             Integer const round, Integer const sample_count
         ) noexcept;
 
-        void skip_round(Integer const round, Integer const sample_count) noexcept;
+        void skip_round(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
 
         void set_random_seed(Number const seed) noexcept;
 
         void start_envelope(
             Seconds const time_offset,
+            Midi::Channel const midi_channel,
             Number const random_1,
             Number const random_2
         ) noexcept;
 
         Seconds end_envelope(Seconds const time_offset) noexcept;
-        void cancel_envelope(Seconds const time_offset, Seconds const duration) noexcept;
-        void update_envelope(Seconds const time_offset) noexcept;
+
+        void cancel_envelope(
+            Seconds const time_offset,
+            Seconds const duration
+        ) noexcept;
+
+        void update_envelope(
+            Seconds const time_offset,
+            Midi::Channel const midi_channel
+        ) noexcept;
 
         void set_midi_channel(Midi::Channel const midi_channel) noexcept;
 

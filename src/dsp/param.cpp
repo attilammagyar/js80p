@@ -265,15 +265,17 @@ MidiController* Param<NumberType, evaluation>::get_midi_controller() const noexc
 template<typename NumberType, ParamEvaluation evaluation>
 void Param<NumberType, evaluation>::set_midi_channel(Midi::Channel const midi_channel) noexcept
 {
-    if (midi_channel_rw == midi_channel) {
-        return;
-    }
-
-    this->cached_round = -1;
-    this->cached_buffer = NULL;
-
     midi_channel_rw = midi_channel;
 }
+
+
+#ifdef JS80P_ASSERTIONS
+template<typename NumberType, ParamEvaluation evaluation>
+Midi::Channel Param<NumberType, evaluation>::get_midi_channel() const noexcept
+{
+    return midi_channel;
+}
+#endif
 
 
 template<typename NumberType, ParamEvaluation evaluation>
@@ -683,13 +685,28 @@ bool FloatParam<evaluation>::is_polyphonic() const noexcept
 template<ParamEvaluation evaluation>
 bool FloatParam<evaluation>::is_affected_by_different_midi_channel_than_leader() const noexcept
 {
-    return (
-        this->midi_channel != leader->midi_channel
-        && (
-            leader->get_midi_controller() != NULL
-            || leader->get_macro() != NULL
-        )
-    );
+    if (leader->get_midi_controller() == NULL && leader->get_macro() == NULL) {
+        return false;
+    }
+
+    Midi::Channel const leader_midi_channel = leader->midi_channel;
+
+    if (this->midi_channel != leader_midi_channel) {
+        return true;
+    }
+
+    for (Queue<SignalProducer::Event>::SizeType i = 0; i != this->events.length(); ++i) {
+        SignalProducer::Event const& event = this->events[i];
+
+        if (
+                event.type == EVT_SYNC_CTL_VALUE
+                && leader_midi_channel != (Midi::Channel)event.byte_param_1
+        ) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -1198,7 +1215,7 @@ void FloatParam<evaluation>::handle_event(
             break;
 
         case EVT_SYNC_CTL_VALUE:
-            handle_sync_ctl_value_event();
+            handle_sync_ctl_value_event(event);
             break;
 
         default:
@@ -1727,10 +1744,30 @@ void FloatParam<evaluation>::handle_lfo_envelope_end_event(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::handle_sync_ctl_value_event() noexcept
-{
+void FloatParam<evaluation>::handle_sync_ctl_value_event(
+        SignalProducer::Event const& event
+) noexcept {
+    Midi::Channel const midi_channel = (Midi::Channel)event.byte_param_1;
+
+    this->set_midi_channel(midi_channel);
     sync_ctl_value();
     latest_event_type = EVT_SET_VALUE;
+}
+
+
+template<ParamEvaluation evaluation>
+void FloatParam<evaluation>::schedule_ctl_value_sync(
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
+) noexcept {
+    this->schedule(
+        EVT_SYNC_CTL_VALUE,
+        time_offset,
+        0,
+        0.0,
+        0.0,
+        (Byte)midi_channel
+    );
 }
 
 
@@ -1884,6 +1921,7 @@ Envelope* const* FloatParam<evaluation>::get_envelopes() const noexcept
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::start_envelope(
         Seconds const time_offset,
+        Midi::Channel const midi_channel,
         Number const random_1,
         Number const random_2
 ) noexcept {
@@ -1894,7 +1932,7 @@ void FloatParam<evaluation>::start_envelope(
     Envelope* const envelope = get_envelope();
 
     if (envelope != NULL) {
-        start_envelope(*envelope, time_offset, random_1, random_2);
+        start_envelope(*envelope, time_offset, midi_channel, random_1, random_2);
 
         return;
     }
@@ -1902,13 +1940,13 @@ void FloatParam<evaluation>::start_envelope(
     LFO* const lfo = get_lfo();
 
     if (lfo != NULL) {
-        start_lfo_envelope(*lfo, time_offset, random_1, random_2);
+        start_lfo_envelope(*lfo, time_offset, midi_channel, random_1, random_2);
     } else {
         envelope_state->lfo_has_envelope = false;
 
         if (get_midi_controller() != NULL || get_macro() != NULL) {
             this->cancel_events_after(time_offset);
-            this->schedule(EVT_SYNC_CTL_VALUE, time_offset, 0, 0.0, 0.0);
+            schedule_ctl_value_sync(time_offset, midi_channel);
         }
     }
 }
@@ -1918,6 +1956,7 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::start_envelope(
         Envelope& envelope,
         Seconds const time_offset,
+        Midi::Channel const midi_channel,
         Number const random_1,
         Number const random_2
 ) noexcept {
@@ -1927,7 +1966,7 @@ void FloatParam<evaluation>::start_envelope(
 
     envelope.update();
     Integer const snapshot_id = make_envelope_snapshot(
-        envelope, Constants::INVALID_ENVELOPE_INDEX
+        envelope, Constants::INVALID_ENVELOPE_INDEX, midi_channel
     );
 
     envelope_state->scheduled_snapshot_id = snapshot_id;
@@ -1935,6 +1974,7 @@ void FloatParam<evaluation>::start_envelope(
     envelope_state->lfo_has_envelope = false;
 
     this->cancel_events_after(time_offset);
+    schedule_ctl_value_sync(time_offset, midi_channel);
     this->schedule(EVT_ENVELOPE_START, time_offset, snapshot_id);
 }
 
@@ -1943,10 +1983,14 @@ template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::start_lfo_envelope(
         LFO& lfo,
         Seconds const time_offset,
+        Midi::Channel const midi_channel,
         Number const random_1,
         Number const random_2
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
+
+    this->cancel_events_after(time_offset);
+    schedule_ctl_value_sync(time_offset, midi_channel);
 
     if (!lfo.has_envelope()) {
         if (envelope_state->lfo_has_envelope) {
@@ -1961,13 +2005,12 @@ void FloatParam<evaluation>::start_lfo_envelope(
         return;
     }
 
-    this->cancel_events_after(time_offset);
-
     update_envelope_randoms(random_1, random_2);
 
     LFOEnvelopeList lfo_envelope_list;
 
     lfo.collect_envelopes(lfo_envelope_list);
+    lfo.schedule_params_mpe_ctl_sync(time_offset, midi_channel);
 
     this->schedule(EVT_LFO_ENVELOPE_RESET, time_offset);
 
@@ -1988,7 +2031,9 @@ void FloatParam<evaluation>::start_lfo_envelope(
         Envelope& envelope = *envelopes[envelope_index];
         envelope.update();
 
-        Integer const snapshot_id = make_envelope_snapshot(envelope, envelope_index);
+        Integer const snapshot_id = make_envelope_snapshot(
+            envelope, envelope_index, midi_channel
+        );
 
         this->schedule(
             EVT_LFO_ENVELOPE_START,
@@ -2021,7 +2066,8 @@ void FloatParam<evaluation>::start_lfo_envelope(
 template<ParamEvaluation evaluation>
 Integer FloatParam<evaluation>::make_envelope_snapshot(
         Envelope& envelope,
-        Byte const envelope_index
+        Byte const envelope_index,
+        Midi::Channel const midi_channel
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
@@ -2030,7 +2076,7 @@ Integer FloatParam<evaluation>::make_envelope_snapshot(
     envelope.make_snapshot(
         envelope_state->randoms,
         envelope_index,
-        this->midi_channel,
+        midi_channel,
         snapshot
     );
 
@@ -2252,8 +2298,10 @@ void FloatParam<evaluation>::cancel_envelope(
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
-{
+void FloatParam<evaluation>::update_envelope(
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
+) noexcept {
     if (envelope_state == NULL) {
         return;
     }
@@ -2261,13 +2309,13 @@ void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
     Envelope* const envelope = get_envelope();
 
     if (envelope != NULL) {
-        update_envelope(*envelope, time_offset);
+        update_envelope(*envelope, time_offset, midi_channel);
 
         return;
     }
 
     if (get_lfo() != NULL) {
-        update_lfo_envelope(time_offset);
+        update_lfo_envelope(time_offset, midi_channel);
     }
 }
 
@@ -2275,25 +2323,31 @@ void FloatParam<evaluation>::update_envelope(Seconds const time_offset) noexcept
 template<ParamEvaluation evaluation>
 void FloatParam<evaluation>::update_envelope(
         Envelope& envelope,
-        Seconds const time_offset
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
     envelope.update();
     Integer const snapshot_id = make_envelope_snapshot(
-        envelope, Constants::INVALID_ENVELOPE_INDEX
+        envelope, Constants::INVALID_ENVELOPE_INDEX, midi_channel
     );
 
     envelope_state->scheduled_snapshot_id = snapshot_id;
 
+    schedule_ctl_value_sync(time_offset, midi_channel);
     this->schedule(EVT_ENVELOPE_UPDATE, time_offset, snapshot_id);
 }
 
 
 template<ParamEvaluation evaluation>
-void FloatParam<evaluation>::update_lfo_envelope(Seconds const time_offset) noexcept
-{
+void FloatParam<evaluation>::update_lfo_envelope(
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
+) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
+
+    schedule_ctl_value_sync(time_offset, midi_channel);
 
     if (!envelope_state->lfo_has_envelope) {
         return;
@@ -2314,11 +2368,15 @@ void FloatParam<evaluation>::update_lfo_envelope(Seconds const time_offset) noex
 
         envelope.update();
 
-        Integer const snapshot_id = make_envelope_snapshot(envelope, envelope_index);
+        Integer const snapshot_id = make_envelope_snapshot(
+            envelope, envelope_index, midi_channel
+        );
 
         lfo_envelope_state.scheduled_snapshot_id = snapshot_id;
 
-        this->schedule(EVT_LFO_ENVELOPE_UPDATE, time_offset, snapshot_id, 0.0, 0.0, i);
+        this->schedule(
+            EVT_LFO_ENVELOPE_UPDATE, time_offset, snapshot_id, 0.0, 0.0, i
+        );
     }
 }
 
@@ -2528,13 +2586,13 @@ void FloatParam<evaluation>::process_midi_controller_events(
         return;
     }
 
-    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled();
+    Seconds ctl_sync_event_time_offset;
+    Midi::Channel ctl_sync_event_midi_channel;
+    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled(
+        ctl_sync_event_time_offset, ctl_sync_event_midi_channel
+    );
 
     this->cancel_events_at(ctl_events[0].time_offset);
-
-    if (needs_sync_ctl_value_event) {
-        this->schedule(EVT_SYNC_CTL_VALUE, ctl_events[0].time_offset, 0, 0.0, 0.0);
-    }
 
     if (should_round) {
         for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
@@ -2547,60 +2605,77 @@ void FloatParam<evaluation>::process_midi_controller_events(
                 schedule_value(time_offset, ratio_to_value_raw(controller_value));
             }
         }
+    } else {
+        Queue<SignalProducer::Event>::SizeType const last_ctl_event_index = (
+            number_of_ctl_events - 1
+        );
 
-        return;
+        Seconds previous_time_offset = 0.0;
+        Number previous_ratio = value_to_ratio(this->get_raw_value());
+
+        for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
+            Seconds time_offset = ctl_events[i].time_offset;
+
+            while (i != last_ctl_event_index) {
+                ++i;
+
+                Seconds const delta = std::fabs(ctl_events[i].time_offset - time_offset);
+
+                if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
+                    --i;
+                    break;
+                }
+            }
+
+            time_offset = ctl_events[i].time_offset;
+
+            Number const controller_value = ctl_events[i].number_param_1;
+            Seconds const duration = smooth_change_duration(
+                previous_ratio,
+                controller_value,
+                time_offset - previous_time_offset
+            );
+            previous_ratio = controller_value;
+
+            if constexpr (is_logarithmic_) {
+                schedule_linear_ramp(duration, ratio_to_value_log(controller_value));
+            } else {
+                schedule_linear_ramp(duration, ratio_to_value_raw(controller_value));
+            }
+
+            previous_time_offset = time_offset;
+        }
     }
 
-    Queue<SignalProducer::Event>::SizeType const last_ctl_event_index = (
-        number_of_ctl_events - 1
-    );
+    if (needs_sync_ctl_value_event) {
+        ctl_sync_event_time_offset -= this->current_time;
 
-    Seconds previous_time_offset = 0.0;
-    Number previous_ratio = value_to_ratio(this->get_raw_value());
-
-    for (Queue<SignalProducer::Event>::SizeType i = 0; i != number_of_ctl_events; ++i) {
-        Seconds time_offset = ctl_events[i].time_offset;
-
-        while (i != last_ctl_event_index) {
-            ++i;
-
-            Seconds const delta = std::fabs(ctl_events[i].time_offset - time_offset);
-
-            if (delta >= MIDI_CTL_SMALL_CHANGE_DURATION) {
-                --i;
-                break;
-            }
-        }
-
-        time_offset = ctl_events[i].time_offset;
-
-        Number const controller_value = ctl_events[i].number_param_1;
-        Seconds const duration = smooth_change_duration(
-            previous_ratio,
-            controller_value,
-            time_offset - previous_time_offset
+        this->cancel_events_at(ctl_sync_event_time_offset);
+        schedule_ctl_value_sync(
+            ctl_sync_event_time_offset, ctl_sync_event_midi_channel
         );
-        previous_ratio = controller_value;
-
-        if constexpr (is_logarithmic_) {
-            schedule_linear_ramp(duration, ratio_to_value_log(controller_value));
-        } else {
-            schedule_linear_ramp(duration, ratio_to_value_raw(controller_value));
-        }
-
-        previous_time_offset = time_offset;
     }
 }
 
 
 template<ParamEvaluation evaluation>
-bool FloatParam<evaluation>::is_sync_ctl_value_event_scheduled() const noexcept
-{
+bool FloatParam<evaluation>::is_sync_ctl_value_event_scheduled(
+        Seconds& time_offset,
+        Midi::Channel& midi_channel
+) const noexcept {
     for (Queue<SignalProducer::Event>::SizeType i = 0; i != this->events.length(); ++i) {
-        if (this->events[i].type == EVT_SYNC_CTL_VALUE) {
+        SignalProducer::Event const& event = this->events[i];
+
+        if (event.type == EVT_SYNC_CTL_VALUE) {
+            time_offset = event.time_offset;
+            midi_channel = (Midi::Channel)event.byte_param_1;
+
             return true;
         }
     }
+
+    time_offset = 0.0;
+    midi_channel = PARAM_DEFAULT_MPE_CHANNEL;
 
     return false;
 }
@@ -2632,12 +2707,21 @@ void FloatParam<evaluation>::process_macro(
         return;
     }
 
-    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled();
+    Seconds ctl_sync_event_time_offset;
+    Midi::Channel ctl_sync_event_midi_channel;
+    bool needs_sync_ctl_value_event = is_sync_ctl_value_event_scheduled(
+        ctl_sync_event_time_offset, ctl_sync_event_midi_channel
+    );
 
     this->cancel_events_at(0.0);
 
     if (needs_sync_ctl_value_event) {
-        this->schedule(EVT_SYNC_CTL_VALUE, 0.0, 0, 0.0, 0.0);
+        schedule_ctl_value_sync(
+            ctl_sync_event_time_offset - this->current_time,
+            ctl_sync_event_midi_channel
+        );
+
+        return;
     }
 
     Seconds const duration = smooth_change_duration(
@@ -3213,12 +3297,13 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::set_random_seed(
 template<class ModulatorSignalProducerClass>
 void ModulatableFloatParam<ModulatorSignalProducerClass>::start_envelope(
         Seconds const time_offset,
+        Midi::Channel const midi_channel,
         Number const random_1,
         Number const random_2
 ) noexcept {
-    FloatParamS::start_envelope(time_offset, random_1, random_2);
+    FloatParamS::start_envelope(time_offset, midi_channel, random_1, random_2);
 
-    modulation_level.start_envelope(time_offset, random_2, random_1);
+    modulation_level.start_envelope(time_offset, midi_channel, random_2, random_1);
 }
 
 
@@ -3249,11 +3334,12 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::cancel_envelope(
 
 template<class ModulatorSignalProducerClass>
 void ModulatableFloatParam<ModulatorSignalProducerClass>::update_envelope(
-        Seconds const time_offset
+        Seconds const time_offset,
+        Midi::Channel const midi_channel
 ) noexcept {
-    FloatParamS::update_envelope(time_offset);
+    FloatParamS::update_envelope(time_offset, midi_channel);
 
-    modulation_level.update_envelope(time_offset);
+    modulation_level.update_envelope(time_offset, midi_channel);
 }
 
 

@@ -736,6 +736,7 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         Integer const note_id,
         Midi::Note const note,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Number const velocity,
         Midi::Note const previous_note,
         bool const should_sync_oscillator_inaccuracy
@@ -770,17 +771,17 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     oscillator.cancel_events_at(time_offset);
 
     if constexpr (IS_MODULATOR) {
-        additive_volume.start_envelope(time_offset, random_1, random_2);
+        additive_volume.start_envelope(time_offset, mpe_channel, random_1, random_2);
     }
 
-    wavefolder.folding.start_envelope(time_offset, random_1, random_2);
+    wavefolder.folding.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     if constexpr (IS_CARRIER) {
-        distortion.level.start_envelope(time_offset, random_1, random_2);
+        distortion.level.start_envelope(time_offset, mpe_channel, random_1, random_2);
     }
 
-    panning.start_envelope(time_offset, random_1, random_2);
-    volume.start_envelope(time_offset, random_1, random_2);
+    panning.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    volume.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     if (should_sync_oscillator_inaccuracy) {
         set_up_oscillator_frequency<true>(
@@ -796,25 +797,25 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.start_envelope(time_offset, random_1, random_2);
-    oscillator.amplitude.start_envelope(time_offset, random_1, random_2);
+    oscillator.modulated_amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.start_envelope(time_offset, random_1, random_2);
+        oscillator.subharmonic_amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
     }
 
-    oscillator.frequency.start_envelope(time_offset, random_1, random_2);
-    oscillator.phase.start_envelope(time_offset, random_1, random_2);
+    oscillator.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.phase.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
-    oscillator.fine_detune.start_envelope(time_offset, random_1, random_2);
+    oscillator.fine_detune.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
-    filter_1.frequency.start_envelope(time_offset, random_1, random_2);
-    filter_1.q.start_envelope(time_offset, random_1, random_2);
-    filter_1.gain.start_envelope(time_offset, random_1, random_2);
+    filter_1.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_1.q.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_1.gain.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
-    filter_2.frequency.start_envelope(time_offset, random_1, random_2);
-    filter_2.q.start_envelope(time_offset, random_1, random_2);
-    filter_2.gain.start_envelope(time_offset, random_1, random_2);
+    filter_2.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_2.q.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_2.gain.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     oscillator.start(time_offset);
 }
@@ -842,45 +843,6 @@ void Voice<ModulatorSignalProducerClass>::update_inaccuracy(Integer const round)
     oscillator_inaccuracy = OscillatorInaccuracy::calculate_new_inaccuracy(oscillator_inaccuracy);
 
     synced_oscillator_inaccuracy.update(round);
-}
-
-
-template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::set_mpe_channel(
-        Midi::Channel const mpe_channel
-) noexcept {
-    if constexpr (IS_MODULATOR) {
-        additive_volume.set_midi_channel(mpe_channel);
-    }
-
-    wavefolder.folding.set_midi_channel(mpe_channel);
-
-    if constexpr (IS_CARRIER) {
-        distortion.level.set_midi_channel(mpe_channel);
-    }
-
-    panning.set_midi_channel(mpe_channel);
-    volume.set_midi_channel(mpe_channel);
-
-    oscillator.modulated_amplitude.set_midi_channel(mpe_channel);
-    oscillator.amplitude.set_midi_channel(mpe_channel);
-
-    if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.set_midi_channel(mpe_channel);
-    }
-
-    oscillator.frequency.set_midi_channel(mpe_channel);
-    oscillator.phase.set_midi_channel(mpe_channel);
-
-    oscillator.fine_detune.set_midi_channel(mpe_channel);
-
-    filter_1.frequency.set_midi_channel(mpe_channel);
-    filter_1.q.set_midi_channel(mpe_channel);
-    filter_1.gain.set_midi_channel(mpe_channel);
-
-    filter_2.frequency.set_midi_channel(mpe_channel);
-    filter_2.q.set_midi_channel(mpe_channel);
-    filter_2.gain.set_midi_channel(mpe_channel);
 }
 
 
@@ -1008,6 +970,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         Integer const note_id,
         Midi::Note const note,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Number const velocity,
         Midi::Note const previous_note,
         bool const should_sync_oscillator_inaccuracy
@@ -1022,6 +985,7 @@ void Voice<ModulatorSignalProducerClass>::retrigger(
         note_id,
         note,
         channel,
+        mpe_channel,
         velocity,
         previous_note,
         should_sync_oscillator_inaccuracy
@@ -1035,6 +999,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         Integer const note_id,
         Midi::Note const note,
         Midi::Channel const channel,
+        Midi::Channel const mpe_channel,
         Number const velocity,
         Midi::Note const previous_note,
         bool const should_sync_oscillator_inaccuracy
@@ -1051,6 +1016,7 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
             note_id,
             note,
             channel,
+            mpe_channel,
             velocity,
             previous_note,
             should_sync_oscillator_inaccuracy
@@ -1062,41 +1028,41 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     save_note_info(note_id, note, channel, velocity);
 
     if constexpr (IS_MODULATOR) {
-        additive_volume.update_envelope(time_offset);
+        additive_volume.update_envelope(time_offset, mpe_channel);
     }
 
-    wavefolder.folding.update_envelope(time_offset);
+    wavefolder.folding.update_envelope(time_offset, mpe_channel);
 
     if constexpr (IS_CARRIER) {
-        distortion.level.update_envelope(time_offset);
+        distortion.level.update_envelope(time_offset, mpe_channel);
     }
 
-    panning.update_envelope(time_offset);
-    volume.update_envelope(time_offset);
+    panning.update_envelope(time_offset, mpe_channel);
+    volume.update_envelope(time_offset, mpe_channel);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.update_envelope(time_offset);
-    oscillator.amplitude.update_envelope(time_offset);
+    oscillator.modulated_amplitude.update_envelope(time_offset, mpe_channel);
+    oscillator.amplitude.update_envelope(time_offset, mpe_channel);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.update_envelope(time_offset);
+        oscillator.subharmonic_amplitude.update_envelope(time_offset, mpe_channel);
     }
 
-    oscillator.frequency.update_envelope(time_offset);
-    oscillator.phase.update_envelope(time_offset);
+    oscillator.frequency.update_envelope(time_offset, mpe_channel);
+    oscillator.phase.update_envelope(time_offset, mpe_channel);
 
-    oscillator.fine_detune.update_envelope(time_offset);
+    oscillator.fine_detune.update_envelope(time_offset, mpe_channel);
 
-    filter_1.frequency.update_envelope(time_offset);
-    filter_1.q.update_envelope(time_offset);
-    filter_1.gain.update_envelope(time_offset);
+    filter_1.frequency.update_envelope(time_offset, mpe_channel);
+    filter_1.q.update_envelope(time_offset, mpe_channel);
+    filter_1.gain.update_envelope(time_offset, mpe_channel);
 
-    filter_2.frequency.update_envelope(time_offset);
-    filter_2.q.update_envelope(time_offset);
-    filter_2.gain.update_envelope(time_offset);
+    filter_2.frequency.update_envelope(time_offset, mpe_channel);
+    filter_2.q.update_envelope(time_offset, mpe_channel);
+    filter_2.gain.update_envelope(time_offset, mpe_channel);
 
     note_velocity.cancel_events_at(time_offset);
     note_panning.cancel_events_at(time_offset);
