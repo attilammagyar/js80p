@@ -695,6 +695,11 @@ bool FloatParam<evaluation>::is_affected_by_different_midi_channel_than_leader()
         return true;
     }
 
+    /*
+    Though this takes O(n) steps, the number of pending events is almost always
+    expected to be less than 3-5.
+    */
+
     for (Queue<SignalProducer::Event>::SizeType i = 0; i != this->events.length(); ++i) {
         SignalProducer::Event const& event = this->events[i];
 
@@ -2663,6 +2668,11 @@ bool FloatParam<evaluation>::is_sync_ctl_value_event_scheduled(
         Seconds& time_offset,
         Midi::Channel& midi_channel
 ) const noexcept {
+    /*
+    Though this takes O(n) steps, the number of pending events is almost always
+    expected to be less than 3-5.
+    */
+
     for (Queue<SignalProducer::Event>::SizeType i = 0; i != this->events.length(); ++i) {
         SignalProducer::Event const& event = this->events[i];
 

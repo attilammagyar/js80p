@@ -395,6 +395,12 @@ void SignalProducer::cancel_events() noexcept
 
 void SignalProducer::cancel_events_at(Seconds const time_offset) noexcept
 {
+    /*
+    Though the events are supposed to be ordered by time offset, we search
+    linearly, because the number of pending events is almost always expected to
+    be less than 3-5.
+    */
+
     Seconds const time = time_offset + current_time;
 
     for (Queue<Event>::SizeType i = 0, l = events.length(); i != l; ++i) {
@@ -410,6 +416,12 @@ void SignalProducer::cancel_events_at(Seconds const time_offset) noexcept
 
 void SignalProducer::cancel_events_after(Seconds const time_offset) noexcept
 {
+    /*
+    Though the events are supposed to be ordered by time offset, we search
+    linearly, because the number of pending events is almost always expected to
+    be less than 3-5.
+    */
+
     Seconds const time = time_offset + current_time;
 
     for (Queue<Event>::SizeType i = 0, l = events.length(); i != l; ++i) {
