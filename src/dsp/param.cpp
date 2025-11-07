@@ -1946,13 +1946,15 @@ void FloatParam<evaluation>::start_envelope(
 
     if (lfo != NULL) {
         start_lfo_envelope(*lfo, time_offset, midi_channel, random_1, random_2);
-    } else {
-        envelope_state->lfo_has_envelope = false;
 
-        if (get_midi_controller() != NULL || get_macro() != NULL) {
-            this->cancel_events_after(time_offset);
-            schedule_ctl_value_sync(time_offset, midi_channel);
-        }
+        return;
+    }
+
+    envelope_state->lfo_has_envelope = false;
+
+    if (get_midi_controller() != NULL || get_macro() != NULL) {
+        this->cancel_events_after(time_offset);
+        schedule_ctl_value_sync(time_offset, midi_channel);
     }
 }
 
