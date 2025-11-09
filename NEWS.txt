@@ -1,6 +1,6 @@
-v3.5.0 (2025-??-??)
+v3.5.0 (2025-11-09)
  * MIDI Polyphonic Expression (MPE) is now supported.
- * Improved abbreviated program names.
+ * Improved program name abbreviations.
  * New presets:
     * Analog Brass AT MPE, Analog Brass mod MPE, Expressive Saw MPE:
       MPE-friendly versions of the respective presets,
