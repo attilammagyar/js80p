@@ -248,7 +248,8 @@ compatible systems, like most desktop PCs and laptops.
 If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
 and you use a 64 bit plugin host application (also known as "`x86_64`"), then
 you should download a JS80P package that is optimized for AVX compatible
-processors. If you have an older computer, or if you experience crashes, then
+processors. If you have an older computer, or if you get error messages
+complaining about "illegal instructions" or experience crashes, then
 you should go with one of the [SSE2](https://en.wikipedia.org/wiki/SSE2)
 compatible JS80P packages.
 

@@ -71,8 +71,9 @@ compatible systems, like most desktop PCs and laptops.
 If your CPU supports AVX instructions and you use a 64 bit plugin host
 application (also known as "x86_64"), then you should download a JS80P package
 that is optimized for AVX compatible processors. If you have an older computer,
-or if you experience crashes, then you should go with one of the
-SSE2 compatible JS80P packages.
+or if you get error messages complaining about "illegal instructions" or
+experience crashes, then you should go with one of the SSE2 compatible JS80P
+packages.
 
 If you are using an older VST 3 host, or if you are running a 32 bit (also
 known as "i686" or "x86") VST 3 host on a 64 bit Linux system, then it might
