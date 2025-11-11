@@ -649,12 +649,6 @@ void Widget::release_captured_mouse()
 }
 
 
-GUI::PlatformWidget Widget::get_platform_widget() const
-{
-    return platform_widget;
-}
-
-
 void ImportPatchButton::click()
 {
     Widget::Text filter(FILTER_STR);

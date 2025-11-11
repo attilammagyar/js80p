@@ -163,8 +163,6 @@ class Widget : public WidgetBase
         void capture_mouse();
         void release_captured_mouse();
 
-        GUI::PlatformWidget get_platform_widget() const;
-
         Text class_name;
         Text text_text;
         DWORD dwStyle;
