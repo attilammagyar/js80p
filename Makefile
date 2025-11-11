@@ -380,6 +380,7 @@ VST3_CXXFLAGS = \
 	-DJS80P_VST3_GUI_PLATFORM=$(VST3_GUI_PLATFORM) \
 	$(JS80P_CXXFLAGS) \
 	-Wno-class-memaccess \
+	-Wno-error=deprecated-declarations \
 	-Wno-format \
 	-Wno-multichar \
 	-Wno-parentheses \
