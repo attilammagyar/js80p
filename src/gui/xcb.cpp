@@ -637,6 +637,9 @@ void XcbPlatform::start_file_selector_dialog(
     if (pid == -1) {
         clear_active_file_selector_dialog_data();
 
+        free_file_selector_vars(argv);
+        free_file_selector_vars(env);
+
         return;
     }
 
@@ -649,17 +652,8 @@ void XcbPlatform::start_file_selector_dialog(
         active_file_selector_dialog_pipe->close_write_fd();
         active_file_selector_dialog_pid = pid;
 
-        for (std::vector<char*>::iterator it = argv.begin(); it != argv.end(); ++it) {
-            if (*it != NULL) {
-                delete[] *it;
-            }
-        }
-
-        for (std::vector<char*>::iterator it = env.begin(); it != env.end(); ++it) {
-            if (*it != NULL) {
-                delete[] *it;
-            }
-        }
+        free_file_selector_vars(argv);
+        free_file_selector_vars(env);
     }
 }
 
@@ -720,6 +714,16 @@ void XcbPlatform::build_file_selector_env(std::vector<char*>& env) const
     }
 
     env.push_back(NULL);
+}
+
+
+void XcbPlatform::free_file_selector_vars(std::vector<char*>& vars) const
+{
+    for (std::vector<char*>::iterator it = vars.begin(); it != vars.end(); ++it) {
+        if (*it != NULL) {
+            delete[] *it;
+        }
+    }
 }
 
 

@@ -134,6 +134,8 @@ class XcbPlatform
 
         void build_file_selector_env(std::vector<char*>& env) const;
 
+        void free_file_selector_vars(std::vector<char*>& argv) const;
+
         void run_file_selector_child_process(
             std::vector<char*> const& argv,
             std::vector<char*> const& env,
