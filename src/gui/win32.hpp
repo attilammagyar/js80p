@@ -86,6 +86,7 @@ class Widget : public WidgetBase
                 std::string text;
                 WCHAR* wtext;
                 char* ctext;
+                size_t capacity;
         };
 
         static std::string const FILTER_STR;

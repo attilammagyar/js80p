@@ -57,13 +57,13 @@ std::string const Widget::FILTER_STR(
 UINT_PTR Widget::next_timer_id = 0x4a533830;
 
 
-Widget::Text::Text() : wtext(NULL), ctext(NULL)
+Widget::Text::Text() : wtext(NULL), ctext(NULL), capacity(0)
 {
     set("");
 }
 
 
-Widget::Text::Text(std::string const& text) : wtext(NULL), ctext(NULL)
+Widget::Text::Text(std::string const& text) : wtext(NULL), ctext(NULL), capacity(0)
 {
     set(text);
 }
@@ -86,40 +86,67 @@ void Widget::Text::free_buffers()
         delete[] wtext;
         wtext = NULL;
     }
+
+    capacity = 0;
 }
 
 
 void Widget::Text::set(std::string const& text)
 {
     size_t const length = (size_t)text.length();
-    size_t const size = length + 1;
+
+    /*
+    Align to 16 byte chunks so that we don't allocate too much bigger buffers
+    than we need, but also avoid reallocation for slightly longer strings.
+
+    Also make sure that we leave room for the terminating zero, e.g. if the
+    new text is 16 bytes long, then we will allocate 32 bytes.
+
+    Maybe we should just go with std::basic_string<WHCAR> instead?
+    */
+    size_t const required_capacity = std::max(
+        (length + 16) & ~size_t(15),
+        size_t(16)
+    );
 
     this->text = text;
 
-    free_buffers();
+    if (required_capacity > capacity) {
+        free_buffers();
 
-    ctext = new char[size];
-    strncpy(ctext, text.c_str(), size);
-    ctext[length] = 0;
+        ctext = new char[required_capacity];
 
 #ifdef UNICODE
-    wtext = new WCHAR[size];
+        wtext = new WCHAR[required_capacity];
+#endif
+
+        capacity = required_capacity;
+    }
+
 
     if (length == 0) {
+        ctext[0] = 0;
+
+#ifdef UNICODE
         wtext[0] = 0;
+#endif
     } else {
+        strncpy(ctext, text.c_str(), capacity);
+        ctext[length] = 0;
+
+#ifdef UNICODE
         MultiByteToWideChar(
             CP_UTF8,
             0,
             (LPCCH)text.c_str(),
             length,
             (LPWSTR)wtext,
-            size
+            capacity
         );
 
         wtext[length] = 0;
-    }
 #endif
+    }
 }
 
 
