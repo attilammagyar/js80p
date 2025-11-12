@@ -249,7 +249,7 @@ class EnvelopeSnapshot
 class LFOEnvelopeState
 {
     public:
-        LFOEnvelopeState() = default;
+        LFOEnvelopeState() noexcept;
 
         WavetableState wavetable_state;
         EnvelopeSnapshot snapshot;
@@ -308,6 +308,8 @@ class FloatParam : public Param<Number, evaluation>
         static constexpr Seconds MIDI_CTL_SMALL_CHANGE_DURATION = (
             MIDI_CTL_BIG_CHANGE_DURATION / 2.5
         );
+
+        static constexpr Integer INVALID_ENVELOPE_SNAPSHOT_ID = -1;
 
         /**
          * \brief Orchestrate rendering signals and handling events.
@@ -593,8 +595,6 @@ class FloatParam : public Param<Number, evaluation>
                 bool is_constant;
                 bool lfo_has_envelope;
         };
-
-        static constexpr Integer INVALID_ENVELOPE_SNAPSHOT_ID = -1;
 
         void initialize_instance() noexcept;
 

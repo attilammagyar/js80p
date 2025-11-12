@@ -355,6 +355,19 @@ ToggleParam::ToggleParam(std::string const& name, Byte const default_value)
 }
 
 
+LFOEnvelopeState::LFOEnvelopeState() noexcept
+    : active_snapshot_id(FloatParamS::INVALID_ENVELOPE_SNAPSHOT_ID),
+    scheduled_snapshot_id(FloatParamS::INVALID_ENVELOPE_SNAPSHOT_ID),
+    time(0.0),
+    value(0.0),
+    stage(EnvelopeStage::ENV_STG_NONE),
+    active_snapshot_envelope_index(Constants::INVALID_ENVELOPE_INDEX),
+    scheduled_snapshot_envelope_index(Constants::INVALID_ENVELOPE_INDEX),
+    is_initialized(false)
+{
+}
+
+
 template<ParamEvaluation evaluation>
 template<class FloatParamClass>
 Sample const* const* FloatParam<evaluation>::produce(
@@ -420,11 +433,6 @@ Sample const* FloatParam<evaluation>::produce_if_not_constant(
 
 
 template<ParamEvaluation evaluation>
-/*
-False positive, we're calling the other constructor which will initialize
-everything.
-*/
-// cppcheck-suppress uninitMemberVar
 FloatParam<evaluation>::FloatParam(
         std::string const& name,
         Number const min_value,
@@ -534,11 +542,6 @@ void FloatParam<evaluation>::initialize_instance() noexcept
 
 
 template<ParamEvaluation evaluation>
-/*
-False positive, we're calling the other constructor which will initialize
-everything.
-*/
-// cppcheck-suppress uninitMemberVar
 FloatParam<evaluation>::FloatParam(
         FloatParam<evaluation>& leader
 ) noexcept
