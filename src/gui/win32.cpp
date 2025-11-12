@@ -741,6 +741,8 @@ void ImportPatchButton::click()
         // TODO: GetLastError
         CloseHandle(file);
 
+        delete[] buffer;
+
         return;
     }
 
