@@ -138,26 +138,29 @@ class LFO : public SignalProducer
                     Byte const depth
                 ) const noexcept;
 
-                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+                void visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) noexcept;
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
 
                 void visit_amplitude_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& amplitude
+                    FloatParamS const& amplitude
                 ) noexcept;
 
                 void visit_frequency_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& frequency
+                    FloatParamS const& frequency
                 ) noexcept;
 
                 void visit_phase_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& phase
+                    FloatParamS const& phase
                 ) noexcept;
 
                 void visit_oscillator(
@@ -169,34 +172,37 @@ class LFO : public SignalProducer
                 void visit_distortion_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& distortion
+                    FloatParamS const& distortion
                 ) noexcept;
 
                 void visit_randomness_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& randomness
+                    FloatParamS const& randomness
                 ) noexcept;
 
                 void visit_min_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& min
+                    FloatParamS const& min
                 ) noexcept;
 
                 void visit_max_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& max
+                    FloatParamS const& max
                 ) noexcept;
         };
 
         class EnvelopeCollector : public Visitor
         {
             public:
-                EnvelopeCollector(LFOEnvelopeList& envelope_list) noexcept;
+                explicit EnvelopeCollector(LFOEnvelopeList& envelope_list) noexcept;
 
-                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+                void visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) noexcept;
 
             private:
                 LFOEnvelopeList* envelope_list;
@@ -210,7 +216,10 @@ class LFO : public SignalProducer
                     Midi::Channel const midi_channel
                 ) noexcept;
 
-                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+                void visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) noexcept;
 
             private:
                 void schedule_ctl_value_sync(
@@ -240,26 +249,29 @@ class LFO : public SignalProducer
                     Byte const depth
                 ) const noexcept;
 
-                void visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept;
+                void visit_lfo_as_polyphonic(
+                    LFO const& lfo,
+                    Byte const depth
+                ) noexcept;
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
 
                 void visit_amplitude_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& amplitude
+                    FloatParamS const& amplitude
                 ) noexcept;
 
                 void visit_frequency_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& frequency
+                    FloatParamS const& frequency
                 ) noexcept;
 
                 void visit_phase_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& phase
+                    FloatParamS const& phase
                 ) noexcept;
 
                 void visit_oscillator(
@@ -271,25 +283,25 @@ class LFO : public SignalProducer
                 void visit_distortion_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& distortion
+                    FloatParamS const& distortion
                 ) noexcept;
 
                 void visit_randomness_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& randomness
+                    FloatParamS const& randomness
                 ) noexcept;
 
                 void visit_min_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& min
+                    FloatParamS const& min
                 ) noexcept;
 
                 void visit_max_param(
                     LFO& lfo,
                     Byte const depth,
-                    FloatParamS& max
+                    FloatParamS const& max
                 ) noexcept;
 
             private:

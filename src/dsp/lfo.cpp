@@ -388,8 +388,10 @@ bool LFO::Visitor::should_visit_lfo_as_polyphonic(
 }
 
 
-void LFO::Visitor::visit_lfo_as_polyphonic(LFO& lfo, Byte const depth) noexcept
-{
+void LFO::Visitor::visit_lfo_as_polyphonic(
+        LFO const& lfo,
+        Byte const depth
+) noexcept {
 }
 
 
@@ -401,7 +403,7 @@ void LFO::Visitor::visit_lfo_as_global(LFO& lfo) noexcept
 void LFO::Visitor::visit_amplitude_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& amplitude
+        FloatParamS const& amplitude
 ) noexcept {
 }
 
@@ -409,7 +411,7 @@ void LFO::Visitor::visit_amplitude_param(
 void LFO::Visitor::visit_frequency_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& frequency
+        FloatParamS const& frequency
 ) noexcept {
 }
 
@@ -417,7 +419,7 @@ void LFO::Visitor::visit_frequency_param(
 void LFO::Visitor::visit_phase_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& phase
+        FloatParamS const& phase
 ) noexcept {
 }
 
@@ -433,7 +435,7 @@ void LFO::Visitor::visit_oscillator(
 void LFO::Visitor::visit_distortion_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& distortion
+        FloatParamS const& distortion
 ) noexcept {
 }
 
@@ -441,7 +443,7 @@ void LFO::Visitor::visit_distortion_param(
 void LFO::Visitor::visit_randomness_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& randomness
+        FloatParamS const& randomness
 ) noexcept {
 }
 
@@ -449,7 +451,7 @@ void LFO::Visitor::visit_randomness_param(
 void LFO::Visitor::visit_min_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& min
+        FloatParamS const& min
 ) noexcept {
 }
 
@@ -457,7 +459,7 @@ void LFO::Visitor::visit_min_param(
 void LFO::Visitor::visit_max_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& max
+        FloatParamS const& max
 ) noexcept {
 }
 
@@ -469,7 +471,7 @@ LFO::EnvelopeCollector::EnvelopeCollector(LFOEnvelopeList& envelope_list) noexce
 
 
 void LFO::EnvelopeCollector::visit_lfo_as_polyphonic(
-        LFO& lfo,
+        LFO const& lfo,
         Byte const depth
 ) noexcept {
     (*envelope_list)[depth] = lfo.amplitude_envelope.get_value();
@@ -487,7 +489,7 @@ LFO::ParamCtlSyncScheduler::ParamCtlSyncScheduler(
 
 
 void LFO::ParamCtlSyncScheduler::visit_lfo_as_polyphonic(
-        LFO& lfo,
+        LFO const& lfo,
         Byte const depth
 ) noexcept {
     schedule_ctl_value_sync(*lfo.frequency_mpe[midi_channel], midi_channel);
@@ -536,14 +538,14 @@ bool LFO::LFOWithEnvelopeRenderer::should_visit_lfo_as_polyphonic(
         LFO const& lfo,
         Byte const depth
 ) const noexcept {
-    LFOEnvelopeState& lfo_envelope_state = lfo_envelope_states[depth];
+    LFOEnvelopeState const& lfo_envelope_state = lfo_envelope_states[depth];
 
     return lfo_envelope_state.stage != EnvelopeStage::ENV_STG_NONE;
 }
 
 
 void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_polyphonic(
-        LFO& lfo,
+        LFO const& lfo,
         Byte const depth
 ) noexcept {
     LFOEnvelopeState const& lfo_envelope_state = lfo_envelope_states[depth];
@@ -590,7 +592,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
 void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& amplitude
+        FloatParamS const& amplitude
 ) noexcept {
     if (amplitude.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
@@ -608,7 +610,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
 void LFO::LFOWithEnvelopeRenderer::visit_frequency_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& frequency
+        FloatParamS const& frequency
 ) noexcept {
     if (frequency.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
@@ -626,7 +628,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_frequency_param(
 void LFO::LFOWithEnvelopeRenderer::visit_phase_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& phase
+        FloatParamS const& phase
 ) noexcept {
     if (phase.get_lfo() == NULL) {
         param_buffer_3 = FloatParamS::produce_if_not_constant(
@@ -705,7 +707,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
 void LFO::LFOWithEnvelopeRenderer::visit_distortion_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& distortion
+        FloatParamS const& distortion
 ) noexcept {
     if (distortion.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
@@ -723,7 +725,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_distortion_param(
 void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& randomness
+        FloatParamS const& randomness
 ) noexcept {
     if (randomness.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
@@ -770,7 +772,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
 void LFO::LFOWithEnvelopeRenderer::visit_min_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& min
+        FloatParamS const& min
 ) noexcept {
     if (min.get_lfo() == NULL) {
         param_buffer_1 = FloatParamS::produce_if_not_constant(
@@ -788,7 +790,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_min_param(
 void LFO::LFOWithEnvelopeRenderer::visit_max_param(
         LFO& lfo,
         Byte const depth,
-        FloatParamS& max
+        FloatParamS const& max
 ) noexcept {
     if (max.get_lfo() == NULL) {
         param_buffer_2 = FloatParamS::produce_if_not_constant(
