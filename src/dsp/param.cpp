@@ -1803,7 +1803,7 @@ void FloatParam<evaluation>::handle_cancel_event(
             this->store_new_value(stop_value);
         }
     } else {
-        Envelope* const envelope = get_envelope();
+        Envelope const* const envelope = get_envelope();
 
         if (envelope != NULL) {
             JS80P_ASSERT(envelope_state != NULL);
@@ -2400,7 +2400,7 @@ bool FloatParam<evaluation>::has_envelope_decayed() const noexcept
         return false;
     }
 
-    Envelope* const envelope = get_envelope();
+    Envelope const* const envelope = get_envelope();
 
     if (envelope != NULL) {
         JS80P_ASSERT(envelope_state != NULL);
