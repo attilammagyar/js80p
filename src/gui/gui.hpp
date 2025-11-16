@@ -207,6 +207,9 @@ class GUI
             bool const show_vst_logo
         );
 
+        GUI(GUI const& gui) = delete;
+        GUI& operator=(GUI const& gui) = delete;
+
         ~GUI();
 
         void show();
