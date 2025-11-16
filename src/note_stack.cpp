@@ -218,10 +218,9 @@ void NoteStack::update_extremes_after_remove(Midi::Word const changed_item) noex
     Midi::Word item = head;
     Midi::Note lowest_note = get_note(lowest_);
     Midi::Note highest_note = get_note(highest_);
-    Midi::Note note;
 
     for (size_t i = 0; item != INVALID_ITEM && i != ITEMS; ++i) {
-        note = get_note(item);
+        Midi::Note note = get_note(item);
 
         if (lowest_ == INVALID_ITEM || note < lowest_note) {
             lowest_note = note;
