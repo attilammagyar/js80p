@@ -151,7 +151,7 @@ class IntParam : public Param<int>
 {
     public:
         IntParam(
-            std::string const name,
+            std::string const& name,
             int const min_value,
             int const max_value,
             int const default_value
@@ -4080,7 +4080,6 @@ TEST(can_tell_if_envelope_has_decayed, {
         &envelope, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL,
     };
-    ToggleParam log_scale("log", ToggleParam::OFF);
     FloatParamS param_with_nothing("PN", 0.0, 1.0, 1.0, 0.0, envelopes);
     FloatParamS param_with_lfo("PL", 0.0, 1.0, 1.0, 0.0, envelopes);
     FloatParamS param_with_midi_controller("PMI", 0.0, 1.0, 1.0, 0.0, envelopes);
