@@ -310,7 +310,7 @@ class FstPlugin : public Midi::EventHandler
 
         static Parameter create_midi_ctl_param(
             Synth::ControllerId const controller_id,
-            Synth& synth,
+            Synth const& synth,
             Midi::Channel const channel
         ) noexcept;
 

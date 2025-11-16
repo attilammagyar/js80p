@@ -473,7 +473,7 @@ void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexce
 
 FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
         Synth::ControllerId const controller_id,
-        Synth& synth,
+        Synth const& synth,
         Midi::Channel const channel
 ) noexcept {
     float value = 0.5f;
