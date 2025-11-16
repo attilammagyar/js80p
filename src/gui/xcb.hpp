@@ -181,7 +181,6 @@ class Widget : public WidgetBase
         virtual void show() override;
         virtual void hide() override;
 
-        virtual void focus() override;
         virtual void bring_to_top() override;
         virtual void redraw() override;
 
