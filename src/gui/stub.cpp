@@ -94,7 +94,7 @@ class Widget : public WidgetBase
                 int const top,
                 int const width,
                 int const height
-        ) {
+        ) override {
             return (GUI::Image)new DummyObject();
         }
 
