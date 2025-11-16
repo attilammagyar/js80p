@@ -91,8 +91,7 @@ int main(int const argc, char const* argv[])
     bool is_running = true;
 
     uint32_t event_mask = (
-        0
-        | XCB_EVENT_MASK_EXPOSURE
+        XCB_EVENT_MASK_EXPOSURE
         | XCB_EVENT_MASK_VISIBILITY_CHANGE
         | XCB_EVENT_MASK_STRUCTURE_NOTIFY
         | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY

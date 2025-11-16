@@ -254,8 +254,7 @@ class Widget : public WidgetBase
         static constexpr int DOUBLE_CLICK_POS_DELTA = 5;
         static constexpr double COLOR_COMPONENT_SCALE = 1.0 / 255.0;
         static constexpr unsigned int TRANSPARENT_WIDGETS = (
-            0
-            | Type::EXPORT_PATCH_BUTTON
+            Type::EXPORT_PATCH_BUTTON
             | Type::IMPORT_PATCH_BUTTON
             | Type::KNOB_PARAM_EDITOR
             | Type::TAB_BODY

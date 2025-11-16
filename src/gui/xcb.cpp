@@ -1401,16 +1401,15 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
     WidgetBase::set_up(platform_data, parent);
 
     uint32_t event_mask = (
-        0
-        // | XCB_EVENT_MASK_KEY_PRESS
-        // | XCB_EVENT_MASK_KEY_RELEASE
-        | XCB_EVENT_MASK_BUTTON_PRESS
+        XCB_EVENT_MASK_BUTTON_PRESS
         | XCB_EVENT_MASK_BUTTON_RELEASE
         | XCB_EVENT_MASK_ENTER_WINDOW
+        | XCB_EVENT_MASK_EXPOSURE
         | XCB_EVENT_MASK_LEAVE_WINDOW
         | XCB_EVENT_MASK_POINTER_MOTION
         // | XCB_EVENT_MASK_BUTTON_1_MOTION
-        | XCB_EVENT_MASK_EXPOSURE
+        // | XCB_EVENT_MASK_KEY_PRESS
+        // | XCB_EVENT_MASK_KEY_RELEASE
         // | XCB_EVENT_MASK_VISIBILITY_CHANGE
     );
 
