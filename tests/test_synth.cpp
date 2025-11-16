@@ -928,7 +928,7 @@ void test_gc_decayed_vs_new_note_while_sustaining(
     constexpr Integer block_size = 2048;
 
     Synth synth(0);
-    Sample const* const* rendered_samples = SignalProducer::produce<Synth>(synth, 3);
+    Sample const* const* rendered_samples;
     Sample* const expected_samples = new Sample[block_size];
 
     synth.set_block_size(block_size);
@@ -1862,9 +1862,6 @@ TEST(input_is_mixed_into_the_effects_chain, {
         0.0, 0.0,
         synth.get_channels()
     );
-    Sample const* const* in_samples;
-    Sample const* const* rendered_samples;
-    Sample const* const* expected_samples;
 
     synth.suspend();
 
@@ -1890,9 +1887,9 @@ TEST(input_is_mixed_into_the_effects_chain, {
     synth.note_on(0.0, 1, Midi::NOTE_A_3, 127);
 
     for (Integer round = 1; round != 3; ++round) {
-        in_samples = SignalProducer::produce<SumOfSines>(input, round);
-        expected_samples = SignalProducer::produce<SumOfSines>(expected, round);
-        rendered_samples = synth.generate_samples(round, block_size, in_samples);
+        Sample const* const* in_samples = SignalProducer::produce<SumOfSines>(input, round);
+        Sample const* const* rendered_samples = synth.generate_samples(round, block_size, in_samples);
+        Sample const* const* expected_samples = SignalProducer::produce<SumOfSines>(expected, round);
 
         for (Integer c = 0; c != synth.get_channels(); ++c) {
             assert_close(
