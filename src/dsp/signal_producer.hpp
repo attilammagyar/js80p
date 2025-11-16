@@ -27,10 +27,6 @@
 #include "dsp/queue.hpp"
 
 
-/* Mark compile-time polymorphism for SignalProducer::produce() */
-#define SIGNAL_PRODUCER_OVERRIDE
-
-
 namespace JS80P
 {
 
@@ -201,7 +197,7 @@ class SignalProducer
          *        rendered buffer if calling \c render() is unnecessary (e.g.
          *        when a filter wants to return its input unaffected).
          *
-         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         * \note Use the \c JS80P_OVERRIDE macro to mark compile-time
          *       polymorphism.
          */
         Sample const* const* initialize_rendering(
@@ -212,7 +208,7 @@ class SignalProducer
         /**
          * \brief Implement sample rendering in this method.
          *
-         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         * \note Use the \c JS80P_OVERRIDE macro to mark compile-time
          *       polymorphism.
          */
         void render(
@@ -225,7 +221,7 @@ class SignalProducer
         /**
          * \brief Implement final housekeeping after rendering in this method.
          *
-         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         * \note Use the \c JS80P_OVERRIDE macro to mark compile-time
          *       polymorphism.
          */
         void finalize_rendering(
@@ -236,7 +232,7 @@ class SignalProducer
         /**
          * \brief Implement handling events in this method.
          *
-         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         * \note Use the \c JS80P_OVERRIDE macro to mark compile-time
          *       polymorphism.
          */
         void handle_event(Event const& event) noexcept;

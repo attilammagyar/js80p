@@ -39,7 +39,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Midi::Channel const channel,
                 Midi::Note const note,
                 Midi::Byte const velocity
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event(
                 "NOTE_OFF", time_offset, channel, (Byte)note, (Byte)velocity
             );
@@ -50,7 +50,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Midi::Channel const channel,
                 Midi::Note const note,
                 Midi::Byte const velocity
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event(
                 "NOTE_ON", time_offset, channel, (Byte)note, (Byte)velocity
             );
@@ -61,7 +61,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Midi::Channel const channel,
                 Midi::Note const note,
                 Midi::Byte const pressure
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event(
                 "AFTERTOUCH", time_offset, channel, (Byte)note, (Byte)pressure
             );
@@ -72,7 +72,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Midi::Channel const channel,
                 Midi::Controller const controller,
                 Midi::Byte const new_value
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event(
                 "CONTROL_CHANGE",
                 time_offset,
@@ -86,7 +86,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Seconds const time_offset,
                 Midi::Channel const channel,
                 Midi::Byte const new_program
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event(
                 "PROGRAM_CHANGE", time_offset, channel, (Byte)new_program
             );
@@ -96,7 +96,7 @@ class MidiEventLogger : public Midi::EventHandler
                 Seconds const time_offset,
                 Midi::Channel const channel,
                 Midi::Byte const pressure
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("CHANNEL_PRESSURE", time_offset, channel, (Byte)pressure);
         }
 
@@ -104,42 +104,42 @@ class MidiEventLogger : public Midi::EventHandler
                 Seconds const time_offset,
                 Midi::Channel const channel,
                 Midi::Word const new_value
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("PITCH_WHEEL", time_offset, channel, new_value);
         }
 
         void all_sound_off(
                 Seconds const time_offset,
                 Midi::Channel const channel
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("ALL_SOUND_OFF", time_offset, channel);
         }
 
         void reset_all_controllers(
                 Seconds const time_offset,
                 Midi::Channel const channel
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("RESET_ALL_CONTROLLERS", time_offset, channel);
         }
 
         void all_notes_off(
                 Seconds const time_offset,
                 Midi::Channel const channel
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("ALL_NOTES_OFF", time_offset, channel);
         }
 
         void mono_mode_on(
                 Seconds const time_offset,
                 Midi::Channel const channel
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("MONO_MODE_ON", time_offset, channel);
         }
 
         void mono_mode_off(
                 Seconds const time_offset,
                 Midi::Channel const channel
-        ) noexcept {
+        ) noexcept JS80P_OVERRIDE {
             log_event("MONO_MODE_OFF", time_offset, channel);
         }
 

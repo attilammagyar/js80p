@@ -191,32 +191,32 @@ class FstPlugin : public Midi::EventHandler
             Midi::Channel const channel,
             Midi::Note const note,
             Midi::Byte const velocity
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
             Midi::Byte const new_value
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void program_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Byte const new_program
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void channel_pressure(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Byte const pressure
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Word const new_value
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         VstIntPtr get_program() noexcept;
         void set_program(size_t index) noexcept;

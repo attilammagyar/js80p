@@ -95,7 +95,7 @@ class Reverb : public SideChainCompressableEffect<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
     private:
         class Tuning

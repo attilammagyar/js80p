@@ -48,6 +48,13 @@
 #endif
 
 
+/*
+Mark compile-time polymorphism. (E.g. Midi::EventHandler,
+SignalProducer::produce(), etc.)
+*/
+#define JS80P_OVERRIDE
+
+
 namespace JS80P
 {
 

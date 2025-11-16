@@ -120,14 +120,14 @@ class LFO : public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
     private:
         class Visitor

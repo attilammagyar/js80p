@@ -122,7 +122,7 @@ class Constant : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             Integer const channels = get_channels();
 
             for (Integer c = 0; c != channels; ++c) {
@@ -168,7 +168,7 @@ class FixedSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             return fixed_samples;
         }
 
@@ -226,7 +226,7 @@ class SumOfSines : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             Integer const channels = get_channels();
 
             if (channels == 0) {

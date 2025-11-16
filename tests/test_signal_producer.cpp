@@ -105,7 +105,7 @@ class CompositeSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             SignalProducer::produce<ChildSignalProducer>(child, round, sample_count);
 
             return NULL;
@@ -116,7 +116,7 @@ class CompositeSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             for (Integer c = 0; c != this->channels; ++c) {
                 for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                     buffer[c][i] = 1.0;
@@ -286,7 +286,7 @@ class CachingTestSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             buffer[0][0] += 1.0;
         }
 };
@@ -335,7 +335,7 @@ class DelegatingSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             ++initialize_rendering_calls;
 
             if (delegate != NULL) {
@@ -352,7 +352,7 @@ class DelegatingSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             ++render_calls;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -363,7 +363,7 @@ class DelegatingSignalProducer : public SignalProducer
         void finalize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             ++finalize_rendering_calls;
         }
 };
@@ -477,7 +477,7 @@ class RendererWithCircularDependecy : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             Sample const* const* const other_buffer = (
                 SignalProducer::produce<RendererWithCircularDependecy>(*dependency, round)
             );
@@ -548,7 +548,7 @@ class PreparerWithCircularDependecy : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             SignalProducer::produce<PreparerWithCircularDependecy>(
                 *dependency, round
             );
@@ -605,7 +605,7 @@ class FeedbackSignalProducer : public SignalProducer
         Sample const* const* initialize_rendering(
                 Integer const round,
                 Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             get_last_rendered_block(feedback_sample_count);
 
             return NULL;
@@ -657,7 +657,7 @@ class EventTestSignalProducer : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
+        ) noexcept JS80P_OVERRIDE {
             ++render_calls;
 
             for (Integer c = 0; c != channels; ++c) {
@@ -667,7 +667,7 @@ class EventTestSignalProducer : public SignalProducer
             }
         }
 
-        void handle_event(Event const& event) noexcept SIGNAL_PRODUCER_OVERRIDE
+        void handle_event(Event const& event) noexcept JS80P_OVERRIDE
         {
             if (event.type == SET_VALUE) {
                 value = event.number_param_1;

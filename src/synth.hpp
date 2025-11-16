@@ -1299,65 +1299,65 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Channel const channel,
             Midi::Note const note,
             Midi::Byte const velocity
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void note_on(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
             Midi::Byte const velocity
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void aftertouch(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Note const note,
             Midi::Byte const pressure
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void control_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Controller const controller,
             Midi::Byte const new_value
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void channel_pressure(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Byte const pressure
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void pitch_wheel_change(
             Seconds const time_offset,
             Midi::Channel const channel,
             Midi::Word const new_value
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void all_sound_off(
             Seconds const time_offset,
             Midi::Channel const channel
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void reset_all_controllers(
             Seconds const time_offset,
             Midi::Channel const channel
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void all_notes_off(
             Seconds const time_offset,
             Midi::Channel const channel
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void mono_mode_on(
             Seconds const time_offset,
             Midi::Channel const channel
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         void mono_mode_off(
             Seconds const time_offset,
             Midi::Channel const channel
-        ) noexcept;
+        ) noexcept JS80P_OVERRIDE;
 
         Number get_midi_controller_value(
             ControllerId const controller_id,
@@ -1393,19 +1393,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
         void finalize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+        ) noexcept JS80P_OVERRIDE;
 
         FrequencyTable frequencies;
         PerChannelFrequencyTable per_channel_frequencies;
@@ -1458,14 +1458,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
-                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+                ) noexcept JS80P_OVERRIDE;
 
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** const buffer
-                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
+                ) noexcept JS80P_OVERRIDE;
 
             private:
                 static constexpr Sample MODULATOR_VOLUME_THRESHOLD = 0.000001;

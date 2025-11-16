@@ -37,6 +37,9 @@ typedef Byte Controller;
 typedef Byte Command;
 
 
+/**
+ * \note Use the \c JS80P_OVERRIDE macro to mark compile-time polymorphism.
+ */
 class EventHandler
 {
     public:
