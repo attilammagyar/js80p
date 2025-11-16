@@ -191,7 +191,9 @@ int main(int const argc, char const* argv[])
             }
 
             case XCB_CLIENT_MESSAGE: {
-                xcb_client_message_event_t* const client_msg = (xcb_client_message_event_t*)event;
+                xcb_client_message_event_t const* const client_msg = (
+                    (xcb_client_message_event_t const*)event
+                );
 
                 if (client_msg->data.data32[0] == wm_delete_window_reply->atom) {
                     is_running = false;
