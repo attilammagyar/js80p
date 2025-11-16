@@ -1863,7 +1863,9 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
             modulators[voice]->note_off(time_offset, note_id, note, velocity);
             carriers[voice]->note_off(time_offset, note_id, note, velocity);
         }
-    } else if (!is_polyphonic) {
+    } else {
+        JS80P_ASSERT(!is_polyphonic);
+
         for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const note_id = deferred_note_off.get_note_id();
