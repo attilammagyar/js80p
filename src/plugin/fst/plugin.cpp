@@ -391,7 +391,7 @@ void VSTCALLBACK FstPlugin::set_parameter(
 }
 
 
-void FstPlugin::populate_parameters(Synth& synth, Parameters& parameters) noexcept
+void FstPlugin::populate_parameters(Synth const& synth, Parameters& parameters) noexcept
 {
     parameters[0] = Parameter("Program", Synth::ControllerId::NONE, 0.0f);
     parameters[1] = create_midi_ctl_param(

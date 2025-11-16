@@ -147,7 +147,7 @@ class FstPlugin : public Midi::EventHandler
         );
 
         static void populate_parameters(
-            Synth& synth,
+            Synth const& synth,
             Parameters& parameters
         ) noexcept;
 
