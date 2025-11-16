@@ -500,7 +500,7 @@ FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
         kVstMaxParamStrLen,
         "%s/%hhu",
         GUI::get_controller(controller_id)->name_5,
-        channel + 1
+        (Midi::Channel)(channel + 1)
     );
 
     name[kVstMaxParamStrLen - 1] = '\x00';
