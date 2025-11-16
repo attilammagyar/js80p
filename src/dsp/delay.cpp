@@ -723,7 +723,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
         if (gain_buffer == NULL) {
             if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
                 if (time_scale_buffer == NULL) {
-                    render<true, true, true, false>(
+                    render_with_gain<true, true, true, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -731,7 +731,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         this->gain.get_value()
                     );
                 } else {
-                    render<true, true, false, false>(
+                    render_with_gain<true, true, false, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -741,7 +741,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 }
             } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
                 if (is_reversed) {
-                    render<true, true, true, true>(
+                    render_with_gain<true, true, true, true>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -749,7 +749,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         this->gain.get_value()
                     );
                 } else {
-                    render<true, true, true, false>(
+                    render_with_gain<true, true, true, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -758,7 +758,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     );
                 }
             } else {
-                render<true, true, true, false>(
+                render_with_gain<true, true, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -769,7 +769,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
         } else {
             if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
                 if (time_scale_buffer == NULL) {
-                    render<true, false, true, false>(
+                    render_with_gain<true, false, true, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -777,7 +777,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         1.0
                     );
                 } else {
-                    render<true, false, false, false>(
+                    render_with_gain<true, false, false, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -787,7 +787,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 }
             } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
                 if (is_reversed) {
-                    render<true, false, true, true>(
+                    render_with_gain<true, false, true, true>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -795,7 +795,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         1.0
                     );
                 } else {
-                    render<true, false, true, false>(
+                    render_with_gain<true, false, true, false>(
                         round,
                         first_sample_index,
                         last_sample_index,
@@ -804,7 +804,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     );
                 }
             } else {
-                render<true, false, true, false>(
+                render_with_gain<true, false, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -816,7 +816,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
     } else {
         if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
             if (time_scale_buffer == NULL) {
-                render<false, true, true, false>(
+                render_with_gain<false, true, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -824,7 +824,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     1.0
                 );
             } else {
-                render<false, true, false, false>(
+                render_with_gain<false, true, false, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -834,7 +834,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
             }
         } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
             if (is_reversed) {
-                render<false, true, true, true>(
+                render_with_gain<false, true, true, true>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -842,7 +842,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     1.0
                 );
             } else {
-                render<false, true, true, false>(
+                render_with_gain<false, true, true, false>(
                     round,
                     first_sample_index,
                     last_sample_index,
@@ -851,7 +851,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 );
             }
         } else {
-            render<false, true, true, false>(
+            render_with_gain<false, true, true, false>(
                 round,
                 first_sample_index,
                 last_sample_index,
@@ -865,7 +865,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<bool need_gain, bool is_gain_constant, bool is_time_scale_constant, bool is_reversed>
-void Delay<InputSignalProducerClass, capabilities>::render(
+void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,

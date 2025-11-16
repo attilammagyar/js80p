@@ -4226,7 +4226,7 @@ class Modulator : public SignalProducer
                 Integer const first_sample_index,
                 Integer const last_sample_index,
                 Sample** const buffer
-        ) noexcept {
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE {
             ++render_called;
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {

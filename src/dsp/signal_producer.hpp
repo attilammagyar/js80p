@@ -27,6 +27,10 @@
 #include "dsp/queue.hpp"
 
 
+/* Mark compile-time polymorphism for SignalProducer::produce() */
+#define SIGNAL_PRODUCER_OVERRIDE
+
+
 namespace JS80P
 {
 
@@ -89,10 +93,16 @@ class SignalProducer
          * \brief Orchestrate rendering signals and handling events.
          *
          * \note An instance method template calling virtual
-         *       \c initialize_rendering(), \c render() and \c handle_event()
-         *       methods would probably be simpler, but a static method template
-         *       which is parametrized by the \c SignalProducer descendant class
-         *       grants the compiler more freedom with inlining.
+         *       \c initialize_rendering(), \c render(), \c handle_event(), and
+         *       \c finalize_rendering() methods would probably be simpler, but
+         *       a static method template which is parametrized by the \c
+         *       SignalProducer descendant class grants the compiler more
+         *       freedom with optimizations.
+         *
+         * \see initialize_rendering(),
+         *      render(),
+         *      handle_event(),
+         *      finalize_rendering()
          *
          * \warning It's the caller's responsibility to ensure that
          *          \c sample_count is not greater than the current block size.
@@ -190,6 +200,9 @@ class SignalProducer
          *        Return NULL if rendering samples is needed, return an already
          *        rendered buffer if calling \c render() is unnecessary (e.g.
          *        when a filter wants to return its input unaffected).
+         *
+         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         *       polymorphism.
          */
         Sample const* const* initialize_rendering(
             Integer const round,
@@ -198,6 +211,9 @@ class SignalProducer
 
         /**
          * \brief Implement sample rendering in this method.
+         *
+         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         *       polymorphism.
          */
         void render(
             Integer const round,
@@ -208,6 +224,9 @@ class SignalProducer
 
         /**
          * \brief Implement final housekeeping after rendering in this method.
+         *
+         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         *       polymorphism.
          */
         void finalize_rendering(
             Integer const round,
@@ -216,6 +235,9 @@ class SignalProducer
 
         /**
          * \brief Implement handling events in this method.
+         *
+         * \note Use the \c SIGNAL_PRODUCER_OVERRIDE macro to mark compile-time
+         *       polymorphism.
          */
         void handle_event(Event const& event) noexcept;
 

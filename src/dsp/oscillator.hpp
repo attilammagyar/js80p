@@ -211,16 +211,16 @@ class Oscillator : public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
-        void handle_event(Event const& event) noexcept;
+        void handle_event(Event const& event) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
     private:
         static constexpr Number TEMPO_SYNC_FREQUENCY_SCALE = (

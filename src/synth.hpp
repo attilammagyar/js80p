@@ -1393,19 +1393,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void finalize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         FrequencyTable frequencies;
         PerChannelFrequencyTable per_channel_frequencies;
@@ -1458,14 +1458,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
-                ) noexcept;
+                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** const buffer
-                ) noexcept;
+                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
             private:
                 static constexpr Sample MODULATOR_VOLUME_THRESHOLD = 0.000001;

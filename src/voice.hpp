@@ -232,14 +232,14 @@ class Voice : public SignalProducer
                 Sample const* const* initialize_rendering(
                     Integer const round,
                     Integer const sample_count
-                ) noexcept;
+                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
                     Integer const last_sample_index,
                     Sample** const buffer
-                ) noexcept;
+                ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
             private:
                 FloatParamS& volume;
@@ -367,14 +367,14 @@ class Voice : public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
     private:
         typedef typename std::conditional<IS_CARRIER, Distortion_, Dummy>::type DistortionInstance;

@@ -51,7 +51,7 @@ class Filter : public SignalProducer
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         Sample const* const* input_was_silent(Integer const round) noexcept;
 

@@ -49,7 +49,7 @@ class Compressor : public SideChainCompressableEffect<InputSignalProducerClass>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
     private:
         void copy_input(Integer const sample_count) noexcept;

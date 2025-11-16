@@ -131,7 +131,7 @@ class Param : public SignalProducer
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         NumberType clamp(NumberType const value) const noexcept;
         void store_new_value(NumberType const new_value) noexcept;
@@ -506,16 +506,18 @@ class FloatParam : public Param<Number, evaluation>
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
-        void handle_event(SignalProducer::Event const& event) noexcept;
+        void handle_event(
+            SignalProducer::Event const& event
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         bool should_update_envelope(Envelope const& envelope) const noexcept;
 
@@ -864,14 +866,14 @@ class ModulatableFloatParam : public FloatParamS
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
         void render(
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) noexcept SIGNAL_PRODUCER_OVERRIDE;
 
     private:
         FloatParamS modulation_level;
