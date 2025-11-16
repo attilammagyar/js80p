@@ -570,7 +570,7 @@ void assert_amplitude_and_frequency_automation_are_independent_of_each_other(
     constexpr Sample sample_period = 1.0 / (Seconds)sample_rate;
     constexpr Sample pi_double = (Sample)Math::PI_DOUBLE;
     Sample const* const* block;
-    Sample expected_samples[block_size] = {
+    Sample const expected_samples[block_size] = {
         /* sin(2 * pi * frequency * time) */
         amplitudes[0] * std::sin(pi_double * frequency * (0.0 * sample_period)),
         amplitudes[1] * std::sin(pi_double * frequency * (1.0 * sample_period)),
@@ -1205,7 +1205,6 @@ TEST(resetting_the_oscillator_turns_it_off, {
     constexpr Integer rounds = 5;
     constexpr Integer sample_count = rounds * block_size;
     constexpr Sample amplitude = 0.75;
-    ReferenceSine reference(frequency);
     SimpleOscillator::WaveformParam waveform_param("");
     SimpleOscillator oscillator(waveform_param);
     Sample expected_samples[sample_count];
