@@ -969,7 +969,7 @@ void Widget::process_events(XcbPlatform* const xcb)
 
 
 void Widget::process_all_events(
-        XcbPlatform* const xcb,
+        XcbPlatform const* const xcb,
         xcb_connection_t* const xcb_connection
 ) {
     xcb_generic_event_t* event;
@@ -996,7 +996,7 @@ void Widget::process_all_events(
 
 
 void Widget::process_non_editing_events(
-        XcbPlatform* const xcb,
+        XcbPlatform const* const xcb,
         xcb_connection_t* const xcb_connection
 ) {
     xcb_generic_event_t* event;

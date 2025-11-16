@@ -295,12 +295,12 @@ class Widget : public WidgetBase
         };
 
         static void process_all_events(
-            XcbPlatform* const xcb,
+            XcbPlatform const* const xcb,
             xcb_connection_t* const xcb_connection
         );
 
         static void process_non_editing_events(
-            XcbPlatform* const xcb,
+            XcbPlatform const* const xcb,
             xcb_connection_t* const xcb_connection
         );
 
