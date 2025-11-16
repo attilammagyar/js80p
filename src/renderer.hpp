@@ -67,6 +67,9 @@ class Renderer
             input = NULL;
         }
 
+        Renderer(Renderer const& renderer) = delete;
+        Renderer& operator=(Renderer const& renderer) = delete;
+
         Integer get_latency_samples() const noexcept
         {
             return block_size;
