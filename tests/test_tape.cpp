@@ -216,7 +216,6 @@ void test_tape_stop(std::array<TapeStopTestStep, step_count> const& steps)
     Tape<FixedSignalProducer, ToggleParam::ON> tape(
         "tape", tape_params, input, rng
     );
-    Sample const* const* rendered = NULL;
     size_t i = 0;
     SignalProducer* sp = tape_params.get_signal_producer(i++);
 
@@ -242,7 +241,7 @@ void test_tape_stop(std::array<TapeStopTestStep, step_count> const& steps)
 
         tape_params.stop_start.set_value(step.stop_start_value);
 
-        rendered = SignalProducer::produce< Tape<FixedSignalProducer, ToggleParam::ON> >(
+        Sample const* const* rendered = SignalProducer::produce< Tape<FixedSignalProducer, ToggleParam::ON> >(
             tape, (Integer)i, step.samples_to_render
         );
 
