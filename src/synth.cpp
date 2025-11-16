@@ -2308,12 +2308,10 @@ Sample const* const* Synth::initialize_rendering(
 
 void Synth::stop_polyphonic_notes() noexcept
 {
-    bool found_note = false;
-    Midi::Channel channel = 0;
-    Midi::Note note = 0;
-
     for (Integer voice = 1; voice != POLYPHONY; ++voice) {
-        found_note = false;
+        Midi::Channel channel = 0;
+        Midi::Note note = 0;
+        bool found_note = false;
 
         Modulator* const modulator = modulators[voice];
 
