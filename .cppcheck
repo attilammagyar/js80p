@@ -6,3 +6,6 @@ missingIncludeSystem
 
 // Too many false positives.
 unusedFunction
+
+// Too many false positives, taken care of by Valgrind.
+uninitMemberVar

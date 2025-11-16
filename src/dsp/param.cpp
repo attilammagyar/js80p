@@ -3165,11 +3165,6 @@ EnvelopeSnapshot const& FloatParam<evaluation>::EnvelopeState::get_active_snapsh
 
 
 template<class ModulatorSignalProducerClass>
-/*
-False positive, we're calling the other constructor which will initialize
-everything.
-*/
-// cppcheck-suppress uninitMemberVar
 ModulatableFloatParam<ModulatorSignalProducerClass>::ModulatableFloatParam(
         ModulatorSignalProducerClass& modulator,
         FloatParamS& modulation_level_leader,

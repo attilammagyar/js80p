@@ -38,12 +38,6 @@ TypeParam::TypeParam(std::string const& name, Byte const default_type) noexcept
 }
 
 
-/*
-The initialize_tanh_tables(), the initialize_bit_crush_tables(),
-initialize_harmonic_tables(), and the initialize_delay_feedback_tables()
-methods will initialize both f_tables and F0_tables.
-*/
-// cppcheck-suppress uninitMemberVar
 Tables::Tables()
 {
     initialize_tanh_tables(TYPE_TANH_3, 3.0);
