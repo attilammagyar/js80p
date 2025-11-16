@@ -724,6 +724,8 @@ void XcbPlatform::free_file_selector_vars(std::vector<char*>& vars) const
             delete[] *it;
         }
     }
+
+    vars.clear();
 }
 
 
