@@ -2107,7 +2107,7 @@ void GUI::build_about_body(char const* const sdk_version)
 
     background->own(about_body);
 
-    ((Widget*)about_body)->own(
+    about_body->own(
         new AboutText(sdk_version, show_vst_logo ? vst_logo_image : NULL)
     );
 
@@ -3273,8 +3273,8 @@ void GUI::build_synth_body(
     constexpr char const* const* mpe = JS80P::GUI::MPE_SETTINGS;
     constexpr int mpec = JS80P::GUI::MPE_SETTINGS_COUNT;
 
-    ((Widget*)synth_body)->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
-    ((Widget*)synth_body)->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
+    synth_body->own(new ImportPatchButton(*this, 7, 2, 32, 30, synth, synth_body));
+    synth_body->own(new ExportPatchButton(*this, 45, 2, 32, 30, synth));
 
     synth_body->own(new TuningSelector(*this, GUI::PARAMS[Synth::ParamId::MTUN], 177,   7, synth, Synth::ParamId::MTUN));
     SCREW(synth_body, 271, 8, Synth::ParamId::MOIA, oia, oiac, screw_states)->set_sync_param_id(Synth::ParamId::COIA);
