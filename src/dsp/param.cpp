@@ -1013,10 +1013,7 @@ bool FloatParam<evaluation>::is_constant_until(
         if (
                 should_update_envelope(*envelope)
                 && envelope_state->active_snapshot_id != INVALID_ENVELOPE_SNAPSHOT_ID
-                && (
-                    envelope_state->stage == EnvelopeStage::ENV_STG_SUSTAIN
-                    || envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED
-                )
+                && is_envelope_stationary(envelope_state->stage)
         ) {
             if (!envelope_state->is_constant) {
                 return false;
@@ -1437,12 +1434,21 @@ void FloatParam<evaluation>::handle_envelope_update_event(
             snapshot,
             Constants::INVALID_ENVELOPE_INDEX
         );
-    } else if (
-            envelope_state->stage == EnvelopeStage::ENV_STG_SUSTAIN
-            || envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED
-    ) {
+    } else if (is_envelope_stationary(envelope_state->stage)) {
         envelope_state->time = 0.0;
     }
+}
+
+
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_envelope_stationary(
+        EnvelopeStage const envelope_stage
+) const noexcept {
+    constexpr int stationary_mask = (
+        EnvelopeStage::ENV_STG_SUSTAIN | EnvelopeStage::ENV_STG_RELEASED
+    );
+
+    return (envelope_stage & stationary_mask) != 0;
 }
 
 
@@ -1553,12 +1559,7 @@ void FloatParam<evaluation>::handle_envelope_end_event(
 ) noexcept {
     JS80P_ASSERT(envelope_state != NULL);
 
-    if (
-            JS80P_UNLIKELY(
-                envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED
-                || envelope_state->stage == EnvelopeStage::ENV_STG_NONE
-            )
-    ) {
+    if (JS80P_UNLIKELY(is_envelope_done(envelope_state->stage))) {
         return;
     }
 
@@ -1578,6 +1579,18 @@ void FloatParam<evaluation>::handle_envelope_end_event(
 
     envelope_state->stage = EnvelopeStage::ENV_STG_RELEASE;
     envelope_state->time = latency;
+}
+
+
+template<ParamEvaluation evaluation>
+bool FloatParam<evaluation>::is_envelope_done(
+        EnvelopeStage const envelope_stage
+) const noexcept {
+    constexpr int done_mask = (int)(
+        EnvelopeStage::ENV_STG_NONE | EnvelopeStage::ENV_STG_RELEASED
+    );
+
+    return (envelope_stage & done_mask) != 0;
 }
 
 
@@ -1697,10 +1710,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_update_event(
             envelope_index,
             lfo_envelope_state.stage
         );
-    } else if (
-            lfo_envelope_state.stage == EnvelopeStage::ENV_STG_SUSTAIN
-            || lfo_envelope_state.stage == EnvelopeStage::ENV_STG_RELEASED
-    ) {
+    } else if (is_envelope_stationary(lfo_envelope_state.stage)) {
         lfo_envelope_state.time = 0.0;
     }
 
@@ -1720,12 +1730,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_end_event(
         envelope_state->lfo_states[lfo_state_index]
     );
 
-    if (
-            JS80P_UNLIKELY(
-                lfo_envelope_state.stage == EnvelopeStage::ENV_STG_NONE
-                || lfo_envelope_state.stage == EnvelopeStage::ENV_STG_RELEASED
-            )
-    ) {
+    if (JS80P_UNLIKELY(is_envelope_done(lfo_envelope_state.stage))) {
         return;
     }
 
@@ -2407,10 +2412,11 @@ bool FloatParam<evaluation>::has_envelope_decayed() const noexcept
 
         EnvelopeStage const stage = envelope_state->stage;
 
-        if (
-                stage == EnvelopeStage::ENV_STG_SUSTAIN
-                || stage == EnvelopeStage::ENV_STG_RELEASE
-        ) {
+        constexpr int sustain_or_release_mask = (int)(
+            EnvelopeStage::ENV_STG_SUSTAIN | EnvelopeStage::ENV_STG_RELEASE
+        );
+
+        if ((stage & sustain_or_release_mask) != 0) {
             EnvelopeSnapshot const& snapshot = envelope_state->get_active_snapshot();
 
             return (
