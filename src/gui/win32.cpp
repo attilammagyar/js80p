@@ -470,6 +470,7 @@ void Widget::fill_rectangle(
         int const height,
         GUI::Color const color
 ) {
+    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
     RECT rect;
     rect.left = left;
     rect.top = top;
@@ -478,6 +479,7 @@ void Widget::fill_rectangle(
     HBRUSH brush = CreateSolidBrush(to_colorref(color));
     FillRect(hdc, (LPRECT)&rect, brush);
     DeleteObject((HGDIOBJ)brush);
+    SetMapMode(hdc, orig_map_mode);
 }
 
 
@@ -570,9 +572,12 @@ void Widget::draw_image(
         int const height
 ) {
     HDC image_hdc = CreateCompatibleDC(hdc);
+    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
+    SetMapMode(image_hdc, MM_TEXT);
     SelectObject(image_hdc, (HBITMAP)image);
     BitBlt(hdc, left, top, width, height, image_hdc, 0, 0, SRCCOPY);
     DeleteDC(image_hdc);
+    SetMapMode(hdc, orig_map_mode);
 }
 
 
@@ -587,6 +592,11 @@ GUI::Image Widget::copy_image_region(
 
     HDC source_hdc = CreateCompatibleDC(hdc);
     HDC destination_hdc = CreateCompatibleDC(hdc);
+
+    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
+
+    SetMapMode(source_hdc, MM_TEXT);
+    SetMapMode(destination_hdc, MM_TEXT);
 
     GUI::Image destination_image = CreateCompatibleBitmap(hdc, width, height);
 
@@ -604,6 +614,8 @@ GUI::Image Widget::copy_image_region(
 
     DeleteDC(source_hdc);
     DeleteDC(destination_hdc);
+
+    SetMapMode(hdc, orig_map_mode);
 
     ReleaseDC((HWND)platform_widget, hdc);
 
