@@ -32,6 +32,23 @@
 namespace JS80P
 {
 
+Win32Platform::Win32Platform(HINSTANCE const dll_instance)
+    : dll_instance(dll_instance)
+{
+}
+
+
+Win32Platform::~Win32Platform()
+{
+}
+
+
+HINSTANCE Win32Platform::get_dll_instance() const
+{
+    return dll_instance;
+}
+
+
 void GUI::idle()
 {
 }
@@ -39,11 +56,21 @@ void GUI::idle()
 
 void GUI::initialize()
 {
+    HINSTANCE dll_instance = (HINSTANCE)platform_data;
+    Win32Platform* win32_platform = new Win32Platform(dll_instance);
+
+    platform_data = (PlatformData)win32_platform;
 }
 
 
 void GUI::destroy()
 {
+    Win32Platform* win32_platform = (Win32Platform*)platform_data;
+    HINSTANCE dll_instance = win32_platform->get_dll_instance();
+
+    platform_data = (PlatformData)dll_instance;
+
+    delete win32_platform;
 }
 
 
@@ -199,11 +226,15 @@ GUI::Image Widget::load_image(
         GUI::PlatformData platform_data,
         char const* const name
 ) {
+    Win32Platform const* const win32_platform = (
+        (Win32Platform const*)platform_data
+    );
+
     tmp_text.set(name);
 
     // TODO: GetLastError()
     GUI::Image image = (GUI::Image)LoadImage(
-        (HINSTANCE)platform_data,               /* hInst    */
+        win32_platform->get_dll_instance(),     /* hInst    */
         tmp_text.get_const(),                   /* name     */
         IMAGE_BITMAP,                           /* type     */
         0,                                      /* cx       */
@@ -422,6 +453,10 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
 {
     WidgetBase::set_up(platform_data, parent);
 
+    Win32Platform const* const win32_platform = (
+        (Win32Platform const*)platform_data
+    );
+
     HWND parent_hwnd = (HWND)parent->get_platform_widget();
 
     // TODO: GetLastError()
@@ -435,7 +470,7 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
         height,                                 /* nHeight      */
         parent_hwnd,                            /* hWndParent   */
         NULL,                                   /* hMenu        */
-        (HINSTANCE)platform_data,               /* hInstance    */
+        win32_platform->get_dll_instance(),     /* hInstance    */
         NULL                                    /* lpParam      */
     );
 

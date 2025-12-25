@@ -36,6 +36,19 @@
 namespace JS80P
 {
 
+class Win32Platform
+{
+    public:
+        Win32Platform(HINSTANCE const dll_instance);
+        ~Win32Platform();
+
+        HINSTANCE get_dll_instance() const;
+
+    private:
+        HINSTANCE const dll_instance;
+};
+
+
 class Widget : public WidgetBase
 {
     public:
