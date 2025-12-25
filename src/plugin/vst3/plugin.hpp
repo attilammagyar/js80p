@@ -186,26 +186,32 @@ class Vst3Plugin
 
         class Controller;
 
-        class GUI : public CPluginView
+        class GUI : public CPluginView, JS80P::GUI::EventHandler
         {
             public:
-                explicit GUI(Synth& synth);
+                explicit GUI(Synth& synth, ViewRect& gui_size);
 
                 virtual ~GUI();
 
                 tresult PLUGIN_API isPlatformTypeSupported(FIDString type) SMTG_OVERRIDE;
                 tresult PLUGIN_API canResize() SMTG_OVERRIDE;
+                tresult PLUGIN_API checkSizeConstraint(ViewRect* rect) SMTG_OVERRIDE;
+                tresult PLUGIN_API onSize(ViewRect* newSize) SMTG_OVERRIDE;
 
                 virtual void attachedToParent() override;
                 virtual void removedFromParent() override;
 
-            private:
-                static ViewRect const rect;
+                virtual void handle_resize_request(
+                    int const new_width,
+                    int const new_height
+                ) override;
 
+            private:
                 void initialize();
                 void show_if_needed();
 
                 Synth& synth;
+                ViewRect& gui_size;
                 JS80P::GUI* gui;
 
                 void* run_loop;
@@ -260,6 +266,7 @@ class Vst3Plugin
                 Bank const bank;
 
                 Synth* synth;
+                ViewRect gui_size;
 
             public:
                 OBJ_METHODS(Controller, Vst::EditControllerEx1)

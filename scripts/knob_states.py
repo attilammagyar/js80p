@@ -57,7 +57,7 @@ def main(argv):
         glow_color_3=(80, 170, 255),
         ticks_color=knob_ticks_color,
         line_color=knob_line_color,
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-free.png")
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-free")
     )
     generate_knob_states(
         knob_bg=knob_bg,
@@ -66,7 +66,7 @@ def main(argv):
         glow_color_3=(255, 145, 72),
         ticks_color=knob_ticks_color,
         line_color=knob_line_color,
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-controlled.png")
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-controlled")
     )
     generate_knob_states(
         knob_bg=knob_bg,
@@ -75,7 +75,7 @@ def main(argv):
         glow_color_3=(0, 0, 0),
         ticks_color=knob_ticks_color,
         line_color=None,
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-none.png"),
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-none"),
         stages=1
     )
     generate_knob_states(
@@ -85,7 +85,7 @@ def main(argv):
         glow_color_3=(255, 180, 36),
         ticks_color=(255, 184, 96),
         line_color=(255, 230, 210),
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-red.png")
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/knob_states-red")
     )
 
     generate_screw_states(
@@ -96,7 +96,7 @@ def main(argv):
         line_border_width=5,
         pointer_color=screw_pointer_color,
         pointer_border_color=screw_pointer_border_color,
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states.png")
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states")
     )
     generate_screw_states(
         screw_bg=screw_bg,
@@ -106,7 +106,7 @@ def main(argv):
         line_border_width=9,
         pointer_color=screw_pointer_color_synced,
         pointer_border_color=screw_pointer_border_color_synced,
-        out_file=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states_synced.png")
+        out_file_prefix=os.path.join(os.path.dirname(argv[0]), "../gui/img/screw_states_synced")
     )
 
 
@@ -117,7 +117,7 @@ def generate_knob_states(
         glow_color_3,
         ticks_color,
         line_color,
-        out_file,
+        out_file_prefix,
         stages=128
 ):
 
@@ -204,10 +204,8 @@ def generate_knob_states(
 
         knob_states.paste(knob.copy(), (0, height * i, width, height * (i + 1)))
 
-    knob_states = knob_states.resize(
-        (int(width / 5), int(height / 5) * stages), Image.BICUBIC
-    )
-    knob_states.save(out_file)
+    knob_states = knob_states.resize((96, 96 * stages), Image.BICUBIC)
+    knob_states.save(out_file_prefix + ".png")
 
     return 0
 
@@ -220,7 +218,7 @@ def generate_screw_states(
         line_border_width,
         pointer_color,
         pointer_border_color,
-        out_file,
+        out_file_prefix,
         stages=61
 ):
 
@@ -265,10 +263,8 @@ def generate_screw_states(
 
         screw_states.paste(screw.copy(), (0, height * i, width, height * (i + 1)))
 
-    screw_states = screw_states.resize(
-        (int(width / 5), int(height / 5) * stages), Image.BICUBIC
-    )
-    screw_states.save(out_file)
+    screw_states = screw_states.resize((40, 40 * stages), Image.BICUBIC)
+    screw_states.save(out_file_prefix + ".png")
 
     return 0
 

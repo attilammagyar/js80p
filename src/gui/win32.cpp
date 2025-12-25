@@ -272,6 +272,27 @@ void Widget::set_text(char const* const text)
 }
 
 
+void Widget::set_scale(Number const new_scale)
+{
+    WidgetBase::set_scale(new_scale);
+
+    if (platform_widget == NULL) {
+        return;
+    }
+
+    // TODO: GetLastError()
+
+    MoveWindow(
+        (HWND)platform_widget,              /* hWnd */
+        this->scale_value(this->left),      /* X */
+        this->scale_value(this->top),       /* Y */
+        this->scale_value(this->width),     /* nWidth */
+        this->scale_value(this->height),    /* nHeight */
+        FALSE                               /* bRepaint */
+    );
+}
+
+
 GUI::Image Widget::load_image(
         GUI::PlatformData platform_data,
         char const* const name
@@ -411,7 +432,7 @@ GUI::Image Widget::load_image(
         return done_loading_image(NULL, factory, stream, decoder, frame, converter);
     }
 
-    UINT stride = width * 4;
+    UINT stride = 4 * (UINT)width;
 
     result = converter->CopyPixels(
         NULL,                           /* prc */
@@ -452,6 +473,193 @@ GUI::Image Widget::done_loading_image(
 
     if (stream != NULL) {
         stream->Release();
+    }
+
+    if (factory != NULL) {
+        factory->Release();
+    }
+
+    return (GUI::Image)bitmap;
+}
+
+
+GUI::Image Widget::copy_image_region(
+        GUI::Image source,
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) {
+    HDC hdc = GetDC((HWND)platform_widget);
+
+    HDC source_hdc = CreateCompatibleDC(hdc);
+    HDC destination_hdc = CreateCompatibleDC(hdc);
+
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
+
+    SetMapMode(source_hdc, MM_TEXT);
+    SetMapMode(destination_hdc, MM_TEXT);
+
+    GUI::Image destination_image = CreateCompatibleBitmap(hdc, width, height);
+
+    GUI::Image old_source_image = (
+        (GUI::Image)SelectObject(source_hdc, (HGDIOBJ)source)
+    );
+    GUI::Image old_destination_image = (
+        (GUI::Image)SelectObject(destination_hdc, (HGDIOBJ)destination_image)
+    );
+
+    BitBlt(destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY);
+
+    SelectObject(source_hdc, (HGDIOBJ)old_source_image);
+    SelectObject(destination_hdc, (HGDIOBJ)old_destination_image);
+
+    DeleteDC(source_hdc);
+    DeleteDC(destination_hdc);
+
+    SetMapMode(hdc, orig_map_mode);
+
+    ReleaseDC((HWND)platform_widget, hdc);
+
+    return destination_image;
+}
+
+
+GUI::Image Widget::downscale_image(
+        GUI::Image source,
+        int const old_width,
+        int const old_height,
+        int const new_width,
+        int const new_height
+) {
+    HRESULT result;
+    IWICImagingFactory* factory = NULL;
+
+    result = CoCreateInstance(
+        CLSID_WICImagingFactory,            /* rclsid */
+        NULL,                               /* pUnkOuter */
+        CLSCTX_INPROC_SERVER,               /* dwClsContext */
+        IID_PPV_ARGS(&factory)              /* riid, ppv */
+
+    );
+
+    if (FAILED(result)) {
+        return done_downscaling_image(NULL);
+    }
+
+    IWICBitmapScaler* scaler = NULL;
+    result = factory->CreateBitmapScaler(&scaler);
+
+    if (FAILED(result)) {
+        return done_downscaling_image(NULL, factory);
+    }
+
+    IWICBitmap* wic_source = NULL;
+    result = factory->CreateBitmapFromHBITMAP(
+        (HBITMAP)source,                    /* hBitmap */
+        NULL,                               /* hPalette */
+        WICBitmapIgnoreAlpha,               /* options */
+        &wic_source                         /* ppIBitmap */
+    );
+
+    if (FAILED(result)) {
+        return done_downscaling_image(NULL, factory, scaler);
+    }
+
+    result = scaler->Initialize(
+        wic_source,                         /* pISource */
+        (UINT)new_width,                    /* uiWidth */
+        (UINT)new_height,                   /* uiHeight */
+        WICBitmapInterpolationModeLinear    /* mode */
+    );
+
+    if (FAILED(result)) {
+        return done_downscaling_image(NULL, factory, scaler, wic_source);
+    }
+
+    IWICBitmapSource* scaled = NULL;
+    result = WICConvertBitmapSource(
+        GUID_WICPixelFormat32bppBGRA,       /* dstFormat */
+        scaler,                             /* pISrc */
+        &scaled                             /* ppIDst */
+    );
+
+    if (FAILED(result)) {
+        return done_downscaling_image(NULL, factory, scaler, wic_source);
+    }
+
+    HDC hdc = GetDC((HWND)platform_widget);
+
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
+
+    BITMAPINFO bitmap_info = {};
+    bitmap_info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmap_info.bmiHeader.biWidth = (LONG)new_width;
+    bitmap_info.bmiHeader.biHeight = -(LONG)new_height; /* top-down DIB */
+    bitmap_info.bmiHeader.biPlanes = 1;
+    bitmap_info.bmiHeader.biBitCount = 32;
+    bitmap_info.bmiHeader.biCompression = BI_RGB;
+
+    void* bits = NULL;
+    HBITMAP destination = CreateDIBSection(
+        hdc,                                /* hdc */
+        &bitmap_info,                       /* pbmi */
+        DIB_RGB_COLORS,                     /* usage */
+        &bits,                              /* ppvBits */
+        NULL,                               /* hSection */
+        0                                   /* offset */
+    );
+
+    SetMapMode(hdc, orig_map_mode);
+
+    ReleaseDC((HWND)platform_widget, hdc);
+
+    if (destination == NULL) {
+        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+    }
+
+    if (bits == NULL) {
+        DeleteObject(destination);
+
+        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+    }
+
+    UINT stride = 4 * (UINT)new_width;
+
+    result = scaled->CopyPixels(
+        NULL,                               /* prc */
+        stride,                             /* cbStride */
+        stride * (UINT)new_height,          /* cbBufferSize */
+        (BYTE*)bits                         /* pbBuffer */
+    );
+
+    if (FAILED(result)) {
+        DeleteObject(destination);
+
+        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+    }
+
+    return done_downscaling_image(destination, factory, scaler, wic_source, scaled);
+}
+
+
+GUI::Image Widget::done_downscaling_image(
+        HBITMAP bitmap,
+        IWICImagingFactory* const factory,
+        IWICBitmapScaler* const scaler,
+        IWICBitmap* const wic_source,
+        IWICBitmapSource* const scaled
+) {
+    if (scaled != NULL) {
+        scaled->Release();
+    }
+
+    if (wic_source != NULL) {
+        wic_source->Release();
+    }
+
+    if (scaler != NULL) {
+        scaler->Release();
     }
 
     if (factory != NULL) {
@@ -715,6 +923,12 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
 }
 
 
+uint64_t Widget::monotonic_clock_ms()
+{
+    return (uint64_t)GetTickCount64();
+}
+
+
 void Widget::fill_rectangle(
         int const left,
         int const top,
@@ -815,50 +1029,9 @@ void Widget::draw_image(
 }
 
 
-GUI::Image Widget::copy_image_region(
-        GUI::Image source,
-        int const left,
-        int const top,
-        int const width,
-        int const height
-) {
-    HDC hdc = GetDC((HWND)platform_widget);
-
-    HDC source_hdc = CreateCompatibleDC(hdc);
-    HDC destination_hdc = CreateCompatibleDC(hdc);
-
-    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
-
-    SetMapMode(source_hdc, MM_TEXT);
-    SetMapMode(destination_hdc, MM_TEXT);
-
-    GUI::Image destination_image = CreateCompatibleBitmap(hdc, width, height);
-
-    GUI::Image old_source_image = (
-        (GUI::Image)SelectObject(source_hdc, (HGDIOBJ)source)
-    );
-    GUI::Image old_destination_image = (
-        (GUI::Image)SelectObject(destination_hdc, (HGDIOBJ)destination_image)
-    );
-
-    BitBlt(destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY);
-
-    SelectObject(source_hdc, (HGDIOBJ)old_source_image);
-    SelectObject(destination_hdc, (HGDIOBJ)old_destination_image);
-
-    DeleteDC(source_hdc);
-    DeleteDC(destination_hdc);
-
-    SetMapMode(hdc, orig_map_mode);
-
-    ReleaseDC((HWND)platform_widget, hdc);
-
-    return destination_image;
-}
-
-
 void Widget::show()
 {
+    WidgetBase::show();
     // TODO: GetLastError()
     ShowWindow((HWND)platform_widget, SW_SHOWNORMAL);
 }
@@ -866,6 +1039,7 @@ void Widget::show()
 
 void Widget::hide()
 {
+    WidgetBase::hide();
     // TODO: GetLastError()
     ShowWindow((HWND)platform_widget, SW_HIDE);
 }

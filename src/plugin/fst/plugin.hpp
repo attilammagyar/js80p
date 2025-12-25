@@ -39,7 +39,7 @@
 namespace JS80P
 {
 
-class FstPlugin : public Midi::EventHandler
+class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
 {
     public:
         class Parameter
@@ -157,7 +157,7 @@ class FstPlugin : public Midi::EventHandler
             GUI::PlatformData const platform_data
         ) noexcept;
 
-        ~FstPlugin();
+        virtual ~FstPlugin();
 
         VstInt32 get_latency_samples() const noexcept;
         void initialize() noexcept;
@@ -217,6 +217,11 @@ class FstPlugin : public Midi::EventHandler
             Midi::Channel const channel,
             Midi::Word const new_value
         ) noexcept JS80P_OVERRIDE;
+
+        virtual void handle_resize_request(
+            int const new_width,
+            int const new_height
+        ) override;
 
         VstIntPtr get_program() noexcept;
         void set_program(size_t index) noexcept;
@@ -322,6 +327,9 @@ class FstPlugin : public Midi::EventHandler
             float const fvalue = 0.0f
         ) const noexcept;
 
+        bool can_host_resize_gui() noexcept;
+        void ensure_correct_gui_size() noexcept;
+
         void clear_received_midi_cc() noexcept;
 
         void prepare_rendering(Integer const sample_count) noexcept;
@@ -386,10 +394,13 @@ class FstPlugin : public Midi::EventHandler
         Integer remaining_samples_before_next_bank_update;
         VstInt32 prev_logged_op_code;
         char program_name[kVstMaxProgNameLen];
+        int gui_width;
+        int gui_height;
         bool had_midi_cc_event;
         bool received_midi_cc_cleared;
         bool need_bank_update;
         bool need_host_update;
+        bool can_resize_gui;
 };
 
 }

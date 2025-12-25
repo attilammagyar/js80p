@@ -19,7 +19,9 @@
 #ifndef JS80P__GUI__GUI_HPP
 #define JS80P__GUI__GUI_HPP
 
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 #include "js80p.hpp"
@@ -42,6 +44,7 @@ class TabSelector;
 class DiscreteParamEditor;
 class ToggleSwitchParamEditor;
 class TuningSelector;
+class ResizerHandle;
 class Widget;
 class WidgetBase;
 
@@ -49,6 +52,18 @@ class WidgetBase;
 class GUI
 {
     public:
+        class EventHandler
+        {
+            public:
+                /**
+                 * \brief Called when the GUI needs to be resized with external help.
+                 */
+                virtual void handle_resize_request(
+                    int const new_width,
+                    int const new_height
+                );
+        };
+
         typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
         typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
         typedef void* Image; ///< \brief GUI platform dependent image handle.
@@ -91,8 +106,26 @@ class GUI
                 Synth::ControllerId const id;
         };
 
-        static constexpr long int WIDTH = 980;
-        static constexpr long int HEIGHT = 600;
+        static constexpr Number INIT_SCALE = 0.48;
+
+        static constexpr int WIDTH = 2076;
+        static constexpr int HEIGHT = 1200;
+
+        static constexpr Number WIDTH_FLOAT = (Number)WIDTH;
+        static constexpr Number HEIGHT_FLOAT = (Number)HEIGHT;
+
+        static constexpr int INIT_WIDTH = (
+            (int)std::round(INIT_SCALE * WIDTH_FLOAT)
+        );
+
+        static constexpr int INIT_HEIGHT = (
+            (int)std::round(INIT_SCALE * HEIGHT_FLOAT)
+        );
+
+        static constexpr int MIN_WIDTH = WIDTH / 4;
+        static constexpr int MIN_HEIGHT = HEIGHT / 4;
+        static constexpr int MAX_WIDTH = WIDTH;
+        static constexpr int MAX_HEIGHT = HEIGHT;
 
         static constexpr Frequency REFRESH_RATE = 18.0;
         static constexpr Seconds REFRESH_RATE_SECONDS = 1.0 / REFRESH_RATE;
@@ -204,7 +237,8 @@ class GUI
             PlatformData platform_data,
             PlatformWidget parent_window,
             Synth& synth,
-            bool const show_vst_logo
+            bool const show_vst_logo,
+            EventHandler* const event_handler = NULL
         );
 
         GUI(GUI const& gui) = delete;
@@ -214,6 +248,14 @@ class GUI
 
         void show();
         void idle();
+
+        void resize(int const new_width, int const new_height);
+
+        void apply_size_constraints(int& new_width, int& new_height, Number& new_scale) const;
+
+        void ignore_resizing();
+        int get_width() const;
+        int get_height() const;
 
         void update_synth_state();
 
@@ -225,7 +267,25 @@ class GUI
         PlatformData get_platform_data() const;
 
     private:
+        class DefaultEventHandler : public EventHandler
+        {
+            public:
+                explicit DefaultEventHandler(GUI& gui);
+
+                virtual void handle_resize_request(
+                    int const new_width,
+                    int const new_height
+                ) override;
+
+            private:
+                GUI& gui;
+        };
+
+        static constexpr Number ASPECT_RATIO = WIDTH_FLOAT / HEIGHT_FLOAT;
+
         static constexpr size_t DEFAULT_STATUS_LINE_MAX_LENGTH = 48;
+
+        static constexpr int clamp(int const number, int const min, int const max);
 
         static void initialize_controllers_by_id();
 
@@ -314,6 +374,9 @@ class GUI
 
         char default_status_line[DEFAULT_STATUS_LINE_MAX_LENGTH];
 
+        DefaultEventHandler default_event_handler;
+        EventHandler* event_handler;
+
         Widget* dummy_widget;
 
         Image about_image;
@@ -327,14 +390,14 @@ class GUI
         Image synth_image;
         Image vst_logo_image;
 
-        ParamStateImages const* knob_states;
-        ParamStateImages const* knob_states_red;
-        ParamStateImages const* screw_states;
-        ParamStateImages const* envelope_shapes_01;
-        ParamStateImages const* envelope_shapes_10;
-        ParamStateImages const* macro_distortions;
-        ParamStateImages const* macro_midpoint_states;
-        ParamStateImages const* reversed_toggle_states;
+        ParamStateImages* knob_states;
+        ParamStateImages* knob_states_red;
+        ParamStateImages* screw_states;
+        ParamStateImages* envelope_shapes_01;
+        ParamStateImages* envelope_shapes_10;
+        ParamStateImages* macro_distortions;
+        ParamStateImages* macro_midpoint_states;
+        ParamStateImages* reversed_toggle_states;
         ControllerSelector* controller_selector;
         Background* background;
         TabBody* about_body;
@@ -347,13 +410,19 @@ class GUI
         TabBody* lfos_body;
         TabBody* synth_body;
         StatusLine* status_line;
+        Number scale;
         Integer active_voices_count;
         TapeParams::State tape_state;
         Color default_status_line_color;
 
+        int width;
+        int height;
+
         Synth& synth;
         JS80P::GUI::PlatformData platform_data;
         ExternallyCreatedWindow* parent_window;
+
+        bool resizing_allowed;
 };
 
 
@@ -378,6 +447,7 @@ class WidgetBase
             STATUS_LINE = 1 << 11,
             TOGGLE_SWITCH = 1 << 12,
             DISCRETE_PARAM_EDITOR = 1 << 13,
+            RESIZER_HANDLE = 1 << 14,
         };
 
         enum TextAlignment {
@@ -403,6 +473,9 @@ class WidgetBase
         virtual void set_text(char const* const text);
         virtual char const* get_text() const;
 
+        virtual void set_scale(Number const new_scale);
+        virtual int scale_value(int const value) const;
+
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* const name
@@ -416,8 +489,17 @@ class WidgetBase
             int const height
         );
 
+        virtual GUI::Image downscale_image(
+            GUI::Image source,
+            int const old_width,
+            int const old_height,
+            int const new_width,
+            int const new_height
+        );
+
         virtual void delete_image(GUI::Image image);
 
+        virtual bool is_on_screen() const;
         virtual void show();
         virtual void hide();
         virtual void focus();
@@ -556,6 +638,8 @@ class WidgetBase
          */
         virtual bool mouse_wheel(Number const delta, bool const modifier);
 
+        virtual uint64_t monotonic_clock_ms();
+
         virtual void fill_rectangle(
             int const left,
             int const top,
@@ -586,6 +670,8 @@ class WidgetBase
             int const height
         );
 
+        virtual void update_children_scale_if_changed();
+
         Type const type;
 
         GUI::Widgets children;
@@ -596,12 +682,16 @@ class WidgetBase
         WidgetBase* parent;
         char const* text;
 
+        Number scale;
+
         int left;
         int top;
         int width;
         int height;
 
+        bool is_visible;
         bool is_clicking;
+        bool scale_changed;
 };
 
 }

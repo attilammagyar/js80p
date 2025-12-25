@@ -17,6 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 
@@ -532,6 +533,8 @@ FstPlugin::FstPlugin(
     min_samples_before_next_bank_update(16384),
     remaining_samples_before_next_bank_update(0),
     prev_logged_op_code(-1),
+    gui_width(GUI::INIT_WIDTH),
+    gui_height(GUI::INIT_HEIGHT),
     had_midi_cc_event(false),
     need_bank_update(false),
     need_host_update(false)
@@ -540,8 +543,8 @@ FstPlugin::FstPlugin(
 
     window_rect.top = 0;
     window_rect.left = 0;
-    window_rect.bottom = GUI::HEIGHT;
-    window_rect.right = GUI::WIDTH;
+    window_rect.bottom = GUI::INIT_HEIGHT;
+    window_rect.right = GUI::INIT_WIDTH;
 
     populate_parameters(synth, parameters);
 
@@ -915,6 +918,57 @@ VstIntPtr FstPlugin::host_callback(
 }
 
 
+bool FstPlugin::can_host_resize_gui() noexcept
+{
+    char buffer[16];
+
+    std::fill_n(buffer, 16, '\x00');
+    strncpy(buffer, "sizeWindow", 16);
+
+    return host_callback(audioMasterCanDo, 0, 0, (void*)buffer, 0.0) == 1;
+}
+
+
+void FstPlugin::handle_resize_request(
+        int const new_width,
+        int const new_height
+) {
+    gui_width = new_width;
+    gui_height = new_height;
+    ensure_correct_gui_size();
+}
+
+
+void FstPlugin::ensure_correct_gui_size() noexcept
+{
+    if (gui == NULL || !can_resize_gui) {
+        return;
+    }
+
+    Number scale;
+
+    gui->apply_size_constraints(gui_width, gui_height, scale);
+
+    int const current_width = gui->get_width();
+    int const current_height = gui->get_height();
+
+    if (current_width == gui_width && current_height == gui_height) {
+        return;
+    }
+
+    gui->resize(gui_width, gui_height);
+
+    window_rect.bottom = window_rect.top + (short int)gui_height;
+    window_rect.right = window_rect.left + (short int)gui_width;
+
+    host_callback(
+        audioMasterSizeWindow,
+        (VstInt32)gui_width,
+        (VstIntPtr)gui_height
+    );
+}
+
+
 void FstPlugin::clear_received_midi_cc() noexcept
 {
     midi_cc_received.reset();
@@ -1262,8 +1316,27 @@ void FstPlugin::open_gui(GUI::PlatformWidget parent_window)
     process_internal_messages_in_gui_thread();
 
     close_gui();
-    gui = new GUI(FST_H_VERSION, platform_data, parent_window, synth, false);
+
+    can_resize_gui = can_host_resize_gui();
+
+    gui = new GUI(
+        FST_H_VERSION,
+        platform_data,
+        parent_window,
+        synth,
+        false,
+        this
+    );
+
+    if (!can_resize_gui) {
+        gui->ignore_resizing();
+    }
+
     gui->show();
+
+    if (can_resize_gui) {
+        ensure_correct_gui_size();
+    }
 }
 
 

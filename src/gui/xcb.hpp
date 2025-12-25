@@ -171,6 +171,8 @@ class Widget : public WidgetBase
         explicit Widget(char const* const text);
         virtual ~Widget();
 
+        virtual void set_scale(Number const new_scale) override;
+
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* const name
@@ -182,6 +184,14 @@ class Widget : public WidgetBase
             int const top,
             int const width,
             int const height
+        ) override;
+
+        virtual GUI::Image downscale_image(
+            GUI::Image source,
+            int const old_width,
+            int const old_height,
+            int const new_width,
+            int const new_height
         ) override;
 
         virtual void delete_image(GUI::Image image) override;
@@ -215,6 +225,8 @@ class Widget : public WidgetBase
         ) override;
 
         virtual bool paint() override;
+
+        virtual uint64_t monotonic_clock_ms() override;
 
         virtual void fill_rectangle(
             int const left,
@@ -261,6 +273,7 @@ class Widget : public WidgetBase
             | Type::STATUS_LINE
             | Type::TOGGLE_SWITCH
             | Type::DISCRETE_PARAM_EDITOR
+            | Type::RESIZER_HANDLE
         );
 
         class Resource;
@@ -386,7 +399,6 @@ class Widget : public WidgetBase
         xcb_timestamp_t mouse_down_time;
         bool need_to_destroy_window;
         bool is_transparent;
-        bool is_hidden;
 };
 
 }

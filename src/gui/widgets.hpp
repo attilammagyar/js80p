@@ -114,7 +114,7 @@ class TabBody : public TransparentWidget
 {
     public:
         static constexpr int LEFT = 0;
-        static constexpr int TOP = 30;
+        static constexpr int TOP = 60;
         static constexpr int WIDTH = GUI::WIDTH;
         static constexpr int HEIGHT = GUI::HEIGHT - TOP;
 
@@ -145,6 +145,7 @@ class Background : public Widget
         ~Background();
 
         void replace_body(TabBody* const new_body);
+        TabBody* get_body() const;
         void hide_body();
         void show_body();
         void refresh();
@@ -160,10 +161,10 @@ class Background : public Widget
 class TabSelector : public TransparentWidget
 {
     public:
-        static constexpr int LEFT = 3;
-        static constexpr int TOP = 2;
-        static constexpr int WIDTH = 72;
-        static constexpr int HEIGHT = 28;
+        static constexpr int LEFT = 6;
+        static constexpr int TOP = 4;
+        static constexpr int WIDTH = 144;
+        static constexpr int HEIGHT = 56;
 
         TabSelector(
             Background* const background,
@@ -173,14 +174,23 @@ class TabSelector : public TransparentWidget
             int const left
         );
 
+        virtual ~TabSelector();
+
+        virtual void set_scale(Number const new_scale) override;
+
     protected:
         virtual void click() override;
 
     private:
+        void rescale_tab_image_if_needed();
+
         Background* background;
         TabBody* tab_body;
 
-        GUI::Image tab_image;
+        GUI::Image tab_image_full_size;
+        GUI::Image tab_image_scaled;
+
+        bool needs_rescale;
 };
 
 
@@ -191,7 +201,9 @@ class ControllerSelector : public Widget
         static constexpr int TOP = 0;
         static constexpr int WIDTH = GUI::WIDTH;
         static constexpr int HEIGHT = GUI::HEIGHT;
-        static constexpr int TITLE_HEIGHT = 30;
+        static constexpr int TITLE_HEIGHT = 60;
+        static constexpr int FONT_SIZE = 24;
+        static constexpr int PADDING = 20;
 
         ControllerSelector(Background& background, Synth& synth);
 
@@ -219,7 +231,8 @@ class ControllerSelector : public Widget
         class Controller : public Widget
         {
             public:
-                static constexpr int HEIGHT = 18;
+                static constexpr int HEIGHT = 36;
+                static constexpr int PADDING = 6;
 
                 Controller(
                     ControllerSelector& controller_selector,
@@ -278,15 +291,19 @@ class ParamStateImages
 
         size_t ratio_to_index(Number const ratio) const;
 
+        void set_scale(Number const new_scale);
+
         size_t const count;
         int const width;
         int const height;
 
         WidgetBase* widget;
 
-        GUI::Image free_image;
-        GUI::Image controlled_image;
-        GUI::Image synced_image;
+        GUI::Image free_image_full;
+        GUI::Image controlled_image_full;
+        GUI::Image synced_image_full;
+        GUI::Image none_image_full;
+
         GUI::Image none_image;
 
         GUI::Image* free_images;
@@ -294,7 +311,13 @@ class ParamStateImages
         GUI::Image* synced_images;
 
     private:
-        GUI::Image* split_image(GUI::Image image) const;
+        void split_image(
+            GUI::Image image,
+            int const scaled_width,
+            int const scaled_height,
+            GUI::Image* images
+        ) const;
+
         GUI::Image* free_images_(GUI::Image* const images) const;
 
         size_t const last_index;
@@ -384,8 +407,9 @@ class KnobParamEditor : public TransparentWidget
         static constexpr size_t TEXT_MAX_LENGTH = 16;
         static constexpr size_t TITLE_MAX_LENGTH = 64;
 
-        static constexpr int VALUE_TEXT_HEIGHT = 20;
-        static constexpr int CONTROLLER_TEXT_HEIGHT = 16;
+        static constexpr int VALUE_TEXT_HEIGHT = 40;
+        static constexpr int CONTROLLER_TEXT_FONT_SIZE = 20;
+        static constexpr int CONTROLLER_TEXT_HEIGHT = 32;
         static constexpr int TEXTS_HEIGHT = VALUE_TEXT_HEIGHT + CONTROLLER_TEXT_HEIGHT;
 
         class Knob : public Widget
@@ -397,10 +421,10 @@ class KnobParamEditor : public TransparentWidget
                     MOUSE_WHEEL_COARSE_SCALE / 50.0
                 );
 
-                static constexpr Number MOUSE_MOVE_COARSE_SCALE = 1.0 / 240.0;
+                static constexpr Number MOUSE_MOVE_COARSE_SCALE = 1.0 / 500.0;
 
                 static constexpr Number MOUSE_MOVE_FINE_SCALE = (
-                    MOUSE_MOVE_COARSE_SCALE / 50.0
+                    MOUSE_MOVE_COARSE_SCALE / 100.0
                 );
 
                 Knob(
@@ -414,6 +438,8 @@ class KnobParamEditor : public TransparentWidget
                 );
 
                 virtual ~Knob();
+
+                virtual void set_scale(Number const new_scale) override;
 
                 void set_sync_param_id(Synth::ParamId const param_id);
 
@@ -495,19 +521,19 @@ class KnobParamEditor : public TransparentWidget
 class AboutText : public Widget
 {
     public:
-        static constexpr int LEFT = 10;
-        static constexpr int TOP = 10;
-        static constexpr int WIDTH = 960;
-        static constexpr int HEIGHT = 546;
+        static constexpr int LEFT = 20;
+        static constexpr int TOP = 20;
+        static constexpr int WIDTH = 2029;
+        static constexpr int HEIGHT = 1092;
 
-        static constexpr int LOGO_WIDTH = 320;
-        static constexpr int LOGO_HEIGHT = 299;
+        static constexpr int LOGO_WIDTH = 474;
+        static constexpr int LOGO_HEIGHT = 443;
 
-        static constexpr int FONT_SIZE = 14;
-        static constexpr int TEXT_TOP = 10;
-        static constexpr int LINE_HEIGHT = 25;
-        static constexpr int EMPTY_LINE_HEIGHT = 12;
-        static constexpr int PADDING = 10;
+        static constexpr int FONT_SIZE = 28;
+        static constexpr int TEXT_TOP = 20;
+        static constexpr int LINE_HEIGHT = 50;
+        static constexpr int EMPTY_LINE_HEIGHT = 24;
+        static constexpr int PADDING = 20;
 
         static constexpr char const* NAME = "JS80P";
 
@@ -544,22 +570,28 @@ class AboutText : public Widget
 
         AboutText(char const* const sdk_version, GUI::Image logo);
 
+        virtual ~AboutText();
+
+        virtual void set_scale(Number const new_scale) override;
+
     protected:
         virtual bool paint() override;
 
     private:
         GUI::Image logo;
+        GUI::Image logo_scaled;
         std::vector<std::string> lines;
+        bool needs_logo_rescale;
 };
 
 
 class StatusLine : public TransparentWidget
 {
     public:
-        static constexpr int LEFT = 654;
+        static constexpr int LEFT = 1424;
         static constexpr int TOP = 0;
-        static constexpr int WIDTH = 325;
-        static constexpr int HEIGHT = 24;
+        static constexpr int WIDTH = 650;
+        static constexpr int HEIGHT = 48;
 
         StatusLine();
 
@@ -658,6 +690,8 @@ class DiscreteParamEditor : public TransparentWidget
             ParamStateImages const* const state_images
         );
 
+        virtual void set_scale(Number const new_scale) override;
+
         virtual void refresh();
 
         Synth::ParamId const param_id;
@@ -725,8 +759,8 @@ class DiscreteParamEditor : public TransparentWidget
 class TuningSelector : public DiscreteParamEditor
 {
     public:
-        static constexpr int WIDTH = 93;
-        static constexpr int HEIGHT = 23;
+        static constexpr int WIDTH = 226;
+        static constexpr int HEIGHT = 46;
 
         TuningSelector(
             GUI& gui,
@@ -744,6 +778,32 @@ class TuningSelector : public DiscreteParamEditor
 
     private:
         bool is_mts_esp_connected;
+};
+
+
+class ResizerHandle : public TransparentWidget
+{
+    public:
+        static constexpr int RESIZE_MOVE_INTERVAL_MS = 100;
+        static constexpr int WIDTH = 64;
+        static constexpr int HEIGHT = 64;
+        static constexpr int LEFT = TabBody::WIDTH - WIDTH;
+        static constexpr int TOP = TabBody::HEIGHT - HEIGHT;
+
+        ResizerHandle(GUI& gui, GUI::EventHandler& event_handler);
+
+    protected:
+        virtual bool mouse_down(int const x, int const y) override;
+        virtual bool mouse_up(int const x, int const y) override;
+        virtual bool mouse_move(int const x, int const y, bool const modifier) override;
+
+    private:
+        void init_movement(int const x, int const y);
+
+        GUI::EventHandler& event_handler;
+        uint64_t prev_resize_time_ms;
+        int click_x;
+        int click_y;
 };
 
 }

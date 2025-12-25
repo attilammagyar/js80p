@@ -23,6 +23,7 @@
 #include <cstring>
 #include <csignal>
 #include <cstdlib>
+#include <ctime>
 #include <istream>
 #include <fstream>
 #include <ostream>
@@ -1303,6 +1304,66 @@ GUI::Image Widget::load_image(
 }
 
 
+GUI::Image Widget::copy_image_region(
+        GUI::Image source,
+        int const left,
+        int const top,
+        int const width,
+        int const height
+) {
+    cairo_surface_t* dest_surface = cairo_image_surface_create(
+        cairo_image_surface_get_format((cairo_surface_t*)source), width, height
+    );
+    cairo_t* cairo = cairo_create(dest_surface);
+    cairo_set_source_surface(
+        cairo, (cairo_surface_t*)source, (double)-left, (double)-top
+    );
+    cairo_rectangle(cairo, 0.0, 0.0, (double)width, (double)height);
+    cairo_fill(cairo);
+    cairo_destroy(cairo);
+
+    return dest_surface;
+}
+
+
+GUI::Image Widget::downscale_image(
+        GUI::Image source,
+        int const old_width,
+        int const old_height,
+        int const new_width,
+        int const new_height
+) {
+    cairo_surface_t* src_surface = (cairo_surface_t*)source;
+    cairo_surface_t* dest_surface = cairo_image_surface_create(
+        cairo_image_surface_get_format(src_surface),
+        new_width,
+        new_height
+    );
+    cairo_t* cairo = cairo_create(dest_surface);
+    cairo_pattern_t* ptrn = cairo_pattern_create_for_surface(src_surface);
+
+    cairo_matrix_t mtx;
+
+    cairo_matrix_init_scale(
+        &mtx,
+        (double)old_width / new_width,
+        (double)old_height / new_height
+    );
+    cairo_pattern_set_matrix(ptrn, &mtx);
+    cairo_pattern_set_filter(ptrn, CAIRO_FILTER_BILINEAR);
+    cairo_pattern_set_extend(ptrn, CAIRO_EXTEND_PAD);
+
+    cairo_set_source(cairo, ptrn);
+    cairo_rectangle(cairo, 0, 0, new_width, new_height);
+    cairo_fill(cairo);
+
+    cairo_pattern_destroy(ptrn);
+    cairo_destroy(cairo);
+
+    return dest_surface;
+}
+
+
 void Widget::delete_image(GUI::Image image)
 {
     cairo_surface_destroy((cairo_surface_t*)image);
@@ -1330,7 +1391,6 @@ void Widget::initialize()
     mouse_down_time = 0;
     need_to_destroy_window = false;
     is_transparent = (type & TRANSPARENT_WIDGETS) != 0;
-    is_hidden = false;
 }
 
 
@@ -1462,9 +1522,40 @@ void Widget::set_up(GUI::PlatformData platform_data, WidgetBase* const parent)
 }
 
 
+void Widget::set_scale(Number const new_scale)
+{
+    WidgetBase::set_scale(new_scale);
+
+    XcbPlatform* xcb = this->xcb();
+
+    if (JS80P_UNLIKELY(xcb == NULL)) {
+        return;
+    }
+
+    destroy_fake_transparent_background();
+
+    uint32_t values[4] = {
+        (uint32_t)this->scale_value(this->left),
+        (uint32_t)this->scale_value(this->top),
+        (uint32_t)this->scale_value(this->width),
+        (uint32_t)this->scale_value(this->height),
+    };
+
+    xcb_configure_window(
+        xcb_connection(),
+        window_id(),
+        XCB_CONFIG_WINDOW_X
+        | XCB_CONFIG_WINDOW_Y
+        | XCB_CONFIG_WINDOW_WIDTH
+        | XCB_CONFIG_WINDOW_HEIGHT,
+        values
+    );
+}
+
+
 bool Widget::paint()
 {
-    if (is_hidden) {
+    if (!this->is_on_screen()) {
         return true;
     }
 
@@ -1473,7 +1564,11 @@ bool Widget::paint()
 
         if (fake_transparent_background != NULL) {
             draw_image(
-                (GUI::Image)fake_transparent_background, 0, 0, width, height
+                (GUI::Image)fake_transparent_background,
+                0,
+                0,
+                this->scale_value(width),
+                this->scale_value(height)
             );
         }
     }
@@ -1513,10 +1608,10 @@ void Widget::update_fake_transparency()
     fake_transparent_background_source = first_parent_image;
     fake_transparent_background = (cairo_surface_t*)copy_image_region(
         (GUI::Image)fake_transparent_background_source,
-        fake_transparent_background_left,
-        fake_transparent_background_top,
-        width,
-        height
+        this->scale_value(fake_transparent_background_left),
+        this->scale_value(fake_transparent_background_top),
+        this->scale_value(width),
+        this->scale_value(height)
     );
 }
 
@@ -1542,6 +1637,16 @@ cairo_surface_t* Widget::find_first_parent_image()
     }
 
     return (cairo_surface_t*)first_parent_with_image->get_image();
+}
+
+
+uint64_t Widget::monotonic_clock_ms()
+{
+    struct timespec time;
+
+    clock_gettime(CLOCK_MONOTONIC, &time);
+
+    return time.tv_sec * 1000 + time.tv_nsec / 1000000;
 }
 
 
@@ -1642,38 +1747,16 @@ void Widget::draw_image(
 }
 
 
-GUI::Image Widget::copy_image_region(
-        GUI::Image source,
-        int const left,
-        int const top,
-        int const width,
-        int const height
-) {
-    cairo_surface_t* dest_surface = cairo_image_surface_create(
-        cairo_image_surface_get_format((cairo_surface_t*)source), width, height
-    );
-    cairo_t* cairo = cairo_create(dest_surface);
-    cairo_set_source_surface(
-        cairo, (cairo_surface_t*)source, (double)-left, (double)-top
-    );
-    cairo_rectangle(cairo, 0.0, 0.0, (double)width, (double)height);
-    cairo_fill(cairo);
-    cairo_destroy(cairo);
-
-    return dest_surface;
-}
-
-
 void Widget::show()
 {
-    is_hidden = false;
+    WidgetBase::show();
     xcb_map_window(xcb_connection(), window_id());
 }
 
 
 void Widget::hide()
 {
-    is_hidden = true;
+    WidgetBase::hide();
     xcb_unmap_window(xcb_connection(), window_id());
 }
 
@@ -1688,7 +1771,7 @@ void Widget::bring_to_top()
 
 void Widget::redraw()
 {
-    if (is_hidden) {
+    if (!this->is_on_screen()) {
         return;
     }
 

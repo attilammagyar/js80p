@@ -32,9 +32,9 @@ except ImportError as error:
     sys.exit(1)
 
 
-WIDTH = 980
-HEIGHT = 600
-LEFT = 11
+WIDTH = 2076
+HEIGHT = 1200
+LEFT = 22
 
 
 def save_tab_bg(file_name, mockup, top):
@@ -53,18 +53,18 @@ def main(argv):
     mockup = Image.open(os.path.join(argv[1]))
 
     tabs = (
-        ("synth", 11),
-        ("effects", 623),
-        ("macros1", 1235),
-        ("macros2", 1847),
-        ("macros3", 2459),
-        ("envelopes1", 3071),
-        ("envelopes2", 3683),
-        ("lfos", 4295),
-        ("about", 4907),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 0, "synth"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 1, "effects"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 2, "macros1"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 3, "macros2"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 4, "macros3"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 5, "envelopes1"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 6, "envelopes2"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 7, "lfos"),
+        (20 + 2 + (1200 + 20 + 2 + 2) * 8, "about"),
     )
 
-    for file_name, top in tabs:
+    for top, file_name in tabs:
         save_tab_bg(os.path.join(dir_name, file_name), mockup, top)
 
 

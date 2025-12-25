@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2024  Attila M. Magyar
+# Copyright (C) 2024, 2025  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@ RED_3 = (250, 180, 180)
 
 SUBPIXELS = 5
 
-WIDTH = 21
-HEIGHT = 21
-SEGMENTS = 20
-STROKE_WIDTH = int(SUBPIXELS * 3.5 + 0.5)
+WIDTH = 42
+HEIGHT = 42
+SEGMENTS = 50
+STROKE_WIDTH = int(7.0 * SUBPIXELS + 0.5)
 
 
 ENV_SHAPES = (
@@ -90,16 +90,16 @@ MACRO_DISTORTIONS = (
 def main(argv):
     out_dir = os.path.join(os.path.dirname(argv[0]), "../gui/img/")
     generate_image(
-        os.path.join(out_dir, "env_shapes-01.png"), 0.0, 1.0, ENV_SHAPES
+        os.path.join(out_dir, "env_shapes-01"), 0.0, 1.0, ENV_SHAPES
     )
     generate_image(
-        os.path.join(out_dir, "env_shapes-10.png"), 1.0, 0.0, ENV_SHAPES
+        os.path.join(out_dir, "env_shapes-10"), 1.0, 0.0, ENV_SHAPES
     )
     generate_image(
-        os.path.join(out_dir, "macro_distortions.png"), 0.0, 1.0, MACRO_DISTORTIONS
+        os.path.join(out_dir, "macro_distortions"), 0.0, 1.0, MACRO_DISTORTIONS
     )
     generate_image(
-        os.path.join(out_dir, "macro_midpoint_states.png"),
+        os.path.join(out_dir, "macro_midpoint_states"),
         0.0,
         1.0,
         tuple(
@@ -109,14 +109,14 @@ def main(argv):
     )
 
 
-def generate_image(out_file, start, end, funcs):
+def generate_image(out_file_prefix, start, end, funcs):
     image = Image.new("RGB", (WIDTH, HEIGHT * len(funcs)), (0, 0, 0))
 
     for i, (color, f) in enumerate(funcs):
         plot = draw_plot(f, start, end, color)
         image.paste(plot, (0, HEIGHT * i, WIDTH, HEIGHT * (i + 1)))
 
-    image.save(out_file)
+    image.save(out_file_prefix + ".png")
 
 
 def draw_plot(f, start, end, color):

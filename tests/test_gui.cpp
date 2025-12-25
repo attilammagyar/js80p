@@ -116,3 +116,51 @@ TEST(gui_initialization, {
     GUI gui(NULL, NULL, NULL, synth, false);
     gui.show();
 })
+
+
+void assert_applied_gui_size_constraints(
+        GUI& gui,
+        int const expected_width,
+        int const expected_height,
+        int const new_width,
+        int const new_height
+) {
+    Number scale;
+    int width = new_width;
+    int height = new_height;
+
+    gui.apply_size_constraints(width, height, scale);
+
+    assert_eq((Number)expected_width, (Number)width, 1.0);
+    assert_eq((Number)expected_height, (Number)height, 1.0);
+
+    gui.resize(new_width, new_height);
+    assert_eq((Number)expected_width, (Number)gui.get_width(), 1.0);
+    assert_eq((Number)expected_height, (Number)gui.get_height(), 1.0);
+}
+
+
+TEST(gui_can_apply_size_constraints, {
+    constexpr int max_w = GUI::MAX_WIDTH;
+    constexpr int max_h = GUI::MAX_HEIGHT;
+    constexpr int min_w = GUI::MIN_WIDTH;
+    constexpr int min_h = GUI::MIN_HEIGHT;
+    constexpr int half_w = GUI::WIDTH / 2;
+    constexpr int half_h = GUI::HEIGHT / 2;
+    Synth synth;
+    GUI gui(NULL, NULL, NULL, synth, false);
+
+    assert_applied_gui_size_constraints(gui, max_w, max_h, 999999, 999999);
+
+    assert_applied_gui_size_constraints(gui, min_w, min_h, 1, 1);
+    assert_applied_gui_size_constraints(gui, min_w, min_h, 999999, 1);
+    assert_applied_gui_size_constraints(gui, min_w, min_h, 1, 999999);
+
+    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, half_h);
+
+    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w + 100, half_h);
+    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, half_h + 100);
+
+    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, 999999);
+    assert_applied_gui_size_constraints(gui, half_w, half_h, 999999, half_h);
+})

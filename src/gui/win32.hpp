@@ -76,6 +76,8 @@ class Widget : public WidgetBase
 
         virtual void set_text(char const* const text) override;
 
+        virtual void set_scale(Number const new_scale) override;
+
         virtual GUI::Image load_image(
             GUI::PlatformData platform_data,
             char const* const name
@@ -87,6 +89,14 @@ class Widget : public WidgetBase
             int const top,
             int const width,
             int const height
+        ) override;
+
+        virtual GUI::Image downscale_image(
+            GUI::Image source,
+            int const old_width,
+            int const old_height,
+            int const new_width,
+            int const new_height
         ) override;
 
         virtual void delete_image(GUI::Image image) override;
@@ -144,6 +154,8 @@ class Widget : public WidgetBase
             WidgetBase* const parent
         ) override;
 
+        virtual uint64_t monotonic_clock_ms() override;
+
         virtual void fill_rectangle(
             int const left,
             int const top,
@@ -197,6 +209,14 @@ class Widget : public WidgetBase
             IWICBitmapDecoder* const decoder = NULL,
             IWICBitmapFrameDecode* const frame = NULL,
             IWICFormatConverter* const converter = NULL
+        );
+
+        GUI::Image done_downscaling_image(
+            HBITMAP bitmap,
+            IWICImagingFactory* const factory = NULL,
+            IWICBitmapScaler* const scaler = NULL,
+            IWICBitmap* const wic_source = NULL,
+            IWICBitmapSource* const scaled_bitmap_source = NULL
         );
 
         Text class_name;

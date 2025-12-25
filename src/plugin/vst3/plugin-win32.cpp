@@ -35,9 +35,12 @@ void Vst3Plugin::GUI::initialize()
         *platform_data,
         (JS80P::GUI::PlatformWidget)systemWindow,
         synth,
-        true
+        true,
+        this
     );
     gui->show();
+
+    this->plugFrame->resizeView(this, &gui_size);
 }
 
 

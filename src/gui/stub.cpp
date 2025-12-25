@@ -73,6 +73,18 @@ class Widget : public WidgetBase
             return (GUI::Image)new DummyObject();
         }
 
+        GUI::Image downscale_image(
+                GUI::Image source,
+                int const old_width,
+                int const old_height,
+                int const new_width,
+                int const new_height
+        ) override {
+            JS80P_ASSERT(new_width <= old_width && new_height <= old_height);
+
+            return (GUI::Image)new DummyObject();
+        }
+
         virtual void delete_image(GUI::Image image) override
         {
             delete (DummyObject*)image;
