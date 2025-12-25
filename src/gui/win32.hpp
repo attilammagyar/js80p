@@ -166,6 +166,7 @@ class Widget : public WidgetBase
 
         Text class_name;
         Text text_text;
+        Text tmp_text;
         DWORD dwStyle;
         WNDPROC original_window_procedure;
         UINT_PTR timer_id;

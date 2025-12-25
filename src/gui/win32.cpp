@@ -199,12 +199,12 @@ GUI::Image Widget::load_image(
         GUI::PlatformData platform_data,
         char const* const name
 ) {
-    Text name_text(name);
+    tmp_text.set(name);
 
     // TODO: GetLastError()
     GUI::Image image = (GUI::Image)LoadImage(
         (HINSTANCE)platform_data,               /* hInst    */
-        name_text.get_const(),                  /* name     */
+        tmp_text.get_const(),                   /* name     */
         IMAGE_BITMAP,                           /* type     */
         0,                                      /* cx       */
         0,                                      /* cy       */
@@ -379,6 +379,7 @@ Widget::Widget(
     hdc(NULL),
     class_name("STATIC"),
     text_text(text),
+    tmp_text(""),
     dwStyle(0),
     original_window_procedure(NULL),
     timer_id(0),
@@ -499,7 +500,7 @@ void Widget::draw_text(
     int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
     int const font_height = -(int)((double)font_size_px * 1.36 + 0.5);
 
-    Text text_obj(text);
+    tmp_text.set(text);
 
     HFONT font = CreateFont(
         font_height,                    /* cHeight          */
@@ -551,7 +552,7 @@ void Widget::draw_text(
             break;
     }
 
-    DrawText(hdc, text_obj.get_const(), -1, (LPRECT)&text_rect, format);
+    DrawText(hdc, tmp_text.get_const(), -1, (LPRECT)&text_rect, format);
 
     SelectObject(hdc, orig_font);
     SetTextColor(hdc, orig_text_color);
