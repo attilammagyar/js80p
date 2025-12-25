@@ -495,7 +495,7 @@ void Widget::draw_text(
         TextAlignment const alignment
 ) {
     int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
-    int const font_height = -MulDiv(font_size_px, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+    int const font_height = -(int)((double)font_size_px * 1.36 + 0.5);
 
     Text text_obj(text);
 
