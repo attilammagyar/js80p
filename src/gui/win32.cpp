@@ -40,12 +40,56 @@ Win32Platform::Win32Platform(HINSTANCE const dll_instance)
 
 Win32Platform::~Win32Platform()
 {
+    for (std::map<FontCacheKey, HFONT>::const_iterator it = font_cache.begin(); it != font_cache.end(); ++it) {
+        HFONT font = it->second;
+        DeleteObject((HGDIOBJ)font);
+    }
+
+    font_cache.clear();
 }
 
 
 HINSTANCE Win32Platform::get_dll_instance() const
 {
     return dll_instance;
+}
+
+
+HFONT Win32Platform::get_font(
+        int const size_px,
+        WidgetBase::FontWeight const weight
+) {
+    FontCacheKey const key = std::make_tuple(size_px, weight);
+    std::map<FontCacheKey, HFONT>::const_iterator const& item = font_cache.find(key);
+    HFONT font;
+
+    if (JS80P_LIKELY(item != font_cache.end())) {
+        font = item->second;
+    } else {
+        int const win32_height = -(int)((double)size_px * 1.36 + 0.5);
+        int const win32_weight = (
+            weight == WidgetBase::FontWeight::NORMAL ? FW_NORMAL : FW_BOLD
+        );
+
+        font_cache[key] = font = CreateFont(
+            win32_height,                   /* cHeight          */
+            0,                              /* cWidth           */
+            0,                              /* cEscapement      */
+            0,                              /* cOrientation     */
+            win32_weight,                   /* cWeight          */
+            FALSE,                          /* bItalic          */
+            FALSE,                          /* bUnderline       */
+            FALSE,                          /* bStrikeOut       */
+            ANSI_CHARSET,                   /* iCharSet         */
+            OUT_DEFAULT_PRECIS,             /* iOutPrecision    */
+            CLIP_DEFAULT_PRECIS,            /* iClipPrecision   */
+            ANTIALIASED_QUALITY,            /* iQuality         */
+            DEFAULT_PITCH | FF_DONTCARE,    /* iPitchAndFamily  */
+            TEXT("Arial")                   /* pszFaceName      */
+        );
+    }
+
+    return font;
 }
 
 
@@ -532,40 +576,21 @@ void Widget::draw_text(
         int const padding,
         TextAlignment const alignment
 ) {
-    int const weight = font_weight == FontWeight::NORMAL ? FW_NORMAL : FW_BOLD;
-    int const font_height = -(int)((double)font_size_px * 1.36 + 0.5);
+    Win32Platform* const win32_platform = (Win32Platform*)platform_data;
+    HFONT const font = win32_platform->get_font(font_size_px, font_weight);
 
-    tmp_text.set(text);
-
-    HFONT font = CreateFont(
-        font_height,                    /* cHeight          */
-        0,                              /* cWidth           */
-        0,                              /* cEscapement      */
-        0,                              /* cOrientation     */
-        weight,                         /* cWeight          */
-        FALSE,                          /* bItalic          */
-        FALSE,                          /* bUnderline       */
-        FALSE,                          /* bStrikeOut       */
-        ANSI_CHARSET,                   /* iCharSet         */
-        OUT_DEFAULT_PRECIS,             /* iOutPrecision    */
-        CLIP_DEFAULT_PRECIS,            /* iClipPrecision   */
-        ANTIALIASED_QUALITY,            /* iQuality         */
-        DEFAULT_PITCH | FF_DONTCARE,    /* iPitchAndFamily  */
-        TEXT("Arial")                   /* pszFaceName      */
-    );
-
-    int orig_bk_mode = SetBkMode(hdc, OPAQUE);
-    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
-    COLORREF orig_bk_color = SetBkColor(hdc, to_colorref(background));
-    COLORREF orig_text_color = SetTextColor(hdc, to_colorref(color));
-    HGDIOBJ orig_font = (HFONT)SelectObject(hdc, (HGDIOBJ)font);
+    int const orig_bk_mode = SetBkMode(hdc, OPAQUE);
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
+    COLORREF const orig_bk_color = SetBkColor(hdc, to_colorref(background));
+    COLORREF const orig_text_color = SetTextColor(hdc, to_colorref(color));
+    HGDIOBJ const orig_font = (HFONT)SelectObject(hdc, (HGDIOBJ)font);
 
     RECT text_rect;
     text_rect.left = left;
     text_rect.top = top;
     text_rect.right = left + width;
     text_rect.bottom = top + height;
-    HBRUSH brush = CreateSolidBrush(to_colorref(background));
+    HBRUSH const brush = CreateSolidBrush(to_colorref(background));
     FillRect(hdc, (LPRECT)&text_rect, brush);
 
     text_rect.left += padding;
@@ -587,6 +612,8 @@ void Widget::draw_text(
             break;
     }
 
+    tmp_text.set(text);
+
     DrawText(hdc, tmp_text.get_const(), -1, (LPRECT)&text_rect, format);
 
     SelectObject(hdc, orig_font);
@@ -596,7 +623,6 @@ void Widget::draw_text(
     SetBkMode(hdc, orig_bk_mode);
 
     DeleteObject((HGDIOBJ)brush);
-    DeleteObject((HGDIOBJ)font);
 }
 
 

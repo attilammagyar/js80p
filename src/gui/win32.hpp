@@ -20,6 +20,8 @@
 #define JS80P__GUI__WIN32_HPP
 
 #include <string>
+#include <map>
+#include <tuple>
 #include <vector>
 
 #include <windows.h>
@@ -44,8 +46,15 @@ class Win32Platform
 
         HINSTANCE get_dll_instance() const;
 
+        HFONT get_font(int const size_px, WidgetBase::FontWeight const weight);
+
     private:
+        typedef std::tuple<int, WidgetBase::FontWeight> FontCacheKey;
+        typedef std::map<FontCacheKey, HFONT> FontCache;
+
         HINSTANCE const dll_instance;
+
+        FontCache font_cache;
 };
 
 
