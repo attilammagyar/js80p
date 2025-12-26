@@ -104,6 +104,8 @@ void GUI::initialize()
     Win32Platform* const win32_platform = new Win32Platform(dll_instance);
 
     platform_data = (PlatformData)win32_platform;
+
+    CoInitialize(NULL);
 }
 
 
@@ -115,6 +117,8 @@ void GUI::destroy()
     platform_data = (PlatformData)dll_instance;
 
     delete win32_platform;
+
+    CoUninitialize();
 }
 
 
@@ -279,16 +283,164 @@ GUI::Image Widget::load_image(
     tmp_text.set(name);
 
     // TODO: GetLastError()
-    GUI::Image image = (GUI::Image)LoadImage(
-        win32_platform->get_dll_instance(),     /* hInst    */
-        tmp_text.get_const(),                   /* name     */
-        IMAGE_BITMAP,                           /* type     */
-        0,                                      /* cx       */
-        0,                                      /* cy       */
-        LR_CREATEDIBSECTION                     /* fuLoad   */
+
+    HINSTANCE dll_instance = win32_platform->get_dll_instance();
+
+    HRSRC resource_info = FindResource(
+        dll_instance,
+        tmp_text.get_const(),
+        TEXT("PNG")
+    );
+    DWORD size = SizeofResource(dll_instance, resource_info);
+    HGLOBAL resource = LoadResource(dll_instance, resource_info);
+    LPVOID resource_bytes = LockResource(resource);
+
+    HRESULT result = S_OK;
+
+    IWICImagingFactory* factory = NULL;
+
+    result = CoCreateInstance(
+        CLSID_WICImagingFactory,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&factory)
     );
 
-    return image;
+    if (FAILED(result)) {
+        return done_loading_image(NULL);
+    }
+
+    IWICStream* stream = NULL;
+
+    result = factory->CreateStream(&stream);
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory);
+    }
+
+    result = stream->InitializeFromMemory((BYTE*)resource_bytes, size);
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream);
+    }
+
+    IWICBitmapDecoder* decoder = NULL;
+
+    result = factory->CreateDecoderFromStream(
+        stream,
+        NULL,
+        WICDecodeMetadataCacheOnLoad,
+        &decoder
+    );
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream);
+    }
+
+    IWICBitmapFrameDecode* frame = NULL;
+
+    result = decoder->GetFrame(0, &frame);
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream, decoder);
+    }
+
+    IWICFormatConverter* converter = NULL;
+
+    result = factory->CreateFormatConverter(&converter);
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream, decoder, frame);
+    }
+
+    result = converter->Initialize(
+        frame,
+        GUID_WICPixelFormat32bppBGRA,
+        WICBitmapDitherTypeNone,
+        NULL,
+        0.0,
+        WICBitmapPaletteTypeCustom
+    );
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+    }
+
+    UINT width = 0;
+    UINT height = 0;
+
+    result = converter->GetSize(&width, &height);
+
+    if (FAILED(result)) {
+        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+    }
+
+    BITMAPINFO bitmap_info = {};
+    bitmap_info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmap_info.bmiHeader.biWidth = (LONG)width;
+    bitmap_info.bmiHeader.biHeight = -(LONG)height; /* top-down DIB */
+    bitmap_info.bmiHeader.biPlanes = 1;
+    bitmap_info.bmiHeader.biBitCount = 32;
+    bitmap_info.bmiHeader.biCompression = BI_RGB;
+
+    void* bits = NULL;
+    HDC hdc = GetDC(NULL);
+    HBITMAP bitmap = CreateDIBSection(hdc, &bitmap_info, DIB_RGB_COLORS, &bits, NULL, 0);
+    ReleaseDC(NULL, hdc);
+
+    if (bitmap == NULL) {
+        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+    }
+
+    if (bits == NULL) {
+        DeleteObject(bitmap);
+
+        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+    }
+
+    UINT stride = width * 4;
+
+    result = converter->CopyPixels(NULL, stride, stride * height, (BYTE*)bits);
+
+    if (FAILED(result)) {
+        DeleteObject(bitmap);
+
+        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+    }
+
+    return done_loading_image(bitmap, factory, stream, decoder, frame, converter);
+}
+
+
+GUI::Image Widget::done_loading_image(
+        HBITMAP bitmap,
+        IWICImagingFactory* const factory,
+        IWICStream* const stream,
+        IWICBitmapDecoder* const decoder,
+        IWICBitmapFrameDecode* const frame,
+        IWICFormatConverter* const converter
+) {
+    if (converter != NULL) {
+        converter->Release();
+    }
+
+    if (frame != NULL) {
+        frame->Release();
+    }
+
+    if (decoder != NULL) {
+        decoder->Release();
+    }
+
+    if (stream != NULL) {
+        stream->Release();
+    }
+
+    if (factory != NULL) {
+        factory->Release();
+    }
+
+    return (GUI::Image)bitmap;
 }
 
 

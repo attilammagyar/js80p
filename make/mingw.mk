@@ -40,27 +40,27 @@ GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
 
 GUI_IMAGES = \
-	gui/img/about.bmp \
-	gui/img/effects.bmp \
-	gui/img/envelopes1.bmp \
-	gui/img/envelopes2.bmp \
-	gui/img/env_shapes-01.bmp \
-	gui/img/env_shapes-10.bmp \
-	gui/img/knob_states-controlled.bmp \
-	gui/img/knob_states-free.bmp \
-	gui/img/knob_states-none.bmp \
-	gui/img/knob_states-red.bmp \
-	gui/img/lfos.bmp \
-	gui/img/macro_distortions.bmp \
-	gui/img/macro_midpoint_states.bmp \
-	gui/img/macros1.bmp \
-	gui/img/macros2.bmp \
-	gui/img/macros3.bmp \
-	gui/img/reversed.bmp \
-	gui/img/screw_states.bmp \
-	gui/img/screw_states_synced.bmp \
-	gui/img/synth.bmp \
-	gui/img/vst_logo.bmp
+	gui/img/about.png \
+	gui/img/effects.png \
+	gui/img/envelopes1.png \
+	gui/img/envelopes2.png \
+	gui/img/env_shapes-01.png \
+	gui/img/env_shapes-10.png \
+	gui/img/knob_states-controlled.png \
+	gui/img/knob_states-free.png \
+	gui/img/knob_states-none.png \
+	gui/img/knob_states-red.png \
+	gui/img/lfos.png \
+	gui/img/macro_distortions.png \
+	gui/img/macro_midpoint_states.png \
+	gui/img/macros1.png \
+	gui/img/macros2.png \
+	gui/img/macros3.png \
+	gui/img/reversed.png \
+	gui/img/screw_states.png \
+	gui/img/screw_states_synced.png \
+	gui/img/synth.png \
+	gui/img/vst_logo.png
 
 OBJ_TARGET_GUI_EXTRA = $(BUILD_DIR)/gui-$(SUFFIX).res
 
@@ -75,7 +75,8 @@ TARGET_PLATFORM_LFLAGS = \
 	-lkernel32 \
 	-municode \
 	-lcomdlg32 \
-	-lole32
+	-lole32 \
+	-lwindowscodecs
 
 LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static
 LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall -static

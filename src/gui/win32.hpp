@@ -26,7 +26,11 @@
 
 #include <windows.h>
 #include <windowsx.h>
+
+#include <combaseapi.h>
 #include <commctrl.h>
+#include <objbase.h>
+#include <wincodec.h>
 
 #include "js80p.hpp"
 #include "serializer.hpp"
@@ -185,6 +189,15 @@ class Widget : public WidgetBase
 
         void capture_mouse();
         void release_captured_mouse();
+
+        GUI::Image done_loading_image(
+            HBITMAP bitmap,
+            IWICImagingFactory* const factory = NULL,
+            IWICStream* const stream = NULL,
+            IWICBitmapDecoder* const decoder = NULL,
+            IWICBitmapFrameDecode* const frame = NULL,
+            IWICFormatConverter* const converter = NULL
+        );
 
         Text class_name;
         Text text_text;
