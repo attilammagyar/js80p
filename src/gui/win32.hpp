@@ -41,7 +41,7 @@ namespace JS80P
 class Win32Platform
 {
     public:
-        Win32Platform(HINSTANCE const dll_instance);
+        Win32Platform(HINSTANCE dll_instance);
         ~Win32Platform();
 
         HINSTANCE get_dll_instance() const;
@@ -52,7 +52,7 @@ class Win32Platform
         typedef std::tuple<int, WidgetBase::FontWeight> FontCacheKey;
         typedef std::map<FontCacheKey, HFONT> FontCache;
 
-        HINSTANCE const dll_instance;
+        HINSTANCE dll_instance;
 
         FontCache font_cache;
 };

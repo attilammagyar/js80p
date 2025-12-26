@@ -32,7 +32,7 @@
 namespace JS80P
 {
 
-Win32Platform::Win32Platform(HINSTANCE const dll_instance)
+Win32Platform::Win32Platform(HINSTANCE dll_instance)
     : dll_instance(dll_instance)
 {
 }
@@ -101,7 +101,7 @@ void GUI::idle()
 void GUI::initialize()
 {
     HINSTANCE dll_instance = (HINSTANCE)platform_data;
-    Win32Platform* win32_platform = new Win32Platform(dll_instance);
+    Win32Platform* const win32_platform = new Win32Platform(dll_instance);
 
     platform_data = (PlatformData)win32_platform;
 }
@@ -109,7 +109,7 @@ void GUI::initialize()
 
 void GUI::destroy()
 {
-    Win32Platform* win32_platform = (Win32Platform*)platform_data;
+    Win32Platform* const win32_platform = (Win32Platform*)platform_data;
     HINSTANCE dll_instance = win32_platform->get_dll_instance();
 
     platform_data = (PlatformData)dll_instance;
@@ -150,11 +150,13 @@ void Widget::Text::free_buffers()
 {
     if (ctext != NULL) {
         delete[] ctext;
+
         ctext = NULL;
     }
 
     if (wtext != NULL) {
         delete[] wtext;
+
         wtext = NULL;
     }
 
@@ -550,7 +552,7 @@ void Widget::fill_rectangle(
         int const height,
         GUI::Color const color
 ) {
-    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
     RECT rect;
     rect.left = left;
     rect.top = top;
@@ -577,7 +579,7 @@ void Widget::draw_text(
         TextAlignment const alignment
 ) {
     Win32Platform* const win32_platform = (Win32Platform*)platform_data;
-    HFONT const font = win32_platform->get_font(font_size_px, font_weight);
+    HFONT font = win32_platform->get_font(font_size_px, font_weight);
 
     int const orig_bk_mode = SetBkMode(hdc, OPAQUE);
     int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
@@ -590,7 +592,7 @@ void Widget::draw_text(
     text_rect.top = top;
     text_rect.right = left + width;
     text_rect.bottom = top + height;
-    HBRUSH const brush = CreateSolidBrush(to_colorref(background));
+    HBRUSH brush = CreateSolidBrush(to_colorref(background));
     FillRect(hdc, (LPRECT)&text_rect, brush);
 
     text_rect.left += padding;
@@ -634,7 +636,7 @@ void Widget::draw_image(
         int const height
 ) {
     HDC image_hdc = CreateCompatibleDC(hdc);
-    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
     SetMapMode(image_hdc, MM_TEXT);
     SelectObject(image_hdc, (HBITMAP)image);
     BitBlt(hdc, left, top, width, height, image_hdc, 0, 0, SRCCOPY);
@@ -655,7 +657,7 @@ GUI::Image Widget::copy_image_region(
     HDC source_hdc = CreateCompatibleDC(hdc);
     HDC destination_hdc = CreateCompatibleDC(hdc);
 
-    int orig_map_mode = SetMapMode(hdc, MM_TEXT);
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
 
     SetMapMode(source_hdc, MM_TEXT);
     SetMapMode(destination_hdc, MM_TEXT);
