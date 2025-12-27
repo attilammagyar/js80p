@@ -3622,8 +3622,8 @@ WidgetBase* WidgetBase::get_parent() const
 
 
 GUI::Image WidgetBase::load_image(
-    GUI::PlatformData platform_data,
-    char const* const name
+        GUI::PlatformData platform_data,
+        char const* const name
 ) {
     return NULL;
 }
@@ -3760,27 +3760,27 @@ bool WidgetBase::mouse_wheel(Number const delta, bool const modifier)
 
 
 void WidgetBase::fill_rectangle(
-    int const left,
-    int const top,
-    int const width,
-    int const height,
-    GUI::Color const color
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        GUI::Color const color
 ) {
 }
 
 
 void WidgetBase::draw_text(
-    char const* const text,
-    int const font_size_px,
-    int const left,
-    int const top,
-    int const width,
-    int const height,
-    GUI::Color const color,
-    GUI::Color const background,
-    FontWeight const font_weight,
-    int const padding,
-    TextAlignment const alignment
+        char const* const text,
+        int const font_size_px,
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        GUI::Color const color,
+        GUI::Color const background,
+        FontWeight const font_weight,
+        int const padding,
+        TextAlignment const alignment
 ) {
 }
 
@@ -3796,11 +3796,11 @@ void WidgetBase::draw_image(
 
 
 GUI::Image WidgetBase::copy_image_region(
-    GUI::Image source,
-    int const left,
-    int const top,
-    int const width,
-    int const height
+        GUI::Image source,
+        int const left,
+        int const top,
+        int const width,
+        int const height
 ) {
     return NULL;
 }
