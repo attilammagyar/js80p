@@ -287,9 +287,9 @@ GUI::Image Widget::load_image(
     HINSTANCE dll_instance = win32_platform->get_dll_instance();
 
     HRSRC resource_info = FindResource(
-        dll_instance,
-        tmp_text.get_const(),
-        TEXT("PNG")
+        dll_instance,                   /* hModule */
+        tmp_text.get_const(),           /* lpName */
+        TEXT("PNG")                     /* lpType */
     );
     DWORD size = SizeofResource(dll_instance, resource_info);
     HGLOBAL resource = LoadResource(dll_instance, resource_info);
@@ -300,10 +300,10 @@ GUI::Image Widget::load_image(
     IWICImagingFactory* factory = NULL;
 
     result = CoCreateInstance(
-        CLSID_WICImagingFactory,
-        NULL,
-        CLSCTX_INPROC_SERVER,
-        IID_PPV_ARGS(&factory)
+        CLSID_WICImagingFactory,        /* rclsid */
+        NULL,                           /* pUnkOuter */
+        CLSCTX_INPROC_SERVER,           /* dwClsContext */
+        IID_PPV_ARGS(&factory)          /* riid, ppv */
     );
 
     if (FAILED(result)) {
@@ -327,10 +327,10 @@ GUI::Image Widget::load_image(
     IWICBitmapDecoder* decoder = NULL;
 
     result = factory->CreateDecoderFromStream(
-        stream,
-        NULL,
-        WICDecodeMetadataCacheOnLoad,
-        &decoder
+        stream,                         /* pIStream */
+        NULL,                           /* pguidVendor */
+        WICDecodeMetadataCacheOnLoad,   /* metadataOptions */
+        &decoder                        /* ppIDecoder */
     );
 
     if (FAILED(result)) {
@@ -354,12 +354,12 @@ GUI::Image Widget::load_image(
     }
 
     result = converter->Initialize(
-        frame,
-        GUID_WICPixelFormat32bppBGRA,
-        WICBitmapDitherTypeNone,
-        NULL,
-        0.0,
-        WICBitmapPaletteTypeCustom
+        frame,                          /* pISource */
+        GUID_WICPixelFormat32bppBGRA,   /* dstFormat */
+        WICBitmapDitherTypeNone,        /* dither */
+        NULL,                           /* pIPalette */
+        0.0,                            /* alphaThresholdPercent */
+        WICBitmapPaletteTypeCustom      /* paletteTranslate */
     );
 
     if (FAILED(result)) {
@@ -383,10 +383,23 @@ GUI::Image Widget::load_image(
     bitmap_info.bmiHeader.biBitCount = 32;
     bitmap_info.bmiHeader.biCompression = BI_RGB;
 
+    HDC hdc = GetDC((HWND)platform_widget);
+
+    int const orig_map_mode = SetMapMode(hdc, MM_TEXT);
+
     void* bits = NULL;
-    HDC hdc = GetDC(NULL);
-    HBITMAP bitmap = CreateDIBSection(hdc, &bitmap_info, DIB_RGB_COLORS, &bits, NULL, 0);
-    ReleaseDC(NULL, hdc);
+    HBITMAP bitmap = CreateDIBSection(
+        hdc,                            /* hdc */
+        &bitmap_info,                   /* pbmi */
+        DIB_RGB_COLORS,                 /* usage */
+        &bits,                          /* ppvBits */
+        NULL,                           /* hSection */
+        0                               /* offset */
+    );
+
+    SetMapMode(hdc, orig_map_mode);
+
+    ReleaseDC((HWND)platform_widget, hdc);
 
     if (bitmap == NULL) {
         return done_loading_image(NULL, factory, stream, decoder, frame, converter);
@@ -400,7 +413,12 @@ GUI::Image Widget::load_image(
 
     UINT stride = width * 4;
 
-    result = converter->CopyPixels(NULL, stride, stride * height, (BYTE*)bits);
+    result = converter->CopyPixels(
+        NULL,                           /* prc */
+        stride,                         /* cbStride */
+        stride * height,                /* cbBufferSize */
+        (BYTE*)bits                     /* pbBuffer */
+    );
 
     if (FAILED(result)) {
         DeleteObject(bitmap);
