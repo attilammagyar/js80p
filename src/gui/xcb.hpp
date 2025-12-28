@@ -176,6 +176,14 @@ class Widget : public WidgetBase
             char const* const name
         ) override;
 
+        virtual GUI::Image copy_image_region(
+            GUI::Image source,
+            int const left,
+            int const top,
+            int const width,
+            int const height
+        ) override;
+
         virtual void delete_image(GUI::Image image) override;
 
         virtual void show() override;
@@ -232,14 +240,6 @@ class Widget : public WidgetBase
 
         virtual void draw_image(
             GUI::Image image,
-            int const left,
-            int const top,
-            int const width,
-            int const height
-        ) override;
-
-        virtual GUI::Image copy_image_region(
-            GUI::Image source,
             int const left,
             int const top,
             int const width,

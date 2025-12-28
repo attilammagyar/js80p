@@ -63,6 +63,16 @@ class Widget : public WidgetBase
             return (GUI::Image)new DummyObject();
         }
 
+        GUI::Image copy_image_region(
+                GUI::Image source,
+                int const left,
+                int const top,
+                int const width,
+                int const height
+        ) override {
+            return (GUI::Image)new DummyObject();
+        }
+
         virtual void delete_image(GUI::Image image) override
         {
             delete (DummyObject*)image;
@@ -86,16 +96,6 @@ class Widget : public WidgetBase
                 Type const type
         ) : WidgetBase(platform_data, platform_widget, type)
         {
-        }
-
-        GUI::Image copy_image_region(
-                GUI::Image source,
-                int const left,
-                int const top,
-                int const width,
-                int const height
-        ) override {
-            return (GUI::Image)new DummyObject();
         }
 
     private:
