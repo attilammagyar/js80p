@@ -148,7 +148,8 @@ bool ExportPatchButton::mouse_leave(int const x, int const y)
 
 
 TabBody::TabBody(GUI& gui, char const* const text)
-    : TransparentWidget(text, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY)
+    : TransparentWidget(text, LEFT, TOP, WIDTH, HEIGHT, Type::TAB_BODY),
+    tab_selector(NULL)
 {
     set_gui(gui);
 }
@@ -222,6 +223,22 @@ void TabBody::refresh_all_params()
 }
 
 
+void TabBody::set_tab_selector(TabSelector& tab_selector)
+{
+    this->tab_selector = &tab_selector;
+}
+
+
+void TabBody::hide()
+{
+    TransparentWidget::hide();
+
+    if (tab_selector != NULL) {
+        tab_selector->tab_body_hidden();
+    }
+}
+
+
 Background::Background()
     : Widget("JS80P", 0, 0, GUI::WIDTH, GUI::HEIGHT, Type::BACKGROUND),
     body(NULL),
@@ -237,8 +254,17 @@ Background::~Background()
 
 void Background::replace_body(TabBody* const new_body)
 {
-    if (body != NULL) {
-        body->hide();
+    if (new_body == body) {
+        body->show();
+        return;
+    }
+
+    TabBody* old_body = body;
+
+    body = NULL;
+
+    if (old_body != NULL) {
+        old_body->hide();
     }
 
     body = new_body;
@@ -287,26 +313,38 @@ void Background::refresh()
 
 TabSelector::TabSelector(
         Background* const background,
-        GUI::Image tab_image,
+        char const* const tab_image_name,
         TabBody* const tab_body,
         char const* const text,
         int const left
 ) : TransparentWidget(text, left, TOP, WIDTH, HEIGHT, Type::TAB_SELECTOR),
+    tab_image_name(tab_image_name),
     background(background),
     tab_body(tab_body),
-    tab_image_full_size(tab_image),
+    tab_image_full_size(NULL),
     tab_image_scaled(NULL),
-    needs_rescale(true)
+    needs_tab_image_update(true)
 {
+    tab_body->set_tab_selector(*this);
 }
 
 
 TabSelector::~TabSelector()
 {
+    destroy_tab_image();
+}
+
+
+void TabSelector::destroy_tab_image()
+{
     if (tab_image_scaled != NULL) {
         this->delete_image(tab_image_scaled);
-
         tab_image_scaled = NULL;
+    }
+
+    if (tab_image_full_size != NULL) {
+        this->delete_image(tab_image_full_size);
+        tab_image_full_size = NULL;
     }
 }
 
@@ -315,12 +353,26 @@ void TabSelector::set_scale(Number const new_scale)
 {
     TransparentWidget::set_scale(new_scale);
 
-    needs_rescale = true;
+    needs_tab_image_update = true;
 
-    if (background->get_body() == tab_body) {
-        rescale_tab_image_if_needed();
-        background->set_image(tab_image_scaled);
+    if (background->get_body() != tab_body) {
+        return;
     }
+
+    background->set_image(NULL);
+    ensure_scaled_tab_image();
+    background->set_image(tab_image_scaled);
+}
+
+
+void TabSelector::tab_body_hidden()
+{
+    if (background->get_body() == tab_body) {
+        return;
+    }
+
+    destroy_tab_image();
+    needs_tab_image_update = true;
 }
 
 
@@ -328,20 +380,34 @@ void TabSelector::click()
 {
     TransparentWidget::click();
 
-    rescale_tab_image_if_needed();
+    ensure_scaled_tab_image();
 
     background->set_image(tab_image_scaled);
     background->replace_body(tab_body);
 }
 
 
-void TabSelector::rescale_tab_image_if_needed()
+void TabSelector::ensure_scaled_tab_image()
 {
-    if (!needs_rescale) {
+    if (!needs_tab_image_update) {
         return;
     }
 
-    needs_rescale = false;
+    if (JS80P_UNLIKELY(this->platform_data == NULL)) {
+        return;
+    }
+
+    if (tab_image_full_size == NULL) {
+        tab_image_full_size = this->load_image(
+            this->platform_data,
+            this->tab_image_name
+        );
+
+        if (tab_image_full_size == NULL) {
+            return;
+        }
+    }
+
     GUI::Image old_tab_image_scaled = tab_image_scaled;
 
     int const width = background->get_width();
@@ -358,6 +424,8 @@ void TabSelector::rescale_tab_image_if_needed()
     if (old_tab_image_scaled != NULL) {
         delete_image(old_tab_image_scaled);
     }
+
+    needs_tab_image_update = false;
 }
 
 

@@ -131,10 +131,16 @@ class TabBody : public TransparentWidget
         void refresh_controlled_knob_param_editors();
         void refresh_all_params();
 
+        void set_tab_selector(TabSelector& tab_selector);
+
+        virtual void hide() override;
+
     private:
         GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitchParamEditors toggle_switch_param_editors;
         GUI::DiscreteParamEditors discrete_param_editors;
+
+        TabSelector* tab_selector;
 };
 
 
@@ -168,7 +174,7 @@ class TabSelector : public TransparentWidget
 
         TabSelector(
             Background* const background,
-            GUI::Image tab_image,
+            char const* const tab_image_name,
             TabBody* const tab_body,
             char const* const text,
             int const left
@@ -178,11 +184,16 @@ class TabSelector : public TransparentWidget
 
         virtual void set_scale(Number const new_scale) override;
 
+        void tab_body_hidden();
+
     protected:
         virtual void click() override;
 
     private:
-        void rescale_tab_image_if_needed();
+        void destroy_tab_image();
+        void ensure_scaled_tab_image();
+
+        char const* const tab_image_name;
 
         Background* background;
         TabBody* tab_body;
@@ -190,7 +201,7 @@ class TabSelector : public TransparentWidget
         GUI::Image tab_image_full_size;
         GUI::Image tab_image_scaled;
 
-        bool needs_rescale;
+        bool needs_tab_image_update;
 };
 
 

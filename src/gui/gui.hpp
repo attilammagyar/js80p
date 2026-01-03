@@ -379,15 +379,6 @@ class GUI
 
         Widget* dummy_widget;
 
-        Image about_image;
-        Image macros_1_image;
-        Image macros_2_image;
-        Image macros_3_image;
-        Image effects_image;
-        Image envelopes_1_image;
-        Image envelopes_2_image;
-        Image lfos_image;
-        Image synth_image;
         Image vst_logo_image;
 
         ParamStateImages* knob_states;

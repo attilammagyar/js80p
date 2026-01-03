@@ -1992,23 +1992,12 @@ GUI::GUI(
         36
     );
 
-    about_image = dummy_widget->load_image(this->platform_data, "ABOUT");
-    macros_1_image = dummy_widget->load_image(this->platform_data, "MACROS1");
-    macros_2_image = dummy_widget->load_image(this->platform_data, "MACROS2");
-    macros_3_image = dummy_widget->load_image(this->platform_data, "MACROS3");
-    effects_image = dummy_widget->load_image(this->platform_data, "EFFECTS");
-    envelopes_1_image = dummy_widget->load_image(this->platform_data, "ENVELOPES1");
-    envelopes_2_image = dummy_widget->load_image(this->platform_data, "ENVELOPES2");
-    lfos_image = dummy_widget->load_image(this->platform_data, "LFOS");
-    synth_image = dummy_widget->load_image(this->platform_data, "SYNTH");
     vst_logo_image = dummy_widget->load_image(this->platform_data, "VSTLOGO");
 
     background = new Background();
 
     this->parent_window = new ExternallyCreatedWindow(this->platform_data, parent_window);
     this->parent_window->own(background);
-
-    background->set_image(synth_image);
 
     status_line = new StatusLine();
     status_line->set_text("");
@@ -2028,7 +2017,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            synth_image,
+            "SYNTH",
             synth_body,
             "Synth",
             TabSelector::LEFT + TabSelector::WIDTH * 0
@@ -2037,7 +2026,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            effects_image,
+            "EFFECTS",
             effects_body,
             "Effects",
             TabSelector::LEFT + TabSelector::WIDTH * 1
@@ -2046,7 +2035,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            macros_1_image,
+            "MACROS1",
             macros_1_body,
             "Macros 1-10",
             TabSelector::LEFT + TabSelector::WIDTH * 2
@@ -2055,7 +2044,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            macros_2_image,
+            "MACROS2",
             macros_2_body,
             "Macros 11-20",
             TabSelector::LEFT + TabSelector::WIDTH * 3
@@ -2064,7 +2053,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            macros_3_image,
+            "MACROS3",
             macros_3_body,
             "Macros 21-30",
             TabSelector::LEFT + TabSelector::WIDTH * 4
@@ -2073,7 +2062,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            envelopes_1_image,
+            "ENVELOPES1",
             envelopes_1_body,
             "Envelopes 1-6",
             TabSelector::LEFT + TabSelector::WIDTH * 5
@@ -2082,7 +2071,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            envelopes_2_image,
+            "ENVELOPES2",
             envelopes_2_body,
             "Envelopes 7-12",
             TabSelector::LEFT + TabSelector::WIDTH * 6
@@ -2091,7 +2080,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            lfos_image,
+            "LFOS",
             lfos_body,
             "LFOs",
             TabSelector::LEFT + TabSelector::WIDTH * 7
@@ -2100,7 +2089,7 @@ GUI::GUI(
     background->own(
         new TabSelector(
             background,
-            about_image,
+            "ABOUT",
             about_body,
             "About",
             TabSelector::LEFT + TabSelector::WIDTH * 8
@@ -3556,15 +3545,6 @@ GUI::~GUI()
     delete macro_midpoint_states;
     delete reversed_toggle_states;
 
-    dummy_widget->delete_image(about_image);
-    dummy_widget->delete_image(macros_1_image);
-    dummy_widget->delete_image(macros_2_image);
-    dummy_widget->delete_image(macros_3_image);
-    dummy_widget->delete_image(effects_image);
-    dummy_widget->delete_image(envelopes_1_image);
-    dummy_widget->delete_image(envelopes_2_image);
-    dummy_widget->delete_image(lfos_image);
-    dummy_widget->delete_image(synth_image);
     dummy_widget->delete_image(vst_logo_image);
 
     delete dummy_widget;

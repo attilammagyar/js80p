@@ -1619,6 +1619,10 @@ void Widget::update_fake_transparency()
 
     destroy_fake_transparent_background();
 
+    if (first_parent_image == NULL) {
+        return;
+    }
+
     fake_transparent_background_source = first_parent_image;
     fake_transparent_background = (cairo_surface_t*)copy_image_region(
         (GUI::Image)fake_transparent_background_source,
