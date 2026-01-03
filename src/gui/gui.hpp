@@ -507,8 +507,9 @@ class WidgetBase
         virtual void redraw();
         virtual WidgetBase* own(WidgetBase* widget);
 
-        virtual GUI::Image set_image(GUI::Image image);
+        virtual GUI::Image set_image(GUI::Image new_image);
         virtual GUI::Image get_image() const;
+        virtual Integer get_image_id() const;
 
         virtual GUI::PlatformWidget get_platform_widget();
 
@@ -682,6 +683,7 @@ class WidgetBase
         WidgetBase* parent;
         char const* text;
 
+        Integer image_id;
         Number scale;
 
         int left;

@@ -1384,6 +1384,7 @@ void Widget::initialize()
     fake_transparent_background_source = NULL;
     cairo = NULL;
     first_parent_with_image = NULL;
+    fake_transparent_background_image_id = -1;
     fake_transparent_background_left = 0;
     fake_transparent_background_top = 0;
     mouse_down_x = 0;
@@ -1454,6 +1455,7 @@ void Widget::destroy_fake_transparent_background()
         cairo_surface_destroy(fake_transparent_background);
         fake_transparent_background = NULL;
         fake_transparent_background_source = NULL;
+        fake_transparent_background_image_id = -1;
     }
 }
 
@@ -1597,11 +1599,23 @@ void Widget::update_fake_transparency()
     3. A background image does not have transparent areas.
     */
 
-    cairo_surface_t* const first_parent_image = find_first_parent_image();
+    WidgetBase* const first_parent_with_image = find_first_parent_with_image();
 
-    if (first_parent_image == fake_transparent_background_source) {
+    if (JS80P_UNLIKELY(first_parent_with_image == NULL)) {
+        destroy_fake_transparent_background();
+
         return;
     }
+
+    Integer const parent_image_id = first_parent_with_image->get_image_id();
+
+    if (JS80P_LIKELY(parent_image_id == fake_transparent_background_image_id)) {
+        return;
+    }
+
+    cairo_surface_t* const first_parent_image = (
+        (cairo_surface_t*)first_parent_with_image->get_image()
+    );
 
     destroy_fake_transparent_background();
 
@@ -1613,10 +1627,11 @@ void Widget::update_fake_transparency()
         this->scale_value(width),
         this->scale_value(height)
     );
+    fake_transparent_background_image_id = parent_image_id;
 }
 
 
-cairo_surface_t* Widget::find_first_parent_image()
+WidgetBase* Widget::find_first_parent_with_image()
 {
     if (first_parent_with_image == NULL) {
         fake_transparent_background_left = left;
@@ -1636,7 +1651,7 @@ cairo_surface_t* Widget::find_first_parent_image()
         first_parent_with_image = widget;
     }
 
-    return (cairo_surface_t*)first_parent_with_image->get_image();
+    return first_parent_with_image;
 }
 
 
@@ -1780,9 +1795,9 @@ void Widget::redraw()
 }
 
 
-GUI::Image Widget::set_image(GUI::Image image)
+GUI::Image Widget::set_image(GUI::Image new_image)
 {
-    GUI::Image old_image = WidgetBase::set_image(image);
+    GUI::Image old_image = WidgetBase::set_image(new_image);
 
     for (GUI::Widgets::iterator it = children.begin(); it != children.end(); ++it) {
         Widget* child = (Widget*)*it;

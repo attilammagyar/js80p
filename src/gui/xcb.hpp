@@ -202,7 +202,7 @@ class Widget : public WidgetBase
         virtual void bring_to_top() override;
         virtual void redraw() override;
 
-        virtual GUI::Image set_image(GUI::Image image) override;
+        virtual GUI::Image set_image(GUI::Image new_image) override;
 
     protected:
         Widget(
@@ -383,7 +383,7 @@ class Widget : public WidgetBase
         xcb_window_t window_id() const;
 
         void update_fake_transparency();
-        cairo_surface_t* find_first_parent_image();
+        WidgetBase* find_first_parent_with_image();
         void destroy_fake_transparent_background();
 
         cairo_surface_t* cairo_surface;
@@ -392,6 +392,7 @@ class Widget : public WidgetBase
         cairo_surface_t* fake_transparent_background_source;
         cairo_t* cairo;
         WidgetBase* first_parent_with_image;
+        Integer fake_transparent_background_image_id;
         int fake_transparent_background_left;
         int fake_transparent_background_top;
         int mouse_down_x;
