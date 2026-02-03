@@ -300,6 +300,11 @@ class ParamStateImages
 
         ~ParamStateImages();
 
+        ParamStateImages(ParamStateImages const& param_state_images) = delete;
+        ParamStateImages(ParamStateImages&& param_state_images) = delete;
+        ParamStateImages& operator=(ParamStateImages const& param_state_images) = delete;
+        ParamStateImages& operator=(ParamStateImages&& param_state_images) = delete;
+
         size_t ratio_to_index(Number const ratio) const;
 
         void set_scale(Number const new_scale);
