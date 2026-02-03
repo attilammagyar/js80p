@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -965,11 +965,12 @@ Sample Distortion<InputSignalProducerClass>::distort(
         Sample& previous_input_sample,
         Sample& F0_previous_input_sample
 ) noexcept {
+    Sample const F0_input_sample = F0(F0_table, input_sample);
     Sample const delta = input_sample - previous_input_sample;
 
     if (JS80P_UNLIKELY(Math::is_abs_small(delta, 0.00000001))) {
         previous_input_sample = input_sample;
-        F0_previous_input_sample = F0(F0_table, input_sample);
+        F0_previous_input_sample = F0_input_sample;
 
         /*
         We're supposed to calculate the average of the current and the previous
@@ -980,7 +981,6 @@ Sample Distortion<InputSignalProducerClass>::distort(
         return f(f_table, input_sample);
     }
 
-    Sample const F0_input_sample = F0(F0_table, input_sample);
     Sample const ret = (F0_input_sample - F0_previous_input_sample) / delta;
 
     previous_input_sample = input_sample;
