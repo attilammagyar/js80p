@@ -45,7 +45,7 @@ namespace JS80P
 class Win32Platform
 {
     public:
-        Win32Platform(HINSTANCE dll_instance);
+        explicit Win32Platform(HINSTANCE dll_instance);
         ~Win32Platform();
 
         HINSTANCE get_dll_instance() const;
