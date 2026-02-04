@@ -604,10 +604,10 @@ class AboutText : public Widget
 class StatusLine : public TransparentWidget
 {
     public:
-        static constexpr int LEFT = 1424;
-        static constexpr int TOP = 0;
         static constexpr int WIDTH = 650;
         static constexpr int HEIGHT = 48;
+        static constexpr int LEFT = GUI::WIDTH - WIDTH - 2;
+        static constexpr int TOP = 0;
 
         StatusLine();
 
