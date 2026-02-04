@@ -3431,7 +3431,7 @@ void GUI::build_synth_body(
     KNOB(synth_body,  17 + KNOB_W * 1,      61, Synth::ParamId::MPRD,   MM___,      "%.2f", 1.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 2,      61, Synth::ParamId::MDTN,   MM__C,      "%.f", Constants::DETUNE_SCALE, knob_states);
     KNOB4(synth_body, 17 + KNOB_W * 3,      61, Synth::ParamId::MFIN,   MMLEC,      "%.2f", 1.0, knob_states, Synth::ParamId::MFX4);
-    KNOB(synth_body,  17 + KNOB_W * 4,      61, Synth::ParamId::MN,     MM__C,      "%.2f", 100.0, knob_states);
+    KNOB(synth_body,  17 + KNOB_W * 4,      61, Synth::ParamId::MN,     MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 5,      61, Synth::ParamId::MAMP,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 6,      61, Synth::ParamId::MSUB,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 7,      61, Synth::ParamId::MFLD,   MMLEC,      "%.2f", 100.0 / Constants::FOLD_MAX, knob_states);
@@ -3489,7 +3489,7 @@ void GUI::build_synth_body(
     KNOB(synth_body,  17 + KNOB_W * 1,      61, Synth::ParamId::CPRD,   MM___,      "%.2f", 1.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 2,      61, Synth::ParamId::CDTN,   MM__C,      "%.f", 0.01, knob_states);
     KNOB4(synth_body, 17 + KNOB_W * 3,      61, Synth::ParamId::CFIN,   MMLEC,      "%.2f", 1.0, knob_states, Synth::ParamId::CFX4);
-    KNOB(synth_body,  17 + KNOB_W * 4,      61, Synth::ParamId::CN,     MM__C,      "%.2f", 100.0, knob_states);
+    KNOB(synth_body,  17 + KNOB_W * 4,      61, Synth::ParamId::CN,     MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 5,      61, Synth::ParamId::CAMP,   MMLEC,      "%.2f", 100.0, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 6,      61, Synth::ParamId::CFLD,   MMLEC,      "%.2f", 100.0 / Constants::FOLD_MAX, knob_states);
     KNOB(synth_body,  17 + KNOB_W * 7,      61, Synth::ParamId::CDL,    MMLEC,      "%.2f", 100.0, knob_states);

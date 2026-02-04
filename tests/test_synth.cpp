@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2172,6 +2172,90 @@ TEST(modulator_additive_volume_can_be_polyphonic, {
             (int)i
         );
     }
+})
+
+
+TEST(noise_level_can_be_polyphonic, {
+    constexpr Integer block_size = 8192;
+    constexpr Frequency sample_rate = 22050.0;
+
+    Synth synth;
+    Integer const channels = synth.get_channels();
+    Sample const* const* rendered_samples;
+    Math::Statistics statistics;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    synth.modulator_params.amplitude.set_value(0.0);
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.width.set_value(0.0);
+    synth.modulator_params.panning.set_value(-1.0);
+
+    synth.carrier_params.amplitude.set_value(0.0);
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.width.set_value(0.0);
+    synth.carrier_params.panning.set_value(1.0);
+
+    synth.envelopes[0]->scale.set_value(1.0);
+    synth.envelopes[0]->initial_value.set_value(1.0);
+    synth.envelopes[0]->delay_time.set_value(0.0);
+    synth.envelopes[0]->attack_time.set_value(0.0);
+    synth.envelopes[0]->peak_value.set_value(1.0);
+    synth.envelopes[0]->hold_time.set_value((Number)block_size / sample_rate);
+    synth.envelopes[0]->decay_time.set_value(0.001);
+    synth.envelopes[0]->sustain_value.set_value(0.0);
+    synth.envelopes[0]->release_time.set_value(0.0);
+    synth.envelopes[0]->final_value.set_value(0.0);
+
+    assign_controller(synth, Synth::ParamId::MN, Synth::ControllerId::ENVELOPE_1);
+    assign_controller(synth, Synth::ParamId::CN, Synth::ControllerId::ENVELOPE_1);
+
+    synth.process_messages();
+
+    synth.envelopes[0]->scale.set_value(1.0);
+    synth.note_on(0.0, 0, Midi::NOTE_C_5, 127);
+
+    synth.envelopes[0]->scale.set_value(0.5);
+    synth.note_on(0.0, 0, Midi::NOTE_C_6, 127);
+
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    for (Integer i = 0; i != channels; ++i) {
+        std::vector<Number> samples(&rendered_samples[i][0], &rendered_samples[i][block_size - 1]);
+
+        Math::compute_statistics(samples, statistics);
+
+        assert_eq(-1.5, statistics.min, 0.35, "channel=%d", (int)i);
+        assert_eq(1.5, statistics.max, 0.35, "channel=%d", (int)i);
+        assert_eq(0.0, statistics.mean, 0.1, "channel=%d", (int)i);
+        assert_eq(0.0, statistics.median, 0.1, "channel=%d", (int)i);
+
+        /*
+        If the X random variable denotes the first note's raw noise and Y
+        denotes that of the second one, then we need the variance of
+        X + 0.5 * Y, given that X and Y are independent, and they are from
+        U(-1, 1) with E(X) = E(Y) = 0.0:
+
+        Var(X + 0.5 * Y)
+            = E((X + 0.5 * Y - 0.0)^2)
+            = E((X + 0.5 * Y)^2)
+            = E(X^2 + 0.25 * Y^2 + XY)
+            = E(X^2) + 0.25 * E(Y^2) + E(X) * E(Y)
+
+        E(X) * E(Y) = 0.0, and E(X^2) = E(Y^2) = Var(X) = Var(Y) = 1 / 3, so:
+
+        Var(X + 0.5 * Y) = 1 / 3 + 0.25 / 3 = 1.25 / 3 = 0.41667
+
+        from which std(X + 0.5 * Y) = sqrt(0.41667) = 0.6455
+        */
+        assert_eq(0.6455, statistics.standard_deviation, 0.2, "channel=%d", (int)i);
+    }
+
+    SignalProducer::produce<Synth>(synth, 2);
+    SignalProducer::produce<Synth>(synth, 3);
+
+    assert_eq(0, (int)synth.get_active_voices_count());
 })
 
 

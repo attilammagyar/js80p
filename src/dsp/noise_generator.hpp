@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2025  Attila M. Magyar
+ * Copyright (C) 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ namespace JS80P
  *          different noise sources generating phase-shifted versions of the
  *          same pattern.
  */
-template<class InputSignalProducerClass>
+template<class InputSignalProducerClass, class LevelParamClass = FloatParamB>
 class NoiseGenerator : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -50,7 +50,7 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
     public:
         NoiseGenerator(
             InputSignalProducerClass& input,
-            FloatParamB& level,
+            LevelParamClass& level,
             Frequency const high_pass_frequency,
             Frequency const low_pass_frequency,
             Math::RNG& rng,
@@ -77,7 +77,7 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
         Frequency const high_pass_frequency;
         Frequency const low_pass_frequency;
 
-        FloatParamB& level;
+        LevelParamClass level;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -96,7 +96,16 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
         void update_filter_coefficients() noexcept;
         void clear_filters_state() noexcept;
 
+        template<bool is_level_constant>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer
+        ) noexcept;
+
         Math::RNG& rng;
+        Sample const* level_buffer;
         Sample* r_n_m1;
         Sample* x_n_m1;
         Sample* y_n_m1;

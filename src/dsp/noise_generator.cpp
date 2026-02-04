@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2025  Attila M. Magyar
+ * Copyright (C) 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,22 +28,24 @@
 namespace JS80P
 {
 
-template<class InputSignalProducerClass>
-NoiseGenerator<InputSignalProducerClass>::NoiseGenerator(
+template<class InputSignalProducerClass, class LevelParamClass>
+NoiseGenerator<InputSignalProducerClass, LevelParamClass>::NoiseGenerator(
         InputSignalProducerClass& input,
-        FloatParamB& level,
+        LevelParamClass& level,
         Frequency const high_pass_frequency,
         Frequency const low_pass_frequency,
         Math::RNG& rng,
         SignalProducer* const buffer_owner,
         Integer const channels
 ) noexcept
-    : Filter<InputSignalProducerClass>(input, 0, channels, buffer_owner),
+    : Filter<InputSignalProducerClass>(input, 1, channels, buffer_owner),
     high_pass_frequency(high_pass_frequency),
     low_pass_frequency(low_pass_frequency),
     level(level),
     rng(rng)
 {
+    this->register_child(this->level);
+
     r_n_m1 = new Sample[this->channels];
     x_n_m1 = new Sample[this->channels];
     y_n_m1 = new Sample[this->channels];
@@ -52,8 +54,8 @@ NoiseGenerator<InputSignalProducerClass>::NoiseGenerator(
 }
 
 
-template<class InputSignalProducerClass>
-NoiseGenerator<InputSignalProducerClass>::~NoiseGenerator()
+template<class InputSignalProducerClass, class LevelParamClass>
+NoiseGenerator<InputSignalProducerClass, LevelParamClass>::~NoiseGenerator()
 {
     delete[] r_n_m1;
     delete[] x_n_m1;
@@ -65,8 +67,8 @@ NoiseGenerator<InputSignalProducerClass>::~NoiseGenerator()
 }
 
 
-template<class InputSignalProducerClass>
-void NoiseGenerator<InputSignalProducerClass>::set_sample_rate(
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::set_sample_rate(
         Frequency const sample_rate
 ) noexcept {
     Filter<InputSignalProducerClass>::set_sample_rate(sample_rate);
@@ -75,8 +77,8 @@ void NoiseGenerator<InputSignalProducerClass>::set_sample_rate(
 }
 
 
-template<class InputSignalProducerClass>
-void NoiseGenerator<InputSignalProducerClass>::reset() noexcept
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::reset() noexcept
 {
     Filter<InputSignalProducerClass>::reset();
 
@@ -84,8 +86,8 @@ void NoiseGenerator<InputSignalProducerClass>::reset() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void NoiseGenerator<InputSignalProducerClass>::clear_filters_state() noexcept
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::clear_filters_state() noexcept
 {
     for (Integer c = 0; c != this->channels; ++c) {
         r_n_m1[c] = x_n_m1[c] = y_n_m1[c] = 0.0;
@@ -93,8 +95,8 @@ void NoiseGenerator<InputSignalProducerClass>::clear_filters_state() noexcept
 }
 
 
-template<class InputSignalProducerClass>
-void NoiseGenerator<InputSignalProducerClass>::update_filter_coefficients() noexcept
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::update_filter_coefficients() noexcept
 {
     /*
     Simple low-pass and high-pass filters. See:
@@ -137,8 +139,8 @@ void NoiseGenerator<InputSignalProducerClass>::update_filter_coefficients() noex
 }
 
 
-template<class InputSignalProducerClass>
-Sample const* const* NoiseGenerator<InputSignalProducerClass>::initialize_rendering(
+template<class InputSignalProducerClass, class LevelParamClass>
+Sample const* const* NoiseGenerator<InputSignalProducerClass, LevelParamClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -149,7 +151,9 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass>::initialize_render
         )
     );
 
-    if (level.get_value() < 0.000001) {
+    level_buffer = LevelParamClass::produce_if_not_constant(level, round, sample_count);
+
+    if (level_buffer == NULL && level.get_value() < 0.000001) {
         return buffer;
     }
 
@@ -157,13 +161,30 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass>::initialize_render
 }
 
 
-template<class InputSignalProducerClass>
-void NoiseGenerator<InputSignalProducerClass>::render(
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    if (level_buffer == NULL) {
+        render<true>(round, first_sample_index, last_sample_index, buffer);
+    } else {
+        render<false>(round, first_sample_index, last_sample_index, buffer);
+    }
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+template<bool is_level_constant>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer
+) noexcept {
+    Sample const* const level_buffer = this->level_buffer;
     Sample const level = this->level.get_value();
     Sample const a = this->a;
     Sample const w1 = this->w1;
@@ -181,7 +202,11 @@ void NoiseGenerator<InputSignalProducerClass>::render(
             Sample const x_n = a * (x_n_m1 + r_n - r_n_m1);
             Sample const y_n = w1 * x_n + w2 * y_n_m1;
 
-            out_channel[i] = in_channel[i] + level * y_n;
+            if constexpr (is_level_constant) {
+                out_channel[i] = in_channel[i] + level * y_n;
+            } else {
+                out_channel[i] = in_channel[i] + level_buffer[i] * y_n;
+            }
 
             r_n_m1 = r_n;
             x_n_m1 = x_n;

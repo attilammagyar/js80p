@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -209,7 +209,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
     : tuning(name + "TUN"),
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
-    noise_level(name + "N", 0.0, 1.0, 0.0),
+    noise_level(name + "N", 0.0, 1.0, 0.0, 0.0, envelopes),
     waveform(name + "WAV"),
     amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
@@ -649,6 +649,8 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
     oscillator.phase.set_random_seed(make_random_seed(0.623));
     oscillator.fine_detune.set_random_seed(make_random_seed(0.457));
 
+    noise_generator.level.set_random_seed(make_random_seed(0.687));
+
     filter_1.frequency.set_random_seed(make_random_seed(0.661));
     filter_1.q.set_random_seed(make_random_seed(0.230));
     filter_1.gain.set_random_seed(make_random_seed(0.146));
@@ -808,6 +810,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     oscillator.phase.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     oscillator.fine_detune.start_envelope(time_offset, mpe_channel, random_1, random_2);
+
+    noise_generator.level.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     filter_1.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
     filter_1.q.start_envelope(time_offset, mpe_channel, random_1, random_2);
@@ -1056,6 +1060,8 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
 
     oscillator.fine_detune.update_envelope(time_offset, mpe_channel);
 
+    noise_generator.level.update_envelope(time_offset, mpe_channel);
+
     filter_1.frequency.update_envelope(time_offset, mpe_channel);
     filter_1.q.update_envelope(time_offset, mpe_channel);
     filter_1.gain.update_envelope(time_offset, mpe_channel);
@@ -1118,14 +1124,18 @@ void Voice<ModulatorSignalProducerClass>::note_off(
             {
                 oscillator.amplitude.end_envelope(time_offset),
                 oscillator.subharmonic_amplitude.end_envelope(time_offset),
+                noise_generator.level.end_envelope(time_offset),
                 volume.end_envelope(time_offset),
                 additive_volume.end_envelope(time_offset),
             }
         );
     } else {
         off_after = time_offset + std::max(
-            oscillator.amplitude.end_envelope(time_offset),
-            volume.end_envelope(time_offset)
+            {
+                oscillator.amplitude.end_envelope(time_offset),
+                noise_generator.level.end_envelope(time_offset),
+                volume.end_envelope(time_offset),
+            }
         );
     }
 
@@ -1208,6 +1218,8 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
     oscillator.phase.cancel_events();
     oscillator.fine_detune.cancel_events();
 
+    noise_generator.level.cancel_events();
+
     filter_1.frequency.cancel_events();
     filter_1.q.cancel_events();
     filter_1.gain.cancel_events();
@@ -1254,6 +1266,8 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     oscillator.stop(time_offset + ENVELOPE_CANCEL_DURATION);
 
     oscillator.fine_detune.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+
+    noise_generator.level.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     filter_1.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     filter_1.q.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);

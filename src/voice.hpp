@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ class Voice : public SignalProducer
         };
 
         typedef Oscillator<ModulatorSignalProducerClass> Oscillator_;
-        typedef NoiseGenerator<Oscillator_> NoiseGenerator_;
+        typedef NoiseGenerator<Oscillator_, FloatParamS> NoiseGenerator_;
         typedef BiquadFilter<NoiseGenerator_> Filter1;
         typedef Wavefolder<Filter1> Wavefolder_;
         typedef Distortion::Distortion<Wavefolder_> Distortion_;
@@ -167,7 +167,7 @@ class Voice : public SignalProducer
                 OscillatorInaccuracyParam oscillator_inaccuracy;
                 OscillatorInaccuracyParam oscillator_instability;
 
-                FloatParamB noise_level;
+                FloatParamS noise_level;
 
                 typename Oscillator_::WaveformParam waveform;
                 FloatParamS amplitude;

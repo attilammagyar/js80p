@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -380,7 +380,7 @@ void Synth::register_modulator_params() noexcept
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIA, modulator_params.oscillator_inaccuracy);
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIS, modulator_params.oscillator_instability);
 
-    register_param_as_child<FloatParamB>(ParamId::MN, modulator_params.noise_level);
+    register_param_as_child<FloatParamS>(ParamId::MN, modulator_params.noise_level);
 
     register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
@@ -437,7 +437,7 @@ void Synth::register_carrier_params() noexcept
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIA, carrier_params.oscillator_inaccuracy);
     register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIS, carrier_params.oscillator_instability);
 
-    register_param_as_child<FloatParamB>(ParamId::CN, carrier_params.noise_level);
+    register_param_as_child<FloatParamS>(ParamId::CN, carrier_params.noise_level);
 
     register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
