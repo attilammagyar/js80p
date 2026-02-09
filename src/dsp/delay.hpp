@@ -187,7 +187,7 @@ class Delay : public Filter<InputSignalProducerClass>
 
         template<
             bool need_gain,
-            bool is_gain_constant,
+            class GainBufferClass,
             bool is_time_scale_constant,
             bool is_reversed
         >
@@ -196,7 +196,7 @@ class Delay : public Filter<InputSignalProducerClass>
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer,
-            Sample const gain
+            GainBufferClass const& gain
         ) noexcept;
 
         void initialize_reverse_rendering(
@@ -392,7 +392,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) const noexcept;
 
         template<int channel_1, int channel_2>
         void render_with_changing_panning(
@@ -400,7 +400,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample** const buffer
-        ) noexcept;
+        ) const noexcept;
 
         bool const is_flipped;
 

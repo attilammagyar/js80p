@@ -96,8 +96,9 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
         void update_filter_coefficients() noexcept;
         void clear_filters_state() noexcept;
 
-        template<bool is_level_constant>
+        template<class LevelBufferClass>
         void render(
+            LevelBufferClass const& level,
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,

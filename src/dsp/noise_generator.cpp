@@ -169,23 +169,34 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Sample** const buffer
 ) noexcept {
     if (level_buffer == NULL) {
-        render<true>(round, first_sample_index, last_sample_index, buffer);
+        render<ParamValueWrapper>(
+            ParamValueWrapper(level.get_value()),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     } else {
-        render<false>(round, first_sample_index, last_sample_index, buffer);
+        render<ParamValueBufferWrapper>(
+            ParamValueBufferWrapper(level_buffer),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     }
 }
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-template<bool is_level_constant>
+template<class LevelBufferClass>
 void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
+        LevelBufferClass const& level,
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
-    Sample const* const level_buffer = this->level_buffer;
-    Sample const level = this->level.get_value();
     Sample const a = this->a;
     Sample const w1 = this->w1;
     Sample const w2 = this->w2;
@@ -202,11 +213,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
             Sample const x_n = a * (x_n_m1 + r_n - r_n_m1);
             Sample const y_n = w1 * x_n + w2 * y_n_m1;
 
-            if constexpr (is_level_constant) {
-                out_channel[i] = in_channel[i] + level * y_n;
-            } else {
-                out_channel[i] = in_channel[i] + level_buffer[i] * y_n;
-            }
+            out_channel[i] = in_channel[i] + level[i] * y_n;
 
             r_n_m1 = r_n;
             x_n_m1 = x_n;

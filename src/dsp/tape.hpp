@@ -182,7 +182,7 @@ class Tape : public Filter<InputSignalProducerClass>
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
-    public:
+    private:
         static constexpr Number DELAY_TIME_MAX_INV = (
             1.0 / TapeParams::DELAY_TIME_MAX
         );
@@ -242,6 +242,15 @@ class Tape : public Filter<InputSignalProducerClass>
             Integer const round,
             Integer const sample_count
         ) noexcept;
+
+        template<class VolumeBufferClass>
+        void render(
+            VolumeBufferClass const& volume,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer
+        ) const noexcept;
 
         bool is_bypassable() const noexcept;
 

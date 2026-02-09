@@ -387,48 +387,72 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
-    Integer const channels = this->channels;
     Sample const* const volume_buffer = this->volume_buffer;
     Sample const* const velocity_buffer = this->velocity_buffer;
 
     if (volume_buffer == NULL) {
-        Sample const volume_value = this->volume_value;
-
         if (JS80P_LIKELY(velocity_buffer == NULL)) {
-            Sample const velocity_value = this->velocity_value;
-
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* const input = this->input_buffer[c];
-
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = velocity_value * volume_value * input[i];
-                }
-            }
+            render<ParamValueWrapper, false, ParamValueWrapper>(
+                ParamValueWrapper(this->volume_value * this->velocity_value),
+                ParamValueWrapper(1.0),
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer
+            );
         } else {
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* const input = this->input_buffer[c];
-
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = velocity_buffer[i] * volume_value * input[i];
-                }
-            }
+            render<ParamValueWrapper, true, ParamValueBufferWrapper>(
+                ParamValueWrapper(this->volume_value),
+                ParamValueBufferWrapper(velocity_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer
+            );
         }
     } else if (JS80P_LIKELY(velocity_buffer == NULL)) {
-        Sample const velocity_value = this->velocity_value;
-
-        for (Integer c = 0; c != channels; ++c) {
-            Sample const* const input = this->input_buffer[c];
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = velocity_value * volume_buffer[i] * input[i];
-            }
-        }
+        render<ParamValueBufferWrapper, true, ParamValueWrapper>(
+            ParamValueBufferWrapper(volume_buffer),
+            ParamValueWrapper(this->velocity_value),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     } else {
-        for (Integer c = 0; c != channels; ++c) {
-            Sample const* const input = this->input_buffer[c];
+        render<ParamValueBufferWrapper, true, ParamValueBufferWrapper>(
+            ParamValueBufferWrapper(volume_buffer),
+            ParamValueBufferWrapper(velocity_buffer),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
+    }
+}
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = velocity_buffer[i] * volume_buffer[i] * input[i];
+
+template<class ModulatorSignalProducerClass>
+template<class VolumeBufferClass, bool has_velocity, class VelocityBufferClass>
+void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
+        VolumeBufferClass const& volume,
+        VelocityBufferClass const& velocity,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer
+) const noexcept {
+    Integer const channels = this->channels;
+
+    for (Integer c = 0; c != channels; ++c) {
+        Sample const* const input = this->input_buffer[c];
+        Sample* const output = buffer[c];
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if constexpr (has_velocity) {
+                output[i] = velocity[i] * volume[i] * input[i];
+            } else {
+                output[i] = volume[i] * input[i];
             }
         }
     }
@@ -1522,10 +1546,10 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     if (JS80P_LIKELY(note_panning_buffer == NULL)) {
         if (panning_buffer == NULL) {
-            Number const panning = std::min(
-                1.0, std::max(panning_value + note_panning_value, -1.0)
+            Number const x = Math::PI_QUARTER * (
+                std::min(1.0, std::max(panning_value + note_panning_value, -1.0))
+                + 1.0
             );
-            Number const x = (panning + 1.0) * Math::PI_QUARTER;
 
             Sample left_gain;
             Sample right_gain;
@@ -1537,51 +1561,33 @@ void Voice<ModulatorSignalProducerClass>::render(
                 buffer[1][i] = right_gain * volume_applier_buffer[i];
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Number const panning = std::min(
-                    1.0, std::max(panning_buffer[i] + note_panning_value, -1.0)
-                );
-                Number const x = (panning + 1.0) * Math::PI_QUARTER;
-
-                Sample left_gain;
-                Sample right_gain;
-
-                Math::sincos(x, right_gain, left_gain);
-
-                buffer[0][i] = left_gain * volume_applier_buffer[i];
-                buffer[1][i] = right_gain * volume_applier_buffer[i];
-            }
+            render<ParamValueBufferWrapper, ParamValueWrapper>(
+                ParamValueBufferWrapper(panning_buffer),
+                ParamValueWrapper(note_panning_value),
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer
+            );
         }
     } else if (panning_buffer == NULL) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Number const panning = std::min(
-                1.0, std::max(panning_value + note_panning_buffer[i], -1.0)
-            );
-            Number const x = (panning + 1.0) * Math::PI_QUARTER;
-
-            Sample left_gain;
-            Sample right_gain;
-
-            Math::sincos(x, right_gain, left_gain);
-
-            buffer[0][i] = left_gain * volume_applier_buffer[i];
-            buffer[1][i] = right_gain * volume_applier_buffer[i];
-        }
+        render<ParamValueWrapper, ParamValueBufferWrapper>(
+            ParamValueWrapper(panning_value),
+            ParamValueBufferWrapper(note_panning_buffer),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Number const panning = std::min(
-                1.0, std::max(panning_buffer[i] + note_panning_buffer[i], -1.0)
-            );
-            Number const x = (panning + 1.0) * Math::PI_QUARTER;
-
-            Sample left_gain;
-            Sample right_gain;
-
-            Math::sincos(x, right_gain, left_gain);
-
-            buffer[0][i] = left_gain * volume_applier_buffer[i];
-            buffer[1][i] = right_gain * volume_applier_buffer[i];
-        }
+        render<ParamValueBufferWrapper, ParamValueBufferWrapper>(
+            ParamValueBufferWrapper(panning_buffer),
+            ParamValueBufferWrapper(note_panning_buffer),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     }
 
     if constexpr (IS_MODULATOR) {
@@ -1604,6 +1610,34 @@ void Voice<ModulatorSignalProducerClass>::render(
                 }
             }
         }
+    }
+}
+
+
+template<class ModulatorSignalProducerClass>
+template<class PanningBufferClass, class NotePanningBufferClass>
+void Voice<ModulatorSignalProducerClass>::render(
+        PanningBufferClass const& panning,
+        NotePanningBufferClass const& note_panning,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer
+) const noexcept {
+    /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
+
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        Number const x = Math::PI_QUARTER * (
+            std::min(1.0, std::max(panning[i] + note_panning[i], -1.0)) + 1.0
+        );
+
+        Sample left_gain;
+        Sample right_gain;
+
+        Math::sincos(x, right_gain, left_gain);
+
+        buffer[0][i] = left_gain * volume_applier_buffer[i];
+        buffer[1][i] = right_gain * volume_applier_buffer[i];
     }
 }
 

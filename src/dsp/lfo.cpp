@@ -967,7 +967,7 @@ void LFO::apply_distortions(
         Integer const last_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
-) {
+) const noexcept {
     if (distortion_buffer == NULL) {
         Number const distortion = this->distortion.get_value();
 
@@ -981,39 +981,68 @@ void LFO::apply_distortions(
                     }
                 }
             } else {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    target_buffer[i] = Math::randomize(
-                        randomness,
-                        Math::distort(distortion, source_buffer[i])
-                    );
-                }
-            }
-        } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize(
-                    randomness_buffer[i],
-                    Math::distort(distortion, source_buffer[i])
+                apply_distortions<ParamValueWrapper, ParamValueWrapper>(
+                    ParamValueWrapper(distortion),
+                    ParamValueWrapper(randomness),
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    source_buffer,
+                    target_buffer
                 );
             }
+        } else {
+            apply_distortions<ParamValueWrapper, ParamValueBufferWrapper>(
+                ParamValueWrapper(distortion),
+                ParamValueBufferWrapper(randomness_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
     } else {
         if (randomness_buffer == NULL) {
-            Number const randomness = this->randomness.get_value();
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize(
-                    randomness,
-                    Math::distort(distortion_buffer[i], source_buffer[i])
-                );
-            }
+            apply_distortions<ParamValueBufferWrapper, ParamValueWrapper>(
+                ParamValueBufferWrapper(distortion_buffer),
+                ParamValueWrapper(this->randomness.get_value()),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize(
-                    randomness_buffer[i],
-                    Math::distort(distortion_buffer[i], source_buffer[i])
-                );
-            }
+            apply_distortions<ParamValueBufferWrapper, ParamValueBufferWrapper>(
+                ParamValueBufferWrapper(distortion_buffer),
+                ParamValueBufferWrapper(randomness_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
+    }
+}
+
+
+template<class DistortionBufferClass, class RandomnessBufferClass>
+void LFO::apply_distortions(
+        DistortionBufferClass const& distortion,
+        RandomnessBufferClass const& randomness,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample const* const source_buffer,
+        Sample* const target_buffer
+) const noexcept {
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        target_buffer[i] = Math::randomize(
+            randomness[i],
+            Math::distort(distortion[i], source_buffer[i])
+        );
     }
 }
 
@@ -1043,7 +1072,7 @@ void LFO::apply_range(
         Integer const last_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
-) {
+) const noexcept {
     if (min_buffer == NULL) {
         if (max_buffer == NULL) {
             if (
@@ -1067,36 +1096,60 @@ void LFO::apply_range(
                 }
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value_buf = max_buffer[i];
-                Sample const range = max_value_buf - min_value;
-
-                target_buffer[i] = min_value + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value_buf);
-            }
+            apply_range<ParamValueWrapper, ParamValueBufferWrapper>(
+                ParamValueWrapper(min_value),
+                ParamValueBufferWrapper(max_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
     } else {
         if (max_buffer == NULL) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value_buf = min_buffer[i];
-                Sample const range = max_value - min_value_buf;
-
-                target_buffer[i] = min_buffer[i] + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value);
-            }
+            apply_range<ParamValueBufferWrapper, ParamValueWrapper>(
+                ParamValueBufferWrapper(min_buffer),
+                ParamValueWrapper(max_value),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value_buf = max_buffer[i];
-                Sample const min_value_buf = min_buffer[i];
-                Sample const range = max_value_buf - min_value_buf;
-
-                target_buffer[i] = min_buffer[i] + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value_buf);
-            }
+            apply_range<ParamValueBufferWrapper, ParamValueBufferWrapper>(
+                ParamValueBufferWrapper(min_buffer),
+                ParamValueBufferWrapper(max_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
+    }
+}
+
+
+template<class MinBufferClass, class MaxBufferClass>
+void LFO::apply_range(
+        MinBufferClass const& min,
+        MaxBufferClass const& max,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample const* const source_buffer,
+        Sample* const target_buffer
+) const noexcept {
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        Sample const max_i = max[i];
+        Sample const min_i = min[i];
+        Sample const range = max_i - min_i;
+
+        target_buffer[i] = min_i + range * source_buffer[i];
+
+        JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_i, max_i);
     }
 }
 
@@ -1111,7 +1164,7 @@ void LFO::apply_distortions_centered(
         Integer const last_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
-) {
+) const noexcept {
     if (distortion_buffer == NULL) {
         if (randomness_buffer == NULL) {
             if (randomness_value < ALMOST_ZERO && distortion_value < ALMOST_ZERO) {
@@ -1121,37 +1174,68 @@ void LFO::apply_distortions_centered(
                     }
                 }
             } else {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    target_buffer[i] = Math::randomize_centered_lfo(
-                        randomness_value,
-                        Math::distort_centered_lfo(distortion_value, source_buffer[i])
-                    );
-                }
-            }
-        } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize_centered_lfo(
-                    randomness_buffer[i],
-                    Math::distort_centered_lfo(distortion_value, source_buffer[i])
+                apply_distortions_centered<ParamValueWrapper, ParamValueWrapper>(
+                    ParamValueWrapper(distortion_value),
+                    ParamValueWrapper(randomness_value),
+                    round,
+                    first_sample_index,
+                    last_sample_index,
+                    source_buffer,
+                    target_buffer
                 );
             }
+        } else {
+            apply_distortions_centered<ParamValueWrapper, ParamValueBufferWrapper>(
+                ParamValueWrapper(distortion_value),
+                ParamValueBufferWrapper(randomness_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
     } else {
         if (randomness_buffer == NULL) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize_centered_lfo(
-                    randomness_value,
-                    Math::distort_centered_lfo(distortion_buffer[i], source_buffer[i])
-                );
-            }
+            apply_distortions_centered<ParamValueBufferWrapper, ParamValueWrapper>(
+                ParamValueBufferWrapper(distortion_buffer),
+                ParamValueWrapper(randomness_value),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                target_buffer[i] = Math::randomize_centered_lfo(
-                    randomness_buffer[i],
-                    Math::distort_centered_lfo(distortion_buffer[i], source_buffer[i])
-                );
-            }
+            apply_distortions_centered<ParamValueBufferWrapper, ParamValueBufferWrapper>(
+                ParamValueBufferWrapper(distortion_buffer),
+                ParamValueBufferWrapper(randomness_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
+    }
+}
+
+
+template<class DistortionBufferClass, class RandomnessBufferClass>
+void LFO::apply_distortions_centered(
+        DistortionBufferClass const& distortion,
+        RandomnessBufferClass const& randomness,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample const* const source_buffer,
+        Sample* const target_buffer
+) const noexcept {
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        target_buffer[i] = Math::randomize_centered_lfo(
+            randomness[i],
+            Math::distort_centered_lfo(distortion[i], source_buffer[i])
+        );
     }
 }
 
@@ -1166,7 +1250,7 @@ void LFO::apply_range_centered(
         Integer const last_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
-) {
+) const noexcept {
     if (min_buffer == NULL) {
         if (max_buffer == NULL) {
             Sample const center = (min_value + max_value) * 0.5;
@@ -1178,39 +1262,61 @@ void LFO::apply_range_centered(
                 JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const max_value_buf = max_buffer[i];
-                Sample const center = (min_value + max_value_buf) * 0.5;
-                Sample const range = max_value_buf - min_value;
-
-                target_buffer[i] = center + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value_buf);
-            }
+            apply_range_centered<ParamValueWrapper, ParamValueBufferWrapper>(
+                ParamValueWrapper(min_value),
+                ParamValueBufferWrapper(max_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
     } else {
         if (max_buffer == NULL) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value_buf = min_buffer[i];
-                Sample const center = (min_value_buf + max_value) * 0.5;
-                Sample const range = max_value - min_value_buf;
-
-                target_buffer[i] = center + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value);
-            }
+            apply_range_centered<ParamValueBufferWrapper, ParamValueWrapper>(
+                ParamValueBufferWrapper(min_buffer),
+                ParamValueWrapper(max_value),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const min_value_buf = min_buffer[i];
-                Sample const max_value_buf = max_buffer[i];
-                Sample const center = (min_value_buf + max_value_buf) * 0.5;
-                Sample const range = max_value_buf - min_value_buf;
-
-                target_buffer[i] = center + range * source_buffer[i];
-
-                JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value_buf, max_value_buf);
-            }
+            apply_range_centered<ParamValueBufferWrapper, ParamValueBufferWrapper>(
+                ParamValueBufferWrapper(min_buffer),
+                ParamValueBufferWrapper(max_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                source_buffer,
+                target_buffer
+            );
         }
+    }
+}
+
+
+template<class MinBufferClass, class MaxBufferClass>
+void LFO::apply_range_centered(
+        MinBufferClass const& min,
+        MaxBufferClass const& max,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample const* const source_buffer,
+        Sample* const target_buffer
+) const noexcept {
+    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        Sample const min_i = min[i];
+        Sample const max_i = max[i];
+        Sample const center = (min_i + max_i) * 0.5;
+        Sample const range = max_i - min_i;
+
+        target_buffer[i] = center + range * source_buffer[i];
+
+        JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_i, max_i);
     }
 }
 

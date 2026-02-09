@@ -72,72 +72,92 @@ void Effect<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
-    Integer const channels = this->channels;
-
     if (is_dry) {
         if (dry_buffer == NULL) {
-            Sample const dry_level = dry.get_value();
-
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = dry_level * this->input_buffer[c][i];
-                }
-            }
+            render<true, ParamValueWrapper, ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueWrapper(dry.get_value()),
+                ParamValueWrapper(0.0)
+            );
         } else {
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = dry_buffer[i] * this->input_buffer[c][i];
-                }
-            }
+            render<true, ParamValueBufferWrapper, ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueBufferWrapper(dry_buffer),
+                ParamValueWrapper(0.0)
+            );
         }
 
         return;
     }
 
     if (wet_buffer == NULL) {
-        Sample const wet_level = wet.get_value();
-
         if (dry_buffer == NULL) {
-            Sample const dry_level = dry.get_value();
-
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = (
-                        dry_level * this->input_buffer[c][i]
-                        + wet_level * buffer[c][i]
-                    );
-                }
-            }
+            render<false, ParamValueWrapper, ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueWrapper(dry.get_value()),
+                ParamValueWrapper(wet.get_value())
+            );
         } else {
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = (
-                        dry_buffer[i] * this->input_buffer[c][i]
-                        + wet_level * buffer[c][i]
-                    );
-                }
-            }
+            render<false, ParamValueBufferWrapper, ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueBufferWrapper(dry_buffer),
+                ParamValueWrapper(wet.get_value())
+            );
         }
     } else {
         if (dry_buffer == NULL) {
-            Sample const dry_level = dry.get_value();
-
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = (
-                        dry_level * this->input_buffer[c][i]
-                        + wet_buffer[i] * buffer[c][i]
-                    );
-                }
-            }
+            render<false, ParamValueWrapper, ParamValueBufferWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueWrapper(dry.get_value()),
+                ParamValueBufferWrapper(wet_buffer)
+            );
         } else {
-            for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    buffer[c][i] = (
-                        dry_buffer[i] * this->input_buffer[c][i]
-                        + wet_buffer[i] * buffer[c][i]
-                    );
-                }
+            render<false, ParamValueBufferWrapper, ParamValueBufferWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueBufferWrapper(dry_buffer),
+                ParamValueBufferWrapper(wet_buffer)
+            );
+        }
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<bool is_dry, class DryBufferClass, class WetBufferClass>
+void Effect<InputSignalProducerClass>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer,
+        DryBufferClass const& dry,
+        WetBufferClass const& wet
+) const noexcept {
+    Integer const channels = this->channels;
+
+    for (Integer c = 0; c != channels; ++c) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            if constexpr (is_dry) {
+                buffer[c][i] = dry[i] * this->input_buffer[c][i];
+            } else {
+                buffer[c][i] = dry[i] * this->input_buffer[c][i] + wet[i] * buffer[c][i];
             }
         }
     }

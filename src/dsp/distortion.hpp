@@ -228,6 +228,15 @@ class Distortion : public Filter<InputSignalProducerClass>
 
         void initialize_instance() noexcept;
 
+        template<class LevelBufferClass>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer,
+            LevelBufferClass const& level
+        ) noexcept;
+
         Sample distort(
             Table const& f_table,
             Table const& F0_table,

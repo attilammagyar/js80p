@@ -33,6 +33,31 @@
 namespace JS80P
 {
 
+ParamValueWrapper::ParamValueWrapper(Sample const value) noexcept
+    : value(value)
+{
+}
+
+
+Sample ParamValueWrapper::operator[](Integer const index) const noexcept
+{
+    return value;
+}
+
+
+
+ParamValueBufferWrapper::ParamValueBufferWrapper(Sample const* const buffer) noexcept
+    : buffer(buffer)
+{
+}
+
+
+Sample ParamValueBufferWrapper::operator[](Integer const index) const noexcept
+{
+    return buffer[index];
+}
+
+
 constexpr Byte dummy_voice_status = Constants::VOICE_STATUS_NORMAL;
 
 

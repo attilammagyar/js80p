@@ -81,22 +81,41 @@ void Gain<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    if (gain_buffer == NULL) {
+        render<ParamValueWrapper>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer,
+            ParamValueWrapper(gain.get_value())
+        );
+    } else {
+        render<ParamValueBufferWrapper>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer,
+            ParamValueBufferWrapper(gain_buffer)
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<class GainBufferClass>
+void Gain<InputSignalProducerClass>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer,
+        GainBufferClass const& gain
+) const noexcept {
     Integer const channels = this->get_channels();
     Sample const* const* const input_buffer = this->input_buffer;
 
-    if (gain_buffer == NULL) {
-        Number const gain_value = gain.get_value();
-
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = gain_value * input_buffer[c][i];
-            }
-        }
-    } else {
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                buffer[c][i] = gain_buffer[i] * input_buffer[c][i];
-            }
+    for (Integer c = 0; c != channels; ++c) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            buffer[c][i] = gain[i] * input_buffer[c][i];
         }
     }
 }

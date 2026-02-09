@@ -55,6 +55,30 @@ constexpr Midi::Channel PARAM_GLOBAL_MPE_CHANNEL = 0;
 constexpr Midi::Channel PARAM_DEFAULT_MPE_CHANNEL = PARAM_GLOBAL_MPE_CHANNEL;
 
 
+class ParamValueWrapper
+{
+    public:
+        explicit ParamValueWrapper(Sample const value) noexcept;
+
+        JS80P_INLINE Sample operator[](Integer const index) const noexcept;
+
+    private:
+        Sample const value;
+};
+
+
+class ParamValueBufferWrapper
+{
+    public:
+        explicit ParamValueBufferWrapper(Sample const* const buffer) noexcept;
+
+        JS80P_INLINE Sample operator[](Integer const index) const noexcept;
+
+    private:
+        Sample const* const buffer;
+};
+
+
 /**
  * \brief A variable that can influence the synthesized sound or other
  *        parameters.

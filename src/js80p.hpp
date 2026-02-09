@@ -42,9 +42,11 @@
 #if defined(__GNUC__) || defined(__clang__)
   #define JS80P_LIKELY(condition) __builtin_expect((condition), 1)
   #define JS80P_UNLIKELY(condition) __builtin_expect((condition), 0)
+  #define JS80P_INLINE inline __attribute__((always_inline))
 #else
   #define JS80P_LIKELY(condition) (condition)
   #define JS80P_UNLIKELY(condition) (condition)
+  #define JS80P_INLINE inline
 #endif
 
 

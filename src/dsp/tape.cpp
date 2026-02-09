@@ -1066,32 +1066,44 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
     }
 
     if (volume_buffer == NULL) {
-        Sample const volume_level = params.volume.get_value();
-
-        for (Integer c = 0; c != this->channels; ++c) {
-            Sample* const channel = buffer[c];
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                /*
-                Conveniently, our buffer owner is the delay, so the buffer
-                already contains its rendered signal, we just have to apply
-                our volume.
-                */
-                channel[i] *= volume_level;
-            }
-        }
+        render<ParamValueWrapper>(
+            ParamValueWrapper(params.volume.get_value()),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
     } else {
-        for (Integer c = 0; c != this->channels; ++c) {
-            Sample* const channel = buffer[c];
+        render<ParamValueBufferWrapper>(
+            ParamValueBufferWrapper(volume_buffer),
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer
+        );
+    }
+}
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                /*
-                Conveniently, our buffer owner is the delay, so the buffer
-                already contains its rendered signal, we just have to apply
-                our volume.
-                */
-                channel[i] *= volume_buffer[i];
-            }
+
+template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
+template<class VolumeBufferClass>
+void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
+        VolumeBufferClass const& volume,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer
+) const noexcept {
+    for (Integer c = 0; c != this->channels; ++c) {
+        Sample* const channel = buffer[c];
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            /*
+            Conveniently, our buffer owner is the delay, so the buffer
+            already contains its rendered signal, we just have to apply
+            our volume.
+            */
+            channel[i] *= volume[i];
         }
     }
 }

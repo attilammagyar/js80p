@@ -63,6 +63,17 @@ class Effect : public Filter<InputSignalProducerClass>
         Sample const* wet_buffer;
         Sample const* dry_buffer;
         bool is_dry;
+
+    private:
+        template<bool is_dry, class DryBufferClass, class WetBufferClass>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer,
+            DryBufferClass const& dry,
+            WetBufferClass const& wet
+        ) const noexcept;
 };
 
 }

@@ -334,6 +334,19 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         void store_no_op_coefficient_samples(Integer const index) noexcept;
         void store_silent_coefficient_samples(Integer const index) noexcept;
 
+        template<class ParamValueBufferClass>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer,
+            ParamValueBufferClass const& b0,
+            ParamValueBufferClass const& b1,
+            ParamValueBufferClass const& b2,
+            ParamValueBufferClass const& a1,
+            ParamValueBufferClass const& a2
+        ) noexcept;
+
         Number const inaccuracy_seed;
         FloatParamB const* const freq_inaccuracy_param;
         FloatParamB const* const q_inaccuracy_param;

@@ -1503,6 +1503,15 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const last_sample_index
                 ) noexcept;
 
+                template<class InputVolumeBufferClass>
+                void render(
+                    InputVolumeBufferClass const& input_volume,
+                    Integer const round,
+                    Integer const first_sample_index,
+                    Integer const last_sample_index,
+                    Sample** const buffer
+                ) const noexcept;
+
                 Integer const polyphony;
                 Modulator* const* const modulators;
                 Carrier* const* const carriers;

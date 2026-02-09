@@ -4751,3 +4751,22 @@ TEST(when_a_midi_controller_is_assigned_to_a_param_or_released_from_it_then_the_
     test_macro_assignment<FloatParamS>(float_param_s);
     test_macro_assignment<FloatParamB>(float_param_b);
 })
+
+
+TEST(param_value_wrappers_provide_a_unified_interface_for_buffers_and_single_values, {
+    constexpr Sample buffer[] = {0.1, 0.2, 0.3, 0.4, 0.5};
+    constexpr Sample value = 0.42;
+
+    ParamValueWrapper value_wrapper(value);
+    ParamValueBufferWrapper buffer_wrapper(buffer);
+
+    assert_eq(0.42, value_wrapper[0], DOUBLE_DELTA);
+    assert_eq(0.42, value_wrapper[1], DOUBLE_DELTA);
+    assert_eq(0.42, value_wrapper[99999], DOUBLE_DELTA);
+
+    assert_eq(0.1, buffer_wrapper[0], DOUBLE_DELTA);
+    assert_eq(0.2, buffer_wrapper[1], DOUBLE_DELTA);
+    assert_eq(0.3, buffer_wrapper[2], DOUBLE_DELTA);
+    assert_eq(0.4, buffer_wrapper[3], DOUBLE_DELTA);
+    assert_eq(0.5, buffer_wrapper[4], DOUBLE_DELTA);
+})

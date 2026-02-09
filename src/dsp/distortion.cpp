@@ -908,8 +908,36 @@ void Distortion<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    if (level_buffer == NULL) {
+        render<ParamValueWrapper>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer,
+            ParamValueWrapper(level_value)
+        );
+    } else {
+        render<ParamValueBufferWrapper>(
+            round,
+            first_sample_index,
+            last_sample_index,
+            buffer,
+            ParamValueBufferWrapper(level_buffer)
+        );
+    }
+}
+
+
+template<class InputSignalProducerClass>
+template<class LevelBufferClass>
+void Distortion<InputSignalProducerClass>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer,
+        LevelBufferClass const& level
+) noexcept {
     Integer const channels = this->channels;
-    Sample const* const level_buffer = this->level_buffer;
     Sample const* const* const input_buffer = this->input_buffer;
     Table const& f_table = tables.get_f_table(current_type);
     Table const& F0_table = tables.get_F0_table(current_type);
@@ -917,41 +945,21 @@ void Distortion<InputSignalProducerClass>::render(
     Sample* const previous_input_sample = this->previous_input_sample;
     Sample* const F0_previous_input_sample = this->F0_previous_input_sample;
 
-    if (level_buffer == NULL) {
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const input_sample = input_buffer[c][i];
+    for (Integer c = 0; c != channels; ++c) {
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            Sample const input_sample = input_buffer[c][i];
 
-                buffer[c][i] = Math::combine(
-                    level_value,
-                    distort(
-                        f_table,
-                        F0_table,
-                        input_sample,
-                        previous_input_sample[c],
-                        F0_previous_input_sample[c]
-                    ),
-                    input_sample
-                );
-            }
-        }
-    } else {
-        for (Integer c = 0; c != channels; ++c) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const input_sample = input_buffer[c][i];
-
-                buffer[c][i] = Math::combine(
-                    level_buffer[i],
-                    distort(
-                        f_table,
-                        F0_table,
-                        input_sample,
-                        previous_input_sample[c],
-                        F0_previous_input_sample[c]
-                    ),
-                    input_sample
-                );
-            }
+            buffer[c][i] = Math::combine(
+                level[i],
+                distort(
+                    f_table,
+                    F0_table,
+                    input_sample,
+                    previous_input_sample[c],
+                    F0_previous_input_sample[c]
+                ),
+                input_sample
+            );
         }
     }
 }

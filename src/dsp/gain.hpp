@@ -62,6 +62,15 @@ class Gain : public Filter<InputSignalProducerClass>
         ) noexcept JS80P_OVERRIDE;
 
     private:
+        template<class GainBufferClass>
+        void render(
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer,
+            GainBufferClass const& gain
+        ) const noexcept;
+
         Sample const* gain_buffer;
 
         FloatParamS& gain;

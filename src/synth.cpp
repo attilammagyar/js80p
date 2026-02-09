@@ -3519,37 +3519,21 @@ void Synth::Bus::render(
 
     if (JS80P_LIKELY(input != NULL)) {
         if (input_volume_buffer == NULL) {
-            Sample const input_volume_value = input_volume.get_value();
-
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* const in_channel = input[c];
-                Sample const* const mod_channel = modulators_buffer[c];
-                Sample const* const car_channel = carriers_buffer[c];
-                Sample* const out_channel = buffer[c];
-
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    out_channel[i] = (
-                        in_channel[i] * input_volume_value
-                        + mod_channel[i]
-                        + car_channel[i]
-                    );
-                }
-            }
+            render<ParamValueWrapper>(
+                ParamValueWrapper(input_volume.get_value()),
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer
+            );
         } else {
-            for (Integer c = 0; c != channels; ++c) {
-                Sample const* const in_channel = input[c];
-                Sample const* const mod_channel = modulators_buffer[c];
-                Sample const* const car_channel = carriers_buffer[c];
-                Sample* const out_channel = buffer[c];
-
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    out_channel[i] = (
-                        in_channel[i] * input_volume_buffer[i]
-                        + mod_channel[i]
-                        + car_channel[i]
-                    );
-                }
-            }
+            render<ParamValueBufferWrapper>(
+                ParamValueBufferWrapper(input_volume_buffer),
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer
+            );
         }
     } else {
         for (Integer c = 0; c != channels; ++c) {
@@ -3560,6 +3544,31 @@ void Synth::Bus::render(
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 out_channel[i] = mod_channel[i] + car_channel[i];
             }
+        }
+    }
+}
+
+
+template<class InputVolumeBufferClass>
+void Synth::Bus::render(
+        InputVolumeBufferClass const& input_volume,
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer
+) const noexcept {
+    for (Integer c = 0; c != channels; ++c) {
+        Sample const* const in_channel = input[c];
+        Sample const* const mod_channel = modulators_buffer[c];
+        Sample const* const car_channel = carriers_buffer[c];
+        Sample* const out_channel = buffer[c];
+
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            out_channel[i] = (
+                in_channel[i] * input_volume[i]
+                + mod_channel[i]
+                + car_channel[i]
+            );
         }
     }
 }

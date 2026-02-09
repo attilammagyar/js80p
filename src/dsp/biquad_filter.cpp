@@ -1604,75 +1604,77 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         }
     }
 
+    if (are_coefficients_constant) {
+        if (can_use_shared_coefficients) {
+            render<ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueWrapper(shared_buffers->b0_buffer[0]),
+                ParamValueWrapper(shared_buffers->b1_buffer[0]),
+                ParamValueWrapper(shared_buffers->b2_buffer[0]),
+                ParamValueWrapper(shared_buffers->a1_buffer[0]),
+                ParamValueWrapper(shared_buffers->a2_buffer[0])
+            );
+        } else {
+            render<ParamValueWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueWrapper(b0_buffer[0]),
+                ParamValueWrapper(b1_buffer[0]),
+                ParamValueWrapper(b2_buffer[0]),
+                ParamValueWrapper(a1_buffer[0]),
+                ParamValueWrapper(a2_buffer[0])
+            );
+        }
+    } else {
+        if (can_use_shared_coefficients) {
+            render<ParamValueBufferWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueBufferWrapper(shared_buffers->b0_buffer),
+                ParamValueBufferWrapper(shared_buffers->b1_buffer),
+                ParamValueBufferWrapper(shared_buffers->b2_buffer),
+                ParamValueBufferWrapper(shared_buffers->a1_buffer),
+                ParamValueBufferWrapper(shared_buffers->a2_buffer)
+            );
+        } else {
+            render<ParamValueBufferWrapper>(
+                round,
+                first_sample_index,
+                last_sample_index,
+                buffer,
+                ParamValueBufferWrapper(b0_buffer),
+                ParamValueBufferWrapper(b1_buffer),
+                ParamValueBufferWrapper(b2_buffer),
+                ParamValueBufferWrapper(a1_buffer),
+                ParamValueBufferWrapper(a2_buffer)
+            );
+        }
+    }
+}
+
+
+template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
+template<class ParamValueBufferClass>
+void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
+        Integer const round,
+        Integer const first_sample_index,
+        Integer const last_sample_index,
+        Sample** const buffer,
+        ParamValueBufferClass const& b0,
+        ParamValueBufferClass const& b1,
+        ParamValueBufferClass const& b2,
+        ParamValueBufferClass const& a1,
+        ParamValueBufferClass const& a2
+) noexcept {
     Integer const channels = this->channels;
     Sample const* const* const input_buffer = this->input_buffer;
-
-    if (are_coefficients_constant) {
-        Sample b0, b1, b2, a1, a2;
-
-        if (can_use_shared_coefficients) {
-            b0 = shared_buffers->b0_buffer[0];
-            b1 = shared_buffers->b1_buffer[0];
-            b2 = shared_buffers->b2_buffer[0];
-            a1 = shared_buffers->a1_buffer[0];
-            a2 = shared_buffers->a2_buffer[0];
-        } else {
-            b0 = b0_buffer[0];
-            b1 = b1_buffer[0];
-            b2 = b2_buffer[0];
-            a1 = a1_buffer[0];
-            a2 = a2_buffer[0];
-        }
-
-        for (Integer c = 0; c != channels; ++c) {
-            Sample x_n_m1 = this->x_n_m1[c];
-            Sample x_n_m2 = this->x_n_m2[c];
-            Sample y_n_m1 = this->y_n_m1[c];
-            Sample y_n_m2 = this->y_n_m2[c];
-
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const x_n = input_buffer[c][i];
-                Sample const y_n = (
-                    b0 * x_n + b1 * x_n_m1 + b2 * x_n_m2
-                    + a1 * y_n_m1 + a2 * y_n_m2
-                );
-
-                buffer[c][i] = y_n;
-
-                x_n_m2 = x_n_m1;
-                x_n_m1 = x_n;
-                y_n_m2 = y_n_m1;
-                y_n_m1 = y_n;
-            }
-
-            this->x_n_m1[c] = x_n_m1;
-            this->x_n_m2[c] = x_n_m2;
-            this->y_n_m1[c] = y_n_m1;
-            this->y_n_m2[c] = y_n_m2;
-        }
-
-        return;
-    }
-
-    Sample const* b0;
-    Sample const* b1;
-    Sample const* b2;
-    Sample const* a1;
-    Sample const* a2;
-
-    if (can_use_shared_coefficients) {
-        b0 = shared_buffers->b0_buffer;
-        b1 = shared_buffers->b1_buffer;
-        b2 = shared_buffers->b2_buffer;
-        a1 = shared_buffers->a1_buffer;
-        a2 = shared_buffers->a2_buffer;
-    } else {
-        b0 = b0_buffer;
-        b1 = b1_buffer;
-        b2 = b2_buffer;
-        a1 = a1_buffer;
-        a2 = a2_buffer;
-    }
 
     for (Integer c = 0; c != channels; ++c) {
         Sample x_n_m1 = this->x_n_m1[c];

@@ -331,7 +331,18 @@ class LFO : public SignalProducer
             Integer const last_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
-        );
+        ) const noexcept;
+
+        template<class DistortionBufferClass, class RandomnessBufferClass>
+        void apply_distortions(
+            DistortionBufferClass const& distortion,
+            RandomnessBufferClass const& randomness,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* const source_buffer,
+            Sample* const target_buffer
+        ) const noexcept;
 
         void apply_range(
             Sample const* const min_buffer,
@@ -343,7 +354,18 @@ class LFO : public SignalProducer
             Integer const last_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
-        );
+        ) const noexcept;
+
+        template<class MinBufferClass, class MaxBufferClass>
+        void apply_range(
+            MinBufferClass const& min,
+            MaxBufferClass const& max,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* const source_buffer,
+            Sample* const target_buffer
+        ) const noexcept;
 
         void apply_distortions_centered(
             Sample const* const distortion_buffer,
@@ -355,7 +377,18 @@ class LFO : public SignalProducer
             Integer const last_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
-        );
+        ) const noexcept;
+
+        template<class DistortionBufferClass, class RandomnessBufferClass>
+        void apply_distortions_centered(
+            DistortionBufferClass const& distortion,
+            RandomnessBufferClass const& randomness,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* const source_buffer,
+            Sample* const target_buffer
+        ) const noexcept;
 
         void apply_range_centered(
             Sample const* const min_buffer,
@@ -367,7 +400,18 @@ class LFO : public SignalProducer
             Integer const last_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
-        );
+        ) const noexcept;
+
+        template<class MinBufferClass, class MaxBufferClass>
+        void apply_range_centered(
+            MinBufferClass const& min,
+            MaxBufferClass const& max,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample const* const source_buffer,
+            Sample* const target_buffer
+        ) const noexcept;
 
         template<class VisitorClass>
         void traverse_lfo_graph(

@@ -110,6 +110,17 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             FloatParamB const& time_param
         ) noexcept;
 
+        template<class DryBufferClass, class WetBufferClass, bool has_gain, class GainBufferClass>
+        void render(
+            DryBufferClass const& dry,
+            WetBufferClass const& wet,
+            GainBufferClass const& gain,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer
+        ) const noexcept;
+
         FloatParamS gain;
         PeakTracker peak_tracker;
         Sample const* gain_buffer;

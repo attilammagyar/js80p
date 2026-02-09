@@ -242,6 +242,16 @@ class Voice : public SignalProducer
                 ) noexcept JS80P_OVERRIDE;
 
             private:
+                template<class VolumeBufferClass, bool has_velocity, class VelocityBufferClass>
+                void render(
+                    VolumeBufferClass const& volume,
+                    VelocityBufferClass const& velocity,
+                    Integer const round,
+                    Integer const first_sample_index,
+                    Integer const last_sample_index,
+                    Sample** const buffer
+                ) const noexcept;
+
                 FloatParamS& volume;
                 FloatParamS& velocity;
 
@@ -423,6 +433,16 @@ class Voice : public SignalProducer
         ) noexcept;
 
         bool is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept;
+
+        template<class PanningBufferClass, class NotePanningBufferClass>
+        void render(
+            PanningBufferClass const& panning,
+            NotePanningBufferClass const& note_panning,
+            Integer const round,
+            Integer const first_sample_index,
+            Integer const last_sample_index,
+            Sample** const buffer
+        ) const noexcept;
 
         Number const oscillator_inaccuracy_seed;
 
