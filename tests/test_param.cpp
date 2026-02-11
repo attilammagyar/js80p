@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -4757,8 +4757,8 @@ TEST(param_value_wrappers_provide_a_unified_interface_for_buffers_and_single_val
     constexpr Sample buffer[] = {0.1, 0.2, 0.3, 0.4, 0.5};
     constexpr Sample value = 0.42;
 
-    ParamValueWrapper value_wrapper(value);
-    ParamValueBufferWrapper buffer_wrapper(buffer);
+    ParamValueWrapper const value_wrapper(value);
+    ParamValueBufferWrapper const buffer_wrapper(buffer);
 
     assert_eq(0.42, value_wrapper[0], DOUBLE_DELTA);
     assert_eq(0.42, value_wrapper[1], DOUBLE_DELTA);
