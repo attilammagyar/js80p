@@ -28,8 +28,6 @@
 
 #include "serializer.hpp"
 
-#include "dsp/oscillator.cpp"
-
 
 namespace JS80P
 {
@@ -579,9 +577,7 @@ Number Serializer::upgrade_old_voice_oscillator_waveform(
         return 0.0;
     }
 
-    SimpleOscillator::WaveformParam waveform("WFM");
-
-    return waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.modulator_params.waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
 }
 
 
@@ -607,9 +603,7 @@ Number Serializer::upgrade_old_lfo_waveform(
         return 0.0;
     }
 
-    SimpleOscillator::WaveformParam waveform("WFM", SimpleOscillator::SOFT_BIPOLAR_PULSE);
-
-    return waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.lfos[0]->waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
 }
 
 
