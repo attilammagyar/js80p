@@ -170,6 +170,7 @@ class Voice : public SignalProducer
                 FloatParamS noise_level;
 
                 typename Oscillator_::WaveformParam waveform;
+                FloatParamS pulse_width;
                 FloatParamS amplitude;
                 FloatParamB velocity_sensitivity;
                 FloatParamS folding;

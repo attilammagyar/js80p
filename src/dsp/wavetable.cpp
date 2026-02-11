@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -183,9 +183,16 @@ Wavetable::~Wavetable()
 }
 
 
-template<Wavetable::Interpolation interpolation, bool single_partial, bool with_subharmonic>
+template<
+        Wavetable::Interpolation interpolation,
+        bool single_partial,
+        bool with_subharmonic,
+        bool is_pulse,
+        bool need_pulse_scaling
+>
 void Wavetable::lookup(
         WavetableState& state,
+        Number const pulse_width,
         Frequency const frequency,
         Number const phase_offset,
         Sample& sample,
@@ -212,8 +219,13 @@ void Wavetable::lookup(
     if constexpr (single_partial) {
         state.table_indices[0] = 0;
 
-        interpolate<interpolation, false, with_subharmonic>(
-            state, abs_frequency, sample_index + phase_offset, sample, subharmonic_sample
+        interpolate<interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling>(
+            state,
+            abs_frequency,
+            sample_index + phase_offset,
+            pulse_width,
+            sample,
+            subharmonic_sample
         );
     } else {
         Sample const max_partials = (
@@ -229,8 +241,13 @@ void Wavetable::lookup(
         state.table_indices[0] = fewer_partials_index;
 
         if (more_partials_index == fewer_partials_index) {
-            interpolate<interpolation, false, with_subharmonic>(
-                state, abs_frequency, sample_index + phase_offset, sample, subharmonic_sample
+            interpolate<interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling>(
+                state,
+                abs_frequency,
+                sample_index + phase_offset,
+                pulse_width,
+                sample,
+                subharmonic_sample
             );
 
             return;
@@ -239,39 +256,101 @@ void Wavetable::lookup(
         state.table_indices[1] = more_partials_index;
         state.fewer_partials_weight = max_partials - std::floor(max_partials);
 
-        interpolate<interpolation, true, with_subharmonic>(
-            state, abs_frequency, sample_index + phase_offset, sample, subharmonic_sample
+        interpolate<interpolation, true, with_subharmonic, is_pulse, need_pulse_scaling>(
+            state,
+            abs_frequency,
+            sample_index + phase_offset,
+            pulse_width,
+            sample,
+            subharmonic_sample
         );
     }
 }
 
 
-template<Wavetable::Interpolation interpolation, bool table_interpolation, bool with_subharmonic>
+template<
+        Wavetable::Interpolation interpolation,
+        bool table_interpolation,
+        bool with_subharmonic,
+        bool is_pulse,
+        bool need_pulse_scaling
+>
 void Wavetable::interpolate(
         WavetableState const& state,
         Frequency const frequency,
         Number const sample_index,
+        Number const pulse_width,
         Sample& sample,
         Sample& subharmonic_sample
 ) const noexcept {
     if constexpr (interpolation == Interpolation::LINEAR_ONLY) {
-        interpolate_sample_linear<table_interpolation, with_subharmonic>(
-            state, sample_index, sample, subharmonic_sample
+        interpolate_sample_linear<
+            table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+        >(
+            state, sample_index, pulse_width, sample, subharmonic_sample
         );
     } else if constexpr (interpolation == Interpolation::LAGRANGE_ONLY) {
-        interpolate_sample_lagrange<table_interpolation, with_subharmonic>(
-            state, sample_index, sample, subharmonic_sample
+        interpolate_sample_lagrange<
+            table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+        >(
+            state, sample_index, pulse_width, sample, subharmonic_sample
         );
     } else {
         if (JS80P_LIKELY(frequency >= state.interpolation_limit)) {
-            interpolate_sample_linear<table_interpolation, with_subharmonic>(
-                state, sample_index, sample, subharmonic_sample
+            interpolate_sample_linear<
+                table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+            >(
+                state, sample_index, pulse_width, sample, subharmonic_sample
             );
         } else {
-            interpolate_sample_lagrange<table_interpolation, with_subharmonic>(
-                state, sample_index, sample, subharmonic_sample
+            interpolate_sample_lagrange<
+                table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+            >(
+                state, sample_index, pulse_width, sample, subharmonic_sample
             );
         }
+    }
+}
+
+
+template<
+        bool table_interpolation,
+        bool with_subharmonic,
+        bool is_pulse,
+        bool need_pulse_scaling
+>
+void Wavetable::interpolate_sample_linear(
+        WavetableState const& state,
+        Number const sample_index,
+        Number const pulse_width,
+        Sample& sample,
+        Sample& subharmonic_sample
+) const noexcept {
+    interpolate_sample_linear<table_interpolation, with_subharmonic>(
+        state, sample_index, sample, subharmonic_sample
+    );
+
+    if constexpr (is_pulse) {
+        Sample sample_2;
+
+        interpolate_sample_linear<table_interpolation, false>(
+            state, sample_index + PERIOD_SIZE_FLOAT * pulse_width, sample_2, subharmonic_sample
+        );
+        compute_pulse_sample<need_pulse_scaling>(sample, sample_2, pulse_width);
+    }
+}
+
+
+template<bool need_pulse_scaling>
+void Wavetable::compute_pulse_sample(
+        Sample& sample,
+        Sample const sample_2,
+        Number const pulse_width
+) const noexcept {
+    sample -= sample_2;
+
+    if constexpr (need_pulse_scaling) {
+        sample *= 0.5;
     }
 }
 
@@ -283,6 +362,8 @@ void Wavetable::interpolate_sample_linear(
         Sample& sample,
         Sample& subharmonic_sample
 ) const noexcept {
+    constexpr Integer mask = get_index_mask<with_subharmonic>();
+
     /*
     Not using Math::lookup_periodic() here, because we don't want to calculate
     the weight twice when interpolation between the two tables (fewer and more
@@ -291,7 +372,6 @@ void Wavetable::interpolate_sample_linear(
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
     );
-    Integer const mask = get_index_mask<with_subharmonic>();
     Integer const sample_1_index = (Integer)sample_index & mask;
     Integer const sample_2_index = (sample_1_index + 1) & mask;
 
@@ -323,6 +403,34 @@ void Wavetable::interpolate_sample_linear(
 }
 
 
+template<
+        bool table_interpolation,
+        bool with_subharmonic,
+        bool is_pulse,
+        bool need_pulse_scaling
+>
+void Wavetable::interpolate_sample_lagrange(
+        WavetableState const& state,
+        Number const sample_index,
+        Number const pulse_width,
+        Sample& sample,
+        Sample& subharmonic_sample
+) const noexcept {
+    interpolate_sample_lagrange<table_interpolation, with_subharmonic>(
+        state, sample_index, sample, subharmonic_sample
+    );
+
+    if constexpr (is_pulse) {
+        Sample sample_2;
+
+        interpolate_sample_lagrange<table_interpolation, false>(
+            state, sample_index + PERIOD_SIZE_FLOAT * pulse_width, sample_2, subharmonic_sample
+        );
+        compute_pulse_sample<need_pulse_scaling>(sample, sample_2, pulse_width);
+    }
+}
+
+
 template<bool table_interpolation, bool with_subharmonic>
 void Wavetable::interpolate_sample_lagrange(
         WavetableState const& state,
@@ -330,7 +438,8 @@ void Wavetable::interpolate_sample_lagrange(
         Sample& sample,
         Sample& subharmonic_sample
 ) const noexcept {
-    Integer const mask = get_index_mask<with_subharmonic>();
+    constexpr Integer mask = get_index_mask<with_subharmonic>();
+
     Integer const sample_1_index = (Integer)sample_index & mask;
     Integer const sample_2_index = (sample_1_index + 1) & mask;
     Integer const sample_3_index = (sample_1_index + 2) & mask;

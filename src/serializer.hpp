@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,7 +145,8 @@ class Serializer
         static void upgrade_line(
             Synth const& synth,
             ParamName& param_name,
-            Number& number
+            Number& number,
+            bool const is_controller_assignment
         ) noexcept;
 
         static bool parse_param_name(
@@ -179,6 +180,16 @@ class Serializer
         ) noexcept;
 
         static Number upgrade_old_envelope_update_mode(
+            Synth const& synth,
+            Number const old_value
+        ) noexcept;
+
+        static Number upgrade_old_voice_oscillator_waveform(
+            Synth const& synth,
+            Number const old_value
+        ) noexcept;
+
+        static Number upgrade_old_lfo_waveform(
             Synth const& synth,
             Number const old_value
         ) noexcept;

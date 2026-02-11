@@ -176,7 +176,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
         8                           /* NH + MODE + MIX + PM + FM + AM + INVOL + bus */
-        + 44 * 2                    /* Modulator::Params + Carrier::Params  */
+        + 45 * 2                    /* Modulator::Params + Carrier::Params  */
         + POLYPHONY * 2             /* modulators + carriers                */
         + 1                         /* effects                              */
         + MACROS * Macro::PARAMS
@@ -382,7 +382,8 @@ void Synth::register_modulator_params() noexcept
 
     register_param_as_child<FloatParamS>(ParamId::MN, modulator_params.noise_level);
 
-    register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWAV, modulator_params.waveform);
+    register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWFM, modulator_params.waveform);
+    register_param_as_child<FloatParamS>(ParamId::MPW, modulator_params.pulse_width);
     register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::MFLD, modulator_params.folding);
@@ -439,7 +440,8 @@ void Synth::register_carrier_params() noexcept
 
     register_param_as_child<FloatParamS>(ParamId::CN, carrier_params.noise_level);
 
-    register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWAV, carrier_params.waveform);
+    register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWFM, carrier_params.waveform);
+    register_param_as_child<FloatParamS>(ParamId::CPW, carrier_params.pulse_width);
     register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
     register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
     register_param_as_child<FloatParamS>(ParamId::CFLD, carrier_params.folding);
@@ -760,13 +762,23 @@ void Synth::create_envelopes() noexcept
 
 void Synth::create_lfos() noexcept
 {
-    Integer next_id = ParamId::L1FRQ;
+    Integer next_id = ParamId::L1PW;
 
     for (Byte i = 0; i != Constants::LFOS; ++i) {
-        LFO* const lfo = new LFO(std::string("L") + to_string((Integer)(i + 1)), true);
+        bool const allow_pulse_waveforms = (i & 1) == 0;
+        LFO* const lfo = new LFO(
+            std::string("L") + to_string((Integer)(i + 1)),
+            true,
+            allow_pulse_waveforms
+        );
         lfos_rw[i] = lfo;
 
         register_child(*lfo);
+
+        if (allow_pulse_waveforms) {
+            register_param<FloatParamS>((ParamId)next_id++, lfo->pulse_width);
+        }
+
         register_param<FloatParamS>((ParamId)next_id++, lfo->frequency);
         register_param<FloatParamS>((ParamId)next_id++, lfo->phase);
         register_param<FloatParamS>((ParamId)next_id++, lfo->min);
@@ -2803,13 +2815,13 @@ bool Synth::assign_controller_to_byte_param(
             is_assigned = true;
             break;
 
-        case ParamId::MWAV:
+        case ParamId::MWFM:
             modulator_params.waveform.set_midi_controller(midi_controller);
             modulator_params.waveform.set_macro(macro);
             is_assigned = true;
             break;
 
-        case ParamId::CWAV:
+        case ParamId::CWFM:
             carrier_params.waveform.set_midi_controller(midi_controller);
             carrier_params.waveform.set_macro(macro);
             is_assigned = true;

@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ class LFO : public SignalProducer
         explicit LFO(
             std::string const& name,
             bool const can_have_envelope = false,
+            bool const allow_pulse_waveforms = false,
             Number const default_frequency = Constants::LFO_FREQUENCY_DEFAULT
         ) noexcept;
 
@@ -104,6 +105,7 @@ class LFO : public SignalProducer
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         typename Oscillator_::WaveformParam waveform;
+        FloatParamS pulse_width;
         ToggleParam freq_log_scale;
         FloatParamS frequency;
         FloatParamS phase;
@@ -144,6 +146,12 @@ class LFO : public SignalProducer
                 ) noexcept;
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
+
+                void visit_pulse_width_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS const& pulse_width
+                ) noexcept;
 
                 void visit_amplitude_param(
                     LFO& lfo,
@@ -256,6 +264,12 @@ class LFO : public SignalProducer
 
                 void visit_lfo_as_global(LFO& lfo) noexcept;
 
+                void visit_pulse_width_param(
+                    LFO& lfo,
+                    Byte const depth,
+                    FloatParamS const& pulse_width
+                ) noexcept;
+
                 void visit_amplitude_param(
                     LFO& lfo,
                     Byte const depth,
@@ -310,6 +324,7 @@ class LFO : public SignalProducer
                 Sample const* param_buffer_1;
                 Sample const* param_buffer_2;
                 Sample const* param_buffer_3;
+                Sample const* param_buffer_4;
                 Integer const round;
                 Integer const sample_count;
                 Integer const first_sample_index;
@@ -437,6 +452,7 @@ class LFO : public SignalProducer
         bool const can_have_envelope;
 
         Oscillator_ oscillator;
+        FloatParamS* pulse_width_mpe[Midi::CHANNELS];
         FloatParamS* frequency_mpe[Midi::CHANNELS];
         FloatParamS* phase_mpe[Midi::CHANNELS];
         FloatParamS* min_mpe[Midi::CHANNELS];
@@ -447,6 +463,7 @@ class LFO : public SignalProducer
 
         Sample* env_buffer_1;
         Sample* env_buffer_2;
+        Sample* env_buffer_3;
 
         Sample const* min_buffer;
         Sample const* max_buffer;

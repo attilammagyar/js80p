@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@
 #include <sstream>
 
 #include "serializer.hpp"
+
+#include "dsp/oscillator.cpp"
 
 
 namespace JS80P
@@ -425,10 +427,11 @@ void Serializer::process_line(
         return;
     }
 
-    upgrade_line(synth, param_name, number);
+    is_controller_assignment = CONTROLLER_SUFFIX == suffix;
+
+    upgrade_line(synth, param_name, number, is_controller_assignment);
 
     param_id = synth.get_param_id(param_name);
-    is_controller_assignment = CONTROLLER_SUFFIX == suffix;
 
     if (
             param_id == Synth::ParamId::INVALID_PARAM_ID
@@ -457,7 +460,8 @@ void Serializer::process_line(
 void Serializer::upgrade_line(
         Synth const& synth,
         ParamName& param_name,
-        Number& number
+        Number& number,
+        bool const is_controller_assignment
 ) noexcept {
     if (
             JS80P_UNLIKELY(
@@ -482,6 +486,30 @@ void Serializer::upgrade_line(
         ) {
             strncpy(&param_name[3], "UPD", 4);
             number = upgrade_old_envelope_update_mode(synth, number);
+        }
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "MWAV", PARAM_NAME_MAX_LENGTH) == 0
+                || strncmp(param_name, "CWAV", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
+        strncpy(&param_name[1], "WFM", 4);
+
+        if (!is_controller_assignment) {
+            number = upgrade_old_voice_oscillator_waveform(synth, number);
+        }
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "L1WAV", PARAM_NAME_MAX_LENGTH) == 0
+                || strncmp(param_name, "L3WAV", PARAM_NAME_MAX_LENGTH) == 0
+                || strncmp(param_name, "L5WAV", PARAM_NAME_MAX_LENGTH) == 0
+                || strncmp(param_name, "L7WAV", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
+        strncpy(&param_name[2], "WFM", 4);
+
+        if (!is_controller_assignment) {
+            number = upgrade_old_lfo_waveform(synth, number);
         }
     }
 }
@@ -525,6 +553,63 @@ Number Serializer::upgrade_old_envelope_update_mode(
     }
 
     return synth.envelopes[0]->update_mode.value_to_ratio(NEW_VALUES[old_value_byte]);
+}
+
+
+Number Serializer::upgrade_old_voice_oscillator_waveform(
+        Synth const& synth,
+        Number const old_value
+) noexcept {
+    constexpr Byte NEW_VALUES[] = {
+        SimpleOscillator::SINE,
+        SimpleOscillator::SAWTOOTH,
+        SimpleOscillator::SOFT_SAWTOOTH,
+        SimpleOscillator::INVERSE_SAWTOOTH,
+        SimpleOscillator::SOFT_INVERSE_SAWTOOTH,
+        SimpleOscillator::TRIANGLE,
+        SimpleOscillator::SOFT_TRIANGLE,
+        SimpleOscillator::SQUARE,
+        SimpleOscillator::SOFT_SQUARE,
+        SimpleOscillator::CUSTOM,
+    };
+
+    Byte const old_value_byte = std::round(old_value * 9.0);
+
+    if (JS80P_UNLIKELY(old_value_byte > 9)) {
+        return 0.0;
+    }
+
+    SimpleOscillator::WaveformParam waveform("WFM");
+
+    return waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
+}
+
+
+Number Serializer::upgrade_old_lfo_waveform(
+        Synth const& synth,
+        Number const old_value
+) noexcept {
+    constexpr Byte NEW_VALUES[] = {
+        SimpleOscillator::SINE,
+        SimpleOscillator::SAWTOOTH,
+        SimpleOscillator::SOFT_SAWTOOTH,
+        SimpleOscillator::INVERSE_SAWTOOTH,
+        SimpleOscillator::SOFT_INVERSE_SAWTOOTH,
+        SimpleOscillator::TRIANGLE,
+        SimpleOscillator::SOFT_TRIANGLE,
+        SimpleOscillator::SQUARE,
+        SimpleOscillator::SOFT_SQUARE,
+    };
+
+    Byte const old_value_byte = std::round(old_value * 8.0);
+
+    if (JS80P_UNLIKELY(old_value_byte > 8)) {
+        return 0.0;
+    }
+
+    SimpleOscillator::WaveformParam waveform("WFM", SimpleOscillator::SOFT_BIPOLAR_PULSE);
+
+    return waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
 }
 
 

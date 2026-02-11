@@ -19,6 +19,7 @@
 #include "test.cpp"
 #include "utils.cpp"
 
+#include <array>
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -123,6 +124,121 @@ void test_lfo(
 TEST(lfo_oscillates_between_min_and_max_times_amplitude, {
     test_lfo(OFF, 180.0, 20.0, 20.0);
     test_lfo(ON, 180.0, 20.0, 60.0);
+})
+
+
+template<Integer block_size, Integer rounds>
+void test_pulse_lfo(
+        std::array<Sample, block_size * rounds> const& expected_output,
+        Byte const waveform,
+        bool const center,
+        Number const pulse_width = 0.25,
+        Number const min = 0.1,
+        Number const max = 0.7,
+        Number const amplitude = 0.75,
+        Number const frequency = 1.0,
+        Frequency const sample_rate = 20.0
+) {
+    constexpr Integer sample_count = rounds * block_size;
+
+    LFO lfo("L1", false, true);
+    Buffer actual_output(sample_count, CHANNELS);
+
+    lfo.set_block_size(block_size);
+    lfo.set_sample_rate(sample_rate);
+    lfo.set_bpm(120);
+    lfo.waveform.set_value(waveform);
+    lfo.pulse_width.set_value(pulse_width - 0.000001);
+    lfo.pulse_width.schedule_value(0.2, pulse_width);
+    lfo.frequency.set_value(frequency);
+    lfo.min.set_value(min);
+    lfo.max.set_value(max);
+    lfo.amplitude.set_value(amplitude * 0.5);
+    lfo.center.set_value(center ? ON : OFF);
+    lfo.start(0.0);
+
+    render_rounds<LFO>(lfo, actual_output, rounds);
+
+    assert_close(
+        expected_output.data(),
+        actual_output.samples[0],
+        sample_count,
+        0.05,
+        "waveform=%d, center=%s",
+        (int)waveform,
+        center ? "true" : "false"
+    );
+}
+
+
+TEST(lfo_waveform_can_be_pulse, {
+    test_pulse_lfo<10, 5>(
+        {
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+        },
+        LFO::Oscillator_::PULSE,
+        false
+    );
+    test_pulse_lfo<10, 5>(
+        {
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.10, 0.10, 0.10, 0.10, 0.10, 0.55, 0.55, 0.55, 0.55, 0.55,
+        },
+        LFO::Oscillator_::SOFT_PULSE,
+        false
+    );
+    test_pulse_lfo<10, 5>(
+        {
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+        },
+        LFO::Oscillator_::BIPOLAR_PULSE,
+        false
+    );
+    test_pulse_lfo<10, 5>(
+        {
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.10, 0.10, 0.10, 0.10, 0.10,
+            0.33, 0.33, 0.33, 0.33, 0.33, 0.55, 0.55, 0.55, 0.55, 0.55,
+        },
+        LFO::Oscillator_::SOFT_BIPOLAR_PULSE,
+        false
+    );
+
+    test_pulse_lfo<10, 5>(
+        {
+            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
+        },
+        LFO::Oscillator_::PULSE,
+        true
+    );
+    test_pulse_lfo<10, 5>(
+        {
+            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.400, 0.400, 0.400, 0.400, 0.400, 0.175, 0.175, 0.175, 0.175, 0.175,
+            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.400, 0.400, 0.400, 0.400, 0.400, 0.175, 0.175, 0.175, 0.175, 0.175,
+            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
+        },
+        LFO::Oscillator_::BIPOLAR_PULSE,
+        true
+    );
 })
 
 
@@ -378,6 +494,7 @@ TEST(when_a_round_is_skipped_then_params_are_still_processed, {
     lfo.set_sample_rate(SAMPLE_RATE);
     lfo.start(0.0);
 
+    lfo.pulse_width.schedule_linear_ramp(duration, 0.8);
     lfo.frequency.schedule_linear_ramp(duration, 0.7);
     lfo.phase.schedule_linear_ramp(duration, 0.6);
     lfo.min.schedule_linear_ramp(duration, 0.5);
@@ -388,6 +505,7 @@ TEST(when_a_round_is_skipped_then_params_are_still_processed, {
 
     lfo.skip_round(1, BLOCK_SIZE);
 
+    assert_eq(0.8, lfo.pulse_width.get_value(), DOUBLE_DELTA);
     assert_eq(0.7, lfo.frequency.get_value(), DOUBLE_DELTA);
     assert_eq(0.6, lfo.phase.get_value(), DOUBLE_DELTA);
     assert_eq(0.5, lfo.min.get_value(), DOUBLE_DELTA);

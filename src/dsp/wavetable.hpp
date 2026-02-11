@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,12 +91,15 @@ class Wavetable
         Wavetable& operator=(Wavetable&& wavetable) = delete;
 
         template<
-            Interpolation interpolation = Interpolation::DYNAMIC,
-            bool single_partial = false,
-            bool with_subharmonic = false
+            Interpolation interpolation,
+            bool single_partial,
+            bool with_subharmonic,
+            bool is_pulse,
+            bool need_pulse_scaling
         >
         void lookup(
             WavetableState& state,
+            Number const pulse_width,
             Frequency const frequency,
             Number const phase_offset,
             Sample& sample,
@@ -151,12 +154,29 @@ class Wavetable
         template<
             Interpolation interpolation,
             bool table_interpolation,
-            bool with_subharmonic
+            bool with_subharmonic,
+            bool is_pulse,
+            bool need_pulse_scaling
         >
         void interpolate(
             WavetableState const& state,
             Frequency const frequency,
             Number const sample_index,
+            Number const pulse_width,
+            Sample& sample,
+            Sample& subharmonic_sample
+        ) const noexcept;
+
+        template<
+            bool table_interpolation,
+            bool with_subharmonic,
+            bool is_pulse,
+            bool need_pulse_scaling
+        >
+        void interpolate_sample_linear(
+            WavetableState const& state,
+            Number const sample_index,
+            Number const pulse_width,
             Sample& sample,
             Sample& subharmonic_sample
         ) const noexcept;
@@ -169,12 +189,33 @@ class Wavetable
             Sample& subharmonic_sample
         ) const noexcept;
 
+        template<
+            bool table_interpolation,
+            bool with_subharmonic,
+            bool is_pulse,
+            bool need_pulse_scaling
+        >
+        void interpolate_sample_lagrange(
+            WavetableState const& state,
+            Number const sample_index,
+            Number const pulse_width,
+            Sample& sample,
+            Sample& subharmonic_sample
+        ) const noexcept;
+
         template<bool table_interpolation, bool with_subharmonic>
         void interpolate_sample_lagrange(
             WavetableState const& state,
             Number const sample_index,
             Sample& sample,
             Sample& subharmonic_sample
+        ) const noexcept;
+
+        template<bool need_pulse_scaling>
+        void compute_pulse_sample(
+            Sample& sample,
+            Sample const sample_2,
+            Number const pulse_width
         ) const noexcept;
 
         Integer const partials;

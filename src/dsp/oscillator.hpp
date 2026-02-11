@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,9 +76,13 @@ class Oscillator : public SignalProducer
         static constexpr Byte SOFT_TRIANGLE = 6;
         static constexpr Byte SQUARE = 7;
         static constexpr Byte SOFT_SQUARE = 8;
-        static constexpr Byte CUSTOM = 9;
+        static constexpr Byte PULSE = 9;
+        static constexpr Byte SOFT_PULSE = 10;
+        static constexpr Byte BIPOLAR_PULSE = 11;
+        static constexpr Byte SOFT_BIPOLAR_PULSE = 12;
+        static constexpr Byte CUSTOM = 13;
 
-        static constexpr int WAVEFORMS = 10;
+        static constexpr int WAVEFORMS = 14;
 
         static constexpr Number FREQUENCY_MIN = 0.001;
         static constexpr Number FREQUENCY_MAX = 24000.0;
@@ -108,6 +112,7 @@ class Oscillator : public SignalProducer
 
         Oscillator(
             WaveformParam& waveform,
+            FloatParamS& pulse_width_leader,
             FloatParamS& amplitude_leader,
             FloatParamS& frequency_leader,
             FloatParamS& phase_leader,
@@ -117,6 +122,7 @@ class Oscillator : public SignalProducer
 
         Oscillator(
             WaveformParam& waveform,
+            FloatParamS& pulse_width_leader,
             FloatParamS& amplitude_leader,
             FloatParamS& subharmonic_leader,
             FloatParamS& detune_leader,
@@ -137,6 +143,7 @@ class Oscillator : public SignalProducer
 
         Oscillator(
             WaveformParam& waveform,
+            FloatParamS& pulse_width_leader,
             FloatParamS& amplitude_leader,
             FloatParamS& detune_leader,
             FloatParamS& fine_detune_leader,
@@ -174,9 +181,11 @@ class Oscillator : public SignalProducer
             Integer const first_sample_index,
             Integer const last_sample_index,
             Sample* const buffer,
+            Sample const* const pulse_width_buffer,
             Sample const* const amplitude_buffer,
             Sample const* const frequency_buffer,
             Sample const* const phase_buffer,
+            Sample const pulse_width_value,
             Sample const amplitude_value,
             Sample const frequency_value,
             Sample const phase_value
@@ -185,6 +194,8 @@ class Oscillator : public SignalProducer
         void skip_round(Integer const round, Integer const sample_count) noexcept;
 
         WaveformParam& waveform;
+
+        FloatParamS pulse_width;
 
         ModulatedFloatParam modulated_amplitude;
         FloatParamS amplitude;
@@ -227,10 +238,12 @@ class Oscillator : public SignalProducer
             1.0 / Math::SECONDS_IN_ONE_MINUTE
         );
 
-        static constexpr Integer NUMBER_OF_CHILDREN = 7;
+        static constexpr Integer NUMBER_OF_CHILDREN = 8;
         static constexpr Integer NUMBER_OF_EVENTS = 4;
 
         static constexpr Integer CUSTOM_WAVEFORM_HARMONICS = 10;
+
+        static Byte const WAVEFORM_TO_WAVETABLE_INDEX[];
 
         void initialize_instance() noexcept;
         void allocate_buffers(Integer const size) noexcept;
@@ -276,8 +289,9 @@ class Oscillator : public SignalProducer
 
         void initialize_first_round(Frequency const frequency) noexcept;
 
-        template<bool has_subharmonic>
+        template<bool has_subharmonic, bool is_pulse, class PulseWidthBufferClass>
         void render(
+            PulseWidthBufferClass const& pulse_width,
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
@@ -288,9 +302,14 @@ class Oscillator : public SignalProducer
         template<
             Wavetable::Interpolation interpolation,
             bool single_partial,
-            bool has_subharmonic
+            bool has_subharmonic,
+            bool is_pulse,
+            class PulseWidthBufferClass,
+            class FrequencyBufferClass
         >
-        void render_with_constant_frequency(
+        void render(
+            PulseWidthBufferClass const& pulse_width,
+            FrequencyBufferClass const& frequency,
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
@@ -298,8 +317,23 @@ class Oscillator : public SignalProducer
             Sample* const buffer
         ) noexcept;
 
-        template<bool single_partial, bool has_subharmonic>
-        void render_with_changing_frequency(
+        template<
+            Wavetable::Interpolation interpolation,
+            bool single_partial,
+            bool has_subharmonic,
+            bool is_pulse,
+            class PulseWidthBufferClass,
+            class AmplitudeBufferClass,
+            class FrequencyBufferClass,
+            class PhaseBufferClass,
+            class SubharmonicAmplitudeBufferClass
+        >
+        void render(
+            PulseWidthBufferClass const& pulse_width,
+            AmplitudeBufferClass const& amplitude,
+            FrequencyBufferClass const& frequency,
+            PhaseBufferClass const& phase,
+            SubharmonicAmplitudeBufferClass const& subharmonic_amplitude,
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
@@ -310,22 +344,27 @@ class Oscillator : public SignalProducer
         template<
             bool single_partial,
             bool has_subharmonic,
-            Wavetable::Interpolation interpolation = Wavetable::Interpolation::DYNAMIC
+            bool is_pulse,
+            bool need_pulse_scaling,
+            Wavetable::Interpolation interpolation
         >
         Sample render_sample(
             WavetableState& wavetable_state,
+            Number const pulse_width,
             Sample const amplitude,
             Sample const frequency,
             Sample const phase,
-            Sample const subharmonic_amplitude = 0.0
-        ) noexcept;
+            Sample const subharmonic_amplitude,
+            Sample const unipolar_pulse_lfo_correction
+        ) const noexcept;
 
         ToggleParam& tempo_sync;
         ToggleParam& center;
         WavetableState wavetable_state;
-        Wavetable const* wavetables[WAVEFORMS];
+        Wavetable const* wavetables[10];
         Wavetable const* wavetable;
         Wavetable* custom_waveform;
+        Sample const* pulse_width_buffer;
         Sample* computed_amplitude_buffer;
         Frequency* computed_frequency_buffer;
         Sample* phase_buffer;
@@ -333,6 +372,7 @@ class Oscillator : public SignalProducer
         FloatParamB* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
         Number custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS];
         Integer custom_waveform_change_indices[CUSTOM_WAVEFORM_HARMONICS];
+        Number pulse_width_value;
         Number computed_amplitude_value;
         Sample subharmonic_amplitude_value;
         Frequency computed_frequency_value;
@@ -340,12 +380,14 @@ class Oscillator : public SignalProducer
         Seconds start_time_offset;
         Number frequency_scale;
         Sample sample_offset_scale;
-        bool is_on_;
-        bool is_starting;
-        bool computed_frequency_is_constant;
-        bool computed_amplitude_is_constant;
-        bool phase_is_constant;
-        bool subharmonic_amplitude_is_constant;
+        bool is_on_:1;
+        bool is_starting:1;
+        bool computed_frequency_is_constant:1;
+        bool computed_amplitude_is_constant:1;
+        bool phase_is_constant:1;
+        bool subharmonic_amplitude_is_constant:1;
+        bool is_pulse:1;
+        bool is_unipolar_pulse:1;
 };
 
 }

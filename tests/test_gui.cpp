@@ -71,7 +71,7 @@ void assert_ratio_as_str(
 TEST(param_ratio_to_str, {
     constexpr size_t number_of_options = 6;
     constexpr Synth::ParamId mc1 = Synth::ParamId::MC1;
-    constexpr Synth::ParamId mwav = Synth::ParamId::MWAV;
+    constexpr Synth::ParamId mwfm = Synth::ParamId::MWFM;
     char const* const options[number_of_options] = {
         "first",
         "second",
@@ -92,11 +92,32 @@ TEST(param_ratio_to_str, {
     assert_ratio_as_str(synth, "0.000", mc1, 0.5, 10.0, "%.3f", NULL, 0);
     assert_ratio_as_str(synth, "0.00", mc1, 0.4999999, 10.0, "%.2f", NULL, 0);
 
-    assert_ratio_as_str(synth, "first", mwav, 0.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str(synth, "second", mwav, 1.0 / 10.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str(synth, "third", mwav, 2.0 / 10.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str(synth, "", mwav, 1.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str(synth, "", mwav, -1.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "first", mwfm, 0.0, 0.0, NULL, options, number_of_options);
+
+    assert_ratio_as_str(
+        synth,
+        "second",
+        mwfm,
+        1.0 / (Number)SimpleOscillator::WAVEFORMS,
+        0.0,
+        NULL,
+        options,
+        number_of_options
+    );
+
+    assert_ratio_as_str(
+        synth,
+        "third",
+        mwfm,
+        2.0 / (Number)SimpleOscillator::WAVEFORMS,
+        0.0,
+        NULL,
+        options,
+        number_of_options
+    );
+
+    assert_ratio_as_str(synth, "", mwfm, 1.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(synth, "", mwfm, -1.0, 0.0, NULL, options, number_of_options);
 })
 
 

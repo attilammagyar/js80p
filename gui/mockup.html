@@ -55,7 +55,7 @@ html, body {
 }
 
 #lfos .main-block {
-  margin: 4px 24px;
+  margin: 4px 4px;
   padding: 2px 4px;
 }
 
@@ -278,7 +278,9 @@ h1 span {
 #osc-1-main > div.knob:nth-child(9),
 #osc-1-main > div.knob:nth-child(11),
 #osc-2-main > div.knob:nth-child(7),
-#osc-2-main > div.knob:nth-child(9) {
+#osc-2-main > div.knob:nth-child(9),
+#osc-1-wave > div.knob:nth-child(4),
+#osc-2-wave > div.knob:nth-child(4) {
   border-left: solid 2px #445;
   width: 114px;
 }
@@ -544,6 +546,11 @@ h1 span {
   margin-top: 2px;
   height: 40px;
   width: 92px;
+}
+
+.block h1 span.lfo-header-pad {
+  display: inline-block;
+  width: 116px;
 }
 
 .block h1 label.center {
@@ -1291,6 +1298,7 @@ window.onload = function ()
         create_knob("osc-" + String(o) + "-filter-2", "GAIN dB", "0.0");
 
         create_knob("osc-" + String(o) + "-wave", "WAV", "triangle");
+        create_knob("osc-" + String(o) + "-wave", "PW %", "50");
 
         for (i = 1; i <= 10; ++i) {
             s = "th";
@@ -1475,6 +1483,7 @@ window.onload = function ()
         h = document.createElement("h1");
         h.innerHTML = [
           '<span>LFO ' + String(i) + '</span>',
+          ((i & 1) === 1) ? '<span class="lfo-header-pad"></span>' : '',
           '<label class="log-freq">',
             '<input type="text" /><span> LG FREQ</span>',
           '</label>',
@@ -1493,6 +1502,11 @@ window.onload = function ()
         d.appendChild(k1);
 
         create_knob(k1, "WAV", "triangle");
+
+        if ((i & 1) === 1) {
+          create_knob(k1, "PW %", "50");
+        }
+
         create_knob(k1, "FREQ Hz", "0.01");
         create_knob(k1, "PHS deg", "50");
         create_knob(k1, "MIN %", "50");

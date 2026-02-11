@@ -152,7 +152,7 @@ TEST(messages_get_processed_during_rendering, {
     synth.modulator_add_volume.set_value(0.42);
     synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
 
-    synth.push_message(SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0);
+    synth.push_message(SET_PARAM, Synth::ParamId::MWFM, inv_saw_as_ratio, 0);
     synth.push_message(message);
     synth.push_message(REFRESH_PARAM, Synth::ParamId::MIX, 0.0, 0);
     assign_controller(synth, Synth::ParamId::CVOL, Synth::ControllerId::ENVELOPE_3);
@@ -176,7 +176,7 @@ TEST(messages_get_processed_during_rendering, {
     assert_eq(0.42, synth.get_param_ratio_atomic(Synth::ParamId::MIX), DOUBLE_DELTA);
     assert_eq(
         inv_saw_as_ratio,
-        synth.get_param_ratio_atomic(Synth::ParamId::MWAV),
+        synth.get_param_ratio_atomic(Synth::ParamId::MWFM),
         DOUBLE_DELTA
     );
     assert_eq(
@@ -213,13 +213,13 @@ TEST(midi_controller_changes_can_affect_parameters, {
         synth, Synth::ParamId::MAMP, Synth::ControllerId::TRIGGERED_VELOCITY
     );
     assign_controller(
-        synth, Synth::ParamId::CWAV, Synth::ControllerId::MODULATION_WHEEL
+        synth, Synth::ParamId::CWFM, Synth::ControllerId::MODULATION_WHEEL
     );
 
     synth.push_message(REFRESH_PARAM, Synth::ParamId::PM, 0.0, 0);
     synth.push_message(REFRESH_PARAM, Synth::ParamId::MFIN, 0.0, 0);
     synth.push_message(REFRESH_PARAM, Synth::ParamId::MAMP, 0.0, 0);
-    synth.push_message(REFRESH_PARAM, Synth::ParamId::CWAV, 0.0, 0);
+    synth.push_message(REFRESH_PARAM, Synth::ParamId::CWFM, 0.0, 0);
 
     synth.control_change(0.0, 1, Midi::VOLUME, 53);
     synth.control_change(0.0, 1, Midi::MODULATION_WHEEL, 127);
@@ -256,7 +256,7 @@ TEST(can_look_up_param_id_by_name, {
     );
 
     assert_lte((int)max_collisions, 7);
-    assert_lte(avg_bucket_size, 3.0);
+    assert_lte(avg_bucket_size, 3.1);
     assert_lte(avg_collisions, 3.5);
 
     assert_eq(Synth::ParamId::INVALID_PARAM_ID, synth.get_param_id(""));
@@ -464,7 +464,7 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
 
     assign_controller(synth, Synth::ParamId::CC1, Synth::ControllerId::MIDI_LEARN);
     assign_controller(synth, Synth::ParamId::MC1, Synth::ControllerId::MIDI_LEARN);
-    assign_controller(synth, Synth::ParamId::MWAV, Synth::ControllerId::MIDI_LEARN);
+    assign_controller(synth, Synth::ParamId::MWFM, Synth::ControllerId::MIDI_LEARN);
 
     synth.process_messages();
 
@@ -478,7 +478,7 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
     );
     assert_eq(
         Synth::ControllerId::MIDI_LEARN,
-        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWFM)
     );
 
     synth.control_change(0.000001, 1, UNSUPPORTED_CC, 12);
@@ -495,7 +495,7 @@ TEST(when_a_param_has_the_learn_controller_assigned_then_the_controller_gets_rep
     );
     assert_eq(
         Synth::ControllerId::GENERAL_1,
-        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWFM)
     );
     assert_neq(NULL, synth.modulator_params.harmonic_0.get_midi_controller());
     assert_neq(NULL, synth.carrier_params.harmonic_0.get_midi_controller());
@@ -508,21 +508,21 @@ TEST(unsupported_controllers_cannot_be_assigned, {
     Synth synth;
 
     assign_controller(
-        synth, Synth::ParamId::MWAV, Synth::ControllerId::MODULATION_WHEEL
+        synth, Synth::ParamId::MWFM, Synth::ControllerId::MODULATION_WHEEL
     );
     assign_controller(
         synth, Synth::ParamId::MVOL, Synth::ControllerId::MODULATION_WHEEL
     );
-    assign_controller(synth, Synth::ParamId::MWAV, UNSUPPORTED_CC);
+    assign_controller(synth, Synth::ParamId::MWFM, UNSUPPORTED_CC);
     assign_controller(synth, Synth::ParamId::MVOL, UNSUPPORTED_CC);
-    assign_controller(synth, Synth::ParamId::CWAV, UNSUPPORTED_CC);
+    assign_controller(synth, Synth::ParamId::CWFM, UNSUPPORTED_CC);
     assign_controller(synth, Synth::ParamId::CVOL, UNSUPPORTED_CC);
 
     synth.process_messages();
 
     assert_eq(
         Synth::ControllerId::MODULATION_WHEEL,
-        synth.get_param_controller_id_atomic(Synth::ParamId::MWAV)
+        synth.get_param_controller_id_atomic(Synth::ParamId::MWFM)
     );
     assert_eq(
         Synth::ControllerId::MODULATION_WHEEL,
@@ -530,7 +530,7 @@ TEST(unsupported_controllers_cannot_be_assigned, {
     );
     assert_eq(
         Synth::ControllerId::NONE,
-        synth.get_param_controller_id_atomic(Synth::ParamId::CWAV)
+        synth.get_param_controller_id_atomic(Synth::ParamId::CWFM)
     );
     assert_eq(
         Synth::ControllerId::NONE,
@@ -638,8 +638,8 @@ TEST(effects_simple, {
 
     synth.resume();
 
-    set_param(synth, Synth::ParamId::MWAV, inv_saw_as_ratio);
-    set_param(synth, Synth::ParamId::CWAV, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::MWFM, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::CWFM, inv_saw_as_ratio);
     set_param(synth, Synth::ParamId::ED1L, 0.2);
     set_param(synth, Synth::ParamId::ED2L, 0.2);
     set_param(synth, Synth::ParamId::EF1FRQ, 0.75);
@@ -680,8 +680,8 @@ TEST(effects_complex, {
 
     synth.resume();
 
-    set_param(synth, Synth::ParamId::MWAV, inv_saw_as_ratio);
-    set_param(synth, Synth::ParamId::CWAV, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::MWFM, inv_saw_as_ratio);
+    set_param(synth, Synth::ParamId::CWFM, inv_saw_as_ratio);
 
     set_param(synth, Synth::ParamId::EV1V, 0.6);
 

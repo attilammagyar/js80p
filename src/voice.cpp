@@ -210,7 +210,8 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
     oscillator_inaccuracy(name + "OIA"),
     oscillator_instability(name + "OIS"),
     noise_level(name + "N", 0.0, 1.0, 0.0, 0.0, envelopes),
-    waveform(name + "WAV"),
+    waveform(name + "WFM"),
+    pulse_width(name + "PW", 0.0, 1.0, 0.5, 0.0, envelopes),
     amplitude(name + "AMP", 0.0, 1.0, 0.75, 0.0, envelopes),
     velocity_sensitivity(name + "VS", 0.0, 2.0, 1.0),
     folding(
@@ -480,6 +481,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     synced_oscillator_inaccuracy(synced_oscillator_inaccuracy),
     oscillator(
         param_leaders.waveform,
+        param_leaders.pulse_width,
         param_leaders.amplitude,
         param_leaders.subharmonic_amplitude,
         param_leaders.detune,
@@ -568,6 +570,7 @@ Voice<ModulatorSignalProducerClass>::Voice(
     synced_oscillator_inaccuracy(synced_oscillator_inaccuracy),
     oscillator(
         param_leaders.waveform,
+        param_leaders.pulse_width,
         param_leaders.amplitude,
         param_leaders.detune,
         param_leaders.fine_detune,
@@ -661,6 +664,8 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
 
     panning.set_random_seed(make_random_seed(0.081));
     volume.set_random_seed(make_random_seed(0.814));
+
+    oscillator.pulse_width.set_random_seed(make_random_seed(0.185));
 
     oscillator.modulated_amplitude.set_random_seed(make_random_seed(0.617));
     oscillator.amplitude.set_random_seed(make_random_seed(0.347));
@@ -818,6 +823,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
             time_offset, note, channel, previous_note
         );
     }
+
+    oscillator.pulse_width.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
@@ -1068,6 +1075,8 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     panning.update_envelope(time_offset, mpe_channel);
     volume.update_envelope(time_offset, mpe_channel);
 
+    oscillator.pulse_width.update_envelope(time_offset, mpe_channel);
+
     /*
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
@@ -1132,6 +1141,8 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     if (state != State::ON || note_id != this->note_id || note != this->note) {
         return;
     }
+
+    oscillator.pulse_width.end_envelope(time_offset);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
@@ -1218,6 +1229,8 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
         additive_volume.cancel_events();
     }
 
+    oscillator.pulse_width.cancel_events();
+
     oscillator.amplitude.cancel_events();
 
     if constexpr (IS_MODULATOR) {
@@ -1272,6 +1285,8 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 
     panning.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     volume.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+
+    oscillator.pulse_width.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their

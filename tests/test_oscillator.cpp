@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -178,17 +178,20 @@ class ReferenceSquare : public NonBandLimitedReferenceWaveform
 {
     public:
         explicit ReferenceSquare(Frequency const frequency)
-            : NonBandLimitedReferenceWaveform(frequency)
+            : NonBandLimitedReferenceWaveform(frequency),
+            period(1.0 / frequency),
+            half_period(0.5 * period)
         {
         }
 
         virtual Sample generate_sample(Seconds const time) const override
         {
-            Sample const period = 1.0 / (Sample)frequency;
-            Sample const half_period = period * 0.5;
-
-            return std::fmod((Sample)time, period) < half_period ? 0.8 : -0.8;
+            return std::fmod(time, period) < half_period ? 0.8 : -0.8;
         }
+
+    private:
+        Seconds const period;
+        Seconds const half_period;
 };
 
 
@@ -216,6 +219,41 @@ class ReferenceSawtoothWithDisappearingPartial : public NonBandLimitedReferenceW
                 + partial_amplitude * partial
             );
         }
+};
+
+
+class ReferencePulse : public NonBandLimitedReferenceWaveform
+{
+    public:
+        static constexpr Number PULSE_WIDTH = 0.2;
+
+        explicit ReferencePulse(Frequency const frequency)
+            : NonBandLimitedReferenceWaveform(frequency),
+            period(1.0 / frequency),
+            duty_cycle(PULSE_WIDTH * period),
+            phase(0.7 * period)
+        {
+        }
+
+        virtual Sample generate_sample(Seconds const time) const override
+        {
+            /*
+            The ideal signal should be 0 when off and 1 when on - subtracting
+            the pulse width aligns it so that the area between 0 and the on
+            part will equal to the area between the off part and 0, which also
+            happens to be the case when the signal is computed as the
+            difference of two sawtooth waves.
+
+            Scaling by 0.85 leaves headroom for the artifacts from band
+            limiting.
+            */
+            return 0.85 * ((std::fmod(time + phase, period) < duty_cycle ? 1.0 : 0.0) - PULSE_WIDTH);
+        }
+
+    private:
+        Seconds const period;
+        Seconds const duty_cycle;
+        Seconds const phase;
 };
 
 
@@ -262,7 +300,8 @@ void test_basic_waveform(
         Frequency const sample_rate = SAMPLE_RATE,
         Frequency const frequency = 100.0,
         Integer const block_size = 128,
-        Integer const rounds = 5
+        Integer const rounds = 5,
+        Number const pulse_width = 0.5
 ) {
     ReferenceWaveformClass reference(frequency);
     SimpleOscillator::WaveformParam waveform_param("");
@@ -271,6 +310,7 @@ void test_basic_waveform(
     oscillator.set_block_size(block_size);
     oscillator.set_sample_rate(sample_rate);
     oscillator.waveform.set_value(waveform);
+    oscillator.pulse_width.set_value(pulse_width);
     oscillator.frequency.set_value(frequency);
 
     assert_oscillator_output_is_close_to_reference(
@@ -292,6 +332,9 @@ TEST(basic_waveforms, {
     );
     test_basic_waveform<ReferenceSquare>(
         SimpleOscillator::SQUARE, 0.05
+    );
+    test_basic_waveform<ReferencePulse>(
+        SimpleOscillator::PULSE, 0.015, SAMPLE_RATE, 100.0, 128, 5, ReferencePulse::PULSE_WIDTH
     );
 })
 
@@ -339,6 +382,7 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     SumOfSines expected_1(0.5, 440.0, -0.5, 440.0 * 2.0, 0.0, 440.0 * 9.0, 1, 0.0);
     SumOfSines expected_2(0.5, 440.0, 0.3, 440.0 * 2.0, 0.2, 440.0 * 9.0, 1, (Number)block_size / sample_rate);
 
+    FloatParamS pulse_width("", 0.0, 1.0, 0.5);
     FloatParamS amplitude("", 0.0, 1.0, 1.0);
     FloatParamS dummy_float_param("", 0.0, 1.0, 0.0);
     ToggleParam dummy_toggle_param("", ToggleParam::OFF);
@@ -350,6 +394,7 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     SimpleOscillator::WaveformParam waveform_param("");
     SimpleOscillator oscillator(
         waveform_param,
+        pulse_width,
         amplitude,
         dummy_float_param,
         dummy_float_param,
@@ -1253,12 +1298,14 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     ReferenceSine reference(expeced_frequency, 0.0, 0.0, 1.0);
     SimpleLFO::WaveformParam waveform_param("");
     ToggleParam tempo_sync("SYN", ToggleParam::ON);
+    FloatParamS pulse_width_leader("PW", 0.0, 1.0, 0.5);
     FloatParamS amplitude_leader("AMP", 0.0, 1.0, 1.0);
     FloatParamS frequency_leader("FREQ", 0.01, 10000.0, 500.0);
     FloatParamS dummy_param("", 0.0, 1.0, 0.0);
     ToggleParam dummy_toggle("", ToggleParam::OFF);
     SimpleLFO oscillator(
         waveform_param,
+        pulse_width_leader,
         amplitude_leader,
         frequency_leader,
         dummy_param,

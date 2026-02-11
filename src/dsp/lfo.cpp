@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,15 @@ namespace JS80P
 LFO::LFO(
         std::string const& name,
         bool const can_have_envelope,
+        bool const allow_pulse_waveforms,
         Number const default_frequency
 ) noexcept
-    : SignalProducer(1, 13 + (can_have_envelope ? Midi::CHANNELS * 7 : 0), 0, &oscillator),
-    waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    : SignalProducer(1, 14 + (can_have_envelope ? Midi::CHANNELS * 8 : 0), 0, &oscillator),
+    waveform(
+        name + (allow_pulse_waveforms ? "WFM" : "WAV"),
+        allow_pulse_waveforms ? Oscillator_::SOFT_BIPOLAR_PULSE : Oscillator_::SOFT_SQUARE
+    ),
+    pulse_width(name + "PW", 0.0, 1.0, 0.5),
     freq_log_scale(name + "LOG", ToggleParam::OFF),
     frequency(
         name + "FRQ",
@@ -59,7 +64,7 @@ LFO::LFO(
         name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
     ),
     can_have_envelope(can_have_envelope),
-    oscillator(waveform, amplitude, frequency, phase, tempo_sync, center),
+    oscillator(waveform, pulse_width, amplitude, frequency, phase, tempo_sync, center),
     is_being_visited(false)
 {
     initialize_instance();
@@ -70,8 +75,9 @@ LFO::LFO(
         std::string const& name,
         FloatParamS& amplitude_leader
 ) noexcept
-    : SignalProducer(1, 13, 0, &oscillator),
+    : SignalProducer(1, 14, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    pulse_width(name + "PW", 0.0, 1.0, 0.5),
     freq_log_scale(name + "LOG", ToggleParam::OFF),
     frequency(
         name + "FRQ",
@@ -97,7 +103,7 @@ LFO::LFO(
         name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
     ),
     can_have_envelope(false),
-    oscillator(waveform, amplitude, frequency, phase, tempo_sync, center),
+    oscillator(waveform, pulse_width, amplitude, frequency, phase, tempo_sync, center),
     is_being_visited(false)
 {
     initialize_instance();
@@ -107,6 +113,7 @@ LFO::LFO(
 void LFO::initialize_instance() noexcept
 {
     register_child(waveform);
+    register_child(pulse_width);
     register_child(frequency);
     register_child(phase);
     register_child(min);
@@ -123,8 +130,10 @@ void LFO::initialize_instance() noexcept
     if (can_have_envelope) {
         env_buffer_1 = new Sample[block_size];
         env_buffer_2 = new Sample[block_size];
+        env_buffer_3 = new Sample[block_size];
 
         for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            pulse_width_mpe[c] = new FloatParamS(pulse_width);
             frequency_mpe[c] = new FloatParamS(frequency);
             phase_mpe[c] = new FloatParamS(phase);
             min_mpe[c] = new FloatParamS(min);
@@ -133,6 +142,7 @@ void LFO::initialize_instance() noexcept
             distortion_mpe[c] = new FloatParamS(distortion);
             randomness_mpe[c] = new FloatParamS(randomness);
 
+            pulse_width_mpe[c]->set_midi_channel(c);
             frequency_mpe[c]->set_midi_channel(c);
             phase_mpe[c]->set_midi_channel(c);
             min_mpe[c]->set_midi_channel(c);
@@ -141,6 +151,7 @@ void LFO::initialize_instance() noexcept
             distortion_mpe[c]->set_midi_channel(c);
             randomness_mpe[c]->set_midi_channel(c);
 
+            register_child(*pulse_width_mpe[c]);
             register_child(*frequency_mpe[c]);
             register_child(*phase_mpe[c]);
             register_child(*min_mpe[c]);
@@ -152,8 +163,10 @@ void LFO::initialize_instance() noexcept
     } else {
         env_buffer_1 = NULL;
         env_buffer_2 = NULL;
+        env_buffer_3 = NULL;
 
         for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            pulse_width_mpe[c] = NULL;
             frequency_mpe[c] = NULL;
             phase_mpe[c] = NULL;
             min_mpe[c] = NULL;
@@ -171,11 +184,14 @@ LFO::~LFO()
     if (can_have_envelope) {
         delete[] env_buffer_1;
         delete[] env_buffer_2;
+        delete[] env_buffer_3;
 
         env_buffer_1 = NULL;
         env_buffer_2 = NULL;
+        env_buffer_3 = NULL;
 
         for (Midi::Channel c = 0; c != Midi::CHANNELS; ++c) {
+            delete pulse_width_mpe[c];
             delete frequency_mpe[c];
             delete phase_mpe[c];
             delete min_mpe[c];
@@ -184,6 +200,7 @@ LFO::~LFO()
             delete distortion_mpe[c];
             delete randomness_mpe[c];
 
+            pulse_width_mpe[c] = NULL;
             frequency_mpe[c] = NULL;
             phase_mpe[c] = NULL;
             min_mpe[c] = NULL;
@@ -204,8 +221,9 @@ LFO::LFO(
         ToggleParam& tempo_sync_,
         Number const phase_offset
 ) noexcept
-    : SignalProducer(1, 13, 0, &oscillator),
+    : SignalProducer(1, 14, 0, &oscillator),
     waveform(name + "WAV", Oscillator_::SOFT_SQUARE),
+    pulse_width(name + "PW", 0.0, 1.0, 0.5),
     freq_log_scale(name + "LOG", ToggleParam::OFF),
     frequency(frequency_leader),
     phase(name + "PHS", 0.0, 1.0, phase_offset),
@@ -220,7 +238,7 @@ LFO::LFO(
         name + "AEN", 0, Constants::ENVELOPES, Constants::ENVELOPES
     ),
     can_have_envelope(false),
-    oscillator(waveform, amplitude, frequency, phase, tempo_sync_, center),
+    oscillator(waveform, pulse_width, amplitude, frequency, phase, tempo_sync_, center),
     is_being_visited(false)
 {
     initialize_instance();
@@ -236,9 +254,11 @@ void LFO::set_block_size(Integer const new_block_size) noexcept
     if (can_have_envelope && old_block_size != new_block_size) {
         delete[] env_buffer_1;
         delete[] env_buffer_2;
+        delete[] env_buffer_3;
 
         env_buffer_1 = new Sample[new_block_size];
         env_buffer_2 = new Sample[new_block_size];
+        env_buffer_3 = new Sample[new_block_size];
     }
 }
 
@@ -253,6 +273,7 @@ void LFO::stop(Seconds const time_offset) noexcept
 {
     oscillator.stop(time_offset);
 
+    pulse_width.cancel_events_at(time_offset);
     frequency.cancel_events_at(time_offset);
     phase.cancel_events_at(time_offset);
     min.cancel_events_at(time_offset);
@@ -317,6 +338,9 @@ void LFO::traverse_lfo_graph(
     Byte const lfo_depth = depth;
 
     visitor.visit_lfo_as_polyphonic(lfo, lfo_depth);
+
+    visit_param_lfo<VisitorClass>(lfo.pulse_width.get_lfo(), depth, visitor);
+    visitor.visit_pulse_width_param(lfo, lfo_depth, lfo.pulse_width);
 
     visit_param_lfo<VisitorClass>(lfo.amplitude.get_lfo(), depth, visitor);
     visitor.visit_amplitude_param(lfo, lfo_depth, lfo.amplitude);
@@ -397,6 +421,14 @@ void LFO::Visitor::visit_lfo_as_polyphonic(
 
 void LFO::Visitor::visit_lfo_as_global(LFO& lfo) noexcept
 {
+}
+
+
+void LFO::Visitor::visit_pulse_width_param(
+        LFO& lfo,
+        Byte const depth,
+        FloatParamS const& pulse_width
+) noexcept {
 }
 
 
@@ -492,6 +524,7 @@ void LFO::ParamCtlSyncScheduler::visit_lfo_as_polyphonic(
         LFO const& lfo,
         Byte const depth
 ) noexcept {
+    schedule_ctl_value_sync(*lfo.pulse_width_mpe[midi_channel], midi_channel);
     schedule_ctl_value_sync(*lfo.frequency_mpe[midi_channel], midi_channel);
     schedule_ctl_value_sync(*lfo.phase_mpe[midi_channel], midi_channel);
     schedule_ctl_value_sync(*lfo.min_mpe[midi_channel], midi_channel);
@@ -525,6 +558,7 @@ LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
     param_buffer_1(NULL),
     param_buffer_2(NULL),
     param_buffer_3(NULL),
+    param_buffer_4(NULL),
     round(round),
     sample_count(sample_count),
     first_sample_index(first_sample_index),
@@ -553,6 +587,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_polyphonic(
     if (JS80P_UNLIKELY(!lfo_envelope_state.is_initialized)) {
         /* The flag will be set to true in visit_oscillator(). */
 
+        lfo.pulse_width_mpe[midi_channel]->sync_ctl_value();
         lfo.frequency_mpe[midi_channel]->sync_ctl_value();
         lfo.phase_mpe[midi_channel]->sync_ctl_value();
         lfo.min_mpe[midi_channel]->sync_ctl_value();
@@ -589,20 +624,38 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
 }
 
 
+void LFO::LFOWithEnvelopeRenderer::visit_pulse_width_param(
+        LFO& lfo,
+        Byte const depth,
+        FloatParamS const& pulse_width
+) noexcept {
+    if (pulse_width.get_lfo() == NULL) {
+        param_buffer_1 = FloatParamS::produce_if_not_constant(
+            *lfo.pulse_width_mpe[midi_channel], round, sample_count
+        );
+    } else {
+        pulse_width.ratios_to_values(
+            buffer, lfo.env_buffer_1, first_sample_index, last_sample_index
+        );
+        param_buffer_1 = lfo.env_buffer_1;
+    }
+}
+
+
 void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
         LFO& lfo,
         Byte const depth,
         FloatParamS const& amplitude
 ) noexcept {
     if (amplitude.get_lfo() == NULL) {
-        param_buffer_1 = FloatParamS::produce_if_not_constant(
+        param_buffer_2 = FloatParamS::produce_if_not_constant(
             *lfo.amplitude_mpe[midi_channel], round, sample_count
         );
     } else {
         amplitude.ratios_to_values(
-            buffer, lfo.env_buffer_1, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_2, first_sample_index, last_sample_index
         );
-        param_buffer_1 = lfo.env_buffer_1;
+        param_buffer_2 = lfo.env_buffer_2;
     }
 }
 
@@ -613,14 +666,14 @@ void LFO::LFOWithEnvelopeRenderer::visit_frequency_param(
         FloatParamS const& frequency
 ) noexcept {
     if (frequency.get_lfo() == NULL) {
-        param_buffer_2 = FloatParamS::produce_if_not_constant(
+        param_buffer_3 = FloatParamS::produce_if_not_constant(
             *lfo.frequency_mpe[midi_channel], round, sample_count
         );
     } else {
         frequency.ratios_to_values(
-            buffer, lfo.env_buffer_2, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_3, first_sample_index, last_sample_index
         );
-        param_buffer_2 = lfo.env_buffer_2;
+        param_buffer_3 = lfo.env_buffer_3;
     }
 }
 
@@ -631,14 +684,14 @@ void LFO::LFOWithEnvelopeRenderer::visit_phase_param(
         FloatParamS const& phase
 ) noexcept {
     if (phase.get_lfo() == NULL) {
-        param_buffer_3 = FloatParamS::produce_if_not_constant(
+        param_buffer_4 = FloatParamS::produce_if_not_constant(
             *lfo.phase_mpe[midi_channel], round, sample_count
         );
     } else {
         phase.ratios_to_values(
             buffer, first_sample_index, last_sample_index
         );
-        param_buffer_3 = buffer;
+        param_buffer_4 = buffer;
     }
 }
 
@@ -654,9 +707,9 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         lfo_envelope_state.is_initialized = true;
 
         Sample const frequency_value = (
-            param_buffer_2 == NULL
+            param_buffer_3 == NULL
                 ? lfo.frequency.get_value()
-                : param_buffer_2[first_sample_index]
+                : param_buffer_3[first_sample_index]
         );
 
         Wavetable::reset_state(
@@ -678,6 +731,8 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         param_buffer_1,
         param_buffer_2,
         param_buffer_3,
+        param_buffer_4,
+        (Sample)lfo.pulse_width_mpe[midi_channel]->get_value(),
         (Sample)lfo.amplitude_mpe[midi_channel]->get_value(),
         (Sample)lfo.frequency_mpe[midi_channel]->get_value(),
         (Sample)lfo.phase_mpe[midi_channel]->get_value()
@@ -701,6 +756,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
     param_buffer_1 = NULL;
     param_buffer_2 = NULL;
     param_buffer_3 = NULL;
+    param_buffer_4 = NULL;
 }
 
 
@@ -834,6 +890,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
 
 void LFO::skip_round(Integer const round, Integer const sample_count) noexcept
 {
+    FloatParamS::produce_if_not_constant(pulse_width, round, sample_count);
     FloatParamS::produce_if_not_constant(frequency, round, sample_count);
     FloatParamS::produce_if_not_constant(phase, round, sample_count);
     FloatParamS::produce_if_not_constant(min, round, sample_count);

@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ def print_oscillator_params(param_id: int, param_objs: list, group: str, prefix:
 
     params = [
         ("$N", "    ///< $ Noise Level", osc_name + "_params.noise_level"),
+        ("$PW", "   ///< $ Pulse Width", osc_name + "_params.pulse_width"),
         ("$AMP", "  ///< $ Amplitude", osc_name + "_params.amplitude"),
         ("$VS", "   ///< $ Velocity Sensitivity", osc_name + "_params.velocity_sensitivity"),
         ("$FLD", "  ///< $ Folding", osc_name + "_params.folding"),
@@ -217,6 +218,7 @@ def print_envelopes_params(param_id: int, param_objs: list) -> int:
 
 def print_lfo_params(param_id: int, param_objs: list) -> int:
     params = [
+        ("$#PW", "  ///< $ # Pulse WIdth", ""),
         ("$#FRQ", " ///< $ # Frequency", ""),
         ("$#PHS", " ///< $ # Phase", ""),
         ("$#MIN", " ///< $ # Minimum Value", ""),
@@ -226,14 +228,16 @@ def print_lfo_params(param_id: int, param_objs: list) -> int:
         ("$#RND", " ///< $ # Randomness", ""),
     ]
 
-    return print_params(param_id, param_objs, "LFO", "L", 8, params)
+    skip_fn = lambda name: name in {"L2PW", "L4PW", "L6PW", "L8PW"}
+
+    return print_params(param_id, param_objs, "LFO", "L", 8, params, skip_fn)
 
 
 def print_discrete_params(param_id: int, param_objs: list) -> int:
     params = [
         ("MODE", "  ///< Mode", "mode"),
-        ("MWAV", "  ///< Modulator Waveform", "modulator_params.waveform"),
-        ("CWAV", "  ///< Carrier Waveform", "carrier_params.waveform"),
+        ("MWFM", "  ///< Modulator Waveform", "modulator_params.waveform"),
+        ("CWFM", "  ///< Carrier Waveform", "carrier_params.waveform"),
         ("MF1TYP", "///< Modulator Filter 1 Type", "modulator_params.filter_1_type"),
         ("MF2TYP", "///< Modulator Filter 2 Type", "modulator_params.filter_2_type"),
         ("CF1TYP", "///< Carrier Filter 1 Type", "carrier_params.filter_1_type"),
@@ -451,7 +455,8 @@ def print_params(
         group: str,
         prefix: str,
         objects: int,
-        object_params: list
+        object_params: list,
+        skip_fn: callable=lambda name: False
 ) -> int:
     for i in range(objects):
         obj_id = str(i + 1)
@@ -460,6 +465,9 @@ def print_params(
             comment = comment.replace("#", obj_id).replace("$", group)
             name = name.replace("#", obj_id).replace("$", prefix)
             spaces = "   "
+
+            if skip_fn(name):
+                continue
 
             if param_obj != "":
                 param_objs.append((name, param_obj))

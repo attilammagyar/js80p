@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
 
     synth_1.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, inv_saw_as_ratio, 0
+        Synth::MessageType::SET_PARAM, Synth::ParamId::MWFM, inv_saw_as_ratio, 0
     );
     synth_1.push_message(
         Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
@@ -82,14 +82,14 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
     synth_1.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::CWAV,
+        Synth::ParamId::CWFM,
         0.0,
         Synth::ControllerId::MODULATION_WHEEL
     );
     synth_1.process_messages();
 
     synth_2.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::MWAV, triangle_as_ratio, 0
+        Synth::MessageType::SET_PARAM, Synth::ParamId::MWFM, triangle_as_ratio, 0
     );
     synth_2.push_message(
         Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.42, 0
@@ -102,7 +102,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
     synth_2.push_message(
         Synth::MessageType::ASSIGN_CONTROLLER,
-        Synth::ParamId::CWAV,
+        Synth::ParamId::CWFM,
         0.0,
         Synth::ControllerId::PITCH_WHEEL
     );
@@ -121,7 +121,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
 
     assert_eq(
         inv_saw_as_ratio,
-        synth_2.get_param_ratio_atomic(Synth::ParamId::MWAV),
+        synth_2.get_param_ratio_atomic(Synth::ParamId::MWFM),
         DOUBLE_DELTA
     );
     assert_eq(
@@ -133,7 +133,7 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     );
     assert_eq(
         Synth::ControllerId::MODULATION_WHEEL,
-        synth_2.get_param_controller_id_atomic(Synth::ParamId::CWAV)
+        synth_2.get_param_controller_id_atomic(Synth::ParamId::CWFM)
     );
     assert_eq(
         Synth::ControllerId::NONE,
@@ -607,7 +607,7 @@ TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_o
 })
 
 
-void assert_upgrade(
+void assert_value_upgrade(
         std::string const& old_serialized_param,
         Synth::ParamId const param_id,
         Byte const expected_value
@@ -628,37 +628,173 @@ void assert_upgrade(
         "old_serialized_param=\"%s\"",
         old_serialized_param.c_str()
     );
+    assert_eq(
+        (int)Synth::ControllerId::NONE,
+        (int)synth.get_param_controller_id_atomic(param_id),
+        "old_serialized_param=\"%s\"",
+        old_serialized_param.c_str()
+    );
+}
+
+
+void assert_controller_upgrade(
+        std::string const& old_serialized_param,
+        Synth::ParamId const param_id,
+        Synth::ControllerId const expected_controller
+) {
+    Synth synth;
+    std::string patch = "";
+
+    patch += "[js80p]";
+    patch += Serializer::LINE_END;
+    patch += old_serialized_param;
+    patch += Serializer::LINE_END;
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
+
+    assert_eq(
+        (int)expected_controller,
+        (int)synth.get_param_controller_id_atomic(param_id),
+        "old_serialized_param=\"%s\"",
+        old_serialized_param.c_str()
+    );
 }
 
 
 TEST(old_note_handling_parameter_is_upgraded, {
-    assert_upgrade(
+    assert_value_upgrade(
         "POLY = 0.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_MONOPHONIC
     );
-    assert_upgrade(
+    assert_value_upgrade(
         "POLY = 0.333333333333333",
         Synth::ParamId::NH,
         Synth::NOTE_HANDLING_MONOPHONIC_HOLD
     );
-    assert_upgrade(
+    assert_value_upgrade(
         "POLY = 0.666666666666667",
         Synth::ParamId::NH,
         Synth::NOTE_HANDLING_POLYPHONIC_HOLD
     );
-    assert_upgrade(
+    assert_value_upgrade(
         "POLY = 1.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_POLYPHONIC
     );
 })
 
 
 TEST(old_envelope_update_mode_parameter_is_upgraded, {
-    assert_upgrade(
+    assert_value_upgrade(
         "N1DYN = 0.0", Synth::ParamId::N1UPD, Envelope::UPDATE_MODE_STATIC
     );
-    assert_upgrade(
+    assert_value_upgrade(
         "N10DYN = 0.50", Synth::ParamId::N10UPD, Envelope::UPDATE_MODE_END
     );
-    assert_upgrade(
+    assert_value_upgrade(
         "N12DYN = 1.0", Synth::ParamId::N12UPD, Envelope::UPDATE_MODE_DYNAMIC
+    );
+})
+
+
+TEST(old_voice_oscillator_waveform_parameters_are_upgraded, {
+    assert_value_upgrade(
+        "MWAV = 0.0", Synth::ParamId::MWFM, SimpleOscillator::SINE
+    );
+    assert_value_upgrade(
+        "CWAV = 0.111111111111111", Synth::ParamId::CWFM, SimpleOscillator::SAWTOOTH
+    );
+    assert_value_upgrade(
+        "MWAV = 0.222222222222222", Synth::ParamId::MWFM, SimpleOscillator::SOFT_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "CWAV = 0.333333333333333", Synth::ParamId::CWFM, SimpleOscillator::INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "MWAV = 0.444444444444444", Synth::ParamId::MWFM, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "CWAV = 0.555555555555556", Synth::ParamId::CWFM, SimpleOscillator::TRIANGLE
+    );
+    assert_value_upgrade(
+        "MWAV = 0.666666666666667", Synth::ParamId::MWFM, SimpleOscillator::SOFT_TRIANGLE
+    );
+    assert_value_upgrade(
+        "CWAV = 0.777777777777778", Synth::ParamId::CWFM, SimpleOscillator::SQUARE
+    );
+    assert_value_upgrade(
+        "MWAV = 0.888888888888889", Synth::ParamId::MWFM, SimpleOscillator::SOFT_SQUARE
+    );
+    assert_value_upgrade(
+        "CWAV = 1.0", Synth::ParamId::CWFM, SimpleOscillator::CUSTOM
+    );
+
+    assert_controller_upgrade(
+        "MWAVctl = 0.06250", Synth::ParamId::MWFM, Synth::ControllerId::GENERAL_1
+    );
+    assert_controller_upgrade(
+        "CWAVctl = 0.06250", Synth::ParamId::CWFM, Synth::ControllerId::GENERAL_1
+    );
+})
+
+
+TEST(old_lfo_waveform_parameters_are_upgraded, {
+    assert_value_upgrade(
+        "L1WAV = 0.0", Synth::ParamId::L1WAV, SimpleOscillator::SINE
+    );
+    assert_value_upgrade(
+        "L2WAV = 0.0", Synth::ParamId::L2WAV, SimpleOscillator::SINE
+    );
+    assert_value_upgrade(
+        "L3WAV = 0.1250", Synth::ParamId::L3WAV, SimpleOscillator::SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L4WAV = 0.1250", Synth::ParamId::L4WAV, SimpleOscillator::SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L5WAV = 0.250", Synth::ParamId::L5WAV, SimpleOscillator::SOFT_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L6WAV = 0.250", Synth::ParamId::L6WAV, SimpleOscillator::SOFT_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L7WAV = 0.3750", Synth::ParamId::L7WAV, SimpleOscillator::INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L8WAV = 0.3750", Synth::ParamId::L8WAV, SimpleOscillator::INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L1WAV = 0.50", Synth::ParamId::L1WAV, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L2WAV = 0.50", Synth::ParamId::L2WAV, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+    );
+    assert_value_upgrade(
+        "L3WAV = 0.6250", Synth::ParamId::L3WAV, SimpleOscillator::TRIANGLE
+    );
+    assert_value_upgrade(
+        "L4WAV = 0.6250", Synth::ParamId::L4WAV, SimpleOscillator::TRIANGLE
+    );
+    assert_value_upgrade(
+        "L5WAV = 0.750", Synth::ParamId::L5WAV, SimpleOscillator::SOFT_TRIANGLE
+    );
+    assert_value_upgrade(
+        "L6WAV = 0.750", Synth::ParamId::L6WAV, SimpleOscillator::SOFT_TRIANGLE
+    );
+    assert_value_upgrade(
+        "L7WAV = 0.8750", Synth::ParamId::L7WAV, SimpleOscillator::SQUARE
+    );
+    assert_value_upgrade(
+        "L8WAV = 0.8750", Synth::ParamId::L8WAV, SimpleOscillator::SQUARE
+    );
+    assert_value_upgrade(
+        "L1WAV = 1.0", Synth::ParamId::L1WAV, SimpleOscillator::SOFT_SQUARE
+    );
+    assert_value_upgrade(
+        "L2WAV = 1.0", Synth::ParamId::L2WAV, SimpleOscillator::SOFT_SQUARE
+    );
+
+    assert_controller_upgrade(
+        "L1WAVctl = 0.06250", Synth::ParamId::L1WAV, Synth::ControllerId::GENERAL_1
+    );
+    assert_controller_upgrade(
+        "L2WAVctl = 0.06250", Synth::ParamId::L2WAV, Synth::ControllerId::GENERAL_1
     );
 })
