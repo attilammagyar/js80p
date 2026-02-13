@@ -3609,6 +3609,26 @@ void GUI::resize(int const new_width, int const new_height)
 }
 
 
+void GUI::start_resizing()
+{
+    TabBody* const active_tab_body = background->get_body();
+
+    if (active_tab_body != NULL) {
+        active_tab_body->hide_param_editors();
+    }
+}
+
+
+void GUI::stop_resizing()
+{
+    TabBody* const active_tab_body = background->get_body();
+
+    if (active_tab_body != NULL) {
+        active_tab_body->show_param_editors();
+    }
+}
+
+
 void GUI::apply_size_constraints(
         int& new_width,
         int& new_height,

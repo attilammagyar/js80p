@@ -135,6 +135,9 @@ class TabBody : public TransparentWidget
 
         virtual void hide() override;
 
+        void hide_param_editors();
+        void show_param_editors();
+
     private:
         GUI::KnobParamEditors knob_param_editors;
         GUI::ToggleSwitchParamEditors toggle_switch_param_editors;
@@ -800,7 +803,7 @@ class TuningSelector : public DiscreteParamEditor
 class ResizerHandle : public TransparentWidget
 {
     public:
-        static constexpr int RESIZE_MOVE_INTERVAL_MS = 100;
+        static constexpr int RESIZE_MOVE_INTERVAL_MS = 150;
         static constexpr int WIDTH = 64;
         static constexpr int HEIGHT = 64;
         static constexpr int LEFT = TabBody::WIDTH - WIDTH;
@@ -815,6 +818,7 @@ class ResizerHandle : public TransparentWidget
 
     private:
         void init_movement(int const x, int const y);
+        bool handle_movement(int const x, int const y);
 
         GUI::EventHandler& event_handler;
         uint64_t prev_resize_time_ms;

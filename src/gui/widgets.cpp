@@ -239,6 +239,38 @@ void TabBody::hide()
 }
 
 
+void TabBody::hide_param_editors()
+{
+    for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
+        (*it)->hide();
+    }
+
+    for (GUI::ToggleSwitchParamEditors::iterator it = toggle_switch_param_editors.begin(); it != toggle_switch_param_editors.end(); ++it) {
+        (*it)->hide();
+    }
+
+    for (GUI::DiscreteParamEditors::iterator it = discrete_param_editors.begin(); it != discrete_param_editors.end(); ++it) {
+        (*it)->hide();
+    }
+}
+
+
+void TabBody::show_param_editors()
+{
+    for (GUI::KnobParamEditors::iterator it = knob_param_editors.begin(); it != knob_param_editors.end(); ++it) {
+        (*it)->show();
+    }
+
+    for (GUI::ToggleSwitchParamEditors::iterator it = toggle_switch_param_editors.begin(); it != toggle_switch_param_editors.end(); ++it) {
+        (*it)->show();
+    }
+
+    for (GUI::DiscreteParamEditors::iterator it = discrete_param_editors.begin(); it != discrete_param_editors.end(); ++it) {
+        (*it)->show();
+    }
+}
+
+
 Background::Background()
     : Widget("JS80P", 0, 0, GUI::WIDTH, GUI::HEIGHT, Type::BACKGROUND),
     body(NULL),
@@ -2218,7 +2250,10 @@ ResizerHandle::ResizerHandle(GUI& gui, GUI::EventHandler& event_handler)
 
 bool ResizerHandle::mouse_down(int const x, int const y)
 {
+    gui->start_resizing();
+
     TransparentWidget::mouse_down(x, y);
+
     init_movement(x, y);
 
     return true;
@@ -2235,8 +2270,35 @@ void ResizerHandle::init_movement(int const x, int const y)
 
 bool ResizerHandle::mouse_up(int const x, int const y)
 {
+    gui->stop_resizing();
+
     TransparentWidget::mouse_up(x, y);
+
+    handle_movement(x, y);
     init_movement(x, y);
+
+    return true;
+}
+
+
+bool ResizerHandle::handle_movement(int const x, int const y)
+{
+    Number scale;
+    int const current_width = gui->get_width();
+    int const current_height = gui->get_height();
+    int const dx = x - click_x;
+    int const dy = y - click_y;
+
+    int new_width = current_width + dx;
+    int new_height = current_height + dy;
+
+    gui->apply_size_constraints(new_width, new_height, scale);
+
+    if (new_width == current_width && new_height == current_height) {
+        return false;
+    }
+
+    event_handler.handle_resize_request(new_width, new_height);
 
     return true;
 }
@@ -2249,22 +2311,11 @@ bool ResizerHandle::mouse_move(int const x, int const y, bool const modifier)
     if (is_clicking && gui != NULL) {
         uint64_t const now = monotonic_clock_ms();
 
-        if ((now - prev_resize_time_ms) > RESIZE_MOVE_INTERVAL_MS) {
-            Number scale;
-            int const current_width = gui->get_width();
-            int const current_height = gui->get_height();
-            int const dx = x - click_x;
-            int const dy = y - click_y;
-
-            int new_width = current_width + dx;
-            int new_height = current_height + dy;
-
-            gui->apply_size_constraints(new_width, new_height, scale);
-
-            if (new_width != current_width || new_height != current_height) {
-                prev_resize_time_ms = now;
-                event_handler.handle_resize_request(new_width, new_height);
-            }
+        if (
+                (now - prev_resize_time_ms) > RESIZE_MOVE_INTERVAL_MS
+                && handle_movement(x, y)
+        ) {
+            prev_resize_time_ms = now;
         }
     }
 
