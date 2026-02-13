@@ -53,6 +53,7 @@ Table of Contents
     * [Knobs](#usage-knobs)
        * [Polyphony](#usage-polyphony)
     * [Controllers](#usage-controllers)
+    * [Resizing the User Interface](#usage-resizing)
     * [Synthesizer (Synth)](#usage-synth)
        * [Main Panel](#usage-synth-main)
        * [Common Oscillator Settings](#usage-synth-common)
@@ -155,7 +156,7 @@ Features
       depending on the portamento length setting.
  * Polyphonic and monophonic hold modes to keep notes ringing without a sustain
    pedal.
- * 2 oscillators with 10 waveforms and an additional noise generator:
+ * 2 oscillators with 14 waveforms and an additional noise generator:
     * sine,
     * sawtooth,
     * soft sawtooth,
@@ -165,6 +166,11 @@ Features
     * soft triangle,
     * square,
     * soft square,
+    * waveforms with variable pulse width:
+       * pulse,
+       * soft pulse,
+       * bipolar pulse,
+       * soft bipolar pulse,
     * custom.
  * 2 filters for each oscillator, 7 filter types:
     * low-pass,
@@ -202,6 +208,7 @@ Features
    the oscillator, filter, and modulation parameters.
  * 8 low-frequency oscillators (LFO) with optional amplitude envelope and
    polyphony.
+    * Variable pulse width in 4 of the LFOs.
  * Filter and envelope imperfection settings for analog-like feel.
  * Freely assignable MIDI controllers and powerful macros.
     * Ability to override the primary function of the sustain pedal, and use it
@@ -479,15 +486,15 @@ and put it in a folder where Windows can find it:
 
 #### Linux
 
-As of November, 2023, there is no official distribution of the MTS-ESP tuning
+As of Feburary, 2026, there is no official distribution of the MTS-ESP tuning
 provider plugins by [ODDSound](https://oddsound.com/) for Linux, however, there
 are plugins which can act as a tuning provider, for example,
 [Surge XT](https://surge-synthesizer.github.io/).
 
 To use MTS-ESP, you may have to download the `libMTS.so` library from the
 [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux),
-and put it in the `/usr/local/lib` directory, if it is not already installed on
-your system.  As of November, 2023, `libMTS.so` is only available for `x86_64`
+and put it in the `/usr/local/lib` directory if it is not already installed on
+your system. As of Feburary, 2026, `libMTS.so` is not available for `x86`
 Linux systems.
 
 <a href="#toc">Table of Contents</a>
@@ -620,11 +627,11 @@ momentary value (on a relative scale between 0% and 100%) of a
    pressed, or more generally, a measure of how strongly a note is to be played
    (where 50% of the nominal range would be mezzo-forte). JS80P automatically
    uses this value to adjust the amplitude of oscillator signals (depending on
-   the [VEL S](#usage-synth-common-vels) parameter), but it can also be used
-   for controlling other parameters as well. For example, by assigning this
-   controller to [filter cutoff frequency](#usage-synth-common-freq) parameters
-   (especially with using [macros](#usage-macros)), you can brighten up forte
-   notes while keeping softer notes warmer, darker.
+   the [velocity sensitivity](#usage-synth-common-vels) parameter), but it can
+   also be used for controlling other parameters as well. For example, by
+   assigning this controller to [filter cutoff frequency](#usage-synth-common-freq)
+   parameters (especially with using [macros](#usage-macros)), you can brighten
+   up forte notes while keeping softer notes warmer, darker.
 
  * **Released Note**:  a value which is associated with note pitch and which is
    updated every time a note stops, e.g. when a key is released on a MIDI
@@ -665,6 +672,15 @@ momentary value (on a relative scale between 0% and 100%) of a
 
 <a href="#toc">Table of Contents</a>
 
+<a id="usage-resizing"></a>
+
+### Resizing the User Interface
+
+Drag and drop the bottom right corner of the window to resize the user
+interface.
+
+<a href="#toc">Table of Contents</a>
+
 <a id="usage-synth"></a>
 
 ### Synthesizer (Synth)
@@ -698,9 +714,10 @@ handles note events. The available options are:
     * If the new note is released, and the previous note is still held, then
       the previous note is restarted.
 
-    * If the [PRT](#usage-synth-common-prt) setting of an oscillator is set
-      to a value above 0, then that oscillator will smoothly glide its
-      frequency and volume to match the new note's pitch and velocity.
+    * If the [portamento length](#usage-synth-common-prt) setting of an
+      oscillator is set to a value above 0, then that oscillator will smoothly
+      glide its frequency and volume to match the new note's pitch and
+      velocity.
 
  * **M HOLD**: same as **MONO**, but Note Stop events are ignored until a
    different note handling setting is selected, or until a Sustain Pedal Off
@@ -784,27 +801,27 @@ one oscillator, and higher notes to the other. The available options are:
 This is an additional volume control for the first oscillator that is applied
 after its signal is sent into the second oscillator as a modulator. The main
 purpose of this knob is to be able to control the oscillator's volume without
-affecting the modulation when the [MODE](#usage-synth-main-mode) knob is in the
-Mix&Mod position. Turn it down to 0% for making the first oscillator contribute
-to the final sound only via modulation.
+affecting the modulation when the [operating mode](#usage-synth-main-mode) knob
+is in the _Mix&Mod_ position. Turn it down to 0% for making the first
+oscillator contribute to the final sound only via modulation.
 
 ##### Phase Modulation (PM)
 
 Turn it up to have the first oscillator modulate the phase of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
-position.
+oscillator when the [operating mode](#usage-synth-main-mode) knob is in the
+_Mix&Mod_ position.
 
 ##### Frequency Modulation (FM)
 
 Turn it up to have the first oscillator modulate the frequency of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
-position.
+oscillator when the [operating mode](#usage-synth-main-mode) knob is in the
+_Mix&Mod_ position.
 
 ##### Amplitude Modulation (AM)
 
 Turn it up to have the first oscillator modulate the amplitude of the second
-oscillator when the [MODE](#usage-synth-main-mode) knob is in the Mix&Mod
-position.
+oscillator when the [operating mode](#usage-synth-main-mode) knob is in the
+_Mix&Mod_ position.
 
 <a href="#toc">Table of Contents</a>
 
@@ -849,9 +866,9 @@ imperfectness of analog synthesizers. The more the screw is turned, the more
 off each note will be from the correct pitch.
 
 When the inaccuracy of the two oscillators is set to the same value, and the
-[MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, then the
-oscillators will synchronize their randomness: each note will be off from the
-correct pitch by a random amount, but within a single voice, the two
+[operating mode](#usage-synth-main-mode) knob is in the _Mix&Mod_ position,
+then the oscillators will synchronize their randomness: each note will be off
+from the correct pitch by a random amount, but within a single voice, the two
 oscillators will be off by the same amount.
 
 ##### Oscillator Instability
@@ -863,8 +880,8 @@ turned, the more the oscillator will diverge from the correct pitch, hovering
 sometimes above, and sometimes below.
 
 When the instability of the two oscillators is set to the same value, and the
-[MODE](#usage-synth-main-mode) knob is in the Mix&Mod position, then the
-oscillators will synchronize their random divergence: each note will be off
+[operating mode](#usage-synth-main-mode) knob is in the Mix&Mod position, then
+the oscillators will synchronize their random divergence: each note will be off
 from the correct pitch by a random amount, but within a single voice, the two
 oscillators will always be off by the same amount, and will always diverge by
 the same amount in the same direction.
@@ -877,7 +894,7 @@ oscillator's amplitude.
 
 ##### Fine Detune x4 (FIN x4)
 
-The [Fine Detune (FIN)](#usage-synth-common-fin) parameter goes from -1200
+The [fine detune](#usage-synth-common-fin) parameter goes from -1200
 cents to +1200 cents (-1 octave to +1 octave), but if you want to go extreme
 with pitch bends, this toggle switch can increase the range to -4800 cents to
 +4800 cents (-4 octaves to +4 octaves).
@@ -888,7 +905,7 @@ with pitch bends, this toggle switch can increase the range to -4800 cents to
 
 The time it takes for the oscillator's frequency to reach the current note's
 pitch starting from the pitch of the previous note, or from the value that is
-specified with the [Portamento Depth](#usage-synth-common-prd) parameter.
+specified with the [portamento depth](#usage-synth-common-prd) parameter.
 
 When the synthesizer is in [MONO](#usage-synth-main-nh) mode, and
 notes are played in a legato fashion (notes are started before the previous
@@ -901,7 +918,7 @@ amplitude will take to match the velocity of the latest note.
 
 When set to a non-zero value (specified in cents), the oscillator's frequency
 will glide to the current note's pitch from a fixed level of detuning in
-accordance with the [PRT](#usage-synth-common-prt) setting.
+accordance with the [portamento length](#usage-synth-common-prt) setting.
 
 When its value is 0 s, then the starting frequency of the glide will be the
 pitch of the previous note.
@@ -926,21 +943,21 @@ Sets the volume of the oscillator before any filtering and shaping.
 
 ##### Filter Logarithmic Frequency (LG F)
 
-The toggle switch above the [FREQ](#usage-synth-common-freq) knob can switch
-between using a linear or a logarithmic scale for the knob.
+The toggle switch above the [filter cutoff frequency](#usage-synth-common-freq)
+knob can switch between using a linear or a logarithmic scale for the knob.
 
 <a id="usage-synth-common-lgq"></a>
 
 ##### Filter Logarithmic Q Factor (LG Q)
 
-The toggle switch above the [Q](#usage-synth-common-q) knob can switch
+The toggle switch above the [Q factor](#usage-synth-common-q) knob can switch
 between using a linear or a logarithmic scale for the knob.
 
 ##### Filter Cutoff Frequency Inaccuracy
 
-The first little screw next to the [LG Q](#usage-synth-common-lgq) switch adds
-a level of randomization to the filter's frequency to mimic imperfections of
-analog synthesizers.
+The first little screw next to the [logarithmic Q factor](#usage-synth-common-lgq)
+switch adds a level of randomization to the filter's frequency to mimic
+imperfections of analog synthesizers.
 
 Be careful with this, because with certain filter settings, too much
 randomization can produce loud noises and sound artifacts or make the filter
@@ -948,9 +965,9 @@ completely silent.
 
 ##### Filter Q Inaccuracy
 
-The second little screw next to the [LG Q](#usage-synth-common-lgq) switch adds
-a level of randomization to the filter's Q factor to mimic imperfections of
-analog synthesizers.
+The second little screw next to the [logarithmic Q factor](#usage-synth-common-lgq)
+switch adds a level of randomization to the filter's Q factor to mimic
+imperfections of analog synthesizers.
 
 Be careful with this, because with certain filter settings, too much
 randomization can produce loud noises and sound artifacts or make the filter
@@ -1006,8 +1023,8 @@ it can make the filter completely silent.
 ##### Filter Q Factor (Q)
 
 The quality factor of the filter. Its precise meaning depends on the position
-of the [TYPE](#usage-synth-common-type) knob. This knob has no effect for
-the low-shelf and high-shelf filters.
+of the [filter type](#usage-synth-common-type) knob. This knob has no effect
+for the low-shelf and high-shelf filters.
 
 Be careful with this, because depending on other settings of the filter, a too
 low or too high Q factor can produce loud noises and sound artifacts or it can
@@ -1015,9 +1032,9 @@ make the filter completely silent.
 
 ##### Filter Gain (GAIN)
 
-Controls the boosting or attenuation when the [TYPE](#usage-synth-common-type)
-knob is in the Bell, LS (low-shelf), or HS (high-shelf) positions. It has no
-effect on other filter types.
+Controls the boosting or attenuation when the [filter type](#usage-synth-common-type)
+knob is in the _Bell_, _LS_ (low-shelf), or _HS_ (high-shelf) positions. It has
+no effect on other filter types.
 
 Be careful with this, because too much boosting can make the signal too loud.
 
@@ -1088,9 +1105,45 @@ Selects the waveform of the oscillator. The available options are:
  * **Soft Sqr**: a softer, warmer version of the square wave. Less prone to
     aliasing when various modulations and wave folding are engaged.
 
+ * **Pulse**: similar to the square wave, but the length of the up part (the
+   duty cycle) within a period is variable using the
+   [pulse width](#usage-synth-common-pw) parameter.
+
+ * **Soft Pls**: a softer, warmer version of the pulse wave. Less prone to
+    aliasing when various modulations and wave folding are engaged.
+
+ * **BiPoPu**: bipolar pulse wave, a staircase-like waveform. Also similar to
+   the square wave, but when the signal flips between its two extremes, it can
+   stay for a while in the center, depending on the
+   [pulse width](#usage-synth-common-pw).
+
+ * **Soft BPP**: a softer, warmer version of the bipolar pulse wave. Less prone
+   to aliasing when various modulations and wave folding are engaged.
+
  * **Custom**: the amplitudes of the waveform's harmonics can be set using the
    10 knobs in the _Waveform & harmonics for the Custom waveform_ section.
    Useful for emulating tonewheel organ sounds.
+
+**Notes**:
+
+ * It is usually a good idea to use a high-pass filter around 20 Hz to control
+   the low-end when using the pulse, soft pulse, bipolar pulse, or soft bipolar
+   pulse waveforms.
+
+ * The pulse, soft pulse, bipolar pulse, and soft bipolar pulse waveforms
+   collapse to complete silence when the [pulse width](#usage-synth-common-pw)
+   parameter is at the 0% or 100% extremes. When the pulse width is 50%, these
+   waveforms are equivalent to a square or a soft square waveform respectively.
+
+<a id="usage-synth-common-pw"></a>
+
+##### Pulse Width (PW)
+
+Control the duty cycle of the pulse, soft pulse, bipolar pulse, and soft
+bipolar pulse [waveforms](#usage-synth-common-wav). Has no effect for any other
+waveform. When pushed to the 0% or 100% extremes, the wave will collapse into
+complete silence. At 50%, the waveform will be equivalent to a square or a soft
+square waveform respectively.
 
 <a href="#toc">Table of Contents</a>
 
@@ -1137,7 +1190,7 @@ input devices and two synthesizers.
 
 The MPE configuration of JS80P can be set by clicking on or using the mouse
 wheel over the black box next to the MPE label in the header section of
-[Oscillator 1](#usage-synth-modulator). The available options are:
+[oscillator 1](#usage-synth-modulator). The available options are:
 
  * **OFF**: MPE is not used, all [macros](#usage-macros), expressions,
    controllers, and MIDI CC are [paraphonic](#usage-polyphony) except when
@@ -1281,8 +1334,8 @@ distortion:
    signal levels, soft clipping at higher signal levels.
 
  * **reduce**: soft clipping distortion that also slightly reduces the volume
-   of the input signal. (This is what the [Echo](#usage-effects-echo) and the
-   [Reverb](#usage-effects-reverb) effects use internally on the feedback line
+   of the input signal. (This is what the [echo](#usage-effects-echo) and the
+   [reverb](#usage-effects-reverb) effects use internally on the feedback line
    to make sure that the signal will decay eventually, even with high
    distortion levels.)
 
@@ -1393,13 +1446,13 @@ much noise should be produced by the virtual tape.
 
 When this toggle is turned off, then the tape simulation is placed between the
 second [volume control](#usage-effects-volume) and the
-[Chorus](#usage-effects-chorus) effect. This setup mimics the scenario of
+[chorus](#usage-effects-chorus) effect. This setup mimics the scenario of
 recording an instrument to tape, and then adding various effects to it later
 during the mixing process. This way, subsequent effects can react to tape stops
 as well.
 
 When this toggle is turned on, then the tape simulation is moved to the end of
-the effects signal chain, right between the [Reverb](#usage-effects-reverb)
+the effects signal chain, right between the [reverb](#usage-effects-reverb)
 and the last [volume control](#usage-effects-volume). With this setup, a tape
 stop will also include the echo and reverb tails.
 
@@ -1425,7 +1478,7 @@ logarithmic scale instead of a linear scale.
 ##### Logarithmic LFO Frequency (LG LFO FREQ)
 
 Switch between a linear and a logarithmic scale for the
-[LFO frequency (FREQ)](#usage-effects-chorus-freq) parameter.
+[LFO frequency](#usage-effects-chorus-freq) parameter.
 
 ##### Logarithmic Filter Cutoff Frequencies (LG FILTER FREQS)
 
@@ -1460,7 +1513,7 @@ the signal chain of the effect.
 Select the chorus type. Different chorus types feature a different number of
 voices (ranging from 3 up to 7) which are arranged in various different
 positions in the stereo field (with regards to the
-[WIDTH](#usage-effects-chorus-wid) parameter as well), with various different
+[width](#usage-effects-chorus-wid) parameter as well), with various different
 loudness values, etc.
 
 ##### Delay Time (DEL)
@@ -1525,7 +1578,7 @@ of the second second one is fed back into the first one.
 
 Reverse the first delay line. In reverse mode, a delay line collects a length
 of sound from its input corresponding to the
-[Delay Time](#usage-effects-echo-time) setting, then plays it backwards while
+[delay time](#usage-effects-echo-time) setting, then plays it backwards while
 collecting the next chunk from the input. To avoid unpleasant artifacts, a
 short attack and release envelope is applied to each segment. Changing the
 delay time will not interrupt the currently played chunk, but will affect its
@@ -1744,7 +1797,7 @@ that can be heard in various rooms, optionally with various levels of filtering
 and distortion, and with side-chain compression or expansion (gate).
 
 The signal chain is similar to the one in the
-[Echo effect](#usage-effects-echo), so many of the parameters work the same way
+[echo effect](#usage-effects-echo), so many of the parameters work the same way
 as described there.
 
 Only the parameters that are unique to the Reverb effect are listed below.
@@ -1797,7 +1850,7 @@ This is most useful when the input of the macro is associated with the pitch
 bend wheel of a MIDI keyboard, and you want precise control over the range that
 is covered by the lower and the upper half of the wheel's movement.
 
-Example: assign the pitch wheel to the [Input](#usage-macros-in) of Macro 1,
+Example: assign the pitch wheel to the [input](#usage-macros-in) of Macro 1,
 and set its Midpoint to 75%. Now if you assign Macro 1 to a knob, then
 when the pitch wheel is at 50%, the knob's position will be at 75%. Moving the
 pitch wheel from 50% to 0% will make the knob move from 75% to 0%, and the
@@ -1809,7 +1862,7 @@ and 100%.
 Click on the second function graph icon at the top right corner of a macro, or
 use the mouse wheel while holding the mouse cursor over it to select the
 non-linearity curve that the macro will use when its
-[distortion (DIST)](#usage-macros-dist) parameter is set to a value above 0%.
+[distortion](#usage-macros-dist) parameter is set to a value above 0%.
 
 <a id="usage-macros-in"></a>
 
@@ -2125,14 +2178,26 @@ information to plugins.)
 #### Waveform (WAV)
 
 Same as the [waveform parameter](#usage-synth-common-wav) of the audio-range
-oscillators, except that LFOs don't have the "Custom" option.
+oscillators, except that LFOs don't have the "Custom" option, and only half of
+the available LFOs offer variable pulse width waveforms.
+
+**Note**: when using square, pulse, or bipolar pulse waveforms or their soft
+versions, then the oscillator may not reach the configured
+[minimum](#usage-lfos-min) and [maximum](#usage-lfos-max) values perfectly
+without adding some saturation using the [distortion](#usage-lfos-dist)
+parameter.
+
+#### Pulse Width (PW)
+
+Same as the [pulse width](#usage-synth-common-pw) parameter of the audio-range
+oscillators.
 
 <a id="usage-lfos-freq"></a>
 
 #### Frequency (FREQ)
 
 Set how many oscillations to do per second (or per beat, when the
-[BPM SYNC](#usage-lfos-bpm) switch is turned on).
+[tempo synchronization](#usage-lfos-bpm) switch is turned on).
 
 #### Phase (PHS)
 
@@ -2158,9 +2223,11 @@ Set the highest value of the oscillation. When it is less than the
 
 Set the amplitude of the oscillation.
 
+<a id="usage-lfos-dist"></a>
+
 #### Distortion (DIST)
 
-Distort the waveform with a soft clipping distortion.
+Saturate the waveform using a soft clipping distortion.
 
 #### Randomness (RAND)
 
@@ -2191,7 +2258,7 @@ the first option, except in two cases:
     * the oscillator is not even triggered according to the
       [split keyboard](#usage-synth-main-mode) configuration,
 
-    * or its amplitude (and in case of [Oscillator 1](#usage-synth-modulator),
+    * or its amplitude (and in case of [oscillator 1](#usage-synth-modulator),
       its subharmonic amplitude) or its volume has no
       [controller](#usage-controllers) and is configured to be 0%.
 
