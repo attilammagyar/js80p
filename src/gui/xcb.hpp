@@ -196,6 +196,8 @@ class Widget : public WidgetBase
 
         virtual void delete_image(GUI::Image image) override;
 
+        virtual uint64_t monotonic_clock_ms() override;
+
         virtual void show() override;
         virtual void hide() override;
 
@@ -225,8 +227,6 @@ class Widget : public WidgetBase
         ) override;
 
         virtual bool paint() override;
-
-        virtual uint64_t monotonic_clock_ms() override;
 
         virtual void fill_rectangle(
             int const left,

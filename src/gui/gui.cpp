@@ -1901,8 +1901,11 @@ GUI::GUI(
     active_voices_count(0),
     tape_state(TapeParams::State::TAPE_STATE_INIT),
     default_status_line_color(TEXT_COLOR),
+    prev_resize_time_ms(0),
     width(WIDTH),
     height(HEIGHT),
+    new_width(WIDTH),
+    new_height(HEIGHT),
     synth(synth),
     platform_data(platform_data),
     resizing_allowed(true)
@@ -2004,7 +2007,7 @@ GUI::GUI(
 
     vst_logo_image = dummy_widget->load_image(this->platform_data, "VSTLOGO");
 
-    background = new Background();
+    background = new Background(*this);
 
     this->parent_window = new ExternallyCreatedWindow(this->platform_data, parent_window);
     this->parent_window->own(background);
@@ -2122,7 +2125,7 @@ void GUI::build_about_body(char const* const sdk_version)
 
     background->own(about_body);
 
-    about_body->own(new ResizerHandle(*this, *event_handler));
+    about_body->own(new ResizerHandle(*this));
     about_body->own(new AboutText(sdk_version, show_vst_logo ? vst_logo_image : NULL));
 
     about_body->hide();
@@ -2138,7 +2141,7 @@ void GUI::build_macros_1_body(
 
     background->own(macros_1_body);
 
-    macros_1_body->own(new ResizerHandle(*this, *event_handler));
+    macros_1_body->own(new ResizerHandle(*this));
 
 
     POSITION_RELATIVE_BEGIN(52, 28);
@@ -2314,7 +2317,7 @@ void GUI::build_macros_2_body(
 
     background->own(macros_2_body);
 
-    macros_2_body->own(new ResizerHandle(*this, *event_handler));
+    macros_2_body->own(new ResizerHandle(*this));
 
 
     POSITION_RELATIVE_BEGIN(52, 28);
@@ -2490,7 +2493,7 @@ void GUI::build_macros_3_body(
 
     background->own(macros_3_body);
 
-    macros_3_body->own(new ResizerHandle(*this, *event_handler));
+    macros_3_body->own(new ResizerHandle(*this));
 
 
     POSITION_RELATIVE_BEGIN(52, 28);
@@ -2666,7 +2669,7 @@ void GUI::build_effects_body(
 
     background->own(effects_body);
 
-    effects_body->own(new ResizerHandle(*this, *event_handler));
+    effects_body->own(new ResizerHandle(*this));
 
     constexpr char const* const* ft = JS80P::GUI::BIQUAD_FILTER_TYPES;
     constexpr int ftc = JS80P::GUI::BIQUAD_FILTER_TYPES_COUNT;
@@ -2854,7 +2857,7 @@ void GUI::build_envelopes_1_body(
 
     background->own(envelopes_1_body);
 
-    envelopes_1_body->own(new ResizerHandle(*this, *event_handler));
+    envelopes_1_body->own(new ResizerHandle(*this));
 
     constexpr char const* const* ut = JS80P::GUI::ENVELOPE_UPDATE_TYPES;
     constexpr int utc = JS80P::GUI::ENVELOPE_UPDATE_TYPES_COUNT;
@@ -3036,7 +3039,7 @@ void GUI::build_envelopes_2_body(
 
     background->own(envelopes_2_body);
 
-    envelopes_2_body->own(new ResizerHandle(*this, *event_handler));
+    envelopes_2_body->own(new ResizerHandle(*this));
 
     constexpr char const* const* ut = JS80P::GUI::ENVELOPE_UPDATE_TYPES;
     constexpr int utc = JS80P::GUI::ENVELOPE_UPDATE_TYPES_COUNT;
@@ -3214,7 +3217,7 @@ void GUI::build_lfos_body(ParamStateImages const* const knob_states)
 
     background->own(lfos_body);
 
-    lfos_body->own(new ResizerHandle(*this, *event_handler));
+    lfos_body->own(new ResizerHandle(*this));
 
     constexpr char const* const* wf = JS80P::GUI::WAVEFORMS;
     constexpr int wfc = JS80P::GUI::WAVEFORMS_COUNT;
@@ -3383,7 +3386,7 @@ void GUI::build_synth_body(
 
     background->own(synth_body);
 
-    synth_body->own(new ResizerHandle(*this, *event_handler));
+    synth_body->own(new ResizerHandle(*this));
 
     constexpr char const* const* nh = JS80P::GUI::NOTE_HANDLING_MODES;
     constexpr int nhc = JS80P::GUI::NOTE_HANDLING_MODES_COUNT;
@@ -3589,9 +3592,13 @@ void GUI::resize(int const new_width, int const new_height)
         return;
     }
 
+    if (JS80P_UNLIKELY(dummy_widget == NULL)) {
+        return;
+    }
+
     scale = new_scale;
-    width = constrained_new_width;
-    height = constrained_new_height;
+    width = this->new_width = constrained_new_width;
+    height = this->new_height = constrained_new_height;
 
     dummy_widget->set_scale(scale);
 
@@ -3606,6 +3613,41 @@ void GUI::resize(int const new_width, int const new_height)
 
     background->set_scale(scale);
     background->redraw();
+
+    prev_resize_time_ms = dummy_widget->monotonic_clock_ms();
+}
+
+
+void GUI::schedule_resize(int const new_width, int const new_height)
+{
+    Number new_scale;
+    int constrained_new_width = new_width;
+    int constrained_new_height = new_height;
+
+    apply_size_constraints(constrained_new_width, constrained_new_height, new_scale);
+
+    this->new_width = constrained_new_width;
+    this->new_height = constrained_new_height;
+}
+
+
+void GUI::handle_scheduled_resize()
+{
+    if (JS80P_LIKELY(new_width == width && new_height == height)) {
+        return;
+    }
+
+    if (JS80P_UNLIKELY(dummy_widget == NULL)) {
+        return;
+    }
+
+    uint64_t now = dummy_widget->monotonic_clock_ms();
+
+    if ((now - prev_resize_time_ms) < SCHEDULED_RESIZE_WAIT) {
+        return;
+    }
+
+    event_handler->handle_resize_request(new_width, new_height);
 }
 
 

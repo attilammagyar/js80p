@@ -95,6 +95,11 @@ HFONT Win32Platform::get_font(
 
 void GUI::idle()
 {
+    handle_scheduled_resize();
+
+    if (background != NULL) {
+        background->refresh();
+    }
 }
 
 
@@ -693,7 +698,12 @@ LRESULT Widget::process_message(
     switch (uMsg) {
         case WM_TIMER:
             if (widget->type == Type::BACKGROUND) {
-                ((Background*)widget)->refresh();
+                GUI* gui = ((Background*)widget)->gui;
+
+                if (gui != NULL) {
+                    gui->idle();
+                }
+
                 is_handled = true;
             }
 

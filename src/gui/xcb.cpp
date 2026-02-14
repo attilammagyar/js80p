@@ -1253,6 +1253,8 @@ void GUI::idle()
 {
     Widget::process_events((XcbPlatform*)platform_data);
 
+    handle_scheduled_resize();
+
     if (background != NULL) {
         XcbPlatform* const xcb = (XcbPlatform*)platform_data;
 

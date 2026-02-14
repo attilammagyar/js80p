@@ -150,7 +150,7 @@ class TabBody : public TransparentWidget
 class Background : public Widget
 {
     public:
-        Background();
+        Background(GUI& gui);
         ~Background();
 
         void replace_body(TabBody* const new_body);
@@ -803,13 +803,12 @@ class TuningSelector : public DiscreteParamEditor
 class ResizerHandle : public TransparentWidget
 {
     public:
-        static constexpr int RESIZE_MOVE_INTERVAL_MS = 150;
         static constexpr int WIDTH = 64;
         static constexpr int HEIGHT = 64;
         static constexpr int LEFT = TabBody::WIDTH - WIDTH;
         static constexpr int TOP = TabBody::HEIGHT - HEIGHT;
 
-        ResizerHandle(GUI& gui, GUI::EventHandler& event_handler);
+        ResizerHandle(GUI& gui);
 
     protected:
         virtual bool mouse_down(int const x, int const y) override;
@@ -818,10 +817,8 @@ class ResizerHandle : public TransparentWidget
 
     private:
         void init_movement(int const x, int const y);
-        bool handle_movement(int const x, int const y);
+        void handle_movement(int const x, int const y);
 
-        GUI::EventHandler& event_handler;
-        uint64_t prev_resize_time_ms;
         int click_x;
         int click_y;
 };

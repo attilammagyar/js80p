@@ -29,11 +29,6 @@
 
 namespace JS80P {
 
-void GUI::idle()
-{
-}
-
-
 void GUI::initialize()
 {
 }
@@ -146,6 +141,16 @@ void ImportPatchButton::click()
 
 void ExportPatchButton::click()
 {
+}
+
+
+void GUI::idle()
+{
+    handle_scheduled_resize();
+
+    if (background != NULL) {
+        background->refresh();
+    }
 }
 
 }
