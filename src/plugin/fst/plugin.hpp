@@ -102,7 +102,8 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
 
         static AEffect* create_instance(
             audioMasterCallback const host_callback_ptr,
-            GUI::PlatformData const platform_data
+            GUI::PlatformData const platform_data,
+            bool const need_gui_idle
         ) noexcept;
 
         static VstIntPtr VSTCALLBACK dispatch(
@@ -154,7 +155,8 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
         FstPlugin(
             AEffect* const effect,
             audioMasterCallback const host_callback_ptr,
-            GUI::PlatformData const platform_data
+            GUI::PlatformData const platform_data,
+            bool const need_gui_idle
         ) noexcept;
 
         virtual ~FstPlugin();
@@ -368,6 +370,8 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
 
         Midi::Byte float_to_midi_byte(float const value) const noexcept;
         Midi::Word float_to_midi_word(float const value) const noexcept;
+
+        bool const need_gui_idle;
 
         Parameters parameters;
 

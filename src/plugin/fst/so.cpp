@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ extern "C"
 
 __attribute__((visibility("default"))) AEffect* VSTPluginMain(audioMasterCallback host_callback)
 {
-    return JS80P::FstPlugin::create_instance(host_callback, NULL);
+    return JS80P::FstPlugin::create_instance(host_callback, NULL, true);
 }
 
 }
