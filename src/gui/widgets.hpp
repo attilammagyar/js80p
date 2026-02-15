@@ -150,7 +150,7 @@ class TabBody : public TransparentWidget
 class Background : public Widget
 {
     public:
-        Background(GUI& gui);
+        explicit Background(GUI& gui);
         ~Background();
 
         void replace_body(TabBody* const new_body);
@@ -808,7 +808,7 @@ class ResizerHandle : public TransparentWidget
         static constexpr int LEFT = TabBody::WIDTH - WIDTH;
         static constexpr int TOP = TabBody::HEIGHT - HEIGHT;
 
-        ResizerHandle(GUI& gui);
+        explicit ResizerHandle(GUI& gui);
 
     protected:
         virtual bool mouse_down(int const x, int const y) override;
