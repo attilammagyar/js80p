@@ -564,7 +564,7 @@ class AboutText : public Widget
 
         static constexpr char const* TEXT = (
             "A MIDI driven, performance oriented, versatile synthesizer\n"
-            "Copyright (C) 2025 Attila M. Magyar and contributors\n"
+            "Copyright (C) 2026 Attila M. Magyar and contributors\n"
             "https://attilammagyar.github.io/js80p\n"
             "\n"
             "License: GNU General Public License Version 3\n"
