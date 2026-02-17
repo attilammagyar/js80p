@@ -266,7 +266,7 @@ TEST(can_look_up_param_id_by_name, {
     for (int i = 0; i != Synth::ParamId::PARAM_ID_COUNT; ++i) {
         std::string const name = synth.get_param_name((Synth::ParamId)i);
         Synth::ParamId const param_id = synth.get_param_id(name);
-        assert_eq((Synth::ParamId)i, param_id, "i=%d, name=\"%s\"", i, name);
+        assert_eq((Synth::ParamId)i, param_id, "i=%d, name=\"%s\"", i, name.c_str());
     }
 })
 
