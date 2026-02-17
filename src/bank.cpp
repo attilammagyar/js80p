@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  * Copyright (C) 2023  Patrik Ehringer
  *
  * JS80P is free software: you can redistribute it and/or modify
@@ -63,7 +63,8 @@ void Bank::Program::set_name_without_update(std::string const& new_name)
 
 std::string Bank::Program::sanitize_name(std::string const& name) const
 {
-    Integer const buffer_size = name.length() + 1;
+    constexpr size_t buffer_size = 256;
+    constexpr Integer max_index = (Integer)(buffer_size - 1);
 
     char filtered[buffer_size];
     Integer next = 0;
@@ -71,6 +72,10 @@ std::string Bank::Program::sanitize_name(std::string const& name) const
     std::fill_n(filtered, buffer_size, '\x00');
 
     for (std::string::const_iterator it = name.begin(); it != name.end(); ++it) {
+        if (next == max_index) {
+            break;
+        }
+
         if (is_allowed_char(*it) && (next > 0 || *it != ' ')) {
             filtered[next++] = *it;
         }
