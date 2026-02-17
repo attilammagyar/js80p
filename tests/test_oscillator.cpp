@@ -268,14 +268,14 @@ void assert_oscillator_output_is_close_to_reference(
         Byte const waveform = OscillatorClass::SINE
 ) {
     Integer const sample_count = rounds * block_size;
-    Sample expected_samples[sample_count];
+    Buffer expected_samples(sample_count);
     Buffer rendered_samples(sample_count);
 
     oscillator.start(0.0);
 
     for (Integer i = 0; i != sample_count; ++i) {
         Seconds const time = (Seconds)i / (Seconds)sample_rate;
-        expected_samples[i] = reference.generate_sample(time);
+        expected_samples.append(reference.generate_sample(time));
     }
 
     render_rounds<OscillatorClass>(
@@ -283,7 +283,7 @@ void assert_oscillator_output_is_close_to_reference(
     );
 
     assert_close(
-        expected_samples,
+        expected_samples.samples[0],
         rendered_samples.samples[0],
         sample_count,
         tolerance,

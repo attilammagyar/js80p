@@ -92,6 +92,11 @@ class Buffer
             append_index += sample_count;
         }
 
+        void append(Sample const sample, Integer const channel = 0)
+        {
+            this->samples[channel][append_index++] = sample;
+        }
+
         void reset()
         {
             append_index = 0;
