@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 #
 # JS80P is free software: you can redistribute it and/or modify
@@ -32,6 +32,8 @@ API_DOC_DIR ?= doc/api
 
 TEST_MAX_ARRAY_PRINT ?= 20
 
+CXX_WARNINGS ?= -Werror
+
 JS80P_CXXINCS = \
 	-I./lib \
 	-I./src
@@ -48,7 +50,7 @@ JS80P_CXXFLAGS = \
 	-D JS80P_TARGET_PLATFORM=$(TARGET_PLATFORM) \
 	-D JS80P_INSTRUCTION_SET=$(INSTRUCTION_SET) \
 	-Wall \
-	-Werror \
+	$(CXX_WARNINGS) \
 	-ffast-math \
 	-O3 \
 	-std=c++17

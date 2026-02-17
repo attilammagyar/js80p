@@ -1,6 +1,7 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
 # Copyright (C) 2023  Patrik Ehringer
+# Copyright (C) 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,6 +42,8 @@ if ($B32) {
     $Env:ROOT_DIR = 'C:/mingw/64'
     $Env:TARGET_PLATFORM = 'x86_64-w64-mingw32'
 }
+
+$Env:CXX_WARNINGS = ''
 
 <#
 cd "%0"\..

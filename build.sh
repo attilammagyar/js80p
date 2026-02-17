@@ -7,6 +7,8 @@ set -e
     export TARGET_PLATFORM=x86_64-gpp
     # export TARGET_PLATFORM=i686-gpp
 
+    export CXX_WARNINGS=
+
     make check
     make all
     make docs
