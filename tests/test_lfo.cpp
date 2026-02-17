@@ -316,7 +316,7 @@ TEST(lfo_performance, {
         assert_true(
             false,
             "Unknown setting for LFO::center: \"%s\" - must be \"ON\" or \"OFF\"\n",
-            TEST_ARGV[2]
+            TEST_ARGV[2].c_str()
         );
     }
 
