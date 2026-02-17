@@ -48,7 +48,6 @@ constexpr Integer CHANNELS = 3;
 constexpr Integer BLOCK_SIZE = 256;
 constexpr Integer ROUNDS = 50;
 constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
-constexpr Seconds ALMOST_IMMEDIATELY = 0.15 / (Seconds)SAMPLE_RATE;
 
 
 TEST(basic_properties, {

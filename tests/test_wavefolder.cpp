@@ -45,7 +45,6 @@ typedef Wavefolder<SumOfSines> Wavefolder_;
 
 
 constexpr Frequency SAMPLE_RATE = 44100.0;
-constexpr Frequency NYQUIST_FREQUENCY = SAMPLE_RATE / 2.0;
 constexpr Integer CHANNELS = 3;
 constexpr Integer BLOCK_SIZE = 1024;
 constexpr Number BLOCK_LENGTH = (Number)BLOCK_SIZE / SAMPLE_RATE;
