@@ -3879,7 +3879,7 @@ void Synth::ParamIdHashTable::Entry::set(
 }
 
 
-Synth::MidiControllerMessage::MidiControllerMessage() : time_offset(-INFINITY), value(0)
+Synth::MidiControllerMessage::MidiControllerMessage() : time_offset(-999999.0), value(0)
 {
 }
 
