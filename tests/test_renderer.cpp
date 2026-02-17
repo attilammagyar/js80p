@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 
 #include "test.cpp"
 #include "utils.cpp"
@@ -83,8 +84,8 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
     );
     Sample const* const* in_samples;
     Sample const* const* expected_samples;
-    double* buffer[channels];
-    double* batch[channels];
+    double** buffer = new double*[channels];
+    double** batch = new double*[channels];
     Integer next_round_start = 0;
 
     input.set_block_size(buffer_size);
@@ -126,52 +127,66 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
         intro_reference, 999, latency
     );
 
-    for (Integer c = 0; c != channels; ++c) {
-        assert_eq(
-            expected_samples[c],
-            batch[c],
-            latency,
-            DOUBLE_DELTA,
-            "channel=%d",
-            (int)c
-        );
-    }
-
-    for (Integer c = 0; c != channels; ++c) {
-        std::fill_n(batch[c], buffer_size, 0.0);
-    }
-
-    for (Integer i = 0; round_sizes[i] >= 0; ++i) {
-        Integer const sample_count = round_sizes[i];
-
-        in_samples = (
-            input_volume > 0.000001
-                ? SignalProducer::produce<SumOfSines>(input, i, sample_count)
-                : NULL
-        );
+    try {
+        for (Integer c = 0; c != channels; ++c) {
+            assert_eq(
+                expected_samples[c],
+                batch[c],
+                latency,
+                DOUBLE_DELTA,
+                "channel=%d",
+                (int)c
+            );
+        }
 
         for (Integer c = 0; c != channels; ++c) {
-            batch[c] = &buffer[c][next_round_start];
+            std::fill_n(batch[c], buffer_size, 0.0);
         }
 
-        if (mode == RenderMode::ADD) {
-            renderer.render<double, Renderer::Operation::ADD>(sample_count, in_samples, batch);
-        } else {
-            renderer.render<double>(sample_count, in_samples, batch);
+        for (Integer i = 0; round_sizes[i] >= 0; ++i) {
+            Integer const sample_count = round_sizes[i];
+
+            in_samples = (
+                input_volume > 0.000001
+                    ? SignalProducer::produce<SumOfSines>(input, i, sample_count)
+                    : NULL
+            );
+
+            for (Integer c = 0; c != channels; ++c) {
+                batch[c] = &buffer[c][next_round_start];
+            }
+
+            if (mode == RenderMode::ADD) {
+                renderer.render<double, Renderer::Operation::ADD>(sample_count, in_samples, batch);
+            } else {
+                renderer.render<double>(sample_count, in_samples, batch);
+            }
+
+            next_round_start += sample_count;
         }
 
-        next_round_start += sample_count;
-    }
+        expected_samples = SignalProducer::produce<SumOfSines>(reference, 1);
 
-    expected_samples = SignalProducer::produce<SumOfSines>(reference, 1);
+        for (Integer c = 0; c != channels; ++c) {
+            assert_close(expected_samples[c], buffer[c], buffer_size, 0.03);
+        }
+    } catch (std::exception const& ex) {
+        for (Integer c = 0; c != channels; ++c) {
+            delete[] buffer[c];
+        }
 
-    for (Integer c = 0; c != channels; ++c) {
-        assert_close(expected_samples[c], buffer[c], buffer_size, 0.03);
+        delete[] buffer;
+        delete[] batch;
+
+        throw;
     }
 
     for (Integer c = 0; c != channels; ++c) {
         delete[] buffer[c];
     }
+
+    delete[] buffer;
+    delete[] batch;
 }
 
 
