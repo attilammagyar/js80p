@@ -19,6 +19,7 @@
 #ifndef JS80P__DSP__MATH_CPP
 #define JS80P__DSP__MATH_CPP
 
+#include <cmath>
 #include <limits>
 
 #include "dsp/math.hpp"
@@ -60,6 +61,10 @@ Number Math::RNG::random() noexcept
 
 Math::Math() noexcept
 {
+    JS80P_ASSERT(Math::is_close(SQRT_OF_2, std::sqrt(2.0)));
+    JS80P_ASSERT(Math::is_close(LN_OF_2, std::log(2.0)));
+    JS80P_ASSERT(Math::is_close(LN_OF_10, std::log(10.0)));
+
     init_sines();
     init_randoms();
     init_distortions();
@@ -304,7 +309,7 @@ void Math::init_envelope_shapes() noexcept
 }
 
 
-constexpr Number Math::shape_smooth_smooth(Number const x) noexcept
+Number Math::shape_smooth_smooth(Number const x) noexcept
 {
     /*
     Antiderivative of 6 * (x - x ^ 2).
@@ -340,7 +345,7 @@ constexpr Number Math::shape_smooth_smooth(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_smooth_smooth_steep(Number const x) noexcept
+Number Math::shape_smooth_smooth_steep(Number const x) noexcept
 {
     /*
     Antiderivative of 30 * ((x - x ^ 2) ^ 2).
@@ -351,7 +356,7 @@ constexpr Number Math::shape_smooth_smooth_steep(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
+Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of 2772 * ((x - x ^ 2) ^ 5).
@@ -371,7 +376,7 @@ constexpr Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_sharp_sharp(Number const x) noexcept
+Number Math::shape_sharp_sharp(Number const x) noexcept
 {
     /*
     Antiderivative of (2 * x - 1) ^ 2.
@@ -383,7 +388,7 @@ constexpr Number Math::shape_sharp_sharp(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_sharp_sharp_steep(Number const x) noexcept
+Number Math::shape_sharp_sharp_steep(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 2.
@@ -394,7 +399,7 @@ constexpr Number Math::shape_sharp_sharp_steep(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
+Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 {
     /*
     Antiderivative of ((2 * x - 1) ^ 2) ^ 5.
@@ -417,37 +422,37 @@ constexpr Number Math::shape_sharp_sharp_steeper(Number const x) noexcept
 }
 
 
-constexpr Number Math::shape_smooth_sharp(Number const x) noexcept
+Number Math::shape_smooth_sharp(Number const x) noexcept
 {
     return std::pow(x, 2.0);
 }
 
 
-constexpr Number Math::shape_smooth_sharp_steep(Number const x) noexcept
+Number Math::shape_smooth_sharp_steep(Number const x) noexcept
 {
     return std::pow(x, 3.0);
 }
 
 
-constexpr Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
+Number Math::shape_smooth_sharp_steeper(Number const x) noexcept
 {
     return std::pow(x, 5.0);
 }
 
 
-constexpr Number Math::shape_sharp_smooth(Number const x) noexcept
+Number Math::shape_sharp_smooth(Number const x) noexcept
 {
     return x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001));
 }
 
 
-constexpr Number Math::shape_sharp_smooth_steep(Number const x) noexcept
+Number Math::shape_sharp_smooth_steep(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 2.0 / 3.0);
 }
 
 
-constexpr Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
+Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
 {
     return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 1.0 / 3.0);
 }

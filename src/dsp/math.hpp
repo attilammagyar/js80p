@@ -19,7 +19,6 @@
 #ifndef JS80P__DSP__MATH_HPP
 #define JS80P__DSP__MATH_HPP
 
-#include <cmath>
 #include <algorithm>
 #include <vector>
 
@@ -84,10 +83,10 @@ class Math
         static constexpr Number PI_QUARTER = PI / 4.0;
         static constexpr Number PI_SQR = PI * PI;
 
-        static constexpr Number SQRT_OF_2 = std::sqrt(2.0);
+        static constexpr Number SQRT_OF_2 = 1.4142135623730951;
 
-        static constexpr Number LN_OF_2 = std::log(2.0);
-        static constexpr Number LN_OF_10 = std::log(10.0);
+        static constexpr Number LN_OF_2 = 0.6931471805599453;
+        static constexpr Number LN_OF_10 = 2.302585092994046;
 
         static constexpr Seconds SECONDS_IN_ONE_MINUTE = 60.0;
 
@@ -385,7 +384,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_smooth(Number const x) noexcept;
+        static Number shape_smooth_smooth(Number const x) noexcept;
 
         /**
          * \brief Steep smooth-smooth shaping function for values between 0.0
@@ -394,7 +393,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_smooth_steep(Number const x) noexcept;
+        static Number shape_smooth_smooth_steep(Number const x) noexcept;
 
         /**
          * \brief Steeper smooth-smooth shaping function for values between 0.0
@@ -403,7 +402,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_smooth_steeper(Number const x) noexcept;
+        static Number shape_smooth_smooth_steeper(Number const x) noexcept;
 
         /**
          * \brief Smooth-sharp shaping function for values between 0.0 and 1.0.
@@ -411,7 +410,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_sharp(Number const x) noexcept;
+        static Number shape_smooth_sharp(Number const x) noexcept;
 
         /**
          * \brief Steep smooth-sharp shaping function for values between 0.0
@@ -420,7 +419,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_sharp_steep(Number const x) noexcept;
+        static Number shape_smooth_sharp_steep(Number const x) noexcept;
 
         /**
          * \brief Steeper smooth-sharp shaping function for values between 0.0
@@ -429,7 +428,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_smooth_sharp_steeper(Number const x) noexcept;
+        static Number shape_smooth_sharp_steeper(Number const x) noexcept;
 
         /**
          * \brief Sharp-smooth shaping function for values between 0.0 and 1.0.
@@ -437,7 +436,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_smooth(Number const x) noexcept;
+        static Number shape_sharp_smooth(Number const x) noexcept;
 
         /**
          * \brief Steep sharp-smooth shaping function for values between 0.0
@@ -446,7 +445,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_smooth_steep(Number const x) noexcept;
+        static Number shape_sharp_smooth_steep(Number const x) noexcept;
 
         /**
          * \brief Steeper sharp-smooth shaping function for values between 0.0
@@ -455,7 +454,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_smooth_steeper(Number const x) noexcept;
+        static Number shape_sharp_smooth_steeper(Number const x) noexcept;
 
         /**
          * \brief Sharp-sharp shaping function for values between 0.0 and 1.0.
@@ -463,7 +462,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_sharp(Number const x) noexcept;
+        static Number shape_sharp_sharp(Number const x) noexcept;
 
         /**
          * \brief Steep sharp-sharp shaping function for values between 0.0
@@ -472,7 +471,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_sharp_steep(Number const x) noexcept;
+        static Number shape_sharp_sharp_steep(Number const x) noexcept;
 
         /**
          * \brief Steeper sharp-sharp shaping function for values between 0.0
@@ -481,7 +480,7 @@ class Math
          * \warning The calculation is slow, use it only for initializing lookup
          *          tables!
          */
-        static constexpr Number shape_sharp_sharp_steeper(Number const x) noexcept;
+        static Number shape_sharp_sharp_steeper(Number const x) noexcept;
 
         class Statistics;
 

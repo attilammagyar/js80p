@@ -19,7 +19,6 @@
 #ifndef JS80P__DSP__SIGNAL_PRODUCER_HPP
 #define JS80P__DSP__SIGNAL_PRODUCER_HPP
 
-#include <cmath>
 #include <vector>
 
 #include "js80p.hpp"
@@ -72,9 +71,7 @@ class SignalProducer
         static constexpr Frequency DEFAULT_SAMPLE_RATE = 44100.0;
 
         static constexpr Number SILENCE_THRESHOLD_DB = -150.0;
-        static constexpr Number SILENCE_THRESHOLD = (
-            std::exp(SILENCE_THRESHOLD_DB * std::log(2.0) / 6.0)
-        );
+        static constexpr Number SILENCE_THRESHOLD = 2.98023223876953e-08;
 
         /*
         Default to 60, so that 1 beat = 1 second, so when no BPM info is

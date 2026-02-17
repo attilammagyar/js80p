@@ -3936,13 +3936,15 @@ TEST(when_a_macro_is_assigned_to_the_leader_of_a_float_param_then_the_follower_v
 TEST(a_float_param_may_use_logarithmic_scale, {
     constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
     constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
-    constexpr Number log2_min = std::log2(min);
-    constexpr Number log2_max = std::log2(max);
     constexpr Integer block_size = 15;
     constexpr Frequency sample_rate = 14.0;
     constexpr Sample expected_samples_log[] = {
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 6.0, 0.0,
     };
+
+    Number const log2_min = std::log2(min);
+    Number const log2_max = std::log2(max);
+
     Envelope envelope("env");
     Envelope* const envelopes[Constants::ENVELOPES] = {
         &envelope, NULL, NULL, NULL, NULL, NULL,

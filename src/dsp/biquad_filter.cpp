@@ -23,8 +23,6 @@
 
 #include "dsp/biquad_filter.hpp"
 
-#include "dsp/math.hpp"
-
 
 namespace JS80P
 {

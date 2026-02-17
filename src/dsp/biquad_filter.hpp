@@ -19,11 +19,10 @@
 #ifndef JS80P__DSP__BIQUAD_FILTER_HPP
 #define JS80P__DSP__BIQUAD_FILTER_HPP
 
-#include <cmath>
-
 #include "js80p.hpp"
 
 #include "dsp/filter.hpp"
+#include "dsp/math.hpp"
 #include "dsp/param.hpp"
 #include "dsp/signal_producer.hpp"
 
@@ -188,7 +187,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         ) noexcept JS80P_OVERRIDE;
 
     private:
-        static constexpr Number FREQUENCY_SINE_SCALE = std::sqrt(2.0);
+        static constexpr Number FREQUENCY_SINE_SCALE = Math::SQRT_OF_2;
         static constexpr Number GAIN_SCALE_HALF = (
             Constants::BIQUAD_FILTER_GAIN_SCALE / 2.0
         );

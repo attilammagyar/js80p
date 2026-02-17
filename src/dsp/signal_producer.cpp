@@ -20,8 +20,11 @@
 #define JS80P__DSP__SIGNAL_PRODUCER_CPP
 
 #include <algorithm>
+#include <cmath>
 
 #include "dsp/signal_producer.hpp"
+
+#include "dsp/math.hpp"
 
 
 namespace JS80P
@@ -136,6 +139,13 @@ SignalProducer::SignalProducer(
     cached_silence_round(-1),
     cached_silence(false)
 {
+    JS80P_ASSERT(
+        Math::is_close(
+            SILENCE_THRESHOLD,
+            std::exp(SILENCE_THRESHOLD_DB * std::log(2.0) / 6.0)
+        )
+    );
+
     if (number_of_children > 0) {
         children.reserve((Children::size_type)number_of_children);
     }
