@@ -43,7 +43,6 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
 {
     constexpr Integer buffer_size = 4096;
     constexpr Frequency sample_rate = 11025.0;
-    constexpr Number volume_per_channel = std::sin(Math::PI / 4.0);
     constexpr Integer round_sizes[] = {
         123, 150, 106, 1, 120,
         20, 20, 20, 10, 10,
@@ -55,6 +54,8 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
         1000, 512, 24, 384, 128,
         -1,
     };
+
+    Number const volume_per_channel = std::sin(Math::PI / 4.0);
 
     Synth synth;
 

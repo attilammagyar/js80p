@@ -37,7 +37,7 @@ SimpleOscillator::WaveformParam wavetable_cache_waveform("WAV");
 SimpleOscillator wavetable_cache(wavetable_cache_waveform);
 
 
-constexpr Number OUT_VOLUME_PER_CHANNEL = std::sin(Math::PI / 4.0);
+constexpr Number OUT_VOLUME_PER_CHANNEL = 0.7071067811865476; /* sin(pi / 4); */
 
 
 /*
