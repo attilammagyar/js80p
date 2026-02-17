@@ -343,8 +343,6 @@ bool Serializer::parse_section_name(
         std::string const& line,
         SectionName& section_name
 ) noexcept {
-    constexpr size_t section_name_pos_limit = strlen(JS80P_SECTION_NAME) + 1;
-
     std::string::const_iterator it = line.begin();
     std::string::const_iterator const end = line.end();
     size_t pos = 0;
@@ -364,6 +362,9 @@ bool Serializer::parse_section_name(
     while (it != end && is_inline_whitespace(*it)) {
         ++it;
     }
+
+    /* strlen() is not constexpr on some platforms. */
+    size_t const section_name_pos_limit = strlen(JS80P_SECTION_NAME) + 1;
 
     while (it != end && is_section_name_char(*it)) {
         if (pos != section_name_pos_limit) {
