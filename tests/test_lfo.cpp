@@ -327,14 +327,12 @@ TEST(lfo_performance, {
 
     Number const total_sample_count = (Number)(BLOCK_SIZE * rounds);
 
-    Integer number_of_rendered_samples = 0;
     Number sum = 0.0;
 
     for (Integer round = 0; round != rounds; ++round) {
         Sample const* const* const rendered_samples = (
             SignalProducer::produce<LFO>(lfo, round)
         );
-        number_of_rendered_samples += BLOCK_SIZE;
 
         for (Integer i = 0; i != BLOCK_SIZE; ++i) {
             sum += rendered_samples[0][i];
