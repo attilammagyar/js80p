@@ -935,7 +935,7 @@ Synth::ParamType Synth::find_param_type(ParamId const param_id) const noexcept
 }
 
 
-Synth::~Synth()
+Synth::~Synth() noexcept
 {
     for (Integer i = 0; i != POLYPHONY; ++i) {
         delete carriers[i];
@@ -3308,7 +3308,7 @@ Synth::Bus::Bus(
 }
 
 
-Synth::Bus::~Bus()
+Synth::Bus::~Bus() noexcept
 {
     free_buffers();
 }
@@ -3859,7 +3859,7 @@ Synth::ParamIdHashTable::Entry::Entry(
 }
 
 
-Synth::ParamIdHashTable::Entry::~Entry()
+Synth::ParamIdHashTable::Entry::~Entry() noexcept
 {
     if (next != NULL) {
         delete next;

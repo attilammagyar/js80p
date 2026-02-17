@@ -1194,7 +1194,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static Number calculate_inaccuracy_seed(Integer const voice) noexcept;
 
         explicit Synth(Integer const samples_between_gc = 8000) noexcept;
-        virtual ~Synth() override;
+        virtual ~Synth() noexcept override;
 
         virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
         virtual void set_block_size(Integer const new_block_size) noexcept override;
@@ -1433,7 +1433,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     FloatParamS& input_volume
                 ) noexcept;
 
-                virtual ~Bus();
+                virtual ~Bus() noexcept;
 
                 virtual void set_block_size(
                     Integer const new_block_size
@@ -1541,7 +1541,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 ParamIdHashTable() noexcept;
-                ~ParamIdHashTable();
+                ~ParamIdHashTable() noexcept;
 
                 void add(std::string const& name, ParamId const param_id) noexcept;
                 ParamId lookup(std::string const& name) noexcept;
@@ -1563,7 +1563,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                         Entry() noexcept;
                         Entry(char const* const name, ParamId const param_id) noexcept;
-                        ~Entry();
+                        ~Entry() noexcept;
 
                         void set(char const* const name, ParamId const param_id) noexcept;
 
