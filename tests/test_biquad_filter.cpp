@@ -907,8 +907,8 @@ TEST(when_params_are_polyphonic_then_does_not_use_cached_coefficients, {
 })
 
 
+template<Integer block_size>
 void test_fast_path_continuity(
-        Integer const block_size,
         Integer const batch_size,
         BiquadFilterSharedBuffers* const shared_buffers,
         Byte const type,
@@ -1067,46 +1067,46 @@ TEST(silent_input_fast_path_keeps_continuity, {
     shared_buffers.a1_buffer = new Sample[block_size];
     shared_buffers.a2_buffer = new Sample[block_size];
 
-    test_fast_path_continuity(
-        block_size, 0, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    test_fast_path_continuity<block_size>(
+        0, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
     );
-    test_fast_path_continuity(
-        block_size, 0, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
-    );
-
-    test_fast_path_continuity(
-        block_size, 0, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
-    );
-    test_fast_path_continuity(
-        block_size, 0, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    test_fast_path_continuity<block_size>(
+        0, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
     );
 
-    test_fast_path_continuity(
-        block_size, 1, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    test_fast_path_continuity<block_size>(
+        0, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
     );
-    test_fast_path_continuity(
-        block_size, 1, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
-    );
-
-    test_fast_path_continuity(
-        block_size, 1, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
-    );
-    test_fast_path_continuity(
-        block_size, 1, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    test_fast_path_continuity<block_size>(
+        0, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
     );
 
-    test_fast_path_continuity(
-        block_size, block_size, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    test_fast_path_continuity<block_size>(
+        1, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
     );
-    test_fast_path_continuity(
-        block_size, block_size, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    test_fast_path_continuity<block_size>(
+        1, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
     );
 
-    test_fast_path_continuity(
-        block_size, block_size, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    test_fast_path_continuity<block_size>(
+        1, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
     );
-    test_fast_path_continuity(
-        block_size, block_size, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    test_fast_path_continuity<block_size>(
+        1, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+
+    test_fast_path_continuity<block_size>(
+        block_size, NULL, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+    test_fast_path_continuity<block_size>(
+        block_size, &shared_buffers, BiquadFilter<FixedSignalProducer>::LOW_PASS, 1.0, 0.0
+    );
+
+    test_fast_path_continuity<block_size>(
+        block_size, NULL, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
+    );
+    test_fast_path_continuity<block_size>(
+        block_size, &shared_buffers, BiquadFilter<FixedSignalProducer>::NOTCH, 0.0, 0.9
     );
 
     delete[] shared_buffers.b0_buffer;
