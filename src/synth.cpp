@@ -2167,6 +2167,38 @@ Number Synth::get_param_default_ratio(ParamId const param_id) const noexcept
 }
 
 
+Number Synth::discrete_param_value_to_ratio(
+        ParamId const param_id,
+        Byte const value
+) const noexcept {
+    size_t const index = (size_t)param_id;
+    ParamType const type = find_param_type(param_id);
+
+    if (type != ParamType::BYTE) {
+        return 0.0;
+    }
+
+    ByteParam const* param = (ByteParam const*)byte_params[index];
+
+    JS80P_ASSERT(param != NULL);
+
+    /*
+    Param::value_to_ratio() sacrifices bounds check for performance, so we're
+    doing it here.
+    */
+
+    if (JS80P_UNLIKELY(value < param->get_min_value())) {
+        return 0.0;
+    }
+
+    if (JS80P_UNLIKELY(value > param->get_max_value())) {
+        return 1.0;
+    }
+
+    return param->value_to_ratio(value);
+}
+
+
 bool Synth::is_discrete_param(ParamId const param_id) const noexcept
 {
     return (
@@ -2212,7 +2244,7 @@ Number Synth::get_param_value(ParamId const param_id) const noexcept
             return block_evaluated_float_params[index]->get_value();
 
         case ParamType::BYTE:
-            return byte_params[index]->get_value();
+            return (Number)byte_params[index]->get_value();
 
         default:
             JS80P_ASSERT_NOT_REACHED();

@@ -2471,3 +2471,46 @@ TEST(can_query_midi_controllers_from_any_mpe_channel, {
         DOUBLE_DELTA
     );
 })
+
+
+TEST(can_convert_discrete_param_value_to_ratio, {
+    Synth synth;
+
+    assert_eq(
+        0.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::MWFM, SimpleOscillator::SINE),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        0.53,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::MWFM, SimpleOscillator::SQUARE),
+        0.01
+    );
+    assert_eq(
+        1.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::MWFM, SimpleOscillator::CUSTOM),
+        DOUBLE_DELTA
+    );
+
+    assert_eq(
+        0.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::L1WAV, SimpleOscillator::SINE),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::L1WAV, SimpleOscillator::SOFT_BIPOLAR_PULSE),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::L1WAV, SimpleOscillator::CUSTOM),
+        DOUBLE_DELTA
+    );
+
+    assert_eq(
+        0.0,
+        synth.discrete_param_value_to_ratio(Synth::ParamId::MF1FRQ, SimpleOscillator::CUSTOM),
+        DOUBLE_DELTA
+    );
+})

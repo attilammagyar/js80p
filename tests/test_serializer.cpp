@@ -53,19 +53,29 @@ void assert_in(std::string const& needle, std::string const& haystack)
 }
 
 
+void set_synth_discrete_param_value(
+        Synth& synth,
+        Synth::ParamId const param_id,
+        Byte const value
+) {
+    synth.process_message(
+        Synth::MessageType::SET_PARAM,
+        param_id,
+        synth.discrete_param_value_to_ratio(param_id, value),
+        0
+    );
+}
+
+
 TEST(can_convert_synth_configuration_to_string_and_import_it, {
     Synth synth_1;
     Synth synth_2;
     std::string serialized;
     Number const inv_saw_as_ratio = (
-        synth_1.modulator_params.waveform.value_to_ratio(
-            Modulator::Oscillator_::INVERSE_SAWTOOTH
-        )
+        synth_1.discrete_param_value_to_ratio(Synth::ParamId::MWFM, Modulator::Oscillator_::INVERSE_SAWTOOTH)
     );
     Number const triangle_as_ratio = (
-        synth_1.modulator_params.waveform.value_to_ratio(
-            Modulator::Oscillator_::TRIANGLE
-        )
+        synth_1.discrete_param_value_to_ratio(Synth::ParamId::MWFM, Modulator::Oscillator_::TRIANGLE)
     );
 
     synth_1.push_message(
@@ -317,16 +327,16 @@ TEST(toggle_params_are_loaded_before_other_params, {
     Serializer::import_patch_in_audio_thread(synth, patch);
 
     assert_eq(
-        ToggleParam::ON, synth.modulator_params.filter_1_freq_log_scale.get_value()
+        ToggleParam::ON, (Byte)synth.get_param_value(Synth::ParamId::MF1LOG)
     );
     assert_eq(
-        1928.2, synth.modulator_params.filter_1_frequency.get_value(), 19.282
+        1928.2, synth.get_param_value(Synth::ParamId::MF1FRQ), 19.282
     );
     assert_eq(
-        ToggleParam::OFF, synth.modulator_params.filter_2_freq_log_scale.get_value()
+        ToggleParam::OFF, (Byte)synth.get_param_value(Synth::ParamId::MF2LOG)
     );
     assert_eq(
-        18000.0, synth.modulator_params.filter_2_frequency.get_value(), 1.0
+        18000.0, synth.get_param_value(Synth::ParamId::MF2FRQ), 1.0
     );
 })
 
@@ -556,7 +566,7 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
         serialized_modulator_tuning,
         serialized_modulator_tuning_length,
         "MTUN = %f",
-        (double)synth.modulator_params.tuning.value_to_ratio(Modulator::TUNING_432HZ_12TET)
+        (double)synth.discrete_param_value_to_ratio(Synth::ParamId::MTUN, Modulator::TUNING_432HZ_12TET)
     );
 
     patch += "[js80p]";
@@ -564,13 +574,13 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
     patch += serialized_modulator_tuning;
     patch += Serializer::LINE_END;
 
-    synth.modulator_params.tuning.set_value(Modulator::TUNING_MTS_ESP_NOTE_ON);
-    synth.carrier_params.tuning.set_value(Carrier::TUNING_MTS_ESP_NOTE_ON);
+    set_synth_discrete_param_value(synth, Synth::ParamId::MTUN, Modulator::TUNING_MTS_ESP_NOTE_ON);
+    set_synth_discrete_param_value(synth, Synth::ParamId::CTUN, Modulator::TUNING_MTS_ESP_NOTE_ON);
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.modulator_params.tuning.get_value());
-    assert_eq((int)Carrier::TUNING_MTS_ESP_NOTE_ON, (int)synth.carrier_params.tuning.get_value());
+    assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.get_param_value(Synth::ParamId::MTUN));
+    assert_eq((int)Carrier::TUNING_MTS_ESP_NOTE_ON, (int)synth.get_param_value(Synth::ParamId::CTUN));
 })
 
 
@@ -585,7 +595,7 @@ TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_o
         serialized_mpe_settings,
         serialized_mpe_settings_length,
         "MPE = %f",
-        (double)synth.mpe_settings.value_to_ratio(Synth::MPE_U10)
+        (double)synth.discrete_param_value_to_ratio(Synth::ParamId::MPEST, Synth::MPE_U10)
     );
 
     patch += "[js80p]";
@@ -593,17 +603,17 @@ TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_o
     patch += serialized_mpe_settings;
     patch += Serializer::LINE_END;
 
-    synth.mpe_settings.set_value(Synth::MPE_L15);
+    set_synth_discrete_param_value(synth, Synth::ParamId::MPEST, Synth::MPE_L15);
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Synth::MPE_U10, (int)synth.mpe_settings.get_value());
+    assert_eq((int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST));
 
     patch = "";
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Synth::MPE_U10, (int)synth.mpe_settings.get_value());
+    assert_eq((int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST));
 })
 
 

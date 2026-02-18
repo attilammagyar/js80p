@@ -1296,6 +1296,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Number get_param_ratio_atomic(ParamId const param_id) const noexcept;
         Number get_param_default_ratio(ParamId const param_id) const noexcept;
 
+        Number discrete_param_value_to_ratio(
+            ParamId const param_id,
+            Byte const value
+        ) const noexcept;
+
         ControllerId get_param_controller_id_atomic(
             ParamId const param_id
         ) const noexcept;

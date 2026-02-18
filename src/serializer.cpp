@@ -528,10 +528,13 @@ Number Serializer::upgrade_old_note_handling_param(
     Byte const old_value_byte = std::round(old_value * 3.0);
 
     if (JS80P_UNLIKELY(old_value_byte > 3)) {
-        return synth.note_handling.get_default_ratio();
+        return synth.get_param_default_ratio(Synth::ParamId::NH);
     }
 
-    return synth.note_handling.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.discrete_param_value_to_ratio(
+        Synth::ParamId::NH,
+        NEW_VALUES[old_value_byte]
+    );
 }
 
 
@@ -548,10 +551,13 @@ Number Serializer::upgrade_old_envelope_update_mode(
     Byte const old_value_byte = std::round(old_value * 2.0);
 
     if (JS80P_UNLIKELY(old_value_byte > 2)) {
-        return synth.envelopes[0]->update_mode.get_default_ratio();
+        return synth.get_param_default_ratio(Synth::ParamId::N1UPD);
     }
 
-    return synth.envelopes[0]->update_mode.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.discrete_param_value_to_ratio(
+        Synth::ParamId::N1UPD,
+        NEW_VALUES[old_value_byte]
+    );
 }
 
 
@@ -575,10 +581,13 @@ Number Serializer::upgrade_old_voice_oscillator_waveform(
     Byte const old_value_byte = std::round(old_value * 9.0);
 
     if (JS80P_UNLIKELY(old_value_byte > 9)) {
-        return 0.0;
+        return synth.get_param_default_ratio(Synth::ParamId::MWFM);
     }
 
-    return synth.modulator_params.waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.discrete_param_value_to_ratio(
+        Synth::ParamId::MWFM,
+        NEW_VALUES[old_value_byte]
+    );
 }
 
 
@@ -601,10 +610,13 @@ Number Serializer::upgrade_old_lfo_waveform(
     Byte const old_value_byte = std::round(old_value * 8.0);
 
     if (JS80P_UNLIKELY(old_value_byte > 8)) {
-        return 0.0;
+        return synth.get_param_default_ratio(Synth::ParamId::L1WAV);
     }
 
-    return synth.lfos[0]->waveform.value_to_ratio(NEW_VALUES[old_value_byte]);
+    return synth.discrete_param_value_to_ratio(
+        Synth::ParamId::L1WAV,
+        NEW_VALUES[old_value_byte]
+    );
 }
 
 

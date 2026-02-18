@@ -112,6 +112,10 @@ class Param : public SignalProducer
         void set_ratio(Number const ratio) noexcept;
 
         NumberType ratio_to_value(Number const ratio) const noexcept;
+
+        /**
+         * \warning The supplied value is assumed to be within the parameter's bounds.
+         */
         Number value_to_ratio(NumberType const value) const noexcept;
 
         void set_midi_controller(MidiController* const midi_controller) noexcept;
