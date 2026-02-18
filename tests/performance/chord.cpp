@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,15 +105,15 @@ class WavBuffer
             return true;
         }
 
-        bool append16(uint16_t word)
+        bool append16(int16_t word)
         {
             return (
                 append8(word & 0xff)
-                && append8(word >> 8)
+                && append8((word >> 8) & 0xff)
             );
         }
 
-        bool append24(uint32_t dword)
+        bool append24(int32_t dword)
         {
             return (
                 append8(dword & 0xff)
@@ -122,7 +122,7 @@ class WavBuffer
             );
         }
 
-        bool append32(uint32_t dword)
+        bool append32(int32_t dword)
         {
             return (
                 append8(dword & 0xff)
@@ -152,15 +152,15 @@ void usage(char const* const name)
 }
 
 
-uint32_t sample_to_wav(Sample const sample)
+int32_t sample_to_wav(Sample const sample)
 {
     if (JS80P_UNLIKELY(sample > 1.0)) {
-        return (uint32_t)SIGNED_24BIT_MAX;
+        return (int32_t)SIGNED_24BIT_MAX;
     } else if (JS80P_UNLIKELY(sample < -1.0)) {
-        return (uint32_t)-SIGNED_24BIT_MAX;
+        return (int32_t)-SIGNED_24BIT_MAX;
     }
 
-    return (uint32_t)(SIGNED_24BIT_MAX * sample);
+    return (int32_t)(SIGNED_24BIT_MAX * sample);
 }
 
 
