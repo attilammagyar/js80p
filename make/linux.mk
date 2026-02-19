@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2024  Attila M. Magyar
+# Copyright (C) 2024, 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,11 @@ COPY ?= cp -v
 CPP_DEV_PLATFORM ?= /usr/bin/g++
 CPPCHECK ?= /usr/bin/cppcheck
 DOXYGEN ?= /usr/bin/doxygen
+
 VALGRIND ?= /usr/bin/valgrind
+VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --leak-check=yes --quiet
+
+CHECK_MEMORY = $(VALGRIND) $(VALGRIND_FLAGS)
 
 PDFLATEX ?= /usr/bin/pdflatex
 
@@ -45,8 +49,6 @@ CPPCHECK_FLAGS = \
 	--suppressions-list=.cppcheck \
 	-I./src \
 	-I./tests
-
-VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --leak-check=yes --quiet
 
 doc/pm-fm-equivalence.pdf: $(DEV_DIR)/pm-fm-equivalence.pdf
 	$(COPY) $< $@

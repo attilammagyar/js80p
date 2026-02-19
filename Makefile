@@ -417,12 +417,6 @@ COMPILE_DEV = \
 		$(TEST_CXXFLAGS) \
 		$(DEBUG_LOG_CXXFLAGS)
 
-ifeq ($(VALGRIND),)
-RUN_WITH_VALGRIND =
-else
-RUN_WITH_VALGRIND = $(VALGRIND) $(VALGRIND_FLAGS)
-endif
-
 show_fst_dir:
 	@echo $(FST_DIR)
 
@@ -642,7 +636,7 @@ $(DEV_DIR)/log_tables_error_tsv$(DEV_EXE): \
 $(DEV_DIR)/test_example$(DEV_EXE): \
 		tests/test_example.cpp $(TEST_LIBS) | $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_bank$(DEV_EXE): \
 		$(OBJ_DEV_BANK) \
@@ -652,7 +646,7 @@ $(DEV_DIR)/test_bank$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(OBJ_DEV_TEST_BANK): \
 		tests/test_bank.cpp \
@@ -670,7 +664,7 @@ $(DEV_DIR)/test_biquad_filter$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_biquad_filter_slow$(DEV_EXE): \
 		tests/test_biquad_filter_slow.cpp \
@@ -696,7 +690,7 @@ $(DEV_DIR)/test_compressor$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_delay$(DEV_EXE): \
 		tests/test_delay.cpp \
@@ -708,7 +702,7 @@ $(DEV_DIR)/test_delay$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_distortion$(DEV_EXE): \
 		tests/test_distortion.cpp \
@@ -719,7 +713,7 @@ $(DEV_DIR)/test_distortion$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_envelope$(DEV_EXE): \
 		tests/test_envelope.cpp \
@@ -728,7 +722,7 @@ $(DEV_DIR)/test_envelope$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_gain$(DEV_EXE): \
 		tests/test_gain.cpp \
@@ -738,7 +732,7 @@ $(DEV_DIR)/test_gain$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_gui$(DEV_EXE): \
 		$(OBJ_DEV_GUI_STUB) \
@@ -748,7 +742,7 @@ $(DEV_DIR)/test_gui$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(OBJ_DEV_TEST_GUI): \
 		tests/test_gui.cpp $(GUI_COMMON_HEADERS) $(TEST_LIBS) | $(DEV_DIR)
@@ -762,7 +756,7 @@ $(DEV_DIR)/test_lfo$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_lfo_envelope_list$(DEV_EXE): \
 		tests/test_lfo_envelope_list.cpp \
@@ -771,7 +765,7 @@ $(DEV_DIR)/test_lfo_envelope_list$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_macro$(DEV_EXE): \
 		tests/test_macro.cpp \
@@ -780,7 +774,7 @@ $(DEV_DIR)/test_macro$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_math$(DEV_EXE): \
 		tests/test_math.cpp \
@@ -796,7 +790,7 @@ $(DEV_DIR)/test_midi$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		tests/test_midi_controller.cpp \
@@ -808,7 +802,7 @@ $(DEV_DIR)/test_midi_controller$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_mixer$(DEV_EXE): \
 		tests/test_mixer.cpp \
@@ -819,7 +813,7 @@ $(DEV_DIR)/test_mixer$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_noise_generator$(DEV_EXE): \
 		tests/test_noise_generator.cpp \
@@ -829,7 +823,7 @@ $(DEV_DIR)/test_noise_generator$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_note_stack$(DEV_EXE): \
 		tests/test_note_stack.cpp \
@@ -839,7 +833,7 @@ $(DEV_DIR)/test_note_stack$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_oscillator$(DEV_EXE): \
 		tests/test_oscillator.cpp \
@@ -849,7 +843,7 @@ $(DEV_DIR)/test_oscillator$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_param$(DEV_EXE): \
 		tests/test_param.cpp \
@@ -858,7 +852,7 @@ $(DEV_DIR)/test_param$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_param_slow$(DEV_EXE): \
 		tests/test_param_slow.cpp \
@@ -876,7 +870,7 @@ $(DEV_DIR)/test_peak_tracker$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_queue$(DEV_EXE): \
 		tests/test_queue.cpp \
@@ -884,7 +878,7 @@ $(DEV_DIR)/test_queue$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_renderer$(DEV_EXE): \
 		tests/test_renderer.cpp \
@@ -895,7 +889,7 @@ $(DEV_DIR)/test_renderer$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_serializer$(DEV_EXE): \
 		$(OBJ_DEV_SERIALIZER) \
@@ -904,7 +898,7 @@ $(DEV_DIR)/test_serializer$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS) $(TEST_SYNTH_BINS)
 	$(LINK_DEV_EXE) $^ -o $@
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(OBJ_DEV_TEST_SERIALIZER): \
 		tests/test_serializer.cpp \
@@ -921,7 +915,7 @@ $(DEV_DIR)/test_signal_producer$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_spscqueue$(DEV_EXE): \
 		tests/test_spscqueue.cpp \
@@ -930,7 +924,7 @@ $(DEV_DIR)/test_spscqueue$(DEV_EXE): \
 		$(TEST_LIBS) \
 		| $(DEV_DIR) show_versions
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_synth$(DEV_EXE): \
 		tests/test_synth.cpp \
@@ -940,7 +934,7 @@ $(DEV_DIR)/test_synth$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_tape$(DEV_EXE): \
 		tests/test_tape.cpp \
@@ -955,7 +949,7 @@ $(DEV_DIR)/test_tape$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_voice$(DEV_EXE): \
 		tests/test_voice.cpp \
@@ -970,7 +964,7 @@ $(DEV_DIR)/test_voice$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS) $(TEST_DSP_BINS) $(TEST_PARAM_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
 
 $(DEV_DIR)/test_wavefolder$(DEV_EXE): \
 		tests/test_wavefolder.cpp \
@@ -981,4 +975,4 @@ $(DEV_DIR)/test_wavefolder$(DEV_EXE): \
 		| $(DEV_DIR) show_versions \
 		$(TEST_BASIC_BINS)
 	$(COMPILE_DEV) -o $@ $<
-	$(RUN_WITH_VALGRIND) $@
+	$(CHECK_MEMORY) $@
