@@ -39,32 +39,12 @@ GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
 
-GUI_IMAGES = \
-	gui/img/about.png \
-	gui/img/effects.png \
-	gui/img/envelopes1.png \
-	gui/img/envelopes2.png \
-	gui/img/env_shapes-01.png \
-	gui/img/env_shapes-10.png \
-	gui/img/knob_states-controlled.png \
-	gui/img/knob_states-free.png \
-	gui/img/knob_states-none.png \
-	gui/img/knob_states-red.png \
-	gui/img/lfos.png \
-	gui/img/macro_distortions.png \
-	gui/img/macro_midpoint_states.png \
-	gui/img/macros1.png \
-	gui/img/macros2.png \
-	gui/img/macros3.png \
-	gui/img/reversed.png \
-	gui/img/screw_states.png \
-	gui/img/screw_states_synced.png \
-	gui/img/synth.png \
-	gui/img/vst_logo.png
+GUI_IMAGE_SOURCES = \
+	$(foreach GUI_IMAGE,$(GUI_IMAGES),gui/img/$(GUI_IMAGE).png)
 
 OBJ_TARGET_GUI_EXTRA = $(BUILD_DIR)/gui-$(SUFFIX).res
 
-$(OBJ_TARGET_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGES) | $(BUILD_DIR)
+$(OBJ_TARGET_GUI_EXTRA): src/gui/gui.rc $(GUI_IMAGE_SOURCES) | $(BUILD_DIR)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 MINGW_CXXFLAGS = -D OEMRESOURCE -D WINVER=0x0601 -D _WIN32_WINNT=0x0601
