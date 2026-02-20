@@ -58,7 +58,7 @@ class Widget : public WidgetBase
             return (GUI::Image)new DummyObject();
         }
 
-        GUI::Image copy_image_region(
+        virtual GUI::Image copy_image_region(
                 GUI::Image source,
                 int const left,
                 int const top,
@@ -68,7 +68,7 @@ class Widget : public WidgetBase
             return (GUI::Image)new DummyObject();
         }
 
-        GUI::Image downscale_image(
+        virtual GUI::Image downscale_image(
                 GUI::Image source,
                 int const old_width,
                 int const old_height,
