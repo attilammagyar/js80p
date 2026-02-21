@@ -1391,7 +1391,7 @@ void KnobParamEditor::Knob::update()
         set_image(knob_states->controlled_images[index]);
     } else if (is_synced && knob_states->synced_images != NULL) {
         set_image(knob_states->synced_images[index]);
-    } else {
+    } else if (knob_states->free_images != NULL) {
         set_image(knob_states->free_images[index]);
     }
 }
@@ -2024,7 +2024,7 @@ void DiscreteParamEditor::update()
 {
     update_value_str(synth.byte_param_ratio_to_display_value(param_id, ratio));
 
-    if (state_images != NULL) {
+    if (state_images != NULL && state_images->free_images != NULL) {
         set_image(state_images->free_images[state_images->ratio_to_index(ratio)]);
     }
 }
