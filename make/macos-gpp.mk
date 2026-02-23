@@ -30,7 +30,9 @@ DOXYGEN ?= echo Skipping Doxygen
 
 CHECK_MEMORY ?= leaks -quiet -atExit --
 
-LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall
+TARGET_PLATFORM_LFLAGS = -Wall -framework Cocoa
+LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall -framework Cocoa
+LINK_FST = $(CPP_TARGET_PLATFORM) -bundle
 
 DEV_EXE =
 
@@ -73,20 +75,52 @@ GUI_PLAYGROUND_EXTRA = \
 	$(BUILD_DIR)/macos-playground.o \
 	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(GUI_PLAYGROUND_APP_RES_DIR)/$(GUI_IMAGE).png)
 
+FST_GUI_IMAGES = \
+	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(FST_RES_DIR)/$(GUI_IMAGE).png)
+
 OBJECTIVE_CPP = -fobjc-arc -x objective-c++
 
-LINK_GUI_PLAYGROUND = \
-	$(CPP_DEV_PLATFORM) -Wall -framework Cocoa $(BUILD_DIR)/macos-playground.o
-
-$(BUILD_DIR)/gui-macos.o: \
-		src/gui/macos.mm \
-		$(BUILD_DIR)/macos-playground.o \
-		$(GUI_PLAYGROUND_EXTRA) \
-		| $(GUI_PLAYGROUND_APP_DIRS) $(BUILD_DIR)
-	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<
+LINK_GUI_PLAYGROUND = $(LINK_DEV_EXE) $(BUILD_DIR)/macos-playground.o
 
 $(BUILD_DIR)/macos-playground.o: src/gui/macos-playground.mm | $(BUILD_DIR)
 	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<
 
 $(GUI_PLAYGROUND_APP_RES_DIR)/%.png: gui/img/%.png | $(GUI_PLAYGROUND_APP_RES_DIR)
 	$(COPY) $< $@
+
+FST_ROOT_DIR = $(FST_DIR)/js80p.vst
+FST_CONTENTS_DIR = $(FST_ROOT_DIR)/Contents
+FST_BIN_DIR = $(FST_CONTENTS_DIR)/MacOS
+FST_RES_DIR = $(FST_CONTENTS_DIR)/Resources
+
+FST_DIRS = \
+	$(FST_CONTENTS_DIR) \
+	$(FST_BIN_DIR) \
+	$(FST_RES_DIR)
+
+$(FST_ROOT_DIR): | $(FST_DIR)
+	$(MKDIR) $@
+
+$(FST_CONTENTS_DIR): | $(FST_ROOT_DIR)
+	$(MKDIR) $@
+
+$(FST_BIN_DIR) $(FST_RES_DIR): | $(FST_CONTENTS_DIR)
+	$(MKDIR) $@
+
+FST = $(FST_BIN_DIR)/js80p
+FST_MAIN_SOURCES = src/plugin/fst/mach-o.cpp
+FST_EXTRA =
+
+$(FST_RES_DIR)/%.png: gui/img/%.png | $(FST_RES_DIR)
+	$(COPY) $< $@
+
+# TODO: untangle GUI resources and dirs for various bundle types from gui-macos.o
+$(BUILD_DIR)/gui-macos.o: \
+		src/gui/macos.mm \
+		$(BUILD_DIR)/macos-playground.o \
+		$(GUI_PLAYGROUND_EXTRA) \
+		$(FST_GUI_IMAGES) \
+		| $(BUILD_DIR) \
+		$(GUI_PLAYGROUND_APP_DIRS) \
+		$(FST_DIRS)
+	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<
