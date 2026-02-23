@@ -1325,7 +1325,6 @@ KnobParamEditor::Knob::Knob(
     steps(steps),
     knob_states(knob_states),
     editor(editor),
-    knob_state(NULL),
     ratio(0.0),
     mouse_move_delta(0.0),
     sync_param_id(Synth::ParamId::INVALID_PARAM_ID),
