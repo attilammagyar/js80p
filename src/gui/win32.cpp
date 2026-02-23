@@ -1057,18 +1057,21 @@ void Widget::hide()
 
 void Widget::focus()
 {
+    WidgetBase::focus();
     SetFocus((HWND)platform_widget);
 }
 
 
 void Widget::bring_to_top()
 {
+    WidgetBase::bring_to_top();
     BringWindowToTop((HWND)platform_widget);
 }
 
 
 void Widget::redraw()
 {
+    WidgetBase::redraw();
     // TODO: GetLastError()
     RedrawWindow((HWND)platform_widget, NULL, NULL, RDW_INVALIDATE);
 }

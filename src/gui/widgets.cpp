@@ -426,10 +426,6 @@ void TabSelector::ensure_scaled_tab_image()
         return;
     }
 
-    if (JS80P_UNLIKELY(this->platform_data == NULL)) {
-        return;
-    }
-
     if (tab_image_full_size == NULL) {
         tab_image_full_size = this->load_image(
             this->platform_data,

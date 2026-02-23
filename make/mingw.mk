@@ -38,6 +38,7 @@ GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/win32.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/win32.cpp
+GUI_PLAYGROUND_EXTRA =
 
 GUI_IMAGE_SOURCES = \
 	$(foreach GUI_IMAGE,$(GUI_IMAGES),gui/img/$(GUI_IMAGE).png)
@@ -59,7 +60,8 @@ TARGET_PLATFORM_LFLAGS = \
 	-lwindowscodecs
 
 LINK_DLL = $(CPP_TARGET_PLATFORM) -Wall -shared -static
-LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall -static
+
+LINK_GUI_PLAYGROUND = $(CPP_TARGET_PLATFORM) -Wall -static
 
 LINK_FST = $(LINK_DLL)
 LINK_VST3 = $(LINK_DLL)

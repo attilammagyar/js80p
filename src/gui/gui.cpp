@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 #ifndef JS80P__GUI__GUI_CPP
 #define JS80P__GUI__GUI_CPP
 
@@ -1362,17 +1363,6 @@ void GUI::initialize_controllers_by_id()
 }
 
 
-constexpr GUI::Color GUI::rgb(
-        ColorComponent const red,
-        ColorComponent const green,
-        ColorComponent const blue
-) {
-    return (Color)(
-        (unsigned int)red << 16 | (unsigned int)green << 8 | (unsigned int)blue
-    );
-}
-
-
 const GUI::Color GUI::TEXT_COLOR = GUI::rgb(181, 181, 189);
 const GUI::Color GUI::TEXT_BACKGROUND = GUI::rgb(0, 0, 0);
 const GUI::Color GUI::TEXT_HIGHLIGHT_COLOR = GUI::rgb(230, 230, 235);
@@ -1406,24 +1396,6 @@ const GUI::Color GUI::CTL_COLOR_LFO_BG = GUI::rgb(131, 57, 145);
 
 const GUI::Color GUI::CTL_COLOR_ENVELOPE_TEXT = GUI::rgb(110, 255, 150);
 const GUI::Color GUI::CTL_COLOR_ENVELOPE_BG = GUI::rgb(63, 145, 85);
-
-
-constexpr GUI::ColorComponent GUI::red(Color const color)
-{
-    return color >> 16;
-}
-
-
-constexpr GUI::ColorComponent GUI::green(Color const color)
-{
-    return color >> 8;
-}
-
-
-constexpr GUI::ColorComponent GUI::blue(Color const color)
-{
-    return color;
-}
 
 
 void GUI::param_ratio_to_str(

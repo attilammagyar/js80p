@@ -180,14 +180,30 @@ class GUI
 
         static Controller const* get_controller(Synth::ControllerId const controller_id);
 
-        static constexpr Color rgb(
-            ColorComponent const red,
-            ColorComponent const green,
-            ColorComponent const blue
-        );
-        static constexpr ColorComponent red(Color const color);
-        static constexpr ColorComponent green(Color const color);
-        static constexpr ColorComponent blue(Color const color);
+        static constexpr inline Color rgb(
+                ColorComponent const red,
+                ColorComponent const green,
+                ColorComponent const blue
+        ) {
+            return (Color)(
+                (unsigned int)red << 16 | (unsigned int)green << 8 | (unsigned int)blue
+            );
+        }
+
+        static constexpr inline ColorComponent red(Color const color)
+        {
+            return (color >> 16) & 0xff;
+        }
+
+        static constexpr inline ColorComponent green(Color const color)
+        {
+            return (color >> 8) & 0xff;
+        }
+
+        static constexpr inline ColorComponent blue(Color const color)
+        {
+            return color & 0xff;
+        }
 
         static Color const TEXT_COLOR;
         static Color const TEXT_BACKGROUND;

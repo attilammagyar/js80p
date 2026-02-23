@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX)
 GUI_PLAYGROUND_SOURCES = src/gui/xcb-playground.cpp
 GUI_TARGET_PLATFORM_HEADERS = src/gui/xcb.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/xcb.cpp
+GUI_PLAYGROUND_EXTRA =
 
 OBJ_TARGET_GUI_EXTRA = \
 	$(LIB_PATH)/libcairo.so \
@@ -86,7 +87,8 @@ EXE =
 CPP_TARGET_PLATFORM ?= /usr/bin/g++
 
 LINK_SO = $(CPP_TARGET_PLATFORM) -Wall -shared
-LINK_TARGET_EXE = $(CPP_TARGET_PLATFORM) -Wall
+
+LINK_GUI_PLAYGROUND = $(CPP_TARGET_PLATFORM) -Wall
 
 TARGET_PLATFORM_LFLAGS = \
 	$(ARCH_LFLAGS) \
