@@ -19,6 +19,7 @@
 #define JS80P__GUI_STUB_CPP
 
 #include <cstddef>
+#include <cstdio>
 #include <string>
 
 #include "js80p.hpp"
@@ -136,11 +137,15 @@ namespace JS80P {
 
 void ImportPatchButton::click()
 {
+    import_patch("[js80p]", 8);
 }
 
 
 void ExportPatchButton::click()
 {
+    std::string const& patch = Serializer::serialize(synth);
+
+    fprintf(stdout, "%s\n", patch.c_str());
 }
 
 
