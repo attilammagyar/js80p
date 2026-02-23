@@ -75,9 +75,6 @@ GUI_PLAYGROUND_EXTRA = \
 	$(BUILD_DIR)/macos-playground.o \
 	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(GUI_PLAYGROUND_APP_RES_DIR)/$(GUI_IMAGE).png)
 
-FST_GUI_IMAGES = \
-	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(FST_RES_DIR)/$(GUI_IMAGE).png)
-
 OBJECTIVE_CPP = -fobjc-arc -x objective-c++
 
 LINK_GUI_PLAYGROUND = $(LINK_DEV_EXE) $(BUILD_DIR)/macos-playground.o
@@ -113,6 +110,9 @@ FST_EXTRA =
 
 $(FST_RES_DIR)/%.png: gui/img/%.png | $(FST_RES_DIR)
 	$(COPY) $< $@
+
+FST_GUI_IMAGES = \
+	$(foreach GUI_IMAGE,$(filter-out vst_logo,$(GUI_IMAGES)),$(FST_RES_DIR)/$(GUI_IMAGE).png)
 
 # TODO: untangle GUI resources and dirs for various bundle types from gui-macos.o
 $(BUILD_DIR)/gui-macos.o: \
