@@ -23,7 +23,10 @@
 
 #include "plugin/fst/plugin.hpp"
 
-// #include "debug.hpp"
+#ifdef JS80P_FST_DEBUG
+#include "debug.hpp"
+#endif
+
 #include "serializer.hpp"
 #include "spscqueue.cpp"
 
@@ -31,6 +34,7 @@
 namespace JS80P
 {
 
+#ifdef JS80P_FST_DEBUG
 static constexpr int FST_OP_CODE_NAMES_LEN = 78;
 
 static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
@@ -113,6 +117,7 @@ static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
     "UNKNOWN-76",                   /*   76 */
     "SetProcessPrecision",          /*   77 */
 };
+#endif
 
 
 AEffect* FstPlugin::create_instance(
@@ -165,31 +170,33 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 ) {
     JS80P::FstPlugin* const fst_plugin = (JS80P::FstPlugin*)effect->object;
 
-    // if (
-            // true
-            // && op_code != effEditIdle
-            // && (op_code != effProcessEvents || fst_plugin->prev_logged_op_code != effProcessEvents)
-            // && op_code != effIdle
-            // && op_code != effGetProgram
-            // && op_code != effGetProgramName
-            // && op_code != effGetProductString
-            // && op_code != 67
-            // && op_code != 68
-            // && op_code != effEditGetRect
-            // && op_code != effGetProgramNameIndexed
-    // ) {
-        // fst_plugin->prev_logged_op_code = op_code;
+#ifdef JS80P_FST_DEBUG
+    if (
+            true
+            && op_code != effEditIdle
+            && (op_code != effProcessEvents || fst_plugin->prev_logged_op_code != effProcessEvents)
+            && op_code != effIdle
+            && op_code != effGetProgram
+            && op_code != effGetProgramName
+            && op_code != effGetProductString
+            && op_code != 67
+            && op_code != 68
+            && op_code != effEditGetRect
+            && op_code != effGetProgramNameIndexed
+    ) {
+        fst_plugin->prev_logged_op_code = op_code;
 
-        // JS80P_DEBUG(
-            // "plugin=%p, op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
-            // effect->object,
-            // (int)op_code,
-            // ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
-            // (int)index,
-            // (int)ivalue,
-            // fvalue
-        // );
-    // }
+        JS80P_DEBUG(
+            "plugin=%p, op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
+            effect->object,
+            (int)op_code,
+            ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+            (int)index,
+            (int)ivalue,
+            fvalue
+        );
+    }
+#endif
 
     switch (op_code) {
         case effProcessEvents:
@@ -316,15 +323,18 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
                 return -1;
             }
 
-            // JS80P_DEBUG(
-                // "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
-                // (int)op_code,
-                // ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
-                // (int)index,
-                // (int)ivalue,
-                // fvalue,
-                // (char*)pointer
-            // );
+#ifdef JS80P_FST_DEBUG
+            JS80P_DEBUG(
+                "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
+                (int)op_code,
+                ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+                (int)index,
+                (int)ivalue,
+                fvalue,
+                (char*)pointer
+            );
+#endif
+
             return 0;
 
         case effIdle:
@@ -535,7 +545,9 @@ FstPlugin::FstPlugin(
     remaining_samples_before_next_cc_ui_update(0),
     min_samples_before_next_bank_update(16384),
     remaining_samples_before_next_bank_update(0),
+#ifdef JS80P_FST_DEBUG
     prev_logged_op_code(-1),
+#endif
     gui_width(GUI::INIT_WIDTH),
     gui_height(GUI::INIT_HEIGHT),
     had_midi_cc_event(false),
