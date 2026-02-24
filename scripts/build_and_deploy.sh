@@ -2,7 +2,7 @@
 
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2026  Attila M. Magyar
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 # Copyright (C) 2024  @YHStar (https://github.com/YHStar)
 #
@@ -58,7 +58,7 @@ main()
     if [[ "$arch" = "" ]]; then arch="x86_64"; fi
     if [[ "$instruction_set" = "" ]]; then instruction_set="avx"; fi
 
-    if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
+    if [[ "$plugin_type" = "vst3" ]]; then suffix="_single" ; fi
 
     case "$arch" in
         "x86") target_platform="i686" ;;

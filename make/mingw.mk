@@ -33,6 +33,7 @@ VST3_EXTRA = src/plugin/vst3/js80p.def
 VST3_PLUGIN_SOURCES = \
 	src/plugin/vst3/plugin.cpp \
 	src/plugin/vst3/plugin-win32.cpp
+VST3_TARGET_PLATFORM_CXXFLAGS =
 
 GUI_PLAYGROUND = $(BUILD_DIR)/gui-playground-$(SUFFIX).exe
 GUI_PLAYGROUND_SOURCES = src/gui/win32-playground.cpp

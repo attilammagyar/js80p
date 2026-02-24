@@ -2,7 +2,7 @@
 
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2026  Attila M. Magyar
 # Copyright (C) 2024  @YHStar (https://github.com/YHStar)
 #
 # JS80P is free software: you can redistribute it and/or modify
@@ -103,7 +103,7 @@ get_plugin_type()
     printf "%s\n" "$file_name" \
         | cut -d"-" -f6 \
         | cut -d"." -f1 \
-        | sed "s/fst/FST (VST 2.4)/ ; s/vst3_single_file/VST 3 Single File/"
+        | sed "s/fst/FST (VST 2.4)/ ; s/vst3_single/VST 3 Single File/"
 }
 
 print_link()

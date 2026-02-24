@@ -33,6 +33,7 @@ CHECK_MEMORY ?= leaks -quiet -atExit --
 TARGET_PLATFORM_LFLAGS = -Wall -framework Cocoa
 LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall -framework Cocoa
 LINK_FST = $(CPP_TARGET_PLATFORM) -bundle
+LINK_VST3 = $(CPP_TARGET_PLATFORM) -bundle
 
 DEV_EXE =
 
@@ -114,13 +115,49 @@ $(FST_RES_DIR)/%.png: gui/img/%.png | $(FST_RES_DIR)
 FST_GUI_IMAGES = \
 	$(foreach GUI_IMAGE,$(filter-out vst_logo,$(GUI_IMAGES)),$(FST_RES_DIR)/$(GUI_IMAGE).png)
 
+VST3_ROOT_DIR = $(VST3_DIR)/js80p.vst3
+VST3_CONTENTS_DIR = $(VST3_ROOT_DIR)/Contents
+VST3_BIN_DIR = $(VST3_CONTENTS_DIR)/MacOS
+VST3_RES_DIR = $(VST3_CONTENTS_DIR)/Resources
+
+VST3_DIRS = \
+	$(VST3_CONTENTS_DIR) \
+	$(VST3_BIN_DIR) \
+	$(VST3_RES_DIR)
+
+$(VST3_ROOT_DIR): | $(VST3_DIR)
+	$(MKDIR) $@
+
+$(VST3_CONTENTS_DIR): | $(VST3_ROOT_DIR)
+	$(MKDIR) $@
+
+$(VST3_BIN_DIR) $(VST3_RES_DIR): | $(VST3_CONTENTS_DIR)
+	$(MKDIR) $@
+
+VST3 = $(VST3_BIN_DIR)/js80p
+VST3_MAIN_SOURCES = src/plugin/vst3/mach-o.cpp
+VST3_GUI_PLATFORM = kPlatformTypeNSView
+VST3_EXTRA =
+VST3_PLUGIN_SOURCES = \
+	src/plugin/vst3/plugin.cpp \
+	src/plugin/vst3/plugin-macos.cpp
+VST3_TARGET_PLATFORM_CXXFLAGS = $(OBJECTIVE_CPP)
+
+$(VST3_RES_DIR)/%.png: gui/img/%.png | $(VST3_RES_DIR)
+	$(COPY) $< $@
+
+VST3_GUI_IMAGES = \
+	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(VST3_RES_DIR)/$(GUI_IMAGE).png)
+
 # TODO: untangle GUI resources and dirs for various bundle types from gui-macos.o
 $(BUILD_DIR)/gui-macos.o: \
 		src/gui/macos.mm \
 		$(BUILD_DIR)/macos-playground.o \
 		$(GUI_PLAYGROUND_EXTRA) \
 		$(FST_GUI_IMAGES) \
+		$(VST3_GUI_IMAGES) \
 		| $(BUILD_DIR) \
 		$(GUI_PLAYGROUND_APP_DIRS) \
-		$(FST_DIRS)
+		$(FST_DIRS) \
+		$(VST3_DIRS)
 	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<

@@ -2,7 +2,7 @@
 
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 # Copyright (C) 2024  @YHStar (https://github.com/YHStar)
 #
@@ -172,7 +172,7 @@ main()
             "$target_platform" "$instruction_set" \
             "$version_str" "$version_int" "$version_as_file_name"
 
-        package_vst3_single_file \
+        package_vst3_single \
             "$target_platform" "$instruction_set" \
             "$version_str" "$version_int" "$version_as_file_name"
     done
@@ -389,7 +389,7 @@ convert_text_file()
     cat "$src_file" | sed 's/$/\r/g' >"$dst_file"
 }
 
-package_vst3_single_file()
+package_vst3_single()
 {
     local target_platform="$1"
     local instruction_set="$2"
@@ -483,7 +483,7 @@ copy_vst3()
 
     mkdir --verbose --parents "$dir"
     cp --verbose \
-        "$DIST_DIR_BASE/js80p-$version_as_file_name-$src_dir-vst3_single_file/js80p.vst3" \
+        "$DIST_DIR_BASE/js80p-$version_as_file_name-$src_dir-vst3_single/js80p.vst3" \
         "$dir/$dst_file"
 }
 

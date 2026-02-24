@@ -108,24 +108,24 @@ These are the file names that you will find on GitHub on the "Releases" page:
 
  * VST 3 single file editions for Windows:
 
-    * "js80p-X_Y_Z-windows-x86_64-avx-vst3_single_file.zip": for modern
+    * "js80p-X_Y_Z-windows-x86_64-avx-vst3_single.zip": for modern
       (AVX), 64 bit CPUs.
 
-    * "js80p-X_Y_Z-windows-x86_64-sse2-vst3_single_file.zip": for older
+    * "js80p-X_Y_Z-windows-x86_64-sse2-vst3_single.zip": for older
       (SSE2), 64 bit CPUs.
 
-    * "js80p-X_Y_Z-windows-x86-sse2-vst3_single_file.zip": for older (SSE2),
+    * "js80p-X_Y_Z-windows-x86-sse2-vst3_single.zip": for older (SSE2),
       32 bit CPUs.
 
  * VST 3 single file editions for Linux:
 
-    * "js80p-X_Y_Z-linux-x86_64-avx-vst3_single_file.zip": for modern (AVX),
+    * "js80p-X_Y_Z-linux-x86_64-avx-vst3_single.zip": for modern (AVX),
       64 bit CPUs.
 
-    * "js80p-X_Y_Z-linux-x86_64-sse2-vst3_single_file.zip": for older
+    * "js80p-X_Y_Z-linux-x86_64-sse2-vst3_single.zip": for older
       (SSE2), 64 bit CPUs.
 
-    * "js80p-X_Y_Z-linux-x86-sse2-vst3_single_file.zip": for older (SSE2),
+    * "js80p-X_Y_Z-linux-x86-sse2-vst3_single.zip": for older (SSE2),
       32 bit CPUs.
 
  * FST editions for Windows:

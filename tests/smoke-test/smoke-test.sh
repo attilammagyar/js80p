@@ -2,7 +2,7 @@
 
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ main()
 
     src_dir="$(dirname "$self")"
 
-    for plugin_type in "fst" "vst3_single_file"
+    for plugin_type in "fst" "vst3_single"
     do
         if [[ $plugin_type =~ _ ]]
         then

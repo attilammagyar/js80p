@@ -66,7 +66,7 @@ DEBUG_LOG_CXXFLAGS = -D JS80P_DEBUG_LOG=$(DEBUG_LOG)
 endif
 
 FST_DIR = $(DIST_DIR_PREFIX)-fst
-VST3_DIR = $(DIST_DIR_PREFIX)-vst3_single_file
+VST3_DIR = $(DIST_DIR_PREFIX)-vst3_single
 
 VSTXML = $(DIST_DIR_BASE)/js80p.vstxml
 VSTXMLGEN = $(DEV_DIR)/vstxmlgen$(DEV_EXE)
@@ -411,6 +411,8 @@ VST3_CXXFLAGS = \
 	-Wno-parentheses \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas \
+	-Wno-unknown-warning-option \
+	-Wno-unused-but-set-variable \
 	-Wno-unused-value
 
 COMPILE_TARGET = \
@@ -432,6 +434,7 @@ COMPILE_VST3 = \
 		$(TARGET_PLATFORM_CXXINCS) \
 		$(VST3_CXXINCS) $(VST3_CXXFLAGS) \
 		$(TARGET_PLATFORM_CXXFLAGS) \
+		$(VST3_TARGET_PLATFORM_CXXFLAGS) \
 		$(DEBUG_LOG_CXXFLAGS)
 
 COMPILE_DEV = \

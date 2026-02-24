@@ -30,6 +30,7 @@ VST3_EXTRA =
 VST3_PLUGIN_SOURCES = \
 	src/plugin/vst3/plugin.cpp \
 	src/plugin/vst3/plugin-xcb.cpp
+VST3_TARGET_PLATFORM_CXXFLAGS =
 
 VST3_MODULE_INFO_TOOL = $(BUILD_DIR)$(DIR_SEP)vst3_module_info_tool
 VST3_MODULE_INFO_LFLAGS = -pthread -Wl,--no-as-needed -ldl
