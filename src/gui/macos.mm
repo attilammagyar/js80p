@@ -17,6 +17,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #include <algorithm>
 #include <cstring>
@@ -536,7 +537,12 @@ bool js80p_import_patch(
 ) {
     NSOpenPanel* panel = [NSOpenPanel openPanel];
 
-    panel.allowedFileTypes = @[@"js80p"];
+    if (@available(macOS 11.0, *)) {
+        [panel setAllowedContentTypes:@[[UTType typeWithFilenameExtension:@"js80p"]]];
+    } else {
+        [panel setAllowedFileTypes:@[@"js80p"]];
+    }
+
     panel.allowsOtherFileTypes = YES;
     panel.canChooseFiles = YES;
     panel.canChooseDirectories = NO;
@@ -587,7 +593,12 @@ void js80p_export_patch(char const* const buffer, size_t const length)
 {
     NSSavePanel* panel = [NSSavePanel savePanel];
 
-    panel.allowedFileTypes = @[@"js80p"];
+    if (@available(macOS 11.0, *)) {
+        [panel setAllowedContentTypes:@[[UTType typeWithFilenameExtension:@"js80p"]]];
+    } else {
+        [panel setAllowedFileTypes:@[@"js80p"]];
+    }
+
     panel.allowsOtherFileTypes = YES;
     panel.canCreateDirectories = YES;
     panel.nameFieldStringValue = @"preset.js80p";

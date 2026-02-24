@@ -30,8 +30,8 @@ DOXYGEN ?= echo Skipping Doxygen
 
 CHECK_MEMORY ?= leaks -quiet -atExit --
 
-TARGET_PLATFORM_LFLAGS = -Wall -framework Cocoa
-LINK_DEV_EXE = $(CPP_DEV_PLATFORM) -Wall -framework Cocoa
+TARGET_PLATFORM_LFLAGS = -Wall -framework Cocoa -framework UniformTypeIdentifiers
+LINK_DEV_EXE = $(CPP_DEV_PLATFORM) $(TARGET_PLATFORM_LFLAGS)
 LINK_FST = $(CPP_TARGET_PLATFORM) -bundle
 LINK_VST3 = $(CPP_TARGET_PLATFORM) -bundle
 
