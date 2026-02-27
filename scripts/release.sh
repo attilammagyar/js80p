@@ -279,7 +279,7 @@ call_make_for_build_platform()
         "x86_64")       call_make "x86_64-w64-mingw32" "avx" "$@" ;;
         "riscv64")      call_make "riscv64-gpp" "none" "$@" ;;
         "loongarch64")  call_make "loongarch64-gpp" "lsx" "$@" ;;
-        *) error "Unsupported build platform: $uname" ;;
+        *) error "Unsupported build platform: $build_platform" ;;
     esac
 }
 
