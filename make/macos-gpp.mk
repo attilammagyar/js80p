@@ -22,6 +22,7 @@ DIR_SEP = /
 RM ?= rm -f
 MKDIR ?= mkdir
 COPY ?= cp -v
+SED ?= sed
 
 CPP_TARGET_PLATFORM ?= $(CPP_DEV_PLATFORM)
 
@@ -105,6 +106,10 @@ $(FST_CONTENTS_DIR): | $(FST_ROOT_DIR)
 $(FST_BIN_DIR) $(FST_RES_DIR): | $(FST_CONTENTS_DIR)
 	$(MKDIR) $@
 
+$(FST_CONTENTS_DIR)/Info.plist: \
+		src/plugin/fst/Info.plist.tpl | $(FST_CONTENTS_DIR)
+	$(SED) 's/{YEAR}/'$(shell date '+%Y')'/g; s/{VERSION}/'$(VERSION_DOT)'/g' $< >$@
+
 FST = $(FST_BIN_DIR)/js80p
 FST_MAIN_SOURCES = src/plugin/fst/mach-o.cpp
 FST_EXTRA =
@@ -134,6 +139,10 @@ $(VST3_CONTENTS_DIR): | $(VST3_ROOT_DIR)
 $(VST3_BIN_DIR) $(VST3_RES_DIR): | $(VST3_CONTENTS_DIR)
 	$(MKDIR) $@
 
+$(VST3_CONTENTS_DIR)/Info.plist: \
+		src/plugin/vst3/Info.plist.tpl | $(VST3_CONTENTS_DIR)
+	$(SED) 's/{YEAR}/'$(shell date '+%Y')'/g; s/{VERSION}/'$(VERSION_DOT)'/g' $< >$@
+
 VST3 = $(VST3_BIN_DIR)/js80p
 VST3_MAIN_SOURCES = src/plugin/vst3/mach-o.cpp
 VST3_GUI_PLATFORM = kPlatformTypeNSView
@@ -155,7 +164,9 @@ $(BUILD_DIR)/gui-macos.o: \
 		$(BUILD_DIR)/macos-playground.o \
 		$(GUI_PLAYGROUND_EXTRA) \
 		$(FST_GUI_IMAGES) \
+		$(FST_CONTENTS_DIR)/Info.plist \
 		$(VST3_GUI_IMAGES) \
+		$(VST3_CONTENTS_DIR)/Info.plist \
 		| $(BUILD_DIR) \
 		$(GUI_PLAYGROUND_APP_DIRS) \
 		$(FST_DIRS) \
