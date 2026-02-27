@@ -131,7 +131,6 @@ Table of Contents
     * [Tremolo PWM Bass](#preset-tremolo-pwm-bass)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
-    * [Mac version?](#faq-mac)
     * [Why do you say FST instead of VST 2?](#faq-fst)
     * [Parameters, Envelopes, LFOs, and polyphony: how do they work?](#faq-params-polyphony)
     * [The knobs in the waveform harmonics section don't do anything, is this a bug?](#faq-custom-wave)
@@ -2807,18 +2806,6 @@ When reporting an issue, please provide at least the following information:
 Frequently Asked Questions
 --------------------------
 
-<a id="faq-mac"></a>
-
-### Mac version?
-
-Sorry, it's not likely to happen anytime soon, unless someone is willing to
-create and maintain a Mac fork of JS80P. For me to do it, it would require
-quite a large investment, both in terms of effort and financially. If MacOS
-would be available (at a reasonable price) for installing it in a virtual
-machine that could be used for testing, I'd consider that. But as long as it
-cannot be obtained (legally) without also buying a Mac, and I'm happy with my
-current computer, I'm not going to invest in a new one.
-
 <a href="#toc">Table of Contents</a>
 
 <a id="faq-fst"></a>
@@ -3100,6 +3087,12 @@ JS80P and want to compile it themselves.
  * [WinLibs MinGW-w64 13.1.0+ (MSVCRT)](https://winlibs.com/)
  * [Doxygen 1.9.6+](https://www.doxygen.nl/)
 
+#### macOS
+
+ * JS80P can be built using the standard Xcode and BSD command-line development
+   tools. Install them by running `xcode-select --install` in a Terminal
+   window.
+
 <a id="dev-dep"></a>
 
 ### Dependencies
@@ -3115,8 +3108,8 @@ contains what is required for compiling JS80P.
 
 #### Linux
 
-To compile JS80P on e.g. Ubuntu Linux 22.04 for all supported platforms, the
-following packages need to be installed:
+To compile JS80P on e.g. Ubuntu Linux 22.04 for both Linux and Windows, 32 and
+64 bits (`i686` and `x86_64`), the following packages need to be installed:
 
     apt-get install \
         binutils \
@@ -3170,6 +3163,62 @@ and `LoongArch` Linux respectively:
     TARGET_PLATFORM=loongarch64-gpp CXX_WARNINGS= make all
 
 Run `make check` in a similar fashion to run unit tests.
+
+#### macOS
+
+If you have a working set of the standard Xcode and BSD command-line
+development tools (e.g. you have successfully run `xcode-select --install`),
+the following commands will compile JS80P:
+
+ * for Apple Silicon CPUs (M1, M2, M3, M4, etc.):
+
+       cd js80p-4_0_0-src
+       export DEV_OS=macos
+       export TARGET_PLATFORM=arm64-gpp
+       export INSTRUCTION_SET=none
+       export CXX_WARNINGS=
+       export SDKROOT=$(xcrun --show-sdk-path)
+       make all
+
+ * for Intel CPUs (`x86_64`) and macOS 10.12 and newer:
+
+       cd js80p-4_0_0-src
+       export DEV_OS=macos
+       export TARGET_PLATFORM=x86_64-gpp
+       export INSTRUCTION_SET=none
+       export CXX_WARNINGS=
+       export SDKROOT=$(xcrun --show-sdk-path)
+       make all
+
+Run `make check` in a similar fashion to run unit tests.
+
+For even older OS X or Mac OS X versions, you might succeed with the second
+set of commands after adjusting the `-target` parameter in
+`make/macos-x86_64-gpp.mk`.
+
+After successful compilation, you will have to copy the entire `js80p.vst` or
+`js80p.vst3` directory to the appropriate plugin directory under
+`/Users/YOUR-NAME/Library/Audio/Plug-Ins`, e.g.:
+
+    mkdir -p ~/Library/Audio/Plug-Ins/VST
+    cp -rv dist/js80p-dev-macos-arm64-none-fst/js80p.vst ~/Library/Audio/Plug-Ins/VST
+
+or:
+
+    mkdir -p ~/Library/Audio/Plug-Ins/VST3
+    cp -rv dist/js80p-dev-macos-arm64-none-vst3/js80p.vst3 ~/Library/Audio/Plug-Ins/VST3
+
+(Replace `arm64` with `x86_64` in the above commands if you have compiled JS80P
+for Intel processors.)
+
+Note: some host applications don't look for VST plugins in the
+`/Users/YOUR-NAME/Library/Audio/Plug-Ins` directory by default. Please refer to
+the documentation of your host application to find out how to configure it to
+do so, or copy the compiled JS80P plugin to the system plugin directory using
+`sudo`, for example:
+
+    sudo mkdir -p /Library/Audio/Plug-Ins/VST
+    sudo cp -rv dist/js80p-dev-macos-arm64-none-fst/js80p.vst /Library/Audio/Plug-Ins/VST
 
 <a href="#toc">Table of Contents</a>
 
