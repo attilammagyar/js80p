@@ -18,6 +18,6 @@
 
 SUFFIX = arm64
 
-CPP_DEV_PLATFORM ?= /usr/bin/g++ -target arm64-apple-macos11
+CPP_DEV_PLATFORM ?= /usr/bin/g++ -target arm64-apple-macos11 -mcpu=apple-m1
 
 include make/macos-gpp.mk
