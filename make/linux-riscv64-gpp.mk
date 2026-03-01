@@ -1,6 +1,6 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2023, 2024  Attila M. Magyar
+# Copyright (C) 2023, 2024, 2026  Attila M. Magyar
 # Copyright (C) 2023  @aimixsaka (https://github.com/aimixsaka/)
 #
 # JS80P is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
-INSTRUCTION_SET = none
+INSTRUCTION_SET ?= none
 
 LIB_PATH ?= $(BUILD_DIR)/lib64
 SYS_LIB_PATH ?= /usr/lib/riscv64-linux-gnu

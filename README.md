@@ -3108,25 +3108,34 @@ contains what is required for compiling JS80P.
 
 #### Linux
 
-To compile JS80P on e.g. Ubuntu Linux 22.04 for both Linux and Windows, 32 and
-64 bits (`i686` and `x86_64`), the following packages need to be installed:
+To compile JS80P on e.g. Ubuntu Linux 22.04, the following packages need to be
+installed:
 
     apt-get install \
         binutils \
         build-essential \
         cppcheck \
         g++ \
+        libcairo2-dev \
+        libx11-dev \
+        libxcb1-dev \
+        libxcb-render0-dev
+
+Additionally, to compile the 32 bit version, the following packages are also
+necessary (don't forget to run `sudo dpkg --add-architecture i386` if you have
+not already done that):
+
+    apt-get install \
         gcc-multilib \
         g++-multilib \
-        libcairo2-dev \
         libcairo2-dev:i386 \
-        libx11-dev \
         libx11-dev:i386 \
-        libxcb1-dev \
         libxcb1-dev:i386 \
-        libxcb-render0-dev \
-        libxcb-render0-dev:i386 \
-        mingw-w64
+        libxcb-render0-dev:i386
+
+The Windows version can also be built on Linux after installing the following:
+
+    apt-get install mingw-w64
 
 <a id="dev-compile"></a>
 
@@ -3149,6 +3158,9 @@ following commands to run tests and compile JS80P for Windows:
     mingw32-make.exe check
     mingw32-make.exe all
 
+To optimize JS80P for the CPU on which it is compiled, insert the following
+variable to the beginning of the above: `SET INSTRUCTION_SET=native`.
+
 #### Linux
 
 The following commands (on a 64 bit Linux environment) will compile JS80P for
@@ -3162,54 +3174,37 @@ and `LoongArch` Linux respectively:
     TARGET_PLATFORM=riscv64-gpp CXX_WARNINGS= make all
     TARGET_PLATFORM=loongarch64-gpp CXX_WARNINGS= make all
 
+Insert `INSTRUCTION_SET=native` to the beginning of the above commands to
+optimize JS80P for the CPU on which it is compiled.
+
 Run `make check` in a similar fashion to run unit tests.
 
 #### macOS
 
 If you have a working set of the standard Xcode and BSD command-line
 development tools (e.g. you have successfully run `xcode-select --install`),
-the following commands will compile JS80P:
+the following commands should compile JS80P for your system:
 
- * for Apple Silicon CPUs (M1, M2, M3, M4, etc.):
-
-       cd js80p-4_0_0-src
-       export DEV_OS=macos
-       export TARGET_PLATFORM=arm64-gpp
-       export INSTRUCTION_SET=none
-       export CXX_WARNINGS=
-       export SDKROOT=$(xcrun --show-sdk-path)
-       make all
-
- * for Intel CPUs (`x86_64`) and macOS 10.12 and newer:
-
-       cd js80p-4_0_0-src
-       export DEV_OS=macos
-       export TARGET_PLATFORM=x86_64-gpp
-       export INSTRUCTION_SET=none
-       export CXX_WARNINGS=
-       export SDKROOT=$(xcrun --show-sdk-path)
-       make all
+    cd js80p-4_0_0-src
+    export DEV_OS=macos
+    export TARGET_PLATFORM=gpp
+    export CXX_WARNINGS=
+    export SDKROOT=$(xcrun --show-sdk-path)
+    make all
 
 Run `make check` in a similar fashion to run unit tests.
 
-For even older OS X or Mac OS X versions, you might succeed with the second
-set of commands after adjusting the `-target` parameter in
-`make/macos-x86_64-gpp.mk`.
-
-After successful compilation, you will have to copy the entire `js80p.vst` or
-`js80p.vst3` directory to the appropriate plugin directory under
-`/Users/YOUR-NAME/Library/Audio/Plug-Ins`, e.g.:
+After successful compilation, you will have to copy either the entire
+`js80p.vst` or the entire `js80p.vst3` directory to the appropriate plugin
+directory under `/Users/YOUR-NAME/Library/Audio/Plug-Ins`, e.g.:
 
     mkdir -p ~/Library/Audio/Plug-Ins/VST
-    cp -rv dist/js80p-dev-macos-arm64-none-fst/js80p.vst ~/Library/Audio/Plug-Ins/VST
+    cp -rv dist/js80p-dev-macos--none-fst/js80p.vst ~/Library/Audio/Plug-Ins/VST
 
 or:
 
     mkdir -p ~/Library/Audio/Plug-Ins/VST3
-    cp -rv dist/js80p-dev-macos-arm64-none-vst3/js80p.vst3 ~/Library/Audio/Plug-Ins/VST3
-
-(Replace `arm64` with `x86_64` in the above commands if you have compiled JS80P
-for Intel processors.)
+    cp -rv dist/js80p-dev-macos--none-vst3_single/js80p.vst3 ~/Library/Audio/Plug-Ins/VST3
 
 Note: some host applications don't look for VST plugins in the
 `/Users/YOUR-NAME/Library/Audio/Plug-Ins` directory by default. Please refer to
@@ -3218,7 +3213,7 @@ do so, or copy the compiled JS80P plugin to the system plugin directory using
 `sudo`, for example:
 
     sudo mkdir -p /Library/Audio/Plug-Ins/VST
-    sudo cp -rv dist/js80p-dev-macos-arm64-none-fst/js80p.vst /Library/Audio/Plug-Ins/VST
+    sudo cp -rv dist/js80p-dev-macos--none-fst/js80p.vst /Library/Audio/Plug-Ins/VST
 
 <a href="#toc">Table of Contents</a>
 

@@ -18,12 +18,19 @@
 
 TARGET_OS = macos
 DIR_SEP = /
+SUFFIX ?=
+
+INSTRUCTION_SET ?= native
 
 RM ?= rm -f
 MKDIR ?= mkdir
 COPY ?= cp -v
 SED ?= sed
 
+CPP_DEV_PLATFORM ?= /usr/bin/g++ \
+	-stdlib=libc++ \
+	-isysroot $(shell xcrun --show-sdk-path) \
+	-mmacos-version-min=10.12
 CPP_TARGET_PLATFORM ?= $(CPP_DEV_PLATFORM)
 
 CPPCHECK ?= echo Skipping Cppcheck:

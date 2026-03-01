@@ -1,6 +1,7 @@
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
 # Copyright (C) 2024  @YHStar (https://github.com/YHStar)
+# Copyright (C) 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###############################################################################
 
-INSTRUCTION_SET = lsx
+INSTRUCTION_SET ?= lsx
 
 LIB_PATH ?= $(BUILD_DIR)/lib64
 SYS_LIB_PATH ?= /usr/lib/loongarch64-linux-gnu

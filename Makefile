@@ -56,10 +56,6 @@ JS80P_CXXFLAGS = \
 	-O3 \
 	-std=c++17
 
-ifneq ($(INSTRUCTION_SET),none)
-JS80P_CXXFLAGS += -m$(INSTRUCTION_SET)
-endif
-
 ifeq ($(DEBUG_LOG),)
 DEBUG_LOG_CXXFLAGS =
 else
@@ -122,6 +118,14 @@ GUI_IMAGES = \
 	vst_logo
 
 include make/$(DEV_OS)-$(TARGET_PLATFORM).mk
+
+ifeq ($(INSTRUCTION_SET),native)
+# The -march=native parameter implies -mtune=native, but only if GCC can
+# identify the CPU exactly, otherwise it may fall back to -mtune=generic.
+JS80P_CXXFLAGS += -march=native -mtune=native
+else ifneq ($(INSTRUCTION_SET),none)
+JS80P_CXXFLAGS += -m$(INSTRUCTION_SET)
+endif
 
 OBJ_TARGET_FST_MAIN = $(BUILD_DIR)/fst-main.o
 OBJ_TARGET_FST_PLUGIN = $(BUILD_DIR)/fst-plugin.o
