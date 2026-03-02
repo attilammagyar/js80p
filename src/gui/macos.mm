@@ -121,12 +121,12 @@
 
     - (void) mouseDragged:(NSEvent*)event
     {
-        [self handle_mouse_move:event];
+        [self handle_mouse_move:event:YES];
     }
 
     - (void) mouseMoved:(NSEvent*)event
     {
-        [self handle_mouse_move:event];
+        [self handle_mouse_move:event:NO];
     }
 
     - (void) scrollWheel:(NSEvent*)event
@@ -173,13 +173,22 @@
         self.gui_idle_timer = nil;
     }
 
-    - (void) handle_mouse_move:(NSEvent*)event
+    - (void) handle_mouse_move:(NSEvent*)event :(BOOL)is_drag
     {
         if (!self.cpp_widget) {
             return;
         }
 
         NSPoint p = [self convertPoint:[event locationInWindow] fromView:nil];
+
+        if (!(is_drag || NSPointInRect(p, self.bounds))) {
+            /*
+            In some REAPER versions, various widgets receive mouseMoved events
+            even when the cursor is outside their area and no mouse buttons are
+            pressed.
+            */
+            return;
+        }
 
         JS80P::Widget::notify_mouse_move(
             self.cpp_widget,
