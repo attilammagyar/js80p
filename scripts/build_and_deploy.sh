@@ -55,7 +55,7 @@ main()
 
     if [[ "$plugin_type" = "" ]]; then plugin_type="fst"; fi
     if [[ "$target_os" = "" ]]; then target_os="linux"; fi
-    if [[ "$arch" = "" ]]; then arch="64bit"; fi
+    if [[ "$arch" = "" ]]; then arch="x86_64"; fi
     if [[ "$instruction_set" = "" ]]; then instruction_set="avx"; fi
 
     if [[ "$plugin_type" = "vst3" ]]; then suffix="_single_file" ; fi
