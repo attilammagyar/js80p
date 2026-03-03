@@ -179,3 +179,19 @@ $(BUILD_DIR)/gui-macos.o: \
 		$(FST_DIRS) \
 		$(VST3_DIRS)
 	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<
+
+VST3_MODULE_INFO_TOOL = $(BUILD_DIR)$(DIR_SEP)vst3_module_info_tool
+VST3_MODULE_INFO_LFLAGS = -pthread -ldl
+
+DEV_PLATFORM_CLEAN = $(VST3_MODULE_INFO_TOOL)
+
+.PHONY: vst3moduleinfo
+
+vst3moduleinfo: $(VST3_MODULE_INFO_TOOL)
+
+$(VST3_MODULE_INFO_TOOL): src/plugin/vst3/moduleinfo.cpp | $(BUILD_DIR)
+	$(CPP_TARGET_PLATFORM) \
+		$(OBJECTIVE_CPP) -framework AppKit \
+		$(VST3_CXXINCS) $(VST3_CXXFLAGS) \
+		$(VST3_MODULE_INFO_LFLAGS) \
+		$< -o $@

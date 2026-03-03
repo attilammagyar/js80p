@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,15 +26,18 @@
 #include <vst3sdk/public.sdk/source/vst/hosting/module.cpp>
 #include <vst3sdk/public.sdk/source/vst/hosting/module.h>
 
-// #if SMTG_OS_LINUX
+#if SMTG_OS_LINUX
 #include <vst3sdk/public.sdk/source/vst/hosting/module_linux.cpp>
 #include "plugin/vst3/so.cpp"
+#elif SMTG_OS_MACOS
+#include <vst3sdk/public.sdk/source/vst/hosting/module_mac.mm>
+#include "plugin/vst3/mach-o.cpp"
 // #elif SMTG_OS_WINDOWS
 // #include <vst3sdk/public.sdk/source/vst/hosting/module_win32.cpp>
 // #include "plugin/vst3/dll.cpp"
-// #else
-// #error "Unsupported OS, currently  can be compiled only for Linux and Windows. (Or did something go wrong with the SMTG_OS_LINUX and SMTG_OS_WINDOWS macros?)"
-// #endif
+#else
+#error "Unsupported OS, currently moduleinfo.cpp can be compiled only for Linux and macOS. (Or did something go wrong with the SMTG_OS_LINUX and SMTG_OS_MACOS macros?)"
+#endif
 
 
 using namespace Steinberg;
