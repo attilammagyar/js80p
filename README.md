@@ -126,6 +126,7 @@ Table of Contents
     * [Analog Brass AT MPE](#preset-analog-brass-at-mpe)
     * [Analog Brass mod MPE](#preset-analog-brass-mod-mpe)
     * [Expressive Saw MPE](#preset-expressive-saw-mpe)
+    * [Chiptune](#preset-chiptune)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2742,6 +2743,14 @@ Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 
 A version of the Expressive Saw preset that is optimized for MIDI Polyphonic
 Expression (MPE). Note: the preset does not turn on or modify MPE settings.
+
+<a id="preset-chiptune"></a>
+
+### Chiptune
+
+Pulse-width-modulated chiptune sound with a healthy dose of pitch modulation.
+The mod wheel controls the modulation amount, note velocity controls loudness
+and brightness, and aftertouch adds emphasis.
 
 <a id="bugs"></a>
 
