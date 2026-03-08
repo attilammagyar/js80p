@@ -21,6 +21,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <map>
 #include <sstream>
 #include <type_traits>
 
@@ -65,6 +66,40 @@
 
 namespace JS80P
 {
+
+typedef std::vector<Synth::ParamId> ParamIds;
+typedef std::map<Synth::ParamId, ParamIds> ToggleParamAffectedParams;
+
+ToggleParamAffectedParams const toggle_param_affected_params{
+    {Synth::ParamId::MF1LOG, {Synth::ParamId::MF1FRQ}},
+    {Synth::ParamId::MF2LOG, {Synth::ParamId::MF2FRQ}},
+    {Synth::ParamId::CF1LOG, {Synth::ParamId::CF1FRQ}},
+    {Synth::ParamId::CF2LOG, {Synth::ParamId::CF2FRQ}},
+    {Synth::ParamId::MF1QLG, {Synth::ParamId::MF1Q}},
+    {Synth::ParamId::MF2QLG, {Synth::ParamId::MF2Q}},
+    {Synth::ParamId::CF1QLG, {Synth::ParamId::CF1Q}},
+    {Synth::ParamId::CF2QLG, {Synth::ParamId::CF2Q}},
+    {Synth::ParamId::EF1LOG, {Synth::ParamId::EF1FRQ}},
+    {Synth::ParamId::EF2LOG, {Synth::ParamId::EF2FRQ}},
+    {Synth::ParamId::EF1QLG, {Synth::ParamId::EF1Q}},
+    {Synth::ParamId::EF2QLG, {Synth::ParamId::EF2Q}},
+    {Synth::ParamId::ECLOG, {Synth::ParamId::ECDF, Synth::ParamId::ECHPF}},
+    {Synth::ParamId::ECLHQ, {Synth::ParamId::ECHPQ}},
+    {Synth::ParamId::ECLLG, {Synth::ParamId::ECFRQ}},
+    {Synth::ParamId::EELOG, {Synth::ParamId::EEDF, Synth::ParamId::EEHPF}},
+    {Synth::ParamId::EELHQ, {Synth::ParamId::EEHPQ}},
+    {Synth::ParamId::ERLOG, {Synth::ParamId::ERDF, Synth::ParamId::ERHPF}},
+    {Synth::ParamId::ERLHQ, {Synth::ParamId::ERHPQ}},
+    {Synth::ParamId::L1LOG, {Synth::ParamId::L1FRQ}},
+    {Synth::ParamId::L2LOG, {Synth::ParamId::L2FRQ}},
+    {Synth::ParamId::L3LOG, {Synth::ParamId::L3FRQ}},
+    {Synth::ParamId::L4LOG, {Synth::ParamId::L4FRQ}},
+    {Synth::ParamId::L5LOG, {Synth::ParamId::L5FRQ}},
+    {Synth::ParamId::L6LOG, {Synth::ParamId::L6FRQ}},
+    {Synth::ParamId::L7LOG, {Synth::ParamId::L7FRQ}},
+    {Synth::ParamId::L8LOG, {Synth::ParamId::L8FRQ}},
+};
+
 
 std::vector<bool> Synth::initialize_supported_midi_controllers() noexcept
 {
@@ -2521,6 +2556,14 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
 
             if (param_id == ParamId::MPEST) {
                 all_notes_off(0.0, 0);
+            } else {
+                ToggleParamAffectedParams::const_iterator affected = toggle_param_affected_params.find(param_id);
+
+                if (affected != toggle_param_affected_params.end()) {
+                    for (ParamIds::const_iterator it = affected->second.begin(); it != affected->second.end(); ++it) {
+                        handle_refresh_param(*it);
+                    }
+                }
             }
 
             break;

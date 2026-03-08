@@ -2514,3 +2514,188 @@ TEST(can_convert_discrete_param_value_to_ratio, {
         DOUBLE_DELTA
     );
 })
+
+
+void assert_toggle_param_change_updates_related_param_ratio(
+        Synth& synth,
+        Synth::ParamId const toggle_param_id,
+        Byte const toggle_new_value,
+        Synth::ParamId const related_param_id,
+        Number const related_param_old_ratio,
+        Number const expected_related_param_new_ratio
+) {
+    Number const toggle_old_ratio = synth.get_param_ratio_atomic(toggle_param_id);
+    Number const toggle_new_ratio = toggle_new_value == ToggleParam::OFF ? 0.0 : 1.0;
+
+    synth.process_message(
+        Synth::MessageType::SET_PARAM, related_param_id, related_param_old_ratio, 0
+    );
+
+    assert_neq(
+        toggle_old_ratio,
+        toggle_new_ratio,
+        DOUBLE_DELTA,
+        "Test would become no-op; toggle_param_id=%d, related_param_id=%d",
+        (int)toggle_param_id,
+        (int)related_param_id
+    );
+    assert_neq(
+        related_param_old_ratio,
+        expected_related_param_new_ratio,
+        DOUBLE_DELTA,
+        "Test would become no-op; toggle_param_id=%d, related_param_id=%d",
+        (int)toggle_param_id,
+        (int)related_param_id
+    );
+
+    synth.process_message(Synth::MessageType::SET_PARAM, toggle_param_id, toggle_new_ratio, 0);
+
+    assert_eq(
+        toggle_new_ratio,
+        synth.get_param_ratio_atomic(toggle_param_id),
+        DOUBLE_DELTA,
+        "toggle_param_id=%d, toggle_ratio=%f, related_param_id=%d",
+        (int)toggle_param_id,
+        toggle_new_ratio,
+        (int)related_param_id
+    );
+    assert_eq(
+        expected_related_param_new_ratio,
+        synth.get_param_ratio_atomic(related_param_id),
+        DOUBLE_DELTA,
+        "toggle_param_id=%d, toggle_ratio=%f, related_param_id=%d",
+        (int)toggle_param_id,
+        toggle_new_ratio,
+        (int)related_param_id
+    );
+
+    synth.process_message(Synth::MessageType::SET_PARAM, toggle_param_id, toggle_old_ratio, 0);
+
+    assert_eq(
+        toggle_old_ratio,
+        synth.get_param_ratio_atomic(toggle_param_id),
+        DOUBLE_DELTA,
+        "toggle_param_id=%d, toggle_ratio=%f, related_param_id=%d",
+        (int)toggle_param_id,
+        toggle_old_ratio,
+        (int)related_param_id
+    );
+    assert_eq(
+        related_param_old_ratio,
+        synth.get_param_ratio_atomic(related_param_id),
+        DOUBLE_DELTA,
+        "toggle_param_id=%d, toggle_ratio=%f, related_param_id=%d",
+        (int)toggle_param_id,
+        toggle_old_ratio,
+        (int)related_param_id
+    );
+}
+
+
+TEST(when_toggle_params_are_changed_then_related_param_ratios_are_updated, {
+    Synth synth;
+
+    synth.process_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::MF1LOG, ToggleParam::ON, Synth::ParamId::MF1FRQ, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::MF2LOG, ToggleParam::ON, Synth::ParamId::MF2FRQ, 0.5, 0.931279
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::CF1LOG, ToggleParam::ON, Synth::ParamId::CF1FRQ, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::CF2LOG, ToggleParam::ON, Synth::ParamId::CF2FRQ, 0.5, 0.931279
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EF1LOG, ToggleParam::ON, Synth::ParamId::EF1FRQ, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EF2LOG, ToggleParam::ON, Synth::ParamId::EF2FRQ, 0.5, 0.931279
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::MF1QLG, ToggleParam::ON, Synth::ParamId::MF1Q, 0.5, 0.807396
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::MF2QLG, ToggleParam::ON, Synth::ParamId::MF2Q, 0.5, 0.807396
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::CF1QLG, ToggleParam::ON, Synth::ParamId::CF1Q, 0.5, 0.807396
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::CF2QLG, ToggleParam::ON, Synth::ParamId::CF2Q, 0.5, 0.807396
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EF1QLG, ToggleParam::ON, Synth::ParamId::EF1Q, 0.5, 0.807396
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EF2QLG, ToggleParam::ON, Synth::ParamId::EF2Q, 0.5, 0.807396
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ECLOG, ToggleParam::ON, Synth::ParamId::ECDF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ECLOG, ToggleParam::ON, Synth::ParamId::ECHPF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ECLHQ, ToggleParam::ON, Synth::ParamId::ECHPQ, 0.5, 0.807396
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ECLLG, ToggleParam::ON, Synth::ParamId::ECFRQ, 0.5, 0.930015
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EELOG, ToggleParam::ON, Synth::ParamId::EEDF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EELOG, ToggleParam::ON, Synth::ParamId::EEHPF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::EELHQ, ToggleParam::ON, Synth::ParamId::EEHPQ, 0.5, 0.807396
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ERLOG, ToggleParam::ON, Synth::ParamId::ERDF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ERLOG, ToggleParam::ON, Synth::ParamId::ERHPF, 0.5, 0.931279
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::ERLHQ, ToggleParam::ON, Synth::ParamId::ERHPQ, 0.5, 0.807396
+    );
+
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L1LOG, ToggleParam::ON, Synth::ParamId::L1FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L2LOG, ToggleParam::ON, Synth::ParamId::L2FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L3LOG, ToggleParam::ON, Synth::ParamId::L3FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L4LOG, ToggleParam::ON, Synth::ParamId::L4FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L5LOG, ToggleParam::ON, Synth::ParamId::L5FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L6LOG, ToggleParam::ON, Synth::ParamId::L6FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L7LOG, ToggleParam::ON, Synth::ParamId::L7FRQ, 0.5, 0.913467
+    );
+    assert_toggle_param_change_updates_related_param_ratio(
+        synth, Synth::ParamId::L8LOG, ToggleParam::ON, Synth::ParamId::L8FRQ, 0.5, 0.913467
+    );
+})
