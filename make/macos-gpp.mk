@@ -36,7 +36,7 @@ CPP_TARGET_PLATFORM ?= $(CPP_DEV_PLATFORM)
 CPPCHECK ?= echo Skipping Cppcheck:
 DOXYGEN ?= echo Skipping Doxygen
 
-CHECK_MEMORY ?= leaks -quiet -atExit --
+CHECK_MEMORY ?= /bin/bash scripts/mac_check_leaks.sh
 
 TARGET_PLATFORM_LFLAGS = -Wall -framework Cocoa -framework UniformTypeIdentifiers
 LINK_DEV_EXE = $(CPP_DEV_PLATFORM) $(TARGET_PLATFORM_LFLAGS)
