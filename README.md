@@ -127,6 +127,8 @@ Table of Contents
     * [Analog Brass mod MPE](#preset-analog-brass-mod-mpe)
     * [Expressive Saw MPE](#preset-expressive-saw-mpe)
     * [Chiptune](#preset-chiptune)
+    * [Octave Bass](#preset-octave-bass)
+    * [Tremolo PWM Bass](#preset-tremolo-pwm-bass)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Mac version?](#faq-mac)
@@ -2751,6 +2753,21 @@ Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 Pulse-width-modulated chiptune sound with a healthy dose of pitch modulation.
 The mod wheel controls the modulation amount, note velocity controls loudness
 and brightness, and aftertouch adds emphasis.
+
+<a id="preset-octave-bass"></a>
+
+### Octave Bass
+
+A bass jumping up and down between two octaves. The mod wheel adds a vibrato
+effect, while aftertouch brightens the sound and shortens the notes.
+
+<a id="preset-tremolo-pwm-bass"></a>
+
+### Tremolo PWM Bass
+
+Ever evolving pulse width modulated bass sound. The mod wheel adds a tremolo
+effect, aftertouch slightly brightens and emphasizes the sound while also
+adjusting the tremolo's timing.
 
 <a id="bugs"></a>
 
