@@ -2,17 +2,17 @@ JS80P
 =====
 
 JS80P is a MIDI driven, performance oriented, versatile, free and open source
-[synthesizer VST® plugin][plugin] for Linux and Windows.
+[synthesizer VST® plugin][plugin] for Linux, Windows, and macOS.
 
   [plugin]: https://en.wikipedia.org/wiki/Virtual_Studio_Technology
 
 <img src="https://raw.githubusercontent.com/attilammagyar/js80p/main/js80p.png" alt="Screenshot of JS80P" />
 
 JS80P has two oscillators (and a sub-harmonic sine), and a lot of filters,
-effects, envelopes, LFOs, and powerful macros to shape your sound with
-subtractive, additive, FM, PM, and AM synthesis, complete with polyphonic,
-monophonic, and split keyboard modes, MPE support, MTS-ESP tuning support, and
-analog imperfection emulation.
+effects, envelope generators, LFOs, and powerful macros to shape your sound
+with subtractive, additive, PWM, FM, PM, and AM synthesis, complete with
+polyphonic, monophonic, and split keyboard modes, MPE support, MTS-ESP tuning
+support, and analog imperfection emulation.
 
 To download JS80P, visit its website at
 [https://attilammagyar.github.io/js80p](https://attilammagyar.github.io/js80p),
@@ -36,18 +36,32 @@ Table of Contents
  * [Features](#features)
  * [Installation](#install)
     * [Before Installing: Choosing a Distribution](#install-dist)
+       * [Linux, Windows](#install-dist-pc)
+       * [macOS](#install-dist-mac)
     * [System Requirements](#system-reqs)
-       * [Dependencies on Windows](#windows-deps)
-       * [Dependencies on Linux](#linux-deps)
-    * [VST 3 Bundle on Windows](#vst3-bundle-windows)
-    * [VST 3 Bundle on Linux](#vst3-bundle-linux)
-    * [VST 3 Single File on Windows](#vst3-single-windows)
-    * [VST 3 Single File on Linux](#vst3-single-linux)
-    * [FST (VST 2.4) on Windows](#fst-windows)
-    * [FST (VST 2.4) on Linux](#fst-linux)
+       * [General Information](#system-reqs)
+       * [Linux](#system-reqs-linux)
+          * [Dependencies](#linux-deps)
+       * [Windows](#system-reqs-windows)
+           * [Dependencies](#windows-deps)
+       * [macOS](#system-reqs-macos)
+    * [Installing on Linux](#install-linux)
+       * [VST 3 Bundle](#vst3-bundle-linux)
+       * [VST 3 Single File](#vst3-single-linux)
+       * [FST (VST 2.4)](#fst-linux)
+       * [Uninstalling](#uninstall-linux)
+    * [Installing on Windows](#install-windows)
+       * [VST 3 Bundle](#vst3-bundle-windows)
+       * [VST 3 Single File](#vst3-single-windows)
+       * [FST (VST 2.4)](#fst-windows)
+       * [Uninstalling](#uninstall-windows)
+    * [Installing on macOS](#install-macos)
+       * [VST 3 Bundle](#vst3-bundle-macos)
+       * [FST (VST 2.4) Bundle](#fst-macos)
+       * [Uninstalling](#uninstall-macos)
     * [Setting up MTS-ESP Tuning Providers](#install-tuning)
-       * [Windows](#mts-esp-windows)
        * [Linux](#mts-esp-linux)
+       * [Windows, macOS](#mts-esp-windows-macos)
  * [Usage](#usage)
     * [Signal Chain (Simplified)](#usage-signal)
     * [Knobs](#usage-knobs)
@@ -206,8 +220,8 @@ Features
       reversible delay lines),
     * stereo reverb (with distortion and side-chain compression or gate),
     * volume controls at various points of the signal chain.
- * 12 DAHDSR envelopes with customizable shapes, freely assignable to most of
-   the oscillator, filter, and modulation parameters.
+ * 12 DAHDSR envelope generators with customizable shapes, freely assignable to
+   most of the oscillator, filter, and modulation parameters.
  * 8 low-frequency oscillators (LFO) with optional amplitude envelope and
    polyphony.
     * Variable pulse width in 4 of the LFOs.
@@ -248,19 +262,27 @@ Installation
 
 If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with a VST 3 bundle on both Windows and Linux.
+Otherwise, you should go with a VST 3 bundle.
 
-The source code distribution can be compiled for various CPU architectures.
-Ready-to-use binary distributions are available for "`x86_64`" and "`x86`"
-compatible systems, like most desktop PCs and laptops.
+The source code distribution can be compiled for various CPU architectures and
+operating systems. Ready-to-use binary distributions are available for
+Linux and Windows "`x86_64`" and "`x86`" compatible systems (like most desktop
+PCs and laptops), and universal binaries are available for macOS.
+
+<a href="#toc">Table of Contents</a>
+
+<a id="install-dist-pc"></a>
+
+#### Linux, Windows
 
 If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
 and you use a 64 bit plugin host application (also known as "`x86_64`"), then
 you should download a JS80P package that is optimized for AVX compatible
-processors. If you have an older computer, or if you get error messages
-complaining about "illegal instructions" or experience crashes, then
-you should go with one of the [SSE2](https://en.wikipedia.org/wiki/SSE2)
-compatible JS80P packages.
+processors.
+
+If you have an older computer, or if you get error messages complaining about
+"illegal instructions" or experience crashes, then you should go with one of
+the [SSE2](https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
 
 If you are using an older VST 3 host, or if you are running a 32 bit (also
 known as "`i686`" or "`x86`") VST 3 host on a 64 bit Linux system, then it might
@@ -280,7 +302,7 @@ edition, and so on.
 **Note**: all versions use the same high-precision sound synthesis engine
 internally, so the CPU architecture does not affect the sound quality.
 
-#### Packages
+##### Packages
 
 These are the file names that you will find on GitHub on the
 "[Releases](https://github.com/attilammagyar/js80p/releases)" page:
@@ -334,7 +356,7 @@ These are the file names that you will find on GitHub on the
 
     * `js80p-X_Y_Z-linux-x86-sse2-fst.zip`: for older (SSE2), 32 bit CPUs.
 
- * Source:
+ * Source code:
 
     * `js80p-X_Y_Z-src.zip`: the source code of the plugin which you can
       compile for any CPU architecture. (See the "[Development](#dev)" section
@@ -342,33 +364,101 @@ These are the file names that you will find on GitHub on the
 
 <a href="#toc">Table of Contents</a>
 
+<a id="install-dist-mac"></a>
+
+#### macOS
+
+The universal packages are built for macOS 11 Big Sur for M1, M2, etc. and
+newer CPUs (`arm64`) and for macOS 10.12 Sierra for Intel CPUs (`x86_64` with
+[AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)),
+and were tested on macOS 26 Tahoe.
+
+[Compiling from source code](#dev) for older macOS versions and different CPUs
+might be possible, but it may require some technical knowledge and a few tweaks
+in the `Makefile` and `make/macos-gpp.mk`.
+
+##### Packages
+
+These are the file names that you will find on GitHub on the
+"[Releases](https://github.com/attilammagyar/js80p/releases)" page:
+
+ * VST 3 bundle: `js80p-X_Y_Z-macos-universal-vst3_bundle-signed.pkg`.
+
+ * FST bundle: `js80p-X_Y_Z-macos-universal-fst_bundle-signed.pkg`.
+
+ * Source code: `js80p-X_Y_Z-src.zip`. (See the "[Development](#dev)" section
+   for the details of compiling.)
+
+<a href="#toc">Table of Contents</a>
+
 <a id="system-reqs"></a>
 
 ### System Requirements
 
- * **Operating System**: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).
- * **CPU**: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
-    * Separate packages are available for AVX capable 64 bit processors for
-      better performance and CPU utilization.
- * **RAM**: 200-300 MB per instance, depending on buffer sizes, sample rate,
-   etc.
+#### General Information
 
-Tested with [REAPER](https://www.reaper.fm/) 7.14.
+Tested with [REAPER](https://www.reaper.fm) 7.14.
 
 A buffer size of around 6 ms (256 samples at 44.1 kHz sample rate) usually
 gives good performance and low latency.
 
-**Note**: the source code can be compiled for various other platforms as well,
-thanks to the following contributors:
+**RAM**: around 300-400 MB is used per instance, depending on settings like
+sample rate, buffer sizes, etc.
+
+**Note**: the source code can be compiled for various other platforms than the
+ones listed below, thanks to the following contributors:
 
  * [RISC-V 64](https://github.com/aimixsaka/js80p/) by
    [@aimixsaka](https://github.com/aimixsaka/)
  * [LoongArch ](https://github.com/YHStar/js80p) by
    [@YHStar](https://github.com/YHStar)
 
+<a href="#toc">Table of Contents</a>
+
+<a id="system-reqs-linux"></a>
+
+#### Linux
+
+ * **CPU**: SSE2 support, 32 bit (`i686`) or 64 bit (`x86_64`).
+    * Separate packages are available for AVX capable 64 bit processors for
+      better performance and CPU utilization.
+
+<a id="linux-deps"></a>
+
+##### Dependencies
+
+Required packages:
+
+ * `libxcb`,
+ * `libxcb-render`,
+ * `libcairo`,
+ * either `kdialog` or `zenity`.
+
+These are usually already installed on most desktop systems, but to install
+them on Debian based distributions (e.g. Ubuntu), you can use the following
+command:
+
+    sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
+
+**Note**: if you want to run the 32 bit version of JS80P on a 64 bit system,
+then you will have to install the 32 bit version of the packages, for example:
+
+    sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
+
+<a href="#toc">Table of Contents</a>
+
+<a id="system-reqs-windows"></a>
+
+#### Windows
+
+ * **Operating System**: Windows 7 or newer.
+ * **CPU**: SSE2 support, 32 bit (`i686`) or 64 bit (`x86_64`).
+    * Separate packages are available for AVX capable 64 bit processors for
+      better performance and CPU utilization.
+
 <a id="windows-deps"></a>
 
-#### Dependencies on Windows
+##### Dependencies
 
 Typical Windows systems usually have the MSVC library already installed, but in
 case you need it, you can download it from
@@ -379,75 +469,45 @@ of the plugin, you will need the `X86` version of the library. See the
 [Before Installing: Choosing a Distribution](#install-dist) section for more
 information.)
 
-<a id="linux-deps"></a>
+<a href="#toc">Table of Contents</a>
 
-#### Dependencies on Linux
+<a id="system-reqs-macos"></a>
 
-On Linux, the `libxcb`, `libxcb-render`, and `libcairo` libraries, and either
-the `kdialog` or the `zenity` application are required to run JS80P. To install
-them on Debian based distributions (e.g. Ubuntu), you can use the following
-command:
+#### macOS
 
-    sudo apt-get install libxcb1 libxcb-render0 libcairo2 zenity kdialog
+ * **Operating System**:
+    * M1, M2, etc. and newer CPUs: macOS 11 Big Sur or newer.
+    * Intel CPUs: macOS 10.12 Sierra or newer.
+ * **CPU**: either M1, M2, or newer, or Intel-based `x86_64` CPUs (with AVX
+   support).
 
-**Note**: if you want to run the 32 bit version of JS80P on a 64 bit system,
-then you will have to install the 32 bit version of the libraries, for example:
+<a href="#toc">Table of Contents</a>
 
-    sudo apt-get install libxcb1:i386 libxcb-render0:i386 libcairo2:i386 zenity kdialog
+<a id="install-linux"></a>
 
-<a id="vst3-bundle-windows"></a>
-
-### VST 3 Bundle on Windows
-
-1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
-2. Extract the ZIP archive.
-3. Copy the entire `js80p.vst3` folder to your VST 3 folder which is
-   usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+### Installing on Linux
 
 <a id="vst3-bundle-linux"></a>
 
-### VST 3 Bundle on Linux
+#### VST 3 Bundle
 
 1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the entire `js80p.vst3` directory to your VST 3 directory which is
    usually `~/.vst3`.
 
-<a id="vst3-single-windows"></a>
-
-### VST 3 Single File on Windows
-
-1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
-2. Extract the ZIP archive.
-3. Copy the `js80p.vst3` file to your VST 3 folder which is usually
-   `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
-
 <a id="vst3-single-linux"></a>
 
-### VST 3 Single File on Linux
+#### VST 3 Single File
 
 1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
 3. Copy the `js80p.vst3` file to your VST 3 directory which is usually
    `~/.vst3`.
 
-<a id="fst-windows"></a>
-
-### FST (VST 2.4) on Windows
-
-1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
-2. Extract the ZIP archive.
-3. Copy the `js80p.dll` file to the folder where you keep your VST 2.4 plugins.
-4. Optionally, if your host application can load `.vstxml` files, it is
-   recommended to copy the `js80p.vstxml` file as well to the folder where
-   you keep your VST 2.4 plugins.
-
-**Note**: VST 2.4 plugins are usually put in the `C:\Program Files\VstPlugins`
-folder.
-
 <a id="fst-linux"></a>
 
-### FST (VST 2.4) on Linux
+#### FST (VST 2.4)
 
 1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
 2. Extract the ZIP archive.
@@ -459,30 +519,97 @@ folder.
 
 **Note**: VST 2.4 plugins are usually put in the `~/.vst` directory.
 
+<a id="uninstall-linux"></a>
+
+#### Uninstalling
+
+1. Use a file manager application to locate JS80P in your VST 2.4 or VST 3
+   folder where you installed it.
+2. Delete it or drag it to the Trash.
+
+<a href="#toc">Table of Contents</a>
+
+<a id="install-windows"></a>
+
+### Installing on Windows
+
+<a id="vst3-bundle-windows"></a>
+
+#### VST 3 Bundle
+
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
+2. Extract the ZIP archive.
+3. Copy the entire `js80p.vst3` folder to your VST 3 folder which is
+   usually `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+
+<a id="vst3-single-windows"></a>
+
+#### VST 3 Single File
+
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
+2. Extract the ZIP archive.
+3. Copy the `js80p.vst3` file to your VST 3 folder which is usually
+   `C:\Users\YourUserName\AppData\Local\Programs\Common\VST3`.
+
+<a id="fst-windows"></a>
+
+#### FST (VST 2.4)
+
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
+2. Extract the ZIP archive.
+3. Copy the `js80p.dll` file to the folder where you keep your VST 2.4 plugins.
+4. Optionally, if your host application can load `.vstxml` files, it is
+   recommended to copy the `js80p.vstxml` file as well to the folder where
+   you keep your VST 2.4 plugins.
+
+**Note**: VST 2.4 plugins are usually put in the `C:\Program Files\VstPlugins`
+folder.
+
+<a id="uninstall-windows"></a>
+
+#### Uninstalling
+
+1. Use File Explorer to locate JS80P in your VST 2.4 or VST 3 folder where you
+   installed it.
+2. Delete it or drag it to the Recycle Bin.
+
+<a href="#toc">Table of Contents</a>
+
+<a id="install-macos"></a>
+
+### Installing on macOS
+
+<a id="vst3-bundle-macos"></a>
+
+#### VST 3 Bundle
+
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
+2. Locate the downloaded `.pkg` file in Finder and double click on it.
+3. Follow the on-screen installation instructions.
+4. JS80P will be installed in the `/Library/Audio/Plug-Ins/VST3` folder.
+
+<a id="fst-macos"></a>
+
+#### FST (VST 2.4) Bundle
+
+1. [Download JS80P](https://attilammagyar.github.io/js80p/index.html#download).
+2. Locate the downloaded `.pkg` file in Finder and double click on it.
+3. Follow the on-screen installation instructions.
+4. JS80P will be installed in the `/Library/Audio/Plug-Ins/VST` folder.
+
+<a id="uninstall-macos"></a>
+
+#### Uninstalling
+
+1. Use Finder to locate the `js80p.vst` or `js80p.vst3` package in the
+   `/Library/Audio/Plug-Ins/VST` or `/Library/Audio/Plug-Ins/VST3` folder.
+2. Drag it to the Trash.
+
+<a href="#toc">Table of Contents</a>
+
 <a id="install-tuning"></a>
 
 ### Setting up MTS-ESP Tuning Providers
-
-<a id="mts-esp-windows"></a>
-
-#### Windows
-
-Download and install either the free [MTS-ESP Mini](https://oddsound.com/mtsespmini.php)
-plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
-by [ODDSound](https://oddsound.com/). Follow the instructions on the website,
-where you can also find the User Guide documentation for each product.
-
-**Note**: it is possible to use a different tuning provider without installing
-any of the above plugins, but you may have to manually download the
-`LIBMTS.dll` library from the [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Win),
-and put it in a folder where Windows can find it:
-
- * On 64 bit Windows:
-    * put the 64 bit DLL into the `Program Files\Common Files\MTS-ESP` folder,
-    * put the 32 bit DLL into the `Program Files (x86)\Common Files\MTS-ESP`
-      folder.
- * On 32 bit Windows, put the 32 bit version of `LIBMTS.dll` into the
-   `Program Files\Common Files\MTS-ESP` folder.
 
 <a id="mts-esp-linux"></a>
 
@@ -498,6 +625,20 @@ To use MTS-ESP, you may have to download the `libMTS.so` library from the
 and put it in the `/usr/local/lib` directory if it is not already installed on
 your system. As of Feburary, 2026, `libMTS.so` is not available for `x86`
 Linux systems.
+
+<a id="mts-esp-windows-macos"></a>
+
+#### Windows, macOS
+
+Download and install either the free [MTS-ESP Mini](https://oddsound.com/mtsespmini.php)
+plugin or the paid [MTS-ESP Suite](https://oddsound.com/mtsespsuite.php) plugin
+by [ODDSound](https://oddsound.com/). Follow the instructions on the website,
+where you can also find the User Guide documentation for each product.
+
+**Note**: it is possible to use a different tuning provider without installing
+any of the above plugins, but you may have to manually download and install the
+libMTS dynamic library from the [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS).
+See the [installation instructions in the README file](https://github.com/ODDSound/MTS-ESP?tab=readme-ov-file#libmts).
 
 <a href="#toc">Table of Contents</a>
 
