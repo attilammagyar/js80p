@@ -3200,4 +3200,6 @@ Run `make check` in a similar fashion to run unit tests.
 
  * [High-pass filter](https://en.wikipedia.org/wiki/High-pass_filter#Discrete-time_realization)
 
+ * [Pulse-width modulation from Sound on Sound](https://www.soundonsound.com/techniques/synthesizing-strings-pwm-string-sounds)
+
 <a href="#toc">Table of Contents</a>

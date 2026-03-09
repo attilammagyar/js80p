@@ -347,6 +347,10 @@ void Wavetable::compute_pulse_sample(
         Sample const sample_2,
         Number const pulse_width
 ) const noexcept {
+    /*
+    https://www.soundonsound.com/techniques/synthesizing-strings-pwm-string-sounds
+    */
+
     sample -= sample_2;
 
     if constexpr (need_pulse_scaling) {
