@@ -2779,7 +2779,7 @@ void GUI::build_effects_body(
     KNOB(effects_body,  12 + KNOB_W * 11,   61, Synth::ParamId::ECDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TOGG(effects_body,  166, 9, 100, 48,   0, Synth::ParamId::ECLHQ);
     TOGG(effects_body,  514, 9, 228, 48,   0, Synth::ParamId::ECLLG);
-    TOGG(effects_body,  864, 9, 272, 48,   0, Synth::ParamId::ECLOG);
+    TOGG(effects_body,  747, 9, 272, 48,   0, Synth::ParamId::ECLOG);
     TOGG(effects_body, 1226, 9, 180, 48, 132, Synth::ParamId::ECSYN);
 
     POSITION_RELATIVE_END();
@@ -2803,7 +2803,7 @@ void GUI::build_effects_body(
     KNOB(effects_body,  12 + KNOB_W * 13,   61, Synth::ParamId::EEWET,  MML_C,      "%.2f", 100.0, knob_states);
     KNOB(effects_body,  12 + KNOB_W * 14,   61, Synth::ParamId::EEDRY,  MML_C,      "%.2f", 100.0, knob_states);
     TOGG(effects_body, 282, 11, 100, 48, 0, Synth::ParamId::EELHQ);
-    TOGG(effects_body, 746, 11, 272, 48, 0, Synth::ParamId::EELOG);
+    TOGG(effects_body, 631, 11, 272, 48, 0, Synth::ParamId::EELOG);
     TOGG(effects_body, 1574, 9, 180, 48, 132, Synth::ParamId::EESYN);
     DPEI(effects_body, 121, 14, 36, 36, 0, 36, Synth::ParamId::EER1, reversed_toggle_states);
     DPEI(effects_body, 157, 14, 36, 36, 0, 36, Synth::ParamId::EER2, reversed_toggle_states);
