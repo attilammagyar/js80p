@@ -2,7 +2,7 @@
 
 ###############################################################################
 # This file is part of JS80P, a synthesizer plugin.
-# Copyright (C) 2025  Attila M. Magyar
+# Copyright (C) 2025, 2026  Attila M. Magyar
 #
 # JS80P is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ main()
     local mod_year
 
     find Makefile gui make scripts src tests -type f \
-      | grep -Eiv '\.(bmp|def|flac|png|rc|rpp|tpl|xcf)$' \
+      | grep -Eiv '\.(bmp|def|flac|png|rc|rpp|tpl|xcf|wav)$' \
       | while read
         do
             mod_year="$(git log -1 --format="%ci" -- "$REPLY" | cut -d"-" -f1)"
