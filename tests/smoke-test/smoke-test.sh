@@ -29,7 +29,9 @@ WINE_TEST_DIR="$WINE_DIR"/test
 
 LINUX_TEST_DIR=/tmp/js80p-smoke-test
 
-# Some Reaper versions (e.g. 7.14) seem to send MIDI CC and parameter change
+MACOS_TEST_DIR=/tmp/js80p-smoke-test
+
+# Some REAPER versions (e.g. 7.14) seem to send MIDI CC and parameter change
 # events in varying order and with slight timing differences in some cases.
 # There's a point in the test project where this can cause a short, slight
 # difference in the start of a note in the monophonic synth track every once
@@ -41,13 +43,28 @@ TRIES=5
 main()
 {
     local self="$1"
+    local platform="$2"
     local src_dir
+
+    src_dir="$(dirname "$self")"
+
+    case "$platform" in
+        "linux") run_tests_linux "$src_dir" ;;
+        "macos") run_tests_macos "$src_dir" ;;
+        *) echo "Usage: $self linux|macos" >&2 ; return 1 ;;
+    esac
+
+    return 0
+}
+
+
+run_tests_linux()
+{
+    local src_dir="$1"
     local plugin_type
     local suffix
     local architecture
     local info
-
-    src_dir="$(dirname "$self")"
 
     for plugin_type in "fst" "vst3_single"
     do
@@ -96,8 +113,6 @@ main()
     # As of VST 3.7.8, loading the 32 bit plugin into a 32 bit host application
     # from a VST 3 bundle on a 64 bit Linux system is broken:
     # https://github.com/steinbergmedia/vst3sdk/issues/115
-
-    return 0
 }
 
 
@@ -135,10 +150,12 @@ run_test_wine()
 
     if [[ ! -f "$reaper_exe" ]]
     then
-        echo "ERROR: expected $reaper_exe to be" >&2
-        echo "       a(n) $architecture portable installation of Reaper that is configured" >&2
-        echo "       to look for VST plugins in the 'C:\\test' directory," >&2
-        echo "       and to render with a buffer size of 1024 samples." >&2
+        cat >&2 <<ERR
+ERROR: expected $reaper_exe to be
+       a(n) $architecture portable installation of REAPER that is configured
+       to look for VST plugins in the 'C:\\test' directory,
+       and to render with a buffer size of 1024 samples.
+ERR
         return 1
     fi
 
@@ -146,7 +163,8 @@ run_test_wine()
     do
         sleep 1
 
-        wine "$reaper_exe" -renderproject "C:\\test\\test.rpp" 2>&1 | tee /tmp/"wine-$architecture-$plugin_type-$try.txt"
+        wine "$reaper_exe" -renderproject "C:\\test\\test.rpp" 2>&1 \
+            | tee /tmp/"wine-$architecture-$plugin_type-$try.txt"
 
         set +e
         verify_rendered_file "$try" "$src_dir" "$rendered_wav" "$msg_info"
@@ -203,10 +221,12 @@ run_test_linux()
 
     if [[ ! -x "$reaper_exe" ]]
     then
-        echo "ERROR: expected $reaper_exe to be" >&2
-        echo "       a(n) $architecture portable installation of Reaper that is configured" >&2
-        echo "       to look for VST plugins in the '$LINUX_TEST_DIR' directory," >&2
-        echo "       and to render with a buffer size of 1024 samples." >&2
+        cat >&2 <<ERR
+ERROR: expected $reaper_exe to be
+       a(n) $architecture portable installation of REAPER that is configured
+       to look for VST plugins in the '$LINUX_TEST_DIR' directory,
+       and to render with a buffer size of 1024 samples.
+ERR
         return 1
     fi
 
@@ -214,7 +234,8 @@ run_test_linux()
     do
         sleep 1
 
-        "$reaper_exe" -renderproject "$LINUX_TEST_DIR/test.rpp" 2>&1 | tee /tmp/"linux-$architecture-$plugin_type-$try.txt"
+        "$reaper_exe" -renderproject "$LINUX_TEST_DIR/test.rpp" 2>&1 \
+            | tee /tmp/"linux-$architecture-$plugin_type-$try.txt"
 
         set +e
         verify_rendered_file "$try" "$src_dir" "$rendered_wav" "$msg_info"
@@ -236,30 +257,15 @@ run_test_linux()
 verify_rendered_file()
 {
     local try=$(($1+1))
-    local expected_flac="$2/smoke-test.flac"
+    local expected_wav="$2/smoke-test.wav"
     local rendered_wav="$3"
     local msg_info="$4"
     local fail=1
-    local stat
-    local min
-    local max
+    local diff
 
-    stat=$(
-        sox -m \
-            -v 1.0 "$rendered_wav" \
-            -v -1.0 "$expected_flac" \
-            -n stat 2>&1
-    )
-    min=$(
-        printf "%s\n" "$stat" \
-            | grep "Minimum *amplitude" | cut -d":" -f2 | tr -d " "
-    )
-    max=$(
-        printf "%s\n" "$stat" \
-            | grep "Maximum *amplitude" | cut -d":" -f2 | tr -d " "
-    )
+    diff=$(python3 "$src_dir/wavdiff.py" "$expected_wav" "$rendered_wav" 2>&1)
 
-    if [[ "$max" =~ ^-*0\.000 ]] && [[ "$min" =~ ^-*0\.000 ]]
+    if [[ "$diff" =~ ^0\.000 ]]
     then
         echo "PASS (try $try); $msg_info" >&2
 
@@ -269,15 +275,124 @@ verify_rendered_file()
     cat >&2 <<ERROR
 FAIL (try $try): unexpected rendered sound; rendered_wav='$rendered_wav', $msg_info
 
-SoX stat for difference:
-
-$stat
-
-(NOTE: set Reaper's rendering buffer size to 1024 samples.)
+NOTES:
+1. Use a REAPER version which is known to pass MIDI events and parameter
+   automation in a fixed, deterministic order (e.g. before 7.14), and set its
+   rendering buffer size to 1024 samples.
+2. Make sure that none of the presets in the test use inaccuracies (oscillators,
+   filters, envelope generators), since the RNG seeds are derived from platform
+   dependent data.
+3. Make sure that the RPP file for the FST plugin contains MIDI events in the
+   exact order in which they are passed to the synth by the VST 3 plugin.
 ERROR
 
     return 1
 }
 
 
-main "$0" "$@"
+run_tests_macos()
+{
+    local src_dir="$1"
+    local installed
+    local architecture
+    local plugin_type
+    local rpp_suffix
+    local dst_dir
+
+    installed="$(find {,~}/Library/Audio/Plug-Ins/VST{,3} -iname "*js80p*" -depth 1)"
+
+    if [[ "$installed" != "" ]]
+    then
+        cat >&2 <<ERR
+Running the tests requires a clean system, but JS80P is already installed at
+the following locations:
+
+$installed
+
+Remove these before running the test.
+ERR
+        return 1
+    fi
+
+    for plugin_type in "fst:fst:VST" "vst3_single:vst3:VST3"
+    do
+        dst_dir="$(printf "%s" "$plugin_type" | cut -d: -f3-)"
+        rpp_suffix="$(printf "%s" "$plugin_type" | cut -d: -f2)"
+        plugin_type="$(printf "%s" "$plugin_type" | cut -d: -f1)"
+
+        for architecture in "x86_64" "arm64"
+        do
+            run_test_macos \
+                "$src_dir" \
+                "$plugin_type" \
+                "$rpp_suffix" \
+                "$architecture" \
+                "$dst_dir"
+        done
+    done
+}
+
+
+run_test_macos()
+{
+    local src_dir="$1"
+    local plugin_type="$2"
+    local rpp_suffix="$3"
+    local architecture="$4"
+    local dst_dir=~/Library/Audio/Plug-Ins/"$5"
+    local msg_info="plugin_type=$plugin_type, architecture=$architecture"
+    local rpp_name
+
+    reaper_exe="/Applications/REAPER.app/Contents/MacOS/REAPER"
+    rendered_wav="$MACOS_TEST_DIR/test.wav"
+
+    echo "Running test; $msg_info" >&2
+
+    rm -vrf "$MACOS_TEST_DIR"/test.{rpp,wav}
+    mkdir -v -p "$MACOS_TEST_DIR"
+    cp -v "$src_dir/smoke-test-$rpp_suffix.rpp" "$MACOS_TEST_DIR/test.rpp"
+    sed -i "" \
+        "s|RENDER_FILE \"[^\"]*\"|RENDER_FILE \"$MACOS_TEST_DIR/test.wav\"|" \
+        "$MACOS_TEST_DIR/test.rpp"
+    cp -vr \
+        "$src_dir/../../dist/"js80p-*macos-"$architecture-none-$plugin_type"/js80p.vst* \
+        "$dst_dir/"
+
+    if [[ ! -x "$reaper_exe" ]]
+    then
+        cat >&2 <<ERR
+ERROR: expected $reaper_exe to be
+       an installation of REAPER that is configured to look for VST plugins in
+       the '$dst_dir' directory,
+       and to render with a buffer size of 1024 samples.
+ERR
+        return 1
+    fi
+
+    for ((try=0;try<$TRIES;++try))
+    do
+        sleep 1
+
+        arch "-$architecture" \
+            "$reaper_exe" -renderproject "$MACOS_TEST_DIR/test.rpp" 2>&1 \
+                | tee /tmp/"macos-$architecture-$plugin_type-$try.txt"
+
+        set +e
+        verify_rendered_file "$try" "$src_dir" "$rendered_wav" "$msg_info"
+        ret=$?
+        set -e
+
+        if [[ $ret -eq 0 ]]
+        then
+            rm -vrf "$dst_dir/js80p.vst" "$dst_dir/js80p.vst3"
+            return 0
+        fi
+
+        sleep 2
+    done
+
+    return 1
+}
+
+
+main "$0" "$@" ""
