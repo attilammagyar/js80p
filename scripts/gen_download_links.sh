@@ -28,6 +28,13 @@ main()
     local arch
     local plugin_type
 
+    find dist -name "js80p-*_bundle-signed.pkg" \
+      | while read
+        do
+            plugin_type="$(get_plugin_type "$REPLY")"
+            print_link "$REPLY" "$plugin_type"
+        done
+
     for instruction_set in "avx" "sse2"
     do
         find dist -name "js80p-*-$instruction_set-vst3_bundle.zip" \
@@ -103,7 +110,7 @@ get_plugin_type()
     printf "%s\n" "$file_name" \
         | cut -d"-" -f6 \
         | cut -d"." -f1 \
-        | sed "s/fst/FST (VST 2.4)/ ; s/vst3_single/VST 3 Single File/"
+        | sed "s/fst/FST (VST 2.4)/ ; s/vst3_single/VST 3 Single File/ ; s/vst3/VST 3/ ; s/_bundle//"
 }
 
 print_link()
