@@ -76,13 +76,13 @@ class Vst3Plugin
             public:
                 enum Type {
                     UNDEFINED = 0,
-                    NOTE_ON = 1,
-                    NOTE_PRESSURE = 2,
-                    NOTE_OFF = 3,
-                    PITCH_WHEEL = 4,
-                    CONTROL_CHANGE = 5,
-                    CHANNEL_PRESSURE = 6,
-                    PROGRAM_CHANGE = 7,
+                    PROGRAM_CHANGE = 1,
+                    CONTROL_CHANGE = 2,
+                    PITCH_WHEEL = 3,
+                    CHANNEL_PRESSURE = 4,
+                    NOTE_OFF = 5,
+                    NOTE_ON = 6,
+                    NOTE_PRESSURE = 7,
                 };
 
                 Event();

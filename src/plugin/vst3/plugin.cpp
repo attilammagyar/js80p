@@ -113,6 +113,18 @@ Vst3Plugin::Event::Event(
 
 bool Vst3Plugin::Event::operator<(Event const& event) const noexcept
 {
+    if (time_offset == event.time_offset) {
+        if (type == event.type) {
+            if (note_or_ctl == event.note_or_ctl) {
+                return channel < event.channel;
+            }
+
+            return note_or_ctl < event.note_or_ctl;
+        }
+
+        return (int)type < (int)event.type;
+    }
+
     return time_offset < event.time_offset;
 }
 
@@ -475,6 +487,31 @@ void Vst3Plugin::Processor::process_events() noexcept
 void Vst3Plugin::Processor::process_event(Event const& event) noexcept
 {
     switch (event.type) {
+        case Event::Type::PROGRAM_CHANGE:
+            new_program = Bank::normalized_parameter_value_to_program_index(
+                event.velocity_or_value
+            );
+            need_to_load_new_program = true;
+
+            break;
+
+        case Event::Type::CONTROL_CHANGE:
+            synth.control_change(
+                event.time_offset,
+                event.channel,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
+            );
+            break;
+
+        case Event::Type::PITCH_WHEEL:
+            synth.pitch_wheel_change(
+                event.time_offset,
+                event.channel,
+                float_to_midi_word(event.velocity_or_value)
+            );
+            break;
+
         case Event::Type::NOTE_ON: {
             mts_esp.update_note_tuning(event.channel, event.note_or_ctl);
             Midi::Byte const velocity = float_to_midi_byte(event.velocity_or_value);
@@ -497,32 +534,6 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
             );
             break;
 
-        case Event::Type::NOTE_OFF:
-            synth.note_off(
-                event.time_offset,
-                event.channel,
-                event.note_or_ctl,
-                float_to_midi_byte(event.velocity_or_value)
-            );
-            break;
-
-        case Event::Type::PITCH_WHEEL:
-            synth.pitch_wheel_change(
-                event.time_offset,
-                event.channel,
-                float_to_midi_word(event.velocity_or_value)
-            );
-            break;
-
-        case Event::Type::CONTROL_CHANGE:
-            synth.control_change(
-                event.time_offset,
-                event.channel,
-                event.note_or_ctl,
-                float_to_midi_byte(event.velocity_or_value)
-            );
-            break;
-
         case Event::Type::CHANNEL_PRESSURE:
             synth.channel_pressure(
                 event.time_offset,
@@ -531,11 +542,14 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
             );
             break;
 
-        case Event::Type::PROGRAM_CHANGE:
-            new_program = Bank::normalized_parameter_value_to_program_index(
-                event.velocity_or_value
+        case Event::Type::NOTE_OFF:
+            synth.note_off(
+                event.time_offset,
+                event.channel,
+                event.note_or_ctl,
+                float_to_midi_byte(event.velocity_or_value)
             );
-            need_to_load_new_program = true;
+            break;
 
         default:
             break;
