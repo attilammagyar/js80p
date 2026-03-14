@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ Effects<InputSignalProducerClass>::Effects(
     backward-compatibility, and new param names use the old scheme for
     consistency.
     */
-    distortion_1_type(name + "OT", Distortion::TYPE_TANH_3),
-    distortion_2_type(name + "DT", Distortion::TYPE_TANH_10),
+    distortion_1_type(name + "OTP", Distortion::TYPE_TANH_3),
+    distortion_2_type(name + "DTP", Distortion::TYPE_TANH_10),
     tape_at_end(name + "TEND", ToggleParam::OFF),
     tape_params(name + "T", tape_at_end),
     volume_1(input, volume_1_gain, NULL, CHANNELS),

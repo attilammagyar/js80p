@@ -510,6 +510,18 @@ void Serializer::upgrade_line(
         if (!is_controller_assignment) {
             number = upgrade_old_lfo_waveform(synth, number);
         }
+    } else if (JS80P_UNLIKELY(strncmp(param_name, "CDT", PARAM_NAME_MAX_LENGTH) == 0)) {
+        strncpy(param_name, "CDTP", 5);
+        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::CDTYP);
+    } else if (JS80P_UNLIKELY(strncmp(param_name, "EOT", PARAM_NAME_MAX_LENGTH) == 0)) {
+        strncpy(param_name, "EOTP", 5);
+        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ED1TYP );
+    } else if (JS80P_UNLIKELY(strncmp(param_name, "EDT", PARAM_NAME_MAX_LENGTH) == 0)) {
+        strncpy(param_name, "EDTP", 5);
+        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ED2TYP );
+    } else if (JS80P_UNLIKELY(strncmp(param_name, "ETSTYP", PARAM_NAME_MAX_LENGTH) == 0)) {
+        strncpy(param_name, "ETDTP", 6);
+        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ETSTYP );
     }
 }
 
@@ -617,6 +629,47 @@ Number Serializer::upgrade_old_lfo_waveform(
         Synth::ParamId::L1WAV,
         NEW_VALUES[old_value_byte]
     );
+}
+
+
+Number Serializer::upgrade_old_distortion_type(
+        Synth const& synth,
+        Number const old_value,
+        Synth::ParamId const param_id
+) noexcept {
+    constexpr Byte NEW_VALUES[] = {
+        Distortion::TYPE_TANH_3,
+        Distortion::TYPE_TANH_5,
+        Distortion::TYPE_TANH_10,
+        Distortion::TYPE_HARMONIC_13,
+        Distortion::TYPE_HARMONIC_15,
+        Distortion::TYPE_HARMONIC_135,
+        Distortion::TYPE_HARMONIC_SQR,
+        Distortion::TYPE_HARMONIC_TRI,
+        Distortion::TYPE_BIT_CRUSH_1,
+        Distortion::TYPE_BIT_CRUSH_2,
+        Distortion::TYPE_BIT_CRUSH_3,
+        Distortion::TYPE_BIT_CRUSH_4,
+        Distortion::TYPE_BIT_CRUSH_4_6,
+        Distortion::TYPE_BIT_CRUSH_5,
+        Distortion::TYPE_BIT_CRUSH_5_6,
+        Distortion::TYPE_BIT_CRUSH_6,
+        Distortion::TYPE_BIT_CRUSH_6_6,
+        Distortion::TYPE_BIT_CRUSH_7,
+        Distortion::TYPE_BIT_CRUSH_7_6,
+        Distortion::TYPE_BIT_CRUSH_8,
+        Distortion::TYPE_BIT_CRUSH_8_6,
+        Distortion::TYPE_BIT_CRUSH_9,
+        Distortion::TYPE_DELAY_FEEDBACK,
+    };
+
+    Byte const old_value_byte = std::round(old_value * 22.0);
+
+    if (JS80P_UNLIKELY(old_value_byte > 22)) {
+        return synth.get_param_default_ratio(param_id);
+    }
+
+    return synth.discrete_param_value_to_ratio(param_id, NEW_VALUES[old_value_byte]);
 }
 
 

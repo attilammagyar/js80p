@@ -1277,6 +1277,21 @@ distortion:
 
  * **tanh 10x**: heavy distortion.
 
+ * **sin x**: very gentle saturation turning into soft clipping at higher
+   signal levels.
+
+ * **x^2**: dynamic range expander using a signed quadratic curve with soft
+   clipping at higher signal levels.
+
+ * **sqrt(x)**: heavy fuzz, a waveshaper which aggressively pulls the signal
+   away from zero.
+
+ * **x^3**: a more prominent dynamic range expander using a cubic curve with
+   soft clipping at higher signal levels.
+
+ * **cbrt(x)**: even heavier fuzz, pulling the signal away from zero more
+   aggressively.
+
  * **1+3**: harmonic distortion, adding the 3rd harmonic at lower signal
    levels; soft clipping at higher signal levels.
 

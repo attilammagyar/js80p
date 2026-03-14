@@ -46,6 +46,87 @@ Tables::Tables()
 
     /* Parametrizations generated with scripts/plot_distortion_func.py */
 
+    initialize_spline_tables(
+        TYPE_SIN,
+        [&](Number const x, Number& y, Number& antiderivative) {
+            y = std::sin(x * Math::PI_HALF);
+            antiderivative = 1.0071750842587022 + (-2.0 / Math::PI) * std::cos(x * Math::PI_HALF);
+        },
+        0.99,
+        0.9,
+        20.94934949722142,
+        -60.884279482400416,
+        58.93051047316476,
+        -18.005580487981206,
+        4.604414371225233
+    );
+
+    initialize_spline_tables(
+        TYPE_SQR,
+        [&](Number const x, Number& y, Number& antiderivative) {
+            Number const x_abs = std::fabs(x);
+            Number const sign = x < 0.0 ? -1.0 : 1.0;
+
+            y = sign * x * x;
+            antiderivative = 0.7008437500000079 + x_abs * x_abs * x_abs / 3.0;
+        },
+        0.95,
+        0.95,
+        19.999999999887223,
+        -76.99999999967258,
+        94.04999999968277,
+        -36.09999999989668,
+        10.774999999975625
+    );
+
+    initialize_spline_tables(
+        TYPE_SQRT,
+        [&](Number const x, Number& y, Number& antiderivative) {
+            Number const x_abs = std::fabs(x);
+            Number const sign = x < 0.0 ? -1.0 : 1.0;
+
+            y = sign * std::sqrt(x_abs);
+            antiderivative = 0.35444165128058613 + (2.0 / 3.0) * std::pow(x_abs, 3.0 / 2.0);
+        },
+        0.97,
+        0.9,
+        13.071194490185235,
+        -39.73813421647537,
+        40.29268496240729,
+        -12.655745236113717,
+        3.507648871188966
+    );
+
+    initialize_spline_tables(
+        TYPE_CUBE,
+        [&](Number const x, Number& y, Number& antiderivative) {
+            y = x * x * x;
+            antiderivative = 0.7838620833332516 + x * x * x * x / 4.0;
+        },
+        0.95,
+        0.97,
+        426.92592590225104,
+        -1307.7777777078154,
+        1334.8277777088806,
+        -453.02592590331915,
+        115.83981480924794
+    );
+
+    initialize_spline_tables(
+        TYPE_CBRT,
+        [&](Number const x, Number& y, Number& antiderivative) {
+            y = std::pow(x, 1.0 / 3.0);
+            antiderivative = 0.27124720583083983 + (3.0 / 4.0) * std::pow(x, 4.0 / 3.0);
+        },
+        0.97,
+        0.9,
+        29.737608819757043,
+        -86.3901271167233,
+        83.59742777418523,
+        -25.97490947721667,
+        6.5585024240923
+    );
+
     initialize_harmonic_tables(
         TYPE_HARMONIC_13,
         1.1,

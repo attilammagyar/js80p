@@ -808,3 +808,76 @@ TEST(old_lfo_waveform_parameters_are_upgraded, {
         "L2WAVctl = 0.06250", Synth::ParamId::L2WAV, Synth::ControllerId::GENERAL_1
     );
 })
+
+
+TEST(old_distortion_types_are_upgraded, {
+    assert_value_upgrade(
+        "CDT = 0.0", Synth::ParamId::CDTYP, Distortion::TYPE_TANH_3
+    );
+    assert_value_upgrade(
+        "EOT = 0.090909090909091", Synth::ParamId::ED1TYP, Distortion::TYPE_TANH_10
+    );
+    assert_value_upgrade(
+        "EDT = 0.045454545454545", Synth::ParamId::ED2TYP, Distortion::TYPE_TANH_5
+    );
+    assert_value_upgrade(
+        "ETSTYP = 0.136363636363636", Synth::ParamId::ETSTYP, Distortion::TYPE_HARMONIC_13
+    );
+    assert_value_upgrade(
+        "CDT = 0.181818181818182", Synth::ParamId::CDTYP, Distortion::TYPE_HARMONIC_15
+    );
+    assert_value_upgrade(
+        "EOT = 0.227272727272727", Synth::ParamId::ED1TYP, Distortion::TYPE_HARMONIC_135
+    );
+    assert_value_upgrade(
+        "EDT = 0.272727272727273", Synth::ParamId::ED2TYP, Distortion::TYPE_HARMONIC_SQR
+    );
+    assert_value_upgrade(
+        "ETSTYP = 0.318181818181818", Synth::ParamId::ETSTYP, Distortion::TYPE_HARMONIC_TRI
+    );
+    assert_value_upgrade(
+        "CDT = 0.363636363636364", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_1
+    );
+    assert_value_upgrade(
+        "EOT = 0.409090909090909", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_2
+    );
+    assert_value_upgrade(
+        "EDT = 0.454545454545455", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_3
+    );
+    assert_value_upgrade(
+        "ETSTYP = 0.50", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_4
+    );
+    assert_value_upgrade(
+        "CDT = 0.545454545454545", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_4_6
+    );
+    assert_value_upgrade(
+        "EOT = 0.590909090909091", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_5
+    );
+    assert_value_upgrade(
+        "EDT = 0.636363636363636", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_5_6
+    );
+    assert_value_upgrade(
+        "ETSTYP = 0.681818181818182", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_6
+    );
+    assert_value_upgrade(
+        "CDT = 0.727272727272727", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_6_6
+    );
+    assert_value_upgrade(
+        "EOT = 0.772727272727273", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_7
+    );
+    assert_value_upgrade(
+        "EDT = 0.818181818181818", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_7_6
+    );
+    assert_value_upgrade(
+        "ETSTYP = 0.863636363636364", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_8
+    );
+    assert_value_upgrade(
+        "CDT = 0.909090909090909", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_8_6
+    );
+    assert_value_upgrade(
+        "EOT = 0.954545454545455", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_9
+    );
+    assert_value_upgrade(
+        "EDT = 1.0", Synth::ParamId::ED2TYP, Distortion::TYPE_DELAY_FEEDBACK
+    );
+})

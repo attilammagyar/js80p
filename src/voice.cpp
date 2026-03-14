@@ -335,7 +335,7 @@ Voice<ModulatorSignalProducerClass>::Params::Params(
 
     subharmonic_amplitude(name + "SUB", 0.0, 1.0, 0.0, 0.0, envelopes),
     distortion(name + "DG", 0.0, 1.0, 0.0, 0.0, envelopes),
-    distortion_type(name + "DT", Distortion::TYPE_TANH_10)
+    distortion_type(name + "DTP", Distortion::TYPE_TANH_10)
 {
 }
 

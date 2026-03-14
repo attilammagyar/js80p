@@ -34,31 +34,36 @@ namespace JS80P { namespace Distortion
 constexpr Byte TYPE_TANH_3          = 0;
 constexpr Byte TYPE_TANH_5          = 1;
 constexpr Byte TYPE_TANH_10         = 2;
+constexpr Byte TYPE_SIN             = 3;
+constexpr Byte TYPE_SQR             = 4;
+constexpr Byte TYPE_SQRT            = 5;
+constexpr Byte TYPE_CUBE            = 6;
+constexpr Byte TYPE_CBRT            = 7;
 
-constexpr Byte TYPE_HARMONIC_13     = 3;
-constexpr Byte TYPE_HARMONIC_15     = 4;
-constexpr Byte TYPE_HARMONIC_135    = 5;
-constexpr Byte TYPE_HARMONIC_SQR    = 6;
-constexpr Byte TYPE_HARMONIC_TRI    = 7;
+constexpr Byte TYPE_HARMONIC_13     = 8;
+constexpr Byte TYPE_HARMONIC_15     = 9;
+constexpr Byte TYPE_HARMONIC_135    = 10;
+constexpr Byte TYPE_HARMONIC_SQR    = 11;
+constexpr Byte TYPE_HARMONIC_TRI    = 12;
 
-constexpr Byte TYPE_BIT_CRUSH_1     = 8;
-constexpr Byte TYPE_BIT_CRUSH_2     = 9;
-constexpr Byte TYPE_BIT_CRUSH_3     = 10;
-constexpr Byte TYPE_BIT_CRUSH_4     = 11;
-constexpr Byte TYPE_BIT_CRUSH_4_6   = 12;
-constexpr Byte TYPE_BIT_CRUSH_5     = 13;
-constexpr Byte TYPE_BIT_CRUSH_5_6   = 14;
-constexpr Byte TYPE_BIT_CRUSH_6     = 15;
-constexpr Byte TYPE_BIT_CRUSH_6_6   = 16;
-constexpr Byte TYPE_BIT_CRUSH_7     = 17;
-constexpr Byte TYPE_BIT_CRUSH_7_6   = 18;
-constexpr Byte TYPE_BIT_CRUSH_8     = 19;
-constexpr Byte TYPE_BIT_CRUSH_8_6   = 20;
-constexpr Byte TYPE_BIT_CRUSH_9     = 21;
+constexpr Byte TYPE_BIT_CRUSH_1     = 13;
+constexpr Byte TYPE_BIT_CRUSH_2     = 14;
+constexpr Byte TYPE_BIT_CRUSH_3     = 15;
+constexpr Byte TYPE_BIT_CRUSH_4     = 16;
+constexpr Byte TYPE_BIT_CRUSH_4_6   = 17;
+constexpr Byte TYPE_BIT_CRUSH_5     = 18;
+constexpr Byte TYPE_BIT_CRUSH_5_6   = 19;
+constexpr Byte TYPE_BIT_CRUSH_6     = 20;
+constexpr Byte TYPE_BIT_CRUSH_6_6   = 21;
+constexpr Byte TYPE_BIT_CRUSH_7     = 22;
+constexpr Byte TYPE_BIT_CRUSH_7_6   = 23;
+constexpr Byte TYPE_BIT_CRUSH_8     = 24;
+constexpr Byte TYPE_BIT_CRUSH_8_6   = 25;
+constexpr Byte TYPE_BIT_CRUSH_9     = 26;
 
-constexpr Byte TYPE_DELAY_FEEDBACK  = 22;
+constexpr Byte TYPE_DELAY_FEEDBACK  = 27;
 
-constexpr Byte TYPES                = 23;
+constexpr Byte TYPES                = 28;
 
 
 class TypeParam : public ByteParam

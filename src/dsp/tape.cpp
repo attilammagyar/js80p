@@ -224,7 +224,7 @@ TapeParams::TapeParams(
     color(color_macro.input),
     hiss_level(name + "HSS", 0.0, 0.125, 0.0),
     stereo_wnf(name + "STR", 0.0, 0.5, 0.0),
-    distortion_type(name + "STYP", Distortion::TYPE_TANH_5),
+    distortion_type(name + "DTP", Distortion::TYPE_TANH_5),
     bypass_toggle(bypass_toggle),
     volume(name + "VOL", 0.0, 1.0, 1.0),
     delay_time_lfo(name + "LD"),

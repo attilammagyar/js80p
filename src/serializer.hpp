@@ -193,6 +193,12 @@ class Serializer
             Synth const& synth,
             Number const old_value
         ) noexcept;
+
+        static Number upgrade_old_distortion_type(
+            Synth const& synth,
+            Number const old_value,
+            Synth::ParamId const param_id
+        ) noexcept;
 };
 
 }
