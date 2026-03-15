@@ -15,7 +15,7 @@ or look for the "Releases" section at its GitHub page at
 https://github.com/attilammagyar/js80p . (The source code is also available on
 GitHub under the terms of the GNU General Public License Version 3.)
 
-> VST is a registered trademark of Steinberg Media Technologies GmbH.
+VST is a registered trademark of Steinberg Media Technologies GmbH.
 
 Before Installing: Choosing a Distribution
 ------------------------------------------
@@ -225,7 +225,7 @@ Installing on Linux
 VST 3 Bundle
 ~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the entire "js80p.vst3" directory to your VST 3 directory which is
    usually "~/.vst3".
@@ -233,7 +233,7 @@ VST 3 Bundle
 VST 3 Single File
 ~~~~~~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the "js80p.vst3" file to your VST 3 directory which is usually
    "~/.vst3".
@@ -241,7 +241,7 @@ VST 3 Single File
 FST (VST 2.4)
 ~~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the "js80p.so" file to the directory where you keep your VST 2.4
    plugins.
@@ -264,7 +264,7 @@ Installing on Windows
 VST 3 Bundle
 ~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the entire "js80p.vst3" folder to your VST 3 folder which is
    usually "C:\Users\YourUserName\AppData\Local\Programs\Common\VST3".
@@ -272,7 +272,7 @@ VST 3 Bundle
 VST 3 Single File
 ~~~~~~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the "js80p.vst3" file to your VST 3 folder which is usually
    "C:\Users\YourUserName\AppData\Local\Programs\Common\VST3".
@@ -280,7 +280,7 @@ VST 3 Single File
 FST (VST 2.4)
 ~~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Extract the ZIP archive.
 3. Copy the "js80p.dll" file to the folder where you keep your VST 2.4 plugins.
 4. Optionally, if your host application can load ".vstxml" files, it is
@@ -303,7 +303,7 @@ Installing on macOS
 VST 3 Bundle
 ~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Locate the downloaded ".pkg" file in Finder and double click on it.
 3. Follow the on-screen installation instructions.
 4. JS80P will be installed in the "/Library/Audio/Plug-Ins/VST3" folder.
@@ -311,7 +311,7 @@ VST 3 Bundle
 FST (VST 2.4) Bundle
 ~~~~~~~~~~~~~~~~~~~~
 
-1. Download JS80P from https://attilammagyar.github.io/js80p/index.html .
+1. Download JS80P from https://attilammagyar.github.io/js80p .
 2. Locate the downloaded ".pkg" file in Finder and double click on it.
 3. Follow the on-screen installation instructions.
 4. JS80P will be installed in the "/Library/Audio/Plug-Ins/VST" folder.

@@ -615,7 +615,7 @@ folder.
 
 #### Linux
 
-As of Feburary, 2026, there is no official distribution of the MTS-ESP tuning
+As of February, 2026, there is no official distribution of the MTS-ESP tuning
 provider plugins by [ODDSound](https://oddsound.com/) for Linux, however, there
 are plugins which can act as a tuning provider, for example,
 [Surge XT](https://surge-synthesizer.github.io/).
@@ -623,7 +623,7 @@ are plugins which can act as a tuning provider, for example,
 To use MTS-ESP, you may have to download the `libMTS.so` library from the
 [ODDSound/MTS-ESP GitHub repository](https://github.com/ODDSound/MTS-ESP/tree/main/libMTS/Linux),
 and put it in the `/usr/local/lib` directory if it is not already installed on
-your system. As of Feburary, 2026, `libMTS.so` is not available for `x86`
+your system. As of February, 2026, `libMTS.so` is not available for `x86`
 Linux systems.
 
 <a id="mts-esp-windows-macos"></a>
@@ -819,8 +819,7 @@ momentary value (on a relative scale between 0% and 100%) of a
 
 ### Resizing the User Interface
 
-Drag and drop the bottom right corner of the window to resize the user
-interface.
+Drag the bottom right corner of the window to resize the user interface.
 
 <a href="#toc">Table of Contents</a>
 
@@ -2947,8 +2946,6 @@ When reporting an issue, please provide at least the following information:
 Frequently Asked Questions
 --------------------------
 
-<a href="#toc">Table of Contents</a>
-
 <a id="faq-fst"></a>
 
 ### Why do you say FST instead of VST 2?
@@ -3324,7 +3321,7 @@ Run `make check` in a similar fashion to run unit tests.
 
 If you have a working set of the standard Xcode and BSD command-line
 development tools (e.g. you have successfully run `xcode-select --install`),
-the following commands should compile JS80P for your system:
+then the following commands should compile JS80P for your system:
 
     cd js80p-4_0_0-src
     export DEV_OS=macos
@@ -3340,12 +3337,12 @@ After successful compilation, you will have to copy either the entire
 directory under `/Users/YOUR-NAME/Library/Audio/Plug-Ins`, e.g.:
 
     mkdir -p ~/Library/Audio/Plug-Ins/VST
-    cp -rv dist/js80p-dev-macos--none-fst/js80p.vst ~/Library/Audio/Plug-Ins/VST
+    cp -rv dist/js80p-dev-macos--native-fst/js80p.vst ~/Library/Audio/Plug-Ins/VST
 
 or:
 
     mkdir -p ~/Library/Audio/Plug-Ins/VST3
-    cp -rv dist/js80p-dev-macos--none-vst3_single/js80p.vst3 ~/Library/Audio/Plug-Ins/VST3
+    cp -rv dist/js80p-dev-macos--native-vst3_single/js80p.vst3 ~/Library/Audio/Plug-Ins/VST3
 
 Note: some host applications don't look for VST plugins in the
 `/Users/YOUR-NAME/Library/Audio/Plug-Ins` directory by default. Please refer to
