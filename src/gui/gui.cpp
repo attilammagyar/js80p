@@ -1380,6 +1380,7 @@ const GUI::Color GUI::TEXT_HIGHLIGHT_BACKGROUND = GUI::rgb(82, 82, 86);
 const GUI::Color GUI::STATUS_LINE_BACKGROUND = GUI::rgb(21, 21, 32);
 const GUI::Color GUI::TOGGLE_OFF_COLOR = GUI::rgb(0, 0, 0);
 const GUI::Color GUI::TOGGLE_ON_COLOR = GUI::rgb(150, 200, 230);
+const GUI::Color GUI::TOGGLE_ON_BLUR_COLOR = GUI::rgb(75, 100, 115);
 
 
 const GUI::Color GUI::CTL_COLOR_NONE_TEXT = TEXT_COLOR;

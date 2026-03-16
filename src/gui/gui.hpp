@@ -196,6 +196,7 @@ class GUI
         static Color const STATUS_LINE_BACKGROUND;
         static Color const TOGGLE_OFF_COLOR;
         static Color const TOGGLE_ON_COLOR;
+        static Color const TOGGLE_ON_BLUR_COLOR;
 
         static Color const CTL_COLOR_NONE_TEXT;
         static Color const CTL_COLOR_NONE_BG;

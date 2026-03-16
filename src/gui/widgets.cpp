@@ -1760,7 +1760,7 @@ ToggleSwitchParamEditor::ToggleSwitchParamEditor(
         Synth::ParamId const param_id
 ) : TransparentWidget(text, left, top, width, height, Type::TOGGLE_SWITCH),
     param_id(param_id),
-    box_left(box_left),
+    box_left((Number)(box_left + 10)),
     synth(synth),
     is_editing_(false)
 {
@@ -1806,17 +1806,38 @@ bool ToggleSwitchParamEditor::paint()
     TransparentWidget::paint();
 
     Byte const toggle = synth.byte_param_ratio_to_display_value(param_id, ratio);
-    GUI::Color const color = (
-        toggle == ToggleParam::ON ? GUI::TOGGLE_ON_COLOR : GUI::TOGGLE_OFF_COLOR
-    );
 
-    fill_rectangle(
-        this->scale_value(box_left + 10),
-        this->scale_value(16),
-        this->scale_value(22),
-        this->scale_value(16),
-        color
-    );
+    Number const scale = this->scale;
+
+    Number const scaled_left = scale * box_left;
+    Number const scaled_top = scale * 16.0;
+    Number const scaled_width = scale * 22.0;
+    Number const scaled_height = scale * 16.0;
+
+    int const out_left = (int)std::floor(scaled_left);
+    int const out_top = (int)std::floor(scaled_top);
+    int const out_width = (int)std::ceil(scaled_left + scaled_width) - out_left;
+    int const out_height = (int)std::ceil(scaled_top + scaled_height) - out_top;
+
+    if (toggle == ToggleParam::ON) {
+        int const in_left = (int)std::round(scaled_left);
+        int const in_top = (int)std::round(scaled_top);
+        int const in_width = (int)std::round(scaled_width);
+        int const in_height = (int)std::round(scaled_height);
+
+        /*
+        Simple and stupid approximation of some kind of anti-aliasing. It would
+        be nice to draw only the edges of the outer area, but filling both
+        rectangles makes sure that there will be no gaps (regardless of any
+        scaling, resolution, etc. trickery on any platforms), even if the
+        platform's rectangle border drawing primitives draw around the specified
+        coordinates instead of staying inside them.
+        */
+        fill_rectangle(out_left, out_top, out_width, out_height, GUI::TOGGLE_ON_BLUR_COLOR);
+        fill_rectangle(in_left, in_top, in_width, in_height, GUI::TOGGLE_ON_COLOR);
+    } else {
+        fill_rectangle(out_left, out_top, out_width, out_height, GUI::TOGGLE_OFF_COLOR);
+    }
 
     return true;
 }

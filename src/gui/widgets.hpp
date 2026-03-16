@@ -665,7 +665,7 @@ class ToggleSwitchParamEditor: public TransparentWidget
         void start_editing();
         void stop_editing();
 
-        int const box_left;
+        Number const box_left;
 
         Synth& synth;
 
