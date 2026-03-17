@@ -124,7 +124,7 @@ Choosing a Distribution for macOS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The universal packages are built for macOS 11 Big Sur for M1, M2, etc. and
-newer CPUs (arm64) and for macOS 10.12 Sierra for Intel CPUs (x86_64 with
+newer CPUs ("arm64") and for macOS 10.12 Sierra for Intel CPUs ("x86_64" with
 AVX instructions, see https://en.wikipedia.org/wiki/Advanced_Vector_Extensions),
 and were tested on macOS 26 Tahoe.
 
@@ -287,8 +287,8 @@ FST (VST 2.4)
    recommended to copy the "js80p.vstxml" file as well to the folder where
    you keep your VST 2.4 plugins.
 
-Note: VST 2.4 plugins are usually put in the "C:\Program Files\VstPlugins"
-folder.
+Note: VST 2.4 plugins are usually put in the
+"C:\Program Files\Steinberg\VstPlugins" folder.
 
 Uninstalling
 ~~~~~~~~~~~~
