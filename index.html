@@ -90,6 +90,45 @@ h1, h2, h3, h4 {
   margin-bottom: 3px;
 }
 
+#download-recommended {
+  display: none;
+}
+
+#download-recommended div {
+  width: 86%;
+  max-width: 640px;
+}
+
+a#download-recommended-link {
+  display: inline-block;
+  margin-top: 30px;
+  color: #e8f0ff;
+  background-color: #154768;
+  padding: 12px 36px;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  border: outset 3px #2b6090;
+  border-radius: 15px;
+}
+
+p#download-recommended-description {
+  font-size: 12px;
+}
+
+a#download-recommended-link:hover {
+  background-color: #1b5075;
+  color: #ffffff;
+}
+
+svg.icon {
+  padding: 0;
+  margin: 0 5px;
+  border-width: 0;
+  width: 20px;
+  height: 20px;
+}
+
 div {
   font-size: 16px;
   line-height: 24px;
@@ -307,89 +346,91 @@ small {
     </div>
 
     <div id="download">
-      <h2 class="center">Download (v3.5.0)</h2>
+      <div id="download-recommended" class="center">
+        <h2>Recommended Download</h2>
+        <div class="section">
+          <div>
+            <a id="download-recommended-link" href="">
+              Download JS80P v3.5.0 (VST 3)
+              <svg class="icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+               <g>
+                <title>Download</title>
+                <path
+                  d="M250,30 L250,350 M100,200 L250,350 M400,200 L250,350 M30,350 L30,470 L470,470 L470,350"
+                  opacity="1"
+                  stroke-width="50"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  stroke="#ffffff" fill="none"/>
+               </g>
+              </svg>
+            </a>
+          </div>
+          <p id="download-recommended-description"></p>
+        </div>
+      </div>
       <div class="section">
+        <h2 class="center">Download Options (v3.5.0)</h2>
         <p class="center">
           <a href="#install-dist">Which distribution should I download?</a>
         </p>
 
         <div class="columns">
           <div class="column">
-            <h3>For newer CPUs with AVX</h3>
+            <h3>Windows and Linux</h3>
+            <ul>
+              <li>
+                VST 3 Bundle, AVX: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-avx-vst3_bundle.zip">Download (4.8M)</a>
+              </li>
+              <li>
+                VST 3 Bundle, SSE2: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-sse2-vst3_bundle.zip">Download (12M)</a>
+              </li>
+            </ul>
 
-            <div class="indent">
-              <h4>Windows and Linux, 64 bit</h4>
-              <ul>
-                <li>
-                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-avx-vst3_bundle.zip">Download (4.8M)</a>
-                </li>
-              </ul>
-
-              <h4>Windows</h4>
-              <ul>
-                <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-avx-vst3_single_file.zip">Download (2.7M)</a>
-                </li>
-                <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-avx-fst.zip">Download (2.4M)</a>
-                </li>
-              </ul>
-
-              <h4>Linux</h4>
-              <ul>
-                <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-avx-vst3_single_file.zip">Download (2.0M)</a>
-                </li>
-                <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-avx-fst.zip">Download (1.9M)</a>
-                </li>
-              </ul>
-            </div>
+            <h3>Windows</h3>
+            <ul>
+              <li>
+                X64 AVX, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-avx-vst3_single_file.zip">Download (2.7M)</a>
+              </li>
+              <li>
+                X64 AVX, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-avx-fst.zip">Download (2.4M)</a>
+              </li>
+              <li>
+                X64 SSE2, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-sse2-vst3_single_file.zip">Download (2.7M)</a>
+              </li>
+              <li>
+                X64 SSE2, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-sse2-fst.zip">Download (2.4M)</a>
+              </li>
+              <li>
+                X86 SSE2, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86-sse2-vst3_single_file.zip">Download (2.7M)</a>
+              </li>
+              <li>
+                X86 SSE2, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86-sse2-fst.zip">Download (2.5M)</a>
+              </li>
+            </ul>
           </div>
 
           <div class="column">
-            <h3>For older CPUs with SSE2</h3>
-
-            <div class="indent">
-              <h4>Windows and Linux, 64 bit and 32 bit</h4>
-              <ul>
-                <li>
-                  VST 3 Bundle: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-sse2-vst3_bundle.zip">Download (12M)</a>
-                </li>
-              </ul>
-
-              <h4>Windows</h4>
-              <ul>
-                <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-sse2-vst3_single_file.zip">Download (2.7M)</a>
-                </li>
-                <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86_64-sse2-fst.zip">Download (2.4M)</a>
-                </li>
-                <li>
-                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86-sse2-vst3_single_file.zip">Download (2.7M)</a>
-                </li>
-                <li>
-                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-windows-x86-sse2-fst.zip">Download (2.5M)</a>
-                </li>
-              </ul>
-
-              <h4>Linux</h4>
-              <ul>
-                <li>
-                  64-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-sse2-vst3_single_file.zip">Download (2.0M)</a>
-                </li>
-                <li>
-                  64-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-sse2-fst.zip">Download (1.9M)</a>
-                </li>
-                <li>
-                  32-bit, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86-sse2-vst3_single_file.zip">Download (2.1M)</a>
-                </li>
-                <li>
-                  32-bit, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86-sse2-fst.zip">Download (1.9M)</a>
-                </li>
-              </ul>
-            </div>
+            <h3>Linux</h3>
+            <ul>
+              <li>
+                x86_64 AVX, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-avx-vst3_single_file.zip">Download (2.0M)</a>
+              </li>
+              <li>
+                x86_64 AVX, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-avx-fst.zip">Download (1.9M)</a>
+              </li>
+              <li>
+                x86_64 SSE2, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-sse2-vst3_single_file.zip">Download (2.0M)</a>
+              </li>
+              <li>
+                x86_64 SSE2, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86_64-sse2-fst.zip">Download (1.9M)</a>
+              </li>
+              <li>
+                i686 SSE2, VST 3 Single File: <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86-sse2-vst3_single_file.zip">Download (2.1M)</a>
+              </li>
+              <li>
+                i686 SSE2, FST (VST 2.4): <a href="https://github.com/attilammagyar/js80p/releases/download/v3.5.0/js80p-3_5_0-linux-x86-sse2-fst.zip">Download (1.9M)</a>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -624,6 +665,55 @@ small {
         </p>
       </div>
     </div>
+
+<script type="text/javascript">
+<!--
+(function () {
+
+    const user_agent = String(window.navigator?.userAgent),
+        platform = String(
+            window.navigator?.userAgentData?.platform
+            || window.navigator?.platform
+        );
+
+    let url_re = null,
+        description = null,
+        ex, links, url, i, l;
+
+    if (platform.match(/mac/i)) {
+        url_re = /macos-universal-vst3.*\.pkg/i;
+        description = "Universal binary for VST 3 compatible hosts running on macOS 11 Big Sur or newer on Apple Silicon (M1, M2, etc.), or macOS 10.12 Sierra on Intel.";
+    } else if (platform.match(/win/i)) {
+        url_re = /avx.*vst3_bundle.*\.zip/i;
+        description = "VST 3 bundle for X64 CPUs with AVX running Windows 7 or newer.";
+    } else if (platform.match(/linux/i) && !user_agent.match(/android/i)) {
+        url_re = /avx.*vst3_bundle.*\.zip/i;
+        description = "VST 3 bundle for x86_64 CPUs with AVX running Linux."
+    }
+
+    if (url_re === null) {
+        return;
+    }
+
+    description += " Find other options below.";
+
+    try {
+        links = document.getElementById("download").getElementsByTagName("a");
+
+        for (i = 0, l = links.length; i < l; ++i) {
+            url = links[i].getAttribute("href") || "";
+
+            if (url.match(url_re)) {
+                document.getElementById("download-recommended-link").setAttribute("href", url);
+                document.getElementById("download-recommended-description").innerText = description;
+                document.getElementById("download-recommended").style.display = "block";
+            }
+        }
+    } catch (ex) {
+    }
+})();
+//-->
+</script>
 
     <div id="demos">
       <h2 class="center">Demos</h2>
@@ -982,22 +1072,24 @@ which support it).</li>
 
 <p>If your plugin host application does not support VST 3, but does support
 VST 2.4, then you have to download and install the FST version of JS80P.
-Otherwise, you should go with a VST 3 bundle on both Windows and Linux.</p>
+Otherwise, you should go with a VST 3 bundle.</p>
 
-<p>The source code distribution can be compiled for various CPU architectures.
-Ready-to-use binary distributions are available for "<code>x86_64</code>" and "<code>x86</code>"
-compatible systems, like most desktop PCs and laptops.</p>
+<p>The source code distribution can be compiled for various CPU architectures and
+operating systems. Ready-to-use binary distributions are available for
+Linux "<code>x86_64</code>" and "<code>i686</code>" and Windows "<code>X64</code>" and "<code>X86</code>" compatible
+systems (like most desktop PCs and laptops).</p>
 
 <p>If your CPU supports <a href="https://en.wikipedia.org/wiki/Advanced_Vector_Extensions">AVX instructions</a>
-and you use a 64 bit plugin host application (also known as "<code>x86_64</code>"), then
-you should download a JS80P package that is optimized for AVX compatible
-processors. If you have an older computer, or if you get error messages
-complaining about "illegal instructions" or experience crashes, then
-you should go with one of the <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a>
-compatible JS80P packages.</p>
+and you use a 64 bit plugin host application (also known as "<code>x86_64</code>" or
+"<code>X64</code>"), then you should download a JS80P package that is optimized for AVX
+compatible processors.</p>
+
+<p>If you have an older computer, or if you get error messages complaining about
+"illegal instructions" or experience crashes, then you should go with one of
+the <a href="https://en.wikipedia.org/wiki/SSE2">SSE2</a> compatible JS80P packages.</p>
 
 <p>If you are using an older VST 3 host, or if you are running a 32 bit (also
-known as "<code>i686</code>" or "<code>x86</code>") VST 3 host on a 64 bit Linux system, then it might
+known as "<code>i686</code>" or "<code>X86</code>") VST 3 host on a 64 bit Linux system, then it might
 not be able to load the VST 3 bundle, so you will have to go with a VST 3
 single file JS80P package that matches the architecture of your host
 application.</p>
@@ -1082,7 +1174,7 @@ for the details.)</li>
 
 <ul>
 <li><strong>Operating System</strong>: Windows 7 or newer, or Linux (e.g. Ubuntu 22.04).</li>
-<li><strong>CPU</strong>: SSE2 support, 32 bit (i686) or 64 bit (x86-64).
+<li><strong>CPU</strong>: SSE2 support, 64 bit (<code>x86_64</code> a.k.a. <code>X64</code>) or 32 bit (<code>i686</code> a.k.a. <code>X86</code>).
 <ul>
 <li>Separate packages are available for AVX capable 64 bit processors for
 better performance and CPU utilization.</li>
