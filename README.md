@@ -266,8 +266,9 @@ Otherwise, you should go with a VST 3 bundle.
 
 The source code distribution can be compiled for various CPU architectures and
 operating systems. Ready-to-use binary distributions are available for
-Linux and Windows "`x86_64`" and "`x86`" compatible systems (like most desktop
-PCs and laptops), and universal binaries are available for macOS.
+Linux "`x86_64`" and "`i686`" and Windows "`X64`" and "`X86`" compatible
+systems (like most desktop PCs and laptops), and universal binaries are
+available for macOS.
 
 <a href="#toc">Table of Contents</a>
 
@@ -276,16 +277,16 @@ PCs and laptops), and universal binaries are available for macOS.
 #### Linux, Windows
 
 If your CPU supports [AVX instructions](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)
-and you use a 64 bit plugin host application (also known as "`x86_64`"), then
-you should download a JS80P package that is optimized for AVX compatible
-processors.
+and you use a 64 bit plugin host application (also known as "`x86_64`" or
+"`X64`"), then you should download a JS80P package that is optimized for AVX
+compatible processors.
 
 If you have an older computer, or if you get error messages complaining about
 "illegal instructions" or experience crashes, then you should go with one of
 the [SSE2](https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
 
 If you are using an older VST 3 host, or if you are running a 32 bit (also
-known as "`i686`" or "`x86`") VST 3 host on a 64 bit Linux system, then it might
+known as "`i686`" or "`X86`") VST 3 host on a 64 bit Linux system, then it might
 not be able to load the VST 3 bundle, so you will have to go with a VST 3
 single file JS80P package that matches the architecture of your host
 application.
@@ -419,7 +420,7 @@ ones listed below, thanks to the following contributors:
 
 #### Linux
 
- * **CPU**: SSE2 support, 32 bit (`i686`) or 64 bit (`x86_64`).
+ * **CPU**: SSE2 support, 64 bit (`x86_64`) or  32 bit (`i686`).
     * Separate packages are available for AVX capable 64 bit processors for
       better performance and CPU utilization.
 
@@ -452,7 +453,7 @@ then you will have to install the 32 bit version of the packages, for example:
 #### Windows
 
  * **Operating System**: Windows 7 or newer.
- * **CPU**: SSE2 support, 32 bit (`i686`) or 64 bit (`x86_64`).
+ * **CPU**: SSE2 support, 64 bit (`X64`) or 32 bit (`X86`).
     * Separate packages are available for AVX capable 64 bit processors for
       better performance and CPU utilization.
 

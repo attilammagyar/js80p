@@ -26,24 +26,25 @@ Otherwise, you should go with a VST 3 bundle.
 
 The source code distribution can be compiled for various CPU architectures and
 operating systems. Ready-to-use binary distributions are available for
-Linux and Windows "x86_64" and "x86" compatible systems (like most desktop
-PCs and laptops), and universal binaries are available for macOS.
+Linux "x86_64" and "i686" and Windows "X64" and "X86" compatible
+systems (like most desktop PCs and laptops), and universal binaries are
+available for macOS.
 
 Choosing a Distribution for Linux or Windows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If your CPU supports AVX instructions (see
 https://en.wikipedia.org/wiki/Advanced_Vector_Extensions for the details)
-and you use a 64 bit plugin host application (also known as "x86_64"), then
-you should download a JS80P package that is optimized for AVX compatible
-processors.
+and you use a 64 bit plugin host application (also known as "x86_64" or
+"X64"), then you should download a JS80P package that is optimized for AVX
+compatible processors.
 
 If you have an older computer, or if you get error messages complaining about
 "illegal instructions" or experience crashes, then you should go with one of
 the SSE2 (https://en.wikipedia.org/wiki/SSE2) compatible JS80P packages.
 
 If you are using an older VST 3 host, or if you are running a 32 bit (also
-known as "i686" or "x86") VST 3 host on a 64 bit Linux system, then it might
+known as "i686" or "X86") VST 3 host on a 64 bit Linux system, then it might
 not be able to load the VST 3 bundle, so you will have to go with a VST 3
 single file JS80P package that matches the architecture of your host
 application.
@@ -167,7 +168,7 @@ ones listed below, thanks to the following contributors:
 Requirements on Linux
 ~~~~~~~~~~~~~~~~~~~~~
 
- * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86_64).
+ * CPU: SSE2 support, 64 bit ("x86_64") or 32 bit ("i686").
     * Separate packages are available for AVX capable 64 bit processors for
       better performance and CPU utilization.
 
@@ -196,7 +197,7 @@ Requirements on Windows
 ~~~~~~~~~~~~~~~~~~~~~~~
 
  * Operating System: Windows 7 or newer.
- * CPU: SSE2 support, 32 bit (i686) or 64 bit (x86_64).
+ * CPU: SSE2 support, 64 bit ("X64") or 32 bit ("X86").
     * Separate packages are available for AVX capable 64 bit processors for
       better performance and CPU utilization.
 
@@ -207,8 +208,8 @@ Typical Windows systems usually have the MSVC library already installed, but in
 case you need it, you can download it from Microsoft's website at
 https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist .
 
-(Most people need the X64 version of this library. To use the 32 bit version
-of the plugin, you will need the X86 version of the library. See the
+(Most people need the "X64" version of this library. To use the 32 bit version
+of the plugin, you will need the "X86" version of the library. See the
 Before Installing: Choosing a Distribution section for more information.)
 
 Requirements on macOS
@@ -217,7 +218,8 @@ Requirements on macOS
  * Operating System:
     * M1, M2, etc. and newer CPUs: macOS 11 Big Sur or newer.
     * Intel CPUs: macOS 10.12 Sierra or newer.
- * CPU: either M1, M2, or newer, or Intel-based x86_64 CPUs (with AVX support).
+ * CPU: either M1, M2, or newer, or Intel-based "x86_64" CPUs (with AVX
+   support).
 
 Installing on Linux
 -------------------
