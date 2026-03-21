@@ -1,4 +1,4 @@
-; A dirty, harsh, detuned FM lead sound. Mod wheel and aftertouch make it even
+; A dirty, harsh, detuned FM sound. Mod wheel and aftertouch make it even
 ; dirtier and harsher.
 [js80p]
 FMctl = 0.58593750

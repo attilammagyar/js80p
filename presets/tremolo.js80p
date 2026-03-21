@@ -1,5 +1,5 @@
-; Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
-; the filter and adds a tremolo effect. Filtering also responds to note velocity.
+; Thick sawtooth sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
+; the filter and adds a tremolo effect. The filter also responds to note velocity.
 [js80p]
 PM = 0.160
 MAMPctl = 0.550781250

@@ -841,7 +841,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Acid Lead 1",
+        "Filter Sweep 1",
         "Prog011",
         (
             "[js80p]\n"
@@ -928,7 +928,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Acid Lead 2",
+        "Filter Sweep 2",
         "Prog012",
         (
             "[js80p]\n"
@@ -1016,7 +1016,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Acid Lead 3",
+        "Filter Sweep 3",
         "Prog013",
         (
             "[js80p]\n"
@@ -1621,7 +1621,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Tech Noir Lead 1",
+        "Tech Noir 1",
         "Prog020",
         (
             "[js80p]\n"
@@ -1735,7 +1735,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Tech Noir Lead 2",
+        "Tech Noir 2",
         "Prog021",
         (
             "[js80p]\n"
@@ -1848,7 +1848,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Tech Noir Lead 3",
+        "Tech Noir 3",
         "Prog022",
         (
             "[js80p]\n"
@@ -2794,7 +2794,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Nightmare Lead",
+        "Nightmare",
         "Prog029",
         (
             "[js80p]\n"
@@ -2964,7 +2964,7 @@ Bank::Program const Bank::BUILT_IN_PROGRAMS[] = {
     ),
 
     Program(
-        "Tremolo Lead",
+        "Tremolo",
         "Prog030",
         (
             "[js80p]\n"

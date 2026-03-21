@@ -1,5 +1,5 @@
-; Another sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
-; the vibrato, the sustain pedal lengthens the decay.
+; Another variation of the filter sweep sawtooth wave. Aftertouch and mod
+; wheel increase the vibrato, the sustain pedal lengthens the decay.
 [js80p]
 MAMPctl = 0.582031250
 MFINctl = 0.550781250

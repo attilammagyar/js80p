@@ -97,26 +97,26 @@ Table of Contents
     * [Rock Organ](#preset-rock-organ)
     * [Sandstorm](#preset-sandstorm)
     * [Stereo Saw](#preset-stereo-saw)
-    * [Acid Lead 1](#preset-acid-lead-1)
-    * [Acid Lead 2](#preset-acid-lead-2)
-    * [Acid Lead 3](#preset-acid-lead-3)
+    * [Filter Sweep 1](#preset-filter-sweep-1)
+    * [Filter Sweep 2](#preset-filter-sweep-2)
+    * [Filter Sweep 3](#preset-filter-sweep-3)
     * [Bells 1](#preset-bells-1)
     * [Bells 2](#preset-bells-2)
     * [Flute](#preset-flute)
     * [FM Womp 1](#preset-fm-womp-1)
     * [FM Womp 2](#preset-fm-womp-2)
     * [FM Womp 3](#preset-fm-womp-3)
-    * [Tech Noir Lead 1](#preset-tech-noir-lead-1)
-    * [Tech Noir Lead 2](#preset-tech-noir-lead-2)
-    * [Tech Noir Lead 3](#preset-tech-noir-lead-3)
+    * [Tech Noir 1](#preset-tech-noir-1)
+    * [Tech Noir 2](#preset-tech-noir-2)
+    * [Tech Noir 3](#preset-tech-noir-3)
     * [Derezzed](#preset-derezzed)
     * [Ambient Pad 1](#preset-ambient-pad-1)
     * [Ambient Pad 2](#preset-ambient-pad-2)
     * [Ambient Pad 3](#preset-ambient-pad-3)
     * [Saw Piano](#preset-saw-piano)
     * [Saw Piano Reversed](#preset-saw-piano-reversed)
-    * [Nightmare Lead](#preset-nightmare-lead)
-    * [Tremolo Lead](#preset-tremolo-lead)
+    * [Nightmare](#preset-nightmare)
+    * [Tremolo](#preset-tremolo)
     * [Monophonic Saw](#preset-monophonic-saw)
     * [Dystopian Cathedral](#preset-dystopian-cathedral)
     * [Gloomy Brass](#preset-gloomy-brass)
@@ -2439,12 +2439,6 @@ for newly triggered notes.
 Presets
 -------
 
-JS80P has a few built-in presets, and in case you don't like your plugin host
-application's preset browser, you can load and save them as ordinary files. For
-each plugin type, you can find these presets in the `presets` folder in the ZIP
-archive, and you can load them into JS80P by clicking on the _Import Patch_
-icon near the top left corner of the main screen of the plugin.
-
 <a id="preset-blank"></a>
 
 ### Blank
@@ -2516,7 +2510,7 @@ you play, the harder the attack.
 
 ### Sandstorm
 
-A dirty, harsh, detuned FM lead sound. Mod wheel and aftertouch make it even
+A dirty, harsh, detuned FM sound. Mod wheel and aftertouch make it even
 dirtier and harsher.
 
 <a id="preset-stereo-saw"></a>
@@ -2527,26 +2521,26 @@ A little bit metallic sounding sawtooth wave. Note velocity slightly affects
 the timbre, mod wheel and aftertouch add wavefolding. The volume knob
 adjusts an LFO which controls filter resonance.
 
-<a id="preset-acid-lead-1"></a>
+<a id="preset-filter-sweep-1"></a>
 
-### Acid Lead 1
+### Filter Sweep 1
 
-Sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
-the vibrato, the sustain pedal lengthens the decay.
+Sawtooth wave with a velocity sensitive filter sweep. Aftertouch and mod wheel
+increase the vibrato, the sustain pedal lengthens the decay.
 
-<a id="preset-acid-lead-2"></a>
+<a id="preset-filter-sweep-2"></a>
 
-### Acid Lead 2
+### Filter Sweep 2
 
-Square wave based acid lead sound. Aftertouch and mod wheel increase
-the vibrato, the sustain pedal lengthens the decay.
+Square wave with a velocity sensitive filter sweep. Aftertouch and mod wheel
+increase the vibrato, the sustain pedal lengthens the decay.
 
-<a id="preset-acid-lead-3"></a>
+<a id="preset-filter-sweep-3"></a>
 
-### Acid Lead 3
+### Filter Sweep 3
 
-Another sawtooth wave based acid lead sound. Aftertouch and mod wheel increase
-the vibrato, the sustain pedal lengthens the decay.
+Another variation of the filter sweep sawtooth wave. Aftertouch and mod
+wheel increase the vibrato, the sustain pedal lengthens the decay.
 
 <a id="preset-bells-1"></a>
 
@@ -2596,25 +2590,25 @@ envelopes, so the notes start with a slight "wah" effect. Aftertouch and mod
 wheel increase the vibrato. Aftertouch also adds more modulation, making the
 sound brighter and more distorted.
 
-<a id="preset-tech-noir-lead-1"></a>
+<a id="preset-tech-noir-1"></a>
 
-### Tech Noir Lead 1
+### Tech Noir 1
 
 A brass sound for futuristic sci-fi dystopias with a slower filter sweep at
 the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
 aftertouch adds emphasis and brightness.
 
-<a id="preset-tech-noir-lead-2"></a>
+<a id="preset-tech-noir-2"></a>
 
-### Tech Noir Lead 2
+### Tech Noir 2
 
 A brass sound for futuristic sci-fi dystopias with a harsher filter sweep at
 the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
 aftertouch adds emphasis and brightness.
 
-<a id="preset-tech-noir-lead-3"></a>
+<a id="preset-tech-noir-3"></a>
 
-### Tech Noir Lead 3
+### Tech Noir 3
 
 A darker brass sound for futuristic sci-fi dystopias with a filter sweep at
 the beginning of notes, depending on note velocity. Mod wheel adds vibrato,
@@ -2670,20 +2664,20 @@ a recording backwards. The time it takes for notes to un-decay depends on
 note pitch and velocity. The harder you play, the brighter and richer the
 sound gets. Mod wheel controls the vibrato, aftertouch adjusts the filtering.
 
-<a id="preset-nightmare-lead"></a>
+<a id="preset-nightmare"></a>
 
-### Nightmare Lead
+### Nightmare
 
 Starts out as a nice, filtered sawtooth wave, but as you begin to turn the mod
 wheel and add some aftertouch, it becomes more and more menacing and distorted,
 until it finally descends into madness.
 
-<a id="preset-tremolo-lead"></a>
+<a id="preset-tremolo"></a>
 
-### Tremolo Lead
+### Tremolo
 
-Thick lead sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
-the filter and adds a tremolo effect. Filtering also responds to note velocity.
+Thick sawtooth sound. Aftertouch adds vibrato and harmonics, mod wheel opens up
+the filter and adds a tremolo effect. The filter also responds to note velocity.
 
 <a id="preset-monophonic-saw"></a>
 
@@ -2824,9 +2818,8 @@ adds more emphasis to the note.
 This preset mutes the synthesizer and turns the Effects section into a
 master mix enhancer by applying tape-like saturation and coloring, and a
 hint of reverb. Depending on how much headroom you have in your mix, you may
-need to adjust the settings; it is recommended to start with the
-[Vol 1](#usage-effects-volume) knob. (The preset has been developed with mixes
-that have around 3-6 dB headroom.)
+need to adjust the settings; it is recommended to start with the Vol 1 knob.
+(The preset has been developed with mixes that have around 3-6 dB headroom.)
 
 <a id="preset-creepy-wind"></a>
 
@@ -2923,6 +2916,8 @@ effect, while aftertouch brightens the sound and shortens the notes.
 Ever evolving pulse width modulated bass sound. The mod wheel adds a tremolo
 effect, aftertouch slightly brightens and emphasizes the sound while also
 adjusting the tremolo's timing.
+
+<a href="#toc">Table of Contents</a>
 
 <a id="bugs"></a>
 
