@@ -143,6 +143,7 @@ Table of Contents
     * [Chiptune](#preset-chiptune)
     * [Octave Bass](#preset-octave-bass)
     * [Tremolo PWM Bass](#preset-tremolo-pwm-bass)
+    * [Ambient Pluck](#preset-ambient-pluck)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Why do you say FST instead of VST 2?](#faq-fst)
@@ -2916,6 +2917,16 @@ effect, while aftertouch brightens the sound and shortens the notes.
 Ever evolving pulse width modulated bass sound. The mod wheel adds a tremolo
 effect, aftertouch slightly brightens and emphasizes the sound while also
 adjusting the tremolo's timing.
+
+<a id="preset-ambient-pluck"></a>
+
+### Ambient Pluck
+
+Dark ambient pluck with distinct response to note velocity and a sustained sub
+oscillator for low notes. The mod wheel adds high-passed echos and reverb
+(with a little bit of side-chain compression), and aftertouch adds more
+harmonics to high notes and makes bass notes growl. Pitch bends, besides
+affecting the currently sounding notes, also change the pitch of the ambience.
 
 <a href="#toc">Table of Contents</a>
 
