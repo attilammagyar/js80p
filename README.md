@@ -1973,6 +1973,15 @@ many spread out reflections.
 Control the size of the room, ie. how long it takes for reflections to be
 audible.
 
+**Note**: bigger is not always better. For example, for transient-heavy sounds
+like plucks and drums, combining a small room size setting with a big
+[reflectivity](#usage-effects-reverb-refl) and careful dampening often produces
+nicer, more diffuse reverb tails than the other way around. (Combine this with
+[side-chain expansion](#usage-effects-echo-cm) to get an 1980s style gated
+reverb effect.)
+
+<a id="usage-effects-reverb-refl"></a>
+
 ##### Room Reflectivity (REFL)
 
 Control how reflective the room is, in other words, how loud are the sounds
