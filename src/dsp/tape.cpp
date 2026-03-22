@@ -583,6 +583,8 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
     delay.gain.set_value(1.0);
     delay.set_channel_lfo(0, params.delay_channel_lfo_1, 0.0037);
     delay.set_channel_lfo(1, params.delay_channel_lfo_2, 0.0043);
+
+    hiss_generator.start(0.0);
 }
 
 
@@ -593,6 +595,8 @@ void Tape<
 >::reset() noexcept
 {
     Filter<InputSignalProducerClass>::reset();
+
+    hiss_generator.start(0.0);
 
     transition_duration = 0.0;
     needs_ff_rescheduling = true;

@@ -42,7 +42,8 @@ NoiseGenerator<InputSignalProducerClass, LevelParamClass>::NoiseGenerator(
     high_pass_frequency(high_pass_frequency),
     low_pass_frequency(low_pass_frequency),
     level(level),
-    rng(rng)
+    rng(rng),
+    is_on_(false)
 {
     this->register_child(this->level);
 
@@ -83,6 +84,30 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::reset() noexcept
     Filter<InputSignalProducerClass>::reset();
 
     clear_filters_state();
+    is_on_ = false;
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::start(
+        Seconds const time_offset
+) noexcept {
+    this->schedule(EVT_START, time_offset, 0, 0.0, 0.0);
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::stop(
+        Seconds const time_offset
+) noexcept {
+    this->schedule(EVT_STOP, time_offset, 0, 0.0, 0.0);
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+bool NoiseGenerator<InputSignalProducerClass, LevelParamClass>::is_on() const noexcept
+{
+    return is_on_;
 }
 
 
@@ -140,6 +165,42 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::update_filter_co
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_event(
+        SignalProducer::Event const& event
+) noexcept {
+    SignalProducer::handle_event(event);
+
+    switch (event.type) {
+        case EVT_START:
+            handle_start_event(event);
+            break;
+
+        case EVT_STOP:
+            handle_stop_event(event);
+            break;
+    }
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_start_event(
+        SignalProducer::Event const& event
+) noexcept {
+    is_on_ = true;
+
+    clear_filters_state();
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_stop_event(
+        SignalProducer::Event const& event
+) noexcept {
+    is_on_ = false;
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
 Sample const* const* NoiseGenerator<InputSignalProducerClass, LevelParamClass>::initialize_rendering(
         Integer const round,
         Integer const sample_count
@@ -153,11 +214,33 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass, LevelParamClass>::
 
     level_buffer = LevelParamClass::produce_if_not_constant(level, round, sample_count);
 
+    if (JS80P_UNLIKELY(this->has_upcoming_events(sample_count))) {
+        return NULL;
+    }
+
     if (level_buffer == NULL && level.get_value() < 0.000001) {
+        this->advance_clock(sample_count);
+
         return buffer;
     }
 
-    return NULL;
+    if (JS80P_LIKELY(is_on_)) {
+        return NULL;
+    }
+
+    this->advance_clock(sample_count);
+
+    return buffer;
+}
+
+
+template<class InputSignalProducerClass, class LevelParamClass>
+void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::advance_clock(
+        Integer const sample_count
+) noexcept {
+    if (JS80P_UNLIKELY(this->has_events())) {
+        this->current_time += (Seconds)sample_count * this->sampling_period;
+    }
 }
 
 
@@ -168,6 +251,19 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    if (JS80P_UNLIKELY(!is_on_)) {
+        for (Integer c = 0; c != this->channels; ++c) {
+            Sample* const out_channel = buffer[c];
+            Sample const* const in_channel = this->input_buffer[c];
+
+            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                out_channel[i] = in_channel[i];
+            }
+        }
+
+        return;
+    }
+
     if (level_buffer == NULL) {
         render<ParamValueWrapper>(
             ParamValueWrapper(level.get_value()),

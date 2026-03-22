@@ -48,6 +48,9 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
     friend class SignalProducer;
 
     public:
+        static constexpr SignalProducer::Event::Type EVT_START = 1;
+        static constexpr SignalProducer::Event::Type EVT_STOP = 2;
+
         NoiseGenerator(
             InputSignalProducerClass& input,
             LevelParamClass& level,
@@ -74,12 +77,18 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
 
         virtual void reset() noexcept override;
 
+        void start(Seconds const time_offset) noexcept;
+        void stop(Seconds const time_offset) noexcept;
+        bool is_on() const noexcept;
+
         Frequency const high_pass_frequency;
         Frequency const low_pass_frequency;
 
         LevelParamClass level;
 
     protected:
+        void handle_event(SignalProducer::Event const& event) noexcept JS80P_OVERRIDE;
+
         Sample const* const* initialize_rendering(
             Integer const round,
             Integer const sample_count
@@ -95,6 +104,11 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
     private:
         void update_filter_coefficients() noexcept;
         void clear_filters_state() noexcept;
+
+        void handle_start_event(SignalProducer::Event const& event) noexcept;
+        void handle_stop_event(SignalProducer::Event const& event) noexcept;
+
+        void advance_clock(Integer const sample_count) noexcept;
 
         template<class LevelBufferClass>
         void render(
@@ -113,6 +127,8 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
         Sample a;
         Sample w1;
         Sample w2;
+
+        bool is_on_;
 };
 
 }

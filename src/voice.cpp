@@ -750,7 +750,11 @@ template<class ModulatorSignalProducerClass>
 bool Voice<ModulatorSignalProducerClass>::is_off_after(
         Seconds const time_offset
 ) const noexcept {
-    return is_released() && !oscillator.has_events_after(time_offset);
+    return (
+        is_released()
+        && !oscillator.has_events_after(time_offset)
+        && !noise_generator.has_events_after(time_offset)
+    );
 }
 
 
@@ -800,6 +804,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     note_panning.schedule_value(time_offset, calculate_note_panning(note));
 
     oscillator.cancel_events_at(time_offset);
+
+    noise_generator.cancel_events_at(time_offset);
 
     if constexpr (IS_MODULATOR) {
         additive_volume.start_envelope(time_offset, mpe_channel, random_1, random_2);
@@ -853,6 +859,8 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     filter_2.gain.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
     oscillator.start(time_offset);
+
+    noise_generator.start(time_offset);
 }
 
 
@@ -1177,6 +1185,9 @@ void Voice<ModulatorSignalProducerClass>::note_off(
     oscillator.cancel_events_at(off_after);
     oscillator.stop(off_after);
 
+    noise_generator.cancel_events_at(off_after);
+    noise_generator.stop(off_after);
+
     state = State::OFF;
 
     wavefolder.folding.end_envelope(time_offset);
@@ -1242,6 +1253,9 @@ void Voice<ModulatorSignalProducerClass>::cancel_note() noexcept
     oscillator.cancel_events();
     oscillator.stop(0.0);
 
+    noise_generator.cancel_events();
+    noise_generator.stop(0.0);
+
     wavefolder.folding.cancel_events();
 
     if constexpr (IS_CARRIER) {
@@ -1302,7 +1316,13 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     oscillator.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     oscillator.phase.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
-    oscillator.stop(time_offset + ENVELOPE_CANCEL_DURATION);
+    Seconds const oscillator_stop = time_offset + ENVELOPE_CANCEL_DURATION;
+
+    oscillator.cancel_events_at(oscillator_stop);
+    oscillator.stop(oscillator_stop);
+
+    noise_generator.cancel_events_at(oscillator_stop);
+    noise_generator.stop(oscillator_stop);
 
     oscillator.fine_detune.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
