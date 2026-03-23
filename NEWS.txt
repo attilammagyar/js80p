@@ -1,3 +1,34 @@
+v4.0.0 (2026-03-24)
+ * JS80P now runs on macOS as well.
+ * New oscillator and LFO waveforms with pulse width modulation (PWM): pulse,
+   soft pulse, bipolar pulse, and soft bipolar pulse.
+    * Most projects and patches that were saved by older versions of JS80P
+      should keep working without any changes, however, there is one exception
+      to backward compatibility: if the waveform parameter of an oscillator or
+      an LFO was assigned any kind of automation (e.g. MIDI controllers,
+      macros, etc.), those automations may need adjustments in order to take
+      the four new waveform options into account.
+ * New distortion types, including sin(x), sqrt(x), etc.
+ * New presets:
+    * 16 Beats Riser,
+    * Ambient Pluck,
+    * Chiptune,
+    * Octave Bass,
+    * Tremolo PWM Bass.
+ * The GUI is now resizable which should also fix various font sizing problems.
+ * Renamed badly named old presets.
+ * Improved VST 3 event processing order consistency.
+ * Bugfix: logarithmic scale parameters were not saved correctly if their value
+   was not modified after switching to logarithmic scale. This is now fixed.
+   (https://github.com/attilammagyar/js80p/issues/38)
+ * Bugfix: the plugin will handle FL Studio's out-of-range parameter values
+   (e.g. Pitch Bend) more gracefully.
+ * Bugfix: in certain cases, the noise generator of the oscillators could
+   produce sound before the Note On events would have a chance to take effect.
+   Now it's made sure that noise generators remain silent before Note On
+   events.
+ * Bugfix: VST 3 bundles now use the correct structure.
+
 v3.5.0 (2025-11-09)
  * MIDI Polyphonic Expression (MPE) is now supported.
  * Improved program name abbreviations.
