@@ -562,19 +562,16 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
 Midi::Byte Vst3Plugin::Processor::float_to_midi_byte(
         Number const number
 ) const noexcept {
-    return std::min(
-        (Midi::Byte)127,
-        std::max((Midi::Byte)0, (Midi::Byte)std::round(number * 127.0))
-    );
+    return (Midi::Byte)std::min(127, std::max(0, (int)std::round(number * 127.0)));
 }
 
 
 Midi::Word Vst3Plugin::Processor::float_to_midi_word(
         Number const number
 ) const noexcept {
-    return std::min(
-        (Midi::Word)16384, /* outside the 14-bit range, but more accurate */
-        std::max((Midi::Word)0, (Midi::Word)std::round(number * 16384.0))
+    return (Midi::Word)std::min(
+        16384, /* outside the 14-bit range, but more accurate */
+        std::max(0, (int)std::round(number * 16384.0))
     );
 }
 

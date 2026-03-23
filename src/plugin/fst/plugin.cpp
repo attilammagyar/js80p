@@ -1103,18 +1103,15 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
 
 Midi::Byte FstPlugin::float_to_midi_byte(float const value) const noexcept
 {
-    return std::min(
-        (Midi::Byte)127,
-        std::max((Midi::Byte)0, (Midi::Byte)std::round(value * 127.0f))
-    );
+    return (Midi::Byte)std::min(127, std::max(0, (int)std::round(value * 127.0f)));
 }
 
 
 Midi::Word FstPlugin::float_to_midi_word(float const value) const noexcept
 {
-    return std::min(
-        (Midi::Word)16384, /* outside the 14-bit range, but more accurate */
-        std::max((Midi::Word)0, (Midi::Word)std::round(value * 16384.0f))
+    return (Midi::Word)std::min(
+        16384, /* outside the 14-bit range, but more accurate */
+        std::max(0, (int)std::round(value * 16384.0f))
     );
 }
 
