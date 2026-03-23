@@ -140,11 +140,11 @@ Table of Contents
     * [Analog Brass AT MPE](#preset-analog-brass-at-mpe)
     * [Analog Brass mod MPE](#preset-analog-brass-mod-mpe)
     * [Expressive Saw MPE](#preset-expressive-saw-mpe)
+    * [16 Beats Riser](#preset-16-beats-riser)
+    * [Ambient Pluck](#preset-ambient-pluck)
     * [Chiptune](#preset-chiptune)
     * [Octave Bass](#preset-octave-bass)
     * [Tremolo PWM Bass](#preset-tremolo-pwm-bass)
-    * [Ambient Pluck](#preset-ambient-pluck)
-    * [16 Beats Riser](#preset-16-beats-riser)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Why do you say FST instead of VST 2?](#faq-fst)
@@ -2905,6 +2905,25 @@ Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 A version of the Expressive Saw preset that is optimized for MIDI Polyphonic
 Expression (MPE). Note: the preset does not turn on or modify MPE settings.
 
+<a id="preset-16-beats-riser"></a>
+
+### 16 Beats Riser
+
+Tempo-synced 16 beats long risers. Notes below middle C make a white noise
+swell followed by a reverb-based impact, notes above middle C make a tonal
+riser covering 6 octaves, starting 4 octaves below the triggered note and
+ending 2 octaves above it. The mod wheel controls filter resonance.
+
+<a id="preset-ambient-pluck"></a>
+
+### Ambient Pluck
+
+Dark ambient pluck with distinct response to note velocity and a sustained sub
+oscillator for low notes. The mod wheel adds high-passed echos and reverb
+(with a little bit of side-chain compression), and aftertouch adds more
+harmonics to high notes and makes bass notes growl. Pitch bends, besides
+affecting the currently sounding notes, also change the pitch of the ambience.
+
 <a id="preset-chiptune"></a>
 
 ### Chiptune
@@ -2927,25 +2946,6 @@ effect, while aftertouch brightens the sound and shortens the notes.
 Ever evolving pulse width modulated bass sound. The mod wheel adds a tremolo
 effect, aftertouch slightly brightens and emphasizes the sound while also
 adjusting the tremolo's timing.
-
-<a id="preset-ambient-pluck"></a>
-
-### Ambient Pluck
-
-Dark ambient pluck with distinct response to note velocity and a sustained sub
-oscillator for low notes. The mod wheel adds high-passed echos and reverb
-(with a little bit of side-chain compression), and aftertouch adds more
-harmonics to high notes and makes bass notes growl. Pitch bends, besides
-affecting the currently sounding notes, also change the pitch of the ambience.
-
-<a id="preset-16-beats-riser"></a>
-
-### 16 Beats Riser
-
-Tempo-synced 16 beats long risers. Notes below middle C make a white noise
-swell followed by a reverb-based impact, notes above middle C make a tonal
-riser covering 6 octaves, starting 4 octaves below the triggered note and
-ending 2 octaves above it. The mod wheel controls filter resonance.
 
 <a href="#toc">Table of Contents</a>
 
