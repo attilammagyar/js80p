@@ -491,12 +491,11 @@ small {
           <li><p><strong>Bugfix</strong>: logarithmic scale parameters were not saved correctly if their value
              was not modified after switching to logarithmic scale. This is now fixed.
              (<a href="https://github.com/attilammagyar/js80p/issues/38">#38</a>)</p></li>
-          <li><p><strong>Bugfix</strong>: the plugin will handle FL Studio's out-of-range parameter values
-             (e.g. Pitch Bend) more gracefully.</p></li>
-          <li><p><strong>Bugfix</strong>: in certain cases, the noise generator of the oscillators could
-             produce sound before the Note On events would have a chance to take effect.
-             Now it's made sure that noise generators remain silent before Note On
-             events.</p></li>
+          <li><p><strong>Bugfix</strong>: the plugin will handle out-of-range
+            parameter values sent by certain DAWs more gracefully.</p></li>
+          <li><p><strong>Bugfix</strong>: in certain cases, the noise generator of the oscillators could turn on
+            slightly ahead of Note On events. Now it's made sure that noise generators won't make any sound before
+            they are supposed to.</p></li>
           <li><p><strong>Bugfix</strong>: VST 3 bundles now use the correct structure.</p></li>
         </ul>
       </div>
