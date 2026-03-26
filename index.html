@@ -183,6 +183,10 @@ p.indent {
   padding-left: 16px;
 }
 
+p.small {
+  font-size: 14px;
+}
+
 p {
   max-width: 960px;
   margin: 6px auto;
@@ -378,6 +382,11 @@ small {
         <div class="columns">
           <div class="column">
             <h3>Windows and Linux</h3>
+            <p class="indent small">
+              The AVX bundle is optimized for 64 bit modern Intel or compatible
+              CPUs. The SSE2 bundle contains 64 and 32 bit binaries for almost
+              any Intel or compatible CPUs sold after 2000.
+            </p>
             <ul>
               <li>
                 VST 3 Bundle, AVX: <a href="https://github.com/attilammagyar/js80p/releases/download/v4.0.0/js80p-4_0_0-avx-vst3_bundle.zip">Download (9.7M)</a>
@@ -434,7 +443,7 @@ small {
             </ul>
 
             <h3>macOS</h3>
-            <p class="indent">
+            <p class="indent small">
               Universal binaries for Apple Silicon (<code>M1</code>,
               <code>M2</code>, etc.) running macOS 11 Big Sur or newer, and
               Intel (<code>x86_64</code> with AVX) running macOS 10.12 Sierra or
