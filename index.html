@@ -437,7 +437,7 @@ small {
             <p class="indent">
               Universal binaries for Apple Silicon (<code>M1</code>,
               <code>M2</code>, etc.) running macOS 11 Big Sur or newer, and
-              Intel (<code>x86_64</code>) running macOS 10.12 Sierra or
+              Intel (<code>x86_64</code> with AVX) running macOS 10.12 Sierra or
               newer:
             </p>
             <ul>
@@ -523,20 +523,18 @@ small {
 
     if (platform.match(/mac/i)) {
         url_re = /macos-universal-vst3.*\.pkg/i;
-        description = "Universal binary for VST 3 compatible hosts running on macOS 11 Big Sur or newer on Apple Silicon (M1, M2, etc.), or macOS 10.12 Sierra on Intel.";
+        description = "Universal binary for VST 3 compatible hosts running on macOS 11 Big Sur or newer on Apple Silicon (M1, M2, etc.), or macOS 10.12 Sierra on Intel x86_64 with AVX. Find other options below.";
     } else if (platform.match(/win/i)) {
-        url_re = /avx.*vst3_bundle.*\.zip/i;
-        description = "VST 3 bundle for X64 CPUs with AVX running Windows 7 or newer.";
+        url_re = /sse2.*vst3_bundle.*\.zip/i;
+        description = "VST 3 bundle for X64 or X86 CPUs with SSE2 running Windows 7 or newer. Find other options and AVX-optimized packages below.";
     } else if (platform.match(/linux/i) && !user_agent.match(/android/i)) {
-        url_re = /avx.*vst3_bundle.*\.zip/i;
-        description = "VST 3 bundle for x86_64 CPUs with AVX running Linux."
+        url_re = /sse2.*vst3_bundle.*\.zip/i;
+        description = "VST 3 bundle for x86_64 or i686 CPUs with SSE2 running Linux. Find other options and AVX-optimized packages below.";
     }
 
     if (url_re === null) {
         return;
     }
-
-    description += " Find other options below.";
 
     try {
         links = document.getElementById("download").getElementsByTagName("a");
