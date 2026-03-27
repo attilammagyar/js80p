@@ -171,7 +171,8 @@ class Vst3Plugin
                 Renderer renderer;
                 MtsEsp mts_esp;
                 Bank const* bank;
-                std::vector<Event> events;
+                std::vector<Event> param_events;
+                std::vector<Event> note_events;
                 size_t new_program;
                 bool need_to_load_new_program;
 
