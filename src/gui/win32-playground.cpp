@@ -21,6 +21,11 @@
 #include "gui/win32.hpp"
 
 
+constexpr JS80P::Integer BLOCK_SIZE = 256;
+constexpr JS80P::Frequency SAMPLE_RATE = 11025.0;
+constexpr UINT GUI_TIMER_MSEC = 100;
+
+
 JS80P::GUI* gui;
 JS80P::Synth synth;
 JS80P::Integer rendering_round = 0;
@@ -37,7 +42,7 @@ LRESULT window_procedure(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_TIMER:
             ++rendering_round;
             rendering_round = rendering_round & 0x7fff;
-            synth.generate_samples(rendering_round, 1);
+            synth.generate_samples(rendering_round, BLOCK_SIZE);
 
             gui->idle();
 
@@ -96,8 +101,8 @@ int WINAPI wWinMain(
 
     SetWindowLongPtr(main_window, GWLP_USERDATA, (LONG_PTR)main_window);
 
-    UINT_PTR timer_id = 12345;
-    SetTimer(main_window, timer_id, 100, NULL);
+    synth.set_block_size(BLOCK_SIZE);
+    synth.set_sample_rate(SAMPLE_RATE);
 
     gui = new JS80P::GUI(
         NULL,
@@ -107,6 +112,9 @@ int WINAPI wWinMain(
         true
     );
     gui->show();
+
+    UINT_PTR timer_id = 12345;
+    SetTimer(main_window, timer_id, GUI_TIMER_MSEC, NULL);
 
     ShowWindow(main_window, nCmdShow);
 

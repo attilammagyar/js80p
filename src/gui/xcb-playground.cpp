@@ -1,6 +1,6 @@
 /*
  * This file is part of JS80P, a synthesizer plugin.
- * Copyright (C) 2023, 2024, 2025  Attila M. Magyar
+ * Copyright (C) 2023, 2024, 2025, 2026  Attila M. Magyar
  *
  * JS80P is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +35,17 @@
 #include "synth.hpp"
 
 
+constexpr JS80P::Integer BLOCK_SIZE = 256;
+constexpr JS80P::Frequency SAMPLE_RATE = 11025.0;
+constexpr JS80P::Seconds GUI_UPDATE_TIMEOUT = 0.1;
+
+
 xcb_generic_event_t* const JS80P_XCB_TIMEOUT = (xcb_generic_event_t*)-1;
 
 
 xcb_generic_event_t* xcb_wait_for_event_with_timeout(
         JS80P::XcbPlatform* const xcb,
-        double const timeout
+        JS80P::Seconds const timeout
 )
 {
     constexpr double NANOSEC_SCALE = 1000000000.0;
@@ -74,7 +79,7 @@ void timer_tick(
 ) {
     ++rendering_round;
     rendering_round = rendering_round & 0x7fff;
-    synth.generate_samples(rendering_round, 1);
+    synth.generate_samples(rendering_round, BLOCK_SIZE);
     gui.idle();
 }
 
@@ -163,6 +168,9 @@ int main(int const argc, char const* argv[])
 
     JS80P::Synth synth;
 
+    synth.set_block_size(BLOCK_SIZE);
+    synth.set_sample_rate(SAMPLE_RATE);
+
     JS80P::GUI* const gui = new JS80P::GUI(
         NULL,
         (JS80P::GUI::PlatformData)gui_xcb,
@@ -172,7 +180,7 @@ int main(int const argc, char const* argv[])
     );
     gui->show();
 
-    while (is_running && (event = xcb_wait_for_event_with_timeout(xcb, 0.05))) {
+    while (is_running && (event = xcb_wait_for_event_with_timeout(xcb, GUI_UPDATE_TIMEOUT))) {
         if (event == JS80P_XCB_TIMEOUT) {
             timer_tick(synth, *gui, rendering_round);
 

@@ -23,6 +23,11 @@
 #include "synth.hpp"
 
 
+constexpr JS80P::Integer BLOCK_SIZE = 256;
+constexpr JS80P::Frequency SAMPLE_RATE = 11025.0;
+constexpr JS80P::Seconds GUI_UPDATE_TIMER_INTERVAL = 0.1;
+
+
 @interface GUIPlaygroundAppDelegate : NSObject<NSApplicationDelegate>
     {
         JS80P::GUI* gui;
@@ -76,6 +81,9 @@
 
         synth = new JS80P::Synth();
 
+        synth->set_block_size(BLOCK_SIZE);
+        synth->set_sample_rate(SAMPLE_RATE);
+
         gui = new JS80P::GUI(
             NULL,
             NULL,
@@ -89,13 +97,13 @@
 
         self.idle_timer = [
             NSTimer
-            scheduledTimerWithTimeInterval:0.1
+            scheduledTimerWithTimeInterval:GUI_UPDATE_TIMER_INTERVAL
             repeats:YES
             block:^(NSTimer* timer) {
                 if (synth != NULL) {
                     ++rendering_round;
                     rendering_round = rendering_round & 0x7fff;
-                    synth->generate_samples(rendering_round, 1);
+                    synth->generate_samples(rendering_round, BLOCK_SIZE);
                 }
             }
         ];
