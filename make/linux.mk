@@ -27,7 +27,7 @@ DOXYGEN ?= /usr/bin/doxygen
 VALGRIND ?= /usr/bin/valgrind
 VALGRIND_FLAGS = --error-exitcode=99 --track-origins=yes --leak-check=yes --quiet
 
-CHECK_MEMORY = $(VALGRIND) $(VALGRIND_FLAGS)
+CHECK_MEMORY ?= $(VALGRIND) $(VALGRIND_FLAGS)
 
 PDFLATEX ?= /usr/bin/pdflatex
 
