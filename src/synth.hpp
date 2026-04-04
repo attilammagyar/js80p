@@ -638,7 +638,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N12TIN = 481,     ///< Envelope 12 Time Inaccuracy
             N12VIN = 482,     ///< Envelope 12 Level Inaccuracy
 
-            L1PW = 483,      ///< LFO 1 Pulse WIdth
+            L1PW = 483,      ///< LFO 1 Pulse Width
             L1FRQ = 484,     ///< LFO 1 Frequency
             L1PHS = 485,     ///< LFO 1 Phase
             L1MIN = 486,     ///< LFO 1 Minimum Value
@@ -655,7 +655,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L2DST = 496,     ///< LFO 2 Distortion
             L2RND = 497,     ///< LFO 2 Randomness
 
-            L3PW = 498,      ///< LFO 3 Pulse WIdth
+            L3PW = 498,      ///< LFO 3 Pulse Width
             L3FRQ = 499,     ///< LFO 3 Frequency
             L3PHS = 500,     ///< LFO 3 Phase
             L3MIN = 501,     ///< LFO 3 Minimum Value
@@ -672,7 +672,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L4DST = 511,     ///< LFO 4 Distortion
             L4RND = 512,     ///< LFO 4 Randomness
 
-            L5PW = 513,      ///< LFO 5 Pulse WIdth
+            L5PW = 513,      ///< LFO 5 Pulse Width
             L5FRQ = 514,     ///< LFO 5 Frequency
             L5PHS = 515,     ///< LFO 5 Phase
             L5MIN = 516,     ///< LFO 5 Minimum Value
@@ -689,7 +689,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6DST = 526,     ///< LFO 6 Distortion
             L6RND = 527,     ///< LFO 6 Randomness
 
-            L7PW = 528,      ///< LFO 7 Pulse WIdth
+            L7PW = 528,      ///< LFO 7 Pulse Width
             L7FRQ = 529,     ///< LFO 7 Frequency
             L7PHS = 530,     ///< LFO 7 Phase
             L7MIN = 531,     ///< LFO 7 Minimum Value

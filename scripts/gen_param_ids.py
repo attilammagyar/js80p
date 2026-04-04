@@ -218,7 +218,7 @@ def print_envelopes_params(param_id: int, param_objs: list) -> int:
 
 def print_lfo_params(param_id: int, param_objs: list) -> int:
     params = [
-        ("$#PW", "  ///< $ # Pulse WIdth", ""),
+        ("$#PW", "  ///< $ # Pulse Width", ""),
         ("$#FRQ", " ///< $ # Frequency", ""),
         ("$#PHS", " ///< $ # Phase", ""),
         ("$#MIN", " ///< $ # Minimum Value", ""),
