@@ -51,6 +51,7 @@ JS80P_CXXFLAGS = \
 	-D JS80P_TARGET_PLATFORM=$(TARGET_PLATFORM) \
 	-D JS80P_INSTRUCTION_SET=$(INSTRUCTION_SET) \
 	-Wall \
+	-Wno-c99-designator \
 	$(CXX_WARNINGS) \
 	-ffast-math \
 	-O3 \
