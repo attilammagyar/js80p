@@ -413,7 +413,9 @@ VST3_CXXFLAGS = \
 	-Wno-class-memaccess \
 	-Wno-error=deprecated-declarations \
 	-Wno-format \
+	-Wno-implicit-const-int-float-conversion \
 	-Wno-multichar \
+	-Wno-nontrivial-memcall \
 	-Wno-parentheses \
 	-Wno-pragmas \
 	-Wno-unknown-pragmas \
