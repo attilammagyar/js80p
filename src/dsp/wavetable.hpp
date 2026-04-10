@@ -35,7 +35,7 @@ class WavetableState
 
         Number scale;
         Number sample_index;
-        Number fewer_partials_weight;
+        Number more_partials_weight;
         Frequency nyquist_frequency;
         Frequency interpolation_limit;
         Integer table_indices[2];

@@ -40,7 +40,7 @@ Number Wavetable::sines[Wavetable::SIZE] = {0.0};
 WavetableState::WavetableState() noexcept
     : scale(1.0),
     sample_index(0.0),
-    fewer_partials_weight(1.0),
+    more_partials_weight(1.0),
     nyquist_frequency(22100.0),
     interpolation_limit(10.0),
     table_indices{0, 0}
@@ -231,16 +231,15 @@ void Wavetable::lookup(
         Sample const max_partials = (
             (Sample)(state.nyquist_frequency / abs_frequency)
         );
+        Integer const max_partials_int = (Integer)max_partials;
+        Integer const partials = this->partials;
         Integer const more_partials_index = (
-            std::max((Integer)0, std::min(this->partials, (Integer)max_partials) - 1)
-        );
-        Integer const fewer_partials_index = (
-            std::max((Integer)0, more_partials_index - 1)
+            std::max((Integer)0, std::min(partials, max_partials_int) - 1)
         );
 
-        state.table_indices[0] = fewer_partials_index;
+        if (more_partials_index == 0 || max_partials_int > partials) {
+            state.table_indices[0] = more_partials_index;
 
-        if (more_partials_index == fewer_partials_index) {
             interpolate<interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling>(
                 state,
                 abs_frequency,
@@ -253,8 +252,13 @@ void Wavetable::lookup(
             return;
         }
 
+        Integer const fewer_partials_index = (
+            std::max((Integer)0, more_partials_index - 1)
+        );
+
+        state.table_indices[0] = fewer_partials_index;
         state.table_indices[1] = more_partials_index;
-        state.fewer_partials_weight = max_partials - std::floor(max_partials);
+        state.more_partials_weight = max_partials - std::floor(max_partials);
 
         interpolate<interpolation, true, with_subharmonic, is_pulse, need_pulse_scaling>(
             state,
@@ -385,12 +389,12 @@ void Wavetable::interpolate_sample_linear(
         Sample const* const table_2 = samples[state.table_indices[1]];
 
         sample = Math::combine(
-            state.fewer_partials_weight,
-            Math::combine(
-                sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
-            ),
+            state.more_partials_weight,
             Math::combine(
                 sample_2_weight, table_2[sample_2_index], table_2[sample_1_index]
+            ),
+            Math::combine(
+                sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
             )
         );
     } else {
@@ -471,9 +475,9 @@ void Wavetable::interpolate_sample_lagrange(
         Sample const f_2_3 = table_2[sample_3_index];
 
         sample = Math::combine(
-            state.fewer_partials_weight,
-            a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3,
-            a_1 * f_2_1 + a_2 * f_2_2 + a_3 * f_2_3
+            state.more_partials_weight,
+            a_1 * f_2_1 + a_2 * f_2_2 + a_3 * f_2_3,
+            a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3
         );
     } else {
         sample = a_1 * f_1_1 + a_2 * f_1_2 + a_3 * f_1_3;

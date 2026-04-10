@@ -971,7 +971,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_oscillator_is_silent, {
 })
 
 
-TEST(while_frequency_goes_close_to_the_nyquist_frequency_harmonics_vanish_gradually, {
+TEST(when_frequency_is_close_to_the_nyquist_frequency_harmonics_vanish_gradually, {
     test_basic_waveform<ReferenceSawtoothWithDisappearingPartial>(
         SimpleOscillator::SAWTOOTH,
         0.12,
@@ -979,6 +979,74 @@ TEST(while_frequency_goes_close_to_the_nyquist_frequency_harmonics_vanish_gradua
         0.75 * NYQUIST_FREQUENCY,
         256,
         1
+    );
+})
+
+
+TEST(when_frequency_is_changing_but_harmonics_remain_below_the_nyquist_frequency_then_they_are_kept_fully, {
+    constexpr Frequency start_frequency = 100.0;
+    constexpr Frequency end_frequency = 200.0;
+    constexpr Integer block_size = 256;
+    constexpr Integer rounds = 3;
+    constexpr Integer sample_count = rounds * block_size;
+    constexpr Seconds duration = (Seconds)sample_count / (Seconds)SAMPLE_RATE;
+
+    Byte const voice_status = Constants::VOICE_STATUS_NORMAL;
+
+    ReferenceSine reference_sine(start_frequency, end_frequency, duration);
+    FloatParamS pulse_width("", 0.0, 1.0, 0.5);
+    FloatParamS amplitude("", 0.0, 1.0, 1.0);
+    FloatParamS dummy_float_param("", 0.0, 1.0, 0.0);
+    ToggleParam dummy_toggle_param("", ToggleParam::OFF);
+    FloatParamB harmonic_9("", -1.0, 1.0, 1.0);
+    FloatParamB harmonic_rest("", -1.0, 1.0, 0.0);
+
+    SimpleOscillator::WaveformParam waveform_param("");
+    SimpleOscillator oscillator(
+        waveform_param,
+        pulse_width,
+        amplitude,
+        dummy_float_param,
+        dummy_float_param,
+        dummy_float_param,
+        dummy_toggle_param,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_rest,
+        harmonic_9,
+        voice_status
+    );
+
+    amplitude.set_sample_rate(SAMPLE_RATE);
+    amplitude.set_block_size(block_size);
+
+    dummy_float_param.set_sample_rate(SAMPLE_RATE);
+    dummy_float_param.set_block_size(block_size);
+
+    harmonic_9.set_sample_rate(SAMPLE_RATE);
+    harmonic_9.set_block_size(block_size);
+
+    harmonic_rest.set_sample_rate(SAMPLE_RATE);
+    harmonic_rest.set_block_size(block_size);
+
+    waveform_param.set_sample_rate(SAMPLE_RATE);
+    waveform_param.set_block_size(block_size);
+    waveform_param.set_value(SimpleOscillator::CUSTOM);
+
+    oscillator.set_block_size(block_size);
+    oscillator.set_sample_rate(SAMPLE_RATE);
+
+    oscillator.frequency.set_value(start_frequency / 10.0);
+    oscillator.frequency.schedule_linear_ramp(duration, (Number)end_frequency / 10.0);
+
+    assert_oscillator_output_is_close_to_reference(
+        reference_sine, oscillator, SAMPLE_RATE, block_size, rounds, 0.02
     );
 })
 
