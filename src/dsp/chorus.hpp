@@ -71,6 +71,11 @@ class Chorus : public Effect<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_HIGH_SHELF
         > HighShelfFilter;
 
+        typedef BiquadFilter<
+            HighShelfFilter,
+            BiquadFilterFixedType::BFFT_HIGH_PASS
+        > HighPassedFeedback;
+
         class TypeParam : public ByteParam
         {
             public:
@@ -321,14 +326,15 @@ class Chorus : public Effect<InputSignalProducerClass>
         void update_tunings(Byte const type) noexcept;
 
         FloatParamS biquad_filter_q;
-        FloatParamS high_pass_filter_gain;
-        HighPassedInput high_pass_filter;
+        FloatParamS input_high_pass_filter_gain;
+        HighPassedInput input_high_pass_filter;
         LFO lfos[VOICES];
         FloatParamS delay_times[VOICES];
         CombFilter comb_filters[VOICES];
         Mixer<CombFilter> mixer;
         HighShelfFilter high_shelf_filter;
-        Gain<HighShelfFilter> feedback_gain;
+        HighPassedFeedback feedback_high_pass_filter;
+        Gain<HighPassedFeedback> feedback_gain;
         Sample const* const* chorused;
         Byte previous_type;
         bool should_start_lfos;

@@ -43,7 +43,7 @@ template<class InputSignalProducerClass>
 Chorus<InputSignalProducerClass>::Chorus(
         std::string const& name,
         InputSignalProducerClass& input
-) : Effect<InputSignalProducerClass>(name, input, 19 + VOICES * 3, &mixer),
+) : Effect<InputSignalProducerClass>(name, input, 20 + VOICES * 3, &mixer),
     type(name + "TYP"),
     delay_time(
         name + "DEL",
@@ -124,18 +124,18 @@ Chorus<InputSignalProducerClass>::Chorus(
         Constants::BIQUAD_FILTER_Q_MAX,
         Constants::BIQUAD_FILTER_Q_DEFAULT
     ),
-    high_pass_filter_gain(
+    input_high_pass_filter_gain(
         "",
         Constants::BIQUAD_FILTER_GAIN_MIN,
         Constants::BIQUAD_FILTER_GAIN_MAX,
         0.0
     ),
-    high_pass_filter(
+    input_high_pass_filter(
         input,
         CombFilter::CHANNELS,
         high_pass_frequency,
         high_pass_q,
-        high_pass_filter_gain
+        input_high_pass_filter_gain
     ),
     lfos{
         {name + "LFO1", frequency, delay_time, depth, tempo_sync, 0.0},
@@ -156,13 +156,13 @@ Chorus<InputSignalProducerClass>::Chorus(
         FloatParamS(name + "DEL7", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT),
     },
     comb_filters{
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[0], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[1], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[2], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[3], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[4], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[5], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[6], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[0], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[1], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[2], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[3], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[4], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[5], &tempo_sync},
+        {input_high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[6], &tempo_sync},
     },
     mixer(CombFilter::CHANNELS),
     high_shelf_filter(
@@ -177,7 +177,13 @@ Chorus<InputSignalProducerClass>::Chorus(
         NULL,
         &mixer
     ),
-    feedback_gain(high_shelf_filter, feedback, NULL, CombFilter::CHANNELS),
+    feedback_high_pass_filter(
+        "",
+        high_shelf_filter,
+        &mixer,
+        CombFilter::CHANNELS
+    ),
+    feedback_gain(feedback_high_pass_filter, feedback, NULL, CombFilter::CHANNELS),
     previous_type(255),
     should_start_lfos(true)
 {
@@ -197,12 +203,13 @@ Chorus<InputSignalProducerClass>::Chorus(
 
     this->register_child(biquad_filter_q);
 
-    this->register_child(high_pass_filter_gain);
-    this->register_child(high_pass_filter);
+    this->register_child(input_high_pass_filter_gain);
+    this->register_child(input_high_pass_filter);
 
     this->register_child(mixer);
 
     this->register_child(high_shelf_filter);
+    this->register_child(feedback_high_pass_filter);
 
     this->register_child(feedback_gain);
 
@@ -221,6 +228,9 @@ Chorus<InputSignalProducerClass>::Chorus(
         this->register_child(delay_times[i]);
         this->register_child(comb_filters[i]);
     }
+
+    feedback_high_pass_filter.frequency.set_value(10.0);
+    feedback_high_pass_filter.q.set_value(0.0);
 }
 
 
@@ -279,7 +289,7 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
     }
 
     chorused = SignalProducer::produce<HighShelfFilter>(high_shelf_filter, round, sample_count);
-    SignalProducer::produce< Gain<HighShelfFilter> >(feedback_gain, round, sample_count);
+    SignalProducer::produce< Gain<HighPassedFeedback> >(feedback_gain, round, sample_count);
 
     return NULL;
 }
