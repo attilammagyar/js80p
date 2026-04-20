@@ -28,6 +28,7 @@
 #include "midi.hpp"
 
 #include "dsp/lfo.hpp"
+#include "dsp/math.hpp"
 
 #include "serializer.hpp"
 #include "synth.hpp"

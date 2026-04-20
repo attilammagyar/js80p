@@ -3496,3 +3496,94 @@ TEST(clearing_the_settings_clears_note_states, {
         "round=3, channel=1"
     );
 })
+
+
+void compute_patch_statistics(
+        Synth const& synth,
+        Math::Statistics& statistics,
+        Number& changed_param_count
+) {
+    std::vector<Number> patch;
+
+    for (int i = 0; i != (int)Synth::ParamId::PARAM_ID_COUNT; ++i) {
+        Synth::ParamId const param_id = (Synth::ParamId)i;
+        std::string const param_name = synth.get_param_name(param_id);
+
+        if (param_name.length() == 0) {
+            continue;
+        }
+
+        Synth::ControllerId const controller_id = (
+            synth.get_param_controller_id_atomic(param_id)
+        );
+
+        if (controller_id == Synth::ControllerId::NONE) {
+            Number const ratio = synth.get_param_ratio_atomic(param_id);
+            Number const default_ratio = (
+                synth.get_param_default_ratio(param_id)
+            );
+
+            if (!Math::is_close(ratio, default_ratio)) {
+                patch.push_back(ratio);
+            }
+        } else {
+            patch.push_back(
+                (Number)controller_id
+                / (Number)Synth::ControllerId::CONTROLLER_ID_COUNT
+            );
+        }
+    }
+
+    Math::compute_statistics(patch, statistics);
+    changed_param_count = (Number)patch.size();
+}
+
+
+TEST(randomized_patches_vary_parameter_values_and_controller_assignments, {
+    Synth synth;
+    std::vector<Number> means;
+    std::vector<Number> standard_deviations;
+    std::vector<Number> changed_param_counts;
+    Math::Statistics means_statistics;
+    Math::Statistics standard_deviations_statistics;
+    Math::Statistics changed_param_counts_statistics;
+
+    for (Integer i = 0; i != 1000; ++i) {
+        Math::Statistics statistics;
+        Number changed_param_count;
+
+        synth.process_message(
+            Synth::MessageType::RANDOMIZE,
+            Synth::ParamId::INVALID_PARAM_ID,
+            0.0,
+            0
+        );
+
+        compute_patch_statistics(synth, statistics, changed_param_count);
+
+        assert_true(statistics.is_valid);
+
+        /* 9 log-scale toggles are always changed */
+        assert_gt(changed_param_count, 12.0);
+        assert_gt(statistics.standard_deviation, 0.1);
+
+        means.push_back(statistics.mean);
+        standard_deviations.push_back(statistics.standard_deviation);
+        changed_param_counts.push_back(changed_param_count);
+
+        synth.generate_samples(i, 2);
+    }
+
+    Math::compute_statistics(means, means_statistics);
+    Math::compute_statistics(
+        standard_deviations, standard_deviations_statistics
+    );
+    Math::compute_statistics(
+        changed_param_counts, changed_param_counts_statistics
+    );
+
+    assert_gt(means_statistics.standard_deviation, 0.015);
+    assert_gt(standard_deviations_statistics.mean, 0.150);
+    assert_gt(standard_deviations_statistics.standard_deviation, 0.005);
+    assert_gt(changed_param_counts_statistics.standard_deviation, 10.0);
+})

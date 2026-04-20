@@ -20,6 +20,8 @@
 #define JS80P__DSP__MATH_HPP
 
 #include <algorithm>
+#include <array>
+#include <cstddef>
 #include <vector>
 
 #include "js80p.hpp"
@@ -65,6 +67,18 @@ class Math
                 void reset() noexcept;
 
                 Number random() noexcept;
+                Number random(Number const min, Number const max) noexcept;
+                Number random_normal() noexcept;
+
+                Number random_normal(
+                    Number const min,
+                    Number const max
+                ) noexcept;
+
+                template<class T, std::size_t N>
+                T const& random_choice(
+                    std::array<T, N> const& options
+                ) noexcept;
 
             private:
                 static constexpr Number SCALE = 1.0 / 65536.0;

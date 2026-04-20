@@ -19,7 +19,9 @@
 #include "test.cpp"
 #include "utils.cpp"
 
+#include <array>
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include "js80p.hpp"
@@ -523,8 +525,8 @@ TEST(distort, {
 })
 
 
-TEST(rng, {
-    constexpr Integer probes = 500;
+TEST(rng_can_generate_uniformly_distributed_random_numbers, {
+    constexpr Integer probes = 10000;
     std::vector<Number> numbers(probes);
     Math::RNG rng(0x2345);
     Math::Statistics statistics;
@@ -538,7 +540,115 @@ TEST(rng, {
 
     Math::compute_statistics(numbers, statistics);
     assert_statistics(
-        true, 0.0, 0.5, 1.0, 0.5, std::pow(1.0 / 12.0, 0.5), statistics, 0.015
+        true, 0.0, 0.5, 1.0, 0.5, std::sqrt(1.0 / 12.0), statistics, 0.0015
+    );
+})
+
+
+TEST(rng_can_generate_uniformly_distributed_random_numbers_within_bounds, {
+    constexpr Integer probes = 10000;
+    constexpr Number min = -10.0;
+    constexpr Number max = 10.0;
+    std::vector<Number> numbers(probes);
+    Math::RNG rng(0x2345);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        Number const number = rng.random(min, max);
+        numbers[i] = number;
+        assert_gte(number, min);
+        assert_lte(number, max);
+    }
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(
+        true,
+        min,
+        0.0,
+        max,
+        0.0,
+        std::sqrt(1.0 / 12.0) * (max - min),
+        statistics,
+        0.025
+    );
+})
+
+
+TEST(rng_can_pick_collection_item_randomly_with_uniform_distribution, {
+    constexpr Integer probes = 10000;
+    constexpr Number probes_inv = 1.0 / (Number)probes;
+    constexpr size_t number_of_options = 3;
+    constexpr size_t distribution_length = 6;
+    constexpr std::array<int, number_of_options> options{1, 3, 5};
+    constexpr Number probability = 1.0 / (Number)number_of_options;
+    constexpr Number expected_distribution[distribution_length] = {
+        0.0, probability, 0.0, probability, 0.0, probability,
+    };
+    constexpr Number mean = (
+        probability * (Number)options[0]
+        + probability * (Number)options[1]
+        + probability * (Number)options[2]
+    );
+    Number const expected_std = std::sqrt(
+        probability * std::pow(((Number)options[0] - mean), 2.0)
+        + probability * std::pow(((Number)options[1] - mean), 2.0)
+        + probability * std::pow(((Number)options[2] - mean), 2.0)
+    );
+
+    std::vector<Number> numbers(probes);
+    Number distribution[distribution_length] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    Math::RNG rng(0x2345);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        int const number = rng.random_choice(options);
+
+        numbers[i] = (Number)number;
+        distribution[number] += probes_inv;
+    }
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(true, 1.0, 3.0, 5.0, 3.0, expected_std, statistics, 0.01);
+    assert_eq(expected_distribution, distribution, distribution_length, 0.01);
+})
+
+
+TEST(rng_can_generate_normally_distributed_random_numbers, {
+    constexpr Integer probes = 50000;
+    std::vector<Number> numbers(probes);
+    Math::RNG rng(0x2345);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        Number const number = rng.random_normal();
+        numbers[i] = number;
+        assert_gte(number, 0.0);
+        assert_lte(number, 1.0);
+    }
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(true, 0.0, 0.5, 1.0, 0.5, 1.0 / 6.0, statistics, 0.02);
+})
+
+
+TEST(rng_can_generate_normally_distributed_random_numbers_within_bounds, {
+    constexpr Integer probes = 100000;
+    constexpr Number min = -10.0;
+    constexpr Number max = 10.0;
+    std::vector<Number> numbers(probes);
+    Math::RNG rng(0x2345);
+    Math::Statistics statistics;
+
+    for (Integer i = 0; i != probes; ++i) {
+        Number const number = rng.random_normal(min, max);
+        numbers[i] = number;
+        assert_gte(number, min);
+        assert_lte(number, max);
+    }
+
+    Math::compute_statistics(numbers, statistics);
+    assert_statistics(
+        true, min, 0.0, max, 0.0, (max - min) / 6.0, statistics, 0.35
     );
 })
 

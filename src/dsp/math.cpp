@@ -59,6 +59,39 @@ Number Math::RNG::random() noexcept
 }
 
 
+Number Math::RNG::random(Number const min, Number const max) noexcept
+{
+    return min + random() * (max - min);
+}
+
+
+Number Math::RNG::random_normal() noexcept
+{
+    constexpr Number scale = 1.0 / 3.0;
+
+    return scale * (random() + random() + random());
+}
+
+
+Number Math::RNG::random_normal(Number const min, Number const max) noexcept
+{
+    return min + random_normal() * (max - min);
+}
+
+
+template<class T, std::size_t N>
+T const& Math::RNG::random_choice(std::array<T, N> const& options) noexcept
+{
+    typename std::array<T, N>::size_type const size = options.size();
+
+    JS80P_ASSERT(size > 0);
+
+    std::size_t const idx = (std::size_t)((Number)size * random()) % size;
+
+    return options[idx];
+}
+
+
 Math::Math() noexcept
 {
     JS80P_ASSERT(Math::is_close(SQRT_OF_2, std::sqrt(2.0)));

@@ -106,6 +106,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
             CLEAR_DIRTY_FLAG = 6,   ///< Clear the dirty flag.
 
+            RANDOMIZE = 7,          ///< Set up a random patch.
+
             INVALID_MESSAGE_TYPE,
         };
 
@@ -1868,6 +1870,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void handle_refresh_param(ParamId const param_id) noexcept;
 
         void handle_clear() noexcept;
+
+        void handle_randomize() noexcept;
 
         bool assign_controller_to_byte_param(
             ParamId const param_id,

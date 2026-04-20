@@ -218,6 +218,7 @@ PARAM_COMPONENTS = \
 SYNTH_COMPONENTS = \
 	synth \
 	note_stack \
+	random_patch \
 	spscqueue \
 	voice \
 	$(PARAM_COMPONENTS) \

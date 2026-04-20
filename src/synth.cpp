@@ -60,6 +60,7 @@
 #include "dsp/wavetable.cpp"
 
 #include "note_stack.cpp"
+#include "random_patch.cpp"
 #include "spscqueue.cpp"
 #include "voice.cpp"
 
@@ -3048,6 +3049,11 @@ void Synth::process_message(Message const& message) noexcept
             is_dirty_ = false;
             break;
 
+        case MessageType::RANDOMIZE:
+            handle_randomize();
+            is_dirty_ = true;
+            break;
+
         default:
             break;
     }
@@ -3311,6 +3317,22 @@ void Synth::handle_clear() noexcept
     }
 
     previous_note_handling = note_handling.get_value();
+}
+
+
+void Synth::handle_randomize() noexcept
+{
+    Integer const random_seed = (
+        samples_since_gc
+        ^ next_note_id
+        ^ ((Integer)previous_note * next_voice)
+        ^ this->cached_round
+        ^ (Integer)(rng.random() * 71993.0)
+    );
+
+    RandomPatchGenerator random_patch_generator(*this, random_seed);
+
+    random_patch_generator.generate();
 }
 
 
