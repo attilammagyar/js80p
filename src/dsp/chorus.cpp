@@ -279,7 +279,7 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
     }
 
     chorused = SignalProducer::produce<HighShelfFilter>(high_shelf_filter, round, sample_count);
-    SignalProducer::produce< Gain<HighShelfFilter> >(feedback_gain, round, sample_count);
+    SignalProducer::produce<Feedback>(feedback_gain, round, sample_count);
 
     return NULL;
 }

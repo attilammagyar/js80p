@@ -71,6 +71,15 @@ class Chorus : public Effect<InputSignalProducerClass>
             BiquadFilterFixedType::BFFT_HIGH_SHELF
         > HighShelfFilter;
 
+        /*
+        Note: inserting a high-pass filter before the feedback can reduce the
+        risk of a runaway feedback loop but depending on the delay time, chorus
+        type, and feedback amount, it does not completely eliminate it, so the
+        extra computation might not be worth it.
+        */
+
+        typedef Gain<HighShelfFilter> Feedback;
+
         class TypeParam : public ByteParam
         {
             public:
@@ -328,7 +337,7 @@ class Chorus : public Effect<InputSignalProducerClass>
         CombFilter comb_filters[VOICES];
         Mixer<CombFilter> mixer;
         HighShelfFilter high_shelf_filter;
-        Gain<HighShelfFilter> feedback_gain;
+        Feedback feedback_gain;
         Sample const* const* chorused;
         Byte previous_type;
         bool should_start_lfos;
