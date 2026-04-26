@@ -3284,7 +3284,7 @@ void Synth::render(
             that happening to us, we are forcing digital clipping here at
             around 9 dB.
             */
-            out[i] = std::min(2.8, std::max(-2.8, raw[i]));
+            out[i] = Math::clamp(raw[i], -2.8, 2.8);
         }
     }
 }

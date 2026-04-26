@@ -173,7 +173,7 @@ NumberType Param<NumberType, evaluation>::get_raw_value() const noexcept
 template<typename NumberType, ParamEvaluation evaluation>
 NumberType Param<NumberType, evaluation>::clamp(NumberType const value) const noexcept
 {
-    return std::min(max_value, std::max(min_value, value));
+    return Math::clamp(value, min_value, max_value);
 }
 
 
@@ -190,7 +190,7 @@ Number Param<NumberType, evaluation>::get_ratio() const noexcept
         return this->macro->get_value(midi_channel);
     }
 
-    return std::min(1.0, std::max(0.0, value_to_ratio(value)));
+    return Math::clamp(value_to_ratio(value), 0.0, 1.0);
 }
 
 
@@ -831,7 +831,7 @@ Number FloatParam<evaluation>::get_ratio() const noexcept
         return macro->get_value(midi_channel);
     }
 
-    return std::min(1.0, std::max(0.0, value_to_ratio(this->get_raw_value())));
+    return Math::clamp(value_to_ratio(this->get_raw_value()), 0.0, 1.0);
 }
 
 

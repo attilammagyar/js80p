@@ -96,9 +96,7 @@ void naive_distort(Number const level, Buffer &buffer)
     for (Integer c = 0; c != CHANNELS; ++c) {
         for (Integer i = 0; i != SAMPLE_COUNT; ++i) {
             buffer.samples[c][i] *= level;
-            buffer.samples[c][i] = std::min(
-                1.0, std::max(-1.0, buffer.samples[c][i])
-            );
+            buffer.samples[c][i] = std::clamp(buffer.samples[c][i], -1.0, 1.0);
         }
     }
 }

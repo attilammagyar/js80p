@@ -534,3 +534,14 @@ TEST(is_close, {
     assert_false(Math::is_close(1.0, 1.2, 0.1));
     assert_false(Math::is_close(-1.0, -1.2, 0.1));
 })
+
+
+TEST(clamp, {
+    assert_eq(-1.0, Math::clamp(-1.1, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(-1.0, Math::clamp(-1.0, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(-0.5, Math::clamp(-0.5, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(0.0, Math::clamp(0.0, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(0.5, Math::clamp(0.5, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(1.0, Math::clamp(1.0, -1.0, 1.0), DOUBLE_DELTA);
+    assert_eq(1.0, Math::clamp(1.1, -1.0, 1.0), DOUBLE_DELTA);
+})

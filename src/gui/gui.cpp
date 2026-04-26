@@ -1500,7 +1500,7 @@ void GUI::param_ratio_to_str_int(
 
 Number GUI::clamp_ratio(Number const ratio)
 {
-    return std::min(1.0, std::max(0.0, ratio));
+    return std::clamp(ratio, 0.0, 1.0);
 }
 
 
@@ -3662,8 +3662,8 @@ void GUI::apply_size_constraints(
         return;
     }
 
-    new_width = clamp(new_width, MIN_WIDTH, MAX_WIDTH);
-    new_height = clamp(new_height, MIN_HEIGHT, MAX_HEIGHT);
+    new_width = std::clamp(new_width, MIN_WIDTH, MAX_WIDTH);
+    new_height = std::clamp(new_height, MIN_HEIGHT, MAX_HEIGHT);
 
     Number const width_scale = (Number)new_width / WIDTH_FLOAT;
     Number const height_scale = (Number)new_height / HEIGHT_FLOAT;
@@ -3675,12 +3675,6 @@ void GUI::apply_size_constraints(
         new_scale = height_scale;
         new_width = (int)std::round(WIDTH_FLOAT * new_scale);
     }
-}
-
-
-constexpr int GUI::clamp(int const number, int const min, int const max)
-{
-    return std::min(max, std::max(min, number));
 }
 
 

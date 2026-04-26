@@ -192,6 +192,12 @@ class Math
             Number const threshold = 0.000001
         ) noexcept;
 
+        static constexpr Number clamp(
+            Number const value,
+            Number const min,
+            Number const max
+        ) noexcept;
+
         /**
          * \warning Negative numbers close to multiples of PI are not handled
          *          very well with regards to precision.

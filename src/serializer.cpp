@@ -792,11 +792,7 @@ bool Serializer::parse_number(
         return false;
     }
 
-    Number const parsed_number = std::min(
-        1.0, std::max(0.0, to_number(number_text))
-    );
-
-    number = parsed_number;
+    number = std::clamp(to_number(number_text), 0.0, 1.0);
 
     return true;
 }

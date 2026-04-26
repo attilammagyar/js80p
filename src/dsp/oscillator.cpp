@@ -1452,7 +1452,7 @@ Sample Oscillator<ModulatorSignalProducerClass, is_lfo>::render_sample(
                 sample += unipolar_pulse_lfo_correction;
             }
 
-            sample = std::min(1.0, std::max(-1.0, sample));
+            sample = Math::clamp(sample, -1.0, 1.0);
         }
 
         return amplitude * (sample_offset_scale + sample);

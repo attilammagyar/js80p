@@ -1157,14 +1157,12 @@ Number Delay<InputSignalProducerClass, capabilities>::calculate_reverse_delta_sa
         Number const time_value_in_samples,
         Number const reverse_target_delay_time_in_samples
 ) const noexcept {
-    return std::max(
-        std::min(
-            (time_value_in_samples > 0.01)
-                ? reverse_target_delay_time_in_samples / time_value_in_samples
-                : 1.0,
-            32.0
-        ),
-        0.125
+    return Math::clamp(
+        (time_value_in_samples > 0.01)
+            ? reverse_target_delay_time_in_samples / time_value_in_samples
+            : 1.0,
+        0.125,
+        32.0
     );
 }
 

@@ -914,17 +914,17 @@ template<class ModulatorSignalProducerClass>
 Number Voice<ModulatorSignalProducerClass>::calculate_note_panning(
         Midi::Note const note
 ) const noexcept {
-    /* note_panning = 2.0 * (note / 127.0) - 1.0; */
+    /*
+    note_panning = 2.0 * (note / 127.0) - 1.0;
+    */
 
-    return std::min(
-        1.0,
-        std::max(
-            -1.0,
-            NOTE_PANNING_SCALE * (
-                note + param_leaders.detune.get_value() * Constants::DETUNE_SCALE
-            ) - 1.0
-        )
-    ) * param_leaders.width.get_value();
+    return param_leaders.width.get_value() * Math::clamp(
+        NOTE_PANNING_SCALE * (
+            note + param_leaders.detune.get_value() * Constants::DETUNE_SCALE
+        ) - 1.0,
+        -1.0,
+        1.0
+    );
 }
 
 
@@ -1583,9 +1583,8 @@ void Voice<ModulatorSignalProducerClass>::render(
     if (JS80P_LIKELY(note_panning_buffer == NULL)) {
         if (panning_buffer == NULL) {
             Sample const* const volume_applier_buffer = this->volume_applier_buffer;
-            Number const x = Math::PI_QUARTER * (
-                std::min(1.0, std::max(panning_value + note_panning_value, -1.0))
-                + 1.0
+            Number const x = Math::PI_QUARTER * Math::clamp(
+                panning_value + note_panning_value + 1.0, 0.0, 2.0
             );
 
             Sample left_gain;
@@ -1672,8 +1671,8 @@ void Voice<ModulatorSignalProducerClass>::render(
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        Number const x = Math::PI_QUARTER * (
-            std::min(1.0, std::max(panning[i] + note_panning[i], -1.0)) + 1.0
+        Number const x = Math::PI_QUARTER * Math::clamp(
+            panning[i] + note_panning[i] + 1.0, 0.0, 2.0
         );
 
         Sample left_gain;

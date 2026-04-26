@@ -511,6 +511,16 @@ bool Math::is_close(
 }
 
 
+constexpr Number Math::clamp(
+        Number const value,
+        Number const min,
+        Number const max
+) noexcept {
+    /* Note: std::clamp(v, lo, hi) seems slightly slower in the general case. */
+    return std::min(max, std::max(min, value));
+}
+
+
 Number Math::sin(Number const x) noexcept
 {
     return math.sin_impl(x);

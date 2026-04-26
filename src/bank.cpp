@@ -287,10 +287,7 @@ size_t Bank::normalized_parameter_value_to_program_index(
 
 Number Bank::program_index_to_normalized_parameter_value(size_t const index)
 {
-    return std::min(
-        1.0,
-        std::max(0.0, (Number)index * PROGRAM_INDEX_TO_FLOAT_SCALE)
-    );
+    return std::clamp((Number)index * PROGRAM_INDEX_TO_FLOAT_SCALE, 0.0, 1.0);
 }
 
 

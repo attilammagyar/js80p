@@ -131,12 +131,10 @@
 
     - (void) scrollWheel:(NSEvent*)event
     {
-        JS80P::Number const delta = std::min(
-            1.0,
-            std::max(
-                -1.0,
-                [event deltaY] * ([event hasPreciseScrollingDeltas] ? 1.0 : 0.1)
-            )
+        JS80P::Number const delta = std::clamp(
+            [event deltaY] * ([event hasPreciseScrollingDeltas] ? 1.0 : 0.1),
+            -1.0,
+            1.0
         );
 
         if (std::fabs(delta) > 0.000001) {

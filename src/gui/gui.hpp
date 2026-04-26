@@ -308,8 +308,6 @@ class GUI
 
         static constexpr size_t DEFAULT_STATUS_LINE_MAX_LENGTH = 48;
 
-        static constexpr int clamp(int const number, int const min, int const max);
-
         static void initialize_controllers_by_id();
 
         static void param_ratio_to_str_float(
