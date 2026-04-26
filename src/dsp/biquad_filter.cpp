@@ -570,18 +570,24 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::update_state_for_no_op_
         for (Integer c = 0; c != channels; ++c) {
             this->x_n_m2[c] = this->x_n_m1[c];
             this->y_n_m2[c] = this->y_n_m1[c];
-            this->x_n_m1[c] = this->input_buffer[c][0];
-            this->y_n_m1[c] = this->input_buffer[c][0];
+
+            Sample const input_sample = this->input_buffer[c][0];
+
+            this->x_n_m1[c] = input_sample;
+            this->y_n_m1[c] = input_sample;
         }
     } else {
         Integer const last_sample_index = sample_count - 1;
         Integer const penultimate_sample_index = sample_count - 2;
 
         for (Integer c = 0; c != channels; ++c) {
-            this->x_n_m2[c] = this->input_buffer[c][penultimate_sample_index];
-            this->y_n_m2[c] = this->input_buffer[c][penultimate_sample_index];
-            this->x_n_m1[c] = this->input_buffer[c][last_sample_index];
-            this->y_n_m1[c] = this->input_buffer[c][last_sample_index];
+            Sample const penultimate_input_sample = this->input_buffer[c][penultimate_sample_index];
+            Sample const last_input_sample = this->input_buffer[c][last_sample_index];
+
+            this->x_n_m2[c] = penultimate_input_sample;
+            this->y_n_m2[c] = penultimate_input_sample;
+            this->x_n_m1[c] = last_input_sample;
+            this->y_n_m1[c] = last_input_sample;
         }
     }
 }
@@ -761,7 +767,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_pass_coeffici
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) noexcept {
+) const noexcept {
     Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
@@ -873,7 +879,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_pass_coeffic
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) noexcept {
+) const noexcept {
     Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
@@ -981,7 +987,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_band_pass_coeffic
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) noexcept {
+) const noexcept {
     Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
@@ -1093,7 +1099,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_notch_coefficient
         Integer const index,
         Number const frequency_value,
         Number const q_value
-) noexcept {
+) const noexcept {
     Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
@@ -1218,7 +1224,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_peaking_coefficie
         Number const frequency_value,
         Number const q_value,
         Number const gain_value
-) noexcept {
+) const noexcept {
     Sample const w0 = w0_scale * apply_freq_inaccuracy<is_freq_inaccurate>(frequency_value);
 
     Sample sin_w0;
@@ -1351,7 +1357,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_low_shelf_coeffic
         Integer const index,
         Number const frequency_value,
         Number const gain_value
-) noexcept {
+) const noexcept {
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
@@ -1480,7 +1486,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_high_shelf_coeffi
         Integer const index,
         Number const frequency_value,
         Number const gain_value
-) noexcept {
+) const noexcept {
     Sample const a = Math::pow_10(
         (Sample)gain_value * Constants::BIQUAD_FILTER_GAIN_SCALE
     );
@@ -1528,7 +1534,7 @@ template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 void BiquadFilter<InputSignalProducerClass, fixed_type>::store_gain_coefficient_samples(
         Integer const index,
         Number const gain_value
-) noexcept {
+) const noexcept {
     store_normalized_coefficient_samples(
         index,
         (Sample)Math::db_to_linear(gain_value),
@@ -1550,7 +1556,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_normalized_coeffi
         Sample const a0,
         Sample const a1,
         Sample const a2
-) noexcept {
+) const noexcept {
     Sample const a0_inv = 1.0 / a0;
 
     b0_buffer[index] = b0 * a0_inv;
@@ -1564,7 +1570,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_normalized_coeffi
 template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 void BiquadFilter<InputSignalProducerClass, fixed_type>::store_no_op_coefficient_samples(
         Integer const index
-) noexcept {
+) const noexcept {
     b0_buffer[index] = 1.0;
     b1_buffer[index] =
         b2_buffer[index] =
@@ -1576,7 +1582,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::store_no_op_coefficient
 template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 void BiquadFilter<InputSignalProducerClass, fixed_type>::store_silent_coefficient_samples(
         Integer const index
-) noexcept {
+) const noexcept {
     b0_buffer[index] =
         b1_buffer[index] =
         b2_buffer[index] =
@@ -1675,19 +1681,21 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
     Sample const* const* const input_buffer = this->input_buffer;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample const* const input_channel = input_buffer[c];
+        Sample* const output_channel = buffer[c];
         Sample x_n_m1 = this->x_n_m1[c];
         Sample x_n_m2 = this->x_n_m2[c];
         Sample y_n_m1 = this->y_n_m1[c];
         Sample y_n_m2 = this->y_n_m2[c];
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Sample const x_n = input_buffer[c][i];
+            Sample const x_n = input_channel[i];
             Sample const y_n = (
                 b0[i] * x_n + b1[i] * x_n_m1 + b2[i] * x_n_m2
                 + a1[i] * y_n_m1 + a2[i] * y_n_m2
             );
 
-            buffer[c][i] = y_n;
+            output_channel[i] = y_n;
 
             x_n_m2 = x_n_m1;
             x_n_m1 = x_n;

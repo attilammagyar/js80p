@@ -1027,21 +1027,29 @@ void Distortion<InputSignalProducerClass>::render(
     Sample* const F0_previous_input_sample = this->F0_previous_input_sample;
 
     for (Integer c = 0; c != channels; ++c) {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            Sample const input_sample = input_buffer[c][i];
+        Sample const* const in_channel = input_buffer[c];
+        Sample* const out_channel = buffer[c];
+        Sample previous_input_sample_c = previous_input_sample[c];
+        Sample F0_previous_input_sample_c = F0_previous_input_sample[c];
 
-            buffer[c][i] = Math::combine(
+        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            Sample const input_sample = in_channel[i];
+
+            out_channel[i] = Math::combine(
                 level[i],
                 distort(
                     f_table,
                     F0_table,
                     input_sample,
-                    previous_input_sample[c],
-                    F0_previous_input_sample[c]
+                    previous_input_sample_c,
+                    F0_previous_input_sample_c
                 ),
                 input_sample
             );
         }
+
+        this->previous_input_sample[c] = previous_input_sample_c;
+        this->F0_previous_input_sample[c] = F0_previous_input_sample_c;
     }
 }
 

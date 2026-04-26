@@ -528,7 +528,11 @@ Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_r
     }
 
     if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
-        for (Integer c = 0; c != this->channels; ++c) {
+        Integer const channels = this->channels;
+        LFO* const* const channel_lfos = this->channel_lfos;
+        Sample const** const channel_lfo_buffers = this->channel_lfo_buffers;
+
+        for (Integer c = 0; c != channels; ++c) {
             channel_lfo_buffers[c] = SignalProducer::produce<LFO>(
                 *channel_lfos[c], round, sample_count
             )[0];
@@ -632,10 +636,13 @@ Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
         Integer const sample_count
 ) noexcept {
     Integer const channels = this->channels;
+    Integer const delay_buffer_size = this->delay_buffer_size;
+    Sample* const* const delay_buffer = this->delay_buffer;
     Integer index = delay_buffer_index;
 
     for (Integer c = 0; c != channels; ++c) {
         Sample const* source_channel;
+        Sample* const delay_channel = delay_buffer[c];
 
         if constexpr (mode == DelayBufferWritingMode::ADD) {
             source_channel = source_buffer[c];
@@ -649,10 +656,10 @@ Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
 
             for (; index != batch_end; ++index) {
                 if constexpr (mode == DelayBufferWritingMode::ADD) {
-                    delay_buffer[c][index] += source_channel[i];
+                    delay_channel[index] += source_channel[i];
                     ++i;
                 } else {
-                    delay_buffer[c][index] = 0.0;
+                    delay_channel[index] = 0.0;
                 }
             }
 
@@ -879,6 +886,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
         || (is_time_scale_constant && !is_reversed)
     );
 
+    Frequency const sample_rate = this->sample_rate;
     Integer const channels = this->channels;
     Number const read_index_orig = (Number)this->read_index;
     Sample const* const* const delay_buffer = (
@@ -886,17 +894,22 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
             ? shared_buffer_owner->delay_buffer
             : this->delay_buffer
     );
+    Sample const* const time_buffer = this->time_buffer;
+    Sample const* const time_scale_buffer = this->time_scale_buffer;
     Number const delay_buffer_size_float = this->delay_buffer_size_float;
+    Integer const delay_buffer_size = this->delay_buffer_size;
 
     Number reverse_delta_samples = 0;
     Number read_index = 0;
     Number reverse_done_samples = 0;
     Number reverse_target_delay_time_in_samples = 0;
     Number reverse_target_delay_time_in_samples_inv = 0;
+    Sample const* reverse_delay_envelope_table = NULL;
 
     if constexpr (is_reversed) {
         reverse_target_delay_time_in_samples = this->reverse_target_delay_time_in_samples;
         reverse_target_delay_time_in_samples_inv = this->reverse_target_delay_time_in_samples_inv;
+        reverse_delay_envelope_table = reverse_delay_envelope.table;
     }
 
     if (time_buffer == NULL) {
@@ -928,7 +941,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                 } else {
                     if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
                         channel_lfo_buffer = channel_lfo_buffers[c];
-                        channel_lfo_scale = channel_lfo_scales[c] * this->sample_rate;
+                        channel_lfo_scale = channel_lfo_scales[c] * sample_rate;
                     }
 
                     read_index = read_index_orig - time_value_in_samples;
@@ -959,6 +972,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         delay_channel,
                         read_index,
                         i,
+                        delay_buffer_size,
                         channel_lfo_buffer,
                         channel_lfo_scale
                     );
@@ -967,6 +981,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         delay_channel,
                         read_index,
                         i,
+                        delay_buffer_size,
                         channel_lfo_buffer,
                         channel_lfo_scale
                     );
@@ -977,7 +992,8 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         apply_reverse_delay_envelope(
                             out_channel[i],
                             reverse_done_samples,
-                            reverse_target_delay_time_in_samples_inv
+                            reverse_target_delay_time_in_samples_inv,
+                            reverse_delay_envelope_table
                         );
 
                         advance_reverse_rendering(
@@ -1017,7 +1033,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                 );
             } else if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
                 channel_lfo_buffer = channel_lfo_buffers[c];
-                channel_lfo_scale = channel_lfo_scales[c] * this->sample_rate;
+                channel_lfo_scale = channel_lfo_scales[c] * sample_rate;
             }
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -1046,6 +1062,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         delay_channel,
                         read_index,
                         i,
+                        delay_buffer_size,
                         channel_lfo_buffer,
                         channel_lfo_scale
                     );
@@ -1054,6 +1071,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         delay_channel,
                         read_index,
                         i,
+                        delay_buffer_size,
                         channel_lfo_buffer,
                         channel_lfo_scale
                     );
@@ -1063,7 +1081,8 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                     apply_reverse_delay_envelope(
                         out_channel[i],
                         reverse_done_samples,
-                        reverse_target_delay_time_in_samples_inv
+                        reverse_target_delay_time_in_samples_inv,
+                        reverse_delay_envelope_table
                     );
 
                     Number const time_value_in_samples = time_buffer[i] * time_scale;
@@ -1106,7 +1125,7 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 void Delay<InputSignalProducerClass, capabilities>::initialize_reverse_rendering(
         Number& read_index,
         Number& reverse_done_samples,
-        Number const& delay_buffer_size_float
+        Number const delay_buffer_size_float
 ) const noexcept {
     read_index = this->reverse_read_index;
     reverse_done_samples = this->reverse_done_samples;
@@ -1121,8 +1140,8 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 void Delay<InputSignalProducerClass, capabilities>::adjust_reverse_target_delay_time(
         Number& reverse_target_delay_time_in_samples,
         Number& reverse_target_delay_time_in_samples_inv,
-        Number const& reverse_done_samples,
-        Number const& time_value_in_samples
+        Number const reverse_done_samples,
+        Number const time_value_in_samples
 ) const noexcept {
     if (reverse_done_samples < 0.000001) {
         reverse_target_delay_time_in_samples = time_value_in_samples;
@@ -1135,8 +1154,8 @@ void Delay<InputSignalProducerClass, capabilities>::adjust_reverse_target_delay_
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 Number Delay<InputSignalProducerClass, capabilities>::calculate_reverse_delta_samples(
-        Number const& time_value_in_samples,
-        Number const& reverse_target_delay_time_in_samples
+        Number const time_value_in_samples,
+        Number const reverse_target_delay_time_in_samples
 ) const noexcept {
     return std::max(
         std::min(
@@ -1154,10 +1173,11 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 void Delay<InputSignalProducerClass, capabilities>::apply_reverse_delay_envelope(
         Sample& sample,
         Number const reverse_done_samples,
-        Number const reverse_target_delay_time_in_samples_inv
+        Number const reverse_target_delay_time_in_samples_inv,
+        Sample const* const reverse_delay_envelope_table
 ) const noexcept {
     sample *= Math::lookup(
-        reverse_delay_envelope.table,
+        reverse_delay_envelope_table,
         ReverseDelayEnvelope::TABLE_MAX_INDEX,
         ReverseDelayEnvelope::TABLE_MAX_INDEX_FLOAT * reverse_done_samples * reverse_target_delay_time_in_samples_inv
     );
@@ -1171,8 +1191,8 @@ void Delay<InputSignalProducerClass, capabilities>::advance_reverse_rendering(
         Number& reverse_done_samples,
         Number& reverse_target_delay_time_in_samples,
         Number& reverse_target_delay_time_in_samples_inv,
-        Number const& time_value_in_samples,
-        Number const& delay_buffer_size_float
+        Number const time_value_in_samples,
+        Number const delay_buffer_size_float
 ) const noexcept {
     read_index -= reverse_delta_samples;
     reverse_done_samples += reverse_delta_samples;
@@ -1204,6 +1224,7 @@ Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
         Sample const* const delay_channel,
         Number const read_index,
         Integer const i,
+        Integer const delay_buffer_size,
         Sample const* const channel_lfo_buffer,
         Sample const channel_lfo_scale
 ) const noexcept {
@@ -1434,29 +1455,37 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
 
         Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
     } else {
+        Sample const* panning_buffer = this->panning_buffer;
+
         if (!Math::is_close(panning_scale, 1.0)) {
+            Sample* const panning_buffer_scaled = this->panning_buffer_scaled[0];
+            Number const panning_scale = this->panning_scale;
+
             for (Integer i = 0; i != sample_count; ++i) {
-                panning_buffer_scaled[0][i] = panning_buffer[i] * panning_scale;
+                panning_buffer_scaled[i] = panning_buffer[i] * panning_scale;
             }
 
-            panning_buffer = panning_buffer_scaled[0];
+            this->panning_buffer = panning_buffer = panning_buffer_scaled;
         }
 
         /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
+
+        Sample* const stereo_gain_buffer_0 = this->stereo_gain_buffer[0];
+        Sample* const stereo_gain_buffer_1 = this->stereo_gain_buffer[1];
 
         if (is_flipped) {
             for (Integer i = 0; i != sample_count; ++i) {
                 Number const p = -panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
-                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+                Math::sincos(x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]);
             }
         } else {
             for (Integer i = 0; i != sample_count; ++i) {
                 Number const p = panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
-                Math::sincos(x, stereo_gain_buffer[1][i], stereo_gain_buffer[0][i]);
+                Math::sincos(x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]);
             }
         }
     }
@@ -1502,18 +1531,21 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         Integer const last_sample_index,
         Sample** const buffer
 ) const noexcept {
-    Sample const* const* const input_buffer = this->input_buffer;
+    Sample const* const input_buffer_channel_1 = this->input_buffer[channel_1];
+    Sample const* const input_buffer_channel_2 = this->input_buffer[channel_2];
+    Sample* const buffer_channel_1 = buffer[channel_1];
+    Sample* const buffer_channel_2 = buffer[channel_2];
+    Sample const stereo_gain_value_channel_1 = stereo_gain_value[channel_1];
+    Sample const stereo_gain_value_channel_2 = stereo_gain_value[channel_2];
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        buffer[channel_1][i] = (
-            input_buffer[channel_1][i] * stereo_gain_value[channel_1]
-        );
+        buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_value_channel_1;
     }
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-        buffer[channel_2][i] = (
-            input_buffer[channel_2][i]
-            + input_buffer[channel_1][i] * stereo_gain_value[channel_2]
+        buffer_channel_2[i] = (
+            input_buffer_channel_2[i]
+            + input_buffer_channel_1[i] * stereo_gain_value_channel_2
         );
     }
 }
@@ -1527,31 +1559,32 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         Integer const last_sample_index,
         Sample** const buffer
 ) const noexcept {
-    Sample const* const* const input_buffer = this->input_buffer;
+    Sample const* const input_buffer_channel_1 = this->input_buffer[channel_1];
+    Sample const* const input_buffer_channel_2 = this->input_buffer[channel_2];
+    Sample* const buffer_channel_1 = buffer[channel_1];
+    Sample* const buffer_channel_2 = buffer[channel_2];
+    Sample const* const stereo_gain_buffer_channel_1 = stereo_gain_buffer[channel_1];
+    Sample const* const stereo_gain_buffer_channel_2 = stereo_gain_buffer[channel_2];
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
         if (panning_buffer[i] > 0.0) {
-            buffer[channel_1][i] = (
-                input_buffer[channel_1][i] * stereo_gain_buffer[channel_1][i]
-            );
+            buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_buffer_channel_1[i];
         } else {
-            buffer[channel_1][i] = (
-                input_buffer[channel_1][i]
-                + input_buffer[channel_2][i] * stereo_gain_buffer[channel_1][i]
+            buffer_channel_1[i] = (
+                input_buffer_channel_1[i]
+                + input_buffer_channel_2[i] * stereo_gain_buffer_channel_1[i]
             );
         }
     }
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
         if (panning_buffer[i] > 0.0) {
-            buffer[channel_2][i] = (
-                input_buffer[channel_2][i]
-                + input_buffer[channel_1][i] * stereo_gain_buffer[channel_2][i]
+            buffer_channel_2[i] = (
+                input_buffer_channel_2[i]
+                + input_buffer_channel_1[i] * stereo_gain_buffer_channel_2[i]
             );
         } else {
-            buffer[channel_2][i] = (
-                input_buffer[channel_2][i] * stereo_gain_buffer[channel_2][i]
-            );
+            buffer_channel_2[i] = input_buffer_channel_2[i] * stereo_gain_buffer_channel_2[i];
         }
     }
 }

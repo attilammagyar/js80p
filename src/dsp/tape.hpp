@@ -191,8 +191,6 @@ class Tape : public Filter<InputSignalProducerClass>
         static constexpr Seconds START_TIME_MIN = 0.05;
         static constexpr Seconds STOP_START_DELAY = 0.1;
 
-        static Sample distort_volume(Sample const volume_level) noexcept;
-
         Sample const* const* initialize_init_rendering(
             Integer const round,
             Integer const sample_count

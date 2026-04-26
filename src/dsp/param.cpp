@@ -356,8 +356,10 @@ void Param<NumberType, evaluation>::render(
     Sample const value = (Sample)this->value;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample* const channel = buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = value;
+            channel[i] = value;
         }
     }
 }
@@ -2838,10 +2840,10 @@ void FloatParam<evaluation>::render(
                 *lfo, round, first_sample_index, last_sample_index, buffer[0]
             );
         } else {
-            render_with_lfo(round, first_sample_index, last_sample_index, buffer);
+            render_with_lfo(round, first_sample_index, last_sample_index, buffer[0]);
         }
     } else if (is_ramping()) {
-        render_linear_ramp(round, first_sample_index, last_sample_index, buffer);
+        render_linear_ramp(round, first_sample_index, last_sample_index, buffer[0]);
     } else if (get_envelope() != NULL) {
         render_with_envelope(round, first_sample_index, last_sample_index, buffer);
     } else {
@@ -2885,7 +2887,7 @@ void FloatParam<evaluation>::render_with_lfo(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** const buffer
+        Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(lfo_buffer == NULL)) {
         /*
@@ -2896,18 +2898,18 @@ void FloatParam<evaluation>::render_with_lfo(
         Sample const value = this->get_value();
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] = value;
+            buffer[i] = value;
         }
 
         return;
     }
 
     ratios_to_values(
-        lfo_buffer[0], buffer[0], first_sample_index, last_sample_index
+        lfo_buffer[0], buffer, first_sample_index, last_sample_index
     );
 
     if (last_sample_index != first_sample_index) {
-        this->store_new_value(buffer[0][last_sample_index - 1]);
+        this->store_new_value(buffer[last_sample_index - 1]);
     }
 }
 
@@ -2917,14 +2919,13 @@ void FloatParam<evaluation>::render_linear_ramp(
         Integer const round,
         Integer const first_sample_index,
         Integer const last_sample_index,
-        Sample** const buffer
+        Sample* const buffer
 ) noexcept {
     Sample sample;
-    Sample* const channel = buffer[0];
 
     if (linear_ramp_state.is_logarithmic) {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            channel[i] = sample = ratio_to_value_log(linear_ramp_state.advance());
+            buffer[i] = sample = ratio_to_value_log(linear_ramp_state.advance());
         }
 
     } else if (JS80P_UNLIKELY(linear_ramp_state.is_curved)) {
@@ -2933,7 +2934,7 @@ void FloatParam<evaluation>::render_linear_ramp(
         Math::EnvelopeShape shape = linear_ramp_state.curve_shape;
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            channel[i] = sample = (
+            buffer[i] = sample = (
                 init_value
                 + delta * Math::apply_envelope_shape(shape, linear_ramp_state.advance())
             );
@@ -2941,7 +2942,7 @@ void FloatParam<evaluation>::render_linear_ramp(
 
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            channel[i] = sample = linear_ramp_state.advance();
+            buffer[i] = sample = linear_ramp_state.advance();
         }
     }
 
@@ -3308,6 +3309,7 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
         return;
     }
 
+    Sample* const channel = buffer[0];
     Sample const* const mod = modulator_buffer;
     Sample const* const mod_level = modulation_level_buffer;
 
@@ -3315,11 +3317,11 @@ void ModulatableFloatParam<ModulatorSignalProducerClass>::render(
         Number const mod_level_value = modulation_level.get_value();
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] += mod_level_value * mod[i];
+            channel[i] += mod_level_value * mod[i];
         }
     } else {
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[0][i] += mod_level[i] * mod[i];
+            channel[i] += mod_level[i] * mod[i];
         }
     }
 }

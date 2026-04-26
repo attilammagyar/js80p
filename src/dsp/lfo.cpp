@@ -605,6 +605,10 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
         SignalProducer::produce<LFO>(lfo, round, sample_count)[0]
     );
 
+    Sample* const buffer = this->buffer;
+    Integer const first_sample_index = this->first_sample_index;
+    Integer const last_sample_index = this->last_sample_index;
+
     if (JS80P_UNLIKELY(lfo_buffer == NULL)) {
         /*
         LFO dependency cycle, and no previously cached rounds are available. We

@@ -100,8 +100,10 @@ void SignalProducer::find_peak(
     peak_index = 0;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample const* const channel = samples[c];
+
         for (Integer i = 0; i != size; ++i) {
-            Sample const sample = std::fabs(samples[c][i]);
+            Sample const sample = std::fabs(channel[i]);
 
             if (sample >= peak) {
                 peak = sample;
@@ -494,8 +496,10 @@ void SignalProducer::render_silence(
         Sample** const buffer
 ) noexcept {
     for (Integer c = 0; c != channels; ++c) {
+        Sample* const channel = buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = 0.0;
+            channel[i] = 0.0;
         }
     }
 }
@@ -593,8 +597,7 @@ void SignalProducer::handle_events(
 
         if (next_event.time_offset > handle_until) {
             next_stop = current_sample_index + (Integer)std::ceil(
-                (next_event.time_offset - signal_producer.current_time)
-                * signal_producer.sample_rate
+                (next_event.time_offset - handle_until) * signal_producer.sample_rate
             );
 
             if (next_stop > sample_count) {

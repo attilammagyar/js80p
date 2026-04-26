@@ -323,10 +323,14 @@ void Chorus<InputSignalProducerClass>::render(
         Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
+    Sample const* const* const chorused = this->chorused;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample const* const chorused_channel = chorused[c];
+        Sample* const output_channel = buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = chorused[c][i];
+            output_channel[i] = chorused_channel[i];
         }
     }
 

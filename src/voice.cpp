@@ -443,17 +443,18 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) const noexcept {
+    Sample const* const* const input_buffer = this->input_buffer;
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
-        Sample const* const input = this->input_buffer[c];
-        Sample* const output = buffer[c];
+        Sample const* const in_channel = input_buffer[c];
+        Sample* const out_channel = buffer[c];
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             if constexpr (has_velocity) {
-                output[i] = velocity[i] * volume[i] * input[i];
+                out_channel[i] = velocity[i] * volume[i] * in_channel[i];
             } else {
-                output[i] = volume[i] * input[i];
+                out_channel[i] = volume[i] * in_channel[i];
             }
         }
     }
@@ -1581,6 +1582,7 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     if (JS80P_LIKELY(note_panning_buffer == NULL)) {
         if (panning_buffer == NULL) {
+            Sample const* const volume_applier_buffer = this->volume_applier_buffer;
             Number const x = Math::PI_QUARTER * (
                 std::min(1.0, std::max(panning_value + note_panning_value, -1.0))
                 + 1.0
@@ -1627,7 +1629,11 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     if constexpr (IS_MODULATOR) {
         if (is_additive_volume_polyphonic) {
+            Sample const* const additive_volume_buffer = this->additive_volume_buffer;
+
             if (additive_volume_buffer == NULL) {
+                Number const additive_volume_value = this->additive_volume_value;
+
                 for (Integer c = 0; c != 2; ++c) {
                     Sample* const channel = buffer[c];
 
@@ -1659,6 +1665,10 @@ void Voice<ModulatorSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) const noexcept {
+    Sample const* const volume_applier_buffer = this->volume_applier_buffer;
+    Sample* const channel_1 = buffer[0];
+    Sample* const channel_2 = buffer[1];
+
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
     for (Integer i = first_sample_index; i != last_sample_index; ++i) {
@@ -1671,8 +1681,10 @@ void Voice<ModulatorSignalProducerClass>::render(
 
         Math::sincos(x, right_gain, left_gain);
 
-        buffer[0][i] = left_gain * volume_applier_buffer[i];
-        buffer[1][i] = right_gain * volume_applier_buffer[i];
+        Sample const volume = volume_applier_buffer[i];
+
+        channel_1[i] = left_gain * volume;
+        channel_2[i] = right_gain * volume;
     }
 }
 

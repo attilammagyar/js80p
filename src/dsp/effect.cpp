@@ -153,11 +153,14 @@ void Effect<InputSignalProducerClass>::render(
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample const* const input_channel = this->input_buffer[c];
+        Sample* const out_channel = buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             if constexpr (is_dry) {
-                buffer[c][i] = dry[i] * this->input_buffer[c][i];
+                out_channel[i] = dry[i] * input_channel[i];
             } else {
-                buffer[c][i] = dry[i] * this->input_buffer[c][i] + wet[i] * buffer[c][i];
+                out_channel[i] = dry[i] * input_channel[i] + wet[i] * out_channel[i];
             }
         }
     }

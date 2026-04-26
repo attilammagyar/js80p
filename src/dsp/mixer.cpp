@@ -58,7 +58,8 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
     Integer const round,
     Integer const sample_count
 ) noexcept {
-    has_weights = false;
+    std::vector<Input>& inputs = this->inputs;
+    bool has_weights = false;
 
     for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
         Number const weight = it->weight;
@@ -70,6 +71,8 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
             has_weights = has_weights || !Math::is_close(weight, 1.0);
         }
     }
+
+    this->has_weights = has_weights;
 
     return NULL;
 }
@@ -98,21 +101,27 @@ void Mixer<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    std::vector<Input> const& inputs = this->inputs;
     Integer const channels = get_channels();
 
     render_silence(round, first_sample_index, last_sample_index, buffer);
 
-    for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        if (JS80P_UNLIKELY(it->weight < SILENCE_WEIGHT)) {
+    for (typename std::vector<Input>::const_iterator it = inputs.begin(); it != inputs.end(); ++it) {
+        Number const weight = it->weight;
+
+        if (JS80P_UNLIKELY(weight < SILENCE_WEIGHT)) {
             continue;
         }
 
         for (Integer c = 0; c != channels; ++c) {
+            Sample const* const in_channel = it->buffer[c];
+            Sample* const out_channel = buffer[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
                 if constexpr (has_weights) {
-                    buffer[c][i] += it->weight * it->buffer[c][i];
+                    out_channel[i] += weight * in_channel[i];
                 } else {
-                    buffer[c][i] += it->buffer[c][i];
+                    out_channel[i] += in_channel[i];
                 }
             }
         }

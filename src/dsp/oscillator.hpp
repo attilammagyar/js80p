@@ -353,6 +353,7 @@ class Oscillator : public SignalProducer
             Number const pulse_width,
             Sample const amplitude,
             Sample const frequency,
+            Sample const frequency_scale,
             Sample const phase,
             Sample const subharmonic_amplitude,
             Sample const unipolar_pulse_lfo_correction
@@ -367,7 +368,7 @@ class Oscillator : public SignalProducer
         Sample const* pulse_width_buffer;
         Sample* computed_amplitude_buffer;
         Frequency* computed_frequency_buffer;
-        Sample* phase_buffer;
+        Sample* computed_phase_buffer;
         Sample const* subharmonic_amplitude_buffer;
         FloatParamB* custom_waveform_params[CUSTOM_WAVEFORM_HARMONICS];
         Number custom_waveform_coefficients[CUSTOM_WAVEFORM_HARMONICS];

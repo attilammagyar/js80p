@@ -206,11 +206,17 @@ void Echo<InputSignalProducerClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    Sample const* const* const comb_filter_1_buffer = this->comb_filter_1_buffer;
+    Sample const* const* const comb_filter_2_buffer = this->comb_filter_2_buffer;
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample* const out_channel = buffer[c];
+        Sample const* const comb_filter_1_channel = comb_filter_1_buffer[c];
+        Sample const* const comb_filter_2_channel = comb_filter_2_buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = comb_filter_1_buffer[c][i] + comb_filter_2_buffer[c][i];
+            out_channel[i] = comb_filter_1_channel[i] + comb_filter_2_channel[i];
         }
     }
 

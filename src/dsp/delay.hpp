@@ -202,25 +202,26 @@ class Delay : public Filter<InputSignalProducerClass>
         void initialize_reverse_rendering(
             Number& read_index,
             Number& reverse_done_samples,
-            Number const& delay_buffer_size_float
+            Number const delay_buffer_size_float
         ) const noexcept;
 
         void adjust_reverse_target_delay_time(
             Number& reverse_target_delay_time_in_samples,
             Number& reverse_target_delay_time_in_samples_inv,
-            Number const& reverse_done_samples,
-            Number const& time_value_in_samples
+            Number const reverse_done_samples,
+            Number const time_value_in_samples
         ) const noexcept;
 
         Number calculate_reverse_delta_samples(
-            Number const& time_value_in_samples,
-            Number const& reverse_target_delay_time_in_samples
+            Number const time_value_in_samples,
+            Number const reverse_target_delay_time_in_samples
         ) const noexcept;
 
         void apply_reverse_delay_envelope(
             Sample& sample,
             Number const reverse_done_samples,
-            Number const reverse_target_delay_time_in_samples_inv
+            Number const reverse_target_delay_time_in_samples_inv,
+            Sample const* const reverse_delay_envelope_table
         ) const noexcept;
 
         void advance_reverse_rendering(
@@ -229,14 +230,15 @@ class Delay : public Filter<InputSignalProducerClass>
             Number& reverse_done_samples,
             Number& reverse_target_delay_time_in_samples,
             Number& reverse_target_delay_time_in_samples_inv,
-            Number const& time_value_in_samples,
-            Number const& delay_buffer_size_float
+            Number const time_value_in_samples,
+            Number const delay_buffer_size_float
         ) const noexcept;
 
         Sample lookup_sample(
             Sample const* const delay_channel,
             Number const read_index,
             Integer const i,
+            Integer const delay_buffer_size,
             Sample const* const channel_lfo_buffer,
             Sample const channel_lfo_scale
         ) const noexcept;

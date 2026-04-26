@@ -112,8 +112,10 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
     samples[n]: n partials above fundamental
     */
 
+    Sample* samples = this->samples[0];
+
     for (Integer j = 0; j != SIZE; ++j) {
-        samples[0][j] = (
+        samples[j] = (
             (Sample)(coefficients[0] * sines[(j * frequency) & TABLE_INDEX_MASK])
         );
     }
@@ -121,9 +123,12 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
     for (Integer i = 1, prev_i = 0; i != partials; ++i, ++prev_i) {
         ++frequency;
 
+        Sample const* const prev_samples = samples;
+        samples = this->samples[i];
+
         for (Integer j = 0; j != SIZE; ++j) {
-            samples[i][j] = (
-                samples[prev_i][j]
+            samples[j] = (
+                prev_samples[j]
                 + (Sample)(coefficients[i] * sines[(j * frequency) & TABLE_INDEX_MASK])
             );
         }
@@ -136,8 +141,10 @@ void Wavetable::normalize() noexcept
     Sample max = 0.0;
 
     for (Integer i = 0; i != partials; ++i) {
+        Sample const* samples = this->samples[i];
+
         for (Integer j = 0; j != SIZE; ++j) {
-            Sample const sample = std::fabs(samples[i][j]);
+            Sample const sample = std::fabs(samples[j]);
 
             if (sample > max) {
                 max = sample;
@@ -146,8 +153,10 @@ void Wavetable::normalize() noexcept
     }
 
     for (Integer i = 0; i != partials; ++i) {
+        Sample* const samples = this->samples[i];
+
         for (Integer j = 0; j != SIZE; ++j) {
-            samples[i][j] /= max;
+            samples[j] /= max;
         }
     }
 }

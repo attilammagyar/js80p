@@ -97,9 +97,7 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Effect<InputSignalProducerClass>::initialize_rendering(
-            round, sample_count
-        )
+        Effect<InputSignalProducerClass>::initialize_rendering(round, sample_count)
     );
 
     if (buffer != NULL) {
@@ -243,9 +241,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
     }
 
     if (is_silent_) {
-        this->render_silence(
-            round, first_sample_index, last_sample_index, buffer
-        );
+        this->render_silence(round, first_sample_index, last_sample_index, buffer);
 
         return;
     }

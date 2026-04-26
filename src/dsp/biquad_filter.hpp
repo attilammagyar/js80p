@@ -234,7 +234,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_high_pass_rendering(
@@ -247,7 +247,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate>
         bool initialize_low_shelf_rendering(
@@ -260,7 +260,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const gain_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate>
         bool initialize_high_shelf_rendering(
@@ -273,7 +273,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const gain_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_band_pass_rendering(
@@ -286,7 +286,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_notch_rendering(
@@ -299,7 +299,7 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Integer const index,
             Number const frequency_value,
             Number const q_value
-        ) noexcept;
+        ) const noexcept;
 
         template<bool is_freq_inaccurate, bool is_q_inaccurate>
         bool initialize_peaking_rendering(
@@ -313,12 +313,12 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Number const frequency_value,
             Number const q_value,
             Number const gain_value
-        ) noexcept;
+        ) const noexcept;
 
         void store_gain_coefficient_samples(
             Integer const index,
             Number const gain_value
-        ) noexcept;
+        ) const noexcept;
 
         void store_normalized_coefficient_samples(
             Integer const index,
@@ -328,10 +328,10 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Sample const a0,
             Sample const a1,
             Sample const a2
-        ) noexcept;
+        ) const noexcept;
 
-        void store_no_op_coefficient_samples(Integer const index) noexcept;
-        void store_silent_coefficient_samples(Integer const index) noexcept;
+        void store_no_op_coefficient_samples(Integer const index) const noexcept;
+        void store_silent_coefficient_samples(Integer const index) const noexcept;
 
         template<class ParamValueBufferClass>
         void render(

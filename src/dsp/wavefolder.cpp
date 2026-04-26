@@ -180,79 +180,106 @@ void Wavefolder<InputSignalProducerClass>::render(
     Sample const* const folding_buffer = this->folding_buffer;
     Sample const* const* const input_buffer = this->input_buffer;
 
-    Sample* const previous_input_sample = this->previous_input_sample;
-    Sample* const F0_previous_input_sample = this->F0_previous_input_sample;
-
     if (folding_buffer == NULL) {
         if (folding_value <= Constants::FOLD_TRANSITION) {
             Sample const folded_weight = folding_value * TRANSITION_INV;
 
             for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    Sample const input_sample = input_buffer[c][i];
+                Sample const* const in_channel = input_buffer[c];
+                Sample* const out_channel = buffer[c];
+                Sample previous_input_sample = this->previous_input_sample[c];
+                Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
+                Sample previous_output_sample = this->previous_output_sample[c];
 
-                    buffer[c][i] = Math::combine(
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    Sample const input_sample = in_channel[i];
+
+                    out_channel[i] = Math::combine(
                         folded_weight,
                         fold(
                             1.0,
                             input_sample,
-                            previous_input_sample[c],
-                            F0_previous_input_sample[c],
-                            previous_output_sample[c]
+                            previous_input_sample,
+                            F0_previous_input_sample,
+                            previous_output_sample
                         ),
                         input_sample
                     );
                 }
+
+                this->previous_input_sample[c] = previous_input_sample;
+                this->F0_previous_input_sample[c] = F0_previous_input_sample;
+                this->previous_output_sample[c] = previous_output_sample;
             }
         } else {
             Sample const folding = folding_value + TRANSITION_DELTA;
 
             for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                    Sample const input_sample = input_buffer[c][i];
+                Sample const* const in_channel = input_buffer[c];
+                Sample* const out_channel = buffer[c];
+                Sample previous_input_sample = this->previous_input_sample[c];
+                Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
+                Sample previous_output_sample = this->previous_output_sample[c];
 
-                    buffer[c][i] = fold(
+                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    Sample const input_sample = in_channel[i];
+
+                    out_channel[i] = fold(
                         folding,
                         input_sample,
-                        previous_input_sample[c],
-                        F0_previous_input_sample[c],
-                        previous_output_sample[c]
+                        previous_input_sample,
+                        F0_previous_input_sample,
+                        previous_output_sample
                     );
                 }
+
+                this->previous_input_sample[c] = previous_input_sample;
+                this->F0_previous_input_sample[c] = F0_previous_input_sample;
+                this->previous_output_sample[c] = previous_output_sample;
             }
         }
     } else {
         for (Integer c = 0; c != channels; ++c) {
+            Sample const* const in_channel = input_buffer[c];
+            Sample* const out_channel = buffer[c];
+            Sample previous_input_sample = this->previous_input_sample[c];
+            Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
+            Sample previous_output_sample = this->previous_output_sample[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                Sample const input_sample = input_buffer[c][i];
+                Sample const input_sample = in_channel[i];
                 Sample const folding_raw = folding_buffer[i];
 
                 if (folding_raw <= Constants::FOLD_TRANSITION) {
                     Sample const folded_weight = folding_raw * TRANSITION_INV;
 
-                    buffer[c][i] = Math::combine(
+                    out_channel[i] = Math::combine(
                         folded_weight,
                         fold(
                             1.0,
                             input_sample,
-                            previous_input_sample[c],
-                            F0_previous_input_sample[c],
-                            previous_output_sample[c]
+                            previous_input_sample,
+                            F0_previous_input_sample,
+                            previous_output_sample
                         ),
                         input_sample
                     );
                 } else {
                     Sample const folding = folding_raw + TRANSITION_DELTA;
 
-                    buffer[c][i] = fold(
+                    out_channel[i] = fold(
                         folding,
                         input_sample,
-                        previous_input_sample[c],
-                        F0_previous_input_sample[c],
-                        previous_output_sample[c]
+                        previous_input_sample,
+                        F0_previous_input_sample,
+                        previous_output_sample
                     );
                 }
             }
+
+            this->previous_input_sample[c] = previous_input_sample;
+            this->F0_previous_input_sample[c] = F0_previous_input_sample;
+            this->previous_output_sample[c] = previous_output_sample;
         }
     }
 }

@@ -1112,20 +1112,6 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
     }
 }
 
-
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-Sample Tape<
-        InputSignalProducerClass,
-        required_bypass_toggle_value
->::distort_volume(
-        Sample const volume_level
-) noexcept {
-    return Math::apply_envelope_shape(
-        Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP_STEEPER,
-        volume_level
-    );
-}
-
 }
 
 #endif

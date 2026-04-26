@@ -206,10 +206,7 @@ Sample const* const* NoiseGenerator<InputSignalProducerClass, LevelParamClass>::
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Filter<InputSignalProducerClass>::initialize_rendering(
-            round,
-            sample_count
-        )
+        Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count)
     );
 
     level_buffer = LevelParamClass::produce_if_not_constant(level, round, sample_count);
@@ -252,7 +249,9 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Sample** const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(!is_on_)) {
-        for (Integer c = 0; c != this->channels; ++c) {
+        Integer const channels = this->channels;
+
+        for (Integer c = 0; c != channels; ++c) {
             Sample* const out_channel = buffer[c];
             Sample const* const in_channel = this->input_buffer[c];
 
@@ -293,11 +292,12 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    Integer const channels = this->channels;
     Sample const a = this->a;
     Sample const w1 = this->w1;
     Sample const w2 = this->w2;
 
-    for (Integer c = 0; c != this->channels; ++c) {
+    for (Integer c = 0; c != channels; ++c) {
         Sample* const out_channel = buffer[c];
         Sample const* const in_channel = this->input_buffer[c];
         Sample r_n_m1 = this->r_n_m1[c];

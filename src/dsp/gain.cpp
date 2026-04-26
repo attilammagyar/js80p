@@ -114,8 +114,11 @@ void Gain<InputSignalProducerClass>::render(
     Sample const* const* const input_buffer = this->input_buffer;
 
     for (Integer c = 0; c != channels; ++c) {
+        Sample const* const in_channel = input_buffer[c];
+        Sample* const out_channel = buffer[c];
+
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-            buffer[c][i] = gain[i] * input_buffer[c][i];
+            out_channel[i] = gain[i] * in_channel[i];
         }
     }
 }

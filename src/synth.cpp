@@ -2360,6 +2360,9 @@ Sample const* const* Synth::initialize_rendering(
         effects, round, sample_count
     );
 
+    FloatParamS* const* const sample_evaluated_float_params = this->sample_evaluated_float_params;
+    FloatParamB* const* const block_evaluated_float_params = this->block_evaluated_float_params;
+
     for (int i = 0; i != (int)ParamId::EV3V; ++i) {
         if (sample_evaluated_float_params[i] != NULL) {
             FloatParamS::produce_if_not_constant(
@@ -2387,6 +2390,9 @@ Sample const* const* Synth::initialize_rendering(
 
 void Synth::stop_polyphonic_notes() noexcept
 {
+    Modulator* const* const modulators = this->modulators;
+    Carrier* const* const carriers = this->carriers;
+
     for (Integer voice = 1; voice != POLYPHONY; ++voice) {
         Midi::Channel channel = 0;
         Midi::Note note = 0;
@@ -2419,6 +2425,9 @@ void Synth::stop_polyphonic_notes() noexcept
 
 void Synth::garbage_collect_voices() noexcept
 {
+    Modulator* const* const modulators = this->modulators;
+    Carrier* const* const carriers = this->carriers;
+
     for (Integer voice = 0; voice != POLYPHONY; ++voice) {
         Midi::Channel channel;
         Midi::Note note;
@@ -3258,6 +3267,9 @@ void Synth::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) noexcept {
+    Integer const channels = this->channels;
+    Sample const* const* const raw_output = this->raw_output;
+
     for (Integer c = 0; c != channels; ++c) {
         Sample* const out = buffer[c];
         Sample const* const raw = raw_output[c];
@@ -3441,6 +3453,8 @@ void Synth::Bus::collect_active_notes(
         NoteTunings& note_tunings,
         Integer& note_tunings_count
 ) const noexcept {
+    Modulator const* const* const modulators = this->modulators;
+    Carrier const* const* const carriers = this->carriers;
     Integer i = 0;
 
     for (Integer v = 0; v != polyphony; ++v) {
@@ -3530,6 +3544,9 @@ Sample const* const* Synth::Bus::initialize_rendering(
 
 void Synth::Bus::collect_active_voices() noexcept
 {
+    Modulator* const* const modulators = this->modulators;
+    Carrier* const* const carriers = this->carriers;
+
     active_modulators_count = 0;
     active_carriers_count = 0;
     active_voices_count = 0;
@@ -3623,13 +3640,15 @@ void Synth::Bus::render(
             );
         }
     } else {
+        Integer const channels = this->channels;
+
         for (Integer c = 0; c != channels; ++c) {
-            Sample const* const mod_channel = modulators_buffer[c];
-            Sample const* const car_channel = carriers_buffer[c];
+            Sample const* const mods_channel = modulators_buffer[c];
+            Sample const* const cars_channel = carriers_buffer[c];
             Sample* const out_channel = buffer[c];
 
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                out_channel[i] = mod_channel[i] + car_channel[i];
+                out_channel[i] = mods_channel[i] + cars_channel[i];
             }
         }
     }
@@ -3644,17 +3663,19 @@ void Synth::Bus::render(
         Integer const last_sample_index,
         Sample** const buffer
 ) const noexcept {
+    Integer const channels = this->channels;
+
     for (Integer c = 0; c != channels; ++c) {
         Sample const* const in_channel = input[c];
-        Sample const* const mod_channel = modulators_buffer[c];
-        Sample const* const car_channel = carriers_buffer[c];
+        Sample const* const mods_channel = modulators_buffer[c];
+        Sample const* const cars_channel = carriers_buffer[c];
         Sample* const out_channel = buffer[c];
 
         for (Integer i = first_sample_index; i != last_sample_index; ++i) {
             out_channel[i] = (
                 in_channel[i] * input_volume[i]
-                + mod_channel[i]
-                + car_channel[i]
+                + mods_channel[i]
+                + cars_channel[i]
             );
         }
     }
@@ -3681,19 +3702,27 @@ void Synth::Bus::mix_modulators_with_additive_volume(
             return;
         }
 
+        Integer const channels = this->channels;
+
         mix_modulators(round, first_sample_index, last_sample_index);
 
         for (Integer c = 0; c != channels; ++c) {
+            Sample* const mods_channel = modulators_buffer[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                modulators_buffer[c][i] *= modulator_add_volume_value;
+                mods_channel[i] *= modulator_add_volume_value;
             }
         }
     } else {
+        Integer const channels = this->channels;
+
         mix_modulators(round, first_sample_index, last_sample_index);
 
         for (Integer c = 0; c != channels; ++c) {
+            Sample* const mods_channel = modulators_buffer[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                modulators_buffer[c][i] *= modulator_add_volume_buffer[i];
+                mods_channel[i] *= modulator_add_volume_buffer[i];
             }
         }
     }
@@ -3705,6 +3734,10 @@ void Synth::Bus::mix_modulators(
         Integer const first_sample_index,
         Integer const last_sample_index
 ) noexcept {
+    Sample* const* const modulators_buffer = this->modulators_buffer;
+    Integer const channels = this->channels;
+    size_t const active_modulators_count = this->active_modulators_count;
+
     for (size_t v = 0; v != active_modulators_count; ++v) {
         /*
         Rendering was done during Synth::Bus::initialize_rendering(), we're
@@ -3715,8 +3748,11 @@ void Synth::Bus::mix_modulators(
         );
 
         for (Integer c = 0; c != channels; ++c) {
+            Sample* const mods_channel = modulators_buffer[c];
+            Sample const* const mod_out_channel = modulator_output[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                modulators_buffer[c][i] += modulator_output[c][i];
+                mods_channel[i] += mod_out_channel[i];
             }
         }
     }
@@ -3728,6 +3764,10 @@ void Synth::Bus::mix_carriers(
         Integer const first_sample_index,
         Integer const last_sample_index
 ) noexcept {
+    Sample* const* const carriers_buffer = this->carriers_buffer;
+    Integer const channels = this->channels;
+    size_t const active_carriers_count = this->active_carriers_count;
+
     for (size_t v = 0; v != active_carriers_count; ++v) {
         /*
         Rendering was done during Synth::Bus::initialize_rendering(), we're
@@ -3738,8 +3778,11 @@ void Synth::Bus::mix_carriers(
         );
 
         for (Integer c = 0; c != channels; ++c) {
+            Sample* const cars_channel = carriers_buffer[c];
+            Sample const* const car_out_channel = carrier_output[c];
+
             for (Integer i = first_sample_index; i != last_sample_index; ++i) {
-                carriers_buffer[c][i] += carrier_output[c][i];
+                cars_channel[i] += car_out_channel[i];
             }
         }
     }

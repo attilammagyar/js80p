@@ -729,7 +729,7 @@ class FloatParam : public Param<Number, evaluation>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** const buffer
+            Sample* const buffer
         ) noexcept;
 
         void render_with_lfo_envelope(
@@ -744,7 +744,7 @@ class FloatParam : public Param<Number, evaluation>
             Integer const round,
             Integer const first_sample_index,
             Integer const last_sample_index,
-            Sample** const buffer
+            Sample* const buffer
         ) noexcept;
 
         void render_with_envelope(
