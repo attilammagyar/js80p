@@ -55,8 +55,10 @@ class MtsEsp
             }
         }
 
-        void update_note_tuning(Midi::Channel const channel, Midi::Note const note)
-        {
+        void update_note_tuning(
+                Midi::Channel const channel,
+                Midi::Note const note
+        ) {
             if (!synth.has_mts_esp_tuning()) {
                 return;
             }
