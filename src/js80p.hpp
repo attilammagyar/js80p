@@ -76,11 +76,17 @@ typedef unsigned char Byte;
 
 namespace Constants {
     constexpr char const* COMPANY_NAME = "Attila M. Magyar";
-    constexpr char const* COMPANY_WEB = "https://github.com/attilammagyar/js80p";
+
+    constexpr char const*
+        COMPANY_WEB = "https://github.com/attilammagyar/js80p";
+
     constexpr char const* COMPANY_EMAIL = "";
 
     constexpr char const* PLUGIN_NAME = "JS80P";
-    constexpr char const* PLUGIN_VERSION_STR = JS80P_TO_STRING(JS80P_VERSION_STR);
+
+    constexpr char const*
+        PLUGIN_VERSION_STR = JS80P_TO_STRING(JS80P_VERSION_STR);
+
     constexpr int PLUGIN_VERSION_INT = JS80P_VERSION_INT;
 
     constexpr Byte VOICE_STATUS_NORMAL =    0b0000;
@@ -109,7 +115,9 @@ namespace Constants {
 
     constexpr Number BIQUAD_FILTER_FREQUENCY_DEFAULT = 24000.0;
     constexpr Number BIQUAD_FILTER_FREQUENCY_MAX = 24000.0;
-    constexpr Number BIQUAD_FILTER_FREQUENCY_MIN = 1.0;  /* NOTE: this must be greater than 0.0 */
+
+    /* NOTE: this must be greater than 0.0 */
+    constexpr Number BIQUAD_FILTER_FREQUENCY_MIN = 1.0;
 
     constexpr Number BIQUAD_FILTER_GAIN_DEFAULT = 0.0;
     constexpr Number BIQUAD_FILTER_GAIN_MAX = 24.0;
