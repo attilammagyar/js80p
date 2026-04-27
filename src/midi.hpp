@@ -642,7 +642,10 @@ size_t EventDispatcher<EventHandlerClass>::dispatch_events(
 
     while (next_byte != buffer_size) {
         next_byte += dispatch_event(
-            event_handler, time_offset, &buffer[next_byte], buffer_size - next_byte
+            event_handler,
+            time_offset,
+            &buffer[next_byte],
+            buffer_size - next_byte
         );
     }
 
@@ -682,37 +685,72 @@ size_t EventDispatcher<EventHandlerClass>::dispatch_event(
     switch (msg_type) {
         case NOTE_OFF:
             return process_note_off(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case NOTE_ON:
             return process_note_on(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case AFTERTOUCH:
             return process_aftertouch(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case CONTROL_CHANGE:
             return process_control_change(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case PROGRAM_CHANGE:
             return process_program_change(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case CHANNEL_PRESSURE:
             return process_channel_pressure(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         case PITCH_BEND_CHANGE:
             return process_pitch_bend_change(
-                event_handler, time_offset, channel, buffer, buffer_size, next_byte
+                event_handler,
+                time_offset,
+                channel,
+                buffer,
+                buffer_size,
+                next_byte
             );
 
         default:
@@ -724,8 +762,9 @@ size_t EventDispatcher<EventHandlerClass>::dispatch_event(
 
 
 template<class EventHandlerClass>
-bool EventDispatcher<EventHandlerClass>::is_status_byte(Byte const byte) noexcept
-{
+bool EventDispatcher<EventHandlerClass>::is_status_byte(
+        Byte const byte
+) noexcept {
     return (byte & STATUS_MASK) != 0;
 }
 
