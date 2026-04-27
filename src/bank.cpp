@@ -71,7 +71,9 @@ std::string Bank::Program::sanitize_name(std::string const& name) const
 
     std::fill_n(filtered, buffer_size, '\x00');
 
-    for (std::string::const_iterator it = name.begin(); it != name.end(); ++it) {
+    std::string::const_iterator it;
+
+    for (it = name.begin(); it != name.end(); ++it) {
         if (next == max_index) {
             break;
         }
@@ -123,7 +125,9 @@ std::string Bank::Program::truncate(
             max_length - prefix_length - fixed_part_length
         );
         std::string const prefix = text.substr(0, prefix_length);
-        std::string const suffix = text.substr(length - suffix_length, suffix_length);
+        std::string const suffix = text.substr(
+            length - suffix_length, suffix_length
+        );
 
         return prefix + ".." + suffix;
     }
