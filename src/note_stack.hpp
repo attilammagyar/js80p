@@ -40,9 +40,18 @@ class NoteStack
 
         void clear() noexcept;
         bool is_empty() const noexcept;
-        bool is_top(Midi::Channel const channel, Midi::Note const note) const noexcept;
 
-        void top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept;
+        bool is_top(
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) const noexcept;
+
+        void top(
+            Midi::Channel& channel,
+            Midi::Note& note,
+            Number& velocity
+        ) const noexcept;
+
         void top(Midi::Channel& channel, Midi::Note& note) const noexcept;
         void oldest(Midi::Channel& channel, Midi::Note& note) const noexcept;
         void lowest(Midi::Channel& channel, Midi::Note& note) const noexcept;
@@ -54,9 +63,16 @@ class NoteStack
             Number const velocity
         ) noexcept;
 
-        void pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) noexcept;
+        void pop(
+            Midi::Channel& channel,
+            Midi::Note& note,
+            Number& velocity
+        ) noexcept;
 
-        void remove(Midi::Channel const channel, Midi::Note const note) noexcept;
+        void remove(
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) noexcept;
 
     private:
         static constexpr Midi::Word INVALID_ITEM = Midi::INVALID_NOTE;
@@ -78,12 +94,17 @@ class NoteStack
 
         // void dump() const noexcept;
 
-        bool is_invalid(Midi::Channel const channel, Midi::Note const note) const noexcept;
+        bool is_invalid(
+            Midi::Channel const channel,
+            Midi::Note const note
+        ) const noexcept;
 
         template<bool should_update_extremes>
         void remove(Midi::Word const word) noexcept;
 
-        void update_extremes_after_remove(Midi::Word const changed_item) noexcept;
+        void update_extremes_after_remove(
+            Midi::Word const changed_item
+        ) noexcept;
 
         bool is_already_pushed(Midi::Word const word) const noexcept;
 

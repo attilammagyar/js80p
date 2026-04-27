@@ -76,14 +76,19 @@ bool NoteStack::is_empty() const noexcept
 }
 
 
-bool NoteStack::is_top(Midi::Channel const channel, Midi::Note const note) const noexcept
-{
+bool NoteStack::is_top(
+        Midi::Channel const channel,
+        Midi::Note const note
+) const noexcept {
     return head == encode(channel, note);
 }
 
 
-void NoteStack::top(Midi::Channel& channel, Midi::Note& note, Number& velocity) const noexcept
-{
+void NoteStack::top(
+        Midi::Channel& channel,
+        Midi::Note& note,
+        Number& velocity
+) const noexcept {
     top(channel, note);
     velocity = is_empty() ? 0.0 : velocities[head];
 }
@@ -164,8 +169,11 @@ bool NoteStack::is_already_pushed(Midi::Word const word) const noexcept
 }
 
 
-void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) noexcept
-{
+void NoteStack::pop(
+        Midi::Channel& channel,
+        Midi::Note& note,
+        Number& velocity
+) noexcept {
     if (is_empty()) {
         decode(INVALID_ITEM, channel, note);
         velocity = 0.0;
@@ -190,8 +198,9 @@ void NoteStack::pop(Midi::Channel& channel, Midi::Note& note, Number& velocity) 
 }
 
 
-void NoteStack::update_extremes_after_remove(Midi::Word const changed_item) noexcept
-{
+void NoteStack::update_extremes_after_remove(
+        Midi::Word const changed_item
+) noexcept {
     if (is_empty()) {
         lowest_ = INVALID_ITEM;
         highest_ = INVALID_ITEM;
@@ -237,8 +246,10 @@ void NoteStack::update_extremes_after_remove(Midi::Word const changed_item) noex
 }
 
 
-void NoteStack::remove(Midi::Channel const channel, Midi::Note const note) noexcept
-{
+void NoteStack::remove(
+        Midi::Channel const channel,
+        Midi::Note const note
+) noexcept {
     if (JS80P_UNLIKELY(is_invalid(channel, note))) {
         return;
     }
