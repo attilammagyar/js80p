@@ -476,7 +476,7 @@ Sample const* const* SignalProducer::initialize_rendering(
 void SignalProducer::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
 }
@@ -492,13 +492,13 @@ void SignalProducer::finalize_rendering(
 void SignalProducer::render_silence(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     for (Integer c = 0; c != channels; ++c) {
         Sample* const channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             channel[i] = 0.0;
         }
     }

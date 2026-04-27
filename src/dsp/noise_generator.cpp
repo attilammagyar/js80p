@@ -245,7 +245,7 @@ template<class InputSignalProducerClass, class LevelParamClass>
 void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(!is_on_)) {
@@ -255,7 +255,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
             Sample* const out_channel = buffer[c];
             Sample const* const in_channel = this->input_buffer[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 out_channel[i] = in_channel[i];
             }
         }
@@ -268,7 +268,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
             ParamValueWrapper(level.get_value()),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     } else {
@@ -276,7 +276,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
             ParamValueBufferWrapper(level_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     }
@@ -289,7 +289,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         LevelBufferClass const& level,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
@@ -304,7 +304,7 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::render(
         Sample x_n_m1 = this->x_n_m1[c];
         Sample y_n_m1 = this->y_n_m1[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             Sample const r_n = rng.random() * 2.0 - 1.0;
             Sample const x_n = a * (x_n_m1 + r_n - r_n_m1);
             Sample const y_n = w1 * x_n + w2 * y_n_m1;

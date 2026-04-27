@@ -319,7 +319,7 @@ template<class InputSignalProducerClass>
 void Chorus<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
@@ -329,13 +329,13 @@ void Chorus<InputSignalProducerClass>::render(
         Sample const* const chorused_channel = chorused[c];
         Sample* const output_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             output_channel[i] = chorused_channel[i];
         }
     }
 
     Effect<InputSignalProducerClass>::render(
-        round, first_sample_index, last_sample_index, buffer
+        round, first_sample_index, end_sample_index, buffer
     );
 }
 

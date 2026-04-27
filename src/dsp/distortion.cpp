@@ -986,14 +986,14 @@ template<class InputSignalProducerClass>
 void Distortion<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (level_buffer == NULL) {
         render<ParamValueWrapper>(
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer,
             ParamValueWrapper(level_value)
         );
@@ -1001,7 +1001,7 @@ void Distortion<InputSignalProducerClass>::render(
         render<ParamValueBufferWrapper>(
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer,
             ParamValueBufferWrapper(level_buffer)
         );
@@ -1014,7 +1014,7 @@ template<class LevelBufferClass>
 void Distortion<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer,
         LevelBufferClass const& level
 ) noexcept {
@@ -1032,7 +1032,7 @@ void Distortion<InputSignalProducerClass>::render(
         Sample previous_input_sample_c = previous_input_sample[c];
         Sample F0_previous_input_sample_c = F0_previous_input_sample[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             Sample const input_sample = in_channel[i];
 
             out_channel[i] = Math::combine(

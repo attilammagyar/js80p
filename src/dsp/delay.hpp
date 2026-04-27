@@ -143,7 +143,7 @@ class Delay : public Filter<InputSignalProducerClass>
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -194,7 +194,7 @@ class Delay : public Filter<InputSignalProducerClass>
         void render_with_gain(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer,
             GainBufferClass const& gain
         ) noexcept;
@@ -379,7 +379,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -392,7 +392,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
         void render_with_constant_panning(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) const noexcept;
 
@@ -400,7 +400,7 @@ class StereoPannedDelay : public Filter<FilterInputClass>
         void render_with_changing_panning(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) const noexcept;
 

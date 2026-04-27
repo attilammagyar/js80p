@@ -568,7 +568,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::produce_for_lfo_with_enve
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer,
         Sample const* const pulse_width_buffer,
         Sample const* const amplitude_buffer,
@@ -584,13 +584,13 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::produce_for_lfo_with_enve
     wavetable = wavetables[WAVEFORM_TO_WAVETABLE_INDEX[waveform]];
 
     compute_amplitude_buffer(
-        amplitude_buffer, amplitude_value, round, sample_count, first_sample_index, last_sample_index
+        amplitude_buffer, amplitude_value, round, sample_count, first_sample_index, end_sample_index
     );
     compute_frequency_buffer(
-        frequency_buffer, frequency_value, round, sample_count, first_sample_index, last_sample_index
+        frequency_buffer, frequency_value, round, sample_count, first_sample_index, end_sample_index
     );
     compute_phase_buffer(
-        phase_buffer, phase_value, round, sample_count, first_sample_index, last_sample_index
+        phase_buffer, phase_value, round, sample_count, first_sample_index, end_sample_index
     );
 
     apply_toggle_params(bpm);
@@ -609,18 +609,18 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::produce_for_lfo_with_enve
 
         if (pulse_width_buffer == NULL) {
             render<false, true>(
-                ParamValueWrapper(pulse_width_value), wavetable_state, round, first_sample_index, last_sample_index, buffer
+                ParamValueWrapper(pulse_width_value), wavetable_state, round, first_sample_index, end_sample_index, buffer
             );
         } else {
             render<false, true>(
-                ParamValueBufferWrapper(pulse_width_buffer), wavetable_state, round, first_sample_index, last_sample_index, buffer
+                ParamValueBufferWrapper(pulse_width_buffer), wavetable_state, round, first_sample_index, end_sample_index, buffer
             );
         }
 
         this->is_unipolar_pulse = was_unipolar_pulse;
     } else {
         render<false, false>(
-            ParamValueWrapper(0.0), wavetable_state, round, first_sample_index, last_sample_index, buffer
+            ParamValueWrapper(0.0), wavetable_state, round, first_sample_index, end_sample_index, buffer
         );
     }
 
@@ -728,7 +728,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     if constexpr (HAS_SUBHARMONIC) {
         subharmonic_amplitude_buffer = FloatParamS::produce_if_not_constant(
@@ -756,7 +756,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         } else {
             Sample* const computed_amplitude_buffer = this->computed_amplitude_buffer;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 computed_amplitude_buffer[i] = amplitude_value * modulated_amplitude_buffer[i];
             }
         }
@@ -768,11 +768,11 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_amplitude_buffer(
         if (modulated_amplitude_buffer == NULL) {
             Sample const modulated_amplitude_value = (Sample)modulated_amplitude.get_value();
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 computed_amplitude_buffer[i] = amplitude_buffer[i] * modulated_amplitude_value;
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 computed_amplitude_buffer[i] = amplitude_buffer[i] * modulated_amplitude_buffer[i];
             }
         }
@@ -787,7 +787,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     Sample const* const detune_buffer = (
         FloatParamS::produce_if_not_constant(detune, round, sample_count)
@@ -809,7 +809,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
         } else {
             Frequency* const computed_frequency_buffer = this->computed_frequency_buffer;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 computed_frequency_buffer[i] = compute_frequency(
                     (Number)frequency_buffer[i], detune_value, fine_detune_value
                 );
@@ -838,7 +838,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             case NONE: {
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         (Number)detune_buffer[i],
@@ -852,7 +852,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
             case FREQUENCY: {
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         frequency_value,
                         (Number)detune_buffer[i],
@@ -868,7 +868,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         detune_value,
@@ -884,7 +884,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         frequency_value,
                         detune_value,
@@ -900,7 +900,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         (Number)detune_buffer[i],
@@ -916,7 +916,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         frequency_value,
                         (Number)detune_buffer[i],
@@ -933,7 +933,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_frequency_buffer(
 
                 computed_frequency_is_constant = false;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     computed_frequency_buffer[i] = compute_frequency(
                         (Number)frequency_buffer[i],
                         detune_value,
@@ -978,7 +978,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     phase_is_constant = phase_buffer == NULL;
 
@@ -987,7 +987,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::compute_phase_buffer(
     } else {
         Sample* const computed_phase_buffer = this->computed_phase_buffer;
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             computed_phase_buffer[i] = Wavetable::scale_phase_offset(phase_buffer[i]);
         }
     }
@@ -998,11 +998,11 @@ template<class ModulatorSignalProducerClass, bool is_lfo>
 void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (!is_on_) {
-        render_silence(round, first_sample_index, last_sample_index, buffer);
+        render_silence(round, first_sample_index, end_sample_index, buffer);
 
         return;
     }
@@ -1014,11 +1014,11 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
                 if (subharmonic_amplitude_is_constant && subharmonic_amplitude_value < 0.000001) {
                     render<false, true>(
-                        pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                        pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                     );
                 } else {
                     render<true, true>(
-                        pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                        pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                     );
                 }
             } else {
@@ -1026,11 +1026,11 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
                 if (subharmonic_amplitude_is_constant && subharmonic_amplitude_value < 0.000001) {
                     render<false, true>(
-                        pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                        pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                     );
                 } else {
                     render<true, true>(
-                        pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                        pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                     );
                 }
             }
@@ -1039,11 +1039,11 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
             if (subharmonic_amplitude_is_constant && subharmonic_amplitude_value < 0.000001) {
                 render<false, false>(
-                    pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                    pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                 );
             } else {
                 render<true, false>(
-                    pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                    pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                 );
             }
         }
@@ -1053,20 +1053,20 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                 ParamValueWrapper pulse_width(pulse_width_value);
 
                 render<false, true>(
-                    pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                    pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                 );
             } else {
                 ParamValueBufferWrapper pulse_width(pulse_width_buffer);
 
                 render<false, true>(
-                    pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                    pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
                 );
             }
         } else {
             ParamValueWrapper pulse_width(0.0);
 
             render<false, false>(
-                pulse_width, wavetable_state, round, first_sample_index, last_sample_index, buffer[0]
+                pulse_width, wavetable_state, round, first_sample_index, end_sample_index, buffer[0]
             );
         }
     }
@@ -1080,7 +1080,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         WavetableState& wavetable_state,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     if (computed_frequency_is_constant) {
@@ -1095,19 +1095,19 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
             switch (interpolation) {
                 case Wavetable::Interpolation::LINEAR_ONLY:
                     render<Wavetable::Interpolation::LINEAR_ONLY, true, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
 
                 case Wavetable::Interpolation::LAGRANGE_ONLY:
                     render<Wavetable::Interpolation::LAGRANGE_ONLY, true, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
 
                 default:
                     render<Wavetable::Interpolation::DYNAMIC, true, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
             }
@@ -1115,19 +1115,19 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
             switch (interpolation) {
                 case Wavetable::Interpolation::LINEAR_ONLY:
                     render<Wavetable::Interpolation::LINEAR_ONLY, false, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
 
                 case Wavetable::Interpolation::LAGRANGE_ONLY:
                     render<Wavetable::Interpolation::LAGRANGE_ONLY, false, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
 
                 default:
                     render<Wavetable::Interpolation::DYNAMIC, false, has_subharmonic, is_pulse>(
-                        pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                        pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
                     );
                     break;
             }
@@ -1137,11 +1137,11 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
         if (wavetable->has_single_partial()) {
             render<Wavetable::Interpolation::DYNAMIC, true, has_subharmonic, is_pulse>(
-                pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
             );
         } else {
             render<Wavetable::Interpolation::DYNAMIC, false, has_subharmonic, is_pulse>(
-                pulse_width, frequency, wavetable_state, round, first_sample_index, last_sample_index, buffer
+                pulse_width, frequency, wavetable_state, round, first_sample_index, end_sample_index, buffer
             );
         }
     }
@@ -1163,7 +1163,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         WavetableState& wavetable_state,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     if constexpr (has_subharmonic) {
@@ -1179,7 +1179,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 } else {
@@ -1192,7 +1192,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 }
@@ -1207,7 +1207,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 } else {
@@ -1220,7 +1220,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 }
@@ -1237,7 +1237,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 } else {
@@ -1250,7 +1250,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 }
@@ -1265,7 +1265,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 } else {
@@ -1278,7 +1278,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                         wavetable_state,
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer
                     );
                 }
@@ -1296,7 +1296,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     wavetable_state,
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             } else {
@@ -1309,7 +1309,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     wavetable_state,
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             }
@@ -1324,7 +1324,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     wavetable_state,
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             } else {
@@ -1337,7 +1337,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                     wavetable_state,
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             }
@@ -1367,7 +1367,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
         WavetableState& wavetable_state,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(is_starting)) {
@@ -1378,7 +1378,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
 
     if constexpr (is_lfo && is_pulse) {
         if (is_unipolar_pulse) {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[i] = render_sample<single_partial, has_subharmonic, true, false, interpolation>(
                     wavetable_state,
                     pulse_width[i],
@@ -1391,7 +1391,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
                 );
             }
         } else {
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[i] = render_sample<single_partial, has_subharmonic, true, true, interpolation>(
                     wavetable_state,
                     pulse_width[i],
@@ -1405,7 +1405,7 @@ void Oscillator<ModulatorSignalProducerClass, is_lfo>::render(
             }
         }
     } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             buffer[i] = render_sample<single_partial, has_subharmonic, is_pulse, true, interpolation>(
                 wavetable_state,
                 pulse_width[i],

@@ -723,7 +723,7 @@ template<class InputSignalProducerClass, DelayCapabilities capabilities>
 void Delay<InputSignalProducerClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (need_gain) {
@@ -733,7 +733,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueWrapper, true, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueWrapper(this->gain.get_value())
                     );
@@ -741,7 +741,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueWrapper, false, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueWrapper(this->gain.get_value())
                     );
@@ -751,7 +751,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueWrapper, true, true>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueWrapper(this->gain.get_value())
                     );
@@ -759,7 +759,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueWrapper, true, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueWrapper(this->gain.get_value())
                     );
@@ -768,7 +768,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<true, ParamValueWrapper, true, false>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueWrapper(this->gain.get_value())
                 );
@@ -779,7 +779,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueBufferWrapper, true, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueBufferWrapper(gain_buffer)
                     );
@@ -787,7 +787,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueBufferWrapper, false, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueBufferWrapper(gain_buffer)
                     );
@@ -797,7 +797,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueBufferWrapper, true, true>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueBufferWrapper(gain_buffer)
                     );
@@ -805,7 +805,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                     render_with_gain<true, ParamValueBufferWrapper, true, false>(
                         round,
                         first_sample_index,
-                        last_sample_index,
+                        end_sample_index,
                         buffer,
                         ParamValueBufferWrapper(gain_buffer)
                     );
@@ -814,7 +814,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<true, ParamValueBufferWrapper, true, false>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueBufferWrapper(gain_buffer)
                 );
@@ -826,7 +826,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<false, ParamValueWrapper, true, false>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueWrapper(1.0)
                 );
@@ -834,7 +834,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<false, ParamValueWrapper, false, false>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueWrapper(1.0)
                 );
@@ -844,7 +844,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<false, ParamValueWrapper, true, true>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueWrapper(1.0)
                 );
@@ -852,7 +852,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                 render_with_gain<false, ParamValueWrapper, true, false>(
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer,
                     ParamValueWrapper(1.0)
                 );
@@ -861,7 +861,7 @@ void Delay<InputSignalProducerClass, capabilities>::render(
             render_with_gain<false, ParamValueWrapper, true, false>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(1.0)
             );
@@ -875,7 +875,7 @@ template<bool need_gain, class GainBufferClass, bool is_time_scale_constant, boo
 void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer,
         GainBufferClass const& gain
 ) noexcept {
@@ -954,7 +954,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                 processed_samples = 0.0;
             }
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 if constexpr (!is_time_scale_constant) {
                     read_index = (
                         read_index_orig
@@ -1036,7 +1036,7 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                 channel_lfo_scale = channel_lfo_scales[c] * sample_rate;
             }
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 if constexpr (is_time_scale_constant) {
                     if constexpr (!is_reversed) {
                         read_index = (
@@ -1496,26 +1496,26 @@ template<class InputSignalProducerClass, class FilterInputClass, DelayCapabiliti
 void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (panning_buffer == NULL) {
         if (panning_value > 0.0) {
             render_with_constant_panning<0, 1>(
-                round, first_sample_index, last_sample_index, buffer
+                round, first_sample_index, end_sample_index, buffer
             );
         } else {
             render_with_constant_panning<1, 0>(
-                round, first_sample_index, last_sample_index, buffer
+                round, first_sample_index, end_sample_index, buffer
             );
         }
     } else if (is_flipped) {
         render_with_changing_panning<1, 0>(
-            round, first_sample_index, last_sample_index, buffer
+            round, first_sample_index, end_sample_index, buffer
         );
     } else {
         render_with_changing_panning<0, 1>(
-            round, first_sample_index, last_sample_index, buffer
+            round, first_sample_index, end_sample_index, buffer
         );
     }
 }
@@ -1526,7 +1526,7 @@ template<int channel_1, int channel_2>
 void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_constant_panning(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Sample const* const input_buffer_channel_1 = this->input_buffer[channel_1];
@@ -1536,11 +1536,11 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
     Sample const stereo_gain_value_channel_1 = stereo_gain_value[channel_1];
     Sample const stereo_gain_value_channel_2 = stereo_gain_value[channel_2];
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_value_channel_1;
     }
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         buffer_channel_2[i] = (
             input_buffer_channel_2[i]
             + input_buffer_channel_1[i] * stereo_gain_value_channel_2
@@ -1554,7 +1554,7 @@ template<int channel_1, int channel_2>
 void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_changing_panning(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Sample const* const input_buffer_channel_1 = this->input_buffer[channel_1];
@@ -1564,7 +1564,7 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
     Sample const* const stereo_gain_buffer_channel_1 = stereo_gain_buffer[channel_1];
     Sample const* const stereo_gain_buffer_channel_2 = stereo_gain_buffer[channel_2];
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         if (panning_buffer[i] > 0.0) {
             buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_buffer_channel_1[i];
         } else {
@@ -1575,7 +1575,7 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
         }
     }
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         if (panning_buffer[i] > 0.0) {
             buffer_channel_2[i] = (
                 input_buffer_channel_2[i]

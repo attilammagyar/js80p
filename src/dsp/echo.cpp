@@ -203,7 +203,7 @@ template<class InputSignalProducerClass>
 void Echo<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Sample const* const* const comb_filter_1_buffer = this->comb_filter_1_buffer;
@@ -215,13 +215,13 @@ void Echo<InputSignalProducerClass>::render(
         Sample const* const comb_filter_1_channel = comb_filter_1_buffer[c];
         Sample const* const comb_filter_2_channel = comb_filter_2_buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             out_channel[i] = comb_filter_1_channel[i] + comb_filter_2_channel[i];
         }
     }
 
     SideChainCompressableEffect<InputSignalProducerClass>::render(
-        round, first_sample_index, last_sample_index, buffer
+        round, first_sample_index, end_sample_index, buffer
     );
 }
 

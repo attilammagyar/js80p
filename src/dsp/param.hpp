@@ -157,7 +157,7 @@ class Param : public SignalProducer
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -443,14 +443,14 @@ class FloatParam : public Param<Number, evaluation>
         void ratios_to_values(
             Sample* const buffer,
             Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const end_sample_index
         ) const noexcept;
 
         void ratios_to_values(
             Sample const* const source_buffer,
             Sample* const target_buffer,
             Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const end_sample_index
         ) const noexcept;
 
         Integer get_change_index() const noexcept;
@@ -539,7 +539,7 @@ class FloatParam : public Param<Number, evaluation>
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -728,7 +728,7 @@ class FloatParam : public Param<Number, evaluation>
         void render_with_lfo(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -736,21 +736,21 @@ class FloatParam : public Param<Number, evaluation>
             LFO& lfo,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
         void render_linear_ramp(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
         void render_with_envelope(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept;
 
@@ -902,7 +902,7 @@ class ModulatableFloatParam : public FloatParamS
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 

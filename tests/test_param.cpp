@@ -4225,12 +4225,12 @@ class Modulator : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             ++render_called;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[0][i] = VALUE;
             }
         }

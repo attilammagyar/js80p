@@ -98,7 +98,7 @@ class LFO : public SignalProducer
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -127,7 +127,7 @@ class LFO : public SignalProducer
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -248,7 +248,7 @@ class LFO : public SignalProducer
                     Integer const round,
                     Integer const sample_count,
                     Integer const first_sample_index,
-                    Integer const last_sample_index,
+                    Integer const end_sample_index,
                     Sample* const buffer
                 ) noexcept;
 
@@ -328,7 +328,7 @@ class LFO : public SignalProducer
                 Integer const round;
                 Integer const sample_count;
                 Integer const first_sample_index;
-                Integer const last_sample_index;
+                Integer const end_sample_index;
                 Midi::Channel const midi_channel;
         };
 
@@ -343,7 +343,7 @@ class LFO : public SignalProducer
             Sample const randomness_value,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -354,7 +354,7 @@ class LFO : public SignalProducer
             RandomnessBufferClass const& randomness,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -366,7 +366,7 @@ class LFO : public SignalProducer
             Sample const max_value,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -377,7 +377,7 @@ class LFO : public SignalProducer
             MaxBufferClass const& max,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -389,7 +389,7 @@ class LFO : public SignalProducer
             Sample const randomness_value,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -400,7 +400,7 @@ class LFO : public SignalProducer
             RandomnessBufferClass const& randomness,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -412,7 +412,7 @@ class LFO : public SignalProducer
             Sample const max_value,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;
@@ -423,7 +423,7 @@ class LFO : public SignalProducer
             MaxBufferClass const& max,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample const* const source_buffer,
             Sample* const target_buffer
         ) const noexcept;

@@ -1058,12 +1058,12 @@ template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
 void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (params.state == TapeParams::State::TAPE_STATE_STOPPED) {
         this->render_silence(
-            round, first_sample_index, last_sample_index, buffer
+            round, first_sample_index, end_sample_index, buffer
         );
 
         return;
@@ -1074,7 +1074,7 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
             ParamValueWrapper(params.volume.get_value()),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     } else {
@@ -1082,7 +1082,7 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
             ParamValueBufferWrapper(volume_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     }
@@ -1095,13 +1095,13 @@ void Tape<InputSignalProducerClass, required_bypass_toggle_value>::render(
         VolumeBufferClass const& volume,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     for (Integer c = 0; c != this->channels; ++c) {
         Sample* const channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             /*
             Conveniently, our buffer owner is the delay, so the buffer
             already contains its rendered signal, we just have to apply

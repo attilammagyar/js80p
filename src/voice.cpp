@@ -385,7 +385,7 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Sample const* const volume_buffer = this->volume_buffer;
@@ -398,7 +398,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
                 ParamValueWrapper(1.0),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         } else {
@@ -407,7 +407,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
                 ParamValueBufferWrapper(velocity_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         }
@@ -417,7 +417,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
             ParamValueWrapper(this->velocity_value),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     } else {
@@ -426,7 +426,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
             ParamValueBufferWrapper(velocity_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     }
@@ -440,7 +440,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         VelocityBufferClass const& velocity,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Sample const* const* const input_buffer = this->input_buffer;
@@ -450,7 +450,7 @@ void Voice<ModulatorSignalProducerClass>::VolumeApplier::render(
         Sample const* const in_channel = input_buffer[c];
         Sample* const out_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             if constexpr (has_velocity) {
                 out_channel[i] = velocity[i] * volume[i] * in_channel[i];
             } else {
@@ -1572,7 +1572,7 @@ template<class ModulatorSignalProducerClass>
 void Voice<ModulatorSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
@@ -1592,7 +1592,7 @@ void Voice<ModulatorSignalProducerClass>::render(
 
             Math::sincos(x, right_gain, left_gain);
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[0][i] = left_gain * volume_applier_buffer[i];
                 buffer[1][i] = right_gain * volume_applier_buffer[i];
             }
@@ -1602,7 +1602,7 @@ void Voice<ModulatorSignalProducerClass>::render(
                 ParamValueWrapper(note_panning_value),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         }
@@ -1612,7 +1612,7 @@ void Voice<ModulatorSignalProducerClass>::render(
             ParamValueBufferWrapper(note_panning_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     } else {
@@ -1621,7 +1621,7 @@ void Voice<ModulatorSignalProducerClass>::render(
             ParamValueBufferWrapper(note_panning_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     }
@@ -1636,7 +1636,7 @@ void Voice<ModulatorSignalProducerClass>::render(
                 for (Integer c = 0; c != 2; ++c) {
                     Sample* const channel = buffer[c];
 
-                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                         channel[i] *= additive_volume_value;
                     }
                 }
@@ -1644,7 +1644,7 @@ void Voice<ModulatorSignalProducerClass>::render(
                 for (Integer c = 0; c != 2; ++c) {
                     Sample* const channel = buffer[c];
 
-                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                         channel[i] *= additive_volume_buffer[i];
                     }
                 }
@@ -1661,7 +1661,7 @@ void Voice<ModulatorSignalProducerClass>::render(
         NotePanningBufferClass const& note_panning,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Sample const* const volume_applier_buffer = this->volume_applier_buffer;
@@ -1670,7 +1670,7 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     /* https://www.w3.org/TR/webaudio/#stereopanner-algorithm */
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         Number const x = Math::PI_QUARTER * Math::clamp(
             panning[i] + note_panning[i] + 1.0, 0.0, 2.0
         );

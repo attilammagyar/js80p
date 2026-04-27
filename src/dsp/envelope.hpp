@@ -132,7 +132,7 @@ class Envelope
             Frequency const sample_rate,
             Seconds const sampling_period,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -262,7 +262,7 @@ class Envelope
             Seconds& time,
             Number const value,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -278,7 +278,7 @@ class Envelope
             Frequency const sample_rate,
             Seconds const sampling_period,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             EnvelopeShape const shape,
             Sample* const buffer,
             Integer& i

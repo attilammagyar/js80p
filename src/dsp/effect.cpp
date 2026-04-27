@@ -69,7 +69,7 @@ template<class InputSignalProducerClass>
 void Effect<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (is_dry) {
@@ -77,7 +77,7 @@ void Effect<InputSignalProducerClass>::render(
             render<true, ParamValueWrapper, ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(dry.get_value()),
                 ParamValueWrapper(0.0)
@@ -86,7 +86,7 @@ void Effect<InputSignalProducerClass>::render(
             render<true, ParamValueBufferWrapper, ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueBufferWrapper(dry_buffer),
                 ParamValueWrapper(0.0)
@@ -101,7 +101,7 @@ void Effect<InputSignalProducerClass>::render(
             render<false, ParamValueWrapper, ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(dry.get_value()),
                 ParamValueWrapper(wet.get_value())
@@ -110,7 +110,7 @@ void Effect<InputSignalProducerClass>::render(
             render<false, ParamValueBufferWrapper, ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueBufferWrapper(dry_buffer),
                 ParamValueWrapper(wet.get_value())
@@ -121,7 +121,7 @@ void Effect<InputSignalProducerClass>::render(
             render<false, ParamValueWrapper, ParamValueBufferWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(dry.get_value()),
                 ParamValueBufferWrapper(wet_buffer)
@@ -130,7 +130,7 @@ void Effect<InputSignalProducerClass>::render(
             render<false, ParamValueBufferWrapper, ParamValueBufferWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueBufferWrapper(dry_buffer),
                 ParamValueBufferWrapper(wet_buffer)
@@ -145,7 +145,7 @@ template<bool is_dry, class DryBufferClass, class WetBufferClass>
 void Effect<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer,
         DryBufferClass const& dry,
         WetBufferClass const& wet
@@ -156,7 +156,7 @@ void Effect<InputSignalProducerClass>::render(
         Sample const* const input_channel = this->input_buffer[c];
         Sample* const out_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             if constexpr (is_dry) {
                 out_channel[i] = dry[i] * input_channel[i];
             } else {

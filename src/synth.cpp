@@ -3264,7 +3264,7 @@ void Synth::set_voice_status_flag(
 void Synth::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
@@ -3274,7 +3274,7 @@ void Synth::render(
         Sample* const out = buffer[c];
         Sample const* const raw = raw_output[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             /*
             Normal synth configurations should stay below 0 dB; if we happen to
             produce samples way outside the [-1, +1] range, it most probably
@@ -3615,11 +3615,11 @@ void Synth::Bus::render_voices(
 void Synth::Bus::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
-    mix_modulators_with_additive_volume(round, first_sample_index, last_sample_index);
-    mix_carriers(round, first_sample_index, last_sample_index);
+    mix_modulators_with_additive_volume(round, first_sample_index, end_sample_index);
+    mix_carriers(round, first_sample_index, end_sample_index);
 
     if (JS80P_LIKELY(input != NULL)) {
         if (input_volume_buffer == NULL) {
@@ -3627,7 +3627,7 @@ void Synth::Bus::render(
                 ParamValueWrapper(input_volume.get_value()),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         } else {
@@ -3635,7 +3635,7 @@ void Synth::Bus::render(
                 ParamValueBufferWrapper(input_volume_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         }
@@ -3647,7 +3647,7 @@ void Synth::Bus::render(
             Sample const* const cars_channel = carriers_buffer[c];
             Sample* const out_channel = buffer[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 out_channel[i] = mods_channel[i] + cars_channel[i];
             }
         }
@@ -3660,7 +3660,7 @@ void Synth::Bus::render(
         InputVolumeBufferClass const& input_volume,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Integer const channels = this->channels;
@@ -3671,7 +3671,7 @@ void Synth::Bus::render(
         Sample const* const cars_channel = carriers_buffer[c];
         Sample* const out_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             out_channel[i] = (
                 in_channel[i] * input_volume[i]
                 + mods_channel[i]
@@ -3685,10 +3685,10 @@ void Synth::Bus::render(
 void Synth::Bus::mix_modulators_with_additive_volume(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     if (modulator_add_volume.is_polyphonic()) {
-        mix_modulators(round, first_sample_index, last_sample_index);
+        mix_modulators(round, first_sample_index, end_sample_index);
 
         return;
     }
@@ -3704,24 +3704,24 @@ void Synth::Bus::mix_modulators_with_additive_volume(
 
         Integer const channels = this->channels;
 
-        mix_modulators(round, first_sample_index, last_sample_index);
+        mix_modulators(round, first_sample_index, end_sample_index);
 
         for (Integer c = 0; c != channels; ++c) {
             Sample* const mods_channel = modulators_buffer[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 mods_channel[i] *= modulator_add_volume_value;
             }
         }
     } else {
         Integer const channels = this->channels;
 
-        mix_modulators(round, first_sample_index, last_sample_index);
+        mix_modulators(round, first_sample_index, end_sample_index);
 
         for (Integer c = 0; c != channels; ++c) {
             Sample* const mods_channel = modulators_buffer[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 mods_channel[i] *= modulator_add_volume_buffer[i];
             }
         }
@@ -3732,7 +3732,7 @@ void Synth::Bus::mix_modulators_with_additive_volume(
 void Synth::Bus::mix_modulators(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     Sample* const* const modulators_buffer = this->modulators_buffer;
     Integer const channels = this->channels;
@@ -3751,7 +3751,7 @@ void Synth::Bus::mix_modulators(
             Sample* const mods_channel = modulators_buffer[c];
             Sample const* const mod_out_channel = modulator_output[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 mods_channel[i] += mod_out_channel[i];
             }
         }
@@ -3762,7 +3762,7 @@ void Synth::Bus::mix_modulators(
 void Synth::Bus::mix_carriers(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index
+        Integer const end_sample_index
 ) noexcept {
     Sample* const* const carriers_buffer = this->carriers_buffer;
     Integer const channels = this->channels;
@@ -3781,7 +3781,7 @@ void Synth::Bus::mix_carriers(
             Sample* const cars_channel = carriers_buffer[c];
             Sample const* const car_out_channel = carrier_output[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 cars_channel[i] += car_out_channel[i];
             }
         }

@@ -1595,13 +1595,13 @@ template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type>
 void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if constexpr (fixed_type != BiquadFilterFixedType::BFFT_HIGH_SHELF) {
         if (JS80P_UNLIKELY(is_silent_)) {
             this->render_silence(
-                round, first_sample_index, last_sample_index, buffer
+                round, first_sample_index, end_sample_index, buffer
             );
 
             return;
@@ -1613,7 +1613,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
             render<ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(shared_buffers->b0_buffer[0]),
                 ParamValueWrapper(shared_buffers->b1_buffer[0]),
@@ -1625,7 +1625,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
             render<ParamValueWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueWrapper(b0_buffer[0]),
                 ParamValueWrapper(b1_buffer[0]),
@@ -1639,7 +1639,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
             render<ParamValueBufferWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueBufferWrapper(shared_buffers->b0_buffer),
                 ParamValueBufferWrapper(shared_buffers->b1_buffer),
@@ -1651,7 +1651,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
             render<ParamValueBufferWrapper>(
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer,
                 ParamValueBufferWrapper(b0_buffer),
                 ParamValueBufferWrapper(b1_buffer),
@@ -1669,7 +1669,7 @@ template<class ParamValueBufferClass>
 void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer,
         ParamValueBufferClass const& b0,
         ParamValueBufferClass const& b1,
@@ -1688,7 +1688,7 @@ void BiquadFilter<InputSignalProducerClass, fixed_type>::render(
         Sample y_n_m1 = this->y_n_m1[c];
         Sample y_n_m2 = this->y_n_m2[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             Sample const x_n = input_channel[i];
             Sample const y_n = (
                 b0[i] * x_n + b1[i] * x_n_m1 + b2[i] * x_n_m2

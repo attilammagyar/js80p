@@ -229,19 +229,19 @@ template<class InputSignalProducerClass>
 void SideChainCompressableEffect<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (is_bypassing) {
         Effect<InputSignalProducerClass>::render(
-            round, first_sample_index, last_sample_index, buffer
+            round, first_sample_index, end_sample_index, buffer
         );
 
         return;
     }
 
     if (is_silent_) {
-        this->render_silence(round, first_sample_index, last_sample_index, buffer);
+        this->render_silence(round, first_sample_index, end_sample_index, buffer);
 
         return;
     }
@@ -259,7 +259,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                     ParamValueWrapper(1.0),
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             } else {
@@ -269,7 +269,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                     ParamValueBufferWrapper(gain_buffer),
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     buffer
                 );
             }
@@ -280,7 +280,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 ParamValueWrapper(1.0),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         } else {
@@ -290,7 +290,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 ParamValueBufferWrapper(gain_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         }
@@ -302,7 +302,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 ParamValueWrapper(gain.get_value()),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         } else {
@@ -312,7 +312,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 ParamValueBufferWrapper(gain_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 buffer
             );
         }
@@ -323,7 +323,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
             ParamValueWrapper(gain.get_value()),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     } else {
@@ -333,7 +333,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
             ParamValueBufferWrapper(gain_buffer),
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
     }
@@ -348,7 +348,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
         GainBufferClass const& gain,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) const noexcept {
     Integer const channels = this->channels;
@@ -357,7 +357,7 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
         Sample const* const input_channel = this->input_buffer[c];
         Sample* const output_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             if constexpr (has_gain) {
                 output_channel[i] = (
                     dry[i] * input_channel[i]

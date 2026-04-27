@@ -125,13 +125,13 @@ class Constant : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             Integer const channels = get_channels();
 
             for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = value;
                 }
             }
@@ -229,7 +229,7 @@ class SumOfSines : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             Integer const channels = get_channels();
@@ -242,7 +242,7 @@ class SumOfSines : public SignalProducer
                 (Seconds)rendered_samples * sampling_period + phase_offset
             );
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[0][i] = (Sample)(
                     amplitude_1 * Math::sin(
                         frequency_1_times_pi_double * time
@@ -259,12 +259,12 @@ class SumOfSines : public SignalProducer
             }
 
             for (Integer c = 1; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = buffer[0][i];
                 }
             }
 
-            rendered_samples += last_sample_index - first_sample_index;
+            rendered_samples += end_sample_index - first_sample_index;
         }
 
     private:

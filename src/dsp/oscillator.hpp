@@ -179,7 +179,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer,
             Sample const* const pulse_width_buffer,
             Sample const* const amplitude_buffer,
@@ -227,7 +227,7 @@ class Oscillator : public SignalProducer
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -257,7 +257,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const end_sample_index
         ) noexcept;
 
         void compute_frequency_buffer(
@@ -266,7 +266,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const end_sample_index
         ) noexcept;
 
         Frequency compute_frequency(
@@ -281,7 +281,7 @@ class Oscillator : public SignalProducer
             Integer const round,
             Integer const sample_count,
             Integer const first_sample_index,
-            Integer const last_sample_index
+            Integer const end_sample_index
         ) noexcept;
 
         void handle_start_event(Event const& event) noexcept;
@@ -295,7 +295,7 @@ class Oscillator : public SignalProducer
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -313,7 +313,7 @@ class Oscillator : public SignalProducer
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 
@@ -337,7 +337,7 @@ class Oscillator : public SignalProducer
             WavetableState& wavetable_state,
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample* const buffer
         ) noexcept;
 

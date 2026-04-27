@@ -173,7 +173,7 @@ template<class InputSignalProducerClass>
 void Wavefolder<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Integer const channels = this->channels;
@@ -191,7 +191,7 @@ void Wavefolder<InputSignalProducerClass>::render(
                 Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
                 Sample previous_output_sample = this->previous_output_sample[c];
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     Sample const input_sample = in_channel[i];
 
                     out_channel[i] = Math::combine(
@@ -221,7 +221,7 @@ void Wavefolder<InputSignalProducerClass>::render(
                 Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
                 Sample previous_output_sample = this->previous_output_sample[c];
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     Sample const input_sample = in_channel[i];
 
                     out_channel[i] = fold(
@@ -246,7 +246,7 @@ void Wavefolder<InputSignalProducerClass>::render(
             Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
             Sample previous_output_sample = this->previous_output_sample[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 Sample const input_sample = in_channel[i];
                 Sample const folding_raw = folding_buffer[i];
 

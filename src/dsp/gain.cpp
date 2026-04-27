@@ -78,14 +78,14 @@ template<class InputSignalProducerClass>
 void Gain<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (gain_buffer == NULL) {
         render<ParamValueWrapper>(
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer,
             ParamValueWrapper(gain.get_value())
         );
@@ -93,7 +93,7 @@ void Gain<InputSignalProducerClass>::render(
         render<ParamValueBufferWrapper>(
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer,
             ParamValueBufferWrapper(gain_buffer)
         );
@@ -106,7 +106,7 @@ template<class GainBufferClass>
 void Gain<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer,
         GainBufferClass const& gain
 ) const noexcept {
@@ -117,7 +117,7 @@ void Gain<InputSignalProducerClass>::render(
         Sample const* const in_channel = input_buffer[c];
         Sample* const out_channel = buffer[c];
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             out_channel[i] = gain[i] * in_channel[i];
         }
     }

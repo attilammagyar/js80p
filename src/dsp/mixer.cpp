@@ -82,13 +82,13 @@ template<class InputSignalProducerClass>
 void Mixer<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     if (has_weights) {
-        render<true>(round, first_sample_index, last_sample_index, buffer);
+        render<true>(round, first_sample_index, end_sample_index, buffer);
     } else {
-        render<false>(round, first_sample_index, last_sample_index, buffer);
+        render<false>(round, first_sample_index, end_sample_index, buffer);
     }
 }
 
@@ -98,13 +98,13 @@ template<bool has_weights>
 void Mixer<InputSignalProducerClass>::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     std::vector<Input> const& inputs = this->inputs;
     Integer const channels = get_channels();
 
-    render_silence(round, first_sample_index, last_sample_index, buffer);
+    render_silence(round, first_sample_index, end_sample_index, buffer);
 
     for (typename std::vector<Input>::const_iterator it = inputs.begin(); it != inputs.end(); ++it) {
         Number const weight = it->weight;
@@ -117,7 +117,7 @@ void Mixer<InputSignalProducerClass>::render(
             Sample const* const in_channel = it->buffer[c];
             Sample* const out_channel = buffer[c];
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 if constexpr (has_weights) {
                     out_channel[i] += weight * in_channel[i];
                 } else {

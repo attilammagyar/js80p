@@ -550,7 +550,7 @@ LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept
     : lfo_envelope_states(lfo_envelope_states),
@@ -562,7 +562,7 @@ LFO::LFOWithEnvelopeRenderer::LFOWithEnvelopeRenderer(
     round(round),
     sample_count(sample_count),
     first_sample_index(first_sample_index),
-    last_sample_index(last_sample_index),
+    end_sample_index(end_sample_index),
     midi_channel(midi_channel)
 {
 }
@@ -607,7 +607,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
 
     Sample* const buffer = this->buffer;
     Integer const first_sample_index = this->first_sample_index;
-    Integer const last_sample_index = this->last_sample_index;
+    Integer const end_sample_index = this->end_sample_index;
 
     if (JS80P_UNLIKELY(lfo_buffer == NULL)) {
         /*
@@ -617,11 +617,11 @@ void LFO::LFOWithEnvelopeRenderer::visit_lfo_as_global(LFO& lfo) noexcept
 
         Sample const value = lfo.min.get_value();
 
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             buffer[i] = value;
         }
     } else {
-        for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+        for (Integer i = first_sample_index; i != end_sample_index; ++i) {
             buffer[i] = lfo_buffer[i];
         }
     }
@@ -639,7 +639,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_pulse_width_param(
         );
     } else {
         pulse_width.ratios_to_values(
-            buffer, lfo.env_buffer_1, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_1, first_sample_index, end_sample_index
         );
         param_buffer_1 = lfo.env_buffer_1;
     }
@@ -657,7 +657,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_amplitude_param(
         );
     } else {
         amplitude.ratios_to_values(
-            buffer, lfo.env_buffer_2, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_2, first_sample_index, end_sample_index
         );
         param_buffer_2 = lfo.env_buffer_2;
     }
@@ -675,7 +675,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_frequency_param(
         );
     } else {
         frequency.ratios_to_values(
-            buffer, lfo.env_buffer_3, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_3, first_sample_index, end_sample_index
         );
         param_buffer_3 = lfo.env_buffer_3;
     }
@@ -692,9 +692,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_phase_param(
             *lfo.phase_mpe[midi_channel], round, sample_count
         );
     } else {
-        phase.ratios_to_values(
-            buffer, first_sample_index, last_sample_index
-        );
+        phase.ratios_to_values(buffer, first_sample_index, end_sample_index);
         param_buffer_4 = buffer;
     }
 }
@@ -730,7 +728,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         round,
         sample_count,
         first_sample_index,
-        last_sample_index,
+        end_sample_index,
         lfo.env_buffer_1,
         param_buffer_1,
         param_buffer_2,
@@ -750,7 +748,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         lfo.sample_rate,
         lfo.sampling_period,
         first_sample_index,
-        last_sample_index,
+        end_sample_index,
         lfo.env_buffer_1
     );
 
@@ -772,7 +770,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_distortion_param(
         );
     } else {
         distortion.ratios_to_values(
-            buffer, lfo.env_buffer_2, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_2, first_sample_index, end_sample_index
         );
         param_buffer_1 = lfo.env_buffer_2;
     }
@@ -790,7 +788,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
         );
     } else {
         randomness.ratios_to_values(
-            buffer, first_sample_index, last_sample_index
+            buffer, first_sample_index, end_sample_index
         );
         param_buffer_2 = buffer;
     }
@@ -806,7 +804,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
             randomness_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             lfo.env_buffer_1,
             lfo.env_buffer_1
         );
@@ -818,7 +816,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_randomness_param(
             randomness_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             lfo.env_buffer_1,
             lfo.env_buffer_1
         );
@@ -837,7 +835,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_min_param(
         );
     } else {
         min.ratios_to_values(
-            buffer, lfo.env_buffer_2, first_sample_index, last_sample_index
+            buffer, lfo.env_buffer_2, first_sample_index, end_sample_index
         );
         param_buffer_1 = lfo.env_buffer_2;
     }
@@ -854,7 +852,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
             *lfo.max_mpe[midi_channel], round, sample_count
         );
     } else {
-        max.ratios_to_values(buffer, first_sample_index, last_sample_index);
+        max.ratios_to_values(buffer, first_sample_index, end_sample_index);
         param_buffer_2 = buffer;
     }
 
@@ -869,7 +867,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
             max_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             lfo.env_buffer_1,
             buffer
         );
@@ -881,7 +879,7 @@ void LFO::LFOWithEnvelopeRenderer::visit_max_param(
             max_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             lfo.env_buffer_1,
             buffer
         );
@@ -927,7 +925,7 @@ Sample const* const* LFO::initialize_rendering(
 void LFO::render(
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
     Sample const distortion_value = (Sample)distortion.get_value();
@@ -943,7 +941,7 @@ void LFO::render(
             randomness_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             oscillator_buffer[0],
             buffer[0]
         );
@@ -954,7 +952,7 @@ void LFO::render(
             max_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer[0],
             buffer[0]
         );
@@ -966,7 +964,7 @@ void LFO::render(
             randomness_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             oscillator_buffer[0],
             buffer[0]
         );
@@ -977,7 +975,7 @@ void LFO::render(
             max_value,
             round,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer[0],
             buffer[0]
         );
@@ -991,7 +989,7 @@ void LFO::produce_with_envelope(
         Integer const round,
         Integer const sample_count,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     LFOWithEnvelopeRenderer renderer(
@@ -1000,7 +998,7 @@ void LFO::produce_with_envelope(
         round,
         sample_count,
         first_sample_index,
-        last_sample_index,
+        end_sample_index,
         buffer
     );
     Byte depth = 0;
@@ -1022,7 +1020,7 @@ void LFO::apply_distortions(
         Sample const randomness_value,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
@@ -1034,7 +1032,7 @@ void LFO::apply_distortions(
 
             if (randomness < ALMOST_ZERO && distortion < ALMOST_ZERO) {
                 if ((void*)target_buffer != (void*)source_buffer) {
-                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                         target_buffer[i] = source_buffer[i];
                     }
                 }
@@ -1044,7 +1042,7 @@ void LFO::apply_distortions(
                     ParamValueWrapper(randomness),
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     source_buffer,
                     target_buffer
                 );
@@ -1055,7 +1053,7 @@ void LFO::apply_distortions(
                 ParamValueBufferWrapper(randomness_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1067,7 +1065,7 @@ void LFO::apply_distortions(
                 ParamValueWrapper(this->randomness.get_value()),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1077,7 +1075,7 @@ void LFO::apply_distortions(
                 ParamValueBufferWrapper(randomness_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1092,11 +1090,11 @@ void LFO::apply_distortions(
         RandomnessBufferClass const& randomness,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         target_buffer[i] = Math::randomize(
             randomness[i],
             Math::distort(distortion[i], source_buffer[i])
@@ -1127,7 +1125,7 @@ void LFO::apply_range(
         Sample const max_value,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
@@ -1138,7 +1136,7 @@ void LFO::apply_range(
                     && Math::is_close(max_value, max.get_max_value(), ALMOST_ZERO)
             ) {
                 if ((void*)target_buffer != (void*)source_buffer) {
-                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                         target_buffer[i] = source_buffer[i];
 
                         JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
@@ -1147,7 +1145,7 @@ void LFO::apply_range(
             } else {
                 Sample const range = max_value - min_value;
 
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     target_buffer[i] = min_value + range * source_buffer[i];
 
                     JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
@@ -1159,7 +1157,7 @@ void LFO::apply_range(
                 ParamValueBufferWrapper(max_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1171,7 +1169,7 @@ void LFO::apply_range(
                 ParamValueWrapper(max_value),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1181,7 +1179,7 @@ void LFO::apply_range(
                 ParamValueBufferWrapper(max_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1196,11 +1194,11 @@ void LFO::apply_range(
         MaxBufferClass const& max,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         Sample const max_i = max[i];
         Sample const min_i = min[i];
         Sample const range = max_i - min_i;
@@ -1219,7 +1217,7 @@ void LFO::apply_distortions_centered(
         Sample const randomness_value,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
@@ -1227,7 +1225,7 @@ void LFO::apply_distortions_centered(
         if (randomness_buffer == NULL) {
             if (randomness_value < ALMOST_ZERO && distortion_value < ALMOST_ZERO) {
                 if ((void*)target_buffer != (void*)source_buffer) {
-                    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                         target_buffer[i] = source_buffer[i];
                     }
                 }
@@ -1237,7 +1235,7 @@ void LFO::apply_distortions_centered(
                     ParamValueWrapper(randomness_value),
                     round,
                     first_sample_index,
-                    last_sample_index,
+                    end_sample_index,
                     source_buffer,
                     target_buffer
                 );
@@ -1248,7 +1246,7 @@ void LFO::apply_distortions_centered(
                 ParamValueBufferWrapper(randomness_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1260,7 +1258,7 @@ void LFO::apply_distortions_centered(
                 ParamValueWrapper(randomness_value),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1270,7 +1268,7 @@ void LFO::apply_distortions_centered(
                 ParamValueBufferWrapper(randomness_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1285,11 +1283,11 @@ void LFO::apply_distortions_centered(
         RandomnessBufferClass const& randomness,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         target_buffer[i] = Math::randomize_centered_lfo(
             randomness[i],
             Math::distort_centered_lfo(distortion[i], source_buffer[i])
@@ -1305,7 +1303,7 @@ void LFO::apply_range_centered(
         Sample const max_value,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
@@ -1314,7 +1312,7 @@ void LFO::apply_range_centered(
             Sample const center = (min_value + max_value) * 0.5;
             Sample const range = max_value - min_value;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 target_buffer[i] = center + range * source_buffer[i];
 
                 JS80P_ASSERT_LFO_LIMITS(target_buffer[i], min_value, max_value);
@@ -1325,7 +1323,7 @@ void LFO::apply_range_centered(
                 ParamValueBufferWrapper(max_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1337,7 +1335,7 @@ void LFO::apply_range_centered(
                 ParamValueWrapper(max_value),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1347,7 +1345,7 @@ void LFO::apply_range_centered(
                 ParamValueBufferWrapper(max_buffer),
                 round,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 source_buffer,
                 target_buffer
             );
@@ -1362,11 +1360,11 @@ void LFO::apply_range_centered(
         MaxBufferClass const& max,
         Integer const round,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample const* const source_buffer,
         Sample* const target_buffer
 ) const noexcept {
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         Sample const min_i = min[i];
         Sample const max_i = max[i];
         Sample const center = (min_i + max_i) * 0.5;

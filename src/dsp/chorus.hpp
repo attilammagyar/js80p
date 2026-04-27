@@ -122,7 +122,7 @@ class Chorus : public Effect<InputSignalProducerClass>
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 

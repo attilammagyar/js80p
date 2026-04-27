@@ -114,11 +114,11 @@ class CompositeSignalProducer : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             for (Integer c = 0; c != this->channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = 1.0;
                 }
             }
@@ -284,7 +284,7 @@ class CachingTestSignalProducer : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             buffer[0][0] += 1.0;
@@ -350,12 +350,12 @@ class DelegatingSignalProducer : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             ++render_calls;
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[0][i] = value;
             }
         }
@@ -475,14 +475,14 @@ class RendererWithCircularDependecy : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             Sample const* const* const other_buffer = (
                 SignalProducer::produce<RendererWithCircularDependecy>(*dependency, round)
             );
 
-            for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+            for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                 buffer[0][i] = other_buffer[0][i] + 1.0;
             }
         }
@@ -655,13 +655,13 @@ class EventTestSignalProducer : public SignalProducer
         void render(
                 Integer const round,
                 Integer const first_sample_index,
-                Integer const last_sample_index,
+                Integer const end_sample_index,
                 Sample** const buffer
         ) noexcept JS80P_OVERRIDE {
             ++render_calls;
 
             for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = value;
                 }
             }

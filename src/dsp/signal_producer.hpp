@@ -211,7 +211,7 @@ class SignalProducer
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept;
 
@@ -241,7 +241,7 @@ class SignalProducer
         void render_silence(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept;
 

@@ -232,7 +232,7 @@ bool Envelope::render(
         Frequency const sample_rate,
         Seconds const sampling_period,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
@@ -240,7 +240,7 @@ bool Envelope::render(
             time,
             last_rendered_value,
             first_sample_index,
-            last_sample_index,
+            end_sample_index,
             buffer
         );
 
@@ -249,7 +249,7 @@ bool Envelope::render(
 
     Integer i = first_sample_index;
 
-    while (i != last_sample_index) {
+    while (i != end_sample_index) {
         Number initial_value;
         Number target_value;
         Seconds time_until_target;
@@ -272,7 +272,7 @@ bool Envelope::render(
         if (becomes_constant) {
             last_rendered_value = target_value;
             render_constant<rendering_mode>(
-                time, target_value, i, last_sample_index, buffer
+                time, target_value, i, end_sample_index, buffer
             );
 
             return true;
@@ -297,7 +297,7 @@ bool Envelope::render(
                 sample_rate,
                 sampling_period,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 shape,
                 buffer,
                 i
@@ -314,7 +314,7 @@ bool Envelope::render(
                 sample_rate,
                 sampling_period,
                 first_sample_index,
-                last_sample_index,
+                end_sample_index,
                 shape,
                 buffer,
                 i
@@ -338,7 +338,7 @@ void Envelope::render(
         Frequency const sample_rate,
         Seconds const sampling_period,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         EnvelopeShape const shape,
         Sample* const buffer,
         Integer& next_sample_index
@@ -346,7 +346,7 @@ void Envelope::render(
     Number const duration_inv = 1.0 / duration;
     Number const scale = sampling_period * duration_inv;
     Integer const end_index = std::min(
-        last_sample_index,
+        end_sample_index,
         next_sample_index + std::max(
             (Integer)1, (Integer)(time_until_target * sample_rate)
         )
@@ -417,12 +417,12 @@ void Envelope::render_constant(
         Seconds& time,
         Number const value,
         Integer const first_sample_index,
-        Integer const last_sample_index,
+        Integer const end_sample_index,
         Sample* const buffer
 ) noexcept {
     time = 0.0;
 
-    for (Integer i = first_sample_index; i != last_sample_index; ++i) {
+    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         if constexpr (rendering_mode == RenderingMode::OVERWRITE) {
             buffer[i] = value;
         } else {

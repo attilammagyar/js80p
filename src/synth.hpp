@@ -1409,7 +1409,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void render(
             Integer const round,
             Integer const first_sample_index,
-            Integer const last_sample_index,
+            Integer const end_sample_index,
             Sample** const buffer
         ) noexcept JS80P_OVERRIDE;
 
@@ -1474,7 +1474,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 void render(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index,
+                    Integer const end_sample_index,
                     Sample** const buffer
                 ) noexcept JS80P_OVERRIDE;
 
@@ -1499,19 +1499,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 void mix_modulators_with_additive_volume(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index
+                    Integer const end_sample_index
                 ) noexcept;
 
                 void mix_modulators(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index
+                    Integer const end_sample_index
                 ) noexcept;
 
                 void mix_carriers(
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index
+                    Integer const end_sample_index
                 ) noexcept;
 
                 template<class InputVolumeBufferClass>
@@ -1519,7 +1519,7 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     InputVolumeBufferClass const& input_volume,
                     Integer const round,
                     Integer const first_sample_index,
-                    Integer const last_sample_index,
+                    Integer const end_sample_index,
                     Sample** const buffer
                 ) const noexcept;
 
