@@ -81,7 +81,10 @@ class Renderer
         after a shorter one, so we split up rendering batches into equal sized
         chunks.
         */
-        template<typename NumberType, Operation operation = Operation::OVERWRITE>
+        template<
+                typename NumberType,
+                Operation operation = Operation::OVERWRITE
+        >
         void render(
                 Integer const sample_count,
                 NumberType const* const* const in_samples,
@@ -116,7 +119,9 @@ class Renderer
 
                             for (Integer i = 0; i != batch_size; ++i) {
                                 dst_channel[next_synth_sample_index + i] = (
-                                    (Sample)src_channel[next_host_sample_index + i]
+                                    (Sample)src_channel[
+                                        next_host_sample_index + i
+                                    ]
                                 );
                             }
                         }
@@ -138,11 +143,15 @@ class Renderer
                     for (Integer i = 0; i != batch_size; ++i) {
                         if constexpr (operation == Operation::OVERWRITE) {
                             dst_channel[next_host_sample_index + i] = (
-                                (NumberType)src_channel[next_synth_sample_index + i]
+                                (NumberType)src_channel[
+                                    next_synth_sample_index + i
+                                ]
                             );
                         } else {
                             dst_channel[next_host_sample_index + i] += (
-                                (NumberType)src_channel[next_synth_sample_index + i]
+                                (NumberType)src_channel[
+                                    next_synth_sample_index + i
+                                ]
                             );
                         }
                     }
