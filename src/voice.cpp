@@ -40,69 +40,70 @@ constexpr Number OscillatorInaccuracy::interval_min(Integer const level)
 }
 
 
-Number const OscillatorInaccuracy::CENTS[OscillatorInaccuracy::MAX_LEVEL + 1][2] = {
-    {0.0, 0.0},
-    {interval_width(1), interval_min(1)},
-    {interval_width(2), interval_min(2)},
-    {interval_width(3), interval_min(3)},
-    {interval_width(4), interval_min(4)},
-    {interval_width(5), interval_min(5)},
-    {interval_width(6), interval_min(6)},
-    {interval_width(7), interval_min(7)},
-    {interval_width(8), interval_min(8)},
-    {interval_width(9), interval_min(9)},
-    {interval_width(10), interval_min(10)},
-    {interval_width(11), interval_min(11)},
-    {interval_width(12), interval_min(12)},
-    {interval_width(13), interval_min(13)},
-    {interval_width(14), interval_min(14)},
-    {interval_width(15), interval_min(15)},
-    {interval_width(16), interval_min(16)},
-    {interval_width(17), interval_min(17)},
-    {interval_width(18), interval_min(18)},
-    {interval_width(19), interval_min(19)},
-    {interval_width(20), interval_min(20)},
-    {interval_width(21), interval_min(21)},
-    {interval_width(22), interval_min(22)},
-    {interval_width(23), interval_min(23)},
-    {interval_width(24), interval_min(24)},
-    {interval_width(25), interval_min(25)},
-    {interval_width(26), interval_min(26)},
-    {interval_width(27), interval_min(27)},
-    {interval_width(28), interval_min(28)},
-    {interval_width(29), interval_min(29)},
-    {interval_width(30), interval_min(30)},
-    {interval_width(31), interval_min(31)},
-    {interval_width(32), interval_min(32)},
-    {interval_width(33), interval_min(33)},
-    {interval_width(34), interval_min(34)},
-    {interval_width(35), interval_min(35)},
-    {interval_width(36), interval_min(36)},
-    {interval_width(37), interval_min(37)},
-    {interval_width(38), interval_min(38)},
-    {interval_width(39), interval_min(39)},
-    {interval_width(40), interval_min(40)},
-    {interval_width(41), interval_min(41)},
-    {interval_width(42), interval_min(42)},
-    {interval_width(43), interval_min(43)},
-    {interval_width(44), interval_min(44)},
-    {interval_width(45), interval_min(45)},
-    {interval_width(46), interval_min(46)},
-    {interval_width(47), interval_min(47)},
-    {interval_width(48), interval_min(48)},
-    {interval_width(49), interval_min(49)},
-    {interval_width(50), interval_min(50)},
-    {interval_width(51), interval_min(51)},
-    {interval_width(52), interval_min(52)},
-    {interval_width(53), interval_min(53)},
-    {interval_width(54), interval_min(54)},
-    {interval_width(55), interval_min(55)},
-    {interval_width(56), interval_min(56)},
-    {interval_width(57), interval_min(57)},
-    {interval_width(58), interval_min(58)},
-    {interval_width(59), interval_min(59)},
-    {interval_width(60), interval_min(60)},
-};
+Number const
+    OscillatorInaccuracy::CENTS[OscillatorInaccuracy::MAX_LEVEL + 1][2] = {
+        {0.0, 0.0},
+        {interval_width(1), interval_min(1)},
+        {interval_width(2), interval_min(2)},
+        {interval_width(3), interval_min(3)},
+        {interval_width(4), interval_min(4)},
+        {interval_width(5), interval_min(5)},
+        {interval_width(6), interval_min(6)},
+        {interval_width(7), interval_min(7)},
+        {interval_width(8), interval_min(8)},
+        {interval_width(9), interval_min(9)},
+        {interval_width(10), interval_min(10)},
+        {interval_width(11), interval_min(11)},
+        {interval_width(12), interval_min(12)},
+        {interval_width(13), interval_min(13)},
+        {interval_width(14), interval_min(14)},
+        {interval_width(15), interval_min(15)},
+        {interval_width(16), interval_min(16)},
+        {interval_width(17), interval_min(17)},
+        {interval_width(18), interval_min(18)},
+        {interval_width(19), interval_min(19)},
+        {interval_width(20), interval_min(20)},
+        {interval_width(21), interval_min(21)},
+        {interval_width(22), interval_min(22)},
+        {interval_width(23), interval_min(23)},
+        {interval_width(24), interval_min(24)},
+        {interval_width(25), interval_min(25)},
+        {interval_width(26), interval_min(26)},
+        {interval_width(27), interval_min(27)},
+        {interval_width(28), interval_min(28)},
+        {interval_width(29), interval_min(29)},
+        {interval_width(30), interval_min(30)},
+        {interval_width(31), interval_min(31)},
+        {interval_width(32), interval_min(32)},
+        {interval_width(33), interval_min(33)},
+        {interval_width(34), interval_min(34)},
+        {interval_width(35), interval_min(35)},
+        {interval_width(36), interval_min(36)},
+        {interval_width(37), interval_min(37)},
+        {interval_width(38), interval_min(38)},
+        {interval_width(39), interval_min(39)},
+        {interval_width(40), interval_min(40)},
+        {interval_width(41), interval_min(41)},
+        {interval_width(42), interval_min(42)},
+        {interval_width(43), interval_min(43)},
+        {interval_width(44), interval_min(44)},
+        {interval_width(45), interval_min(45)},
+        {interval_width(46), interval_min(46)},
+        {interval_width(47), interval_min(47)},
+        {interval_width(48), interval_min(48)},
+        {interval_width(49), interval_min(49)},
+        {interval_width(50), interval_min(50)},
+        {interval_width(51), interval_min(51)},
+        {interval_width(52), interval_min(52)},
+        {interval_width(53), interval_min(53)},
+        {interval_width(54), interval_min(54)},
+        {interval_width(55), interval_min(55)},
+        {interval_width(56), interval_min(56)},
+        {interval_width(57), interval_min(57)},
+        {interval_width(58), interval_min(58)},
+        {interval_width(59), interval_min(59)},
+        {interval_width(60), interval_min(60)},
+    };
 
 
 Frequency OscillatorInaccuracy::detune(
@@ -123,8 +124,9 @@ Frequency OscillatorInaccuracy::detune(
 }
 
 
-Number OscillatorInaccuracy::calculate_new_inaccuracy(Number const seed) noexcept
-{
+Number OscillatorInaccuracy::calculate_new_inaccuracy(
+        Number const seed
+) noexcept {
     return MIN + DELTA * Math::randomize(1.0, seed);
 }
 
@@ -158,7 +160,9 @@ void OscillatorInaccuracy::reset() noexcept
 }
 
 
-OscillatorInaccuracyParam::OscillatorInaccuracyParam(std::string const& name) noexcept
+OscillatorInaccuracyParam::OscillatorInaccuracyParam(
+        std::string const& name
+) noexcept
     : ByteParam(name, 0, OscillatorInaccuracy::MAX_LEVEL, 0)
 {
 }
@@ -169,7 +173,10 @@ Voice<ModulatorSignalProducerClass>::TuningParam::TuningParam(
         std::string const& name
 ) noexcept
     : ByteParam(
-        name, TUNING_440HZ_12TET, TUNING_MTS_ESP_NOTE_ON, TUNING_MTS_ESP_CONTINUOUS
+        name,
+        TUNING_440HZ_12TET,
+        TUNING_MTS_ESP_NOTE_ON,
+        TUNING_MTS_ESP_CONTINUOUS
     )
 {
 }
@@ -355,7 +362,9 @@ Voice<ModulatorSignalProducerClass>::VolumeApplier::VolumeApplier(
 
 
 template<class ModulatorSignalProducerClass>
-Sample const* const* Voice<ModulatorSignalProducerClass>::VolumeApplier::initialize_rendering(
+Sample const* const* Voice<
+        ModulatorSignalProducerClass
+>::VolumeApplier::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -672,7 +681,9 @@ void Voice<ModulatorSignalProducerClass>::initialize_instance(
     oscillator.amplitude.set_random_seed(make_random_seed(0.347));
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.set_random_seed(make_random_seed(0.388));
+        oscillator.subharmonic_amplitude.set_random_seed(
+            make_random_seed(0.388)
+        );
     }
 
     oscillator.frequency.set_random_seed(make_random_seed(0.348));
@@ -799,7 +810,9 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     filter_2.update_inaccuracy(1.0 - random_2, random_1);
 
     note_velocity.cancel_events_at(time_offset);
-    note_velocity.schedule_value(time_offset, calculate_note_velocity(velocity));
+    note_velocity.schedule_value(
+        time_offset, calculate_note_velocity(velocity)
+    );
 
     note_panning.cancel_events_at(time_offset);
     note_panning.schedule_value(time_offset, calculate_note_panning(note));
@@ -809,13 +822,19 @@ void Voice<ModulatorSignalProducerClass>::note_on(
     noise_generator.cancel_events_at(time_offset);
 
     if constexpr (IS_MODULATOR) {
-        additive_volume.start_envelope(time_offset, mpe_channel, random_1, random_2);
+        additive_volume.start_envelope(
+            time_offset, mpe_channel, random_1, random_2
+        );
     }
 
-    wavefolder.folding.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    wavefolder.folding.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
     if constexpr (IS_CARRIER) {
-        distortion.level.start_envelope(time_offset, mpe_channel, random_1, random_2);
+        distortion.level.start_envelope(
+            time_offset, mpe_channel, random_1, random_2
+        );
     }
 
     panning.start_envelope(time_offset, mpe_channel, random_1, random_2);
@@ -831,31 +850,51 @@ void Voice<ModulatorSignalProducerClass>::note_on(
         );
     }
 
-    oscillator.pulse_width.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.pulse_width.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
-    oscillator.amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.modulated_amplitude.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
+    oscillator.amplitude.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.start_envelope(time_offset, mpe_channel, random_1, random_2);
+        oscillator.subharmonic_amplitude.start_envelope(
+            time_offset, mpe_channel, random_1, random_2
+        );
     }
 
-    oscillator.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
-    oscillator.phase.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.frequency.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
+    oscillator.phase.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
-    oscillator.fine_detune.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    oscillator.fine_detune.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
-    noise_generator.level.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    noise_generator.level.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
 
-    filter_1.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_1.frequency.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
     filter_1.q.start_envelope(time_offset, mpe_channel, random_1, random_2);
     filter_1.gain.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
-    filter_2.frequency.start_envelope(time_offset, mpe_channel, random_1, random_2);
+    filter_2.frequency.start_envelope(
+        time_offset, mpe_channel, random_1, random_2
+    );
     filter_2.q.start_envelope(time_offset, mpe_channel, random_1, random_2);
     filter_2.gain.start_envelope(time_offset, mpe_channel, random_1, random_2);
 
@@ -882,9 +921,12 @@ void Voice<ModulatorSignalProducerClass>::save_note_info(
 
 
 template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::update_inaccuracy(Integer const round) noexcept
-{
-    oscillator_inaccuracy = OscillatorInaccuracy::calculate_new_inaccuracy(oscillator_inaccuracy);
+void Voice<ModulatorSignalProducerClass>::update_inaccuracy(
+        Integer const round
+) noexcept {
+    oscillator_inaccuracy = OscillatorInaccuracy::calculate_new_inaccuracy(
+        oscillator_inaccuracy
+    );
 
     synced_oscillator_inaccuracy.update(round);
 }
@@ -936,7 +978,9 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
         Midi::Channel const channel,
         Midi::Note const previous_note
 ) noexcept {
-    Number const portamento_length = param_leaders.portamento_length.get_value();
+    Number const portamento_length = (
+        param_leaders.portamento_length.get_value()
+    );
 
     nominal_frequency = get_note_frequency(note, channel);
     note_frequency = detune<should_sync_oscillator_inaccuracy>(
@@ -946,7 +990,9 @@ void Voice<ModulatorSignalProducerClass>::set_up_oscillator_frequency(
     oscillator.frequency.cancel_events_at(time_offset);
 
     if (portamento_length <= sampling_period) {
-        oscillator.frequency.schedule_value(time_offset, (Number)note_frequency);
+        oscillator.frequency.schedule_value(
+            time_offset, (Number)note_frequency
+        );
         return;
     }
 
@@ -990,7 +1036,9 @@ Frequency Voice<ModulatorSignalProducerClass>::detune(
 ) const noexcept {
     if constexpr (should_sync) {
         return OscillatorInaccuracy::detune(
-            frequency, level_param, synced_oscillator_inaccuracy.get_inaccuracy()
+            frequency,
+            level_param,
+            synced_oscillator_inaccuracy.get_inaccuracy()
         );
     } else {
         return OscillatorInaccuracy::detune(
@@ -1002,9 +1050,13 @@ Frequency Voice<ModulatorSignalProducerClass>::detune(
 
 template<class ModulatorSignalProducerClass>
 template<bool should_sync_oscillator_instability>
-Frequency Voice<ModulatorSignalProducerClass>::calculate_note_frequency_drift_target() const noexcept
+Frequency Voice<
+        ModulatorSignalProducerClass
+>::calculate_note_frequency_drift_target() const noexcept
 {
-    return detune<should_sync_oscillator_instability>(note_frequency, param_leaders.oscillator_instability);
+    return detune<should_sync_oscillator_instability>(
+        note_frequency, param_leaders.oscillator_instability
+    );
 }
 
 
@@ -1052,7 +1104,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         return;
     }
 
-    Number const portamento_length = param_leaders.portamento_length.get_value();
+    Number const portamento_length = (
+        param_leaders.portamento_length.get_value()
+    );
 
     if (portamento_length <= 0.000001) {
         retrigger(
@@ -1094,7 +1148,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
     oscillator.amplitude.update_envelope(time_offset, mpe_channel);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.update_envelope(time_offset, mpe_channel);
+        oscillator.subharmonic_amplitude.update_envelope(
+            time_offset, mpe_channel
+        );
     }
 
     oscillator.frequency.update_envelope(time_offset, mpe_channel);
@@ -1136,7 +1192,9 @@ void Voice<ModulatorSignalProducerClass>::glide_to(
         );
     }
 
-    oscillator.frequency.schedule_linear_ramp(portamento_length, note_frequency);
+    oscillator.frequency.schedule_linear_ramp(
+        portamento_length, note_frequency
+    );
 }
 
 
@@ -1218,8 +1276,9 @@ void Voice<ModulatorSignalProducerClass>::clear_status() noexcept {
 
 
 template<class ModulatorSignalProducerClass>
-void Voice<ModulatorSignalProducerClass>::set_status_flag(Byte const flag) noexcept
-{
+void Voice<ModulatorSignalProducerClass>::set_status_flag(
+        Byte const flag
+) noexcept {
     status |= flag;
 }
 
@@ -1301,17 +1360,23 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     panning.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     volume.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
-    oscillator.pulse_width.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    oscillator.pulse_width.cancel_envelope(
+        time_offset, ENVELOPE_CANCEL_DURATION
+    );
 
     /*
     Though we never assign an envelope to some Oscillator parameters, their
     modulation level parameter might have one (through the leader).
     */
-    oscillator.modulated_amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    oscillator.modulated_amplitude.cancel_envelope(
+        time_offset, ENVELOPE_CANCEL_DURATION
+    );
     oscillator.amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
 
     if constexpr (IS_MODULATOR) {
-        oscillator.subharmonic_amplitude.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+        oscillator.subharmonic_amplitude.cancel_envelope(
+            time_offset, ENVELOPE_CANCEL_DURATION
+        );
     }
 
     oscillator.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
@@ -1325,9 +1390,13 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
     noise_generator.cancel_events_at(oscillator_stop);
     noise_generator.stop(oscillator_stop);
 
-    oscillator.fine_detune.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    oscillator.fine_detune.cancel_envelope(
+        time_offset, ENVELOPE_CANCEL_DURATION
+    );
 
-    noise_generator.level.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
+    noise_generator.level.cancel_envelope(
+        time_offset, ENVELOPE_CANCEL_DURATION
+    );
 
     filter_1.frequency.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
     filter_1.q.cancel_envelope(time_offset, ENVELOPE_CANCEL_DURATION);
@@ -1340,8 +1409,8 @@ void Voice<ModulatorSignalProducerClass>::cancel_note_smoothly(
 
 
 template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off() const noexcept
-{
+bool Voice<ModulatorSignalProducerClass>::has_decayed_before_note_off(
+) const noexcept {
     if constexpr (IS_MODULATOR) {
         /*
         Not taking additive volume into account, because even if that decays,
@@ -1410,16 +1479,31 @@ Number Voice<ModulatorSignalProducerClass>::get_inaccuracy() const noexcept
 
 
 template<class ModulatorSignalProducerClass>
-template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
-void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_continuous_mts_esp(Integer const round) noexcept
+template<
+        bool should_sync_oscillator_inaccuracy,
+        bool should_sync_oscillator_instability
+>
+void Voice<
+        ModulatorSignalProducerClass
+>::update_note_frequency_for_continuous_mts_esp(Integer const round) noexcept
 {
-    if (JS80P_UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
+    if (
+            JS80P_UNLIKELY(
+                is_oscillator_starting_or_stopping_or_expecting_glide()
+            )
+    ) {
         return;
     }
 
-    Frequency const new_nominal_frequency = per_channel_frequencies[channel][note];
+    Frequency const new_nominal_frequency = (
+        per_channel_frequencies[channel][note]
+    );
 
-    if (JS80P_LIKELY(Math::is_close(new_nominal_frequency, nominal_frequency))) {
+    if (
+            JS80P_LIKELY(
+                Math::is_close(new_nominal_frequency, nominal_frequency)
+            )
+    ) {
         return;
     }
 
@@ -1445,21 +1529,29 @@ void Voice<ModulatorSignalProducerClass>::update_note_frequency_for_continuous_m
         );
         oscillator.frequency.schedule_linear_ramp(
             std::max(MIN_DRIFT_DURATION, remaining),
-            calculate_note_frequency_drift_target<should_sync_oscillator_instability>()
+            calculate_note_frequency_drift_target<
+                should_sync_oscillator_instability
+            >()
         );
     } else {
-        Seconds const ramp_duration = std::max(MTS_ESP_CORRECTION_DURATION, remaining);
+        Seconds const ramp_duration = std::max(
+            MTS_ESP_CORRECTION_DURATION, remaining
+        );
 
         oscillator.frequency.schedule_linear_ramp(
             ramp_duration,
-            calculate_note_frequency_drift_target<should_sync_oscillator_instability>()
+            calculate_note_frequency_drift_target<
+                should_sync_oscillator_instability
+            >()
         );
     }
 }
 
 
 template<class ModulatorSignalProducerClass>
-bool Voice<ModulatorSignalProducerClass>::is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept
+bool Voice<
+        ModulatorSignalProducerClass
+>::is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept
 {
     return (
         !oscillator.is_on()
@@ -1477,7 +1569,11 @@ template<bool should_sync_oscillator_instability>
 void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
         Integer const round
 ) noexcept {
-    if (JS80P_UNLIKELY(is_oscillator_starting_or_stopping_or_expecting_glide())) {
+    if (
+            JS80P_UNLIKELY(
+                is_oscillator_starting_or_stopping_or_expecting_glide()
+            )
+    ) {
         return;
     }
 
@@ -1492,19 +1588,33 @@ void Voice<ModulatorSignalProducerClass>::update_unstable_note_frequency(
     update_inaccuracy(round);
 
     Frequency const new_frequency = (
-        calculate_note_frequency_drift_target<should_sync_oscillator_instability>()
+        calculate_note_frequency_drift_target<
+            should_sync_oscillator_instability
+        >()
     );
 
-    if (JS80P_UNLIKELY(Math::is_close(new_frequency, oscillator.frequency.get_value()))) {
+    if (
+            JS80P_UNLIKELY(
+                Math::is_close(new_frequency, oscillator.frequency.get_value())
+            )
+    ) {
         return;
     }
 
     Number ramp_duration;
 
     if constexpr (should_sync_oscillator_instability) {
-        ramp_duration = MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * synced_oscillator_inaccuracy.get_inaccuracy();
+        Number const oscillator_inaccuracy = (
+            synced_oscillator_inaccuracy.get_inaccuracy()
+        );
+
+        ramp_duration = (
+            MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * oscillator_inaccuracy
+        );
     } else {
-        ramp_duration = MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * oscillator_inaccuracy;
+        ramp_duration = (
+            MIN_DRIFT_DURATION + DRIFT_DURATION_DELTA * oscillator_inaccuracy
+        );
     }
 
     oscillator.frequency.cancel_events_at(0.0);
@@ -1582,7 +1692,9 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     if (JS80P_LIKELY(note_panning_buffer == NULL)) {
         if (panning_buffer == NULL) {
-            Sample const* const volume_applier_buffer = this->volume_applier_buffer;
+            Sample const* const volume_applier_buffer = (
+                this->volume_applier_buffer
+            );
             Number const x = Math::PI_QUARTER * Math::clamp(
                 panning_value + note_panning_value + 1.0, 0.0, 2.0
             );
@@ -1628,15 +1740,23 @@ void Voice<ModulatorSignalProducerClass>::render(
 
     if constexpr (IS_MODULATOR) {
         if (is_additive_volume_polyphonic) {
-            Sample const* const additive_volume_buffer = this->additive_volume_buffer;
+            Sample const* const additive_volume_buffer = (
+                this->additive_volume_buffer
+            );
 
             if (additive_volume_buffer == NULL) {
-                Number const additive_volume_value = this->additive_volume_value;
+                Number const additive_volume_value = (
+                    this->additive_volume_value
+                );
 
                 for (Integer c = 0; c != 2; ++c) {
                     Sample* const channel = buffer[c];
 
-                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                    for (
+                            Integer i = first_sample_index;
+                            i != end_sample_index;
+                            ++i
+                    ) {
                         channel[i] *= additive_volume_value;
                     }
                 }
@@ -1644,7 +1764,11 @@ void Voice<ModulatorSignalProducerClass>::render(
                 for (Integer c = 0; c != 2; ++c) {
                     Sample* const channel = buffer[c];
 
-                    for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                    for (
+                            Integer i = first_sample_index;
+                            i != end_sample_index;
+                            ++i
+                    ) {
                         channel[i] *= additive_volume_buffer[i];
                     }
                 }

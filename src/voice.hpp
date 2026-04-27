@@ -124,7 +124,9 @@ class Voice : public SignalProducer
         typedef Wavefolder<Filter1> Wavefolder_;
         typedef Distortion::Distortion<Wavefolder_> Distortion_;
 
-        typedef typename std::conditional<IS_CARRIER, Distortion_, Wavefolder_>::type Filter2Input;
+        typedef typename std::conditional<
+            IS_CARRIER, Distortion_, Wavefolder_
+        >::type Filter2Input;
 
         typedef BiquadFilter<Filter2Input> Filter2;
 
@@ -212,9 +214,17 @@ class Voice : public SignalProducer
                 FloatParamB filter_2_freq_inaccuracy;
                 FloatParamB filter_2_q_inaccuracy;
 
-                typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type subharmonic_amplitude;
-                typename std::conditional<IS_CARRIER, FloatParamS, Dummy>::type distortion;
-                typename std::conditional<IS_CARRIER, Distortion::TypeParam, Dummy>::type distortion_type;
+                typename std::conditional<
+                    IS_MODULATOR, FloatParamS, Dummy
+                >::type subharmonic_amplitude;
+
+                typename std::conditional<
+                    IS_CARRIER, FloatParamS, Dummy
+                >::type distortion;
+
+                typename std::conditional<
+                    IS_CARRIER, Distortion::TypeParam, Dummy
+                >::type distortion_type;
         };
 
         class VolumeApplier : public Filter<Filter2>
@@ -243,7 +253,11 @@ class Voice : public SignalProducer
                 ) noexcept JS80P_OVERRIDE;
 
             private:
-                template<class VolumeBufferClass, bool has_velocity, class VelocityBufferClass>
+                template<
+                    class VolumeBufferClass,
+                    bool has_velocity,
+                    class VelocityBufferClass
+                >
                 void render(
                     VolumeBufferClass const& volume,
                     VelocityBufferClass const& velocity,
@@ -364,15 +378,25 @@ class Voice : public SignalProducer
         Number get_velocity() const noexcept;
         Number get_inaccuracy() const noexcept;
 
-        template<bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
-        void update_note_frequency_for_continuous_mts_esp(Integer const round) noexcept;
+        template<
+            bool should_sync_oscillator_inaccuracy,
+            bool should_sync_oscillator_instability
+        >
+        void update_note_frequency_for_continuous_mts_esp(
+            Integer const round
+        ) noexcept;
 
         template<bool should_sync_oscillator_inaccuracy>
         void update_unstable_note_frequency(Integer const round) noexcept;
 
-        void render_oscillator(Integer const round, Integer const sample_count) noexcept;
+        void render_oscillator(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
 
-        typename std::conditional<IS_MODULATOR, FloatParamS, Dummy>::type additive_volume;
+        typename std::conditional<
+            IS_MODULATOR, FloatParamS, Dummy
+        >::type additive_volume;
 
     protected:
         Sample const* const* initialize_rendering(
@@ -388,16 +412,22 @@ class Voice : public SignalProducer
         ) noexcept JS80P_OVERRIDE;
 
     private:
-        typedef typename std::conditional<IS_CARRIER, Distortion_, Dummy>::type DistortionInstance;
+        typedef typename std::conditional<
+            IS_CARRIER, Distortion_, Dummy
+        >::type DistortionInstance;
 
-        static constexpr Number NOTE_PANNING_SCALE = 2.0 / (Number)Midi::NOTE_MAX;
+        static constexpr Number NOTE_PANNING_SCALE = (
+            2.0 / (Number)Midi::NOTE_MAX
+        );
 
         static constexpr Seconds MTS_ESP_CORRECTION_DURATION = 0.003;
 
         static constexpr Seconds MIN_DRIFT_DURATION = 0.3;
         static constexpr Seconds DRIFT_DURATION_DELTA = 3.2;
 
-        void initialize_instance(Number const oscillator_inaccuracy_seed) noexcept;
+        void initialize_instance(
+                Number const oscillator_inaccuracy_seed
+        ) noexcept;
 
         Number make_random_seed(Number const random) const noexcept;
 
@@ -422,7 +452,10 @@ class Voice : public SignalProducer
         template<bool should_sync_oscillator_inaccuracy>
         Frequency calculate_note_frequency_drift_target() const noexcept;
 
-        Number calculate_note_velocity(Number const raw_velocity) const noexcept;
+        Number calculate_note_velocity(
+            Number const raw_velocity
+        ) const noexcept;
+
         Number calculate_note_panning(Midi::Note const note) const noexcept;
 
         template<bool should_sync_oscillator_inaccuracy>
@@ -433,7 +466,8 @@ class Voice : public SignalProducer
             Midi::Note const previous_note
         ) noexcept;
 
-        bool is_oscillator_starting_or_stopping_or_expecting_glide() const noexcept;
+        bool is_oscillator_starting_or_stopping_or_expecting_glide(
+        ) const noexcept;
 
         template<class PanningBufferClass, class NotePanningBufferClass>
         void render(
