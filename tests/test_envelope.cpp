@@ -470,11 +470,10 @@ void test_envelope_rendering_with_batch_size(
             )
         );
 
-        Envelope::render<rendering_mode>(
+        becomes_constant = Envelope::render<rendering_mode>(
             snapshot,
             time,
             stage,
-            becomes_constant,
             value,
             sample_rate,
             sampling_period,
@@ -984,7 +983,6 @@ void test_envelope_shape(
     Number last_rendered_value = 0.0;
     Seconds time = 0.0;
     EnvelopeStage stage = EnvelopeStage::ENV_STG_DAHD;
-    bool becomes_constant;
 
     std::fill_n(actual_relations, SHAPE_TEST_REL_LENGTH, '\x00');
 
@@ -1001,7 +999,6 @@ void test_envelope_shape(
         snapshot,
         time,
         stage,
-        becomes_constant,
         last_rendered_value,
         sample_rate,
         sampling_period,

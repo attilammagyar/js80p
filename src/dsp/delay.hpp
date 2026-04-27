@@ -276,10 +276,10 @@ class Delay : public Filter<InputSignalProducerClass>
         Number reverse_target_delay_time_in_samples;
         Number reverse_target_delay_time_in_samples_inv;
 
-        bool is_starting;
-        bool need_gain;
-        bool need_to_render_silence;
-        bool is_reversed;
+        bool is_starting:1;
+        bool need_gain:1;
+        bool need_to_render_silence:1;
+        bool is_reversed:1;
 };
 
 

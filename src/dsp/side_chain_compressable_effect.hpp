@@ -126,8 +126,8 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
         Sample const* gain_buffer;
         Action previous_action;
         Byte previous_mode;
-        bool is_bypassing;
-        bool is_silent_;
+        bool is_bypassing:1;
+        bool is_silent_:1;
 };
 
 }

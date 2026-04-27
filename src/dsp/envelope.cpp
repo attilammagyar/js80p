@@ -73,9 +73,8 @@ Number Envelope::get_value_at_time(
     Seconds time_until_target;
     Seconds duration;
     EnvelopeShape shape = SHAPE_LINEAR;
-    bool becomes_constant;
 
-    set_up_next_target(
+    bool const becomes_constant = set_up_next_target(
         snapshot,
         last_rendered_value,
         time_,
@@ -85,7 +84,6 @@ Number Envelope::get_value_at_time(
         time_until_target,
         duration,
         shape,
-        becomes_constant,
         sampling_period
     );
 
@@ -226,11 +224,10 @@ Number Envelope::find_adjusted_initial_value(
 
 
 template<Envelope::RenderingMode rendering_mode>
-void Envelope::render(
+bool Envelope::render(
         EnvelopeSnapshot const& snapshot,
         Seconds& time,
         EnvelopeStage& stage,
-        bool& becomes_constant,
         Number& last_rendered_value,
         Frequency const sample_rate,
         Seconds const sampling_period,
@@ -239,7 +236,6 @@ void Envelope::render(
         Sample* const buffer
 ) noexcept {
     if (JS80P_UNLIKELY(stage == EnvelopeStage::ENV_STG_NONE)) {
-        becomes_constant = true;
         render_constant<rendering_mode>(
             time,
             last_rendered_value,
@@ -248,7 +244,7 @@ void Envelope::render(
             buffer
         );
 
-        return;
+        return true;
     }
 
     Integer i = first_sample_index;
@@ -260,7 +256,7 @@ void Envelope::render(
         Seconds duration;
         EnvelopeShape shape;
 
-        set_up_next_target(
+        bool const becomes_constant = set_up_next_target(
             snapshot,
             last_rendered_value,
             time,
@@ -270,7 +266,6 @@ void Envelope::render(
             time_until_target,
             duration,
             shape,
-            becomes_constant,
             sampling_period
         );
 
@@ -280,7 +275,7 @@ void Envelope::render(
                 time, target_value, i, last_sample_index, buffer
             );
 
-            return;
+            return true;
         }
 
         if (JS80P_UNLIKELY(duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO)) {
@@ -326,6 +321,8 @@ void Envelope::render(
             );
         }
     }
+
+    return false;
 }
 
 
@@ -435,7 +432,7 @@ void Envelope::render_constant(
 }
 
 
-void Envelope::set_up_next_target(
+bool Envelope::set_up_next_target(
         EnvelopeSnapshot const& snapshot,
         Number const last_rendered_value,
         Seconds& time,
@@ -445,12 +442,11 @@ void Envelope::set_up_next_target(
         Seconds& time_until_target,
         Seconds& duration,
         EnvelopeShape& shape,
-        bool& becomes_constant,
         Seconds const sampling_period
 ) noexcept {
     switch (stage) {
         case EnvelopeStage::ENV_STG_DAHD:
-            set_up_next_dahds_target(
+            return set_up_next_dahds_target(
                 snapshot,
                 last_rendered_value,
                 time,
@@ -460,16 +456,13 @@ void Envelope::set_up_next_target(
                 time_until_target,
                 duration,
                 shape,
-                becomes_constant,
                 sampling_period
             );
-
-            break;
 
         case EnvelopeStage::ENV_STG_SUSTAIN:
             target_value = snapshot.sustain_value;
 
-            set_up_next_sustain_target(
+            return set_up_next_sustain_target(
                 snapshot,
                 last_rendered_value,
                 time,
@@ -477,14 +470,11 @@ void Envelope::set_up_next_target(
                 target_value,
                 time_until_target,
                 duration,
-                shape,
-                becomes_constant
+                shape
             );
 
-            break;
-
         case EnvelopeStage::ENV_STG_RELEASE:
-            set_up_next_release_target(
+            return set_up_next_release_target(
                 snapshot,
                 time,
                 stage,
@@ -492,16 +482,13 @@ void Envelope::set_up_next_target(
                 target_value,
                 time_until_target,
                 duration,
-                shape,
-                becomes_constant
+                shape
             );
-
-            break;
 
         case EnvelopeStage::ENV_STG_RELEASED:
             target_value = snapshot.final_value;
 
-            set_up_next_sustain_target(
+            return set_up_next_sustain_target(
                 snapshot,
                 last_rendered_value,
                 time,
@@ -509,11 +496,8 @@ void Envelope::set_up_next_target(
                 target_value,
                 time_until_target,
                 duration,
-                shape,
-                becomes_constant
+                shape
             );
-
-            break;
 
         default:
             time_until_target = 0.0;
@@ -521,14 +505,15 @@ void Envelope::set_up_next_target(
             initial_value = last_rendered_value;
             target_value = last_rendered_value;
             shape = SHAPE_LINEAR;
-            becomes_constant = true;
 
-            break;
+            return true;
     }
+
+    JS80P_ASSERT_NOT_REACHED();
 }
 
 
-void Envelope::set_up_next_dahds_target(
+bool Envelope::set_up_next_dahds_target(
         EnvelopeSnapshot const& snapshot,
         Number const last_rendered_value,
         Seconds& time,
@@ -538,7 +523,6 @@ void Envelope::set_up_next_dahds_target(
         Seconds& time_until_target,
         Seconds& duration,
         EnvelopeShape& shape,
-        bool& becomes_constant,
         Seconds const sampling_period
 ) noexcept {
     /*
@@ -552,9 +536,8 @@ void Envelope::set_up_next_dahds_target(
         initial_value = snapshot.initial_value;
         target_value = snapshot.initial_value;
         shape = SHAPE_LINEAR;
-        becomes_constant = false;
 
-        return;
+        return false;
     }
 
     time_until_target += snapshot.attack_time;
@@ -564,9 +547,8 @@ void Envelope::set_up_next_dahds_target(
         initial_value = snapshot.initial_value;
         target_value = snapshot.peak_value;
         shape = snapshot.attack_shape;
-        becomes_constant = false;
 
-        return;
+        return false;
     }
 
     time_until_target += snapshot.hold_time;
@@ -576,9 +558,8 @@ void Envelope::set_up_next_dahds_target(
         initial_value = snapshot.peak_value;
         target_value = snapshot.peak_value;
         shape = SHAPE_LINEAR;
-        becomes_constant = false;
 
-        return;
+        return false;
     }
 
     time_until_target += snapshot.decay_time;
@@ -588,16 +569,16 @@ void Envelope::set_up_next_dahds_target(
         duration = snapshot.decay_time;
         initial_value = snapshot.peak_value;
         shape = snapshot.decay_shape;
-        becomes_constant = false;
 
-        return;
+        return false;
     }
 
     initial_value = snapshot.sustain_value;
     time = 0.0;
     stage = EnvelopeStage::ENV_STG_SUSTAIN;
     shape = SHAPE_LINEAR;
-    becomes_constant = std::fabs(time_until_target) < sampling_period;
+
+    bool const becomes_constant = std::fabs(time_until_target) < sampling_period;
 
     if (JS80P_LIKELY(becomes_constant)) {
         time_until_target = 0.0;
@@ -606,10 +587,12 @@ void Envelope::set_up_next_dahds_target(
         duration = DYNAMIC_ENVELOPE_RAMP_TIME;
         time_until_target = DYNAMIC_ENVELOPE_RAMP_TIME;
     }
+
+    return becomes_constant;
 }
 
 
-void Envelope::set_up_next_sustain_target(
+bool Envelope::set_up_next_sustain_target(
         EnvelopeSnapshot const& snapshot,
         Number const last_rendered_value,
         Seconds const time,
@@ -617,12 +600,12 @@ void Envelope::set_up_next_sustain_target(
         Number const target_value,
         Seconds& time_until_target,
         Seconds& duration,
-        EnvelopeShape& shape,
-        bool& becomes_constant
+        EnvelopeShape& shape
 ) noexcept {
     initial_value = snapshot.sustain_value;
     shape = SHAPE_LINEAR;
-    becomes_constant = Math::is_close(last_rendered_value, target_value);
+
+    bool const becomes_constant = Math::is_close(last_rendered_value, target_value);
 
     if (JS80P_LIKELY(becomes_constant)) {
         duration = 0.0;
@@ -631,10 +614,12 @@ void Envelope::set_up_next_sustain_target(
         duration = DYNAMIC_ENVELOPE_RAMP_TIME;
         time_until_target = std::max(0.0, duration - time);
     }
+
+    return becomes_constant;
 }
 
 
-void Envelope::set_up_next_release_target(
+bool Envelope::set_up_next_release_target(
         EnvelopeSnapshot const& snapshot,
         Seconds& time,
         EnvelopeStage& stage,
@@ -642,8 +627,7 @@ void Envelope::set_up_next_release_target(
         Number& target_value,
         Seconds& time_until_target,
         Seconds& duration,
-        EnvelopeShape& shape,
-        bool& becomes_constant
+        EnvelopeShape& shape
 ) noexcept {
     /* current-v ==release-t==> release-v */
 
@@ -653,7 +637,8 @@ void Envelope::set_up_next_release_target(
     shape = snapshot.release_shape;
 
     time_until_target = duration - time;
-    becomes_constant = time_until_target < ALMOST_ZERO;
+
+    bool const becomes_constant = time_until_target < ALMOST_ZERO;
 
     if (JS80P_UNLIKELY(becomes_constant)) {
         stage = EnvelopeStage::ENV_STG_RELEASED;
@@ -662,6 +647,8 @@ void Envelope::set_up_next_release_target(
         time = 0.0;
         shape = SHAPE_LINEAR;
     }
+
+    return becomes_constant;
 }
 
 

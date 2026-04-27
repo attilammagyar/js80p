@@ -2972,11 +2972,10 @@ void FloatParam<evaluation>::render_with_envelope(
     Sample* const buffer_ = buffer[0];
     Sample ratio = value_to_ratio(this->get_raw_value());
 
-    Envelope::render<Envelope::RenderingMode::OVERWRITE>(
+    envelope_state->is_constant = Envelope::render<Envelope::RenderingMode::OVERWRITE>(
         envelope_state->get_active_snapshot(),
         envelope_state->time,
         envelope_state->stage,
-        envelope_state->is_constant,
         ratio,
         this->sample_rate,
         this->sampling_period,

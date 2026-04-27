@@ -58,9 +58,9 @@ class BiquadFilterSharedBuffers
         Sample* b2_buffer;
         Sample* a1_buffer;
         Sample* a2_buffer;
-        bool are_coefficients_constant;
-        bool is_silent;
-        bool is_no_op;
+        bool are_coefficients_constant:1;
+        bool is_silent:1;
+        bool is_no_op:1;
 };
 
 
@@ -376,9 +376,9 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         Number freq_inaccuracy_param_value;
         Number q_inaccuracy_param_value;
 
-        bool is_silent_;
-        bool are_coefficients_constant;
-        bool can_use_shared_coefficients;
+        bool is_silent_:1;
+        bool are_coefficients_constant:1;
+        bool can_use_shared_coefficients:1;
 };
 
 }

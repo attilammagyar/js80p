@@ -118,12 +118,16 @@ class Envelope
                 Seconds const sampling_period
         ) noexcept;
 
+        /**
+         * \brief Render samples starting from the specified envelope state, and
+         *        tell if the envelope generator stabilizes at a constant level
+         *        by the end.
+         */
         template<RenderingMode rendering_mode>
-        static void render(
+        static bool render(
             EnvelopeSnapshot const& snapshot,
             Seconds& time,
             EnvelopeStage& stage,
-            bool& becomes_constant,
             Number& last_rendered_value,
             Frequency const sample_rate,
             Seconds const sampling_period,
@@ -180,7 +184,7 @@ class Envelope
     private:
         static constexpr Number ALMOST_ZERO = 0.0000001;
 
-        static void set_up_next_target(
+        static bool set_up_next_target(
             EnvelopeSnapshot const& snapshot,
             Number const last_rendered_value,
             Seconds& time,
@@ -190,11 +194,10 @@ class Envelope
             Seconds& time_until_target,
             Seconds& duration,
             EnvelopeShape& shape,
-            bool& becomes_constant,
             Seconds const sampling_period
         ) noexcept;
 
-        static void set_up_next_dahds_target(
+        static bool set_up_next_dahds_target(
             EnvelopeSnapshot const& snapshot,
             Number const last_rendered_value,
             Seconds& time,
@@ -204,11 +207,10 @@ class Envelope
             Seconds& time_until_target,
             Seconds& duration,
             EnvelopeShape& shape,
-            bool& becomes_constant,
             Seconds const sampling_period
         ) noexcept;
 
-        static void set_up_next_sustain_target(
+        static bool set_up_next_sustain_target(
             EnvelopeSnapshot const& snapshot,
             Number const last_rendered_value,
             Seconds const time,
@@ -216,11 +218,10 @@ class Envelope
             Number const target_value,
             Seconds& time_until_target,
             Seconds& duration,
-            EnvelopeShape& shape,
-            bool& becomes_constant
+            EnvelopeShape& shape
         ) noexcept;
 
-        static void set_up_next_release_target(
+        static bool set_up_next_release_target(
             EnvelopeSnapshot const& snapshot,
             Seconds& time,
             EnvelopeStage& stage,
@@ -228,8 +229,7 @@ class Envelope
             Number& target_value,
             Seconds& time_until_target,
             Seconds& duration,
-            EnvelopeShape& shape,
-            bool& becomes_constant
+            EnvelopeShape& shape
         ) noexcept;
 
         template<bool adjust_initial_value_during_dahds, bool need_shaping_for_initial_value_adjustment>

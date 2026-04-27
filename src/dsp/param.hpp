@@ -584,9 +584,9 @@ class FloatParam : public Param<Number, evaluation>
                 Number curve_initial_value;
                 Number curve_delta;
                 Math::EnvelopeShape curve_shape;
-                bool is_logarithmic;
-                bool is_curved;
-                bool is_done;
+                bool is_logarithmic:1;
+                bool is_curved:1;
+                bool is_done:1;
         };
 
         class EnvelopeState
@@ -621,9 +621,9 @@ class FloatParam : public Param<Number, evaluation>
                 EnvelopeStage stage;
                 Byte active_snapshot_envelope_index;
                 Byte scheduled_snapshot_envelope_index;
-                bool is_canceled;
-                bool is_constant;
-                bool lfo_has_envelope;
+                bool is_canceled:1;
+                bool is_constant:1;
+                bool lfo_has_envelope:1;
         };
 
         void initialize_instance() noexcept;
@@ -911,8 +911,8 @@ class ModulatableFloatParam : public FloatParamS
         ModulatorSignalProducerClass& modulator;
         Sample const* modulator_buffer;
         Sample const* modulation_level_buffer;
-        bool modulation_level_is_constant;
-        bool is_no_op;
+        bool modulation_level_is_constant:1;
+        bool is_no_op:1;
 };
 
 }

@@ -742,13 +742,10 @@ void LFO::LFOWithEnvelopeRenderer::visit_oscillator(
         (Sample)lfo.phase_mpe[midi_channel]->get_value()
     );
 
-    bool envelope_is_constant = false;
-
     Envelope::render<Envelope::RenderingMode::MULTIPLY>(
         lfo_envelope_state.snapshot,
         lfo_envelope_state.time,
         lfo_envelope_state.stage,
-        envelope_is_constant,
         lfo_envelope_state.value,
         lfo.sample_rate,
         lfo.sampling_period,
