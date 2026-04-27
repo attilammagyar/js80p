@@ -673,20 +673,20 @@ void assert_controller_upgrade(
 
 TEST(old_note_handling_parameter_is_upgraded, {
     assert_value_upgrade(
-        "POLY = 0.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_MONOPHONIC
+        "POLY = 0.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_MONO
     );
     assert_value_upgrade(
         "POLY = 0.333333333333333",
         Synth::ParamId::NH,
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD
+        Synth::NOTE_HANDLING_MONO_HOLD
     );
     assert_value_upgrade(
         "POLY = 0.666666666666667",
         Synth::ParamId::NH,
-        Synth::NOTE_HANDLING_POLYPHONIC_HOLD
+        Synth::NOTE_HANDLING_POLY_HOLD
     );
     assert_value_upgrade(
-        "POLY = 1.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_POLYPHONIC
+        "POLY = 1.0", Synth::ParamId::NH, Synth::NOTE_HANDLING_POLY
     );
 })
 

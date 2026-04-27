@@ -103,7 +103,9 @@ ToggleParamAffectedParams const toggle_param_affected_params{
 
 std::vector<bool> Synth::initialize_supported_midi_controllers() noexcept
 {
-    std::vector<bool> supported_midi_controllers(Synth::MIDI_CONTROLLERS, false);
+    std::vector<bool> supported_midi_controllers(
+        Synth::MIDI_CONTROLLERS, false
+    );
 
     supported_midi_controllers[ControllerId::MODULATION_WHEEL] = true;
     supported_midi_controllers[ControllerId::BREATH] = true;
@@ -180,7 +182,9 @@ std::vector<bool> Synth::initialize_supported_midi_controllers() noexcept
 }
 
 
-std::vector<bool> Synth::supported_midi_controllers = Synth::initialize_supported_midi_controllers();
+std::vector<bool> Synth::supported_midi_controllers = (
+    Synth::initialize_supported_midi_controllers()
+);
 
 
 unsigned int Synth::make_rng_seed(void const* const ptr) noexcept
@@ -210,19 +214,21 @@ Synth::ModeParam::ModeParam(std::string const& name) noexcept
 Synth::Synth(Integer const samples_between_gc) noexcept
     : SignalProducer(
         OUT_CHANNELS,
-        8                           /* NH + MODE + MIX + PM + FM + AM + INVOL + bus */
-        + 45 * 2                    /* Modulator::Params + Carrier::Params  */
-        + POLYPHONY * 2             /* modulators + carriers                */
-        + 1                         /* effects                              */
+        8                   /* NH + MODE + MIX + PM + FM + AM + INVOL + bus */
+        + 45 * 2            /* Modulator::Params + Carrier::Params  */
+        + POLYPHONY * 2     /* modulators + carriers                */
+        + 1                 /* effects                              */
         + MACROS * Macro::PARAMS
-        + (Integer)Constants::ENVELOPES * (ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS)
+        + (Integer)Constants::ENVELOPES * (
+            ENVELOPE_FLOAT_PARAMS + ENVELOPE_DISCRETE_PARAMS
+        )
         + (Integer)Constants::LFOS
     ),
     note_handling(
         "NH",
-        NOTE_HANDLING_MONOPHONIC,
-        NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS,
-        NOTE_HANDLING_POLYPHONIC
+        NOTE_HANDLING_MONO,
+        NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS,
+        NOTE_HANDLING_POLY
     ),
     mode("MODE"),
     mpe_settings("MPE", MPE_OFF, MPE_U01, MPE_OFF),
@@ -391,7 +397,9 @@ void Synth::build_frequency_table() noexcept
 
     for (Midi::Channel channel = 1; channel != Midi::CHANNELS; ++channel) {
         for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            per_channel_frequencies[channel][note] = per_channel_frequencies[0][note];
+            per_channel_frequencies[channel][note] = (
+                per_channel_frequencies[0][note]
+            );
         }
     }
 }
@@ -403,123 +411,292 @@ void Synth::register_main_params() noexcept
     register_param_as_child<ByteParam>(ParamId::MPEST, mpe_settings);
     register_param_as_child<FloatParamS>(ParamId::MIX, modulator_add_volume);
     register_param_as_child<FloatParamS>(ParamId::PM, phase_modulation_level);
-    register_param_as_child<FloatParamS>(ParamId::FM, frequency_modulation_level);
-    register_param_as_child<FloatParamS>(ParamId::AM, amplitude_modulation_level);
+
+    register_param_as_child<FloatParamS>(
+        ParamId::FM, frequency_modulation_level
+    );
+
+    register_param_as_child<FloatParamS>(
+        ParamId::AM, amplitude_modulation_level
+    );
+
     register_param_as_child<FloatParamS>(ParamId::INVOL, input_volume);
 }
 
 
 void Synth::register_modulator_params() noexcept
 {
-    register_param_as_child<Modulator::TuningParam>(ParamId::MTUN, modulator_params.tuning);
-    register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIA, modulator_params.oscillator_inaccuracy);
-    register_param_as_child<OscillatorInaccuracyParam>(ParamId::MOIS, modulator_params.oscillator_instability);
+    register_param_as_child<Modulator::TuningParam>(
+        ParamId::MTUN, modulator_params.tuning
+    );
+    register_param_as_child<OscillatorInaccuracyParam>(
+        ParamId::MOIA, modulator_params.oscillator_inaccuracy
+    );
+    register_param_as_child<OscillatorInaccuracyParam>(
+        ParamId::MOIS, modulator_params.oscillator_instability
+    );
 
-    register_param_as_child<FloatParamS>(ParamId::MN, modulator_params.noise_level);
+    register_param_as_child<FloatParamS>(
+        ParamId::MN, modulator_params.noise_level
+    );
 
-    register_param_as_child<Modulator::Oscillator_::WaveformParam>(ParamId::MWFM, modulator_params.waveform);
-    register_param_as_child<FloatParamS>(ParamId::MPW, modulator_params.pulse_width);
-    register_param_as_child<FloatParamS>(ParamId::MAMP, modulator_params.amplitude);
-    register_param_as_child<FloatParamB>(ParamId::MVS, modulator_params.velocity_sensitivity);
-    register_param_as_child<FloatParamS>(ParamId::MFLD, modulator_params.folding);
-    register_param_as_child<FloatParamB>(ParamId::MPRT, modulator_params.portamento_length);
-    register_param_as_child<FloatParamB>(ParamId::MPRD, modulator_params.portamento_depth);
-    register_param_as_child<FloatParamS>(ParamId::MDTN, modulator_params.detune);
-    register_param_as_child<FloatParamS>(ParamId::MFIN, modulator_params.fine_detune);
-    register_param_as_child<ToggleParam>(ParamId::MFX4, modulator_params.fine_detune_x4);
+    register_param_as_child<Modulator::Oscillator_::WaveformParam>(
+        ParamId::MWFM, modulator_params.waveform
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MPW, modulator_params.pulse_width
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MAMP, modulator_params.amplitude
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MVS, modulator_params.velocity_sensitivity
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MFLD, modulator_params.folding
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MPRT, modulator_params.portamento_length
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MPRD, modulator_params.portamento_depth
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MDTN, modulator_params.detune
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MFIN, modulator_params.fine_detune
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::MFX4, modulator_params.fine_detune_x4
+    );
     register_param_as_child<FloatParamB>(ParamId::MWID, modulator_params.width);
-    register_param_as_child<FloatParamS>(ParamId::MPAN, modulator_params.panning);
-    register_param_as_child<FloatParamS>(ParamId::MVOL, modulator_params.volume);
-    register_param_as_child<FloatParamS>(ParamId::MSUB, modulator_params.subharmonic_amplitude);
+    register_param_as_child<FloatParamS>(
+        ParamId::MPAN, modulator_params.panning
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MVOL, modulator_params.volume
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MSUB, modulator_params.subharmonic_amplitude
+    );
 
-    register_param_as_child<FloatParamB>(ParamId::MC1, modulator_params.harmonic_0);
-    register_param_as_child<FloatParamB>(ParamId::MC2, modulator_params.harmonic_1);
-    register_param_as_child<FloatParamB>(ParamId::MC3, modulator_params.harmonic_2);
-    register_param_as_child<FloatParamB>(ParamId::MC4, modulator_params.harmonic_3);
-    register_param_as_child<FloatParamB>(ParamId::MC5, modulator_params.harmonic_4);
-    register_param_as_child<FloatParamB>(ParamId::MC6, modulator_params.harmonic_5);
-    register_param_as_child<FloatParamB>(ParamId::MC7, modulator_params.harmonic_6);
-    register_param_as_child<FloatParamB>(ParamId::MC8, modulator_params.harmonic_7);
-    register_param_as_child<FloatParamB>(ParamId::MC9, modulator_params.harmonic_8);
-    register_param_as_child<FloatParamB>(ParamId::MC10, modulator_params.harmonic_9);
+    register_param_as_child<FloatParamB>(
+        ParamId::MC1, modulator_params.harmonic_0
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC2, modulator_params.harmonic_1
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC3, modulator_params.harmonic_2
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC4, modulator_params.harmonic_3
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC5, modulator_params.harmonic_4
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC6, modulator_params.harmonic_5
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC7, modulator_params.harmonic_6
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC8, modulator_params.harmonic_7
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC9, modulator_params.harmonic_8
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MC10, modulator_params.harmonic_9
+    );
 
     register_param_as_child<BiquadFilterTypeParam>(
         ParamId::MF1TYP, modulator_params.filter_1_type
     );
-    register_param_as_child<ToggleParam>(ParamId::MF1LOG, modulator_params.filter_1_freq_log_scale);
-    register_param_as_child<ToggleParam>(ParamId::MF1QLG, modulator_params.filter_1_q_log_scale);
-    register_param_as_child<FloatParamS>(ParamId::MF1FRQ, modulator_params.filter_1_frequency);
-    register_param_as_child<FloatParamS>(ParamId::MF1Q, modulator_params.filter_1_q);
-    register_param_as_child<FloatParamS>(ParamId::MF1G, modulator_params.filter_1_gain);
-    register_param_as_child<FloatParamB>(ParamId::MF1FIA, modulator_params.filter_1_freq_inaccuracy);
-    register_param_as_child<FloatParamB>(ParamId::MF1QIA, modulator_params.filter_1_q_inaccuracy);
+    register_param_as_child<ToggleParam>(
+        ParamId::MF1LOG, modulator_params.filter_1_freq_log_scale
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::MF1QLG, modulator_params.filter_1_q_log_scale
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF1FRQ, modulator_params.filter_1_frequency
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF1Q, modulator_params.filter_1_q
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF1G, modulator_params.filter_1_gain
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MF1FIA, modulator_params.filter_1_freq_inaccuracy
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MF1QIA, modulator_params.filter_1_q_inaccuracy
+    );
 
     register_param_as_child<BiquadFilterTypeParam>(
         ParamId::MF2TYP, modulator_params.filter_2_type
     );
-    register_param_as_child<ToggleParam>(ParamId::MF2LOG, modulator_params.filter_2_freq_log_scale);
-    register_param_as_child<ToggleParam>(ParamId::MF2QLG, modulator_params.filter_2_q_log_scale);
-    register_param_as_child<FloatParamS>(ParamId::MF2FRQ, modulator_params.filter_2_frequency);
-    register_param_as_child<FloatParamS>(ParamId::MF2Q, modulator_params.filter_2_q);
-    register_param_as_child<FloatParamS>(ParamId::MF2G, modulator_params.filter_2_gain);
-    register_param_as_child<FloatParamB>(ParamId::MF2FIA, modulator_params.filter_2_freq_inaccuracy);
-    register_param_as_child<FloatParamB>(ParamId::MF2QIA, modulator_params.filter_2_q_inaccuracy);
+    register_param_as_child<ToggleParam>(
+        ParamId::MF2LOG, modulator_params.filter_2_freq_log_scale
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::MF2QLG, modulator_params.filter_2_q_log_scale
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF2FRQ, modulator_params.filter_2_frequency
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF2Q, modulator_params.filter_2_q
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::MF2G, modulator_params.filter_2_gain
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MF2FIA, modulator_params.filter_2_freq_inaccuracy
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::MF2QIA, modulator_params.filter_2_q_inaccuracy
+    );
 }
 
 
 void Synth::register_carrier_params() noexcept
 {
-    register_param_as_child<Carrier::TuningParam>(ParamId::CTUN, carrier_params.tuning);
-    register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIA, carrier_params.oscillator_inaccuracy);
-    register_param_as_child<OscillatorInaccuracyParam>(ParamId::COIS, carrier_params.oscillator_instability);
+    register_param_as_child<Carrier::TuningParam>(
+        ParamId::CTUN, carrier_params.tuning
+    );
+    register_param_as_child<OscillatorInaccuracyParam>(
+        ParamId::COIA, carrier_params.oscillator_inaccuracy
+    );
+    register_param_as_child<OscillatorInaccuracyParam>(
+        ParamId::COIS, carrier_params.oscillator_instability
+    );
 
-    register_param_as_child<FloatParamS>(ParamId::CN, carrier_params.noise_level);
+    register_param_as_child<FloatParamS>(
+        ParamId::CN, carrier_params.noise_level
+    );
 
-    register_param_as_child<Carrier::Oscillator_::WaveformParam>(ParamId::CWFM, carrier_params.waveform);
-    register_param_as_child<FloatParamS>(ParamId::CPW, carrier_params.pulse_width);
-    register_param_as_child<FloatParamS>(ParamId::CAMP, carrier_params.amplitude);
-    register_param_as_child<FloatParamB>(ParamId::CVS, carrier_params.velocity_sensitivity);
+    register_param_as_child<Carrier::Oscillator_::WaveformParam>(
+        ParamId::CWFM, carrier_params.waveform
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CPW, carrier_params.pulse_width
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CAMP, carrier_params.amplitude
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CVS, carrier_params.velocity_sensitivity
+    );
     register_param_as_child<FloatParamS>(ParamId::CFLD, carrier_params.folding);
-    register_param_as_child<FloatParamB>(ParamId::CPRT, carrier_params.portamento_length);
-    register_param_as_child<FloatParamB>(ParamId::CPRD, carrier_params.portamento_depth);
+    register_param_as_child<FloatParamB>(
+        ParamId::CPRT, carrier_params.portamento_length
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CPRD, carrier_params.portamento_depth
+    );
     register_param_as_child<FloatParamS>(ParamId::CDTN, carrier_params.detune);
-    register_param_as_child<FloatParamS>(ParamId::CFIN, carrier_params.fine_detune);
-    register_param_as_child<ToggleParam>(ParamId::CFX4, carrier_params.fine_detune_x4);
+    register_param_as_child<FloatParamS>(
+        ParamId::CFIN, carrier_params.fine_detune
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::CFX4, carrier_params.fine_detune_x4
+    );
     register_param_as_child<FloatParamB>(ParamId::CWID, carrier_params.width);
     register_param_as_child<FloatParamS>(ParamId::CPAN, carrier_params.panning);
     register_param_as_child<FloatParamS>(ParamId::CVOL, carrier_params.volume);
 
-    register_param_as_child<Distortion::TypeParam>(ParamId::CDTYP, carrier_params.distortion_type);
-    register_param_as_child<FloatParamS>(ParamId::CDL, carrier_params.distortion);
+    register_param_as_child<Distortion::TypeParam>(
+        ParamId::CDTYP, carrier_params.distortion_type
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CDL, carrier_params.distortion
+    );
 
-    register_param_as_child<FloatParamB>(ParamId::CC1, carrier_params.harmonic_0);
-    register_param_as_child<FloatParamB>(ParamId::CC2, carrier_params.harmonic_1);
-    register_param_as_child<FloatParamB>(ParamId::CC3, carrier_params.harmonic_2);
-    register_param_as_child<FloatParamB>(ParamId::CC4, carrier_params.harmonic_3);
-    register_param_as_child<FloatParamB>(ParamId::CC5, carrier_params.harmonic_4);
-    register_param_as_child<FloatParamB>(ParamId::CC6, carrier_params.harmonic_5);
-    register_param_as_child<FloatParamB>(ParamId::CC7, carrier_params.harmonic_6);
-    register_param_as_child<FloatParamB>(ParamId::CC8, carrier_params.harmonic_7);
-    register_param_as_child<FloatParamB>(ParamId::CC9, carrier_params.harmonic_8);
-    register_param_as_child<FloatParamB>(ParamId::CC10, carrier_params.harmonic_9);
+    register_param_as_child<FloatParamB>(
+        ParamId::CC1, carrier_params.harmonic_0
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC2, carrier_params.harmonic_1
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC3, carrier_params.harmonic_2
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC4, carrier_params.harmonic_3
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC5, carrier_params.harmonic_4
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC6, carrier_params.harmonic_5
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC7, carrier_params.harmonic_6
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC8, carrier_params.harmonic_7
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC9, carrier_params.harmonic_8
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CC10, carrier_params.harmonic_9
+    );
 
-    register_param_as_child<BiquadFilterTypeParam>(ParamId::CF1TYP, carrier_params.filter_1_type);
-    register_param_as_child<ToggleParam>(ParamId::CF1LOG, carrier_params.filter_1_freq_log_scale);
-    register_param_as_child<ToggleParam>(ParamId::CF1QLG, carrier_params.filter_1_q_log_scale);
-    register_param_as_child<FloatParamS>(ParamId::CF1FRQ, carrier_params.filter_1_frequency);
-    register_param_as_child<FloatParamS>(ParamId::CF1Q, carrier_params.filter_1_q);
-    register_param_as_child<FloatParamS>(ParamId::CF1G, carrier_params.filter_1_gain);
-    register_param_as_child<FloatParamB>(ParamId::CF1FIA, carrier_params.filter_1_freq_inaccuracy);
-    register_param_as_child<FloatParamB>(ParamId::CF1QIA, carrier_params.filter_1_q_inaccuracy);
+    register_param_as_child<BiquadFilterTypeParam>(
+        ParamId::CF1TYP, carrier_params.filter_1_type
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::CF1LOG, carrier_params.filter_1_freq_log_scale
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::CF1QLG, carrier_params.filter_1_q_log_scale
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF1FRQ, carrier_params.filter_1_frequency
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF1Q, carrier_params.filter_1_q
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF1G, carrier_params.filter_1_gain
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CF1FIA, carrier_params.filter_1_freq_inaccuracy
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CF1QIA, carrier_params.filter_1_q_inaccuracy
+    );
 
-    register_param_as_child<BiquadFilterTypeParam>(ParamId::CF2TYP, carrier_params.filter_2_type);
-    register_param_as_child<ToggleParam>(ParamId::CF2LOG, carrier_params.filter_2_freq_log_scale);
-    register_param_as_child<ToggleParam>(ParamId::CF2QLG, carrier_params.filter_2_q_log_scale);
-    register_param_as_child<FloatParamS>(ParamId::CF2FRQ, carrier_params.filter_2_frequency);
-    register_param_as_child<FloatParamS>(ParamId::CF2Q, carrier_params.filter_2_q);
-    register_param_as_child<FloatParamS>(ParamId::CF2G, carrier_params.filter_2_gain);
-    register_param_as_child<FloatParamB>(ParamId::CF2FIA, carrier_params.filter_2_freq_inaccuracy);
-    register_param_as_child<FloatParamB>(ParamId::CF2QIA, carrier_params.filter_2_q_inaccuracy);
+    register_param_as_child<BiquadFilterTypeParam>(
+        ParamId::CF2TYP, carrier_params.filter_2_type
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::CF2LOG, carrier_params.filter_2_freq_log_scale
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::CF2QLG, carrier_params.filter_2_q_log_scale
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF2FRQ, carrier_params.filter_2_frequency
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF2Q, carrier_params.filter_2_q
+    );
+    register_param_as_child<FloatParamS>(
+        ParamId::CF2G, carrier_params.filter_2_gain
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CF2FIA, carrier_params.filter_2_freq_inaccuracy
+    );
+    register_param_as_child<FloatParamB>(
+        ParamId::CF2QIA, carrier_params.filter_2_q_inaccuracy
+    );
 }
 
 
@@ -527,21 +704,33 @@ void Synth::register_effects_params() noexcept
 {
     register_param<FloatParamS>(ParamId::EV1V, effects.volume_1_gain);
 
-    register_param<Distortion::TypeParam>(ParamId::ED1TYP, effects.distortion_1_type);
+    register_param<Distortion::TypeParam>(
+        ParamId::ED1TYP, effects.distortion_1_type
+    );
     register_param<FloatParamS>(ParamId::ED1L, effects.distortion_1.level);
 
-    register_param<Distortion::TypeParam>(ParamId::ED2TYP, effects.distortion_2_type);
+    register_param<Distortion::TypeParam>(
+        ParamId::ED2TYP, effects.distortion_2_type
+    );
     register_param<FloatParamS>(ParamId::ED2L, effects.distortion_2.level);
 
-    register_param<BiquadFilterTypeParam>(ParamId::EF1TYP, effects.filter_1_type);
-    register_param<ToggleParam>(ParamId::EF1LOG, effects.filter_1_freq_log_scale);
+    register_param<BiquadFilterTypeParam>(
+        ParamId::EF1TYP, effects.filter_1_type
+    );
+    register_param<ToggleParam>(
+        ParamId::EF1LOG, effects.filter_1_freq_log_scale
+    );
     register_param<ToggleParam>(ParamId::EF1QLG, effects.filter_1_q_log_scale);
     register_param<FloatParamS>(ParamId::EF1FRQ, effects.filter_1.frequency);
     register_param<FloatParamS>(ParamId::EF1Q, effects.filter_1.q);
     register_param<FloatParamS>(ParamId::EF1G, effects.filter_1.gain);
 
-    register_param<BiquadFilterTypeParam>(ParamId::EF2TYP, effects.filter_2_type);
-    register_param<ToggleParam>(ParamId::EF2LOG, effects.filter_2_freq_log_scale);
+    register_param<BiquadFilterTypeParam>(
+        ParamId::EF2TYP, effects.filter_2_type
+    );
+    register_param<ToggleParam>(
+        ParamId::EF2LOG, effects.filter_2_freq_log_scale
+    );
     register_param<ToggleParam>(ParamId::EF2QLG, effects.filter_2_q_log_scale);
     register_param<FloatParamS>(ParamId::EF2FRQ, effects.filter_2.frequency);
     register_param<FloatParamS>(ParamId::EF2Q, effects.filter_2.q);
@@ -553,28 +742,44 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamB>(ParamId::ETSTP, effects.tape_params.stop_start);
     register_param<FloatParamB>(ParamId::ETWFA, effects.tape_params.wnf_amp);
     register_param<FloatParamB>(ParamId::ETWFS, effects.tape_params.wnf_speed);
-    register_param<FloatParamS>(ParamId::ETSAT, effects.tape_params.distortion_level);
+    register_param<FloatParamS>(
+        ParamId::ETSAT, effects.tape_params.distortion_level
+    );
     register_param<FloatParamB>(ParamId::ETCLR, effects.tape_params.color);
     register_param<FloatParamB>(ParamId::ETHSS, effects.tape_params.hiss_level);
     register_param<FloatParamS>(ParamId::ETSTR, effects.tape_params.stereo_wnf);
-    register_param<Distortion::TypeParam>(ParamId::ETSTYP, effects.tape_params.distortion_type);
+    register_param<Distortion::TypeParam>(
+        ParamId::ETSTYP, effects.tape_params.distortion_type
+    );
 
-    register_param<Effects::Chorus<Bus>::TypeParam>(ParamId::ECTYP, effects.chorus.type);
+    register_param<Effects::Chorus<Bus>::TypeParam>(
+        ParamId::ECTYP, effects.chorus.type
+    );
     register_param<FloatParamS>(ParamId::ECDEL, effects.chorus.delay_time);
     register_param<FloatParamS>(ParamId::ECFRQ, effects.chorus.frequency);
     register_param<FloatParamS>(ParamId::ECDPT, effects.chorus.depth);
     register_param<FloatParamS>(ParamId::ECFB, effects.chorus.feedback);
-    register_param<FloatParamS>(ParamId::ECDF, effects.chorus.damping_frequency);
+    register_param<FloatParamS>(
+        ParamId::ECDF, effects.chorus.damping_frequency
+    );
     register_param<FloatParamS>(ParamId::ECDG, effects.chorus.damping_gain);
     register_param<FloatParamS>(ParamId::ECWID, effects.chorus.width);
-    register_param<FloatParamS>(ParamId::ECHPF, effects.chorus.high_pass_frequency);
+    register_param<FloatParamS>(
+        ParamId::ECHPF, effects.chorus.high_pass_frequency
+    );
     register_param<FloatParamS>(ParamId::ECHPQ, effects.chorus.high_pass_q);
     register_param<FloatParamS>(ParamId::ECWET, effects.chorus.wet);
     register_param<FloatParamS>(ParamId::ECDRY, effects.chorus.dry);
     register_param<ToggleParam>(ParamId::ECSYN, effects.chorus.tempo_sync);
-    register_param<ToggleParam>(ParamId::ECLOG, effects.chorus.log_scale_filter_frequencies);
-    register_param<ToggleParam>(ParamId::ECLHQ, effects.chorus.log_scale_high_pass_q);
-    register_param<ToggleParam>(ParamId::ECLLG, effects.chorus.log_scale_lfo_frequency);
+    register_param<ToggleParam>(
+        ParamId::ECLOG, effects.chorus.log_scale_filter_frequencies
+    );
+    register_param<ToggleParam>(
+        ParamId::ECLHQ, effects.chorus.log_scale_high_pass_q
+    );
+    register_param<ToggleParam>(
+        ParamId::ECLLG, effects.chorus.log_scale_lfo_frequency
+    );
 
     register_param<FloatParamS>(ParamId::EEDEL, effects.echo.delay_time);
     register_param<FloatParamS>(ParamId::EEINV, effects.echo.input_volume);
@@ -583,39 +788,79 @@ void Synth::register_effects_params() noexcept
     register_param<FloatParamS>(ParamId::EEDF, effects.echo.damping_frequency);
     register_param<FloatParamS>(ParamId::EEDG, effects.echo.damping_gain);
     register_param<FloatParamS>(ParamId::EEWID, effects.echo.width);
-    register_param<FloatParamS>(ParamId::EEHPF, effects.echo.high_pass_frequency);
+    register_param<FloatParamS>(
+        ParamId::EEHPF, effects.echo.high_pass_frequency
+    );
     register_param<FloatParamS>(ParamId::EEHPQ, effects.echo.high_pass_q);
-    register_param<FloatParamB>(ParamId::EECTH, effects.echo.side_chain_compression_threshold);
-    register_param<FloatParamB>(ParamId::EECAT, effects.echo.side_chain_compression_attack_time);
-    register_param<FloatParamB>(ParamId::EECRL, effects.echo.side_chain_compression_release_time);
-    register_param<FloatParamB>(ParamId::EECR, effects.echo.side_chain_compression_ratio);
-    register_param<CompressionModeParam>(ParamId::EECM, effects.echo.side_chain_compression_mode);
+    register_param<FloatParamB>(
+        ParamId::EECTH, effects.echo.side_chain_compression_threshold
+    );
+    register_param<FloatParamB>(
+        ParamId::EECAT, effects.echo.side_chain_compression_attack_time
+    );
+    register_param<FloatParamB>(
+        ParamId::EECRL, effects.echo.side_chain_compression_release_time
+    );
+    register_param<FloatParamB>(
+        ParamId::EECR, effects.echo.side_chain_compression_ratio
+    );
+    register_param<CompressionModeParam>(
+        ParamId::EECM, effects.echo.side_chain_compression_mode
+    );
     register_param<FloatParamS>(ParamId::EEWET, effects.echo.wet);
     register_param<FloatParamS>(ParamId::EEDRY, effects.echo.dry);
     register_param<ToggleParam>(ParamId::EESYN, effects.echo.tempo_sync);
-    register_param<ToggleParam>(ParamId::EELOG, effects.echo.log_scale_frequencies);
-    register_param<ToggleParam>(ParamId::EELHQ, effects.echo.log_scale_high_pass_q);
+    register_param<ToggleParam>(
+        ParamId::EELOG, effects.echo.log_scale_frequencies
+    );
+    register_param<ToggleParam>(
+        ParamId::EELHQ, effects.echo.log_scale_high_pass_q
+    );
     register_param<ToggleParam>(ParamId::EER1, effects.echo.reversed_1);
     register_param<ToggleParam>(ParamId::EER2, effects.echo.reversed_2);
 
-    register_param<Effects::Reverb<Bus>::TypeParam>(ParamId::ERTYP, effects.reverb.type);
+    register_param<Effects::Reverb<Bus>::TypeParam>(
+        ParamId::ERTYP, effects.reverb.type
+    );
     register_param<FloatParamS>(ParamId::ERRS, effects.reverb.room_size);
-    register_param<FloatParamS>(ParamId::ERRR, effects.reverb.room_reflectivity);
-    register_param<FloatParamS>(ParamId::ERDST, effects.reverb.distortion_level);
-    register_param<FloatParamS>(ParamId::ERDF, effects.reverb.damping_frequency);
+    register_param<FloatParamS>(
+        ParamId::ERRR, effects.reverb.room_reflectivity
+    );
+    register_param<FloatParamS>(
+        ParamId::ERDST, effects.reverb.distortion_level
+    );
+    register_param<FloatParamS>(
+        ParamId::ERDF, effects.reverb.damping_frequency
+    );
     register_param<FloatParamS>(ParamId::ERDG, effects.reverb.damping_gain);
     register_param<FloatParamS>(ParamId::ERWID, effects.reverb.width);
-    register_param<FloatParamS>(ParamId::ERHPF, effects.reverb.high_pass_frequency);
+    register_param<FloatParamS>(
+        ParamId::ERHPF, effects.reverb.high_pass_frequency
+    );
     register_param<FloatParamS>(ParamId::ERHPQ, effects.reverb.high_pass_q);
-    register_param<FloatParamB>(ParamId::ERCTH, effects.reverb.side_chain_compression_threshold);
-    register_param<FloatParamB>(ParamId::ERCAT, effects.reverb.side_chain_compression_attack_time);
-    register_param<FloatParamB>(ParamId::ERCRL, effects.reverb.side_chain_compression_release_time);
-    register_param<FloatParamB>(ParamId::ERCR, effects.reverb.side_chain_compression_ratio);
-    register_param<CompressionModeParam>(ParamId::ERCM, effects.reverb.side_chain_compression_mode);
+    register_param<FloatParamB>(
+        ParamId::ERCTH, effects.reverb.side_chain_compression_threshold
+    );
+    register_param<FloatParamB>(
+        ParamId::ERCAT, effects.reverb.side_chain_compression_attack_time
+    );
+    register_param<FloatParamB>(
+        ParamId::ERCRL, effects.reverb.side_chain_compression_release_time
+    );
+    register_param<FloatParamB>(
+        ParamId::ERCR, effects.reverb.side_chain_compression_ratio
+    );
+    register_param<CompressionModeParam>(
+        ParamId::ERCM, effects.reverb.side_chain_compression_mode
+    );
     register_param<FloatParamS>(ParamId::ERWET, effects.reverb.wet);
     register_param<FloatParamS>(ParamId::ERDRY, effects.reverb.dry);
-    register_param<ToggleParam>(ParamId::ERLOG, effects.reverb.log_scale_frequencies);
-    register_param<ToggleParam>(ParamId::ERLHQ, effects.reverb.log_scale_high_pass_q);
+    register_param<ToggleParam>(
+        ParamId::ERLOG, effects.reverb.log_scale_frequencies
+    );
+    register_param<ToggleParam>(
+        ParamId::ERLHQ, effects.reverb.log_scale_high_pass_q
+    );
 
     register_param<FloatParamS>(ParamId::EV3V, effects.volume_3_gain);
 }
@@ -687,13 +932,19 @@ void Synth::create_macros() noexcept
 
         macros_rw[i] = macro;
 
-        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->midpoint);
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, macro->midpoint
+        );
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->input);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->min);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->max);
         register_param_as_child<FloatParamB>((ParamId)next_id++, macro->scale);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->distortion);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, macro->randomness);
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, macro->distortion
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, macro->randomness
+        );
     }
 
     next_id = ParamId::M1DCV;
@@ -711,87 +962,233 @@ void Synth::create_envelopes() noexcept
     Integer next_id = ParamId::N1SCL;
 
     for (Byte i = 0; i != Constants::ENVELOPES; ++i) {
-        Envelope* const envelope = new Envelope(std::string("N") + to_string((Integer)(i + 1)));
+        Envelope* const envelope = new Envelope(
+            std::string("N") + to_string((Integer)(i + 1))
+        );
         envelopes_rw[i] = envelope;
 
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->scale);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->initial_value);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->delay_time);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->attack_time);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->peak_value);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->hold_time);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->decay_time);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->sustain_value);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->release_time);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->final_value);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->time_inaccuracy);
-        register_param_as_child<FloatParamB>((ParamId)next_id++, envelope->value_inaccuracy);
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->scale
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->initial_value
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->delay_time
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->attack_time
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->peak_value
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->hold_time
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->decay_time
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->sustain_value
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->release_time
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->final_value
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->time_inaccuracy
+        );
+        register_param_as_child<FloatParamB>(
+            (ParamId)next_id++, envelope->value_inaccuracy
+        );
     }
 
-    register_param_as_child<ByteParam>(ParamId::N1UPD, envelopes_rw[0]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N2UPD, envelopes_rw[1]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N3UPD, envelopes_rw[2]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N4UPD, envelopes_rw[3]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N5UPD, envelopes_rw[4]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N6UPD, envelopes_rw[5]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N7UPD, envelopes_rw[6]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N8UPD, envelopes_rw[7]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N9UPD, envelopes_rw[8]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N10UPD, envelopes_rw[9]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N11UPD, envelopes_rw[10]->update_mode);
-    register_param_as_child<ByteParam>(ParamId::N12UPD, envelopes_rw[11]->update_mode);
+    register_param_as_child<ByteParam>(
+        ParamId::N1UPD, envelopes_rw[0]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N2UPD, envelopes_rw[1]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N3UPD, envelopes_rw[2]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N4UPD, envelopes_rw[3]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N5UPD, envelopes_rw[4]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N6UPD, envelopes_rw[5]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N7UPD, envelopes_rw[6]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N8UPD, envelopes_rw[7]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N9UPD, envelopes_rw[8]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N10UPD, envelopes_rw[9]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N11UPD, envelopes_rw[10]->update_mode
+    );
+    register_param_as_child<ByteParam>(
+        ParamId::N12UPD, envelopes_rw[11]->update_mode
+    );
 
-    register_param_as_child<ToggleParam>(ParamId::N1SYN, envelopes_rw[0]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N2SYN, envelopes_rw[1]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N3SYN, envelopes_rw[2]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N4SYN, envelopes_rw[3]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N5SYN, envelopes_rw[4]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N6SYN, envelopes_rw[5]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N7SYN, envelopes_rw[6]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N8SYN, envelopes_rw[7]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N9SYN, envelopes_rw[8]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N10SYN, envelopes_rw[9]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N11SYN, envelopes_rw[10]->tempo_sync);
-    register_param_as_child<ToggleParam>(ParamId::N12SYN, envelopes_rw[11]->tempo_sync);
+    register_param_as_child<ToggleParam>(
+        ParamId::N1SYN, envelopes_rw[0]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N2SYN, envelopes_rw[1]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N3SYN, envelopes_rw[2]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N4SYN, envelopes_rw[3]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N5SYN, envelopes_rw[4]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N6SYN, envelopes_rw[5]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N7SYN, envelopes_rw[6]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N8SYN, envelopes_rw[7]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N9SYN, envelopes_rw[8]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N10SYN, envelopes_rw[9]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N11SYN, envelopes_rw[10]->tempo_sync
+    );
+    register_param_as_child<ToggleParam>(
+        ParamId::N12SYN, envelopes_rw[11]->tempo_sync
+    );
 
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N1ASH, envelopes_rw[0]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N2ASH, envelopes_rw[1]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N3ASH, envelopes_rw[2]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N4ASH, envelopes_rw[3]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N5ASH, envelopes_rw[4]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N6ASH, envelopes_rw[5]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N7ASH, envelopes_rw[6]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N8ASH, envelopes_rw[7]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N9ASH, envelopes_rw[8]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N10ASH, envelopes_rw[9]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N11ASH, envelopes_rw[10]->attack_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N12ASH, envelopes_rw[11]->attack_shape);
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N1ASH, envelopes_rw[0]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N2ASH, envelopes_rw[1]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N3ASH, envelopes_rw[2]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N4ASH, envelopes_rw[3]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N5ASH, envelopes_rw[4]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N6ASH, envelopes_rw[5]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N7ASH, envelopes_rw[6]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N8ASH, envelopes_rw[7]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N9ASH, envelopes_rw[8]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N10ASH, envelopes_rw[9]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N11ASH, envelopes_rw[10]->attack_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N12ASH, envelopes_rw[11]->attack_shape
+    );
 
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N1DSH, envelopes_rw[0]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N2DSH, envelopes_rw[1]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N3DSH, envelopes_rw[2]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N4DSH, envelopes_rw[3]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N5DSH, envelopes_rw[4]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N6DSH, envelopes_rw[5]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N7DSH, envelopes_rw[6]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N8DSH, envelopes_rw[7]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N9DSH, envelopes_rw[8]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N10DSH, envelopes_rw[9]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N11DSH, envelopes_rw[10]->decay_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N12DSH, envelopes_rw[11]->decay_shape);
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N1DSH, envelopes_rw[0]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N2DSH, envelopes_rw[1]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N3DSH, envelopes_rw[2]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N4DSH, envelopes_rw[3]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N5DSH, envelopes_rw[4]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N6DSH, envelopes_rw[5]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N7DSH, envelopes_rw[6]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N8DSH, envelopes_rw[7]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N9DSH, envelopes_rw[8]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N10DSH, envelopes_rw[9]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N11DSH, envelopes_rw[10]->decay_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N12DSH, envelopes_rw[11]->decay_shape
+    );
 
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N1RSH, envelopes_rw[0]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N2RSH, envelopes_rw[1]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N3RSH, envelopes_rw[2]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N4RSH, envelopes_rw[3]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N5RSH, envelopes_rw[4]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N6RSH, envelopes_rw[5]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N7RSH, envelopes_rw[6]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N8RSH, envelopes_rw[7]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N9RSH, envelopes_rw[8]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N10RSH, envelopes_rw[9]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N11RSH, envelopes_rw[10]->release_shape);
-    register_param_as_child<Envelope::ShapeParam>(ParamId::N12RSH, envelopes_rw[11]->release_shape);
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N1RSH, envelopes_rw[0]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N2RSH, envelopes_rw[1]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N3RSH, envelopes_rw[2]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N4RSH, envelopes_rw[3]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N5RSH, envelopes_rw[4]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N6RSH, envelopes_rw[5]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N7RSH, envelopes_rw[6]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N8RSH, envelopes_rw[7]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N9RSH, envelopes_rw[8]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N10RSH, envelopes_rw[9]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N11RSH, envelopes_rw[10]->release_shape
+    );
+    register_param_as_child<Envelope::ShapeParam>(
+        ParamId::N12RSH, envelopes_rw[11]->release_shape
+    );
 }
 
 
@@ -823,14 +1220,30 @@ void Synth::create_lfos() noexcept
         register_param<FloatParamS>((ParamId)next_id++, lfo->randomness);
     }
 
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L1WAV, lfos_rw[0]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L2WAV, lfos_rw[1]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L3WAV, lfos_rw[2]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L4WAV, lfos_rw[3]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L5WAV, lfos_rw[4]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L6WAV, lfos_rw[5]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L7WAV, lfos_rw[6]->waveform);
-    register_param<LFO::Oscillator_::WaveformParam>(ParamId::L8WAV, lfos_rw[7]->waveform);
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L1WAV, lfos_rw[0]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L2WAV, lfos_rw[1]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L3WAV, lfos_rw[2]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L4WAV, lfos_rw[3]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L5WAV, lfos_rw[4]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L6WAV, lfos_rw[5]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L7WAV, lfos_rw[6]->waveform
+    );
+    register_param<LFO::Oscillator_::WaveformParam>(
+        ParamId::L8WAV, lfos_rw[7]->waveform
+    );
 
     register_param<ToggleParam>(ParamId::L1LOG, lfos_rw[0]->freq_log_scale);
     register_param<ToggleParam>(ParamId::L2LOG, lfos_rw[1]->freq_log_scale);
@@ -859,27 +1272,43 @@ void Synth::create_lfos() noexcept
     register_param<ToggleParam>(ParamId::L7CEN, lfos_rw[6]->center);
     register_param<ToggleParam>(ParamId::L8CEN, lfos_rw[7]->center);
 
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L1AEN, lfos_rw[0]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L2AEN, lfos_rw[1]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L3AEN, lfos_rw[2]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L4AEN, lfos_rw[3]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L5AEN, lfos_rw[4]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L6AEN, lfos_rw[5]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L7AEN, lfos_rw[6]->amplitude_envelope);
-    register_param<LFO::AmplitudeEnvelopeParam>(ParamId::L8AEN, lfos_rw[7]->amplitude_envelope);
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L1AEN, lfos_rw[0]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L2AEN, lfos_rw[1]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L3AEN, lfos_rw[2]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L4AEN, lfos_rw[3]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L5AEN, lfos_rw[4]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L6AEN, lfos_rw[5]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L7AEN, lfos_rw[6]->amplitude_envelope
+    );
+    register_param<LFO::AmplitudeEnvelopeParam>(
+        ParamId::L8AEN, lfos_rw[7]->amplitude_envelope
+    );
 }
 
 
 void Synth::allocate_buffers() noexcept
 {
     for (Integer i = 0; i != BIQUAD_FILTER_SHARED_BUFFERS; ++i) {
-        BiquadFilterSharedBuffers& shared_buffers = biquad_filter_shared_buffers[i];
+        BiquadFilterSharedBuffers& sh_bufs = biquad_filter_shared_buffers[i];
 
-        shared_buffers.b0_buffer = new Sample[block_size];
-        shared_buffers.b1_buffer = new Sample[block_size];
-        shared_buffers.b2_buffer = new Sample[block_size];
-        shared_buffers.a1_buffer = new Sample[block_size];
-        shared_buffers.a2_buffer = new Sample[block_size];
+        sh_bufs.b0_buffer = new Sample[block_size];
+        sh_bufs.b1_buffer = new Sample[block_size];
+        sh_bufs.b2_buffer = new Sample[block_size];
+        sh_bufs.a1_buffer = new Sample[block_size];
+        sh_bufs.a2_buffer = new Sample[block_size];
     }
 }
 
@@ -887,19 +1316,19 @@ void Synth::allocate_buffers() noexcept
 void Synth::free_buffers() noexcept
 {
     for (Integer i = 0; i != BIQUAD_FILTER_SHARED_BUFFERS; ++i) {
-        BiquadFilterSharedBuffers& shared_buffers = biquad_filter_shared_buffers[i];
+        BiquadFilterSharedBuffers& sh_bufs = biquad_filter_shared_buffers[i];
 
-        delete[] shared_buffers.b0_buffer;
-        delete[] shared_buffers.b1_buffer;
-        delete[] shared_buffers.b2_buffer;
-        delete[] shared_buffers.a1_buffer;
-        delete[] shared_buffers.a2_buffer;
+        delete[] sh_bufs.b0_buffer;
+        delete[] sh_bufs.b1_buffer;
+        delete[] sh_bufs.b2_buffer;
+        delete[] sh_bufs.a1_buffer;
+        delete[] sh_bufs.a2_buffer;
 
-        shared_buffers.b0_buffer = NULL;
-        shared_buffers.b1_buffer = NULL;
-        shared_buffers.b2_buffer = NULL;
-        shared_buffers.a1_buffer = NULL;
-        shared_buffers.a2_buffer = NULL;
+        sh_bufs.b0_buffer = NULL;
+        sh_bufs.b1_buffer = NULL;
+        sh_bufs.b2_buffer = NULL;
+        sh_bufs.a1_buffer = NULL;
+        sh_bufs.a2_buffer = NULL;
     }
 }
 
@@ -1004,7 +1433,9 @@ void Synth::set_sample_rate(Frequency const new_sample_rate) noexcept
 {
     SignalProducer::set_sample_rate(new_sample_rate);
 
-    samples_between_gc = std::max((Integer)5000, (Integer)(new_sample_rate * 0.2));
+    samples_between_gc = std::max(
+        (Integer)5000, (Integer)(new_sample_rate * 0.2)
+    );
 }
 
 
@@ -1135,8 +1566,14 @@ bool Synth::has_mts_esp_tuning() const noexcept
 bool Synth::has_continuous_mts_esp_tuning() const noexcept
 {
     return (
-        modulator_params.tuning.get_value() == Modulator::TUNING_MTS_ESP_CONTINUOUS
-        || carrier_params.tuning.get_value() == Carrier::TUNING_MTS_ESP_CONTINUOUS
+        (
+            modulator_params.tuning.get_value()
+            == Modulator::TUNING_MTS_ESP_CONTINUOUS
+        )
+        || (
+            carrier_params.tuning.get_value()
+            == Carrier::TUNING_MTS_ESP_CONTINUOUS
+        )
     );
 }
 
@@ -1159,8 +1596,9 @@ void Synth::mts_esp_disconnected() noexcept
 }
 
 
-Synth::NoteTunings& Synth::collect_active_notes(Integer& active_notes_count) noexcept
-{
+Synth::NoteTunings& Synth::collect_active_notes(
+        Integer& active_notes_count
+) noexcept {
     bus.collect_active_notes(active_note_tunings, active_notes_count);
 
     return active_note_tunings;
@@ -1170,13 +1608,17 @@ Synth::NoteTunings& Synth::collect_active_notes(Integer& active_notes_count) noe
 void Synth::update_note_tuning(NoteTuning const& note_tuning) noexcept
 {
     if (note_tuning.is_valid() && note_tuning.frequency > 0.0) {
-        per_channel_frequencies[note_tuning.channel][note_tuning.note] = note_tuning.frequency;
+        per_channel_frequencies[note_tuning.channel][note_tuning.note] = (
+            note_tuning.frequency
+        );
     }
 }
 
 
-void Synth::update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept
-{
+void Synth::update_note_tunings(
+        NoteTunings const& note_tunings,
+        Integer const count
+) noexcept {
     for (Integer i = 0; i != count; ++i) {
         update_note_tuning(note_tunings[i]);
     }
@@ -1201,7 +1643,7 @@ bool Synth::is_holding() const noexcept
 
     return (
         (nh & NOTE_HANDLING_MASK_HOLD) != 0
-        || nh == NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS
+        || nh == NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS
     );
 }
 
@@ -1251,12 +1693,19 @@ void Synth::note_on(
             this->triggered_velocity, mpe_channel, time_offset, velocity_float
         );
         change_midi_controller(
-            this->triggered_note, mpe_channel, time_offset, midi_byte_to_float(note)
+            this->triggered_note,
+            mpe_channel,
+            time_offset,
+            midi_byte_to_float(note)
         );
 
-        note_on_polyphonic(time_offset, channel, mpe_channel, note, velocity_float);
+        note_on_polyphonic(
+            time_offset, channel, mpe_channel, note, velocity_float
+        );
     } else {
-        note_on_monophonic(time_offset, channel, mpe_channel, note, velocity_float, true);
+        note_on_monophonic(
+            time_offset, channel, mpe_channel, note, velocity_float, true
+        );
     }
 
     update_voice_statuses();
@@ -1279,7 +1728,10 @@ bool Synth::should_sync_oscillator_inaccuracy(
         Modulator::Params const& modulator_params,
         Carrier::Params const& carrier_params
 ) noexcept {
-    return modulator_params.oscillator_inaccuracy.get_value() == carrier_params.oscillator_inaccuracy.get_value();
+    Byte const mod_inacc = modulator_params.oscillator_inaccuracy.get_value();
+    Byte const car_inacc = carrier_params.oscillator_inaccuracy.get_value();
+
+    return mod_inacc == car_inacc;
 }
 
 
@@ -1287,7 +1739,10 @@ bool Synth::should_sync_oscillator_instability(
         Modulator::Params const& modulator_params,
         Carrier::Params const& carrier_params
 ) noexcept {
-    return modulator_params.oscillator_instability.get_value() == carrier_params.oscillator_instability.get_value();
+    Byte const mod_inst = modulator_params.oscillator_instability.get_value();
+    Byte const car_inst = carrier_params.oscillator_instability.get_value();
+
+    return mod_inst == car_inst;
 }
 
 
@@ -1344,7 +1799,9 @@ void Synth::trigger_note_on_voice(
     assign_voice_and_note_id(voice, channel, note);
 
     Byte const mode = this->mode.get_value();
-    bool const should_sync_oscillator_inaccuracy = this->should_sync_oscillator_inaccuracy();
+    bool const should_sync_oscillator_inaccuracy = (
+        this->should_sync_oscillator_inaccuracy()
+    );
 
     Modulator& modulator = *modulators[voice];
     Carrier& carrier = *carriers[voice];
@@ -1500,7 +1957,9 @@ void Synth::note_on_monophonic(
     assign_voice_and_note_id(0, channel, note);
 
     Byte const mode = this->mode.get_value();
-    bool const should_sync_oscillator_inaccuracy = this->should_sync_oscillator_inaccuracy();
+    bool const should_sync_oscillator_inaccuracy = (
+        this->should_sync_oscillator_inaccuracy()
+    );
 
     modulator->update_inaccuracy(cached_round);
     carrier->update_inaccuracy(cached_round);
@@ -1571,15 +2030,36 @@ void Synth::trigger_note_on_voice_monophonic(
 ) noexcept {
     if (is_off) {
         voice.note_on(
-            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset,
+            next_note_id,
+            note,
+            channel,
+            mpe_channel,
+            velocity,
+            previous_note,
+            should_sync_oscillator_inaccuracy
         );
     } else if (voice.is_released()) {
         voice.retrigger(
-            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset,
+            next_note_id,
+            note,
+            channel,
+            mpe_channel,
+            velocity,
+            previous_note,
+            should_sync_oscillator_inaccuracy
         );
     } else {
         voice.glide_to(
-            time_offset, next_note_id, note, channel, mpe_channel, velocity, previous_note, should_sync_oscillator_inaccuracy
+            time_offset,
+            next_note_id,
+            note,
+            channel,
+            mpe_channel,
+            velocity,
+            previous_note,
+            should_sync_oscillator_inaccuracy
         );
     }
 }
@@ -1620,7 +2100,9 @@ void Synth::change_midi_controller(
     if (mpe_channel == PARAM_GLOBAL_MPE_CHANNEL) {
         midi_controller.change_all_channels(time_offset, new_value);
     } else {
-        midi_controller.change(PARAM_GLOBAL_MPE_CHANNEL, time_offset, new_value);
+        midi_controller.change(
+            PARAM_GLOBAL_MPE_CHANNEL, time_offset, new_value
+        );
         midi_controller.change(mpe_channel, time_offset, new_value);
     }
 }
@@ -1672,7 +2154,10 @@ void Synth::channel_pressure(
     }
 
     change_midi_controller(
-        channel_pressure_ctl, mpe_channel, time_offset, midi_byte_to_float(pressure)
+        channel_pressure_ctl,
+        mpe_channel,
+        time_offset,
+        midi_byte_to_float(pressure)
     );
 }
 
@@ -1755,7 +2240,9 @@ void Synth::note_off(
 
         if (is_polyphonic() || was_note_stack_top) {
             deferred_note_offs.push_back(
-                DeferredNoteOff(note_id, channel, mpe_channel, note, velocity, voice)
+                DeferredNoteOff(
+                    note_id, channel, mpe_channel, note, velocity, voice
+                )
             );
         }
 
@@ -1780,7 +2267,9 @@ void Synth::note_off(
 
         note_stack.top(previous_channel, previous_note, previous_velocity);
 
-        Midi::Channel const previous_mpe_channel = map_mpe_channel(previous_channel);
+        Midi::Channel const previous_mpe_channel = map_mpe_channel(
+            previous_channel
+        );
 
         if (JS80P_UNLIKELY(previous_mpe_channel == Midi::INVALID_CHANNEL)) {
             JS80P_ASSERT_NOT_REACHED();
@@ -1801,8 +2290,12 @@ void Synth::note_off(
         return;
     }
 
-    modulator->note_off(time_offset, modulator->get_note_id(), note, velocity_float);
-    carrier->note_off(time_offset, carrier->get_note_id(), note, velocity_float);
+    modulator->note_off(
+        time_offset, modulator->get_note_id(), note, velocity_float
+    );
+    carrier->note_off(
+        time_offset, carrier->get_note_id(), note, velocity_float
+    );
 
     update_voice_statuses();
 }
@@ -1885,7 +2378,13 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
     bool const is_polyphonic = this->is_polyphonic();
 
     if (is_polyphonic || note_stack.is_empty()) {
-        for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
+        std::vector<DeferredNoteOff>::const_iterator it;
+
+        for (
+                it = deferred_note_offs.begin();
+                it != deferred_note_offs.end();
+                ++it
+        ) {
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const voice = deferred_note_off.get_voice();
 
@@ -1897,14 +2396,21 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
 
             Integer const note_id = deferred_note_off.get_note_id();
             Midi::Note const note = deferred_note_off.get_note();
-            Midi::Channel const mpe_channel = deferred_note_off.get_mpe_channel();
-            Number const velocity = midi_byte_to_float(deferred_note_off.get_velocity());
+            Midi::Channel const mpe_channel = (
+                deferred_note_off.get_mpe_channel()
+            );
+            Number const velocity = midi_byte_to_float(
+                deferred_note_off.get_velocity()
+            );
 
             change_midi_controller(
                 this->released_velocity, mpe_channel, time_offset, velocity
             );
             change_midi_controller(
-                this->released_note, mpe_channel, time_offset, midi_byte_to_float(note)
+                this->released_note,
+                mpe_channel,
+                time_offset,
+                midi_byte_to_float(note)
             );
 
             modulators[voice]->note_off(time_offset, note_id, note, velocity);
@@ -1913,12 +2419,22 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
     } else {
         JS80P_ASSERT(!is_polyphonic);
 
-        for (std::vector<DeferredNoteOff>::const_iterator it = deferred_note_offs.begin(); it != deferred_note_offs.end(); ++it) {
+        std::vector<DeferredNoteOff>::const_iterator it;
+
+        for (
+                it = deferred_note_offs.begin();
+                it != deferred_note_offs.end();
+                ++it
+        ) {
             DeferredNoteOff const& deferred_note_off = *it;
             Integer const note_id = deferred_note_off.get_note_id();
-            Midi::Channel const mpe_channel = deferred_note_off.get_mpe_channel();
+            Midi::Channel const mpe_channel = (
+                deferred_note_off.get_mpe_channel()
+            );
 
-            bool const modulator_playing = modulators[0]->get_note_id() == note_id;
+            bool const modulator_playing = (
+                modulators[0]->get_note_id() == note_id
+            );
             bool const carrier_playing = carriers[0]->get_note_id() == note_id;
 
             if (modulator_playing || carrier_playing) {
@@ -1940,14 +2456,25 @@ void Synth::release_held_notes(Seconds const time_offset) noexcept
                     this->released_velocity, mpe_channel, time_offset, velocity
                 );
                 change_midi_controller(
-                    this->released_note, mpe_channel, time_offset, midi_byte_to_float(note)
+                    this->released_note,
+                    mpe_channel,
+                    time_offset,
+                    midi_byte_to_float(note)
                 );
 
-                note_stack.top(previous_channel, previous_note, previous_velocity);
+                note_stack.top(
+                    previous_channel, previous_note, previous_velocity
+                );
 
-                Midi::Channel const previous_mpe_channel = map_mpe_channel(previous_channel);
+                Midi::Channel const previous_mpe_channel = map_mpe_channel(
+                    previous_channel
+                );
 
-                if (JS80P_UNLIKELY(previous_mpe_channel == Midi::INVALID_CHANNEL)) {
+                if (
+                        JS80P_UNLIKELY(
+                            previous_mpe_channel == Midi::INVALID_CHANNEL
+                        )
+                ) {
                     JS80P_ASSERT_NOT_REACHED();
                     continue;
                 }
@@ -1982,8 +2509,14 @@ bool Synth::is_supported_midi_controller(
 bool Synth::is_controller_polyphonic(ControllerId const controller_id) noexcept
 {
     return (
-        (controller_id >= ControllerId::ENVELOPE_1 && controller_id <= ControllerId::ENVELOPE_6)
-        || (controller_id >= ControllerId::ENVELOPE_7 && controller_id <= ControllerId::ENVELOPE_12)
+        (
+            controller_id >= ControllerId::ENVELOPE_1
+            && controller_id <= ControllerId::ENVELOPE_6
+        )
+        || (
+            controller_id >= ControllerId::ENVELOPE_7
+            && controller_id <= ControllerId::ENVELOPE_12
+        )
     );
 }
 
@@ -1992,7 +2525,9 @@ Number Synth::calculate_inaccuracy_seed(Integer const voice) noexcept
 {
     constexpr Number scale = 1.0 / (Number)POLYPHONY;
 
-    return OscillatorInaccuracy::calculate_new_inaccuracy(scale * (Number)voice);
+    return OscillatorInaccuracy::calculate_new_inaccuracy(
+        scale * (Number)voice
+    );
 }
 
 
@@ -2046,7 +2581,10 @@ void Synth::all_notes_off(
 
         if (modulator->is_on()) {
             modulator->note_off(
-                time_offset, modulator->get_note_id(), modulator->get_note(), 0.0
+                time_offset,
+                modulator->get_note_id(),
+                modulator->get_note(),
+                0.0
             );
         }
 
@@ -2110,7 +2648,9 @@ Number Synth::get_midi_controller_value(
 
         default:
             if (is_supported_midi_controller((Midi::Controller)controller_id)) {
-                return midi_controllers_rw[controller_id]->get_value(mpe_channel);
+                return midi_controllers_rw[controller_id]->get_value(
+                    mpe_channel
+                );
             }
 
             break;
@@ -2360,8 +2900,12 @@ Sample const* const* Synth::initialize_rendering(
         effects, round, sample_count
     );
 
-    FloatParamS* const* const sample_evaluated_float_params = this->sample_evaluated_float_params;
-    FloatParamB* const* const block_evaluated_float_params = this->block_evaluated_float_params;
+    FloatParamS* const* const sample_evaluated_float_params = (
+        this->sample_evaluated_float_params
+    );
+    FloatParamB* const* const block_evaluated_float_params = (
+        this->block_evaluated_float_params
+    );
 
     for (int i = 0; i != (int)ParamId::EV3V; ++i) {
         if (sample_evaluated_float_params[i] != NULL) {
@@ -2451,7 +2995,9 @@ void Synth::garbage_collect_voices() noexcept
         }
 
         if (modulator_decayed && carrier_decayed) {
-            Integer const assigned = midi_note_to_voice_assignments[channel][note];
+            Integer const assigned = (
+                midi_note_to_voice_assignments[channel][note]
+            );
 
             /*
             The note's key might have been released and triggered again while
@@ -2545,8 +3091,10 @@ void Synth::process_message(Message const& message) noexcept
 }
 
 
-void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcept
-{
+void Synth::handle_set_param(
+        ParamId const param_id,
+        Number const ratio
+) noexcept {
     size_t const index = (size_t)param_id;
     ParamType const type = find_param_type(param_id);
 
@@ -2566,10 +3114,18 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
             if (param_id == ParamId::MPEST) {
                 all_notes_off(0.0, 0);
             } else {
-                ToggleParamAffectedParams::const_iterator affected = toggle_param_affected_params.find(param_id);
+                ToggleParamAffectedParams::const_iterator affected = (
+                    toggle_param_affected_params.find(param_id
+                ));
 
                 if (affected != toggle_param_affected_params.end()) {
-                    for (ParamIds::const_iterator it = affected->second.begin(); it != affected->second.end(); ++it) {
+                    ParamIds::const_iterator it;
+
+                    for (
+                            it = affected->second.begin();
+                            it != affected->second.end();
+                            ++it
+                    ) {
                         handle_refresh_param(*it);
                     }
                 }
@@ -2586,8 +3142,10 @@ void Synth::handle_set_param(ParamId const param_id, Number const ratio) noexcep
 }
 
 
-void Synth::handle_set_param_smoothly(ParamId const param_id, Number const ratio) noexcept
-{
+void Synth::handle_set_param_smoothly(
+        ParamId const param_id,
+        Number const ratio
+) noexcept {
     size_t const index = (size_t)param_id;
     ParamType const type = find_param_type(param_id);
 
@@ -3011,7 +3569,9 @@ bool Synth::assign_controller_to_byte_param(
             break;
     }
 
-    return is_assigned && (is_special || midi_controller != NULL || macro != NULL);
+    return (
+        is_assigned && (is_special || midi_controller != NULL || macro != NULL)
+    );
 }
 
 
@@ -3030,8 +3590,13 @@ bool Synth::assign_controller(
 
         case PITCH_WHEEL: param.set_midi_controller(&pitch_wheel); return true;
 
-        case TRIGGERED_NOTE: param.set_midi_controller(&triggered_note); return true;
-        case TRIGGERED_VELOCITY: param.set_midi_controller(&triggered_velocity); return true;
+        case TRIGGERED_NOTE:
+            param.set_midi_controller(&triggered_note);
+            return true;
+
+        case TRIGGERED_VELOCITY:
+            param.set_midi_controller(&triggered_velocity);
+            return true;
 
         case MACRO_1: param.set_macro(macros[0]); return true;
         case MACRO_2: param.set_macro(macros[1]); return true;
@@ -3060,7 +3625,9 @@ bool Synth::assign_controller(
         case ENVELOPE_5: param.set_envelope(envelopes[4]); return true;
         case ENVELOPE_6: param.set_envelope(envelopes[5]); return true;
 
-        case CHANNEL_PRESSURE: param.set_midi_controller(&channel_pressure_ctl); return true;
+        case CHANNEL_PRESSURE:
+            param.set_midi_controller(&channel_pressure_ctl);
+            return true;
 
         case MIDI_LEARN: return true;
 
@@ -3088,8 +3655,13 @@ bool Synth::assign_controller(
         case ENVELOPE_11: param.set_envelope(envelopes[10]); return true;
         case ENVELOPE_12: param.set_envelope(envelopes[11]); return true;
 
-        case RELEASED_NOTE: param.set_midi_controller(&released_note); return true;
-        case RELEASED_VELOCITY: param.set_midi_controller(&released_velocity); return true;
+        case RELEASED_NOTE:
+            param.set_midi_controller(&released_note);
+            return true;
+
+        case RELEASED_VELOCITY:
+            param.set_midi_controller(&released_velocity);
+            return true;
 
         case MACRO_21: param.set_macro(macros[20]); return true;
         case MACRO_22: param.set_macro(macros[21]); return true;
@@ -3301,32 +3873,52 @@ void Synth::finalize_rendering(
 
     if (osc_1_peak.is_assigned()) {
         bus.find_modulators_peak(sample_count, peak, peak_index);
-        osc_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        osc_1_peak.change_all_channels(0.0, std::min(1.0, osc_1_peak_tracker.get_peak()));
+        osc_1_peak_tracker.update(
+            peak, peak_index, sample_count, sampling_period
+        );
+        osc_1_peak.change_all_channels(
+            0.0, std::min(1.0, osc_1_peak_tracker.get_peak())
+        );
     }
 
     if (osc_2_peak.is_assigned()) {
         bus.find_carriers_peak(sample_count, peak, peak_index);
-        osc_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        osc_2_peak.change_all_channels(0.0, std::min(1.0, osc_2_peak_tracker.get_peak()));
+        osc_2_peak_tracker.update(
+            peak, peak_index, sample_count, sampling_period
+        );
+        osc_2_peak.change_all_channels(
+            0.0, std::min(1.0, osc_2_peak_tracker.get_peak())
+        );
     }
 
     if (vol_1_peak.is_assigned()) {
         effects.volume_1.find_input_peak(round, sample_count, peak, peak_index);
-        vol_1_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_1_peak.change_all_channels(0.0, std::min(1.0, vol_1_peak_tracker.get_peak()));
+        vol_1_peak_tracker.update(
+            peak, peak_index, sample_count, sampling_period
+        );
+        vol_1_peak.change_all_channels(
+            0.0, std::min(1.0, vol_1_peak_tracker.get_peak())
+        );
     }
 
     if (vol_2_peak.is_assigned()) {
         effects.volume_2.find_input_peak(round, sample_count, peak, peak_index);
-        vol_2_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_2_peak.change_all_channels(0.0, std::min(1.0, vol_2_peak_tracker.get_peak()));
+        vol_2_peak_tracker.update(
+            peak, peak_index, sample_count, sampling_period
+        );
+        vol_2_peak.change_all_channels(
+            0.0, std::min(1.0, vol_2_peak_tracker.get_peak())
+        );
     }
 
     if (vol_3_peak.is_assigned()) {
         effects.volume_3.find_input_peak(round, sample_count, peak, peak_index);
-        vol_3_peak_tracker.update(peak, peak_index, sample_count, sampling_period);
-        vol_3_peak.change_all_channels(0.0, std::min(1.0, vol_3_peak_tracker.get_peak()));
+        vol_3_peak_tracker.update(
+            peak, peak_index, sample_count, sampling_period
+        );
+        vol_3_peak.change_all_channels(
+            0.0, std::min(1.0, vol_3_peak_tracker.get_peak())
+        );
     }
 
     active_voices_count.store((Integer)bus.get_active_voices_count());
@@ -3436,7 +4028,9 @@ void Synth::Bus::find_modulators_peak(
         Sample& peak,
         Integer& peak_index
 ) noexcept {
-    SignalProducer::find_peak(modulators_buffer, this->channels, sample_count, peak, peak_index);
+    SignalProducer::find_peak(
+        modulators_buffer, this->channels, sample_count, peak, peak_index
+    );
 }
 
 
@@ -3445,7 +4039,9 @@ void Synth::Bus::find_carriers_peak(
         Sample& peak,
         Integer& peak_index
 ) noexcept {
-    SignalProducer::find_peak(carriers_buffer, this->channels, sample_count, peak, peak_index);
+    SignalProducer::find_peak(
+        carriers_buffer, this->channels, sample_count, peak, peak_index
+    );
 }
 
 
@@ -3510,28 +4106,91 @@ Sample const* const* Synth::Bus::initialize_rendering(
     render_silence(round, 0, sample_count, carriers_buffer);
     render_silence(round, 0, sample_count, buffer);
 
-    if (Synth::should_sync_oscillator_inaccuracy(modulator_params, carrier_params)) {
-        if (Synth::should_sync_oscillator_instability(modulator_params, carrier_params)) {
-            render_voices<Modulator, true, true>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
-            render_voices<Carrier, true, true>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+    if (
+            Synth::should_sync_oscillator_inaccuracy(
+                modulator_params, carrier_params
+            )
+        ) {
+        if (
+                Synth::should_sync_oscillator_instability(
+                    modulator_params, carrier_params
+                )
+        ) {
+            render_voices<Modulator, true, true>(
+                active_modulators,
+                active_modulators_count,
+                modulator_params,
+                round,
+                sample_count
+            );
+            render_voices<Carrier, true, true>(
+                active_carriers,
+                active_carriers_count,
+                carrier_params,
+                round,
+                sample_count
+            );
         } else {
-            render_voices<Modulator, true, false>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
-            render_voices<Carrier, true, false>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+            render_voices<Modulator, true, false>(
+                active_modulators,
+                active_modulators_count,
+                modulator_params,
+                round,
+                sample_count
+            );
+            render_voices<Carrier, true, false>(
+                active_carriers,
+                active_carriers_count,
+                carrier_params,
+                round,
+                sample_count
+            );
         }
     } else {
-        if (Synth::should_sync_oscillator_instability(modulator_params, carrier_params)) {
-            render_voices<Modulator, false, true>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
-            render_voices<Carrier, false, true>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+        if (
+                Synth::should_sync_oscillator_instability(
+                    modulator_params, carrier_params
+                )
+        ) {
+            render_voices<Modulator, false, true>(
+                active_modulators,
+                active_modulators_count,
+                modulator_params,
+                round,
+                sample_count
+            );
+            render_voices<Carrier, false, true>(
+                active_carriers,
+                active_carriers_count,
+                carrier_params,
+                round,
+                sample_count
+            );
         } else {
-            render_voices<Modulator, false, false>(active_modulators, active_modulators_count, modulator_params, round, sample_count);
-            render_voices<Carrier, false, false>(active_carriers, active_carriers_count, carrier_params, round, sample_count);
+            render_voices<Modulator, false, false>(
+                active_modulators,
+                active_modulators_count,
+                modulator_params,
+                round,
+                sample_count
+            );
+            render_voices<Carrier, false, false>(
+                active_carriers,
+                active_carriers_count,
+                carrier_params,
+                round,
+                sample_count
+            );
         }
     }
 
     if (
             active_modulators_count == 0
             && active_carriers_count == 0
-            && (JS80P_UNLIKELY(input == NULL) || is_silent(input, sample_count, channels))
+            && (
+                JS80P_UNLIKELY(input == NULL)
+                || is_silent(input, sample_count, channels)
+            )
     ) {
         mark_round_as_silent(round);
 
@@ -3573,7 +4232,11 @@ void Synth::Bus::collect_active_voices() noexcept
 }
 
 
-template<class VoiceClass, bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
+template<
+        class VoiceClass,
+        bool should_sync_oscillator_inaccuracy,
+        bool should_sync_oscillator_instability
+>
 void Synth::Bus::render_voices(
         VoiceClass* const (&voices)[POLYPHONY],
         size_t const voices_count,
@@ -3583,21 +4246,34 @@ void Synth::Bus::render_voices(
 ) noexcept {
     if (voices_count > 0) {
         /*
-        Rendering oscillators together seems to be more cache-friendly. Cannot group
-        modulators and carriers though, because when there is actual modulation,
-        then rendering carrier oscillators would trigger rendering the whole signal
-        chain of the corresponding modulator.
+        Rendering oscillators together seems to be more cache-friendly. Cannot
+        group modulators and carriers though, because when there is actual
+        modulation, then rendering carrier oscillators would trigger rendering
+        the whole signal chain of the corresponding modulator.
         */
 
-        if (params.tuning.get_value() == VoiceClass::TUNING_MTS_ESP_CONTINUOUS) {
+        Byte const tuning = params.tuning.get_value();
+
+        if (
+                tuning == VoiceClass::TUNING_MTS_ESP_CONTINUOUS
+        ) {
             for (size_t v = 0; v != voices_count; ++v) {
-                voices[v]->template update_note_frequency_for_continuous_mts_esp<should_sync_oscillator_inaccuracy, should_sync_oscillator_instability>(round);
+                VoiceClass& voice = *voices[v];
+
+                voice.template update_note_frequency_for_continuous_mts_esp<
+                    should_sync_oscillator_inaccuracy,
+                    should_sync_oscillator_instability
+                >(round);
             }
         }
 
         if (params.oscillator_instability.get_value() != 0) {
             for (size_t v = 0; v != voices_count; ++v) {
-                voices[v]->template update_unstable_note_frequency<should_sync_oscillator_instability>(round);
+                VoiceClass& voice = *voices[v];
+
+                voice.template update_unstable_note_frequency<
+                    should_sync_oscillator_instability
+                >(round);
             }
         }
 
@@ -3606,7 +4282,9 @@ void Synth::Bus::render_voices(
         }
 
         for (size_t v = 0; v != voices_count; ++v) {
-            SignalProducer::produce<VoiceClass>(*voices[v], round, sample_count);
+            SignalProducer::produce<VoiceClass>(
+                *voices[v], round, sample_count
+            );
         }
     }
 }
@@ -3618,7 +4296,9 @@ void Synth::Bus::render(
         Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
-    mix_modulators_with_additive_volume(round, first_sample_index, end_sample_index);
+    mix_modulators_with_additive_volume(
+        round, first_sample_index, end_sample_index
+    );
     mix_carriers(round, first_sample_index, end_sample_index);
 
     if (JS80P_LIKELY(input != NULL)) {
@@ -3799,8 +4479,10 @@ Synth::ParamIdHashTable::~ParamIdHashTable() noexcept
 }
 
 
-void Synth::ParamIdHashTable::add(std::string const& name, ParamId const param_id) noexcept
-{
+void Synth::ParamIdHashTable::add(
+        std::string const& name,
+        ParamId const param_id
+) noexcept {
     Entry* root;
     Entry* parent;
     Entry* entry;
@@ -3997,7 +4679,9 @@ void Synth::ParamIdHashTable::Entry::set(
 }
 
 
-Synth::MidiControllerMessage::MidiControllerMessage() : time_offset(-999999.0), value(0)
+Synth::MidiControllerMessage::MidiControllerMessage()
+    : time_offset(-999999.0),
+    value(0)
 {
 }
 

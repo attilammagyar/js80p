@@ -180,7 +180,7 @@ def print_effect_params(param_id: int, param_objs: list) -> int:
         ("$V3V", "  ///< $ Volume 3", "effects.volume_3_gain"),
     ]
 
-    return print_params(param_id, param_objs, "Effects", "E", 1, params)
+    return print_params(param_id, param_objs, "FX", "E", 1, params)
 
 
 def print_macros(param_id: int, param_objs: list) -> int:
@@ -244,11 +244,11 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("CDTYP", " ///< Carrier Distortion Type", "carrier.distortion_type"),
         ("CF2TYP", "///< Carrier Filter 2 Type", "carrier_params.filter_2_type"),
 
-        ("ED1TYP", "///< Effects Distortion 1 Type", "effects.distortion_1_type"),
-        ("ED2TYP", "///< Effects Distortion 2 Type", "effects.distortion_2_type"),
+        ("ED1TYP", "///< FX Distortion 1 Type", "effects.distortion_1_type"),
+        ("ED2TYP", "///< FX Distortion 2 Type", "effects.distortion_2_type"),
 
-        ("EF1TYP", "///< Effects Filter 1 Type", "effects.filter_1_type"),
-        ("EF2TYP", "///< Effects Filter 2 Type", "effects.filter_2_type"),
+        ("EF1TYP", "///< FX Filter 1 Type", "effects.filter_1_type"),
+        ("EF2TYP", "///< FX Filter 2 Type", "effects.filter_2_type"),
 
         ("L1WAV", " ///< LFO 1 Waveform", "lfos_rw[0]->waveform"),
         ("L2WAV", " ///< LFO 2 Waveform", "lfos_rw[1]->waveform"),
@@ -259,14 +259,14 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("L7WAV", " ///< LFO 7 Waveform", "lfos_rw[6]->waveform"),
         ("L8WAV", " ///< LFO 8 Waveform", "lfos_rw[7]->waveform"),
 
-        ("L1LOG", " ///< LFO 1 Logarithmic Frequency", "lfos_rw[0]->freq_log_scale"),
-        ("L2LOG", " ///< LFO 2 Logarithmic Frequency", "lfos_rw[1]->freq_log_scale"),
-        ("L3LOG", " ///< LFO 3 Logarithmic Frequency", "lfos_rw[2]->freq_log_scale"),
-        ("L4LOG", " ///< LFO 4 Logarithmic Frequency", "lfos_rw[3]->freq_log_scale"),
-        ("L5LOG", " ///< LFO 5 Logarithmic Frequency", "lfos_rw[4]->freq_log_scale"),
-        ("L6LOG", " ///< LFO 6 Logarithmic Frequency", "lfos_rw[5]->freq_log_scale"),
-        ("L7LOG", " ///< LFO 7 Logarithmic Frequency", "lfos_rw[6]->freq_log_scale"),
-        ("L8LOG", " ///< LFO 8 Logarithmic Frequency", "lfos_rw[7]->freq_log_scale"),
+        ("L1LOG", " ///< LFO 1 Log Frequency", "lfos_rw[0]->freq_log_scale"),
+        ("L2LOG", " ///< LFO 2 Log Frequency", "lfos_rw[1]->freq_log_scale"),
+        ("L3LOG", " ///< LFO 3 Log Frequency", "lfos_rw[2]->freq_log_scale"),
+        ("L4LOG", " ///< LFO 4 Log Frequency", "lfos_rw[3]->freq_log_scale"),
+        ("L5LOG", " ///< LFO 5 Log Frequency", "lfos_rw[4]->freq_log_scale"),
+        ("L6LOG", " ///< LFO 6 Log Frequency", "lfos_rw[5]->freq_log_scale"),
+        ("L7LOG", " ///< LFO 7 Log Frequency", "lfos_rw[6]->freq_log_scale"),
+        ("L8LOG", " ///< LFO 8 Log Frequency", "lfos_rw[7]->freq_log_scale"),
 
         ("L1CEN", " ///< LFO 1 Center", "lfos_rw[0]->center"),
         ("L2CEN", " ///< LFO 2 Center", "lfos_rw[1]->center"),
@@ -286,23 +286,23 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("L7SYN", " ///< LFO 7 Tempo Synchronization", "lfos_rw[6]->tempo_sync"),
         ("L8SYN", " ///< LFO 8 Tempo Synchronization", "lfos_rw[7]->tempo_sync"),
 
-        ("ECSYN", " ///< Effects Chorus Tempo Synchronization", "effects.chorus.tempo_sync"),
+        ("ECSYN", " ///< FX Chorus Tempo Synchronization", "effects.chorus.tempo_sync"),
 
-        ("EESYN", " ///< Effects Echo Tempo Synchronization", "effects.echo.tempo_sync"),
+        ("EESYN", " ///< FX Echo Tempo Synchronization", "effects.echo.tempo_sync"),
 
-        ("MF1LOG", "///< Modulator Filter 1 Logarithmic Frequency", "modulator_params.filter_1_freq_log_scale"),
-        ("MF2LOG", "///< Modulator Filter 2 Logarithmic Frequency", "modulator_params.filter_2_freq_log_scale"),
-        ("CF1LOG", "///< Carrier Filter 1 Logarithmic Frequency", "carrier_params.filter_1_freq_log_scale"),
-        ("CF2LOG", "///< Carrier Filter 2 Logarithmic Frequency", "carrier_params.filter_2_freq_log_scale"),
-        ("EF1LOG", "///< Effects Filter 1 Logarithmic Frequency", "effects.filter_1_freq_log_scale"),
-        ("EF2LOG", "///< Effects Filter 2 Logarithmic Frequency", "effects.filter_2_freq_log_scale"),
-        ("ECLOG", " ///< Effects Chorus Logarithmic Filter Frequencies", "effects.chorus.log_scale_filter_frequencies"),
-        ("ECLHQ", " ///< Effects Chorus Logarithmic High-pass Filter Q Factor", "effects.chorus.log_scale_high_pass_q"),
-        ("ECLLG", " ///< Effects Chorus Logarithmic LFO Frequency", "effects.chorus.log_scale_lfo_frequency"),
-        ("EELOG", " ///< Effects Echo Logarithmic Filter Frequencies", "effects.echo.log_scale_frequencies"),
-        ("EELHQ", " ///< Effects Echo Logarithmic High-pass Filter Q Factor", "effects.echo.log_scale_high_pass_q"),
-        ("ERLOG", " ///< Effects Reverb Logarithmic Filter Frequencies", "effects.reverb.log_scale_frequencies"),
-        ("ERLHQ", " ///< Effects Reverb Logarithmic High-pass Filter Q Factor", "effects.reverb.log_scale_high_pass_q"),
+        ("MF1LOG", "///< Modulator Filter 1 Log Frequency", "modulator_params.filter_1_freq_log_scale"),
+        ("MF2LOG", "///< Modulator Filter 2 Log Frequency", "modulator_params.filter_2_freq_log_scale"),
+        ("CF1LOG", "///< Carrier Filter 1 Log Frequency", "carrier_params.filter_1_freq_log_scale"),
+        ("CF2LOG", "///< Carrier Filter 2 Log Frequency", "carrier_params.filter_2_freq_log_scale"),
+        ("EF1LOG", "///< FX Filter 1 Log Frequency", "effects.filter_1_freq_log_scale"),
+        ("EF2LOG", "///< FX Filter 2 Log Frequency", "effects.filter_2_freq_log_scale"),
+        ("ECLOG", " ///< FX Chorus Log Filter Frequencies", "effects.chorus.log_scale_filter_frequencies"),
+        ("ECLHQ", " ///< FX Chorus Log High-pass Filter Q Factor", "effects.chorus.log_scale_high_pass_q"),
+        ("ECLLG", " ///< FX Chorus Log LFO Frequency", "effects.chorus.log_scale_lfo_frequency"),
+        ("EELOG", " ///< FX Echo Log Filter Frequencies", "effects.echo.log_scale_frequencies"),
+        ("EELHQ", " ///< FX Echo Log High-pass Filter Q Factor", "effects.echo.log_scale_high_pass_q"),
+        ("ERLOG", " ///< FX Reverb Log Filter Frequencies", "effects.reverb.log_scale_frequencies"),
+        ("ERLHQ", " ///< FX Reverb Log High-pass Filter Q Factor", "effects.reverb.log_scale_high_pass_q"),
 
         ("N1UPD", " ///< Envelope 1 Update Mode", "envelopes_rw[0]->update_mode"),
         ("N2UPD", " ///< Envelope 2 Update Mode", "envelopes_rw[1]->update_mode"),
@@ -319,9 +319,9 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
 
         ("NH", "    ///< Note Handling", "note_handling"),
 
-        ("ERTYP", " ///< Effects Reverb Type", "effects.reverb.type"),
+        ("ERTYP", " ///< FX Reverb Type", "effects.reverb.type"),
 
-        ("ECTYP", " ///< Effects Chorus Type", "effects.chorus.type"),
+        ("ECTYP", " ///< FX Chorus Type", "effects.chorus.type"),
 
         ("MTUN", "  ///< Modulator Tuning", "modulator_params.tuning"),
         ("CTUN", "  ///< Carrier Tuning", "carrier_params.tuning"),
@@ -332,12 +332,12 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("COIA", "  ///< Carrier Oscillator Inaccuracy", "carrier_params.oscillator_inaccuracy"),
         ("COIS", "  ///< Carrier Oscillator Instability", "carrier_params.oscillator_instability"),
 
-        ("MF1QLG", "///< Modulator Filter 1 Logarithmic Q Factor", "modulator_params.filter_1_q_log_scale"),
-        ("MF2QLG", "///< Modulator Filter 2 Logarithmic Q Factor", "modulator_params.filter_2_q_log_scale"),
-        ("CF1QLG", "///< Carrier Filter 1 Logarithmic Q Factor", "carrier_params.filter_1_q_log_scale"),
-        ("CF2QLG", "///< Carrier Filter 2 Logarithmic Q Factor", "carrier_params.filter_2_q_log_scale"),
-        ("EF1QLG", "///< Effects Filter 1 Logarithmic Q Factor", "effects.filter_1_q_log_scale"),
-        ("EF2QLG", "///< Effects Filter 2 Logarithmic Q Factor", "effects.filter_2_q_log_scale"),
+        ("MF1QLG", "///< Modulator Filter 1 Log Q Factor", "modulator_params.filter_1_q_log_scale"),
+        ("MF2QLG", "///< Modulator Filter 2 Log Q Factor", "modulator_params.filter_2_q_log_scale"),
+        ("CF1QLG", "///< Carrier Filter 1 Log Q Factor", "carrier_params.filter_1_q_log_scale"),
+        ("CF2QLG", "///< Carrier Filter 2 Log Q Factor", "carrier_params.filter_2_q_log_scale"),
+        ("EF1QLG", "///< FX Filter 1 Log Q Factor", "effects.filter_1_q_log_scale"),
+        ("EF2QLG", "///< FX Filter 2 Log Q Factor", "effects.filter_2_q_log_scale"),
 
         ("L1AEN", " ///< LFO 1 Amplitude Envelope", "lfos_rw[0]->amplitude_envelope"),
         ("L2AEN", " ///< LFO 2 Amplitude Envelope", "lfos_rw[1]->amplitude_envelope"),
@@ -434,14 +434,14 @@ def print_discrete_params(param_id: int, param_objs: list) -> int:
         ("MFX4", "  ///< Modulator Fine Detune x4", "modulator_params.fine_detune_x4"),
         ("CFX4", "  ///< Carrier Fine Detune x4", "carrier_params.fine_detune_x4"),
 
-        ("EER1", "  ///< Effects Echo Delay 1 Reversed", "effects.echo.reversed_1"),
-        ("EER2", "  ///< Effects Echo Delay 2 Reversed", "effects.echo.reversed_2"),
+        ("EER1", "  ///< FX Echo Delay 1 Reversed", "effects.echo.reversed_1"),
+        ("EER2", "  ///< FX Echo Delay 2 Reversed", "effects.echo.reversed_2"),
 
-        ("ETSTYP", "///< Effects Tape Saturation Type", "effects.tape.distortion_type"),
-        ("ETEND", " ///< Effects Tape Position at End of Chain", "effects.tape_at_end"),
+        ("ETSTYP", "///< FX Tape Saturation Type", "effects.tape.distortion_type"),
+        ("ETEND", " ///< FX Tape Position at End of Chain", "effects.tape_at_end"),
 
-        ("EECM", "  ///< Effects Echo Side-Chain Compression Mode", "effects.echo.side_chain_compression_mode"),
-        ("ERCM", "  ///< Effects Reverb Side-Chain Compression Mode", "effects.reverb.side_chain_compression_mode"),
+        ("EECM", "  ///< FX Echo Side-Chain Compression Mode", "effects.echo.side_chain_compression_mode"),
+        ("ERCM", "  ///< FX Reverb Side-Chain Compression Mode", "effects.reverb.side_chain_compression_mode"),
 
         ("MPEST", " ///< MPE Settings", "mpe_settings"),
     ]

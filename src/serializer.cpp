@@ -531,10 +531,10 @@ Number Serializer::upgrade_old_note_handling_param(
         Number const old_value
 ) noexcept {
     constexpr Byte NEW_VALUES[] = {
-        Synth::NOTE_HANDLING_MONOPHONIC,
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD,
-        Synth::NOTE_HANDLING_POLYPHONIC_HOLD,
-        Synth::NOTE_HANDLING_POLYPHONIC,
+        Synth::NOTE_HANDLING_MONO,
+        Synth::NOTE_HANDLING_MONO_HOLD,
+        Synth::NOTE_HANDLING_POLY_HOLD,
+        Synth::NOTE_HANDLING_POLY,
     };
 
     Byte const old_value_byte = std::round(old_value * 3.0);

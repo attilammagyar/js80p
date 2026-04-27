@@ -95,7 +95,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ASSIGN_CONTROLLER = 3,  ///< Assign the controller identified by
                                     ///< \c byte_param to the given parameter.
 
-            REFRESH_PARAM = 4,      ///< Make sure that \c get_param_ratio_atomic()
+            REFRESH_PARAM = 4,      ///< Make sure that
+                                    ///< \c get_param_ratio_atomic()
                                     ///< will return the most recent value of
                                     ///< the given parameter.
 
@@ -183,64 +184,64 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CF2FIA = 69,     ///< Carrier Filter 2 Frequency Inaccuracy
             CF2QIA = 70,     ///< Carrier Filter 2 Q Factor Inaccuracy
 
-            EV1V = 71,       ///< Effects Volume 1
-            ED1L = 72,       ///< Effects Distortion 1 Level
-            ED2L = 73,       ///< Effects Distortion 2 Level
-            EF1FRQ = 74,     ///< Effects Filter 1 Frequency
-            EF1Q = 75,       ///< Effects Filter 1 Q Factor
-            EF1G = 76,       ///< Effects Filter 1 Gain
-            EF2FRQ = 77,     ///< Effects Filter 2 Frequency
-            EF2Q = 78,       ///< Effects Filter 2 Q Factor
-            EF2G = 79,       ///< Effects Filter 2 Gain
-            EV2V = 80,       ///< Effects Volume 2
-            ETSTP = 81,      ///< Effects Tape Stop / Start
-            ETWFA = 82,      ///< Effects Tape Wow and Flutter Amplitude
-            ETWFS = 83,      ///< Effects Tape Wow and Flutter Speed
-            ETSAT = 84,      ///< Effects Tape Saturation
-            ETCLR = 85,      ///< Effects Tape Color
-            ETHSS = 86,      ///< Effects Tape Hiss Level
-            ETSTR = 87,      ///< Effects Tape Stereo Wow and Flutter
-            ECDEL = 88,      ///< Effects Chorus Delay Time
-            ECFRQ = 89,      ///< Effects Chorus LFO Frequency
-            ECDPT = 90,      ///< Effects Chorus Depth
-            ECFB = 91,       ///< Effects Chorus Feedback
-            ECDF = 92,       ///< Effects Chorus Dampening Frequency
-            ECDG = 93,       ///< Effects Chorus Dampening Gain
-            ECWID = 94,      ///< Effects Chorus Stereo Width
-            ECHPF = 95,      ///< Effects Chorus High-pass Frequency
-            ECHPQ = 96,      ///< Effects Chorus High-pass Q Factor
-            ECWET = 97,      ///< Effects Chorus Wet Volume
-            ECDRY = 98,      ///< Effects Chorus Dry Volume
-            EEDEL = 99,      ///< Effects Echo Delay Time
-            EEINV = 100,     ///< Effects Echo Input Volume
-            EEFB = 101,      ///< Effects Echo Feedback
-            EEDST = 102,     ///< Effects Echo Distortion
-            EEDF = 103,      ///< Effects Echo Dampening Frequency
-            EEDG = 104,      ///< Effects Echo Dampening Gain
-            EEWID = 105,     ///< Effects Echo Stereo Width
-            EEHPF = 106,     ///< Effects Echo High-pass Frequency
-            EEHPQ = 107,     ///< Effects Echo High-pass Q Factor
-            EECTH = 108,     ///< Effects Echo Side-Chain Compression Threshold
-            EECAT = 109,     ///< Effects Echo Side-Chain Compression Attack Time
-            EECRL = 110,     ///< Effects Echo Side-Chain Compression Release Time
-            EECR = 111,      ///< Effects Echo Side-Chain Compression Ratio
-            EEWET = 112,     ///< Effects Echo Wet Volume
-            EEDRY = 113,     ///< Effects Echo Dry Volume
-            ERRS = 114,      ///< Effects Reverb Room Size
-            ERRR = 115,      ///< Effects Reverb Room Reflectivity
-            ERDST = 116,     ///< Effects Reverb Distortion
-            ERDF = 117,      ///< Effects Reverb Dampening Frequency
-            ERDG = 118,      ///< Effects Reverb Dampening Gain
-            ERWID = 119,     ///< Effects Reverb Stereo Width
-            ERHPF = 120,     ///< Effects Reverb High-pass Frequency
-            ERHPQ = 121,     ///< Effects Reverb High-pass Q Factor
-            ERCTH = 122,     ///< Effects Reverb Side-Chain Compression Threshold
-            ERCAT = 123,     ///< Effects Reverb Side-Chain Compression Attack Time
-            ERCRL = 124,     ///< Effects Reverb Side-Chain Compression Release Time
-            ERCR = 125,      ///< Effects Reverb Side-Chain Compression Ratio
-            ERWET = 126,     ///< Effects Reverb Wet Volume
-            ERDRY = 127,     ///< Effects Reverb Dry Volume
-            EV3V = 128,      ///< Effects Volume 3
+            EV1V = 71,       ///< FX Volume 1
+            ED1L = 72,       ///< FX Distortion 1 Level
+            ED2L = 73,       ///< FX Distortion 2 Level
+            EF1FRQ = 74,     ///< FX Filter 1 Frequency
+            EF1Q = 75,       ///< FX Filter 1 Q Factor
+            EF1G = 76,       ///< FX Filter 1 Gain
+            EF2FRQ = 77,     ///< FX Filter 2 Frequency
+            EF2Q = 78,       ///< FX Filter 2 Q Factor
+            EF2G = 79,       ///< FX Filter 2 Gain
+            EV2V = 80,       ///< FX Volume 2
+            ETSTP = 81,      ///< FX Tape Stop / Start
+            ETWFA = 82,      ///< FX Tape Wow and Flutter Amplitude
+            ETWFS = 83,      ///< FX Tape Wow and Flutter Speed
+            ETSAT = 84,      ///< FX Tape Saturation
+            ETCLR = 85,      ///< FX Tape Color
+            ETHSS = 86,      ///< FX Tape Hiss Level
+            ETSTR = 87,      ///< FX Tape Stereo Wow and Flutter
+            ECDEL = 88,      ///< FX Chorus Delay Time
+            ECFRQ = 89,      ///< FX Chorus LFO Frequency
+            ECDPT = 90,      ///< FX Chorus Depth
+            ECFB = 91,       ///< FX Chorus Feedback
+            ECDF = 92,       ///< FX Chorus Dampening Frequency
+            ECDG = 93,       ///< FX Chorus Dampening Gain
+            ECWID = 94,      ///< FX Chorus Stereo Width
+            ECHPF = 95,      ///< FX Chorus High-pass Frequency
+            ECHPQ = 96,      ///< FX Chorus High-pass Q Factor
+            ECWET = 97,      ///< FX Chorus Wet Volume
+            ECDRY = 98,      ///< FX Chorus Dry Volume
+            EEDEL = 99,      ///< FX Echo Delay Time
+            EEINV = 100,     ///< FX Echo Input Volume
+            EEFB = 101,      ///< FX Echo Feedback
+            EEDST = 102,     ///< FX Echo Distortion
+            EEDF = 103,      ///< FX Echo Dampening Frequency
+            EEDG = 104,      ///< FX Echo Dampening Gain
+            EEWID = 105,     ///< FX Echo Stereo Width
+            EEHPF = 106,     ///< FX Echo High-pass Frequency
+            EEHPQ = 107,     ///< FX Echo High-pass Q Factor
+            EECTH = 108,     ///< FX Echo Side-Chain Compression Threshold
+            EECAT = 109,     ///< FX Echo Side-Chain Compression Attack Time
+            EECRL = 110,     ///< FX Echo Side-Chain Compression Release Time
+            EECR = 111,      ///< FX Echo Side-Chain Compression Ratio
+            EEWET = 112,     ///< FX Echo Wet Volume
+            EEDRY = 113,     ///< FX Echo Dry Volume
+            ERRS = 114,      ///< FX Reverb Room Size
+            ERRR = 115,      ///< FX Reverb Room Reflectivity
+            ERDST = 116,     ///< FX Reverb Distortion
+            ERDF = 117,      ///< FX Reverb Dampening Frequency
+            ERDG = 118,      ///< FX Reverb Dampening Gain
+            ERWID = 119,     ///< FX Reverb Stereo Width
+            ERHPF = 120,     ///< FX Reverb High-pass Frequency
+            ERHPQ = 121,     ///< FX Reverb High-pass Q Factor
+            ERCTH = 122,     ///< FX Reverb Side-Chain Compression Threshold
+            ERCAT = 123,     ///< FX Reverb Side-Chain Compression Attack Time
+            ERCRL = 124,     ///< FX Reverb Side-Chain Compression Release Time
+            ERCR = 125,      ///< FX Reverb Side-Chain Compression Ratio
+            ERWET = 126,     ///< FX Reverb Wet Volume
+            ERDRY = 127,     ///< FX Reverb Dry Volume
+            EV3V = 128,      ///< FX Volume 3
 
             M1MID = 129,     ///< Macro 1 Midpoint
             M1IN = 130,      ///< Macro 1 Input
@@ -714,10 +715,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             CF1TYP = 548,    ///< Carrier Filter 1 Type
             CDTYP = 549,     ///< Carrier Distortion Type
             CF2TYP = 550,    ///< Carrier Filter 2 Type
-            ED1TYP = 551,    ///< Effects Distortion 1 Type
-            ED2TYP = 552,    ///< Effects Distortion 2 Type
-            EF1TYP = 553,    ///< Effects Filter 1 Type
-            EF2TYP = 554,    ///< Effects Filter 2 Type
+            ED1TYP = 551,    ///< FX Distortion 1 Type
+            ED2TYP = 552,    ///< FX Distortion 2 Type
+            EF1TYP = 553,    ///< FX Filter 1 Type
+            EF2TYP = 554,    ///< FX Filter 2 Type
             L1WAV = 555,     ///< LFO 1 Waveform
             L2WAV = 556,     ///< LFO 2 Waveform
             L3WAV = 557,     ///< LFO 3 Waveform
@@ -726,14 +727,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6WAV = 560,     ///< LFO 6 Waveform
             L7WAV = 561,     ///< LFO 7 Waveform
             L8WAV = 562,     ///< LFO 8 Waveform
-            L1LOG = 563,     ///< LFO 1 Logarithmic Frequency
-            L2LOG = 564,     ///< LFO 2 Logarithmic Frequency
-            L3LOG = 565,     ///< LFO 3 Logarithmic Frequency
-            L4LOG = 566,     ///< LFO 4 Logarithmic Frequency
-            L5LOG = 567,     ///< LFO 5 Logarithmic Frequency
-            L6LOG = 568,     ///< LFO 6 Logarithmic Frequency
-            L7LOG = 569,     ///< LFO 7 Logarithmic Frequency
-            L8LOG = 570,     ///< LFO 8 Logarithmic Frequency
+            L1LOG = 563,     ///< LFO 1 Log Frequency
+            L2LOG = 564,     ///< LFO 2 Log Frequency
+            L3LOG = 565,     ///< LFO 3 Log Frequency
+            L4LOG = 566,     ///< LFO 4 Log Frequency
+            L5LOG = 567,     ///< LFO 5 Log Frequency
+            L6LOG = 568,     ///< LFO 6 Log Frequency
+            L7LOG = 569,     ///< LFO 7 Log Frequency
+            L8LOG = 570,     ///< LFO 8 Log Frequency
             L1CEN = 571,     ///< LFO 1 Center
             L2CEN = 572,     ///< LFO 2 Center
             L3CEN = 573,     ///< LFO 3 Center
@@ -750,21 +751,21 @@ class Synth : public Midi::EventHandler, public SignalProducer
             L6SYN = 584,     ///< LFO 6 Tempo Synchronization
             L7SYN = 585,     ///< LFO 7 Tempo Synchronization
             L8SYN = 586,     ///< LFO 8 Tempo Synchronization
-            ECSYN = 587,     ///< Effects Chorus Tempo Synchronization
-            EESYN = 588,     ///< Effects Echo Tempo Synchronization
-            MF1LOG = 589,    ///< Modulator Filter 1 Logarithmic Frequency
-            MF2LOG = 590,    ///< Modulator Filter 2 Logarithmic Frequency
-            CF1LOG = 591,    ///< Carrier Filter 1 Logarithmic Frequency
-            CF2LOG = 592,    ///< Carrier Filter 2 Logarithmic Frequency
-            EF1LOG = 593,    ///< Effects Filter 1 Logarithmic Frequency
-            EF2LOG = 594,    ///< Effects Filter 2 Logarithmic Frequency
-            ECLOG = 595,     ///< Effects Chorus Logarithmic Filter Frequencies
-            ECLHQ = 596,     ///< Effects Chorus Logarithmic High-pass Filter Q Factor
-            ECLLG = 597,     ///< Effects Chorus Logarithmic LFO Frequency
-            EELOG = 598,     ///< Effects Echo Logarithmic Filter Frequencies
-            EELHQ = 599,     ///< Effects Echo Logarithmic High-pass Filter Q Factor
-            ERLOG = 600,     ///< Effects Reverb Logarithmic Filter Frequencies
-            ERLHQ = 601,     ///< Effects Reverb Logarithmic High-pass Filter Q Factor
+            ECSYN = 587,     ///< FX Chorus Tempo Synchronization
+            EESYN = 588,     ///< FX Echo Tempo Synchronization
+            MF1LOG = 589,    ///< Modulator Filter 1 Log Frequency
+            MF2LOG = 590,    ///< Modulator Filter 2 Log Frequency
+            CF1LOG = 591,    ///< Carrier Filter 1 Log Frequency
+            CF2LOG = 592,    ///< Carrier Filter 2 Log Frequency
+            EF1LOG = 593,    ///< FX Filter 1 Log Frequency
+            EF2LOG = 594,    ///< FX Filter 2 Log Frequency
+            ECLOG = 595,     ///< FX Chorus Log Filter Frequencies
+            ECLHQ = 596,     ///< FX Chorus Log High-pass Filter Q Factor
+            ECLLG = 597,     ///< FX Chorus Log LFO Frequency
+            EELOG = 598,     ///< FX Echo Log Filter Frequencies
+            EELHQ = 599,     ///< FX Echo Log High-pass Filter Q Factor
+            ERLOG = 600,     ///< FX Reverb Log Filter Frequencies
+            ERLHQ = 601,     ///< FX Reverb Log High-pass Filter Q Factor
             N1UPD = 602,     ///< Envelope 1 Update Mode
             N2UPD = 603,     ///< Envelope 2 Update Mode
             N3UPD = 604,     ///< Envelope 3 Update Mode
@@ -778,20 +779,20 @@ class Synth : public Midi::EventHandler, public SignalProducer
             N11UPD = 612,    ///< Envelope 11 Update Mode
             N12UPD = 613,    ///< Envelope 12 Update Mode
             NH = 614,        ///< Note Handling
-            ERTYP = 615,     ///< Effects Reverb Type
-            ECTYP = 616,     ///< Effects Chorus Type
+            ERTYP = 615,     ///< FX Reverb Type
+            ECTYP = 616,     ///< FX Chorus Type
             MTUN = 617,      ///< Modulator Tuning
             CTUN = 618,      ///< Carrier Tuning
             MOIA = 619,      ///< Modulator Oscillator Inaccuracy
             MOIS = 620,      ///< Modulator Oscillator Instability
             COIA = 621,      ///< Carrier Oscillator Inaccuracy
             COIS = 622,      ///< Carrier Oscillator Instability
-            MF1QLG = 623,    ///< Modulator Filter 1 Logarithmic Q Factor
-            MF2QLG = 624,    ///< Modulator Filter 2 Logarithmic Q Factor
-            CF1QLG = 625,    ///< Carrier Filter 1 Logarithmic Q Factor
-            CF2QLG = 626,    ///< Carrier Filter 2 Logarithmic Q Factor
-            EF1QLG = 627,    ///< Effects Filter 1 Logarithmic Q Factor
-            EF2QLG = 628,    ///< Effects Filter 2 Logarithmic Q Factor
+            MF1QLG = 623,    ///< Modulator Filter 1 Log Q Factor
+            MF2QLG = 624,    ///< Modulator Filter 2 Log Q Factor
+            CF1QLG = 625,    ///< Carrier Filter 1 Log Q Factor
+            CF2QLG = 626,    ///< Carrier Filter 2 Log Q Factor
+            EF1QLG = 627,    ///< FX Filter 1 Log Q Factor
+            EF2QLG = 628,    ///< FX Filter 2 Log Q Factor
             L1AEN = 629,     ///< LFO 1 Amplitude Envelope
             L2AEN = 630,     ///< LFO 2 Amplitude Envelope
             L3AEN = 631,     ///< LFO 3 Amplitude Envelope
@@ -880,12 +881,12 @@ class Synth : public Midi::EventHandler, public SignalProducer
             M30DCV = 714,    ///< Macro 30 Distortion Curve
             MFX4 = 715,      ///< Modulator Fine Detune x4
             CFX4 = 716,      ///< Carrier Fine Detune x4
-            EER1 = 717,      ///< Effects Echo Delay 1 Reversed
-            EER2 = 718,      ///< Effects Echo Delay 2 Reversed
-            ETSTYP = 719,    ///< Effects Tape Saturation Type
-            ETEND = 720,     ///< Effects Tape Position at End of Chain
-            EECM = 721,      ///< Effects Echo Side-Chain Compression Mode
-            ERCM = 722,      ///< Effects Reverb Side-Chain Compression Mode
+            EER1 = 717,      ///< FX Echo Delay 1 Reversed
+            EER2 = 718,      ///< FX Echo Delay 2 Reversed
+            ETSTYP = 719,    ///< FX Tape Saturation Type
+            ETEND = 720,     ///< FX Tape Position at End of Chain
+            EECM = 721,      ///< FX Echo Side-Chain Compression Mode
+            ERCM = 722,      ///< FX Reverb Side-Chain Compression Mode
             MPEST = 723,     ///< MPE Settings
 
             PARAM_ID_COUNT = 724,
@@ -895,152 +896,152 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Integer FLOAT_PARAMS = ParamId::MODE;
 
         enum ControllerId {
-            NONE =                      Midi::NONE,                 ///< None
-            MODULATION_WHEEL =          Midi::MODULATION_WHEEL,     ///< Modulation Wheel (CC 1)
-            BREATH =                    Midi::BREATH,               ///< Breath (CC 2)
-            UNDEFINED_1 =               Midi::UNDEFINED_1,          ///< Undefined (CC 3)
-            FOOT_PEDAL =                Midi::FOOT_PEDAL,           ///< Foot Pedal (CC 4)
-            PORTAMENTO_TIME =           Midi::PORTAMENTO_TIME,      ///< Portamento Time (CC 5)
-            DATA_ENTRY =                Midi::DATA_ENTRY,           ///< Data Entry (CC 6)
-            VOLUME =                    Midi::VOLUME,               ///< Volume (CC 7)
-            BALANCE =                   Midi::BALANCE,              ///< Balance (CC 8)
-            UNDEFINED_2 =               Midi::UNDEFINED_2,          ///< Undefined (CC 9)
-            PAN =                       Midi::PAN,                  ///< Pan (CC 10)
-            EXPRESSION_PEDAL =          Midi::EXPRESSION_PEDAL,     ///< Expression Pedal (CC 11)
-            FX_CTL_1 =                  Midi::FX_CTL_1,             ///< Effect Control 1 (CC 12)
-            FX_CTL_2 =                  Midi::FX_CTL_2,             ///< Effect Control 2 (CC 13)
-            UNDEFINED_3 =               Midi::UNDEFINED_3,          ///< Undefined (CC 14)
-            UNDEFINED_4 =               Midi::UNDEFINED_4,          ///< Undefined (CC 15)
-            GENERAL_1 =                 Midi::GENERAL_1,            ///< General 1 (CC 16)
-            GENERAL_2 =                 Midi::GENERAL_2,            ///< General 2 (CC 17)
-            GENERAL_3 =                 Midi::GENERAL_3,            ///< General 3 (CC 18)
-            GENERAL_4 =                 Midi::GENERAL_4,            ///< General 4 (CC 19)
-            UNDEFINED_5 =               Midi::UNDEFINED_5,          ///< Undefined (CC 20)
-            UNDEFINED_6 =               Midi::UNDEFINED_6,          ///< Undefined (CC 21)
-            UNDEFINED_7 =               Midi::UNDEFINED_7,          ///< Undefined (CC 22)
-            UNDEFINED_8 =               Midi::UNDEFINED_8,          ///< Undefined (CC 23)
-            UNDEFINED_9 =               Midi::UNDEFINED_9,          ///< Undefined (CC 24)
-            UNDEFINED_10 =              Midi::UNDEFINED_10,         ///< Undefined (CC 25)
-            UNDEFINED_11 =              Midi::UNDEFINED_11,         ///< Undefined (CC 26)
-            UNDEFINED_12 =              Midi::UNDEFINED_12,         ///< Undefined (CC 27)
-            UNDEFINED_13 =              Midi::UNDEFINED_13,         ///< Undefined (CC 28)
-            UNDEFINED_14 =              Midi::UNDEFINED_14,         ///< Undefined (CC 29)
-            UNDEFINED_15 =              Midi::UNDEFINED_15,         ///< Undefined (CC 30)
-            UNDEFINED_16 =              Midi::UNDEFINED_16,         ///< Undefined (CC 31)
-            SUSTAIN_PEDAL =             Midi::SUSTAIN_PEDAL,        ///< Sustain Pedal (CC 64)
-            SOUND_1 =                   Midi::SOUND_1,              ///< Sound 1 (CC 70)
-            SOUND_2 =                   Midi::SOUND_2,              ///< Sound 2 (CC 71)
-            SOUND_3 =                   Midi::SOUND_3,              ///< Sound 3 (CC 72)
-            SOUND_4 =                   Midi::SOUND_4,              ///< Sound 4 (CC 73)
-            SOUND_5 =                   Midi::SOUND_5,              ///< Sound 5 (CC 74)
-            SOUND_6 =                   Midi::SOUND_6,              ///< Sound 6 (CC 75)
-            SOUND_7 =                   Midi::SOUND_7,              ///< Sound 7 (CC 76)
-            SOUND_8 =                   Midi::SOUND_8,              ///< Sound 8 (CC 77)
-            SOUND_9 =                   Midi::SOUND_9,              ///< Sound 9 (CC 78)
-            SOUND_10 =                  Midi::SOUND_10,             ///< Sound 10 (CC 79)
-            UNDEFINED_17 =              Midi::UNDEFINED_17,         ///< Undefined (CC 85)
-            UNDEFINED_18 =              Midi::UNDEFINED_18,         ///< Undefined (CC 86)
-            UNDEFINED_19 =              Midi::UNDEFINED_19,         ///< Undefined (CC 87)
-            UNDEFINED_20 =              Midi::UNDEFINED_20,         ///< Undefined (CC 88)
-            UNDEFINED_21 =              Midi::UNDEFINED_21,         ///< Undefined (CC 89)
-            UNDEFINED_22 =              Midi::UNDEFINED_22,         ///< Undefined (CC 90)
-            FX_1 =                      Midi::FX_1,                 ///< Effect 1 (CC 91)
-            FX_2 =                      Midi::FX_2,                 ///< Effect 2 (CC 92)
-            FX_3 =                      Midi::FX_3,                 ///< Effect 3 (CC 93)
-            FX_4 =                      Midi::FX_4,                 ///< Effect 4 (CC 94)
-            FX_5 =                      Midi::FX_5,                 ///< Effect 5 (CC 95)
-            UNDEFINED_23 =              Midi::UNDEFINED_23,         ///< Undefined (CC 102)
-            UNDEFINED_24 =              Midi::UNDEFINED_24,         ///< Undefined (CC 103)
-            UNDEFINED_25 =              Midi::UNDEFINED_25,         ///< Undefined (CC 104)
-            UNDEFINED_26 =              Midi::UNDEFINED_26,         ///< Undefined (CC 105)
-            UNDEFINED_27 =              Midi::UNDEFINED_27,         ///< Undefined (CC 106)
-            UNDEFINED_28 =              Midi::UNDEFINED_28,         ///< Undefined (CC 107)
-            UNDEFINED_29 =              Midi::UNDEFINED_29,         ///< Undefined (CC 108)
-            UNDEFINED_30 =              Midi::UNDEFINED_30,         ///< Undefined (CC 109)
-            UNDEFINED_31 =              Midi::UNDEFINED_31,         ///< Undefined (CC 110)
-            UNDEFINED_32 =              Midi::UNDEFINED_32,         ///< Undefined (CC 111)
-            UNDEFINED_33 =              Midi::UNDEFINED_33,         ///< Undefined (CC 112)
-            UNDEFINED_34 =              Midi::UNDEFINED_34,         ///< Undefined (CC 113)
-            UNDEFINED_35 =              Midi::UNDEFINED_35,         ///< Undefined (CC 114)
-            UNDEFINED_36 =              Midi::UNDEFINED_36,         ///< Undefined (CC 115)
-            UNDEFINED_37 =              Midi::UNDEFINED_37,         ///< Undefined (CC 116)
-            UNDEFINED_38 =              Midi::UNDEFINED_38,         ///< Undefined (CC 117)
-            UNDEFINED_39 =              Midi::UNDEFINED_39,         ///< Undefined (CC 118)
-            UNDEFINED_40 =              Midi::UNDEFINED_40,         ///< Undefined (CC 119)
+            NONE =                      Midi::NONE,
+            MODULATION_WHEEL =          Midi::MODULATION_WHEEL,
+            BREATH =                    Midi::BREATH,
+            UNDEFINED_1 =               Midi::UNDEFINED_1,
+            FOOT_PEDAL =                Midi::FOOT_PEDAL,
+            PORTAMENTO_TIME =           Midi::PORTAMENTO_TIME,
+            DATA_ENTRY =                Midi::DATA_ENTRY,
+            VOLUME =                    Midi::VOLUME,
+            BALANCE =                   Midi::BALANCE,
+            UNDEFINED_2 =               Midi::UNDEFINED_2,
+            PAN =                       Midi::PAN,
+            EXPRESSION_PEDAL =          Midi::EXPRESSION_PEDAL,
+            FX_CTL_1 =                  Midi::FX_CTL_1,
+            FX_CTL_2 =                  Midi::FX_CTL_2,
+            UNDEFINED_3 =               Midi::UNDEFINED_3,
+            UNDEFINED_4 =               Midi::UNDEFINED_4,
+            GENERAL_1 =                 Midi::GENERAL_1,
+            GENERAL_2 =                 Midi::GENERAL_2,
+            GENERAL_3 =                 Midi::GENERAL_3,
+            GENERAL_4 =                 Midi::GENERAL_4,
+            UNDEFINED_5 =               Midi::UNDEFINED_5,
+            UNDEFINED_6 =               Midi::UNDEFINED_6,
+            UNDEFINED_7 =               Midi::UNDEFINED_7,
+            UNDEFINED_8 =               Midi::UNDEFINED_8,
+            UNDEFINED_9 =               Midi::UNDEFINED_9,
+            UNDEFINED_10 =              Midi::UNDEFINED_10,
+            UNDEFINED_11 =              Midi::UNDEFINED_11,
+            UNDEFINED_12 =              Midi::UNDEFINED_12,
+            UNDEFINED_13 =              Midi::UNDEFINED_13,
+            UNDEFINED_14 =              Midi::UNDEFINED_14,
+            UNDEFINED_15 =              Midi::UNDEFINED_15,
+            UNDEFINED_16 =              Midi::UNDEFINED_16,
+            SUSTAIN_PEDAL =             Midi::SUSTAIN_PEDAL,
+            SOUND_1 =                   Midi::SOUND_1,
+            SOUND_2 =                   Midi::SOUND_2,
+            SOUND_3 =                   Midi::SOUND_3,
+            SOUND_4 =                   Midi::SOUND_4,
+            SOUND_5 =                   Midi::SOUND_5,
+            SOUND_6 =                   Midi::SOUND_6,
+            SOUND_7 =                   Midi::SOUND_7,
+            SOUND_8 =                   Midi::SOUND_8,
+            SOUND_9 =                   Midi::SOUND_9,
+            SOUND_10 =                  Midi::SOUND_10,
+            UNDEFINED_17 =              Midi::UNDEFINED_17,
+            UNDEFINED_18 =              Midi::UNDEFINED_18,
+            UNDEFINED_19 =              Midi::UNDEFINED_19,
+            UNDEFINED_20 =              Midi::UNDEFINED_20,
+            UNDEFINED_21 =              Midi::UNDEFINED_21,
+            UNDEFINED_22 =              Midi::UNDEFINED_22,
+            FX_1 =                      Midi::FX_1,
+            FX_2 =                      Midi::FX_2,
+            FX_3 =                      Midi::FX_3,
+            FX_4 =                      Midi::FX_4,
+            FX_5 =                      Midi::FX_5,
+            UNDEFINED_23 =              Midi::UNDEFINED_23,
+            UNDEFINED_24 =              Midi::UNDEFINED_24,
+            UNDEFINED_25 =              Midi::UNDEFINED_25,
+            UNDEFINED_26 =              Midi::UNDEFINED_26,
+            UNDEFINED_27 =              Midi::UNDEFINED_27,
+            UNDEFINED_28 =              Midi::UNDEFINED_28,
+            UNDEFINED_29 =              Midi::UNDEFINED_29,
+            UNDEFINED_30 =              Midi::UNDEFINED_30,
+            UNDEFINED_31 =              Midi::UNDEFINED_31,
+            UNDEFINED_32 =              Midi::UNDEFINED_32,
+            UNDEFINED_33 =              Midi::UNDEFINED_33,
+            UNDEFINED_34 =              Midi::UNDEFINED_34,
+            UNDEFINED_35 =              Midi::UNDEFINED_35,
+            UNDEFINED_36 =              Midi::UNDEFINED_36,
+            UNDEFINED_37 =              Midi::UNDEFINED_37,
+            UNDEFINED_38 =              Midi::UNDEFINED_38,
+            UNDEFINED_39 =              Midi::UNDEFINED_39,
+            UNDEFINED_40 =              Midi::UNDEFINED_40,
 
-            PITCH_WHEEL =               128,                        ///< Pitch Wheel
+            PITCH_WHEEL =               128,
 
-            TRIGGERED_NOTE =            129,                        ///< Triggered Note
-            TRIGGERED_VELOCITY =        130,                        ///< Triggered Note's Velocity
+            TRIGGERED_NOTE =            129,
+            TRIGGERED_VELOCITY =        130,
 
-            MACRO_1 =                   131,                        ///< Macro 1
-            MACRO_2 =                   132,                        ///< Macro 2
-            MACRO_3 =                   133,                        ///< Macro 3
-            MACRO_4 =                   134,                        ///< Macro 4
-            MACRO_5 =                   135,                        ///< Macro 5
-            MACRO_6 =                   136,                        ///< Macro 6
-            MACRO_7 =                   137,                        ///< Macro 7
-            MACRO_8 =                   138,                        ///< Macro 8
-            MACRO_9 =                   139,                        ///< Macro 9
-            MACRO_10 =                  140,                        ///< Macro 10
+            MACRO_1 =                   131,
+            MACRO_2 =                   132,
+            MACRO_3 =                   133,
+            MACRO_4 =                   134,
+            MACRO_5 =                   135,
+            MACRO_6 =                   136,
+            MACRO_7 =                   137,
+            MACRO_8 =                   138,
+            MACRO_9 =                   139,
+            MACRO_10 =                  140,
 
-            LFO_1 =                     141,                        ///< LFO 1
-            LFO_2 =                     142,                        ///< LFO 2
-            LFO_3 =                     143,                        ///< LFO 3
-            LFO_4 =                     144,                        ///< LFO 4
-            LFO_5 =                     145,                        ///< LFO 5
-            LFO_6 =                     146,                        ///< LFO 6
-            LFO_7 =                     147,                        ///< LFO 7
-            LFO_8 =                     148,                        ///< LFO 8
+            LFO_1 =                     141,
+            LFO_2 =                     142,
+            LFO_3 =                     143,
+            LFO_4 =                     144,
+            LFO_5 =                     145,
+            LFO_6 =                     146,
+            LFO_7 =                     147,
+            LFO_8 =                     148,
 
-            ENVELOPE_1 =                149,                        ///< Envelope 1
-            ENVELOPE_2 =                150,                        ///< Envelope 2
-            ENVELOPE_3 =                151,                        ///< Envelope 3
-            ENVELOPE_4 =                152,                        ///< Envelope 4
-            ENVELOPE_5 =                153,                        ///< Envelope 5
-            ENVELOPE_6 =                154,                        ///< Envelope 6
+            ENVELOPE_1 =                149,
+            ENVELOPE_2 =                150,
+            ENVELOPE_3 =                151,
+            ENVELOPE_4 =                152,
+            ENVELOPE_5 =                153,
+            ENVELOPE_6 =                154,
 
-            CHANNEL_PRESSURE =          155,                        ///< Channel Pressure
+            CHANNEL_PRESSURE =          155,
 
-            MIDI_LEARN =                156,                        ///< MIDI Learn
+            MIDI_LEARN =                156,
 
-            MACRO_11 =                  157,                        ///< Macro 11
-            MACRO_12 =                  158,                        ///< Macro 12
-            MACRO_13 =                  159,                        ///< Macro 13
-            MACRO_14 =                  160,                        ///< Macro 14
-            MACRO_15 =                  161,                        ///< Macro 15
-            MACRO_16 =                  162,                        ///< Macro 16
-            MACRO_17 =                  163,                        ///< Macro 17
-            MACRO_18 =                  164,                        ///< Macro 18
-            MACRO_19 =                  165,                        ///< Macro 19
-            MACRO_20 =                  166,                        ///< Macro 20
+            MACRO_11 =                  157,
+            MACRO_12 =                  158,
+            MACRO_13 =                  159,
+            MACRO_14 =                  160,
+            MACRO_15 =                  161,
+            MACRO_16 =                  162,
+            MACRO_17 =                  163,
+            MACRO_18 =                  164,
+            MACRO_19 =                  165,
+            MACRO_20 =                  166,
 
-            OSC_1_PEAK =                167,                        ///< Oscillator 1 Peak
-            OSC_2_PEAK =                168,                        ///< Oscillator 1 Peak
-            VOL_1_PEAK =                169,                        ///< Volume 1 Peak
-            VOL_2_PEAK =                170,                        ///< Volume 2 Peak
-            VOL_3_PEAK =                171,                        ///< Volume 3 Peak
+            OSC_1_PEAK =                167,
+            OSC_2_PEAK =                168,
+            VOL_1_PEAK =                169,
+            VOL_2_PEAK =                170,
+            VOL_3_PEAK =                171,
 
-            ENVELOPE_7 =                172,                        ///< Envelope 7
-            ENVELOPE_8 =                173,                        ///< Envelope 8
-            ENVELOPE_9 =                174,                        ///< Envelope 9
-            ENVELOPE_10 =               175,                        ///< Envelope 10
-            ENVELOPE_11 =               176,                        ///< Envelope 11
-            ENVELOPE_12 =               177,                        ///< Envelope 12
+            ENVELOPE_7 =                172,
+            ENVELOPE_8 =                173,
+            ENVELOPE_9 =                174,
+            ENVELOPE_10 =               175,
+            ENVELOPE_11 =               176,
+            ENVELOPE_12 =               177,
 
-            RELEASED_NOTE =             178,                        ///< Released Note
-            RELEASED_VELOCITY =         179,                        ///< Released Note's Velocity
+            RELEASED_NOTE =             178,
+            RELEASED_VELOCITY =         179,
 
-            MACRO_21 =                  180,                        ///< Macro 21
-            MACRO_22 =                  181,                        ///< Macro 22
-            MACRO_23 =                  182,                        ///< Macro 23
-            MACRO_24 =                  183,                        ///< Macro 24
-            MACRO_25 =                  184,                        ///< Macro 25
-            MACRO_26 =                  185,                        ///< Macro 26
-            MACRO_27 =                  186,                        ///< Macro 27
-            MACRO_28 =                  187,                        ///< Macro 28
-            MACRO_29 =                  188,                        ///< Macro 29
-            MACRO_30 =                  189,                        ///< Macro 30
+            MACRO_21 =                  180,
+            MACRO_22 =                  181,
+            MACRO_23 =                  182,
+            MACRO_24 =                  183,
+            MACRO_25 =                  184,
+            MACRO_26 =                  185,
+            MACRO_27 =                  186,
+            MACRO_28 =                  187,
+            MACRO_29 =                  188,
+            MACRO_30 =                  189,
 
             CONTROLLER_ID_COUNT =       190,
             INVALID_CONTROLLER_ID =     CONTROLLER_ID_COUNT,
@@ -1095,24 +1096,24 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Byte MPE_U02 = 29;
         static constexpr Byte MPE_U01 = 30;
 
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC                      = 0b0000;
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD                 = 0b0001;
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC_IGSUS                = 0b0010;
-        static constexpr Byte NOTE_HANDLING_MONOPHONIC_HOLD_IGSUS           = 0b0011;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC                      = 0b0100;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD                 = 0b0101;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_IGSUS                = 0b0110;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_HOLD_IGSUS           = 0b0111;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER            = 0b1000;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD       = 0b1001;
-        static constexpr Byte NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS = 0b1010;
+        static constexpr Byte NOTE_HANDLING_MONO                      = 0b0000;
+        static constexpr Byte NOTE_HANDLING_MONO_HOLD                 = 0b0001;
+        static constexpr Byte NOTE_HANDLING_MONO_IGSUS                = 0b0010;
+        static constexpr Byte NOTE_HANDLING_MONO_HOLD_IGSUS           = 0b0011;
+        static constexpr Byte NOTE_HANDLING_POLY                      = 0b0100;
+        static constexpr Byte NOTE_HANDLING_POLY_HOLD                 = 0b0101;
+        static constexpr Byte NOTE_HANDLING_POLY_IGSUS                = 0b0110;
+        static constexpr Byte NOTE_HANDLING_POLY_HOLD_IGSUS           = 0b0111;
+        static constexpr Byte NOTE_HANDLING_POLY_RETRIGGER            = 0b1000;
+        static constexpr Byte NOTE_HANDLING_POLY_RETRIGGER_HOLD       = 0b1001;
+        static constexpr Byte NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS = 0b1010;
 
     private:
-        static constexpr Byte NOTE_HANDLING_MASK_HOLD                       = 0b0001;
-        static constexpr Byte NOTE_HANDLING_MASK_IGSUS                      = 0b0010;
-        static constexpr Byte NOTE_HANDLING_MASK_POLYPHONIC                 = 0b0100;
-        static constexpr Byte NOTE_HANDLING_MASK_RETRIGGER                  = 0b1000;
-        static constexpr Byte NOTE_HANDLING_MASK_POLY_OR_RETRIG             = 0b1100;
+        static constexpr Byte NOTE_HANDLING_MASK_HOLD                 = 0b0001;
+        static constexpr Byte NOTE_HANDLING_MASK_IGSUS                = 0b0010;
+        static constexpr Byte NOTE_HANDLING_MASK_POLYPHONIC           = 0b0100;
+        static constexpr Byte NOTE_HANDLING_MASK_RETRIGGER            = 0b1000;
+        static constexpr Byte NOTE_HANDLING_MASK_POLY_OR_RETRIG       = 0b1100;
 
     public:
         class Message
@@ -1168,12 +1169,19 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 {
                 }
 
-                NoteTuning& operator=(NoteTuning const& note_tuning) noexcept = default;
-                NoteTuning& operator=(NoteTuning&& note_tuning) noexcept = default;
+                NoteTuning& operator=(
+                    NoteTuning const& note_tuning
+                ) noexcept = default;
+
+                NoteTuning& operator=(
+                    NoteTuning&& note_tuning
+                ) noexcept = default;
 
                 bool is_valid() const noexcept
                 {
-                    return channel <= Midi::CHANNEL_MAX && note <= Midi::NOTE_MAX;
+                    return (
+                        channel <= Midi::CHANNEL_MAX && note <= Midi::NOTE_MAX
+                    );
                 }
 
                 Frequency frequency;
@@ -1196,8 +1204,14 @@ class Synth : public Midi::EventHandler, public SignalProducer
         explicit Synth(Integer const samples_between_gc = 8000) noexcept;
         virtual ~Synth() noexcept override;
 
-        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_sample_rate(
+            Frequency const new_sample_rate
+        ) noexcept override;
+
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
+
         virtual void reset() noexcept override;
 
         bool is_dirty() const noexcept;
@@ -1217,7 +1231,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         void mts_esp_disconnected() noexcept;
         NoteTunings& collect_active_notes(Integer& active_notes_count) noexcept;
         void update_note_tuning(NoteTuning const& note_tuning) noexcept;
-        void update_note_tunings(NoteTunings const& note_tunings, Integer const count) noexcept;
+
+        void update_note_tunings(
+            NoteTunings const& note_tunings,
+            Integer const count
+        ) noexcept;
 
         bool is_polyphonic() const noexcept;
         bool is_monophonic() const noexcept;
@@ -1265,7 +1283,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
          */
         void process_message(Message const& message) noexcept;
 
-        std::string const& get_param_name(ParamId const param_id) const noexcept;
+        std::string const& get_param_name(
+            ParamId const param_id
+        ) const noexcept;
+
         ParamId get_param_id(std::string const& name) const noexcept;
 
 #ifdef JS80P_ASSERTIONS
@@ -1487,7 +1508,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
 
                 void collect_active_voices() noexcept;
 
-                template<class VoiceClass, bool should_sync_oscillator_inaccuracy, bool should_sync_oscillator_instability>
+                template<
+                    class VoiceClass,
+                    bool should_sync_oscillator_inaccuracy,
+                    bool should_sync_oscillator_instability
+                >
                 void render_voices(
                     VoiceClass* const (&voices)[POLYPHONY],
                     size_t const voices_count,
@@ -1548,7 +1573,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
                 ParamIdHashTable() noexcept;
                 ~ParamIdHashTable() noexcept;
 
-                void add(std::string const& name, ParamId const param_id) noexcept;
+                void add(
+                    std::string const& name,
+                    ParamId const param_id
+                ) noexcept;
+
                 ParamId lookup(std::string const& name) noexcept;
 
 #ifdef JS80P_ASSERTIONS
@@ -1567,10 +1596,18 @@ class Synth : public Midi::EventHandler, public SignalProducer
                         static constexpr Integer NAME_MAX_INDEX = NAME_SIZE - 1;
 
                         Entry() noexcept;
-                        Entry(char const* const name, ParamId const param_id) noexcept;
+
+                        Entry(
+                            char const* const name,
+                            ParamId const param_id
+                        ) noexcept;
+
                         ~Entry() noexcept;
 
-                        void set(char const* const name, ParamId const param_id) noexcept;
+                        void set(
+                            char const* const name,
+                            ParamId const param_id
+                        ) noexcept;
 
                         Entry *next;
                         char name[NAME_SIZE];
@@ -1598,14 +1635,31 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 MidiControllerMessage();
-                MidiControllerMessage(MidiControllerMessage const& message) = default;
-                MidiControllerMessage(MidiControllerMessage&& message) = default;
 
-                MidiControllerMessage(Seconds const time_offset, Midi::Word const value);
+                MidiControllerMessage(
+                    MidiControllerMessage const& message
+                ) = default;
 
-                bool operator==(MidiControllerMessage const& message) const noexcept;
-                MidiControllerMessage& operator=(MidiControllerMessage const& message) noexcept = default;
-                MidiControllerMessage& operator=(MidiControllerMessage&& message) noexcept = default;
+                MidiControllerMessage(
+                    MidiControllerMessage&& message
+                ) = default;
+
+                MidiControllerMessage(
+                    Seconds const time_offset,
+                    Midi::Word const value
+                );
+
+                bool operator==(
+                    MidiControllerMessage const& message
+                ) const noexcept;
+
+                MidiControllerMessage& operator=(
+                    MidiControllerMessage const& message
+                ) noexcept = default;
+
+                MidiControllerMessage& operator=(
+                    MidiControllerMessage&& message
+                ) noexcept = default;
 
             private:
                 Seconds time_offset;
@@ -1616,7 +1670,11 @@ class Synth : public Midi::EventHandler, public SignalProducer
         {
             public:
                 DeferredNoteOff();
-                DeferredNoteOff(DeferredNoteOff const& deferred_note_off) = default;
+
+                DeferredNoteOff(
+                    DeferredNoteOff const& deferred_note_off
+                ) = default;
+
                 DeferredNoteOff(DeferredNoteOff&& deferred_note_off) = default;
 
                 DeferredNoteOff(
@@ -1628,8 +1686,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
                     Integer const voice
                 );
 
-                DeferredNoteOff& operator=(DeferredNoteOff const& deferred_note_off) noexcept = default;
-                DeferredNoteOff& operator=(DeferredNoteOff&& deferred_note_off) noexcept = default;
+                DeferredNoteOff& operator=(
+                    DeferredNoteOff const& deferred_note_off
+                ) noexcept = default;
+
+                DeferredNoteOff& operator=(
+                    DeferredNoteOff&& deferred_note_off
+                ) noexcept = default;
 
                 Integer get_note_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;
@@ -1722,7 +1785,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Carrier::Params const& carrier_params
         ) noexcept;
 
-        static std::vector<bool> initialize_supported_midi_controllers() noexcept;
+        static std::vector<bool> initialize_supported_midi_controllers(
+        ) noexcept;
 
         static unsigned int make_rng_seed(void const* const ptr) noexcept;
 
@@ -1757,7 +1821,10 @@ class Synth : public Midi::EventHandler, public SignalProducer
             ParamType const type
         ) const noexcept;
 
-        Midi::Channel map_mpe_channel(Midi::Channel const channel) const noexcept;
+        Midi::Channel map_mpe_channel(
+            Midi::Channel const channel
+        ) const noexcept;
+
         Number midi_byte_to_float(Midi::Byte const midi_byte) const noexcept;
         Number midi_word_to_float(Midi::Word const midi_word) const noexcept;
 
@@ -1905,8 +1972,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Math::RNG rng;
 
         Sample const* const* raw_output;
-        MidiControllerMessage previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];
-        BiquadFilterSharedBuffers biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
+
+        MidiControllerMessage
+            previous_controller_message[ControllerId::CONTROLLER_ID_COUNT];
+
+        BiquadFilterSharedBuffers
+            biquad_filter_shared_buffers[BIQUAD_FILTER_SHARED_BUFFERS];
+
         FloatParamS* sample_evaluated_float_params[ParamId::PARAM_ID_COUNT];
         FloatParamB* block_evaluated_float_params[ParamId::PARAM_ID_COUNT];
         ByteParam* byte_params[ParamId::PARAM_ID_COUNT];

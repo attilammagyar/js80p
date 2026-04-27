@@ -432,7 +432,7 @@ TEST(all_notes_off_message_clears_note_stack, {
 
     synth.resume();
 
-    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONOPHONIC);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONO);
 
     synth.modulator_params.amplitude.set_value(1.0);
     synth.modulator_params.volume.set_value(1.0);
@@ -814,7 +814,7 @@ TEST(hold_note, {
     set_param(
         synth_2,
         Synth::ParamId::NH,
-        synth_2.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLYPHONIC_HOLD)
+        synth_2.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY_HOLD)
     );
     synth_2.process_messages();
 
@@ -983,7 +983,7 @@ void hold_mode_on(Synth& synth)
     set_param(
         synth,
         Synth::ParamId::NH,
-        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLYPHONIC_HOLD)
+        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY_HOLD)
     );
 }
 
@@ -993,7 +993,7 @@ void hold_mode_off(Synth& synth)
     set_param(
         synth,
         Synth::ParamId::NH,
-        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLYPHONIC)
+        synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY)
     );
 }
 
@@ -1577,48 +1577,42 @@ TEST(can_switch_between_polyphonic_and_monophonic_modes, {
     Synth synth;
 
     synth.mono_mode_on(0.0, 0);
-    assert_eq(Synth::NOTE_HANDLING_MONOPHONIC, synth.note_handling.get_value());
+    assert_eq(Synth::NOTE_HANDLING_MONO, synth.note_handling.get_value());
     assert_false(synth.is_polyphonic());
     assert_true(synth.is_monophonic());
     assert_false(synth.is_holding());
     assert_false(synth.is_ignoring_sustain_pedal());
 
     synth.mono_mode_off(0.0, 0);
-    assert_eq(Synth::NOTE_HANDLING_POLYPHONIC, synth.note_handling.get_value());
+    assert_eq(Synth::NOTE_HANDLING_POLY, synth.note_handling.get_value());
     assert_true(synth.is_polyphonic());
     assert_false(synth.is_monophonic());
     assert_false(synth.is_holding());
     assert_false(synth.is_ignoring_sustain_pedal());
 
-    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLYPHONIC_HOLD);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLY_HOLD);
     synth.mono_mode_on(0.0, 0);
-    assert_eq(
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD,
-        synth.note_handling.get_value()
-    );
+    assert_eq(Synth::NOTE_HANDLING_MONO_HOLD, synth.note_handling.get_value());
     assert_false(synth.is_polyphonic());
     assert_true(synth.is_monophonic());
     assert_true(synth.is_holding());
     assert_false(synth.is_ignoring_sustain_pedal());
 
     synth.mono_mode_off(0.0, 0);
-    assert_eq(
-        Synth::NOTE_HANDLING_POLYPHONIC_HOLD,
-        synth.note_handling.get_value()
-    );
+    assert_eq(Synth::NOTE_HANDLING_POLY_HOLD, synth.note_handling.get_value());
     assert_true(synth.is_polyphonic());
     assert_false(synth.is_monophonic());
     assert_true(synth.is_holding());
     assert_false(synth.is_ignoring_sustain_pedal());
 
-    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLYPHONIC_RETRIGGER);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLY_RETRIGGER);
     synth.mono_mode_on(0.0, 0);
-    assert_eq(Synth::NOTE_HANDLING_MONOPHONIC, synth.note_handling.get_value());
+    assert_eq(Synth::NOTE_HANDLING_MONO, synth.note_handling.get_value());
 
-    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLYPHONIC_HOLD_IGSUS);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLY_HOLD_IGSUS);
     synth.mono_mode_on(0.0, 0);
     assert_eq(
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD_IGSUS,
+        Synth::NOTE_HANDLING_MONO_HOLD_IGSUS,
         synth.note_handling.get_value()
     );
     assert_false(synth.is_polyphonic());
@@ -1671,7 +1665,7 @@ TEST(triggered_and_released_note_and_velocity_controllers_are_maintained, {
     assert_eq(A_2, synth.released_note.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
     assert_eq(48.0 / 127.0, synth.released_velocity.get_value(PARAM_DEFAULT_MPE_CHANNEL), tolerance);
 
-    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONOPHONIC);
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_MONO);
 
     synth.note_on(0.0, 1, Midi::NOTE_A_2, 36);
     synth.note_on(0.0, 1, Midi::NOTE_A_5, 96);
@@ -1735,7 +1729,7 @@ TEST(when_sustained_notes_are_to_be_retriggered_then_note_on_retriggers_already_
     );
     synth_1.note_off(1.0, 1, Midi::NOTE_A_0, 100);
 
-    synth_2.note_handling.set_value(Synth::NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD);
+    synth_2.note_handling.set_value(Synth::NOTE_HANDLING_POLY_RETRIGGER_HOLD);
     synth_2.note_on(0.0, 1, Midi::NOTE_A_0, 100);
     synth_2.note_off(0.1, 1, Midi::NOTE_A_0, 100);
     synth_2.note_on(0.5, 1, Midi::NOTE_A_0, 100);
@@ -1824,23 +1818,21 @@ void test_ignore_sustain_pedal(
 
 TEST(when_sustain_pedal_is_ignored_in_non_hold_modes_then_it_only_updates_its_midi_controller, {
     test_ignore_sustain_pedal(
-        Synth::NOTE_HANDLING_MONOPHONIC_IGSUS, Synth::NOTE_HANDLING_MONOPHONIC
+        Synth::NOTE_HANDLING_MONO_IGSUS, Synth::NOTE_HANDLING_MONO
     );
     test_ignore_sustain_pedal(
-        Synth::NOTE_HANDLING_POLYPHONIC_IGSUS, Synth::NOTE_HANDLING_POLYPHONIC
+        Synth::NOTE_HANDLING_POLY_IGSUS, Synth::NOTE_HANDLING_POLY
     );
 
     test_ignore_sustain_pedal(
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD_IGSUS,
-        Synth::NOTE_HANDLING_MONOPHONIC_HOLD
+        Synth::NOTE_HANDLING_MONO_HOLD_IGSUS, Synth::NOTE_HANDLING_MONO_HOLD
     );
     test_ignore_sustain_pedal(
-        Synth::NOTE_HANDLING_POLYPHONIC_HOLD_IGSUS,
-        Synth::NOTE_HANDLING_POLYPHONIC_HOLD
+        Synth::NOTE_HANDLING_POLY_HOLD_IGSUS, Synth::NOTE_HANDLING_POLY_HOLD
     );
     test_ignore_sustain_pedal(
-        Synth::NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD_IGSUS,
-        Synth::NOTE_HANDLING_POLYPHONIC_RETRIGGER_HOLD
+        Synth::NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS,
+        Synth::NOTE_HANDLING_POLY_RETRIGGER_HOLD
     );
 })
 
