@@ -50,7 +50,10 @@ Tables::Tables()
         TYPE_SIN,
         [&](Number const x, Number& y, Number& antiderivative) {
             y = std::sin(x * Math::PI_HALF);
-            antiderivative = 1.0071750842587022 + (-2.0 / Math::PI) * std::cos(x * Math::PI_HALF);
+            antiderivative = (
+                1.0071750842587022
+                + (-2.0 / Math::PI) * std::cos(x * Math::PI_HALF)
+            );
         },
         0.99,
         0.9,
@@ -86,7 +89,9 @@ Tables::Tables()
             Number const sign = x < 0.0 ? -1.0 : 1.0;
 
             y = sign * std::sqrt(x_abs);
-            antiderivative = 0.35444165128058613 + (2.0 / 3.0) * std::pow(x_abs, 3.0 / 2.0);
+            antiderivative = (
+                0.35444165128058613 + (2.0 / 3.0) * std::pow(x_abs, 3.0 / 2.0)
+            );
         },
         0.97,
         0.9,
@@ -116,7 +121,9 @@ Tables::Tables()
         TYPE_CBRT,
         [&](Number const x, Number& y, Number& antiderivative) {
             y = std::pow(x, 1.0 / 3.0);
-            antiderivative = 0.27124720583083983 + (3.0 / 4.0) * std::pow(x, 4.0 / 3.0);
+            antiderivative = (
+                0.27124720583083983 + (3.0 / 4.0) * std::pow(x, 4.0 / 3.0)
+            );
         },
         0.97,
         0.9,
@@ -951,7 +958,9 @@ Sample const* const* Distortion<InputSignalProducerClass>::initialize_rendering(
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
-    level_buffer = FloatParamS::produce_if_not_constant(level, round, sample_count);
+    level_buffer = FloatParamS::produce_if_not_constant(
+        level, round, sample_count
+    );
 
     if (this->input.is_silent(round, sample_count)) {
         return this->input_was_silent(round);
@@ -974,7 +983,9 @@ Sample const* const* Distortion<InputSignalProducerClass>::initialize_rendering(
         Table const& F0_table = tables.get_F0_table(current_type);
 
         for (Integer c = 0; c != this->channels; ++c) {
-            F0_previous_input_sample[c] = F0(F0_table, previous_input_sample[c]);
+            F0_previous_input_sample[c] = F0(
+                F0_table, previous_input_sample[c]
+            );
         }
     }
 
