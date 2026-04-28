@@ -166,7 +166,9 @@ Echo<InputSignalProducerClass>::Echo(
     this->register_child(comb_filter_1);
     this->register_child(comb_filter_2);
 
-    comb_filter_1.delay.set_feedback_signal_producer(comb_filter_2.high_shelf_filter);
+    comb_filter_1.delay.set_feedback_signal_producer(
+        comb_filter_2.high_shelf_filter
+    );
 
     comb_filter_1.delay.set_reverse_toggle_param(reversed_1);
     comb_filter_2.delay.set_reverse_toggle_param(reversed_2);
@@ -179,7 +181,9 @@ Sample const* const* Echo<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+        SideChainCompressableEffect<
+            InputSignalProducerClass
+        >::initialize_rendering(
             round, sample_count
         )
     );
@@ -206,8 +210,12 @@ void Echo<InputSignalProducerClass>::render(
         Integer const end_sample_index,
         Sample** const buffer
 ) noexcept {
-    Sample const* const* const comb_filter_1_buffer = this->comb_filter_1_buffer;
-    Sample const* const* const comb_filter_2_buffer = this->comb_filter_2_buffer;
+    Sample const* const* const comb_filter_1_buffer = (
+        this->comb_filter_1_buffer
+    );
+    Sample const* const* const comb_filter_2_buffer = (
+        this->comb_filter_2_buffer
+    );
     Integer const channels = this->channels;
 
     for (Integer c = 0; c != channels; ++c) {
@@ -216,7 +224,9 @@ void Echo<InputSignalProducerClass>::render(
         Sample const* const comb_filter_2_channel = comb_filter_2_buffer[c];
 
         for (Integer i = first_sample_index; i != end_sample_index; ++i) {
-            out_channel[i] = comb_filter_1_channel[i] + comb_filter_2_channel[i];
+            out_channel[i] = (
+                comb_filter_1_channel[i] + comb_filter_2_channel[i]
+            );
         }
     }
 
