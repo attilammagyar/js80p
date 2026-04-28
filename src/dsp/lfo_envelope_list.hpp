@@ -44,12 +44,20 @@ class LFOEnvelopeList
 
                 operator Byte() const noexcept;
 
-                EnvelopeIndex& operator=(EnvelopeIndex const& envelope_index) = delete;
-                EnvelopeIndex& operator=(EnvelopeIndex&& envelope_index) = delete;
+                EnvelopeIndex& operator=(
+                    EnvelopeIndex const& envelope_index
+                ) = delete;
+
+                EnvelopeIndex& operator=(
+                    EnvelopeIndex&& envelope_index
+                ) = delete;
+
                 EnvelopeIndex& operator=(Byte const envelope_index);
 
             private:
-                static constexpr Byte index_to_offset(Byte const index) noexcept;
+                static constexpr Byte index_to_offset(
+                    Byte const index
+                ) noexcept;
 
                 static constexpr Byte byte_at_offset(
                     uint64_t const list,

@@ -80,10 +80,12 @@ LFOEnvelopeList::EnvelopeIndex& LFOEnvelopeList::EnvelopeIndex::operator=(
 LFOEnvelopeList::LFOEnvelopeList() : list(0)
 {
     JS80P_ASSERT(
-        (Integer)Constants::INVALID_ENVELOPE_INDEX <= (Integer)((1 << Constants::ENVELOPE_INDEX_BITS) - 1)
+        (Integer)Constants::INVALID_ENVELOPE_INDEX
+        <= (Integer)((1 << Constants::ENVELOPE_INDEX_BITS) - 1)
     );
     JS80P_ASSERT(
-        (size_t)(Constants::ENVELOPE_INDEX_BITS * Constants::ENVELOPES) <= sizeof(list) * 8
+        (size_t)(Constants::ENVELOPE_INDEX_BITS * Constants::ENVELOPES)
+        <= sizeof(list) * 8
     );
 
     clear();
@@ -92,7 +94,9 @@ LFOEnvelopeList::LFOEnvelopeList() : list(0)
 
 void LFOEnvelopeList::clear() noexcept
 {
-    for (Byte index = 0; index != Constants::PARAM_LFO_ENVELOPE_STATES; ++index) {
+    Byte index;
+
+    for (index = 0; index != Constants::PARAM_LFO_ENVELOPE_STATES; ++index) {
         (*this)[index] = Constants::INVALID_ENVELOPE_INDEX;
     }
 }

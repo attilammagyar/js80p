@@ -81,7 +81,10 @@ void Macro::update(Midi::Channel const midi_channel) noexcept
     Number const shifted_input_value = (
         input_value < 0.5
             ? 2.0 * input_value * midpoint_value
-            : (midpoint_value + (2.0 * input_value - 1.0) * (1.0 - midpoint_value))
+            : (
+                midpoint_value
+                + (2.0 * input_value - 1.0) * (1.0 - midpoint_value)
+            )
     );
     Number const min_value = min.get_value();
     Number const computed_value = Math::randomize(
@@ -107,14 +110,42 @@ bool Macro::update_change_indices(Midi::Channel const midi_channel) noexcept
 {
     bool is_dirty;
 
-    is_dirty = update_change_index<FloatParamB>(midi_channel, midpoint, midpoint_change_indices);
-    is_dirty = update_change_index<FloatParamB>(midi_channel, input, input_change_indices) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(midi_channel, min, min_change_indices) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(midi_channel, max, max_change_indices) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(midi_channel, scale, scale_change_indices) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(midi_channel, distortion, distortion_change_indices) || is_dirty;
-    is_dirty = update_change_index<FloatParamB>(midi_channel, randomness, randomness_change_indices) || is_dirty;
-    is_dirty = update_change_index<DistortionCurveParam>(midi_channel, distortion_curve, distortion_curve_change_indices) || is_dirty;
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, midpoint, midpoint_change_indices
+    );
+
+    /*
+    Note: we want to update all change indices, so we are not letting the
+          operator short-circuit.
+    */
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, input, input_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, min, min_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, max, max_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, scale, scale_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, distortion, distortion_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<FloatParamB>(
+        midi_channel, randomness, randomness_change_indices
+    ) || is_dirty;
+
+    is_dirty = update_change_index<DistortionCurveParam>(
+        midi_channel, distortion_curve, distortion_curve_change_indices
+    ) || is_dirty;
 
     return is_dirty;
 }

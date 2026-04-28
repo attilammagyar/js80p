@@ -40,10 +40,21 @@ namespace JS80P
 class Macro : public MidiController
 {
     public:
-        static constexpr Byte DIST_CURVE_SMOOTH_SMOOTH = Math::DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH;
-        static constexpr Byte DIST_CURVE_SMOOTH_SHARP = Math::DistortionCurve::DIST_CURVE_SMOOTH_SHARP;
-        static constexpr Byte DIST_CURVE_SHARP_SMOOTH = Math::DistortionCurve::DIST_CURVE_SHARP_SMOOTH;
-        static constexpr Byte DIST_CURVE_SHARP_SHARP = Math::DistortionCurve::DIST_CURVE_SHARP_SHARP;
+        static constexpr Byte DIST_CURVE_SMOOTH_SMOOTH = (
+            Math::DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH
+        );
+
+        static constexpr Byte DIST_CURVE_SMOOTH_SHARP = (
+            Math::DistortionCurve::DIST_CURVE_SMOOTH_SHARP
+        );
+
+        static constexpr Byte DIST_CURVE_SHARP_SMOOTH = (
+            Math::DistortionCurve::DIST_CURVE_SHARP_SMOOTH
+        );
+
+        static constexpr Byte DIST_CURVE_SHARP_SHARP = (
+            Math::DistortionCurve::DIST_CURVE_SHARP_SHARP
+        );
 
         static constexpr Integer PARAMS = 8;
 

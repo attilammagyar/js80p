@@ -115,19 +115,27 @@ void Math::init_distortions() noexcept
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH][i] = distortion_centered_lfo[i] + 0.5;
+        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH][i] = (
+            distortion_centered_lfo[i] + 0.5
+        );
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SHARP][i] = shape_smooth_sharp_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SMOOTH_SHARP][i] = (
+            shape_smooth_sharp_steeper(xs[i])
+        );
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionCurve::DIST_CURVE_SHARP_SMOOTH][i] = shape_sharp_smooth_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SHARP_SMOOTH][i] = (
+            shape_sharp_smooth_steeper(xs[i])
+        );
     }
 
     for (int i = 0; i != DISTORTION_TABLE_SIZE; ++i) {
-        distortions[DistortionCurve::DIST_CURVE_SHARP_SHARP][i] = shape_sharp_sharp_steeper(xs[i]);
+        distortions[DistortionCurve::DIST_CURVE_SHARP_SHARP][i] = (
+            shape_sharp_sharp_steeper(xs[i])
+        );
     }
 }
 
@@ -370,9 +378,7 @@ Number Math::shape_smooth_smooth_steeper(Number const x) noexcept
     constexpr Number e = 1980.0;
     constexpr Number f = 462.0;
 
-    return (
-        ((((((((((a * x + b) * x - c) * x + d) * x - e) * x + f) * x) * x) * x) * x) * x) * x
-    );
+    return ((((((((((a * x + b) * x - c) * x + d) * x - e) * x + f) * x) * x) * x) * x) * x) * x;
 }
 
 
@@ -448,13 +454,17 @@ Number Math::shape_sharp_smooth(Number const x) noexcept
 
 Number Math::shape_sharp_smooth_steep(Number const x) noexcept
 {
-    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 2.0 / 3.0);
+    return std::pow(
+        x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 2.0 / 3.0
+    );
 }
 
 
 Number Math::shape_sharp_smooth_steeper(Number const x) noexcept
 {
-    return std::pow(x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 1.0 / 3.0);
+    return std::pow(
+        x * (1.0 - std::log(x + 0.001)) / (1.0 - std::log(1.001)), 1.0 / 3.0
+    );
 }
 
 
@@ -710,7 +720,9 @@ void Math::compute_statistics(
         statistics.median = sorted[middle];
     }
 
-    for (std::vector<Number>::const_iterator it = sorted.begin(); it != sorted.end(); ++it) {
+    std::vector<Number>::const_iterator it;
+
+    for (it = sorted.begin(); it != sorted.end(); ++it) {
         statistics.mean += *it;
 
         if (*it < statistics.min) {
@@ -726,7 +738,7 @@ void Math::compute_statistics(
 
     statistics.mean /= size_float;
 
-    for (std::vector<Number>::const_iterator it = sorted.begin(); it != sorted.end(); ++it) {
+    for (it = sorted.begin(); it != sorted.end(); ++it) {
         Number const diff = *it - statistics.mean;
         statistics.standard_deviation += diff * diff;
     }

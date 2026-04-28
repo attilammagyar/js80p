@@ -77,7 +77,9 @@ class Math
 
         static constexpr int DISTORTIONS = 4;
 
-        static constexpr Number PI = 3.14159265358979323846264338327950288419716939937510;
+        static constexpr Number PI = (
+            3.14159265358979323846264338327950288419716939937510
+        );
         static constexpr Number PI_DOUBLE = 2.0 * PI;
         static constexpr Number PI_HALF = PI / 2.0;
         static constexpr Number PI_QUARTER = PI / 4.0;
@@ -91,28 +93,30 @@ class Math
         static constexpr Seconds SECONDS_IN_ONE_MINUTE = 60.0;
 
         static constexpr Number POW_10_MIN = (
-            Constants::BIQUAD_FILTER_GAIN_MIN * Constants::BIQUAD_FILTER_GAIN_SCALE
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+            Constants::BIQUAD_FILTER_GAIN_MIN
+            * Constants::BIQUAD_FILTER_GAIN_SCALE
+        ); ///< \warning Values below this limit may yield imprecise results.
 
         static constexpr Number POW_10_MAX = (
-            Constants::BIQUAD_FILTER_GAIN_MAX * Constants::BIQUAD_FILTER_GAIN_SCALE
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+            Constants::BIQUAD_FILTER_GAIN_MAX
+            * Constants::BIQUAD_FILTER_GAIN_SCALE
+        ); ///< \warning Values above this limit may yield imprecise results.
 
         static constexpr Number POW_10_INV_MIN = (
             Constants::BIQUAD_FILTER_Q_MIN * Constants::BIQUAD_FILTER_Q_SCALE
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning Values below this limit may yield imprecise results.
 
         static constexpr Number POW_10_INV_MAX = (
             Constants::BIQUAD_FILTER_Q_MAX * Constants::BIQUAD_FILTER_Q_SCALE
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning Values above this limit may yield imprecise results.
 
         static constexpr Number EXP_MIN = (
             std::min(LN_OF_10 * POW_10_MIN, -1.0 * LN_OF_10 * POW_10_INV_MAX)
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning Values below this limit may yield imprecise results.
 
         static constexpr Number EXP_MAX = (
             std::max(LN_OF_10 * POW_10_MAX, -1.0 * LN_OF_10 * POW_10_INV_MIN)
-        ); ///< \warning This limit is not enforced. Values outside the limit may be imprecise.
+        ); ///< \warning Values above this limit may yield imprecise results.
 
         static constexpr int LOG_LFO_FREQ_TABLE_SIZE = 0x400;
 
@@ -128,7 +132,9 @@ class Math
             (Number)LOG_LFO_FREQ_TABLE_MAX_INDEX
         );
 
-        static constexpr int LOG_CHORUS_LFO_FREQ_TABLE_SIZE = LOG_LFO_FREQ_TABLE_SIZE;
+        static constexpr int LOG_CHORUS_LFO_FREQ_TABLE_SIZE = (
+            LOG_LFO_FREQ_TABLE_SIZE
+        );
 
         static constexpr int LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX = (
             LOG_LFO_FREQ_TABLE_MAX_INDEX
@@ -173,7 +179,10 @@ class Math
         static constexpr Number LOG_BIQUAD_FILTER_Q_VALUE_OFFSET = 1.0;
 
         static constexpr Number LINEAR_TO_DB_GAIN_SCALE = 20.0;
-        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = 1.0 / LINEAR_TO_DB_GAIN_SCALE;
+
+        static constexpr Number DB_TO_LINEAR_GAIN_SCALE = (
+            1.0 / LINEAR_TO_DB_GAIN_SCALE
+        );
 
         static constexpr Number DB_MIN = -120.0;
         static constexpr Number LINEAR_TO_DB_MIN = 0.000001;
@@ -311,7 +320,8 @@ class Math
         static Number distort(
             Number const level,
             Number const number,
-            DistortionCurve const curve = DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH
+            DistortionCurve const curve =
+                DistortionCurve::DIST_CURVE_SMOOTH_SMOOTH
         ) noexcept;
 
         /**
@@ -329,7 +339,10 @@ class Math
          *        deterministic, the same input number will always generate the
          *        same result.
          */
-        static Number randomize(Number const level, Number const number) noexcept;
+        static Number randomize(
+            Number const level,
+            Number const number
+        ) noexcept;
 
         /**
          * \brief Same as \c Math::randomize(), but input and output are between
@@ -515,8 +528,14 @@ class Math
         static constexpr Number RANDOM_SCALE = (Number)RANDOMS_MAX_INDEX;
 
         static constexpr int DISTORTION_TABLE_SIZE = 0x0800;
-        static constexpr int DISTORTION_TABLE_MAX_INDEX = DISTORTION_TABLE_SIZE - 1;
-        static constexpr Number DISTORTION_SCALE = (Number)DISTORTION_TABLE_MAX_INDEX;
+
+        static constexpr int DISTORTION_TABLE_MAX_INDEX = (
+            DISTORTION_TABLE_SIZE - 1
+        );
+
+        static constexpr Number DISTORTION_SCALE = (
+            (Number)DISTORTION_TABLE_MAX_INDEX
+        );
 
         static constexpr Number SINE_SCALE = (Number)SIN_TABLE_SIZE / PI_DOUBLE;
 
@@ -529,15 +548,22 @@ class Math
         static constexpr Number DETUNE_CENTS_TO_POWER_OF_2_SCALE = 1.0 / 1200.0;
 
         static constexpr int LINEAR_TO_DB_TABLE_SIZE = 0x0800;
-        static constexpr int LINEAR_TO_DB_TABLE_MAX_INDEX = LINEAR_TO_DB_TABLE_SIZE - 1;
+        static constexpr int LINEAR_TO_DB_TABLE_MAX_INDEX = (
+            LINEAR_TO_DB_TABLE_SIZE - 1
+        );
 
         /* LINEAR_TO_DB_MIN is considered to be approximately 0.0 */
         static constexpr Number LINEAR_TO_DB_SCALE = (
             (Number)LINEAR_TO_DB_TABLE_SIZE / LINEAR_TO_DB_MAX
         );
 
-        static constexpr int ENVELOPE_SHAPE_TABLE_MAX_INDEX = ENVELOPE_SHAPE_TABLE_SIZE - 1;
-        static constexpr Number ENVELOPE_SHAPE_SCALE = (Number)ENVELOPE_SHAPE_TABLE_MAX_INDEX;
+        static constexpr int ENVELOPE_SHAPE_TABLE_MAX_INDEX = (
+            ENVELOPE_SHAPE_TABLE_SIZE - 1
+        );
+
+        static constexpr Number ENVELOPE_SHAPE_SCALE = (
+            (Number)ENVELOPE_SHAPE_TABLE_MAX_INDEX
+        );
 
         static Math const math;
 
@@ -568,7 +594,12 @@ class Math
         Number sin_impl(Number const x) const noexcept;
         Number cos_impl(Number const x) const noexcept;
         Number trig(Number const* const table, Number const x) const noexcept;
-        void sincos_impl(Number const x, Number& sin, Number& cos) const noexcept;
+
+        void sincos_impl(
+            Number const x,
+            Number& sin,
+            Number& cos
+        ) const noexcept;
 
         Number sines[SIN_TABLE_SIZE];
         Number cosines[SIN_TABLE_SIZE];
