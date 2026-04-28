@@ -89,7 +89,9 @@ Number Envelope::get_value_at_time(
 
     if (
             becomes_constant
-            || JS80P_UNLIKELY(duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO)
+            || JS80P_UNLIKELY(
+                duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO
+            )
     ) {
         return target_value;
     }
@@ -133,7 +135,10 @@ Number Envelope::get_value_at_time(
 }
 
 
-template<bool adjust_initial_value_during_dahds, bool need_shaping_for_initial_value_adjustment>
+template<
+        bool adjust_initial_value_during_dahds,
+        bool need_shaping_for_initial_value_adjustment
+>
 void Envelope::set_up_interpolation(
         Number& initial_value,
         Number& delta,
@@ -154,13 +159,29 @@ void Envelope::set_up_interpolation(
 
     if (
             stage != EnvelopeStage::ENV_STG_DAHD
-            || (adjust_initial_value_during_dahds && elapsed_time >= sampling_period)
+            || (
+                adjust_initial_value_during_dahds
+                && elapsed_time >= sampling_period
+            )
     ) {
-        Number const adjusted_initial_value = find_adjusted_initial_value<need_shaping_for_initial_value_adjustment>(
-            elapsed_time, sampling_period, duration_inv, last_rendered_value, target_value, shape
+        Number const adjusted_initial_value = (
+            find_adjusted_initial_value<
+                need_shaping_for_initial_value_adjustment
+            >(
+                elapsed_time,
+                sampling_period,
+                duration_inv,
+                last_rendered_value,
+                target_value,
+                shape
+            )
         );
 
-        if (JS80P_UNLIKELY(!Math::is_close(adjusted_initial_value, initial_value))) {
+        if (
+                JS80P_UNLIKELY(
+                    !Math::is_close(adjusted_initial_value, initial_value)
+                )
+        ) {
             initial_value = adjusted_initial_value;
         }
     }
@@ -278,7 +299,11 @@ bool Envelope::render(
             return true;
         }
 
-        if (JS80P_UNLIKELY(duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO)) {
+        if (
+                JS80P_UNLIKELY(
+                    duration < ALMOST_ZERO || time_until_target < ALMOST_ZERO
+                )
+        ) {
             time += ALMOST_ZERO;
             last_rendered_value = target_value;
 
@@ -387,7 +412,11 @@ void Envelope::render(
         );
     }
 
-    for (; next_sample_index != end_index; ++next_sample_index, done_samples += 1.0) {
+    for (
+            ;
+            next_sample_index != end_index;
+            ++next_sample_index, done_samples += 1.0
+    ) {
         if constexpr (need_shaping) {
             Number const ratio = Math::apply_envelope_shape(
                 (Math::EnvelopeShape)shape, initial_ratio + done_samples * scale
@@ -578,7 +607,9 @@ bool Envelope::set_up_next_dahds_target(
     stage = EnvelopeStage::ENV_STG_SUSTAIN;
     shape = SHAPE_LINEAR;
 
-    bool const becomes_constant = std::fabs(time_until_target) < sampling_period;
+    bool const becomes_constant = (
+        std::fabs(time_until_target) < sampling_period
+    );
 
     if (JS80P_LIKELY(becomes_constant)) {
         time_until_target = 0.0;
@@ -605,7 +636,9 @@ bool Envelope::set_up_next_sustain_target(
     initial_value = snapshot.sustain_value;
     shape = SHAPE_LINEAR;
 
-    bool const becomes_constant = Math::is_close(last_rendered_value, target_value);
+    bool const becomes_constant = Math::is_close(
+        last_rendered_value, target_value
+    );
 
     if (JS80P_LIKELY(becomes_constant)) {
         duration = 0.0;
@@ -660,7 +693,10 @@ Envelope::Envelope(std::string const& name) noexcept
         turning on dynamic updates. The parameter's name is kept in order to be
         able to load old presets and host application saved states.
         */
-        name + "UPD", UPDATE_MODE_DYNAMIC_LAST, UPDATE_MODE_DYNAMIC, UPDATE_MODE_STATIC
+        name + "UPD",
+        UPDATE_MODE_DYNAMIC_LAST,
+        UPDATE_MODE_DYNAMIC,
+        UPDATE_MODE_STATIC
     ),
     tempo_sync(name + "SYN", ToggleParam::OFF),
     attack_shape(name + "ASH"),
@@ -729,7 +765,9 @@ bool Envelope::needs_update(Byte const voice_status) const noexcept
         [Envelope::UPDATE_MODE_DYNAMIC_LAST] = Constants::VOICE_STATUS_LAST,
         [Envelope::UPDATE_MODE_DYNAMIC_OLDEST] = Constants::VOICE_STATUS_OLDEST,
         [Envelope::UPDATE_MODE_DYNAMIC_LOWEST] = Constants::VOICE_STATUS_LOWEST,
-        [Envelope::UPDATE_MODE_DYNAMIC_HIGHEST] = Constants::VOICE_STATUS_HIGHEST,
+        [Envelope::UPDATE_MODE_DYNAMIC_HIGHEST] = (
+            Constants::VOICE_STATUS_HIGHEST
+        ),
         [Envelope::UPDATE_MODE_STATIC] = 0,
         [Envelope::UPDATE_MODE_END] = 0,
         [Envelope::UPDATE_MODE_DYNAMIC] = 0,
@@ -802,8 +840,9 @@ void Envelope::make_snapshot(
 }
 
 
-Number Envelope::get_sustain_value(EnvelopeRandoms const& randoms) const noexcept
-{
+Number Envelope::get_sustain_value(
+        EnvelopeRandoms const& randoms
+) const noexcept {
     if (value_inaccuracy.get_value() > 0.000001) {
         return randomize_value(sustain_value, randoms[2]);
     }

@@ -52,7 +52,9 @@ Effects<InputSignalProducerClass>::Effects(
     tape_params(name + "T", tape_at_end),
     volume_1(input, volume_1_gain, NULL, CHANNELS),
     distortion_1(name + "O", distortion_1_type, volume_1, &volume_1, CHANNELS),
-    distortion_2(name + "D", distortion_2_type, distortion_1, &volume_1, CHANNELS),
+    distortion_2(
+        name + "D", distortion_2_type, distortion_1, &volume_1, CHANNELS
+    ),
     filter_1_type(name + "F1TYP"),
     filter_2_type(name + "F2TYP"),
     filter_1_freq_log_scale(name + "F1LOG", ToggleParam::OFF),

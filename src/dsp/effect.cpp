@@ -160,7 +160,9 @@ void Effect<InputSignalProducerClass>::render(
             if constexpr (is_dry) {
                 out_channel[i] = dry[i] * input_channel[i];
             } else {
-                out_channel[i] = dry[i] * input_channel[i] + wet[i] * out_channel[i];
+                out_channel[i] = (
+                    dry[i] * input_channel[i] + wet[i] * out_channel[i]
+                );
             }
         }
     }

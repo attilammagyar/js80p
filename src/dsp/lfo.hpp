@@ -77,7 +77,9 @@ class LFO : public SignalProducer
 
         virtual ~LFO();
 
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
 
         void start(Seconds const time_offset) noexcept;
         void stop(Seconds const time_offset) noexcept;
@@ -102,7 +104,10 @@ class LFO : public SignalProducer
             Sample* const buffer
         ) noexcept;
 
-        void skip_round(Integer const round, Integer const sample_count) noexcept;
+        void skip_round(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
 
         typename Oscillator_::WaveformParam waveform;
         FloatParamS pulse_width;
@@ -205,7 +210,9 @@ class LFO : public SignalProducer
         class EnvelopeCollector : public Visitor
         {
             public:
-                explicit EnvelopeCollector(LFOEnvelopeList& envelope_list) noexcept;
+                explicit EnvelopeCollector(
+                    LFOEnvelopeList& envelope_list
+                ) noexcept;
 
                 void visit_lfo_as_polyphonic(
                     LFO const& lfo,

@@ -41,10 +41,14 @@ template<class InputSignalProducerClass>
 using Volume1 = Gain<InputSignalProducerClass>;
 
 template<class InputSignalProducerClass>
-using Distortion1 = JS80P::Distortion::Distortion< Volume1<InputSignalProducerClass> >;
+using Distortion1 = JS80P::Distortion::Distortion<
+    Volume1<InputSignalProducerClass>
+>;
 
 template<class InputSignalProducerClass>
-using Distortion2 = JS80P::Distortion::Distortion< Distortion1<InputSignalProducerClass> >;
+using Distortion2 = JS80P::Distortion::Distortion<
+    Distortion1<InputSignalProducerClass>
+>;
 
 template<class InputSignalProducerClass>
 using Filter1 = BiquadFilter< Distortion2<InputSignalProducerClass> >;

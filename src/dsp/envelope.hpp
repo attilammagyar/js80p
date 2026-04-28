@@ -82,18 +82,42 @@ class Envelope
         static constexpr Seconds TIME_INACCURACY_MAX = 0.3;
         static constexpr Seconds DYNAMIC_ENVELOPE_RAMP_TIME = 0.1;
 
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH;
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEP = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH_STEEP;
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH_STEEPER;
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP;
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEP = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP_STEEP;
-        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP_STEEPER;
-        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH = Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH;
-        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEP = Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH_STEEP;
-        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH_STEEPER;
-        static constexpr EnvelopeShape SHAPE_SHARP_SHARP = Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP;
-        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEP = Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEP;
-        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEPER = Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEPER;
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH
+        );
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEP = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH_STEEP
+        );
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SMOOTH_STEEPER = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SMOOTH_STEEPER
+        );
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP
+        );
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEP = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP_STEEP
+        );
+        static constexpr EnvelopeShape SHAPE_SMOOTH_SHARP_STEEPER = (
+            Math::EnvelopeShape::ENV_SHAPE_SMOOTH_SHARP_STEEPER
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEP = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH_STEEP
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SMOOTH_STEEPER = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SMOOTH_STEEPER
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEP = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEP
+        );
+        static constexpr EnvelopeShape SHAPE_SHARP_SHARP_STEEPER = (
+            Math::EnvelopeShape::ENV_SHAPE_SHARP_SHARP_STEEPER
+        );
         static constexpr EnvelopeShape SHAPE_LINEAR = 12;
 
         static constexpr Byte UPDATE_MODE_DYNAMIC_LAST = 0;
@@ -232,7 +256,10 @@ class Envelope
             EnvelopeShape& shape
         ) noexcept;
 
-        template<bool adjust_initial_value_during_dahds, bool need_shaping_for_initial_value_adjustment>
+        template<
+            bool adjust_initial_value_during_dahds,
+            bool need_shaping_for_initial_value_adjustment
+        >
         static void set_up_interpolation(
             Number& initial_value,
             Number& delta,

@@ -48,11 +48,15 @@ void Gain<InputSignalProducerClass>::find_input_peak(
         Sample& peak,
         Integer& peak_index
 ) const noexcept {
-    Sample const* const* const input_buffer = SignalProducer::produce<InputSignalProducerClass>(
-        this->input, round, sample_count
+    Sample const* const* const input_buffer = (
+        SignalProducer::produce<InputSignalProducerClass>(
+            this->input, round, sample_count
+        )
     );
 
-    SignalProducer::find_peak(input_buffer, this->channels, sample_count, peak, peak_index);
+    SignalProducer::find_peak(
+        input_buffer, this->channels, sample_count, peak, peak_index
+    );
 }
 
 
@@ -62,9 +66,13 @@ Sample const* const* Gain<InputSignalProducerClass>::initialize_rendering(
     Integer const sample_count
 ) noexcept {
     Sample const* const* const input_buffer = (
-        Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        Filter<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
-    gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
+    gain_buffer = FloatParamS::produce_if_not_constant(
+        gain, round, sample_count
+    );
 
     if (gain_buffer == NULL && Math::is_close(gain.get_value(), 1.0)) {
         return input_buffer;
