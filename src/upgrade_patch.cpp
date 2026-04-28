@@ -28,6 +28,8 @@
 #include "synth.hpp"
 
 
+namespace JS80P {
+
 bool read_patch(char const* const file_path, std::string& result)
 {
     std::ifstream patch_file(file_path, std::ios::in | std::ios::binary);
@@ -36,10 +38,10 @@ bool read_patch(char const* const file_path, std::string& result)
         return false;
     }
 
-    char* const buffer = new char[JS80P::Serializer::MAX_SIZE];
+    char* const buffer = new char[Serializer::MAX_SIZE];
 
-    std::fill_n(buffer, JS80P::Serializer::MAX_SIZE, '\x00');
-    patch_file.read(buffer, JS80P::Serializer::MAX_SIZE);
+    std::fill_n(buffer, Serializer::MAX_SIZE, '\x00');
+    patch_file.read(buffer, Serializer::MAX_SIZE);
 
     result = buffer;
 
@@ -53,17 +55,18 @@ bool is_whole_line_comment_or_white_space(std::string const& line)
 {
     std::string::const_iterator it = line.begin();
 
-    return JS80P::Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
+    return Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
         it, line.end()
     );
 }
 
 
-void collect_comments(std::string const& patch, JS80P::Serializer::Lines& comments)
+void collect_comments(std::string const& patch, Serializer::Lines& comments)
 {
-    JS80P::Serializer::Lines* const lines = JS80P::Serializer::parse_lines(patch);
+    Serializer::Lines* const lines = Serializer::parse_lines(patch);
+    Serializer::Lines::const_iterator it;
 
-    for (JS80P::Serializer::Lines::const_iterator it = lines->begin(); it != lines->end(); ++it) {
+    for (it = lines->begin(); it != lines->end(); ++it) {
         std::string const& line = *it;
 
         if (is_whole_line_comment_or_white_space(line)) {
@@ -76,7 +79,7 @@ void collect_comments(std::string const& patch, JS80P::Serializer::Lines& commen
 bool write_patch(
         char const* const file_path,
         std::string const& patch,
-        JS80P::Serializer::Lines const& comments
+        Serializer::Lines const& comments
 ) {
     std::ofstream patch_file(file_path, std::ios::out | std::ios::binary);
 
@@ -84,9 +87,10 @@ bool write_patch(
         return false;
     }
 
-    std::string const line_end = JS80P::Serializer::LINE_END;
+    std::string const line_end = Serializer::LINE_END;
+    Serializer::Lines::const_iterator it;
 
-    for (JS80P::Serializer::Lines::const_iterator it = comments.begin(); it != comments.end(); ++it) {
+    for (it = comments.begin(); it != comments.end(); ++it) {
         std::string const& comment = *it;
         std::cout << "c: " << comment << std::endl;
 
@@ -124,18 +128,27 @@ int upgrade_patch(char const* const patch_file)
         return error("Error reading patch file", patch_file);
     }
 
-    JS80P::Synth synth;
-    JS80P::Serializer::Lines comments;
+    if (patch.find("RANDOM") != std::string::npos) {
+        std::cout << "Skipping " << patch_file;
+        std::cout << " because it may contain a randomized patch" << std::endl;
 
-    JS80P::Serializer::import_patch_in_audio_thread(synth, patch);
+        return 0;
+    }
+
+    Synth synth;
+    Serializer::Lines comments;
+
+    Serializer::import_patch_in_audio_thread(synth, patch);
 
     collect_comments(patch, comments);
 
-    if (!write_patch(patch_file, JS80P::Serializer::serialize(synth), comments)) {
+    if (!write_patch(patch_file, Serializer::serialize(synth), comments)) {
         return error("Error writing patch file", patch_file);
     }
 
     return 0;
+}
+
 }
 
 
@@ -147,5 +160,5 @@ int main(int argc, char const* argv[])
         return 1;
     }
 
-    return upgrade_patch(argv[1]);
+    return JS80P::upgrade_patch(argv[1]);
 }
