@@ -61,7 +61,7 @@ class Serializer
             Suffix& suffix
         ) noexcept;
 
-        static bool skipping_remaining_whitespace_or_comment_reaches_the_end(
+        static bool skipping_whitespace_or_comment_reaches_the_end(
             std::string::const_iterator& it,
             std::string::const_iterator const& end
         ) noexcept;

@@ -55,7 +55,7 @@ bool is_whole_line_comment_or_white_space(std::string const& line)
 {
     std::string::const_iterator it = line.begin();
 
-    return Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
+    return Serializer::skipping_whitespace_or_comment_reaches_the_end(
         it, line.end()
     );
 }

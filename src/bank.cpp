@@ -251,7 +251,7 @@ void Bank::Program::import_without_update(
                 && strncmp(param_name, "NAME", 8) == 0
                 && strncmp(suffix, "", 4) == 0
         ) {
-            Serializer::skipping_remaining_whitespace_or_comment_reaches_the_end(
+            Serializer::skipping_whitespace_or_comment_reaches_the_end(
                 line_it, line_end
             );
             program_name = &(*line_it);
