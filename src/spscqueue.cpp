@@ -49,8 +49,8 @@ bool SPSCQueue<ItemClass>::is_empty() const noexcept
 
 
 template<class ItemClass>
-typename SPSCQueue<ItemClass>::SizeType SPSCQueue<ItemClass>::length() const noexcept
-{
+typename SPSCQueue<ItemClass>::SizeType SPSCQueue<ItemClass>::length(
+) const noexcept {
     size_t const next_pop = this->next_pop.load();
     size_t const next_push = this->next_push.load();
 
