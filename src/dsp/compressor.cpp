@@ -47,7 +47,9 @@ Sample const* const* Compressor<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+        SideChainCompressableEffect<
+            InputSignalProducerClass
+        >::initialize_rendering(
             round, sample_count
         )
     );
