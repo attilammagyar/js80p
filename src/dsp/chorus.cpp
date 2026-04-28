@@ -28,7 +28,8 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-constexpr typename Chorus<InputSignalProducerClass>::Tuning Chorus<InputSignalProducerClass>::TUNINGS[][VOICES];
+constexpr typename Chorus<InputSignalProducerClass>::Tuning
+    Chorus<InputSignalProducerClass>::TUNINGS[][VOICES];
 
 
 template<class InputSignalProducerClass>
@@ -156,13 +157,55 @@ Chorus<InputSignalProducerClass>::Chorus(
         FloatParamS(name + "DEL7", 0.0, DELAY_TIME_MAX, DELAY_TIME_DEFAULT),
     },
     comb_filters{
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[0], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[1], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[2], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[3], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[4], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[5], &tempo_sync},
-        {high_pass_filter, StereoPannedDelayMode::NORMAL, width, delay_times[6], &tempo_sync},
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[0],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[1],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[2],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[3],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[4],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[5],
+            &tempo_sync
+        },
+        {
+            high_pass_filter,
+            StereoPannedDelayMode::NORMAL,
+            width,
+            delay_times[6],
+            &tempo_sync
+        },
     },
     mixer(CombFilter::CHANNELS),
     high_shelf_filter(
@@ -212,7 +255,9 @@ Chorus<InputSignalProducerClass>::Chorus(
         comb_filters[i].delay.set_feedback_signal_producer(feedback_gain);
 
         if (i > 0) {
-            comb_filters[i].delay.use_shared_delay_buffer(comb_filters[0].delay);
+            comb_filters[i].delay.use_shared_delay_buffer(
+                comb_filters[0].delay
+            );
         }
 
         mixer.add(comb_filters[i]);
@@ -225,8 +270,9 @@ Chorus<InputSignalProducerClass>::Chorus(
 
 
 template<class InputSignalProducerClass>
-void Chorus<InputSignalProducerClass>::start_lfos(Seconds const time_offset) noexcept
-{
+void Chorus<InputSignalProducerClass>::start_lfos(
+        Seconds const time_offset
+) noexcept {
     should_start_lfos = true;
 
     for (size_t i = 0; i != VOICES; ++i) {
@@ -236,8 +282,9 @@ void Chorus<InputSignalProducerClass>::start_lfos(Seconds const time_offset) noe
 
 
 template<class InputSignalProducerClass>
-void Chorus<InputSignalProducerClass>::stop_lfos(Seconds const time_offset) noexcept
-{
+void Chorus<InputSignalProducerClass>::stop_lfos(
+        Seconds const time_offset
+) noexcept {
     should_start_lfos = false;
 
     for (size_t i = 0; i != VOICES; ++i) {
@@ -263,7 +310,9 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Effect<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        Effect<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
 
     if (buffer != NULL) {
@@ -278,7 +327,9 @@ Sample const* const* Chorus<InputSignalProducerClass>::initialize_rendering(
         update_tunings(type);
     }
 
-    chorused = SignalProducer::produce<HighShelfFilter>(high_shelf_filter, round, sample_count);
+    chorused = SignalProducer::produce<HighShelfFilter>(
+        high_shelf_filter, round, sample_count
+    );
     SignalProducer::produce<Feedback>(feedback_gain, round, sample_count);
 
     return NULL;

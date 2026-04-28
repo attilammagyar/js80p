@@ -155,8 +155,12 @@ class Chorus : public Effect<InputSignalProducerClass>
         instead of the maximum.  Thus, the actual delay time range needs to be
         twice as large as the delay time range that we present to the user.
         */
-        static constexpr Number DELAY_TIME_MAX = Constants::CHORUS_DELAY_TIME_MAX * 2.0;
-        static constexpr Number DELAY_TIME_DEFAULT = Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0;
+        static constexpr Number DELAY_TIME_MAX = (
+            Constants::CHORUS_DELAY_TIME_MAX * 2.0
+        );
+        static constexpr Number DELAY_TIME_DEFAULT = (
+            Constants::CHORUS_DELAY_TIME_DEFAULT * 2.0
+        );
 
         static constexpr size_t VOICES = 7;
 
