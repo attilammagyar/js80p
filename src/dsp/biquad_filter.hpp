@@ -40,7 +40,10 @@ enum BiquadFilterFixedType {
 };
 
 
-template<class InputSignalProducerClass, BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE>
+template<
+    class InputSignalProducerClass,
+    BiquadFilterFixedType fixed_type = BiquadFilterFixedType::BFFT_CUSTOMIZABLE
+>
 class BiquadFilter;
 
 
@@ -157,9 +160,13 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
 
         virtual ~BiquadFilter();
 
-        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
+        virtual void set_sample_rate(
+            Frequency const new_sample_rate
+        ) noexcept override;
 
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
 
         virtual void reset() noexcept override;
 
@@ -218,7 +225,9 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
         ) noexcept;
 
         template<bool is_freq_inaccurate>
-        Number apply_freq_inaccuracy(Number const frequency_value) const noexcept;
+        Number apply_freq_inaccuracy(
+            Number const frequency_value
+        ) const noexcept;
 
         template<bool is_q_inaccurate>
         Number apply_q_inaccuracy(Number const q_value) const noexcept;
@@ -330,8 +339,13 @@ class BiquadFilter : public Filter<InputSignalProducerClass>
             Sample const a2
         ) const noexcept;
 
-        void store_no_op_coefficient_samples(Integer const index) const noexcept;
-        void store_silent_coefficient_samples(Integer const index) const noexcept;
+        void store_no_op_coefficient_samples(
+            Integer const index
+        ) const noexcept;
+
+        void store_silent_coefficient_samples(
+            Integer const index
+        ) const noexcept;
 
         template<class ParamValueBufferClass>
         void render(
