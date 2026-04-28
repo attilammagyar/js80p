@@ -66,7 +66,9 @@ class Serializer
             std::string::const_iterator const& end
         ) noexcept;
 
-        static bool is_js80p_section_start(SectionName const& section_name) noexcept;
+        static bool is_js80p_section_start(
+            SectionName const& section_name
+        ) noexcept;
 
         static std::string serialize(Synth const& synth) noexcept;
 
@@ -120,7 +122,10 @@ class Serializer
         ) noexcept;
 
         template<Thread thread>
-        static void process_lines(Synth& synth, Lines const* const lines) noexcept;
+        static void process_lines(
+            Synth& synth,
+            Lines const* const lines
+        ) noexcept;
 
         template<Thread thread>
         static void send_message(

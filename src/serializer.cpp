@@ -60,7 +60,9 @@ std::string Serializer::serialize(Synth const& synth) noexcept
 
             if (controller_id == Synth::ControllerId::NONE) {
                 Number const set_ratio = synth.get_param_ratio_atomic(param_id);
-                Number const default_ratio = synth.get_param_default_ratio(param_id);
+                Number const default_ratio = (
+                    synth.get_param_default_ratio(param_id)
+                );
 
                 if (std::fabs(default_ratio - set_ratio) > 0.000001) {
                     int const length = snprintf(
@@ -70,7 +72,9 @@ std::string Serializer::serialize(Synth const& synth) noexcept
                         param_name.c_str(),
                         set_ratio
                     );
-                    trim_excess_zeros_from_end_after_snprintf(line, length, line_size);
+                    trim_excess_zeros_from_end_after_snprintf(
+                        line, length, line_size
+                    );
                     serialized += line;
                     serialized += LINE_END;
                 }
@@ -83,7 +87,9 @@ std::string Serializer::serialize(Synth const& synth) noexcept
                     CONTROLLER_SUFFIX.c_str(),
                     controller_id_to_float(controller_id)
                 );
-                trim_excess_zeros_from_end_after_snprintf(line, length, line_size);
+                trim_excess_zeros_from_end_after_snprintf(
+                    line, length, line_size
+                );
                 serialized += line;
                 serialized += LINE_END;
             }
@@ -173,8 +179,10 @@ void Serializer::import_patch_in_audio_thread(
 
 
 template<Serializer::Thread thread>
-void Serializer::import_patch(Synth& synth, std::string const& serialized) noexcept
-{
+void Serializer::import_patch(
+        Synth& synth,
+        std::string const& serialized
+) noexcept {
     Lines const* const lines = parse_lines(serialized);
     process_lines<thread>(synth, lines);
 
@@ -182,8 +190,9 @@ void Serializer::import_patch(Synth& synth, std::string const& serialized) noexc
 }
 
 
-Serializer::Lines* Serializer::parse_lines(std::string const& serialized) noexcept
-{
+Serializer::Lines* Serializer::parse_lines(
+        std::string const& serialized
+) noexcept {
     constexpr size_t max_line_pos = MAX_SIZE - 1;
     Lines* const lines = new Lines();
     char* const line = new char[MAX_SIZE];
@@ -308,13 +317,15 @@ void Serializer::process_lines(Synth& synth, Lines const* const lines) noexcept
     ratios are to be interpreted (especially the log-scale toggles).
     */
 
-    for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
+    Messages::const_iterator it;
+
+    for (it = messages.begin(); it != messages.end(); ++it) {
         if (synth.is_discrete_param(it->param_id)) {
             send_message<thread>(synth, *it);
         }
     }
 
-    for (Messages::const_iterator it = messages.begin(); it != messages.end(); ++it) {
+    for (it = messages.begin(); it != messages.end(); ++it) {
         if (!synth.is_discrete_param(it->param_id)) {
             send_message<thread>(synth, *it);
         }
@@ -323,8 +334,10 @@ void Serializer::process_lines(Synth& synth, Lines const* const lines) noexcept
 
 
 template<Serializer::Thread thread>
-void Serializer::send_message(Synth& synth, Synth::Message const& message) noexcept
-{
+void Serializer::send_message(
+        Synth& synth,
+        Synth::Message const& message
+) noexcept {
     if constexpr (thread == Thread::AUDIO) {
         synth.process_message(message);
     } else {
@@ -333,9 +346,12 @@ void Serializer::send_message(Synth& synth, Synth::Message const& message) noexc
 }
 
 
-bool Serializer::is_js80p_section_start(SectionName const& section_name) noexcept
-{
-    return strncmp(section_name, JS80P_SECTION_NAME, SECTION_NAME_MAX_LENGTH) == 0;
+bool Serializer::is_js80p_section_start(
+        SectionName const& section_name
+) noexcept {
+    return (
+        strncmp(section_name, JS80P_SECTION_NAME, SECTION_NAME_MAX_LENGTH) == 0
+    );
 }
 
 
@@ -421,7 +437,9 @@ void Serializer::process_line(
             !parse_line_until_value(it, end, param_name, suffix)
             || skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
             || !parse_number(it, end, number)
-            || !skipping_remaining_whitespace_or_comment_reaches_the_end(it, end)
+            || !skipping_remaining_whitespace_or_comment_reaches_the_end(
+                it, end
+            )
     ) {
         return;
     }
@@ -469,10 +487,14 @@ void Serializer::upgrade_line(
     ) {
         strncpy(param_name, "NH", 3);
         number = upgrade_old_note_handling_param(synth, number);
-    } else if (JS80P_UNLIKELY(param_name[0] == 'N' && is_digit(param_name[1]))) {
+    } else if (
+            JS80P_UNLIKELY(param_name[0] == 'N' && is_digit(param_name[1]))
+    ) {
         if (
                 JS80P_UNLIKELY(
-                    strncmp(&param_name[2], "DYN", PARAM_NAME_MAX_LENGTH - 2) == 0
+                    strncmp(
+                        &param_name[2], "DYN", PARAM_NAME_MAX_LENGTH - 2
+                    ) == 0
                 )
         ) {
             strncpy(&param_name[2], "UPD", 4);
@@ -480,7 +502,9 @@ void Serializer::upgrade_line(
         } else if (
                 JS80P_UNLIKELY(
                     is_digit(param_name[2])
-                    && strncmp(&param_name[3], "DYN", PARAM_NAME_MAX_LENGTH - 3) == 0
+                    && strncmp(
+                        &param_name[3], "DYN", PARAM_NAME_MAX_LENGTH - 3
+                    ) == 0
                 )
         ) {
             strncpy(&param_name[3], "UPD", 4);
@@ -510,18 +534,42 @@ void Serializer::upgrade_line(
         if (!is_controller_assignment) {
             number = upgrade_old_lfo_waveform(synth, number);
         }
-    } else if (JS80P_UNLIKELY(strncmp(param_name, "CDT", PARAM_NAME_MAX_LENGTH) == 0)) {
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "CDT", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
         strncpy(param_name, "CDTP", 5);
-        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::CDTYP);
-    } else if (JS80P_UNLIKELY(strncmp(param_name, "EOT", PARAM_NAME_MAX_LENGTH) == 0)) {
+        number = upgrade_old_distortion_type(
+            synth, number, Synth::ParamId::CDTYP
+        );
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "EOT", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
         strncpy(param_name, "EOTP", 5);
-        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ED1TYP );
-    } else if (JS80P_UNLIKELY(strncmp(param_name, "EDT", PARAM_NAME_MAX_LENGTH) == 0)) {
+        number = upgrade_old_distortion_type(
+            synth, number, Synth::ParamId::ED1TYP
+        );
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "EDT", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
         strncpy(param_name, "EDTP", 5);
-        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ED2TYP );
-    } else if (JS80P_UNLIKELY(strncmp(param_name, "ETSTYP", PARAM_NAME_MAX_LENGTH) == 0)) {
+        number = upgrade_old_distortion_type(
+            synth, number, Synth::ParamId::ED2TYP
+        );
+    } else if (
+            JS80P_UNLIKELY(
+                strncmp(param_name, "ETSTYP", PARAM_NAME_MAX_LENGTH) == 0
+            )
+    ) {
         strncpy(param_name, "ETDTP", 6);
-        number = upgrade_old_distortion_type(synth, number, Synth::ParamId::ETSTYP );
+        number = upgrade_old_distortion_type(
+            synth, number, Synth::ParamId::ETSTYP
+        );
     }
 }
 
@@ -669,7 +717,9 @@ Number Serializer::upgrade_old_distortion_type(
         return synth.get_param_default_ratio(param_id);
     }
 
-    return synth.discrete_param_value_to_ratio(param_id, NEW_VALUES[old_value_byte]);
+    return synth.discrete_param_value_to_ratio(
+        param_id, NEW_VALUES[old_value_byte]
+    );
 }
 
 
@@ -711,8 +761,16 @@ bool Serializer::parse_param_name(
 
     std::fill_n(param_name, PARAM_NAME_MAX_LENGTH, '\x00');
 
-    while (is_capital_letter(*it) || is_digit(*it) || is_lowercase_letter(*it)) {
-        if (strncmp(&(*it), CONTROLLER_SUFFIX.c_str(), CONTROLLER_SUFFIX.length()) == 0) {
+    while (
+            is_capital_letter(*it) || is_digit(*it) || is_lowercase_letter(*it)
+    ) {
+        if (
+                strncmp(
+                    &(*it),
+                    CONTROLLER_SUFFIX.c_str(),
+                    CONTROLLER_SUFFIX.length()
+                ) == 0
+        ) {
             break;
         }
 
