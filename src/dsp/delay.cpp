@@ -138,7 +138,10 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::initialize_instance() noexcept
 {
     shared_buffer_owner = NULL;
 
@@ -238,7 +241,10 @@ Delay<InputSignalProducerClass, capabilities>::Delay(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::reallocate_delay_buffer_if_needed() noexcept
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::reallocate_delay_buffer_if_needed() noexcept
 {
     Integer const new_delay_buffer_size = this->block_size * 2 + std::max(
         (Integer)(this->sample_rate * time.get_max_value()) + 1,
@@ -275,7 +281,10 @@ void Delay<InputSignalProducerClass, capabilities>::free_delay_buffer() noexcept
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::allocate_delay_buffer() noexcept
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::allocate_delay_buffer() noexcept
 {
     if (this->channels <= 0 || shared_buffer_owner != NULL) {
         Delay<InputSignalProducerClass, capabilities>::reset();
@@ -326,21 +335,30 @@ void Delay<InputSignalProducerClass, capabilities>::reset() noexcept
 
 #ifdef JS80P_ASSERTIONS
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::begin_reverse_delay_test() noexcept
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::begin_reverse_delay_test() noexcept
 {
     reverse_delay_envelope.begin_test(TEST_REVERSE_ENVELOPE);
 }
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::end_reverse_delay_test() noexcept
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::end_reverse_delay_test() noexcept
 {
     reverse_delay_envelope.end_test();
 }
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-Integer Delay<InputSignalProducerClass, capabilities>::get_input_channels() const noexcept
+Integer Delay<
+        InputSignalProducerClass,
+        capabilities
+>::get_input_channels() const noexcept
 {
     return this->input.get_channels();
 }
@@ -389,7 +407,10 @@ void Delay<InputSignalProducerClass, capabilities>::set_sample_rate(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::set_feedback_signal_producer(
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::set_feedback_signal_producer(
         SignalProducer& feedback_signal_producer
 ) noexcept {
     this->feedback_signal_producer = &feedback_signal_producer;
@@ -428,7 +449,9 @@ void Delay<InputSignalProducerClass, capabilities>::set_channel_lfo(
     JS80P_ASSERT(scale <= time.get_max_value());
 
     channel_lfos[channel] = &lfo;
-    channel_lfo_scales[channel] = - std::min((Sample)time.get_max_value(), scale);
+    channel_lfo_scales[channel] = - std::min(
+        (Sample)time.get_max_value(), scale
+    );
 }
 
 
@@ -443,9 +466,12 @@ void Delay<InputSignalProducerClass, capabilities>::use_shared_delay_buffer(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_rendering(
-    Integer const round,
-    Integer const sample_count
+Sample const* const* Delay<
+        InputSignalProducerClass,
+        capabilities
+>::initialize_rendering(
+        Integer const round,
+        Integer const sample_count
 ) noexcept {
     Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count);
 
@@ -482,11 +508,17 @@ Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_r
         gain_buffer = NULL;
         need_gain = false;
     } else {
-        gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
-        need_gain = gain_buffer != NULL || !Math::is_close(gain.get_value(), 1.0);
+        gain_buffer = FloatParamS::produce_if_not_constant(
+            gain, round, sample_count
+        );
+        need_gain = (
+            gain_buffer != NULL || !Math::is_close(gain.get_value(), 1.0)
+        );
     }
 
-    time_buffer = FloatParamS::produce_if_not_constant(time, round, sample_count);
+    time_buffer = FloatParamS::produce_if_not_constant(
+        time, round, sample_count
+    );
 
     time_scale = (
         tempo_sync != NULL && tempo_sync->get_value() == ToggleParam::ON
@@ -546,7 +578,10 @@ Sample const* const* Delay<InputSignalProducerClass, capabilities>::initialize_r
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-Integer Delay<InputSignalProducerClass, capabilities>::advance_delay_buffer_index(
+Integer Delay<
+        InputSignalProducerClass,
+        capabilities
+>::advance_delay_buffer_index(
         Integer const position,
         Integer const increment
 ) const noexcept {
@@ -575,7 +610,10 @@ void Delay<InputSignalProducerClass, capabilities>::clear_delay_buffer(
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
 template<bool is_delay_buffer_shared>
-void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buffer(
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::mix_feedback_into_delay_buffer(
         Integer const sample_count
 ) noexcept {
     if (JS80P_UNLIKELY(feedback_signal_producer == NULL)) {
@@ -604,7 +642,11 @@ void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buff
         )
     );
 
-    if (feedback_signal_producer->is_silent(previous_round, feedback_sample_count)) {
+    if (
+            feedback_signal_producer->is_silent(
+                previous_round, feedback_sample_count
+            )
+    ) {
         write_index_feedback = advance_delay_buffer_index(
             write_index_feedback, feedback_sample_count
         );
@@ -629,7 +671,12 @@ void Delay<InputSignalProducerClass, capabilities>::mix_feedback_into_delay_buff
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-template<typename Delay<InputSignalProducerClass, capabilities>::DelayBufferWritingMode mode>
+template<
+        typename Delay<
+            InputSignalProducerClass,
+            capabilities
+        >::DelayBufferWritingMode mode
+>
 Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
         Sample const* const* const source_buffer,
         Integer const delay_buffer_index,
@@ -651,7 +698,9 @@ Integer Delay<InputSignalProducerClass, capabilities>::write_delay_buffer(
         index = delay_buffer_index;
 
         for (Integer i = 0; i != sample_count;) {
-            Integer const batch_size = std::min(sample_count - i, delay_buffer_size - index);
+            Integer const batch_size = std::min(
+                sample_count - i, delay_buffer_size - index
+            );
             Integer const batch_end = index + batch_size;
 
             for (; index != batch_end; ++index) {
@@ -710,7 +759,10 @@ void Delay<InputSignalProducerClass, capabilities>::mix_input_into_delay_buffer(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-bool Delay<InputSignalProducerClass, capabilities>::is_delay_buffer_silent() const noexcept
+bool Delay<
+        InputSignalProducerClass,
+        capabilities
+>::is_delay_buffer_silent() const noexcept
 {
     return (
         silent_input_samples >= delay_buffer_size
@@ -746,7 +798,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         ParamValueWrapper(this->gain.get_value())
                     );
                 }
-            } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+            } else if constexpr (
+                    capabilities == DelayCapabilities::DC_REVERSIBLE
+            ) {
                 if (is_reversed) {
                     render_with_gain<true, ParamValueWrapper, true, true>(
                         round,
@@ -776,7 +830,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
         } else {
             if constexpr (capabilities == DelayCapabilities::DC_SCALABLE) {
                 if (time_scale_buffer == NULL) {
-                    render_with_gain<true, ParamValueBufferWrapper, true, false>(
+                    render_with_gain<
+                        true, ParamValueBufferWrapper, true, false
+                    >(
                         round,
                         first_sample_index,
                         end_sample_index,
@@ -784,7 +840,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         ParamValueBufferWrapper(gain_buffer)
                     );
                 } else {
-                    render_with_gain<true, ParamValueBufferWrapper, false, false>(
+                    render_with_gain<
+                        true, ParamValueBufferWrapper, false, false
+                    >(
                         round,
                         first_sample_index,
                         end_sample_index,
@@ -792,7 +850,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         ParamValueBufferWrapper(gain_buffer)
                     );
                 }
-            } else if constexpr (capabilities == DelayCapabilities::DC_REVERSIBLE) {
+            } else if constexpr (
+                    capabilities == DelayCapabilities::DC_REVERSIBLE
+            ) {
                 if (is_reversed) {
                     render_with_gain<true, ParamValueBufferWrapper, true, true>(
                         round,
@@ -802,7 +862,9 @@ void Delay<InputSignalProducerClass, capabilities>::render(
                         ParamValueBufferWrapper(gain_buffer)
                     );
                 } else {
-                    render_with_gain<true, ParamValueBufferWrapper, true, false>(
+                    render_with_gain<
+                        true, ParamValueBufferWrapper, true, false
+                    >(
                         round,
                         first_sample_index,
                         end_sample_index,
@@ -871,7 +933,12 @@ void Delay<InputSignalProducerClass, capabilities>::render(
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-template<bool need_gain, class GainBufferClass, bool is_time_scale_constant, bool is_reversed>
+template<
+        bool need_gain,
+        class GainBufferClass,
+        bool is_time_scale_constant,
+        bool is_reversed
+>
 void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
         Integer const round,
         Integer const first_sample_index,
@@ -907,8 +974,12 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
     Sample const* reverse_delay_envelope_table = NULL;
 
     if constexpr (is_reversed) {
-        reverse_target_delay_time_in_samples = this->reverse_target_delay_time_in_samples;
-        reverse_target_delay_time_in_samples_inv = this->reverse_target_delay_time_in_samples_inv;
+        reverse_target_delay_time_in_samples = (
+            this->reverse_target_delay_time_in_samples
+        );
+        reverse_target_delay_time_in_samples_inv = (
+            this->reverse_target_delay_time_in_samples_inv
+        );
         reverse_delay_envelope_table = reverse_delay_envelope.table;
     }
 
@@ -936,10 +1007,13 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         time_value_in_samples
                     );
                     reverse_delta_samples = calculate_reverse_delta_samples(
-                        time_value_in_samples, reverse_target_delay_time_in_samples
+                        time_value_in_samples,
+                        reverse_target_delay_time_in_samples
                     );
                 } else {
-                    if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+                    if constexpr (
+                            capabilities == DelayCapabilities::DC_CHANNEL_LFO
+                    ) {
                         channel_lfo_buffer = channel_lfo_buffers[c];
                         channel_lfo_scale = channel_lfo_scales[c] * sample_rate;
                     }
@@ -1031,7 +1105,9 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                     reverse_done_samples,
                     delay_buffer_size_float
                 );
-            } else if constexpr (capabilities == DelayCapabilities::DC_CHANNEL_LFO) {
+            } else if constexpr (
+                    capabilities == DelayCapabilities::DC_CHANNEL_LFO
+            ) {
                 channel_lfo_buffer = channel_lfo_buffers[c];
                 channel_lfo_scale = channel_lfo_scales[c] * sample_rate;
             }
@@ -1085,7 +1161,9 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         reverse_delay_envelope_table
                     );
 
-                    Number const time_value_in_samples = time_buffer[i] * time_scale;
+                    Number const time_value_in_samples = (
+                        time_buffer[i] * time_scale
+                    );
 
                     adjust_reverse_target_delay_time(
                         reverse_target_delay_time_in_samples,
@@ -1094,7 +1172,8 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
                         time_value_in_samples
                     );
                     reverse_delta_samples = calculate_reverse_delta_samples(
-                        time_value_in_samples, reverse_target_delay_time_in_samples
+                        time_value_in_samples,
+                        reverse_target_delay_time_in_samples
                     );
                     advance_reverse_rendering(
                         read_index,
@@ -1115,14 +1194,21 @@ void Delay<InputSignalProducerClass, capabilities>::render_with_gain(
     if constexpr (is_reversed) {
         this->reverse_read_index = read_index;
         this->reverse_done_samples = reverse_done_samples;
-        this->reverse_target_delay_time_in_samples = reverse_target_delay_time_in_samples;
-        this->reverse_target_delay_time_in_samples_inv = reverse_target_delay_time_in_samples_inv;
+        this->reverse_target_delay_time_in_samples = (
+            reverse_target_delay_time_in_samples
+        );
+        this->reverse_target_delay_time_in_samples_inv = (
+            reverse_target_delay_time_in_samples_inv
+        );
     }
 }
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::initialize_reverse_rendering(
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::initialize_reverse_rendering(
         Number& read_index,
         Number& reverse_done_samples,
         Number const delay_buffer_size_float
@@ -1137,7 +1223,10 @@ void Delay<InputSignalProducerClass, capabilities>::initialize_reverse_rendering
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::adjust_reverse_target_delay_time(
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::adjust_reverse_target_delay_time(
         Number& reverse_target_delay_time_in_samples,
         Number& reverse_target_delay_time_in_samples_inv,
         Number const reverse_done_samples,
@@ -1153,7 +1242,10 @@ void Delay<InputSignalProducerClass, capabilities>::adjust_reverse_target_delay_
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-Number Delay<InputSignalProducerClass, capabilities>::calculate_reverse_delta_samples(
+Number Delay<
+        InputSignalProducerClass,
+        capabilities
+>::calculate_reverse_delta_samples(
         Number const time_value_in_samples,
         Number const reverse_target_delay_time_in_samples
 ) const noexcept {
@@ -1168,16 +1260,24 @@ Number Delay<InputSignalProducerClass, capabilities>::calculate_reverse_delta_sa
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void Delay<InputSignalProducerClass, capabilities>::apply_reverse_delay_envelope(
+void Delay<
+        InputSignalProducerClass,
+        capabilities
+>::apply_reverse_delay_envelope(
         Sample& sample,
         Number const reverse_done_samples,
         Number const reverse_target_delay_time_in_samples_inv,
         Sample const* const reverse_delay_envelope_table
 ) const noexcept {
+    Number const index = (
+        ReverseDelayEnvelope::TABLE_MAX_INDEX_FLOAT
+        * reverse_done_samples
+        * reverse_target_delay_time_in_samples_inv
+    );
     sample *= Math::lookup(
         reverse_delay_envelope_table,
         ReverseDelayEnvelope::TABLE_MAX_INDEX,
-        ReverseDelayEnvelope::TABLE_MAX_INDEX_FLOAT * reverse_done_samples * reverse_target_delay_time_in_samples_inv
+        index
     );
 }
 
@@ -1196,7 +1296,9 @@ void Delay<InputSignalProducerClass, capabilities>::advance_reverse_rendering(
     reverse_done_samples += reverse_delta_samples;
 
     if (reverse_done_samples > reverse_target_delay_time_in_samples) {
-        reverse_done_samples = reverse_done_samples - reverse_target_delay_time_in_samples;
+        reverse_done_samples = (
+            reverse_done_samples - reverse_target_delay_time_in_samples
+        );
 
         if (reverse_done_samples >= 1.0) {
             reverse_done_samples = 0.0;
@@ -1240,8 +1342,16 @@ Sample Delay<InputSignalProducerClass, capabilities>::lookup_sample(
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& input,
         StereoPannedDelayMode const stereo_mode,
         ToggleParam const* const tempo_sync
@@ -1252,8 +1362,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& input,
         StereoPannedDelayMode const stereo_mode,
         FloatParamS& delay_time_leader,
@@ -1268,8 +1386,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& input,
         StereoPannedDelayMode const stereo_mode,
         FloatParamS& panning_leader,
@@ -1289,8 +1415,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         StereoPannedDelayMode const stereo_mode,
@@ -1310,8 +1444,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         StereoPannedDelayMode const stereo_mode,
@@ -1333,8 +1475,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         StereoPannedDelayMode const stereo_mode,
@@ -1357,8 +1507,16 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::StereoPannedDelay(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::StereoPannedDelay(
         InputSignalProducerClass& delay_input,
         FilterInputClass& filter_input,
         StereoPannedDelayMode const stereo_mode,
@@ -1376,14 +1534,24 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::Ste
     is_flipped(stereo_mode == StereoPannedDelayMode::FLIPPED),
     panning_scale(1.0),
     panning(panning_leader),
-    delay(delay_input, delay_gain_leader, delay_time, delay_time_max, tempo_sync)
+    delay(
+        delay_input, delay_gain_leader, delay_time, delay_time_max, tempo_sync
+    )
 {
     initialize_instance();
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_instance() noexcept
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::initialize_instance() noexcept
 {
     panning_buffer = NULL;
     stereo_gain_buffer = SignalProducer::allocate_buffer();
@@ -1394,8 +1562,16 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~StereoPannedDelay()
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::~StereoPannedDelay()
 {
     SignalProducer::free_buffer(stereo_gain_buffer);
     SignalProducer::free_buffer(panning_buffer_scaled);
@@ -1403,28 +1579,54 @@ StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::~St
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_block_size(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::set_block_size(
         Integer const new_block_size
 ) noexcept {
     SignalProducer::set_block_size(new_block_size);
 
     stereo_gain_buffer = SignalProducer::reallocate_buffer(stereo_gain_buffer);
-    panning_buffer_scaled = SignalProducer::reallocate_buffer(panning_buffer_scaled);
+    panning_buffer_scaled = SignalProducer::reallocate_buffer(
+        panning_buffer_scaled
+    );
     panning_buffer = NULL;
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::set_panning_scale(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::set_panning_scale(
         Number const scale
 ) noexcept {
     panning_scale = scale;
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::initialize_rendering(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+Sample const* const* StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
@@ -1434,7 +1636,9 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
 
     Filter<FilterInputClass>::initialize_rendering(round, sample_count);
 
-    panning_buffer = FloatParamS::produce_if_not_constant(panning, round, sample_count);
+    panning_buffer = FloatParamS::produce_if_not_constant(
+        panning, round, sample_count
+    );
 
     if (this->input.is_silent(round, sample_count)) {
         return this->input_was_silent(round);
@@ -1448,7 +1652,8 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
         );
 
         Number const x = (
-            (panning_value <= 0.0 ? panning_value + 1.0 : panning_value) * Math::PI_HALF
+            (panning_value <= 0.0 ? panning_value + 1.0 : panning_value)
+            * Math::PI_HALF
         );
 
         Math::sincos(x, stereo_gain_value[1], stereo_gain_value[0]);
@@ -1456,7 +1661,9 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
         Sample const* panning_buffer = this->panning_buffer;
 
         if (!Math::is_close(panning_scale, 1.0)) {
-            Sample* const panning_buffer_scaled = this->panning_buffer_scaled[0];
+            Sample* const panning_buffer_scaled = (
+                this->panning_buffer_scaled[0]
+            );
             Number const panning_scale = this->panning_scale;
 
             for (Integer i = 0; i != sample_count; ++i) {
@@ -1476,14 +1683,18 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
                 Number const p = -panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
-                Math::sincos(x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]);
+                Math::sincos(
+                    x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]
+                );
             }
         } else {
             for (Integer i = 0; i != sample_count; ++i) {
                 Number const p = panning_buffer[i];
                 Number const x = (p <= 0.0 ? p + 1.0 : p) * Math::PI_HALF;
 
-                Math::sincos(x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]);
+                Math::sincos(
+                    x, stereo_gain_buffer_1[i], stereo_gain_buffer_0[i]
+                );
             }
         }
     }
@@ -1492,8 +1703,16 @@ Sample const* const* StereoPannedDelay<InputSignalProducerClass, FilterInputClas
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render(
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::render(
         Integer const round,
         Integer const first_sample_index,
         Integer const end_sample_index,
@@ -1521,9 +1740,17 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
 template<int channel_1, int channel_2>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_constant_panning(
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::render_with_constant_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const end_sample_index,
@@ -1537,7 +1764,9 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
     Sample const stereo_gain_value_channel_2 = stereo_gain_value[channel_2];
 
     for (Integer i = first_sample_index; i != end_sample_index; ++i) {
-        buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_value_channel_1;
+        buffer_channel_1[i] = (
+            input_buffer_channel_1[i] * stereo_gain_value_channel_1
+        );
     }
 
     for (Integer i = first_sample_index; i != end_sample_index; ++i) {
@@ -1549,9 +1778,17 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
 }
 
 
-template<class InputSignalProducerClass, class FilterInputClass, DelayCapabilities capabilities>
+template<
+        class InputSignalProducerClass,
+        class FilterInputClass,
+        DelayCapabilities capabilities
+>
 template<int channel_1, int channel_2>
-void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>::render_with_changing_panning(
+void StereoPannedDelay<
+        InputSignalProducerClass,
+        FilterInputClass,
+        capabilities
+>::render_with_changing_panning(
         Integer const round,
         Integer const first_sample_index,
         Integer const end_sample_index,
@@ -1561,12 +1798,18 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
     Sample const* const input_buffer_channel_2 = this->input_buffer[channel_2];
     Sample* const buffer_channel_1 = buffer[channel_1];
     Sample* const buffer_channel_2 = buffer[channel_2];
-    Sample const* const stereo_gain_buffer_channel_1 = stereo_gain_buffer[channel_1];
-    Sample const* const stereo_gain_buffer_channel_2 = stereo_gain_buffer[channel_2];
+    Sample const* const stereo_gain_buffer_channel_1 = (
+        stereo_gain_buffer[channel_1]
+    );
+    Sample const* const stereo_gain_buffer_channel_2 = (
+        stereo_gain_buffer[channel_2]
+    );
 
     for (Integer i = first_sample_index; i != end_sample_index; ++i) {
         if (panning_buffer[i] > 0.0) {
-            buffer_channel_1[i] = input_buffer_channel_1[i] * stereo_gain_buffer_channel_1[i];
+            buffer_channel_1[i] = (
+                input_buffer_channel_1[i] * stereo_gain_buffer_channel_1[i]
+            );
         } else {
             buffer_channel_1[i] = (
                 input_buffer_channel_1[i]
@@ -1582,20 +1825,27 @@ void StereoPannedDelay<InputSignalProducerClass, FilterInputClass, capabilities>
                 + input_buffer_channel_1[i] * stereo_gain_buffer_channel_2[i]
             );
         } else {
-            buffer_channel_2[i] = input_buffer_channel_2[i] * stereo_gain_buffer_channel_2[i];
+            buffer_channel_2[i] = (
+                input_buffer_channel_2[i] * stereo_gain_buffer_channel_2[i]
+            );
         }
     }
 }
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
-    InputSignalProducerClass& input,
-    StereoPannedDelayMode const stereo_mode,
-    FloatParamS& distortion_level_leader,
-    Distortion::TypeParam const& distortion_type,
-    ToggleParam const* const tempo_sync
-) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
+DistortedHighShelfStereoPannedDelay<
+        InputSignalProducerClass,
+        capabilities
+>::DistortedHighShelfStereoPannedDelay(
+        InputSignalProducerClass& input,
+        StereoPannedDelayMode const stereo_mode,
+        FloatParamS& distortion_level_leader,
+        Distortion::TypeParam const& distortion_type,
+        ToggleParam const* const tempo_sync
+) : DistortedHighShelfStereoPannedDelayBase<
+        InputSignalProducerClass, capabilities
+    >(
         input, high_shelf_filter, stereo_mode, tempo_sync, NUMBER_OF_CHILDREN
     ),
     high_shelf_filter_q(
@@ -1616,26 +1866,33 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
 {
     initialize_instance();
 
-    high_shelf_filter.frequency.set_value(Constants::BIQUAD_FILTER_FREQUENCY_MAX);
+    high_shelf_filter.frequency.set_value(
+        Constants::BIQUAD_FILTER_FREQUENCY_MAX
+    );
     high_shelf_filter.q.set_value(Constants::BIQUAD_FILTER_Q_DEFAULT);
     high_shelf_filter.gain.set_value(0.0);
 }
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
-    InputSignalProducerClass& input,
-    StereoPannedDelayMode const stereo_mode,
-    FloatParamS& panning_leader,
-    FloatParamS& delay_gain_leader,
-    FloatParamS& delay_time_leader,
-    BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
-    FloatParamS& high_shelf_filter_frequency_leader,
-    FloatParamS& high_shelf_filter_gain_leader,
-    FloatParamS& distortion_level_leader,
-    Distortion::TypeParam const& distortion_type,
-    ToggleParam const* const tempo_sync
-) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
+DistortedHighShelfStereoPannedDelay<
+        InputSignalProducerClass,
+        capabilities
+>::DistortedHighShelfStereoPannedDelay(
+        InputSignalProducerClass& input,
+        StereoPannedDelayMode const stereo_mode,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_gain_leader,
+        FloatParamS& delay_time_leader,
+        BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
+        FloatParamS& high_shelf_filter_frequency_leader,
+        FloatParamS& high_shelf_filter_gain_leader,
+        FloatParamS& distortion_level_leader,
+        Distortion::TypeParam const& distortion_type,
+        ToggleParam const* const tempo_sync
+) : DistortedHighShelfStereoPannedDelayBase<
+        InputSignalProducerClass, capabilities
+    >(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1677,20 +1934,25 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::DistortedHighShelfStereoPannedDelay(
-    InputSignalProducerClass& input,
-    StereoPannedDelayMode const stereo_mode,
-    FloatParamS& panning_leader,
-    FloatParamS& delay_gain_leader,
-    Seconds const delay_time,
-    Seconds const delay_time_max,
-    BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
-    FloatParamS& high_shelf_filter_frequency_leader,
-    FloatParamS& high_shelf_filter_gain_leader,
-    FloatParamS& distortion_level_leader,
-    Distortion::TypeParam const& distortion_type,
-    ToggleParam const* const tempo_sync
-) : DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>(
+DistortedHighShelfStereoPannedDelay<
+        InputSignalProducerClass,
+        capabilities
+>::DistortedHighShelfStereoPannedDelay(
+        InputSignalProducerClass& input,
+        StereoPannedDelayMode const stereo_mode,
+        FloatParamS& panning_leader,
+        FloatParamS& delay_gain_leader,
+        Seconds const delay_time,
+        Seconds const delay_time_max,
+        BiquadFilterSharedBuffers& high_shelf_filter_shared_buffers,
+        FloatParamS& high_shelf_filter_frequency_leader,
+        FloatParamS& high_shelf_filter_gain_leader,
+        FloatParamS& distortion_level_leader,
+        Distortion::TypeParam const& distortion_type,
+        ToggleParam const* const tempo_sync
+) : DistortedHighShelfStereoPannedDelayBase<
+        InputSignalProducerClass, capabilities
+    >(
         input,
         high_shelf_filter,
         stereo_mode,
@@ -1733,7 +1995,10 @@ DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::Dis
 
 
 template<class InputSignalProducerClass, DelayCapabilities capabilities>
-void DistortedHighShelfStereoPannedDelay<InputSignalProducerClass, capabilities>::initialize_instance() noexcept
+void DistortedHighShelfStereoPannedDelay<
+        InputSignalProducerClass,
+        capabilities
+>::initialize_instance() noexcept
 {
     this->register_child(high_shelf_filter_q);
     this->register_child(distortion);

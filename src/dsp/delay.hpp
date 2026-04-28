@@ -43,7 +43,10 @@ enum DelayCapabilities {
 };
 
 
-template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
+template<
+        class InputSignalProducerClass,
+        DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
 class Delay : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;
@@ -54,7 +57,8 @@ class Delay : public Filter<InputSignalProducerClass>
 
     public:
         static constexpr Number BPM_MIN = (
-            Math::SECONDS_IN_ONE_MINUTE / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
+            Math::SECONDS_IN_ONE_MINUTE
+            / (Number)OVERSIZE_DELAY_BUFFER_FOR_TEMPO_SYNC
         );
 
 #ifdef JS80P_ASSERTIONS
@@ -91,8 +95,14 @@ class Delay : public Filter<InputSignalProducerClass>
 
         virtual ~Delay();
 
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
-        virtual void set_sample_rate(Frequency const new_sample_rate) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
+
+        virtual void set_sample_rate(
+            Frequency const new_sample_rate
+        ) noexcept override;
+
         virtual void reset() noexcept override;
 
         /**
@@ -109,12 +119,15 @@ class Delay : public Filter<InputSignalProducerClass>
         ) noexcept;
 
         void use_shared_delay_buffer(
-            Delay<InputSignalProducerClass, capabilities> const& shared_buffer_owner
+            Delay<InputSignalProducerClass, capabilities> const&
+                shared_buffer_owner
         ) noexcept;
 
         void set_time_scale_param(FloatParamS& time_scale_param) noexcept;
 
-        void set_reverse_toggle_param(ToggleParam& reverse_toggle_param) noexcept;
+        void set_reverse_toggle_param(
+            ToggleParam& reverse_toggle_param
+        ) noexcept;
 
         void set_channel_lfo(
             Integer const channel,
@@ -163,7 +176,9 @@ class Delay : public Filter<InputSignalProducerClass>
         void clear_delay_buffer(Integer const sample_count) noexcept;
 
         template<bool is_delay_buffer_shared>
-        void mix_feedback_into_delay_buffer(Integer const sample_count) noexcept;
+        void mix_feedback_into_delay_buffer(
+            Integer const sample_count
+        ) noexcept;
 
         template<DelayBufferWritingMode mode>
         Integer write_delay_buffer(
@@ -246,7 +261,8 @@ class Delay : public Filter<InputSignalProducerClass>
         Integer const delay_buffer_oversize;
         bool const is_gain_constant_1;
 
-        Delay<InputSignalProducerClass, capabilities> const* shared_buffer_owner;
+        Delay<InputSignalProducerClass, capabilities> const*
+            shared_buffer_owner;
 
         SignalProducer* feedback_signal_producer;
         FloatParamS* time_scale_param;
@@ -325,7 +341,9 @@ class StereoPannedDelay : public Filter<FilterInputClass>
 
         virtual ~StereoPannedDelay();
 
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
 
         void set_panning_scale(Number const scale) noexcept;
 
@@ -420,18 +438,29 @@ class StereoPannedDelay : public Filter<FilterInputClass>
 };
 
 
-template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
-using DistortedDelay = Distortion::Distortion< Delay<InputSignalProducerClass, capabilities> >;
+template<
+        class InputSignalProducerClass,
+        DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
+using DistortedDelay = Distortion::Distortion<
+    Delay<InputSignalProducerClass, capabilities>
+>;
 
 
-template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
+template<
+        class InputSignalProducerClass,
+        DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
 using DistortedHighShelfDelay = BiquadFilter<
     DistortedDelay<InputSignalProducerClass, capabilities>,
     BiquadFilterFixedType::BFFT_HIGH_SHELF
 >;
 
 
-template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
+template<
+        class InputSignalProducerClass,
+        DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
 using DistortedHighShelfStereoPannedDelayBase = StereoPannedDelay<
     InputSignalProducerClass,
     DistortedHighShelfDelay<InputSignalProducerClass, capabilities>,
@@ -439,13 +468,23 @@ using DistortedHighShelfStereoPannedDelayBase = StereoPannedDelay<
 >;
 
 
-template<class InputSignalProducerClass, DelayCapabilities capabilities = DelayCapabilities::DC_BASIC>
-class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>
+template<
+        class InputSignalProducerClass,
+        DelayCapabilities capabilities = DelayCapabilities::DC_BASIC
+>
+class DistortedHighShelfStereoPannedDelay
+    : public DistortedHighShelfStereoPannedDelayBase<
+        InputSignalProducerClass, capabilities
+    >
 {
     friend class SignalProducer;
 
     public:
-        static constexpr Integer CHANNELS = DistortedHighShelfStereoPannedDelayBase<InputSignalProducerClass, capabilities>::CHANNELS;
+        static constexpr Integer CHANNELS = (
+            DistortedHighShelfStereoPannedDelayBase<
+                InputSignalProducerClass, capabilities
+            >::CHANNELS
+        );
 
         DistortedHighShelfStereoPannedDelay(
             InputSignalProducerClass& input,
@@ -493,7 +532,8 @@ class DistortedHighShelfStereoPannedDelay : public DistortedHighShelfStereoPanne
         DistortedDelay<InputSignalProducerClass, capabilities> distortion;
 
     public:
-        DistortedHighShelfDelay<InputSignalProducerClass, capabilities> high_shelf_filter;
+        DistortedHighShelfDelay<InputSignalProducerClass, capabilities>
+            high_shelf_filter;
 };
 
 }
