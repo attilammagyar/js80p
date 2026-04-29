@@ -54,7 +54,10 @@ class MidiController
          *        an event with a time offset for sample-exact parameters for
          *        all channels.
          */
-        void change_all_channels(Seconds const time_offset, Number const new_value) noexcept;
+        void change_all_channels(
+            Seconds const time_offset,
+            Number const new_value
+        ) noexcept;
 
         Integer get_change_index(Midi::Channel const channel) const noexcept;
 
@@ -67,7 +70,10 @@ class MidiController
         Integer is_assigned() const noexcept;
 
     protected:
-        void change(Midi::Channel const channel, Number const new_value) noexcept;
+        void change(
+            Midi::Channel const channel,
+            Number const new_value
+        ) noexcept;
 
     private:
         Queue<SignalProducer::Event> event_queues_rw[Midi::CHANNELS];

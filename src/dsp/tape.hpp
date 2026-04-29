@@ -57,7 +57,9 @@ class TapeParams
         };
 
         static constexpr Number DELAY_TIME_MAX = 30.0;
-        static constexpr Number DELAY_TIME_LFO_RANGE = DELAY_TIME_MAX / 310000.0;
+        static constexpr Number DELAY_TIME_LFO_RANGE = (
+            DELAY_TIME_MAX / 310000.0
+        );
         static constexpr size_t SIGNAL_PRODUCERS = 11 + 19 * Macro::PARAMS;
 
         explicit TapeParams(
@@ -115,13 +117,18 @@ class TapeParams
         TapeParams::State state;
 
     private:
-        void store_signal_producers_from_macro(Macro& macro, size_t& i) noexcept;
+        void store_signal_producers_from_macro(
+            Macro& macro, size_t& i
+        ) noexcept;
 
         SignalProducer* signal_producers[SIGNAL_PRODUCERS];
 };
 
 
-template<class InputSignalProducerClass, Byte required_bypass_toggle_value = ToggleParam::ON>
+template<
+    class InputSignalProducerClass,
+    Byte required_bypass_toggle_value = ToggleParam::ON
+>
 class Tape : public Filter<InputSignalProducerClass>
 {
     friend class SignalProducer;

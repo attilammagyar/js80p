@@ -87,7 +87,9 @@ class NoiseGenerator : public Filter<InputSignalProducerClass>
         LevelParamClass level;
 
     protected:
-        void handle_event(SignalProducer::Event const& event) noexcept JS80P_OVERRIDE;
+        void handle_event(
+            SignalProducer::Event const& event
+        ) noexcept JS80P_OVERRIDE;
 
         Sample const* const* initialize_rendering(
             Integer const round,

@@ -36,8 +36,9 @@ Mixer<InputSignalProducerClass>::Mixer(Integer const channels) noexcept
 
 
 template<class InputSignalProducerClass>
-void Mixer<InputSignalProducerClass>::add(InputSignalProducerClass& input) noexcept
-{
+void Mixer<InputSignalProducerClass>::add(
+        InputSignalProducerClass& input
+) noexcept {
     inputs.push_back(Input(&input));
 }
 
@@ -61,12 +62,15 @@ Sample const* const* Mixer<InputSignalProducerClass>::initialize_rendering(
     std::vector<Input>& inputs = this->inputs;
     bool has_weights = false;
 
-    for (typename std::vector<Input>::iterator it = inputs.begin(); it != inputs.end(); ++it) {
-        Number const weight = it->weight;
+    typename std::vector<Input>::iterator it;
+
+    for (it = inputs.begin(); it != inputs.end(); ++it) {
+        Input& input = *it;
+        Number const weight = input.weight;
 
         if (weight > SILENCE_WEIGHT) {
-            it->buffer = SignalProducer::produce<InputSignalProducerClass>(
-                *it->input, round, sample_count
+            input.buffer = SignalProducer::produce<InputSignalProducerClass>(
+                *input.input, round, sample_count
             );
             has_weights = has_weights || !Math::is_close(weight, 1.0);
         }
@@ -106,7 +110,9 @@ void Mixer<InputSignalProducerClass>::render(
 
     render_silence(round, first_sample_index, end_sample_index, buffer);
 
-    for (typename std::vector<Input>::const_iterator it = inputs.begin(); it != inputs.end(); ++it) {
+    typename std::vector<Input>::const_iterator it;
+
+    for (it = inputs.begin(); it != inputs.end(); ++it) {
         Number const weight = it->weight;
 
         if (JS80P_UNLIKELY(weight < SILENCE_WEIGHT)) {
@@ -130,8 +136,9 @@ void Mixer<InputSignalProducerClass>::render(
 
 
 template<class InputSignalProducerClass>
-Mixer<InputSignalProducerClass>::Input::Input(InputSignalProducerClass* const input)
-    : input(input),
+Mixer<InputSignalProducerClass>::Input::Input(
+        InputSignalProducerClass* const input
+) : input(input),
     buffer(NULL),
     weight(1.0)
 {

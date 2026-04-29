@@ -79,14 +79,17 @@ void MidiController::change_all_channels(
 }
 
 
-Integer MidiController::get_change_index(Midi::Channel const channel) const noexcept
-{
+Integer MidiController::get_change_index(
+        Midi::Channel const channel
+) const noexcept {
     return change_indices[channel];
 }
 
 
-void MidiController::change(Midi::Channel const channel, Number const new_value) noexcept
-{
+void MidiController::change(
+        Midi::Channel const channel,
+        Number const new_value
+) noexcept {
     values[channel] = new_value;
     ++change_indices[channel];
     change_indices[channel] &= 0x7fffffff;

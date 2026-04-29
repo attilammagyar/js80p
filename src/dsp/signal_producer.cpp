@@ -41,10 +41,14 @@ Sample const* const* SignalProducer::produce(
     }
 
     Seconds const start_time = signal_producer.current_time;
-    Integer const count = signal_producer.sample_count_or_block_size(sample_count);
+    Integer const count = (
+        signal_producer.sample_count_or_block_size(sample_count)
+    );
 
     signal_producer.cached_round = round;
-    signal_producer.cached_buffer = signal_producer.initialize_rendering(round, count);
+    signal_producer.cached_buffer = (
+        signal_producer.initialize_rendering(round, count)
+    );
     signal_producer.last_sample_count = count;
 
     if (signal_producer.cached_buffer != NULL) {
@@ -69,7 +73,8 @@ Sample const* const* SignalProducer::produce(
             current_sample_index = next_stop;
             signal_producer.current_time = (
                 start_time
-                + (Seconds)current_sample_index * signal_producer.sampling_period
+                + (Seconds)current_sample_index
+                * signal_producer.sampling_period
             );
         }
     } else {
@@ -174,8 +179,9 @@ void SignalProducer::set_block_size(Integer const new_block_size) noexcept
 }
 
 
-Sample** SignalProducer::reallocate_buffer(Sample** const old_buffer) const noexcept
-{
+Sample** SignalProducer::reallocate_buffer(
+        Sample** const old_buffer
+) const noexcept {
     free_buffer(old_buffer);
 
     return allocate_buffer();
@@ -597,7 +603,8 @@ void SignalProducer::handle_events(
 
         if (next_event.time_offset > handle_until) {
             next_stop = current_sample_index + (Integer)std::ceil(
-                (next_event.time_offset - handle_until) * signal_producer.sample_rate
+                (next_event.time_offset - handle_until)
+                * signal_producer.sample_rate
             );
 
             if (next_stop > sample_count) {

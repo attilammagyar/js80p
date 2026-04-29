@@ -28,7 +28,8 @@ namespace JS80P
 {
 
 template<class InputSignalProducerClass>
-constexpr typename Reverb<InputSignalProducerClass>::Tuning Reverb<InputSignalProducerClass>::TUNINGS[][COMB_FILTERS];
+constexpr typename Reverb<InputSignalProducerClass>::Tuning
+    Reverb<InputSignalProducerClass>::TUNINGS[][COMB_FILTERS];
 
 
 template<class InputSignalProducerClass>
@@ -315,7 +316,9 @@ Sample const* const* Reverb<InputSignalProducerClass>::initialize_rendering(
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+        SideChainCompressableEffect<
+            InputSignalProducerClass
+        >::initialize_rendering(
             round, sample_count
         )
     );

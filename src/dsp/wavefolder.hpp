@@ -34,11 +34,11 @@ namespace JS80P
  * \brief Antialiased waveshaper based wavefolder, using Antiderivative
  *        Antialiasing (ADAA). See:
  *        <a href="https://www.dafx.de/paper-archive/2016/dafxpapers/20-DAFx-16_paper_41-PN.pdf">
- *        Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time Convolution
- *        (Parker, J., Zavalishin, V., & Bivic, E.L. - 2016)</a>. The shaping
- *        function is an approximation of a triangle wave which has a wavelength
- *        of 4.0, and which is positioned so that f(0.0) = 0.0, and the
- *        projection of the [-1.0, 1.0] interval is approximately itself.
+ *        Reducing the Aliasing of Nonlinear Waveshaping Using Continuous-Time
+ *        Convolution (Parker, J., Zavalishin, V., & Bivic, E.L. - 2016)</a>.
+ *        The shaping function is an approximation of a triangle wave which has
+ *        a wavelength of 4.0, and which is positioned so that f(0.0) = 0.0, and
+ *        the projection of the [-1.0, 1.0] interval is approximately itself.
  */
 template<class InputSignalProducerClass>
 class Wavefolder : public Filter<InputSignalProducerClass>
@@ -75,8 +75,13 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         ) noexcept JS80P_OVERRIDE;
 
     private:
-        static constexpr Sample TRANSITION_INV = 1.0 / Constants::FOLD_TRANSITION;
-        static constexpr Sample TRANSITION_DELTA = 1.0 - Constants::FOLD_TRANSITION;
+        static constexpr Sample TRANSITION_INV = (
+            1.0 / Constants::FOLD_TRANSITION
+        );
+
+        static constexpr Sample TRANSITION_DELTA = (
+            1.0 - Constants::FOLD_TRANSITION
+        );
 
         static constexpr Sample TRIANGLE_SCALE = 8.0 / Math::PI_SQR;
 
@@ -110,7 +115,10 @@ class Wavefolder : public Filter<InputSignalProducerClass>
         static constexpr Number WAVE_LENGTH = Math::PI_DOUBLE / S1;
         static constexpr Number WAVE_LENGTH_HALF = WAVE_LENGTH / 2.0;
         static constexpr Number TABLE_SCALE = TABLE_SIZE_FLOAT / WAVE_LENGTH;
-        static constexpr Number TABLE_OFFSET = TABLE_SIZE_FLOAT / WAVE_LENGTH_HALF;
+
+        static constexpr Number TABLE_OFFSET = (
+            TABLE_SIZE_FLOAT / WAVE_LENGTH_HALF
+        );
 
         // static Sample f_table[TABLE_SIZE];
         static Sample F0_table[TABLE_SIZE];

@@ -42,7 +42,9 @@ CompressionModeParam::CompressionModeParam(
 
 
 template<class InputSignalProducerClass>
-SideChainCompressableEffect<InputSignalProducerClass>::SideChainCompressableEffect(
+SideChainCompressableEffect<
+        InputSignalProducerClass
+>::SideChainCompressableEffect(
         std::string const& name,
         InputSignalProducerClass& input,
         Integer const number_of_children,
@@ -82,8 +84,9 @@ void SideChainCompressableEffect<InputSignalProducerClass>::reset() noexcept
 
 
 template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::clear_state() noexcept
-{
+void SideChainCompressableEffect<
+        InputSignalProducerClass
+>::clear_state() noexcept {
     gain.cancel_events_at(0.0);
     gain.set_value(BYPASS_GAIN);
     previous_action = Action::BYPASS_OR_RELEASE;
@@ -92,12 +95,16 @@ void SideChainCompressableEffect<InputSignalProducerClass>::clear_state() noexce
 
 
 template<class InputSignalProducerClass>
-Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::initialize_rendering(
+Sample const* const* SideChainCompressableEffect<
+        InputSignalProducerClass
+>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Effect<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        Effect<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
 
     if (buffer != NULL) {
@@ -136,7 +143,10 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
     Number const diff_db = Math::linear_to_db(peak) - threshold_db;
 
-    if ((CompressionMode)new_mode == CompressionMode::COMPRESSION_MODE_COMPRESSOR) {
+    if (
+            (CompressionMode)new_mode
+            == CompressionMode::COMPRESSION_MODE_COMPRESSOR
+    ) {
         if (diff_db > 0.0) {
             compress(
                 peak,
@@ -166,7 +176,9 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
         }
     }
 
-    gain_buffer = FloatParamS::produce_if_not_constant(gain, round, sample_count);
+    gain_buffer = FloatParamS::produce_if_not_constant(
+        gain, round, sample_count
+    );
 
     is_silent_ = gain_buffer == NULL && gain.get_value() < 0.000003;
 
@@ -175,7 +187,9 @@ Sample const* const* SideChainCompressableEffect<InputSignalProducerClass>::init
 
 
 template<class InputSignalProducerClass>
-void SideChainCompressableEffect<InputSignalProducerClass>::fast_bypass() noexcept
+void SideChainCompressableEffect<
+        InputSignalProducerClass
+>::fast_bypass() noexcept
 {
     clear_state();
     is_bypassing = true;
@@ -241,7 +255,9 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
     }
 
     if (is_silent_) {
-        this->render_silence(round, first_sample_index, end_sample_index, buffer);
+        this->render_silence(
+            round, first_sample_index, end_sample_index, buffer
+        );
 
         return;
     }
@@ -253,7 +269,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
     if (wet_buffer == NULL) {
         if (dry_buffer == NULL) {
             if (gain_buffer == NULL) {
-                render<ParamValueWrapper, ParamValueWrapper, false, ParamValueWrapper>(
+                render<
+                    ParamValueWrapper,
+                    ParamValueWrapper,
+                    false,
+                    ParamValueWrapper
+                >(
                     ParamValueWrapper(this->dry.get_value()),
                     ParamValueWrapper(this->wet.get_value() * gain.get_value()),
                     ParamValueWrapper(1.0),
@@ -263,7 +284,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                     buffer
                 );
             } else {
-                render<ParamValueWrapper, ParamValueWrapper, true, ParamValueBufferWrapper>(
+                render<
+                    ParamValueWrapper,
+                    ParamValueWrapper,
+                    true,
+                    ParamValueBufferWrapper
+                >(
                     ParamValueWrapper(this->dry.get_value()),
                     ParamValueWrapper(this->wet.get_value()),
                     ParamValueBufferWrapper(gain_buffer),
@@ -274,7 +300,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 );
             }
         } else if (gain_buffer == NULL) {
-            render<ParamValueBufferWrapper, ParamValueWrapper, false, ParamValueWrapper>(
+            render<
+                ParamValueBufferWrapper,
+                ParamValueWrapper,
+                false,
+                ParamValueWrapper
+            >(
                 ParamValueBufferWrapper(dry_buffer),
                 ParamValueWrapper(this->wet.get_value() * gain.get_value()),
                 ParamValueWrapper(1.0),
@@ -284,7 +315,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 buffer
             );
         } else {
-            render<ParamValueBufferWrapper, ParamValueWrapper, true, ParamValueBufferWrapper>(
+            render<
+                ParamValueBufferWrapper,
+                ParamValueWrapper,
+                true,
+                ParamValueBufferWrapper
+            >(
                 ParamValueBufferWrapper(dry_buffer),
                 ParamValueWrapper(this->wet.get_value()),
                 ParamValueBufferWrapper(gain_buffer),
@@ -296,7 +332,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
         }
     } else if (dry_buffer == NULL) {
         if (gain_buffer == NULL) {
-            render<ParamValueWrapper, ParamValueBufferWrapper, true, ParamValueWrapper>(
+            render<
+                ParamValueWrapper,
+                ParamValueBufferWrapper,
+                true,
+                ParamValueWrapper
+            >(
                 ParamValueWrapper(this->dry.get_value()),
                 ParamValueBufferWrapper(wet_buffer),
                 ParamValueWrapper(gain.get_value()),
@@ -306,7 +347,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
                 buffer
             );
         } else {
-            render<ParamValueWrapper, ParamValueBufferWrapper, true, ParamValueBufferWrapper>(
+            render<
+                ParamValueWrapper,
+                ParamValueBufferWrapper,
+                true,
+                ParamValueBufferWrapper
+            >(
                 ParamValueWrapper(this->dry.get_value()),
                 ParamValueBufferWrapper(wet_buffer),
                 ParamValueBufferWrapper(gain_buffer),
@@ -317,7 +363,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
             );
         }
     } else if (gain_buffer == NULL) {
-        render<ParamValueBufferWrapper, ParamValueBufferWrapper, true, ParamValueWrapper>(
+        render<
+            ParamValueBufferWrapper,
+            ParamValueBufferWrapper,
+            true,
+            ParamValueWrapper
+        >(
             ParamValueBufferWrapper(dry_buffer),
             ParamValueBufferWrapper(wet_buffer),
             ParamValueWrapper(gain.get_value()),
@@ -327,7 +378,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
             buffer
         );
     } else {
-        render<ParamValueBufferWrapper, ParamValueBufferWrapper, true, ParamValueBufferWrapper>(
+        render<
+            ParamValueBufferWrapper,
+            ParamValueBufferWrapper,
+            true,
+            ParamValueBufferWrapper
+        >(
             ParamValueBufferWrapper(dry_buffer),
             ParamValueBufferWrapper(wet_buffer),
             ParamValueBufferWrapper(gain_buffer),
@@ -341,7 +397,12 @@ void SideChainCompressableEffect<InputSignalProducerClass>::render(
 
 
 template<class InputSignalProducerClass>
-template<class DryBufferClass, class WetBufferClass, bool has_gain, class GainBufferClass>
+template<
+        class DryBufferClass,
+        class WetBufferClass,
+        bool has_gain,
+        class GainBufferClass
+>
 void SideChainCompressableEffect<InputSignalProducerClass>::render(
         DryBufferClass const& dry,
         WetBufferClass const& wet,

@@ -116,7 +116,7 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
 
     for (Integer j = 0; j != SIZE; ++j) {
         samples[j] = (
-            (Sample)(coefficients[0] * sines[(j * frequency) & TABLE_INDEX_MASK])
+            coefficients[0] * sines[(j * frequency) & TABLE_INDEX_MASK]
         );
     }
 
@@ -129,7 +129,7 @@ void Wavetable::update_coefficients(Number const coefficients[]) noexcept
         for (Integer j = 0; j != SIZE; ++j) {
             samples[j] = (
                 prev_samples[j]
-                + (Sample)(coefficients[i] * sines[(j * frequency) & TABLE_INDEX_MASK])
+                + coefficients[i] * sines[(j * frequency) & TABLE_INDEX_MASK]
             );
         }
     }
@@ -228,7 +228,9 @@ void Wavetable::lookup(
     if constexpr (single_partial) {
         state.table_indices[0] = 0;
 
-        interpolate<interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling>(
+        interpolate<
+            interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling
+        >(
             state,
             abs_frequency,
             sample_index + phase_offset,
@@ -249,7 +251,13 @@ void Wavetable::lookup(
         if (more_partials_index == 0 || max_partials_int > partials) {
             state.table_indices[0] = more_partials_index;
 
-            interpolate<interpolation, false, with_subharmonic, is_pulse, need_pulse_scaling>(
+            interpolate<
+                interpolation,
+                false,
+                with_subharmonic,
+                is_pulse,
+                need_pulse_scaling
+            >(
                 state,
                 abs_frequency,
                 sample_index + phase_offset,
@@ -269,7 +277,9 @@ void Wavetable::lookup(
         state.table_indices[1] = more_partials_index;
         state.more_partials_weight = max_partials - std::floor(max_partials);
 
-        interpolate<interpolation, true, with_subharmonic, is_pulse, need_pulse_scaling>(
+        interpolate<
+            interpolation, true, with_subharmonic, is_pulse, need_pulse_scaling
+        >(
             state,
             abs_frequency,
             sample_index + phase_offset,
@@ -311,13 +321,19 @@ void Wavetable::interpolate(
     } else {
         if (JS80P_LIKELY(frequency >= state.interpolation_limit)) {
             interpolate_sample_linear<
-                table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+                table_interpolation,
+                with_subharmonic,
+                is_pulse,
+                need_pulse_scaling
             >(
                 state, sample_index, pulse_width, sample, subharmonic_sample
             );
         } else {
             interpolate_sample_lagrange<
-                table_interpolation, with_subharmonic, is_pulse, need_pulse_scaling
+                table_interpolation,
+                with_subharmonic,
+                is_pulse,
+                need_pulse_scaling
             >(
                 state, sample_index, pulse_width, sample, subharmonic_sample
             );
@@ -347,7 +363,9 @@ void Wavetable::interpolate_sample_linear(
         Sample sample_2;
 
         interpolate_sample_linear<table_interpolation, false>(
-            state, sample_index + PERIOD_SIZE_FLOAT * pulse_width, sample_2, subharmonic_sample
+            state,
+            sample_index + PERIOD_SIZE_FLOAT * pulse_width,
+            sample_2, subharmonic_sample
         );
         compute_pulse_sample<need_pulse_scaling>(sample, sample_2, pulse_width);
     }
@@ -400,10 +418,14 @@ void Wavetable::interpolate_sample_linear(
         sample = Math::combine(
             state.more_partials_weight,
             Math::combine(
-                sample_2_weight, table_2[sample_2_index], table_2[sample_1_index]
+                sample_2_weight,
+                table_2[sample_2_index],
+                table_2[sample_1_index]
             ),
             Math::combine(
-                sample_2_weight, table_1[sample_2_index], table_1[sample_1_index]
+                sample_2_weight,
+                table_1[sample_2_index],
+                table_1[sample_1_index]
             )
         );
     } else {
@@ -414,7 +436,9 @@ void Wavetable::interpolate_sample_linear(
 
     if constexpr (with_subharmonic) {
         subharmonic_sample = Math::combine(
-            sample_2_weight, subharmonic[sample_2_index], subharmonic[sample_1_index]
+            sample_2_weight,
+            subharmonic[sample_2_index],
+            subharmonic[sample_1_index]
         );
     }
 }
@@ -441,7 +465,10 @@ void Wavetable::interpolate_sample_lagrange(
         Sample sample_2;
 
         interpolate_sample_lagrange<table_interpolation, false>(
-            state, sample_index + PERIOD_SIZE_FLOAT * pulse_width, sample_2, subharmonic_sample
+            state,
+            sample_index + PERIOD_SIZE_FLOAT * pulse_width,
+            sample_2,
+            subharmonic_sample
         );
         compute_pulse_sample<need_pulse_scaling>(sample, sample_2, pulse_width);
     }

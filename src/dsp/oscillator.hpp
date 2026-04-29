@@ -167,7 +167,10 @@ class Oscillator : public SignalProducer
 
         ~Oscillator() override;
 
-        virtual void set_block_size(Integer const new_block_size) noexcept override;
+        virtual void set_block_size(
+            Integer const new_block_size
+        ) noexcept override;
+
         virtual void reset() noexcept override;
 
         void start(Seconds const time_offset) noexcept;
@@ -191,7 +194,10 @@ class Oscillator : public SignalProducer
             Sample const phase_value
         ) noexcept;
 
-        void skip_round(Integer const round, Integer const sample_count) noexcept;
+        void skip_round(
+            Integer const round,
+            Integer const sample_count
+        ) noexcept;
 
         WaveformParam& waveform;
 
@@ -289,7 +295,11 @@ class Oscillator : public SignalProducer
 
         void initialize_first_round(Frequency const frequency) noexcept;
 
-        template<bool has_subharmonic, bool is_pulse, class PulseWidthBufferClass>
+        template<
+            bool has_subharmonic,
+            bool is_pulse,
+            class PulseWidthBufferClass
+        >
         void render(
             PulseWidthBufferClass const& pulse_width,
             WavetableState& wavetable_state,

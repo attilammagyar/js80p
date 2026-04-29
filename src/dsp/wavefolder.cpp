@@ -34,11 +34,15 @@ bool Wavefolder<InputSignalProducerClass>::is_initialized = false;
 
 
 // template<class InputSignalProducerClass>
-// Sample Wavefolder<InputSignalProducerClass>::f_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
+// Sample Wavefolder<
+        // InputSignalProducerClass
+// >::f_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
 
 
 template<class InputSignalProducerClass>
-Sample Wavefolder<InputSignalProducerClass>::F0_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
+Sample Wavefolder<
+        InputSignalProducerClass
+>::F0_table[Wavefolder<InputSignalProducerClass>::TABLE_SIZE] = {};
 
 
 template<class InputSignalProducerClass>
@@ -55,8 +59,16 @@ void Wavefolder<InputSignalProducerClass>::initialize_class() noexcept
 
     for (int i = 0; i != TABLE_SIZE; ++i) {
         Number const x = ((Number)i - table_size_half) * scale;
-        // f_table[i] = S0 * std::sin(S1 * x) - S2 * std::sin(S3 * x) + S4 * std::sin(S5 * x);
-        F0_table[i] = -S6 * std::cos(S1 * x) + S7 * std::cos(S3 * x) - S8 * std::cos(S5 * x);
+        // f_table[i] = (
+            // S0 * std::sin(S1 * x)
+            // - S2 * std::sin(S3 * x)
+            // + S4 * std::sin(S5 * x)
+        // );
+        F0_table[i] = (
+            -S6 * std::cos(S1 * x)
+            + S7 * std::cos(S3 * x)
+            - S8 * std::cos(S5 * x)
+        );
     }
 }
 
@@ -188,10 +200,13 @@ void Wavefolder<InputSignalProducerClass>::render(
                 Sample const* const in_channel = input_buffer[c];
                 Sample* const out_channel = buffer[c];
                 Sample previous_input_sample = this->previous_input_sample[c];
-                Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
+                Sample F0_previous_input_sample = (
+                    this->F0_previous_input_sample[c]
+                );
                 Sample previous_output_sample = this->previous_output_sample[c];
+                Integer i;
 
-                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                for (i = first_sample_index; i != end_sample_index; ++i) {
                     Sample const input_sample = in_channel[i];
 
                     out_channel[i] = Math::combine(
@@ -218,10 +233,13 @@ void Wavefolder<InputSignalProducerClass>::render(
                 Sample const* const in_channel = input_buffer[c];
                 Sample* const out_channel = buffer[c];
                 Sample previous_input_sample = this->previous_input_sample[c];
-                Sample F0_previous_input_sample = this->F0_previous_input_sample[c];
+                Sample F0_previous_input_sample = (
+                    this->F0_previous_input_sample[c]
+                );
                 Sample previous_output_sample = this->previous_output_sample[c];
+                Integer i;
 
-                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                for (i = first_sample_index; i != end_sample_index; ++i) {
                     Sample const input_sample = in_channel[i];
 
                     out_channel[i] = fold(
@@ -324,14 +342,18 @@ Sample Wavefolder<InputSignalProducerClass>::fold(
 // template<class InputSignalProducerClass>
 // Sample Wavefolder<InputSignalProducerClass>::f(Sample const x) const noexcept
 // {
-    // return Math::lookup_periodic_2(f_table, TABLE_SIZE, TABLE_INDEX_MASK, TABLE_SCALE * x + TABLE_OFFSET);
+    // return Math::lookup_periodic_2(
+        // f_table, TABLE_SIZE, TABLE_INDEX_MASK, TABLE_SCALE * x + TABLE_OFFSET
+    // );
 // }
 
 
 template<class InputSignalProducerClass>
 Sample Wavefolder<InputSignalProducerClass>::F0(Sample const x) const noexcept
 {
-    return Math::lookup_periodic_2(F0_table, TABLE_SIZE, TABLE_INDEX_MASK, TABLE_SCALE * x + TABLE_OFFSET);
+    return Math::lookup_periodic_2(
+        F0_table, TABLE_SIZE, TABLE_INDEX_MASK, TABLE_SCALE * x + TABLE_OFFSET
+    );
 }
 
 }

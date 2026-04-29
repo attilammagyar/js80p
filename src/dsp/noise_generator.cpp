@@ -105,14 +105,20 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::stop(
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-bool NoiseGenerator<InputSignalProducerClass, LevelParamClass>::is_on() const noexcept
+bool NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::is_on() const noexcept
 {
     return is_on_;
 }
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::clear_filters_state() noexcept
+void NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::clear_filters_state() noexcept
 {
     for (Integer c = 0; c != this->channels; ++c) {
         r_n_m1[c] = x_n_m1[c] = y_n_m1[c] = 0.0;
@@ -121,7 +127,10 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::clear_filters_st
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::update_filter_coefficients() noexcept
+void NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::update_filter_coefficients() noexcept
 {
     /*
     Simple low-pass and high-pass filters. See:
@@ -150,8 +159,12 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::update_filter_co
 
     */
 
-    Frequency const H = std::min(high_pass_frequency, this->sample_rate * 0.0625);
-    Frequency const L = std::min(low_pass_frequency, this->sample_rate * 0.3500);
+    Frequency const H = std::min(
+        high_pass_frequency, this->sample_rate * 0.0625
+    );
+    Frequency const L = std::min(
+        low_pass_frequency, this->sample_rate * 0.3500
+    );
     Sample const PI_2_S = Math::PI_DOUBLE * this->sampling_period;
     Sample const v = PI_2_S * H;
     Sample const t = PI_2_S * L;
@@ -183,7 +196,10 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_event(
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_start_event(
+void NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::handle_start_event(
         SignalProducer::Event const& event
 ) noexcept {
     is_on_ = true;
@@ -193,7 +209,10 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_start_eve
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_stop_event(
+void NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::handle_stop_event(
         SignalProducer::Event const& event
 ) noexcept {
     is_on_ = false;
@@ -201,15 +220,22 @@ void NoiseGenerator<InputSignalProducerClass, LevelParamClass>::handle_stop_even
 
 
 template<class InputSignalProducerClass, class LevelParamClass>
-Sample const* const* NoiseGenerator<InputSignalProducerClass, LevelParamClass>::initialize_rendering(
+Sample const* const* NoiseGenerator<
+        InputSignalProducerClass,
+        LevelParamClass
+>::initialize_rendering(
         Integer const round,
         Integer const sample_count
 ) noexcept {
     Sample const* const* const buffer = (
-        Filter<InputSignalProducerClass>::initialize_rendering(round, sample_count)
+        Filter<InputSignalProducerClass>::initialize_rendering(
+            round, sample_count
+        )
     );
 
-    level_buffer = LevelParamClass::produce_if_not_constant(level, round, sample_count);
+    level_buffer = LevelParamClass::produce_if_not_constant(
+        level, round, sample_count
+    );
 
     if (JS80P_UNLIKELY(this->has_upcoming_events(sample_count))) {
         return NULL;

@@ -313,10 +313,14 @@ TapeParams::TapeParams(
     delay_channel_lfo_1.phase.set_value(0.3);
     delay_channel_lfo_1.distortion.set_value(0.15);
     delay_channel_lfo_1.waveform.set_value(LFO::Oscillator_::SOFT_TRIANGLE);
-    delay_channel_lfo_1.frequency.set_macro(&delay_channel_lfo_1_frequency_macro);
+    delay_channel_lfo_1.frequency.set_macro(
+        &delay_channel_lfo_1_frequency_macro
+    );
 
     delay_channel_lfo_2.distortion.set_value(0.05);
-    delay_channel_lfo_2.frequency.set_macro(&delay_channel_lfo_2_frequency_macro);
+    delay_channel_lfo_2.frequency.set_macro(
+        &delay_channel_lfo_2_frequency_macro
+    );
 
     constexpr Number filter_gain_min = Constants::BIQUAD_FILTER_GAIN_MIN;
     constexpr Number filter_gain_max = Constants::BIQUAD_FILTER_GAIN_MAX;
@@ -374,7 +378,9 @@ TapeParams::TapeParams(
     low_pass_filter_frequency_macro.distortion_curve.set_value(
         Macro::DIST_CURVE_SHARP_SMOOTH
     );
-    low_pass_filter_frequency_macro.input.set_macro(&color_distance_from_midpoint);
+    low_pass_filter_frequency_macro.input.set_macro(
+        &color_distance_from_midpoint
+    );
 
     low_shelf_filter_gain_macro.min.set_value(
         (0.0 - filter_gain_min) / filter_gain_range
@@ -438,8 +444,10 @@ TapeParams::TapeParams(
 }
 
 
-void TapeParams::store_signal_producers_from_macro(Macro& macro, size_t& i) noexcept
-{
+void TapeParams::store_signal_producers_from_macro(
+        Macro& macro,
+        size_t& i
+) noexcept {
     signal_producers[i++] = &macro.midpoint;
     signal_producers[i++] = &macro.input;
     signal_producers[i++] = &macro.min;
@@ -577,7 +585,9 @@ Tape<InputSignalProducerClass, required_bypass_toggle_value>::Tape(
 
     low_pass_filter.type.set_value(LowPassFilter::LOW_PASS);
     low_pass_filter.q.set_value(0.0);
-    low_pass_filter.frequency.set_macro(&params.low_pass_filter_frequency_macro);
+    low_pass_filter.frequency.set_macro(
+        &params.low_pass_filter_frequency_macro
+    );
 
     delay.time.set_lfo(&params.delay_time_lfo);
     delay.gain.set_value(1.0);
@@ -950,10 +960,15 @@ Sample const* const* Tape<
 
 
 template<class InputSignalProducerClass, Byte required_bypass_toggle_value>
-void Tape<InputSignalProducerClass, required_bypass_toggle_value>::schedule_stop(
+void Tape<
+        InputSignalProducerClass,
+        required_bypass_toggle_value
+>::schedule_stop(
         Seconds const duration
 ) noexcept {
-    constexpr Number delay_time_min_max = 1.0 - TapeParams::DELAY_TIME_LFO_RANGE;
+    constexpr Number delay_time_min_max = (
+        1.0 - TapeParams::DELAY_TIME_LFO_RANGE
+    );
 
     transition_duration = duration;
     params.state = TapeParams::State::TAPE_STATE_STOPPING;

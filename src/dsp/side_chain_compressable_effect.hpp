@@ -110,7 +110,12 @@ class SideChainCompressableEffect : public Effect<InputSignalProducerClass>
             FloatParamB const& time_param
         ) noexcept;
 
-        template<class DryBufferClass, class WetBufferClass, bool has_gain, class GainBufferClass>
+        template<
+            class DryBufferClass,
+            class WetBufferClass,
+            bool has_gain,
+            class GainBufferClass
+        >
         void render(
             DryBufferClass const& dry,
             WetBufferClass const& wet,
