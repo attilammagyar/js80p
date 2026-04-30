@@ -56,7 +56,8 @@ class GUI
         {
             public:
                 /**
-                 * \brief Called when the GUI needs to be resized with external help.
+                 * \brief Called when the GUI needs to be resized with external
+                 *        help.
                  */
                 virtual void handle_resize_request(
                     int const new_width,
@@ -64,9 +65,9 @@ class GUI
                 );
         };
 
-        typedef void* PlatformWidget; ///< \brief GUI platform dependent widget type.
-        typedef void* PlatformData; ///< \brief GUI platform dependent data (e.g. HINSTANCE on Windows).
-        typedef void* Image; ///< \brief GUI platform dependent image handle.
+        typedef void* PlatformWidget; ///< \brief Platform-specific widget type.
+        typedef void* PlatformData; ///< \brief Platform-specific data type.
+        typedef void* Image; ///< \brief Platform-specific image handle.
 
         typedef std::vector<WidgetBase*> Widgets;
 
@@ -138,7 +139,9 @@ class GUI
         static char const* const TUNINGS[];
         static int const TUNINGS_COUNT;
 
-        static char const* const OSCILLATOR_INACCURACY_LEVELS[OscillatorInaccuracy::MAX_LEVEL + 1];
+        static char const* const
+            OSCILLATOR_INACCURACY_LEVELS[OscillatorInaccuracy::MAX_LEVEL + 1];
+
         static int const OSCILLATOR_INACCURACY_LEVELS_COUNT;
 
         static char const* const WAVEFORMS[];
@@ -178,7 +181,9 @@ class GUI
 
         static Controller const CONTROLLERS[];
 
-        static Controller const* get_controller(Synth::ControllerId const controller_id);
+        static Controller const* get_controller(
+            Synth::ControllerId const controller_id
+        );
 
         static constexpr inline Color rgb(
                 ColorComponent const red,
@@ -186,7 +191,9 @@ class GUI
                 ColorComponent const blue
         ) {
             return (Color)(
-                (unsigned int)red << 16 | (unsigned int)green << 8 | (unsigned int)blue
+                (unsigned int)red << 16
+                | (unsigned int)green << 8
+                | (unsigned int)blue
             );
         }
 
@@ -245,9 +252,13 @@ class GUI
 
         static Number clamp_ratio(Number const ratio);
 
-        static Color controller_id_to_text_color(Synth::ControllerId const controller_id);
+        static Color controller_id_to_text_color(
+            Synth::ControllerId const controller_id
+        );
 
-        static Color controller_id_to_bg_color(Synth::ControllerId const controller_id);
+        static Color controller_id_to_bg_color(
+            Synth::ControllerId const controller_id
+        );
 
         GUI(
             char const* const sdk_version,
@@ -272,7 +283,11 @@ class GUI
         void start_resizing();
         void stop_resizing();
 
-        void apply_size_constraints(int& new_width, int& new_height, Number& new_scale) const;
+        void apply_size_constraints(
+            int& new_width,
+            int& new_height,
+            Number& new_scale
+        ) const;
 
         void ignore_resizing();
         int get_width() const;
@@ -338,7 +353,9 @@ class GUI
             size_t const buffer_size
         );
 
-        static Controller const* controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT];
+        static Controller const*
+            controllers_by_id[Synth::ControllerId::CONTROLLER_ID_COUNT];
+
         static bool controllers_by_id_initialized;
 
         void initialize();
@@ -609,7 +626,8 @@ class WidgetBase
         virtual bool mouse_up(int const x, int const y);
 
         /**
-         * \brief Event handler to run when the mouse cursor moves over the widget.
+         * \brief Event handler to run when the mouse cursor moves over the
+         *        widget.
          *
          * \param   x           Horizontal coordinate of the cursor relative to
          *                      the top left corner of the widget.
@@ -627,7 +645,8 @@ class WidgetBase
         virtual bool mouse_move(int const x, int const y, bool const modifier);
 
         /**
-         * \brief Event handler to run when the mouse cursor leaves the widget's area.
+         * \brief Event handler to run when the mouse cursor leaves the widget's
+         *        area.
          *
          * \param   x           Horizontal coordinate of the cursor relative to
          *                      the top left corner of the widget.
