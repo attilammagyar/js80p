@@ -112,8 +112,12 @@ bool Widget::notify_mouse_up(Widget* widget, int const x, int const y)
 }
 
 
-bool Widget::notify_mouse_move(Widget* widget, int const x, int const y, bool const modifier)
-{
+bool Widget::notify_mouse_move(
+        Widget* widget,
+        int const x,
+        int const y,
+        bool const modifier
+) {
     return widget != NULL ? widget->mouse_move(x, y, modifier) : false;
 }
 
@@ -124,8 +128,11 @@ bool Widget::notify_mouse_leave(Widget* widget, int const x, int const y)
 }
 
 
-bool Widget::notify_mouse_wheel(Widget* widget, Number const delta, bool const modifier)
-{
+bool Widget::notify_mouse_wheel(
+        Widget* widget,
+        Number const delta,
+        bool const modifier
+) {
     return widget != NULL ? widget->mouse_wheel(delta, modifier) : false;
 }
 

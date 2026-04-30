@@ -91,9 +91,13 @@
         if (event.clickCount >= 2) {
             JS80P::Widget::notify_double_click(self.cpp_widget);
         } else {
-            NSPoint p = [self convertPoint:[event locationInWindow] fromView:nil];
+            NSPoint p = [
+                self convertPoint:[event locationInWindow] fromView:nil
+            ];
 
-            JS80P::Widget::notify_mouse_down(self.cpp_widget, (int)p.x, (int)p.y);
+            JS80P::Widget::notify_mouse_down(
+                self.cpp_widget, (int)p.x, (int)p.y
+            );
         }
     }
 
@@ -207,7 +211,9 @@ JS80P::GUI::PlatformWidget js80p_create_platform_widget(
         JS80P::GUI::PlatformWidget parent,
         JS80P::WidgetBase::Type const type
 ) {
-    NSRect frame = NSMakeRect((CGFloat)left, (CGFloat)top, (CGFloat)width, (CGFloat)height);
+    NSRect frame = NSMakeRect(
+        (CGFloat)left, (CGFloat)top, (CGFloat)width, (CGFloat)height
+    );
 
     CocoaWidget* cocoa_widget = [[CocoaWidget alloc] initWithFrame:frame];
     cocoa_widget.cpp_widget = cpp_widget;
@@ -430,7 +436,9 @@ void js80p_widget_draw_text(
 
     [
         ns_text
-        drawInRect:NSMakeRect((CGFloat)left, float_top, (CGFloat)width, float_height)
+        drawInRect:NSMakeRect(
+            (CGFloat)left, float_top, (CGFloat)width, float_height
+        )
         withAttributes:attrs
     ];
 }
@@ -451,7 +459,9 @@ JS80P::GUI::Image js80p_widget_load_image(char const* const name)
     }
 
     NSImage* ns_image = [[NSImage alloc] initWithContentsOfFile:path];
-    CGImageRef cg_image = [ns_image CGImageForProposedRect:nil context:nil hints:nil];
+    CGImageRef cg_image = [
+        ns_image CGImageForProposedRect:nil context:nil hints:nil
+    ];
     CGImageRetain(cg_image);
 
     return (JS80P::GUI::Image)cg_image;
@@ -550,7 +560,12 @@ bool js80p_import_patch(
     NSOpenPanel* panel = [NSOpenPanel openPanel];
 
     if (@available(macOS 11.0, *)) {
-        [panel setAllowedContentTypes:@[[UTType typeWithFilenameExtension:@"js80p"]]];
+        [
+            panel
+            setAllowedContentTypes:@[
+                [UTType typeWithFilenameExtension:@"js80p"]
+            ]
+        ];
     } else {
         [panel setAllowedFileTypes:@[@"js80p"]];
     }
@@ -606,7 +621,12 @@ void js80p_export_patch(char const* const buffer, size_t const length)
     NSSavePanel* panel = [NSSavePanel savePanel];
 
     if (@available(macOS 11.0, *)) {
-        [panel setAllowedContentTypes:@[[UTType typeWithFilenameExtension:@"js80p"]]];
+        [
+            panel
+            setAllowedContentTypes:@[
+                [UTType typeWithFilenameExtension:@"js80p"]
+            ]
+        ];
     } else {
         [panel setAllowedFileTypes:@[@"js80p"]];
     }

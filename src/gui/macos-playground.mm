@@ -126,7 +126,8 @@ constexpr JS80P::Seconds GUI_UPDATE_TIMER_INTERVAL = 0.1;
         }
     }
 
-    - (BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)sender
+    - (BOOL) applicationShouldTerminateAfterLastWindowClosed
+        :(NSApplication*)sender
     {
         return YES;
     }

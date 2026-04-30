@@ -35,9 +35,26 @@ class Widget : public WidgetBase
         static bool notify_double_click(Widget* widget);
         static bool notify_mouse_down(Widget* widget, int const x, int const y);
         static bool notify_mouse_up(Widget* widget, int const x, int const y);
-        static bool notify_mouse_move(Widget* widget, int const x, int const y, bool const modifier);
-        static bool notify_mouse_leave(Widget* widget, int const x, int const y);
-        static bool notify_mouse_wheel(Widget* widget, Number const delta, bool const modifier);
+
+        static bool notify_mouse_move(
+            Widget* widget,
+            int const x,
+            int const y,
+            bool const modifier
+        );
+
+        static bool notify_mouse_leave(
+            Widget* widget,
+            int const x,
+            int const y
+        );
+
+        static bool notify_mouse_wheel(
+            Widget* widget,
+            Number const delta,
+            bool const modifier
+        );
+
         static bool notify_timer_tick(Widget* widget);
 
         explicit Widget(char const* const text);
@@ -147,7 +164,9 @@ extern "C" {
         JS80P::WidgetBase::Type const type
     );
 
-    void js80p_destroy_platform_widget(JS80P::GUI::PlatformWidget platform_widget);
+    void js80p_destroy_platform_widget(
+        JS80P::GUI::PlatformWidget platform_widget
+    );
 
     void js80p_widget_resize(
         JS80P::GUI::PlatformWidget platform_widget,
