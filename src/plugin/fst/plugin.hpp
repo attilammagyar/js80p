@@ -55,14 +55,18 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
                 Parameter(Parameter const& parameter) = default;
                 Parameter(Parameter&& parameter) = default;
 
-                Parameter& operator=(Parameter const& parameter) noexcept = default;
+                Parameter& operator=(
+                    Parameter const& parameter
+                ) noexcept = default;
+
                 Parameter& operator=(Parameter&& parameter) noexcept = default;
 
                 char const* get_name() const noexcept;
                 Midi::Controller get_controller_id() const noexcept;
                 Midi::Channel get_channel() const noexcept;
 
-                // bool needs_host_update() const noexcept; /* See FstPlugin::generate_samples() */
+                /* See FstPlugin::generate_samples() */
+                // bool needs_host_update() const noexcept;
 
                 float get_value(Synth const& synth) noexcept;
                 float get_last_set_value() const noexcept;
@@ -79,17 +83,25 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
         static constexpr size_t NUMBER_OF_CTL_PARAMETERS = 72;
 
         /* MIDI Controller parameters + Program + Patch Changed */
-        static constexpr size_t NUMBER_OF_PARAMETERS = NUMBER_OF_CTL_PARAMETERS * Midi::CHANNELS + 2;
+        static constexpr size_t NUMBER_OF_PARAMETERS = (
+            NUMBER_OF_CTL_PARAMETERS * Midi::CHANNELS + 2
+        );
 
         static constexpr size_t PATCH_CHANGED_PARAMETER_INDEX = 72;
-        static constexpr char const* PATCH_CHANGED_PARAMETER_SHORT_NAME = "Changed";
-        static constexpr char const* PATCH_CHANGED_PARAMETER_LONG_NAME = "Patch Changed";
+        static constexpr char const* PATCH_CHANGED_PARAMETER_SHORT_NAME = (
+            "Changed"
+        );
+        static constexpr char const* PATCH_CHANGED_PARAMETER_LONG_NAME = (
+            "Patch Changed"
+        );
 
         typedef Parameter Parameters[NUMBER_OF_PARAMETERS];
 
         static constexpr VstInt32 IN_CHANNELS = (VstInt32)Synth::IN_CHANNELS;
         static constexpr VstInt32 OUT_CHANNELS = (VstInt32)Synth::OUT_CHANNELS;
-        static constexpr VstInt32 VERSION = JS80P::Constants::PLUGIN_VERSION_INT;
+        static constexpr VstInt32 VERSION = (
+            JS80P::Constants::PLUGIN_VERSION_INT
+        );
 
         static constexpr char const* FST_H_VERSION = (
             "FST "
@@ -186,7 +198,11 @@ class FstPlugin : public Midi::EventHandler, public GUI::EventHandler
         ) noexcept;
 
         VstIntPtr get_chunk(void** chunk, bool is_preset) noexcept;
-        void set_chunk(void const* chunk, VstIntPtr const size, bool is_preset) noexcept;
+        void set_chunk(
+            void const* chunk,
+            VstIntPtr const size,
+            bool is_preset
+        ) noexcept;
 
         void note_on(
             Seconds const time_offset,

@@ -160,7 +160,7 @@ int main(int const argc, char const* argv[])
 
         fprintf(
             stderr,
-            "ERROR: unable to open output file \"%s\": errno=%d, error=\"%s\"\n",
+            "ERROR: unable to write \"%s\": errno=%d, error=\"%s\"\n",
             out_file_name.c_str(),
             errno,
             error_msg == NULL ? "<NULL>" : error_msg

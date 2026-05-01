@@ -36,8 +36,9 @@ extern "C" BOOL WINAPI DllMain(
 }
 
 
-extern "C" __declspec(dllexport) AEffect* VSTPluginMain(audioMasterCallback host_callback)
-{
+extern "C" __declspec(dllexport) AEffect* VSTPluginMain(
+        audioMasterCallback host_callback
+) {
     return JS80P::FstPlugin::create_instance(
         host_callback, (JS80P::GUI::PlatformData)dll_instance, false
     );

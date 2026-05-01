@@ -35,9 +35,9 @@ namespace JS80P
 {
 
 #ifdef JS80P_FST_DEBUG
-static constexpr int FST_OP_CODE_NAMES_LEN = 78;
+static constexpr int FST_OP_NAMES_LEN = 78;
 
-static constexpr char const* FST_OP_CODE_NAMES[FST_OP_CODE_NAMES_LEN] = {
+static constexpr char const* FST_OP_NAMES[FST_OP_NAMES_LEN] = {
     "Open",                         /*    0 */
     "Close",                        /*    1 */
     "SetProgram",                   /*    2 */
@@ -174,7 +174,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
     if (
             true
             && op_code != effEditIdle
-            && (op_code != effProcessEvents || fst_plugin->prev_logged_op_code != effProcessEvents)
+            && (
+                op_code != effProcessEvents
+                || fst_plugin->prev_logged_op_code != effProcessEvents
+            )
             && op_code != effIdle
             && op_code != effGetProgram
             && op_code != effGetProgramName
@@ -187,10 +190,10 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
         fst_plugin->prev_logged_op_code = op_code;
 
         JS80P_DEBUG(
-            "plugin=%p, op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f",
+            "plugin=%p, op_code=%d, op_name=%s, index=%d, ivalue=%d, fvalue=%f",
             effect->object,
             (int)op_code,
-            ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+            op_code < FST_OP_NAMES_LEN ? FST_OP_NAMES[op_code] : "???",
             (int)index,
             (int)ivalue,
             fvalue
@@ -280,7 +283,9 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
             return fst_plugin->get_chunk((void**)pointer, index ? true : false);
 
         case effSetChunk:
-            fst_plugin->set_chunk((void const*)pointer, ivalue, index ? true : false);
+            fst_plugin->set_chunk(
+                (void const*)pointer, ivalue, index ? true : false
+            );
             return 0;
 
         case effGetPlugCategory:
@@ -325,9 +330,12 @@ VstIntPtr VSTCALLBACK FstPlugin::dispatch(
 
 #ifdef JS80P_FST_DEBUG
             JS80P_DEBUG(
-                "op_code=%d, op_code_name=%s, index=%d, ivalue=%d, fvalue=%f, pointer=%s",
+                (
+                    "op_code=%d, op_name=%s,"
+                    " index=%d, ivalue=%d, fvalue=%f, pointer=%s"
+                ),
                 (int)op_code,
-                ((op_code < FST_OP_CODE_NAMES_LEN) ? FST_OP_CODE_NAMES[op_code] : "???"),
+                op_code < FST_OP_NAMES_LEN ? FST_OP_NAMES[op_code] : "???",
                 (int)index,
                 (int)ivalue,
                 fvalue,
@@ -403,8 +411,10 @@ void VSTCALLBACK FstPlugin::set_parameter(
 }
 
 
-void FstPlugin::populate_parameters(Synth const& synth, Parameters& parameters) noexcept
-{
+void FstPlugin::populate_parameters(
+        Synth const& synth,
+        Parameters& parameters
+) noexcept {
     parameters[0] = Parameter("Program", Synth::ControllerId::NONE, 0.0f);
     parameters[1] = create_midi_ctl_param(
         Synth::ControllerId::PITCH_WHEEL, synth, 0
@@ -430,7 +440,10 @@ void FstPlugin::populate_parameters(Synth const& synth, Parameters& parameters) 
 
         Similarly, CC 88 was erroneously missing, and it was added after v3.1.0.
         */
-        if (midi_controller == Midi::SUSTAIN_PEDAL || midi_controller == Midi::UNDEFINED_20) {
+        if (
+                midi_controller == Midi::SUSTAIN_PEDAL
+                || midi_controller == Midi::UNDEFINED_20
+        ) {
             continue;
         }
 
@@ -501,8 +514,14 @@ FstPlugin::Parameter FstPlugin::create_midi_ctl_param(
             break;
 
         default:
-            if (Synth::is_supported_midi_controller((Midi::Controller)controller_id)) {
-                value = (float)synth.midi_controllers[controller_id]->get_value(0);
+            if (
+                    Synth::is_supported_midi_controller(
+                        (Midi::Controller)controller_id
+                    )
+            ) {
+                value = (
+                    (float)synth.midi_controllers[controller_id]->get_value(0)
+                );
             }
             break;
     }
@@ -684,7 +703,9 @@ void FstPlugin::handle_change_param(
 
     switch ((Synth::ControllerId)controller_id) {
         case Synth::ControllerId::PITCH_WHEEL:
-            synth.pitch_wheel_change(0.0, channel, float_to_midi_word(new_value));
+            synth.pitch_wheel_change(
+                0.0, channel, float_to_midi_word(new_value)
+            );
             break;
 
         case Synth::ControllerId::CHANNEL_PRESSURE:
@@ -851,12 +872,16 @@ void FstPlugin::set_sample_rate(float const new_sample_rate) noexcept
         min_samples_before_next_cc_ui_update = 1 + (Integer)(
             new_sample_rate * HOST_CC_UI_UPDATE_FREQUENCY_INV
         );
-        remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
+        remaining_samples_before_next_cc_ui_update = (
+            min_samples_before_next_cc_ui_update
+        );
 
         min_samples_before_next_bank_update = 1 + (Integer)(
             new_sample_rate * BANK_UPDATE_FREQUENCY_INV
         );
-        remaining_samples_before_next_bank_update = min_samples_before_next_bank_update;
+        remaining_samples_before_next_bank_update = (
+            min_samples_before_next_bank_update
+        );
     }
 
     synth.set_sample_rate((Frequency)new_sample_rate);
@@ -912,7 +937,9 @@ void FstPlugin::process_vst_events(VstEvents const* const events) noexcept
 
     if (had_midi_cc_event && remaining_samples_before_next_cc_ui_update == 0) {
         had_midi_cc_event = false;
-        remaining_samples_before_next_cc_ui_update = min_samples_before_next_cc_ui_update;
+        remaining_samples_before_next_cc_ui_update = (
+            min_samples_before_next_cc_ui_update
+        );
         to_gui_messages.push(Message(MessageType::PARAMS_CHANGED));
     }
 }
@@ -1079,7 +1106,9 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
         return;
     }
 
-    remaining_samples_before_next_bank_update = min_samples_before_next_bank_update;
+    remaining_samples_before_next_bank_update = (
+        min_samples_before_next_bank_update
+    );
     need_bank_update = false;
     synth.clear_dirty_flag();
 
@@ -1093,7 +1122,9 @@ void FstPlugin::finalize_rendering(Integer const sample_count) noexcept
     to_gui_messages.push(
         Message(MessageType::PROGRAM_CHANGED, current_program, current_patch)
     );
-    to_gui_messages.push(Message(MessageType::BANK_CHANGED, 0, serialized_bank));
+    to_gui_messages.push(
+        Message(MessageType::BANK_CHANGED, 0, serialized_bank)
+    );
 
     if (is_dirty) {
         to_gui_messages.push(Message(MessageType::SYNTH_WAS_DIRTY));
@@ -1177,8 +1208,11 @@ VstIntPtr FstPlugin::get_chunk(void** chunk, bool is_preset) noexcept
 }
 
 
-void FstPlugin::set_chunk(void const* const chunk, VstIntPtr const size, bool is_preset) noexcept
-{
+void FstPlugin::set_chunk(
+        void const* const chunk,
+        VstIntPtr const size,
+        bool is_preset
+) noexcept {
     process_internal_messages_in_gui_thread();
 
     std::string buffer((char const*)chunk, (std::string::size_type)size);
@@ -1316,7 +1350,9 @@ void FstPlugin::set_program_name(char const* const name)
 {
     process_internal_messages_in_gui_thread();
 
-    to_audio_string_messages.push(Message(MessageType::RENAME_PROGRAM, 0, name));
+    to_audio_string_messages.push(
+        Message(MessageType::RENAME_PROGRAM, 0, name)
+    );
     program_names[current_program_index].set_name(name);
 }
 
