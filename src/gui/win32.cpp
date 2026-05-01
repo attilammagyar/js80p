@@ -40,7 +40,9 @@ Win32Platform::Win32Platform(HINSTANCE dll_instance)
 
 Win32Platform::~Win32Platform()
 {
-    for (std::map<FontCacheKey, HFONT>::const_iterator it = font_cache.begin(); it != font_cache.end(); ++it) {
+    std::map<FontCacheKey, HFONT>::const_iterator it;
+
+    for (it = font_cache.begin(); it != font_cache.end(); ++it) {
         HFONT font = it->second;
         DeleteObject((HGDIOBJ)font);
     }
@@ -60,7 +62,9 @@ HFONT Win32Platform::get_font(
         WidgetBase::FontWeight const weight
 ) {
     FontCacheKey const key = std::make_tuple(size_px, weight);
-    std::map<FontCacheKey, HFONT>::const_iterator const& item = font_cache.find(key);
+    std::map<FontCacheKey, HFONT>::const_iterator const& item = (
+        font_cache.find(key)
+    );
     HFONT font;
 
     if (JS80P_LIKELY(item != font_cache.end())) {
@@ -143,7 +147,10 @@ Widget::Text::Text() : wtext(NULL), ctext(NULL), capacity(0)
 }
 
 
-Widget::Text::Text(std::string const& text) : wtext(NULL), ctext(NULL), capacity(0)
+Widget::Text::Text(std::string const& text)
+    : wtext(NULL),
+    ctext(NULL),
+    capacity(0)
 {
     set(text);
 }
@@ -389,7 +396,9 @@ GUI::Image Widget::load_image(
     );
 
     if (FAILED(result)) {
-        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+        return done_loading_image(
+            NULL, factory, stream, decoder, frame, converter
+        );
     }
 
     UINT width = 0;
@@ -398,7 +407,9 @@ GUI::Image Widget::load_image(
     result = converter->GetSize(&width, &height);
 
     if (FAILED(result)) {
-        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+        return done_loading_image(
+            NULL, factory, stream, decoder, frame, converter
+        );
     }
 
     BITMAPINFO bitmap_info = {};
@@ -428,13 +439,17 @@ GUI::Image Widget::load_image(
     ReleaseDC((HWND)platform_widget, hdc);
 
     if (bitmap == NULL) {
-        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+        return done_loading_image(
+            NULL, factory, stream, decoder, frame, converter
+        );
     }
 
     if (bits == NULL) {
         DeleteObject(bitmap);
 
-        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+        return done_loading_image(
+            NULL, factory, stream, decoder, frame, converter
+        );
     }
 
     UINT stride = 4 * (UINT)width;
@@ -449,10 +464,14 @@ GUI::Image Widget::load_image(
     if (FAILED(result)) {
         DeleteObject(bitmap);
 
-        return done_loading_image(NULL, factory, stream, decoder, frame, converter);
+        return done_loading_image(
+            NULL, factory, stream, decoder, frame, converter
+        );
     }
 
-    return done_loading_image(bitmap, factory, stream, decoder, frame, converter);
+    return done_loading_image(
+        bitmap, factory, stream, decoder, frame, converter
+    );
 }
 
 
@@ -514,7 +533,9 @@ GUI::Image Widget::copy_image_region(
         (GUI::Image)SelectObject(destination_hdc, (HGDIOBJ)destination_image)
     );
 
-    BitBlt(destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY);
+    BitBlt(
+        destination_hdc, 0, 0, width, height, source_hdc, left, top, SRCCOPY
+    );
 
     SelectObject(source_hdc, (HGDIOBJ)old_source_image);
     SelectObject(destination_hdc, (HGDIOBJ)old_destination_image);
@@ -620,13 +641,17 @@ GUI::Image Widget::downscale_image(
     ReleaseDC((HWND)platform_widget, hdc);
 
     if (destination == NULL) {
-        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+        return done_downscaling_image(
+            NULL, factory, scaler, wic_source, scaled
+        );
     }
 
     if (bits == NULL) {
         DeleteObject(destination);
 
-        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+        return done_downscaling_image(
+            NULL, factory, scaler, wic_source, scaled
+        );
     }
 
     UINT stride = 4 * (UINT)new_width;
@@ -641,10 +666,14 @@ GUI::Image Widget::downscale_image(
     if (FAILED(result)) {
         DeleteObject(destination);
 
-        return done_downscaling_image(NULL, factory, scaler, wic_source, scaled);
+        return done_downscaling_image(
+            NULL, factory, scaler, wic_source, scaled
+        );
     }
 
-    return done_downscaling_image(destination, factory, scaler, wic_source, scaled);
+    return done_downscaling_image(
+        destination, factory, scaler, wic_source, scaled
+    );
 }
 
 
@@ -787,7 +816,9 @@ LRESULT Widget::process_message(
         }
 
         case WM_DESTROY: {
-            WNDPROC original_window_procedure = widget->original_window_procedure;
+            WNDPROC original_window_procedure = (
+                widget->original_window_procedure
+            );
 
             if (original_window_procedure != NULL) {
                 SetWindowLongPtr(
@@ -1085,7 +1116,11 @@ LRESULT Widget::call_original_window_procedure(
     if (original_window_procedure != NULL) {
         // TODO: GetLastError()
         return CallWindowProc(
-            original_window_procedure, (HWND)platform_widget, uMsg, wParam, lParam
+            original_window_procedure,
+            (HWND)platform_widget,
+            uMsg,
+            wParam,
+            lParam
         );
     } else {
         return DefWindowProcW((HWND)platform_widget, uMsg, wParam, lParam);

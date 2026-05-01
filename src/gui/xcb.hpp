@@ -117,7 +117,9 @@ class XcbPlatform
             cairo_font_weight_t weight
         );
 
-        char const* find_executable(char const* const* const alternatives) const;
+        char const* find_executable(
+            char const* const* const alternatives
+        ) const;
 
         void start_file_selector_dialog(
             char const* const executable,

@@ -120,8 +120,8 @@ int main(int const argc, char const* argv[])
     xcb_intern_atom_cookie_t wm_delete_window_cookie = xcb_intern_atom(
         xcb_connection, 0, WM_DELETE_WINDOW.size(), WM_DELETE_WINDOW.c_str()
     );
-    xcb_intern_atom_reply_t* const wm_delete_window_reply = xcb_intern_atom_reply(
-        xcb_connection, wm_delete_window_cookie, NULL
+    xcb_intern_atom_reply_t* const wm_delete_window_reply = (
+        xcb_intern_atom_reply(xcb_connection, wm_delete_window_cookie, NULL)
     );
 
     xcb_generic_event_t* event;
@@ -180,14 +180,21 @@ int main(int const argc, char const* argv[])
     );
     gui->show();
 
-    while (is_running && (event = xcb_wait_for_event_with_timeout(xcb, GUI_UPDATE_TIMEOUT))) {
+    while (
+            is_running
+            && (
+                event = xcb_wait_for_event_with_timeout(xcb, GUI_UPDATE_TIMEOUT)
+            )
+    ) {
         if (event == JS80P_XCB_TIMEOUT) {
             timer_tick(synth, *gui, rendering_round);
 
             continue;
         }
 
-        // fprintf(stderr, "main()\tevent->response_type=%d\n", event->response_type);
+        // fprintf(
+            // stderr, "main()\tevent->response_type=%d\n", event->response_type
+        // );
 
         switch (event->response_type & ~0x80) {
             case XCB_EXPOSE: {
@@ -203,7 +210,10 @@ int main(int const argc, char const* argv[])
                     (xcb_client_message_event_t const*)event
                 );
 
-                if (client_msg->data.data32[0] == wm_delete_window_reply->atom) {
+                if (
+                        client_msg->data.data32[0]
+                        == wm_delete_window_reply->atom
+                ) {
                     is_running = false;
                 }
 
