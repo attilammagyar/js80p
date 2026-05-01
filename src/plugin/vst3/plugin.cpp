@@ -52,30 +52,30 @@
 using namespace Steinberg;
 
 
-#define JS80P_VST3_SEND_MSG(msg_id, attr_setter, attr_name, attr_value)         \
-    do {                                                                        \
-        IPtr<Vst::IMessage> message = owned(allocateMessage());                 \
-                                                                                \
-        if (message) {                                                          \
-            message->setMessageID(msg_id);                                      \
-                                                                                \
-            Vst::IAttributeList* const attributes = message->getAttributes();   \
-                                                                                \
-            if (attributes) {                                                   \
-                attributes->attr_setter((attr_name), (attr_value));             \
-                sendMessage(message);                                           \
-            }                                                                   \
-        }                                                                       \
+#define JS80P_VST3_SEND_MSG(msg_id, attr_setter, attr_name, attr_value)     \
+    do {                                                                    \
+        IPtr<Vst::IMessage> msg = owned(allocateMessage());                 \
+                                                                            \
+        if (msg) {                                                          \
+            msg->setMessageID(msg_id);                                      \
+                                                                            \
+            Vst::IAttributeList* const attributes = msg->getAttributes();   \
+                                                                            \
+            if (attributes) {                                               \
+                attributes->attr_setter((attr_name), (attr_value));         \
+                sendMessage(msg);                                           \
+            }                                                               \
+        }                                                                   \
     } while (false)
 
 
 #define JS80P_VST3_SEND_EMPTY_MSG(msg_id)                                   \
     do {                                                                    \
-        IPtr<Vst::IMessage> message = owned(allocateMessage());             \
+        IPtr<Vst::IMessage> msg = owned(allocateMessage());                 \
                                                                             \
-        if (message) {                                                      \
-            message->setMessageID(msg_id);                                  \
-            sendMessage(message);                                           \
+        if (msg) {                                                          \
+            msg->setMessageID(msg_id);                                      \
+            sendMessage(msg);                                               \
         }                                                                   \
     } while (false)
 
@@ -83,9 +83,13 @@ using namespace Steinberg;
 namespace JS80P
 {
 
-FUID const Vst3Plugin::Processor::ID(0x565354, 0x414d4a38, 0x6a733830, 0x70000000);
+FUID const Vst3Plugin::Processor::ID(
+    0x565354, 0x414d4a38, 0x6a733830, 0x70000000
+);
 
-FUID const Vst3Plugin::Controller::ID(0x565345, 0x414d4a38, 0x6a733830, 0x70000000);
+FUID const Vst3Plugin::Controller::ID(
+    0x565345, 0x414d4a38, 0x6a733830, 0x70000000
+);
 
 
 Vst3Plugin::Event::Event()
@@ -167,7 +171,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::initialize(FUnknown* context)
     Marking the input as side-chain so that the host won't mix the dry signal
     with our output.
     */
-    addAudioInput(STR16("AudioInput"), Vst::SpeakerArr::kStereo, Vst::BusTypes::kAux);
+    addAudioInput(
+        STR16("AudioInput"), Vst::SpeakerArr::kStereo, Vst::BusTypes::kAux
+    );
 
     addAudioOutput(STR16("AudioOutput"), Vst::SpeakerArr::kStereo);
 
@@ -212,16 +218,22 @@ tresult PLUGIN_API Vst3Plugin::Processor::notify(Vst::IMessage* message)
 
     if (FIDStringsEqual(message->getMessageID(), MSG_PROGRAM_CHANGE)) {
         double program;
+        Vst::IAttributeList* const attributes = message->getAttributes();
+        tresult const result = attributes->getFloat(
+            MSG_PROGRAM_CHANGE_PROGRAM, program
+        );
 
-        if (message->getAttributes()->getFloat(MSG_PROGRAM_CHANGE_PROGRAM, program) == kResultOk) {
+        if (result == kResultOk) {
             param_events.push_back(
                 Event(Event::Type::PROGRAM_CHANGE, 0.0, 0, 0, (Number)program)
             );
         }
     } else if (FIDStringsEqual(message->getMessageID(), MSG_CTL_READY)) {
         int64 bank_ptr;
+        Vst::IAttributeList* const attributes = message->getAttributes();
+        tresult const result = attributes->getInt(MSG_CTL_READY_BANK, bank_ptr);
 
-        if (message->getAttributes()->getInt(MSG_CTL_READY_BANK, bank_ptr) == kResultOk) {
+        if (result == kResultOk) {
             bank = (Bank const*)bank_ptr;
             share_synth();
         }
@@ -231,8 +243,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::notify(Vst::IMessage* message)
 }
 
 
-tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(int32 symbolic_sample_size)
-{
+tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(
+        int32 symbolic_sample_size
+) {
     if (
             symbolic_sample_size == Vst::SymbolicSampleSizes::kSample64
             || symbolic_sample_size == Vst::SymbolicSampleSizes::kSample32
@@ -244,8 +257,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::canProcessSampleSize(int32 symbolic_sa
 }
 
 
-tresult PLUGIN_API Vst3Plugin::Processor::setupProcessing(Vst::ProcessSetup& setup)
-{
+tresult PLUGIN_API Vst3Plugin::Processor::setupProcessing(
+        Vst::ProcessSetup& setup
+) {
     synth.set_sample_rate((Frequency)setup.sampleRate);
     renderer.reset();
 
@@ -261,8 +275,9 @@ tresult PLUGIN_API Vst3Plugin::Processor::setProcessing(TBool state)
 }
 
 
-void Vst3Plugin::Processor::reset_for_state_change(TBool const new_state) noexcept
-{
+void Vst3Plugin::Processor::reset_for_state_change(
+        TBool const new_state
+) noexcept {
     if (new_state) {
         synth.resume();
     } else {
@@ -376,7 +391,11 @@ void Vst3Plugin::Processor::collect_param_change_events(
             default: {
                 Midi::Byte const midi_controller = (Midi::Byte)param_type;
 
-                if (Synth::is_supported_midi_controller((Midi::Controller)midi_controller)) {
+                if (
+                        Synth::is_supported_midi_controller(
+                            (Midi::Controller)midi_controller
+                        )
+                ) {
                     collect_param_change_events_as(
                         param_queue,
                         Event::Type::CONTROL_CHANGE,
@@ -486,7 +505,10 @@ void Vst3Plugin::Processor::process_events() noexcept
     std::vector<Event>::const_iterator param_event_it = param_events.begin();
     std::vector<Event>::const_iterator note_event_it = note_events.begin();
 
-    while (param_event_it != param_events.end() && note_event_it != note_events.end()) {
+    while (
+            param_event_it != param_events.end()
+            && note_event_it != note_events.end()
+    ) {
         Event const& param_event = *param_event_it;
         Event const& note_event = *note_event_it;
 
@@ -541,12 +563,21 @@ void Vst3Plugin::Processor::process_event(Event const& event) noexcept
 
         case Event::Type::NOTE_ON: {
             mts_esp.update_note_tuning(event.channel, event.note_or_ctl);
-            Midi::Byte const velocity = float_to_midi_byte(event.velocity_or_value);
+            Midi::Byte const velocity = float_to_midi_byte(
+                event.velocity_or_value
+            );
 
             if (velocity == 0) {
-                synth.note_off(event.time_offset, event.channel, event.note_or_ctl, 64);
+                synth.note_off(
+                    event.time_offset, event.channel, event.note_or_ctl, 64
+                );
             } else {
-                synth.note_on(event.time_offset, event.channel, event.note_or_ctl, velocity);
+                synth.note_on(
+                    event.time_offset,
+                    event.channel,
+                    event.note_or_ctl,
+                    velocity
+                );
             }
 
             break;
@@ -601,9 +632,13 @@ Midi::Word Vst3Plugin::Processor::float_to_midi_word(
 
 void Vst3Plugin::Processor::update_bpm(Vst::ProcessData& data) noexcept
 {
+    constexpr Vst::ProcessContext::StatesAndFlags tempo_valid = (
+        Vst::ProcessContext::StatesAndFlags::kTempoValid
+    );
+
     if (
             data.processContext == NULL
-            || (data.processContext->state & Vst::ProcessContext::StatesAndFlags::kTempoValid) == 0
+            || (data.processContext->state & tempo_valid) == 0
     ) {
         return;
     }
@@ -620,13 +655,19 @@ void Vst3Plugin::Processor::generate_samples(Vst::ProcessData& data) noexcept
             : NULL
     );
 
-    if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample64) {
+    if (
+            processSetup.symbolicSampleSize
+            == Vst::SymbolicSampleSizes::kSample64
+    ) {
         renderer.render<double>(
             (Integer)data.numSamples,
             (double**)input,
             (double**)getChannelBuffersPointer(processSetup, data.outputs[0])
         );
-    } else if (processSetup.symbolicSampleSize == Vst::SymbolicSampleSizes::kSample32) {
+    } else if (
+            processSetup.symbolicSampleSize
+            == Vst::SymbolicSampleSizes::kSample32
+    ) {
         renderer.render<float>(
             (Integer)data.numSamples,
             (float**)input,
@@ -916,7 +957,10 @@ tresult PLUGIN_API Vst3Plugin::Controller::initialize(FUnknown* context)
         of consistency, let's put the helper params that belong to these
         controllers at the end of the list here as well.
         */
-        if (midi_controller == Midi::SUSTAIN_PEDAL || midi_controller == Midi::UNDEFINED_20) {
+        if (
+                midi_controller == Midi::SUSTAIN_PEDAL
+                || midi_controller == Midi::UNDEFINED_20
+        ) {
             continue;
         }
 
@@ -1021,7 +1065,10 @@ tresult PLUGIN_API Vst3Plugin::Controller::setParamNormalized(
 
     if (result == kResultOk && tag == PROGRAM_LIST_ID) {
         JS80P_VST3_SEND_MSG(
-            MSG_PROGRAM_CHANGE, setFloat, MSG_PROGRAM_CHANGE_PROGRAM, (double)value
+            MSG_PROGRAM_CHANGE,
+            setFloat,
+            MSG_PROGRAM_CHANGE_PROGRAM,
+            (double)value
         );
     }
 
@@ -1037,7 +1084,9 @@ Vst::RangeParameter* Vst3Plugin::Controller::create_midi_ctl_param(
 ) const {
     constexpr size_t buffer_size = 128;
 
-    JS80P::GUI::Controller const* const controller = JS80P::GUI::get_controller(controller_id);
+    JS80P::GUI::Controller const* const controller = JS80P::GUI::get_controller(
+        controller_id
+    );
 
     char long_name[buffer_size];
     char short_name[buffer_size];
@@ -1107,7 +1156,9 @@ tresult PLUGIN_API Vst3Plugin::Controller::getMidiControllerAssignment(
             && channel >= 0
             && channel <= (int16)Midi::CHANNEL_MAX
             && (
-                Synth::is_supported_midi_controller((Midi::Controller)midi_controller_number)
+                Synth::is_supported_midi_controller(
+                    (Midi::Controller)midi_controller_number
+                )
                 || midi_controller_number == Vst::ControllerNumbers::kPitchBend
                 || midi_controller_number == Vst::ControllerNumbers::kAfterTouch
             )
@@ -1128,7 +1179,9 @@ tresult PLUGIN_API Vst3Plugin::Controller::connect(IConnectionPoint* other)
 {
     tresult result = EditControllerEx1::connect(other);
 
-    JS80P_VST3_SEND_MSG(MSG_CTL_READY, setInt, MSG_CTL_READY_BANK, (int64)&bank);
+    JS80P_VST3_SEND_MSG(
+        MSG_CTL_READY, setInt, MSG_CTL_READY_BANK, (int64)&bank
+    );
 
     return result;
 }
@@ -1142,8 +1195,12 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
 
     if (FIDStringsEqual(message->getMessageID(), MSG_SHARE_SYNTH)) {
         int64 synth_ptr;
+        Vst::IAttributeList* const attributes = message->getAttributes();
+        tresult const result = attributes->getInt(
+            MSG_SHARE_SYNTH_SYNTH, synth_ptr
+        );
 
-        if (message->getAttributes()->getInt(MSG_SHARE_SYNTH_SYNTH, synth_ptr) == kResultOk) {
+        if (result == kResultOk) {
             synth = (Synth*)synth_ptr;
 
             return kResultOk;
@@ -1153,9 +1210,13 @@ tresult PLUGIN_API Vst3Plugin::Controller::notify(Vst::IMessage* message)
         Calling setDirty(true) would suffice, the dummy parameter dance is done
         only to keep parameter behaviour in sync with the FST plugin.
         */
-        Vst::ParamValue const new_value = getParamNormalized(PATCH_CHANGED_PARAM_ID) + 0.01;
+        Vst::ParamValue const new_value = (
+            getParamNormalized(PATCH_CHANGED_PARAM_ID) + 0.01
+        );
 
-        setParamNormalized(PATCH_CHANGED_PARAM_ID, new_value < 1.0 ? new_value : 0.0);
+        setParamNormalized(
+            PATCH_CHANGED_PARAM_ID, new_value < 1.0 ? new_value : 0.0
+        );
         setDirty(true);
 
         return kResultOk;

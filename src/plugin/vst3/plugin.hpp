@@ -61,7 +61,9 @@ class Vst3Plugin
 
         static constexpr char const* MSG_SYNTH_DIRTY = "JS80PDirty";
 
-        static constexpr Vst::ProgramListID PROGRAM_LIST_ID = Vst::kCtrlProgramChange;
+        static constexpr Vst::ProgramListID PROGRAM_LIST_ID = (
+            Vst::kCtrlProgramChange
+        );
 
         static constexpr Vst::ParamID PATCH_CHANGED_PARAM_ID = 255;
 
@@ -125,14 +127,26 @@ class Vst3Plugin
                     int32 number_of_outputs
                 ) SMTG_OVERRIDE;
 
-                tresult PLUGIN_API connect(IConnectionPoint* other) SMTG_OVERRIDE;
+                tresult PLUGIN_API connect(
+                    IConnectionPoint* other
+                ) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API notify(Vst::IMessage* message) SMTG_OVERRIDE;
 
-                tresult PLUGIN_API canProcessSampleSize(int32 symbolic_sample_size) SMTG_OVERRIDE;
-                tresult PLUGIN_API setupProcessing(Vst::ProcessSetup& setup) SMTG_OVERRIDE;
+                tresult PLUGIN_API canProcessSampleSize(
+                    int32 symbolic_sample_size
+                ) SMTG_OVERRIDE;
+
+                tresult PLUGIN_API setupProcessing(
+                    Vst::ProcessSetup& setup
+                ) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API setProcessing(TBool state) SMTG_OVERRIDE;
                 tresult PLUGIN_API setActive(TBool state) SMTG_OVERRIDE;
-                tresult PLUGIN_API process(Vst::ProcessData& data) SMTG_OVERRIDE;
+
+                tresult PLUGIN_API process(
+                    Vst::ProcessData& data
+                ) SMTG_OVERRIDE;
 
                 uint32 PLUGIN_API getLatencySamples() SMTG_OVERRIDE;
                 uint32 PLUGIN_API getTailSamples() SMTG_OVERRIDE;
@@ -143,7 +157,9 @@ class Vst3Plugin
             private:
                 void share_synth() noexcept;
 
-                void collect_param_change_events(Vst::ProcessData& data) noexcept;
+                void collect_param_change_events(
+                    Vst::ProcessData& data
+                ) noexcept;
 
                 void collect_param_change_events_as(
                     Vst::IParamValueQueue* const param_queue,
@@ -156,8 +172,13 @@ class Vst3Plugin
                 void process_events() noexcept;
                 void process_event(Event const& event) noexcept;
 
-                Midi::Byte float_to_midi_byte(Number const number) const noexcept;
-                Midi::Word float_to_midi_word(Number const number) const noexcept;
+                Midi::Byte float_to_midi_byte(
+                    Number const number
+                ) const noexcept;
+
+                Midi::Word float_to_midi_word(
+                    Number const number
+                ) const noexcept;
 
                 void update_bpm(Vst::ProcessData& data) noexcept;
 
@@ -194,9 +215,16 @@ class Vst3Plugin
 
                 virtual ~GUI();
 
-                tresult PLUGIN_API isPlatformTypeSupported(FIDString type) SMTG_OVERRIDE;
+                tresult PLUGIN_API isPlatformTypeSupported(
+                    FIDString type
+                ) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API canResize() SMTG_OVERRIDE;
-                tresult PLUGIN_API checkSizeConstraint(ViewRect* rect) SMTG_OVERRIDE;
+
+                tresult PLUGIN_API checkSizeConstraint(
+                    ViewRect* rect
+                ) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API onSize(ViewRect* newSize) SMTG_OVERRIDE;
 
                 virtual void attachedToParent() override;
@@ -222,7 +250,9 @@ class Vst3Plugin
 #endif
         };
 
-        class Controller : public Vst::EditControllerEx1, public Vst::IMidiMapping
+        class Controller
+            : public Vst::EditControllerEx1,
+            public Vst::IMidiMapping
         {
             public:
                 static FUID const ID;
@@ -235,7 +265,10 @@ class Vst3Plugin
 
                 tresult PLUGIN_API initialize(FUnknown* context) SMTG_OVERRIDE;
 
-                tresult PLUGIN_API connect(IConnectionPoint* other) SMTG_OVERRIDE;
+                tresult PLUGIN_API connect(
+                    IConnectionPoint* other
+                ) SMTG_OVERRIDE;
+
                 tresult PLUGIN_API notify(Vst::IMessage* message) SMTG_OVERRIDE;
 
                 tresult PLUGIN_API getMidiControllerAssignment(
@@ -252,7 +285,9 @@ class Vst3Plugin
                     Vst::ParamValue value
                 ) SMTG_OVERRIDE;
 
-                tresult PLUGIN_API setComponentState(IBStream* state) SMTG_OVERRIDE;
+                tresult PLUGIN_API setComponentState(
+                    IBStream* state
+                ) SMTG_OVERRIDE;
 
             private:
                 Vst::Parameter* set_up_program_change_param();

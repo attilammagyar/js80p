@@ -79,7 +79,8 @@ class GUITimerHandler : public Linux::ITimerHandler, public FObject
 void Vst3Plugin::GUI::initialize()
 {
     /*
-    Must be destroyed by the platform-specific implementation of JS80P::GUI::destroy().
+    Must be destroyed by the platform-specific implementation of
+    JS80P::GUI::destroy().
     */
     XcbPlatform* const xcb = new XcbPlatform();
 
@@ -94,7 +95,9 @@ void Vst3Plugin::GUI::initialize()
     GUIEventHandler* const event_handler = new GUIEventHandler();
     GUITimerHandler* const timer_handler = new GUITimerHandler();
 
-    plugFrame->queryInterface(Steinberg::Linux::IRunLoop::iid, (void**)&run_loop);
+    plugFrame->queryInterface(
+        Steinberg::Linux::IRunLoop::iid, (void**)&run_loop
+    );
 
     if (run_loop != NULL) {
         run_loop->registerEventHandler(event_handler, xcb_fd);
