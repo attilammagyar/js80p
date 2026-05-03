@@ -1050,7 +1050,7 @@ void test_envelope_shape(
 
 
 TEST(envelope_shapes, {
-    constexpr Sample reference_samples[SHAPE_TEST_REL_LENGTH] = {
+    constexpr Sample reference_samples[SHAPE_TEST_SAMPLE_COUNT] = {
         0.0, 1.0 / 6.0, 2.0 / 6.0, 3.0 / 6.0, 4.0 / 6.0, 5.0 / 6.0, 1.0, 1.0, 1.0,
     };
 
