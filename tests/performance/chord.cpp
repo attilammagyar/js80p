@@ -142,11 +142,26 @@ void usage(char const* const name)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "  valgrind --tool=callgrind %s program velocity out.wav\n", name);
+    fprintf(
+        stderr,
+        "  valgrind --tool=callgrind %s program velocity out.wav\n",
+        name
+    );
     fprintf(stderr, "\n");
-    fprintf(stderr, "  valgrind --tool=cachegrind --cache-sim=yes --branch-sim=yes %s program velocity out.wav\n", name);
+    fprintf(
+        stderr,
+        (
+            "  valgrind --tool=cachegrind --cache-sim=yes --branch-sim=yes "
+            " %s program velocity out.wav\n"
+        ),
+        name
+    );
     fprintf(stderr, "\n");
-    fprintf(stderr, "    program    preset number (0-%d)\n", (int)Bank::NUMBER_OF_PROGRAMS - 1);
+    fprintf(
+        stderr,
+        "    program    preset number (0-%d)\n",
+        (int)Bank::NUMBER_OF_PROGRAMS - 1
+    );
     fprintf(stderr, "    velocity   first note's velocity (0-127)\n");
     fprintf(stderr, "    out.wav    output file\n");
 }
@@ -224,7 +239,9 @@ void render_sound(
         std::fill_n(input[i], BLOCK_SIZE, 0.0);
     }
 
-    Serializer::import_patch_in_audio_thread(synth, bank[program_index].serialize());
+    Serializer::import_patch_in_audio_thread(
+        synth, bank[program_index].serialize()
+    );
 
     write_wav_header(buffer);
     out_file.write(buffer.get_buffer(), buffer.get_buffer_pos());
@@ -236,7 +253,9 @@ void render_sound(
     synth.resume();
     synth.process_messages();
 
-    for (std::vector<Midi::Note>::const_iterator it = notes.begin(); it != notes.end(); ++it) {
+    std::vector<Midi::Note>::const_iterator it;
+
+    for (it = notes.begin(); it != notes.end(); ++it) {
         if (velocity > 0) {
             synth.note_on(note_start, 1, *it, velocity);
             synth.note_off(note_end, 1, *it, velocity);
@@ -244,7 +263,9 @@ void render_sound(
 
         note_start += NOTE_GAP;
         note_end += NOTE_GAP;
-        velocity = velocity > VELOCITY_DECREASE ? velocity - VELOCITY_DECREASE : 0;
+        velocity = (
+            velocity > VELOCITY_DECREASE ? velocity - VELOCITY_DECREASE : 0
+        );
     }
 
     for (Integer r = 0; r != ROUNDS; ++r) {
@@ -295,7 +316,10 @@ int main(int const argc, char const* argv[])
     if (program_index < 0 || program_index >= (int)Bank::NUMBER_OF_PROGRAMS) {
         fprintf(
             stderr,
-            "ERROR: invalid program number, must be between 0 and %d, got: %d (interpreted from \"%s\")\n\n",
+            (
+                "ERROR: invalid program number, must be between 0 and %d,"
+                " got: %d (interpreted from \"%s\")\n\n"
+            ),
             (int)Bank::NUMBER_OF_PROGRAMS - 1,
             program_index,
             argv[1]
@@ -306,7 +330,10 @@ int main(int const argc, char const* argv[])
     if (velocity < 0 || velocity > 127) {
         fprintf(
             stderr,
-            "ERROR: invalid velocity, must be between 0 and 127, got: %d (interpreted from \"%s\")\n\n",
+            (
+                "ERROR: invalid velocity, must be between 0 and 127,"
+                " got: %d (interpreted from \"%s\")\n\n"
+            ),
             velocity,
             argv[2]
         );
@@ -325,7 +352,10 @@ int main(int const argc, char const* argv[])
 
         fprintf(
             stderr,
-            "ERROR: unable to open output file \"%s\": errno=%d, error=\"%s\"\n",
+            (
+                "ERROR: unable to open output file \"%s\":"
+                " errno=%d, error=\"%s\"\n"
+            ),
             out_file_name.c_str(),
             errno,
             error_msg == NULL ? "<NULL>" : error_msg

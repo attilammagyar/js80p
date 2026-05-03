@@ -116,7 +116,10 @@ void test_inaccurate_filter_with_random(
             actual_output.samples[c],
             sample_count,
             tolerance,
-            "channel=%d, filter_type=%d, random=%f, frequency=%f, q=%f, gain=%f",
+            (
+                "channel=%d, filter_type=%d, random=%f,"
+                " frequency=%f, q=%f, gain=%f"
+            ),
             (int)c,
             (int)filter_type,
             random,

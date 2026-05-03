@@ -25,115 +25,125 @@
 using namespace JS80P;
 
 
-#define assert_empty(note_stack)                                                    \
-    do {                                                                            \
-        Number velocity = -1.0;                                                     \
-        Midi::Channel channel = Midi::INVALID_CHANNEL;                              \
-        Midi::Note note = 0;                                                        \
-                                                                                    \
-        assert_true(note_stack.is_empty());                                         \
-                                                                                    \
-        note_stack.top(channel, note, velocity);                                    \
-        assert_eq(Midi::INVALID_NOTE, note);                                        \
-        assert_eq(0, channel);                                                      \
-        assert_eq(0.0, velocity, DOUBLE_DELTA);                                     \
-                                                                                    \
-        channel = Midi::INVALID_CHANNEL;                                            \
-        note = 0;                                                                   \
-        velocity = -1.0;                                                            \
-        note_stack.pop(channel, note, velocity);                                    \
-        assert_eq(Midi::INVALID_NOTE, note);                                        \
-        assert_eq(0, channel);                                                      \
-        assert_eq(0.0, velocity, DOUBLE_DELTA);                                     \
+#define assert_empty(note_stack)                        \
+    do {                                                \
+        Number velocity = -1.0;                         \
+        Midi::Channel channel = Midi::INVALID_CHANNEL;  \
+        Midi::Note note = 0;                            \
+                                                        \
+        assert_true(note_stack.is_empty());             \
+                                                        \
+        note_stack.top(channel, note, velocity);        \
+        assert_eq(Midi::INVALID_NOTE, note);            \
+        assert_eq(0, channel);                          \
+        assert_eq(0.0, velocity, DOUBLE_DELTA);         \
+                                                        \
+        channel = Midi::INVALID_CHANNEL;                \
+        note = 0;                                       \
+        velocity = -1.0;                                \
+        note_stack.pop(channel, note, velocity);        \
+        assert_eq(Midi::INVALID_NOTE, note);            \
+        assert_eq(0, channel);                          \
+        assert_eq(0.0, velocity, DOUBLE_DELTA);         \
     } while (false)
 
-#define assert_top(expected_channel, expected_note, expected_velocity, note_stack)  \
-    do {                                                                            \
-        Number velocity = -1.0;                                                     \
-        Midi::Channel channel = Midi::INVALID_CHANNEL;                              \
-        Midi::Note note = Midi::INVALID_NOTE;                                       \
-                                                                                    \
-        assert_false(note_stack.is_empty());                                        \
-        assert_true(note_stack.is_top(expected_channel, expected_note));            \
-                                                                                    \
-        note_stack.top(channel, note);                                              \
-        assert_eq(expected_channel, channel);                                       \
-        assert_eq(expected_note, note);                                             \
-                                                                                    \
-        channel = Midi::INVALID_CHANNEL;                                            \
-        note = Midi::INVALID_NOTE;                                                  \
-                                                                                    \
-        note_stack.top(channel, note, velocity);                                    \
-        assert_eq(expected_channel, channel);                                       \
-        assert_eq(expected_note, note);                                             \
-        assert_eq(expected_velocity, velocity, DOUBLE_DELTA);                       \
+#define assert_top(                                                         \
+        expected_channel,                                                   \
+        expected_note,                                                      \
+        expected_velocity,                                                  \
+        note_stack                                                          \
+)                                                                           \
+    do {                                                                    \
+        Number velocity = -1.0;                                             \
+        Midi::Channel channel = Midi::INVALID_CHANNEL;                      \
+        Midi::Note note = Midi::INVALID_NOTE;                               \
+                                                                            \
+        assert_false(note_stack.is_empty());                                \
+        assert_true(note_stack.is_top(expected_channel, expected_note));    \
+                                                                            \
+        note_stack.top(channel, note);                                      \
+        assert_eq(expected_channel, channel);                               \
+        assert_eq(expected_note, note);                                     \
+                                                                            \
+        channel = Midi::INVALID_CHANNEL;                                    \
+        note = Midi::INVALID_NOTE;                                          \
+                                                                            \
+        note_stack.top(channel, note, velocity);                            \
+        assert_eq(expected_channel, channel);                               \
+        assert_eq(expected_note, note);                                     \
+        assert_eq(expected_velocity, velocity, DOUBLE_DELTA);               \
     } while (false)
 
-#define assert_extreme(extreme_type, expected_channel, expected_note, note_stack)   \
-    do {                                                                            \
-        Midi::Channel channel = Midi::INVALID_CHANNEL;                              \
-        Midi::Note note = Midi::INVALID_NOTE;                                       \
-                                                                                    \
-        assert_false(note_stack.is_empty());                                        \
-                                                                                    \
-        note_stack.extreme_type(channel, note);                                     \
-        assert_eq(expected_channel, channel);                                       \
-        assert_eq(expected_note, note);                                             \
+#define assert_extreme(                                 \
+        extreme_type,                                   \
+        expected_channel,                               \
+        expected_note,                                  \
+        note_stack                                      \
+)                                                       \
+    do {                                                \
+        Midi::Channel channel = Midi::INVALID_CHANNEL;  \
+        Midi::Note note = Midi::INVALID_NOTE;           \
+                                                        \
+        assert_false(note_stack.is_empty());            \
+                                                        \
+        note_stack.extreme_type(channel, note);         \
+        assert_eq(expected_channel, channel);           \
+        assert_eq(expected_note, note);                 \
     } while (false)
 
-#define assert_oldest(expected_channel, expected_note, note_stack)                  \
+#define assert_oldest(expected_channel, expected_note, note_stack)      \
     assert_extreme(oldest, expected_channel, expected_note, note_stack)
 
-#define assert_lowest(expected_channel, expected_note, note_stack)                  \
+#define assert_lowest(expected_channel, expected_note, note_stack)      \
     assert_extreme(lowest, expected_channel, expected_note, note_stack)
 
-#define assert_highest(expected_channel, expected_note, note_stack)                 \
+#define assert_highest(expected_channel, expected_note, note_stack)     \
     assert_extreme(highest, expected_channel, expected_note, note_stack)
 
-#define assert_pop(                                                                 \
-        expected_popped_channel,                                                    \
-        expected_popped_note,                                                       \
-        expected_popped_velocity,                                                   \
-        expected_top_channel_after_pop,                                             \
-        expected_top_note_after_pop,                                                \
-        expected_top_velocity_after_pop,                                            \
-        note_stack                                                                  \
-)                                                                                   \
-    do {                                                                            \
-        Number velocity = -1.0;                                                     \
-        Midi::Channel channel = Midi::INVALID_CHANNEL;                              \
-        Midi::Note note = Midi::INVALID_NOTE;                                       \
-                                                                                    \
-        assert_true(                                                                \
-            note_stack.is_top(                                                      \
-                expected_popped_channel, expected_popped_note                       \
-            )                                                                       \
-        );                                                                          \
-        note_stack.top(channel, note, velocity);                                    \
-        assert_eq(expected_popped_channel, channel);                                \
-        assert_eq(expected_popped_note, note);                                      \
-        assert_eq(expected_popped_velocity, velocity, DOUBLE_DELTA);                \
-                                                                                    \
-        channel = Midi::INVALID_CHANNEL;                                            \
-        note = Midi::INVALID_NOTE;                                                  \
-        velocity = -1.0;                                                            \
-        note_stack.pop(channel, note, velocity);                                    \
-        assert_eq(expected_popped_channel, channel);                                \
-        assert_eq(expected_popped_note, note);                                      \
-        assert_eq(expected_popped_velocity, velocity, DOUBLE_DELTA);                \
-                                                                                    \
-        channel = Midi::INVALID_CHANNEL;                                            \
-        note = Midi::INVALID_NOTE;                                                  \
-        velocity = -1.0;                                                            \
-        note_stack.top(channel, note, velocity);                                    \
-        assert_true(                                                                \
-            note_stack.is_top(                                                      \
-                expected_top_channel_after_pop, expected_top_note_after_pop         \
-            )                                                                       \
-        );                                                                          \
-        assert_eq(expected_top_channel_after_pop, channel);                         \
-        assert_eq(expected_top_note_after_pop, note);                               \
-        assert_eq(expected_top_velocity_after_pop, velocity, DOUBLE_DELTA);         \
+#define assert_pop(                                                         \
+        expected_popped_channel,                                            \
+        expected_popped_note,                                               \
+        expected_popped_velocity,                                           \
+        expected_top_channel_after_pop,                                     \
+        expected_top_note_after_pop,                                        \
+        expected_top_velocity_after_pop,                                    \
+        note_stack                                                          \
+)                                                                           \
+    do {                                                                    \
+        Number velocity = -1.0;                                             \
+        Midi::Channel channel = Midi::INVALID_CHANNEL;                      \
+        Midi::Note note = Midi::INVALID_NOTE;                               \
+                                                                            \
+        assert_true(                                                        \
+            note_stack.is_top(                                              \
+                expected_popped_channel, expected_popped_note               \
+            )                                                               \
+        );                                                                  \
+        note_stack.top(channel, note, velocity);                            \
+        assert_eq(expected_popped_channel, channel);                        \
+        assert_eq(expected_popped_note, note);                              \
+        assert_eq(expected_popped_velocity, velocity, DOUBLE_DELTA);        \
+                                                                            \
+        channel = Midi::INVALID_CHANNEL;                                    \
+        note = Midi::INVALID_NOTE;                                          \
+        velocity = -1.0;                                                    \
+        note_stack.pop(channel, note, velocity);                            \
+        assert_eq(expected_popped_channel, channel);                        \
+        assert_eq(expected_popped_note, note);                              \
+        assert_eq(expected_popped_velocity, velocity, DOUBLE_DELTA);        \
+                                                                            \
+        channel = Midi::INVALID_CHANNEL;                                    \
+        note = Midi::INVALID_NOTE;                                          \
+        velocity = -1.0;                                                    \
+        note_stack.top(channel, note, velocity);                            \
+        assert_true(                                                        \
+            note_stack.is_top(                                              \
+                expected_top_channel_after_pop, expected_top_note_after_pop \
+            )                                                               \
+        );                                                                  \
+        assert_eq(expected_top_channel_after_pop, channel);                 \
+        assert_eq(expected_top_note_after_pop, note);                       \
+        assert_eq(expected_top_velocity_after_pop, velocity, DOUBLE_DELTA); \
     } while (false)
 
 
@@ -144,7 +154,7 @@ TEST(note_stack_is_created_empty, {
 })
 
 
-TEST(when_a_note_is_pushed_on_the_stack_then_stack_is_no_longer_empty_and_the_note_is_on_the_top, {
+TEST(stack_is_not_empty_after_pushing_note_and_the_pushed_note_is_at_the_top, {
     NoteStack note_stack;
 
     note_stack.push(15, Midi::NOTE_A_3, 0.5);

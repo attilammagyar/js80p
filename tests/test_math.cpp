@@ -53,10 +53,18 @@ TEST(sin, {
         std::sin(PI), Math::sin(PI), TOLERANCE_TRIG, "x=%f", PI
     );
     assert_eq(
-        std::sin(PI_HALF_3), Math::sin(PI_HALF_3), TOLERANCE_TRIG, "x=%f", PI_HALF_3
+        std::sin(PI_HALF_3),
+        Math::sin(PI_HALF_3),
+        TOLERANCE_TRIG,
+        "x=%f",
+        PI_HALF_3
     );
     assert_eq(
-        std::sin(PI_DOUBLE), Math::sin(PI_DOUBLE), TOLERANCE_TRIG, "x=%f", PI_DOUBLE
+        std::sin(PI_DOUBLE),
+        Math::sin(PI_DOUBLE),
+        TOLERANCE_TRIG,
+        "x=%f",
+        PI_DOUBLE
     );
 })
 
@@ -73,10 +81,18 @@ TEST(cos, {
         std::cos(PI), Math::cos(PI), TOLERANCE_TRIG, "x=%f", PI
     );
     assert_eq(
-        std::cos(PI_HALF_3), Math::cos(PI_HALF_3), TOLERANCE_TRIG, "x=%f", PI_HALF_3
+        std::cos(PI_HALF_3),
+        Math::cos(PI_HALF_3),
+        TOLERANCE_TRIG,
+        "x=%f",
+        PI_HALF_3
     );
     assert_eq(
-        std::cos(PI_DOUBLE), Math::cos(PI_DOUBLE), TOLERANCE_TRIG, "x=%f", PI_DOUBLE
+        std::cos(PI_DOUBLE),
+        Math::cos(PI_DOUBLE),
+        TOLERANCE_TRIG,
+        "x=%f",
+        PI_DOUBLE
     );
 })
 
@@ -104,7 +120,9 @@ TEST(exp_limits_sanity, {
     values.push_back(-1.0 * Math::LN_OF_10 * Math::POW_10_INV_MIN);
     values.push_back(-1.0 * Math::LN_OF_10 * Math::POW_10_INV_MAX);
 
-    for (std::vector<Number>::iterator it = values.begin(); it != values.end(); ++it) {
+    std::vector<Number>::iterator it;
+
+    for (it = values.begin(); it != values.end(); ++it) {
         if (min > *it) {
             min = *it;
         }
@@ -138,7 +156,9 @@ TEST(pow_10, {
     for (Number x = min; x < max; x += DELTA) {
         Number const expected = std::pow(10.0, x);
 
-        assert_eq(expected, Math::pow_10(x), expected * TOLERANCE_EXP, "x=%f", x);
+        assert_eq(
+            expected, Math::pow_10(x), expected * TOLERANCE_EXP, "x=%f", x
+        );
     }
 })
 
@@ -192,7 +212,7 @@ TEST(linear_to_db, {
 })
 
 
-TEST(converting_back_and_forth_between_linear_and_db_reproduces_the_original_value, {
+TEST(converting_back_and_forth_btwn_linear_and_db_reproduces_original_value, {
     constexpr int resolution = 50000;
     constexpr Number scale = Math::LINEAR_TO_DB_MAX / (Number)resolution;
 
@@ -206,7 +226,13 @@ TEST(converting_back_and_forth_between_linear_and_db_reproduces_the_original_val
         Number const db_tolerance = std::max(0.001, std::fabs(db * 0.01));
 
         assert_eq(linear, Math::db_to_linear(db), 0.03, "i=%d", i);
-        assert_eq(db, Math::linear_to_db(Math::db_to_linear(db)), db_tolerance, "i=%d", i);
+        assert_eq(
+            db,
+            Math::linear_to_db(Math::db_to_linear(db)),
+            db_tolerance,
+            "i=%d",
+            i
+        );
     }
 })
 
@@ -251,21 +277,61 @@ TEST(lookup_periodic, {
     constexpr Integer table_size = 7;
     Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
 
-    assert_eq(7.0, Math::lookup_periodic<true>(table, table_size, 6.0), DOUBLE_DELTA);
-    assert_eq(6.4, Math::lookup_periodic<true>(table, table_size, 6.1), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic<true>(table, table_size, 7.0), DOUBLE_DELTA);
-    assert_eq(1.7, Math::lookup_periodic<true>(table, table_size, 7.7), DOUBLE_DELTA);
-    assert_eq(6.0, Math::lookup_periodic<true>(table, table_size, 12.0), DOUBLE_DELTA);
-    assert_eq(6.3, Math::lookup_periodic<true>(table, table_size, 12.3), DOUBLE_DELTA);
-    assert_eq(6.99, Math::lookup_periodic<true>(table, table_size, 12.99), DOUBLE_DELTA);
-    assert_eq(6.94, Math::lookup_periodic<true>(table, table_size, 13.01), DOUBLE_DELTA);
-    assert_eq(2.7, Math::lookup_periodic<true>(table, table_size, 15.7), DOUBLE_DELTA);
-    assert_eq(6.3, Math::lookup_periodic<false>(table, table_size, -15.7), DOUBLE_DELTA);
-    assert_eq(3.8, Math::lookup_periodic<false>(table, table_size, -11.2), DOUBLE_DELTA);
-    assert_eq(7.0, Math::lookup_periodic<false>(table, table_size, -8.0), DOUBLE_DELTA);
-    assert_eq(2.8, Math::lookup_periodic<false>(table, table_size, -7.3), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic<false>(table, table_size, -7.0), DOUBLE_DELTA);
-    assert_eq(2.0, Math::lookup_periodic<false>(table, table_size, -6.0), DOUBLE_DELTA);
+    assert_eq(
+        7.0, Math::lookup_periodic<true>(table, table_size, 6.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        6.4, Math::lookup_periodic<true>(table, table_size, 6.1), DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0, Math::lookup_periodic<true>(table, table_size, 7.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        1.7, Math::lookup_periodic<true>(table, table_size, 7.7), DOUBLE_DELTA
+    );
+    assert_eq(
+        6.0, Math::lookup_periodic<true>(table, table_size, 12.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        6.3, Math::lookup_periodic<true>(table, table_size, 12.3), DOUBLE_DELTA
+    );
+    assert_eq(
+        6.99,
+        Math::lookup_periodic<true>(table, table_size, 12.99),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        6.94,
+        Math::lookup_periodic<true>(table, table_size, 13.01),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        2.7,
+        Math::lookup_periodic<true>(table, table_size, 15.7),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        6.3,
+        Math::lookup_periodic<false>(table, table_size, -15.7),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        3.8,
+        Math::lookup_periodic<false>(table, table_size, -11.2),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        7.0, Math::lookup_periodic<false>(table, table_size, -8.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        2.8, Math::lookup_periodic<false>(table, table_size, -7.3), DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0, Math::lookup_periodic<false>(table, table_size, -7.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        2.0, Math::lookup_periodic<false>(table, table_size, -6.0), DOUBLE_DELTA
+    );
 })
 
 
@@ -274,21 +340,81 @@ TEST(lookup_periodic_2, {
     constexpr Integer table_mask = 7;
     Number const table[] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
 
-    assert_eq(8.0, Math::lookup_periodic_2(table, table_size, table_mask, 7.0), DOUBLE_DELTA);
-    assert_eq(7.3, Math::lookup_periodic_2(table, table_size, table_mask, 7.1), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic_2(table, table_size, table_mask, 8.0), DOUBLE_DELTA);
-    assert_eq(1.7, Math::lookup_periodic_2(table, table_size, table_mask, 8.7), DOUBLE_DELTA);
-    assert_eq(6.0, Math::lookup_periodic_2(table, table_size, table_mask, 13.0), DOUBLE_DELTA);
-    assert_eq(6.3, Math::lookup_periodic_2(table, table_size, table_mask, 13.3), DOUBLE_DELTA);
-    assert_eq(7.99, Math::lookup_periodic_2(table, table_size, table_mask, 14.99), DOUBLE_DELTA);
-    assert_eq(7.93, Math::lookup_periodic_2(table, table_size, table_mask, 15.01), DOUBLE_DELTA);
-    assert_eq(1.7, Math::lookup_periodic_2(table, table_size, table_mask, 16.7), DOUBLE_DELTA);
-    assert_eq(5.9, Math::lookup_periodic_2(table, table_size, table_mask, -16.7), DOUBLE_DELTA);
-    assert_eq(6.8, Math::lookup_periodic_2(table, table_size, table_mask, -10.2), DOUBLE_DELTA);
-    assert_eq(8.0, Math::lookup_periodic_2(table, table_size, table_mask, -1.0), DOUBLE_DELTA);
-    assert_eq(2.7, Math::lookup_periodic_2(table, table_size, table_mask, -6.3), DOUBLE_DELTA);
-    assert_eq(1.0, Math::lookup_periodic_2(table, table_size, table_mask, -8.0), DOUBLE_DELTA);
-    assert_eq(2.0, Math::lookup_periodic_2(table, table_size, table_mask, -7.0), DOUBLE_DELTA);
+    assert_eq(
+        8.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, 7.0),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        7.3,
+        Math::lookup_periodic_2(table, table_size, table_mask, 7.1),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, 8.0),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.7,
+        Math::lookup_periodic_2(table, table_size, table_mask, 8.7),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        6.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, 13.0),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        6.3,
+        Math::lookup_periodic_2(table, table_size, table_mask, 13.3),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        7.99,
+        Math::lookup_periodic_2(table, table_size, table_mask, 14.99),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        7.93,
+        Math::lookup_periodic_2(table, table_size, table_mask, 15.01),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.7,
+        Math::lookup_periodic_2(table, table_size, table_mask, 16.7),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        5.9,
+        Math::lookup_periodic_2(table, table_size, table_mask, -16.7),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        6.8,
+        Math::lookup_periodic_2(table, table_size, table_mask, -10.2),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        8.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, -1.0),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        2.7,
+        Math::lookup_periodic_2(table, table_size, table_mask, -6.3),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        1.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, -8.0),
+        DOUBLE_DELTA
+    );
+    assert_eq(
+        2.0,
+        Math::lookup_periodic_2(table, table_size, table_mask, -7.0),
+        DOUBLE_DELTA
+    );
 })
 
 
@@ -466,8 +592,12 @@ TEST(ratio_to_exact_log_chorus_lfo_frequency, {
     constexpr Number min = Constants::CHORUS_LFO_FREQUENCY_MIN;
     constexpr Number max = Constants::CHORUS_LFO_FREQUENCY_MAX;
 
-    assert_eq(min, Math::ratio_to_exact_log_chorus_lfo_frequency(0.0), DOUBLE_DELTA);
-    assert_eq(max, Math::ratio_to_exact_log_chorus_lfo_frequency(1.0), DOUBLE_DELTA);
+    assert_eq(
+        min, Math::ratio_to_exact_log_chorus_lfo_frequency(0.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        max, Math::ratio_to_exact_log_chorus_lfo_frequency(1.0), DOUBLE_DELTA
+    );
     assert_eq(
         min * std::sqrt(max / min),
         Math::ratio_to_exact_log_chorus_lfo_frequency(0.5),
@@ -494,8 +624,12 @@ TEST(ratio_to_exact_log_biquad_filter_frequency, {
     constexpr Number min = Constants::BIQUAD_FILTER_FREQUENCY_MIN;
     constexpr Number max = Constants::BIQUAD_FILTER_FREQUENCY_MAX;
 
-    assert_eq(min, Math::ratio_to_exact_log_biquad_filter_frequency(0.0), DOUBLE_DELTA);
-    assert_eq(max, Math::ratio_to_exact_log_biquad_filter_frequency(1.0), DOUBLE_DELTA);
+    assert_eq(
+        min, Math::ratio_to_exact_log_biquad_filter_frequency(0.0), DOUBLE_DELTA
+    );
+    assert_eq(
+        max, Math::ratio_to_exact_log_biquad_filter_frequency(1.0), DOUBLE_DELTA
+    );
     assert_eq(
         min * std::sqrt(max / min),
         Math::ratio_to_exact_log_biquad_filter_frequency(0.5),

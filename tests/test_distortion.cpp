@@ -53,7 +53,7 @@ constexpr Integer ROUNDS = 20;
 constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
 
-TEST(while_distortion_level_is_close_to_zero_the_original_signal_is_barely_affected, {
+TEST(while_dist_level_is_close_to_zero_the_original_signal_is_barely_affected, {
     SumOfSines input(1.0, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
     Distortion::TypeParam type("T", Distortion::TYPE_TANH_10);
     Distortion_ distortion("D", type, input);
@@ -104,7 +104,9 @@ void naive_distort(Number const level, Buffer &buffer)
 
 void test_distortion(Number const original_signal_level)
 {
-    SumOfSines input(original_signal_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
+    SumOfSines input(
+        original_signal_level, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS
+    );
     Distortion::TypeParam type("T", Distortion::TYPE_TANH_10);
     Distortion_ distortion("D", type, input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
@@ -169,7 +171,9 @@ TEST(when_input_is_silent_then_distortion_is_no_op, {
     distortion.level.set_value(1.0);
 
     input_buffer = SignalProducer::produce<SumOfSines>(input, 1, BLOCK_SIZE);
-    distorted_buffer = SignalProducer::produce<Distortion_>(distortion, 1, BLOCK_SIZE);
+    distorted_buffer = SignalProducer::produce<Distortion_>(
+        distortion, 1, BLOCK_SIZE
+    );
 
     assert_eq(input_buffer, distorted_buffer);
 })
@@ -204,11 +208,15 @@ TEST(delay_feedback_distortion_will_eventually_decay_completely, {
     }
 
     for (Integer round = 0; round != 1000; ++round) {
-        rendered = SignalProducer::produce< Distortion::Distortion<FixedSignalProducer> >(
+        rendered = SignalProducer::produce<
+            Distortion::Distortion<FixedSignalProducer>
+        >(
             distortion, round
         );
 
-        SignalProducer::find_peak(rendered, channels, block_size, peak, peak_index);
+        SignalProducer::find_peak(
+            rendered, channels, block_size, peak, peak_index
+        );
 
         if (round < 50) {
             assert_lt(peak, previous_peak, "round=%d", (int)round);

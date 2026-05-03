@@ -149,7 +149,9 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
 
             in_samples = (
                 input_volume > 0.000001
-                    ? SignalProducer::produce<SumOfSines>(input, i, sample_count)
+                    ? SignalProducer::produce<SumOfSines>(
+                        input, i, sample_count
+                    )
                     : NULL
             );
 
@@ -158,7 +160,9 @@ void test_varaible_size_rounds(RenderMode const mode, Number const input_volume)
             }
 
             if (mode == RenderMode::ADD) {
-                renderer.render<double, Renderer::Operation::ADD>(sample_count, in_samples, batch);
+                renderer.render<double, Renderer::Operation::ADD>(
+                    sample_count, in_samples, batch
+                );
             } else {
                 renderer.render<double>(sample_count, in_samples, batch);
             }

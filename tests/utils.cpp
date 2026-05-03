@@ -81,11 +81,15 @@ class Buffer
             }
         }
 
-        void append(Sample const* const* const samples, Integer const sample_count)
-        {
+        void append(
+                Sample const* const* const samples,
+                Integer const sample_count
+        ) {
             for (Integer channel = 0; channel != channels; ++channel) {
                 for (Integer i = 0; i != sample_count; ++i) {
-                    this->samples[channel][append_index + i] = samples[channel][i];
+                    this->samples[channel][append_index + i] = (
+                        samples[channel][i]
+                    );
                 }
             }
 
@@ -115,7 +119,10 @@ class Constant : public SignalProducer
     friend class SignalProducer;
 
     public:
-        explicit Constant(Sample const value, Integer const channels = 1) noexcept
+        explicit Constant(
+                Sample const value,
+                Integer const channels = 1
+        ) noexcept
             : SignalProducer(channels, 0),
             value(value)
         {
@@ -131,7 +138,9 @@ class Constant : public SignalProducer
             Integer const channels = get_channels();
 
             for (Integer c = 0; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                Integer i;
+
+                for (i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = value;
                 }
             }
@@ -163,8 +172,9 @@ class FixedSignalProducer : public SignalProducer
             return this->cached_round;
         }
 
-        void set_fixed_samples(Sample const* const* const fixed_samples) noexcept
-        {
+        void set_fixed_samples(
+                Sample const* const* const fixed_samples
+        ) noexcept {
             this->fixed_samples = fixed_samples;
             this->cached_round = -1;
         }
@@ -259,7 +269,9 @@ class SumOfSines : public SignalProducer
             }
 
             for (Integer c = 1; c != channels; ++c) {
-                for (Integer i = first_sample_index; i != end_sample_index; ++i) {
+                Integer i;
+
+                for (i = first_sample_index; i != end_sample_index; ++i) {
                     buffer[c][i] = buffer[0][i];
                 }
             }
@@ -338,11 +350,21 @@ void assert_rendering_is_independent_from_chunk_size(
     signal_producer_1.set_block_size(block_size);
     signal_producer_2.set_block_size(block_size * 10);
 
-    render_rounds<SignalProducerClass>(signal_producer_1, buffer_1, rounds_1, block_size);
-    render_rounds<SignalProducerClass>(signal_producer_2, buffer_2, rounds_2, short_round_size);
+    render_rounds<SignalProducerClass>(
+        signal_producer_1, buffer_1, rounds_1, block_size
+    );
+    render_rounds<SignalProducerClass>(
+        signal_producer_2, buffer_2, rounds_2, short_round_size
+    );
 
     for (Integer c = 0; c != channels; ++c) {
-        assert_eq(buffer_1.samples[c], buffer_2.samples[c], buffer_size, tolerance, message);
+        assert_eq(
+            buffer_1.samples[c],
+            buffer_2.samples[c],
+            buffer_size,
+            tolerance,
+            message
+        );
     }
 }
 

@@ -102,29 +102,97 @@ void assert_needs_update(
 
 
 TEST(can_tell_if_snapshot_update_is_needed_for_a_given_voice_status, {
-    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC, Constants::VOICE_STATUS_NORMAL);
-    assert_needs_update(false, Envelope::UPDATE_MODE_STATIC, Constants::VOICE_STATUS_NORMAL);
-    assert_needs_update(false, Envelope::UPDATE_MODE_END, Constants::VOICE_STATUS_NORMAL);
+    assert_needs_update(
+        true, Envelope::UPDATE_MODE_DYNAMIC, Constants::VOICE_STATUS_NORMAL
+    );
+    assert_needs_update(
+        false, Envelope::UPDATE_MODE_STATIC, Constants::VOICE_STATUS_NORMAL
+    );
+    assert_needs_update(
+        false, Envelope::UPDATE_MODE_END, Constants::VOICE_STATUS_NORMAL
+    );
 
-    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LAST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_OLDEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LOWEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_HIGHEST);
+    assert_needs_update(
+        true, Envelope::UPDATE_MODE_DYNAMIC_LAST, Constants::VOICE_STATUS_LAST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LAST,
+        Constants::VOICE_STATUS_HIGHEST
+    );
 
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_LAST);
-    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_OLDEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_LOWEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_OLDEST, Constants::VOICE_STATUS_HIGHEST);
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_LAST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_OLDEST,
+        Constants::VOICE_STATUS_HIGHEST
+    );
 
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_LAST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_OLDEST);
-    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_LOWEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_LOWEST, Constants::VOICE_STATUS_HIGHEST);
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_LAST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_LOWEST,
+        Constants::VOICE_STATUS_HIGHEST
+    );
 
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_LAST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_OLDEST);
-    assert_needs_update(false, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_LOWEST);
-    assert_needs_update(true, Envelope::UPDATE_MODE_DYNAMIC_HIGHEST, Constants::VOICE_STATUS_HIGHEST);
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_LAST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_OLDEST
+    );
+    assert_needs_update(
+        false,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_LOWEST
+    );
+    assert_needs_update(
+        true,
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST,
+        Constants::VOICE_STATUS_HIGHEST
+    );
 
     assert_needs_update(
         true,
@@ -207,7 +275,7 @@ void test_tempo_synced_snapshot_creation(
 }
 
 
-TEST(when_envelope_is_tempo_synced_then_snapshot_times_are_measured_in_beats_instead_of_seconds, {
+TEST(tempo_synced_envelope_times_are_measured_in_beats_instead_of_seconds, {
     Envelope tempo_synced("T");
     Envelope not_tempo_synced("N");
 
@@ -274,9 +342,13 @@ TEST(when_inaccuracy_is_non_zero_then_randomizes_times_and_levels, {
     envelope.update();
     envelope.make_snapshot(randoms, 0, PARAM_DEFAULT_MPE_CHANNEL, snapshot);
 
-    assert_eq(value_scale * initial_value, snapshot.initial_value, DOUBLE_DELTA);
+    assert_eq(
+        value_scale * initial_value, snapshot.initial_value, DOUBLE_DELTA
+    );
     assert_eq(value_scale * peak_value, snapshot.peak_value, DOUBLE_DELTA);
-    assert_eq(value_scale * sustain_value, snapshot.sustain_value, DOUBLE_DELTA);
+    assert_eq(
+        value_scale * sustain_value, snapshot.sustain_value, DOUBLE_DELTA
+    );
     assert_eq(value_scale * final_value, snapshot.final_value, DOUBLE_DELTA);
 
     assert_eq(time_offset + delay_time, snapshot.delay_time, DOUBLE_DELTA);
@@ -307,7 +379,9 @@ void set_env_param_via_midi_ctl(
 
 void free_midi_controllers(std::vector<MidiController*>& midi_controllers)
 {
-    for (std::vector<MidiController*>::const_iterator it = midi_controllers.begin(); it != midi_controllers.end(); ++it) {
+    std::vector<MidiController*>::const_iterator it;
+
+    for (it = midi_controllers.begin(); it != midi_controllers.end(); ++it) {
         delete *it;
     }
 
@@ -337,16 +411,36 @@ TEST(envelope_snapshot_creation_respects_midi_channel, {
     EnvelopeSnapshot snapshot;
     std::vector<MidiController*> midi_controllers;
 
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.scale, scale);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.initial_value, initial_value);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.peak_value, peak_value);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.sustain_value, sustain_value);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.final_value, final_value_1);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.delay_time, delay_time);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.attack_time, attack_time);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.hold_time, hold_time);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.decay_time, decay_time);
-    set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.release_time, release_time_1);
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.scale, scale
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.initial_value, initial_value
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.peak_value, peak_value
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.sustain_value, sustain_value
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.final_value, final_value_1
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.delay_time, delay_time
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.attack_time, attack_time
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.hold_time, hold_time
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.decay_time, decay_time
+    );
+    set_env_param_via_midi_ctl(
+        midi_controllers, midi_channel, envelope.release_time, release_time_1
+    );
 
     envelope.update();
     envelope.make_snapshot(randoms, 1, midi_channel, snapshot);
@@ -363,8 +457,15 @@ TEST(envelope_snapshot_creation_respects_midi_channel, {
         assert_eq(release_time_1, snapshot.release_time, DOUBLE_DELTA);
         assert_eq(1, snapshot.envelope_index);
 
-        set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.final_value, final_value_2);
-        set_env_param_via_midi_ctl(midi_controllers, midi_channel, envelope.release_time, release_time_2);
+        set_env_param_via_midi_ctl(
+            midi_controllers, midi_channel, envelope.final_value, final_value_2
+        );
+        set_env_param_via_midi_ctl(
+            midi_controllers,
+            midi_channel,
+            envelope.release_time,
+            release_time_2
+        );
         envelope.update();
 
         envelope.make_end_snapshot(randoms, 2, midi_channel, snapshot);
@@ -535,7 +636,9 @@ void test_envelope_rendering(
     }
 
     for (Integer batch_size = 1; batch_size != max_batch_size; ++batch_size) {
-        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::OVERWRITE>(
+        test_envelope_rendering_with_batch_size<
+            expected_samples_count, Envelope::RenderingMode::OVERWRITE
+        >(
             test_name,
             batch_size,
             envelope_values,
@@ -548,7 +651,9 @@ void test_envelope_rendering(
             expected_constantness,
             0.0
         );
-        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+        test_envelope_rendering_with_batch_size<
+            expected_samples_count, Envelope::RenderingMode::MULTIPLY
+        >(
             test_name,
             batch_size,
             envelope_values,
@@ -561,7 +666,9 @@ void test_envelope_rendering(
             expected_constantness,
             0.0
         );
-        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+        test_envelope_rendering_with_batch_size<
+            expected_samples_count, Envelope::RenderingMode::MULTIPLY
+        >(
             test_name,
             batch_size,
             envelope_values,
@@ -574,7 +681,9 @@ void test_envelope_rendering(
             expected_constantness,
             0.5
         );
-        test_envelope_rendering_with_batch_size<expected_samples_count, Envelope::RenderingMode::MULTIPLY>(
+        test_envelope_rendering_with_batch_size<
+            expected_samples_count, Envelope::RenderingMode::MULTIPLY
+        >(
             test_name,
             batch_size,
             envelope_values,
@@ -940,8 +1049,9 @@ constexpr int SHAPE_TEST_SAMPLE_COUNT = 9;
 constexpr int SHAPE_TEST_REL_LENGTH = SHAPE_TEST_SAMPLE_COUNT + 1;
 
 
-std::string shape_test_array_to_string(Sample const samples[SHAPE_TEST_SAMPLE_COUNT])
-{
+std::string shape_test_array_to_string(
+        Sample const samples[SHAPE_TEST_SAMPLE_COUNT]
+) {
     constexpr int max_length = 256;
     char buffer[max_length];
     int pos = 0;
@@ -1044,27 +1154,57 @@ void test_envelope_shape(
     }
 
     assert_eq(
-        buffer_1, buffer_2, SHAPE_TEST_SAMPLE_COUNT, DOUBLE_DELTA, "shape=%d", (int)shape
+        buffer_1,
+        buffer_2,
+        SHAPE_TEST_SAMPLE_COUNT,
+        DOUBLE_DELTA,
+        "shape=%d",
+        (int)shape
     );
 }
 
 
 TEST(envelope_shapes, {
     constexpr Sample reference_samples[SHAPE_TEST_SAMPLE_COUNT] = {
-        0.0, 1.0 / 6.0, 2.0 / 6.0, 3.0 / 6.0, 4.0 / 6.0, 5.0 / 6.0, 1.0, 1.0, 1.0,
+        0.0, 1.0 / 6.0, 2.0 / 6.0, 3.0 / 6.0, 4.0 / 6.0,
+        5.0 / 6.0, 1.0, 1.0, 1.0,
     };
 
     test_envelope_shape(Envelope::SHAPE_LINEAR, reference_samples, "=========");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH, reference_samples, "=<<=>>===");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH_STEEP, reference_samples, "=<<=>>===");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SMOOTH_STEEPER, reference_samples, "=<<=>>===");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP, reference_samples, "=<<<<<===");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP_STEEP, reference_samples, "=<<<<<===");
-    test_envelope_shape(Envelope::SHAPE_SMOOTH_SHARP_STEEPER, reference_samples, "=<<<<<===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH, reference_samples, "=>>>>>===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH_STEEP, reference_samples, "=>>>>>===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SMOOTH_STEEPER, reference_samples, "=>>>>>===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP, reference_samples, "=>>=<<===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP_STEEP, reference_samples, "=>>=<<===");
-    test_envelope_shape(Envelope::SHAPE_SHARP_SHARP_STEEPER, reference_samples, "=>>=<<===");
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SMOOTH, reference_samples, "=<<=>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SMOOTH_STEEP, reference_samples, "=<<=>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SMOOTH_STEEPER, reference_samples, "=<<=>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SHARP, reference_samples, "=<<<<<==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SHARP_STEEP, reference_samples, "=<<<<<==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SMOOTH_SHARP_STEEPER, reference_samples, "=<<<<<==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SMOOTH, reference_samples, "=>>>>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SMOOTH_STEEP, reference_samples, "=>>>>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SMOOTH_STEEPER, reference_samples, "=>>>>>==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SHARP, reference_samples, "=>>=<<==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SHARP_STEEP, reference_samples, "=>>=<<==="
+    );
+    test_envelope_shape(
+        Envelope::SHAPE_SHARP_SHARP_STEEPER, reference_samples, "=>>=<<==="
+    );
 })

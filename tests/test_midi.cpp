@@ -154,7 +154,12 @@ class MidiEventLogger : public Midi::EventHandler
             char buffer[128];
 
             snprintf(
-                buffer, 128, "%s %.1f 0x%02hhx\n", event_name, time_offset, channel
+                buffer,
+                128,
+                "%s %.1f 0x%02hhx\n",
+                event_name,
+                time_offset,
+                channel
             );
 
             events += buffer;
@@ -257,13 +262,19 @@ std::string parse_midi(
 TEST(parses_known_midi_messages_and_ignores_unknown_and_invalid_ones, {
     assert_eq("NOTE_OFF 1.0 0x06 0x42 0x70\n", parse_midi(1.0, "\x86\x42\x70"));
     assert_eq("NOTE_ON 2.0 0x06 0x42 0x70\n", parse_midi(2.0, "\x96\x42\x70"));
-    assert_eq("AFTERTOUCH 3.0 0x06 0x42 0x70\n", parse_midi(3.0, "\xa6\x42\x70"));
-    assert_eq("CONTROL_CHANGE 4.0 0x06 0x01 0x70\n", parse_midi(4.0, "\xb6\x01\x70"));
+    assert_eq(
+        "AFTERTOUCH 3.0 0x06 0x42 0x70\n", parse_midi(3.0, "\xa6\x42\x70")
+    );
+    assert_eq(
+        "CONTROL_CHANGE 4.0 0x06 0x01 0x70\n", parse_midi(4.0, "\xb6\x01\x70")
+    );
     assert_eq("PROGRAM_CHANGE 5.0 0x06 0x01\n", parse_midi(5.0, "\xc6\x01"));
     assert_eq("CHANNEL_PRESSURE 6.0 0x06 0x42\n", parse_midi(6.0, "\xd6\x42"));
     assert_eq("PITCH_WHEEL 7.0 0x06 0x0abc\n", parse_midi(7.0, "\xe6\x3c\x15"));
     assert_eq("ALL_SOUND_OFF 8.0 0x06\n", parse_midi(8.0, "\xb6\x78\x00", 3));
-    assert_eq("RESET_ALL_CONTROLLERS 9.0 0x06\n", parse_midi(9.0, "\xb6\x79\x00", 3));
+    assert_eq(
+        "RESET_ALL_CONTROLLERS 9.0 0x06\n", parse_midi(9.0, "\xb6\x79\x00", 3)
+    );
     assert_eq("ALL_NOTES_OFF 10.0 0x06\n", parse_midi(10.0, "\xb6\x7b\x00", 3));
     assert_eq("ALL_NOTES_OFF 11.0 0x06\n", parse_midi(11.0, "\xb6\x7c\x00", 3));
     assert_eq("ALL_NOTES_OFF 12.0 0x06\n", parse_midi(12.0, "\xb6\x7d\x00", 3));

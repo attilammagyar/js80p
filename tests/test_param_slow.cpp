@@ -37,7 +37,7 @@
 using namespace JS80P;
 
 
-void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+void assert_error_of_repeated_ratio_to_log_scale_conversion_is_low_and_stable(
         Number const* const table,
         int const max_index,
         Number const index_scale,
@@ -96,8 +96,8 @@ void assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_lo
 }
 
 
-TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable, {
-    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+TEST(error_of_repeated_ratio_to_log_scale_and_back_conv_is_low_and_stable, {
+    assert_error_of_repeated_ratio_to_log_scale_conversion_is_low_and_stable(
         Math::log_chorus_lfo_freq_table(),
         Math::LOG_CHORUS_LFO_FREQ_TABLE_MAX_INDEX,
         Math::LOG_CHORUS_LFO_FREQ_TABLE_INDEX_SCALE,
@@ -109,7 +109,7 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         0.0020,
         "Chorus LFO logarithmic frequency"
     );
-    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+    assert_error_of_repeated_ratio_to_log_scale_conversion_is_low_and_stable(
         Math::log_lfo_freq_table(),
         Math::LOG_LFO_FREQ_TABLE_MAX_INDEX,
         Math::LOG_LFO_FREQ_TABLE_INDEX_SCALE,
@@ -121,7 +121,7 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         0.0020,
         "LFO logarithmic frequencies"
     );
-    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+    assert_error_of_repeated_ratio_to_log_scale_conversion_is_low_and_stable(
         Math::log_biquad_filter_freq_table(),
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_FREQ_TABLE_INDEX_SCALE,
@@ -133,7 +133,7 @@ TEST(error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_s
         0.0,
         "biquad filter logarithmic frequencies"
     );
-    assert_error_of_repeated_ratio_to_log_scale_value_and_back_conversion_is_low_and_stable(
+    assert_error_of_repeated_ratio_to_log_scale_conversion_is_low_and_stable(
         Math::log_biquad_filter_q_table(),
         Math::LOG_BIQUAD_FILTER_Q_TABLE_MAX_INDEX,
         Math::LOG_BIQUAD_FILTER_Q_TABLE_INDEX_SCALE,

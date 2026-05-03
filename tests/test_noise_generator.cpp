@@ -164,7 +164,9 @@ TEST(noise_level_may_be_sample_evaluated, {
         input_channel_2[i] = -0.2;
     }
 
-    rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer, FloatParamS> >(
+    rendered = SignalProducer::produce<
+        NoiseGenerator<FixedSignalProducer, FloatParamS>
+    >(
         noise_generator, 1, BLOCK_SIZE
     );
 
@@ -221,8 +223,12 @@ TEST(when_noise_generator_is_off_then_input_passes_through_it_unmodified, {
     );
     assert_false(noise_generator.is_on());
 
-    assert_eq((void const*)input_channel_1, (void const*)rendered[0], "round=1");
-    assert_eq((void const*)input_channel_2, (void const*)rendered[1], "round=1");
+    assert_eq(
+        (void const*)input_channel_1, (void const*)rendered[0], "round=1"
+    );
+    assert_eq(
+        (void const*)input_channel_2, (void const*)rendered[1], "round=1"
+    );
 
     noise_generator.start(1.29);
     noise_generator.stop(1.69);
@@ -235,8 +241,12 @@ TEST(when_noise_generator_is_off_then_input_passes_through_it_unmodified, {
     );
     assert_false(noise_generator.is_on());
 
-    assert_eq((void const*)input_channel_1, (void const*)rendered[0], "round=2");
-    assert_eq((void const*)input_channel_2, (void const*)rendered[1], "round=2");
+    assert_eq(
+        (void const*)input_channel_1, (void const*)rendered[0], "round=2"
+    );
+    assert_eq(
+        (void const*)input_channel_2, (void const*)rendered[1], "round=2"
+    );
 
     assert_false(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -245,10 +255,14 @@ TEST(when_noise_generator_is_off_then_input_passes_through_it_unmodified, {
     assert_true(noise_generator.is_on());
 
     assert_eq(&input_channel_1[0], &rendered[0][0], 3, DOUBLE_DELTA, "round=3");
-    assert_neq(&input_channel_1[3], &rendered[0][3], 7, DOUBLE_DELTA, "round=3");
+    assert_neq(
+        &input_channel_1[3], &rendered[0][3], 7, DOUBLE_DELTA, "round=3"
+    );
 
     assert_eq(&input_channel_2[0], &rendered[1][0], 3, DOUBLE_DELTA, "round=3");
-    assert_neq(&input_channel_2[3], &rendered[1][3], 7, DOUBLE_DELTA, "round=3");
+    assert_neq(
+        &input_channel_2[3], &rendered[1][3], 7, DOUBLE_DELTA, "round=3"
+    );
 
     assert_true(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -256,8 +270,12 @@ TEST(when_noise_generator_is_off_then_input_passes_through_it_unmodified, {
     );
     assert_true(noise_generator.is_on());
 
-    assert_neq(input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=4");
-    assert_neq(input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=4");
+    assert_neq(
+        input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=4"
+    );
+    assert_neq(
+        input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=4"
+    );
 
     assert_true(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -265,15 +283,19 @@ TEST(when_noise_generator_is_off_then_input_passes_through_it_unmodified, {
     );
     assert_false(noise_generator.is_on());
 
-    assert_neq(&input_channel_1[0], &rendered[0][0], 7, DOUBLE_DELTA, "round=5");
+    assert_neq(
+        &input_channel_1[0], &rendered[0][0], 7, DOUBLE_DELTA, "round=5"
+    );
     assert_eq(&input_channel_1[7], &rendered[0][7], 3, DOUBLE_DELTA, "round=5");
 
-    assert_neq(&input_channel_2[0], &rendered[1][0], 7, DOUBLE_DELTA, "round=5");
+    assert_neq(
+        &input_channel_2[0], &rendered[1][0], 7, DOUBLE_DELTA, "round=5"
+    );
     assert_eq(&input_channel_2[7], &rendered[1][7], 3, DOUBLE_DELTA, "round=5");
 })
 
 
-TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodified, {
+TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_as_is, {
     constexpr Integer block_size = 10;
     constexpr Frequency sample_rate = 10.0;
 
@@ -307,8 +329,12 @@ TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodifi
     );
     assert_false(noise_generator.is_on());
 
-    assert_eq((void const*)input_channel_1, (void const*)rendered[0], "round=1");
-    assert_eq((void const*)input_channel_2, (void const*)rendered[1], "round=1");
+    assert_eq(
+        (void const*)input_channel_1, (void const*)rendered[0], "round=1"
+    );
+    assert_eq(
+        (void const*)input_channel_2, (void const*)rendered[1], "round=1"
+    );
 
     noise_generator.start(1.29);
     noise_generator.stop(1.69);
@@ -321,8 +347,12 @@ TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodifi
     );
     assert_false(noise_generator.is_on());
 
-    assert_eq((void const*)input_channel_1, (void const*)rendered[0], "round=2");
-    assert_eq((void const*)input_channel_2, (void const*)rendered[1], "round=2");
+    assert_eq(
+        (void const*)input_channel_1, (void const*)rendered[0], "round=2"
+    );
+    assert_eq(
+        (void const*)input_channel_2, (void const*)rendered[1], "round=2"
+    );
 
     assert_false(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -330,8 +360,12 @@ TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodifi
     );
     assert_true(noise_generator.is_on());
 
-    assert_eq(input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=3");
-    assert_eq(input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=3");
+    assert_eq(
+        input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=3"
+    );
+    assert_eq(
+        input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=3"
+    );
 
     assert_true(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -339,8 +373,12 @@ TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodifi
     );
     assert_true(noise_generator.is_on());
 
-    assert_eq((void const*)input_channel_1, (void const*)rendered[0], "round=4");
-    assert_eq((void const*)input_channel_2, (void const*)rendered[1], "round=4");
+    assert_eq(
+        (void const*)input_channel_1, (void const*)rendered[0], "round=4"
+    );
+    assert_eq(
+        (void const*)input_channel_2, (void const*)rendered[1], "round=4"
+    );
 
     assert_true(noise_generator.is_on());
     rendered = SignalProducer::produce< NoiseGenerator<FixedSignalProducer> >(
@@ -348,6 +386,10 @@ TEST(when_noise_level_is_zero_then_handles_events_and_returns_the_input_unmodifi
     );
     assert_false(noise_generator.is_on());
 
-    assert_eq(input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=5");
-    assert_eq(input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=5");
+    assert_eq(
+        input_channel_1, rendered[0], block_size, DOUBLE_DELTA, "round=5"
+    );
+    assert_eq(
+        input_channel_2, rendered[1], block_size, DOUBLE_DELTA, "round=5"
+    );
 })

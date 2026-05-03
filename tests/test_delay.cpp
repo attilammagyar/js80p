@@ -390,8 +390,14 @@ void test_delay_with_feedback(
     };
     /* output = gain * (input + feedback) */
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.00, 0.00, 0.05, 0.10, 0.15, 0.06, 0.12, 0.36, 0.12, 0.24, 0.36, 0.12},
-        {0.00, 0.00, 0.10, 0.20, 0.30, 0.12, 0.24, 0.72, 0.24, 0.48, 0.72, 0.24},
+        {
+            0.00, 0.00, 0.05, 0.10, 0.15, 0.06,
+            0.12, 0.36, 0.12, 0.24, 0.36, 0.12,
+        },
+        {
+            0.00, 0.00, 0.10, 0.20, 0.30, 0.12,
+            0.24, 0.72, 0.24, 0.48, 0.72, 0.24,
+        },
     };
     Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -467,8 +473,16 @@ TEST(feedback_signal_merging_is_independent_of_rendered_sample_count, {
         {0.02, 0.04, 0.06, 0.099, 0.099},
     };
     constexpr Sample expected_output[CHANNELS][sample_count] = {
-        {0.00, 0.00, 0.10, 0.20, 0.30, 0.11, 0.12, 0.23, 0.31, 0.11, 0.22, 0.13, 0.11, 0.22, 0.11},
-        {0.00, 0.00, 0.20, 0.40, 0.60, 0.22, 0.24, 0.46, 0.62, 0.22, 0.44, 0.26, 0.22, 0.44, 0.22},
+        {
+            0.00, 0.00, 0.10, 0.20, 0.30,
+            0.11, 0.12, 0.23, 0.31, 0.11,
+            0.22, 0.13, 0.11, 0.22, 0.11,
+        },
+        {
+            0.00, 0.00, 0.20, 0.40, 0.60,
+            0.22, 0.24, 0.46, 0.62, 0.22,
+            0.44, 0.26, 0.22, 0.44, 0.22,
+        },
     };
     Sample const* const input_buffer[CHANNELS] = {
         (Sample const*)&input_samples[0],
@@ -495,25 +509,39 @@ TEST(feedback_signal_merging_is_independent_of_rendered_sample_count, {
     delay.gain.set_value(1.0);
     delay.time.set_value(0.2);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 1, 3), 3);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 1, 3), 3
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 1, 3);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 2, 1), 1);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 2, 1), 1
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 2, 1);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 3, 3), 3);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 3, 3), 3
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 3, 3);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 4, 2), 2);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 4, 2), 2
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 4, 2);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 5, 1), 1);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 5, 1), 1
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 5, 1);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 6, 2), 2);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 6, 2), 2
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 6, 2);
 
-    output.append(SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 7, 3), 3);
+    output.append(
+        SignalProducer::produce< Delay<FixedSignalProducer> >(delay, 7, 3), 3
+    );
     SignalProducer::produce<FixedSignalProducer>(feedback, 7, 3);
 
     for (Integer c = 0; c != CHANNELS; ++c) {
@@ -577,7 +605,7 @@ TEST(reset_clears_the_delay_buffer, {
 })
 
 
-TEST(when_tempo_sync_is_on_then_delay_time_is_measured_in_beats_instead_of_seconds, {
+TEST(tempo_synced_delay_time_is_measured_in_beats_instead_of_seconds, {
     test_basic_delay(1.0, 120.0, ToggleParam::OFF);
     test_delay_with_feedback(1.0, 180.0, ToggleParam::OFF);
     test_delay_with_feedback(1.0, 30.0, ToggleParam::OFF);
@@ -588,7 +616,7 @@ TEST(when_tempo_sync_is_on_then_delay_time_is_measured_in_beats_instead_of_secon
 })
 
 
-TEST(when_tempo_sync_is_on_but_tempo_is_too_slow_then_the_minimum_tempo_is_used, {
+TEST(tempo_synced_delay_overrides_too_slow_tempo_with_minimum_tempo, {
     constexpr Number time_scale = (
         Delay<FixedSignalProducer>::BPM_MIN / Math::SECONDS_IN_ONE_MINUTE
     );
@@ -699,7 +727,9 @@ TEST(delay_may_be_reversed, {
     constexpr Integer sample_count = rounds * block_size;
     constexpr Frequency sample_rate = 10.0;
     constexpr Number envelope = (
-        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>::TEST_REVERSE_ENVELOPE
+        Delay<
+            FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE
+        >::TEST_REVERSE_ENVELOPE
     );
 
     /*
@@ -814,7 +844,9 @@ TEST(delay_may_be_reversed, {
     delay.time.set_value(0.66);
     delay.time.schedule_value(0.71, 0.65999);
 
-    render_rounds< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+    render_rounds<
+        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>
+    >(
         delay, output, rounds
     );
 
@@ -835,14 +867,16 @@ TEST(delay_may_be_reversed, {
 })
 
 
-TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part_of_the_delay_segment, {
+TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part, {
     constexpr Number bpm = 120.0;
     constexpr Integer block_size = 10;
     constexpr Integer rounds = 1;
     constexpr Integer sample_count = rounds * block_size;
     constexpr Frequency sample_rate = 10.0;
     constexpr Number envelope = (
-        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>::TEST_REVERSE_ENVELOPE
+        Delay<
+            FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE
+        >::TEST_REVERSE_ENVELOPE
     );
     constexpr Sample input_samples[CHANNELS][block_size] = {
         {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0},
@@ -907,12 +941,16 @@ TEST(reverse_delay_time_change_affects_the_speed_of_the_remaining_part_of_the_de
     delay.gain.set_value(1.0);
     delay.time.set_value(1.0);
 
-    SignalProducer::produce< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+    SignalProducer::produce<
+        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>
+    >(
         delay, 123
     );
 
     delay.time.schedule_value(0.51, 2.0);
-    render_rounds< Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE> >(
+    render_rounds<
+        Delay<FixedSignalProducer, DelayCapabilities::DC_REVERSIBLE>
+    >(
         delay, output, rounds
     );
 
@@ -964,7 +1002,9 @@ void test_stereo_panned_delay(
     stereo_panned_delay.panning.schedule_value(0.45, -1.0);
     stereo_panned_delay.set_panning_scale(panning_scale);
 
-    assert_eq((int)input.get_channels(), (int)stereo_panned_delay.get_channels());
+    assert_eq(
+        (int)input.get_channels(), (int)stereo_panned_delay.get_channels()
+    );
 
     render_rounds<StereoPannedDelayClass>(stereo_panned_delay, output, rounds);
 
@@ -994,45 +1034,46 @@ void test_stereo_panned_delay(
     constexpr Integer block_size = 5;
     constexpr Integer rounds = 2;
     constexpr Integer sample_count = rounds * block_size;
+    constexpr Integer channels = FixedSignalProducer::CHANNELS;
 
-    constexpr Sample input_samples[FixedSignalProducer::CHANNELS][block_size] = {
+    constexpr Sample input_samples[channels][block_size] = {
         {0.10, 0.20, 0.30, 0.40, 0.50},
         {0.20, 0.40, 0.60, 0.80, 1.00},
     };
 
-    constexpr Sample expected_output_full_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+    constexpr Sample exp_output_full_panning_samples[channels][sample_count] = {
         {0.000, 0.000, 0.075, 0.150, 0.225, 0.000, 0.000, 0.000, 0.000, 0.000},
         {0.000, 0.000, 0.150, 0.300, 0.450, 0.900, 1.125, 0.225, 0.450, 0.675},
     };
 
-    constexpr Sample expected_output_opposite_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+    constexpr Sample exp_output_opp_panning_samples[channels][sample_count] = {
         {0.000, 0.000, 0.075, 0.150, 0.225, 0.900, 1.125, 0.225, 0.450, 0.675},
         {0.000, 0.000, 0.150, 0.300, 0.450, 0.000, 0.000, 0.000, 0.000, 0.000},
     };
 
-    constexpr Sample expected_output_no_panning_samples[FixedSignalProducer::CHANNELS][sample_count] = {
+    constexpr Sample exp_output_no_panning_samples[channels][sample_count] = {
         {0.000, 0.000, 0.075, 0.150, 0.225, 0.300, 0.375, 0.075, 0.150, 0.225},
         {0.000, 0.000, 0.150, 0.300, 0.450, 0.600, 0.750, 0.150, 0.300, 0.450},
     };
 
-    Sample const* const input_buffer[FixedSignalProducer::CHANNELS] = {
+    Sample const* const input_buffer[channels] = {
         (Sample const*)&input_samples[0],
         (Sample const*)&input_samples[1]
     };
 
-    Sample const* const expected_output_full_panning[] = {
-        (Sample const*)&expected_output_full_panning_samples[0],
-        (Sample const*)&expected_output_full_panning_samples[1],
+    Sample const* const exp_output_full_panning[] = {
+        (Sample const*)&exp_output_full_panning_samples[0],
+        (Sample const*)&exp_output_full_panning_samples[1],
     };
 
-    Sample const* const expected_output_opposite_panning[] = {
-        (Sample const*)&expected_output_opposite_panning_samples[0],
-        (Sample const*)&expected_output_opposite_panning_samples[1],
+    Sample const* const exp_output_opp_panning[] = {
+        (Sample const*)&exp_output_opp_panning_samples[0],
+        (Sample const*)&exp_output_opp_panning_samples[1],
     };
 
-    Sample const* const expected_output_no_panning[] = {
-        (Sample const*)&expected_output_no_panning_samples[0],
-        (Sample const*)&expected_output_no_panning_samples[1],
+    Sample const* const exp_output_no_panning[] = {
+        (Sample const*)&exp_output_no_panning_samples[0],
+        (Sample const*)&exp_output_no_panning_samples[1],
     };
 
     test_stereo_panned_delay<StereoPannedDelayClass>(
@@ -1043,7 +1084,7 @@ void test_stereo_panned_delay(
         rounds,
         1.0,
         input_buffer,
-        expected_output_full_panning
+        exp_output_full_panning
     );
     test_stereo_panned_delay<StereoPannedDelayClass>(
         stereo_panned_delay,
@@ -1053,7 +1094,7 @@ void test_stereo_panned_delay(
         rounds,
         -1.0,
         input_buffer,
-        expected_output_opposite_panning
+        exp_output_opp_panning
     );
     test_stereo_panned_delay<StereoPannedDelayClass>(
         stereo_panned_delay,
@@ -1063,7 +1104,7 @@ void test_stereo_panned_delay(
         rounds,
         0.000001,
         input_buffer,
-        expected_output_no_panning
+        exp_output_no_panning
     );
 }
 
@@ -1074,7 +1115,9 @@ TEST(output_may_be_panned, {
     StereoPannedDelay<FixedSignalProducer> stereo_panned_delay(
         input, StereoPannedDelayMode::FLIPPED
     );
-    Distortion::TypeParam distortion_type("DSTTYP", Distortion::TYPE_DELAY_FEEDBACK);
+    Distortion::TypeParam distortion_type(
+        "DSTTYP", Distortion::TYPE_DELAY_FEEDBACK
+    );
     DistortedHighShelfStereoPannedDelay<FixedSignalProducer> distorted_delay(
         input, StereoPannedDelayMode::FLIPPED, distortion, distortion_type
     );
@@ -1083,7 +1126,9 @@ TEST(output_may_be_panned, {
     test_stereo_panned_delay< StereoPannedDelay<FixedSignalProducer> >(
         stereo_panned_delay, input, "StereoPannedDelay"
     );
-    test_stereo_panned_delay< DistortedHighShelfStereoPannedDelay<FixedSignalProducer> >(
+    test_stereo_panned_delay<
+        DistortedHighShelfStereoPannedDelay<FixedSignalProducer>
+    >(
         distorted_delay, input, "DistortedHighShelfStereoPannedDelay"
     );
 })

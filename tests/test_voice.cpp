@@ -353,7 +353,10 @@ void test_turning_off_voice(std::function<void (SimpleVoice&)> reset)
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], sample_count, DOUBLE_DELTA
+        expected_output.samples[0],
+        actual_output.samples[0],
+        sample_count,
+        DOUBLE_DELTA
     );
     assert_false(voice.is_on());
     assert_true(voice.is_off_after(0.0));
@@ -406,7 +409,9 @@ void test_decay_before_note_off(
         envelope->attack_time.set_value(attack_time);
         envelope->hold_time.set_value(hold_time);
         envelope->decay_time.set_value(decay_time);
-        envelope->release_time.set_value(envelope->release_time.get_max_value());
+        envelope->release_time.set_value(
+            envelope->release_time.get_max_value()
+        );
         envelope->final_value.set_value(0.0);
     }
 
@@ -554,7 +559,9 @@ TEST(can_tell_if_note_decayed_before_note_off, {
     params_with_amplitude_envelopes.volume.set_value(1.0);
 
     params_with_amplitude_envelopes.amplitude.set_envelope(&envelope);
-    params_with_amplitude_envelopes.subharmonic_amplitude.set_envelope(&envelope);
+    params_with_amplitude_envelopes.subharmonic_amplitude.set_envelope(
+        &envelope
+    );
 
     params_with_zero_amplitudes.amplitude.set_value(0.0);
     params_with_zero_amplitudes.subharmonic_amplitude.set_value(0.0);
@@ -587,7 +594,10 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::AT_BEGINNING_OF_SUSTAIN,
-        "when sustain value is 0.0, then the note should decay when starting sustaining"
+        (
+            "when sustain value is 0.0,"
+            " then the note should decay when starting sustaining"
+        )
     );
 
     params_with_amplitude_envelopes.noise_level.set_value(0.5);
@@ -597,7 +607,10 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::NEVER,
-        "when sustain value is 0.0 but the noise level is non-zero, then the note should never decay"
+        (
+            "when sustain value is 0.0 but the noise level is non-zero,"
+            " then the note should never decay"
+        )
     );
 
     params_with_amplitude_envelopes.noise_level.set_value(0.5);
@@ -608,7 +621,10 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::AT_BEGINNING_OF_SUSTAIN,
-        "when sustain value is 0.0 for the volume envelope, then the note should decay even if the noise level is non-zero"
+        (
+            "when sustain value is 0.0 for the volume envelope,"
+            " then the note should decay even if the noise level is non-zero"
+        )
     );
     params_with_amplitude_envelopes.volume.set_envelope(NULL);
     params_with_amplitude_envelopes.volume.set_value(1.0);
@@ -621,7 +637,11 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice,
         &envelope,
         NoteDecay::NEVER,
-        "when only the additive volume has a decaying envelope, then the note should not decay, because it might be needed for modulation"
+        (
+            "when only the additive volume has a decaying envelope,"
+            " then the note should not decay,"
+            " because it might be needed for modulation"
+        )
     );
     additive_volume_leader.set_envelope(NULL);
 
@@ -632,7 +652,10 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice_with_amplitude_envelopes,
         &envelope,
         NoteDecay::NEVER,
-        "when sustain value is greater than 0.0, then the note should never decay"
+        (
+            "when sustain value is greater than 0.0,"
+            " then the note should never decay"
+        )
     );
 
     test_decay_before_note_off(
@@ -661,7 +684,10 @@ TEST(can_tell_if_note_decayed_before_note_off, {
         voice_with_zero_subharmonic_amplitude,
         NULL,
         NoteDecay::NEVER,
-        "when only the subharmonic amplitude is 0.0, then the note should never decay"
+        (
+            "when only the subharmonic amplitude is 0.0,"
+            " then the note should never decay"
+        )
     );
 
     test_decay_before_note_off(
@@ -819,7 +845,7 @@ TEST(tuning_can_be_changed, {
 })
 
 
-TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_channel, {
+TEST(when_using_mts_esp_then_note_freq_is_selected_based_on_the_channel, {
     constexpr Frequency sample_rate = 44100.0;
     constexpr Integer block_size = 8192;
     constexpr Integer rounds = 1;
@@ -861,15 +887,20 @@ TEST(when_using_mts_esp_tuning_then_note_frequency_is_selected_based_on_the_chan
     render_rounds<SimpleVoice>(voice, actual_output, rounds);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
+        expected_output.samples[0],
+        actual_output.samples[0],
+        sample_count,
+        0.001
     );
 })
 
 
-TEST(when_using_continuous_mts_esp_tuning_then_frequency_can_be_updated_before_each_round, {
+TEST(when_using_continuous_mts_esp_then_freq_can_be_updated_before_each_round, {
     constexpr Frequency sample_rate = 30000.0;
     constexpr Integer block_size = 3000;
-    constexpr Seconds portamento_length = 2.0 * ((Seconds)block_size / sample_rate);
+    constexpr Seconds portamento_length = (
+        2.0 * ((Seconds)block_size / sample_rate)
+    );
     constexpr Number portamento_depth = -1200.0;
     constexpr Number tolerance = 0.001;
     constexpr Frequency orig_freq = 300.0;
@@ -965,7 +996,7 @@ TEST(when_using_continuous_mts_esp_tuning_then_frequency_can_be_updated_before_e
 })
 
 
-TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, {
+TEST(synced_inaccuracy_is_updated_once_per_round, {
     OscillatorInaccuracy synced_oscillator_inaccuracy(0.123);
     SimpleVoice::Params params("");
     FloatParamS additive_volume_leader;
@@ -985,18 +1016,26 @@ TEST(when_synced_and_drifting_then_synced_inaccuracy_is_updated_once_per_round, 
 
     voice.update_unstable_note_frequency<true>(1);
     SignalProducer::produce<SimpleVoice>(voice, 1);
-    Number const inaccuracy_in_round_1 = synced_oscillator_inaccuracy.get_inaccuracy();
+    Number const inaccuracy_in_round_1 = (
+        synced_oscillator_inaccuracy.get_inaccuracy()
+    );
 
     voice.update_unstable_note_frequency<true>(2);
     SignalProducer::produce<SimpleVoice>(voice, 2);
-    Number const inaccuracy_in_round_2 = synced_oscillator_inaccuracy.get_inaccuracy();
+    Number const inaccuracy_in_round_2 = (
+        synced_oscillator_inaccuracy.get_inaccuracy()
+    );
 
     synced_oscillator_inaccuracy.update(2);
     assert_lt(0.01, std::fabs(inaccuracy_in_round_1 - inaccuracy_in_round_2));
-    assert_eq(inaccuracy_in_round_2, synced_oscillator_inaccuracy.get_inaccuracy());
+    assert_eq(
+        inaccuracy_in_round_2, synced_oscillator_inaccuracy.get_inaccuracy()
+    );
 
     synced_oscillator_inaccuracy.update(2);
-    assert_eq(inaccuracy_in_round_2, synced_oscillator_inaccuracy.get_inaccuracy());
+    assert_eq(
+        inaccuracy_in_round_2, synced_oscillator_inaccuracy.get_inaccuracy()
+    );
 })
 
 
@@ -1028,5 +1067,7 @@ TEST(when_voice_is_reset_then_synced_inaccuracy_is_also_reset, {
 
     voice.reset();
 
-    assert_eq(seed, synced_oscillator_inaccuracy.get_inaccuracy(), DOUBLE_DELTA);
+    assert_eq(
+        seed, synced_oscillator_inaccuracy.get_inaccuracy(), DOUBLE_DELTA
+    );
 })

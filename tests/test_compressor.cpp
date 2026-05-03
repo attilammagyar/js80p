@@ -51,8 +51,12 @@ constexpr Integer BLOCK_SIZE = 1024;
 constexpr Integer ROUNDS = 20;
 constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
-constexpr CompressionMode CM_COMP = CompressionMode::COMPRESSION_MODE_COMPRESSOR;
-constexpr CompressionMode CM_EXPAND = CompressionMode::COMPRESSION_MODE_EXPANDER;
+constexpr CompressionMode CM_COMP = (
+    CompressionMode::COMPRESSION_MODE_COMPRESSOR
+);
+constexpr CompressionMode CM_EXPAND = (
+    CompressionMode::COMPRESSION_MODE_EXPANDER
+);
 
 
 void test_compressor(
@@ -91,7 +95,9 @@ void test_compressor(
     compressor.wet.set_value(wet);
 
     render_rounds<Compressor_>(compressor, actual_output, ROUNDS);
-    render_rounds<SumOfSines>(expected_output_generator, expected_output, ROUNDS);
+    render_rounds<SumOfSines>(
+        expected_output_generator, expected_output, ROUNDS
+    );
 
     for (Integer c = 0; c != CHANNELS; ++c) {
         assert_close(

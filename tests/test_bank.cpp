@@ -37,8 +37,12 @@ TEST(long_program_names_are_trimmed_and_truncated, {
     constexpr char const* long_name = "a long program name, way over the limit";
     constexpr char const* truncated = "a long prog.. the limit";
     constexpr char const* truncated_short = "a l..it";
-    constexpr char const* just_below_the_limit = "   just below length limit   ";
-    constexpr char const* just_below_the_limit_trimmed = "just below length limit";
+    constexpr char const* just_below_the_limit = (
+        "   just below length limit   "
+    );
+    constexpr char const* just_below_the_limit_trimmed = (
+        "just below length limit"
+    );
     constexpr char const* becomes_empty = "    [\\]   ";
 
     Bank::Program program(long_name, " [Default Name] ", "");
@@ -156,7 +160,7 @@ TEST(an_imported_program_may_be_empty, {
 })
 
 
-TEST(when_a_serialized_program_does_not_have_a_name_then_original_name_is_kept, {
+TEST(when_a_serialized_program_does_not_have_a_name_then_original_is_kept, {
     Bank::Program program("Name", "Default Name", "[js80p]\nMIX = 1.0");
 
     program.import(
@@ -207,7 +211,9 @@ TEST(serialized_program_buffer_remains_valid, {
 TEST(bank_is_initialized_with_built_in_programs, {
     Bank bank;
 
-    /* the name of the program is "Blank", but the patch itself isn't blank :-) */
+    /*
+    The name of the program is "Blank", but the patch itself isn't blank. :-)
+    */
     assert_eq("Blank", bank[0].get_name().c_str());
     assert_false(bank[0].is_blank());
 

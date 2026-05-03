@@ -168,7 +168,9 @@ DEFINE_FUNC(StdCos, "std::cos(x)", std::cos(x), -FOUR_PI, FOUR_PI);
 
 NEW_GROUP();
 
-DEFINE_FUNC(MathExp, "Math::exp(x)", Math::exp(x), Math::EXP_MIN, Math::EXP_MAX);
+DEFINE_FUNC(
+    MathExp, "Math::exp(x)", Math::exp(x), Math::EXP_MIN, Math::EXP_MAX
+);
 DEFINE_FUNC(StdExp, "std::exp(x)", std::exp(x), Math::EXP_MIN, Math::EXP_MAX);
 
 
@@ -177,9 +179,18 @@ NEW_GROUP();
 constexpr Number POW_10_MIN = Math::POW_10_MIN;
 constexpr Number POW_10_MAX = Math::POW_10_MAX;
 
-DEFINE_FUNC(MathPow10, "Math::pow_10(x)", Math::pow_10(x), POW_10_MIN, POW_10_MAX);
-DEFINE_FUNC(StdExpLog10, "std::exp(std::log(10)*x)", std::exp(Math::LN_OF_10 * x), POW_10_MIN, POW_10_MAX);
-DEFINE_FUNC(StdPow10, "std::pow(10,x)", std::pow(10.0, x), POW_10_MIN, POW_10_MAX);
+DEFINE_FUNC(
+    MathPow10, "Math::pow_10(x)", Math::pow_10(x), POW_10_MIN, POW_10_MAX
+);
+DEFINE_FUNC(
+    StdExpLog10,
+    "std::exp(std::log(10)*x)",
+    std::exp(Math::LN_OF_10 * x),
+    POW_10_MIN, POW_10_MAX
+);
+DEFINE_FUNC(
+    StdPow10, "std::pow(10,x)", std::pow(10.0, x), POW_10_MIN, POW_10_MAX
+);
 
 
 NEW_GROUP();
@@ -187,11 +198,41 @@ NEW_GROUP();
 constexpr Number POW_10_INV_MIN = Math::POW_10_INV_MIN;
 constexpr Number POW_10_INV_MAX = Math::POW_10_INV_MAX;
 
-DEFINE_FUNC(MathPow10Inv, "Math::pow_10_inv(x)", Math::pow_10_inv(x), POW_10_INV_MIN, POW_10_INV_MAX);
-DEFINE_FUNC(StdExpLog10Inv, "1/std::exp(std::log(10)*x)", 1.0 / std::exp(Math::LN_OF_10 * x), POW_10_INV_MIN, POW_10_INV_MAX);
-DEFINE_FUNC(StdPow10Inv, "1/std::pow(10,x)", 1.0 / std::pow(10.0, x), POW_10_INV_MIN, POW_10_INV_MAX);
-DEFINE_FUNC(StdExpMinusLog10, "std::exp(-std::log(10)*x)", std::exp(MINUS_LN_OF_10 * x), POW_10_INV_MIN, POW_10_INV_MAX);
-DEFINE_FUNC(StdPow10Minus, "std::pow(10,-x)", std::pow(10.0, -x), POW_10_INV_MIN, POW_10_INV_MAX);
+DEFINE_FUNC(
+    MathPow10Inv,
+    "Math::pow_10_inv(x)",
+    Math::pow_10_inv(x),
+    POW_10_INV_MIN,
+    POW_10_INV_MAX
+);
+DEFINE_FUNC(
+    StdExpLog10Inv,
+    "1/std::exp(std::log(10)*x)",
+    1.0 / std::exp(Math::LN_OF_10 * x),
+    POW_10_INV_MIN,
+    POW_10_INV_MAX
+);
+DEFINE_FUNC(
+    StdPow10Inv,
+    "1/std::pow(10,x)",
+    1.0 / std::pow(10.0, x),
+    POW_10_INV_MIN,
+    POW_10_INV_MAX
+);
+DEFINE_FUNC(
+    StdExpMinusLog10,
+    "std::exp(-std::log(10)*x)",
+    std::exp(MINUS_LN_OF_10 * x),
+    POW_10_INV_MIN,
+    POW_10_INV_MAX
+);
+DEFINE_FUNC(
+    StdPow10Minus,
+    "std::pow(10,-x)",
+    std::pow(10.0, -x),
+    POW_10_INV_MIN,
+    POW_10_INV_MAX
+);
 
 
 NEW_GROUP();
@@ -200,8 +241,20 @@ NEW_GROUP();
 constexpr Number POW_2_SCALE = 1.0 / 100.0;
 constexpr Number EXP_2_SCALE = POW_2_SCALE * Math::LN_OF_2;
 
-DEFINE_FUNC(StdExpLog2, "std::exp(std::log(2)*0.01*x)", std::exp(EXP_2_SCALE * x), POW_10_MIN, POW_10_MAX);
-DEFINE_FUNC(StdPow2, "std::pow(2,0.01*x)", std::pow(2.0, POW_2_SCALE * x), POW_10_MIN, POW_10_MAX);
+DEFINE_FUNC(
+    StdExpLog2,
+    "std::exp(std::log(2)*0.01*x)",
+    std::exp(EXP_2_SCALE * x),
+    POW_10_MIN,
+    POW_10_MAX
+);
+DEFINE_FUNC(
+    StdPow2,
+    "std::pow(2,0.01*x)",
+    std::pow(2.0, POW_2_SCALE * x),
+    POW_10_MIN,
+    POW_10_MAX
+);
 
 
 NEW_GROUP();
@@ -211,14 +264,24 @@ Shelving filters need both A = 10 ^ (G / 40) and sqrt(A) - but which is faster:
 taking the square root of the already calculated A, or to calculate
 10 ^ (G / 80) from scratch?
 */
-DEFINE_FUNC(MathPow10Scaled, "Math::pow_10(0.0125*x)", Math::pow_10(0.0125 * x), 0.0, 20.0);
+DEFINE_FUNC(
+    MathPow10Scaled,
+    "Math::pow_10(0.0125*x)",
+    Math::pow_10(0.0125 * x),
+    0.0,
+    20.0
+);
 DEFINE_FUNC(StdSqrt, "std::sqrt(x)", std::sqrt(x), 0.0, 20.0);
 
 
 NEW_GROUP();
 
-DEFINE_FUNC(MathCombine, "Math::combine(x,0.5,y)", Math::combine(x, 0.5, y), 0.0, 1.0);
-DEFINE_FUNC(SimpleCombine, "x*0.5+(1.0-x)*y", x * 0.5 + (1.0 - x) * y, 0.0, 1.0);
+DEFINE_FUNC(
+    MathCombine, "Math::combine(x,0.5,y)", Math::combine(x, 0.5, y), 0.0, 1.0
+);
+DEFINE_FUNC(
+    SimpleCombine, "x*0.5+(1.0-x)*y", x * 0.5 + (1.0 - x) * y, 0.0, 1.0
+);
 
 
 NEW_GROUP();
@@ -244,7 +307,7 @@ void usage(char const* const name)
     fprintf(stderr, "Usage: %s func N\n", name);
     fprintf(stderr, "\n");
     fprintf(stderr, "    func   function name to test\n");
-    fprintf(stderr, "    N      positive integer, number of times to call the function\n");
+    fprintf(stderr, "    N      number of times to call the function\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Valid options for function name:\n");
     fprintf(stderr, "\n");
@@ -269,7 +332,10 @@ int main(int const argc, char const* argv[])
     if (n < 1) {
         fprintf(
             stderr,
-            "ERROR: number of test runs must be a positive integer, got: %d (interpreted from \"%s\")\n\n",
+            (
+                "ERROR: number of test runs must be a positive integer,"
+                " got: %d (interpreted from \"%s\")\n\n"
+            ),
             n,
             argv[2]
         );

@@ -57,22 +57,36 @@ TEST(decreasing_peaks_have_some_inertia, {
 
     block_size = 10;
     samples_until_next_peak = 0;
-    peak_tracker.update(0.5, samples_until_next_peak, block_size, sampling_period);
+    peak_tracker.update(
+        0.5, samples_until_next_peak, block_size, sampling_period
+    );
     assert_eq(1.0, peak_tracker.get_peak(), 0.01);
 
-    samples_until_next_peak = samples_until_half_ring_down - (block_size - samples_until_next_peak);
+    samples_until_next_peak = (
+        samples_until_half_ring_down - (block_size - samples_until_next_peak)
+    );
     block_size = 20;
-    peak_tracker.update(0.5, samples_until_next_peak, block_size, sampling_period);
+    peak_tracker.update(
+        0.5, samples_until_next_peak, block_size, sampling_period
+    );
     assert_eq(0.75, peak_tracker.get_peak(), 0.01);
 
-    samples_until_next_peak = samples_until_half_ring_down - (block_size - samples_until_next_peak);
+    samples_until_next_peak = (
+        samples_until_half_ring_down - (block_size - samples_until_next_peak)
+    );
     block_size = 30;
-    peak_tracker.update(0.0, samples_until_next_peak, block_size, sampling_period);
+    peak_tracker.update(
+        0.0, samples_until_next_peak, block_size, sampling_period
+    );
     assert_eq(0.375, peak_tracker.get_peak(), 0.01);
 
-    samples_until_next_peak = samples_until_half_ring_down - (block_size - samples_until_next_peak);
+    samples_until_next_peak = (
+        samples_until_half_ring_down - (block_size - samples_until_next_peak)
+    );
     block_size = 16;
-    peak_tracker.update(0.0, samples_until_next_peak, block_size, sampling_period);
+    peak_tracker.update(
+        0.0, samples_until_next_peak, block_size, sampling_period
+    );
     assert_eq(0.1875, peak_tracker.get_peak(), 0.01);
 
     peak_tracker.update(0.123, 99999, 100000, sampling_period);

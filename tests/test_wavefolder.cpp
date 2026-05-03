@@ -52,7 +52,7 @@ constexpr Integer ROUNDS = 20;
 constexpr Integer SAMPLE_COUNT = BLOCK_SIZE * ROUNDS;
 
 
-TEST(when_folding_level_is_below_the_transition_threshold_then_no_folding_happens, {
+TEST(when_folding_level_is_below_transition_threshold_then_no_folding_happens, {
     SumOfSines input(1.0, 110.0, 0.0, 0.0, 0.0, 0.0, CHANNELS);
     Wavefolder_ folder(input);
     Buffer expected_output(SAMPLE_COUNT, CHANNELS);
@@ -108,7 +108,7 @@ void naive_fold(Number const folding, Buffer &buffer)
 }
 
 
-TEST(when_folding_level_is_above_the_transition_threshold_then_the_signal_is_amplified_and_folded, {
+TEST(when_fld_level_is_above_threshold_then_signal_is_amplified_and_folded, {
     Sample const folding = (
         1.0 + (Sample)(Constants::FOLD_MAX - Constants::FOLD_TRANSITION)
     );
@@ -127,7 +127,9 @@ TEST(when_folding_level_is_above_the_transition_threshold_then_the_signal_is_amp
     folder.folding.schedule_value(
         BLOCK_LENGTH * 2.5, Constants::FOLD_MAX * 0.99
     );
-    folder.folding.schedule_linear_ramp(3.0 * BLOCK_LENGTH, Constants::FOLD_MAX);
+    folder.folding.schedule_linear_ramp(
+        3.0 * BLOCK_LENGTH, Constants::FOLD_MAX
+    );
 
     render_rounds<SumOfSines>(input, expected_output, ROUNDS);
     input.reset();

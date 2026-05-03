@@ -92,7 +92,9 @@ TEST(param_ratio_to_str, {
     assert_ratio_as_str(synth, "0.000", mc1, 0.5, 10.0, "%.3f", NULL, 0);
     assert_ratio_as_str(synth, "0.00", mc1, 0.4999999, 10.0, "%.2f", NULL, 0);
 
-    assert_ratio_as_str(synth, "first", mwfm, 0.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(
+        synth, "first", mwfm, 0.0, 0.0, NULL, options, number_of_options
+    );
 
     assert_ratio_as_str(
         synth,
@@ -116,8 +118,12 @@ TEST(param_ratio_to_str, {
         number_of_options
     );
 
-    assert_ratio_as_str(synth, "", mwfm, 1.0, 0.0, NULL, options, number_of_options);
-    assert_ratio_as_str(synth, "", mwfm, -1.0, 0.0, NULL, options, number_of_options);
+    assert_ratio_as_str(
+        synth, "", mwfm, 1.0, 0.0, NULL, options, number_of_options
+    );
+    assert_ratio_as_str(
+        synth, "", mwfm, -1.0, 0.0, NULL, options, number_of_options
+    );
 })
 
 
@@ -179,8 +185,12 @@ TEST(gui_can_apply_size_constraints, {
 
     assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, half_h);
 
-    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w + 100, half_h);
-    assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, half_h + 100);
+    assert_applied_gui_size_constraints(
+        gui, half_w, half_h, half_w + 100, half_h
+    );
+    assert_applied_gui_size_constraints(
+        gui, half_w, half_h, half_w, half_h + 100
+    );
 
     assert_applied_gui_size_constraints(gui, half_w, half_h, half_w, 999999);
     assert_applied_gui_size_constraints(gui, half_w, half_h, 999999, half_h);

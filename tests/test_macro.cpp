@@ -85,8 +85,12 @@ TEST(circular_dependencies_between_macros_are_broken_up, {
 
     macro_2.update(PARAM_DEFAULT_MPE_CHANNEL);
 
-    assert_eq(0.125, macro_1.get_value(PARAM_DEFAULT_MPE_CHANNEL), DOUBLE_DELTA);
-    assert_eq(0.0625, macro_2.get_value(PARAM_DEFAULT_MPE_CHANNEL), DOUBLE_DELTA);
+    assert_eq(
+        0.125, macro_1.get_value(PARAM_DEFAULT_MPE_CHANNEL), DOUBLE_DELTA
+    );
+    assert_eq(
+        0.0625, macro_2.get_value(PARAM_DEFAULT_MPE_CHANNEL), DOUBLE_DELTA
+    );
 })
 
 
@@ -212,7 +216,14 @@ TEST(macro_value_can_be_randomized, {
     Math::compute_statistics(numbers, statistics);
 
     assert_statistics(
-        true, min, mean, scale * max, mean, (mean - min) / 2.0, statistics, 0.025
+        true,
+        min,
+        mean,
+        scale * max,
+        mean,
+        (mean - min) / 2.0,
+        statistics,
+        0.025
     );
 })
 

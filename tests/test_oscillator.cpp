@@ -163,7 +163,9 @@ class ReferenceTriangle : public NonBandLimitedReferenceWaveform
             Sample const half_period = period * 0.5;
 
             /* Shifting by a quarter period so that the wave starts with 0.0 */
-            Sample const phase = std::fmod((Sample)time + period * 0.25, period);
+            Sample const phase = std::fmod(
+                (Sample)time + period * 0.25, period
+            );
 
             return 2.0 * (
                 phase < half_period
@@ -195,11 +197,13 @@ class ReferenceSquare : public NonBandLimitedReferenceWaveform
 };
 
 
-class ReferenceSawtoothWithDisappearingPartial : public NonBandLimitedReferenceWaveform
+class ReferenceSawtoothWithDisappearingPartial
+    : public NonBandLimitedReferenceWaveform
 {
     public:
-        explicit ReferenceSawtoothWithDisappearingPartial(Frequency const frequency)
-            : NonBandLimitedReferenceWaveform(frequency)
+        explicit ReferenceSawtoothWithDisappearingPartial(
+                Frequency const frequency
+        ) : NonBandLimitedReferenceWaveform(frequency)
         {
         }
 
@@ -247,7 +251,12 @@ class ReferencePulse : public NonBandLimitedReferenceWaveform
             Scaling by 0.85 leaves headroom for the artifacts from band
             limiting.
             */
-            return 0.85 * ((std::fmod(time + phase, period) < duty_cycle ? 1.0 : 0.0) - PULSE_WIDTH);
+            return (
+                0.85 * (
+                    (std::fmod(time + phase, period) < duty_cycle ? 1.0 : 0.0)
+                    - PULSE_WIDTH
+                )
+            );
         }
 
     private:
@@ -314,7 +323,13 @@ void test_basic_waveform(
     oscillator.frequency.set_value(frequency);
 
     assert_oscillator_output_is_close_to_reference(
-        reference, oscillator, sample_rate, block_size, rounds, tolerance, waveform
+        reference,
+        oscillator,
+        sample_rate,
+        block_size,
+        rounds,
+        tolerance,
+        waveform
     );
 }
 
@@ -334,7 +349,13 @@ TEST(basic_waveforms, {
         SimpleOscillator::SQUARE, 0.05
     );
     test_basic_waveform<ReferencePulse>(
-        SimpleOscillator::PULSE, 0.015, SAMPLE_RATE, 100.0, 128, 5, ReferencePulse::PULSE_WIDTH
+        SimpleOscillator::PULSE,
+        0.015,
+        SAMPLE_RATE,
+        100.0,
+        128,
+        5,
+        ReferencePulse::PULSE_WIDTH
     );
 })
 
@@ -379,8 +400,20 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
 
     Byte const voice_status = Constants::VOICE_STATUS_NORMAL;
 
-    SumOfSines expected_1(0.5, 440.0, -0.5, 440.0 * 2.0, 0.0, 440.0 * 9.0, 1, 0.0);
-    SumOfSines expected_2(0.5, 440.0, 0.3, 440.0 * 2.0, 0.2, 440.0 * 9.0, 1, (Number)block_size / sample_rate);
+    SumOfSines expected_1(
+        0.5, 440.0,
+        -0.5, 440.0 * 2.0,
+        0.0, 440.0 * 9.0,
+        1,
+        0.0
+    );
+    SumOfSines expected_2(
+        0.5, 440.0,
+        0.3, 440.0 * 2.0,
+        0.2, 440.0 * 9.0,
+        1,
+        (Number)block_size / sample_rate
+    );
 
     FloatParamS pulse_width("", 0.0, 1.0, 0.5);
     FloatParamS amplitude("", 0.0, 1.0, 1.0);
@@ -456,7 +489,9 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
     harmonic_1.schedule_value(0.001, 0.3);
     harmonic_8.schedule_value(0.001, 0.2);
 
-    render_rounds<SimpleOscillator>(oscillator, actual_output, 1, block_size, 1);
+    render_rounds<SimpleOscillator>(
+        oscillator, actual_output, 1, block_size, 1
+    );
     render_rounds<SumOfSines>(expected_1, expected_output, 1, block_size, 1);
 
     assert_close(
@@ -467,7 +502,9 @@ TEST(custom_waveform_is_updated_before_each_rendering_round, {
         "round=1"
     );
 
-    render_rounds<SimpleOscillator>(oscillator, actual_output, 1, block_size, 2);
+    render_rounds<SimpleOscillator>(
+        oscillator, actual_output, 1, block_size, 2
+    );
     render_rounds<SumOfSines>(expected_2, expected_output, 1, block_size, 2);
 
     assert_close(
@@ -509,17 +546,17 @@ TEST(oscillator_can_be_started_and_stopped_between_samples, {
     constexpr Integer block_size = 6;
     constexpr Sample sample_period = 1.0 / (Seconds)sample_rate;
     constexpr Sample time_offset = 0.5 * sample_period;
-    constexpr Sample pi_double = (Sample)Math::PI_DOUBLE;
+    constexpr Sample pi_2 = (Sample)Math::PI_DOUBLE;
     Sample const* const* block;
     Sample expected_samples[2][block_size] = {
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {
             /* sin(2 * pi * frequency * time) */
-            std::sin(pi_double * frequency * (0.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (1.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (2.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (3.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (4.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (0.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (1.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (2.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (3.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (4.0 * sample_period + time_offset)),
             0.0,
         },
     };
@@ -534,10 +571,14 @@ TEST(oscillator_can_be_started_and_stopped_between_samples, {
     oscillator.start((Seconds)(1.0 - time_offset));
     oscillator.stop((Seconds)(2.0 - time_offset - sample_period));
 
-    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
+    block = SignalProducer::produce<SimpleOscillator>(
+        oscillator, 1, block_size
+    );
     assert_eq(expected_samples[0], block[0], block_size, DOUBLE_DELTA);
 
-    block = SignalProducer::produce<SimpleOscillator>(oscillator, 2, block_size);
+    block = SignalProducer::produce<SimpleOscillator>(
+        oscillator, 2, block_size
+    );
     assert_eq(expected_samples[1], block[0], block_size, DOUBLE_DELTA);
 })
 
@@ -548,17 +589,17 @@ TEST(repeated_start_and_stop_calls_are_ignored, {
     constexpr Integer block_size = 6;
     constexpr Sample sample_period = 1.0 / (Seconds)sample_rate;
     constexpr Sample time_offset = 0.5 * sample_period;
-    constexpr Sample pi_double = (Sample)Math::PI_DOUBLE;
+    constexpr Sample pi_2 = (Sample)Math::PI_DOUBLE;
     Sample const* const* block;
     Sample expected_samples[2][block_size] = {
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
         {
             /* sin(2 * pi * frequency * time) */
-            std::sin(pi_double * frequency * (0.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (1.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (2.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (3.0 * sample_period + time_offset)),
-            std::sin(pi_double * frequency * (4.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (0.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (1.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (2.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (3.0 * sample_period + time_offset)),
+            std::sin(pi_2 * frequency * (4.0 * sample_period + time_offset)),
             0.0,
         },
     };
@@ -575,10 +616,14 @@ TEST(repeated_start_and_stop_calls_are_ignored, {
     oscillator.stop(2.0 - time_offset - sample_period);
     oscillator.stop(1.23);
 
-    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
+    block = SignalProducer::produce<SimpleOscillator>(
+        oscillator, 1, block_size
+    );
     assert_eq(expected_samples[0], block[0], block_size, DOUBLE_DELTA);
 
-    block = SignalProducer::produce<SimpleOscillator>(oscillator, 2, block_size);
+    block = SignalProducer::produce<SimpleOscillator>(
+        oscillator, 2, block_size
+    );
     assert_eq(expected_samples[1], block[0], block_size, DOUBLE_DELTA);
 })
 
@@ -647,16 +692,26 @@ void assert_amplitude_and_frequency_automation_are_independent_of_each_other(
 
     oscillator.start(0.0);
 
-    block = SignalProducer::produce<SimpleOscillator>(oscillator, 1, block_size);
+    block = SignalProducer::produce<SimpleOscillator>(
+        oscillator, 1, block_size
+    );
     assert_eq(expected_samples, block[0], block_size, DOUBLE_DELTA);
 }
 
 
 TEST(amplitude_and_frequency_may_be_automated_independently_of_each_other, {
-    assert_amplitude_and_frequency_automation_are_independent_of_each_other(false, false);
-    assert_amplitude_and_frequency_automation_are_independent_of_each_other(true, false);
-    assert_amplitude_and_frequency_automation_are_independent_of_each_other(false, true);
-    assert_amplitude_and_frequency_automation_are_independent_of_each_other(true, true);
+    assert_amplitude_and_frequency_automation_are_independent_of_each_other(
+        false, false
+    );
+    assert_amplitude_and_frequency_automation_are_independent_of_each_other(
+        true, false
+    );
+    assert_amplitude_and_frequency_automation_are_independent_of_each_other(
+        false, true
+    );
+    assert_amplitude_and_frequency_automation_are_independent_of_each_other(
+        true, true
+    );
 })
 
 
@@ -666,9 +721,13 @@ void schedule_100hz_tuning(
         Integer const rounds
 ) {
     Seconds const time_offset = (
-        oscillator.sample_count_to_relative_time_offset(rounds * block_size) / 2.0
+        oscillator.sample_count_to_relative_time_offset(
+            rounds * block_size
+        ) / 2.0
     );
-    Seconds const one_block = oscillator.sample_count_to_relative_time_offset(block_size);
+    Seconds const one_block = oscillator.sample_count_to_relative_time_offset(
+        block_size
+    );
 
     oscillator.frequency.schedule_value(time_offset, 50.0);
     oscillator.detune.schedule_value(time_offset, 1600.0);
@@ -692,7 +751,7 @@ void assert_completed(SimpleOscillator& oscillator)
 
 
 /* Both frequency, detune, and fine_detune are constants. */
-TEST(sine_wave_25hz_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_wave_25hz_detuned_and_fine_detuned_2_octaves_up_makes_a_100hz_wave, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -717,7 +776,7 @@ TEST(sine_wave_25hz_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_
 
 
 /* Detune and fine detune are constants. */
-TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_scheduled_to_25hz_detuned_and_fine_detuned_2_octaves_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 1000;
     ReferenceSine reference_sine(100.0);
@@ -743,7 +802,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_fine_detuned_two_octaves_up_
 
 
 /* Frequency and fine detune are constants. */
-TEST(sine_wave_25hz_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_25hz_fine_detuned_and_scheduled_to_detune_2_octaves_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -769,7 +828,7 @@ TEST(sine_wave_25hz_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_shou
 
 
 /* Fine detune is constant. */
-TEST(sine_wave_scheduled_to_be_25hz_and_fine_detuned_and_scheduled_to_be_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_scheduled_to_25hz_fine_dtned_scheduled_to_dtn_2_octs_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -796,7 +855,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_fine_detuned_and_scheduled_to_be_detuned
 
 
 /* Frequency and detune are constants. */
-TEST(sine_wave_25hz_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_25hz_detuned_and_scheduled_to_fine_detune_2_octs_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -822,7 +881,7 @@ TEST(sine_wave_25hz_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_shou
 
 
 /* Detune is constant. */
-TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_scheduled_to_be_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_scheduled_to_25hz_dtned_scheduled_to_fine_dtn_2_octs_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -849,7 +908,7 @@ TEST(sine_wave_scheduled_to_be_25hz_and_detuned_and_scheduled_to_be_fine_detuned
 
 
 /* Frequency is constant. */
-TEST(sine_wave_25hz_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_25hz_scheduled_to_dtn_and_fine_dtn_2_octs_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -876,7 +935,7 @@ TEST(sine_wave_25hz_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_shou
 
 
 /* All frequency related params are changing. */
-TEST(sine_wave_scheduled_to_be_25hz_and_scheduled_to_be_detuned_and_fine_detuned_two_octaves_up_should_make_a_100hz_wave, {
+TEST(sine_scheduled_to_25hz_scheduled_to_dtn_fine_dtn_2_octs_up_makes_100hz, {
     constexpr Integer block_size = 256;
     constexpr Integer rounds = 10;
     ReferenceSine reference_sine(100.0);
@@ -971,7 +1030,7 @@ TEST(when_frequency_is_above_the_nyquist_frequency_then_oscillator_is_silent, {
 })
 
 
-TEST(when_frequency_is_close_to_the_nyquist_frequency_harmonics_vanish_gradually, {
+TEST(when_freq_is_close_to_the_nyquist_then_harmonics_vanish_gradually, {
     test_basic_waveform<ReferenceSawtoothWithDisappearingPartial>(
         SimpleOscillator::SAWTOOTH,
         0.12,
@@ -983,7 +1042,7 @@ TEST(when_frequency_is_close_to_the_nyquist_frequency_harmonics_vanish_gradually
 })
 
 
-TEST(when_frequency_is_changing_but_harmonics_remain_below_the_nyquist_frequency_then_they_are_kept_fully, {
+TEST(when_freq_is_changed_but_harmonics_stay_below_nyquist_then_they_are_kept, {
     constexpr Frequency start_frequency = 100.0;
     constexpr Frequency end_frequency = 200.0;
     constexpr Integer block_size = 256;
@@ -1043,7 +1102,9 @@ TEST(when_frequency_is_changing_but_harmonics_remain_below_the_nyquist_frequency
     oscillator.set_sample_rate(SAMPLE_RATE);
 
     oscillator.frequency.set_value(start_frequency / 10.0);
-    oscillator.frequency.schedule_linear_ramp(duration, (Number)end_frequency / 10.0);
+    oscillator.frequency.schedule_linear_ramp(
+        duration, (Number)end_frequency / 10.0
+    );
 
     assert_oscillator_output_is_close_to_reference(
         reference_sine, oscillator, SAMPLE_RATE, block_size, rounds, 0.02
@@ -1351,12 +1412,15 @@ TEST(resetting_the_oscillator_turns_it_off, {
     assert_false(oscillator.is_on());
 
     assert_close(
-        expected_samples, rendered_samples.samples[0], sample_count, DOUBLE_DELTA
+        expected_samples,
+        rendered_samples.samples[0],
+        sample_count,
+        DOUBLE_DELTA
     );
 })
 
 
-TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_beats_instead_of_seconds, {
+TEST(tempo_synced_oscillator_freq_is_measured_in_beats_instead_of_seconds, {
     constexpr Frequency frequency = 100.0;
     constexpr Number scale = 3.0;
     constexpr Number bpm = scale * 60.0;
@@ -1388,7 +1452,13 @@ TEST(when_oscillator_is_tempo_synced_then_frequency_is_interpreted_in_terms_of_b
     frequency_leader.set_value(frequency);
 
     assert_oscillator_output_is_close_to_reference<SimpleLFO>(
-        reference, oscillator, SAMPLE_RATE, block_size, 5, 0.000001, SimpleOscillator::SINE
+        reference,
+        oscillator,
+        SAMPLE_RATE,
+        block_size,
+        5,
+        0.000001,
+        SimpleOscillator::SINE
     );
 });
 
@@ -1424,10 +1494,15 @@ TEST(amplitude_of_subharmonic_is_independent_from_main_amplitude, {
     oscillator.amplitude.schedule_value(0.0001, 0.3);
     oscillator.subharmonic_amplitude.schedule_value(0.0001, 0.7);
 
-    render_rounds<SimpleOscillator>(oscillator, actual_output, rounds, block_size);
+    render_rounds<SimpleOscillator>(
+        oscillator, actual_output, rounds, block_size
+    );
     render_rounds<SumOfSines>(expected, expected_output, rounds, block_size);
 
     assert_close(
-        expected_output.samples[0], actual_output.samples[0], buffer_size, 0.0001
+        expected_output.samples[0],
+        actual_output.samples[0],
+        buffer_size,
+        0.0001
     );
 })

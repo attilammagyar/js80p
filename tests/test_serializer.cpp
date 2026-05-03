@@ -72,10 +72,14 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     Synth synth_2;
     std::string serialized;
     Number const inv_saw_as_ratio = (
-        synth_1.discrete_param_value_to_ratio(Synth::ParamId::MWFM, Modulator::Oscillator_::INVERSE_SAWTOOTH)
+        synth_1.discrete_param_value_to_ratio(
+            Synth::ParamId::MWFM, Modulator::Oscillator_::INVERSE_SAWTOOTH
+        )
     );
     Number const triangle_as_ratio = (
-        synth_1.discrete_param_value_to_ratio(Synth::ParamId::MWFM, Modulator::Oscillator_::TRIANGLE)
+        synth_1.discrete_param_value_to_ratio(
+            Synth::ParamId::MWFM, Modulator::Oscillator_::TRIANGLE
+        )
     );
 
     synth_1.push_message(
@@ -99,7 +103,10 @@ TEST(can_convert_synth_configuration_to_string_and_import_it, {
     synth_1.process_messages();
 
     synth_2.push_message(
-        Synth::MessageType::SET_PARAM, Synth::ParamId::MWFM, triangle_as_ratio, 0
+        Synth::MessageType::SET_PARAM,
+        Synth::ParamId::MWFM,
+        triangle_as_ratio,
+        0
     );
     synth_2.push_message(
         Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.42, 0
@@ -423,7 +430,7 @@ TEST(params_which_are_missing_from_the_patch_are_cleared_and_reset_to_default, {
 })
 
 
-TEST(synth_message_queue_is_cleared_before_importing_patch_inside_audio_thread, {
+TEST(synth_message_queue_is_cleared_before_importing_patch_in_audio_thread, {
     Synth synth;
     std::string const patch = (
         "[js80p]\n"
@@ -471,20 +478,28 @@ void assert_trimmed(char const* const expected, char const* const raw_number)
     char buffer[buffer_size];
     int const length = snprintf(buffer, buffer_size, "%s", raw_number);
 
-    Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, length, buffer_size);
+    Serializer::trim_excess_zeros_from_end_after_snprintf(
+        buffer, length, buffer_size
+    );
     assert_eq(expected, buffer);
 
     if (strncmp(expected, raw_number, buffer_size) != 0) {
         std::fill_n(buffer, buffer_size, '0');
-        int const terminating_zero = snprintf(buffer, buffer_size, "%s", expected);
+        int const terminating_zero = snprintf(
+            buffer, buffer_size, "%s", expected
+        );
         buffer[terminating_zero] = '0';
         buffer[buffer_size - 1] = '\x00';
-        Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, 12345, buffer_size);
+        Serializer::trim_excess_zeros_from_end_after_snprintf(
+            buffer, 12345, buffer_size
+        );
         assert_eq(expected, buffer);
     }
 
     snprintf(buffer, buffer_size, "000");
-    Serializer::trim_excess_zeros_from_end_after_snprintf(buffer, -1, buffer_size);
+    Serializer::trim_excess_zeros_from_end_after_snprintf(
+        buffer, -1, buffer_size
+    );
     assert_eq("000", buffer);
 }
 
@@ -510,7 +525,7 @@ TEST(trimming_zeros_from_end_of_numbers, {
 })
 
 
-TEST(trailing_zeros_and_none_controllers_and_params_with_default_values_are_omitted_from_serialized_patch, {
+TEST(trailing_zeros_and_none_ctls_and_params_with_default_values_are_omitted, {
     Synth synth;
     std::string patch = "";
 
@@ -555,7 +570,7 @@ TEST(when_a_param_has_a_controller_then_its_own_value_is_omitted, {
 })
 
 
-TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_current_tuning_is_kept, {
+TEST(current_tuning_is_kept_unless_the_patch_contains_a_tuning, {
     constexpr size_t serialized_modulator_tuning_length = 64;
 
     Synth synth;
@@ -566,7 +581,9 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
         serialized_modulator_tuning,
         serialized_modulator_tuning_length,
         "MTUN = %f",
-        (double)synth.discrete_param_value_to_ratio(Synth::ParamId::MTUN, Modulator::TUNING_432HZ_12TET)
+        (double)synth.discrete_param_value_to_ratio(
+            Synth::ParamId::MTUN, Modulator::TUNING_432HZ_12TET
+        )
     );
 
     patch += "[js80p]";
@@ -574,17 +591,27 @@ TEST(when_a_patch_contains_a_tuning_then_it_overrides_current_tuning_otherwise_c
     patch += serialized_modulator_tuning;
     patch += Serializer::LINE_END;
 
-    set_synth_discrete_param_value(synth, Synth::ParamId::MTUN, Modulator::TUNING_MTS_ESP_NOTE_ON);
-    set_synth_discrete_param_value(synth, Synth::ParamId::CTUN, Modulator::TUNING_MTS_ESP_NOTE_ON);
+    set_synth_discrete_param_value(
+        synth, Synth::ParamId::MTUN, Modulator::TUNING_MTS_ESP_NOTE_ON
+    );
+    set_synth_discrete_param_value(
+        synth, Synth::ParamId::CTUN, Modulator::TUNING_MTS_ESP_NOTE_ON
+    );
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Modulator::TUNING_432HZ_12TET, (int)synth.get_param_value(Synth::ParamId::MTUN));
-    assert_eq((int)Carrier::TUNING_MTS_ESP_NOTE_ON, (int)synth.get_param_value(Synth::ParamId::CTUN));
+    assert_eq(
+        (int)Modulator::TUNING_432HZ_12TET,
+        (int)synth.get_param_value(Synth::ParamId::MTUN)
+    );
+    assert_eq(
+        (int)Carrier::TUNING_MTS_ESP_NOTE_ON,
+        (int)synth.get_param_value(Synth::ParamId::CTUN)
+    );
 })
 
 
-TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_otherwise_current_settings_are_kept, {
+TEST(mpe_settings_are_kept_unless_the_patch_contains_mpe_settings, {
     constexpr size_t serialized_mpe_settings_length = 64;
 
     Synth synth;
@@ -595,7 +622,9 @@ TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_o
         serialized_mpe_settings,
         serialized_mpe_settings_length,
         "MPE = %f",
-        (double)synth.discrete_param_value_to_ratio(Synth::ParamId::MPEST, Synth::MPE_U10)
+        (double)synth.discrete_param_value_to_ratio(
+            Synth::ParamId::MPEST, Synth::MPE_U10
+        )
     );
 
     patch += "[js80p]";
@@ -603,17 +632,23 @@ TEST(when_a_patch_contains_mpe_settings_then_it_overrides_current_mpe_settings_o
     patch += serialized_mpe_settings;
     patch += Serializer::LINE_END;
 
-    set_synth_discrete_param_value(synth, Synth::ParamId::MPEST, Synth::MPE_L15);
+    set_synth_discrete_param_value(
+        synth, Synth::ParamId::MPEST, Synth::MPE_L15
+    );
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST));
+    assert_eq(
+        (int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST)
+    );
 
     patch = "";
 
     Serializer::import_patch_in_audio_thread(synth, patch);
 
-    assert_eq((int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST));
+    assert_eq(
+        (int)Synth::MPE_U10, (int)synth.get_param_value(Synth::ParamId::MPEST)
+    );
 })
 
 
@@ -709,38 +744,58 @@ TEST(old_voice_oscillator_waveform_parameters_are_upgraded, {
         "MWAV = 0.0", Synth::ParamId::MWFM, SimpleOscillator::SINE
     );
     assert_value_upgrade(
-        "CWAV = 0.111111111111111", Synth::ParamId::CWFM, SimpleOscillator::SAWTOOTH
+        "CWAV = 0.111111111111111",
+        Synth::ParamId::CWFM,
+        SimpleOscillator::SAWTOOTH
     );
     assert_value_upgrade(
-        "MWAV = 0.222222222222222", Synth::ParamId::MWFM, SimpleOscillator::SOFT_SAWTOOTH
+        "MWAV = 0.222222222222222",
+        Synth::ParamId::MWFM,
+        SimpleOscillator::SOFT_SAWTOOTH
     );
     assert_value_upgrade(
-        "CWAV = 0.333333333333333", Synth::ParamId::CWFM, SimpleOscillator::INVERSE_SAWTOOTH
+        "CWAV = 0.333333333333333",
+        Synth::ParamId::CWFM,
+        SimpleOscillator::INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
-        "MWAV = 0.444444444444444", Synth::ParamId::MWFM, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+        "MWAV = 0.444444444444444",
+        Synth::ParamId::MWFM,
+        SimpleOscillator::SOFT_INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
-        "CWAV = 0.555555555555556", Synth::ParamId::CWFM, SimpleOscillator::TRIANGLE
+        "CWAV = 0.555555555555556",
+        Synth::ParamId::CWFM,
+        SimpleOscillator::TRIANGLE
     );
     assert_value_upgrade(
-        "MWAV = 0.666666666666667", Synth::ParamId::MWFM, SimpleOscillator::SOFT_TRIANGLE
+        "MWAV = 0.666666666666667",
+        Synth::ParamId::MWFM,
+        SimpleOscillator::SOFT_TRIANGLE
     );
     assert_value_upgrade(
-        "CWAV = 0.777777777777778", Synth::ParamId::CWFM, SimpleOscillator::SQUARE
+        "CWAV = 0.777777777777778",
+        Synth::ParamId::CWFM,
+        SimpleOscillator::SQUARE
     );
     assert_value_upgrade(
-        "MWAV = 0.888888888888889", Synth::ParamId::MWFM, SimpleOscillator::SOFT_SQUARE
+        "MWAV = 0.888888888888889",
+        Synth::ParamId::MWFM,
+        SimpleOscillator::SOFT_SQUARE
     );
     assert_value_upgrade(
         "CWAV = 1.0", Synth::ParamId::CWFM, SimpleOscillator::CUSTOM
     );
 
     assert_controller_upgrade(
-        "MWAVctl = 0.06250", Synth::ParamId::MWFM, Synth::ControllerId::GENERAL_1
+        "MWAVctl = 0.06250",
+        Synth::ParamId::MWFM,
+        Synth::ControllerId::GENERAL_1
     );
     assert_controller_upgrade(
-        "CWAVctl = 0.06250", Synth::ParamId::CWFM, Synth::ControllerId::GENERAL_1
+        "CWAVctl = 0.06250",
+        Synth::ParamId::CWFM,
+        Synth::ControllerId::GENERAL_1
     );
 })
 
@@ -765,16 +820,24 @@ TEST(old_lfo_waveform_parameters_are_upgraded, {
         "L6WAV = 0.250", Synth::ParamId::L6WAV, SimpleOscillator::SOFT_SAWTOOTH
     );
     assert_value_upgrade(
-        "L7WAV = 0.3750", Synth::ParamId::L7WAV, SimpleOscillator::INVERSE_SAWTOOTH
+        "L7WAV = 0.3750",
+        Synth::ParamId::L7WAV,
+        SimpleOscillator::INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
-        "L8WAV = 0.3750", Synth::ParamId::L8WAV, SimpleOscillator::INVERSE_SAWTOOTH
+        "L8WAV = 0.3750",
+        Synth::ParamId::L8WAV,
+        SimpleOscillator::INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
-        "L1WAV = 0.50", Synth::ParamId::L1WAV, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+        "L1WAV = 0.50",
+        Synth::ParamId::L1WAV,
+        SimpleOscillator::SOFT_INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
-        "L2WAV = 0.50", Synth::ParamId::L2WAV, SimpleOscillator::SOFT_INVERSE_SAWTOOTH
+        "L2WAV = 0.50",
+        Synth::ParamId::L2WAV,
+        SimpleOscillator::SOFT_INVERSE_SAWTOOTH
     );
     assert_value_upgrade(
         "L3WAV = 0.6250", Synth::ParamId::L3WAV, SimpleOscillator::TRIANGLE
@@ -802,10 +865,14 @@ TEST(old_lfo_waveform_parameters_are_upgraded, {
     );
 
     assert_controller_upgrade(
-        "L1WAVctl = 0.06250", Synth::ParamId::L1WAV, Synth::ControllerId::GENERAL_1
+        "L1WAVctl = 0.06250",
+        Synth::ParamId::L1WAV,
+        Synth::ControllerId::GENERAL_1
     );
     assert_controller_upgrade(
-        "L2WAVctl = 0.06250", Synth::ParamId::L2WAV, Synth::ControllerId::GENERAL_1
+        "L2WAVctl = 0.06250",
+        Synth::ParamId::L2WAV,
+        Synth::ControllerId::GENERAL_1
     );
 })
 
@@ -815,67 +882,107 @@ TEST(old_distortion_types_are_upgraded, {
         "CDT = 0.0", Synth::ParamId::CDTYP, Distortion::TYPE_TANH_3
     );
     assert_value_upgrade(
-        "EOT = 0.090909090909091", Synth::ParamId::ED1TYP, Distortion::TYPE_TANH_10
+        "EOT = 0.090909090909091",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_TANH_10
     );
     assert_value_upgrade(
-        "EDT = 0.045454545454545", Synth::ParamId::ED2TYP, Distortion::TYPE_TANH_5
+        "EDT = 0.045454545454545",
+        Synth::ParamId::ED2TYP,
+        Distortion::TYPE_TANH_5
     );
     assert_value_upgrade(
-        "ETSTYP = 0.136363636363636", Synth::ParamId::ETSTYP, Distortion::TYPE_HARMONIC_13
+        "ETSTYP = 0.136363636363636",
+        Synth::ParamId::ETSTYP,
+        Distortion::TYPE_HARMONIC_13
     );
     assert_value_upgrade(
-        "CDT = 0.181818181818182", Synth::ParamId::CDTYP, Distortion::TYPE_HARMONIC_15
+        "CDT = 0.181818181818182",
+        Synth::ParamId::CDTYP,
+        Distortion::TYPE_HARMONIC_15
     );
     assert_value_upgrade(
-        "EOT = 0.227272727272727", Synth::ParamId::ED1TYP, Distortion::TYPE_HARMONIC_135
+        "EOT = 0.227272727272727",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_HARMONIC_135
     );
     assert_value_upgrade(
-        "EDT = 0.272727272727273", Synth::ParamId::ED2TYP, Distortion::TYPE_HARMONIC_SQR
+        "EDT = 0.272727272727273",
+        Synth::ParamId::ED2TYP,
+        Distortion::TYPE_HARMONIC_SQR
     );
     assert_value_upgrade(
-        "ETSTYP = 0.318181818181818", Synth::ParamId::ETSTYP, Distortion::TYPE_HARMONIC_TRI
+        "ETSTYP = 0.318181818181818",
+        Synth::ParamId::ETSTYP,
+        Distortion::TYPE_HARMONIC_TRI
     );
     assert_value_upgrade(
-        "CDT = 0.363636363636364", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_1
+        "CDT = 0.363636363636364",
+        Synth::ParamId::CDTYP,
+        Distortion::TYPE_BIT_CRUSH_1
     );
     assert_value_upgrade(
-        "EOT = 0.409090909090909", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_2
+        "EOT = 0.409090909090909",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_BIT_CRUSH_2
     );
     assert_value_upgrade(
-        "EDT = 0.454545454545455", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_3
+        "EDT = 0.454545454545455",
+        Synth::ParamId::ED2TYP,
+        Distortion::TYPE_BIT_CRUSH_3
     );
     assert_value_upgrade(
         "ETSTYP = 0.50", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_4
     );
     assert_value_upgrade(
-        "CDT = 0.545454545454545", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_4_6
+        "CDT = 0.545454545454545",
+        Synth::ParamId::CDTYP,
+        Distortion::TYPE_BIT_CRUSH_4_6
     );
     assert_value_upgrade(
-        "EOT = 0.590909090909091", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_5
+        "EOT = 0.590909090909091",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_BIT_CRUSH_5
     );
     assert_value_upgrade(
-        "EDT = 0.636363636363636", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_5_6
+        "EDT = 0.636363636363636",
+        Synth::ParamId::ED2TYP,
+        Distortion::TYPE_BIT_CRUSH_5_6
     );
     assert_value_upgrade(
-        "ETSTYP = 0.681818181818182", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_6
+        "ETSTYP = 0.681818181818182",
+        Synth::ParamId::ETSTYP,
+        Distortion::TYPE_BIT_CRUSH_6
     );
     assert_value_upgrade(
-        "CDT = 0.727272727272727", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_6_6
+        "CDT = 0.727272727272727",
+        Synth::ParamId::CDTYP,
+        Distortion::TYPE_BIT_CRUSH_6_6
     );
     assert_value_upgrade(
-        "EOT = 0.772727272727273", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_7
+        "EOT = 0.772727272727273",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_BIT_CRUSH_7
     );
     assert_value_upgrade(
-        "EDT = 0.818181818181818", Synth::ParamId::ED2TYP, Distortion::TYPE_BIT_CRUSH_7_6
+        "EDT = 0.818181818181818",
+        Synth::ParamId::ED2TYP,
+        Distortion::TYPE_BIT_CRUSH_7_6
     );
     assert_value_upgrade(
-        "ETSTYP = 0.863636363636364", Synth::ParamId::ETSTYP, Distortion::TYPE_BIT_CRUSH_8
+        "ETSTYP = 0.863636363636364",
+        Synth::ParamId::ETSTYP,
+        Distortion::TYPE_BIT_CRUSH_8
     );
     assert_value_upgrade(
-        "CDT = 0.909090909090909", Synth::ParamId::CDTYP, Distortion::TYPE_BIT_CRUSH_8_6
+        "CDT = 0.909090909090909",
+        Synth::ParamId::CDTYP,
+        Distortion::TYPE_BIT_CRUSH_8_6
     );
     assert_value_upgrade(
-        "EOT = 0.954545454545455", Synth::ParamId::ED1TYP, Distortion::TYPE_BIT_CRUSH_9
+        "EOT = 0.954545454545455",
+        Synth::ParamId::ED1TYP,
+        Distortion::TYPE_BIT_CRUSH_9
     );
     assert_value_upgrade(
         "EDT = 1.0", Synth::ParamId::ED2TYP, Distortion::TYPE_DELAY_FEEDBACK

@@ -219,22 +219,32 @@ TEST(lfo_waveform_can_be_pulse, {
 
     test_pulse_lfo<10, 5>(
         {
-            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
-            0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175,
-            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
-            0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175, 0.175,
-            0.175, 0.175, 0.175, 0.175, 0.175, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.625, 0.625, 0.625, 0.625, 0.625,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.625, 0.625, 0.625, 0.625, 0.625,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.625, 0.625, 0.625, 0.625, 0.625,
         },
         LFO::Oscillator_::PULSE,
         true
     );
     test_pulse_lfo<10, 5>(
         {
-            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
-            0.400, 0.400, 0.400, 0.400, 0.400, 0.175, 0.175, 0.175, 0.175, 0.175,
-            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
-            0.400, 0.400, 0.400, 0.400, 0.400, 0.175, 0.175, 0.175, 0.175, 0.175,
-            0.400, 0.400, 0.400, 0.400, 0.400, 0.625, 0.625, 0.625, 0.625, 0.625,
+            0.400, 0.400, 0.400, 0.400, 0.400,
+            0.625, 0.625, 0.625, 0.625, 0.625,
+            0.400, 0.400, 0.400, 0.400, 0.400,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.400, 0.400, 0.400, 0.400, 0.400,
+            0.625, 0.625, 0.625, 0.625, 0.625,
+            0.400, 0.400, 0.400, 0.400, 0.400,
+            0.175, 0.175, 0.175, 0.175, 0.175,
+            0.400, 0.400, 0.400, 0.400, 0.400,
+            0.625, 0.625, 0.625, 0.625, 0.625,
         },
         LFO::Oscillator_::BIPOLAR_PULSE,
         true
@@ -242,7 +252,7 @@ TEST(lfo_waveform_can_be_pulse, {
 })
 
 
-TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min_and_max, {
+TEST(centered_lfo_oscillates_around_the_center_point_between_min_and_max, {
     constexpr Integer rounds = 20;
     constexpr Integer sample_count = BLOCK_SIZE * rounds;
     constexpr Number min = 0.1;
@@ -285,14 +295,19 @@ TEST(when_lfo_is_centered_then_it_oscillates_around_the_center_point_between_min
     assert_true(lfo.is_on());
 
     assert_eq(
-        expected_output.samples[0], actual_output.samples[0], sample_count, 0.001
+        expected_output.samples[0],
+        actual_output.samples[0],
+        sample_count,
+        0.001
     );
 })
 
 
 TEST(lfo_performance, {
     /*
-    Usage: time ./build/dev-linux-x86_64-avx/test_lfo lfo_performance ON|OFF number-of-samples
+    Usage:
+
+        time ./build/dev-.../test_lfo lfo_performance ON|OFF number-of-samples
     */
     LFO lfo("L1");
 
@@ -315,7 +330,10 @@ TEST(lfo_performance, {
     } else {
         assert_true(
             false,
-            "Unknown setting for LFO::center: \"%s\" - must be \"ON\" or \"OFF\"\n",
+            (
+                "Unknown setting for LFO::center: \"%s\""
+                " - must be \"ON\" or \"OFF\"\n"
+            ),
             TEST_ARGV[2].c_str()
         );
     }
@@ -385,7 +403,9 @@ void test_lfo_modifier_statistics(
 
     Math::compute_statistics(numbers, stats);
 
-    assert_statistics(true, 0.25, 0.5, 0.75, 0.5, 0.125, stats, tolerance, message);
+    assert_statistics(
+        true, 0.25, 0.5, 0.75, 0.5, 0.125, stats, tolerance, message
+    );
     assert_gte(0.75, stats.max);
     assert_lte(0.25, stats.min);
 }
@@ -403,7 +423,7 @@ TEST(distortion_and_randomness_respect_min_and_max_values, {
 })
 
 
-TEST(can_tell_if_an_envelope_is_set_even_when_there_is_a_dependency_cycle_between_lfos, {
+TEST(can_tell_if_amp_envelope_is_set_even_with_dependency_cycle_between_lfos, {
     LFO lfo_1("L1");
     LFO lfo_2("L2");
     LFO lfo_3("L3");
@@ -473,7 +493,9 @@ void test_inverted_min_max_lfo(
     expected_samples = SignalProducer::produce<LFO>(expected, 1);
     rendered_samples = SignalProducer::produce<LFO>(lfo, 1);
 
-    assert_eq(expected_samples[0], rendered_samples[0], BLOCK_SIZE, DOUBLE_DELTA);
+    assert_eq(
+        expected_samples[0], rendered_samples[0], BLOCK_SIZE, DOUBLE_DELTA
+    );
 }
 
 
