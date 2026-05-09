@@ -27,13 +27,13 @@
 #include "gui/macos.hpp"
 
 
-@interface CocoaWidget : NSView
+@interface JS80PCocoaWidget : NSView
     @property (assign) JS80P::Widget* cpp_widget;
     @property (strong) NSTimer* gui_idle_timer;
 @end
 
 
-@implementation CocoaWidget
+@implementation JS80PCocoaWidget
     - (id) initWithFrame:(NSRect)frameRect
     {
         if (!(self = [super initWithFrame:frameRect])) {
@@ -215,7 +215,9 @@ JS80P::GUI::PlatformWidget js80p_create_platform_widget(
         (CGFloat)left, (CGFloat)top, (CGFloat)width, (CGFloat)height
     );
 
-    CocoaWidget* cocoa_widget = [[CocoaWidget alloc] initWithFrame:frame];
+    JS80PCocoaWidget* cocoa_widget = [
+        [JS80PCocoaWidget alloc] initWithFrame:frame
+    ];
     cocoa_widget.cpp_widget = cpp_widget;
 
     if (parent != NULL) {
@@ -233,7 +235,9 @@ JS80P::GUI::PlatformWidget js80p_create_platform_widget(
 
 void js80p_destroy_platform_widget(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge_transfer CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge_transfer JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -254,7 +258,9 @@ void js80p_widget_resize(
         int const width,
         int const height
 ) {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -270,7 +276,9 @@ void js80p_widget_resize(
 
 void js80p_widget_show(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -282,7 +290,9 @@ void js80p_widget_show(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_hide(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -294,7 +304,9 @@ void js80p_widget_hide(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_focus(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -306,7 +318,9 @@ void js80p_widget_focus(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_bring_to_top(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -321,7 +335,9 @@ void js80p_widget_bring_to_top(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_redraw(JS80P::GUI::PlatformWidget platform_widget)
 {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -364,7 +380,9 @@ void js80p_widget_draw_text(
         JS80P::WidgetBase::FontWeight const font_weight,
         JS80P::WidgetBase::TextAlignment const alignment
 ) {
-    CocoaWidget* cocoa_widget = (__bridge CocoaWidget*)platform_widget;
+    JS80PCocoaWidget* cocoa_widget = (
+        (__bridge JS80PCocoaWidget*)platform_widget
+    );
 
     if (!cocoa_widget) {
         return;
@@ -448,7 +466,7 @@ JS80P::GUI::Image js80p_widget_load_image(char const* const name)
 {
     NSString* ns_name = [NSString stringWithUTF8String:name];
     NSString* path = [
-        [NSBundle bundleForClass:[CocoaWidget class]]
+        [NSBundle bundleForClass:[JS80PCocoaWidget class]]
         pathForResource:ns_name
         ofType:@"png"
         inDirectory:@"img"
