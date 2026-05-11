@@ -568,7 +568,8 @@ build_vst3_bundle_zip()
 
 get_vst3_snapshot_id()
 {
-    grep "Vst3Plugin::Processor::ID(.*);" src/plugin/vst3/plugin.cpp \
+    grep -A2 'Vst3Plugin::Processor::ID(' src/plugin/vst3/plugin.cpp \
+        | grep -o '0x[0-9a-fx, ]*' \
         | sed -r "s/^.*\\((.*)\\).*/\\1/g ; s/^0x//g ; s/, 0x//g" \
         | tr [[:lower:]] [[:upper:]]
 }
