@@ -267,4 +267,3 @@ class Distortion : public Filter<InputSignalProducerClass>
 } }
 
 #endif
-
