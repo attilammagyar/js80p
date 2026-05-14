@@ -84,6 +84,8 @@ GUI_TARGET_PLATFORM_HEADERS = src/gui/macos.hpp
 GUI_TARGET_PLATFORM_SOURCES = src/gui/macos.cpp
 
 OBJ_TARGET_GUI_EXTRA = $(BUILD_DIR)/gui-macos.o
+OBJ_TARGET_GUI_FST_EXTRA = $(BUILD_DIR)/gui-macos-fst.o
+OBJ_TARGET_GUI_VST3_EXTRA = $(BUILD_DIR)/gui-macos-vst3.o
 
 GUI_PLAYGROUND_EXTRA = \
 	$(BUILD_DIR)/macos-playground.o \
@@ -180,21 +182,6 @@ $(VST3_IMG_DIR)/%.png: gui/img/%.png | $(VST3_IMG_DIR)
 VST3_GUI_IMAGES = \
 	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(VST3_IMG_DIR)/$(GUI_IMAGE).png)
 
-# TODO: untangle GUI resources and dirs for various bundle types from gui-macos.o
-$(BUILD_DIR)/gui-macos.o: \
-		src/gui/macos.mm \
-		$(BUILD_DIR)/macos-playground.o \
-		$(GUI_PLAYGROUND_EXTRA) \
-		$(FST_GUI_IMAGES) \
-		$(FST_CONTENTS_DIR)/Info.plist \
-		$(VST3_GUI_IMAGES) \
-		$(VST3_CONTENTS_DIR)/Info.plist \
-		| $(BUILD_DIR) \
-		$(GUI_PLAYGROUND_APP_DIRS) \
-		$(FST_DIRS) \
-		$(VST3_DIRS)
-	$(COMPILE_TARGET) $(OBJECTIVE_CPP) -c -o $@ $<
-
 VST3_MODULE_INFO_TOOL = $(BUILD_DIR)$(DIR_SEP)vst3_module_info_tool
 VST3_MODULE_INFO_LFLAGS = -pthread -ldl
 
@@ -210,3 +197,30 @@ $(VST3_MODULE_INFO_TOOL): src/plugin/vst3/moduleinfo.cpp | $(BUILD_DIR)
 		$(VST3_CXXINCS) $(VST3_CXXFLAGS) \
 		$(VST3_MODULE_INFO_LFLAGS) \
 		$< -o $@
+
+$(OBJ_TARGET_GUI_EXTRA): \
+		src/gui/macos.mm \
+		$(BUILD_DIR)/macos-playground.o \
+		$(GUI_PLAYGROUND_EXTRA) \
+		| $(BUILD_DIR) \
+		$(GUI_PLAYGROUND_APP_DIRS)
+	$(COMPILE_TARGET) $(OBJECTIVE_CPP) \
+		-D JS80P_OBJC_CLASS_NAME_INFIX=Playground -c -o $@ $<
+
+$(OBJ_TARGET_GUI_FST_EXTRA): \
+		src/gui/macos.mm \
+		$(FST_GUI_IMAGES) \
+		$(FST_CONTENTS_DIR)/Info.plist \
+		| $(BUILD_DIR) \
+		$(FST_DIRS)
+	$(COMPILE_TARGET) $(OBJECTIVE_CPP) \
+		-D JS80P_OBJC_CLASS_NAME_INFIX=FST -c -o $@ $<
+
+$(OBJ_TARGET_GUI_VST3_EXTRA): \
+		src/gui/macos.mm \
+		$(VST3_GUI_IMAGES) \
+		$(VST3_CONTENTS_DIR)/Info.plist \
+		| $(BUILD_DIR) \
+		$(VST3_DIRS)
+	$(COMPILE_TARGET) $(OBJECTIVE_CPP) \
+		-D JS80P_OBJC_CLASS_NAME_INFIX=VST3 -c -o $@ $<

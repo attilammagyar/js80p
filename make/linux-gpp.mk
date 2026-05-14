@@ -59,6 +59,9 @@ OBJ_TARGET_GUI_EXTRA = \
 	$(LIB_PATH)/libxcb-render.so \
 	$(foreach GUI_IMAGE,$(GUI_IMAGES),$(BUILD_DIR)/img_$(GUI_IMAGE).o)
 
+OBJ_TARGET_GUI_FST_EXTRA = $(OBJ_TARGET_GUI_EXTRA)
+OBJ_TARGET_GUI_VST3_EXTRA = $(OBJ_TARGET_GUI_EXTRA)
+
 $(BUILD_DIR)/img_%.o: gui/img/%.png | $(BUILD_DIR)
 	/usr/bin/objcopy \
 		--input binary \

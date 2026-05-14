@@ -27,13 +27,31 @@
 #include "gui/macos.hpp"
 
 
-@interface JS80PCocoaWidget : NSView
+/*
+The name of the NSView class must be prefixed in a way that avoids collision
+between different plugins and plugin types, so that e.g. both the VST 3 and the
+FST version can be loaded into the same DAW project without the Objective-C
+runtime complaining.
+*/
+#define JS80P_COCOA_WIDGET_CLASS            \
+    _JS80P_OBJC_CLASS_NAME_RESOLVE_CONCAT(  \
+        JS80P_OBJC_CLASS_NAME_INFIX         \
+    )
+
+#define _JS80P_OBJC_CLASS_NAME_RESOLVE_CONCAT(infix) \
+    _JS80P_OBJC_CLASS_NAME_CONCAT(infix)
+
+#define _JS80P_OBJC_CLASS_NAME_CONCAT(infix) \
+    JS80P_ ## infix ## _CocoaWidget
+
+
+@interface JS80P_COCOA_WIDGET_CLASS : NSView
     @property (assign) JS80P::Widget* cpp_widget;
     @property (strong) NSTimer* gui_idle_timer;
 @end
 
 
-@implementation JS80PCocoaWidget
+@implementation JS80P_COCOA_WIDGET_CLASS
     - (id) initWithFrame:(NSRect)frameRect
     {
         if (!(self = [super initWithFrame:frameRect])) {
@@ -215,8 +233,8 @@ JS80P::GUI::PlatformWidget js80p_create_platform_widget(
         (CGFloat)left, (CGFloat)top, (CGFloat)width, (CGFloat)height
     );
 
-    JS80PCocoaWidget* cocoa_widget = [
-        [JS80PCocoaWidget alloc] initWithFrame:frame
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = [
+        [JS80P_COCOA_WIDGET_CLASS alloc] initWithFrame:frame
     ];
     cocoa_widget.cpp_widget = cpp_widget;
 
@@ -235,8 +253,8 @@ JS80P::GUI::PlatformWidget js80p_create_platform_widget(
 
 void js80p_destroy_platform_widget(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge_transfer JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge_transfer JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -258,8 +276,8 @@ void js80p_widget_resize(
         int const width,
         int const height
 ) {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -276,8 +294,8 @@ void js80p_widget_resize(
 
 void js80p_widget_show(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -290,8 +308,8 @@ void js80p_widget_show(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_hide(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -304,8 +322,8 @@ void js80p_widget_hide(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_focus(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -318,8 +336,8 @@ void js80p_widget_focus(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_bring_to_top(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -335,8 +353,8 @@ void js80p_widget_bring_to_top(JS80P::GUI::PlatformWidget platform_widget)
 
 void js80p_widget_redraw(JS80P::GUI::PlatformWidget platform_widget)
 {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -380,8 +398,8 @@ void js80p_widget_draw_text(
         JS80P::WidgetBase::FontWeight const font_weight,
         JS80P::WidgetBase::TextAlignment const alignment
 ) {
-    JS80PCocoaWidget* cocoa_widget = (
-        (__bridge JS80PCocoaWidget*)platform_widget
+    JS80P_COCOA_WIDGET_CLASS* cocoa_widget = (
+        (__bridge JS80P_COCOA_WIDGET_CLASS*)platform_widget
     );
 
     if (!cocoa_widget) {
@@ -466,7 +484,7 @@ JS80P::GUI::Image js80p_widget_load_image(char const* const name)
 {
     NSString* ns_name = [NSString stringWithUTF8String:name];
     NSString* path = [
-        [NSBundle bundleForClass:[JS80PCocoaWidget class]]
+        [NSBundle bundleForClass:[JS80P_COCOA_WIDGET_CLASS class]]
         pathForResource:ns_name
         ofType:@"png"
         inDirectory:@"img"
