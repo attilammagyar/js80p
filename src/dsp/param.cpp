@@ -1093,7 +1093,10 @@ bool FloatParam<evaluation>::is_constant_until(
                 envelope_state->stage == EnvelopeStage::ENV_STG_RELEASED
                 || Math::is_close(
                     value_to_ratio(this->get_raw_value()),
-                    envelope->get_sustain_value(envelope_state->randoms)
+                    envelope->get_sustain_value(
+                        this->midi_channel,
+                        envelope_state->randoms
+                    )
                 )
             );
         }

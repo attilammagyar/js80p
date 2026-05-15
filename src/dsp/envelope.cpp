@@ -841,23 +841,17 @@ void Envelope::make_snapshot(
 
 
 Number Envelope::get_sustain_value(
+        Midi::Channel const midi_channel,
         EnvelopeRandoms const& randoms
-) const noexcept {
+) noexcept {
+    scale.set_midi_channel(midi_channel);
+    sustain_value.set_midi_channel(midi_channel);
+
     if (value_inaccuracy.get_value() > 0.000001) {
         return randomize_value(sustain_value, randoms[2]);
     }
 
     return sustain_value.get_value() * scale.get_value();
-}
-
-
-Number Envelope::get_final_value(EnvelopeRandoms const& randoms) const noexcept
-{
-    if (value_inaccuracy.get_value() > 0.000001) {
-        return randomize_value(final_value, randoms[3]);
-    }
-
-    return final_value.get_value() * scale.get_value();
 }
 
 

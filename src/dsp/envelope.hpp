@@ -184,8 +184,10 @@ class Envelope
             EnvelopeSnapshot& snapshot
         ) noexcept;
 
-        Number get_sustain_value(EnvelopeRandoms const& randoms) const noexcept;
-        Number get_final_value(EnvelopeRandoms const& randoms) const noexcept;
+        Number get_sustain_value(
+            Midi::Channel const midi_channel,
+            EnvelopeRandoms const& randoms
+        ) noexcept;
 
         ByteParam update_mode;
         ToggleParam tempo_sync;

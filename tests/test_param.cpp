@@ -2657,6 +2657,128 @@ TEST(float_param_reacts_to_dynamic_envelope_changes_during_sustaining, {
 })
 
 
+TEST(float_param_uses_midi_channel_to_updating_dynamic_envelope_sustain_value, {
+    constexpr Integer block_size = 5;
+    constexpr Sample expected_samples_1[block_size] = {
+        9.00, 8.50, 8.00, 7.50, 7.00,
+    };
+    constexpr Sample expected_samples_2[block_size] = {
+        7.00, 6.75, 6.50, 6.25, 6.00,
+    };
+    constexpr Sample expected_samples_3[block_size] = {
+        5.75, 5.50, 5.50, 5.50, 5.50,
+    };
+    constexpr Midi::Channel midi_channel_1 = 10;
+    constexpr Midi::Channel midi_channel_2 = 11;
+    Envelope envelope("env");
+    Envelope* const envelopes[Constants::ENVELOPES] = {
+        &envelope, NULL, NULL, NULL, NULL, NULL,
+        NULL, NULL, NULL, NULL, NULL, NULL,
+    };
+    FloatParamS leader("follow", 0.0, 10.0, 0.0, 0.0, envelopes);
+    FloatParamS follower_1(leader);
+    FloatParamS follower_2(leader);
+    MidiController midi_controller_for_scale;
+    MidiController midi_controller_for_sustain_value;
+    Sample const* rendered_samples;
+
+    leader.set_block_size(block_size);
+    leader.set_sample_rate(1.0);
+    leader.set_envelope(&envelope);
+    leader.set_value(0.2);
+
+    follower_1.set_block_size(block_size);
+    follower_1.set_sample_rate(6.0 / Envelope::DYNAMIC_ENVELOPE_RAMP_TIME);
+
+    follower_2.set_block_size(block_size);
+    follower_2.set_sample_rate(6.0 / Envelope::DYNAMIC_ENVELOPE_RAMP_TIME);
+
+    midi_controller_for_scale.change_all_channels(0.0, 1.0);
+    midi_controller_for_sustain_value.change_all_channels(0.0, 0.9);
+
+    envelope.update_mode.set_value(Envelope::UPDATE_MODE_DYNAMIC);
+    envelope.initial_value.set_value(0.0);
+    envelope.delay_time.set_value(0.0);
+    envelope.attack_time.set_value(0.0);
+    envelope.peak_value.set_value(1.0);
+    envelope.hold_time.set_value(0.0);
+    envelope.decay_time.set_value(envelope.decay_time.get_min_value());
+    envelope.release_time.set_value(0.0);
+    envelope.final_value.set_value(0.0);
+
+    envelope.scale.set_midi_controller(
+        &midi_controller_for_scale
+    );
+    envelope.sustain_value.set_midi_controller(
+        &midi_controller_for_sustain_value
+    );
+
+    follower_1.start_envelope(0.0, midi_channel_1, 0.0, 0.0);
+    follower_2.start_envelope(0.0, midi_channel_2, 0.0, 0.0);
+
+    /* Both params reach the sustain stage. */
+    FloatParamS::produce<FloatParamS>(follower_1, 1, block_size);
+    FloatParamS::produce<FloatParamS>(follower_2, 1, block_size);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_1, 2, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_2, 2, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+
+    /*
+    The first param changed, the second one remains at the original sustain
+    level.
+    */
+    midi_controller_for_scale.change(midi_channel_1, 0.0, 0.6 / 0.7);
+    midi_controller_for_sustain_value.change(midi_channel_1, 0.0, 0.7);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_1, 3, block_size
+    );
+    assert_eq(expected_samples_1, rendered_samples, block_size, DOUBLE_DELTA);
+    assert_false(follower_1.is_constant_until(block_size));
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_2, 3, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+    assert_true(follower_2.is_constant_until(block_size));
+
+    /* Ditto. */
+    midi_controller_for_scale.change(midi_channel_1, 0.0, 0.55 / 0.77);
+    midi_controller_for_sustain_value.change(midi_channel_1, 0.0, 0.77);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_1, 4, block_size
+    );
+    assert_eq(expected_samples_2, rendered_samples, block_size, DOUBLE_DELTA);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_2, 4, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_1, 5, block_size
+    );
+    assert_eq(expected_samples_3, rendered_samples, block_size, DOUBLE_DELTA);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_2, 5, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_1, 6, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+    assert_eq(5.5, follower_1.get_value(), DOUBLE_DELTA);
+    rendered_samples = FloatParamS::produce_if_not_constant<FloatParamS>(
+        follower_2, 6, block_size
+    );
+    assert_eq(NULL, rendered_samples);
+    assert_eq(9.0, follower_2.get_value(), DOUBLE_DELTA);
+})
+
+
 void test_voice_status_dependent_envelope_update(
         Byte const envelope_update_mode,
         Byte const new_voice_status
