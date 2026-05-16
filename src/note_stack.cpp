@@ -229,7 +229,7 @@ void NoteStack::update_extremes_after_remove(
     Midi::Note highest_note = get_note(highest_);
 
     for (size_t i = 0; item != INVALID_ITEM && i != ITEMS; ++i) {
-        Midi::Note note = get_note(item);
+        Midi::Note const note = get_note(item);
 
         if (lowest_ == INVALID_ITEM || note < lowest_note) {
             lowest_note = note;
