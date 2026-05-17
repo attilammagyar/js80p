@@ -1,3 +1,29 @@
+v4.0.2 (2026-05-18)
+ * Various small CPU usage optimizations were done.
+ * Bugfix: using the 10th harmonic of the Custom waveform could cause unwanted
+   noises and aliasing distortions if the oscillator's frequency was moving
+   (e.g. via the Fine Detune knob or the Oscillator Instability setting, etc.).
+   This has been fixed. (https://github.com/attilammagyar/js80p/issues/41)
+ * Bugfix: when both the VST 3 and the FST version of JS80P were loaded
+   in a host application on macOS, or when JS80P and MPE Emulator were both
+   loaded on macOS, then a name collision of an internal resource could occur
+   between these plugins, resulting in various warnings or error messages,
+   depending on the host application. This collision has been resolved so that
+   now any combination of the latest versions of these plugins can be loaded on
+   macOS into the same process without any warnings and error messages.
+   (https://github.com/attilammagyar/js80p/issues/42)
+ * Bugfix: when using MPE, envelope generators with dynamic update modes failed
+   to properly update once the envelope reached the sustain stage. This has
+   been fixed so that envelope update modes are now respected when using MPE
+   as well. (https://github.com/attilammagyar/js80p/issues/43)
+ * Bugfix: switching note handling modes could result in Note On messages
+   being dropped. This has been fixed, so now notes will properly make the
+   configured sounds after changing the note handling mode.
+   (https://github.com/attilammagyar/js80p/issues/44)
+ * Bugfix: note states were not properly reset when loading presets, resulting
+   in envelope generators not respecting the configured update modes. This has
+   been fixed. (https://github.com/attilammagyar/js80p/issues/45)
+
 v4.0.1 (2026-03-27)
  * Bugfix: when the VST 3 plugin received a Note On and a subsequent Note Off
    event with the exact same timestamp (e.g. while editing MIDI in a piano
