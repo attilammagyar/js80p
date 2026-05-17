@@ -228,7 +228,7 @@ Synth::Synth(Integer const samples_between_gc) noexcept
         "NH",
         NOTE_HANDLING_MONO,
         NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS,
-        NOTE_HANDLING_POLY
+        NOTE_HANDLING_DEFAULT
     ),
     mode("MODE"),
     mpe_settings("MPE", MPE_OFF, MPE_U01, MPE_OFF),
@@ -290,9 +290,9 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     next_voice(0),
     next_note_id(0),
     previous_note(Midi::NOTE_MAX + 1),
+    previous_note_handling(NOTE_HANDLING_DEFAULT),
     is_learning(false),
     is_sustain_pedal_on(false),
-    is_polyphonic_(true),
     is_holding_(false),
     is_dirty_(false),
     effects(
@@ -2889,6 +2889,15 @@ Sample const* const* Synth::initialize_rendering(
 ) noexcept {
     process_messages();
 
+    Byte const note_handling = this->note_handling.get_value();
+
+    if (note_handling != previous_note_handling) {
+        previous_note_handling = note_handling;
+
+        suspend();
+        resume();
+    }
+
     samples_since_gc += sample_count;
 
     if (samples_since_gc > samples_between_gc) {
@@ -2929,41 +2938,6 @@ Sample const* const* Synth::initialize_rendering(
     clear_midi_controllers();
 
     return NULL;
-}
-
-
-void Synth::stop_polyphonic_notes() noexcept
-{
-    Modulator* const* const modulators = this->modulators;
-    Carrier* const* const carriers = this->carriers;
-
-    for (Integer voice = 1; voice != POLYPHONY; ++voice) {
-        Midi::Channel channel = 0;
-        Midi::Note note = 0;
-        bool found_note = false;
-
-        Modulator* const modulator = modulators[voice];
-
-        if (modulator->is_on()) {
-            note = modulator->get_note();
-            channel = modulator->get_channel();
-            found_note = true;
-            modulator->note_off(0.0, modulator->get_note_id(), note, 0.0);
-        }
-
-        Carrier* const carrier = carriers[voice];
-
-        if (carrier->is_on()) {
-            note = carrier->get_note();
-            channel = carrier->get_channel();
-            found_note = true;
-            carrier->note_off(0.0, carrier->get_note_id(), note, 0.0);
-        }
-
-        if (found_note) {
-            midi_note_to_voice_assignments[channel][note] = INVALID_VOICE;
-        }
-    }
 }
 
 
@@ -3024,13 +2998,6 @@ void Synth::process_messages() noexcept
         if (messages.pop(message)) {
             process_message(message);
         }
-    }
-
-    bool const was_polyphonic = is_polyphonic_;
-    is_polyphonic_ = is_polyphonic();
-
-    if (was_polyphonic && !is_polyphonic_) {
-        stop_polyphonic_notes();
     }
 
     bool const was_holding = is_holding_;
@@ -3349,6 +3316,8 @@ void Synth::handle_clear() noexcept
             handle_set_param(param_id, get_param_default_ratio(param_id));
         }
     }
+
+    previous_note_handling = note_handling.get_value();
 }
 
 

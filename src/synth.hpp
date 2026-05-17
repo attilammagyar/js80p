@@ -1108,6 +1108,8 @@ class Synth : public Midi::EventHandler, public SignalProducer
         static constexpr Byte NOTE_HANDLING_POLY_RETRIGGER_HOLD       = 0b1001;
         static constexpr Byte NOTE_HANDLING_POLY_RETRIGGER_HOLD_IGSUS = 0b1010;
 
+        static constexpr Byte NOTE_HANDLING_DEFAULT = NOTE_HANDLING_POLY;
+
     private:
         static constexpr Byte NOTE_HANDLING_MASK_HOLD                 = 0b0001;
         static constexpr Byte NOTE_HANDLING_MASK_IGSUS                = 0b0010;
@@ -1950,8 +1952,6 @@ class Synth : public Midi::EventHandler, public SignalProducer
             Midi::Note const note
         ) noexcept;
 
-        void stop_polyphonic_notes() noexcept;
-
         void release_held_notes(Seconds const time_offset) noexcept;
 
         void update_param_states() noexcept;
@@ -2000,9 +2000,9 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer next_voice;
         Integer next_note_id;
         Midi::Note previous_note;
+        Byte previous_note_handling;
         bool is_learning;
         bool is_sustain_pedal_on;
-        bool is_polyphonic_;
         bool is_holding_;
         bool is_dirty_;
         std::atomic<bool> is_mts_esp_connected_;

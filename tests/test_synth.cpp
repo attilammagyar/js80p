@@ -901,15 +901,18 @@ TEST(hold_note, {
     synth_1.resume();
     synth_2.resume();
 
-    synth_1.note_on(note_on, 1, Midi::NOTE_A_3, 114);
-    synth_1.note_off(sustain_off, 1, Midi::NOTE_A_3, 114);
-
     set_param(
         synth_2,
         Synth::ParamId::NH,
         synth_2.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY_HOLD)
     );
     synth_2.process_messages();
+
+    SignalProducer::produce<Synth>(synth_1, 0);
+    SignalProducer::produce<Synth>(synth_2, 0);
+
+    synth_1.note_on(note_on, 1, Midi::NOTE_A_3, 114);
+    synth_1.note_off(sustain_off, 1, Midi::NOTE_A_3, 114);
 
     synth_2.note_on(note_on, 1, Midi::NOTE_A_3, 114);
     synth_2.note_off(note_off, 1, Midi::NOTE_A_3, 114);
@@ -1126,6 +1129,7 @@ void hold_mode_on(Synth& synth)
         Synth::ParamId::NH,
         synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY_HOLD)
     );
+    SignalProducer::produce<Synth>(synth, 99999);
 }
 
 
@@ -1136,6 +1140,7 @@ void hold_mode_off(Synth& synth)
         Synth::ParamId::NH,
         synth.note_handling.value_to_ratio(Synth::NOTE_HANDLING_POLY)
     );
+    SignalProducer::produce<Synth>(synth, 99998);
 }
 
 
@@ -1225,7 +1230,7 @@ TEST(gc_reallocated_notes_are_not_released_again_when_sustain_pedal_is_lifted, {
         &sustain_pedal_on, &sustain_pedal_off, "pedal"
     );
     test_gc_reallocated_notes_while_sustaining(
-        &hold_mode_on, &hold_mode_off, "hold"
+        &hold_mode_on, &sustain_pedal_off, "hold"
     );
 })
 
@@ -1355,7 +1360,7 @@ TEST(sustain_off_leaves_gc_reallocated_notes_ringing_if_key_is_still_held, {
         "pedal"
     );
     test_sustain_off_while_key_is_still_held(
-        &hold_mode_on, &hold_mode_off, "hold"
+        &hold_mode_on, &sustain_pedal_off, "hold"
     );
 })
 
@@ -2086,6 +2091,8 @@ TEST(sustained_notes_may_be_retriggered, {
     synth_1.note_off(1.0, 1, Midi::NOTE_A_0, 100);
 
     synth_2.note_handling.set_value(Synth::NOTE_HANDLING_POLY_RETRIGGER_HOLD);
+    SignalProducer::produce<Synth>(synth_2, 0);
+
     synth_2.note_on(0.0, 1, Midi::NOTE_A_0, 100);
     synth_2.note_off(0.1, 1, Midi::NOTE_A_0, 100);
     synth_2.note_on(0.5, 1, Midi::NOTE_A_0, 100);
@@ -2135,10 +2142,14 @@ void test_ignore_sustain_pedal(
     synth_2.process_messages();
 
     synth_1.note_handling.set_value(ref_note_handling);
+    synth_2.note_handling.set_value(note_handling);
+
+    SignalProducer::produce<Synth>(synth_1, 0);
+    SignalProducer::produce<Synth>(synth_2, 0);
+
     synth_1.note_on(0.0, 1, Midi::NOTE_A_0, 100);
     synth_1.note_off(0.5, 1, Midi::NOTE_A_0, 100);
 
-    synth_2.note_handling.set_value(note_handling);
     synth_2.note_on(0.0, 1, Midi::NOTE_A_0, 100);
     synth_2.control_change(0.2, 1, Midi::SUSTAIN_PEDAL, 127);
     assert_eq(
@@ -3293,5 +3304,103 @@ TEST(when_toggle_params_are_changed_then_related_param_ratios_are_updated, {
         Synth::ParamId::L8FRQ,
         0.5,
         0.913467
+    );
+})
+
+
+TEST(when_note_handling_changes_then_voice_states_are_cleared, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 1000.0;
+    constexpr Seconds hold_time = (Number)(block_size - 1) / sample_rate;
+
+    Synth synth;
+    SumOfSines expected(
+        1.0, 110.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    assign_controller(
+        synth, Synth::ParamId::MAMP, Synth::ControllerId::ENVELOPE_1
+    );
+    assign_controller(
+        synth, Synth::ParamId::CAMP, Synth::ControllerId::ENVELOPE_1
+    );
+
+    synth.process_messages();
+
+    /*
+    Notes will play at full volume on both channels, and decay precisely between
+    the last sample of the current block and the first sample of the next one.
+    */
+    synth.envelopes[0]->attack_time.set_value(0.0);
+    synth.envelopes[0]->hold_time.set_value(hold_time);
+    synth.envelopes[0]->decay_time.set_value(
+        synth.envelopes[0]->decay_time.get_min_value()
+    );
+    synth.envelopes[0]->sustain_value.set_value(0.0);
+
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+    synth.modulator_params.panning.set_value(-1.0);
+
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+    synth.carrier_params.panning.set_value(1.0);
+
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLY_RETRIGGER_HOLD);
+    SignalProducer::produce<Synth>(synth, 0);
+
+    synth.note_on(0.000, 0, Midi::NOTE_A_2, 127);
+    synth.note_off(0.001, 0, Midi::NOTE_A_2, 127);
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 1);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 1);
+
+    assert_eq(
+        expected_samples[0],
+        rendered_samples[0],
+        block_size,
+        DOUBLE_DELTA,
+        "round=1, channel=0"
+    );
+    assert_eq(
+        expected_samples[1],
+        rendered_samples[1],
+        block_size,
+        DOUBLE_DELTA,
+        "round=1, channel=1"
+    );
+
+    synth.note_handling.set_value(Synth::NOTE_HANDLING_POLY_HOLD);
+    SignalProducer::produce<Synth>(synth, 2);
+
+    synth.note_on(0.000, 0, Midi::NOTE_A_2, 127);
+    synth.note_off(0.001, 0, Midi::NOTE_A_2, 127);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 3);
+
+    assert_eq(
+        expected_samples[0],
+        rendered_samples[0],
+        block_size,
+        DOUBLE_DELTA,
+        "round=3, channel=0"
+    );
+    assert_eq(
+        expected_samples[1],
+        rendered_samples[1],
+        block_size,
+        DOUBLE_DELTA,
+        "round=3, channel=1"
     );
 })
