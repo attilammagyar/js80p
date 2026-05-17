@@ -3292,11 +3292,8 @@ void Synth::handle_clear() noexcept
 {
     constexpr Byte no_controller = (Byte)ControllerId::NONE;
 
-    reset();
-    start_lfos();
-
-    clear_midi_note_to_voice_assignments();
-    clear_sustain();
+    suspend();
+    resume();
 
     for (int i = 0; i != ParamId::PARAM_ID_COUNT; ++i) {
         ParamId const param_id = (ParamId)i;

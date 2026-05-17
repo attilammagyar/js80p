@@ -3404,3 +3404,95 @@ TEST(when_note_handling_changes_then_voice_states_are_cleared, {
         "round=3, channel=1"
     );
 })
+
+
+void set_up_envelope_with_highest_note_update_mode(Synth& synth)
+{
+    assign_controller(
+        synth, Synth::ParamId::MAMP, Synth::ControllerId::ENVELOPE_1
+    );
+    assign_controller(
+        synth, Synth::ParamId::CAMP, Synth::ControllerId::ENVELOPE_1
+    );
+
+    synth.process_messages();
+
+    synth.envelopes[0]->update_mode.set_value(
+        Envelope::UPDATE_MODE_DYNAMIC_HIGHEST
+    );
+    synth.envelopes[0]->attack_time.set_value(0.0);
+    synth.envelopes[0]->sustain_value.set_value(1.0);
+
+    synth.modulator_params.volume.set_value(1.0);
+    synth.modulator_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.modulator_params.width.set_value(0.0);
+    synth.modulator_params.panning.set_value(-1.0);
+
+    synth.carrier_params.volume.set_value(1.0);
+    synth.carrier_params.waveform.set_value(SimpleOscillator::SINE);
+    synth.carrier_params.width.set_value(0.0);
+    synth.carrier_params.panning.set_value(1.0);
+}
+
+
+TEST(clearing_the_settings_clears_note_states, {
+    constexpr Integer block_size = 2048;
+    constexpr Frequency sample_rate = 1000.0;
+
+    Synth synth;
+    SumOfSines expected(
+        1.0, 110.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        synth.get_channels()
+    );
+    Sample const* const* rendered_samples;
+    Sample const* const* expected_samples;
+
+    synth.set_block_size(block_size);
+    synth.set_sample_rate(sample_rate);
+
+    expected.set_block_size(block_size);
+    expected.set_sample_rate(sample_rate);
+
+    set_up_envelope_with_highest_note_update_mode(synth);
+
+    synth.envelopes[0]->scale.set_value(0.5);
+    synth.note_on(0.000, 0, Midi::NOTE_A_2, 127);
+    synth.note_on(0.000, 0, Midi::NOTE_C_5, 127);
+    SignalProducer::produce<Synth>(synth, 999);
+
+    synth.push_message(CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0);
+    SignalProducer::produce<Synth>(synth, 998);
+
+    set_up_envelope_with_highest_note_update_mode(synth);
+    synth.envelopes[0]->scale.set_value(0.5);
+    synth.note_on(0.000, 0, Midi::NOTE_A_2, 127);
+
+    SignalProducer::produce<SumOfSines>(expected, 1, 1);
+    SignalProducer::produce<Synth>(synth, 1, 1);
+
+    synth.envelopes[0]->scale.set_value(1.0);
+
+    /* Skip past envelope update smoothing. */
+    SignalProducer::produce<SumOfSines>(expected, 2);
+    SignalProducer::produce<Synth>(synth, 2);
+
+    expected_samples = SignalProducer::produce<SumOfSines>(expected, 3);
+    rendered_samples = SignalProducer::produce<Synth>(synth, 3);
+
+    assert_eq(
+        expected_samples[0],
+        rendered_samples[0],
+        block_size,
+        DOUBLE_DELTA,
+        "round=3, channel=0"
+    );
+    assert_eq(
+        expected_samples[1],
+        rendered_samples[1],
+        block_size,
+        DOUBLE_DELTA,
+        "round=3, channel=1"
+    );
+})
