@@ -1526,6 +1526,7 @@ void Synth::stop_lfos() noexcept
         lfos_rw[i]->stop(0.0);
     }
 
+    effects.tape_params.stop_lfos(0.0);
     effects.chorus.stop_lfos(0.0);
 }
 
