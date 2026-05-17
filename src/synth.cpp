@@ -2597,13 +2597,8 @@ void Synth::all_notes_off(
         }
     }
 
-    for (Midi::Channel channel_ = 0; channel_ != Midi::CHANNELS; ++channel_) {
-        for (Midi::Note note = 0; note != Midi::NOTES; ++note) {
-            midi_note_to_voice_assignments[channel_][note] = INVALID_VOICE;
-        }
-    }
-
     clear_note_stack();
+    clear_midi_note_to_voice_assignments();
 }
 
 
