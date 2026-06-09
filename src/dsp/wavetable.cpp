@@ -400,9 +400,9 @@ void Wavetable::interpolate_sample_linear(
     constexpr Integer mask = get_index_mask<with_subharmonic>();
 
     /*
-    Not using Math::lookup_periodic() here, because we don't want to calculate
+    Not using Math::lookup_periodic_2() here, because we don't want to calculate
     the weight twice when interpolation between the two tables (fewer and more
-    partials) is needed.
+    partials) is necessary.
     */
     Sample const sample_2_weight = (
         (Sample)(sample_index - std::floor(sample_index))
