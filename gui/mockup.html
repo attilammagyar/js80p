@@ -759,17 +759,21 @@ body.hide-objects #mpe > span {
   content: "";
 }
 
-#export-import {
+#icons {
+  width: 138px;
   height: 50px;
+  margin-left: -3px;
   text-align: center;
+  font-size: 0;
+
 }
 
 svg.icon {
   padding: 0;
   margin: 0;
   border-width: 0;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
 }
 
 .last-tab {
@@ -938,19 +942,78 @@ function make_tabs(active)
     </div>
     <div class="border">
       <div id="main" class="block">
-        <div id="export-import">
-          <svg class="icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <div id="icons">
+          <svg class="icon" viewBox="0 30 500 500" xmlns="http://www.w3.org/2000/svg">
            <g>
             <title>Open</title>
             <path
               d="M50,120 L150,120 L200,170 L380,170 L380,250 M350,450 L50,450 L50,120 M50,450 L150,250 L450,250 L350,450"
               opacity="1"
               stroke-width="50"
-              stroke-linecap="round" stroke-linejoin="round"
-              stroke="#b8b8c0" fill="none"/>
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke="#b8b8c0"
+              fill="none"/>
            </g>
           </svg>
+
           <svg class="icon" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+           <g>
+            <title>Randomize</title>
+            <g transform="translate(1 92) scale(0.63 0.68) skewY(10)">
+             <rect
+               x="55"
+               y="55"
+               width="390"
+               height="390"
+               fill="#b8b8c0"
+               stroke="#b8b8c0"
+               stroke-width="90"
+               stroke-linejoin="round"/>
+             <g fill="#000000" stroke="none">
+              <circle cx="120" cy="120" r="59" />
+              <circle cx="120" cy="250" r="59" />
+              <circle cx="120" cy="380" r="59" />
+              <circle cx="380" cy="120" r="59" />
+              <circle cx="380" cy="250" r="59" />
+              <circle cx="380" cy="380" r="59" />
+             </g>
+            </g>
+            <g transform="translate(185 12) scale(0.63 0.23) skewY(27.5) skewX(-30.3)">
+             <rect
+               x="55"
+               y="55"
+               width="390"
+               height="390"
+               fill="#ccccd8"
+               stroke="#ccccd8"
+               stroke-width="90"
+               stroke-linejoin="round"/>
+             <g fill="#000000" stroke="none">
+              <circle cx="120" cy="120" r="59" />
+              <circle cx="380" cy="380" r="59" />
+             </g>
+            </g>
+            <g transform="translate(316 152) scale(0.367 0.68) skewY(-13.2)">
+             <rect
+               x="55"
+               y="55"
+               width="390"
+               height="390"
+               fill="#9999a0"
+               stroke="#9999a0"
+               stroke-width="90"
+               stroke-linejoin="round"/>
+             <g fill="#000000" stroke="none">
+              <circle cx="120" cy="120" r="59" />
+              <circle cx="250" cy="250" r="59" />
+              <circle cx="380" cy="380" r="59" />
+             </g>
+            </g>
+           </g>
+          </svg>
+
+          <svg class="icon" viewBox="0 30 500 500" xmlns="http://www.w3.org/2000/svg">
            <g>
             <title>Save</title>
             <path
