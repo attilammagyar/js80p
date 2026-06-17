@@ -238,6 +238,9 @@ Features
        * oldest pressed key,
        * lowest pressed key,
        * or highest pressed key.
+ * Highly expressive built-in presets, including classic synth sounds as well
+   as emulations of real instruments.
+ * Random preset generator to help explore the capabilities of JS80P.
  * MIDI learn.
  * Logarithmic or linear scale filter cutoff frequencies.
  * Tempo synchronization for envelopes, LFOs, and effects.
@@ -838,17 +841,26 @@ This tab contains the foundational settings of the sound.
 
 ##### Import Patch, Export Patch
 
-The two icons at the top left corner allow saving and loading synth settings
-(often called "patches" or "presets") as ordinary files, e.g. for transferring
-sounds across projects, different host applications, computers, etc.
+The leftmost and rightmost icons at the top left corner allow loading and
+saving synth settings (often called "patches" or "presets") as ordinary files,
+e.g. for transferring sounds across projects, different host applications,
+computers, etc.
+
+##### Randomize Patch
+
+The dice icon in the middle at the top left corner generates a random synth
+configuration (within reason) and sets up randomized effects and expressions.
+Try playing notes with varying velocities, adjust the modulation wheel or the
+pitch wheel, or use aftertouch (channel pressure) to find out how the sound
+reacts.
 
 <a id="usage-synth-main-nh"></a>
 
 ##### Note Handling
 
-Click on the black bar below the Import Patch and Export Patch icons, or use
-the mouse wheel while holding the mouse cursor over it to change how JS80P
-handles note events. The available options are:
+Click on the black bar below the Import Patch, Randomize Patch, and Export
+Patch icons, or use the mouse wheel while holding the mouse cursor over it to
+change how JS80P handles note events. The available options are:
 
  * **MONO**: monophonic mode, only a single note can be played at a time.
 
