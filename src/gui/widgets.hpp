@@ -94,6 +94,37 @@ class ImportPatchButton : public TransparentWidget
 };
 
 
+class RandomizePatchButton : public TransparentWidget
+{
+    public:
+        RandomizePatchButton(
+            GUI& gui,
+            int const left,
+            int const top,
+            int const width,
+            int const height,
+            Synth& synth,
+            TabBody* const tab_body
+        );
+
+    protected:
+        virtual void click() override;
+
+        virtual bool mouse_move(
+            int const x,
+            int const y,
+            bool const modifier
+        ) override;
+
+        virtual bool mouse_leave(int const x, int const y) override;
+
+    private:
+        TabBody* const tab_body;
+
+        Synth& synth;
+};
+
+
 class ExportPatchButton : public TransparentWidget
 {
     public:

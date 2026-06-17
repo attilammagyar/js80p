@@ -3524,10 +3524,21 @@ void GUI::build_synth_body(
     synth_body->own(
         new ImportPatchButton(
             *this,
-            pos_rel_offset_left + 10,
-            pos_rel_offset_top + 14,
-            60,
-            42,
+            pos_rel_offset_left + 4,
+            pos_rel_offset_top + 5,
+            45,
+            45,
+            synth,
+            synth_body
+        )
+    );
+    synth_body->own(
+        new RandomizePatchButton(
+            *this,
+            pos_rel_offset_left + 49,
+            pos_rel_offset_top + 5,
+            45,
+            45,
             synth,
             synth_body
         )
@@ -3535,10 +3546,10 @@ void GUI::build_synth_body(
     synth_body->own(
         new ExportPatchButton(
             *this,
-            pos_rel_offset_left + 70,
-            pos_rel_offset_top + 14,
-            60,
-            42,
+            pos_rel_offset_left + 94,
+            pos_rel_offset_top + 5,
+            45,
+            45,
             synth
         )
     );

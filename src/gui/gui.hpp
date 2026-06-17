@@ -34,6 +34,7 @@ namespace JS80P
 class Background;
 class ControllerSelector;
 class ExportPatchButton;
+class RandomizePatchButton;
 class ExternallyCreatedWindow;
 class ImportPatchButton;
 class ParamStateImages;
@@ -470,18 +471,17 @@ class WidgetBase
             BACKGROUND = 1 << 0,
             CONTROLLER = 1 << 1,
             CONTROLLER_SELECTOR = 1 << 2,
-            EXPORT_PATCH_BUTTON = 1 << 3,
+            PATCH_ACTION_BUTTON = 1 << 3,
             EXTERNALLY_CREATED_WINDOW = 1 << 4,
-            IMPORT_PATCH_BUTTON = 1 << 5,
-            KNOB = 1 << 6,
-            KNOB_PARAM_EDITOR = 1 << 7,
-            TAB_BODY = 1 << 8,
-            TAB_SELECTOR = 1 << 9,
-            ABOUT_TEXT = 1 << 10,
-            STATUS_LINE = 1 << 11,
-            TOGGLE_SWITCH = 1 << 12,
-            DISCRETE_PARAM_EDITOR = 1 << 13,
-            RESIZER_HANDLE = 1 << 14,
+            KNOB = 1 << 5,
+            KNOB_PARAM_EDITOR = 1 << 6,
+            TAB_BODY = 1 << 7,
+            TAB_SELECTOR = 1 << 8,
+            ABOUT_TEXT = 1 << 9,
+            STATUS_LINE = 1 << 10,
+            TOGGLE_SWITCH = 1 << 11,
+            DISCRETE_PARAM_EDITOR = 1 << 12,
+            RESIZER_HANDLE = 1 << 13,
         };
 
         enum TextAlignment {

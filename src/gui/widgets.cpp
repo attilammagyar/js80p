@@ -73,7 +73,7 @@ ImportPatchButton::ImportPatchButton(
         Synth& synth,
         TabBody* const tab_body
 ) : TransparentWidget(
-        "Import Patch", left, top, width, height, Type::IMPORT_PATCH_BUTTON
+        "Import Patch", left, top, width, height, Type::PATCH_ACTION_BUTTON
     ),
     tab_body(tab_body),
     synth(synth)
@@ -122,6 +122,56 @@ bool ImportPatchButton::mouse_leave(int const x, int const y)
 }
 
 
+RandomizePatchButton::RandomizePatchButton(
+        GUI& gui,
+        int const left,
+        int const top,
+        int const width,
+        int const height,
+        Synth& synth,
+        TabBody* const tab_body
+) : TransparentWidget(
+        "Randomize Patch", left, top, width, height, Type::PATCH_ACTION_BUTTON
+    ),
+    tab_body(tab_body),
+    synth(synth)
+{
+    set_gui(gui);
+}
+
+
+void RandomizePatchButton::click()
+{
+    synth.push_message(
+        Synth::MessageType::RANDOMIZE, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
+    );
+
+    tab_body->stop_editing();
+    tab_body->refresh_all_params();
+}
+
+
+bool RandomizePatchButton::mouse_move(
+        int const x,
+        int const y,
+        bool const modifier
+) {
+    TransparentWidget::mouse_move(x, y, modifier);
+    gui->set_status_line(text);
+
+    return true;
+}
+
+
+bool RandomizePatchButton::mouse_leave(int const x, int const y)
+{
+    TransparentWidget::mouse_leave(x, y);
+    gui->set_status_line("");
+
+    return true;
+}
+
+
 ExportPatchButton::ExportPatchButton(
         GUI& gui,
         int const left,
@@ -130,7 +180,7 @@ ExportPatchButton::ExportPatchButton(
         int const height,
         Synth& synth
 ) : TransparentWidget(
-        "Export Patch", left, top, width, height, Type::EXPORT_PATCH_BUTTON
+        "Export Patch", left, top, width, height, Type::PATCH_ACTION_BUTTON
     ),
     synth(synth)
 {
