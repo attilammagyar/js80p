@@ -108,6 +108,7 @@ class RandomPatchGenerator
         ) noexcept;
 
         void clear_synth_settings() noexcept;
+        void initialize() noexcept;
         void set_up_flags() noexcept;
         void set_up_note_handling() noexcept;
         void set_up_portamento() noexcept;

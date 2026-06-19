@@ -51,8 +51,154 @@ RandomPatchGenerator::RandomPatchGenerator(
         Synth& synth,
         Integer const random_seed
 ) : synth(synth),
-    rng((unsigned int)(random_seed > 0 ? random_seed : -random_seed)),
-    available_macros{
+    rng((unsigned int)(random_seed > 0 ? random_seed : -random_seed))
+{
+}
+
+
+void RandomPatchGenerator::generate() noexcept
+{
+    clear_synth_settings();
+
+    initialize();
+    set_up_flags();
+    set_up_note_handling();
+    set_up_portamento();
+    set_up_amplitude();
+    set_up_modulation();
+    set_up_waveform();
+    set_up_inaccuracy();
+    set_up_detune();
+
+    if (rng.random() < 0.5) {
+        set_up_pitch_wheel_without_vibrato();
+    } else {
+        set_up_vibrato();
+    }
+
+    set_up_waveshaper();
+    set_up_filter();
+    set_up_volume();
+    set_up_panning();
+
+    set_up_fx_distortion();
+    set_up_fx_filter();
+    set_up_fx_tape();
+    set_up_fx_chorus();
+    set_up_fx_echo();
+    set_up_fx_reverb();
+
+    refresh_all_params();
+}
+
+
+void RandomPatchGenerator::set_param_ratio(
+        Synth::ParamId const param_id,
+        Number const ratio
+) noexcept {
+    synth.process_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
+}
+
+
+void RandomPatchGenerator::set_param_ratio_if(
+        bool const condition,
+        Synth::ParamId const param_id,
+        Number const ratio
+) noexcept {
+    if (condition) {
+        set_param_ratio(param_id, ratio);
+    }
+}
+
+
+void RandomPatchGenerator::assign_controller(
+        Synth::ParamId const param_id,
+        Synth::ControllerId const controller_id
+) noexcept {
+    synth.process_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        param_id,
+        0.0,
+        (Byte)controller_id
+    );
+}
+
+
+void RandomPatchGenerator::assign_controller_if(
+        bool const condition,
+        Synth::ParamId const param_id,
+        Synth::ControllerId const controller_id
+) noexcept {
+    if (condition) {
+        assign_controller(param_id, controller_id);
+    }
+}
+
+
+Synth::ControllerId RandomPatchGenerator::pick_random_midi_controller(
+    Number const mod_wheel_probability,
+    Synth::ControllerId const fallback_controller_id
+) noexcept {
+    if (mod_wheel_budget == 0 && channel_pressure_budget == 0) {
+        return fallback_controller_id;
+    }
+
+    if (mod_wheel_budget == 0) {
+        --channel_pressure_budget;
+
+        return Synth::ControllerId::CHANNEL_PRESSURE;
+    }
+
+    if (channel_pressure_budget == 0) {
+        --mod_wheel_budget;
+
+        return Synth::ControllerId::MODULATION_WHEEL;
+    }
+
+    if (rng.random() < mod_wheel_probability) {
+        --mod_wheel_budget;
+
+        return Synth::ControllerId::MODULATION_WHEEL;
+    }
+
+    --channel_pressure_budget;
+
+    return Synth::ControllerId::CHANNEL_PRESSURE;
+}
+
+
+Number RandomPatchGenerator::random_normal_pow(
+        Number const min,
+        Number const max,
+        Number const pow
+) noexcept {
+    Number const raw_number = std::pow(rng.random_normal(), pow);
+
+    return min + raw_number * (max - min);
+}
+
+
+void RandomPatchGenerator::clear_synth_settings() noexcept
+{
+    synth.process_message(
+        Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
+    );
+
+    set_param_ratio(Synth::ParamId::MF1LOG, 1.0);
+    set_param_ratio(Synth::ParamId::MF2LOG, 1.0);
+    set_param_ratio(Synth::ParamId::CF1LOG, 1.0);
+    set_param_ratio(Synth::ParamId::CF2LOG, 1.0);
+    set_param_ratio(Synth::ParamId::EF1LOG, 1.0);
+    set_param_ratio(Synth::ParamId::EF2LOG, 1.0);
+    set_param_ratio(Synth::ParamId::ECLOG, 1.0);
+    set_param_ratio(Synth::ParamId::EELOG, 1.0);
+    set_param_ratio(Synth::ParamId::ERLOG, 1.0);
+}
+
+
+void RandomPatchGenerator::initialize() noexcept
+{
+    available_macros = {
         {
             Synth::ControllerId::MACRO_1,
             Synth::ParamId::M1IN,
@@ -203,8 +349,9 @@ RandomPatchGenerator::RandomPatchGenerator(
             Synth::ParamId::M30IN,
             synth.macros[29]
         },
-    },
-    available_envelopes{
+    };
+
+    available_envelopes = {
         {
             Synth::ControllerId::ENVELOPE_1,
             Synth::ParamId::N1SCL,
@@ -255,31 +402,8 @@ RandomPatchGenerator::RandomPatchGenerator(
             Synth::ParamId::N10SCL,
             synth.envelopes[9]
         },
-    },
-    next_macro(available_macros.begin()),
-    next_envelope(available_envelopes.begin()),
-    no_filter_probability(0.1),
-    mod_wheel_budget(2),
-    channel_pressure_budget(2),
-    is_monophonic(false),
-    is_pluck(false),
-    is_slow_attack(false),
-    is_decaying(false),
-    is_osc_1_active(false),
-    is_osc_2_active(false),
-    is_mix(false),
-    is_pm(false),
-    is_fm(false),
-    is_am(false),
-    is_stereo(false),
-    is_lfo_8_used(false),
-    can_use_reverse_echo(false)
-{
-}
+    };
 
-
-void RandomPatchGenerator::generate() noexcept
-{
     next_macro = available_macros.begin();
     next_envelope = available_envelopes.begin();
 
@@ -287,141 +411,6 @@ void RandomPatchGenerator::generate() noexcept
 
     mod_wheel_budget = 2;
     channel_pressure_budget = 2;
-
-    clear_synth_settings();
-
-    set_up_flags();
-    set_up_note_handling();
-    set_up_portamento();
-    set_up_amplitude();
-    set_up_modulation();
-    set_up_waveform();
-    set_up_inaccuracy();
-    set_up_detune();
-
-    if (rng.random() < 0.5) {
-        set_up_pitch_wheel_without_vibrato();
-    } else {
-        set_up_vibrato();
-    }
-
-    set_up_waveshaper();
-    set_up_filter();
-    set_up_volume();
-    set_up_panning();
-
-    set_up_fx_distortion();
-    set_up_fx_filter();
-    set_up_fx_tape();
-    set_up_fx_chorus();
-    set_up_fx_echo();
-    set_up_fx_reverb();
-
-    refresh_all_params();
-}
-
-
-void RandomPatchGenerator::set_param_ratio(
-        Synth::ParamId const param_id,
-        Number const ratio
-) noexcept {
-    synth.process_message(Synth::MessageType::SET_PARAM, param_id, ratio, 0);
-}
-
-
-void RandomPatchGenerator::set_param_ratio_if(
-        bool const condition,
-        Synth::ParamId const param_id,
-        Number const ratio
-) noexcept {
-    if (condition) {
-        set_param_ratio(param_id, ratio);
-    }
-}
-
-
-void RandomPatchGenerator::assign_controller(
-        Synth::ParamId const param_id,
-        Synth::ControllerId const controller_id
-) noexcept {
-    synth.process_message(
-        Synth::MessageType::ASSIGN_CONTROLLER,
-        param_id,
-        0.0,
-        (Byte)controller_id
-    );
-}
-
-
-void RandomPatchGenerator::assign_controller_if(
-        bool const condition,
-        Synth::ParamId const param_id,
-        Synth::ControllerId const controller_id
-) noexcept {
-    if (condition) {
-        assign_controller(param_id, controller_id);
-    }
-}
-
-
-Synth::ControllerId RandomPatchGenerator::pick_random_midi_controller(
-    Number const mod_wheel_probability,
-    Synth::ControllerId const fallback_controller_id
-) noexcept {
-    if (mod_wheel_budget == 0 && channel_pressure_budget == 0) {
-        return fallback_controller_id;
-    }
-
-    if (mod_wheel_budget == 0) {
-        --channel_pressure_budget;
-
-        return Synth::ControllerId::CHANNEL_PRESSURE;
-    }
-
-    if (channel_pressure_budget == 0) {
-        --mod_wheel_budget;
-
-        return Synth::ControllerId::MODULATION_WHEEL;
-    }
-
-    if (rng.random() < mod_wheel_probability) {
-        --mod_wheel_budget;
-
-        return Synth::ControllerId::MODULATION_WHEEL;
-    }
-
-    --channel_pressure_budget;
-
-    return Synth::ControllerId::CHANNEL_PRESSURE;
-}
-
-
-Number RandomPatchGenerator::random_normal_pow(
-        Number const min,
-        Number const max,
-        Number const pow
-) noexcept {
-    Number const raw_number = std::pow(rng.random_normal(), pow);
-
-    return min + raw_number * (max - min);
-}
-
-
-void RandomPatchGenerator::clear_synth_settings() noexcept
-{
-    synth.process_message(
-        Synth::MessageType::CLEAR, Synth::ParamId::INVALID_PARAM_ID, 0.0, 0
-    );
-
-    set_param_ratio(Synth::ParamId::MF1LOG, 1.0);
-    set_param_ratio(Synth::ParamId::MF2LOG, 1.0);
-    set_param_ratio(Synth::ParamId::CF1LOG, 1.0);
-    set_param_ratio(Synth::ParamId::CF2LOG, 1.0);
-    set_param_ratio(Synth::ParamId::EF1LOG, 1.0);
-    set_param_ratio(Synth::ParamId::EF2LOG, 1.0);
-    set_param_ratio(Synth::ParamId::ECLOG, 1.0);
-    set_param_ratio(Synth::ParamId::EELOG, 1.0);
-    set_param_ratio(Synth::ParamId::ERLOG, 1.0);
 }
 
 
