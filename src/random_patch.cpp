@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <random>
 
 #include "random_patch.hpp"
 
@@ -47,10 +48,24 @@ Fixed controller allocation:
  * Envelope 12: dummy for making LFO 7 polyphonic
 */
 
+/*
+Only the modulation wheel and the pitch wheel will be used until the presence of
+channel pressure or CC 74 (MPE) is confirmed.
+
+It would be nice to select from any MIDI CC previously used by the user, but
+parameter randomizers (e.g. plugins, FL Studio's built-in randomization menu,
+etc.) could generate false positives which would confuse expression
+randomization. By sticking to just a few very common controls, we won't make
+huge mistakes even if the confirmation is based on bad data.
+*/
 RandomPatchGenerator::RandomPatchGenerator(
         Synth& synth,
-        Integer const random_seed
-) : synth(synth),
+        Integer const random_seed,
+        bool const has_cc_74,
+        bool const has_channel_pressure
+) : has_cc_74(has_cc_74),
+    has_channel_pressure(has_channel_pressure),
+    synth(synth),
     rng((unsigned int)(random_seed > 0 ? random_seed : -random_seed))
 {
 }
@@ -139,31 +154,21 @@ Synth::ControllerId RandomPatchGenerator::pick_random_midi_controller(
     Number const mod_wheel_probability,
     Synth::ControllerId const fallback_controller_id
 ) noexcept {
-    if (mod_wheel_budget == 0 && channel_pressure_budget == 0) {
+    if (mod_wheel_budget > 0 && rng.random() < mod_wheel_probability) {
+        --mod_wheel_budget;
+
+        return Synth::ControllerId::MODULATION_WHEEL;
+    }
+
+    if (available_midi_controllers.empty()) {
         return fallback_controller_id;
     }
 
-    if (mod_wheel_budget == 0) {
-        --channel_pressure_budget;
+    Synth::ControllerId const controller_id = available_midi_controllers.back();
 
-        return Synth::ControllerId::CHANNEL_PRESSURE;
-    }
+    available_midi_controllers.pop_back();
 
-    if (channel_pressure_budget == 0) {
-        --mod_wheel_budget;
-
-        return Synth::ControllerId::MODULATION_WHEEL;
-    }
-
-    if (rng.random() < mod_wheel_probability) {
-        --mod_wheel_budget;
-
-        return Synth::ControllerId::MODULATION_WHEEL;
-    }
-
-    --channel_pressure_budget;
-
-    return Synth::ControllerId::CHANNEL_PRESSURE;
+    return controller_id;
 }
 
 
@@ -198,6 +203,30 @@ void RandomPatchGenerator::clear_synth_settings() noexcept
 
 void RandomPatchGenerator::initialize() noexcept
 {
+    available_midi_controllers = {};
+
+    if (has_channel_pressure) {
+        available_midi_controllers.push_back(
+            Synth::ControllerId::CHANNEL_PRESSURE
+        );
+        available_midi_controllers.push_back(
+            Synth::ControllerId::CHANNEL_PRESSURE
+        );
+    }
+
+    if (has_cc_74) {
+        available_midi_controllers.push_back(Synth::ControllerId::SOUND_5);
+        available_midi_controllers.push_back(Synth::ControllerId::SOUND_5);
+    }
+
+    if (available_midi_controllers.size() > 2) {
+        std::shuffle(
+            available_midi_controllers.begin(),
+            available_midi_controllers.end(),
+            std::mt19937((int)(rng.random() * 1000000.0))
+        );
+    }
+
     available_macros = {
         {
             Synth::ControllerId::MACRO_1,
@@ -410,7 +439,6 @@ void RandomPatchGenerator::initialize() noexcept
     no_filter_probability = 0.1;
 
     mod_wheel_budget = 2;
-    channel_pressure_budget = 2;
 }
 
 

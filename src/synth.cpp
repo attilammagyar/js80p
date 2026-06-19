@@ -296,6 +296,8 @@ Synth::Synth(Integer const samples_between_gc) noexcept
     is_sustain_pedal_on(false),
     is_holding_(false),
     is_dirty_(false),
+    has_cc_74(false),
+    has_channel_pressure(false),
     effects(
         "E",
         bus,
@@ -2149,6 +2151,8 @@ void Synth::channel_pressure(
         return;
     }
 
+    has_channel_pressure = true;
+
     Midi::Channel const mpe_channel = map_mpe_channel(channel);
 
     if (mpe_channel == Midi::INVALID_CHANNEL) {
@@ -2320,6 +2324,8 @@ void Synth::control_change(
     ) {
         return;
     }
+
+    has_cc_74 = has_cc_74 || controller == Midi::SOUND_5;
 
     Midi::Channel const mpe_channel = map_mpe_channel(channel);
 
@@ -3330,7 +3336,9 @@ void Synth::handle_randomize() noexcept
         ^ (Integer)(rng.random() * 71993.0)
     );
 
-    RandomPatchGenerator random_patch_generator(*this, random_seed);
+    RandomPatchGenerator random_patch_generator(
+        *this, random_seed, has_cc_74, has_channel_pressure
+    );
 
     random_patch_generator.generate();
 }

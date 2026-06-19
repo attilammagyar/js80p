@@ -3498,10 +3498,14 @@ TEST(clearing_the_settings_clears_note_states, {
 })
 
 
+typedef std::vector<bool>::size_type BoolVectorSize;
+
+
 void compute_patch_statistics(
         Synth const& synth,
         Math::Statistics& statistics,
-        Number& changed_param_count
+        Number& changed_param_count,
+        std::vector<bool>& midi_controller_usage
 ) {
     std::vector<Number> patch;
 
@@ -3531,6 +3535,16 @@ void compute_patch_statistics(
                 (Number)controller_id
                 / (Number)Synth::ControllerId::CONTROLLER_ID_COUNT
             );
+
+            bool const is_midi_controller = (
+                controller_id <= (Synth::ControllerId)Midi::MAX_CONTROLLER_ID
+                || controller_id == Synth::ControllerId::PITCH_WHEEL
+                || controller_id == Synth::ControllerId::CHANNEL_PRESSURE
+            );
+
+            if (is_midi_controller) {
+                midi_controller_usage[(BoolVectorSize)controller_id] = true;
+            }
         }
     }
 
@@ -3539,11 +3553,54 @@ void compute_patch_statistics(
 }
 
 
+void assert_midi_controller_usage(
+        std::vector<Synth::ControllerId> const& expected_midi_controller_usage,
+        std::vector<bool> const& actual_midi_controller_usage
+) {
+    std::vector<bool> expectation(
+        Synth::ControllerId::CONTROLLER_ID_COUNT, false
+    );
+
+    for (
+            std::vector<Synth::ControllerId>::const_iterator it = (
+                expected_midi_controller_usage.begin()
+            );
+            it != expected_midi_controller_usage.end();
+            ++it
+    ) {
+        Synth::ControllerId const controller_id = *it;
+
+        expectation[(BoolVectorSize)controller_id] = true;
+    }
+
+    for (
+            BoolVectorSize i = (BoolVectorSize)Synth::ControllerId::NONE;
+            i != (BoolVectorSize)Synth::ControllerId::CONTROLLER_ID_COUNT;
+            ++i
+    ) {
+        assert_eq(
+            expectation[i],
+            actual_midi_controller_usage[i],
+            "Expected MIDI controller %s; controller_id=%d",
+            (
+                expectation[i]
+                    ? "to be used at least once"
+                    : "never to be used"
+            ),
+            (int)i
+        );
+    }
+}
+
+
 TEST(randomized_patches_vary_parameter_values_and_controller_assignments, {
     Synth synth;
     std::vector<Number> means;
     std::vector<Number> standard_deviations;
     std::vector<Number> changed_param_counts;
+    std::vector<bool> midi_controller_usage(
+        Synth::ControllerId::CONTROLLER_ID_COUNT, false
+    );
     Math::Statistics means_statistics;
     Math::Statistics standard_deviations_statistics;
     Math::Statistics changed_param_counts_statistics;
@@ -3559,7 +3616,9 @@ TEST(randomized_patches_vary_parameter_values_and_controller_assignments, {
             0
         );
 
-        compute_patch_statistics(synth, statistics, changed_param_count);
+        compute_patch_statistics(
+            synth, statistics, changed_param_count, midi_controller_usage
+        );
 
         assert_true(statistics.is_valid);
 
@@ -3586,4 +3645,96 @@ TEST(randomized_patches_vary_parameter_values_and_controller_assignments, {
     assert_gt(standard_deviations_statistics.mean, 0.150);
     assert_gt(standard_deviations_statistics.standard_deviation, 0.005);
     assert_gt(changed_param_counts_statistics.standard_deviation, 10.0);
+
+    assert_midi_controller_usage(
+        {
+            Synth::ControllerId::MODULATION_WHEEL,
+            Synth::ControllerId::PITCH_WHEEL,
+        },
+        midi_controller_usage
+    );
+})
+
+
+TEST(randomized_patches_use_cc_74_and_channel_pressure_if_present, {
+    Synth synth;
+    Math::Statistics statistics;
+    Number changed_param_count;
+    std::vector<bool> midi_controller_usage_1(
+        Synth::ControllerId::CONTROLLER_ID_COUNT, false
+    );
+    std::vector<bool> midi_controller_usage_2(
+        Synth::ControllerId::CONTROLLER_ID_COUNT, false
+    );
+    std::vector<bool> midi_controller_usage_3(
+        Synth::ControllerId::CONTROLLER_ID_COUNT, false
+    );
+
+    for (Integer i = 0; i != 30; ++i) {
+        synth.process_message(
+            Synth::MessageType::RANDOMIZE,
+            Synth::ParamId::INVALID_PARAM_ID,
+            0.0,
+            0
+        );
+        compute_patch_statistics(
+            synth, statistics, changed_param_count, midi_controller_usage_1
+        );
+        synth.generate_samples(i, 2);
+    }
+
+    synth.control_change(0.0, 0, Midi::SOUND_5, 123);
+
+    for (Integer i = 0; i != 30; ++i) {
+        synth.process_message(
+            Synth::MessageType::RANDOMIZE,
+            Synth::ParamId::INVALID_PARAM_ID,
+            0.0,
+            0
+        );
+        compute_patch_statistics(
+            synth, statistics, changed_param_count, midi_controller_usage_2
+        );
+        synth.generate_samples(i, 2);
+    }
+
+    synth.channel_pressure(0.0, 0, 123);
+
+    for (Integer i = 0; i != 30; ++i) {
+        synth.process_message(
+            Synth::MessageType::RANDOMIZE,
+            Synth::ParamId::INVALID_PARAM_ID,
+            0.0,
+            0
+        );
+        compute_patch_statistics(
+            synth, statistics, changed_param_count, midi_controller_usage_3
+        );
+        synth.generate_samples(i, 2);
+    }
+
+    assert_midi_controller_usage(
+        {
+            Synth::ControllerId::MODULATION_WHEEL,
+            Synth::ControllerId::PITCH_WHEEL,
+        },
+        midi_controller_usage_1
+    );
+    assert_midi_controller_usage(
+        {
+            Synth::ControllerId::MODULATION_WHEEL,
+            Synth::ControllerId::PITCH_WHEEL,
+            Synth::ControllerId::SOUND_5,
+        },
+        midi_controller_usage_2
+    );
+    assert_midi_controller_usage(
+        {
+            Synth::ControllerId::MODULATION_WHEEL,
+            Synth::ControllerId::PITCH_WHEEL,
+            Synth::ControllerId::SOUND_5,
+            Synth::ControllerId::CHANNEL_PRESSURE,
+        },
+        midi_controller_usage_3
+    );
 })

@@ -2005,11 +2005,13 @@ class Synth : public Midi::EventHandler, public SignalProducer
         Integer next_note_id;
         Midi::Note previous_note;
         Byte previous_note_handling;
-        bool is_learning;
-        bool is_sustain_pedal_on;
-        bool is_holding_;
-        bool is_dirty_;
         std::atomic<bool> is_mts_esp_connected_;
+        bool is_learning:1;
+        bool is_sustain_pedal_on:1;
+        bool is_holding_:1;
+        bool is_dirty_:1;
+        bool has_cc_74:1;
+        bool has_channel_pressure:1;
 
     public:
         Effects::Effects<Bus> effects;

@@ -41,7 +41,12 @@ class Synth;
 class RandomPatchGenerator
 {
     public:
-        RandomPatchGenerator(Synth& synth, Integer const random_seed);
+        RandomPatchGenerator(
+            Synth& synth,
+            Integer const random_seed,
+            bool const has_cc_74,
+            bool const has_channel_pressure
+        );
 
         void generate() noexcept;
 
@@ -64,6 +69,7 @@ class RandomPatchGenerator
             Envelope*
         > EnvelopeDescriptor;
 
+        typedef std::vector<Synth::ControllerId> MidiControllers;
         typedef std::vector<MacroDescriptor> MacroDescriptors;
         typedef std::vector<LFODescriptor> LFODescriptors;
         typedef std::vector<EnvelopeDescriptor> EnvelopeDescriptors;
@@ -173,15 +179,18 @@ class RandomPatchGenerator
 
         void refresh_all_params() const noexcept;
 
+        bool const has_cc_74:1;
+        bool const has_channel_pressure:1;
+
         Synth& synth;
         Math::RNG rng;
+        MidiControllers available_midi_controllers;
         MacroDescriptors available_macros;
         EnvelopeDescriptors available_envelopes;
         MacroDescriptors::const_iterator next_macro;
         EnvelopeDescriptors::const_iterator next_envelope;
         Number no_filter_probability;
         Integer mod_wheel_budget;
-        Integer channel_pressure_budget;
 
         bool is_monophonic:1;
         bool is_pluck:1;
