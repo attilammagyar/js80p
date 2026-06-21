@@ -145,6 +145,7 @@ Table of Contents
     * [Chiptune](#preset-chiptune)
     * [Octave Bass](#preset-octave-bass)
     * [Tremolo PWM Bass](#preset-tremolo-pwm-bass)
+    * [Handpan](#preset-handpan)
  * [Bugs](#bugs)
  * [Frequently Asked Questions](#faq)
     * [Why do you say FST instead of VST 2?](#faq-fst)
@@ -2958,6 +2959,13 @@ effect, while aftertouch brightens the sound and shortens the notes.
 Ever evolving pulse width modulated bass sound. The mod wheel adds a tremolo
 effect, aftertouch slightly brightens and emphasizes the sound while also
 adjusting the tremolo's timing.
+
+<a id="preset-handpan"></a>
+
+### Handpan
+
+Evoke the ethereal, almost hypnotic mood of various handpan or steelpan like
+instruments. Use the modulation wheel to control the amount of ambience.
 
 <a href="#toc">Table of Contents</a>
 
