@@ -850,7 +850,7 @@ computers, etc.
 
 The dice icon in the middle at the top left corner generates a random synth
 configuration (within reason) and sets up randomized effects and expressions.
-Try playing notes with varying velocities, adjust the modulation wheel or the
+Try playing notes with varying velocities, turn the modulation wheel or the
 pitch wheel, or use aftertouch (channel pressure) to find out how the sound
 reacts.
 
