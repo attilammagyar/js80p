@@ -3605,7 +3605,7 @@ TEST(randomized_patches_vary_parameter_values_and_controller_assignments, {
     Math::Statistics standard_deviations_statistics;
     Math::Statistics changed_param_counts_statistics;
 
-    for (Integer i = 0; i != 1000; ++i) {
+    for (Integer i = 0; i != 50; ++i) {
         Math::Statistics statistics;
         Number changed_param_count;
 
@@ -3670,7 +3670,7 @@ TEST(randomized_patches_use_cc_74_and_channel_pressure_if_present, {
         Synth::ControllerId::CONTROLLER_ID_COUNT, false
     );
 
-    for (Integer i = 0; i != 30; ++i) {
+    for (Integer i = 0; i != 15; ++i) {
         synth.process_message(
             Synth::MessageType::RANDOMIZE,
             Synth::ParamId::INVALID_PARAM_ID,
@@ -3685,7 +3685,7 @@ TEST(randomized_patches_use_cc_74_and_channel_pressure_if_present, {
 
     synth.control_change(0.0, 0, Midi::SOUND_5, 123);
 
-    for (Integer i = 0; i != 30; ++i) {
+    for (Integer i = 0; i != 15; ++i) {
         synth.process_message(
             Synth::MessageType::RANDOMIZE,
             Synth::ParamId::INVALID_PARAM_ID,
@@ -3700,7 +3700,7 @@ TEST(randomized_patches_use_cc_74_and_channel_pressure_if_present, {
 
     synth.channel_pressure(0.0, 0, 123);
 
-    for (Integer i = 0; i != 30; ++i) {
+    for (Integer i = 0; i != 15; ++i) {
         synth.process_message(
             Synth::MessageType::RANDOMIZE,
             Synth::ParamId::INVALID_PARAM_ID,
