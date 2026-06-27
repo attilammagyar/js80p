@@ -1,3 +1,7 @@
+v4.1.0 (2026-06-27)
+ * A random preset generator has been added to help explore the sounds of
+   JS80P.
+
 v4.0.2 (2026-05-18)
  * Various small CPU usage optimizations were done.
  * Bugfix: using the 10th harmonic of the Custom waveform could cause unwanted
