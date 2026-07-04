@@ -82,7 +82,7 @@ class Serializer
             std::string const& serialized
         ) noexcept;
 
-        static void trim_excess_zeros_from_end_after_snprintf(
+        static void trim_excess_zeros_from_end(
             char* const number,
             int const length,
             size_t const max_length

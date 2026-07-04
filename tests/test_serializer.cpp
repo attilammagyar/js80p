@@ -479,9 +479,7 @@ void assert_trimmed(char const* const expected, char const* const raw_number)
     char buffer[buffer_size];
     int const length = snprintf(buffer, buffer_size, "%s", raw_number);
 
-    Serializer::trim_excess_zeros_from_end_after_snprintf(
-        buffer, length, buffer_size
-    );
+    Serializer::trim_excess_zeros_from_end(buffer, length, buffer_size);
     assert_eq(expected, buffer);
 
     if (strncmp(expected, raw_number, buffer_size) != 0) {
@@ -491,16 +489,12 @@ void assert_trimmed(char const* const expected, char const* const raw_number)
         );
         buffer[terminating_zero] = '0';
         buffer[buffer_size - 1] = '\x00';
-        Serializer::trim_excess_zeros_from_end_after_snprintf(
-            buffer, 12345, buffer_size
-        );
+        Serializer::trim_excess_zeros_from_end(buffer, 12345, buffer_size);
         assert_eq(expected, buffer);
     }
 
     snprintf(buffer, buffer_size, "000");
-    Serializer::trim_excess_zeros_from_end_after_snprintf(
-        buffer, -1, buffer_size
-    );
+    Serializer::trim_excess_zeros_from_end(buffer, -1, buffer_size);
     assert_eq("000", buffer);
 }
 

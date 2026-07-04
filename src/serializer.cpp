@@ -39,9 +39,10 @@ std::string const Serializer::LINE_END = "\r\n";
 
 std::string Serializer::serialize(Synth const& synth) noexcept
 {
-    constexpr size_t line_size = 128;
-    char line[line_size];
+    constexpr size_t line_size = 127;
+    char line[line_size + 1];
     std::string serialized("");
+    int length;
 
     serialized.reserve(MAX_SIZE);
     serialized += "[";
@@ -53,54 +54,53 @@ std::string Serializer::serialize(Synth const& synth) noexcept
         Synth::ParamId const param_id = (Synth::ParamId)i;
         std::string const param_name = synth.get_param_name(param_id);
 
-        if (param_name.length() > 0) {
-            Synth::ControllerId const controller_id = (
-                synth.get_param_controller_id_atomic(param_id)
+        if (param_name.length() < 1) {
+            continue;
+        }
+
+        Synth::ControllerId const controller_id = (
+            synth.get_param_controller_id_atomic(param_id)
+        );
+
+        if (controller_id == Synth::ControllerId::NONE) {
+            Number const set_ratio = synth.get_param_ratio_atomic(param_id);
+            Number const default_ratio = (
+                synth.get_param_default_ratio(param_id)
             );
 
-            if (controller_id == Synth::ControllerId::NONE) {
-                Number const set_ratio = synth.get_param_ratio_atomic(param_id);
-                Number const default_ratio = (
-                    synth.get_param_default_ratio(param_id)
-                );
-
-                if (std::fabs(default_ratio - set_ratio) > 0.000001) {
-                    int const length = snprintf(
-                        line,
-                        line_size,
-                        "%s = %.15f",
-                        param_name.c_str(),
-                        set_ratio
-                    );
-                    trim_excess_zeros_from_end_after_snprintf(
-                        line, length, line_size
-                    );
-                    serialized += line;
-                    serialized += LINE_END;
-                }
-            } else {
-                int const length = snprintf(
-                    line,
-                    line_size,
-                    "%s%s = %.15f",
-                    param_name.c_str(),
-                    CONTROLLER_SUFFIX.c_str(),
-                    controller_id_to_float(controller_id)
-                );
-                trim_excess_zeros_from_end_after_snprintf(
-                    line, length, line_size
-                );
-                serialized += line;
-                serialized += LINE_END;
+            if (std::fabs(default_ratio - set_ratio) <= 0.000001) {
+                continue;
             }
+
+            length = snprintf(
+                line,
+                line_size,
+                "%s = %.15f",
+                param_name.c_str(),
+                set_ratio
+            );
+        } else {
+            length = snprintf(
+                line,
+                line_size,
+                "%s%s = %.15f",
+                param_name.c_str(),
+                CONTROLLER_SUFFIX.c_str(),
+                controller_id_to_float(controller_id)
+            );
         }
+
+        trim_excess_zeros_from_end(line, length, line_size);
+        line[line_size] = '\x00';
+        serialized += line;
+        serialized += LINE_END;
     }
 
     return serialized;
 }
 
 
-void Serializer::trim_excess_zeros_from_end_after_snprintf(
+void Serializer::trim_excess_zeros_from_end(
         char* const number,
         int const length,
         size_t const max_length
