@@ -22,8 +22,9 @@
 #include <algorithm>
 #include <cmath>
 #include <cctype>
-#include <cstdio>
 #include <cstring>
+#include <ios>
+#include <locale>
 #include <sstream>
 
 #include "serializer.hpp"
@@ -42,6 +43,7 @@ std::string Serializer::serialize(Synth const& synth) noexcept
     constexpr size_t line_size = 127;
     char line[line_size + 1];
     std::string serialized("");
+    std::ostringstream oss;
     int length;
 
     serialized.reserve(MAX_SIZE);
@@ -49,6 +51,10 @@ std::string Serializer::serialize(Synth const& synth) noexcept
     serialized += JS80P_SECTION_NAME;
     serialized += "]";
     serialized += LINE_END;
+
+    oss.imbue(std::locale::classic());
+    oss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+    oss.precision(15);
 
     for (int i = 0; i != Synth::ParamId::PARAM_ID_COUNT; ++i) {
         Synth::ParamId const param_id = (Synth::ParamId)i;
@@ -72,21 +78,23 @@ std::string Serializer::serialize(Synth const& synth) noexcept
                 continue;
             }
 
+            oss << set_ratio;
             length = snprintf(
                 line,
                 line_size,
-                "%s = %.15f",
+                "%s = %s",
                 param_name.c_str(),
-                set_ratio
+                oss.str().c_str()
             );
         } else {
+            oss << controller_id_to_float(controller_id);
             length = snprintf(
                 line,
                 line_size,
-                "%s%s = %.15f",
+                "%s%s = %s",
                 param_name.c_str(),
                 CONTROLLER_SUFFIX.c_str(),
-                controller_id_to_float(controller_id)
+                oss.str().c_str()
             );
         }
 
@@ -94,6 +102,9 @@ std::string Serializer::serialize(Synth const& synth) noexcept
         line[line_size] = '\x00';
         serialized += line;
         serialized += LINE_END;
+
+        oss.str("");
+        oss.clear();
     }
 
     return serialized;
@@ -861,6 +872,7 @@ Number Serializer::to_number(std::string const& text) noexcept
     std::istringstream s(text);
     Number n;
 
+    s.imbue(std::locale::classic());
     s >> n;
 
     return n;

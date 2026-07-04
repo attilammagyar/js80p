@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <clocale>
 #include <cstddef>
 #include <cstdio>
 #include <string>
@@ -981,5 +982,113 @@ TEST(old_distortion_types_are_upgraded, {
     );
     assert_value_upgrade(
         "EDT = 1.0", Synth::ParamId::ED2TYP, Distortion::TYPE_DELAY_FEEDBACK
+    );
+})
+
+
+TEST(serialization_is_independent_of_locale, {
+    constexpr char const* decimal_comma_locales[] = {
+        "da_DK.UTF-8",
+        "da_DK.utf8",
+        "da_DK",
+        "da-DK.UTF-8",
+        "da-DK",
+        "Danish_Denmark.1252",
+        "Danish_Denmark.UTF8",
+        "Danish_Denmark",
+        "de_DE.UTF-8",
+        "de_DE.utf8",
+        "de_DE",
+        "de-DE.UTF-8",
+        "de-DE",
+        "en_DK.UTF-8",
+        "en_DK.utf8",
+        "en_DK",
+        "en-DK.UTF-8",
+        "en-DK",
+        "fr_FR.UTF-8",
+        "fr_FR.utf8",
+        "fr_FR",
+        "fr-FR.UTF-8",
+        "fr-FR",
+        "French_France.1252",
+        "French_France.UTF8",
+        "French_France",
+        "German_Germany.1252",
+        "German_Germany.UTF8",
+        "German_Germany",
+        "hu_HU.UTF-8",
+        "hu_HU.utf8",
+        "hu_HU",
+        "hu-HU.UTF-8",
+        "hu-HU",
+        "Hungarian_Hungary.1250",
+        "Hungarian_Hungary",
+        NULL,
+    };
+    Synth synth_1;
+    Synth synth_2;
+    std::string serialized;
+    char const* locale = NULL;
+
+    for (
+            size_t i = 0;
+            decimal_comma_locales[i] != NULL && locale == NULL;
+            ++i
+    ) {
+        locale = setlocale(LC_NUMERIC, decimal_comma_locales[i]);
+    }
+
+    assert_neq(
+        (void const*)locale,
+        NULL,
+        "Unable to find a decimal comma using locale for testing"
+    );
+
+    synth_1.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.123, 0
+    );
+    synth_1.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::CVOL,
+        0.0,
+        Synth::ControllerId::ENVELOPE_3
+    );
+    synth_1.process_messages();
+
+    synth_2.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.42, 0
+    );
+    synth_2.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::CWFM,
+        0.0,
+        Synth::ControllerId::PITCH_WHEEL
+    );
+    synth_2.process_messages();
+
+    serialized = Serializer::serialize(synth_1);
+    Serializer::import_patch_in_audio_thread(synth_2, serialized);
+
+    assert_in("\r\nPM = 0.123", serialized + "; locale=\"" + locale + "\"");
+
+    assert_eq(
+        0.123,
+        synth_2.get_param_ratio_atomic(Synth::ParamId::PM),
+        DOUBLE_DELTA,
+        "locale=\"%s\"",
+        locale
+    );
+    assert_eq(
+        Synth::ControllerId::ENVELOPE_3,
+        synth_2.get_param_controller_id_atomic(Synth::ParamId::CVOL),
+        "locale=\"%s\"",
+        locale
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth_2.get_param_controller_id_atomic(Synth::ParamId::CWFM),
+        "locale=\"%s\"",
+        locale
     );
 })
