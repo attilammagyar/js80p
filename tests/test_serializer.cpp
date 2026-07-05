@@ -1135,3 +1135,51 @@ TEST(can_load_buggy_locale_dependent_serialization, {
         synth.get_param_controller_id_atomic(Synth::ParamId::CWFM)
     );
 })
+
+
+TEST(fuzzing, {
+    Synth synth_1;
+    Synth synth_2;
+    std::string serialized;
+
+    for (int i = 0; i != 20; ++i) {
+        synth_1.process_message(
+            Synth::MessageType::RANDOMIZE,
+            Synth::ParamId::INVALID_PARAM_ID,
+            0.0,
+            0
+        );
+        serialized = Serializer::serialize(synth_1);
+        Serializer::import_patch_in_audio_thread(synth_2, serialized);
+
+        for (int j = 0; j != Synth::ParamId::PARAM_ID_COUNT; ++j) {
+            Synth::ParamId const param_id = (Synth::ParamId)j;
+            Synth::ControllerId const synth_1_controller_id = (
+                synth_1.get_param_controller_id_atomic(param_id)
+            );
+
+            if (synth_1_controller_id == Synth::ControllerId::NONE) {
+                assert_eq(
+                    synth_1.get_param_ratio_atomic(param_id),
+                    synth_2.get_param_ratio_atomic(param_id),
+                    DOUBLE_DELTA,
+                    "i=%d, param_id=%d, synth_1=\"%s\", synth_2=\"%s\"",
+                    i,
+                    (int)param_id,
+                    serialized.c_str(),
+                    Serializer::serialize(synth_2).c_str()
+                );
+            } else {
+                assert_eq(
+                    (int)synth_1_controller_id,
+                    (int)synth_2.get_param_controller_id_atomic(param_id),
+                    "i=%d, param_id=%d, synth_1=\"%s\", synth_2=\"%s\"",
+                    i,
+                    (int)param_id,
+                    serialized.c_str(),
+                    Serializer::serialize(synth_2).c_str()
+                );
+            }
+        }
+    }
+})
