@@ -1092,3 +1092,46 @@ TEST(serialization_is_independent_of_locale, {
         locale
     );
 })
+
+
+TEST(can_load_buggy_locale_dependent_serialization, {
+    Synth synth;
+
+    synth.push_message(
+        Synth::MessageType::SET_PARAM, Synth::ParamId::PM, 0.42, 0
+    );
+    synth.push_message(
+        Synth::MessageType::ASSIGN_CONTROLLER,
+        Synth::ParamId::CWFM,
+        0.0,
+        Synth::ControllerId::PITCH_WHEEL
+    );
+    synth.process_messages();
+
+    Serializer::import_patch_in_audio_thread(
+        synth,
+        (
+            "[js80p]\n"
+            "PM = 0,42.123\n"           /* ignored due to being invalid */
+            "PM = 0,42,123\n"           /* ignored due to being invalid */
+            "PM = 0,1230\n"
+            "PM = 0,42 123\n"           /* ignored due to being invalid */
+            "CVOLctl = 0,589.43750\n"   /* ignored due to being invalid */
+            "CVOLctl = 0,589,43750\n"   /* ignored due to being invalid */
+            "CVOLctl = 0,589843750\n"
+            "CVOLctl = 0,589 43750\n"   /* ignored due to being invalid */
+        )
+    );
+
+    assert_eq(
+        0.123, synth.get_param_ratio_atomic(Synth::ParamId::PM), DOUBLE_DELTA
+    );
+    assert_eq(
+        Synth::ControllerId::ENVELOPE_3,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CVOL)
+    );
+    assert_eq(
+        Synth::ControllerId::NONE,
+        synth.get_param_controller_id_atomic(Synth::ParamId::CWFM)
+    );
+})
