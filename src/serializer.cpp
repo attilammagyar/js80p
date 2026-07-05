@@ -751,9 +751,7 @@ bool Serializer::skipping_whitespace_or_comment_reaches_the_end(
     }
 
     if (is_comment_leader(*it)) {
-        while (it != end) {
-            ++it;
-        }
+        it = end;
 
         return true;
     }
