@@ -1,3 +1,9 @@
+v4.1.1 (2026-07-05)
+ * Bugfix: resolved an issue that broke state persistence and preset saving in
+   certain DAWs (including Ardour, FL Studio, etc.) when the plugin was used on
+   a system with a non-English locale.
+   (https://github.com/attilammagyar/js80p/issues/46)
+
 v4.1.0 (2026-06-27)
  * A random preset generator has been added to help explore the sounds of
    JS80P.
