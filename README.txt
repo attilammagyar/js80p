@@ -13,7 +13,9 @@ support, and analog imperfection emulation.
 To download JS80P, visit its website at https://attilammagyar.github.io/js80p ,
 or look for the "Releases" section at its GitHub page at
 https://github.com/attilammagyar/js80p . (The source code is also available on
-GitHub under the terms of the GNU General Public License Version 3.)
+GitHub under the terms of the GNU General Public License Version 3. The
+included presets are released under the terms of the CC0 1.0 license, i.e. they
+are in the public domain.)
 
 VST is a registered trademark of Steinberg Media Technologies GmbH.
 

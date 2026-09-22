@@ -20,7 +20,8 @@ or look for the "[Releases](https://github.com/attilammagyar/js80p/releases)"
 section at its GitHub page at
 [https://github.com/attilammagyar/js80p](https://github.com/attilammagyar/js80p).
 (The source code is also available on GitHub under the terms of the GNU General
-Public License Version 3.)
+Public License Version 3. The included presets are released under the terms of
+the CC0 1.0 license, i.e. they are in the public domain.)
 
 See the "[Before Installing: Choosing a Distribution](#install-dist)" section
 below to find out which package you need.
@@ -2462,6 +2463,10 @@ for newly triggered notes.
 
 Presets
 -------
+
+Note: the following presets are released under the terms of the
+[CC0 1.0 license](https://creativecommons.org/publicdomain/zero/1.0/), i.e.
+they are in the public domain.
 
 <a id="preset-blank"></a>
 

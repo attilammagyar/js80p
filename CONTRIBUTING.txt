@@ -40,8 +40,8 @@ Licensing
 
 By submitting a contribution, you certify that the contribution is your
 original work, or that you have the right to submit it under the project's
-license (GPLv3), and that you agree to license your contributions under the
-same terms.
+license (GPLv3 for the source code, CC0 for the built-in presets), and that you
+agree to license your contributions under the same terms.
 
 AI Generated Code
 -----------------

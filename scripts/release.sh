@@ -28,7 +28,8 @@ set -o pipefail
 TARGET_PLATFORMS="x86_64-w64-mingw32:avx x86_64-w64-mingw32:sse2 i686-w64-mingw32:sse2 x86_64-gpp:avx x86_64-gpp:sse2 i686-gpp:sse2 riscv64-gpp:none loongarch64-gpp:lsx"
 MACOS="macos"
 PLUGIN_TYPES="fst vst3"
-TEXT_FILES="CONTRIBUTING.txt LICENSE.txt NEWS.txt README.txt"
+DOC_FILES="CONTRIBUTING.txt LICENSE.txt NEWS.txt README.txt presets/LICENSE.txt"
+TEXT_FILES="$DOC_FILES presets/LICENSE.txt"
 DIST_DIR_BASE="dist"
 README_HTML="$DIST_DIR_BASE/README.html"
 
@@ -447,7 +448,9 @@ finalize_zip()
     log "Copying presets, etc. to $DIST_DIR_BASE/$dist_dir"
 
     cp -v "$README_HTML" "$DIST_DIR_BASE/$dist_dir/"
-    cp -v -r presets "$DIST_DIR_BASE/$dist_dir/"
+
+    mkdir "$DIST_DIR_BASE/$dist_dir/presets"
+    cp -v -r presets/*.js80p "$DIST_DIR_BASE/$dist_dir/presets"
 
     if [[ ! -z "$extra_file" ]]
     then
@@ -462,7 +465,11 @@ finalize_zip()
             convert_text_file "$src_file" "$dst_file"
         done
     else
-        cp -v $TEXT_FILES "$DIST_DIR_BASE/$dist_dir/"
+        for src_file in $TEXT_FILES
+        do
+            dst_file="$DIST_DIR_BASE/$dist_dir/$src_file"
+            cp -v "$src_file" "$dst_file"
+        done
     fi
 
     dist_archive="$dist_dir.zip"
@@ -746,7 +753,7 @@ build_macos_universal_bundle()
     cp -v -r "$template_dir/Contents/Resources"/* "$bundle_dir/Contents/Resources/"
     cp -v -r presets "$bundle_dir/Contents/Resources/"
     cp -v "$README_HTML" "$bundle_dir/Contents/Resources/Documentation/"
-    cp -v $TEXT_FILES "$bundle_dir/Contents/Resources/Documentation/"
+    cp -v $DOC_FILES "$bundle_dir/Contents/Resources/Documentation/"
 
     echo "BNDL????" >"$bundle_dir/Contents/PkgInfo"
 
