@@ -3090,8 +3090,8 @@ void Synth::handle_set_param(
                 all_notes_off(0.0, 0);
             } else {
                 ToggleParamAffectedParams::const_iterator affected = (
-                    toggle_param_affected_params.find(param_id
-                ));
+                    toggle_param_affected_params.find(param_id)
+                );
 
                 if (affected != toggle_param_affected_params.end()) {
                     ParamIds::const_iterator it;
