@@ -30,7 +30,7 @@ SED ?= sed
 CPP_DEV_PLATFORM ?= /usr/bin/g++ \
 	-stdlib=libc++ \
 	-isysroot $(shell xcrun --show-sdk-path) \
-	-mmacos-version-min=10.12
+	-mmacos-version-min=11.0
 CPP_TARGET_PLATFORM ?= $(CPP_DEV_PLATFORM)
 
 CPPCHECK ?= echo Skipping Cppcheck:

@@ -126,9 +126,9 @@ These are the file names that you will find on GitHub on the
 Choosing a Distribution for macOS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The universal packages are built for macOS 11 Big Sur for M1, M2, etc. and
-newer CPUs ("arm64") and for macOS 10.12 Sierra for Intel CPUs ("x86_64" with
-AVX instructions, see https://en.wikipedia.org/wiki/Advanced_Vector_Extensions),
+The universal packages are built for macOS 11 Big Sur or newer, for M1, M2,
+etc. and newer CPUs ("arm64") and for Intel CPUs ("x86_64" with AVX
+instructions, see https://en.wikipedia.org/wiki/Advanced_Vector_Extensions),
 and were tested on macOS 26 Tahoe.
 
 Compiling from source code for older macOS versions and different CPUs might be
@@ -217,9 +217,7 @@ Before Installing: Choosing a Distribution section for more information.)
 Requirements on macOS
 ~~~~~~~~~~~~~~~~~~~~~
 
- * Operating System:
-    * M1, M2, etc. and newer CPUs: macOS 11 Big Sur or newer.
-    * Intel CPUs: macOS 10.12 Sierra or newer.
+ * Operating System: macOS 11 Big Sur or newer.
  * CPU: either M1, M2, or newer, or Intel-based "x86_64" CPUs (with AVX
    support).
 

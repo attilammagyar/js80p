@@ -658,7 +658,7 @@ build_packages_on_macos()
             vst3moduleinfo
 
     SUFFIX=x86_64 \
-        CPP_DEV_PLATFORM="/usr/bin/g++ -target x86_64-apple-macos10.12 -mavx" \
+        CPP_DEV_PLATFORM="/usr/bin/g++ -target x86_64-apple-macos11 -mavx" \
         call_make \
             "macos" "gpp" "none" \
             "$version_str" "$version_dot" "$version_int" "$version_as_file_name" \
