@@ -212,7 +212,7 @@ class Envelope
 
         static bool set_up_next_target(
             EnvelopeSnapshot const& snapshot,
-            Number const last_rendered_value,
+            Number& last_rendered_value,
             Seconds& time,
             EnvelopeStage& stage,
             Number& initial_value,
@@ -223,9 +223,10 @@ class Envelope
             Seconds const sampling_period
         ) noexcept;
 
+        template<bool is_initializing>
         static bool set_up_next_dahds_target(
             EnvelopeSnapshot const& snapshot,
-            Number const last_rendered_value,
+            Number& last_rendered_value,
             Seconds& time,
             EnvelopeStage& stage,
             Number& initial_value,

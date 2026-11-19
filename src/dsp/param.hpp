@@ -243,10 +243,11 @@ typedef Byte EnvelopeShape;
 /* The VST 3 SDK uses a macro named "RELEASE", hence the prefix. */
 enum EnvelopeStage : int {
     ENV_STG_NONE = 0x01,
-    ENV_STG_DAHD = 0x02,
-    ENV_STG_SUSTAIN = 0x04,
-    ENV_STG_RELEASE = 0x08,
-    ENV_STG_RELEASED = 0x10,
+    ENV_STG_INIT = 0x02,
+    ENV_STG_DAHD = 0x04,
+    ENV_STG_SUSTAIN = 0x08,
+    ENV_STG_RELEASE = 0x10,
+    ENV_STG_RELEASED = 0x20,
 };
 
 

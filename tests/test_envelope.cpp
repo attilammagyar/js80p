@@ -701,6 +701,48 @@ void test_envelope_rendering(
 
 
 TEST(envelope_rendering, {
+    test_envelope_rendering<10>(
+        "D initializing at offset from a different value than the initial",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 2.0, 3.0, 2.0, 1.0},
+        0.5,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.000, 0.000, 0.250, 0.500, 0.750,
+            1.000, 1.000, 1.000, 1.000, 1.000,
+        },
+        false
+    );
+    test_envelope_rendering<10>(
+        "DA initializing at offset from a different value than the initial",
+        {0.0, 1.0, 0.5, 0.0},
+        {0.0, 2.0, 3.0, 2.0, 1.0},
+        0.5,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.250, 0.500, 0.750, 1.000, 1.000,
+            1.000, 1.000, 1.000, 1.000, 1.000,
+        },
+        false
+    );
+    test_envelope_rendering<12>(
+        "DAH, initializing at 0",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 2.0, 3.0, 2.0, 1.0},
+        0.0,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.000, 0.000, 0.000, 0.250, 0.500, 0.750,
+            1.000, 1.000, 1.000, 1.000, 1.000, 1.000,
+        },
+        false
+    );
     test_envelope_rendering<12>(
         "DAH, starting at 0",
         {0.0, 1.0, 0.5, 0.0},
@@ -714,6 +756,21 @@ TEST(envelope_rendering, {
             1.000, 1.000, 1.000, 1.000, 1.000, 1.000,
         },
         false
+    );
+    test_envelope_rendering<18>(
+        "DAHDS, initializing at 0",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 2.0, 3.0, 2.0, 1.0},
+        0.0,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.000, 0.000, 0.000, 0.250, 0.500, 0.750,
+            1.000, 1.000, 1.000, 1.000, 1.000, 1.000,
+            1.000, 0.875, 0.750, 0.625, 0.500, 0.500,
+        },
+        true
     );
     test_envelope_rendering<18>(
         "DAHDS, starting at 0",
@@ -731,7 +788,22 @@ TEST(envelope_rendering, {
         true
     );
     test_envelope_rendering<18>(
-        "DAHDS with offset",
+        "DAHDS initializing with offset",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 2.0, 3.0, 2.0, 1.0},
+        0.25,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.0000, 0.0000, 0.1250, 0.3750, 0.6250, 0.8750,
+            1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
+            0.9375, 0.8125, 0.6875, 0.5625, 0.5000, 0.5000,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
+        "DAHDS starting with offset",
         {0.0, 1.0, 0.5, 0.0},
         {1.0, 2.0, 3.0, 2.0, 1.0},
         0.25,
@@ -742,6 +814,34 @@ TEST(envelope_rendering, {
             0.0000, 0.0000, 0.1250, 0.3750, 0.6250, 0.8750,
             1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
             0.9375, 0.8125, 0.6875, 0.5625, 0.5000, 0.5000,
+        },
+        true
+    );
+    test_envelope_rendering<10>(
+        "DAHDS initializing with 0 attack and offset matching the sampling period",
+        {0.0, 1.0, 0.5, 0.0},
+        {0.0, 0.0, 2.5, 2.0, 1.0},
+        0.5,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            1.000, 1.000, 1.000, 1.000, 1.000,
+            0.875, 0.750, 0.625, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<10>(
+        "DAHDS initializing with 0 attack and hold, and offset matching the sampling period",
+        {0.0, 1.0, 0.5, 0.0},
+        {0.0, 0.0, 0.0, 2.0, 1.0},
+        0.5,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+            0.875, 0.750, 0.625, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500,
         },
         true
     );
@@ -820,6 +920,22 @@ TEST(envelope_rendering, {
     );
 
     test_envelope_rendering<18>(
+        "extreme short envelope, initializing at 0, from some value",
+        {0.0, 1.0, 0.5, 0.0},
+        {0.0, 0.0, 0.0, 0.001, 0.0},
+        0.0,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+
+            1.000, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
         "extreme short envelope, starting at 0",
         {0.0, 1.0, 0.5, 0.0},
         {0.0, 0.0, 0.0, 0.001, 0.0},
@@ -830,6 +946,22 @@ TEST(envelope_rendering, {
         {
 
             1.000, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
+        "extreme short envelope with delay, initializing at 0 from some value",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 0.0, 0.0, 0.001, 0.0},
+        0.0,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+
+            0.000, 0.000, 1.000, 0.500, 0.500, 0.500,
             0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
             0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
         },
@@ -852,7 +984,23 @@ TEST(envelope_rendering, {
         true
     );
     test_envelope_rendering<18>(
-        "extreme short envelope with delay, from the middle of delay",
+        "extreme short envelope initializing with delay, from the middle of delay",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 0.0, 0.0, 0.001, 0.0},
+        0.5,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+
+            0.000, 1.000, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
+        "extreme short envelope starting with delay, from the middle of delay",
         {0.0, 1.0, 0.5, 0.0},
         {1.0, 0.0, 0.0, 0.001, 0.0},
         0.5,
@@ -868,7 +1016,23 @@ TEST(envelope_rendering, {
         true
     );
     test_envelope_rendering<18>(
-        "extreme short envelope with delay, from the end of delay",
+        "extreme short envelope initializing with delay, from the end of delay",
+        {0.0, 1.0, 0.5, 0.0},
+        {1.0, 0.0, 0.0, 0.001, 0.0},
+        1.0,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+
+            1.000, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
+        "extreme short envelope starting with delay, from the end of delay",
         {0.0, 1.0, 0.5, 0.0},
         {1.0, 0.0, 0.0, 0.001, 0.0},
         1.0,
@@ -878,6 +1042,22 @@ TEST(envelope_rendering, {
         {
 
             1.000, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
+        },
+        true
+    );
+    test_envelope_rendering<18>(
+        "extreme short envelope initializing with offset already in sustain",
+        {0.0, 1.0, 0.5, 0.0},
+        {0.0, 0.0, 0.0, 0.001, 0.0},
+        0.001,
+        EnvelopeStage::ENV_STG_INIT,
+        0.7,
+        2.0,
+        {
+
+            0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
             0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
             0.500, 0.500, 0.500, 0.500, 0.500, 0.500,
         },
@@ -1075,6 +1255,7 @@ std::string shape_test_array_to_string(
 
 
 void test_envelope_shape(
+        EnvelopeStage const start_stage,
         EnvelopeShape const shape,
         Sample const reference_samples[SHAPE_TEST_SAMPLE_COUNT],
         char const expected_relations[SHAPE_TEST_REL_LENGTH]
@@ -1092,7 +1273,7 @@ void test_envelope_shape(
     char actual_relations[SHAPE_TEST_REL_LENGTH];
     Number last_rendered_value = 0.0;
     Seconds time = 0.0;
-    EnvelopeStage stage = EnvelopeStage::ENV_STG_DAHD;
+    EnvelopeStage stage = start_stage;
 
     std::fill_n(actual_relations, SHAPE_TEST_REL_LENGTH, '\x00');
 
@@ -1130,7 +1311,8 @@ void test_envelope_shape(
     assert_eq(
         expected_relations,
         actual_relations,
-        "shape=%d\n    reference=%s\n     rendered=%s",
+        "start_stage=%d\n    shape=%d\n    reference=%s\n     rendered=%s",
+        (int)start_stage,
         (int)shape,
         shape_test_array_to_string(reference_samples).c_str(),
         shape_test_array_to_string(buffer_1).c_str()
@@ -1160,6 +1342,20 @@ void test_envelope_shape(
         DOUBLE_DELTA,
         "shape=%d",
         (int)shape
+    );
+}
+
+
+void test_envelope_shape(
+        EnvelopeShape const shape,
+        Sample const reference_samples[SHAPE_TEST_SAMPLE_COUNT],
+        char const expected_relations[SHAPE_TEST_REL_LENGTH]
+) {
+    test_envelope_shape(
+        EnvelopeStage::ENV_STG_INIT, shape, reference_samples, expected_relations
+    );
+    test_envelope_shape(
+        EnvelopeStage::ENV_STG_DAHD, shape, reference_samples, expected_relations
     );
 }
 

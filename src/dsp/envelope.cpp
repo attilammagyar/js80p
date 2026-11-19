@@ -68,6 +68,7 @@ Number Envelope::get_value_at_time(
 
     Seconds time_ = time;
     EnvelopeStage stage_ = stage;
+    Number last_rendered_value_ = last_rendered_value;
     Number initial_value;
     Number target_value;
     Seconds time_until_target;
@@ -76,7 +77,7 @@ Number Envelope::get_value_at_time(
 
     bool const becomes_constant = set_up_next_target(
         snapshot,
-        last_rendered_value,
+        last_rendered_value_,
         time_,
         stage_,
         initial_value,
@@ -104,7 +105,7 @@ Number Envelope::get_value_at_time(
             initial_value,
             delta,
             ratio,
-            last_rendered_value,
+            last_rendered_value_,
             target_value,
             duration,
             time_until_target,
@@ -118,7 +119,7 @@ Number Envelope::get_value_at_time(
             initial_value,
             delta,
             ratio,
-            last_rendered_value,
+            last_rendered_value_,
             target_value,
             duration,
             time_until_target,
@@ -158,7 +159,10 @@ void Envelope::set_up_interpolation(
     Seconds const elapsed_time = duration - time_until_target;
 
     if (
-            stage != EnvelopeStage::ENV_STG_DAHD
+            (
+                stage != EnvelopeStage::ENV_STG_INIT
+                && stage != EnvelopeStage::ENV_STG_DAHD
+            )
             || (
                 adjust_initial_value_during_dahds
                 && elapsed_time >= sampling_period
@@ -463,7 +467,7 @@ void Envelope::render_constant(
 
 bool Envelope::set_up_next_target(
         EnvelopeSnapshot const& snapshot,
-        Number const last_rendered_value,
+        Number& last_rendered_value,
         Seconds& time,
         EnvelopeStage& stage,
         Number& initial_value,
@@ -474,8 +478,24 @@ bool Envelope::set_up_next_target(
         Seconds const sampling_period
 ) noexcept {
     switch (stage) {
+        case EnvelopeStage::ENV_STG_INIT:
+            stage = ENV_STG_DAHD;
+
+            return set_up_next_dahds_target<true>(
+                snapshot,
+                last_rendered_value,
+                time,
+                stage,
+                initial_value,
+                target_value,
+                time_until_target,
+                duration,
+                shape,
+                sampling_period
+            );
+
         case EnvelopeStage::ENV_STG_DAHD:
-            return set_up_next_dahds_target(
+            return set_up_next_dahds_target<false>(
                 snapshot,
                 last_rendered_value,
                 time,
@@ -542,9 +562,10 @@ bool Envelope::set_up_next_target(
 }
 
 
+template<bool is_initializing>
 bool Envelope::set_up_next_dahds_target(
         EnvelopeSnapshot const& snapshot,
-        Number const last_rendered_value,
+        Number& last_rendered_value,
         Seconds& time,
         EnvelopeStage& stage,
         Number& initial_value,
@@ -566,6 +587,10 @@ bool Envelope::set_up_next_dahds_target(
         target_value = snapshot.initial_value;
         shape = SHAPE_LINEAR;
 
+        if constexpr (is_initializing) {
+            last_rendered_value = snapshot.initial_value;
+        }
+
         return false;
     }
 
@@ -576,6 +601,10 @@ bool Envelope::set_up_next_dahds_target(
         initial_value = snapshot.initial_value;
         target_value = snapshot.peak_value;
         shape = snapshot.attack_shape;
+
+        if constexpr (is_initializing) {
+            last_rendered_value = snapshot.initial_value;
+        }
 
         return false;
     }
@@ -588,6 +617,10 @@ bool Envelope::set_up_next_dahds_target(
         target_value = snapshot.peak_value;
         shape = SHAPE_LINEAR;
 
+        if constexpr (is_initializing) {
+            last_rendered_value = snapshot.peak_value;
+        }
+
         return false;
     }
 
@@ -599,7 +632,15 @@ bool Envelope::set_up_next_dahds_target(
         initial_value = snapshot.peak_value;
         shape = snapshot.decay_shape;
 
+        if constexpr (is_initializing) {
+            last_rendered_value = snapshot.peak_value;
+        }
+
         return false;
+    }
+
+    if constexpr (is_initializing) {
+        last_rendered_value = snapshot.sustain_value;
     }
 
     initial_value = snapshot.sustain_value;

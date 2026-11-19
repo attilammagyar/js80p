@@ -1472,7 +1472,7 @@ void FloatParam<evaluation>::handle_envelope_start_event(
 
     Seconds const latency = this->current_time - event.time_offset;
 
-    envelope_state->stage = EnvelopeStage::ENV_STG_DAHD;
+    envelope_state->stage = EnvelopeStage::ENV_STG_INIT;
     envelope_state->time = latency;
 
     this->store_new_value(ratio_to_value(snapshot.initial_value));
@@ -1755,7 +1755,7 @@ void FloatParam<evaluation>::handle_lfo_envelope_start_event(
     lfo_envelope_state.snapshot = snapshot;
     lfo_envelope_state.time = latency;
     lfo_envelope_state.value = snapshot.initial_value;
-    lfo_envelope_state.stage = EnvelopeStage::ENV_STG_DAHD;
+    lfo_envelope_state.stage = EnvelopeStage::ENV_STG_INIT;
     lfo_envelope_state.active_snapshot_envelope_index = envelope_index;
     lfo_envelope_state.is_initialized = false;
 }
